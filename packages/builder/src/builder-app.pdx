@@ -1124,6 +1124,9 @@ async function themeListArrived() {
 
 .bar {
     display: flex;
+    /* Wraps instead of spilling: in a narrow window the column is 460px, and a row that does not
+       fit runs under the verdict panel, which paints over it — Measure drawn and unclickable. */
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--pdx-space-md);
     padding: var(--pdx-space-sm) var(--pdx-space-md);
