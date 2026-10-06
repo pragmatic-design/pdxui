@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Error State</h2>
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Payment method" required></pdx-label>
+        <pdx-radio-group error>
+          <pdx-radio label="Credit card" value="card"></pdx-radio>
+          <pdx-radio label="PayPal" value="paypal"></pdx-radio>
+          <pdx-radio label="Bank transfer" value="bank"></pdx-radio>
+        </pdx-radio-group>
+        <span class="pdx-field-error">Please select a payment method</span>
+      </div>
+    </div>
+  </section>
+</template>

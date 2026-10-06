@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Axis Formatting</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Built-in formatters: <code>currency</code>, <code>percent</code>, <code>compact</code>, or template <code>{value}%</code>.</p>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">y-format="currency"</span>
+        <div class="demo-area">
+          <pdx-chart type="bar" :data="lineData" :x-field="'month'" :y-field="'revenue'" :legend="false" :y-format="'currency'" height="200px"></pdx-chart>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">y-format="compact"</span>
+        <div class="demo-area">
+          <pdx-chart type="line" :data="lineData" :x-field="'month'" :y-field="'revenue'" :legend="false" :y-format="'compact'" smooth height="200px"></pdx-chart>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { lineData } from './state.pdx';
+</script>

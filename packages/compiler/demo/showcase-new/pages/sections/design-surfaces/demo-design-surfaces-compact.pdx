@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact Card</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>.pdx-card-compact</code> for reduced padding on all sections.</p>
+
+    <div class="card-demo" style="max-width: 300px;">
+      <div class="pdx-surface-card pdx-card-compact">
+        <div class="pdx-card-header">Compact Header</div>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small">Smaller padding on all sections.</span>
+        </div>
+        <div class="pdx-card-footer">
+          <span class="pdx-txt-caption pdx-ink-muted">Updated 2 hours ago</span>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-surface-card pdx-card-compact"&gt;
+  &lt;div class="pdx-card-header"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-card-footer"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

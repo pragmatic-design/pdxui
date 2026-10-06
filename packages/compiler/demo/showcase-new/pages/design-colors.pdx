@@ -1,0 +1,219 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Colors & Tokens</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Pragmatic CSS color system: OKLCH-based primitives, semantic tokens with automatic dark mode via <code>light-dark()</code>, and utility classes.
+      <strong>CSS only</strong> — toggle dark mode and switch themes above to see live adaptation.
+    </p>
+
+    <!-- ═══ Gray Scale ═══ -->
+    <pdx-demo-design-colors-gray-scale class="demo-section"></pdx-demo-design-colors-gray-scale>
+
+    <!-- ═══ Semantic Surfaces ═══ -->
+    <pdx-demo-design-colors-surfaces class="demo-section"></pdx-demo-design-colors-surfaces>
+
+    <!-- ═══ Text & Ink Colors ═══ -->
+    <pdx-demo-design-colors-text-ink class="demo-section"></pdx-demo-design-colors-text-ink>
+
+    <!-- ═══ Interactive Colors ═══ -->
+    <pdx-demo-design-colors-interactive class="demo-section"></pdx-demo-design-colors-interactive>
+
+    <!-- ═══ Shade Ramps ═══ -->
+    <pdx-demo-design-colors-shade-ramps class="demo-section"></pdx-demo-design-colors-shade-ramps>
+
+    <!-- ═══ Border & Focus ═══ -->
+    <pdx-demo-design-colors-border-focus class="demo-section"></pdx-demo-design-colors-border-focus>
+
+    <!-- ═══ Semantic Ink Applied ═══ -->
+    <pdx-demo-design-colors-ink-applied class="demo-section"></pdx-demo-design-colors-ink-applied>
+
+    <!-- ═══ Dark Mode ═══ -->
+    <pdx-demo-design-colors-dark-mode class="demo-section"></pdx-demo-design-colors-dark-mode>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-colors-composition class="demo-section"></pdx-demo-design-colors-composition>
+
+    <!-- ═══ CSS Variables Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">CSS Variables Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Token</span><span>Category</span><span>Light / Dark</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-gray-{50-950}</code><span>Primitive</span><span>11-step neutral ramp (oklch)</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-hue-primary</code><span>Primitive</span><span>Hue anchor of the primary ramp, per theme</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-bg</code><span>Surface</span><span>gray-50 / gray-950</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-surface</code><span>Surface</span><span>white / gray-900</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-inset</code><span>Surface</span><span>gray-100 / gray-800</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-overlay</code><span>Surface</span><span>white / gray-800</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-text</code><span>Text</span><span>gray-900 / gray-100</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-muted</code><span>Text</span><span>gray-500 / gray-400</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-subtle</code><span>Borders, dividers, decorative icons — never text</span><span>gray-400 / gray-600</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-border</code><span>Border</span><span>gray-200 / gray-700</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-border-strong</code><span>Border</span><span>gray-300 / gray-600</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-primary</code><span>Interactive</span><span>Brand, per theme</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-secondary</code><span>Interactive</span><span>hue 30, inverse brand</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-accent</code><span>Interactive</span><span>Highlight, per theme (base: hue 170)</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-danger</code><span>Feedback</span><span>hue 25, error/delete</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-success</code><span>Feedback</span><span>hue 155, confirmed</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-warning</code><span>Feedback</span><span>hue 85, caution</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-color-info</code><span>Feedback</span><span>hue 220, informational</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-{color}-{50-900}</code><span>Shade ramp</span><span>10-step lightness scale per color</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-focus-ring</code><span>Focus</span><span>3px ring, primary-derived</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-shadow-color</code><span>Elevation</span><span>black/0.08 / black/0.4</span>
+        </div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-xl)">Utility Classes</h3>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class</span><span>Purpose</span><span>Maps to</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-default</code><span>Primary text</span><span>--pdx-color-text</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-muted</code><span>Secondary text</span><span>--pdx-color-muted</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-subtle</code><span>Alias of .pdx-ink-muted</span><span>--pdx-color-muted</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-primary</code><span>Brand text</span><span>--pdx-color-primary</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-secondary</code><span>Inverse brand</span><span>--pdx-color-secondary</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-accent</code><span>Accent text</span><span>--pdx-color-accent</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-danger</code><span>Error text</span><span>--pdx-color-danger</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-success</code><span>Success text</span><span>--pdx-color-success</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-warning</code><span>Warning text</span><span>--pdx-color-warning</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-info</code><span>Info text</span><span>--pdx-color-info</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-inherit</code><span>Inherit parent</span><span>color: inherit</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/colors';
+@title 'Colors & Tokens';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .dark-text { color: var(--pdx-gray-800); }
+  .light-text { color: var(--pdx-gray-100); }
+
+  /* Source block */
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 220px 100px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  /* Shared */
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

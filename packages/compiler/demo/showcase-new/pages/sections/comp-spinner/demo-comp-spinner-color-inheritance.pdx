@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Color Inheritance</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Spinner inherits <code>color</code> from parent via <code>currentColor</code>.</p>
+    <div class="demo-row">
+      <span style="color:var(--pdx-color-primary)"><pdx-spinner size="lg"></pdx-spinner></span>
+      <span style="color:var(--pdx-color-danger)"><pdx-spinner size="lg"></pdx-spinner></span>
+      <span style="color:var(--pdx-color-success)"><pdx-spinner size="lg"></pdx-spinner></span>
+      <span style="color:var(--pdx-color-warning)"><pdx-spinner size="lg"></pdx-spinner></span>
+      <span style="color:var(--pdx-color-accent)"><pdx-spinner size="lg"></pdx-spinner></span>
+    </div>
+  </section>
+</template>

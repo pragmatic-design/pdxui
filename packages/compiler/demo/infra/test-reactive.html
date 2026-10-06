@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Test Reactive Render</title></head>
+<body>
+<div id="result"></div>
+<script type="module">
+import { html, signal, effect } from '@pdxui/core';
+
+const show = signal(false);
+const container = document.getElementById('result');
+
+// Test: html template with only a conditional dynamic block
+const frag = html`${() => show() ? html`<div class="visible">CONTENT VISIBLE</div>` : html`<span class="hidden">hidden</span>`}`;
+container.appendChild(frag);
+
+window.__test = {
+    before: container.innerHTML,
+    show: () => { show.set(true); },
+    getHTML: () => container.innerHTML,
+};
+</script>
+</body>
+</html>

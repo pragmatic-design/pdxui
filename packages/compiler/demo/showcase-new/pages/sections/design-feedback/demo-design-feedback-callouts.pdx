@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Callouts</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Highlighted blocks for tips, info, warnings, and danger notes. Optional title via nested element.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-callout pdx-callout-info">
+        <strong>Note:</strong> This feature requires Node.js 20 or later.
+      </div>
+      <div class="pdx-callout pdx-callout-tip">
+        <strong>Tip:</strong> Use keyboard shortcuts for faster navigation.
+      </div>
+      <div class="pdx-callout pdx-callout-warning">
+        <strong>Warning:</strong> This action will modify your database schema.
+      </div>
+      <div class="pdx-callout pdx-callout-danger">
+        <strong>Danger:</strong> Deleting this resource is irreversible.
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-callout pdx-callout-info"&gt;
+  &lt;strong&gt;Note:&lt;/strong&gt; Requires Node.js 20+.
+&lt;/div&gt;
+&lt;div class="pdx-callout pdx-callout-tip"&gt;...&lt;/div&gt;
+&lt;div class="pdx-callout pdx-callout-warning"&gt;...&lt;/div&gt;
+&lt;div class="pdx-callout pdx-callout-danger"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Resize Control</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>resize</code> prop controls the drag handle: <code>vertical</code> (default), <code>horizontal</code>, <code>both</code>, <code>none</code>.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-textarea placeholder="Vertical resize (default)" resize="vertical" rows="2"></pdx-textarea>
+      <pdx-textarea placeholder="Both directions" resize="both" rows="2"></pdx-textarea>
+      <pdx-textarea placeholder="No resize" resize="none" rows="2"></pdx-textarea>
+    </div>
+  </section>
+</template>

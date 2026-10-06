@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Works With All Inputs</h2>
+    <p class="pdx-txt-small pdx-ink-muted">FormField wraps any input component — the slot-based design is agnostic.</p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="Password" required hint="Min 8 characters">
+        <pdx-input type="password" placeholder="Enter password..."></pdx-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Comments" optional hint="Max 500 characters">
+        <pdx-textarea placeholder="Leave a comment..." showCount maxlength="500" minRows="2" maxRows="6"></pdx-textarea>
+      </pdx-form-field>
+
+      <pdx-form-field label="Website" hint="Include https://">
+        <pdx-input-group>
+          <span class="pdx-input-addon">https://</span>
+          <pdx-input placeholder="example.com"></pdx-input>
+        </pdx-input-group>
+      </pdx-form-field>
+
+      <pdx-form-field label="Notifications">
+        <pdx-switch label="Enable email alerts"></pdx-switch>
+      </pdx-form-field>
+
+      <pdx-form-field label="Role" required>
+        <pdx-radio-group value="editor">
+          <pdx-radio label="Viewer" value="viewer"></pdx-radio>
+          <pdx-radio label="Editor" value="editor"></pdx-radio>
+          <pdx-radio label="Admin" value="admin"></pdx-radio>
+        </pdx-radio-group>
+      </pdx-form-field>
+
+      <pdx-form-field label="Skills" hint="Select all that apply">
+        <pdx-checkbox-group orientation="horizontal" value="js">
+          <pdx-checkbox label="JavaScript" value="js"></pdx-checkbox>
+          <pdx-checkbox label="TypeScript" value="ts"></pdx-checkbox>
+          <pdx-checkbox label="CSS" value="css"></pdx-checkbox>
+          <pdx-checkbox label="Rust" value="rust"></pdx-checkbox>
+        </pdx-checkbox-group>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

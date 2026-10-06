@@ -1,0 +1,65 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Motion</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Duration and easing tokens for consistent transitions.</p>
+
+    <div class="motion-demo">
+      <div class="motion-row">
+        <code class="motion-label">fast</code>
+        <div class="motion-bar fast"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">100ms</span>
+      </div>
+      <div class="motion-row">
+        <code class="motion-label">base</code>
+        <div class="motion-bar base"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">200ms</span>
+      </div>
+      <div class="motion-row">
+        <code class="motion-label">slow</code>
+        <div class="motion-bar slow"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">350ms</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>--pdx-duration-fast: 100ms;
+--pdx-duration-base: 200ms;
+--pdx-duration-slow: 350ms;
+
+--pdx-ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+--pdx-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+--pdx-ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+/* Shorthand: */
+--pdx-transition: var(--pdx-duration) var(--pdx-ease);
+transition: color var(--pdx-transition);</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Motion */
+  .motion-demo { margin-top: var(--pdx-space-md); }
+  .motion-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .motion-label { min-width: 50px; font-size: var(--pdx-text-xs); }
+  .motion-bar {
+    height: 24px;
+    width: 48px;
+    background: var(--pdx-color-primary);
+    border-radius: var(--pdx-radius-sm);
+    transition-property: width;
+    transition-timing-function: var(--pdx-ease-standard);
+    cursor: pointer;
+  }
+  .motion-bar.fast { transition-duration: var(--pdx-duration-fast); }
+  .motion-bar.base { transition-duration: var(--pdx-duration-base); }
+  .motion-bar.slow { transition-duration: var(--pdx-duration-slow); }
+  .motion-bar:hover { width: 200px; }
+</style>

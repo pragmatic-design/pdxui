@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Open by Default</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add the <code>open</code> attribute to expand an item initially.</p>
+
+    <div class="pdx-accordion-group">
+      <details class="pdx-accordion" open>
+        <summary>This section is open by default</summary>
+        <div class="pdx-accordion-body">
+          The native <code>open</code> attribute on <code>&lt;details&gt;</code> controls
+          the initial expanded state. No JavaScript required.
+        </div>
+      </details>
+      <details class="pdx-accordion">
+        <summary>This section is collapsed</summary>
+        <div class="pdx-accordion-body">
+          Click the summary to expand this section.
+        </div>
+      </details>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;details class="pdx-accordion" open&gt;
+  &lt;summary&gt;Open by default&lt;/summary&gt;
+  &lt;div class="pdx-accordion-body"&gt;...&lt;/div&gt;
+&lt;/details&gt;</code></pre>
+    </details>
+  </section>
+</template>

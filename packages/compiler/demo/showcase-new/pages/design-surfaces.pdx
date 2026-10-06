@@ -1,0 +1,128 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Surfaces & Cards</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      5 surface types, card sections, accents, interactive/selected states, horizontal layout, and compact mode.
+      <strong>CSS only</strong> — apply classes to <code>&lt;div&gt;</code> elements.
+    </p>
+
+    <!-- ═══ Surface Types ═══ -->
+    <pdx-demo-design-surfaces-types class="demo-section"></pdx-demo-design-surfaces-types>
+
+    <!-- ═══ Card Sections ═══ -->
+    <pdx-demo-design-surfaces-card-sections class="demo-section"></pdx-demo-design-surfaces-card-sections>
+
+    <!-- ═══ Card Accents ═══ -->
+    <pdx-demo-design-surfaces-accents class="demo-section"></pdx-demo-design-surfaces-accents>
+
+    <!-- ═══ Elevation Levels ═══ -->
+    <pdx-demo-design-surfaces-elevation class="demo-section"></pdx-demo-design-surfaces-elevation>
+
+    <!-- ═══ Interactive Card ═══ -->
+    <pdx-demo-design-surfaces-interactive class="demo-section"></pdx-demo-design-surfaces-interactive>
+
+    <!-- ═══ Selected Card ═══ -->
+    <pdx-demo-design-surfaces-selected class="demo-section"></pdx-demo-design-surfaces-selected>
+
+    <!-- ═══ Compact Card ═══ -->
+    <pdx-demo-design-surfaces-compact class="demo-section"></pdx-demo-design-surfaces-compact>
+
+    <!-- ═══ Horizontal Card ═══ -->
+    <pdx-demo-design-surfaces-horizontal class="demo-section"></pdx-demo-design-surfaces-horizontal>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-surfaces-composition class="demo-section"></pdx-demo-design-surfaces-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-surface-base</code><span>Surface</span><span>Page background color</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-surface-card</code><span>Surface</span><span>Bordered card with shadow</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-surface-inset</code><span>Surface</span><span>Recessed background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-surface-overlay</code><span>Surface</span><span>Elevated overlay with large shadow</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-surface-glass</code><span>Surface</span><span>Frosted glass (backdrop blur)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-header</code><span>Section</span><span>Top section with bottom border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-body</code><span>Section</span><span>Main content area</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-footer</code><span>Section</span><span>Bottom section with top border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-media</code><span>Section</span><span>Image container (top rounded)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-horizontal</code><span>Layout</span><span>Side-by-side media + body</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-compact</code><span>Modifier</span><span>Reduced padding on all sections</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-accent</code><span>Accent</span><span>Primary top border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-accent-success</code><span>Accent</span><span>Success top border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-accent-danger</code><span>Accent</span><span>Danger top border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-card-accent-warning</code><span>Accent</span><span>Warning top border</span>
+        </div>
+        <div class="opt-row">
+          <code>interactive</code><span>Attribute</span><span>Hover lift + pointer cursor</span>
+        </div>
+        <div class="opt-row">
+          <code>selected</code><span>Attribute</span><span>Primary border ring</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/surfaces';
+@title 'Surfaces & Cards';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .card-demo {
+    margin-top: var(--pdx-space-md);
+    max-width: 500px;
+  }
+
+  /* Source block */
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 200px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

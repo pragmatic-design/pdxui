@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multi-Column</h2>
+    <p class="pdx-txt-small pdx-ink-muted">2-column grid. Description spans both columns.</p>
+    <div class="demo-container demo-wide">
+      <pdx-description-list :items="productItems" :columns="2" layout="horizontal" label-width="100px"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { label: 'Name', value: 'Ergonomic Keyboard' },
+  { label: 'SKU', value: 'KB-ERG-2026' },
+  { label: 'Price', value: '$149.99' },
+  { label: 'Weight', value: '1.2 kg' },
+  // span: 2 takes both columns
+  { label: 'Description', value: 'Split mechanical...', span: 2 },
+];
+
+&lt;pdx-description-list :items="items"
+  :columns="2" label-width="100px"&gt;
+&lt;/pdx-description-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const productItems = [
+  { label: 'Name', value: 'Ergonomic Keyboard' },
+  { label: 'SKU', value: 'KB-ERG-2026' },
+  { label: 'Price', value: '$149.99' },
+  { label: 'Weight', value: '1.2 kg' },
+  { label: 'Category', value: 'Peripherals' },
+  { label: 'Stock', value: '342 units' },
+  { label: 'Description', value: 'Split mechanical keyboard with adjustable tenting, Cherry MX Brown switches, and programmable macro keys.', span: 2 },
+];
+</script>

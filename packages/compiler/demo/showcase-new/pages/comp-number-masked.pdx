@@ -1,0 +1,73 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Number & Masked Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Specialized inputs: Figma-style number input with cursor-position-aware step, and pattern-masked input.
+    </p>
+
+    <!-- ═══ Number Input ═══ -->
+    <pdx-demo-comp-number-masked-number-input class="demo-section"></pdx-demo-comp-number-masked-number-input>
+
+    <!-- ═══ Masked Input ═══ -->
+    <pdx-demo-comp-number-masked-masked-input class="demo-section"></pdx-demo-comp-number-masked-masked-input>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">pdx-number-input</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>number</span><span>Current numeric value</span></div>
+        <div class="opt-row"><code>min / max</code><span>number</span><span>Range constraints</span></div>
+        <div class="opt-row"><code>step</code><span>number</span><span>Default step (1). Cursor position overrides this.</span></div>
+        <div class="opt-row"><code>precision</code><span>number</span><span>Decimal places (-1 = auto from step)</span></div>
+        <div class="opt-row"><code>controls</code><span>string</span><span>'both' (default: −left +right), 'right' (stacked), 'none' (hidden)</span></div>
+        <div class="opt-row"><code>allowNegative</code><span>boolean</span><span>Enable sign toggle button (+/−) and keyboard sign</span></div>
+        <div class="opt-row"><code>allowWheel</code><span>boolean</span><span>Enable scroll wheel when focused</span></div>
+        <div class="opt-row"><code>locale</code><span>string</span><span>Intl.NumberFormat locale (e.g. "en-US")</span></div>
+        <div class="opt-row"><code>currency</code><span>string</span><span>Currency code (e.g. "USD", "EUR")</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">pdx-masked-input</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>mask</code><span>string</span><span>Pattern or preset: phone, card, date, time, ssn, zip, custom</span></div>
+        <div class="opt-row"><code>placeholderChar</code><span>string</span><span>Char for unfilled positions (default "_")</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Mask Presets</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Pattern</span></div>
+        <div class="opt-row"><code>phone</code><span>(###) ###-####</span></div>
+        <div class="opt-row"><code>phone-intl</code><span>+## (###) ###-####</span></div>
+        <div class="opt-row"><code>card</code><span>#### #### #### ####</span></div>
+        <div class="opt-row"><code>date</code><span>##/##/####</span></div>
+        <div class="opt-row"><code>time</code><span>##:##</span></div>
+        <div class="opt-row"><code>ssn</code><span>###-##-####</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/number-masked';
+@title 'Number & Masked Input';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); padding: var(--pdx-space-md) 0; }
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 200px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

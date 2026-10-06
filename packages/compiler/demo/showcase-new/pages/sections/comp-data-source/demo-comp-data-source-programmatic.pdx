@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Programmatic DataSource</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Create a DataSource in script and bind via <code>:source</code> prop.</p>
+    <div class="demo-row">
+      <pdx-select :source="userDS" labelField="name" valueField="id" searchable clearable placeholder="Select user..." />
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>import { createDataSource } from '@pdxui/core';
+
+const userDS = createDataSource({
+  data: users,
+  idField: 'id',
+});
+
+&lt;pdx-select :source="userDS" labelField="name"
+  valueField="id" searchable clearable /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { users } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+const userDS = createDataSource({ data: users, idField: 'id' });
+</script>

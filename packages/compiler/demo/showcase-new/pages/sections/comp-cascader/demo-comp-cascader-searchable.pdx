@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Searchable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Type to filter across all levels. Shows flattened results with full path.</p>
+
+    <div class="demo-row">
+      <pdx-cascader searchable :options="locations" placeholder="Search location..."></pdx-cascader>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { locations } from './state.pdx';
+</script>

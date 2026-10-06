@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Common Ratios</h2>
+    <div class="demo-grid">
+      <div class="ratio-demo">
+        <p class="pdx-txt-small pdx-ink-muted">16:9 (Video)</p>
+        <pdx-aspect-ratio ratio="16/9">
+          <div class="ratio-content">16:9</div>
+        </pdx-aspect-ratio>
+      </div>
+      <div class="ratio-demo">
+        <p class="pdx-txt-small pdx-ink-muted">4:3 (Photo)</p>
+        <pdx-aspect-ratio ratio="4/3">
+          <div class="ratio-content">4:3</div>
+        </pdx-aspect-ratio>
+      </div>
+      <div class="ratio-demo">
+        <p class="pdx-txt-small pdx-ink-muted">1:1 (Square)</p>
+        <pdx-aspect-ratio ratio="1/1">
+          <div class="ratio-content">1:1</div>
+        </pdx-aspect-ratio>
+      </div>
+      <div class="ratio-demo">
+        <p class="pdx-txt-small pdx-ink-muted">21:9 (Ultra-wide)</p>
+        <pdx-aspect-ratio ratio="21/9">
+          <div class="ratio-content">21:9</div>
+        </pdx-aspect-ratio>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-aspect-ratio ratio="16/9"&gt;
+  &lt;img src="..." /&gt;
+&lt;/pdx-aspect-ratio&gt;
+
+&lt;pdx-aspect-ratio ratio="1/1"&gt;
+  &lt;div&gt;Square content&lt;/div&gt;
+&lt;/pdx-aspect-ratio&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+.ratio-content {
+  width: 100%;
+  height: 100%;
+  background: var(--pdx-color-inset);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--pdx-text-lg);
+  font-weight: var(--pdx-weight-semibold);
+  color: var(--pdx-color-muted);
+}
+</style>

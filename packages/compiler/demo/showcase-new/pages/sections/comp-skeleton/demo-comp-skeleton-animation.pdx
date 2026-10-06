@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Animation Types</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Pulse (default), wave (left-to-right sweep), or static (no animation).</p>
+    <div class="anim-grid">
+      <div>
+        <span class="pdx-txt-caption pdx-ink-muted">Pulse (default)</span>
+        <div class="pdx-skeleton pdx-skeleton-text" style="margin-top:var(--pdx-space-xs)"></div>
+        <div class="pdx-skeleton pdx-skeleton-text" style="width:60%;margin-top:var(--pdx-space-xs)"></div>
+      </div>
+      <div>
+        <span class="pdx-txt-caption pdx-ink-muted">Wave</span>
+        <div class="pdx-skeleton pdx-skeleton-wave pdx-skeleton-text" style="margin-top:var(--pdx-space-xs)"></div>
+        <div class="pdx-skeleton pdx-skeleton-wave pdx-skeleton-text" style="width:60%;margin-top:var(--pdx-space-xs)"></div>
+      </div>
+      <div>
+        <span class="pdx-txt-caption pdx-ink-muted">Static</span>
+        <div class="pdx-skeleton pdx-skeleton-static pdx-skeleton-text" style="margin-top:var(--pdx-space-xs)"></div>
+        <div class="pdx-skeleton pdx-skeleton-static pdx-skeleton-text" style="width:60%;margin-top:var(--pdx-space-xs)"></div>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Pulse (default) --&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-text"&gt;&lt;/div&gt;
+
+&lt;!-- Wave (left-to-right sweep) --&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-wave pdx-skeleton-text"&gt;&lt;/div&gt;
+
+&lt;!-- Static (no animation) --&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-static pdx-skeleton-text"&gt;&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .anim-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--pdx-space-lg); margin-top: var(--pdx-space-md); }
+</style>

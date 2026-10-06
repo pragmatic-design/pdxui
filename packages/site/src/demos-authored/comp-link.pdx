@@ -1,0 +1,50 @@
+<!-- Hand-written demo for @pdxui/router's <pdx-link>: the router's elements have no showcase page. -->
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Link</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      A link that navigates without reloading the page, marks itself active while its route is the current one,
+      and fetches the route's code on hover, focus or pointerdown — before the click.
+    </p>
+
+    <section>
+      <h2 class="pdx-txt-heading">Link to a route</h2>
+      <p class="pdx-txt-small pdx-ink-muted">These links lead to the site's own pages: try one, then come back.</p>
+      <nav class="demo-row" aria-label="Demo links">
+        <pdx-link to="/docs/router">Router guide</pdx-link>
+        <pdx-link to="/components" exact active-class="is-here">All components</pdx-link>
+      </nav>
+      <details class="source">
+        <summary>Source</summary>
+        <pre><code>&lt;pdx-link to="/docs/router"&gt;Router guide&lt;/pdx-link&gt;
+&lt;pdx-link to="/components" exact active-class="is-here"&gt;All components&lt;/pdx-link&gt;</code></pre>
+      </details>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading">A route with params</h2>
+      <p class="pdx-txt-small pdx-ink-muted">A pattern in <code>to</code> is filled from <code>params</code>; bound with <code>:to</code>, the path is an expression.</p>
+      <details class="source">
+        <summary>Source</summary>
+        <pre><code>&lt;pdx-link to="/users/:id" params='&#123;"id": "42"&#125;'&gt;Ada&lt;/pdx-link&gt;
+&lt;pdx-link :to="'/users/' + user.id"&gt;&#123;&#123; user.name &#125;&#125;&lt;/pdx-link&gt;</code></pre>
+      </details>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading">No prefetch</h2>
+      <p class="pdx-txt-small pdx-ink-muted">A link to a heavy route that is rarely followed: its code loads on the click, not on the hover.</p>
+      <details class="source">
+        <summary>Source</summary>
+        <pre><code>&lt;pdx-link to="/reports/archive" prefetch="never"&gt;Archive&lt;/pdx-link&gt;</code></pre>
+      </details>
+    </section>
+  </div>
+</template>
+
+<style scoped>
+.page { max-width: 760px; }
+.intro { margin-bottom: var(--pdx-space-xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.demo-row { display: flex; flex-wrap: wrap; gap: var(--pdx-space-lg); align-items: center; margin: var(--pdx-space-md) 0; }
+</style>

@@ -1,0 +1,50 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Vertical Orientation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Stepper on the left, content on the right.</p>
+
+    <div class="demo-box">
+      <pdx-wizard orientation="vertical" :linear="false">
+        <div data-wizard-step data-label="Upload" data-description="Select your files">
+          <h3 class="pdx-txt-body" style="margin-bottom: var(--pdx-space-md)">Upload Files</h3>
+          <p class="pdx-txt-body pdx-ink-muted">Drag and drop files or click to browse.</p>
+          <div class="upload-placeholder">
+            <span style="font-size: 2rem">📁</span>
+            <span class="pdx-ink-muted">Drop files here</span>
+          </div>
+        </div>
+        <div data-wizard-step data-label="Configure" data-description="Set import options">
+          <h3 class="pdx-txt-body" style="margin-bottom: var(--pdx-space-md)">Import Configuration</h3>
+          <div class="form-fields">
+            <label class="pdx-label">Delimiter</label>
+            <div class="pdx-input-wrap"><input class="pdx-input" value="," /></div>
+            <label class="pdx-label">Encoding</label>
+            <div class="pdx-input-wrap"><input class="pdx-input" value="UTF-8" /></div>
+          </div>
+        </div>
+        <div data-wizard-step data-label="Map Fields" data-description="Match columns to fields">
+          <h3 class="pdx-txt-body" style="margin-bottom: var(--pdx-space-md)">Field Mapping</h3>
+          <p class="pdx-txt-body pdx-ink-muted">Map your CSV columns to system fields.</p>
+        </div>
+        <div data-wizard-step data-label="Import" data-description="Review and run">
+          <h3 class="pdx-txt-body" style="margin-bottom: var(--pdx-space-md)">Ready to Import</h3>
+          <p class="pdx-txt-body pdx-ink-muted">Click Complete to start the import process.</p>
+        </div>
+      </pdx-wizard>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-xl);
+  border: 2px dashed var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  margin-top: var(--pdx-space-md);
+}
+</style>

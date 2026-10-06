@@ -1,0 +1,20 @@
+{
+  "name": "pragmatic-react-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@pdxui/core": "1.0.0-alpha.1",
+    "@pdxui/ui": "1.0.0-alpha.1",
+    "@pdxui/design": "1.0.0-alpha.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "@vitejs/plugin-react": "^4.3.0"
+  }
+}

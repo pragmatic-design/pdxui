@@ -1,0 +1,159 @@
+<template>
+  <div class="demo">
+    <h2>Utility Primitives</h2>
+    <p class="desc">Clipboard, Resize Handle, Toast Queue — three small infra primitives.</p>
+
+    <!-- Clipboard -->
+    <section>
+      <h3>Clipboard API</h3>
+      <p class="desc">Signal-based copy/paste. Try copying text, then pasting.</p>
+      <div class="row">
+        <input type="text" :ref="clipInputRef" value="Hello from PDX!" class="input" />
+        <button class="pdx-primary" @click="doCopy">Copy</button>
+        <button class="pdx-secondary" @click="doPaste">Paste</button>
+      </div>
+      <div class="log">
+        <span>Copied: <strong>{{ clipCopied }}</strong></span>
+        <span>Pasted: <strong>{{ clipPasted }}</strong></span>
+        <span>Supported: <strong>{{ clipSupported }}</strong></span>
+      </div>
+    </section>
+
+    <!-- Resize Handle -->
+    <section>
+      <h3>Resize Handle</h3>
+      <p class="desc">Drag the vertical grip to resize the left panel. Min: 100px, Max: 400px.</p>
+      <div class="split-container">
+        <div class="split-left" :ref="panelRef">
+          <div class="panel-content">Left panel ({{ panelSize }}px)</div>
+        </div>
+        <div class="split-handle" :ref="handleRef"></div>
+        <div class="split-right">
+          <div class="panel-content">Right panel (fills remaining)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toast Queue -->
+    <section>
+      <h3>Toast Queue</h3>
+      <p class="desc">Signal-based notification queue. Click buttons to add toasts. Auto-dismiss after 3s.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="addSuccess">Success</button>
+        <button @click="addInfo">Info</button>
+        <button @click="addWarning" style="background:#f59e0b;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Warning</button>
+        <button @click="addError" style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Error</button>
+        <button @click="clearToasts" style="background:#666;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Clear All</button>
+      </div>
+      <div class="toast-container">
+        @for (toasts as t; track t.id) {
+          <div class="toast-item" :class="'toast-' + t.type">
+            <span>{{ t.type.toUpperCase() }}: {{ t.message }}</span>
+            <button class="toast-dismiss" @click="dismissToast(t.id)">×</button>
+          </div>
+        }
+      </div>
+      <div class="log">Count: <strong>{{ toastCount }}</strong></div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { useClipboard, useResizeHandle, createToastQueue, effect, onMount, onDestroy } from '@pdxui/core';
+
+// ─── Clipboard ────────────────────────
+let clipCopied = $signal('');
+let clipPasted = $signal('');
+let clipSupported = $signal(false);
+let clipInputRef = $signal(null);
+
+const clip = useClipboard({
+    onCopy: function(t) { clipCopied = t; },
+    onPaste: function(t) { clipPasted = t; },
+});
+clipSupported = clip.isSupported;
+
+function doCopy() {
+    var input = clipInputRef;
+    if (input) clip.copy(input.value);
+}
+function doPaste() { clip.paste(); }
+
+// ─── Resize Handle ────────────────────
+let panelSize = $signal(200);
+let panelRef = $signal(null);
+let handleRef = $signal(null);
+
+const resize = useResizeHandle(() => handleRef, () => panelRef, {
+    direction: 'horizontal',
+    min: 100,
+    max: 400,
+    initialSize: 200,
+});
+
+onMount(() => {
+    const d1 = effect(() => {
+        var s = resize.size();
+        panelSize = Math.round(s);
+        var el = panelRef;
+        if (el) el.style.width = s + 'px';
+    });
+    onDestroy(() => { d1(); resize.dispose(); });
+});
+
+// ─── Toast Queue ──────────────────────
+let toasts = $signal([]);
+let toastCount = $signal(0);
+
+const queue = createToastQueue({
+    position: 'top-right',
+    maxVisible: 5,
+    defaultDuration: 3000,
+});
+
+let toastN = 1;
+function addSuccess() { queue.success('Operation completed #' + toastN++); }
+function addInfo() { queue.info('Something happened #' + toastN++); }
+function addWarning() { queue.warning('Watch out #' + toastN++); }
+function addError() { queue.error('Something went wrong #' + toastN++); }
+function dismissToast(id) { queue.dismiss(id); }
+function clearToasts() { queue.clear(); }
+
+onMount(() => {
+    const d2 = effect(() => {
+        toasts = queue.items();
+        toastCount = queue.count();
+    });
+    onDestroy(() => { d2(); });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 700px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .input { padding: 6px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; width: 200px; }
+  .log { font-size: 0.85rem; margin-top: 8px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+  /* Resize */
+  .split-container { display: flex; height: 120px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; margin-top: 8px; }
+  .split-left { width: 200px; background: #eff6ff; flex-shrink: 0; overflow: hidden; }
+  .split-handle { width: 6px; background: #d0d0d0; cursor: col-resize; flex-shrink: 0; transition: background 150ms; }
+  .split-handle:hover { background: #3b82f6; }
+  .split-right { flex: 1; background: #f9f9f9; }
+  .panel-content { padding: 16px; font-size: 0.85rem; color: #666; }
+
+  /* Toast */
+  .toast-container { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; min-height: 40px; }
+  .toast-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; animation: slideIn 200ms ease; }
+  .toast-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+  .toast-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .toast-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+  .toast-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .toast-dismiss { background: none; border: none; cursor: pointer; font-size: 1.2rem; opacity: 0.5; padding: 0 4px; }
+  .toast-dismiss:hover { opacity: 1; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+</style>

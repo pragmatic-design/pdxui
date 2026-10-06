@@ -1,0 +1,70 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">5. Programmatic Form (Code API)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Create forms entirely in code with <code>createForm()</code>. Full control over fields, validation, and save behavior.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="codeForm">
+        <pdx-form-field name="username" label="Username" required>
+          <pdx-input name="username" placeholder="Choose a username"></pdx-input>
+        </pdx-form-field>
+
+        <pdx-form-field name="age" label="Age">
+          <pdx-number-input name="age" :min="0" :max="150"></pdx-number-input>
+        </pdx-form-field>
+
+        <pdx-form-field name="role" label="Role">
+          <pdx-select name="role" :options="roleOptions" placeholder="Select role"></pdx-select>
+        </pdx-form-field>
+
+        <pdx-form-field name="agree" label="">
+          <pdx-checkbox name="agree" label="I agree to the terms"></pdx-checkbox>
+        </pdx-form-field>
+
+        <pdx-form-actions submitLabel="Create Account"></pdx-form-actions>
+      </pdx-form>
+
+      <div class="form-output">
+        <h4 class="pdx-txt-small pdx-weight-semibold">Form Values:</h4>
+        <pre class="pdx-txt-mono form-values" :textContent="codeFormValuesText()"></pre>
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source (code)</summary><pre class="pdx-txt-mono"><code>import { createForm, required, email, minLength } from '@pdxui/core';
+
+const form = createForm({
+  initialValues: { username: '', age: 0, role: '', agree: false },
+  validators: {
+    username: [required('Username is required'), minLength(3, 'Min 3 chars')],
+  },
+  validateOn: 'onBlur',
+});</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required, minLength } from '@pdxui/core';
+
+// ─── 4. Programmatic Form ───
+const roleOptions = ['Admin', 'Editor', 'Viewer', 'Guest'];
+
+const codeForm = createForm({
+  initialValues: { username: '', age: 0, role: '', agree: false },
+  validators: {
+    username: [required('Username is required'), minLength(3, 'Min 3 characters')],
+  },
+  validateOn: 'onBlur',
+});
+
+function codeFormValuesText() { const v = codeForm.dirty(); const out = { username: codeForm.fields.username?.value(), age: codeForm.fields.age?.value(), role: codeForm.fields.role?.value(), agree: codeForm.fields.agree?.value() }; return JSON.stringify(out, null, 2); }
+</script>
+
+<style scoped>
+  .form-output {
+    margin-top: var(--pdx-space-md);
+    padding-top: var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+  }
+</style>

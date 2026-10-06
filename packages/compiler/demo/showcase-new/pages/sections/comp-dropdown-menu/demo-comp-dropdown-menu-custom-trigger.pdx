@@ -1,0 +1,48 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom trigger</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      An element in <code>slot="trigger"</code> is the menu button: an avatar, a chip. The dropdown gives it
+      <code>aria-haspopup</code>, <code>aria-expanded</code>, the keys and the focus back on close. An element that
+      is not a <code>&lt;button&gt;</code> also gets <code>role="button"</code>, a tab stop, and <kbd>Enter</kbd> / <kbd>Space</kbd>.
+    </p>
+    <div class="demo-row">
+      <pdx-dropdown-menu :items="accountItems" placement="bottom-end" @pdx-select="onSelect" data-test="dd-avatar">
+        <button slot="trigger" class="avatar-trigger" aria-label="Account: Ada Lovelace">
+          <pdx-avatar alt="Ada Lovelace" size="sm"></pdx-avatar>
+        </button>
+      </pdx-dropdown-menu>
+      <span class="pdx-txt-small pdx-ink-muted">Last selected: <strong>{{ lastSelect }}</strong></span>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dropdown-menu :items="accountItems" placement="bottom-end"&gt;
+  &lt;button slot="trigger" aria-label="Account: Ada Lovelace"&gt;
+    &lt;pdx-avatar alt="Ada Lovelace" size="sm" /&gt;
+  &lt;/button&gt;
+&lt;/pdx-dropdown-menu&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useDropdownMenuLog } from './state.pdx';
+
+// The basic section shows the same line (state.pdx.ts).
+const dropdownMenuLog = useDropdownMenuLog();
+const lastSelect = $derived(dropdownMenuLog.lastSelect());
+function onSelect(e) { dropdownMenuLog.onSelect(e); }
+
+const accountItems = [
+  { key: 'profile', label: 'Profile', icon: 'user' },
+  { key: 'settings', label: 'Settings', icon: 'settings' },
+  { key: 'd1', label: '', type: 'separator' },
+  { key: 'signout', label: 'Sign out', icon: 'log-out' },
+];
+</script>
+
+<style scoped>
+/* The trigger is the author's: a bare round button around the avatar. */
+.avatar-trigger { padding: 0; border: 0; background: none; border-radius: 50%; cursor: pointer; line-height: 0; }
+.avatar-trigger:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: 2px; }
+</style>

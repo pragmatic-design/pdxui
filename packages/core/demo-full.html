@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX UI — Full Feature Demo</title>
+    <style>
+        :root {
+            --pdx-color-primary: #4361ee;
+            --pdx-color-danger: #e63946;
+            --pdx-color-success: #2a9d8f;
+            --pdx-color-bg: #f8f9fa;
+            --pdx-color-surface: #ffffff;
+            --pdx-color-text: #1a1a2e;
+            --pdx-space-md: 1rem;
+            --pdx-radius-md: 8px;
+            --pdx-font-sans: system-ui, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--pdx-font-sans); background: var(--pdx-color-bg); color: var(--pdx-color-text); padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        h2 { font-size: 1rem; color: #4a4a6a; margin: 1.25rem 0 0.5rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: var(--pdx-color-surface); border-radius: var(--pdx-radius-md); padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        button { padding: 0.35rem 0.85rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white; font-size: 0.85rem; }
+        button:hover { background: #f0f0f0; }
+        button.primary { background: var(--pdx-color-primary); color: white; border-color: var(--pdx-color-primary); }
+        button.danger { background: var(--pdx-color-danger); color: white; border-color: var(--pdx-color-danger); }
+        button.success { background: var(--pdx-color-success); color: white; border-color: var(--pdx-color-success); }
+        input { padding: 0.35rem 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+        .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        .tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 99px; font-size: 0.7rem; font-weight: 600; }
+        .tag-green { background: #d4edda; color: #155724; }
+        .tag-red { background: #f8d7da; color: #721c24; }
+        .tag-blue { background: #cce5ff; color: #004085; }
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+        #log { font-family: monospace; font-size: 0.75rem; background: #1a1a2e; color: #4cc9f0; padding: 0.75rem; border-radius: 4px; max-height: 180px; overflow-y: auto; white-space: pre-wrap; margin-top: 0.5rem; }
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .item-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0; border-bottom: 1px solid #f0f0f0; }
+        .item-row:last-child { border-bottom: none; }
+        .viewport-bar { height: 8px; background: var(--pdx-color-primary); border-radius: 4px; transition: width 0.2s; }
+        .theme-swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; }
+        .adaptive-badge { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<h1>PDX UI — Full Feature Demo</h1>
+<p style="color:#666; margin-bottom:1rem; font-size:0.85rem;">Interactive demo of all component model features running in real browser.</p>
+
+<div class="grid">
+
+<!-- ═══ 1. Composable Lifecycle + Store ═══ -->
+<div class="card" id="section-store">
+    <h2>1. Store + Watch + Lifecycle</h2>
+    <div id="store-demo"></div>
+</div>
+
+<!-- ═══ 2. Component Expose + Channel ═══ -->
+<div class="card" id="section-comm">
+    <h2>2. Expose + Channel</h2>
+    <div id="comm-demo"></div>
+</div>
+
+<!-- ═══ 3. Error Boundary ═══ -->
+<div class="card" id="section-error">
+    <h2>3. Error Boundary</h2>
+    <div id="error-demo"></div>
+</div>
+
+<!-- ═══ 4. Scoped Slot ═══ -->
+<div class="card" id="section-slot">
+    <h2>4. Scoped Slot</h2>
+    <div id="slot-demo"></div>
+</div>
+
+<!-- ═══ 5. Dynamic Component ═══ -->
+<div class="card" id="section-dynamic">
+    <h2>5. Dynamic Component</h2>
+    <div id="dynamic-demo"></div>
+</div>
+
+<!-- ═══ 6. Animation ═══ -->
+<div class="card" id="section-anim">
+    <h2>6. Animation (Spring + Keyframes)</h2>
+    <div id="anim-demo"></div>
+</div>
+
+<!-- ═══ 7. Reactive Styles + Tokens ═══ -->
+<div class="card" id="section-styles">
+    <h2>7. Reactive Styles + Token Bridge</h2>
+    <div id="styles-demo"></div>
+</div>
+
+<!-- ═══ 8. Viewport + Adaptive ═══ -->
+<div class="card" id="section-viewport">
+    <h2>8. Viewport Signals + Adaptive</h2>
+    <div id="viewport-demo"></div>
+</div>
+
+<!-- ═══ 9. Browser Composables ═══ -->
+<div class="card" id="section-browser">
+    <h2>9. Browser: Storage + Online + Title</h2>
+    <div id="browser-demo"></div>
+</div>
+
+<!-- ═══ Event Log ═══ -->
+<div class="card" style="grid-column: 1 / -1;">
+    <h2>Event Log</h2>
+    <div id="log"></div>
+</div>
+
+</div>
+
+<script type="module">
+import {
+    signal, computed, effect, batch, ref, html, component,
+    when, each, match, show, dynamic,
+    store, watch,
+    onMount, onDestroy, useEffect,
+    createChannel, createCommands,
+    errorBoundary,
+    renderSlot,
+    keyframes, spring, playKeyframes,
+    cssVar, createTokenBridge, createTheme, applyTheme,
+    viewport, screen, adaptive,
+    useStorage, useOnline, useTitle, useMediaQuery,
+} from './src/index.ts';
+
+// ─── Shared log ──────────────────────────────────────────────────
+const logEl = document.getElementById('log');
+function log(msg) {
+    const time = new Date().toLocaleTimeString('it-IT', { hour12: false });
+    logEl.textContent += `[${time}] ${msg}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+}
+
+// ═══ 1. Store + Watch + Lifecycle ═══════════════════════════════
+
+(() => {
+    const state = store({ items: [], nextId: 1 });
+    const inputVal = signal('');
+    const changeLog = signal([]);
+
+    watch(() => state.items.length, (n, o) => {
+        log(`Store: items ${o} → ${n}`);
+        changeLog.set(prev => [...prev, `${o}→${n}`].slice(-5));
+    });
+
+    function addItem() {
+        const text = inputVal.peek();
+        if (!text) return;
+        state.items.push({ id: state.nextId, text });
+        state.nextId++;
+        inputVal.set('');
+    }
+
+    function removeItem(id) {
+        const idx = state.items.findIndex(i => i.id === id);
+        if (idx >= 0) state.items.splice(idx, 1);
+    }
+
+    const el = document.getElementById('store-demo');
+    el.appendChild(html`
+        <div class="row" style="margin-bottom:0.5rem;">
+            <input placeholder="Add item..." :value=${inputVal}
+                @input=${(e) => inputVal.set(e.target.value)}
+                @keydown=${(e) => e.key === 'Enter' && addItem()} />
+            <button class="primary" @click=${addItem}>Add</button>
+        </div>
+        <div>${() => `${state.items.length} items`}</div>
+        <div style="margin-top:0.5rem;">
+            ${() => state.items.map(item => html`
+                <div class="item-row fade-in">
+                    <span style="flex:1">${item.text}</span>
+                    <button class="danger" style="font-size:0.7rem; padding:0.15rem 0.5rem;" @click=${() => removeItem(item.id)}>×</button>
+                </div>
+            `)}
+        </div>
+        <div class="mono" style="margin-top:0.5rem; color:#888;">
+            Watch log: ${() => changeLog().join(', ') || '(no changes yet)'}
+        </div>
+    `);
+})();
+
+// ═══ 2. Expose + Channel ═══════════════════════════════════════
+
+(() => {
+    // Exposed dialog component
+    component('demo-dialog', {
+        props: { title: { type: String, default: 'Dialog' } },
+        setup(ctx) {
+            const isOpen = signal(false);
+            ctx.expose({
+                open: () => { isOpen.set(true); log('Dialog: opened via expose'); },
+                close: () => { isOpen.set(false); log('Dialog: closed via expose'); },
+                isOpen: () => isOpen(),
+            });
+            return { isOpen };
+        },
+        render: (ctx) => html`
+            ${when(() => ctx.isOpen(), () => html`
+                <div style="background:#eef; border:1px solid #99c; border-radius:6px; padding:0.75rem; margin-top:0.5rem;">
+                    <div class="row" style="justify-content:space-between;">
+                        <strong>${ctx.title}</strong>
+                        <button @click=${() => ctx.el.close()}>✕</button>
+                    </div>
+                    <p style="margin-top:0.5rem; font-size:0.85rem;">This dialog was opened via parent ref.</p>
+                </div>
+            `)}
+        `,
+    });
+
+    // Channel
+    const ch = createChannel();
+    const msgCount = signal(0);
+    ch.on('ping', () => {
+        msgCount.set(v => v + 1);
+        log(`Channel: received ping #${msgCount.peek()}`);
+        ch.emit('pong');
+    });
+    ch.on('pong', () => log('Channel: pong received'));
+
+    const el = document.getElementById('comm-demo');
+    el.innerHTML = '<demo-dialog title="Exposed Dialog"></demo-dialog>';
+    const dialogEl = el.querySelector('demo-dialog');
+
+    el.appendChild(html`
+        <div class="row" style="margin-top:0.5rem;">
+            <button class="primary" @click=${() => dialogEl.open()}>Open Dialog (expose)</button>
+            <button @click=${() => ch.send('ping')}>Send Ping (channel)</button>
+            <span class="tag tag-blue">${() => `${msgCount()} pings`}</span>
+        </div>
+    `);
+})();
+
+// ═══ 3. Error Boundary ═════════════════════════════════════════
+
+(() => {
+    let shouldFail = signal(true);
+    const el = document.getElementById('error-demo');
+
+    el.appendChild(html`
+        <div class="row" style="margin-bottom:0.5rem;">
+            <button @click=${() => shouldFail.set(!shouldFail.peek())}>
+                Toggle Error: ${() => shouldFail() ? 'ON' : 'OFF'}
+            </button>
+        </div>
+        ${errorBoundary(
+            () => {
+                if (shouldFail()) throw new Error('Component crashed!');
+                return html`<div class="tag tag-green" style="font-size:0.9rem; padding:0.5rem;">✅ Component is working fine</div>`;
+            },
+            (err, retry) => html`
+                <div style="background:#f8d7da; border-radius:6px; padding:0.75rem;">
+                    <strong style="color:#721c24;">Error: ${err.message}</strong>
+                    <div style="margin-top:0.5rem;">
+                        <button class="success" @click=${() => { shouldFail.set(false); retry(); log('ErrorBoundary: retry clicked'); }}>Fix & Retry</button>
+                    </div>
+                </div>
+            `
+        )}
+    `);
+})();
+
+// ═══ 4. Scoped Slot ════════════════════════════════════════════
+
+(() => {
+    const users = signal([
+        { id: 1, name: 'Alice', role: 'Admin' },
+        { id: 2, name: 'Bob', role: 'Editor' },
+        { id: 3, name: 'Charlie', role: 'Viewer' },
+    ]);
+
+    const slots = {
+        row: (scope) => html`
+            <div class="item-row">
+                <strong style="flex:1">${scope.user.name}</strong>
+                <span class="tag ${scope.user.role === 'Admin' ? 'tag-red' : scope.user.role === 'Editor' ? 'tag-blue' : 'tag-green'}">
+                    ${scope.user.role}
+                </span>
+                <span class="mono" style="color:#999">#${scope.index + 1}</span>
+            </div>
+        `,
+    };
+
+    const el = document.getElementById('slot-demo');
+    el.appendChild(html`
+        <div>
+            ${() => users().map((user, index) =>
+                renderSlot(slots, 'row', () => ({ user, index }),
+                    () => html`<div>${user.name}</div>`)
+            )}
+        </div>
+        <button style="margin-top:0.5rem;" @click=${() => {
+            users.set(prev => [...prev, { id: prev.length + 1, name: 'New User', role: 'Viewer' }]);
+            log('ScopedSlot: user added');
+        }}>Add User</button>
+    `);
+})();
+
+// ═══ 5. Dynamic Component ══════════════════════════════════════
+
+(() => {
+    component('demo-view-a', {
+        render: () => html`<div style="padding:0.5rem; background:#e8f4f8; border-radius:4px;">📊 <strong>Dashboard View</strong> — Charts and stats here</div>`,
+    });
+    component('demo-view-b', {
+        render: () => html`<div style="padding:0.5rem; background:#f0e8f8; border-radius:4px;">📋 <strong>List View</strong> — Items and filters here</div>`,
+    });
+    component('demo-view-c', {
+        render: () => html`<div style="padding:0.5rem; background:#e8f8e8; border-radius:4px;">⚙️ <strong>Settings View</strong> — Config options here</div>`,
+    });
+
+    const currentView = signal('demo-view-a');
+    const el = document.getElementById('dynamic-demo');
+
+    el.appendChild(html`
+        <div class="row" style="margin-bottom:0.5rem;">
+            <button @click=${() => { currentView.set('demo-view-a'); log('Dynamic: → Dashboard'); }}>Dashboard</button>
+            <button @click=${() => { currentView.set('demo-view-b'); log('Dynamic: → List'); }}>List</button>
+            <button @click=${() => { currentView.set('demo-view-c'); log('Dynamic: → Settings'); }}>Settings</button>
+            <span class="mono" style="color:#888;">${() => currentView()}</span>
+        </div>
+        ${dynamic(() => currentView())}
+    `);
+})();
+
+// ═══ 6. Animation ══════════════════════════════════════════════
+
+(() => {
+    const bounce = keyframes('bounce', [
+        { offset: 0, transform: 'scale(1)' },
+        { offset: 0.3, transform: 'scale(1.15)' },
+        { offset: 0.6, transform: 'scale(0.95)' },
+        { offset: 1, transform: 'scale(1)' },
+    ], { duration: 400, easing: 'ease-out' });
+
+    const springEase = spring({ stiffness: 400, damping: 15 });
+    const animTarget = ref();
+
+    const el = document.getElementById('anim-demo');
+    el.appendChild(html`
+        <div class="row" style="gap:1rem;">
+            <div>
+                <div :ref=${animTarget} style="width:60px; height:60px; background:var(--pdx-color-primary); border-radius:var(--pdx-radius-md); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">PDX</div>
+                <button style="margin-top:0.5rem;" @click=${() => {
+                    const target = animTarget();
+                    if (target) { playKeyframes(target, bounce); log('Animation: bounce played'); }
+                }}>Bounce</button>
+            </div>
+            <div style="flex:1;">
+                <div class="mono" style="font-size:0.7rem;">
+                    <strong>Spring easing:</strong><br/>
+                    <span style="color:#888; word-break:break-all;">${springEase.slice(0, 80)}...</span>
+                </div>
+                <div style="margin-top:0.5rem; height:4px; background:#eee; border-radius:2px; overflow:hidden;">
+                    <div style="width:70%; height:100%; background:var(--pdx-color-primary); transition: width 0.5s ${springEase};"></div>
+                </div>
+            </div>
+        </div>
+    `);
+})();
+
+// ═══ 7. Reactive Styles + Tokens ═══════════════════════════════
+
+(() => {
+    const primaryVar = cssVar('--pdx-color-primary', '#4361ee');
+    const tokens = createTokenBridge();
+
+    const colors = ['#4361ee', '#e63946', '#2a9d8f', '#f77f00', '#7209b7', '#264653'];
+    const colorIdx = signal(0);
+
+    const el = document.getElementById('styles-demo');
+    el.appendChild(html`
+        <div class="row" style="margin-bottom:0.5rem;">
+            <span style="font-size:0.85rem;">Theme color:</span>
+            ${colors.map((c, i) => html`
+                <div class="theme-swatch" style="background:${c};" @click=${() => {
+                    primaryVar.set(c);
+                    colorIdx.set(i);
+                    log(`Styles: primary → ${c}`);
+                }}></div>
+            `)}
+        </div>
+        <div class="mono" style="color:#888;">
+            Token count: ${tokens.names.length} discovered<br/>
+            Current primary: ${() => primaryVar()}
+        </div>
+        <div style="margin-top:0.5rem; padding:0.5rem; background:var(--pdx-color-primary); color:white; border-radius:4px; text-align:center; transition: background 0.3s;">
+            This box uses var(--pdx-color-primary)
+        </div>
+    `);
+})();
+
+// ═══ 8. Viewport + Adaptive ════════════════════════════════════
+
+(() => {
+    const features = adaptive({
+        mobile: () => viewport.width() < 768,
+        desktop: () => viewport.width() >= 1024,
+        touch: () => screen.isTouch(),
+        dark: () => screen.prefersDark(),
+        reducedMotion: () => screen.prefersReducedMotion(),
+    });
+
+    const el = document.getElementById('viewport-demo');
+    el.appendChild(html`
+        <div class="mono" style="line-height:1.8;">
+            <div>Viewport: <strong>${() => viewport.width()}</strong> × ${() => viewport.height()} px</div>
+            <div>Scroll: Y=${() => viewport.scrollY()}</div>
+            <div style="margin-top:0.35rem;">
+                <div class="viewport-bar" style="width:${() => Math.min(100, (viewport.width() / 1920) * 100)}%"></div>
+            </div>
+            <div style="margin-top:0.5rem;">
+                ${() => Object.entries(features).map(([name, sig]) => html`
+                    <span class="adaptive-badge" style="background:${sig() ? '#d4edda' : '#f0f0f0'}; color:${sig() ? '#155724' : '#888'}; margin-right:0.35rem;">
+                        ${sig() ? '●' : '○'} ${name}
+                    </span>
+                `)}
+            </div>
+        </div>
+    `);
+})();
+
+// ═══ 9. Browser Composables ════════════════════════════════════
+
+(() => {
+    const stored = useStorage('demo-counter', 0);
+    const online = useOnline();
+    const isDark = useMediaQuery('(prefers-color-scheme: dark)');
+
+    useTitle(() => `Pragmatic Demo (${stored()} clicks)`);
+
+    const el = document.getElementById('browser-demo');
+    el.appendChild(html`
+        <div class="mono" style="line-height:1.8;">
+            <div>
+                localStorage counter: <strong>${stored}</strong>
+                <button style="margin-left:0.5rem;" @click=${() => { stored.set(v => v + 1); log(`Browser: counter → ${stored.peek()}`); }}>+1</button>
+                <button @click=${() => { stored.set(0); log('Browser: counter reset'); }}>Reset</button>
+            </div>
+            <div>Online: <span class="tag ${() => online() ? 'tag-green' : 'tag-red'}">${() => online() ? 'Online' : 'Offline'}</span></div>
+            <div>Prefers dark: <span class="tag ${() => isDark() ? 'tag-blue' : 'tag-green'}">${() => isDark() ? 'Dark' : 'Light'}</span></div>
+            <div>Document title updates with counter ↑</div>
+        </div>
+    `);
+})();
+
+log('Demo initialized — all features loaded');
+</script>
+</body>
+</html>

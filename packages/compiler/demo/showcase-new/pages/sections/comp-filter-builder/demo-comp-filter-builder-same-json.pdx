@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Same JSON — Grid + Filter</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      One <code>FieldDefinition[]</code> drives both the grid columns and the filter builder fields.
+      Changes in the filter automatically update the grid via shared DataSource.
+    </p>
+    <div class="demo-container">
+      <pdx-filter-builder :fields="fields2" :source="ds2"></pdx-filter-builder>
+      <pdx-data-grid :source="ds2" :columns="columns2" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// ONE definition drives both components
+const fields = [
+  { field: 'name', label: 'Name', type: 'text' },
+  { field: 'category', label: 'Category', type: 'enum', options: [...] },
+  { field: 'price', label: 'Price', type: 'currency' },
+];
+const columns = toColumnDefs(fields);
+
+&lt;pdx-filter-builder :fields="fields" :source="ds" /&gt;
+&lt;pdx-data-grid :source="ds" :columns="columns" hover /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource, toColumnDefs } from '@pdxui/core';
+import { categories, products } from './state.pdx';
+
+// Second demo — same JSON pattern
+const fields2 = [
+  { field: 'name', label: 'Name', type: 'text' },
+  { field: 'category', label: 'Category', type: 'enum', options: categories.map(function(c) { return { label: c, value: c }; }) },
+  { field: 'price', label: 'Price', type: 'currency' },
+];
+
+const columns2 = toColumnDefs(fields2);
+const ds2 = createDataSource({ data: products.slice(), pageSize: 10 });
+</script>

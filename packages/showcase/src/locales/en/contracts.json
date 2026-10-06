@@ -1,0 +1,22 @@
+{
+    "contracts": {
+        "title": "Contracts",
+        "intro": "Every employee's contracts in one list, and what ends soon. A contract is changed where it lives, in its employee's Contracts.",
+        "matching": "{count, plural, one {# contract} other {# contracts}}",
+        "views": {
+            "default": "All contracts",
+            "endingThisMonth": "Ending this month"
+        },
+        "columns": {
+            "employee": "Employee",
+            "type": "Type",
+            "start": "Start",
+            "end": "End",
+            "weeklyHours": "Hours a week",
+            "state": "State"
+        },
+        "types": { "permanent": "Permanent", "fixedTerm": "Fixed-term", "apprenticeship": "Apprenticeship" },
+        "states": { "open": "Open", "endingSoon": "Ending soon", "ended": "Ended" },
+        "openEnded": "—"
+    }
+}

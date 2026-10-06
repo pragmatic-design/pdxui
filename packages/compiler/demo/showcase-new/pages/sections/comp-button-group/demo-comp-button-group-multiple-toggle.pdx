@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple Toggle</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>mode="multiple"</code> — multiple buttons can be selected simultaneously: toggle buttons with <code>aria-pressed</code>. The value is every pressed value joined by commas, <code>"bold,italic"</code>.</p>
+
+    <div class="demo-row">
+      <span class="pdx-txt-caption pdx-ink-muted">Formatting:</span>
+      <pdx-button-group mode="multiple" label="Formatting" :value="formatting" variant="ghost" @pdx-change="onFormatting">
+        <pdx-button value="bold"><strong>B</strong></pdx-button>
+        <pdx-button value="italic"><em>I</em></pdx-button>
+        <pdx-button value="underline"><u>U</u></pdx-button>
+        <pdx-button value="strike"><s>S</s></pdx-button>
+      </pdx-button-group>
+      <span class="pdx-txt-small pdx-ink-muted">{{ formatting || 'none' }}</span>
+    </div>
+
+    <div class="demo-row">
+      <span class="pdx-txt-caption pdx-ink-muted">Filters:</span>
+      <pdx-button-group mode="multiple" label="Status filter" :value="filters" variant="outline" size="sm" @pdx-change="onFilters">
+        <pdx-button value="active">Active</pdx-button>
+        <pdx-button value="pending">Pending</pdx-button>
+        <pdx-button value="archived">Archived</pdx-button>
+      </pdx-button-group>
+      <span class="pdx-txt-small pdx-ink-muted">{{ filters || 'none' }}</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button-group mode="multiple" label="Formatting" :value="formatting" @pdx-change="onFormatting"&gt;
+  &lt;pdx-button value="bold"&gt;&lt;strong&gt;B&lt;/strong&gt;&lt;/pdx-button&gt;
+  &lt;pdx-button value="italic"&gt;&lt;em&gt;I&lt;/em&gt;&lt;/pdx-button&gt;
+  &lt;pdx-button value="underline"&gt;&lt;u&gt;U&lt;/u&gt;&lt;/pdx-button&gt;
+&lt;/pdx-button-group&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useButtonGroupDemo } from './state.pdx';
+
+const demo = useButtonGroupDemo();
+const formatting = $derived(demo.formatting());
+const filters = $derived(demo.filters());
+
+function onFormatting(e) { demo.onFormatting(e); }
+function onFilters(e) { demo.onFilters(e); }
+</script>

@@ -1,0 +1,57 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Field List</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-field-list&gt;</code> — an array of objects in a form, one row per item. Each row's fields live at
+      dotted paths (<code>lines.0.product</code>, <code>lines.1.qty</code>); adding and removing a row re-indexes
+      them, and <code>getValues()</code> returns the array.
+    </p>
+
+    <!-- ═══ Rows from itemFields ═══ -->
+    <pdx-demo-comp-field-list-item-fields class="demo-section"></pdx-demo-comp-field-list-item-fields>
+
+    <!-- ═══ Min / max ═══ -->
+    <pdx-demo-comp-field-list-min-max class="demo-section"></pdx-demo-comp-field-list-min-max>
+
+    <!-- ═══ Row slot ═══ -->
+    <pdx-demo-comp-field-list-row-slot class="demo-section"></pdx-demo-comp-field-list-row-slot>
+
+    <!-- ═══ Dialog ═══ -->
+    <pdx-demo-comp-field-list-dialog-display class="demo-section"></pdx-demo-comp-field-list-dialog-display>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>The array's name in the form</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Label above the list</span></div>
+        <div class="opt-row"><code>itemFields</code><span>array</span><span><code>{ name, type, label, placeholder }</code> per column: text, email, number, textarea, checkbox, switch</span></div>
+        <div class="opt-row"><code>itemDefault</code><span>object</span><span>Values of a new row</span></div>
+        <div class="opt-row"><code>minItems / maxItems</code><span>number</span><span>Hide remove / add at the bounds</span></div>
+        <div class="opt-row"><code>addLabel</code><span>string</span><span>Text of the add button</span></div>
+        <div class="opt-row"><code>removable</code><span>boolean</span><span>Show the remove button (default true)</span></div>
+        <div class="opt-row"><code>display</code><span>string</span><span>inline (default) or dialog</span></div>
+        <div class="opt-row"><code>form</code><span>Form</span><span>The form, when the list is not inside a <code>&lt;pdx-form&gt;</code></span></div>
+        <div class="opt-row"><code>row</code><span>slot</span><span>One row, with <code>item</code>, <code>index</code>, <code>fields</code>, <code>remove()</code></span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/field-list';
+@title 'Field List Component';
+</script>
+
+<style scoped>
+  .page { }
+
+  .form-stack { display: flex; flex-direction: column; gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); }
+  .values-json {
+    margin-top: var(--pdx-space-md); padding: var(--pdx-space-md);
+    background: var(--pdx-color-surface-inset, var(--pdx-color-surface));
+    border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md);
+    font-size: 0.8rem; white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+</style>

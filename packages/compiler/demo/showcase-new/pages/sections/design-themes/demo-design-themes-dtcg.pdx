@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Take the tokens with you — DTCG</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The tokens of the theme you are viewing, in the
+      <a class="pdx-link" href="https://tr.designtokens.org/format/" target="_blank" rel="noreferrer">Design Tokens Community Group</a>
+      format that Figma Variables and Tokens Studio import. Generated here by
+      <code>toDTCGJson()</code>, over the {{ contractSize }} tokens a theme is expected to have an
+      opinion about.
+    </p>
+    <details class="source-block" open>
+      <summary>tokens.json</summary>
+      <pre class="pdx-txt-mono dtcg-block"><code data-test="dtcg">{{ dtcg }}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { THEME_CONTRACT } from '@pdxui/design/engine';
+import { useThemeMeasure } from './state.pdx';
+
+// Measured by the page on mount and on every theme change (state.pdx.ts).
+const themeMeasure = useThemeMeasure();
+const dtcg = $derived(themeMeasure.dtcg());
+
+const contractSize = THEME_CONTRACT.length;
+</script>
+
+<style scoped>
+.dtcg-block { max-height: 340px; overflow: auto; }
+</style>

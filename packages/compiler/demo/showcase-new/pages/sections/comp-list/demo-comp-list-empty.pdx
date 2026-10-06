@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Empty State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">When items is empty, shows the empty state.</p>
+    <div class="demo-container">
+      <pdx-list :items="emptyItems" empty-title="No users found" empty-description="Try adjusting your search or filters." empty-icon="search"></pdx-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="[]"
+  empty-title="No users found"
+  empty-description="Try adjusting your search or filters."
+  empty-icon="search"&gt;
+&lt;/pdx-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const emptyItems = [];
+</script>

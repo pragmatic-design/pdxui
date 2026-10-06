@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default horizontal layout with colon after labels.</p>
+    <div class="demo-container">
+      <pdx-description-list :items="basicItems"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { label: 'Name', value: 'John Doe' },
+  { label: 'Email', value: 'john.doe@example.com' },
+  { label: 'Phone', value: '+1 (555) 123-4567' },
+  { label: 'Role', value: 'Administrator' },
+];
+
+&lt;pdx-description-list :items="items"&gt;
+&lt;/pdx-description-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+</script>

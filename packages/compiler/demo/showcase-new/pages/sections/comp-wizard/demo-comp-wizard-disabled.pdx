@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <p class="pdx-txt-small pdx-ink-muted">No interaction when disabled.</p>
+
+    <div class="demo-box">
+      <pdx-wizard disabled>
+        <div data-wizard-step data-label="Locked">
+          <p class="pdx-txt-body pdx-ink-muted">This wizard is disabled.</p>
+        </div>
+        <div data-wizard-step data-label="Step 2">
+          <p class="pdx-txt-body">Unreachable.</p>
+        </div>
+      </pdx-wizard>
+    </div>
+  </section>
+</template>

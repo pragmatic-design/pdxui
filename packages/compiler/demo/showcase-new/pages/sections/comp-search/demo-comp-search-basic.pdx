@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Basic Search">
+        <pdx-search-input placeholder="Search users..."></pdx-search-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="With Keyboard Shortcut">
+        <pdx-search-input placeholder="Search commands..." shortcut="Ctrl+K"></pdx-search-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-search-input
+  placeholder="Search..."
+  debounce="300"
+  shortcut="Ctrl+K"
+  @pdx-search="onSearch"&gt;
+&lt;/pdx-search-input&gt;</code></pre>
+    </details>
+  </section>
+</template>

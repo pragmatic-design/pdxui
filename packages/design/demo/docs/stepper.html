@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Stepper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Stepper</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Stepper / Wizard</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Multi-step progress. Horizontal + vertical, icon steps, error state, clickable, descriptions.</p>
+                    </pdx-stack>
+
+                    <!-- Basic horizontal -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Horizontal</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Done, active, upcoming states with connectors.</p>
+                        <div class="pdx-stepper">
+                            <div class="pdx-step" data-status="done"><div class="pdx-step-number"><i data-lucide="check" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Account</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step" data-status="done"><div class="pdx-step-number"><i data-lucide="check" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Profile</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step" data-status="active"><div class="pdx-step-number">3</div><span class="pdx-step-label">Payment</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step"><div class="pdx-step-number">4</div><span class="pdx-step-label">Review</span></div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- With icons -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Icon Steps</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Use icons instead of numbers.</p>
+                        <div class="pdx-stepper">
+                            <div class="pdx-step" data-status="done"><div class="pdx-step-number"><i data-lucide="user" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Account</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step" data-status="active"><div class="pdx-step-number"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Payment</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step"><div class="pdx-step-number"><i data-lucide="package" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Shipping</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step"><div class="pdx-step-number"><i data-lucide="check-circle" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Confirm</span></div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Error state -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Error State</h2>
+                        <p class="pdx-txt-small pdx-ink-muted"><code>data-status="error"</code> for failed steps.</p>
+                        <div class="pdx-stepper">
+                            <div class="pdx-step" data-status="done"><div class="pdx-step-number"><i data-lucide="check" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Details</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step" data-status="error"><div class="pdx-step-number"><i data-lucide="x" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Validation</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step"><div class="pdx-step-number">3</div><span class="pdx-step-label">Submit</span></div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Small variant -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Small</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Compact with <code>pdx-stepper-sm</code>.</p>
+                        <div class="pdx-stepper pdx-stepper-sm">
+                            <div class="pdx-step" data-status="done"><div class="pdx-step-number"><i data-lucide="check" style="width:10px;height:10px"></i></div><span class="pdx-step-label">Step 1</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step" data-status="done"><div class="pdx-step-number"><i data-lucide="check" style="width:10px;height:10px"></i></div><span class="pdx-step-label">Step 2</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step" data-status="active"><div class="pdx-step-number">3</div><span class="pdx-step-label">Step 3</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step"><div class="pdx-step-number">4</div><span class="pdx-step-label">Step 4</span></div>
+                            <div class="pdx-step-connector"></div>
+                            <div class="pdx-step"><div class="pdx-step-number">5</div><span class="pdx-step-label">Step 5</span></div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Vertical stepper -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Vertical</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Vertical layout with descriptions. Use <code>pdx-stepper-vertical</code>.</p>
+                        <div class="pdx-stepper-vertical" style="max-width:28rem">
+                            <div class="pdx-step" data-status="done">
+                                <div class="pdx-step-number"><i data-lucide="check" style="width:14px;height:14px"></i></div>
+                                <div class="pdx-step-content">
+                                    <span class="pdx-step-label">Create Account</span>
+                                    <span class="pdx-step-desc">Set up your email and password.</span>
+                                </div>
+                            </div>
+                            <div class="pdx-step" data-status="done">
+                                <div class="pdx-step-number"><i data-lucide="check" style="width:14px;height:14px"></i></div>
+                                <div class="pdx-step-content">
+                                    <span class="pdx-step-label">Complete Profile</span>
+                                    <span class="pdx-step-desc">Add your name, avatar, and bio.</span>
+                                </div>
+                            </div>
+                            <div class="pdx-step" data-status="active">
+                                <div class="pdx-step-number">3</div>
+                                <div class="pdx-step-content">
+                                    <span class="pdx-step-label">Add Payment Method</span>
+                                    <span class="pdx-step-desc">Credit card or bank transfer.</span>
+                                    <div style="margin-top:var(--pdx-space-sm)">
+                                        <div class="pdx-surface-card pdx-card-compact">
+                                            <div class="pdx-card-body">
+                                                <pdx-stack gap="sm">
+                                                    <div class="pdx-field"><label class="pdx-field-label">Card Number</label><input class="pdx-input" placeholder="4242 4242 4242 4242"></div>
+                                                    <pdx-row gap="sm"><div class="pdx-field" grow><label class="pdx-field-label">Expiry</label><input class="pdx-input" placeholder="MM/YY"></div><div class="pdx-field" grow><label class="pdx-field-label">CVC</label><input class="pdx-input" placeholder="123"></div></pdx-row>
+                                                    <button class="pdx-primary" size="sm">Continue</button>
+                                                </pdx-stack>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pdx-step">
+                                <div class="pdx-step-number">4</div>
+                                <div class="pdx-step-content">
+                                    <span class="pdx-step-label">Review & Confirm</span>
+                                    <span class="pdx-step-desc">Verify your details and submit.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

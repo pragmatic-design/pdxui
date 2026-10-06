@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Heatmap</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Grid-based intensity. Values mapped to color gradient (light → primary).</p>
+
+    <div class="demo-area">
+      <pdx-chart type="heatmap" :data="heatmapData" :x-field="'hour'" :y-field="'day'" height="280px" :legend="false"></pdx-chart>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chart type="heatmap" :data="data"
+  :x-field="'hour'" :y-field="'day'" /&gt;
+
+// Data: { hour, day, visits } (value field auto-detected)</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const heatmapData = buildHeatmap();
+
+function buildHeatmap() {
+  const dList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const hList = ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm'];
+  const out = [];
+  for (let di = 0; di < dList.length; di++) {
+    for (let hi = 0; hi < hList.length; hi++) {
+      out.push({ hour: hList[hi], day: dList[di], visits: Math.floor(Math.random() * 100) });
+    }
+  }
+  return out;
+}
+</script>

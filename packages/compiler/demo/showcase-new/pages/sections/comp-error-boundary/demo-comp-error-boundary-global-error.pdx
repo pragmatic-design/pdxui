@@ -1,0 +1,60 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">onGlobalError — App-wide Interceptor</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Catches all errors not handled by local boundaries. The log below shows errors intercepted globally.
+    </p>
+    <div class="demo-box">
+      <div class="demo-widget">
+        <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="triggerGlobalError">Trigger Unhandled Error</button>
+      </div>
+      @if (globalErrors.length > 0) {
+        <div class="error-log">
+          <div class="pdx-txt-small" style="font-weight: 600; margin-bottom: var(--pdx-space-xs)">Global Error Log ({{ globalErrors.length }})</div>
+          @for (globalErrors as entry; track entry.id) {
+            <div class="log-entry">
+              <span class="log-source">{{ entry.source }}</span>
+              <span class="log-msg">{{ entry.message }}</span>
+              <span class="log-time">{{ entry.time }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>import { onGlobalError } from '@pdxui/core';
+
+onGlobalError((error, context) =&gt; {
+  telemetry.log({
+    source: context.source,
+    component: context.component,
+    message: error.message,
+  });
+  // return true to suppress console.error
+  return true;
+});</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Global Error Interceptor Demo ──────────────────────
+
+import { onGlobalError } from '@pdxui/core';
+
+let globalErrors = $signal([]);
+let errorId = $signal(0);
+
+onGlobalError(function handleGlobalError(error, context) {
+  errorId = errorId + 1;
+  globalErrors = globalErrors.slice().concat([{
+    id: errorId,
+    source: context.source,
+    message: error.message,
+    time: new Date().toLocaleTimeString(),
+  }]);
+  return true;
+});
+
+function triggerGlobalError() {
+  throw new Error('Unhandled click: fetchUserProfile() returned 403 Forbidden');
+}
+</script>

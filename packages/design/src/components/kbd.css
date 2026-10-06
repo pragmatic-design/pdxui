@@ -1,0 +1,83 @@
+/* Kbd / Keyboard Shortcut — styled key indicators.
+   Single keys, combinations, sequences.
+
+   Usage:
+     <kbd class="pdx-kbd">K</kbd>
+     <span class="pdx-kbd-combo"><kbd class="pdx-kbd">Ctrl</kbd><kbd class="pdx-kbd">K</kbd></span>
+     <span class="pdx-kbd-seq"><kbd class="pdx-kbd">G</kbd> then <kbd class="pdx-kbd">D</kbd></span>
+*/
+
+/* ===== Single key ===== */
+
+.pdx-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4em;
+    height: 1.5em;
+    padding: 0 0.35em;
+    font-family: var(--pdx-font-mono);
+    font-size: 0.75em;
+    line-height: 1;
+    color: var(--pdx-color-text);
+    background: light-dark(oklch(0.97 0 0), oklch(0.2 0 0));
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--pdx-radius-sm);
+    box-shadow: light-dark(
+        0 1px 0 oklch(0 0 0 / 0.06),
+        0 1px 0 oklch(0 0 0 / 0.3)
+    );
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+
+/* ===== Combination (Ctrl+K) ===== */
+
+.pdx-kbd-combo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15em;
+}
+
+.pdx-kbd-combo > .pdx-kbd + .pdx-kbd::before {
+    content: '+';
+    margin-right: 0.15em;
+    color: var(--pdx-color-muted);
+    font-size: 0.8em;
+}
+
+/* ===== Sequence (G then D) ===== */
+
+.pdx-kbd-seq {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    font-size: 0.75em;
+    color: var(--pdx-color-muted);
+}
+
+/* ===== Size variants ===== */
+
+.pdx-kbd-sm {
+    font-size: 0.65em;
+    min-width: 1.2em;
+    height: 1.3em;
+    padding: 0 0.25em;
+}
+
+.pdx-kbd-lg {
+    font-size: 0.9em;
+    min-width: 1.6em;
+    height: 1.7em;
+    padding: 0 0.45em;
+}
+
+/* ===== Light variant (for dark backgrounds) ===== */
+
+.pdx-kbd-light {
+    background: oklch(1 0 0 / 0.1);
+    border-color: oklch(1 0 0 / 0.2);
+    color: oklch(0.9 0 0);
+    box-shadow: 0 1px 0 oklch(0 0 0 / 0.3);
+}

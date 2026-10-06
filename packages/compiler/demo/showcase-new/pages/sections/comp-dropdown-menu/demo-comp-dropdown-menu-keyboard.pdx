@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+    <div class="options-table">
+      <div class="opt-header"><span>Key</span><span>Action</span></div>
+      <div class="opt-row"><kbd>Enter</kbd> / <kbd>Space</kbd> / <kbd>↓</kbd><span>On the trigger: open, focus the first item</span></div>
+      <div class="opt-row"><kbd>↑</kbd><span>On the trigger: open, focus the last item</span></div>
+      <div class="opt-row"><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Home</kbd> <kbd>End</kbd><span>Move between items (separators are skipped; wraps)</span></div>
+      <div class="opt-row"><kbd>→</kbd> / <kbd>←</kbd><span>Open a submenu on its first item / close it, back to its item</span></div>
+      <div class="opt-row"><kbd>Enter</kbd> / <kbd>Space</kbd><span>Activate the item; a checkbox or radio item toggles and the menu stays open</span></div>
+      <div class="opt-row"><kbd>Esc</kbd><span>Close, focus back on the trigger</span></div>
+      <div class="opt-row"><kbd>Tab</kbd><span>Close and move on from the trigger</span></div>
+    </div>
+  </section>
+</template>

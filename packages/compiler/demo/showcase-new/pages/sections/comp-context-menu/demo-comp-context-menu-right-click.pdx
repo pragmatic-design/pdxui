@@ -1,0 +1,50 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Right-Click Area</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Right-click (or long-press on touch) anywhere in the box below — or Tab to it and press Shift+F10 or the menu key.</p>
+    <pdx-context-menu :items="menuItems" @pdx-select="onSelect">
+      <div class="ctx-target" tabindex="0" role="group" aria-label="Document area">
+        <p class="pdx-ink-muted">Right-click here for context menu</p>
+      </div>
+    </pdx-context-menu>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="ctx-log">{{ ctxLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-context-menu :items="menuItems" @pdx-select="onSelect"&gt;
+  &lt;!-- focusable, so Shift+F10 and the menu key can reach it --&gt;
+  &lt;div class="target-area" tabindex="0" role="group" aria-label="Document area"&gt;Right-click here&lt;/div&gt;
+&lt;/pdx-context-menu&gt;
+
+// menuItems = [
+//   { key: 'cut', label: 'Cut', icon: 'scissors', shortcut: 'Ctrl+X' },
+//   { key: 'copy', label: 'Copy', icon: 'copy', shortcut: 'Ctrl+C' },
+//   { key: 'paste', label: 'Paste', icon: 'clipboard', shortcut: 'Ctrl+V' },
+//   { key: 'sep', type: 'separator' },
+//   { key: 'delete', label: 'Delete', icon: 'trash', danger: true },
+// ]</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useContextMenuLog } from './state.pdx';
+
+// Both menus on the page write to this line (state.pdx.ts).
+const contextMenuLog = useContextMenuLog();
+const ctxLog = $derived(contextMenuLog.ctxLog());
+function onSelect(e) { contextMenuLog.onSelect(e); }
+
+const menuItems = [
+  { key: 'cut', label: 'Cut', icon: 'scissors', shortcut: 'Ctrl+X' },
+  { key: 'copy', label: 'Copy', icon: 'copy', shortcut: 'Ctrl+C' },
+  { key: 'paste', label: 'Paste', icon: 'clipboard', shortcut: 'Ctrl+V' },
+  { key: 'sep1', type: 'separator' },
+  { key: 'select-all', label: 'Select All', shortcut: 'Ctrl+A' },
+  { key: 'sep2', type: 'separator' },
+  { key: 'delete', label: 'Delete', icon: 'trash', shortcut: 'Del', danger: true },
+];
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+</style>

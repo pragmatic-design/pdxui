@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Auto Color from Name</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>color="auto"</code> (default) generates a consistent color from the name hash. Same name = always same color. 10 distinct hues.</p>
+
+    <div class="demo-row">
+      <pdx-avatar alt="Alice"></pdx-avatar>
+      <pdx-avatar alt="Bob"></pdx-avatar>
+      <pdx-avatar alt="Charlie"></pdx-avatar>
+      <pdx-avatar alt="Diana"></pdx-avatar>
+      <pdx-avatar alt="Eve"></pdx-avatar>
+      <pdx-avatar alt="Frank"></pdx-avatar>
+      <pdx-avatar alt="Grace"></pdx-avatar>
+      <pdx-avatar alt="Henry"></pdx-avatar>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-xs)">Each name produces a stable color: the same name always gets the same one.</p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-avatar alt="Alice"&gt;&lt;/pdx-avatar&gt;  &lt;!-- auto color from "Alice" --&gt;
+&lt;pdx-avatar alt="Bob" color="#e91e63"&gt;&lt;/pdx-avatar&gt;  &lt;!-- explicit color --&gt;</code></pre>
+    </details>
+  </section>
+</template>

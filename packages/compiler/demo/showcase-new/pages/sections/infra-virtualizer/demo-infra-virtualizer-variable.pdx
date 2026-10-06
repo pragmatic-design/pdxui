@@ -1,0 +1,54 @@
+<template>
+  <section>
+    <h3>Variable Heights (5,000 items, 30-80px)</h3>
+    <div class="stats">
+      <span>Rendered: <strong>{{ rendered2 }}</strong> / 5,000</span>
+    </div>
+    <div class="scroll-box" :ref="scroll2Ref">
+      <div :ref="inner2Ref" style="position:relative"></div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createVirtualizer, effect, onMount } from '@pdxui/core';
+
+let rendered2 = $signal(0);
+
+let scroll2Ref = $signal(null);
+let inner2Ref = $signal(null);
+
+const COUNT2 = 5000;
+const heights2 = Array.from({ length: COUNT2 }, () => 30 + Math.floor(Math.random() * 50));
+
+let v2 = null;
+
+onMount(() => {
+    // Wait a tick for :ref to be set
+    requestAnimationFrame(() => {
+        const scrollEl2 = scroll2Ref;
+        const innerEl2 = inner2Ref;
+
+        if (scrollEl2 && innerEl2) {
+            v2 = createVirtualizer({
+                count: () => COUNT2,
+                estimateSize: (i) => heights2[i],
+                getScrollElement: () => scrollEl2,
+                overscan: 5,
+            });
+
+            effect(() => {
+                const items = v2.items();
+                const total = v2.totalSize();
+                rendered2 = items.length;
+                innerEl2.style.height = total + 'px';
+                let html = '';
+                for (const item of items) {
+                    html += '<div class="v-item' + (item.index % 2 === 0 ? ' even' : '') + '" style="height:' + item.size + 'px;transform:translateY(' + item.offsetStart + 'px)"><span>#' + item.index + '</span><span class="muted">' + item.size + 'px</span></div>';
+                }
+                innerEl2.innerHTML = html;
+            });
+        }
+    });
+});
+</script>

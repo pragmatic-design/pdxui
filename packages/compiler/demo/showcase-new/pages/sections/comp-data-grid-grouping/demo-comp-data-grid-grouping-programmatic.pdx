@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Programmatic Grouping</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use the <code>group-by</code> prop to set initial grouping. Accepts an array of
+      <code>{ field, dir? }</code> descriptors.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="progDS" :columns="columns" :group-by="groupByCategory" :show-group-bar="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  :group-by="[{ field: 'category' }]"
+  show-group-bar hover striped&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products, columns } from './state.pdx';
+
+const progDS = createDataSource({ data: products.slice(), pageSize: 0 });
+const groupByCategory = [{ field: 'category' }];
+</script>

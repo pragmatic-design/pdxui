@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Right Position</h2>
+    <div class="demo-layout">
+      <div class="demo-content">Content with right sidebar</div>
+      <pdx-sidebar open position="right" :width="200">
+        <pdx-nav-menu :items="shortItems" activekey="overview"></pdx-nav-menu>
+      </pdx-sidebar>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const shortItems = [
+  { key: 'overview', label: 'Overview', icon: 'eye' },
+  { key: 'details', label: 'Details', icon: 'file-text' },
+  { key: 'comments', label: 'Comments', icon: 'message-circle' },
+];
+</script>

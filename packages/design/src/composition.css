@@ -1,0 +1,22 @@
+/* ==========================================================================
+   Composition rules — enforce group constraints on inner elements.
+   This layer comes AFTER themes, so group radius always wins over
+   standalone component radius (e.g., pill buttons inside input-groups).
+   Zero !important needed — cascade layer ordering handles it.
+   ========================================================================== */
+
+/* Input-group: children use inherited --_r-* custom properties for radius */
+:is(.pdx-input-group, pdx-input-group) > pdx-input .pdx-input-wrap,
+:is(.pdx-input-group, pdx-input-group) > pdx-button button,
+:is(.pdx-input-group, pdx-input-group) > .pdx-input-wrap,
+:is(.pdx-input-group, pdx-input-group) > button,
+:is(.pdx-input-group, pdx-input-group) > .pdx-input-addon {
+    border-radius: var(--_r-tl, 0) var(--_r-tr, 0) var(--_r-br, 0) var(--_r-bl, 0);
+}
+
+/* Number-group: same enforcement */
+.pdx-number-group > .pdx-input-wrap,
+.pdx-number-group > .pdx-input-addon,
+.pdx-number-group > .pdx-number-btn-stack {
+    border-radius: var(--_r-tl, 0) var(--_r-tr, 0) var(--_r-br, 0) var(--_r-bl, 0);
+}

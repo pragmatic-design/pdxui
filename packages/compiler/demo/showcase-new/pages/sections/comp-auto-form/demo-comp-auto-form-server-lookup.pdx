@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Server-side Lookup (autocomplete)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      A <code>type: 'lookup'</code> field with <code>optionsSource</code> loads its options
+      <strong>from the server as you type</strong> (a remote autocomplete). Type "ro" in City;
+      the multi-value lookup below it picks several, as chips.
+    </p>
+    <div class="demo-container">
+      <pdx-auto-form :schema="lookupSchema"></pdx-auto-form>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>function loadCities(query) {
+  return fetch('/api/cities?q=' + query).then(r =&gt; r.json()); // [{ label, value }]
+}
+
+const schema = { fields: [
+  { name: 'name', label: 'Name', type: 'text', required: true },
+  { name: 'city', label: 'City', type: 'lookup', optionsSource: loadCities },
+  // many-to-many: multi-value lookup → chips, value is an array
+  { name: 'cities', label: 'Cities', type: 'lookup', multiple: true, optionsSource: loadCities },
+] };</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+// Server-side lookup field (type: 'lookup') — options loaded on demand while typing.
+const allCities = ['Milano', 'Roma', 'Torino', 'Napoli', 'Bologna', 'Firenze', 'Venezia', 'Genova', 'Palermo', 'Bari', 'Verona'];
+
+function loadCities(query) {
+  return new Promise(function(resolve) {
+    setTimeout(function() {
+      const q = (query || '').toLowerCase();
+      resolve(allCities.filter(function(c) { return c.toLowerCase().includes(q); }).map(function(c) { return { label: c, value: c }; }));
+    }, 200);
+  });
+}
+
+const lookupSchema = {
+  fields: [
+    { name: 'name', label: 'Name', type: 'text', required: true, validators: [{ type: 'required' }] },
+    { name: 'city', label: 'City (server lookup)', type: 'lookup', optionsSource: loadCities, placeholder: 'Type to search…' },
+    { name: 'cities', label: 'Cities (multi-value)', type: 'lookup', multiple: true, optionsSource: loadCities, placeholder: 'Pick several…' },
+  ],
+  layout: 'grid', columns: 12,
+};
+</script>

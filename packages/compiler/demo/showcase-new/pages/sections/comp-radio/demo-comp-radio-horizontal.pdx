@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal Orientation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>orientation="horizontal"</code> for inline layout. Arrow Left/Right for navigation.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Size"></pdx-label>
+        <pdx-radio-group orientation="horizontal" value="md">
+          <pdx-radio label="S" value="sm"></pdx-radio>
+          <pdx-radio label="M" value="md"></pdx-radio>
+          <pdx-radio label="L" value="lg"></pdx-radio>
+          <pdx-radio label="XL" value="xl"></pdx-radio>
+        </pdx-radio-group>
+      </div>
+    </div>
+  </section>
+</template>

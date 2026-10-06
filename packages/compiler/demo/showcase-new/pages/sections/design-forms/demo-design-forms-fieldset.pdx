@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Fieldset & Legend</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Group related controls with <code>.pdx-fieldset</code> and <code>.pdx-legend</code>.</p>
+
+    <fieldset class="pdx-fieldset">
+      <legend class="pdx-legend">Notification preferences</legend>
+      <div class="control-list">
+        <label class="control-row"><input type="checkbox" class="pdx-checkbox" checked /><span>Email notifications</span></label>
+        <label class="control-row"><input type="checkbox" class="pdx-checkbox" /><span>SMS notifications</span></label>
+        <label class="control-row"><input type="checkbox" class="pdx-checkbox" checked /><span>Push notifications</span></label>
+      </div>
+    </fieldset>
+  </section>
+</template>

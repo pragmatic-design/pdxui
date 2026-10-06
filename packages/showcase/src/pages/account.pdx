@@ -1,0 +1,208 @@
+<template>
+  <section class="page" data-test="account">
+    <h1 class="pdx-txt-title">{{ $t('account.title') }}</h1>
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('account.intro') }}</p>
+
+    <!-- ─── Profile ─────────────────────────────────────────────────────────────────────
+         Decoded from the token by the store: no request was made to draw this card. The role is
+         named by its label — the key is the server's, not the reader's. -->
+    <div class="card pdx-surface-card" data-test="profile-card">
+      <div class="identity">
+        <span class="avatar" aria-hidden="true" data-test="profile-avatar">{{ initials }}</span>
+        <div>
+          <h2 class="pdx-txt-heading" data-test="who">{{ name }}</h2>
+          <p class="pdx-txt-small pdx-ink-muted" data-test="email">{{ email }}</p>
+        </div>
+      </div>
+      <dl class="facts">
+        <div><dt>{{ $t('account.role') }}</dt><dd data-test="roles">{{ roleLabel }}</dd></div>
+        <!-- What the permissions ALLOW, in words. They are read as signals at every use —
+             `permissions.md`'s first gotcha is caching the boolean before the user is known. -->
+        <div><dt>{{ $t('account.can') }}</dt><dd data-test="perms">{{ abilities }}</dd></div>
+      </dl>
+    </div>
+
+    <!-- ─── Preferences ─────────────────────────────────────────────────────────────────
+         The same three settings as the profile menu's Settings, on the page: the
+         language through `switchLocale` (both registries), the theme through core's `setScheme`,
+         the density through `src/preferences.ts`. -->
+    <div class="card pdx-surface-card" data-test="preferences">
+      <h2 class="pdx-txt-heading">{{ $t('account.preferencesTitle') }}</h2>
+      <!-- Each control named where it is SEEN, beside it: `label` names the radiogroup for a
+           screen reader, and a row of «Compact · Normal · Comfortable» with no word beside it leaves a
+           sighted reader to guess what it sets. -->
+      <div class="prefs">
+        <span class="pref-label" aria-hidden="true">{{ $t('app.language') }}</span>
+        <pdx-segmented :label="$t('app.language')" :options="localeOptions" :value="locale" @pdx-change="e => switchLocale(e.detail.value)" data-test="pref-locale"></pdx-segmented>
+        <span class="pref-label" aria-hidden="true">{{ $t('app.profile.scheme') }}</span>
+        <pdx-segmented :label="$t('app.profile.scheme')" :options="schemeOptions" :value="scheme" @pdx-change="e => setScheme(e.detail.value)" data-test="pref-scheme"></pdx-segmented>
+        <span class="pref-label" aria-hidden="true">{{ $t('app.profile.density') }}</span>
+        <pdx-segmented :label="$t('app.profile.density')" :options="densityOptions" :value="density" @pdx-change="pickDensity" data-test="pref-density"></pdx-segmented>
+      </div>
+    </div>
+
+    <!-- ─── Billing ─────────────────────────────────────────────────────────────────────
+         The month-end close is a real administrator's action, so it stays. The count is the
+         SERVER's answer to a request whose bearer `authMiddleware` attached: a token the backend
+         rejected would leave this card waiting. A technician is told the action is not theirs —
+         and the same call made anyway, which the server refuses with its own reason, is the Demo
+         panel's, because nobody using the product presses a button to be refused. -->
+    <div class="card pdx-surface-card" data-test="billing-card">
+      <h2 class="pdx-txt-heading">{{ $t('account.billingTitle') }}</h2>
+      <p class="pdx-txt-body" :show="closedMonths !== null" data-test="closed-months">{{ $t('account.closedMonths', { count: closedMonths ?? 0 }) }}</p>
+      <p class="pdx-txt-small pdx-ink-muted" :show="closedMonths === null" data-test="server-pending">{{ $t('account.billingPending') }}</p>
+
+      @if (canCloseMonth()) {
+        <pdx-button variant="primary" @click="closeMonth" data-test="close-month">{{ $t('account.closeMonth') }}</pdx-button>
+      } @else {
+        <p class="pdx-txt-small pdx-ink-muted" data-test="close-month-hidden">{{ $t('account.closeMonthHidden') }}</p>
+      }
+
+      <p class="pdx-txt-small allowed" :show="actionOk !== ''" role="status" data-test="action-ok">{{ actionOk }}</p>
+      <p class="pdx-txt-small refused" :show="actionError !== ''" role="alert" data-test="action-error">{{ actionError }}</p>
+    </div>
+
+    <!-- ─── Session ─────────────────────────────────────────────────────────────────────
+         Until when, as a time: a countdown in seconds is a debugger's view of the same fact. -->
+    <div class="card pdx-surface-card" data-test="session-card">
+      <h2 class="pdx-txt-heading">{{ $t('account.sessionTitle') }}</h2>
+      <p class="pdx-txt-small pdx-ink-muted" data-test="session-state">{{ $t('account.signedInUntil', { time: expiresAt }) }}</p>
+      <pdx-button variant="outline" @click="signOut" data-test="sign-out">{{ $t('account.signOut') }}</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+@page '/account' { label: accountLabel };
+@title $t('account.title');
+
+// The crumb and the tab title in the page's language: a label read from the dictionary.
+function accountLabel() {
+  return $t('account.title');
+}
+// The route's own permission. The outlet registers the bridge to `hasPermission` when it mounts,
+// so nothing here wires the check — and a visitor without it never reaches this template, because
+// `src/auth.ts` points `guardFailRedirect` at the login.
+@guard 'account.read';
+
+// A person's profile and preferences. The authentication is measured in `auth.spec.ts`, through
+// this page and the Demo panel.
+import { hasPermission, getLocale, currentScheme, setScheme } from '@pdxui/core';
+import { auth, signOut } from '../auth';
+import { roleName } from '../data/grants';
+import { api } from '../api';
+import { LOCALES, localeName, switchLocale } from '../i18n';
+import { DENSITIES, storedDensity, setDensity } from '../preferences';
+import { registerDemo } from '../demo';
+
+const user = $derived(auth.user());
+const name = $derived(user?.name ?? '');
+const email = $derived(user?.email ?? '');
+const initials = $derived(name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase());
+const roleLabel = $derived((user?.roles ?? []).map(roleName).join(', '));
+
+const canCloseMonth = hasPermission('billing.write');
+const canReadBilling = hasPermission('billing.read');
+const abilities = $derived(describeAbilities(canReadBilling(), canCloseMonth()));
+
+function describeAbilities(read, write) {
+  const more = [read ? $t('account.canBilling.read') : null, write ? $t('account.canBilling.write') : null]
+    .filter(Boolean);
+  return more.length ? $t('account.canList', { more: more.join($t('account.and')) }) : $t('account.canNothing');
+}
+
+// ── Preferences ──────────────────────────────────────────────────────────────────────────
+const localeSignal = getLocale();
+const locale = $derived(localeSignal());
+const localeOptions = LOCALES.map(l => ({ value: l.value, label: localeName(l.value) }));
+const scheme = $derived(currentScheme() === 'dark' ? 'dark' : 'light');
+const schemeOptions = $derived([
+  { value: 'light', label: $t('app.profile.light') },
+  { value: 'dark', label: $t('app.profile.dark') },
+]);
+let density = $signal(storedDensity());
+const densityOptions = $derived(DENSITIES.map(d => ({ value: d, label: $t('app.profile.' + d) })));
+
+function pickDensity(e) {
+  density = e.detail.value;
+  setDensity(e.detail.value);
+}
+
+// ── Billing ──────────────────────────────────────────────────────────────────────────────
+/** What the account endpoints answer with. */
+interface AccountState { closedMonths: number | null }
+
+let closedMonths = $signal<number | null>(null);
+let actionOk = $signal('');
+let actionError = $signal('');
+
+// The server's view. `api` is the one client `src/auth.ts` configured, so the bearer is attached
+// by middleware and this call says nothing about tokens.
+$effect(() => {
+  if (!auth.isAuthenticated()) return;
+  void api.get<AccountState>('/account/me').then(me => { closedMonths = me.closedMonths; }).catch(() => { closedMonths = null; });
+});
+
+async function closeMonth() {
+  actionOk = '';
+  actionError = '';
+  try {
+    const result = await api.post<AccountState>('/account/close-month', {});
+    closedMonths = result.closedMonths;
+    actionOk = $t('account.closed', { count: result.closedMonths });
+  } catch (err) {
+    // The server's own words. A client that rewrote them would be hiding the enforcement it is
+    // there to show.
+    actionError = String(err?.data?.error ?? err?.message ?? err);
+  }
+}
+
+// The same call with nothing hidden, for the Demo panel: hiding a button is not forbidding the
+// action, and the server's 403 is what shows it.
+onMount(() => onDestroy(registerDemo([
+  { test: 'close-month-anyway', label: 'account.demo.closeAnyway', run: closeMonth },
+])));
+
+// ── Session ──────────────────────────────────────────────────────────────────────────────
+// `isAuthenticated()` flips by itself when the token passes its `exp` — the store arms a timer —
+// and the app, not this page, sends the visitor to the sign-in then, carrying this page as `next`
+// (`src/auth.ts`). This page does not watch it on its own, which would send to a bare `/login`.
+
+/** When the session ends, as the reader's clock says it — again when the user or the locale changes. */
+const expiresAt = $derived(user ? endOfSession(auth.getToken()) : '');
+
+function endOfSession(token) {
+  const exp = token ? Number(JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).exp) : 0;
+  return exp ? $d(new Date(exp * 1000), { timeStyle: 'short' }) : '';
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+
+  .card {
+    display: flex; flex-direction: column; gap: var(--pdx-space-sm); align-items: flex-start;
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+  }
+
+  .identity { display: flex; align-items: center; gap: var(--pdx-space-md); }
+  .identity h2, .identity p { margin: 0; }
+  .avatar {
+    width: 48px; height: 48px; flex: 0 0 auto;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text);
+    font-weight: 600;
+  }
+
+  .facts { display: grid; grid-template-columns: max-content 1fr; gap: var(--pdx-space-xs) var(--pdx-space-lg); margin: 0; }
+  .facts div { display: contents; }
+  .facts dt { color: var(--pdx-color-muted); }
+  .facts dd { margin: 0; }
+
+  .prefs { display: grid; grid-template-columns: max-content auto; align-items: center; gap: var(--pdx-space-sm) var(--pdx-space-lg); }
+  .pref-label { color: var(--pdx-color-muted); }
+  .prefs pdx-segmented { justify-self: start; }
+
+  .allowed { color: var(--pdx-color-success-ink); }
+  .refused { color: var(--pdx-color-danger-ink); }
+</style>

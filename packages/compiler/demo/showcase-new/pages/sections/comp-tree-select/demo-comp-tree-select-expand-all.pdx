@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Expand All</h2>
+    <div class="demo-row">
+      <pdx-tree-select label="Department" expandall :options="departments" placeholder="All expanded"></pdx-tree-select>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { departments } from './state.pdx';
+</script>

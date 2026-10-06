@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h3>Keyboard Drag (a11y)</h3>
+    <p class="desc">Focus the box, then <strong>Space</strong> to grab, <strong>Arrow keys</strong> to move, <strong>Space/Enter</strong> to drop, <strong>Escape</strong> to cancel.</p>
+    <div class="arena-small">
+      <div class="drag-box-small" :ref="kbRef" tabindex="0">Alt+Arrow</div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useDrag, effect, onMount, onDestroy } from '@pdxui/core';
+
+let kbRef = $signal(null);
+
+const kbDrag = useDrag(() => kbRef, { bounds: 'parent' });
+
+onMount(() => {
+    // Keyboard drag visual
+    const d10 = effect(() => {
+        const pos = kbDrag.position();
+        const el = kbRef;
+        if (el) el.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
+    });
+
+    onDestroy(() => {
+        d10();
+        kbDrag.dispose();
+    });
+});
+</script>
+
+<style scoped>
+  .arena-small { position: relative; width: 300px; height: 150px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; }
+  .drag-box-small { position: absolute; top: 40px; left: 100px; width: 100px; height: 50px; background: var(--pdx-color-accent); color: var(--pdx-color-accent-text); display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: grab; user-select: none; touch-action: none; font-size: 0.8rem; font-weight: 600; }
+  .drag-box-small:focus { outline: 3px solid var(--pdx-color-focus); outline-offset: 2px; }
+</style>

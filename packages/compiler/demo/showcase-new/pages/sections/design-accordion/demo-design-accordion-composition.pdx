@@ -1,0 +1,60 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">FAQ section with multiple questions and answers.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Frequently Asked Questions</h3>
+      <div class="pdx-accordion-group">
+        <details class="pdx-accordion">
+          <summary>Is Pragmatic Design free to use?</summary>
+          <div class="pdx-accordion-body">
+            Yes, the core framework is open source and free for both personal and commercial use
+            under the MIT license.
+          </div>
+        </details>
+        <details class="pdx-accordion">
+          <summary>What browsers are supported?</summary>
+          <div class="pdx-accordion-body">
+            All modern evergreen browsers: Chrome, Firefox, Safari, and Edge. The framework
+            uses Web Components and CSS custom properties, both widely supported since 2020.
+          </div>
+        </details>
+        <details class="pdx-accordion">
+          <summary>Can I use it with an existing project?</summary>
+          <div class="pdx-accordion-body">
+            Absolutely. PDX components are standard Web Components and can be used alongside
+            React, Vue, Angular, or plain HTML. Install <code>@pdxui/core</code> and
+            import components as needed.
+          </div>
+        </details>
+        <details class="pdx-accordion">
+          <summary>How does it compare to other frameworks?</summary>
+          <div class="pdx-accordion-body">
+            Pragmatic Design focuses on the compiler doing the work, not the developer.
+            Where other frameworks require manual wiring, PDX generates it from declarations.
+            The result is less code, fewer bugs, and consistent patterns.
+          </div>
+        </details>
+        <details class="pdx-accordion">
+          <summary>Is there enterprise support?</summary>
+          <div class="pdx-accordion-body">
+            Enterprise support plans are available. Contact us for SLAs, dedicated support
+            channels, and priority bug fixes.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-md); }
+</style>

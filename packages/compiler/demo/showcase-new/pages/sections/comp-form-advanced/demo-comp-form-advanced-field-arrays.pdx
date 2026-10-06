@@ -1,0 +1,81 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">4. Field Arrays (Dynamic Rows)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Add/remove line items dynamically. Realistic scenario: invoice with products.
+      Uses <code>createFieldArray()</code> with stable keyed items.
+    </p>
+
+    <div class="demo-block">
+      <h4 class="pdx-txt-small pdx-weight-semibold">Invoice Line Items</h4>
+
+      <div class="field-array-header">
+        <span class="fa-col-product">Product</span>
+        <span class="fa-col-qty">Qty</span>
+        <span class="fa-col-price">Price</span>
+        <span class="fa-col-action"></span>
+      </div>
+      <div class="field-array-rows" :ref="lineItemRows"></div>
+
+      <div class="field-array-footer">
+        <button class="pdx-btn pdx-outline pdx-sm" :ref="addLineButton" @click="addLineItem">+ Add Line Item</button>
+        <span class="pdx-txt-small pdx-ink-muted" :textContent="lineItemCount()"></span>
+        <span class="fa-total pdx-weight-semibold" :textContent="lineItemTotal()"></span>
+      </div>
+
+      <pre class="pdx-txt-mono form-values" :textContent="lineItemsJson()"></pre>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const lineItems = createFieldArray([
+  { product: 'Widget Pro', qty: 2, price: 49.99 },
+]);
+
+function addLineItem() {
+  lineItems.append({ product: '', qty: 1, price: 0 });
+}
+function removeLineItem(idx) {
+  lineItems.remove(idx);
+}
+
+// Reactive total
+function total() {
+  return lineItems.items().reduce(
+    (sum, it) =&gt; sum + it.value.qty * it.value.price, 0
+  );
+}
+
+// API: append, prepend, insert, remove, move, swap
+// Each item has stable .__id for keyed rendering</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createFieldArray, onMount } from '@pdxui/core';
+
+// ─── 4. Field Arrays (Invoice Line Items) ───
+const lineItems = createFieldArray([{ product: 'Widget Pro', qty: 2, price: 49.99 }, { product: 'Cable USB-C', qty: 5, price: 12.50 }]);
+
+function addLineItem() { lineItems.append({ product: '', qty: 1, price: 0 }); renderLineItems(); }
+
+// A row's fields and its remove button are named after its line; after a removal focus goes to the
+// first field of the row now in that place, else of the last row, else to "+ Add Line Item".
+function removeLineItem(idx) { lineItems.remove(idx); renderLineItems(idx); }
+
+let lineItemRows = $signal(null);
+let addLineButton = $signal(null);
+
+function renderLineItems(focusRow) { requestAnimationFrame(() => { const container = lineItemRows; if (!container) return; container.innerHTML = ''; const items = lineItems.items(); items.forEach((item, idx) => { const n = idx + 1; const row = document.createElement('div'); row.className = 'field-array-row'; const pInput = document.createElement('input'); pInput.className = 'pdx-input'; pInput.placeholder = 'Product name'; pInput.setAttribute('aria-label', 'Product, line ' + n); pInput.value = item.value.product || ''; pInput.addEventListener('input', (e) => { item.value.product = e.target.value; }); const qInput = document.createElement('input'); qInput.className = 'pdx-input'; qInput.type = 'number'; qInput.setAttribute('aria-label', 'Quantity, line ' + n); qInput.value = String(item.value.qty || 1); qInput.style.textAlign = 'center'; qInput.addEventListener('input', (e) => { item.value.qty = Number(e.target.value) || 0; }); const prInput = document.createElement('input'); prInput.className = 'pdx-input'; prInput.type = 'number'; prInput.step = '0.01'; prInput.setAttribute('aria-label', 'Price, line ' + n); prInput.value = String(item.value.price || 0); prInput.style.textAlign = 'right'; prInput.addEventListener('input', (e) => { item.value.price = Number(e.target.value) || 0; }); const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'pdx-btn pdx-ghost pdx-sm'; btn.style.padding = '4px'; btn.textContent = '×'; btn.setAttribute('aria-label', 'Remove line ' + n); btn.addEventListener('click', () => { removeLineItem(idx); }); row.appendChild(pInput); row.appendChild(qInput); row.appendChild(prInput); row.appendChild(btn); container.appendChild(row); }); if (typeof focusRow === 'number') { const rows = container.querySelectorAll('.field-array-row'); const target = rows[Math.min(focusRow, rows.length - 1)]; const first = target ? target.querySelector('input') : addLineButton; if (first) first.focus(); } }); }
+function lineItemCount() { return lineItems.length() + ' item(s)'; }
+function lineItemTotal() { const items = lineItems.items(); let total = 0; for (const it of items) { total += (it.value.qty || 0) * (it.value.price || 0); } return 'Total: $' + total.toFixed(2); }
+function lineItemsJson() { const items = lineItems.items(); return JSON.stringify(items.map(i => i.value), null, 2); }
+
+onMount(renderLineItems);
+</script>
+
+<style scoped>
+  .field-array-header, .field-array-row { display: grid; grid-template-columns: 3fr 1fr 1fr 40px; gap: var(--pdx-space-sm); align-items: center; }
+  .field-array-header { font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-semibold); color: var(--pdx-color-muted); text-transform: uppercase; letter-spacing: 0.04em; padding-bottom: var(--pdx-space-xs); border-bottom: 1px solid var(--pdx-color-border); margin-bottom: var(--pdx-space-sm); }
+  .field-array-rows { display: flex; flex-direction: column; gap: var(--pdx-space-xs); margin-bottom: var(--pdx-space-md); }
+  .field-array-footer { display: flex; gap: var(--pdx-space-sm); align-items: center; }
+  .fa-total { margin-left: auto; font-size: var(--pdx-text-sm); }
+</style>

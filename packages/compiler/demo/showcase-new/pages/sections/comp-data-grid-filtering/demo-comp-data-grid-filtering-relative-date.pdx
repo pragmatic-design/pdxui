@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Relative Date Filters</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>type: 'date'</code> columns offer relative presets, computed from today:
+      <code>Today</code>, <code>Yesterday</code>, <code>This week/month/year</code>,
+      <code>Last 7/30 days</code> (besides After/Before and Between). Open the Order Date filter.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="dateDS" :columns="dateColumns" show-toolbar hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>{ field: 'date', header: 'Order Date', type: 'date' }
+// Operators: After / On or after / Before / On or before / Between
+//   + relative: Today, Yesterday, This week/month/year, Last 7/30 days
+// The relative ones are dynamic ranges (recomputed each time they apply), with no value.</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// Relative date filters: today / yesterday / this month / last 7 days …
+const dateColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'date', header: 'Order Date', type: 'date' },
+  { field: 'category', header: 'Category' },
+];
+
+const dateDS = createDataSource({ data: products.slice(), pageSize: 10 });
+</script>

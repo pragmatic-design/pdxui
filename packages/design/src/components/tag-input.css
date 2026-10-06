@@ -1,0 +1,79 @@
+/* Tag Input — tokenized text input with chips.
+   Reuses .pdx-input-wrap (container) and .pdx-chip (tags).
+   Only additional layout and state overrides live here.
+
+   Usage:
+     <pdx-tag-input>
+       <div class="pdx-input-wrap pdx-tag-input">
+         <span class="pdx-chip">Tag <button class="pdx-chip-remove">&times;</button></span>
+         <input class="pdx-tag-input-field" placeholder="Add tag…" />
+       </div>
+     </pdx-tag-input>
+*/
+
+/* ===== Host ===== */
+
+pdx-tag-input { display: block; }
+
+/* ===== Container (extends .pdx-input-wrap) ===== */
+
+.pdx-tag-input {
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: calc(var(--pdx-input-height, 2.5rem) - 2px);
+    padding: var(--pdx-space-2xs) var(--pdx-space-xs);
+    align-items: center;
+    cursor: text;
+}
+
+/* ===== Inline text input ===== */
+
+.pdx-tag-input-field {
+    flex: 1;
+    min-width: 60px;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    line-height: 1.5;
+}
+
+.pdx-tag-input-field::placeholder {
+    color: var(--pdx-color-muted);
+}
+
+/* ===== Chip overrides (slightly tighter inside input) ===== */
+
+.pdx-tag-input .pdx-chip {
+    margin: 0;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== States ===== */
+
+.pdx-tag-input.disabled {
+    opacity: var(--pdx-opacity-disabled);
+    pointer-events: none;
+}
+
+.pdx-tag-input.readonly .pdx-chip-remove,
+.pdx-tag-input.readonly .pdx-tag-input-field {
+    display: none;
+}
+
+/* ===== Mobile / coarse pointer ===== */
+
+@media (pointer: coarse) {
+    .pdx-tag-input {
+        min-height: 44px;
+        gap: 6px;
+    }
+
+    .pdx-tag-input .pdx-chip {
+        font-size: var(--pdx-text-sm);
+    }
+}

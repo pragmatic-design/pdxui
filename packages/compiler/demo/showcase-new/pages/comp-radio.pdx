@@ -1,0 +1,68 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Radio & Groups</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-radio&gt;</code> + <code>&lt;pdx-radio-group&gt;</code> — single selection with arrow key navigation.
+      Multi-selection has its own page: <code>&lt;pdx-checkbox-group&gt;</code>.
+    </p>
+
+    <!-- ═══ Basic Radio ═══ -->
+    <pdx-demo-comp-radio-basic class="demo-section"></pdx-demo-comp-radio-basic>
+
+    <!-- ═══ With Description ═══ -->
+    <pdx-demo-comp-radio-description class="demo-section"></pdx-demo-comp-radio-description>
+
+    <!-- ═══ Radio Group ═══ -->
+    <pdx-demo-comp-radio-group class="demo-section"></pdx-demo-comp-radio-group>
+
+    <!-- ═══ Horizontal ═══ -->
+    <pdx-demo-comp-radio-horizontal class="demo-section"></pdx-demo-comp-radio-horizontal>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-radio-size-propagation class="demo-section"></pdx-demo-comp-radio-size-propagation>
+
+    <!-- ═══ Error on Group ═══ -->
+    <pdx-demo-comp-radio-error class="demo-section"></pdx-demo-comp-radio-error>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-radio-composition class="demo-section"></pdx-demo-comp-radio-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">pdx-radio</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>checked</code><span>boolean</span><span>Selected state</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Label text</span></div>
+        <div class="opt-row"><code>description</code><span>string</span><span>Help text below label</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Value for group selection</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Red border</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">pdx-radio-group</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Selected radio value</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Accessible name; without it, a pdx-label right before the group names it</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>vertical (default), horizontal</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>Propagated to children</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Propagated to children</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Propagated to children</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/radio';
+@title 'Radio & Groups';
+</script>
+
+<style scoped>
+  .page { }
+</style>

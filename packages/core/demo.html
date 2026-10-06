@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@pdxui/core — Live Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; background: #f8f9fa; color: #1a1a2e; }
+        h1 { margin-bottom: 1.5rem; font-size: 1.5rem; }
+        h2 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; color: #4a4a6a; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
+        .demo-section { background: white; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        button { padding: 0.4rem 1rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white; font-size: 0.9rem; }
+        button:hover { background: #f0f0f0; }
+        button.primary { background: #4361ee; color: white; border-color: #4361ee; }
+        button.primary:hover { background: #3a56d4; }
+        button.danger { background: #e63946; color: white; border-color: #e63946; }
+        input[type="text"] { padding: 0.4rem 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
+        .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
+        .badge-green { background: #d4edda; color: #155724; }
+        .badge-red { background: #f8d7da; color: #721c24; }
+        .badge-blue { background: #cce5ff; color: #004085; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 0.3rem 0; }
+        .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        #log { font-family: monospace; font-size: 0.8rem; background: #1a1a2e; color: #4cc9f0; padding: 0.75rem; border-radius: 4px; max-height: 150px; overflow-y: auto; white-space: pre-wrap; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>@pdxui/core — Live Demo</h1>
+    <div id="app"></div>
+
+    <script type="module">
+        import {
+            signal, computed, effect, batch,
+            html, when, each, match, pipe,
+            component, define, PdxElement,
+            createBus, setPermissions, requirePermission, hasPermission,
+        } from './src/index.ts';
+
+        const app = document.getElementById('app');
+
+        // ─── 1. Counter (signal + effect) ──────────────────────────
+        const count = signal(0);
+        const doubled = computed(() => count() * 2);
+
+        app.appendChild(html`
+            <h2>1. Signal Reactivity</h2>
+            <div class="demo-section">
+                <div class="row">
+                    <button id="dec" @click=${() => count.set(v => v - 1)}>−</button>
+                    <span id="count">${count}</span>
+                    <button id="inc" @click=${() => count.set(v => v + 1)}>+</button>
+                    <span style="color:#888">doubled = <span id="doubled">${doubled}</span></span>
+                </div>
+            </div>
+        `);
+
+        // ─── 2. when() conditional ─────────────────────────────────
+        const showBox = signal(false);
+
+        app.appendChild(html`
+            <h2>2. when() — Conditional Rendering</h2>
+            <div class="demo-section">
+                <button id="toggle-box" @click=${() => showBox.set(v => !v)}>Toggle</button>
+                ${when(
+                    () => showBox(),
+                    () => html`<div id="box" style="margin-top:0.5rem;padding:0.75rem;background:#e8f5e9;border-radius:4px;">
+                        I appear and disappear reactively!
+                    </div>`,
+                    () => html`<div id="no-box" style="margin-top:0.5rem;color:#999;">Box is hidden</div>`
+                )}
+            </div>
+        `);
+
+        // ─── 3. each() list ────────────────────────────────────────
+        const items = signal([
+            { id: 1, name: 'Alpha' },
+            { id: 2, name: 'Beta' },
+            { id: 3, name: 'Gamma' },
+        ]);
+        let nextId = 4;
+
+        function addItem() {
+            const names = ['Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta'];
+            items.set(prev => [...prev, { id: nextId++, name: names[Math.floor(Math.random() * names.length)] }]);
+        }
+        function removeItem(id) {
+            items.set(prev => prev.filter(i => i.id !== id));
+        }
+
+        app.appendChild(html`
+            <h2>3. each() — Reactive List</h2>
+            <div class="demo-section">
+                <button id="add-item" @click=${addItem}>Add Item</button>
+                <ul id="item-list">
+                    ${each(() => items(), 'id', (item) => html`
+                        <li class="row">
+                            <span class="badge badge-blue">${item.id}</span>
+                            ${item.name}
+                            <button @click=${() => removeItem(item.id)} style="font-size:0.75rem;padding:0.15rem 0.5rem;">×</button>
+                        </li>
+                    `)}
+                </ul>
+            </div>
+        `);
+
+        // ─── 4. match() switch ─────────────────────────────────────
+        const status = signal('idle');
+
+        app.appendChild(html`
+            <h2>4. match() — Switch Rendering</h2>
+            <div class="demo-section">
+                <div class="row">
+                    <button @click=${() => status.set('idle')}>Idle</button>
+                    <button @click=${() => status.set('loading')}>Loading</button>
+                    <button @click=${() => status.set('success')}>Success</button>
+                    <button @click=${() => status.set('error')}>Error</button>
+                </div>
+                <div id="match-result" style="margin-top:0.5rem">
+                    ${match(() => status(), {
+                        idle:    () => html`<span class="badge" style="background:#eee">⏸ Idle</span>`,
+                        loading: () => html`<span class="badge" style="background:#fff3cd;color:#856404">⏳ Loading...</span>`,
+                        success: () => html`<span class="badge badge-green">✓ Success</span>`,
+                        error:   () => html`<span class="badge badge-red">✗ Error</span>`,
+                    })}
+                </div>
+            </div>
+        `);
+
+        // ─── 5. Two-way binding (::attr) ──────────────────────────
+        const username = signal('');
+
+        app.appendChild(html`
+            <h2>5. Two-Way Binding (::value)</h2>
+            <div class="demo-section">
+                <div class="row">
+                    <input id="name-input" type="text" ::value=${username} placeholder="Type here...">
+                    <span>→ <strong id="name-mirror">${() => username() || '(empty)'}</strong></span>
+                </div>
+            </div>
+        `);
+
+        // ─── 6. Event modifiers ────────────────────────────────────
+        const keyLog = signal('(press Enter in the input)');
+
+        app.appendChild(html`
+            <h2>6. Event Modifiers (@keydown.enter)</h2>
+            <div class="demo-section">
+                <div class="row">
+                    <input id="key-input" type="text" placeholder="Press Enter..."
+                        @keydown.enter=${(e) => keyLog.set('Enter pressed! Value: ' + e.target.value)}>
+                    <span id="key-log">${keyLog}</span>
+                </div>
+            </div>
+        `);
+
+        // ─── 7. pipe() transform ──────────────────────────────────
+        const price = signal(49.99);
+        const currency = (n) => '$' + n.toFixed(2);
+        const upper = (s) => s.toUpperCase();
+
+        app.appendChild(html`
+            <h2>7. pipe() — Value Transform</h2>
+            <div class="demo-section">
+                <div class="row">
+                    <span>Price: <strong id="piped-price">${() => pipe(price(), currency)}</strong></span>
+                    <button @click=${() => price.set(v => v + 10)}>+$10</button>
+                    <span style="color:#888">${() => pipe('formatted via pipe()', upper)}</span>
+                </div>
+            </div>
+        `);
+
+        // ─── 8. Signal History (undo/redo) ─────────────────────────
+        const editor = signal('Hello', { history: true });
+
+        app.appendChild(html`
+            <h2>8. Signal History — Undo/Redo</h2>
+            <div class="demo-section">
+                <div class="row">
+                    <input id="history-input" type="text" ::value=${editor}>
+                    <button id="undo" @click=${() => editor.undo()} :disabled=${() => !editor.canUndo()}>Undo</button>
+                    <button id="redo" @click=${() => editor.redo()} :disabled=${() => !editor.canRedo()}>Redo</button>
+                </div>
+                <div style="margin-top:0.5rem;font-size:0.85rem;color:#666">
+                    History: <span id="history-list">${() => JSON.stringify(editor.history())}</span>
+                </div>
+            </div>
+        `);
+
+        // ─── 9. Event Bus ──────────────────────────────────────────
+        const bus = createBus({ store: true });
+        const busLog = signal('');
+
+        bus.on('demo:ping', (payload) => {
+            busLog.set(prev => prev + `[${new Date().toLocaleTimeString()}] ping: ${JSON.stringify(payload)}\n`);
+        });
+
+        app.appendChild(html`
+            <h2>9. Event Bus (createBus)</h2>
+            <div class="demo-section">
+                <button id="bus-emit" @click=${() => bus.emit('demo:ping', { n: Math.floor(Math.random() * 100) })}>Emit Ping</button>
+                <button @click=${() => { bus.clear(); busLog.set(''); }}>Clear</button>
+                <div id="log">${busLog}</div>
+            </div>
+        `);
+
+        // ─── 10. Permissions ───────────────────────────────────────
+        const isAdmin = signal(false);
+
+        // Permission checker reads isAdmin signal
+        setPermissions((perm) => {
+            if (perm === 'admin.panel') return isAdmin.peek();
+            return true; // grant everything else
+        });
+
+        app.appendChild(html`
+            <h2>10. Permissions (requirePermission)</h2>
+            <div class="demo-section">
+                <div class="row">
+                    <label><input id="admin-toggle" type="checkbox" @change=${(e) => {
+                        isAdmin.set(e.target.checked);
+                        setPermissions((perm) => {
+                            if (perm === 'admin.panel') return isAdmin.peek();
+                            return true;
+                        });
+                    }}> I am admin</label>
+                </div>
+                <div style="margin-top:0.5rem">
+                    ${requirePermission('admin.panel',
+                        () => html`<div id="admin-panel" class="badge badge-green">🔓 Admin Panel — Welcome!</div>`,
+                        () => html`<div id="no-admin" class="badge badge-red">🔒 Admin Panel — Access Denied</div>`
+                    )}
+                </div>
+            </div>
+        `);
+
+        // ─── 11. component() function API ──────────────────────────
+        component('pdx-demo-counter', {
+            props: {
+                initial: { type: Number, default: 0 },
+                label:   { type: String, default: 'Counter' },
+            },
+            setup(ctx) {
+                const count = signal(ctx.initial.peek());
+                return {
+                    count,
+                    inc: () => count.set(v => v + 1),
+                    dec: () => count.set(v => v - 1),
+                };
+            },
+            render: (ctx) => html`
+                <div class="row" style="padding:0.5rem 0">
+                    <strong>${ctx.label}</strong>
+                    <button @click=${ctx.dec}>−</button>
+                    <span id="wc-count">${ctx.count}</span>
+                    <button @click=${ctx.inc}>+</button>
+                </div>
+            `,
+        });
+
+        app.appendChild(html`
+            <h2>11. component() — Web Component</h2>
+            <div class="demo-section">
+                <pdx-demo-counter label="Fruits" initial="5"></pdx-demo-counter>
+                <pdx-demo-counter label="Veggies" initial="12"></pdx-demo-counter>
+            </div>
+        `);
+    </script>
+</body>
+</html>

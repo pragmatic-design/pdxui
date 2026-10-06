@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">In table rows</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A trend column that stays readable at row height. Use a fixed <code>width</code> so columns align.</p>
+    <div class="demo-container">
+      <div class="mini-table">
+        <div class="mt-head"><span>Product</span><span>Units</span><span>Last 12 weeks</span></div>
+        <div class="mt-row"><span>Aurora Keyboard</span><span>1,204</span><pdx-sparkline data="20,24,22,28,30,27,33,38,36,41,44,49" type="line" width="140px" height="22px"></pdx-sparkline></div>
+        <div class="mt-row"><span>Nimbus Mouse</span><span>982</span><pdx-sparkline data="40,38,42,36,33,35,30,28,31,27,25,22" type="line" color="--pdx-color-danger" width="140px" height="22px"></pdx-sparkline></div>
+        <div class="mt-row"><span>Pulse Headset</span><span>1,640</span><pdx-sparkline data="30,32,31,35,38,40,39,44,47,46,52,58" type="area" width="140px" height="22px"></pdx-sparkline></div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.mini-table { display: flex; flex-direction: column; }
+.mt-head, .mt-row { display: grid; grid-template-columns: minmax(0, 1fr) 80px minmax(0, 140px); align-items: center; gap: var(--pdx-space-md); padding: var(--pdx-space-sm) 0; }
+.mt-head { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--pdx-color-muted); border-bottom: 1px solid var(--pdx-color-border); }
+.mt-row { border-bottom: 1px solid var(--pdx-color-border); }
+.mt-row span:nth-child(2) { font-variant-numeric: tabular-nums; }
+</style>

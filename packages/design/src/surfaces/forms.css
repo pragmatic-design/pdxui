@@ -1,0 +1,514 @@
+/* Form controls — checkbox, radio, toggle, range, field wrapper, fieldset */
+
+/* Checkbox */
+.pdx-checkbox {
+    appearance: none;
+    width: var(--pdx-check-size);
+    height: var(--pdx-check-size);
+    border: 2px solid var(--pdx-color-border-strong);
+    border-radius: var(--pdx-check-radius);
+    background: var(--pdx-color-surface);
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background var(--pdx-transition), border-color var(--pdx-transition);
+
+    &:checked,
+    &:indeterminate {
+        background-color: var(--pdx-color-primary);
+        border-color: var(--pdx-color-primary);
+    }
+    /* The check and the dash are masks painted in the theme's label colour for its primary fill —
+       white on most, dark on Pragmatic Gold's light gold and in editorial's dark scheme. Not
+       background images: a fixed white stroke is under 3:1 on those fills, and a theme's
+       `background` shorthand on :checked would erase them. */
+    &:checked::before,
+    &:indeterminate::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: var(--pdx-color-primary-text);
+        mask-position: center;
+        mask-size: 12px 12px;
+        mask-repeat: no-repeat;
+    }
+    &:checked::before {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    }
+    &:indeterminate::before {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
+    }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+}
+
+/* Checkbox sizes */
+.pdx-checkbox-sm { width: 1rem; height: 1rem; }
+.pdx-checkbox-lg { width: 1.5rem; height: 1.5rem; }
+
+/* Checkbox error */
+.pdx-checkbox-error { border-color: var(--pdx-color-danger); }
+
+/* Checkbox wrapper — label + description layout */
+.pdx-checkbox-wrap {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--pdx-space-xs);
+    cursor: pointer;
+    user-select: none;
+}
+.pdx-checkbox-wrap.disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+.pdx-checkbox-wrap.pdx-checkbox-label-left { flex-direction: row-reverse; }
+
+.pdx-checkbox-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding-top: 1px;
+}
+
+.pdx-checkbox-label {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-text);
+    line-height: 1.25rem;
+}
+
+.pdx-checkbox-desc {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+/* Radio */
+.pdx-radio {
+    appearance: none;
+    width: var(--pdx-check-size);
+    height: var(--pdx-check-size);
+    border: 2px solid var(--pdx-color-border-strong);
+    /* Not --pdx-check-radius: a radio is round by definition, and a theme setting a square
+       check radius must not turn its radios into squares. The SIZE is shared, the shape is not. */
+    border-radius: 50%;
+    background: var(--pdx-color-surface);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--pdx-transition), border-color var(--pdx-transition);
+
+    &:checked {
+        border-color: var(--pdx-color-primary);
+        background: var(--pdx-color-surface);
+        box-shadow: inset 0 0 0 4px var(--pdx-color-primary);
+    }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:checked:focus-visible { box-shadow: inset 0 0 0 4px var(--pdx-color-primary), var(--pdx-focus-ring); }
+    &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+}
+
+/* Radio sizes */
+.pdx-radio-sm { width: 1rem; height: 1rem; }
+.pdx-radio-sm:checked { box-shadow: inset 0 0 0 3px var(--pdx-color-primary); }
+.pdx-radio-lg { width: 1.5rem; height: 1.5rem; }
+.pdx-radio-lg:checked { box-shadow: inset 0 0 0 5px var(--pdx-color-primary); }
+
+/* Radio error */
+.pdx-radio-error { border-color: var(--pdx-color-danger); }
+
+/* Radio wrapper — same pattern as checkbox */
+.pdx-radio-wrap {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--pdx-space-xs);
+    cursor: pointer;
+    user-select: none;
+}
+.pdx-radio-wrap.disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+.pdx-radio-wrap.pdx-radio-label-left { flex-direction: row-reverse; }
+
+.pdx-radio-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding-top: 1px;
+}
+
+.pdx-radio-label {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-text);
+    line-height: 1.25rem;
+}
+
+.pdx-radio-desc {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+/* ── Choice Group — shared for RadioGroup / CheckboxGroup ── */
+.pdx-choice-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+}
+.pdx-choice-group.horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-md);
+}
+
+/* Toggle / Switch */
+.pdx-toggle {
+    appearance: none;
+    width: var(--pdx-toggle-width);
+    height: var(--pdx-toggle-height);
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-border-strong);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: background var(--pdx-transition);
+
+    /* The knob is derived, not measured again: a theme that changes --pdx-toggle-height gets a
+       knob that still fits, and one that changes the width gets a travel that still lands. The
+       size variants below keep their own literals because they override BOTH dimensions. */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: calc(var(--pdx-toggle-height) - 4px);
+        height: calc(var(--pdx-toggle-height) - 4px);
+        border-radius: 50%;
+        background: white;
+        transition: transform var(--pdx-transition);
+        box-shadow: 0 1px 3px oklch(0 0 0 / 0.2);
+    }
+    &:checked {
+        background: var(--pdx-color-primary);
+    }
+    &:checked::before {
+        transform: translateX(calc(var(--pdx-toggle-width) - var(--pdx-toggle-height)));
+    }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+}
+
+/* Toggle sizes */
+.pdx-toggle-sm {
+    width: 2rem;
+    height: 1.125rem;
+    &::before { width: calc(1.125rem - 4px); height: calc(1.125rem - 4px); }
+    &:checked::before { transform: translateX(0.875rem); }
+}
+
+.pdx-toggle-lg {
+    width: 3.5rem;
+    height: 2rem;
+    &::before { width: calc(2rem - 4px); height: calc(2rem - 4px); }
+    &:checked::before { transform: translateX(1.5rem); }
+}
+
+/* Toggle error */
+.pdx-toggle-error { background: oklch(from var(--pdx-color-danger) l c h / 0.3); }
+.pdx-toggle-error:checked { background: var(--pdx-color-danger); }
+
+/* Toggle loading — spinner replaces thumb dot */
+.pdx-toggle-loading::before {
+    border: 2px solid oklch(0 0 0 / 0.15);
+    border-top-color: var(--pdx-color-primary);
+    background: white;
+    animation: pdx-input-spin 0.6s linear infinite;
+}
+.pdx-toggle-loading:checked::before {
+    border-color: oklch(1 0 0 / 0.3);
+    border-top-color: white;
+}
+
+/* Switch wrapper — same pattern as checkbox/radio */
+.pdx-switch-wrap {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--pdx-space-sm);
+    cursor: pointer;
+    user-select: none;
+}
+.pdx-switch-wrap.disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+.pdx-switch-wrap.pdx-switch-label-left { flex-direction: row-reverse; }
+
+/* In a form field, the switch is a control beside text fields: its box is as tall as theirs, at the
+   density in force, and the track sits centred in it. The track keeps its own size — density changes
+   the row, not the switch's shape. At its own 24px and at the top of its cell, it would sit 8px off
+   the field beside it at normal density and 13 at comfortable. The height
+   is the text field's own formula (inputs.css), so a theme that changes one changes both. */
+.pdx-form-field-input > pdx-switch > .pdx-switch-wrap {
+    min-height: calc(var(--pdx-input-min-height) * var(--pdx-density-factor, 1));
+    align-items: center;
+}
+
+.pdx-switch-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding-top: 2px;
+}
+
+.pdx-switch-label {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-text);
+    line-height: 1.25rem;
+}
+
+.pdx-switch-desc {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+/* ── FormField — layout wrapper ── */
+
+/* The field owns its vertical rhythm: in a card body, a grid cell or a plain div nothing else
+   spaces it. The host is block, or its margin would not separate it in a block flow. */
+pdx-form-field {
+    display: block;
+    margin-block-end: var(--pdx-form-field-gap);
+}
+pdx-form-field:last-child {
+    margin-block-end: 0;
+}
+/* A parent that already spaces its children with a gap keeps its own gap, not doubled. :where()
+   keeps the specificity at zero, so an app can set its own margin. */
+:where(.pdx-form, pdx-stack[gap], pdx-row, pdx-grid, pdx-cluster, .pdx-form-section-content,
+       .pdx-form-template-fields, .pdx-field-group-content, .pdx-wizard-step-content) > pdx-form-field {
+    margin-block-end: 0;
+}
+
+.pdx-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-form-field-horizontal {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--pdx-space-md);
+}
+.pdx-form-field-horizontal > .pdx-field-label {
+    min-width: 8rem;
+    padding-top: var(--pdx-space-xs);
+    flex-shrink: 0;
+}
+.pdx-form-field-horizontal > .pdx-form-field-input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Error state: label turns red */
+.pdx-form-field.has-error > .pdx-field-label {
+    color: var(--pdx-color-danger-ink);
+}
+
+/* Disabled */
+.pdx-form-field.disabled { opacity: 0.6; }
+
+/* Transition on error message appearance */
+.pdx-form-field .pdx-field-error,
+.pdx-form-field .pdx-field-success {
+    animation: pdx-field-msg-in 0.15s ease-out;
+}
+@keyframes pdx-field-msg-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Range slider */
+.pdx-range {
+    appearance: none;
+    width: 100%;
+    height: 0.375rem;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-full);
+    outline: none;
+    cursor: pointer;
+}
+
+.pdx-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--pdx-color-primary);
+    border: 2px solid var(--pdx-color-surface);
+    box-shadow: var(--pdx-shadow-sm);
+    cursor: pointer;
+    transition: transform var(--pdx-transition);
+}
+
+.pdx-range::-moz-range-thumb {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--pdx-color-primary);
+    border: 2px solid var(--pdx-color-surface);
+    box-shadow: var(--pdx-shadow-sm);
+    cursor: pointer;
+}
+
+.pdx-range:hover::-webkit-slider-thumb { transform: scale(1.15); }
+.pdx-range:focus-visible { box-shadow: var(--pdx-focus-ring); }
+.pdx-range:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+
+/* Field messages */
+.pdx-field-hint {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    margin-top: var(--pdx-space-2xs);
+}
+
+.pdx-field-error {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-danger-ink);
+    margin-top: var(--pdx-space-2xs);
+}
+
+.pdx-field-success {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-success-ink);
+    margin-top: var(--pdx-space-2xs);
+}
+
+/* Field wrapper */
+.pdx-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-field > label,
+.pdx-field-label {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-text);
+}
+
+.pdx-field-required::after {
+    content: ' *';
+    color: var(--pdx-color-danger-ink);
+}
+
+.pdx-field-optional::after {
+    content: ' (optional)';
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-normal);
+    color: var(--pdx-color-muted);
+}
+
+.pdx-field-label-disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+}
+
+.pdx-field-description {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    font-weight: var(--pdx-weight-normal);
+}
+
+/* Label sizes */
+.pdx-field-label-xs { font-size: var(--pdx-text-xs); }
+.pdx-field-label-sm { font-size: var(--pdx-text-xs); }
+.pdx-field-label-lg { font-size: var(--pdx-text-base); }
+.pdx-field-label-xl { font-size: var(--pdx-text-lg); }
+
+/* Propagate error state from input to label */
+.pdx-field:has([aria-invalid="true"]) > label,
+.pdx-field:has([aria-invalid="true"]) .pdx-field-label {
+    color: var(--pdx-color-danger-ink);
+}
+
+/* Fieldset / Legend */
+.pdx-fieldset {
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    padding: var(--pdx-space-md);
+    margin: 0;
+}
+
+.pdx-fieldset > legend,
+.pdx-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-text);
+    padding-inline: var(--pdx-space-xs);
+}
+
+/* Variants */
+.pdx-fieldset-filled {
+    border: none;
+    background: var(--pdx-color-inset);
+}
+
+.pdx-fieldset-plain {
+    border: none;
+    padding: 0;
+}
+
+/* Sizes */
+.pdx-fieldset-sm { padding: var(--pdx-space-sm); }
+.pdx-fieldset-sm .pdx-legend { font-size: var(--pdx-text-xs); }
+.pdx-fieldset-lg { padding: var(--pdx-space-lg); }
+.pdx-fieldset-lg .pdx-legend { font-size: var(--pdx-text-base); }
+
+/* Invalid */
+.pdx-fieldset-invalid { border-color: var(--pdx-color-danger); }
+.pdx-fieldset-error {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-danger-ink);
+    margin-top: var(--pdx-space-xs);
+}
+
+/* Disabled: the native fieldset disables the controls inside, which dim themselves; the legend text
+   and the description dim with them. The content is not dimmed again: opacity would
+   multiply on the controls. */
+.pdx-fieldset:disabled > .pdx-legend .pdx-legend-text,
+.pdx-fieldset:disabled > .pdx-fieldset-description {
+    opacity: var(--pdx-opacity-disabled);
+}
+
+/* Description */
+.pdx-fieldset-description {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    margin-bottom: var(--pdx-space-sm);
+}
+
+/* Collapsible */
+.pdx-fieldset-toggle {
+    all: unset;
+    display: inline-flex;
+    cursor: pointer;
+    padding: 0.125rem;
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-muted);
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease);
+}
+
+.pdx-fieldset-toggle:hover { color: var(--pdx-color-text); }
+.pdx-fieldset-toggle:focus-visible { box-shadow: var(--pdx-focus-ring); }
+
+.pdx-fieldset-chevron {
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease);
+}
+
+.pdx-fieldset-collapsed .pdx-fieldset-chevron {
+    transform: rotate(-90deg);
+}
+
+.pdx-fieldset-collapsed .pdx-fieldset-content {
+    display: none;
+}
+
+.pdx-fieldset-collapsible .pdx-legend {
+    cursor: pointer;
+}

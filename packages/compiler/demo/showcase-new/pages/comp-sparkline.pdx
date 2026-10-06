@@ -1,0 +1,48 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Sparkline</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-sparkline&gt;</code> — a tiny inline trend chart for tables, cards and KPIs.
+      No axes, no tooltip, no legend: just a line, area or bar drawn into a small canvas.
+      Pass numbers as a comma-separated <code>data</code> string and size it with
+      <code>width</code>/<code>height</code>.
+    </p>
+
+    <pdx-demo-comp-sparkline-types class="demo-section"></pdx-demo-comp-sparkline-types>
+
+    <pdx-demo-comp-sparkline-kpi-cards class="demo-section"></pdx-demo-comp-sparkline-kpi-cards>
+
+    <pdx-demo-comp-sparkline-table-rows class="demo-section"></pdx-demo-comp-sparkline-table-rows>
+
+    <pdx-demo-comp-sparkline-color-smoothing class="demo-section"></pdx-demo-comp-sparkline-color-smoothing>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>data</code><span>string</span><span>''</span><span>Comma-separated numbers (e.g. <code>"12,18,15"</code>)</span></div>
+        <div class="opt-row"><code>type</code><span>string</span><span>line</span><span>line · area · bar</span></div>
+        <div class="opt-row"><code>width</code><span>string</span><span>120px</span><span>CSS width (px, %, …)</span></div>
+        <div class="opt-row"><code>height</code><span>string</span><span>32px</span><span>CSS height</span></div>
+        <div class="opt-row"><code>color</code><span>string</span><span>theme</span><span>CSS color or <code>--pdx-*</code> token; defaults to palette</span></div>
+        <div class="opt-row"><code>smooth</code><span>boolean</span><span>true</span><span>Bézier-smoothed line (line/area only)</span></div>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
+        For axes, tooltips and legends use the full <code>&lt;pdx-chart&gt;</code>; sparkline is intentionally minimal.
+      </p>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/sparkline';
+@title 'Sparkline';
+let _pdxKeep = $signal(0);
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+.spark-grid { display: flex; flex-wrap: wrap; gap: var(--pdx-space-xl); }
+.spark-item { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+</style>

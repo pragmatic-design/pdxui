@@ -1,0 +1,67 @@
+{
+  "name": "pragmatic-pdx",
+  "displayName": "Pragmatic PDX",
+  "description": "PDX components in VS Code: highlighting, diagnostics with quick fixes, completion, hover, navigation, rename and the template type-check, for .pdx Single File Components",
+  "version": "0.9.0",
+  "publisher": "pdxui",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "galleryBanner": { "color": "#131313", "theme": "dark" },
+  "repository": { "type": "git", "url": "git+https://github.com/pragmatic-design/pdxui.git", "directory": "packages/vscode-pdx" },
+  "homepage": "https://pdxui.com",
+  "bugs": { "url": "https://github.com/pragmatic-design/pdxui/issues" },
+  "engines": { "vscode": "^1.85.0" },
+  "main": "./out/extension.js",
+  "categories": ["Programming Languages", "Linters", "Formatters"],
+  "keywords": ["pdx", "pdxui", "web components", "custom elements", "signals", "language server"],
+  "contributes": {
+    "configuration": {
+      "title": "PDX",
+      "properties": {
+        "pdx.typeCheck": {
+          "type": "boolean",
+          "default": true,
+          "description": "Report TypeScript type errors in the script and the template of a .pdx. Off keeps completion, hover and navigation, without the type squiggles."
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "pdx",
+        "aliases": ["PDX", "Pragmatic Component"],
+        "extensions": [".pdx"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "pdx",
+        "scopeName": "source.pdx",
+        "path": "./syntaxes/pdx.tmLanguage.json",
+        "embeddedLanguages": {
+          "source.js": "javascript",
+          "source.ts": "typescript",
+          "source.css": "css",
+          "text.html.basic": "html"
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\" && esbuild src/extension.ts --bundle --platform=node --format=cjs --outfile=out/extension.js --external:vscode",
+    "typecheck": "npx tsc -p tsconfig.json --noEmit",
+    "gen-grammar": "node scripts/gen-grammar.mjs",
+    "bundle-server": "node scripts/bundle-server.mjs",
+    "render-icon": "node scripts/render-icon.mjs",
+    "vscode:prepublish": "npm run bundle-server && npm run build",
+    "package": "npx --yes @vscode/vsce package --pre-release --no-dependencies"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.28.1",
+    "typescript": "^5.8.0"
+  }
+}

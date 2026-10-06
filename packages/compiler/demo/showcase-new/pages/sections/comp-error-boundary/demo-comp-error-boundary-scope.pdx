@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Scope and Limitations</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>@@try/@@catch</code> and <code>&lt;pdx-error-boundary&gt;</code> catch:
+    </p>
+    <ul class="pdx-txt-small" style="margin: 0.5rem 0; padding-left: 1.5rem">
+      <li><strong>Render errors</strong> — throw in contentFn()</li>
+      <li><strong>Effect errors</strong> — throw in tracked effects</li>
+      <li><strong>Event handler errors</strong> — @@click, @@input, etc. (compiler wraps with safeHandler, routes to nearest boundary)</li>
+    </ul>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>onGlobalError()</code> is the last-resort fallback and additionally catches:
+    </p>
+    <ul class="pdx-txt-small" style="margin: 0.5rem 0; padding-left: 1.5rem">
+      <li><strong>Unhandled event errors</strong> — when no local boundary is active</li>
+      <li><strong>Async rejections</strong> — unhandled Promise rejections</li>
+      <li><strong>Uncaught exceptions</strong> — window.onerror fallback</li>
+    </ul>
+  </section>
+</template>

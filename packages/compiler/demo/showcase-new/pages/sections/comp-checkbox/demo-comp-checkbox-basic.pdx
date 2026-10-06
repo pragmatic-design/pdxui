@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Checkbox</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to toggle. Label is part of the clickable area.</p>
+
+    <div class="demo-stack">
+      <pdx-checkbox label="Accept terms and conditions"></pdx-checkbox>
+      <pdx-checkbox label="Subscribe to newsletter" checked></pdx-checkbox>
+      <pdx-checkbox label="Disabled option" disabled></pdx-checkbox>
+      <pdx-checkbox label="Disabled checked" disabled checked></pdx-checkbox>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-checkbox label="Accept terms"&gt;&lt;/pdx-checkbox&gt;
+&lt;pdx-checkbox label="Pre-checked" checked&gt;&lt;/pdx-checkbox&gt;
+&lt;pdx-checkbox label="Disabled" disabled&gt;&lt;/pdx-checkbox&gt;</code></pre>
+    </details>
+  </section>
+</template>

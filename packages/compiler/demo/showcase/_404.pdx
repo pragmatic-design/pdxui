@@ -1,0 +1,33 @@
+<template>
+  <div class="not-found">
+    <h1 class="code">404</h1>
+    <p class="message">{{ $t('error.notFound') }}</p>
+    <p class="path"><code>{{ path }}</code></p>
+    <button @click="goHome" class="home-link">← {{ $t('error.backHome') }}</button>
+  </div>
+</template>
+
+<script setup>
+import { navigate } from '@pdxui/router';
+
+@prop code: string = '404';
+@prop path: string = '';
+
+function goHome() {
+  navigate('/dashboard');
+}
+</script>
+
+<style scoped>
+  .not-found { text-align: center; padding: 80px 20px; }
+  .code { font-size: 6rem; font-weight: 900; margin: 0; opacity: 0.15; line-height: 1; }
+  .message { font-size: 1.3rem; color: #555; margin: 12px 0 0; }
+  .path { font-size: 0.85rem; color: #999; margin: 8px 0 0; }
+  .path code { background: #f0f0f0; padding: 3px 8px; border-radius: 4px; }
+  .home-link {
+    display: inline-block; margin-top: 28px; padding: 10px 24px;
+    background: #3949ab; color: white; border: none;
+    border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  }
+  .home-link:hover { background: #303f9f; }
+</style>

@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Loading</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Skeleton placeholders while data loads.</p>
+    <div class="demo-row">
+      <pdx-statistic :loading="true"></pdx-statistic>
+      <pdx-statistic :loading="true"></pdx-statistic>
+      <pdx-statistic :loading="true"></pdx-statistic>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-statistic :loading="true"&gt;&lt;/pdx-statistic&gt;</code></pre>
+    </details>
+  </section>
+</template>

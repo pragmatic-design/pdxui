@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Grouped</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Options grouped by a field. Group headers are non-interactive.</p>
+    <div class="demo-row">
+      <pdx-select label="City" :options="cities" groupField="country" labelField="name" valueField="id" searchable placeholder="Select city..." />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="cities" groupField="country"
+  labelField="name" valueField="id"
+  searchable placeholder="Select city..." /&gt;
+
+const cities = [
+  { id: 1, name: 'New York', country: 'USA' },
+  { id: 4, name: 'London', country: 'UK' },
+  { id: 7, name: 'Rome', country: 'Italy' },
+];</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const cities = [
+  { id: 1, name: 'New York', country: 'USA' },
+  { id: 2, name: 'Los Angeles', country: 'USA' },
+  { id: 3, name: 'Chicago', country: 'USA' },
+  { id: 4, name: 'London', country: 'UK' },
+  { id: 5, name: 'Manchester', country: 'UK' },
+  { id: 6, name: 'Edinburgh', country: 'UK' },
+  { id: 7, name: 'Rome', country: 'Italy' },
+  { id: 8, name: 'Milan', country: 'Italy' },
+  { id: 9, name: 'Florence', country: 'Italy' },
+  { id: 10, name: 'Tokyo', country: 'Japan' },
+  { id: 11, name: 'Osaka', country: 'Japan' },
+  { id: 12, name: 'Kyoto', country: 'Japan' },
+];
+</script>

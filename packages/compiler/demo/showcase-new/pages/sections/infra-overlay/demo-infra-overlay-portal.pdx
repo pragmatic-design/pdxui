@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h3>Portal</h3>
+    <p class="desc">Render content into document.body. Click to create/remove.</p>
+    <div class="row">
+      <button class="pdx-primary" @click="showPortal">Create Portal</button>
+      <button class="pdx-danger" @click="hidePortal">Remove Portal</button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createPortal } from '@pdxui/core';
+
+// ── Portal ──
+let portalDispose = null;
+function showPortal() {
+    portalDispose?.();
+    const content = document.createElement('div');
+    content.style.cssText = 'position:fixed;bottom:16px;right:16px;padding:16px;background:white;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.15);z-index:9999;font-family:system-ui';
+    content.innerHTML = '<strong>Portaled!</strong><br><small>I live in document.body</small>';
+    const result = createPortal(content);
+    portalDispose = result.dispose;
+}
+function hidePortal() { portalDispose?.(); portalDispose = null; }
+</script>

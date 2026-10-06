@@ -1,0 +1,50 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Card Accents</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Colored top border via <code>.pdx-card-accent</code> variants.</p>
+
+    <div class="accent-grid">
+      <div class="pdx-surface-card pdx-card-accent">
+        <div class="pdx-card-header">Primary</div>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small pdx-ink-muted">.pdx-card-accent</span>
+        </div>
+      </div>
+      <div class="pdx-surface-card pdx-card-accent-success">
+        <div class="pdx-card-header">Success</div>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small pdx-ink-muted">.pdx-card-accent-success</span>
+        </div>
+      </div>
+      <div class="pdx-surface-card pdx-card-accent-danger">
+        <div class="pdx-card-header">Danger</div>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small pdx-ink-muted">.pdx-card-accent-danger</span>
+        </div>
+      </div>
+      <div class="pdx-surface-card pdx-card-accent-warning">
+        <div class="pdx-card-header">Warning</div>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small pdx-ink-muted">.pdx-card-accent-warning</span>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-surface-card pdx-card-accent"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-card pdx-card-accent-success"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-card pdx-card-accent-danger"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-card pdx-card-accent-warning"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .accent-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+</style>

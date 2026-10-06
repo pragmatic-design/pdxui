@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Reduced padding with <code>.pdx-toolbar-compact</code>.</p>
+
+    <div class="pdx-toolbar pdx-toolbar-bordered pdx-toolbar-compact">
+      <button class="pdx-ghost" size="sm">Zoom In</button>
+      <button class="pdx-ghost" size="sm">Zoom Out</button>
+      <div class="pdx-toolbar-sep"></div>
+      <button class="pdx-ghost" size="sm">Fit</button>
+      <button class="pdx-ghost" size="sm">100%</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toolbar pdx-toolbar-bordered pdx-toolbar-compact"&gt;
+  &lt;button class="pdx-ghost" size="sm"&gt;Zoom In&lt;/button&gt;
+  &lt;button class="pdx-ghost" size="sm"&gt;Zoom Out&lt;/button&gt;
+  &lt;div class="pdx-toolbar-sep"&gt;&lt;/div&gt;
+  &lt;button class="pdx-ghost" size="sm"&gt;Fit&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

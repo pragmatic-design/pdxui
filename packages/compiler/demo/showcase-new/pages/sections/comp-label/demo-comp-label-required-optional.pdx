@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Required & Optional Indicators</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>required</code> appends a red asterisk. <code>optional</code> appends "(optional)" in muted text.
+      Both use CSS pseudo-elements — no extra DOM.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-label text="Email" required></pdx-label>
+      <input class="pdx-input" placeholder="you@example.com" />
+    </div>
+    <div class="demo-stack" style="margin-top:var(--pdx-space-md)">
+      <pdx-label text="Nickname" optional></pdx-label>
+      <input class="pdx-input" placeholder="Optional field..." />
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-label text="Email" required&gt;&lt;/pdx-label&gt;
+&lt;pdx-label text="Nickname" optional&gt;&lt;/pdx-label&gt;</code></pre>
+    </details>
+  </section>
+</template>

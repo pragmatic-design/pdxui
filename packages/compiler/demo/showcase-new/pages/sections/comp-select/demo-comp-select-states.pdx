@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">States</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Disabled, readonly, error, success, warning.</p>
+    <div class="demo-col">
+      <pdx-select label="Color" :options="colors" disabled placeholder="Disabled" />
+      <pdx-select label="Color" :options="colors" readonly :value="'Blue'" placeholder="Readonly" />
+      <pdx-select label="Color" :options="colors" error placeholder="Error state" />
+      <pdx-select label="Color" :options="colors" success placeholder="Success state" />
+      <pdx-select label="Color" :options="colors" warning placeholder="Warning state" />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="colors" disabled placeholder="Disabled" /&gt;
+&lt;pdx-select :options="colors" readonly :value="'Blue'" /&gt;
+&lt;pdx-select :options="colors" error placeholder="Error state" /&gt;
+&lt;pdx-select :options="colors" success placeholder="Success state" /&gt;
+&lt;pdx-select :options="colors" warning placeholder="Warning state" /&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan', 'Teal'];
+</script>

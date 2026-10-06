@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Both Axes</h2>
+    <div class="demo-container">
+      <pdx-scroll-area axis="both" maxheight="200px">
+        <div class="scroll-both">
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Status</th><th>Location</th><th>Phone</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Alice Johnson</td><td>alice@example.com</td><td>Engineering</td><td>Senior Dev</td><td>Active</td><td>New York</td><td>+1-555-0101</td></tr>
+              <tr><td>2</td><td>Bob Smith</td><td>bob@example.com</td><td>Design</td><td>Lead Designer</td><td>Active</td><td>San Francisco</td><td>+1-555-0102</td></tr>
+              <tr><td>3</td><td>Carol White</td><td>carol@example.com</td><td>Marketing</td><td>Manager</td><td>On Leave</td><td>Chicago</td><td>+1-555-0103</td></tr>
+              <tr><td>4</td><td>David Brown</td><td>david@example.com</td><td>Sales</td><td>VP Sales</td><td>Active</td><td>Austin</td><td>+1-555-0104</td></tr>
+              <tr><td>5</td><td>Eve Davis</td><td>eve@example.com</td><td>Engineering</td><td>DevOps</td><td>Active</td><td>Seattle</td><td>+1-555-0105</td></tr>
+              <tr><td>6</td><td>Frank Miller</td><td>frank@example.com</td><td>HR</td><td>Director</td><td>Active</td><td>Boston</td><td>+1-555-0106</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </pdx-scroll-area>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.scroll-both { min-width: 900px; }
+.scroll-both table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
+.scroll-both th, .scroll-both td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); white-space: nowrap; }
+.scroll-both th { background: var(--pdx-color-inset); font-weight: var(--pdx-weight-semibold); position: sticky; top: 0; }
+</style>

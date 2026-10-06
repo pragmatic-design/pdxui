@@ -1,0 +1,33 @@
+{
+  "name": "@pdxui/site",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "description": "pdxui.com — the PDX UI showcase site, written entirely in PDX (dogfooding).",
+  "scripts": {
+    "dev": "node scripts/port-demos.mjs && vite --port 5300",
+    "llms": "node scripts/gen-llms.mjs",
+    "api": "node scripts/gen-api.mjs",
+    "build": "node scripts/port-demos.mjs && node scripts/gen-api.mjs && node scripts/gen-llms.mjs && vite build",
+    "preview": "vite preview --port 5300",
+    "test": "npx playwright test --config tests/playwright.config.ts",
+    "build:integrations": "node scripts/build-integrations.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pdxui/core": "workspace:*",
+    "@pdxui/design": "workspace:*",
+    "@pdxui/router": "workspace:*",
+    "@pdxui/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@pdxui/compiler": "workspace:*",
+    "@types/markdown-it": "^14.1.2",
+    "markdown-it": "^14.2.0",
+    "shiki": "^4.1.0",
+    "typescript": "^5.8.0",
+    "vite": "^6.2.0"
+  }
+}

@@ -1,0 +1,69 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Settings Panel</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Tabs paired with content panels in a realistic settings UI.</p>
+
+    <div class="comp-card">
+      <div class="pdx-tabs">
+        <button class="pdx-tab active">General</button>
+        <button class="pdx-tab">Appearance</button>
+        <button class="pdx-tab">Privacy</button>
+      </div>
+      <div class="tab-panel">
+        <h3 class="pdx-txt-subheading">General Settings</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Configure your account name, email, and language preferences.</p>
+        <div class="setting-row">
+          <span class="pdx-txt-body">Display Name</span>
+          <input class="pdx-input" type="text" value="Alex Johnson" />
+        </div>
+        <div class="setting-row">
+          <span class="pdx-txt-body">Language</span>
+          <select class="pdx-select">
+            <option>English</option>
+            <option>Italian</option>
+            <option>German</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="settings-card"&gt;
+  &lt;div class="pdx-tabs"&gt;
+    &lt;button class="pdx-tab active"&gt;General&lt;/button&gt;
+    &lt;button class="pdx-tab"&gt;Appearance&lt;/button&gt;
+    &lt;button class="pdx-tab"&gt;Privacy&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="tab-panel"&gt;
+    &lt;h3&gt;General Settings&lt;/h3&gt;
+    &lt;p&gt;Configure your account...&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    overflow: hidden;
+  }
+  .tab-panel {
+    padding: var(--pdx-space-lg);
+  }
+  .tab-panel h3 { margin: 0 0 var(--pdx-space-xs); }
+  .tab-panel p { margin: 0 0 var(--pdx-space-md); }
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .setting-row:last-child { border-bottom: none; }
+</style>

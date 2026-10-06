@@ -1,0 +1,53 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Animated Span Change</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Drag the slider to change column spans. The transition is animated.</p>
+
+    <div class="demo-area">
+      <pdx-row gutter="sm" align="stretch">
+        <pdx-col :span="sidebarSpan"><div class="box tall">Sidebar</div></pdx-col>
+        <pdx-col :span="contentSpan"><div class="box tall accent">Content</div></pdx-col>
+      </pdx-row>
+    </div>
+
+    <div class="controls">
+      <label class="pdx-txt-small">Sidebar span</label>
+      <input type="range" min="1" max="8" :value="sidebarSpan" @input="onSliderChange" />
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-row gutter="sm"&gt;
+  &lt;pdx-col :span="sidebarSpan"&gt;Sidebar&lt;/pdx-col&gt;
+  &lt;pdx-col :span="contentSpan"&gt;Content&lt;/pdx-col&gt;
+&lt;/pdx-row&gt;
+
+&lt;!-- Change sidebarSpan signal and the columns animate --&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let sidebarSpan = $signal(3);
+const contentSpan = $derived(12 - sidebarSpan);
+
+function onSliderChange(e) {
+    sidebarSpan = Number(e.target.value);
+}
+</script>
+
+<style scoped>
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+  }
+  .controls input[type="range"] {
+    flex: 1;
+    max-width: 300px;
+  }
+</style>

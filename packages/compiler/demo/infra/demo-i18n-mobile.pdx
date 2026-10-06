@@ -1,0 +1,161 @@
+<template>
+  <div class="demo">
+    <h2>i18n + Mobile</h2>
+    <p class="desc">Component strings, RTL, Bottom Sheet, Pull-to-Refresh, Safe Area.</p>
+
+    <!-- i18n: Component Strings -->
+    <section>
+      <h3>Component String Registry</h3>
+      <p class="desc">Translatable default strings for components. Switch locale to see changes.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="setEnglish">English</button>
+        <button @click="setItalian" style="background:#22c55e;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Italiano</button>
+        <button @click="setArabic" style="background:#f59e0b;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">العربية (RTL)</button>
+      </div>
+      <div class="mock-select">
+        <span class="placeholder">{{ selectPlaceholder }}</span>
+        <span class="no-results">{{ selectNoResults }}</span>
+      </div>
+      <div class="log">Direction: <strong>{{ dir }}</strong> | RTL: <strong>{{ rtl }}</strong></div>
+    </section>
+
+    <!-- RTL -->
+    <section>
+      <h3>RTL Layout</h3>
+      <p class="desc">The box below respects direction. Text alignment and icon position flip.</p>
+      <div class="rtl-box" :style="'direction:' + dir">
+        <span class="icon">📌</span>
+        <span>This text follows {{ dir }} direction</span>
+        <span class="action">→</span>
+      </div>
+    </section>
+
+    <!-- Bottom Sheet -->
+    <section>
+      <h3>Bottom Sheet</h3>
+      <p class="desc">Drag the handle to resize. Snap to 25%, 50%, 100%. Swipe down to close.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="openSheet">Open Bottom Sheet</button>
+      </div>
+    </section>
+    <div class="sheet" :ref="sheetRef">
+      <div class="sheet-handle"></div>
+      <div class="sheet-content">
+        <h4>Bottom Sheet Content</h4>
+        <p>Drag the handle bar above to resize. Detents: 25%, 50%, 100%.</p>
+        <p>Height: {{ sheetHeight }}px | Detent: {{ sheetDetent }}</p>
+        <button @click="closeSheet">Close</button>
+      </div>
+    </div>
+
+    <!-- Safe Area -->
+    <section>
+      <h3>Safe Area Insets</h3>
+      <p class="desc">Reads env(safe-area-inset-*). On desktop these are 0. On mobile devices with notch, they show real values.</p>
+      <div class="log">
+        Top: <strong>{{ safeTop }}</strong>px |
+        Right: <strong>{{ safeRight }}</strong>px |
+        Bottom: <strong>{{ safeBottom }}</strong>px |
+        Left: <strong>{{ safeLeft }}</strong>px |
+        Has insets: <strong>{{ hasInsets }}</strong>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerComponentStrings, setComponentStrings, getComponentString, setLocaleStrings, direction, isRTL, setDirection, useBottomSheet, useSafeArea, injectSafeAreaCSS, effect, onMount, onDestroy } from '@pdxui/core';
+
+// ─── i18n: Component Strings ──────────────────────────────────
+registerComponentStrings('select', {
+    placeholder: 'Select...',
+    noResults: 'No results found',
+});
+
+let selectPlaceholder = $signal('Select...');
+let selectNoResults = $signal('No results found');
+let dir = $signal('ltr');
+let rtl = $signal(false);
+
+var phSignal = getComponentString('select', 'placeholder');
+var nrSignal = getComponentString('select', 'noResults');
+
+function setEnglish() {
+    setComponentStrings('select', { placeholder: 'Select...', noResults: 'No results found' });
+    setDirection('ltr');
+}
+function setItalian() {
+    setComponentStrings('select', { placeholder: 'Seleziona...', noResults: 'Nessun risultato' });
+    setDirection('ltr');
+}
+function setArabic() {
+    setComponentStrings('select', { placeholder: 'اختر...', noResults: 'لا توجد نتائج' });
+    setDirection('rtl');
+}
+
+// ─── Bottom Sheet ─────────────────────────────────────────────
+let sheetRef = $signal(null);
+let sheetHeight = $signal(0);
+let sheetDetent = $signal(0);
+
+var sheet = useBottomSheet(() => sheetRef, {
+    detents: [0.25, 0.5, 1],
+    onDetentChange: function(d) { sheetDetent = Math.round(d * 100); },
+    onClose: function() { sheetDetent = 0; },
+});
+
+function openSheet() { sheet.open(1); }
+function closeSheet() { sheet.close(); }
+
+// ─── Safe Area ────────────────────────────────────────────────
+let safeTop = $signal(0);
+let safeRight = $signal(0);
+let safeBottom = $signal(0);
+let safeLeft = $signal(0);
+let hasInsets = $signal(false);
+
+injectSafeAreaCSS();
+var sa = useSafeArea();
+
+onMount(() => {
+    var d1 = effect(() => {
+        selectPlaceholder = phSignal();
+        selectNoResults = nrSignal();
+        dir = direction();
+        rtl = isRTL();
+    });
+    var d2 = effect(() => {
+        sheetHeight = Math.round(sheet.height());
+    });
+    var d3 = effect(() => {
+        var insets = sa.insets();
+        safeTop = insets.top;
+        safeRight = insets.right;
+        safeBottom = insets.bottom;
+        safeLeft = insets.left;
+        hasInsets = sa.hasInsets();
+    });
+    onDestroy(() => { d1(); d2(); d3(); sheet.dispose(); });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .mock-select { margin-top: 12px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .placeholder { color: #999; font-size: 0.9rem; }
+  .no-results { color: #999; font-size: 0.8rem; font-style: italic; }
+  .log { font-size: 0.8rem; margin-top: 8px; font-family: monospace; }
+  .rtl-box { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; }
+  .icon { font-size: 1.2rem; }
+  .action { margin-inline-start: auto; font-size: 1.2rem; }
+  .sheet { background: white; border-radius: 16px 16px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,0.15); overflow: hidden; }
+  .sheet-handle { width: 40px; height: 5px; background: #d0d0d0; border-radius: 3px; margin: 10px auto; cursor: grab; }
+  .sheet-content { padding: 16px 24px 32px; }
+  .sheet-content h4 { margin: 0 0 8px; }
+  .sheet-content p { margin: 0 0 8px; font-size: 0.9rem; color: #666; }
+</style>

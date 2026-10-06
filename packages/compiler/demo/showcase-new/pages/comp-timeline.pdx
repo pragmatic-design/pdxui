@@ -1,0 +1,86 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Timeline</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-timeline&gt;</code> — displays a vertical or horizontal sequence of events.
+      Supports left/right/alternate/horizontal modes, status colors, icons, pending state, clickable items.
+    </p>
+
+    <pdx-demo-comp-timeline-basic class="demo-section"></pdx-demo-comp-timeline-basic>
+
+    <pdx-demo-comp-timeline-icons class="demo-section"></pdx-demo-comp-timeline-icons>
+
+    <pdx-demo-comp-timeline-alternate class="demo-section"></pdx-demo-comp-timeline-alternate>
+
+    <pdx-demo-comp-timeline-horizontal class="demo-section"></pdx-demo-comp-timeline-horizontal>
+
+    <pdx-demo-comp-timeline-clickable class="demo-section"></pdx-demo-comp-timeline-clickable>
+
+    <pdx-demo-comp-timeline-pending class="demo-section"></pdx-demo-comp-timeline-pending>
+
+    <pdx-demo-comp-timeline-dashed class="demo-section"></pdx-demo-comp-timeline-dashed>
+
+    <pdx-demo-comp-timeline-slot class="demo-section"></pdx-demo-comp-timeline-slot>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>content</code></td><td><code>{ item, index, status }</code></td><td>Custom content for each timeline entry</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>Array</td><td>[]</td><td>Timeline items <code>[{ title, description?, date?, icon?, color?, status? }]</code></td></tr>
+            <tr><td><code>mode</code></td><td>String</td><td>'left'</td><td>'left' | 'right' | 'alternate' | 'horizontal'</td></tr>
+            <tr><td><code>reverse</code></td><td>Boolean</td><td>false</td><td>Reverse item order</td></tr>
+            <tr><td><code>pending</code></td><td>Boolean</td><td>false</td><td>Show pending pulsing dot at end</td></tr>
+            <tr><td><code>pending-label</code></td><td>String</td><td>'In progress...'</td><td>Pending item label text</td></tr>
+            <tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Items are clickable (emits pdx-click)</td></tr>
+            <tr><td><code>connector-style</code></td><td>String</td><td>'solid'</td><td>'solid' | 'dashed' | 'dotted'</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Payload</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-click</code></td><td><code>{ item, index }</code></td><td>Fired when a clickable item is clicked</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/timeline';
+@title 'Timeline — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-container { max-width: 500px; padding: var(--pdx-space-md); }
+.demo-container-wide { max-width: 700px; }
+.tl-slot-card { padding: 12px 16px; background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); }
+.tl-slot-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
+.tl-slot-badge-success { background: var(--pdx-color-success); color: var(--pdx-color-success-text); }
+.tl-slot-badge-warning { background: var(--pdx-color-warning); color: var(--pdx-gray-900); }
+.tl-slot-badge-info { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+</style>

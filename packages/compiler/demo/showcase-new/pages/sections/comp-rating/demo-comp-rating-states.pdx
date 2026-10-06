@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <div class="demo-stack">
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted label-w">Readonly</span>
+        <pdx-rating value="4" readonly></pdx-rating>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted label-w">Disabled</span>
+        <pdx-rating value="2" disabled></pdx-rating>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted label-w">10 stars</span>
+        <pdx-rating value="7" count="10" precision="0.25" readonly size="sm"></pdx-rating>
+      </div>
+    </div>
+  </section>
+</template>

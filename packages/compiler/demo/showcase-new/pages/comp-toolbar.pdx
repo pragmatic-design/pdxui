@@ -1,0 +1,73 @@
+<template>
+  <div class="page" @click="onToolbarClick">
+    <h1 class="pdx-txt-title">Toolbar</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-toolbar&gt;</code> — horizontal toolbar container with buttons, separators, groups, and spacers.
+      It is one tab stop: ←/→ (↑/↓ when <code>vertical</code>), Home and End move between its controls,
+      and Tab comes back to the last one used. Name it with <code>label</code>, and every icon-only button with <code>aria-label</code>.
+    </p>
+
+    <pdx-demo-comp-toolbar-text-editor class="demo-section"></pdx-demo-comp-toolbar-text-editor>
+
+    <pdx-demo-comp-toolbar-file-actions class="demo-section"></pdx-demo-comp-toolbar-file-actions>
+
+    <pdx-demo-comp-toolbar-compact class="demo-section"></pdx-demo-comp-toolbar-compact>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>compact</code></td><td>Boolean</td><td>false</td><td>Less padding</td></tr>
+            <tr><td><code>bordered</code></td><td>Boolean</td><td>false</td><td>Show border + background</td></tr>
+            <tr><td><code>vertical</code></td><td>Boolean</td><td>false</td><td>Vertical orientation: ↑/↓ move between the controls</td></tr>
+            <tr><td><code>label</code></td><td>String</td><td>'Toolbar'</td><td>The toolbar's accessible name</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">CSS Classes</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Class</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>.pdx-toolbar-sep</code></td><td>Vertical separator between groups</td></tr>
+            <tr><td><code>.pdx-toolbar-spacer</code></td><td>Flexible space (push right)</td></tr>
+            <tr><td><code>.pdx-toolbar-group</code></td><td>Fused button group (joined borders)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/toolbar';
+@title 'Toolbar — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+
+// Toggle active state on toolbar buttons (for demo interactivity). One delegated listener on the
+// page's root: it hears every toolbar button this page renders, with no wait for them to exist.
+function onToolbarClick(e) {
+  const btnEl = e.target.closest && e.target.closest('.pdx-toolbar .pdx-btn');
+  if (!btnEl) return;
+  const parentGroup = btnEl.closest('.pdx-toolbar-group');
+  if (parentGroup && parentGroup.hasAttribute('data-radio')) {
+    // Radio group (alignment): one active at a time
+    parentGroup.querySelectorAll('.pdx-btn').forEach(function(siblingEl) { siblingEl.classList.remove('active'); });
+    btnEl.classList.add('active');
+  } else {
+    // Independent toggle (bold, italic, etc.)
+    btnEl.classList.toggle('active');
+  }
+}
+</script>
+
+<style scoped>
+.page { }
+</style>

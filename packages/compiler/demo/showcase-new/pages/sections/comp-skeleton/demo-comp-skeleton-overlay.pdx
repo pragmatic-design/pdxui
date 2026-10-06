@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Loading Overlay</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>.pdx-loading-overlay</code> adds frosted overlay + spinner on any container.</p>
+    <div class="comp-card pdx-loading-overlay" style="min-height:120px">
+      <h3 class="pdx-txt-subheading">Dashboard</h3>
+      <p class="pdx-txt-small">Revenue: $42,000 | Users: 1,234 | Orders: 567</p>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-loading-overlay"&gt;
+  &lt;!-- content covered by overlay --&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

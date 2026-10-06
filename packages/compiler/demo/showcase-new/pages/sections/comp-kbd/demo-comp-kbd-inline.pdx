@@ -1,0 +1,7 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Inline with Text</h2>
+    <p class="pdx-txt-body">Press <pdx-kbd keys="Ctrl+S"></pdx-kbd> to save, or <pdx-kbd keys="Ctrl+Z"></pdx-kbd> to undo.</p>
+    <p class="pdx-txt-body">Use <pdx-kbd keys="Tab"></pdx-kbd> to navigate and <pdx-kbd keys="Enter"></pdx-kbd> to confirm.</p>
+  </section>
+</template>

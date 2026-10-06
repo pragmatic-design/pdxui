@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Segmented Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+    <script>
+        function pdxSelectSegment(btn) {
+            btn.closest('.pdx-segmented').querySelectorAll('.pdx-segmented-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+    </script>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Segmented Control</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Segmented Control</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">iOS-style toggle for 2-4 options. Compact alternative to tabs.</p>
+                    </pdx-stack>
+
+                    <!-- Basic -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Basic</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Click to switch. Active item gets surface background + shadow.</p>
+                        <pdx-stack gap="md">
+                            <div class="pdx-segmented">
+                                <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">Day</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Week</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Month</button>
+                            </div>
+                            <div class="pdx-segmented">
+                                <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">List</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Grid</button>
+                            </div>
+                            <div class="pdx-segmented">
+                                <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">All</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Active</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Archived</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Drafts</button>
+                            </div>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Sizes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sizes</h2>
+                        <pdx-stack gap="md" items="start">
+                            <div class="pdx-segmented pdx-segmented-sm">
+                                <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">S</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">M</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">L</button>
+                            </div>
+                            <div class="pdx-segmented">
+                                <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">Small</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Medium</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Large</button>
+                            </div>
+                            <div class="pdx-segmented pdx-segmented-lg">
+                                <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">Small</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Medium</button>
+                                <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Large</button>
+                            </div>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Full width -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Full Width</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>[full]</code> attribute for 100% width, items distributed evenly.</p>
+                        <div class="pdx-segmented" full>
+                            <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">Overview</button>
+                            <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Analytics</button>
+                            <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Reports</button>
+                            <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Settings</button>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- With disabled -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Disabled</h2>
+                        <div class="pdx-segmented">
+                            <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">Active</button>
+                            <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Normal</button>
+                            <button class="pdx-segmented-item" disabled>Disabled</button>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- In context -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">In Context</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Segmented control inside a card toolbar.</p>
+                        <div class="pdx-surface-card">
+                            <div class="pdx-card-header">
+                                <pdx-row justify="between" items="center">
+                                    <strong>Dashboard</strong>
+                                    <div class="pdx-segmented pdx-segmented-sm">
+                                        <button class="pdx-segmented-item active" onclick="pdxSelectSegment(this)">Day</button>
+                                        <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Week</button>
+                                        <button class="pdx-segmented-item" onclick="pdxSelectSegment(this)">Month</button>
+                                    </div>
+                                </pdx-row>
+                            </div>
+                            <div class="pdx-card-body">
+                                <p class="pdx-txt-small pdx-ink-muted" style="text-align:center;padding:var(--pdx-space-xl)">Chart / content area</p>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

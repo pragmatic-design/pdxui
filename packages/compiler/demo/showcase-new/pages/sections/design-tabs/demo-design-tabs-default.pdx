@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Default Tabs</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Basic tab bar with one active tab via <code>.active</code> class.</p>
+
+    <div class="pdx-tabs">
+      <button class="pdx-tab active">Overview</button>
+      <button class="pdx-tab">Features</button>
+      <button class="pdx-tab">Pricing</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-tabs"&gt;
+  &lt;button class="pdx-tab active"&gt;Overview&lt;/button&gt;
+  &lt;button class="pdx-tab"&gt;Features&lt;/button&gt;
+  &lt;button class="pdx-tab"&gt;Pricing&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

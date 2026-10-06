@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Indeterminate State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Visual "—" state for a parent checkbox when only some children are selected. The native input
+      has <code>indeterminate</code> only as a property; the component takes it as a prop or an attribute
+      and sets it for you. A click settles it. Here the parent follows its children — all, none or some —
+      and clicking it sets them all.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-checkbox label="Select all items" :checked="allOn(items)" :indeterminate="someOn(items)" @pdx-change="e => items = setAll(items, e.detail.checked)"></pdx-checkbox>
+      @for (items as item; track item.label) {
+        <div style="padding-left:var(--pdx-space-xl)">
+          <pdx-checkbox :label="item.label" :value="item.label" :checked="item.on" @pdx-change="e => items = setOne(items, e.detail)"></pdx-checkbox>
+        </div>
+      }
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-checkbox label="Select all items"
+  :checked="allOn(items)" :indeterminate="someOn(items)"
+  @pdx-change="e =&gt; items = setAll(items, e.detail.checked)"&gt;&lt;/pdx-checkbox&gt;
+&#64;for (items as item; track item.label) {
+  &lt;pdx-checkbox :label="item.label" :value="item.label" :checked="item.on"
+    @pdx-change="e =&gt; items = setOne(items, e.detail)"&gt;&lt;/pdx-checkbox&gt;
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { allOn, someOn, setAll, setOne } from './state.pdx';
+
+// Two "Select all" parents: each follows its children, and sets them all when clicked.
+let items = $signal([
+    { label: 'Item A', on: true },
+    { label: 'Item B', on: false },
+    { label: 'Item C', on: true },
+]);
+</script>

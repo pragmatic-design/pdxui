@@ -1,0 +1,287 @@
+<template>
+  <!-- ONE list header, the reference's: the entity's title, the view picker — its name
+       with `*` while the arrangement differs from the saved one — a reset icon and a save menu; the
+       page's own actions on the right. Written once for tickets, customers and employees: a list
+       does not wire its views, it declares where they are kept. -->
+  <div class="host">
+  <header class="list-header" data-test="list-header" :data-active-view="activeView">
+    <div class="start">
+      <h1 class="pdx-txt-title">{{ title }}</h1>
+      <pdx-select
+        class="picker"
+        size="sm"
+        :label="$t('app.views.label')"
+        :options="pickerOptions"
+        :value="activeView"
+        @pdx-change="e => chooseView(e.detail.value)"
+        data-test="view-picker"></pdx-select>
+      <pdx-button size="sm" variant="ghost" :disabled="!modified" :aria-label="$t('app.views.reset')" :title="$t('app.views.reset')"
+        @click="resetView" data-test="view-reset"><pdx-icon name="rotate-ccw" aria-hidden="true"></pdx-icon></pdx-button>
+      <pdx-dropdown-menu
+        variant="ghost"
+        icon="save"
+        :label="$t('app.views.saveMenu')"
+        :items="menuItems"
+        @pdx-select="onMenu"
+        data-test="view-menu"></pdx-dropdown-menu>
+    </div>
+    <div class="end">
+      <slot></slot>
+    </div>
+  </header>
+
+    <!-- The name, asked in the page: a browser prompt is unstyled, untranslated and outside the
+         app's focus. One dialog for Save as and Rename. -->
+    <pdx-dialog :open="naming !== ''" size="sm" :title="naming === 'rename' ? $t('app.views.renameTitle') : $t('app.views.saveAsTitle')"
+      @pdx-close="naming = ''" data-test="view-name-dialog">
+      <form class="name-form" @submit="commitName">
+        <pdx-form-field :label="$t('app.views.name')" :error="nameError" :show-error="nameError !== ''">
+          <pdx-input :value="draft" :aria-label="$t('app.views.name')" autofocus @pdx-input="e => { draft = e.detail.value; nameError = ''; }" data-test="view-name"></pdx-input>
+        </pdx-form-field>
+        <div class="name-actions">
+          <pdx-button variant="ghost" @click="naming = ''">{{ $t('app.views.cancel') }}</pdx-button>
+          <pdx-button variant="primary" type="submit">{{ $t('app.views.save') }}</pdx-button>
+        </div>
+      </form>
+    </pdx-dialog>
+
+    <pdx-alert-dialog
+      :open="asking"
+      variant="danger"
+      :title="$t('app.views.deleteTitle')"
+      :message="$t('app.views.deleteBody', { name: activeName })"
+      :confirm-label="$t('app.views.delete')"
+      :cancel-label="$t('app.views.keep')"
+      close-on-escape
+      @pdx-confirm="confirmDelete"
+      @pdx-cancel="asking = false"
+      data-test="view-delete-dialog"></pdx-alert-dialog>
+  </div>
+</template>
+
+<script setup>
+import { setQueryParam, currentQuery } from '@pdxui/router';
+import { createViewStore, pickView, markViewFilter, DEFAULT_VIEW } from './data/views';
+import type { ListGrid, BuiltInView } from './data/views';
+import type { DataSource } from '@pdxui/core';
+
+/** The entity's name, the page's h1. */
+@prop title: string = '';
+/** Where this list's views are kept: each list has its own, and its own last-used view. */
+@prop storeKey: string = '';
+/** What the arrangement nobody saved is called: «All tickets». */
+@prop defaultName: string = '';
+/** The list's grid element, once it is up — the page's `:ref`. */
+@prop grid: ListGrid | null = null;
+/** The grid's DataSource: the filter, the sort and the page size are read from it. */
+@prop source: DataSource<unknown> | null = null;
+/** The arrangement the list opens with, which Reset on the default view returns to. */
+@prop baseSort: object[] = [];
+@prop basePageSize: number = 10;
+/** Views the list ships with, after the default: used, never overwritten, renamed or deleted. */
+@prop builtIn: BuiltInView[] = [];
+/**
+ * The address's parameters that carry a filter of the list's own (`status`, `assignee` on the tickets).
+ * An address that names one opens on it, not on the last-used view.
+ */
+@prop filterParams: string[] = [];
+
+/**
+ * A view was put on the list: the page drops what does not survive it, a selection. One word, and
+ * lower case: the template's attributes are parsed as HTML, and `@viewChange` would listen for
+ * `viewchange`.
+ */
+@event switched: { key: string };
+
+let views = null;
+let savedViews = $signal([]);
+let activeView = $signal(DEFAULT_VIEW);
+/** The arrangement the list opens with, captured once the grid is up. */
+let defaultState = $signal(null);
+/**
+ * The column order as the reader left it. It arrives the only way it can: the grid says when a
+ * column moves (`pdx-column-reorder`); `applyState` raises no event, so putting a view
+ * back writes the order it applied.
+ */
+let liveColumnOrder = $signal([]);
+
+let naming = $signal('');
+let draft = $signal('');
+let nameError = $signal('');
+let asking = $signal(false);
+
+/** A view the list ships with, or null. */
+function builtInFor(key) {
+  return builtIn.find(v => v.key === key) ?? null;
+}
+
+/** The default and the built-in ones are the list's: the reader uses them, and cannot change them. */
+const activeIsTheList = $derived(activeView === DEFAULT_VIEW || builtInFor(activeView) !== null);
+
+const activeName = $derived(activeView === DEFAULT_VIEW
+  ? defaultName
+  : (builtInFor(activeView)?.name ?? savedViews.find(v => v.key === activeView)?.name ?? ''));
+
+/** A built-in view's arrangement: its filter on the list's default. */
+function builtInState(view) {
+  return defaultState ? { ...defaultState, filter: view.filter } : null;
+}
+
+/** What the active view says the arrangement is. */
+const activeState = $derived(activeView === DEFAULT_VIEW
+  ? defaultState
+  : builtInFor(activeView) ? builtInState(builtInFor(activeView))
+  : (savedViews.find(v => v.key === activeView)?.state ?? null));
+
+/** The fields of a view as one string, for the comparison `*` is made of — the grouping too. */
+function keyOf(state) {
+  return [JSON.stringify(state.filter ?? []), JSON.stringify(state.sort ?? []),
+          JSON.stringify(state.columnOrder ?? []), String(state.pageSize),
+          JSON.stringify(state.group ?? [])].join('|');
+}
+
+const liveKey = $derived(source
+  ? keyOf({ filter: source.filter(), sort: source.sort(), columnOrder: liveColumnOrder, pageSize: source.pageSize(), group: source.group() })
+  : '');
+const modified = $derived(activeState !== null && liveKey !== '' && liveKey !== keyOf(activeState));
+
+/** The picker's entries; the current one carries `*` while it is changed. */
+const pickerOptions = $derived([
+  { value: DEFAULT_VIEW, label: defaultName },
+  ...builtIn.map(v => ({ value: v.key, label: v.name })),
+  ...savedViews.map(v => ({ value: v.key, label: v.name })),
+].map(o => ({ ...o, label: o.value === activeView && modified ? '*' + o.label : o.label })));
+
+const menuItems = $derived([
+  { key: 'save', label: $t('app.views.save'), disabled: activeIsTheList || !modified },
+  { key: 'saveAs', label: $t('app.views.saveAs') },
+  { key: 'rename', label: $t('app.views.rename'), disabled: activeIsTheList },
+  { key: 'sep', label: '', type: 'separator' },
+  { key: 'delete', label: $t('app.views.delete'), danger: true, disabled: activeIsTheList },
+]);
+
+function onColumnReorder(e) {
+  liveColumnOrder = e.detail?.columnOrder ?? [];
+}
+
+// The grid arrives after the header — the page's `:ref` hands it over before it is even up — and
+// builds itself a frame later still. Built already, it is read now; otherwise its `pdx-ready` says
+// when, and a listener is the one thing an element that is not up yet accepts. Then the
+// default arrangement is captured, and the view the reader is owed is put back: the one the address
+// names, or the one they last worked in.
+let listened = null;
+$watch(grid, (el) => {
+  if (!el || el === listened) return;
+  views = createViewStore(storeKey);
+  savedViews = views.list();
+  el.addEventListener('pdx-column-reorder', onColumnReorder);
+  listened = el;
+  if (el.grid) arrive(el);
+  else el.addEventListener('pdx-ready', () => arrive(el), { once: true });
+}, { immediate: true });
+
+function arrive(el) {
+  const columnOrder = el.grid.saveState().columnOrder;
+  defaultState = pickView({ filter: [], sort: baseSort, pageSize: basePageSize, columnOrder });
+  liveColumnOrder = defaultState.columnOrder;
+  // The view the address names; else, when it names no filter either, the one last worked in. A link
+  // that carries a filter is an explicit request — the dashboard's «Unassigned» is `?assignee=none` —
+  // and the last-used view must not stand in for it.
+  const query = currentQuery();
+  const namesFilter = filterParams.some(p => query[p]);
+  const wanted = query.view || (namesFilter ? null : views.lastUsed());
+  if (wanted && (views.get(wanted) || builtInFor(wanted))) applyView(wanted);
+}
+
+onDestroy(() => { if (listened) listened.removeEventListener('pdx-column-reorder', onColumnReorder); });
+
+/** The fields a view is — from the grid's own snapshot, narrowed by `pickView`. */
+function capture() {
+  const state = grid?.grid ? grid.grid.saveState() : {};
+  return pickView({ ...state, filter: source.filter(), sort: source.sort(), pageSize: source.pageSize(), group: source.group() });
+}
+
+function applyView(key) {
+  const state = key === DEFAULT_VIEW ? defaultState
+    : builtInFor(key) ? builtInState(builtInFor(key))
+    : (views.get(key)?.state ?? null);
+  if (!state) return;
+  activeView = key;
+  // Named by `?view=` below: the address filter leaves this one out of the address.
+  markViewFilter(source, state.filter);
+  // The element's own call: it sets filter, sort, page size, order and grouping in one batch, and
+  // repaints. A view saved without a grouping has none — and `loadState` skips a field that is
+  // absent, which would keep the grouping of the view left behind.
+  grid.applyState({ ...state, group: state.group ?? [] });
+  liveColumnOrder = state.columnOrder ?? [];
+  // Linkable, and theirs: the key is in the address, and it is what the list opens on next time.
+  setQueryParam('view', key === DEFAULT_VIEW ? null : key);
+  views.setLastUsed(key);
+  switched({ key });
+}
+
+function chooseView(key) {
+  if (key && key !== activeView) applyView(key);
+}
+
+/** Back to what the view says, throwing away what was changed on top of it. */
+function resetView() {
+  applyView(activeView);
+}
+
+function onMenu(e) {
+  const key = e.detail?.key;
+  if (key === 'save') saveView();
+  else if (key === 'saveAs') askName('saveAs', '');
+  else if (key === 'rename') askName('rename', activeName);
+  else if (key === 'delete') asking = true;
+}
+
+function saveView() {
+  if (activeIsTheList) return;
+  views.update(activeView, capture());
+  savedViews = views.list();
+}
+
+function askName(mode, initial) {
+  draft = initial;
+  nameError = '';
+  naming = mode;
+}
+
+function commitName(e) {
+  e.preventDefault();
+  const name = draft.trim();
+  if (!name) { nameError = $t('app.views.nameRequired'); return; }
+  if (naming === 'rename') {
+    views.rename(activeView, name);
+    savedViews = views.list();
+  } else {
+    const view = views.saveAs(name, capture());
+    savedViews = views.list();
+    activeView = view.key;
+    setQueryParam('view', view.key);
+    views.setLastUsed(view.key);
+  }
+  naming = '';
+}
+
+function confirmDelete() {
+  asking = false;
+  views.remove(activeView);
+  savedViews = views.list();
+  applyView(DEFAULT_VIEW);
+}
+</script>
+
+<style scoped>
+  .list-header { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; }
+  .start { display: flex; align-items: center; gap: var(--pdx-space-sm); flex-wrap: wrap; min-width: 0; }
+  .start h1 { margin: 0 var(--pdx-space-sm) 0 0; }
+  .picker { min-width: 14rem; }
+  /* To the right edge. The dialogs are outside the header: as its children they would be flex
+     items, and push the actions off the edge by two gaps. */
+  .end { display: flex; align-items: center; gap: var(--pdx-space-md); margin-left: auto; }
+  .name-form { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .name-actions { display: flex; justify-content: flex-end; gap: var(--pdx-space-sm); }
+</style>

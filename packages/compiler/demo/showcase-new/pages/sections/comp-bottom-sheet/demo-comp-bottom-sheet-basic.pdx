@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default detents: 40% and 85% of viewport. Drag the handle or swipe down to dismiss.</p>
+    <pdx-button variant="outline" @click="openBasic">Open Bottom Sheet</pdx-button>
+
+    <pdx-bottom-sheet :open="basicOpen" label="Basic bottom sheet" @pdx-close="closeBasic">
+      <span slot="header"><strong>Basic Sheet</strong></span>
+      <p>Drag the handle to resize between detent snap points.</p>
+      <p class="pdx-txt-small pdx-ink-muted">Swipe down quickly to dismiss, or tap the backdrop.</p>
+      <p>This sheet has two detents: <strong>40%</strong> (half) and <strong>85%</strong> (expanded).</p>
+      <span slot="footer">
+        <pdx-button variant="ghost" size="sm" @click="closeBasic">Cancel</pdx-button>
+        <pdx-button variant="primary" size="sm" @click="closeBasic">Done</pdx-button>
+      </span>
+    </pdx-bottom-sheet>
+  </section>
+</template>
+
+<script setup>
+// Basic
+let basicOpen = $signal(false);
+
+function openBasic() { basicOpen = true; }
+function closeBasic() { basicOpen = false; }
+</script>

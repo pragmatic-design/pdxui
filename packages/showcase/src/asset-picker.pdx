@@ -1,0 +1,66 @@
+<template>
+  <!-- What a ticket is opened on: the named customer's assets, and nobody else's. Used
+       by the tickets' create modal and by the intake, so it is one component and not two copies. -->
+  <div class="asset-picker">
+    <p class="pdx-label">{{ $t('assets.picker.label') }}</p>
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('assets.picker.hint') }}</p>
+    <pdx-relation-picker
+      :source="assets"
+      :columns="columns"
+      @pdx-pick="onPick"
+      data-test="asset-picker-grid"></pdx-relation-picker>
+    <p class="pdx-txt-small" :show="pickedText !== ''" role="status" data-test="asset-picked">{{ pickedText }}</p>
+  </div>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { assetRowTransport } from './data/asset-rows';
+
+/** The customer's record, when the form has one: its assets, by id. Wins over `customer`. */
+@prop customerId: number = 0;
+/** The customer as a free-text field holds it — the tickets' create modal: a name, matched the way the server joins it. Empty offers nothing. */
+@prop customer: string = '';
+
+/** An asset was picked: the page keeps its id with the ticket. One word, lower case, as `switched`. */
+@event picked: { id: number };
+
+const assets = createDataSource({ transport: assetRowTransport, idField: 'id', pageSize: 5 });
+
+const columns = $derived([
+  { field: 'serial', header: $t('assets.columns.serial'), width: 110 },
+  { field: 'name', header: $t('assets.columns.name') },
+  { field: 'kind', header: $t('assets.columns.kind'), width: 110, format: (v) => $t('assets.kinds.' + String(v)) },
+  { field: 'customer', header: $t('assets.columns.customer'), width: 170 },
+]);
+
+let pickedText = $signal('');
+
+/**
+ * The customer's assets — by id when there is one, else by the name typed — or none: `in []` asks
+ * the server for nothing. Fires when either CHANGES, compared one by one.
+ */
+$watch([customerId, customer], ([id, name]) => {
+  const needle = String(name ?? '').trim();
+  assets.setFilter(Number(id) > 0
+    ? [{ field: 'customerId', operator: 'eq', value: Number(id) }]
+    : needle
+      ? [{ field: 'customer', operator: 'contains', value: needle }]
+      : [{ field: 'customerId', operator: 'in', value: [] }]);
+  // A pick belongs to the customer it was made for.
+  if (pickedText) { pickedText = ''; picked({ id: 0 }); }
+}, { immediate: true });
+
+/** The relation picker hands over rows; a ticket is opened on one, the first chosen. */
+function onPick(e) {
+  const row = e.detail?.items?.[0];
+  if (!row) return;
+  pickedText = $t('assets.picker.picked', { name: row.name, serial: row.serial });
+  picked({ id: Number(row.id) });
+}
+</script>
+
+<style scoped>
+  .asset-picker { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+  .asset-picker p { margin: 0; }
+</style>

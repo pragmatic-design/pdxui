@@ -1,0 +1,54 @@
+name: Bug Report
+description: Report something in PDX UI that does not work as documented
+labels: ["bug"]
+body:
+  - type: input
+    id: packages
+    attributes:
+      label: Packages and version
+      description: The @pdxui packages involved, with the version you use.
+      placeholder: "@pdxui/core 1.0.0-alpha.1, @pdxui/compiler 1.0.0-alpha.1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of the bug. If the compiler reported it, include the diagnostic with its `PDX_` code.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: The smallest `.pdx` file, page or steps that show the problem.
+      render: html
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened.
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, Node and build mode
+      description: The browser and its version, `node --version`, and whether it happens in `pdx dev`, in a production build, or both.
+      placeholder: "Chrome 141, Node 22.12, production build only"
+    validations:
+      required: true

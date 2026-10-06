@@ -1,0 +1,56 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-divider</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Separator line, horizontal or vertical, with an optional label: the text inside the tag, or
+      <code>label</code>. Unlike the tags above it is a component (<code>@pdxui/ui/divider</code>);
+      the CSS-only line is the <code>.pdx-divider</code> class.
+    </p>
+
+    <div class="demo-area">
+      <pdx-stack gap="md">
+        <div class="box sm">Content above</div>
+        <pdx-divider></pdx-divider>
+        <div class="box sm">Content below</div>
+      </pdx-stack>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">With label:</p>
+    <div class="demo-area">
+      <pdx-stack gap="md">
+        <pdx-divider>OR</pdx-divider>
+        <pdx-divider labelPosition="left">Section</pdx-divider>
+        <pdx-divider labelPosition="right">End</pdx-divider>
+      </pdx-stack>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">Styles:</p>
+    <div class="demo-area">
+      <pdx-stack gap="lg">
+        <pdx-divider>Solid (default)</pdx-divider>
+        <pdx-divider variant="dashed">Dashed</pdx-divider>
+        <pdx-divider variant="dotted">Dotted</pdx-divider>
+      </pdx-stack>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">Vertical:</p>
+    <div class="demo-area">
+      <pdx-row gap="md" items="center">
+        <div class="box sm">Left</div>
+        <pdx-divider orientation="vertical"></pdx-divider>
+        <div class="box sm">Center</div>
+        <pdx-divider orientation="vertical" variant="dashed"></pdx-divider>
+        <div class="box sm">Right</div>
+      </pdx-row>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-divider&gt;&lt;/pdx-divider&gt;
+&lt;pdx-divider&gt;OR&lt;/pdx-divider&gt;
+&lt;pdx-divider labelPosition="left"&gt;Section&lt;/pdx-divider&gt;
+&lt;pdx-divider variant="dashed"&gt;Dashed&lt;/pdx-divider&gt;
+&lt;pdx-divider orientation="vertical"&gt;&lt;/pdx-divider&gt;</code></pre>
+    </details>
+  </section>
+</template>

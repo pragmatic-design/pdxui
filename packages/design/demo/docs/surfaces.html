@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Surfaces</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Surfaces</span></div>
+                        <h1 class="pdx-txt-display">Surfaces</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Visual containers. Auto dark mode via light-dark(). 5 types + interactive states.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Types</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="2" gap="md">
+                                    <div class="pdx-surface-card"><pdx-stack gap="xs"><strong>pdx-surface-card</strong><span class="pdx-txt-small pdx-ink-muted">Border + shadow + radius. For cards, panels, sections.</span></pdx-stack></div>
+                                    <div class="pdx-surface-inset" style="padding:var(--pdx-space-lg)"><pdx-stack gap="xs"><strong>pdx-surface-inset</strong><span class="pdx-txt-small pdx-ink-muted">Recessed. For inputs, code blocks, backgrounds.</span></pdx-stack></div>
+                                    <div class="pdx-surface-overlay"><pdx-stack gap="xs"><strong>pdx-surface-overlay</strong><span class="pdx-txt-small pdx-ink-muted">Elevated. For modals, popovers, dropdowns.</span></pdx-stack></div>
+                                    <div class="pdx-surface-glass" style="padding:var(--pdx-space-lg)"><pdx-stack gap="xs"><strong>pdx-surface-glass</strong><span class="pdx-txt-small pdx-ink-muted">Frosted glass with backdrop blur.</span></pdx-stack></div>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-surface-card"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-inset"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-overlay"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-glass"&gt;...&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Interactive Card</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>[interactive]</code> for hover elevation. Add <code>[selected]</code> for primary border.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="3" gap="md">
+                                    <div class="pdx-surface-card">Default</div>
+                                    <div class="pdx-surface-card" interactive>Hover me (interactive)</div>
+                                    <div class="pdx-surface-card" selected>Selected</div>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-surface-card" interactive&gt;Hover me&lt;/div&gt;
+&lt;div class="pdx-surface-card" selected&gt;Selected&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Card Sections</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Structured cards with header, body, footer. Add <code>.pdx-card-media</code> for image-top layout.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="2" gap="md">
+                                    <div class="pdx-surface-card">
+                                        <div class="pdx-card-header">Card Header</div>
+                                        <div class="pdx-card-body">
+                                            <p class="pdx-txt-body">Card body content goes here. This section has generous padding for main content.</p>
+                                        </div>
+                                        <div class="pdx-card-footer">
+                                            <span class="pdx-txt-small pdx-ink-muted">Card Footer</span>
+                                        </div>
+                                    </div>
+                                    <div class="pdx-surface-card">
+                                        <div class="pdx-card-media">
+                                            <div class="pdx-image-placeholder" style="height:120px"></div>
+                                        </div>
+                                        <div class="pdx-card-body">
+                                            <strong>Media Card</strong>
+                                            <p class="pdx-txt-small pdx-ink-muted">Card with an image placeholder on top via .pdx-card-media.</p>
+                                        </div>
+                                    </div>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-surface-card"&gt;
+  &lt;div class="pdx-card-header"&gt;Card Header&lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-card-footer"&gt;Card Footer&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="pdx-surface-card"&gt;
+  &lt;div class="pdx-card-media"&gt;
+    &lt;div class="pdx-image-placeholder" style="height:120px"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;...&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Loading Overlay</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>.pdx-loading-overlay</code> to dim content and show a spinner. Disables pointer events.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="2" gap="md">
+                                    <div class="pdx-surface-card pdx-loading-overlay">
+                                        <div class="pdx-card-header">Loading Card</div>
+                                        <div class="pdx-card-body">
+                                            <p class="pdx-txt-body">This card has the loading overlay active.</p>
+                                        </div>
+                                    </div>
+                                    <div class="pdx-surface-card">
+                                        <div class="pdx-card-header">Normal Card</div>
+                                        <div class="pdx-card-body">
+                                            <p class="pdx-txt-body">This card is in its default state for comparison.</p>
+                                        </div>
+                                    </div>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-surface-card pdx-loading-overlay"&gt;
+  &lt;div class="pdx-card-header"&gt;Loading Card&lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="pdx-surface-card"&gt;
+  &lt;div class="pdx-card-header"&gt;Normal Card&lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;...&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

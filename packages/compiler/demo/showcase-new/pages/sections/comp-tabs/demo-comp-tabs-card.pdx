@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Card Variant</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Bordered container with inset tab bar. For widgets and dashboard panels.</p>
+
+    <pdx-tabs value="revenue" variant="card" label="Report">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="revenue">Revenue</button>
+        <button class="pdx-tab" data-tab="customers">Customers</button>
+        <button class="pdx-tab" data-tab="orders">Orders</button>
+      </div>
+      <div data-tab-panel="revenue">
+        <p style="font-size:2rem;font-weight:700;margin:0">$12,450</p>
+        <p class="pdx-txt-small pdx-ink-muted" style="margin-top:4px">+12% from last month</p>
+      </div>
+      <div data-tab-panel="customers">
+        <p style="font-size:2rem;font-weight:700;margin:0">1,234</p>
+        <p class="pdx-txt-small pdx-ink-muted" style="margin-top:4px">+5% from last week</p>
+      </div>
+      <div data-tab-panel="orders">
+        <p style="font-size:2rem;font-weight:700;margin:0">89</p>
+        <p class="pdx-txt-small pdx-ink-muted" style="margin-top:4px">3 pending</p>
+      </div>
+    </pdx-tabs>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="revenue" variant="card"&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="revenue"&gt;Revenue&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="customers"&gt;Customers&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="revenue"&gt;$12,450&lt;/div&gt;
+  &lt;div data-tab-panel="customers"&gt;1,234&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </details>
+  </section>
+</template>

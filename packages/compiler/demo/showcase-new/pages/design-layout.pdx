@@ -1,0 +1,168 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Layout</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      CSS-only layout primitives as custom elements. <strong>Zero JS</strong> — just HTML attributes.
+      Shared attributes: <code>gap</code>, <code>pad</code>, <code>grow</code> on any element.
+    </p>
+
+    <!-- ═══ pdx-stack ═══ -->
+    <pdx-demo-design-layout-stack class="demo-section"></pdx-demo-design-layout-stack>
+
+    <!-- ═══ pdx-row ═══ -->
+    <pdx-demo-design-layout-row class="demo-section"></pdx-demo-design-layout-row>
+
+    <!-- ═══ pdx-spacer ═══ -->
+    <pdx-demo-design-layout-spacer class="demo-section"></pdx-demo-design-layout-spacer>
+
+    <!-- ═══ pdx-divider ═══ -->
+    <pdx-demo-design-layout-divider class="demo-section"></pdx-demo-design-layout-divider>
+
+    <!-- ═══ pdx-grid ═══ -->
+    <pdx-demo-design-layout-grid class="demo-section"></pdx-demo-design-layout-grid>
+
+    <!-- ═══ pdx-split ═══ -->
+    <pdx-demo-design-layout-split class="demo-section"></pdx-demo-design-layout-split>
+
+    <!-- ═══ pdx-center ═══ -->
+    <pdx-demo-design-layout-center class="demo-section"></pdx-demo-design-layout-center>
+
+    <!-- ═══ pdx-container ═══ -->
+    <pdx-demo-design-layout-container class="demo-section"></pdx-demo-design-layout-container>
+
+    <!-- ═══ pdx-cluster ═══ -->
+    <pdx-demo-design-layout-cluster class="demo-section"></pdx-demo-design-layout-cluster>
+
+    <!-- ═══ Gap & Pad Scale ═══ -->
+    <pdx-demo-design-layout-scale class="demo-section"></pdx-demo-design-layout-scale>
+
+    <!-- ═══ Responsive Behavior ═══ -->
+    <pdx-demo-design-layout-responsive class="demo-section"></pdx-demo-design-layout-responsive>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-layout-composition class="demo-section"></pdx-demo-design-layout-composition>
+
+    <!-- ═══ Reference Table ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Element / Attribute</span><span>Type</span><span>Values</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-stack&gt;</code><span>Vertical flex</span><span>items: start, center, end, stretch</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-row&gt;</code><span>Horizontal flex</span><span>justify: start, center, end, between, around, evenly</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-grid&gt;</code><span>CSS Grid</span><span>cols: 1-12, auto (--pdx-grid-min)</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-split&gt;</code><span>2-panel grid</span><span>ratio: 1:1, 1:2, 1:3, 2:1, 3:1, etc.</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-center&gt;</code><span>Centered max-w</span><span>max: xs sm md lg xl 2xl full</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-container&gt;</code><span>Responsive box</span><span>max: xs sm md lg xl 2xl full, fluid</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-cluster&gt;</code><span>Wrapping flex</span><span>justify: start, center, end</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-spacer&gt;</code><span>Flex filler</span><span>size: 2xs, xs, sm, md, lg, xl, 2xl</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-divider&gt;</code><span>Separator</span><span>orient: vertical; weight: bold; color: primary, muted</span>
+        </div>
+        <div class="opt-row">
+          <code>gap="..."</code><span>Attribute</span><span>2xs, xs, sm, md, lg, xl, 2xl</span>
+        </div>
+        <div class="opt-row">
+          <code>pad="..."</code><span>Attribute</span><span>2xs, xs, sm, md, lg, xl, 2xl</span>
+        </div>
+        <div class="opt-row">
+          <code>grow</code><span>Child attr</span><span>flex: 1 (fill remaining space)</span>
+        </div>
+        <div class="opt-row">
+          <code>span="N"</code><span>Grid child</span><span>2-12, full (span all columns)</span>
+        </div>
+        <div class="opt-row">
+          <code>[pdx-sticky]</code><span>Attribute</span><span>Sticky position (z-index: 200)</span>
+        </div>
+        <div class="opt-row">
+          <code>&lt;pdx-visually-hidden&gt;</code><span>A11y</span><span>focusable: visible on focus</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/layout';
+@title 'Layout';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  /* Demo areas */
+  .demo-area {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-md);
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+  }
+  .demo-area.narrow { max-width: 180px; }
+  .demo-area.comp { border-style: solid; }
+
+  .demo-row {
+    display: flex;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .demo-labeled {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    flex: 1;
+    min-width: 160px;
+  }
+
+  /* Demo boxes */
+  .box {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-primary-100);
+    border: 1px solid var(--pdx-primary-300);
+    border-radius: var(--pdx-radius-sm);
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-primary-800);
+    text-align: center;
+  }
+  .box.sm { padding: var(--pdx-space-xs) var(--pdx-space-sm); }
+  .box.md { padding: var(--pdx-space-sm) var(--pdx-space-lg); }
+  .box.tall { padding: var(--pdx-space-lg) var(--pdx-space-md); }
+  .box.mini { padding: var(--pdx-space-2xs) var(--pdx-space-xs); font-size: var(--pdx-text-xs); }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-full);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-text);
+  }
+  .tag.accent {
+    background: var(--pdx-primary-50);
+    border-color: var(--pdx-primary-200);
+    color: var(--pdx-primary-700);
+  }
+</style>

@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Separator and Spacer</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>.pdx-toolbar-sep</code> for a vertical divider and <code>.pdx-toolbar-spacer</code> to push items right.</p>
+
+    <div class="pdx-toolbar pdx-toolbar-bordered">
+      <button class="pdx-ghost">File</button>
+      <button class="pdx-ghost">Edit</button>
+      <div class="pdx-toolbar-sep"></div>
+      <button class="pdx-ghost">View</button>
+      <div class="pdx-toolbar-spacer"></div>
+      <button class="pdx-primary" size="sm">Publish</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toolbar pdx-toolbar-bordered"&gt;
+  &lt;button class="pdx-ghost"&gt;File&lt;/button&gt;
+  &lt;button class="pdx-ghost"&gt;Edit&lt;/button&gt;
+  &lt;div class="pdx-toolbar-sep"&gt;&lt;/div&gt;
+  &lt;button class="pdx-ghost"&gt;View&lt;/button&gt;
+  &lt;div class="pdx-toolbar-spacer"&gt;&lt;/div&gt;
+  &lt;button class="pdx-primary" size="sm"&gt;Publish&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

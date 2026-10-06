@@ -1,0 +1,64 @@
+<template>
+  <div class="page">
+    <h2>Dialog</h2>
+    <p class="desc">Modal dialog with backdrop, focus trap, Escape to close. Uses pdx-dialog component.</p>
+
+    <section>
+      <h3>Open Dialog</h3>
+      <div class="row">
+        <button class="pdx-primary" @click="openConfirm">Confirm Delete</button>
+        <button class="pdx-secondary" @click="openInfo">Info Dialog</button>
+      </div>
+      <div class="log">{{ dialogLog }}</div>
+    </section>
+
+    <pdx-dialog :ref="confirmRef" title="Confirm Delete" size="sm">
+      <p style="margin:0 0 16px">Are you sure you want to delete this item? This action cannot be undone.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="pdx-secondary" @click="closeConfirm">Cancel</button>
+        <button class="pdx-danger" @click="doDelete">Delete</button>
+      </div>
+    </pdx-dialog>
+
+    <pdx-dialog :ref="infoRef" title="Information" size="md">
+      <p style="margin:0 0 8px">This is a PDX Dialog component built on the overlay-stack + focus-trap primitives.</p>
+      <p style="margin:0;color:var(--pdx-color-muted);font-size:0.85rem">Press Escape or click the backdrop to close. Focus is trapped inside the dialog.</p>
+    </pdx-dialog>
+  </div>
+</template>
+
+<script setup>
+@page '/dialog';
+@title 'Dialog — PDX Components';
+
+let confirmRef = $signal(null);
+let infoRef = $signal(null);
+let dialogLog = $signal('Click a button to open a dialog.');
+
+function openConfirm() {
+    if (confirmRef) confirmRef.open = true;
+}
+
+function closeConfirm() {
+    if (confirmRef) confirmRef.open = false;
+}
+
+function doDelete() {
+    if (confirmRef) confirmRef.open = false;
+    dialogLog = 'Item deleted at ' + new Date().toLocaleTimeString();
+}
+
+function openInfo() {
+    if (infoRef) infoRef.open = true;
+}
+</script>
+
+<style scoped>
+  .page { max-width: 680px; }
+  h2 { font-size: 1.3rem; font-weight: 700; margin: 0 0 4px; }
+  h3 { font-size: 0.9rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { font-size: 0.82rem; color: var(--pdx-color-muted, #999); margin: 0 0 20px; }
+  section { margin-bottom: 24px; padding: 16px; border: 1px solid var(--pdx-color-border, #e0e0e0); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-surface, white); }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .log { margin-top: 12px; font-size: 0.8rem; font-family: monospace; padding: 8px 12px; background: var(--pdx-color-inset, #f5f5f7); border-radius: var(--pdx-radius-sm, 4px); color: var(--pdx-color-muted, #666); }
+</style>

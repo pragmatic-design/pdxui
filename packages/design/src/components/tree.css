@@ -1,0 +1,71 @@
+/* pdx-tree — the tree as a view.
+ *
+ * The indentation is a CSS variable the row carries (`--pdx-tree-level`), not a nested box: the
+ * rows are siblings inside their `role="group"`, and a row that is indented by padding can be
+ * highlighted edge to edge, which is what a folder pane looks like. Nesting the boxes would make
+ * the hover band start further right at every level.
+ */
+
+.pdx-tree {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    overflow: auto;
+}
+
+.pdx-tree-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-tree-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    /* The level's indent, plus the row's own padding: one declaration for every depth. */
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    padding-inline-start: calc(var(--pdx-space-sm) + (var(--pdx-tree-level, 1) - 1) * var(--pdx-space-lg));
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+    color: var(--pdx-color-text);
+    min-height: 2rem;
+}
+
+.pdx-tree-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+/* The focus ring is the tree's ONE tab stop, so it has to be unmissable: a roving tabindex means
+   the ring is the only thing telling the user where they are in a hundred rows. */
+.pdx-tree-item:focus-visible {
+    outline: var(--pdx-focus-ring-width, 2px) solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}
+
+.pdx-tree-item[aria-selected="true"] {
+    background: var(--pdx-color-primary-soft);
+    color: var(--pdx-color-primary-ink);
+}
+
+.pdx-tree-twisty {
+    display: inline-flex;
+    justify-content: center;
+    width: 1rem;
+    flex: none;
+    color: var(--pdx-color-muted);
+    font-size: 0.75rem;
+    user-select: none;
+}
+
+.pdx-tree-check {
+    flex: none;
+    margin: 0;
+}
+
+.pdx-tree-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

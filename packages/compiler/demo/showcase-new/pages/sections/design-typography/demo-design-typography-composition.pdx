@@ -1,0 +1,39 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">How type roles work together in realistic content. This is what a typical page section looks like.</p>
+
+    <div class="composition-demo">
+      <p class="pdx-txt-label pdx-ink-muted">GETTING STARTED</p>
+      <h3 class="pdx-txt-heading">Build your first PDX app</h3>
+      <p class="pdx-txt-body">PDX is a component framework built on Web Standards. Create reactive UI with <code>.pdx</code> single-file components, signal-based state, and a compiler that does the heavy lifting.</p>
+      <p class="pdx-txt-small pdx-ink-muted">Updated 2 hours ago · 5 min read</p>
+      <hr />
+      <p class="pdx-txt-body">Start with <code class="pdx-txt-mono">pdx new my-app</code> and open <a href="#" class="pdx-link">the getting started guide</a>.</p>
+      <p class="pdx-txt-caption pdx-ink-muted">Requires Node.js 20+ and pnpm.</p>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;p class="pdx-txt-label pdx-ink-muted"&gt;GETTING STARTED&lt;/p&gt;
+&lt;h3 class="pdx-txt-heading"&gt;Build your first PDX app&lt;/h3&gt;
+&lt;p class="pdx-txt-body"&gt;PDX is a component framework...&lt;/p&gt;
+&lt;p class="pdx-txt-small pdx-ink-muted"&gt;Updated 2 hours ago&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p class="pdx-txt-caption pdx-ink-muted"&gt;Requires Node.js 20+&lt;/p&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Composition */
+  .composition-demo {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .composition-demo p { margin: 0 0 var(--pdx-space-sm); }
+  .composition-demo h3 { margin: 0 0 var(--pdx-space-sm); }
+</style>

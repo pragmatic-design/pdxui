@@ -1,0 +1,294 @@
+/* Code Block — editor/terminal-style code viewer.
+   Compact line spacing, terminal colors, macOS console variant.
+   Line numbers, language badge, copy button, diff, collapsible, file tabs.
+*/
+
+/* ===== Container ===== */
+
+.pdx-code {
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+    font-family: var(--pdx-font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    background: light-dark(oklch(0.97 0 0), oklch(0.13 0 0));
+}
+
+/* ===== Header ===== */
+
+.pdx-code-header {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: 0.35rem var(--pdx-space-md);
+    background: light-dark(oklch(0.93 0 0), oklch(0.16 0 0));
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+    font-size: 0.7rem;
+}
+
+.pdx-code-lang {
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-primary-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pdx-code-filename {
+    color: var(--pdx-color-muted);
+    flex: 1;
+}
+
+.pdx-code-copy {
+    padding: 0.15rem 0.5rem;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font-family: var(--pdx-font-sans);
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: all var(--pdx-transition);
+}
+
+.pdx-code-copy:hover {
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+}
+
+/* ===== macOS Console variant ===== */
+
+.pdx-code-console {
+    background: light-dark(oklch(0.97 0 0), oklch(0.11 0 0));
+}
+
+.pdx-code-console > .pdx-code-header {
+    position: relative;
+    padding: 0.4rem var(--pdx-space-md) 0.4rem 4.5rem;
+    background: light-dark(oklch(0.94 0 0), oklch(0.17 0 0));
+}
+
+/* Three dots: red, yellow, green — before the title */
+.pdx-code-console > .pdx-code-header::before {
+    content: '';
+    position: absolute;
+    left: var(--pdx-space-md);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: oklch(0.65 0.2 25);
+    box-shadow:
+        0.9rem 0 0 oklch(0.75 0.18 85),
+        1.8rem 0 0 oklch(0.65 0.18 150);
+}
+
+/* ===== Body ===== */
+
+.pdx-code-body {
+    margin: 0;
+    padding: 0.4rem 0.5rem;
+    overflow-x: auto;
+    max-height: 30rem;
+}
+
+.pdx-code-body code {
+    display: block;
+    /* Override <pre> whitespace — we control spacing via line-height, not literal newlines */
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+}
+
+/* Each line is a block — no extra whitespace between them */
+.pdx-code-line + .pdx-code-line {
+    margin-top: 0;
+}
+
+/* No top radius when header/tabs are above */
+.pdx-code-header + .pdx-code-body,
+.pdx-code-tabs + .pdx-code-body {
+    border-radius: 0;
+}
+
+/* ===== Lines ===== */
+
+.pdx-code-line {
+    display: block;
+    padding: 0 0.5rem 0 2.8rem;
+    position: relative;
+    height: 1.3em;
+}
+
+/* Line numbers */
+.pdx-code-line::before {
+    content: attr(data-line);
+    position: absolute;
+    left: 0;
+    width: 2rem;
+    text-align: right;
+    color: light-dark(oklch(0.65 0 0), oklch(0.4 0 0));
+    user-select: none;
+    font-size: 0.75rem;
+}
+
+/* Line highlight */
+.pdx-code-highlight {
+    background: light-dark(
+        oklch(from var(--pdx-color-primary) l c h / 0.08),
+        oklch(from var(--pdx-color-primary) l c h / 0.15)
+    );
+    border-left: 2px solid var(--pdx-color-primary);
+    margin-left: -2px;
+}
+
+/* Active line */
+.pdx-code-active {
+    background: light-dark(oklch(0.96 0 0), oklch(0.17 0 0));
+}
+
+/* ===== Diff markers ===== */
+
+.pdx-code-add {
+    background: light-dark(oklch(0.94 0.05 155), oklch(0.16 0.04 155));
+}
+
+.pdx-code-add::after {
+    content: '+';
+    position: absolute;
+    left: 2.2rem;
+    color: var(--pdx-color-success-ink);
+    font-weight: bold;
+}
+
+.pdx-code-remove {
+    background: light-dark(oklch(0.94 0.05 25), oklch(0.16 0.04 25));
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.pdx-code-remove::after {
+    content: '−';
+    position: absolute;
+    left: 2.2rem;
+    color: var(--pdx-color-danger-ink);
+    font-weight: bold;
+}
+
+/* ===== Tabs (multi-file) ===== */
+
+.pdx-code-tabs {
+    display: flex;
+    background: light-dark(oklch(0.93 0 0), oklch(0.14 0 0));
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+    overflow-x: auto;
+}
+
+.pdx-code-tab {
+    padding: 0.3rem 0.75rem;
+    font-family: var(--pdx-font-mono);
+    font-size: 0.7rem;
+    color: var(--pdx-color-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--pdx-transition);
+}
+
+.pdx-code-tab:hover {
+    color: var(--pdx-color-text);
+    background: light-dark(oklch(0.95 0 0), oklch(0.16 0 0));
+}
+
+.pdx-code-tab.active,
+.pdx-code-tab[aria-selected="true"] {
+    color: var(--pdx-color-text);
+    background: light-dark(oklch(0.97 0 0), oklch(0.13 0 0));
+    border-bottom-color: var(--pdx-color-primary);
+}
+
+/* ===== Inline code ===== */
+
+.pdx-code-inline {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.875em;
+    padding: 0.1em 0.35em;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+}
+
+/* ===== Syntax Token Colors — Terminal/VS Code Dark+ ===== */
+
+.pdx-tok-keyword    { color: light-dark(oklch(0.45 0.25 300), oklch(0.75 0.22 300)); }   /* vivid purple/magenta */
+.pdx-tok-string     { color: light-dark(oklch(0.48 0.2 50), oklch(0.75 0.18 50)); }      /* orange */
+.pdx-tok-comment    { color: light-dark(oklch(0.55 0.06 150), oklch(0.48 0.06 150)); font-style: italic; } /* dim green italic */
+.pdx-tok-number     { color: light-dark(oklch(0.5 0.2 145), oklch(0.78 0.2 145)); }      /* bright green */
+.pdx-tok-function   { color: light-dark(oklch(0.52 0.18 85), oklch(0.82 0.18 85)); }     /* yellow */
+.pdx-tok-tag        { color: light-dark(oklch(0.5 0.22 250), oklch(0.7 0.2 250)); }      /* blue */
+.pdx-tok-attr       { color: light-dark(oklch(0.52 0.18 195), oklch(0.78 0.16 195)); }   /* cyan */
+.pdx-tok-value      { color: light-dark(oklch(0.48 0.2 50), oklch(0.75 0.18 50)); }      /* orange (= string) */
+.pdx-tok-operator   { color: light-dark(oklch(0.4 0 0), oklch(0.8 0 0)); }               /* near-white/black */
+.pdx-tok-punctuation { color: light-dark(oklch(0.4 0 0), oklch(0.55 0 0)); }             /* dim gray */
+
+/* ===== No line numbers variant ===== */
+
+.pdx-code-plain .pdx-code-line {
+    padding-left: 0.5rem;
+}
+
+.pdx-code-plain .pdx-code-line::before {
+    display: none;
+}
+
+/* ===== Collapsible variant ===== */
+
+details.pdx-code-collapsible {
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+}
+
+details.pdx-code-collapsible > summary {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: 0.35rem var(--pdx-space-md);
+    background: light-dark(oklch(0.93 0 0), oklch(0.16 0 0));
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+    font-family: var(--pdx-font-mono);
+    font-size: 0.7rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background var(--pdx-transition);
+}
+
+details.pdx-code-collapsible > summary:hover {
+    background: light-dark(oklch(0.91 0 0), oklch(0.18 0 0));
+}
+
+details.pdx-code-collapsible > summary::-webkit-details-marker { display: none; }
+
+details.pdx-code-collapsible > summary::before {
+    content: '▶';
+    font-size: 0.55em;
+    color: var(--pdx-color-muted);
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease);
+}
+
+details.pdx-code-collapsible[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+details.pdx-code-collapsible > .pdx-code {
+    border: none;
+    border-radius: 0;
+}
+
+details.pdx-code-collapsible > .pdx-code > .pdx-code-header {
+    display: none;
+}

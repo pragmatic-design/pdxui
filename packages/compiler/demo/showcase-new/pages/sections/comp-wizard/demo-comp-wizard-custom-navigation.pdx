@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Navigation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Hide the built-in footer with <code>hide-nav</code> and provide your own buttons.</p>
+
+    <div class="demo-box">
+      <pdx-wizard hidenav :linear="false">
+        <div data-wizard-step data-label="Design">
+          <p class="pdx-txt-body">Step 1: Design your layout. Use the stepper header to navigate.</p>
+        </div>
+        <div data-wizard-step data-label="Build">
+          <p class="pdx-txt-body">Step 2: Build your components.</p>
+        </div>
+        <div data-wizard-step data-label="Deploy">
+          <p class="pdx-txt-body">Step 3: Deploy to production.</p>
+        </div>
+      </pdx-wizard>
+    </div>
+  </section>
+</template>

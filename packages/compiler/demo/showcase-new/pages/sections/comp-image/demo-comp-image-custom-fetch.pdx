@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Fetch</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Uses <code>:fetch-fn</code> for full control over image fetching. This demo adds a 1.5s simulated delay.</p>
+    <div class="demo-row">
+      <pdx-image src="/demo-images/desert.svg" alt="Custom fetch" width="300px" height="200px" :fetch-fn="customFetchFn" :lazy="false"></pdx-image>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-image src="/photo.jpg"
+  :fetch-fn="customFetch"&gt;
+&lt;/pdx-image&gt;
+
+function customFetch(url) {
+  return fetch(url, { headers: getAuth() })
+    .then(r =&gt; r.blob());
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const customFetchFn = function(url) {
+    return new Promise(function(resolve) {
+        setTimeout(function() {
+            fetch(url).then(function(r) { return r.blob(); }).then(resolve);
+        }, 1500);
+    });
+};
+</script>

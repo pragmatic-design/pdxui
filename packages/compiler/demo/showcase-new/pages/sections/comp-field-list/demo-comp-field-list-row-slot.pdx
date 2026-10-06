@@ -1,0 +1,73 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">A row of your own — the row slot</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>itemFields</code> builds plain controls. A row that needs a component of its own — here a
+      <code>&lt;pdx-select&gt;</code> with options — goes in the <code>row</code> slot, which receives
+      <code>item</code> (that row's values) and <code>index</code>. The slot writes back through the form's field at
+      <code>tasks.{index}.assignee</code>. The list still draws each row's remove button; a row that wants its own
+      calls <code>remove()</code>, which the slot also receives.
+    </p>
+    <pdx-form :form="taskForm" @pdx-submit="submitTasks">
+      <div class="form-stack">
+        <pdx-field-list name="tasks" label="Tasks" addLabel="+ Add task" :itemFields="taskFields" :itemDefault="taskDefault">
+          <slot name="row" let:item let:index>
+            <div class="task-row">
+              <pdx-input :value="item.title" aria-label="Task" @pdx-input="e => setTask(index, 'title', e.detail.value)"></pdx-input>
+              <pdx-select :options="people" :value="item.assignee" placeholder="Assign to…" label="Assignee" @pdx-change="e => setTask(index, 'assignee', e.detail.value)"></pdx-select>
+            </div>
+          </slot>
+        </pdx-field-list>
+        <pdx-form-actions submitLabel="Save tasks"></pdx-form-actions>
+      </div>
+    </pdx-form>
+    <pre class="pdx-txt-mono values-json" :hidden="!taskValues">{{ taskValues }}</pre>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-field-list name="tasks" :itemFields="taskFields" :itemDefault="taskDefault"&gt;
+  &lt;slot name="row" let:item let:index&gt;
+    &lt;pdx-input :value="item.title" @pdx-input="e =&gt; setTask(index, 'title', e.detail.value)"&gt;&lt;/pdx-input&gt;
+    &lt;pdx-select :options="people" :value="item.assignee"
+      @pdx-change="e =&gt; setTask(index, 'assignee', e.detail.value)"&gt;&lt;/pdx-select&gt;
+  &lt;/slot&gt;
+&lt;/pdx-field-list&gt;
+
+function setTask(index, key, value) {
+  taskForm.fields['tasks.' + index + '.' + key].onChange(value);
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createForm } from '@pdxui/core';
+
+const people = [
+  { value: 'ada', label: 'Ada Lovelace' },
+  { value: 'grace', label: 'Grace Hopper' },
+  { value: 'alan', label: 'Alan Turing' },
+];
+
+const taskFields = [
+  { name: 'title', type: 'text', label: 'Task' },
+  { name: 'assignee', type: 'text', label: 'Assignee' },
+];
+
+const taskDefault = { title: '', assignee: '' };
+
+const taskForm = createForm({
+  initialValues: { tasks: [{ title: 'Write the release notes', assignee: 'grace' }, { title: 'Review the API', assignee: '' }] },
+});
+
+let taskValues = $signal('');
+
+function submitTasks(e) { taskValues = JSON.stringify(e.detail.values, null, 2); }
+
+function setTask(index, key, value) {
+  taskForm.fields['tasks.' + index + '.' + key].onChange(value);
+}
+</script>
+
+<style scoped>
+  .task-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--pdx-space-sm); width: 100%; }
+</style>

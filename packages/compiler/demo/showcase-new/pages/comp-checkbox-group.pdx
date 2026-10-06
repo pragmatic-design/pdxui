@@ -1,0 +1,50 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Checkbox Group</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-checkbox-group&gt;</code> — multi-selection across <code>&lt;pdx-checkbox&gt;</code> children,
+      with one value for the form. Propagates size, disabled and error.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-checkbox-group-basic class="demo-section"></pdx-demo-comp-checkbox-group-basic>
+
+    <!-- ═══ Horizontal ═══ -->
+    <pdx-demo-comp-checkbox-group-horizontal class="demo-section"></pdx-demo-comp-checkbox-group-horizontal>
+
+    <!-- ═══ Sizes, disabled, error ═══ -->
+    <pdx-demo-comp-checkbox-group-size-disabled-error class="demo-section"></pdx-demo-comp-checkbox-group-size-disabled-error>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-checkbox-group-composition class="demo-section"></pdx-demo-comp-checkbox-group-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Comma-separated selected values</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Accessible name; without it, a pdx-label right before the group names it</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>vertical (default), horizontal</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>Propagated to children</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Propagated to children</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Propagated to children</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ value, values }</span><span>Once per change; the children's own events stop at them</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/checkbox-group';
+@title 'Checkbox Group';
+</script>
+
+<style scoped>
+  .page { }
+</style>

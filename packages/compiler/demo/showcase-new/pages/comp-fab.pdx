@@ -1,0 +1,84 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">FAB (Floating Action Button)</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-fab&gt;</code> — floating action button with advanced speed dial.
+      4 directions, 4 layout types, tooltips, mask, hover trigger.
+    </p>
+
+    <pdx-demo-comp-fab-basic class="demo-section"></pdx-demo-comp-fab-basic>
+
+    <pdx-demo-comp-fab-speed-dial class="demo-section"></pdx-demo-comp-fab-speed-dial>
+
+    <pdx-demo-comp-fab-circular class="demo-section"></pdx-demo-comp-fab-circular>
+
+    <pdx-demo-comp-fab-mask-overlay class="demo-section"></pdx-demo-comp-fab-mask-overlay>
+
+    <pdx-demo-comp-fab-variants-sizes class="demo-section"></pdx-demo-comp-fab-variants-sizes>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>icon</code></td><td>String</td><td>'plus'</td><td>Main button icon</td></tr>
+            <tr><td><code>actions</code></td><td>FabAction[]</td><td>[]</td><td>Speed dial actions</td></tr>
+            <tr><td><code>position</code></td><td>String</td><td>'bottom-right'</td><td>Fixed position on screen</td></tr>
+            <tr><td><code>direction</code></td><td>String</td><td>'up'</td><td>up, down, left, right, up-left, up-right, down-left, down-right</td></tr>
+            <tr><td><code>type</code></td><td>String</td><td>'linear'</td><td>Layout: linear, circle, semi-circle, quarter-circle</td></tr>
+            <tr><td><code>variant</code></td><td>String</td><td>'primary'</td><td>primary, secondary, danger</td></tr>
+            <tr><td><code>size</code></td><td>String</td><td>'md'</td><td>sm, md, lg</td></tr>
+            <tr><td><code>show-tooltip</code></td><td>Boolean</td><td>true</td><td>Labels next to actions</td></tr>
+            <tr><td><code>mask</code></td><td>Boolean</td><td>false</td><td>Dark overlay when open</td></tr>
+            <tr><td><code>trigger</code></td><td>String</td><td>'click'</td><td>click or hover (the keyboard opens either with Enter)</td></tr>
+            <tr><td><code>--pdx-fab-position</code></td><td>CSS property</td><td>fixed</td><td>Set to <code>absolute</code> on a positioned box to keep the FAB and its mask inside it, as these frames do</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+      <p class="pdx-txt-small pdx-ink-muted">A speed dial is a menu. Closed, its actions are out of the tab order.</p>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Key</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>On the FAB: open, focus the action nearest the FAB (or close)</td></tr>
+            <tr><td>Arrow in the dial's direction</td><td>On the FAB: open. In the dial: the next action away from the FAB</td></tr>
+            <tr><td>The opposite arrow</td><td>The previous action (wraps)</td></tr>
+            <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>The nearest / farthest action</td></tr>
+            <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> on an action</td><td>Emit <code>pdx-select</code>, close, focus back on the FAB</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Close, focus back on the FAB</td></tr>
+            <tr><td><kbd>Tab</kbd></td><td>Close and move on from the FAB</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/fab';
+@title 'FAB — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-row-wrap { display: flex; gap: var(--pdx-space-lg); flex-wrap: wrap; align-items: flex-start; }
+.demo-frame {
+  position: relative;
+  max-width: 100%;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  overflow: visible;
+  margin-top: var(--pdx-space-xs);
+}
+.demo-frame { --pdx-fab-position: absolute; }
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+</style>

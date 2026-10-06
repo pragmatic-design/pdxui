@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Code Block</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Code Block</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Code Block</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Editor-style code viewer. Line numbers, syntax tokens, diff markers, file tabs, copy button. Theme-aware colors.</p>
+                    </pdx-stack>
+
+                    <!-- Basic -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Basic</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Header with language badge + copy button. Line numbers via <code>data-line</code>.</p>
+                        <div class="pdx-code">
+                            <div class="pdx-code-header">
+                                <span class="pdx-code-lang">HTML</span>
+                                <span class="pdx-code-filename">button.html</span>
+                                <button class="pdx-code-copy" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+                            </div>
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line" data-line="1"><span class="pdx-tok-punctuation">&lt;</span><span class="pdx-tok-tag">button</span> <span class="pdx-tok-attr">class</span><span class="pdx-tok-operator">=</span><span class="pdx-tok-string">"pdx-primary"</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="2">  Primary</span><span class="pdx-code-line" data-line="3"><span class="pdx-tok-punctuation">&lt;/</span><span class="pdx-tok-tag">button</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="4"></span><span class="pdx-code-line" data-line="5"><span class="pdx-tok-punctuation">&lt;</span><span class="pdx-tok-tag">button</span> <span class="pdx-tok-attr">class</span><span class="pdx-tok-operator">=</span><span class="pdx-tok-string">"pdx-danger"</span> <span class="pdx-tok-attr">size</span><span class="pdx-tok-operator">=</span><span class="pdx-tok-string">"sm"</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="6">  Delete</span><span class="pdx-code-line" data-line="7"><span class="pdx-tok-punctuation">&lt;/</span><span class="pdx-tok-tag">button</span><span class="pdx-tok-punctuation">&gt;</span></span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Syntax Highlighting -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Syntax Tokens</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">10 token classes. Colors adapt to light/dark.</p>
+                        <div class="pdx-code">
+                            <div class="pdx-code-header">
+                                <span class="pdx-code-lang">JS</span>
+                                <span class="pdx-code-filename">signal.ts</span>
+                                <button class="pdx-code-copy">Copy</button>
+                            </div>
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line" data-line="1"><span class="pdx-tok-keyword">import</span> { <span class="pdx-tok-function">signal</span>, <span class="pdx-tok-function">computed</span> } <span class="pdx-tok-keyword">from</span> <span class="pdx-tok-string">'@pdxui/core'</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line" data-line="2"></span><span class="pdx-code-line" data-line="3"><span class="pdx-tok-keyword">const</span> count <span class="pdx-tok-operator">=</span> <span class="pdx-tok-function">signal</span><span class="pdx-tok-punctuation">(</span><span class="pdx-tok-number">0</span><span class="pdx-tok-punctuation">)</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line" data-line="4"><span class="pdx-tok-keyword">const</span> doubled <span class="pdx-tok-operator">=</span> <span class="pdx-tok-function">computed</span><span class="pdx-tok-punctuation">(</span><span class="pdx-tok-punctuation">()</span> <span class="pdx-tok-operator">=&gt;</span> count<span class="pdx-tok-punctuation">.</span><span class="pdx-tok-function">value</span> <span class="pdx-tok-operator">*</span> <span class="pdx-tok-number">2</span><span class="pdx-tok-punctuation">)</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line" data-line="5"></span><span class="pdx-code-line" data-line="6"><span class="pdx-tok-comment">// Reactive — doubled updates automatically</span></span><span class="pdx-code-line" data-line="7">count<span class="pdx-tok-punctuation">.</span>value <span class="pdx-tok-operator">=</span> <span class="pdx-tok-number">5</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line" data-line="8">console<span class="pdx-tok-punctuation">.</span><span class="pdx-tok-function">log</span><span class="pdx-tok-punctuation">(</span>doubled<span class="pdx-tok-punctuation">.</span>value<span class="pdx-tok-punctuation">)</span><span class="pdx-tok-punctuation">;</span> <span class="pdx-tok-comment">// 10</span></span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Line Highlight -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Line Highlight</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Highlight specific lines with <code>pdx-code-highlight</code>.</p>
+                        <div class="pdx-code">
+                            <div class="pdx-code-header"><span class="pdx-code-lang">CSS</span></div>
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line" data-line="1"><span class="pdx-tok-punctuation">.</span><span class="pdx-tok-tag">pdx-primary</span> <span class="pdx-tok-punctuation">{</span></span><span class="pdx-code-line pdx-code-highlight" data-line="2">  <span class="pdx-tok-attr">background</span><span class="pdx-tok-punctuation">:</span> <span class="pdx-tok-function">var</span><span class="pdx-tok-punctuation">(</span><span class="pdx-tok-string">--pdx-color-primary</span><span class="pdx-tok-punctuation">)</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line pdx-code-highlight" data-line="3">  <span class="pdx-tok-attr">color</span><span class="pdx-tok-punctuation">:</span> <span class="pdx-tok-function">var</span><span class="pdx-tok-punctuation">(</span><span class="pdx-tok-string">--pdx-color-primary-text</span><span class="pdx-tok-punctuation">)</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line" data-line="4"><span class="pdx-tok-punctuation">}</span></span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Diff -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Diff View</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Green for additions, red strikethrough for removals.</p>
+                        <div class="pdx-code">
+                            <div class="pdx-code-header"><span class="pdx-code-lang">DIFF</span><span class="pdx-code-filename">theme.css</span></div>
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line" data-line="1"><span class="pdx-tok-attr">--pdx-radius-md</span><span class="pdx-tok-punctuation">:</span> <span class="pdx-tok-number">0.5rem</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line pdx-code-remove" data-line="2"><span class="pdx-tok-attr">--pdx-color-primary</span><span class="pdx-tok-punctuation">:</span> <span class="pdx-tok-string">blue</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line pdx-code-add" data-line="3"><span class="pdx-tok-attr">--pdx-color-primary</span><span class="pdx-tok-punctuation">:</span> <span class="pdx-tok-function">oklch</span><span class="pdx-tok-punctuation">(</span><span class="pdx-tok-number">0.6</span> <span class="pdx-tok-number">0.2</span> <span class="pdx-tok-number">260</span><span class="pdx-tok-punctuation">)</span><span class="pdx-tok-punctuation">;</span></span><span class="pdx-code-line" data-line="4"><span class="pdx-tok-attr">--pdx-shadow-sm</span><span class="pdx-tok-punctuation">:</span> <span class="pdx-tok-number">0 1px 2px</span><span class="pdx-tok-punctuation">;</span></span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- File Tabs -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">File Tabs</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Multi-file code viewer with tab navigation.</p>
+                        <div class="pdx-code">
+                            <div class="pdx-code-tabs">
+                                <button class="pdx-code-tab active">index.html</button>
+                                <button class="pdx-code-tab">style.css</button>
+                                <button class="pdx-code-tab">app.js</button>
+                            </div>
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line" data-line="1"><span class="pdx-tok-punctuation">&lt;!</span><span class="pdx-tok-keyword">DOCTYPE</span> <span class="pdx-tok-tag">html</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="2"><span class="pdx-tok-punctuation">&lt;</span><span class="pdx-tok-tag">html</span> <span class="pdx-tok-attr">pdx-scheme</span><span class="pdx-tok-operator">=</span><span class="pdx-tok-string">"auto"</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="3"><span class="pdx-tok-punctuation">&lt;</span><span class="pdx-tok-tag">head</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="4">  <span class="pdx-tok-punctuation">&lt;</span><span class="pdx-tok-tag">link</span> <span class="pdx-tok-attr">rel</span><span class="pdx-tok-operator">=</span><span class="pdx-tok-string">"stylesheet"</span> <span class="pdx-tok-attr">href</span><span class="pdx-tok-operator">=</span><span class="pdx-tok-string">"pragmatic-design.css"</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="5"><span class="pdx-tok-punctuation">&lt;/</span><span class="pdx-tok-tag">head</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="6"><span class="pdx-tok-punctuation">&lt;</span><span class="pdx-tok-tag">body</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="7">  <span class="pdx-tok-punctuation">&lt;</span><span class="pdx-tok-tag">button</span> <span class="pdx-tok-attr">class</span><span class="pdx-tok-operator">=</span><span class="pdx-tok-string">"pdx-primary"</span><span class="pdx-tok-punctuation">&gt;</span>Go<span class="pdx-tok-punctuation">&lt;/</span><span class="pdx-tok-tag">button</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="8"><span class="pdx-tok-punctuation">&lt;/</span><span class="pdx-tok-tag">body</span><span class="pdx-tok-punctuation">&gt;</span></span><span class="pdx-code-line" data-line="9"><span class="pdx-tok-punctuation">&lt;/</span><span class="pdx-tok-tag">html</span><span class="pdx-tok-punctuation">&gt;</span></span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Plain -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Plain (no line numbers)</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-code-plain</code> to hide line numbers.</p>
+                        <div class="pdx-code pdx-code-plain">
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line">npm install @pdxui/design</span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- macOS Console -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Console (macOS style)</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-code-console</code> for terminal window with traffic light dots.</p>
+                        <div class="pdx-code pdx-code-console pdx-code-plain">
+                            <div class="pdx-code-header">
+                                <span class="pdx-code-filename">Terminal</span>
+                            </div>
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line"><span class="pdx-tok-function">$</span> npm install <span class="pdx-tok-string">@pdxui/design</span></span><span class="pdx-code-line"><span class="pdx-tok-comment">added 1 package in 0.8s</span></span><span class="pdx-code-line"></span><span class="pdx-code-line"><span class="pdx-tok-function">$</span> ls src/</span><span class="pdx-code-line"><span class="pdx-tok-tag">pragmatic-design.css</span>  <span class="pdx-tok-tag">tokens.css</span>  <span class="pdx-tok-tag">layout.css</span></span><span class="pdx-code-line"><span class="pdx-tok-tag">surfaces/</span>             <span class="pdx-tok-tag">components/</span> <span class="pdx-tok-tag">themes/</span></span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Collapsible -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Collapsible</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Wrap in <code>&lt;details class="pdx-code-collapsible"&gt;</code> for expand/collapse.</p>
+                        <details class="pdx-code-collapsible">
+                            <summary><span class="pdx-code-lang">CSS</span><span style="color:var(--pdx-color-muted)">pragmatic-design.css</span></summary>
+                            <div class="pdx-code">
+                                <pre class="pdx-code-body"><code><span class="pdx-code-line" data-line="1"><span class="pdx-tok-keyword">@layer</span> pdx.reset, pdx.tokens, pdx.layout;</span><span class="pdx-code-line" data-line="2"><span class="pdx-tok-keyword">@import</span> <span class="pdx-tok-string">"./reset.css"</span> <span class="pdx-tok-function">layer</span>(pdx.reset);</span><span class="pdx-code-line" data-line="3"><span class="pdx-tok-keyword">@import</span> <span class="pdx-tok-string">"./tokens.css"</span> <span class="pdx-tok-function">layer</span>(pdx.tokens);</span></code></pre>
+                            </div>
+                        </details>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

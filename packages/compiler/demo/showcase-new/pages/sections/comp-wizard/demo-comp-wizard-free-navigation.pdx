@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Free Navigation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">With <code>linear="false"</code>, users can jump to any step.</p>
+
+    <div class="demo-box">
+      <pdx-wizard :linear="false">
+        <div data-wizard-step data-label="General">
+          <p class="pdx-txt-body">General settings go here. Jump to any step using the stepper above.</p>
+        </div>
+        <div data-wizard-step data-label="Notifications">
+          <p class="pdx-txt-body">Notification preferences. You can freely navigate between all steps.</p>
+        </div>
+        <div data-wizard-step data-label="Privacy">
+          <p class="pdx-txt-body">Privacy and data sharing options.</p>
+        </div>
+        <div data-wizard-step data-label="Advanced">
+          <p class="pdx-txt-body">Advanced configuration for power users.</p>
+        </div>
+      </pdx-wizard>
+    </div>
+  </section>
+</template>

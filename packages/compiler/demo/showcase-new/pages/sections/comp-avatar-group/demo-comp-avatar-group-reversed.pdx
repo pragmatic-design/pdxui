@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Reversed</h2>
+    <p class="pdx-txt-small pdx-ink-muted">row-reverse direction — avatars stack from right to left.</p>
+    <div class="demo-container">
+      <pdx-avatar-group :items="teamItems" :max="5" direction="row-reverse"></pdx-avatar-group>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { teamItems } from './state.pdx';
+</script>

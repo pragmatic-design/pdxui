@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Separator</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Separator every 3 digits">
+        <pdx-otp-input length="6" separator="3"></pdx-otp-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

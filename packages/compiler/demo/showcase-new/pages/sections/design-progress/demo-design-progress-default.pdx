@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Default Progress</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set width on <code>.pdx-progress-bar</code> for determinate progress.</p>
+
+    <div class="demo-stack">
+      <div class="progress-label">
+        <span class="pdx-txt-small">25%</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" style="width: 25%"></div>
+      </div>
+
+      <div class="progress-label">
+        <span class="pdx-txt-small">50%</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" style="width: 50%"></div>
+      </div>
+
+      <div class="progress-label">
+        <span class="pdx-txt-small">75%</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" style="width: 75%"></div>
+      </div>
+
+      <div class="progress-label">
+        <span class="pdx-txt-small">100%</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" style="width: 100%"></div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-progress"&gt;
+  &lt;div class="pdx-progress-bar" style="width: 50%"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,39 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Remote Simulation — delayTransport</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Wraps <code>arrayTransport</code> with <code>delayTransport</code> for 1s latency.
+      Loading spinner shows on first open (<code>autoLoad: false</code>).
+    </p>
+    <div class="demo-row">
+      <pdx-select :source="remoteDS" labelField="name" valueField="id" searchable clearable placeholder="Click to load (1s)..." />
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>import { createDataSource, arrayTransport, delayTransport } from '@pdxui/core';
+
+const remoteDS = createDataSource({
+  transport: delayTransport({
+    transport: arrayTransport({ data: users, idField: 'id' }),
+    readDelay: 1000,
+  }),
+  idField: 'id',
+  autoLoad: false,
+});
+
+&lt;pdx-select :source="remoteDS" labelField="name" valueField="id"
+  searchable clearable placeholder="Click to load..." /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { users } from './state.pdx';
+import { createDataSource, arrayTransport, delayTransport } from '@pdxui/core';
+
+const remoteDS = createDataSource({
+  transport: delayTransport({
+    transport: arrayTransport({ data: users, idField: 'id' }),
+    readDelay: 1000,
+  }),
+  idField: 'id',
+  autoLoad: false,
+});
+</script>

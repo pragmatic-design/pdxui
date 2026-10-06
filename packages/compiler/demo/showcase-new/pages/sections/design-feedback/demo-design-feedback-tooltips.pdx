@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Tooltips</h2>
+    <p class="pdx-txt-small pdx-ink-muted">CSS-only tooltips via <code>data-pdx-tooltip</code> attribute. Hover to reveal.</p>
+
+    <div class="chip-row">
+      <button class="pdx-secondary" data-pdx-tooltip="Save your changes">Hover me</button>
+      <span class="pdx-badge-primary" data-pdx-tooltip="Current version">v2.1.0</span>
+      <a href="#" class="pdx-link" data-pdx-tooltip="Opens in new tab">Documentation</a>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button data-pdx-tooltip="Save your changes"&gt;Hover me&lt;/button&gt;
+&lt;span data-pdx-tooltip="Current version"&gt;v2.1.0&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>

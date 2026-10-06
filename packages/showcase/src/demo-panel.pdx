@@ -1,0 +1,179 @@
+<template>
+  <span class="demo" @keydown="onKey" @focusout="onFocusOut">
+    <!-- Labelled as what it is, with its own glyph (a flask), and in the service bar rather than in
+         any screen: it acts on the showcase's simulated server, not on the product. -->
+    <button
+      class="opener"
+      type="button"
+      aria-haspopup="dialog"
+      aria-controls="demo-panel"
+      :aria-expanded="open ? 'true' : 'false'"
+      :ref="openerEl"
+      data-test="demo-open"
+      @click="toggle"><svg class="flask" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 15h9"/></svg><span class="opener-label">{{ $t('app.demo.open') }}</span></button>
+
+    <!-- Not modal, like the catalogue: Escape, a click outside or a knob puts it away, and the focus
+         goes back to the opener. `:show`, not `@if`: a spec that clicks a knob from script while the
+         panel is closed (live-data.spec) still finds it. -->
+    <div
+      id="demo-panel"
+      class="panel pdx-surface-card"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="demo-title"
+      :show="open"
+      :ref="panelEl"
+      data-test="demo-panel">
+      <div class="head">
+        <h2 id="demo-title" class="title">{{ $t('app.demo.title') }}</h2>
+        <button class="close" type="button" :aria-label="$t('app.demo.close')" data-test="demo-close" :ref="closeEl" @click="close">×</button>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted">{{ $t('app.demo.note') }}</p>
+      @if (sections.length === 0) {
+        <p class="pdx-txt-small" data-test="demo-empty">{{ $t('app.demo.empty') }}</p>
+      }
+      @for (sections as s; track s.key) {
+        <div class="group" role="group" :aria-label="s.heading ? $t(s.heading) : null">
+          @if (s.heading) {
+            <span class="group-title pdx-txt-small pdx-ink-muted">{{ $t(s.heading) }}</span>
+          }
+          @for (s.knobs as k; track k.test) {
+            <button
+              class="pdx-outline knob"
+              type="button"
+              :data-test="k.test"
+              :show="k.when ? k.when() : true"
+              @click="press(k)">{{ $t(k.label) }}</button>
+          }
+        </div>
+      }
+    </div>
+  </span>
+</template>
+
+<script setup>
+// The Demo panel: the current screen's demo knobs, out of the screen.
+//
+// A screen says which knobs it has with `registerDemo` (src/demo.ts); this draws them. It is in the
+// shell, so in the entry chunk: native markup and no `<pdx-*>`, as the rest of the service bar.
+import { demoKnobs } from './demo';
+
+let open = $signal(false);
+let openerEl = $signal(null);
+
+/** The knobs, the ungrouped first and then one section per heading, in registration order. */
+const sections = $derived(groupKnobs(demoKnobs()));
+
+function groupKnobs(knobs) {
+  const out = [];
+  for (const k of knobs) {
+    const key = k.group ?? '';
+    let s = out.find((x) => x.key === key);
+    if (!s) { s = { key, heading: k.group ?? '', knobs: [] }; out.push(s); }
+    s.knobs.push(k);
+  }
+  return out.sort((a, b) => (a.key === '' ? -1 : b.key === '' ? 1 : 0));
+}
+
+/** The panel and its close button, by :ref (CD-A1). */
+let panelEl = $signal(null);
+let closeEl = $signal(null);
+
+function toggle() {
+  if (open) { close(); return; }
+  open = true;
+  // Into the panel, on its first control: the opener's job is done.
+  // A knob hidden by its `when` has no offsetParent; with none shown, the close button.
+  requestAnimationFrame(() => {
+    const knob = [...(panelEl?.querySelectorAll('.knob') ?? [])].find((b) => b.offsetParent);
+    (knob ?? closeEl)?.focus();
+  });
+}
+
+/** Put it away and give the focus back to the opener. */
+function close() {
+  open = false;
+  openerEl?.focus();
+}
+
+/** A knob acts on the simulated server and hands the screen back: the panel goes away. */
+function press(k) {
+  k.run();
+  if (open) close();
+}
+
+function onKey(e) {
+  if (e.key === 'Escape' && open) {
+    e.stopPropagation();
+    close();
+  }
+}
+
+/** The focus leaving the panel and its opener puts it away, as a click outside does. */
+function onFocusOut(e) {
+  if (!open) return;
+  const next = e.relatedTarget;
+  if (next && e.currentTarget.contains(next)) return;
+  // A click on nothing focusable leaves `relatedTarget` null; the document listener below decides.
+  if (next) open = false;
+}
+
+onMount(() => {
+  const onDocDown = (e) => {
+    if (open && !e.target.closest?.('.demo')) open = false;
+  };
+  document.addEventListener('pointerdown', onDocDown, true);
+  onDestroy(() => document.removeEventListener('pointerdown', onDocDown, true));
+});
+</script>
+
+<style scoped>
+  .demo { position: relative; display: inline-flex; align-items: center; }
+
+  .opener {
+    display: inline-flex; align-items: center; gap: var(--pdx-space-2xs);
+    min-height: var(--pdx-control-height); padding: 0 var(--pdx-space-xs);
+    border: 1px dashed var(--pdx-color-border); border-radius: var(--pdx-radius-md);
+    background: transparent; color: var(--pdx-color-muted);
+    font: inherit; font-size: var(--pdx-text-sm); cursor: pointer; white-space: nowrap;
+  }
+  .opener:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
+  .opener:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: 2px; }
+  .flask { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Under the opener, its right edge on the opener's: the cluster is at the bar's right. */
+  .panel {
+    position: absolute; top: calc(100% + 4px); right: 0; z-index: 40;
+    width: min(22rem, calc(100vw - 2 * var(--pdx-space-md)));
+    display: flex; flex-direction: column; gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-md);
+    box-shadow: var(--pdx-shadow-lg);
+  }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-sm); }
+  .title { margin: 0; font-size: var(--pdx-text-base); font-weight: 600; }
+  .close {
+    width: 28px; height: 28px; border: 0; border-radius: var(--pdx-radius-md);
+    background: transparent; color: var(--pdx-color-muted); font-size: 18px; line-height: 1; cursor: pointer;
+  }
+  .close:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+  .close:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: 2px; }
+
+  .group { display: flex; flex-direction: column; align-items: stretch; gap: var(--pdx-space-2xs); }
+  .group-title { padding-top: var(--pdx-space-2xs); }
+  /* A knob's label is a sentence, and the panel is narrow: it wraps inside its border rather than
+     running past it on a button's single line. */
+  .knob {
+    justify-content: flex-start; text-align: left;
+    white-space: normal; height: auto; min-height: var(--pdx-control-height);
+  }
+
+  /* COMPACT window, as the shell's: the bar has room for its title and icons only, so
+     the opener is the flask alone — at a thumb's 44×44 — and its word is still its name. */
+  @media (max-width: 599px) {
+    .opener { width: 44px; height: 44px; padding: 0; justify-content: center; }
+    .opener-label {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+  }
+</style>

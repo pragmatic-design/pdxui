@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Group</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Value is comma-separated. A <code>&lt;pdx-label&gt;</code> right before the group names it; or give the group a <code>label</code>.
+    </p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Interests" description="Select all that apply"></pdx-label>
+        <pdx-checkbox-group value="code,design" @pdx-change="e => interests = e.detail.values.join(', ') || 'none'">
+          <pdx-checkbox label="Coding" value="code"></pdx-checkbox>
+          <pdx-checkbox label="Design" value="design"></pdx-checkbox>
+          <pdx-checkbox label="Marketing" value="marketing"></pdx-checkbox>
+          <pdx-checkbox label="Sales" value="sales"></pdx-checkbox>
+        </pdx-checkbox-group>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted" data-test="interests-out">Selected: {{ interests }}</p>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-label text="Interests"&gt;&lt;/pdx-label&gt;
+&lt;pdx-checkbox-group value="code,design"
+  @pdx-change="e =&gt; interests = e.detail.values.join(', ')"&gt;
+  &lt;pdx-checkbox label="Coding" value="code"&gt;&lt;/pdx-checkbox&gt;
+  &lt;pdx-checkbox label="Design" value="design"&gt;&lt;/pdx-checkbox&gt;
+&lt;/pdx-checkbox-group&gt;
+// one pdx-change per click: { value: "code,design", values: ["code", "design"] }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let interests = $signal('code, design');
+</script>

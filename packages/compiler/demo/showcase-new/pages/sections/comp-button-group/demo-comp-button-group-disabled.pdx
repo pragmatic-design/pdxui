@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>disabled</code> prop disables all buttons in the group.</p>
+
+    <div class="demo-row">
+      <pdx-button-group disabled>
+        <pdx-button variant="primary">Save</pdx-button>
+        <pdx-button variant="outline">Cancel</pdx-button>
+      </pdx-button-group>
+    </div>
+  </section>
+</template>

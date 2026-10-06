@@ -1,0 +1,8 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Search — No Results</h2>
+    <div class="demo-container">
+      <pdx-empty-state icon="search" title="No results found" description="Try adjusting your search or filter criteria."></pdx-empty-state>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,50 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Search Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-search-input&gt;</code> — search icon prefix, auto-clearable, debounced
+      <code>pdx-search</code> event. Press Escape to clear, Enter for immediate search.
+    </p>
+
+    <!-- Basic -->
+    <pdx-demo-comp-search-basic class="demo-section"></pdx-demo-comp-search-basic>
+
+    <!-- States -->
+    <pdx-demo-comp-search-states class="demo-section"></pdx-demo-comp-search-states>
+
+    <!-- Sizes -->
+    <pdx-demo-comp-search-sizes class="demo-section"></pdx-demo-comp-search-sizes>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>debounce</code><span>number</span><span>Delay (ms) before pdx-search fires (default 300)</span></div>
+        <div class="opt-row"><code>shortcut</code><span>string</span><span>Keyboard hint shown in suffix (e.g. "Ctrl+K")</span></div>
+        <div class="opt-row"><code>loading</code><span>boolean</span><span>Spinner replaces search icon</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>Placeholder text</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-search</code><span>Debounced search (or immediate on Enter)</span></div>
+        <div class="opt-row"><code>pdx-clear</code><span>Clear button or Escape pressed</span></div>
+        <div class="opt-row"><code>pdx-input</code><span>Every keystroke</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/search';
+@title 'Search Input';
+</script>
+
+<style scoped>
+  .page { }
+</style>

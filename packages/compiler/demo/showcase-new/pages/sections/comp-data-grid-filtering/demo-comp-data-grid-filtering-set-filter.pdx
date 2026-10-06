@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Set Filter (Excel-style)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>filterSet: true</code> builds the checklist from the <strong>distinct values in the data</strong>
+      (no <code>filterOptions</code> to write), with search, select-all and <code>(Blanks)</code>.
+      Open the Category column's filter (the funnel icon in its header).
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="setDS" :columns="setColumns" show-toolbar hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>{ field: 'category', header: 'Category', filterSet: true }
+// → checklist of the distinct values (from the data) + search + select-all + (Blanks)
+// Applies the `in` operator. Server-side: DataSource.distinctValues() with pageSize=0.</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// Set/Excel filter: the checklist of distinct values is derived FROM THE DATA (no options by hand).
+const setColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category', filterSet: true },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+];
+
+const setDS = createDataSource({ data: products.slice(), pageSize: 10 });
+</script>

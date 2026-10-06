@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Label</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple form label with <code>text</code> prop. Associates with input via <code>for</code>.</p>
+
+    <div class="demo-stack">
+      <pdx-label text="Username" for="demo-user"></pdx-label>
+      <input id="demo-user" class="pdx-input" placeholder="Enter username..." />
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-label text="Username" for="demo-user"&gt;&lt;/pdx-label&gt;
+&lt;input id="demo-user" class="pdx-input" placeholder="Enter username..." /&gt;</code></pre>
+    </details>
+  </section>
+</template>

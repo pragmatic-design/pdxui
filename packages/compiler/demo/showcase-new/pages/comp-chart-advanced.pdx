@@ -1,0 +1,39 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Chart — Advanced Features</h1>
+    <p class="pdx-txt-body pdx-ink-muted">
+      Dual Y-axis, mixed chart types, zoom, legend positioning, axis formatting, dynamic data.
+    </p>
+
+    <!-- ═══ Dual Y-Axis ═══ -->
+    <pdx-demo-comp-chart-advanced-dual-axis class="demo-section"></pdx-demo-comp-chart-advanced-dual-axis>
+
+    <!-- ═══ Zoom & Pan ═══ -->
+    <pdx-demo-comp-chart-advanced-zoom class="demo-section"></pdx-demo-comp-chart-advanced-zoom>
+
+    <!-- ═══ Legend Positions ═══ -->
+    <pdx-demo-comp-chart-advanced-legend class="demo-section"></pdx-demo-comp-chart-advanced-legend>
+
+    <!-- ═══ Axis Formatting ═══ -->
+    <pdx-demo-comp-chart-advanced-axis-format class="demo-section"></pdx-demo-comp-chart-advanced-axis-format>
+
+    <!-- ═══ Dynamic Data ═══ -->
+    <pdx-demo-comp-chart-advanced-dynamic class="demo-section"></pdx-demo-comp-chart-advanced-dynamic>
+
+    <!-- ═══ Dark Mode ═══ -->
+    <pdx-demo-comp-chart-advanced-theme class="demo-section"></pdx-demo-comp-chart-advanced-theme>
+  </div>
+</template>
+
+<script setup>
+@page '/components/chart-advanced';
+@title 'Chart — Advanced';
+</script>
+
+<style scoped>
+  .page { }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-area { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+  .demo-row { display: flex; gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); flex-wrap: wrap; }
+  .demo-labeled { display: flex; flex-direction: column; gap: var(--pdx-space-2xs); flex: 1; min-width: 280px; }
+</style>

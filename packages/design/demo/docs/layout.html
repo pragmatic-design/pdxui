@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Layout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Layout</span></div>
+                        <h1 class="pdx-txt-display">Layout</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">6 custom element tags. CSS-only, no JS. Attributes for gap, pad, items, justify, cols, ratio.</p>
+                    </pdx-stack>
+
+                    <!-- Stack -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Stack</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Vertical flow. Children stack top to bottom. <code>gap</code> <code>pad</code> <code>items</code></p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <div class="pdx-surface-inset" style="padding:var(--pdx-space-xs)">Item 1</div>
+                                    <div class="pdx-surface-inset" style="padding:var(--pdx-space-xs)">Item 2</div>
+                                    <div class="pdx-surface-inset" style="padding:var(--pdx-space-xs)">Item 3</div>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;pdx-stack gap="sm"&gt;
+  &lt;div&gt;Item 1&lt;/div&gt;
+  &lt;div&gt;Item 2&lt;/div&gt;
+&lt;/pdx-stack&gt;</div>
+                        </div>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="md" items="center">
+                                    <button class="pdx-primary">Centered</button>
+                                    <span class="pdx-txt-small pdx-ink-muted">items="center" aligns on cross-axis</span>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;pdx-stack gap="md" items="center"&gt;...&lt;/pdx-stack&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Row -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Row</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Horizontal flow. Wraps by default. <code>gap</code> <code>items</code> <code>justify</code> <code>wrap</code></p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="md">
+                                    <pdx-row gap="sm" items="center" justify="between">
+                                        <span>Left</span>
+                                        <button class="pdx-primary" size="sm">Action</button>
+                                        <span>Right</span>
+                                    </pdx-row>
+                                    <pdx-row gap="sm" justify="center">
+                                        <span class="pdx-badge pdx-badge-primary">Tag 1</span>
+                                        <span class="pdx-badge pdx-badge-secondary">Tag 2</span>
+                                        <span class="pdx-badge pdx-badge-success">Tag 3</span>
+                                    </pdx-row>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;pdx-row gap="sm" items="center" justify="between"&gt;
+  &lt;span&gt;Left&lt;/span&gt;
+  &lt;button class="pdx-primary"&gt;Action&lt;/button&gt;
+  &lt;span&gt;Right&lt;/span&gt;
+&lt;/pdx-row&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Grid -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Grid</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">CSS Grid. <code>cols="1-6|auto"</code>. Auto-collapses via Container Queries.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="md">
+                                    <span class="pdx-txt-caption pdx-ink-muted">cols="3"</span>
+                                    <pdx-grid cols="3" gap="sm">
+                                        <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">1</div>
+                                        <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">2</div>
+                                        <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">3</div>
+                                    </pdx-grid>
+                                    <span class="pdx-txt-caption pdx-ink-muted">cols="auto" — auto-fit responsive</span>
+                                    <pdx-grid cols="auto" gap="sm">
+                                        <div class="pdx-surface-card">Auto 1</div>
+                                        <div class="pdx-surface-card">Auto 2</div>
+                                        <div class="pdx-surface-card">Auto 3</div>
+                                        <div class="pdx-surface-card">Auto 4</div>
+                                    </pdx-grid>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;pdx-grid cols="3" gap="sm"&gt;...&lt;/pdx-grid&gt;
+&lt;pdx-grid cols="auto" gap="sm"&gt;...&lt;/pdx-grid&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Center -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Center</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Centers content with max-width. <code>max="xs|sm|md|lg|xl|2xl"</code></p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-center max="sm" pad="md" style="background:var(--pdx-color-inset);border-radius:var(--pdx-radius-md)">
+                                    <p class="pdx-txt-small">Centered content, max-width sm (480px)</p>
+                                </pdx-center>
+                            </div>
+                            <div class="doc-source">&lt;pdx-center max="sm" pad="md"&gt;...&lt;/pdx-center&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Split -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Split</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Two-panel layout. <code>ratio="1:3|1:4|2:1|..."</code>. Auto-stacks on narrow.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-split ratio="1:3" gap="sm">
+                                    <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">Sidebar</div>
+                                    <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">Content</div>
+                                </pdx-split>
+                            </div>
+                            <div class="doc-source">&lt;pdx-split ratio="1:3" gap="sm"&gt;
+  &lt;div&gt;Sidebar&lt;/div&gt;
+  &lt;div&gt;Content&lt;/div&gt;
+&lt;/pdx-split&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Cluster -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Cluster</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Wrapping flow for tags and chips.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-cluster gap="xs">
+                                    <span class="pdx-badge pdx-badge-primary">React</span>
+                                    <span class="pdx-badge pdx-badge-primary">TypeScript</span>
+                                    <span class="pdx-badge pdx-badge-primary">CSS</span>
+                                    <span class="pdx-badge pdx-badge-primary">Node.js</span>
+                                    <span class="pdx-badge pdx-badge-secondary">Docker</span>
+                                    <span class="pdx-badge pdx-badge-secondary">PostgreSQL</span>
+                                </pdx-cluster>
+                            </div>
+                            <div class="doc-source">&lt;pdx-cluster gap="xs"&gt;
+  &lt;span class="pdx-badge pdx-badge-primary"&gt;Tag&lt;/span&gt;
+  ...
+&lt;/pdx-cluster&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Gap scale -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Gap &amp; Pad Scale</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="xs">
+                                    <pdx-row gap="sm" items="center"><span class="pdx-txt-mono" style="min-width:3rem">2xs</span><div style="width:var(--pdx-space-2xs);height:1rem;background:var(--pdx-color-primary);border-radius:2px"></div><span class="pdx-txt-caption pdx-ink-muted">4px</span></pdx-row>
+                                    <pdx-row gap="sm" items="center"><span class="pdx-txt-mono" style="min-width:3rem">xs</span><div style="width:var(--pdx-space-xs);height:1rem;background:var(--pdx-color-primary);border-radius:2px"></div><span class="pdx-txt-caption pdx-ink-muted">8px</span></pdx-row>
+                                    <pdx-row gap="sm" items="center"><span class="pdx-txt-mono" style="min-width:3rem">sm</span><div style="width:var(--pdx-space-sm);height:1rem;background:var(--pdx-color-primary);border-radius:2px"></div><span class="pdx-txt-caption pdx-ink-muted">12px</span></pdx-row>
+                                    <pdx-row gap="sm" items="center"><span class="pdx-txt-mono" style="min-width:3rem">md</span><div style="width:var(--pdx-space-md);height:1rem;background:var(--pdx-color-primary);border-radius:2px"></div><span class="pdx-txt-caption pdx-ink-muted">16px</span></pdx-row>
+                                    <pdx-row gap="sm" items="center"><span class="pdx-txt-mono" style="min-width:3rem">lg</span><div style="width:var(--pdx-space-lg);height:1rem;background:var(--pdx-color-primary);border-radius:2px"></div><span class="pdx-txt-caption pdx-ink-muted">24px</span></pdx-row>
+                                    <pdx-row gap="sm" items="center"><span class="pdx-txt-mono" style="min-width:3rem">xl</span><div style="width:var(--pdx-space-xl);height:1rem;background:var(--pdx-color-primary);border-radius:2px"></div><span class="pdx-txt-caption pdx-ink-muted">40px</span></pdx-row>
+                                    <pdx-row gap="sm" items="center"><span class="pdx-txt-mono" style="min-width:3rem">2xl</span><div style="width:var(--pdx-space-2xl);height:1rem;background:var(--pdx-color-primary);border-radius:2px"></div><span class="pdx-txt-caption pdx-ink-muted">64px</span></pdx-row>
+                                </pdx-stack>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

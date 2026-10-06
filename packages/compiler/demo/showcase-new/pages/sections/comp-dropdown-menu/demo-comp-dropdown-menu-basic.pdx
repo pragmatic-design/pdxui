@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Items with icons and shortcuts; a divider separates the destructive action.</p>
+    <div class="demo-stack">
+      <pdx-dropdown-menu label="Actions" :items="basicItems" @pdx-select="onSelect"></pdx-dropdown-menu>
+      <span class="pdx-txt-small pdx-ink-muted">Last selected: <strong>{{ lastSelect }}</strong></span>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { key: 'edit', label: 'Edit', icon: 'pencil', shortcut: 'Ctrl E' },
+  { key: 'dup', label: 'Duplicate', icon: 'copy' },
+  { key: 'd1', label: '', type: 'separator' },
+  { key: 'del', label: 'Delete', icon: 'trash', danger: true },
+];
+
+&lt;pdx-dropdown-menu label="Actions" :items="items" @pdx-select="onSelect" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './data.pdx';
+import { useDropdownMenuLog } from './state.pdx';
+
+// The custom-trigger section shows the same line (state.pdx.ts).
+const dropdownMenuLog = useDropdownMenuLog();
+const lastSelect = $derived(dropdownMenuLog.lastSelect());
+function onSelect(e) { dropdownMenuLog.onSelect(e); }
+</script>

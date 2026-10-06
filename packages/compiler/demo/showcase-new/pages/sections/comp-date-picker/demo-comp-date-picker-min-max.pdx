@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Min/Max & Disabled Dates</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Constrain selectable dates. Disabled dates are grayed out.</p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Min: 2024-01-01, Max: 2024-12-31</span>
+        <pdx-date-picker min="2024-01-01" max="2024-12-31" placeholder="2024 only"></pdx-date-picker>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker min="2024-01-01" max="2024-12-31" placeholder="2024 only"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

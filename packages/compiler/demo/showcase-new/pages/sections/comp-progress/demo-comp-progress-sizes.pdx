@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Small">
+        <pdx-progress value="60" size="sm"></pdx-progress>
+      </pdx-form-field>
+      <pdx-form-field label="Default">
+        <pdx-progress value="60"></pdx-progress>
+      </pdx-form-field>
+      <pdx-form-field label="Large">
+        <pdx-progress value="60" size="lg"></pdx-progress>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

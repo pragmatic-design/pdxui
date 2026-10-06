@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Always Visible</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Scrollbar always visible, never auto-hides.</p>
+    <div class="demo-container">
+      <pdx-scroll-area maxheight="200px" type="always">
+        <div class="scroll-content">
+          <p>Content with always-visible scrollbar. The scrollbar stays visible at all times, providing a consistent visual indicator of scroll position.</p>
+          <p>This is useful for panels where the user should always know there is more content below.</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat.</p>
+          <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.</p>
+          <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p>
+          <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
+          <p>Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae.</p>
+        </div>
+      </pdx-scroll-area>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Timer-Gated Confirm</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Confirm button disabled for 3 seconds.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm" @click="onTimerConfirm">Timer Confirm</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+
+async function onTimerConfirm() {
+    await dialog.confirm({
+        title: 'Deploy to Production?',
+        message: 'This will deploy the latest build to all production servers.',
+        confirmLabel: 'Deploy',
+        confirmDelay: 3,
+    });
+}
+</script>

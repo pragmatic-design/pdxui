@@ -1,0 +1,82 @@
+/* Table — base, striped, hover, compact, responsive, sticky header, sort */
+
+.pdx-table {
+    /* Difensivo: line-height + box-sizing espliciti così la tabella non eredita
+       un line-height anomalo da un wrapper host (style-isolation). */
+    box-sizing: border-box;
+    line-height: var(--pdx-line-normal);
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--pdx-text-sm);
+}
+
+/* The header's look is the single most theme-specific part of a table (11 of 13 shipped
+   themes redefined it). It is driven by tokens so a theme — or an ENGINE-generated theme —
+   supplies values only, and never re-declares the structure. */
+.pdx-table th {
+    text-align: left;
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    font-family: var(--pdx-table-header-font);
+    font-weight: var(--pdx-table-header-weight);
+    font-size: var(--pdx-table-header-size);
+    color: var(--pdx-table-header-color);
+    background: var(--pdx-table-header-bg);
+    text-transform: var(--pdx-table-header-transform);
+    letter-spacing: var(--pdx-table-header-letter-spacing);
+    border-bottom: var(--pdx-table-header-border-width) solid var(--pdx-table-header-border-color);
+}
+
+.pdx-table td {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+
+.pdx-table-striped tr:nth-child(even) td {
+    background: light-dark(oklch(0.98 0 0 / 0.5), oklch(0.15 0 0 / 0.3));
+}
+
+.pdx-table-hover tr:hover td {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-table-compact th,
+.pdx-table-compact td {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+}
+
+.pdx-table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Sticky header */
+.pdx-table-sticky thead th {
+    position: sticky;
+    top: 0;
+    background: var(--pdx-color-surface);
+    z-index: 1;
+}
+
+/* Sort indicator. `aria-sort` draws it and tells assistive technology the order; `data-sort`
+   (asc/desc/none) is the older alias, which draws the same and says nothing. */
+.pdx-table th[aria-sort],
+.pdx-table th[data-sort] {
+    cursor: pointer;
+    user-select: none;
+}
+
+.pdx-table th[aria-sort]::after,
+.pdx-table th[data-sort]::after {
+    content: '⇅';
+    margin-left: var(--pdx-space-xs);
+    font-size: 0.75em;
+    opacity: 0.3;
+}
+
+.pdx-table th[aria-sort="ascending"]::after,
+.pdx-table th[data-sort="asc"]::after  { content: '↑'; opacity: 0.8; }
+.pdx-table th[aria-sort="descending"]::after,
+.pdx-table th[data-sort="desc"]::after { content: '↓'; opacity: 0.8; }
+
+.pdx-table th[aria-sort]:hover::after,
+.pdx-table th[data-sort]:hover::after { opacity: 0.6; }

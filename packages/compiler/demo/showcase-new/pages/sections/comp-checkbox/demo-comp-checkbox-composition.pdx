@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Checkboxes in realistic form contexts.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Notification Preferences</h3>
+      <div class="comp-form-single">
+        <pdx-checkbox label="Email notifications" description="Get notified about new messages" checked></pdx-checkbox>
+        <pdx-checkbox label="Push notifications" description="Receive browser push notifications" checked></pdx-checkbox>
+        <pdx-checkbox label="SMS notifications" description="Text messages for urgent alerts only"></pdx-checkbox>
+        <pdx-divider></pdx-divider>
+        <pdx-checkbox label="Marketing communications" description="Product updates and promotional offers"></pdx-checkbox>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Permissions</h3>
+      <div class="comp-form-single">
+        <pdx-checkbox label="Select all" :checked="allOn(perms)" :indeterminate="someOn(perms)" @pdx-change="e => perms = setAll(perms, e.detail.checked)"></pdx-checkbox>
+        <div style="padding-left:var(--pdx-space-lg);display:flex;flex-direction:column;gap:var(--pdx-space-sm)">
+          @for (perms as perm; track perm.label) {
+            <pdx-checkbox :label="perm.label" :description="perm.description" :value="perm.label" :checked="perm.on" @pdx-change="e => perms = setOne(perms, e.detail)"></pdx-checkbox>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { allOn, someOn, setAll, setOne } from './state.pdx';
+
+let perms = $signal([
+    { label: 'Read', description: 'View content', on: true },
+    { label: 'Write', description: 'Create and edit content', on: true },
+    { label: 'Delete', description: 'Remove content permanently', on: false },
+    { label: 'Admin', description: 'Manage users and settings', on: false },
+]);
+</script>
+
+<style scoped>
+  .comp-form-single { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+</style>

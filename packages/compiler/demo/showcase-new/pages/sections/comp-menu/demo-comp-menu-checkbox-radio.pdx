@@ -1,0 +1,48 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Checkbox &amp; Radio Items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Checkbox items toggle independently. Radio items are mutually exclusive within a group.
+    </p>
+
+    <div class="demo-row">
+      <div class="menu-demo">
+        <button class="pdx-outline" size="sm" :aria-expanded="shown === 'format' ? 'true' : 'false'" @click="show('format')">Format</button>
+        <pdx-menu :open="shown === 'format'" :items="formatItems" @pdx-close="hide"></pdx-menu>
+      </div>
+      <div class="menu-demo">
+        <button class="pdx-outline" size="sm" :aria-expanded="shown === 'size' ? 'true' : 'false'" @click="show('size')">Text size</button>
+        <pdx-menu :open="shown === 'size'" :items="sizeItems" @pdx-close="hide"></pdx-menu>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// { key: 'bold', label: 'Bold', type: 'checkbox', checked: true }
+// { key: 'md', label: 'Medium', type: 'radio', radioGroup: 'size', checked: true }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useMenuDemo } from './state.pdx';
+
+// One menu open at a time across the sections (state.pdx.ts).
+const menuDemo = useMenuDemo();
+const shown = $derived(menuDemo.shown());
+function show(key) { menuDemo.show(key); }
+function hide(e) { menuDemo.hide(e); }
+
+const formatItems = [
+  { key: 'bold', label: 'Bold', type: 'checkbox', checked: true },
+  { key: 'italic', label: 'Italic', type: 'checkbox', checked: false },
+  { key: 'underline', label: 'Underline', type: 'checkbox', checked: false },
+  { key: 'strike', label: 'Strikethrough', type: 'checkbox', checked: false },
+];
+
+const sizeItems = [
+  { key: 'lbl', label: 'Text Size', type: 'label' },
+  { key: 'sm', label: 'Small', type: 'radio', radioGroup: 'size', checked: false },
+  { key: 'md', label: 'Medium', type: 'radio', radioGroup: 'size', checked: true },
+  { key: 'lg', label: 'Large', type: 'radio', radioGroup: 'size', checked: false },
+];
+</script>

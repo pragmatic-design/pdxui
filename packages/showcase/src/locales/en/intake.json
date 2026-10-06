@@ -1,0 +1,54 @@
+{
+    "intake": {
+        "title": "New intake",
+        "intro": "Raise a request in four steps: who asks, when, what is needed, and how it is billed.",
+        "steps": {
+            "requester": "Requester",
+            "window": "Window",
+            "details": "Details",
+            "billing": "Billing"
+        },
+        "fields": {
+            "requester": "Requester",
+            "email": "Email",
+            "customer": "Customer",
+            "starts": "Starts",
+            "ends": "Ends",
+            "mode": "Mode",
+            "address": "Address",
+            "street": "Street",
+            "city": "City",
+            "sector": "Sector",
+            "lines": "Activities",
+            "activity": "Activity",
+            "hours": "Hours",
+            "po": "Purchase order",
+            "attachment": "Attachment"
+        },
+        "modes": {
+            "onsite": "On site",
+            "remote": "Remote"
+        },
+        "remoteNote": "Remote work needs no address.",
+        "addLine": "+ Add activity",
+        "endsBeforeStarts": "The end date is before the start date.",
+        "reviewFor": "For {customer}",
+        "reviewLines": "{count} activities",
+        "submit": "Submit intake",
+        "refuseNext": "Make the next submit fail",
+        "submitted": "Submitted. The server has the whole payload.",
+        "leave": {
+            "title": "Leave this intake?",
+            "question": "This intake has unsaved changes.",
+            "discard": "Discard and leave",
+            "stay": "Stay"
+        },
+        "draft": {
+            "saved": "Draft saved",
+            "found": "A draft of this form was saved {when}.",
+            "lost": "It could not keep: {names}",
+            "resume": "Resume",
+            "discard": "Discard"
+        }
+    }
+}

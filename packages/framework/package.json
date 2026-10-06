@@ -1,0 +1,62 @@
+{
+  "name": "@pdxui/framework",
+  "version": "1.0.0-alpha.1",
+  "license": "MIT",
+  "publishConfig": { "access": "public" },
+  "repository": { "type": "git", "url": "git+https://github.com/pragmatic-design/pdxui.git", "directory": "packages/framework" },
+  "homepage": "https://pdxui.com",
+  "bugs": { "url": "https://github.com/pragmatic-design/pdxui/issues" },
+  "type": "module",
+  "description": "The PDX UI runtime in one install: core, design, ui, router. The pdx CLI is a separate dev dependency: @pdxui/cli.",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "development": "./src/core.ts",
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js"
+    },
+    "./ui": {
+      "development": "./src/ui.ts",
+      "types": "./dist/ui.d.ts",
+      "import": "./dist/ui.js"
+    },
+    "./router": {
+      "development": "./src/router.ts",
+      "types": "./dist/router.d.ts",
+      "import": "./dist/router.js"
+    },
+    "./css": "./src/pragmatic.css"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": [
+    "./src/pragmatic.css",
+    "./src/index.ts",
+    "./src/ui.ts",
+    "./dist/index.js",
+    "./dist/ui.js"
+  ],
+  "scripts": {
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pdxui/core": "workspace:*",
+    "@pdxui/design": "workspace:*",
+    "@pdxui/ui": "workspace:*",
+    "@pdxui/router": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vite": "^6.4.2"
+  }
+}

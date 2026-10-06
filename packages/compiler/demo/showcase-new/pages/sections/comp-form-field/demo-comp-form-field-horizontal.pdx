@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal Layout</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Label on the left, input on the right. Good for settings pages.</p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="Full Name" required horizontal>
+        <pdx-input placeholder="John Doe"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field label="Email" required horizontal hint="Primary email">
+        <pdx-input type="email" placeholder="john@example.com"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field label="Theme" horizontal>
+        <pdx-radio-group orientation="horizontal" value="system">
+          <pdx-radio label="Light" value="light"></pdx-radio>
+          <pdx-radio label="Dark" value="dark"></pdx-radio>
+          <pdx-radio label="System" value="system"></pdx-radio>
+        </pdx-radio-group>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Default</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Inline flex container with <code>.active</code> item getting a surface background + shadow.</p>
+
+    <div class="demo-row">
+      <div class="pdx-segmented">
+        <button class="pdx-segmented-item active">Day</button>
+        <button class="pdx-segmented-item">Week</button>
+        <button class="pdx-segmented-item">Month</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-segmented"&gt;
+  &lt;button class="pdx-segmented-item active"&gt;Day&lt;/button&gt;
+  &lt;button class="pdx-segmented-item"&gt;Week&lt;/button&gt;
+  &lt;button class="pdx-segmented-item"&gt;Month&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

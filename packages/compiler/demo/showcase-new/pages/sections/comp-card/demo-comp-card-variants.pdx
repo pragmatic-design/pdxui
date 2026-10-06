@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <div class="demo-grid">
+      <pdx-card>
+        <div class="pdx-card-body">
+          <h4 class="pdx-txt-subheading">Default</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Surface background with subtle border and shadow.</p>
+        </div>
+      </pdx-card>
+      <pdx-card variant="outline">
+        <div class="pdx-card-body">
+          <h4 class="pdx-txt-subheading">Outline</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Stronger border, transparent background.</p>
+        </div>
+      </pdx-card>
+      <pdx-card variant="elevated">
+        <div class="pdx-card-body">
+          <h4 class="pdx-txt-subheading">Elevated</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Raised shadow for prominent content.</p>
+        </div>
+      </pdx-card>
+      <pdx-card variant="flat">
+        <div class="pdx-card-body">
+          <h4 class="pdx-txt-subheading">Flat</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Inset background, no border, no shadow.</p>
+        </div>
+      </pdx-card>
+    </div>
+  </section>
+</template>

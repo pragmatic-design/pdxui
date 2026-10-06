@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Stacked Bar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>stacked</code> prop to stack series.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="bar" :data="barData" :x-field="'quarter'" :y-field="'desktop,mobile,tablet'" :series-names="'Desktop,Mobile,Tablet'" stacked height="300px"></pdx-chart>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { barData } from './state.pdx';
+</script>

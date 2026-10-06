@@ -1,0 +1,37 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Chart — Specialized Types</h1>
+    <p class="pdx-txt-body pdx-ink-muted">
+      Gauge, radar, candlestick, heatmap, funnel, sparkline.
+    </p>
+
+    <!-- ═══ Gauge ═══ -->
+    <pdx-demo-comp-chart-specialized-gauge class="demo-section"></pdx-demo-comp-chart-specialized-gauge>
+
+    <!-- ═══ Radar ═══ -->
+    <pdx-demo-comp-chart-specialized-radar class="demo-section"></pdx-demo-comp-chart-specialized-radar>
+
+    <!-- ═══ Candlestick ═══ -->
+    <pdx-demo-comp-chart-specialized-candlestick class="demo-section"></pdx-demo-comp-chart-specialized-candlestick>
+
+    <!-- ═══ Heatmap ═══ -->
+    <pdx-demo-comp-chart-specialized-heatmap class="demo-section"></pdx-demo-comp-chart-specialized-heatmap>
+
+    <!-- ═══ Funnel ═══ -->
+    <pdx-demo-comp-chart-specialized-funnel class="demo-section"></pdx-demo-comp-chart-specialized-funnel>
+
+    <!-- ═══ Sparkline ═══ -->
+    <pdx-demo-comp-chart-specialized-sparkline class="demo-section"></pdx-demo-comp-chart-specialized-sparkline>
+  </div>
+</template>
+
+<script setup>
+@page '/components/chart-specialized';
+@title 'Chart — Specialized';
+</script>
+
+<style scoped>
+  .page { }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-area { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+</style>

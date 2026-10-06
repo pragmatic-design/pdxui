@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">DataSource + AssignedValue</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Match a specific value: items where <code>team === 'alpha'</code> are in the target panel.
+    </p>
+
+    <div class="demo-row">
+      <pdx-transfer
+        :source="teamData"
+        labelfield="name"
+        valuefield="id"
+        assignedfield="team"
+        assignedvalue="alpha"
+        sourcetitle="Unassigned"
+        targettitle="Team Alpha"
+      ></pdx-transfer>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const teamData = [
+  { id: 'alice', name: 'Alice', team: 'alpha' },
+  { id: 'bob', name: 'Bob', team: '' },
+  { id: 'charlie', name: 'Charlie', team: 'alpha' },
+  { id: 'diana', name: 'Diana', team: '' },
+  { id: 'eve', name: 'Eve', team: '' },
+  { id: 'frank', name: 'Frank', team: 'alpha' },
+];
+</script>

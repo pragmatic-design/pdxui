@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Max Files</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Limit to 3 files maximum. Files over the limit are listed under the zone as refused, each
+      with a <code>pdx-error</code>. Removing a file moves focus to the next file's remove button.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-file-upload multiple :max-files="3"></pdx-file-upload>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-file-upload multiple :max-files="3" /&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 sizes: sm (16px), default (20px), lg (24px).</p>
+
+    <div class="demo-stack">
+      <pdx-checkbox label="Small checkbox" size="sm" checked></pdx-checkbox>
+      <pdx-checkbox label="Default checkbox" checked></pdx-checkbox>
+      <pdx-checkbox label="Large checkbox" size="lg" checked></pdx-checkbox>
+    </div>
+  </section>
+</template>

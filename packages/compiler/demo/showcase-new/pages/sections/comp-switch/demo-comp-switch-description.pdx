@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Description</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Supplemental text below the label.</p>
+
+    <div class="demo-stack">
+      <pdx-switch label="Email notifications" description="Receive daily digest of activity" checked></pdx-switch>
+      <pdx-switch label="Push notifications" description="Real-time alerts in your browser" checked></pdx-switch>
+      <pdx-switch label="Marketing emails" description="Product updates and promotional offers"></pdx-switch>
+    </div>
+  </section>
+</template>

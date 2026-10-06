@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+# The showcase builds itself other ways to measure: `--outDir dist-inline` against dist-template
+# for inlineBindings, `--minify false` into dist-dbg to read a real stack.
+dist-*/
+*.tsbuildinfo
+
+# Vite / cache
+.vite/
+.tmp-*/
+
+# Test / coverage
+coverage/
+
+# Editor / OS
+.DS_Store
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Playwright artifacts
+**/test-results/
+# A failed run's traces, copied where the next run cannot empty them
+**/test-results-kept/
+**/playwright-report/
+**/.last-run.json
+# `pnpm design-score` writes its reading here, with the previous one to diff against
+packages/responsive/design-score/
+
+# Tooling state / local config (not project content)
+.agentflow/
+.playwright-mcp/
+.npmrc
+
+# Agent tooling and private agent instructions: working material, not project content.
+# The root CLAUDE.md is the public one, which imports AGENTS.md; a CLAUDE.md anywhere else is
+# private. packages/core/tests/public-tree.test.ts fails if any of it is tracked.
+.claude/
+CLAUDE.md
+!/CLAUDE.md
+settings.local.json
+
+# Design reasoning that lives outside the repo record.
+.internals/

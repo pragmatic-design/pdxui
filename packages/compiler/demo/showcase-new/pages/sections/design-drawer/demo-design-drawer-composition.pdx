@@ -1,0 +1,70 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Settings Drawer</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A right-anchored settings panel with form inputs.</p>
+
+    <div class="drawer-preview" style="height: 300px;">
+      <div class="drawer-content-area">
+        <span class="pdx-txt-small pdx-ink-muted">Application</span>
+      </div>
+      <div class="pdx-drawer drawer-right" style="width: 260px;">
+        <div class="pdx-drawer-header">
+          <h3 class="pdx-txt-small" style="margin:0; font-weight: var(--pdx-weight-semibold);">Settings</h3>
+          <button class="pdx-dialog-close" aria-label="Close" style="font-size: 1.25rem;">&times;</button>
+        </div>
+        <div class="pdx-drawer-body">
+          <div class="setting-field">
+            <label class="pdx-txt-small pdx-ink-muted">Theme</label>
+            <select class="pdx-select">
+              <option>Light</option>
+              <option>Dark</option>
+              <option>System</option>
+            </select>
+          </div>
+          <div class="setting-field">
+            <label class="pdx-txt-small pdx-ink-muted">Language</label>
+            <select class="pdx-select">
+              <option>English</option>
+              <option>Italian</option>
+            </select>
+          </div>
+          <div class="setting-field">
+            <label class="pdx-txt-small pdx-ink-muted">Notifications</label>
+            <label class="pdx-txt-small"><input type="checkbox" checked /> Email alerts</label>
+            <label class="pdx-txt-small"><input type="checkbox" /> Push notifications</label>
+          </div>
+        </div>
+        <div class="pdx-drawer-footer">
+          <button class="pdx-ghost" size="sm">Cancel</button>
+          <button class="pdx-primary" size="sm">Save</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  /* Setting field */
+  .setting-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    margin-bottom: var(--pdx-space-md);
+  }
+  .setting-field:last-child { margin-bottom: 0; }
+  .pdx-dialog-close {
+    appearance: none;
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    padding: var(--pdx-space-xs);
+    border-radius: var(--pdx-radius-sm);
+  }
+  .pdx-dialog-close:hover {
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+  }
+</style>

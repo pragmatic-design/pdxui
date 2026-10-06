@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Force Selection</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      With <code>force-selection</code>, the input clears on blur if the text does not match a suggestion.
+      Try typing something that is not in the list, then click outside.
+    </p>
+    <div class="demo-box">
+      <pdx-autocomplete
+        placeholder="Must match a color..."
+        :suggestions="colors"
+        force-selection
+        @pdx-change="onColorChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">Color: {{ colorValue }}</p>
+    </div>
+  </section>
+</template>
+
+<script setup>
+// ─── Force selection (colors) ───
+const colors = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Indigo', 'Violet', 'Pink', 'Cyan', 'Magenta', 'Teal', 'Navy', 'Coral', 'Salmon', 'Gold'];
+
+let colorValue = $signal('');
+
+function onColorChange(e) { colorValue = e.detail.value ?? e.detail; }
+</script>

@@ -1,0 +1,75 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">DataSource + Pagination</h2>
+    <p class="pdx-txt-small pdx-ink-muted">List and Pagination share the same DataSource. Page change reloads the list with loading overlay.</p>
+    <div class="demo-container">
+      <pdx-list :source="pagedDS" :render-item="renderPagedItem" dividers bordered id="paged-list"></pdx-list>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)">
+      <span class="pdx-txt-small pdx-ink-muted" id="paged-info">{{ pagedInfo }}</span>
+      <pdx-pagination :total="pagedTotal" :pageSize="5" :page="pagedPage" @pdx-change="onPageChange" id="paged-pagination"></pdx-pagination>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const ds = createDataSource({
+  transport: fakePagedTransport,
+  pageSize: 5,
+  autoLoad: true,
+});
+
+&lt;pdx-list :source="ds" :render-item="renderItem"&gt;&lt;/pdx-list&gt;
+&lt;pdx-pagination :total="ds.total()" :pageSize="5"
+  :page="ds.page()" @pdx-change="onPage"&gt;
+&lt;/pdx-pagination&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+// Paged DataSource — 23 items, 5 per page, simulates server paging
+const allUsers = [];
+for (let _userIdx = 1; _userIdx <= 23; _userIdx++) {
+  allUsers.push({ id: _userIdx, name: 'User ' + _userIdx, email: 'user' + _userIdx + '@example.com', dept: _userIdx % 3 === 0 ? 'Engineering' : _userIdx % 3 === 1 ? 'Design' : 'Marketing' });
+}
+
+function _fakePagedRead(params) {
+  return new Promise(function(resolve) {
+    const _off = ((params.page || 1) - 1) * (params.pageSize || 5);
+    const _result = allUsers.slice(_off, _off + (params.pageSize || 5));
+    setTimeout(function() { resolve({ data: _result, total: allUsers.length }); }, 800);
+  });
+}
+
+const pagedDS = createDataSource({
+  transport: { read: _fakePagedRead },
+  pageSize: 5,
+  autoLoad: true,
+});
+
+let pagedTotal = $signal(23);
+let pagedPage = $signal(1);
+
+// Update info text when data loads
+$effect(() => {
+  const loading = pagedDS.isLoading();
+  const total = pagedDS.total();
+  const pageNum = pagedDS.page();
+  const dataLen = pagedDS.data().length;
+  pagedTotal = total;
+  pagedPage = pageNum;
+});
+
+const pagedInfo = $derived(pagedDS.isLoading()
+  ? 'Loading...'
+  : 'Showing ' + pagedDS.data().length + ' of ' + pagedDS.total() + ' items (page ' + pagedDS.page() + ')');
+
+function onPageChange(evt) {
+  pagedDS.setPage(evt.detail.page);
+}
+
+function renderPagedItem(userItem) {
+  return '<span style="min-width:28px;color:var(--pdx-color-muted);font-size:0.75rem">#' + userItem.id + '</span><strong>' + userItem.name + '</strong><span style="color:var(--pdx-color-muted);font-size:0.8rem">' + userItem.email + '</span><span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;border-radius:9999px;background:var(--pdx-color-inset)">' + userItem.dept + '</span>';
+}
+</script>

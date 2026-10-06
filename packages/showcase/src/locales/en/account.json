@@ -1,0 +1,34 @@
+{
+    "account": {
+        "title": "Account",
+        "intro": "Your profile, your preferences, and your session.",
+        "profileTitle": "Profile",
+        "email": "Email",
+        "role": "Role",
+        "roleNames": {
+            "admin": "Administrator",
+            "technician": "Technician"
+        },
+        "can": "What you can do",
+        "canList": "Work on tickets, {more}",
+        "canNothing": "Work on tickets",
+        "canBilling": {
+            "read": "read the billing",
+            "write": "close the month"
+        },
+        "and": " and ",
+        "preferencesTitle": "Preferences",
+        "billingTitle": "Billing",
+        "billingPending": "Loading…",
+        "closedMonths": "Months closed so far: {count}.",
+        "closeMonth": "Close the month",
+        "closeMonthHidden": "Closing the month is for the administration.",
+        "closed": "Month closed. Months closed so far: {count}.",
+        "sessionTitle": "Session",
+        "signedInUntil": "Signed in until {time}.",
+        "signOut": "Sign out",
+        "demo": {
+            "closeAnyway": "Close the month without the permission"
+        }
+    }
+}

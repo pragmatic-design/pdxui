@@ -1,0 +1,179 @@
+/* pdx-inline-edit — Click to edit, appropriate editor per data type */
+
+pdx-inline-edit {
+    display: inline-block;
+    min-width: 60px;
+}
+
+/* When editing, expand to give editors room */
+pdx-inline-edit:has(.editing) {
+    min-width: 200px;
+}
+
+.pdx-inline-edit {
+    position: relative;
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-sm);
+}
+
+.pdx-inline-edit.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.pdx-inline-edit.readonly .pdx-inline-edit-display {
+    cursor: default;
+}
+
+/* Display mode */
+.pdx-inline-edit-display {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 2px var(--pdx-space-xs);
+    border: 1px solid transparent;
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    min-height: 28px;
+    color: var(--pdx-color-text);
+    user-select: none;
+}
+
+.pdx-inline-edit-display:hover {
+    background: var(--pdx-color-inset);
+    border-color: var(--pdx-color-border);
+}
+
+.pdx-inline-edit-display:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -1px;
+}
+
+.pdx-inline-edit-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Textarea type: allow multi-line display. The type is `data-type` on the root: as a class it would
+   be the editor <textarea>'s own, and draw a focused field around the display. */
+.pdx-inline-edit[data-type="textarea"] .pdx-inline-edit-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.pdx-inline-edit-text.empty {
+    color: var(--pdx-color-muted);
+    font-style: italic;
+}
+
+/* Edit icon — visible on hover */
+.pdx-inline-edit-icon {
+    opacity: 0;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+}
+
+.pdx-inline-edit-display:hover .pdx-inline-edit-icon {
+    opacity: 0.7;
+}
+
+/* Color swatch */
+.pdx-inline-edit-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--pdx-radius-sm);
+    border: 1px solid var(--pdx-color-border);
+    flex-shrink: 0;
+}
+
+/* Editor mode */
+.pdx-inline-edit-editor {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--pdx-space-xs);
+    min-width: 200px;
+}
+
+/* Ensure inner editors expand */
+.pdx-inline-edit-editor > pdx-number-input,
+.pdx-inline-edit-editor > pdx-date-picker,
+.pdx-inline-edit-editor > pdx-select,
+.pdx-inline-edit-editor > pdx-color-picker {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
+/* Number input needs enough room for currency formatting */
+.pdx-inline-edit[data-type="number"] .pdx-inline-edit-editor,
+.pdx-inline-edit[data-type="currency"] .pdx-inline-edit-editor {
+    min-width: 220px;
+}
+
+/* Text/textarea input inside editor */
+.pdx-inline-edit-input,
+.pdx-inline-edit-textarea {
+    width: 100%;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: 1px solid var(--pdx-color-focus);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--pdx-color-focus) 20%, transparent);
+}
+
+.pdx-inline-edit-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* Action buttons (confirm/cancel) */
+.pdx-inline-edit-actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.pdx-inline-edit-save,
+.pdx-inline-edit-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--pdx-color-text);
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.pdx-inline-edit-save:hover {
+    background: color-mix(in oklch, var(--pdx-color-success) 12%, transparent);
+    border-color: var(--pdx-color-success);
+    color: var(--pdx-color-success-ink);
+}
+
+.pdx-inline-edit-cancel:hover {
+    background: color-mix(in oklch, var(--pdx-color-danger) 12%, transparent);
+    border-color: var(--pdx-color-danger);
+    color: var(--pdx-color-danger-ink);
+}
+
+.pdx-inline-edit-save:focus-visible,
+.pdx-inline-edit-cancel:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -1px;
+}

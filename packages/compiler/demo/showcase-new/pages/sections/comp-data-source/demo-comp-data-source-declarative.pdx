@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">&lt;pdx-data-source&gt; — Declarative</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Non-rendering component. Pass <code>:data</code>, <code>url</code>, or <code>:transport</code>.
+      Use <code>:ref</code> to get the DataSource, or <code>name</code> for Context Protocol.
+    </p>
+    <div class="demo-row">
+      <pdx-data-source :data="users" id-field="id" :ref="dsRef" />
+      <pdx-select :source="dsRef" labelField="name" valueField="id" searchable clearable placeholder="From &lt;pdx-data-source&gt;..." />
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-data-source :data="users" id-field="id" :ref="dsRef" /&gt;
+&lt;pdx-select :source="dsRef" labelField="name" valueField="id"
+  searchable clearable /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { users } from './state.pdx';
+
+let dsRef = $signal(null);
+</script>

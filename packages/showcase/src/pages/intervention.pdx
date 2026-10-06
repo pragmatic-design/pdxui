@@ -1,0 +1,33 @@
+<template>
+  <div class="intervention" data-test="intervention">
+    <h2 class="pdx-txt-heading">{{ $t('intervention.title', { n: n }) }}</h2>
+    <!-- For the reader of the source: both levels' params reach this page — `:id` from
+         the ticket, `:n` from here — which is one match, not two. -->
+
+    <p class="pdx-txt-small pdx-ink-muted">
+      <span data-test="intervention-ticket" hidden>{{ id }}</span>
+      {{ $t('intervention.onTicket', { id: id }) }}
+    </p>
+  </div>
+</template>
+
+<script setup>
+@page '/tickets/:id/interventions/:n' { label: interventionLabel };
+@title $t('intervention.title', { n: n });
+
+@prop id: string = '';
+@prop n: string = '';
+
+// The crumb in the page's language. A label is read outside any component, so it takes
+// the params, as the ticket's does.
+function interventionLabel(params) {
+  return $t('intervention.title', { n: params.n });
+}
+</script>
+
+<style scoped>
+  .intervention {
+    border-left: 3px solid var(--pdx-color-primary);
+    padding-left: var(--pdx-space-md);
+  }
+</style>

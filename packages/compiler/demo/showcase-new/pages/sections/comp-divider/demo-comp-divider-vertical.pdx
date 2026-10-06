@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Vertical</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>orientation="vertical"</code> for inline separators.</p>
+    <div class="demo-row">
+      <span class="pdx-txt-small">Home</span>
+      <pdx-divider orientation="vertical"></pdx-divider>
+      <span class="pdx-txt-small">Products</span>
+      <pdx-divider orientation="vertical"></pdx-divider>
+      <span class="pdx-txt-small">About</span>
+      <pdx-divider orientation="vertical"></pdx-divider>
+      <span class="pdx-txt-small">Contact</span>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-row { gap: var(--pdx-space-sm); }
+</style>

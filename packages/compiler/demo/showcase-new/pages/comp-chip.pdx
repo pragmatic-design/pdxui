@@ -1,0 +1,112 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Chip</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-chip&gt;</code> — selectable, removable tag/chip with variants, avatar, and group support.
+    </p>
+
+    <!-- ═══ Console ═══ -->
+    <div class="console-panel">
+      <div class="console-header">
+        <span class="pdx-txt-caption pdx-ink-muted">Event Console</span>
+        <button class="pdx-ghost" size="sm" @click="clearLog">Clear</button>
+      </div>
+      <div class="console-body pdx-txt-mono">
+        @if (logs.length === 0) {
+          <span class="pdx-ink-muted">Interact with chips below...</span>
+        } @else {
+          @for (logs as entry; track entry.id) {
+            <div class="log-entry">
+              <span class="log-time">{{ entry.time }}</span>
+              <span>{{ entry.text }}</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- ═══ Outline Variants ═══ -->
+    <pdx-demo-comp-chip-outline class="demo-section"></pdx-demo-comp-chip-outline>
+
+    <!-- ═══ Tonal Variants ═══ -->
+    <pdx-demo-comp-chip-tonal class="demo-section"></pdx-demo-comp-chip-tonal>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-chip-sizes class="demo-section"></pdx-demo-comp-chip-sizes>
+
+    <!-- ═══ With Avatar ═══ -->
+    <pdx-demo-comp-chip-avatar class="demo-section"></pdx-demo-comp-chip-avatar>
+
+    <!-- ═══ With Icon ═══ -->
+    <pdx-demo-comp-chip-icon class="demo-section"></pdx-demo-comp-chip-icon>
+
+    <!-- ═══ Removable ═══ -->
+    <pdx-demo-comp-chip-removable class="demo-section"></pdx-demo-comp-chip-removable>
+
+    <!-- ═══ Selectable ═══ -->
+    <pdx-demo-comp-chip-selectable class="demo-section"></pdx-demo-comp-chip-selectable>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-chip-disabled class="demo-section"></pdx-demo-comp-chip-disabled>
+
+    <!-- ═══ CSS Only ═══ -->
+    <pdx-demo-comp-chip-css-only class="demo-section"></pdx-demo-comp-chip-css-only>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-chip-composition class="demo-section"></pdx-demo-comp-chip-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Text content (alternative to slot)</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>primary, success, danger, warning, info, tonal-*</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>removable</code><span>boolean</span><span>Show close button</span></div>
+        <div class="opt-row"><code>selectable</code><span>boolean</span><span>Click to toggle selection</span></div>
+        <div class="opt-row"><code>selected</code><span>boolean</span><span>Selected state (filled background)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Prevents all interaction</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Identifier passed in remove/toggle events</span></div>
+        <div class="opt-row"><code>avatar</code><span>string</span><span>URL for small circle image before label</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>When</span></div>
+        <div class="opt-row"><code>pdx-remove</code><span>{ value, label }</span><span>Close button clicked</span></div>
+        <div class="opt-row"><code>pdx-toggle</code><span>{ selected, value }</span><span>Selectable chip clicked</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+import { useChipConsole } from './sections/comp-chip/state.pdx';
+
+@page '/components/chip';
+@title 'Chip Component';
+
+registerPragmaticIcons();
+
+// Console: the sections write to it, the page shows it (sections/comp-chip/state.pdx.ts).
+const chipConsole = useChipConsole();
+const logs = $derived(chipConsole.logs());
+
+function clearLog() { chipConsole.clearLog(); }
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-row { gap: var(--pdx-space-sm); }
+
+  .console-panel { margin-bottom: var(--pdx-space-xl); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .console-header { display: flex; align-items: center; justify-content: space-between; padding: var(--pdx-space-xs) var(--pdx-space-md); background: var(--pdx-color-inset); border-bottom: 1px solid var(--pdx-color-border); }
+  .console-body { padding: var(--pdx-space-sm) var(--pdx-space-md); max-height: 120px; overflow-y: auto; font-size: var(--pdx-text-xs); background: var(--pdx-color-surface); }
+  .log-entry { display: flex; gap: var(--pdx-space-sm); padding: 2px 0; line-height: 1.5; }
+  .log-time { color: var(--pdx-color-muted); min-width: 70px; }
+
+  .opt-header, .opt-row { grid-template-columns: 120px 120px 1fr; }
+</style>

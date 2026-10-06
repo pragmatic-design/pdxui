@@ -1,0 +1,127 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">2. Declarative Composition (Template)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Same nested DTO, but composed declaratively in the template with <code>&lt;pdx-field-group&gt;</code> and compiler auto-binding.
+      The compiler resolves <code>name="email"</code> inside <code>&lt;pdx-field-group name="customer"&gt;</code>
+      to <code>form.fields['customer.email']</code>.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="declForm" @pdx-submit="saveDeclForm">
+        <div class="form-grid">
+          <pdx-form-field name="orderNumber" label="Order #" required>
+            <pdx-input name="orderNumber"></pdx-input>
+          </pdx-form-field>
+        </div>
+
+        <pdx-field-group name="customer" label="Customer">
+          <div class="form-grid">
+            <pdx-form-field name="name" label="Name" required>
+              <pdx-input name="name" placeholder="Full name"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="email" label="Email" required>
+              <pdx-input name="email" type="email" placeholder="email@company.com"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </pdx-field-group>
+
+        <pdx-field-group name="shipping" label="Shipping Address">
+          <div class="form-grid-3">
+            <pdx-form-field name="street" label="Street">
+              <pdx-input name="street"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="city" label="City">
+              <pdx-input name="city"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="zip" label="ZIP">
+              <pdx-input name="zip"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </pdx-field-group>
+
+        <pdx-form-actions submitLabel="Save Order" resetLabel="Reset"></pdx-form-actions>
+      </pdx-form>
+
+      <div class="form-output">
+        <div class="form-status">
+          <span :class="declDirtyClass()" :textContent="declDirtyText()"></span>
+          <span :class="declValidClass()" :textContent="declValidText()"></span>
+        </div>
+        <strong>getValues():</strong>
+        <pre class="form-json" :textContent="declValuesJson()"></pre>
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>&lt;pdx-form :form="orderForm"&gt;
+  &lt;pdx-form-field name="orderNumber" label="Order #" required&gt;
+    &lt;pdx-input name="orderNumber" /&gt;
+  &lt;/pdx-form-field&gt;
+
+  &lt;pdx-field-group name="customer" label="Customer"&gt;
+    &lt;pdx-form-field name="name" label="Name" required&gt;
+      &lt;pdx-input name="name" /&gt;
+    &lt;/pdx-form-field&gt;
+    &lt;!-- compiler resolves to form.fields['customer.name'] --&gt;
+  &lt;/pdx-field-group&gt;
+
+  &lt;pdx-field-group name="shipping" label="Shipping"&gt;
+    &lt;pdx-form-field name="street" label="Street"&gt;...&lt;/pdx-form-field&gt;
+    &lt;pdx-form-field name="city" label="City"&gt;...&lt;/pdx-form-field&gt;
+  &lt;/pdx-field-group&gt;
+&lt;/pdx-form&gt;
+
+// createForm accepts nested initialValues:
+const orderForm = createForm({
+  initialValues: {
+    orderNumber: 'ORD-042',
+    customer: { name: 'Jane', email: 'jane@test.com' },
+    shipping: { street: '', city: '', zip: '' },
+  },
+  validators: {
+    'customer.name': [required()],  // dotted path validators
+    'customer.email': [required(), email()],
+  },
+});</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required, email } from '@pdxui/core';
+
+// ─── 2. Declarative Composition ───
+const declForm = createForm({
+  initialValues: {
+    orderNumber: 'ORD-042',
+    customer: { name: 'Jane Doe', email: 'jane@acme.com' },
+    shipping: { street: '123 Main St', city: 'New York', zip: '10001' },
+  },
+  validators: {
+    'orderNumber': [required('Order number is required')],
+    'customer.name': [required('Name is required')],
+    'customer.email': [required('Email is required'), email('Invalid email')],
+  },
+});
+
+function saveDeclForm() { declForm.validate(); }
+function declDirtyText() { return 'Dirty: ' + (declForm.dirty() ? 'Yes' : 'No'); }
+function declDirtyClass() { return 'form-status-badge' + (declForm.dirty() ? ' active' : ''); }
+function declValidText() { return 'Valid: ' + (declForm.valid() ? 'Yes' : 'No'); }
+function declValidClass() { return 'form-status-badge' + (declForm.valid() ? ' success' : ' error'); }
+function declValuesJson() { const d = declForm.dirty(); return JSON.stringify(declForm.getValues(), null, 2); }
+</script>
+
+<style scoped>
+  .form-json {
+    margin: var(--pdx-space-xs) 0 0;
+    padding: var(--pdx-space-sm);
+    font-family: var(--pdx-font-mono);
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    overflow-x: auto;
+    max-height: 250px;
+    white-space: pre-wrap;
+  }
+  .form-status { display: flex; gap: var(--pdx-space-sm); margin-bottom: var(--pdx-space-sm); }
+</style>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario: Tooltip Positions</title>
+    <style>
+        body { font-family: system-ui; padding: 100px 200px; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(3, auto); gap: 60px; justify-content: center; align-items: center; margin-top: 60px; }
+        .center { grid-column: 2; }
+        button { padding: 8px 16px; cursor: pointer; }
+    </style>
+    <script type="module">
+        import '@pdxui/design';
+        import '@pdxui/ui/tooltip';
+
+        // Auto-open tooltips for measurement (no hover needed)
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const param = new URLSearchParams(location.search);
+                const placement = param.get('placement') || 'all';
+
+                document.querySelectorAll('pdx-tooltip').forEach(tt => {
+                    if (placement === 'all' || tt.getAttribute('placement') === placement) {
+                        // Force-show by dispatching mouseenter on trigger
+                        const trigger = tt.previousElementSibling;
+                        if (trigger) {
+                            trigger.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+                        }
+                    }
+                });
+            }, 300);
+        });
+    </script>
+</head>
+<body>
+    <h2>Tooltip Positioning Scenarios</h2>
+
+    <!-- Single tooltip for focused testing via ?placement=top -->
+    <section data-scenario="single" style="margin-bottom: 80px;">
+        <button data-test="trigger-top">Top trigger</button>
+        <pdx-tooltip placement="top" text="Tooltip top" delay="0"></pdx-tooltip>
+
+        <button data-test="trigger-bottom" style="margin-left: 40px;">Bottom trigger</button>
+        <pdx-tooltip placement="bottom" text="Tooltip bottom" delay="0"></pdx-tooltip>
+
+        <button data-test="trigger-left" style="margin-left: 40px;">Left trigger</button>
+        <pdx-tooltip placement="left" text="Tooltip left" delay="0"></pdx-tooltip>
+
+        <button data-test="trigger-right" style="margin-left: 40px;">Right trigger</button>
+        <pdx-tooltip placement="right" text="Tooltip right" delay="0"></pdx-tooltip>
+    </section>
+
+    <!-- All 4 start/end variants -->
+    <section data-scenario="alignment">
+        <button data-test="trigger-top-start">Top-start</button>
+        <pdx-tooltip placement="top-start" text="Top start tooltip" delay="0"></pdx-tooltip>
+
+        <button data-test="trigger-top-end" style="margin-left: 40px;">Top-end</button>
+        <pdx-tooltip placement="top-end" text="Top end tooltip" delay="0"></pdx-tooltip>
+
+        <button data-test="trigger-bottom-start" style="margin-left: 40px;">Bottom-start</button>
+        <pdx-tooltip placement="bottom-start" text="Bottom start tooltip" delay="0"></pdx-tooltip>
+
+        <button data-test="trigger-bottom-end" style="margin-left: 40px;">Bottom-end</button>
+        <pdx-tooltip placement="bottom-end" text="Bottom end tooltip" delay="0"></pdx-tooltip>
+    </section>
+</body>
+</html>

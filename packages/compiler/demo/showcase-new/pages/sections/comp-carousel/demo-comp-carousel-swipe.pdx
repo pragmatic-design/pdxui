@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Swipe</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Swipeable is on by default. Try dragging left/right with mouse or touch.</p>
+    <div class="demo-container">
+      <pdx-carousel :items="basicSlides" :show-arrows="false"></pdx-carousel>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { basicSlides } from './state.pdx';
+</script>

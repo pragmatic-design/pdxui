@@ -1,0 +1,69 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Cascading DataSources</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Second select filters reactively based on the first. Uses <code>$derived</code> to recompute
+      options. Changing country resets the city selection.
+    </p>
+    <div class="demo-col">
+      <div class="field">
+        <label class="pdx-txt-small pdx-weight-medium">Country</label>
+        <pdx-select :options="countryList" clearable placeholder="Select country..." @pdx-change="onCountryPick" />
+      </div>
+      <div class="field">
+        <label class="pdx-txt-small pdx-weight-medium">City</label>
+        <pdx-select :options="filteredCityList" labelField="name" valueField="id" :value="pickedCity" :disabled="!pickedCountry" searchable clearable placeholder="Select city..." @pdx-change="onCityPick" />
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Selected: {{ pickedCountry || '—' }} / {{ pickedCityLabel || '—' }}
+      </p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>let pickedCountry = $signal('');
+let pickedCity = $signal(null);
+
+const filteredCityList = $derived(
+  cities.filter(c => !pickedCountry || c.country === pickedCountry)
+);
+
+function onCountryPick(e) {
+  pickedCountry = e.detail.value ?? e.detail;
+  pickedCity = null; // reset dependent
+}
+
+&lt;pdx-select :options="countryList" clearable
+  @pdx-change="onCountryPick" /&gt;
+
+&lt;pdx-select :options="filteredCityList" labelField="name"
+  valueField="id" :value="pickedCity"
+  :disabled="!pickedCountry" searchable clearable /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// Cascade
+const cities = [
+  { id: 1, name: 'New York', country: 'USA' },
+  { id: 2, name: 'Los Angeles', country: 'USA' },
+  { id: 3, name: 'Chicago', country: 'USA' },
+  { id: 4, name: 'London', country: 'UK' },
+  { id: 5, name: 'Manchester', country: 'UK' },
+  { id: 6, name: 'Edinburgh', country: 'UK' },
+  { id: 7, name: 'Rome', country: 'Italy' },
+  { id: 8, name: 'Milan', country: 'Italy' },
+  { id: 9, name: 'Florence', country: 'Italy' },
+];
+
+const countryList = ['USA', 'UK', 'Italy'];
+let pickedCountry = $signal('');
+let pickedCity = $signal(null);
+const filteredCityList = $derived(cities.filter(c => !pickedCountry || c.country === pickedCountry));
+
+const pickedCityLabel = $derived(() => {
+  if (!pickedCity) return '';
+  const c = cities.find(x => x.id === pickedCity);
+  return c ? c.name : '';
+});
+
+function onCountryPick(e) { pickedCountry = e.detail.value ?? e.detail; pickedCity = null; }
+function onCityPick(e) { pickedCity = e.detail.value ?? e.detail; }
+</script>

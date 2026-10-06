@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Sizes — sm / default / lg</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Control the swatch trigger size with the <code>size</code> prop.
+    </p>
+    <div class="demo-box sizes-row">
+      <div class="size-col">
+        <p class="pdx-txt-small pdx-ink-muted">sm</p>
+        <pdx-color-picker value="#3b82f6" size="sm" />
+      </div>
+      <div class="size-col">
+        <p class="pdx-txt-small pdx-ink-muted">default</p>
+        <pdx-color-picker value="#10b981" />
+      </div>
+      <div class="size-col">
+        <p class="pdx-txt-small pdx-ink-muted">lg</p>
+        <pdx-color-picker value="#ef4444" size="lg" />
+      </div>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker value="#3b82f6" size="sm" /&gt;
+&lt;pdx-color-picker value="#10b981" /&gt;
+&lt;pdx-color-picker value="#ef4444" size="lg" /&gt;</code></pre></details>}
+  </section>
+</template>

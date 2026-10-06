@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 sizes: compact, default, large. Affects padding, font size, icon size.</p>
+    <div class="btn-row">
+      <pdx-button variant="outline" size="sm" @click="showCompact">Compact</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="showDefault">Default</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="showLargeSize">Large</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showCompact() { toast.success('Compact toast.', { size: 'compact' }); }
+function showDefault() { toast.success('Default size toast.'); }
+function showLargeSize() { toast.success('Large toast with more presence.', { size: 'large', title: 'Deployment Complete' }); }
+</script>

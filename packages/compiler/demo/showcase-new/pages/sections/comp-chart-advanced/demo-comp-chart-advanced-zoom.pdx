@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Zoom & Pan</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Mouse wheel to zoom, drag to pan. Set <code>zoom="inside"</code>.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="line" :data="zoomData" :x-field="'day'" :y-field="'value'" :legend="false" zoom="inside" smooth height="300px" title="90-day trend (scroll to zoom, drag to pan)"></pdx-chart>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const zoomData = Array.from({ length: 90 }, (_, i) => ({
+  day: 'Day ' + (i + 1),
+  value: Math.round(50 + 30 * Math.sin(i / 8) + Math.random() * 15),
+}));
+</script>

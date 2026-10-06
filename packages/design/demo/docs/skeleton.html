@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Skeleton & Spinner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Skeleton & Spinner</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Skeleton & Spinner</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Loading states: skeleton shimmer placeholders, button spinner, card overlay. Show UI structure while content loads.</p>
+                    </pdx-stack>
+
+                    <!-- Skeleton shapes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Skeleton Shapes</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">6 presets matching common UI elements.</p>
+                        <pdx-grid cols="3" gap="md">
+                            <pdx-stack gap="xs" items="center">
+                                <div class="pdx-skeleton pdx-skeleton-circle"></div>
+                                <span class="pdx-txt-caption pdx-ink-muted">circle</span>
+                            </pdx-stack>
+                            <pdx-stack gap="xs" items="center">
+                                <div class="pdx-skeleton pdx-skeleton-title" style="width:100%"></div>
+                                <span class="pdx-txt-caption pdx-ink-muted">title</span>
+                            </pdx-stack>
+                            <pdx-stack gap="xs" items="center">
+                                <div class="pdx-skeleton pdx-skeleton-text" style="width:100%"></div>
+                                <span class="pdx-txt-caption pdx-ink-muted">text</span>
+                            </pdx-stack>
+                            <pdx-stack gap="xs" items="center">
+                                <div class="pdx-skeleton pdx-skeleton-button"></div>
+                                <span class="pdx-txt-caption pdx-ink-muted">button</span>
+                            </pdx-stack>
+                            <pdx-stack gap="xs" items="center">
+                                <div class="pdx-skeleton pdx-skeleton-input" style="width:100%"></div>
+                                <span class="pdx-txt-caption pdx-ink-muted">input</span>
+                            </pdx-stack>
+                            <pdx-stack gap="xs" items="center">
+                                <div class="pdx-skeleton pdx-skeleton-image" style="width:100%"></div>
+                                <span class="pdx-txt-caption pdx-ink-muted">image</span>
+                            </pdx-stack>
+                        </pdx-grid>
+                    </pdx-stack>
+
+                    <!-- Card skeleton -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Card Skeleton</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Compose shapes to match your card layout.</p>
+                        <pdx-grid cols="3" gap="md">
+                            <!-- Profile skeleton -->
+                            <div class="pdx-surface-card">
+                                <div class="pdx-card-body">
+                                    <pdx-row gap="sm" items="center">
+                                        <div class="pdx-skeleton pdx-skeleton-circle"></div>
+                                        <pdx-stack gap="xs" grow>
+                                            <div class="pdx-skeleton pdx-skeleton-title"></div>
+                                            <div class="pdx-skeleton pdx-skeleton-text"></div>
+                                        </pdx-stack>
+                                    </pdx-row>
+                                </div>
+                            </div>
+                            <!-- Article skeleton -->
+                            <div class="pdx-surface-card">
+                                <div class="pdx-card-media"><div class="pdx-skeleton pdx-skeleton-image"></div></div>
+                                <div class="pdx-card-body">
+                                    <pdx-stack gap="xs">
+                                        <div class="pdx-skeleton pdx-skeleton-title"></div>
+                                        <div class="pdx-skeleton pdx-skeleton-text"></div>
+                                        <div class="pdx-skeleton pdx-skeleton-text" style="width:60%"></div>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                            <!-- Form skeleton -->
+                            <div class="pdx-surface-card">
+                                <div class="pdx-card-body">
+                                    <pdx-stack gap="sm">
+                                        <div class="pdx-skeleton pdx-skeleton-text" style="width:30%"></div>
+                                        <div class="pdx-skeleton pdx-skeleton-input"></div>
+                                        <div class="pdx-skeleton pdx-skeleton-text" style="width:30%"></div>
+                                        <div class="pdx-skeleton pdx-skeleton-input"></div>
+                                        <pdx-row gap="sm">
+                                            <div class="pdx-skeleton pdx-skeleton-button"></div>
+                                            <div class="pdx-skeleton pdx-skeleton-button"></div>
+                                        </pdx-row>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                        </pdx-grid>
+                    </pdx-stack>
+
+                    <!-- Button spinner -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Button Spinner</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-loading</code> to any button. Text becomes invisible, spinner appears.</p>
+                        <pdx-row gap="sm" wrap>
+                            <button class="pdx-primary pdx-loading">Saving</button>
+                            <button class="pdx-secondary pdx-loading">Loading</button>
+                            <button class="pdx-danger pdx-loading">Deleting</button>
+                            <button class="pdx-ghost pdx-loading">Wait</button>
+                            <button class="pdx-success pdx-loading">Done</button>
+                        </pdx-row>
+                        <pdx-row gap="sm" items="center">
+                            <button class="pdx-primary pdx-loading" size="sm">Sm</button>
+                            <button class="pdx-primary pdx-loading">Md</button>
+                            <button class="pdx-primary pdx-loading" size="lg">Lg</button>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Card loading overlay -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Card Loading Overlay</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-loading-overlay</code> to dim content and show a centered spinner.</p>
+                        <pdx-grid cols="2" gap="md">
+                            <div class="pdx-surface-card pdx-loading-overlay">
+                                <div class="pdx-card-header">Loading Card</div>
+                                <div class="pdx-card-body">
+                                    <pdx-stack gap="sm">
+                                        <p class="pdx-txt-small">This content is dimmed while loading.</p>
+                                        <pdx-row gap="sm">
+                                            <button class="pdx-primary" size="sm">Action</button>
+                                            <button class="pdx-ghost" size="sm">Cancel</button>
+                                        </pdx-row>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                            <div class="pdx-surface-card">
+                                <div class="pdx-card-header">Normal Card</div>
+                                <div class="pdx-card-body">
+                                    <pdx-stack gap="sm">
+                                        <p class="pdx-txt-small">This card is in its normal state for comparison.</p>
+                                        <pdx-row gap="sm">
+                                            <button class="pdx-primary" size="sm">Action</button>
+                                            <button class="pdx-ghost" size="sm">Cancel</button>
+                                        </pdx-row>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                        </pdx-grid>
+                    </pdx-stack>
+
+                    <!-- Progress indeterminate -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Indeterminate Progress</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Sliding bar for unknown duration operations.</p>
+                        <div class="pdx-progress pdx-progress-indeterminate"><div class="pdx-progress-bar"></div></div>
+                    </pdx-stack>
+
+                    <!-- Table skeleton -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Table Skeleton</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Compose skeleton rows for table loading states.</p>
+                        <div class="pdx-surface-card">
+                            <div class="pdx-card-body">
+                                <pdx-stack gap="md">
+                                    <pdx-row gap="md"><div class="pdx-skeleton pdx-skeleton-text" style="width:20%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:30%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:25%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:15%"></div></pdx-row>
+                                    <pdx-row gap="md"><div class="pdx-skeleton pdx-skeleton-text" style="width:20%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:30%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:25%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:15%"></div></pdx-row>
+                                    <pdx-row gap="md"><div class="pdx-skeleton pdx-skeleton-text" style="width:20%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:30%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:25%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:15%"></div></pdx-row>
+                                    <pdx-row gap="md"><div class="pdx-skeleton pdx-skeleton-text" style="width:20%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:30%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:25%"></div><div class="pdx-skeleton pdx-skeleton-text" style="width:15%"></div></pdx-row>
+                                </pdx-stack>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

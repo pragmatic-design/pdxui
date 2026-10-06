@@ -1,0 +1,141 @@
+<template>
+  <div class="api">
+    @if (propRows.length > 0) {
+      <h3 class="api-h3">Properties</h3>
+      <table class="api-table">
+        <thead><tr><th>Name</th><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          @for (propRows as a; track a.name) {
+            <tr>
+              <td><code>{{ a.name }}</code></td>
+              <td>@if (a.attribute) {<code>{{ a.attribute }}</code>}</td>
+              <td><code>{{ a.type ? a.type.text : '' }}</code></td>
+              <td><code>{{ a.default }}</code></td>
+              <td><pdx-api-desc :text="a.description || ''"></pdx-api-desc></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (events.length > 0) {
+      <h3 class="api-h3">Events</h3>
+      <table class="api-table">
+        <thead><tr><th>Name</th><th>Detail</th><th>Description</th></tr></thead>
+        <tbody>
+          @for (events as e; track e.name) {
+            <tr>
+              <td><code>{{ e.name }}</code></td>
+              <td>@if (e.detail) {<code>{{ e.detail }}</code>}</td>
+              <td><pdx-api-desc :text="e.description || ''"></pdx-api-desc></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (methods.length > 0) {
+      <h3 class="api-h3">Methods <span class="api-h3-note">(call via a ref)</span></h3>
+      <table class="api-table">
+        <thead><tr><th>Name</th><th>Description</th></tr></thead>
+        <tbody>
+          @for (methods as m; track m.name) {
+            <tr><td><code>{{ signature(m) }}</code></td><td><pdx-api-desc :text="m.description || ''"></pdx-api-desc></td></tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (readonly.length > 0) {
+      <h3 class="api-h3">Read-only <span class="api-h3-note">(read via a ref)</span></h3>
+      <table class="api-table">
+        <thead><tr><th>Name</th><th>Description</th></tr></thead>
+        <tbody>
+          @for (readonly as r; track r.name) {
+            <tr><td><code>{{ r.name }}</code></td><td><pdx-api-desc :text="r.description || ''"></pdx-api-desc></td></tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (slots.length > 0) {
+      <h3 class="api-h3">Slots</h3>
+      <table class="api-table">
+        <thead><tr><th>Name</th><th>Description</th></tr></thead>
+        <tbody>
+          @for (slots as s; track s.name) {
+            <tr><td><code>{{ s.name ? s.name : '(default)' }}</code></td><td><pdx-api-desc :text="s.description || ''"></pdx-api-desc></td></tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (cssProps.length > 0) {
+      <h3 class="api-h3">CSS Custom Properties</h3>
+      <table class="api-table">
+        <thead><tr><th>Name</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          @for (cssProps as p; track p.name) {
+            <tr><td><code>{{ p.name }}</code></td><td><code>{{ p.default }}</code></td><td><pdx-api-desc :text="p.description || ''"></pdx-api-desc></td></tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (empty) {
+      <p class="api-empty">No documented API for this component yet.</p>
+    }
+  </div>
+</template>
+
+<script setup>
+import { getComponent } from '../lib/manifest';
+
+@prop tag: string = '';
+
+const _decl = $derived(getComponent(tag) || null);
+// Every settable prop, by the name a template binds, with its attribute beside it. From `members`,
+// not `attributes`: an array, object or function prop has no attribute, and listing attributes
+// leaves all 95 of them out — pdx-auto-form's `fields`, `schema`, `source`. And an attribute is the
+// lowercase form (`headerheight`), which is not what `:headerHeight` binds.
+// …and then each attribute no field carries: a class-defined element (the router's `<pdx-link
+// active-class>`) reads attributes it never reflects. The library has a field for each.
+const propRows = $derived(_propRows(_decl));
+function _propRows(decl) {
+    const fields = ((decl && decl.members) || []).filter(m => m.kind === 'field' && !m.readonly);
+    const carried = new Set(fields.map(m => m.attribute));
+    const attrOnly = ((decl && decl.attributes) || []).filter(a => !carried.has(a.name))
+        .map(a => ({ name: a.name, attribute: a.name, type: a.type, default: a.default, description: a.description }));
+    return [...fields, ...attrOnly];
+}
+const events = $derived((_decl && _decl.events) || []);
+const slots = $derived((_decl && _decl.slots) || []);
+const cssProps = $derived((_decl && _decl.cssProperties) || []);
+const methods = $derived(((_decl && _decl.members) || []).filter(m => m.kind === 'method'));
+// The call as a reader would write it: the manifest carries each method's `parameters`, read from
+// the declaration, so `startEdit(rowId, field?)` says which argument may be left out.
+// A method with no `parameters` is one the generator could not follow — a call, say — and prints
+// bare rather than asserting a signature nobody measured.
+function signature(m) {
+    if (!m.parameters) return m.name;
+    return m.name + '(' + m.parameters.map(p => p.name + (p.optional ? '?' : '')).join(', ') + ')';
+}
+// An exposed getter (`el.isOpen`) is a value, not a method: printed as `isOpen()` it reads as a call
+// that throws.
+const readonly = $derived(((_decl && _decl.members) || []).filter(m => m.kind === 'field' && m.readonly));
+const empty = $derived(propRows.length === 0 && events.length === 0 && slots.length === 0 && cssProps.length === 0 && methods.length === 0 && readonly.length === 0);
+</script>
+
+<style scoped>
+/* The tables scroll sideways inside this box on a phone instead of running off the page. */
+.api { overflow-x: auto; }
+.api-h3 { font-size: 1.05rem; margin: 1.6rem 0 0.6rem; color: var(--ink); }
+.api-h3:first-child { margin-top: 0; }
+.api-h3-note { font-size: 0.78rem; font-weight: 400; color: var(--ink-muted); }
+.api-table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+.api-table th, .api-table td { border: 1px solid var(--outline); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+.api-table th { background: var(--surface-container); color: var(--gold-fixed); font-weight: 600; }
+.api-table td { color: var(--ink-variant); }
+.api-table code { font-size: 0.85em; color: var(--gold-fixed); font-family: var(--font-mono); }
+.api-empty { color: var(--ink-muted); font-size: 0.9rem; }
+</style>

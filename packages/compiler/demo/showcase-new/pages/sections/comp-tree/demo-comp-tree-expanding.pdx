@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Expanding</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Click a branch to open it. A leaf has no twisty, and no <code>aria-expanded</code> either —
+      the pattern puts that attribute only where there is something to expand.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tree label="Project files" :nodes="files"></pdx-tree>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tree label="Project files" :nodes="files"&gt;&lt;/pdx-tree&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { files } from './state.pdx';
+</script>

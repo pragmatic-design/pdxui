@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <div class="comp-card" style="max-width:320px">
+      <h3 class="pdx-txt-subheading">Sign In</h3>
+      <div class="pdx-skeleton pdx-skeleton-input" style="margin-bottom:var(--pdx-space-sm)"></div>
+      <div class="pdx-skeleton pdx-skeleton-input" style="margin-bottom:var(--pdx-space-md)"></div>
+      <div class="pdx-skeleton pdx-skeleton-button" style="width:100%;margin-bottom:var(--pdx-space-md)"></div>
+      <pdx-divider label="OR"></pdx-divider>
+      <div class="pdx-skeleton pdx-skeleton-button" style="width:100%;margin-top:var(--pdx-space-md)"></div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card h3 { margin: 0 0 var(--pdx-space-sm); }
+</style>

@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic Grid</h2>
+    <p class="pdx-txt-small pdx-ink-muted">12-column system. Each <code>pdx-col</code> specifies how many columns to span.</p>
+
+    <div class="demo-area">
+      <pdx-row gutter="sm">
+        <pdx-col span="6"><div class="box">span 6</div></pdx-col>
+        <pdx-col span="6"><div class="box">span 6</div></pdx-col>
+      </pdx-row>
+    </div>
+
+    <div class="demo-area">
+      <pdx-row gutter="sm">
+        <pdx-col span="4"><div class="box">4</div></pdx-col>
+        <pdx-col span="4"><div class="box">4</div></pdx-col>
+        <pdx-col span="4"><div class="box">4</div></pdx-col>
+      </pdx-row>
+    </div>
+
+    <div class="demo-area">
+      <pdx-row gutter="sm">
+        <pdx-col span="3"><div class="box">3</div></pdx-col>
+        <pdx-col span="6"><div class="box">6</div></pdx-col>
+        <pdx-col span="3"><div class="box">3</div></pdx-col>
+      </pdx-row>
+    </div>
+
+    <div class="demo-area">
+      <pdx-row gutter="sm">
+        <pdx-col span="2"><div class="box">2</div></pdx-col>
+        <pdx-col span="8"><div class="box">8</div></pdx-col>
+        <pdx-col span="2"><div class="box">2</div></pdx-col>
+      </pdx-row>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-row gutter="sm"&gt;
+  &lt;pdx-col span="4"&gt;...&lt;/pdx-col&gt;
+  &lt;pdx-col span="4"&gt;...&lt;/pdx-col&gt;
+  &lt;pdx-col span="4"&gt;...&lt;/pdx-col&gt;
+&lt;/pdx-row&gt;</code></pre>
+    </details>
+  </section>
+</template>

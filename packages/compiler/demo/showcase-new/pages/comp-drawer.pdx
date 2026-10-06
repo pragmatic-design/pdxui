@@ -1,0 +1,58 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Drawer</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Slide-in panel from any edge. Overlay or push mode, swipe-to-close, resize handle, focus trap, keyboard nav.
+      4 positions, 3 sizes, mobile responsive.
+    </p>
+
+    <!-- ═══ Positions ═══ -->
+    <pdx-demo-comp-drawer-positions class="demo-section"></pdx-demo-comp-drawer-positions>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-drawer-sizes class="demo-section"></pdx-demo-comp-drawer-sizes>
+
+    <!-- ═══ Form Drawer ═══ -->
+    <pdx-demo-comp-drawer-form-drawer class="demo-section"></pdx-demo-comp-drawer-form-drawer>
+
+    <!-- ═══ Keyboard ═══ -->
+    <pdx-demo-comp-drawer-keyboard class="demo-section"></pdx-demo-comp-drawer-keyboard>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Description</span></div>
+        <div class="opt-row"><code>open</code><span>Open/close state</span></div>
+        <div class="opt-row"><code>position</code><span>"left", "right" (default), "top", "bottom"</span></div>
+        <div class="opt-row"><code>size</code><span>"sm" (280px), "md" (380px), "lg" (520px), or CSS value</span></div>
+        <div class="opt-row"><code>mode</code><span>"overlay" (default) or "push"</span></div>
+        <div class="opt-row"><code>closeOnBackdrop</code><span>Close on backdrop click (default true)</span></div>
+        <div class="opt-row"><code>closeOnEscape</code><span>Close on Escape key (default true)</span></div>
+        <div class="opt-row"><code>showClose</code><span>Show close button in header (default true)</span></div>
+        <div class="opt-row"><code>resizable</code><span>Show resize handle on edge</span></div>
+        <div class="opt-row"><code>label</code><span>Accessible label (aria-label)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Slots</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Slot</span><span>Description</span></div>
+        <div class="opt-row"><code>header</code><span>Title area (left of close button)</span></div>
+        <div class="opt-row"><code>default</code><span>Body content (scrollable)</span></div>
+        <div class="opt-row"><code>footer</code><span>Actions area (bottom)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+@page '/components/drawer';
+@title 'Drawer';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
+</style>

@@ -1,0 +1,111 @@
+/* pdx-wizard — Multi-step wizard layout */
+/* Stepper circles/connectors use .pdx-stepper from pagination.css */
+
+pdx-wizard {
+    display: block;
+}
+
+.pdx-wizard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-lg);
+}
+
+.pdx-wizard-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ─── Vertical layout: stepper left, content right ─── */
+.pdx-wizard-vertical {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-xl);
+}
+
+.pdx-wizard-vertical > .pdx-stepper-vertical {
+    flex-shrink: 0;
+    min-width: 200px;
+}
+
+.pdx-wizard-vertical > [data-wizard-step] {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Nav footer spans full width below stepper + content */
+.pdx-wizard-vertical > .pdx-wizard-nav {
+    width: 100%;
+}
+
+/* ─── Step panels ─── */
+.pdx-wizard > [data-wizard-step] {
+    padding: var(--pdx-space-md) 0;
+    animation: pdx-wizard-fade-in 0.2s ease;
+}
+
+.pdx-wizard-vertical > [data-wizard-step] {
+    padding: 0;
+}
+
+@keyframes pdx-wizard-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Stepper containment ─── */
+.pdx-wizard > .pdx-stepper {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Step labels truncate when space is tight */
+.pdx-wizard .pdx-step-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Steps shrink proportionally — never overflow */
+.pdx-wizard .pdx-step {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+/* ─── Stepper clickable enhancement ─── */
+.pdx-wizard .pdx-step {
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: var(--pdx-space-xs);
+}
+
+.pdx-wizard .pdx-step:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pdx-wizard .pdx-step:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: var(--pdx-focus-offset);
+    border-radius: var(--pdx-radius-sm);
+}
+
+/* Connector done state for horizontal */
+.pdx-wizard .pdx-step-connector[data-status="done"] {
+    background: var(--pdx-color-primary);
+}
+
+/* ─── Navigation footer ─── */
+.pdx-wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+.pdx-wizard-indicator {
+    text-align: center;
+}

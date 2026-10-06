@@ -1,0 +1,58 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">4. Display Modes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Field groups and lists support <code>display="panel"</code> (collapsible) and
+      <code>display="dialog"</code> (edit in modal). Below: panel groups with collapsible sections.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="displayForm">
+        <pdx-form-field name="name" label="Full Name" required>
+          <pdx-input name="name"></pdx-input>
+        </pdx-form-field>
+
+        <pdx-field-group name="address" label="Address" display="panel">
+          <div class="form-grid-3">
+            <pdx-form-field name="street" label="Street">
+              <pdx-input name="street"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="city" label="City">
+              <pdx-input name="city"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="zip" label="ZIP">
+              <pdx-input name="zip"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </pdx-field-group>
+
+        <pdx-field-group name="billing" label="Billing Info" display="panel" collapsed>
+          <div class="form-grid">
+            <pdx-form-field name="card" label="Card Number">
+              <pdx-input name="card" placeholder="**** **** **** ****"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="expiry" label="Expiry">
+              <pdx-input name="expiry" placeholder="MM/YY"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </pdx-field-group>
+      </pdx-form>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createForm, required } from '@pdxui/core';
+
+// ─── 4. Display Modes Form ───
+const displayForm = createForm({
+  initialValues: {
+    name: 'Alex Smith',
+    address: { street: '456 Oak Ave', city: 'Chicago', zip: '60601' },
+    billing: { card: '', expiry: '' },
+  },
+  validators: {
+    'name': [required()],
+  },
+});
+</script>

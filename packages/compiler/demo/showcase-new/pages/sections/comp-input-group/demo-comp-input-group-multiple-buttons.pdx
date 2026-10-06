@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple Buttons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Input with multiple action buttons.</p>
+
+    <div class="demo-stack">
+      <pdx-input-group>
+        <pdx-input placeholder="File path..." clearable></pdx-input>
+        <pdx-button variant="outline">Browse</pdx-button>
+        <pdx-button variant="solid">Upload</pdx-button>
+      </pdx-input-group>
+
+      <pdx-input-group size="sm">
+        <span class="pdx-input-addon">Filter:</span>
+        <pdx-input placeholder="Search items..."></pdx-input>
+        <pdx-button variant="outline">Clear</pdx-button>
+        <pdx-button variant="solid">Apply</pdx-button>
+      </pdx-input-group>
+    </div>
+  </section>
+</template>

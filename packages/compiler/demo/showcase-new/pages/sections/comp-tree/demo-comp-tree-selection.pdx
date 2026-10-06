@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Selection</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>selection-mode</code> is <code>none</code> (navigate only), <code>single</code>, or
+      <code>multiple</code> — where Ctrl-click and Space add to the selection.
+    </p>
+
+    <div class="demo-stack">
+      <div>
+        <h3 class="pdx-txt-subheading">Single</h3>
+        <pdx-tree label="Pick a folder" selection-mode="single" default-expand-all :nodes="files"></pdx-tree>
+      </div>
+      <div>
+        <h3 class="pdx-txt-subheading">Multiple</h3>
+        <pdx-tree label="Pick folders" selection-mode="multiple" default-expand-all :nodes="files"></pdx-tree>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tree selection-mode="multiple" :nodes="files"
+          @pdx-select="e =&gt; picked = e.detail.selected"&gt;&lt;/pdx-tree&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { files } from './state.pdx';
+</script>

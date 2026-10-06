@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Inline Filters</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>filterable</code> or <code>filter-mode="row"</code> — filter row under header.
+      Type-aware: text search, number min, boolean Yes/No, date picker.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="filterDS" :columns="filterColumns" :filterable="true" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  filterable hover&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// ─── Inline filters ─────────────────────────
+const filterColumns = [
+  { field: 'name', header: 'Name' },
+  { field: 'category', header: 'Category' },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+  { field: 'inStock', header: 'Available', type: 'boolean' },
+];
+
+const filterDS = createDataSource({ data: products.slice(0, 30), pageSize: 10 });
+</script>

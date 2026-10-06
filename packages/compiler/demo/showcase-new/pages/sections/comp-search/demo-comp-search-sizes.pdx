@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-stack">
+      <pdx-search-input size="sm" placeholder="Small search..."></pdx-search-input>
+      <pdx-search-input placeholder="Default search..."></pdx-search-input>
+      <pdx-search-input size="lg" placeholder="Large search..."></pdx-search-input>
+    </div>
+  </section>
+</template>

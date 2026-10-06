@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Semantic colors via <code>variant</code> attribute on the bar.</p>
+
+    <div class="demo-stack">
+      <div class="progress-label">
+        <span class="pdx-txt-small pdx-ink-muted">Default (primary)</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" style="width: 60%"></div>
+      </div>
+
+      <div class="progress-label">
+        <span class="pdx-txt-small pdx-ink-success">Success</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" variant="success" style="width: 80%"></div>
+      </div>
+
+      <div class="progress-label">
+        <span class="pdx-txt-small pdx-ink-warning">Warning</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" variant="warning" style="width: 45%"></div>
+      </div>
+
+      <div class="progress-label">
+        <span class="pdx-txt-small pdx-ink-danger">Danger</span>
+      </div>
+      <div class="pdx-progress">
+        <div class="pdx-progress-bar" variant="danger" style="width: 90%"></div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-progress"&gt;
+  &lt;div class="pdx-progress-bar" variant="success" style="width: 80%"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="pdx-progress"&gt;
+  &lt;div class="pdx-progress-bar" variant="warning" style="width: 45%"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="pdx-progress"&gt;
+  &lt;div class="pdx-progress-bar" variant="danger" style="width: 90%"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Hover or focus the button to show a tooltip.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm">Hover me</pdx-button>
+      <pdx-tooltip text="This is a tooltip"></pdx-tooltip>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Any number pressed. The event carries both forms: <code>detail.value</code> (<code>"bold,italic"</code>)
+      and <code>detail.values</code> (an array).
+    </p>
+    <div class="demo-row">
+      <pdx-toggle-group type="multiple" label="Formatting" :value="formatting" @pdx-change="e => setFormatting(e.detail.value)">
+        <pdx-toggle value="bold" aria-label="Bold"><strong>B</strong></pdx-toggle>
+        <pdx-toggle value="italic" aria-label="Italic"><em>I</em></pdx-toggle>
+        <pdx-toggle value="underline" aria-label="Underline"><u>U</u></pdx-toggle>
+        <pdx-toggle value="strike" aria-label="Strikethrough"><s>S</s></pdx-toggle>
+      </pdx-toggle-group>
+      <span class="pdx-txt-small pdx-ink-muted">value: <code class="live-value">{{ formatting || '(none)' }}</code></span>
+    </div>
+    <p class="pdx-txt-small sample" :style="sampleStyle()">Formatted sample text</p>
+  </section>
+</template>
+
+<script setup>
+import { useToggleGroupDemo } from './state.pdx';
+
+// The composition section's style group shows and sets the same value (state.pdx.ts).
+const toggleGroupDemo = useToggleGroupDemo();
+const formatting = $derived(toggleGroupDemo.formatting());
+function setFormatting(v) { toggleGroupDemo.setFormatting(v); }
+function sampleStyle() { return toggleGroupDemo.sampleStyle(); }
+</script>

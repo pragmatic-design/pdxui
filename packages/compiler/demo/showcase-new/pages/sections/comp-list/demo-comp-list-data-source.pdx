@@ -1,0 +1,62 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With DataSource + Loading</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simulates a 1.5s fetch. Shows loading overlay, then data.</p>
+    <div class="demo-container">
+      <pdx-list :source="fakeDS" :render-item="renderUserItem" clickable dividers id="ds-list"></pdx-list>
+    </div>
+    <button class="pdx-btn pdx-outline pdx-btn-xs" style="margin-top: var(--pdx-space-sm)" @click="reloadDS">Reload</button>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const ds = createDataSource({
+  transport: {
+    read: () =&gt; fetch('/api/users').then(r =&gt; r.json()),
+  },
+  autoLoad: true,
+});
+
+function renderUser(user) {
+  return '&lt;pdx-icon name="user"&gt;&lt;/pdx-icon&gt;'
+    + '&lt;span&gt;' + user.name + '&lt;/span&gt;'
+    + '&lt;span class="role"&gt;' + user.role + '&lt;/span&gt;';
+}
+
+&lt;pdx-list :source="ds" :render-item="renderUser"
+  clickable dividers&gt;
+&lt;/pdx-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+// Fake DataSource that simulates 1.5s fetch
+const fakeUsers = [
+  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Editor' },
+  { id: 3, name: 'Mike Wilson', email: 'mike@example.com', role: 'Viewer' },
+  { id: 4, name: 'Sara Lee', email: 'sara@example.com', role: 'Editor' },
+  { id: 5, name: 'Tom Clark', email: 'tom@example.com', role: 'Admin' },
+];
+
+const fakeDS = createDataSource({
+  transport: {
+    read: () => new Promise(function(resolve) {
+      setTimeout(function() {
+        resolve({ data: fakeUsers, total: fakeUsers.length });
+      }, 1500);
+    }),
+  },
+  pageSize: 0,
+  autoLoad: true,
+});
+
+function renderUserItem(userItem) {
+  return '<pdx-icon name="user" size="16" style="display:inline-flex"></pdx-icon><span>' + userItem.name + '</span><span style="color:var(--pdx-color-muted);font-size:0.8rem">' + userItem.email + '</span><span style="margin-left:auto;font-size:0.75rem;padding:2px 8px;border-radius:9999px;background:var(--pdx-color-inset)">' + userItem.role + '</span>';
+}
+
+function reloadDS() {
+  fakeDS.refresh();
+}
+</script>

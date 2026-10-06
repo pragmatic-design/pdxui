@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Width & Sizing</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default is 100% width. Use inline styles or CSS classes to control width.</p>
+    <div class="demo-sizing">
+      <pdx-select label="Color" :options="colors" placeholder="100% width (default)" />
+      <pdx-select label="Color" :options="colors" placeholder="Fixed 200px" style="width: 200px" />
+      <pdx-select label="Color" :options="colors" placeholder="Inline" style="width: auto; min-width: 150px; display: inline-block" />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="colors" placeholder="100% width (default)" /&gt;
+&lt;pdx-select :options="colors" style="width: 200px" /&gt;
+&lt;pdx-select :options="colors" style="width: auto; min-width: 150px; display: inline-block" /&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan', 'Teal'];
+</script>

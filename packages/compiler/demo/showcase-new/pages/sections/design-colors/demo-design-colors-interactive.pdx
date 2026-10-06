@@ -1,0 +1,114 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Interactive Colors</h2>
+    <p class="pdx-txt-small pdx-ink-muted">7 semantic color roles. Each has base + hover variant. Themes override via hue anchors.</p>
+
+    <div class="color-swatches">
+      <div class="swatch-group">
+        <div class="swatch-pair">
+          <div class="swatch" style="background:var(--pdx-color-primary)"></div>
+          <div class="swatch sm" style="background:var(--pdx-color-primary-hover)"></div>
+        </div>
+        <span class="pdx-txt-small">Primary</span>
+        <code class="pdx-txt-caption">brand</code>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-pair">
+          <div class="swatch" style="background:var(--pdx-color-secondary)"></div>
+          <div class="swatch sm" style="background:var(--pdx-color-secondary-hover)"></div>
+        </div>
+        <span class="pdx-txt-small">Secondary</span>
+        <code class="pdx-txt-caption">inverse brand</code>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-pair">
+          <div class="swatch" style="background:var(--pdx-color-accent)"></div>
+          <div class="swatch sm" style="background:var(--pdx-color-accent-hover)"></div>
+        </div>
+        <span class="pdx-txt-small">Accent</span>
+        <code class="pdx-txt-caption">highlight</code>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-pair">
+          <div class="swatch" style="background:var(--pdx-color-danger)"></div>
+          <div class="swatch sm" style="background:var(--pdx-color-danger-hover)"></div>
+        </div>
+        <span class="pdx-txt-small">Danger</span>
+        <code class="pdx-txt-caption">error, delete</code>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-pair">
+          <div class="swatch" style="background:var(--pdx-color-success)"></div>
+          <div class="swatch sm" style="background:var(--pdx-color-success-hover)"></div>
+        </div>
+        <span class="pdx-txt-small">Success</span>
+        <code class="pdx-txt-caption">confirmed</code>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-pair">
+          <div class="swatch" style="background:var(--pdx-color-warning)"></div>
+          <div class="swatch sm" style="background:var(--pdx-color-warning-hover)"></div>
+        </div>
+        <span class="pdx-txt-small">Warning</span>
+        <code class="pdx-txt-caption">caution</code>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-pair">
+          <div class="swatch" style="background:var(--pdx-color-info)"></div>
+          <div class="swatch sm" style="background:var(--pdx-color-info-hover)"></div>
+        </div>
+        <span class="pdx-txt-small">Info</span>
+        <code class="pdx-txt-caption">informational</code>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>/* Each color: base + hover + text (where needed). The base values, from tokens.css: */
+--pdx-color-primary:         oklch(0.35 0.02 260)
+--pdx-color-primary-hover:   oklch(0.28 0.03 260)
+--pdx-color-secondary:       light-dark(oklch(0.55 0.18 30), oklch(0.55 0.16 30))
+--pdx-color-accent:          light-dark(oklch(0.55 0.12 170), oklch(0.65 0.12 170))
+--pdx-color-danger:          light-dark(oklch(0.55 0.20 25), oklch(0.575 0.18 25))
+--pdx-color-success:         light-dark(oklch(0.52 0.18 155), ...)
+--pdx-color-warning:         light-dark(oklch(0.75 0.15 85), ...)
+--pdx-color-info:            light-dark(oklch(0.52 0.16 220), ...)
+
+/* A theme sets its own primary, accent and hue anchor:
+   --pdx-hue-primary: 235 (pragmatic)
+   --pdx-hue-primary: 85  (pragmatic gold) */</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Color swatches */
+  .color-swatches {
+    display: flex;
+    gap: var(--pdx-space-lg);
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .swatch-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+  }
+  .swatch-pair {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--pdx-space-2xs);
+  }
+  .swatch {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--pdx-radius-md);
+    border: 1px solid var(--pdx-color-border);
+  }
+  .swatch.sm {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--pdx-radius-sm);
+  }
+</style>

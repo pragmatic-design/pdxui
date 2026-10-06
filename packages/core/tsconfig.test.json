@@ -1,0 +1,33 @@
+{
+    // The package's OWN project, widened to everything it holds.
+    //
+    // `tsconfig.json` is the BUILD: `rootDir: src`, `outDir: dist`, and adding `tests/` to it would
+    // both break the root and emit declarations for test files. So the tests get a project of their
+    // own that emits nothing — the shape a monorepo usually reaches for, and the one
+    // `packages/design/tsconfig.engine.json` uses too.
+    //
+    // A type gate that reads only `src/` leaves the test suites compiled by nothing, and `tsc`
+    // pointed at an unchecked suite finds tests that cannot fail.
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        // Three suites import a build script written in JS (.mjs). Without this the import itself
+        // is an error and every value it hands back is implicitly any, which is the opposite of
+        // what a type gate is for.
+        "allowJs": true,
+        // The REPO root, because nothing is emitted and a test may legitimately
+        // import a sibling package's source — the CLI's theme tests read the
+        // builder's config. With `rootDir` at the package, TS6059 fires on every
+        // such file: "not under rootDir", about a program that produces no output.
+        "rootDir": "../..",
+        "declaration": false,
+        "declarationMap": false,
+        "types": ["node"],
+        "typeRoots": ["../compiler/node_modules/@types"]
+    },
+    // `"*.ts"` is the package ROOT: `vite.config.ts` and friends. A build config that does
+    // not typecheck is a build that breaks on a rename nobody sees, as in `builder` and
+    // `showcase`.
+    "include": ["*.ts", "src/**/*.ts", "tests/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+}

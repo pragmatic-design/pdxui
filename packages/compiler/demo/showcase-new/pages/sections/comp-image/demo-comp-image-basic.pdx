@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple image with src and alt.</p>
+    <div class="demo-row">
+      <pdx-image src="/demo-images/mountains.svg" alt="Basic example" width="400px" height="250px" :lazy="false"></pdx-image>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-image src="/photos/landscape.jpg" alt="Photo" width="400px" height="250px"&gt;&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>

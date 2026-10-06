@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Chip Group</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Wrap chips in <code>.pdx-chip-group</code> for consistent flex-wrap spacing.</p>
+
+    <div class="pdx-chip-group">
+      <span class="pdx-chip">JavaScript</span>
+      <span class="pdx-chip">TypeScript</span>
+      <span class="pdx-chip">Rust</span>
+      <span class="pdx-chip">Go</span>
+      <span class="pdx-chip">Python</span>
+      <span class="pdx-chip">C#</span>
+      <span class="pdx-chip">Java</span>
+      <span class="pdx-chip">Kotlin</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-chip-group"&gt;
+  &lt;span class="pdx-chip"&gt;JavaScript&lt;/span&gt;
+  &lt;span class="pdx-chip"&gt;TypeScript&lt;/span&gt;
+  ...
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

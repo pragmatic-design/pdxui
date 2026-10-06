@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Subtle Variant</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Light inset background with border — less prominent, for inline use.</p>
+
+    <div class="banner-demo">
+      <div class="pdx-banner pdx-banner-subtle">
+        <span class="pdx-banner-icon">&#128276;</span>
+        <span class="pdx-banner-text">You have 3 unread notifications.</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-banner pdx-banner-subtle"&gt;
+  &lt;span class="pdx-banner-icon"&gt;...&lt;/span&gt;
+  &lt;span class="pdx-banner-text"&gt;You have 3 unread notifications.&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

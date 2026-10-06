@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Group Bar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Drag column headers to the group bar. Chips show active groupings with ✕ to remove.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="groupBarDS" :columns="groupBarColumns" :show-group-bar="true" :show-toolbar="true" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  show-group-bar show-toolbar hover&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// ─── Group bar ──────────────────────────────
+const groupBarColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category' },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+];
+
+const groupBarDS = createDataSource({ data: products.slice(0, 40), pageSize: 0 });
+</script>

@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Show Delay</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Control how long before the tooltip appears.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm">Instant (0ms)</pdx-button>
+      <pdx-tooltip text="No delay" :delay="0"></pdx-tooltip>
+      <pdx-button variant="outline" size="sm">Default (200ms)</pdx-button>
+      <pdx-tooltip text="200ms delay"></pdx-tooltip>
+      <pdx-button variant="outline" size="sm">Slow (800ms)</pdx-button>
+      <pdx-tooltip text="800ms delay" :delay="800"></pdx-tooltip>
+    </div>
+  </section>
+</template>

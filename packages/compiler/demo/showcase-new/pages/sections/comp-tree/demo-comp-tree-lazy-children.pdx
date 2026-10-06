@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Children fetched when asked for</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>loadChildren</code> is called the first time a branch opens, and the branch shows
+      <code>⋯</code> while it waits. The second server here fails on purpose: the branch stays
+      askable, and <code>pdx-load-error</code> fires rather than the tree emptying itself.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tree label="Servers" :nodes="servers" :loadChildren="fetchChildren"></pdx-tree>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const fetchChildren = (node) =&gt; api.get('/servers/' + node.id + '/disks');
+
+&lt;pdx-tree :nodes="servers" :loadChildren="fetchChildren"&gt;&lt;/pdx-tree&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+// A branch whose children are not in the page yet: `isBranch` is what says "this one opens"
+// before anything is known about what is inside it.
+const servers = [
+  { id: 'web-01', label: 'web-01', isBranch: true },
+  { id: 'db-01', label: 'db-01', isBranch: true },
+  { id: 'cache-01', label: 'cache-01 (this one fails)', isBranch: true },
+];
+
+const fetchChildren = (node) => new Promise((resolve, reject) => {
+  setTimeout(() => {
+    if (node.id === 'cache-01') { reject(new Error('host unreachable')); return; }
+    resolve([
+      { id: node.id + '-sda', label: '/dev/sda — 40 GB' },
+      { id: node.id + '-sdb', label: '/dev/sdb — 200 GB' },
+    ]);
+  }, 600);
+});
+</script>

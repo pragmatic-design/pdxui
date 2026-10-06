@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 variants: <code>spinner</code> (default SVG circle), <code>dots</code> (pulsing), <code>bar</code> (indeterminate progress).</p>
+    <div class="demo-row">
+      <div class="demo-item"><pdx-spinner></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">Spinner</span></div>
+      <div class="demo-item"><pdx-spinner variant="dots"></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">Dots</span></div>
+      <div class="demo-item" style="width:100px"><pdx-spinner variant="bar"></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">Bar</span></div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-spinner&gt;&lt;/pdx-spinner&gt;
+&lt;pdx-spinner variant="dots"&gt;&lt;/pdx-spinner&gt;
+&lt;pdx-spinner variant="bar"&gt;&lt;/pdx-spinner&gt;</code></pre>
+    </details>
+  </section>
+</template>

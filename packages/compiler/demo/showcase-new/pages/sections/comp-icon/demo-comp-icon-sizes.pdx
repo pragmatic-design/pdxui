@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5 preset sizes. Optical size compensation adjusts stroke weight for smaller icons.</p>
+
+    <div class="size-row">
+      <div class="size-demo">
+        <pdx-icon name="settings" size="xs"></pdx-icon>
+        <span class="pdx-txt-caption">xs · 12px</span>
+      </div>
+      <div class="size-demo">
+        <pdx-icon name="settings" size="sm"></pdx-icon>
+        <span class="pdx-txt-caption">sm · 16px</span>
+      </div>
+      <div class="size-demo">
+        <pdx-icon name="settings" size="md"></pdx-icon>
+        <span class="pdx-txt-caption">md · 20px</span>
+      </div>
+      <div class="size-demo">
+        <pdx-icon name="settings" size="lg"></pdx-icon>
+        <span class="pdx-txt-caption">lg · 24px</span>
+      </div>
+      <div class="size-demo">
+        <pdx-icon name="settings" size="xl"></pdx-icon>
+        <span class="pdx-txt-caption">xl · 32px</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-icon name="settings" size="xs"&gt;&lt;/pdx-icon&gt;  &lt;!-- 12px --&gt;
+&lt;pdx-icon name="settings" size="sm"&gt;&lt;/pdx-icon&gt;  &lt;!-- 16px --&gt;
+&lt;pdx-icon name="settings" size="md"&gt;&lt;/pdx-icon&gt;  &lt;!-- 20px (default) --&gt;
+&lt;pdx-icon name="settings" size="lg"&gt;&lt;/pdx-icon&gt;  &lt;!-- 24px --&gt;
+&lt;pdx-icon name="settings" size="xl"&gt;&lt;/pdx-icon&gt;  &lt;!-- 32px --&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,68 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">2. Validation i18n</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Switch language to see validation messages change. Uses <code>setValidationLocale()</code>
+      with a custom resolver.
+    </p>
+
+    <div class="demo-block">
+      <div class="demo-toolbar">
+        <button :class="langBtnEn()" @click="setLang('en')">English</button>
+        <button :class="langBtnIt()" @click="setLang('it')">Italiano</button>
+        <button :class="langBtnDe()" @click="setLang('de')">Deutsch</button>
+      </div>
+
+      <pdx-form :form="i18nForm">
+        <div class="form-grid-2">
+          <pdx-form-field name="username" label="Username" required>
+            <pdx-input name="username" placeholder="min 3 chars"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="email" label="Email" required>
+            <pdx-input name="email" type="email" placeholder="name@example.com"></pdx-input>
+          </pdx-form-field>
+        </div>
+        <pdx-form-field name="age" label="Age" required>
+          <pdx-number-input name="age" :min="0" :max="150"></pdx-number-input>
+        </pdx-form-field>
+        <button type="submit" class="pdx-btn pdx-primary pdx-sm">Validate</button>
+      </pdx-form>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const translations = {
+  en: { 'validation.required': '{field} is required', ... },
+  it: { 'validation.required': '{field} è obbligatorio', ... },
+};
+
+function setLang(lang) {
+  const dict = translations[lang];
+  setValidationLocale((key, params) =&gt; {
+    const tmpl = dict[key];
+    if (!tmpl) return undefined;
+    return tmpl.replace(/\{(\w+)\}/g, (_, k) =&gt; params?.[k] ?? k);
+  });
+  form.validate(); // re-run to refresh messages
+}
+
+// Validators use i18n keys as messages:
+validators: { email: [required('validation.required')] }</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, setValidationLocale, required, minLength, email, min } from '@pdxui/core';
+
+// ─── 2. Validation i18n ───
+const translations = { en: { 'validation.required': '{field} is required', 'validation.email': 'Invalid email address', 'validation.minLength': 'Must be at least {min} characters', 'validation.min': 'Must be at least {min}' }, it: { 'validation.required': '{field} è obbligatorio', 'validation.email': 'Indirizzo email non valido', 'validation.minLength': 'Minimo {min} caratteri', 'validation.min': 'Deve essere almeno {min}' }, de: { 'validation.required': '{field} ist erforderlich', 'validation.email': 'Ungültige E-Mail-Adresse', 'validation.minLength': 'Mindestens {min} Zeichen', 'validation.min': 'Muss mindestens {min} sein' } };
+
+let currentLang = $signal('en');
+
+function setLang(lang) { currentLang = lang; const dict = translations[lang] || translations.en; setValidationLocale((key, params) => { const tmpl = dict[key]; if (!tmpl) return undefined; const merged = Object.assign({ field: 'This field', min: '?', max: '?' }, params || {}); return tmpl.replace(/\{(\w+)\}/g, (_, k) => String(merged[k] ?? k)); }); i18nForm.validate(); }
+function langBtnEn() { return 'pdx-btn pdx-sm ' + (currentLang === 'en' ? 'pdx-primary' : 'pdx-outline'); }
+function langBtnIt() { return 'pdx-btn pdx-sm ' + (currentLang === 'it' ? 'pdx-primary' : 'pdx-outline'); }
+function langBtnDe() { return 'pdx-btn pdx-sm ' + (currentLang === 'de' ? 'pdx-primary' : 'pdx-outline'); }
+
+const i18nForm = createForm({ initialValues: { username: '', email: '', age: 0 }, validators: { username: [required('validation.required'), minLength(3, 'validation.minLength')], email: [required('validation.required'), email('validation.email')], age: [min(1, 'validation.min')] }, validateOn: 'onChange' });
+
+setLang('en');
+</script>

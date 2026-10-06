@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Striped</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Alternating row backgrounds with <code>.pdx-table-striped</code>.</p>
+
+    <div class="table-wrap">
+      <table class="pdx-table pdx-table-striped">
+        <thead>
+          <tr><th>Product</th><th>Price</th><th>Stock</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Widget A</td><td>$12.99</td><td>143</td></tr>
+          <tr><td>Widget B</td><td>$24.50</td><td>87</td></tr>
+          <tr><td>Widget C</td><td>$8.00</td><td>312</td></tr>
+          <tr><td>Widget D</td><td>$45.00</td><td>5</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;table class="pdx-table pdx-table-striped"&gt;...&lt;/table&gt;</code></pre>
+    </details>
+  </section>
+</template>

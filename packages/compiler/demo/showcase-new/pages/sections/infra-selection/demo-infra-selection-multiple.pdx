@@ -1,0 +1,72 @@
+<template>
+  <section>
+    <h3>Multiple Select (toggle + range)</h3>
+    <p class="desc">Click toggles. Shift+Click for range. "Cherry" is disabled.</p>
+    <div class="two-col">
+      <div>
+        <div class="list">
+          @for (fruits as fruit; track fruit) {
+            <div class="item"
+              :class="multiClass(fruit)"
+              @click="handleMultiClick">{{ fruit }}</div>
+          }
+        </div>
+        <div class="row">
+          <button class="pdx-ghost" @click="multiSel.selectAll(enabledFruits)">Select All</button>
+          <button class="pdx-ghost" @click="multiSel.clear()">Clear</button>
+        </div>
+      </div>
+      <pre class="log">{{ multiInfo }}</pre>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createSelection, effect, onMount, onDestroy } from '@pdxui/core';
+
+const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape'];
+const enabledFruits = fruits.filter(f => f !== 'Cherry');
+
+let multiInfo = $signal('Nothing selected');
+
+// Multiple
+const multiSel = createSelection({
+    mode: 'multiple', behavior: 'toggle',
+    disabledKeys: () => new Set(['Cherry']),
+});
+
+// Reactive class helpers — read selection signal inside a function so the
+// template effect tracks changes. Direct isSelected() calls on the selection
+// object would be transformed incorrectly by the compiler's callSignals pass
+// (it adds () to ctx.singleSel, treating the object as a signal).
+function multiClass(fruit) {
+    const sel = multiSel.selected().has(fruit) ? 'selected ' : '';
+    return sel + (fruit === 'Cherry' ? 'disabled' : '');
+}
+
+onMount(() => {
+    const d2 = effect(() => {
+        const sel = multiSel.selected();
+        multiInfo = sel.size > 0
+            ? 'Selected (' + sel.size + '): ' + [...sel].join(', ') + '\nAnchor: ' + multiSel.anchor()
+            : 'Nothing selected';
+    });
+    onDestroy(() => { d2(); });
+});
+
+// Event handlers as simple functions — no inline arrows in template.
+// The compiler double-wraps arrow expressions like (e) => fn(e) into
+// () => (e) => fn(e), losing the event object. Using simple function
+// names + data attributes avoids this.
+
+function handleMultiClick(e) {
+    const fruit = e.currentTarget.textContent.trim();
+    if (fruit === 'Cherry') return;
+    if (e.shiftKey) multiSel.extendTo(fruit, fruits);
+    else multiSel.toggle(fruit);
+}
+</script>
+
+<style scoped>
+  .row { display: flex; gap: 8px; margin-top: 8px; }
+</style>

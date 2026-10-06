@@ -1,0 +1,51 @@
+<template>
+  <section>
+    <h3>Axis Constrained (bounded)</h3>
+    <div class="axis-row">
+      <div class="h-track">
+        <div class="drag-small" :ref="xRef">X only</div>
+      </div>
+      <div class="v-track">
+        <div class="drag-small" :ref="yRef">Y</div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useDrag, effect, onMount, onDestroy } from '@pdxui/core';
+
+let xRef = $signal(null);
+let yRef = $signal(null);
+
+const xDrag = useDrag(() => xRef, { axis: 'x', bounds: 'parent' });
+const yDrag = useDrag(() => yRef, { axis: 'y', bounds: 'parent' });
+
+onMount(() => {
+    const d2 = effect(() => {
+        const pos = xDrag.position();
+        const el = xRef;
+        if (el) el.style.transform = 'translateX(' + pos.x + 'px)';
+    });
+
+    const d3 = effect(() => {
+        const pos = yDrag.position();
+        const el = yRef;
+        if (el) el.style.transform = 'translateY(' + pos.y + 'px)';
+    });
+
+    onDestroy(() => {
+        d2(); d3();
+        xDrag.dispose(); yDrag.dispose();
+    });
+});
+</script>
+
+<style scoped>
+  .drag-small { position: absolute; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: grab; user-select: none; touch-action: none; font-size: 0.75rem; font-weight: 600; }
+  .axis-row { display: flex; gap: 24px; align-items: flex-start; margin-top: 8px; }
+  .h-track { width: 300px; height: 50px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; position: relative; }
+  .h-track .drag-small { width: 80px; height: 36px; top: 7px; left: 110px; }
+  .v-track { width: 50px; height: 200px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; position: relative; }
+  .v-track .drag-small { width: 36px; height: 36px; top: 82px; left: 7px; }
+</style>

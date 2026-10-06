@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+    <div class="options-table">
+      <table>
+        <thead><tr><th>Key</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Arrow Down / Up</kbd></td><td>Next / previous item</td></tr>
+          <tr><td><kbd>Arrow Right</kbd></td><td>Open a submenu, on its first item</td></tr>
+          <tr><td><kbd>Arrow Left</kbd></td><td>Close the submenu, back to its item</td></tr>
+          <tr><td><kbd>Enter / Space</kbd></td><td>Activate item</td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Close the submenu; on the menu, <code>pdx-close</code></td></tr>
+          <tr><td><kbd>Home / End</kbd></td><td>First / last item</td></tr>
+          <tr><td><kbd>Type character</kbd></td><td>Typeahead search</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,631 @@
+<template>
+  <section class="page" data-test="tickets">
+    <!-- No `:items`: the trail is the routes that matched, named by the `label` on each `@page`.
+         Renaming a route renames the crumb, and this page states no path. -->
+    <pdx-breadcrumb data-test="crumbs"></pdx-breadcrumb>
+    <!-- The list's header: title, views, and the page's own action on the right. The
+         views are the header's — this page says where they are kept and what the list opens with.
+         The arrangement changed under the selection, so a view put back clears it. -->
+    <pdx-list-header
+      :title="$t('tickets.title')"
+      store-key="tickets"
+      :default-name="$t('tickets.views.default')"
+      :grid="gridEl"
+      :source="source"
+      :base-sort="BASE_SORT"
+      :base-page-size="BASE_PAGE_SIZE"
+      :filter-params="FILTER_PARAMS"
+      @switched="clearSelection">
+      <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('tickets.matching', { count: total }) }}</span>
+      <pdx-button variant="primary" @click="list.openCreate()" data-test="new">{{ $t('tickets.new') }}</pdx-button>
+    </pdx-list-header>
+    <!-- For the reader of the source, not of the screen: the grid is over a data source,
+         not an array — the page on screen was asked for by the server, and so were its sort and its
+         filter. -->
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('tickets.intro') }}</p>
+
+    <!-- One way to filter, the grid's own: a `<pdx-filter-builder>` here would be a second
+         «+ Add filter» a hand's width from the toolbar's. The URL is kept in step with the
+         SOURCE, below, whichever control changed it. -->
+
+    <!-- Live, and what it costs to be honest about it: the state is on screen, not in a console.
+         A list that silently stopped receiving is worse than one that never claimed to. -->
+    <div class="live-bar" :data-connection="connection" data-test="live-bar">
+      <span class="dot" :data-state="connection"></span>
+      <span class="pdx-txt-small" data-test="live-state">
+        {{ connection === 'live' ? $t('tickets.live.connected') : $t('tickets.live.disconnected') }}
+      </span>
+      <!-- Dropping the connection and restoring it are the simulated server's, in the Demo panel;
+           the state stays here, because a real list would show it. -->
+      <span class="pdx-txt-small pdx-ink-muted" :show="liveNotice !== ''" role="status" data-test="live-notice">{{ liveNotice }}</span>
+    </div>
+
+    <!-- The table and the bar that belongs to it, in one box. The bar is ANCHORED to the table and
+         as wide as it — the reference draws a 1760×64 bulk bar at the foot of a 1760-wide list,
+         and a floating pill of its own width says nothing about what it acts on: measured
+         unanchored, 494px of bar against a 1392px table, above it. -->
+    <div class="list">
+      <!-- `:source`, not `:data`. `data` is the array a grid holds; `source` is the DataSource it
+           reads from — and handing the source to `data` makes the grid wrap it in an array-backed
+           source of its own, which is the opposite of what this screen is for. -->
+      <pdx-data-grid
+        :ref="gridEl"
+        :source="source"
+        :columns="columns"
+        :page-sizes="[10, 20, 50]"
+        show-toolbar
+        search
+        selection="multiple"
+        @pdx-selection-change="onSelectionChange"
+        row-clickable
+        @pdx-row-click="e => list.openRecord(e.detail.row)"
+        data-test="grid">
+        <!-- THE TWO EMPTINESSES, in the grid's own `empty` slot.
+
+             Put UNDER the grid instead, they read as a second message below the one the grid draws
+             for itself: «Nessun risultato» inside the table and the invitation below it, one empty
+             list with two answers. The slot replaces the grid's, so there is
+             one.
+
+             They are two ELEMENTS, not one with two texts: an empty list because nothing has been
+             created yet is an INVITATION; an empty list because a filter excludes everything is a
+             WAY BACK. A test that asserts one has to fail on the other, and that is the control.
+             `:show` rather than `@if`, because a conditional AROUND slotted content does not
+             project (the framework's own note). -->
+        <slot name="empty" let:_>
+          <pdx-empty-state
+            :show="activeFilterCount > 0"
+            icon="filter"
+            :title="$t('tickets.empty.filtered.title')"
+            :description="$t('tickets.empty.filtered.body', { count: activeFilterCount })"
+            :action-label="$t('tickets.empty.filtered.action')"
+            @pdx-action="clearFilters"
+            data-test="empty-filtered"></pdx-empty-state>
+
+          <pdx-empty-state
+            :show="activeFilterCount === 0"
+            icon="inbox"
+            :title="$t('tickets.empty.none.title')"
+            :description="$t('tickets.empty.none.body')"
+            :action-label="$t('tickets.new')"
+            @pdx-action="list.openCreate()"
+            data-test="empty-nothing-yet"></pdx-empty-state>
+        </slot>
+      </pdx-data-grid>
+
+      <pdx-bulk-actions
+        class="bulk"
+        :count="selectedCount"
+        :actions="bulkActions"
+        @pdx-action="onBulkAction"
+        @pdx-clear="clearSelection"
+        data-test="bulk"></pdx-bulk-actions>
+    </div>
+
+
+    <!-- A bulk write is not a boolean, and the mixed result is its own shape. It is
+         derived from the three rules of `../data/answer.ts` rather than a fourth invented beside them: the
+         REFUSAL decides the placement — next to the control that asked, with no timer — and it
+         carries rule 1's undo for the part that did go through. `role="status"` and not `alert`:
+         most of the sentence is what succeeded. -->
+    <div class="bulk-outcome" :show="outcomeText !== ''" role="status" data-test="bulk-outcome">
+      <span class="pdx-txt-small">{{ outcomeText }}</span>
+      <span class="pdx-txt-small pdx-ink-muted">{{ outcomeReason }}</span>
+      <pdx-button size="sm" variant="ghost" @click="undoBulk" data-test="bulk-undo">{{ $t('tickets.undo') }}</pdx-button>
+    </div>
+
+    <!-- The one field worth editing in place: no drawer, no form, no save button. -->
+    <div class="detail" :show="current !== null" data-test="detail">
+      <span class="pdx-txt-small pdx-ink-muted">{{ $t('tickets.subjectOf', { reference: currentReference }) }}</span>
+      <pdx-inline-edit
+        :value="currentSubject"
+        :label="$t('tickets.columns.subject')"
+        @pdx-change="onInlineSubject"
+        data-test="inline-subject"></pdx-inline-edit>
+    </div>
+
+    <!-- CREATE IN A MODAL: `src/tickets/create-dialog.pdx`. The page owns
+         whether it is open and what a create does; the modal says what was filled in. -->
+    <pdx-create-dialog
+      :open="createOpen"
+      :schema="schema"
+      @create="e => list.create(e.detail)"
+      @close="list.closeCreate()"></pdx-create-dialog>
+
+    <!-- THE RECORD, FROM THE ROW. A drawer, opened by the row's own control, and it does not move
+         the URL: a record read here is a record the Back button cannot lose.
+         ⚠️ The drawer is a decision, not a drift. The reference's rule is create in a modal, edit
+         where the data lives, and the drawer is how a record is edited here. The two are reconciled
+         by SCOPE, and the screen holds all three, each for one thing:
+           a FIELD  → edited where it lives      (the inline subject below)
+           a RECORD → the drawer the row opens    (here)
+           a NEW record → the modal               (above)
+         What must never come back is two ways to edit the same record in one screen. -->
+    <pdx-edit-drawer
+      :open="editing !== null"
+      :schema="schema"
+      :value="editing"
+      :title="editing ? $t('tickets.edit') : ''"
+      :save-label="$t('tickets.save')"
+      :cancel-label="$t('tickets.cancel')"
+      @pdx-save="onDrawerSave"
+      @pdx-cancel="list.askToClose()"
+      :ref="drawerEl"
+      data-test="record-drawer"></pdx-edit-drawer>
+
+    <!-- The question the drawer owes: it is not a modal, so it is easy to leave by accident, and a
+         close that discards without saying so is the one thing a form must not do. Asked only when
+         there is something to lose — a confirm on every close is a confirm nobody reads. -->
+    <pdx-alert-dialog
+      :open="confirmClose"
+      :title="$t('tickets.discardTitle')"
+      :message="$t('tickets.discardBody')"
+      :confirm-label="$t('tickets.discardLeave')"
+      :cancel-label="$t('tickets.discardStay')"
+      tone="danger"
+      @pdx-confirm="list.discardAndClose()"
+      @pdx-cancel="list.keepEditing()"
+      data-test="drawer-confirm"></pdx-alert-dialog>
+    <!-- Rule 1's host. On the SCREEN, not in the shell, and that is measured rather
+         than tidy: in `app.pdx` it joins the entry chunk, and the entry is what a visitor waits
+         for before anything is painted — 81 KB against a budget of 78. A toast answers an action
+         that has not happened yet on the first paint, so it travels with the screen that can
+         raise one. The QUEUE is global (`getToastQueue`), so the two screens share one, and only
+         one of them is ever mounted. -->
+    <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
+  </section>
+</template>
+
+<script setup>
+// A dictionary key, for the reason in `customers.pdx`: `/tickets/:id` does not render inside this
+// page, so a deep link never loads it, and a function label would vanish from the trail.
+@page '/tickets' { label: $t('tickets.title') };
+@title $t('tickets.title');
+// A long list, and coming back to it is coming back to WHERE YOU WERE — on the Back button,
+// which every list gets by default, and on a link from another screen, which only this
+// declaration gives. Measured in `tests/scroll-behaviour.spec.ts`.
+@scroll 'preserve';
+
+import { createDataSource, actions, rowMenu, toCsv, saveBlob, badge } from '@pdxui/core';
+import type { SortDescriptor } from '@pdxui/core';
+import { categoryLabel, categoryTones, categoryOptions } from '../data/categories';
+import { ticketTransport, refuseNextDelete, bulkUpdateTickets, refuseOneOfNextBulk, AGENTS } from '../data/tickets';
+import type { Ticket } from '../data/tickets';
+import { registerDemo } from '../demo';
+// Created from JS, so the compiler cannot auto-import it from a tag; the answers use it.
+import { toast } from '@pdxui/ui/toast';
+import { createAnswer } from '../data/answer';
+import { createListActions } from '../data/list-actions';
+import { createUrlFilter, FILTER_PARAMS } from '../data/url-filter';
+import { createLiveList } from '../data/live-list';
+import { bulkActionSet, dispatchBulk } from '../tickets/bulk-actions';
+import { liveDemoKnobs } from '../tickets/live-demo';
+
+// ─── The source ────────────────────────────────────────────────────────────────
+//
+// `pageSize` is the server's page, and the grid renders whatever the source holds. Nothing in this
+// component slices an array.
+// The list's DECLARED arrangement, written once: it is what `createDataSource` opens with and it
+// is what the default view restores. Captured from the live state at mount instead, the «default»
+// view would be whatever the URL happened to carry — open `?status=closed` once and the unfiltered
+// list would become unreachable.
+// By REFERENCE, the column a reader knows it by: sorted by `id` — the actions column, whose header is
+// empty — the toolbar's chip reads «↑ ×» and names nothing. The same order: references
+// are `T-1000 + id`, four digits each.
+const BASE_SORT: SortDescriptor[] = [{ field: 'reference', dir: 'asc' }];
+const BASE_PAGE_SIZE = 10;
+
+const source = createDataSource({
+  transport: ticketTransport,
+  idField: 'id',
+  pageSize: BASE_PAGE_SIZE,
+  sort: BASE_SORT,
+});
+
+// A filtered list that cannot be linked is a demo, not an application: the source's filter and the
+// address are kept in step both ways, in `../data/url-filter.ts`. A view's filter is named
+// by `?view=` and left out of the address, whatever the order of the setup. The empty
+// state reads how many filters are narrowing the list.
+const urlFilter = createUrlFilter(source);
+function clearFilters() { urlFilter.clearFilters(); }
+const activeFilterCount = $derived(urlFilter.activeCount());
+
+// Columns, filter fields, schema and bulk actions are DATA that carries labels, so each one is a
+// `$derived`: `$t` is reactive, and a locale switch has to re-read them the way it re-reads the
+// template. A plain `const` here would leave the grid's headers in the previous language — the
+// half-translated screen this app exists not to be.
+const statusOptions = $derived([
+  { value: 'open', label: $t('tickets.status.open') },
+  { value: 'waiting', label: $t('tickets.status.waiting') },
+  { value: 'closed', label: $t('tickets.status.closed') },
+]);
+
+const priorityOptions = $derived([
+  { value: 'low', label: $t('tickets.priority.low') },
+  { value: 'normal', label: $t('tickets.priority.normal') },
+  { value: 'high', label: $t('tickets.priority.high') },
+]);
+
+const columns = $derived([
+  // `searchable`: what the toolbar's search looks in; `quickFilter`: the chips on screen before any
+  // filter is set.
+  { field: 'reference', header: $t('tickets.columns.reference'), width: 90, sortable: true, searchable: true },
+  // The one column that flexes, and the one a ticket is read by: without a floor of its own the fixed
+  // columns squeeze it to the grid's 70px default. Past that, the grid scrolls inside itself.
+  { field: 'subject', header: $t('tickets.columns.subject'), minWidth: 240, sortable: true, searchable: true },
+  { field: 'customer', groupable: true, header: $t('tickets.columns.customer'), width: 150, sortable: true, searchable: true },
+  // The enums are stored as `low` / `open` and must not be SHOWN that way. A composed key is the
+  // documented way to translate an enum, and the tooling reads `tickets.priority.` as a prefix.
+  // `filterOptions`: the grid's filter offers the words, not the stored codes.
+  { field: 'priority', groupable: true, header: $t('tickets.columns.priority'), width: 110, sortable: true,
+    format: (v) => $t('tickets.priority.' + String(v)), filterOptions: priorityOptions, quickFilter: true },
+  { field: 'status', groupable: true, header: $t('tickets.columns.status'), width: 110, sortable: true,
+    format: (v) => $t('tickets.status.' + String(v)), filterOptions: statusOptions, quickFilter: true },
+  // Codes on the record, a coloured badge each, named in the page's language. A
+  // deactivated one is still here, muted; the filter offers the ones that apply to tickets.
+  { field: 'categories', header: $t('tickets.columns.categories'), width: 200, sortable: false,
+    format: (v) => categoryLabel(String(v)), cell: badge({ tones: categoryTones() }),
+    filterOptions: categoryOptions('tickets'), quickFilter: true },
+  // A date is not a string: `2026-09-01` reads one way in English and another in Italian, and $d
+  // is what knows the difference.
+  // Empty is a real value, not a missing one: an unassigned ticket is what a queue is for, and a
+  // blank cell reads as a bug. The em dash says «nobody yet» in both locales.
+  { field: 'assignee', groupable: true, header: $t('tickets.columns.assignee'), width: 150, sortable: true,
+    format: (v) => String(v ?? '') || '—',
+    filterOptions: AGENTS.map(a => ({ value: a, label: a })), quickFilter: true },
+  { field: 'opened', header: $t('tickets.columns.opened'), width: 120, sortable: true,
+    format: (v) => $d(String(v), { dateStyle: 'medium' }) },
+  // The row's own way in. `actions()` builds the cell safely and stops the click from
+  // reaching the row, which is what keeps opening a record from selecting it. The label NAMES the
+  // record — thirty-six buttons all called «Open» are thirty-six buttons a screen reader cannot
+  // tell apart.
+  { field: 'id', header: '', width: 56, sortable: false,
+    cell: actions([{ icon: 'eye', label: (row) => $t('tickets.openRecord', { reference: String(row.reference) }),
+                     // A cell action hands over the grid's untyped row; this grid's rows are its source's tickets.
+                     onClick: (row) => list.openRecord(row as Ticket) }]) },
+  // What the record affords, and the bulk bar does not. ONE control: `actions()` puts
+  // a button per entry, which is right for the eye above it and wrong for four — at 390px a row of
+  // four icon buttons is the whole width of the phone. The two surfaces stay DIFFERENT on purpose:
+  // duplicate, print and «open in a new tab» have no meaning for a selection, and close/archive
+  // have none for one record the reader is already looking at.
+  { field: 'rowMenu', header: '', width: 56, sortable: false, command: true,
+    cell: rowMenu({
+      label: (row) => $t('tickets.rowActions', { reference: String(row.reference) }),
+      items: [
+        { key: 'duplicate', icon: 'copy', label: $t('tickets.row.duplicate'), onSelect: duplicateRecord },
+        // Refused PER ROW, not for the whole screen: a closed ticket's record is archived. A rule
+        // that refuses everything is satisfied by refusing everything, and teaches nothing.
+        { key: 'export', icon: 'download', label: $t('tickets.row.export'),
+          disabled: (row) => row.status === 'closed',
+          disabledReason: $t('tickets.row.exportDenied'),
+          onSelect: exportRecord },
+        { key: 'print', icon: 'printer', label: $t('tickets.row.print'), onSelect: () => window.print() },
+        // A real link. `window.open` in a handler is not one: it cannot be middle-clicked, cannot
+        // be copied, and announces itself as a button.
+        { key: 'open-tab', icon: 'external-link', label: $t('tickets.row.openTab'),
+          href: (row) => `/tickets/${row.id}`, target: '_blank' },
+      ],
+    }) },
+]);
+
+// `field`, not `name` — and the difference is silent. `<pdx-auto-form>`'s schema names a field
+// `name`; `FilterField` and `ColumnDef` name it `field`, and `toFilterFields` reads `f.field`. A
+// filter field written with `name` resolves to `undefined`, so the URL's filter matches no known
+// field and is dropped without a word: the list comes back unfiltered and nothing says why.
+// The roster, plus the empty one. Unassigned is a CHOICE — a picker that can only hand a ticket
+// over, never take it back, is half a picker.
+const assigneeOptions = $derived([
+  { value: '', label: $t('tickets.unassigned') },
+  ...AGENTS.map(a => ({ value: a, label: a })),
+]);
+
+/** The categories a ticket may be given, plus any it already carries that has since been deactivated. */
+const ticketCategoryOptions = $derived([
+  ...categoryOptions('tickets'),
+  ...(editing?.categories ?? [])
+    .filter(code => !categoryOptions('tickets').some(o => o.value === code))
+    .map(code => ({ value: code, label: categoryLabel(code) })),
+]);
+
+const schema = $derived({
+  fields: [
+    { name: 'subject', type: 'text', label: $t('tickets.columns.subject'), validators: [{ type: 'required' }] },
+    { name: 'customer', type: 'text', label: $t('tickets.columns.customer'), validators: [{ type: 'required' }] },
+    { name: 'priority', type: 'select', label: $t('tickets.columns.priority'), options: priorityOptions },
+    { name: 'status', type: 'select', label: $t('tickets.columns.status'), options: statusOptions },
+    { name: 'assignee', type: 'select', label: $t('tickets.columns.assignee'), options: assigneeOptions },
+    // The active categories that apply to tickets — and those the record already has, so a
+    // deactivated one it carries is kept, not dropped by the save.
+    { name: 'categories', type: 'select', multiple: true, label: $t('tickets.columns.categories'), options: ticketCategoryOptions },
+  ],
+});
+
+// A permission the current role does not have. A bulk bar where everything is allowed teaches a
+// permission model nobody has.
+//
+// What this role may do. Offered and refused rather than withheld: an action that merely vanishes
+// is indistinguishable from one nobody wrote, and the visitor never finds out it exists. The bar
+// carries the refusal and the reason.
+const canExport = false;
+
+// Which picker the bar is showing, or null for its actions. The bar BECOMES its picker,
+// so its action sets are data, in `../tickets/bulk-actions.ts`.
+let picking = $signal(null);
+
+const bulkActions = $derived(bulkActionSet(picking, {
+  statusOptions,
+  assigneeOptions,
+  canExport,
+  labels: {
+    back: $t('tickets.bulk.back'),
+    close: $t('tickets.bulk.close'),
+    delete: $t('tickets.bulk.delete'),
+    export: $t('tickets.bulk.export'),
+    exportDenied: $t('tickets.bulk.exportDenied'),
+    status: $t('tickets.bulk.status'),
+    assign: $t('tickets.bulk.assign'),
+  },
+}));
+
+const total = $derived(source.total());
+let current = $signal(null);
+const currentReference = $derived(current ? current.reference : '');
+const currentSubject = $derived(current ? current.subject : '');
+
+// The grid itself, for the one thing only it can do: put a PARTIAL selection back.
+// A `:ref` binds into a SIGNAL — a plain let stays null.
+let gridEl = $signal(null);
+
+// What a partly refused bulk write left behind: the line, the server's words, and the rows as they
+// were before it, so the undo restores what CHANGED and not what was asked.
+let outcomeText = $signal('');
+let outcomeReason = $signal('');
+let bulkBefore = $signal([]);
+
+// ─── The answer to an action and the round-trip ───────────────────
+//
+// One function per rule, in `../data/answer.ts`: a screen that calls `answer.reversible` cannot
+// accidentally grow a fifth shape. The round-trip — the selection mirror, create, the drawer with its
+// question, the save — is `../data/list-actions.ts`, the customers' too: one implementation, because
+// two copies drift and a fix reaches only one of them.
+//
+// The drawer element is passed for `isDirty()`, asked of the COMPONENT, which is the only thing that
+// knows. The two other readings are wrong: a querySelector under the host finds no form (the panel
+// is re-parented to <body>), and comparing `getValues()` with the record races a keystroke that has
+// not reached the form model yet.
+const answer = createAnswer(toast);
+/** The drawer element. A `:ref` binds into a SIGNAL — a plain let stays null (board.pdx:62). */
+let drawerEl = $signal(null);
+const list = createListActions({
+  source, transport: ticketTransport, answer,
+  grid: () => gridEl,
+  drawer: () => drawerEl,
+});
+const selectedIds = $derived(list.selectedIds());
+const selectedCount = $derived(selectedIds.length);
+const createOpen = $derived(list.createOpen());
+const editing = $derived(list.editing());
+const confirmClose = $derived(list.confirmClose());
+
+// ─── Selection ─────────────────────────────────────────────────────────────────
+
+function onSelectionChange(e) {
+  list.onSelectionChange(e);
+  const only = selectedIds.length === 1 ? source.getById(selectedIds[0]) : null;
+  current = only ?? null;
+}
+
+function armRefusal() { refuseNextDelete(); }
+
+function clearSelection() {
+  // In the grid, which owns the checkboxes: `list.clearSelection()` unchecks them there.
+  list.clearSelection();
+  current = null;
+}
+
+function armBulkRefusal() { refuseOneOfNextBulk(); }
+
+// ─── Create and edit ───────────────────────────────────────────────────────────
+
+// Two paths, two forms, one schema — and the difference between them is WHERE they are, which is
+// the whole point: `add` in a modal, `edit` in the page. The modal is
+// `../tickets/create-dialog.pdx`; what a create does is the list's.
+
+// ─── What ONE record affords ───────────────────────────────────────
+
+/** A new record made from this one, opened where an edit opens. */
+async function duplicateRecord(row) {
+  answer.clearRefusal();
+  const rec = source.getById(Number(row.id)) ?? row;
+  // The fields the server takes, named: the id, the reference and the opened date are ITS to
+  // assign, and a copy that carried them over would be the same record twice.
+  const copy = await ticketTransport.create({
+    subject: `${rec.subject} (copy)`,
+    customer: rec.customer,
+    priority: rec.priority,
+    status: rec.status,
+  });
+  await source.refresh();
+  // RULE 2: the copy is visible where the action happened — it opens in the drawer,
+  // which IS the confirmation. Nothing else is drawn. Announced, because a row appearing is not
+  // an event a screen reader notices.
+  list.openRecord(copy);
+  answer.visible($t('tickets.row.duplicated', { reference: copy.reference }));
+}
+
+/** This record, as the CSV the toolbar writes for the list. */
+function exportRecord(row) {
+  const rec = source.getById(Number(row.id)) ?? row;
+  // The columns the reader sees, under the headers they read, through their own formatter — so
+  // the file says «Closed» and «High» where the screen does, not `closed` and `high`. The two
+  // control columns are not data.
+  const fields = columns
+    .filter(c => c.field !== 'id' && c.field !== 'rowMenu')
+    .map(c => ({ field: c.field, header: c.header, format: c.format }));
+  saveBlob(new Blob([toCsv([rec], fields)], { type: 'text/csv;charset=utf-8' }), `${rec.reference}.csv`);
+}
+
+/** The drawer's save: its values over the record, then the list re-read. */
+function onDrawerSave(e) { return list.save(e.detail?.values ?? {}); }
+
+// In place: one field, no drawer. The change goes to the server and the row is re-read.
+async function onInlineSubject(e) {
+  if (!current) return;
+  await ticketTransport.update({ ...current, subject: String(e.detail?.value ?? '') });
+  await source.refresh();
+  current = source.getById(current.id) ?? null;
+}
+
+// ─── Delete, optimistically, with an undo ──────────────────────────────────────
+
+/** The bar's keys, through the dispatch table of `../tickets/bulk-actions.ts`. */
+function onBulkAction(e) {
+  return dispatchBulk(e.detail?.key ?? e.detail?.action, {
+    delete: deleteSelected,
+    close: closeSelected,
+    pick: (kind) => { picking = kind; },
+    status: (value) => {
+      picking = null;
+      return applyBulk({ status: value },
+        (n) => $t('tickets.bulk.moved', { count: n, value: $t('tickets.status.' + value) }));
+    },
+    assign: (value) => {
+      picking = null;
+      return applyBulk({ assignee: value },
+        (n) => $t('tickets.bulk.assigned', { count: n, value: value || $t('tickets.unassigned') }));
+    },
+  });
+}
+
+// ─── One write for a selection, and an answer that is not a boolean ─
+//
+// The all-or-nothing refusal is the easy case and `deleteSelected` already shows it. The one an
+// application gets wrong is nine of twelve: «it failed» is a lie about the nine that landed, and a
+// re-selection is what the visitor has to do next unless the three that did not stay checked.
+async function applyBulk(patch, describe) {
+  answer.clearRefusal();
+  outcomeText = '';
+  const ids = selectedIds.slice();
+  if (ids.length === 0) return;
+  // BEFORE the write: the undo is built from what the rows held, per row, not from the patch.
+  const before = ids.map(id => source.getById(id)).filter(Boolean).map(r => ({ ...r }));
+
+  const { changed, refused } = await bulkUpdateTickets(ids, patch);
+  await source.refresh();
+
+  // Only the ones that actually moved are the undo's business.
+  const restore = before.filter(r => changed.some(c => c.id === r.id));
+
+  if (refused.length === 0) {
+    clearSelection();
+    bulkBefore = [];
+    // Rule 1: reversible, and a selection can span pages, so the way back travels
+    // with the message rather than waiting on a screen the visitor may have left.
+    answer.reversible(describe(changed.length), $t('tickets.undo'), undoBulk);
+    bulkBefore = restore;
+    return;
+  }
+
+  outcomeText = $t('tickets.bulk.partial', { changed: changed.length, refused: refused.length });
+  // The SERVER's words. A sentence the page invented would be the same sentence for every reason
+  // a server can have, which is how an application stops telling the truth.
+  outcomeReason = refused[0].reason;
+  bulkBefore = restore;
+  // Exactly the refused ones stay checked, so the next attempt is a click and not a re-selection.
+  // Only the grid can do this, through `setSelectedIds`: `clearSelection()` and «keep everything»
+  // are the only other moves an application has.
+  if (gridEl) gridEl.setSelectedIds(refused.map(r => r.id));
+}
+
+async function undoBulk() {
+  const rows = bulkBefore;
+  if (rows.length === 0) return;
+  for (const row of rows) await ticketTransport.update(row);
+  bulkBefore = [];
+  outcomeText = '';
+  await source.refresh();
+}
+
+async function closeSelected() {
+  for (const id of selectedIds) {
+    const row = source.getById(id);
+    if (row) await ticketTransport.update({ ...row, status: 'closed' });
+  }
+  clearSelection();
+  await source.refresh();
+}
+
+async function deleteSelected() {
+  // The inline subject edits the one selected ticket, and the selection is going.
+  current = null;
+  await list.removeSelected({
+    describe: (rows) => rows.length === 1
+      ? $t('tickets.deleted', { reference: rows[0].reference })
+      : $t('tickets.deletedMany', { count: rows.length }),
+    undoLabel: $t('tickets.undo'),
+    // The id, the reference and the opened date are the server's to assign: a copy that carried
+    // them over would be the same record twice.
+    recreate: ({ id: _id, reference: _ref, opened: _opened, ...rest }) => rest,
+  });
+}
+
+// ─── Live: what a colleague does, arriving here ────────────────────────────────
+//
+// The bridge and the honest reconnect are `../data/live-list.ts`, with the five questions
+// a live list has to answer. The page holds what it shows of the feed — the bar's state and notice —
+// and what it holds of one record, the inline subject's, which a withdrawal or a resync re-reads.
+const live = createLiveList({
+  source,
+  list,
+  words: {
+    shadowed: (reference) => $t('tickets.live.shadowed', { reference }),
+    withdrawn: (reference) => $t('tickets.live.withdrawn', { reference }),
+    changed: (reference) => $t('tickets.live.changed', { reference }),
+    resynced: (count) => $t('tickets.live.resynced', { count }),
+  },
+  onRemoved: (id) => { if (current && current.id === id) current = null; },
+  afterResync: () => { if (current) current = source.getById(current.id) ?? null; },
+});
+const connection = $derived(live.connection());
+const liveNotice = $derived(live.notice());
+
+// The simulated server's knobs are the DEMO's, not this screen's: they are in the Demo panel of the
+// service bar, and leave with the page. The connection's and the colleague's are
+// `../tickets/live-demo.ts`; the refusals stay here, between them, as the panel had them.
+const liveKnobs = liveDemoKnobs(source, live);
+
+onMount(() => onDestroy(registerDemo([
+  ...liveKnobs.connection,
+  { test: 'refuse-next', label: 'tickets.refuseNext', run: armRefusal },
+  { test: 'refuse-one-bulk', label: 'tickets.refuseOneBulk', run: armBulkRefusal },
+  ...liveKnobs.colleague,
+])));
+</script>
+
+<style scoped>
+  /* The list and its bar are one box: the bar takes the box's width, so it is the table's. */
+  .list { display: flex; flex-direction: column; }
+  .bulk { display: block; width: 100%; }
+
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+
+  .bulk-outcome {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    flex-wrap: wrap;
+    margin-top: var(--pdx-space-sm);
+  }
+
+  .undo-bar {
+    display: flex; align-items: center; gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md);
+  }
+
+  .detail {
+    display: flex; flex-direction: column; gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
+</style>

@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Date Range</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Click start, hover preview, click end. Auto-swap if end &lt; start.
+      2-month view for range mode.
+    </p>
+
+    <div class="demo-row">
+      <pdx-date-picker mode="daterange" :number-of-months="2" placeholder="Select range"></pdx-date-picker>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker mode="daterange" :number-of-months="2" placeholder="Select range"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

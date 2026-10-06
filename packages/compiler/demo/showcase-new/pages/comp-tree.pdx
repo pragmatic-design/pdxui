@@ -1,0 +1,119 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Tree</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-tree&gt;</code> — a hierarchy the user navigates: a folder pane, a category
+      tree, a knowledge base. It stays on the page, where <code>&lt;pdx-tree-select&gt;</code> is
+      an input that opens, picks and closes.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-tree-expanding class="demo-section"></pdx-demo-comp-tree-expanding>
+
+    <!-- ═══ Expanded by default ═══ -->
+    <pdx-demo-comp-tree-open-on-arrival class="demo-section"></pdx-demo-comp-tree-open-on-arrival>
+
+    <!-- ═══ Selection ═══ -->
+    <pdx-demo-comp-tree-selection class="demo-section"></pdx-demo-comp-tree-selection>
+
+    <!-- ═══ Checkboxes ═══ -->
+    <pdx-demo-comp-tree-checkboxes class="demo-section"></pdx-demo-comp-tree-checkboxes>
+
+    <!-- ═══ Lazy ═══ -->
+    <pdx-demo-comp-tree-lazy-children class="demo-section"></pdx-demo-comp-tree-lazy-children>
+
+    <!-- ═══ Fields ═══ -->
+    <pdx-demo-comp-tree-fields class="demo-section"></pdx-demo-comp-tree-fields>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-tree-disabled class="demo-section"></pdx-demo-comp-tree-disabled>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-tree-screen class="demo-section"></pdx-demo-comp-tree-screen>
+
+    <!-- ═══ Keyboard ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+      <p class="pdx-txt-small pdx-ink-muted">
+        The whole tree is <strong>one</strong> tab stop: inside it the arrows move, as the W3C tree
+        pattern asks.
+      </p>
+
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Does</span></div>
+        <div class="opt-row"><code>↓ ↑</code><span>Next / previous visible node</span></div>
+        <div class="opt-row"><code>→</code><span>Opens a closed branch, then moves to its first child</span></div>
+        <div class="opt-row"><code>←</code><span>Closes an open branch, then moves to its parent</span></div>
+        <div class="opt-row"><code>Home</code><span>First node</span></div>
+        <div class="opt-row"><code>End</code><span>Last visible node</span></div>
+        <div class="opt-row"><code>Enter</code><span>Selects, or toggles a branch</span></div>
+        <div class="opt-row"><code>Space</code><span>Checks, or adds to a multiple selection</span></div>
+        <div class="opt-row"><code>*</code><span>Opens every sibling of the focused node</span></div>
+        <div class="opt-row"><code>a–z</code><span>Type-ahead: jumps to the next node starting with what you typed</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>nodes</code><span>array</span><span>The roots</span></div>
+        <div class="opt-row"><code>idField</code><span>string</span><span>Field identifying a node — <code>id</code></span></div>
+        <div class="opt-row"><code>labelField</code><span>string</span><span>Field rendered as text — <code>label</code></span></div>
+        <div class="opt-row"><code>childrenField</code><span>string</span><span>Field holding the children — <code>children</code></span></div>
+        <div class="opt-row"><code>selectionMode</code><span>string</span><span>none (default), single, multiple</span></div>
+        <div class="opt-row"><code>checkable</code><span>boolean</span><span>A checkbox per node, tri-state over a branch</span></div>
+        <div class="opt-row"><code>defaultExpandAll</code><span>boolean</span><span>Open every branch on first render</span></div>
+        <div class="opt-row"><code>loadChildren</code><span>function</span><span><code>(node) =&gt; Promise&lt;Node[]&gt;</code>, called the first time a branch opens</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Accessible name for the tree</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Readable, not operable</span></div>
+      </div>
+
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-select</code><span><code>{ selected: string[] }</code> — the ids selected, after the change</span></div>
+        <div class="opt-row"><code>pdx-expand</code><span><code>{ id, expanded }</code> — one branch opened or closed</span></div>
+        <div class="opt-row"><code>pdx-check</code><span><code>{ checked: string[] }</code> — fully checked ids; a mixed parent is not one</span></div>
+        <div class="opt-row"><code>pdx-load-error</code><span><code>{ id, error }</code> — <code>loadChildren</code> rejected</span></div>
+      </div>
+
+      <h2 class="pdx-txt-heading section-heading">Slot</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Slot</span><span>Scope</span><span>Description</span></div>
+        <div class="opt-row"><code>node</code><span><code>{ node, level, expanded }</code></span><span>Renders one node's label</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/tree';
+@title 'Tree Component';
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-xl); }
+
+  .explorer {
+    display: flex;
+    gap: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+
+  .explorer-pane {
+    flex: 0 0 240px;
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+  }
+
+  @media (max-width: 640px) {
+    .explorer { flex-direction: column; }
+    .explorer-pane { flex: none; }
+  }
+</style>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="pragmatic-gold" pdx-scheme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDX UI</title>
+    <meta name="description" content="PDX: a signal-based UI framework with a .pdx compiler that emits standard Web Components. Agent-native — and this site is built with PDX." />
+    <link rel="canonical" href="https://pdxui.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pdxui.com/" />
+    <meta property="og:title" content="PDX UI" />
+    <meta property="og:description" content="A signal-based UI framework with a .pdx compiler that emits standard Web Components. Agent-native — and this site is built with PDX." />
+    <meta property="og:image" content="https://pdxui.com/og.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PDX UI" />
+    <meta name="twitter:description" content="A signal-based UI framework with a .pdx compiler that emits standard Web Components." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <pdx-app></pdx-app>
+    <script type="module">
+        // The design system's CSS (tokens + themes + components).
+        import '@pdxui/design';
+        // The identity shared with the builder (themebuilder.pdxui.com) — before site.css,
+        // which aliases its variables under names of its own.
+        import '../../brand/brand.css';
+        // The demos' scaffolding (Reference/Props tables, demo-grid, comp-card…) from its one
+        // source, the showcase the galleries are ported from. Every rule is `.page …`, and the site
+        // uses `.page` only in the galleries. Before site.css, which overrides some.
+        import '../compiler/demo/showcase-new/showcase-shared.css';
+        // The site's styles.
+        import './src/styles/site.css';
+        // Input guards: horizontal swipe-back (touchpad) + stray clicks at the end of a selection.
+        import { installNoSwipeBack, installDragClickGuard } from './src/lib/no-swipe-back';
+        installNoSwipeBack();
+        installDragClickGuard();
+        // The site's own components (pdx-code, pdx-demo, …) — registered explicitly
+        // (they are not in @pdxui/ui, so they are not auto-imported).
+        import.meta.glob('./src/components/**/*.pdx', { eager: true });
+        // The app shell.
+        import './src/app.pdx';
+        // Route auto-discovery: every file registers its own @page.
+        // The @pdxui/ui <pdx-*> components used in templates are auto-imported by the compiler.
+        import.meta.glob('./src/routes/**/*.pdx', { eager: true });
+        // Cloudflare Web Analytics, on pdxui.com only — not in dev, preview or the tests.
+        import { installAnalytics } from './src/lib/analytics';
+        installAnalytics();
+    </script>
+</body>
+</html>

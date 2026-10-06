@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Character & Word Count</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>showCount</code> for character counter. <code>wordCount</code> for word counter. Both can be combined.
+      Counter turns red when over <code>maxlength</code>.
+    </p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Bio" description="Max 200 characters"></pdx-label>
+        <pdx-textarea placeholder="Tell us about yourself..." showCount maxlength="200" minRows="2" maxRows="6"></pdx-textarea>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Essay" description="Word count"></pdx-label>
+        <pdx-textarea placeholder="Write your essay..." wordCount minRows="3" maxRows="10"></pdx-textarea>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Post" description="Both counters"></pdx-label>
+        <pdx-textarea placeholder="Write a post..." showCount wordCount maxlength="500" minRows="2" maxRows="6"></pdx-textarea>
+      </div>
+    </div>
+  </section>
+</template>

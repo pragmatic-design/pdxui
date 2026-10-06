@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Bar Chart</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Grouped bars with multiple series. Click legend to toggle visibility.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="bar" :data="barData" :x-field="'quarter'" :y-field="'desktop,mobile,tablet'" :series-names="'Desktop,Mobile,Tablet'" title="Traffic by Device" height="320px"></pdx-chart>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { barData } from './state.pdx';
+</script>

@@ -1,0 +1,83 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Size Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Four sizes via <code>size</code> attribute: sm, default, lg, xl. Shown as width indicators.</p>
+
+    <div class="size-grid">
+      <div class="size-card">
+        <span class="pdx-txt-caption pdx-ink-muted">sm (360px)</span>
+        <div class="pdx-dialog size-demo" style="max-width: 360px;">
+          <div class="pdx-dialog-header">
+            <h3 class="pdx-txt-small">Small Dialog</h3>
+            <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="pdx-dialog-body">
+            <p class="pdx-txt-small">Compact content area.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="size-card">
+        <span class="pdx-txt-caption pdx-ink-muted">default (480px)</span>
+        <div class="pdx-dialog size-demo" style="max-width: 480px;">
+          <div class="pdx-dialog-header">
+            <h3 class="pdx-txt-small">Default Dialog</h3>
+            <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="pdx-dialog-body">
+            <p class="pdx-txt-small">Standard content area for most use cases.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="size-card">
+        <span class="pdx-txt-caption pdx-ink-muted">lg (640px)</span>
+        <div class="pdx-dialog size-demo" style="max-width: 640px;">
+          <div class="pdx-dialog-header">
+            <h3 class="pdx-txt-small">Large Dialog</h3>
+            <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="pdx-dialog-body">
+            <p class="pdx-txt-small">Wider area for forms, tables, or detailed content.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="size-card">
+        <span class="pdx-txt-caption pdx-ink-muted">full (100%)</span>
+        <div class="pdx-dialog size-demo" style="max-width: 100%;">
+          <div class="pdx-dialog-header">
+            <h3 class="pdx-txt-small">Full Width Dialog</h3>
+            <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="pdx-dialog-body">
+            <p class="pdx-txt-small">Full viewport width for immersive content.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-dialog" size="sm"&gt;...&lt;/div&gt;
+&lt;div class="pdx-dialog"&gt;...&lt;/div&gt;            &lt;!-- default --&gt;
+&lt;div class="pdx-dialog" size="lg"&gt;...&lt;/div&gt;
+&lt;div class="pdx-dialog" size="xl"&gt;...&lt;/div&gt;
+&lt;div class="pdx-dialog" size="full"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .size-grid {
+    margin-top: var(--pdx-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-lg);
+  }
+  .size-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

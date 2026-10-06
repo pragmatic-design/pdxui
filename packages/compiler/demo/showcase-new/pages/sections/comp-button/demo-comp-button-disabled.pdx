@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>disabled</code> prop. Click events are blocked. Try clicking — no console output.</p>
+
+    <div class="btn-row">
+      <pdx-button variant="primary" disabled @click="log">Primary</pdx-button>
+      <pdx-button variant="secondary" disabled @click="log">Secondary</pdx-button>
+      <pdx-button variant="outline" disabled @click="log">Outline</pdx-button>
+      <pdx-button variant="ghost" disabled @click="log">Ghost</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useButtonConsole } from './state.pdx';
+
+const buttonConsole = useButtonConsole();
+
+function log(e) {
+    buttonConsole.log(e);
+}
+</script>

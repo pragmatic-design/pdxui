@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sign Toggle</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Green (+) / red (-) toggle button. Press +/- keys or click. <code>colorBySign</code> colors the number.
+    </p>
+    <div class="demo-stack">
+      <pdx-form-field label="Amount" hint="Click +/- button or press key">
+        <pdx-number-input value="100" allowNegative precision="2"></pdx-number-input>
+      </pdx-form-field>
+      <pdx-form-field label="Colored by sign">
+        <pdx-number-input value="-75.50" allowNegative colorBySign precision="2"></pdx-number-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

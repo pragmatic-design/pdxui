@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Elevation Levels</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5 elevation levels with increasing shadow depth. Best visible in Material theme.</p>
+    <div class="pdx-row" style="gap: var(--pdx-space-lg); flex-wrap: wrap;">
+      <div class="pdx-surface-card pdx-card-elevation-0" style="padding: var(--pdx-space-lg); min-width: 140px; text-align: center;">
+        <strong>Level 0</strong>
+        <div class="pdx-txt-small pdx-ink-muted">Flat</div>
+      </div>
+      <div class="pdx-surface-card pdx-card-elevation-1" style="padding: var(--pdx-space-lg); min-width: 140px; text-align: center;">
+        <strong>Level 1</strong>
+        <div class="pdx-txt-small pdx-ink-muted">Resting</div>
+      </div>
+      <div class="pdx-surface-card pdx-card-elevation-2" style="padding: var(--pdx-space-lg); min-width: 140px; text-align: center;">
+        <strong>Level 2</strong>
+        <div class="pdx-txt-small pdx-ink-muted">Hover</div>
+      </div>
+      <div class="pdx-surface-card pdx-card-elevation-3" style="padding: var(--pdx-space-lg); min-width: 140px; text-align: center;">
+        <strong>Level 3</strong>
+        <div class="pdx-txt-small pdx-ink-muted">Dragged</div>
+      </div>
+      <div class="pdx-surface-card pdx-card-elevation-4" style="padding: var(--pdx-space-lg); min-width: 140px; text-align: center;">
+        <strong>Level 4</strong>
+        <div class="pdx-txt-small pdx-ink-muted">Modal</div>
+      </div>
+    </div>
+  </section>
+</template>

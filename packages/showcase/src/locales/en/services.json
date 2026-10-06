@@ -1,0 +1,49 @@
+{
+    "services": {
+        "title": "Services",
+        "intro": "What customers subscribe to: each service promises an answer and a resolution time, and a ticket is owed the answer time of its customer's subscription. A service is withdrawn from sale, never deleted.",
+        "matching": "{count, plural, one {# service} other {# services}}",
+        "openRecord": "Open {name}",
+        "unknown": "Unknown service",
+        "new": "New service",
+        "create": "Create",
+        "cancel": "Cancel",
+        "sections": "Service sections",
+        "views": { "default": "All services" },
+        "columns": {
+            "code": "Code",
+            "name": "Name",
+            "slaHours": "Answer",
+            "resolveHours": "Resolution",
+            "price": "Monthly",
+            "customers": "Customers",
+            "active": "Status"
+        },
+        "hours": "{hours} h",
+        "states": { "active": "Active", "inactive": "Inactive" },
+        "groups": { "service": "Service" },
+        "sectionNames": { "details": "Details", "customers": "Customers" },
+        "fields": {
+            "code": "Code",
+            "name": "Name",
+            "description": "Description",
+            "slaHours": "Answer within (hours)",
+            "resolveHours": "Resolved within (hours)",
+            "price": "Monthly price (€)",
+            "active": "On sale",
+            "covers": "Covers"
+        },
+        "saving": "Saving…",
+        "saved": "Saved",
+        "notSaved": "Not saved",
+        "savedAt": "Saved at {time}",
+        "nameRequired": "A service needs a name.",
+        "hoursPositive": "A number of hours above zero.",
+        "resolveBeforeAnswer": "A resolution cannot come before the first answer.",
+        "customers": {
+            "since": "since {date}",
+            "emptyTitle": "No customer subscribes to it",
+            "emptyBody": "A customer subscribes from its own Services section."
+        }
+    }
+}

@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Caption</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Caption text below the image.</p>
+    <div class="demo-row">
+      <pdx-image src="/demo-images/mountains.svg" alt="With caption" width="300px" height="200px" caption="A beautiful mountain view taken at dawn" :lazy="false"></pdx-image>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-image src="..." caption="A beautiful mountain view"&gt;&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>

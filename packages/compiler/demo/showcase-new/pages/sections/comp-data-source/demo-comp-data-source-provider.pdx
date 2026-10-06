@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Wrapping Children — Provider Pattern</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The core pattern: <code>&lt;pdx-data-source&gt;</code> <strong>wraps</strong> its consumers.
+      The select inside reads data from the parent DataSource automatically.
+      Multiple components can share the same source.
+    </p>
+    <div class="demo-col">
+      <pdx-data-source :data="products" id-field="id" name="products">
+        <div class="field">
+          <label class="pdx-txt-small pdx-weight-medium">Pick a product</label>
+          <pdx-select labelField="name" valueField="id" searchable clearable placeholder="Select product..." />
+        </div>
+        <div class="field">
+          <label class="pdx-txt-small pdx-weight-medium">Pick another (same source)</label>
+          <pdx-select labelField="name" valueField="id" placeholder="Same data..." />
+        </div>
+      </pdx-data-source>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;!-- No :source needed — children inject automatically --&gt;
+&lt;pdx-data-source :data="products" id-field="id"&gt;
+  &lt;pdx-select labelField="name" valueField="id" /&gt;
+  &lt;pdx-select labelField="name" valueField="id" /&gt;
+&lt;/pdx-data-source&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// Products for wrapping demo
+const products = [
+  { id: 1, name: 'Widget Pro', price: 29.99 },
+  { id: 2, name: 'Gadget Plus', price: 49.99 },
+  { id: 3, name: 'Thingamajig', price: 19.99 },
+  { id: 4, name: 'Doohickey XL', price: 79.99 },
+  { id: 5, name: 'Whatchamacallit', price: 9.99 },
+];
+</script>

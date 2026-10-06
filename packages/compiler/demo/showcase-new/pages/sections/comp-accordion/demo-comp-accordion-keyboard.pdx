@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Keyboard</h2>
+    <div class="shortcut-list">
+      <div><kbd>Enter</kbd> / <kbd>Space</kbd> Toggle focused section</div>
+      <div><kbd>↑</kbd> / <kbd>↓</kbd> Move focus between triggers</div>
+      <div><kbd>Home</kbd> / <kbd>End</kbd> First / last trigger</div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .shortcut-list { display: flex; flex-direction: column; gap: var(--pdx-space-xs); font-size: var(--pdx-text-sm); }
+  .shortcut-list kbd { font-family: var(--pdx-font-mono); font-size: var(--pdx-text-xs); padding: 2px 6px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm); }
+</style>

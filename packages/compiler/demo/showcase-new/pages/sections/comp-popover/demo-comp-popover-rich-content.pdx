@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Rich Content</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Popovers can contain forms, lists, or any interactive content.</p>
+    <div class="demo-row">
+      <pdx-button variant="primary" size="sm">Settings</pdx-button>
+      <pdx-popover placement="bottom-start">
+        <div class="pop-form">
+          <strong style="font-size:var(--pdx-text-sm)">Quick Settings</strong>
+          <label class="pop-label"><input type="checkbox" checked /> Notifications</label>
+          <label class="pop-label"><input type="checkbox" /> Dark mode</label>
+          <label class="pop-label"><input type="checkbox" checked /> Auto-save</label>
+        </div>
+      </pdx-popover>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .pop-form { display: flex; flex-direction: column; gap: var(--pdx-space-xs); min-width: 160px; }
+  .pop-label { display: flex; align-items: center; gap: var(--pdx-space-xs); font-size: var(--pdx-text-sm); cursor: pointer; }
+</style>

@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">CSS Only</h2>
+    <div class="demo-row">
+      <span class="pdx-chip">Default</span>
+      <span class="pdx-chip pdx-chip-primary">Primary</span>
+      <span class="pdx-chip pdx-chip-tonal-primary">Tonal</span>
+      <span class="pdx-chip selected">Selected</span>
+      <span class="pdx-chip">Tag <button class="pdx-chip-remove">&times;</button></span>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-md)">Chip group + input field:</p>
+    <div class="pdx-chip-field" style="max-width:400px">
+      <span class="pdx-chip">JavaScript <button class="pdx-chip-remove">&times;</button></span>
+      <span class="pdx-chip">TypeScript <button class="pdx-chip-remove">&times;</button></span>
+      <input class="pdx-chip-input" placeholder="Add skill..." />
+    </div>
+  </section>
+</template>

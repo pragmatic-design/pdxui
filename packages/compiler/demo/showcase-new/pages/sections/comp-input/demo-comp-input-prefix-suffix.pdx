@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Prefix & Suffix</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Text prefix/suffix via props. Icon prefix/suffix via named slots. Both render inside the border.</p>
+
+    <div class="demo-stack">
+      <pdx-input prefix="$" placeholder="0.00" inputmode="decimal"></pdx-input>
+      <pdx-input suffix="kg" placeholder="Weight" inputmode="decimal"></pdx-input>
+      <pdx-input prefix="https://" suffix=".com" placeholder="domain"></pdx-input>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-input prefix="$" placeholder="0.00" inputmode="decimal" /&gt;
+&lt;pdx-input suffix="kg" placeholder="Weight" /&gt;
+&lt;pdx-input prefix="https://" suffix=".com" placeholder="domain" /&gt;</code></pre>
+    </details>
+  </section>
+</template>

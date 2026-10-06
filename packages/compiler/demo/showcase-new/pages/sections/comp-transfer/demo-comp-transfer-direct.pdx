@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Direct Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click an item to move it immediately. No checkboxes, no buttons.</p>
+
+    <div class="demo-row">
+      <pdx-transfer
+        mode="direct"
+        :items="basicItems"
+        sourcetitle="Available"
+        targettitle="Selected"
+      ></pdx-transfer>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+</script>

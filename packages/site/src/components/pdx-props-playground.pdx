@@ -1,0 +1,224 @@
+<template>
+  <div class="pp">
+    <div class="pp-stage glass" :ref="stageRef"></div>
+
+    <div class="pp-controls-head">
+      <span class="pp-controls-title">Props</span>
+      @if (dirty) {
+        <button class="pp-reset" @click="reset">↺ Reset</button>
+      }
+    </div>
+    <div class="pp-controls">
+      @for (keyedControls as c; track c._k) {
+        <label class="pp-control">
+          <span class="pp-label" :title="c.description">{{ c.name }}</span>
+          <span class="pp-slot">
+            @if (c.kind === 'boolean') {
+              <pdx-switch :checked="ctlBool(c)" @pdx-change="apply($event, c)"></pdx-switch>
+            }
+            @if (c.kind === 'select') {
+              <pdx-select size="sm" placeholder="—" :label="c.name" :options="optionsFor(c)" :value="ctlVal(c)" @pdx-change="apply($event, c)"></pdx-select>
+            }
+            @if (c.kind === 'number') {
+              <pdx-number-input size="sm" :value="numVal(c)" @pdx-change="apply($event, c)"></pdx-number-input>
+            }
+            @if (c.kind === 'text') {
+              <pdx-input size="sm" :value="ctlVal(c)" placeholder="—" @pdx-input="apply($event, c)"></pdx-input>
+            }
+          </span>
+        </label>
+      }
+    </div>
+
+    <details class="pp-source" open>
+      <summary>Live source</summary>
+      <pdx-code :code="markup"></pdx-code>
+    </details>
+  </div>
+</template>
+
+<script setup>
+import { onMount, onDestroy, effect } from '@pdxui/core';
+import { getComponent } from '../lib/manifest';
+import { controlsFor } from '../lib/cem-controls';
+
+@prop tag: string = '';
+
+let stageRef = $signal(null);
+let markup = $signal('');
+let dirty = $signal(false);   // any control changed from its default?
+let ver = $signal(0);         // bump to remount the controls (reset → back to default values)
+
+const controls = $derived(controlsFor((getComponent(tag) || {}).attributes, tag));
+// Same controls, but keyed by `ver` so a reset (ver++) remounts them back to their default values.
+const keyedControls = $derived(controls.map(c => Object.assign({}, c, { _k: c.attr + '-' + ver })));
+const label = $derived(((tag || '').replace(/^pdx-/, '').replace(/-/g, ' ') || 'demo'));
+// Children are content only where the component renders a default slot. A badge renders its value
+// and drops them, and the source would read `<pdx-badge value="5">badge</pdx-badge>`.
+const hasContent = $derived(((getComponent(tag) || {}).slots || []).some(s => s.name === ''));
+
+// One live instance the controls mutate. Plain (non-signal) — it's imperative DOM, not state.
+let liveEl = null;
+let applied = {};       // prop name → applied value (drives both the live element and the source)
+let uiReady = $signal(false);
+
+onMount(() => { import('@pdxui/ui/all').then(() => { uiReady = true; }); });
+
+// Coerce a control's string value to the right runtime type for the PDX prop.
+function _coerce(c, v) { return c.kind === 'number' ? Number(v) : (c.kind === 'boolean' ? !!v : v); }
+
+// The effective value of a prop = the user's override if set, otherwise the component default.
+// '' / false / undefined mean "unset" → don't apply it, let the component use its own default.
+function _effective(c) {
+  if (Object.prototype.hasOwnProperty.call(applied, c.name)) return applied[c.name];
+  if (c.kind === 'boolean') return c.value === 'true';
+  return _seedable(c) ? c.value : undefined;
+}
+
+// Build a FRESH live instance with defaults + overrides applied. We recreate (not mutate) so that
+// components which read a prop once at setup — number-input `value`, otp `length` — still reflect a
+// change: they re-read everything on connect. Both attribute (read on upgrade) and property are set.
+function buildLive() {
+  if (!stageRef || !uiReady || !tag) return;
+  const _ct = tag.startsWith('pdx-') ? tag : 'pdx-' + tag;  // route gives the short name; CE needs the full tag
+  if (liveEl) liveEl.remove();
+  stageRef.innerHTML = '';
+  liveEl = document.createElement(_ct);
+  if (hasContent) liveEl.textContent = label;
+  controls.forEach(c => {
+    const v = _effective(c);
+    if (c.kind === 'boolean') { if (v) liveEl.setAttribute(c.attr, ''); }
+    else if (v !== undefined && v !== '' && v != null) liveEl.setAttribute(c.attr, String(v));
+  });
+  _extraSeeds().forEach(([k, v]) => liveEl.setAttribute(_attrName(k), v));
+  stageRef.appendChild(liveEl);
+  controls.forEach(c => {
+    const v = _effective(c);
+    if (c.kind === 'boolean') { if (v) { try { liveEl[c.name] = true; } catch (_e) { /* ro */ } } }
+    else if (v !== undefined && v !== '' && v != null) { try { liveEl[c.name] = _coerce(c, v); } catch (_e) { /* ro */ } }
+  });
+  _extraSeeds().forEach(([k, v]) => { liveEl[k] = _jsonOr(v); });
+  buildMarkup();
+}
+
+// Seeded props that have no control — an array or object prop, like pdx-segmented's `options`. A
+// seed that reaches the element only through the controls is dropped, and the playground shows an
+// empty radiogroup. They are not the reader's to change: no control, no reset.
+function _extraSeeds() {
+  const _named = controls.map(c => c.name);
+  return Object.entries(_seedFor(tag)).filter(([k]) => !_named.includes(k));
+}
+function _attrName(k) { return k.replace(/[A-Z]/g, m => '-' + m.toLowerCase()); }
+// A seed written as JSON (an array, an object) is set as its value; anything else as the string.
+function _isJson(v) { return v[0] === '[' || v[0] === '{'; }
+function _jsonOr(v) { return _isJson(v) ? JSON.parse(v) : v; }
+
+// Rebuild on tag/ready change. The /components/:tag route is reused, so re-running here swaps the
+// component. stageRef-first guard avoids the setup-reorder TDZ.
+effect(() => {
+  const _stage = stageRef;
+  if (!_stage) return;
+  const _ready = uiReady;
+  const _tag = tag;
+  if (!_ready || !_tag) return;
+  applied = _seedFor(_tag);   // start from the demo seed (visible state); source shows only deviations from defaults
+  // The controls render before this seed and never read it again: the badge's value field would sit
+  // empty beside a preview showing 5. Remount them, as a reset does.
+  // pdx-ignore PDX_EFFECT_STATE: a remount generation bumped because the seed was just applied, an event and not a value that follows from what the effect reads
+  ver++;
+  buildLive();
+});
+
+onDestroy(() => { if (liveEl) { liveEl.remove(); liveEl = null; } });
+
+// PDX controls emit pdx-change/pdx-input with detail = { value } or { checked }.
+// '' / null value = the user cleared it → record as an explicit unset (falls back to the default).
+function apply(e, c) {
+  const _d = (e && e.detail) || {};
+  if (c.kind === 'boolean') applied[c.name] = !!_d.checked;
+  else applied[c.name] = (_d.value === '' || _d.value == null) ? '' : String(_d.value);
+  dirty = true;
+  buildLive();
+}
+
+// Reset every control to the component defaults: clear overrides, remount the controls (ver bump
+// re-renders them to their default value), rebuild the live element.
+function reset() { applied = _seedFor(tag); dirty = false; ver = ver + 1; buildLive(); }
+
+// Some components render nothing as a bare default instance (a badge with no value, a 0% progress).
+// Seed a minimal, meaningful value so the demo is visible — reflected in the controls AND the source.
+const _SEEDS = {
+  'pdx-badge': { value: '5' },
+  'pdx-progress': { value: '60' },
+  'pdx-avatar': { alt: 'Ada Lovelace' },   // `alt`: the avatar has no `name` prop, and a `name` seed reaches nothing
+  'pdx-rating': { value: '3' },
+  'pdx-statistic': { value: '1284', label: 'Revenue' },
+  'pdx-bulk-actions': { count: '3' },   // hidden at 0, as it says it is
+  // `options` is an array: no control, so the seed is all it gets.
+  'pdx-segmented': { options: '["Day","Week","Month"]', value: 'Week', label: 'View' },
+};
+function _seedFor(t) { const _f = (t && !String(t).startsWith('pdx-')) ? 'pdx-' + t : t; return Object.assign({}, _SEEDS[_f] || {}); }
+// Effective control value (seed/override wins over the manifest default) — keeps controls in sync.
+function ctlVal(c) { return Object.prototype.hasOwnProperty.call(applied, c.name) ? applied[c.name] : c.value; }
+function ctlBool(c) { return Object.prototype.hasOwnProperty.call(applied, c.name) ? !!applied[c.name] : (c.value === 'true'); }
+
+// Build pdx-select options ([{label,value}]) from the control's string set, with an "unset" entry.
+function optionsFor(c) { return [{ label: '—', value: '' }].concat((c.options || []).map(o => ({ label: o, value: o }))); }
+// Show only a finite default in a number stepper — manifest min/max default to ±Infinity.
+function numVal(c) { const n = Number(ctlVal(c)); return Number.isFinite(n) ? n : 0; }
+function _seedable(c) { return c.kind === 'number' ? Number.isFinite(Number(c.value)) : (c.value && c.value !== ''); }
+
+// Build a clean source string from the APPLIED control values (not outerHTML — light-DOM components
+// render their internals inline, and properties don't always reflect to attributes).
+function buildMarkup() {
+  let attrs = '';
+  for (const c of controls) {
+    const v = applied[c.name];
+    if (v === undefined || v === false || v === '') continue;
+    attrs += c.kind === 'boolean' ? ' ' + c.attr : ' ' + c.attr + '="' + v + '"';
+  }
+  // JSON in single quotes, as an author writes it: its own double quotes stay readable.
+  for (const [k, v] of _extraSeeds()) attrs += _isJson(v) ? ' ' + _attrName(k) + "='" + v + "'" : ' ' + _attrName(k) + '="' + v + '"';
+  const _ct = tag.startsWith('pdx-') ? tag : 'pdx-' + tag;
+  markup = '<' + _ct + attrs + '>' + (hasContent ? label : '') + '</' + _ct + '>';
+}
+</script>
+
+<style scoped>
+.pp { border: 1px solid var(--outline); border-radius: 14px; overflow: hidden; }
+.pp-stage {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.75rem;
+  padding: 2.5rem 1.5rem; min-height: 90px;
+}
+.pp-controls-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 1.5rem; border-top: 1px solid var(--outline); background: color-mix(in srgb, var(--gold-display) 2%, transparent);
+}
+.pp-controls-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 700; }
+.pp-reset {
+  font-size: 0.74rem; color: var(--gold); background: transparent; border: 1px solid var(--outline);
+  border-radius: 7px; padding: 0.2rem 0.6rem; cursor: pointer; font-family: var(--font-heading);
+}
+.pp-reset:hover { border-color: var(--gold); }
+.pp-controls {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem 1.5rem;
+  padding: 1.25rem 1.5rem; background: color-mix(in srgb, var(--gold-display) 2%, transparent);
+}
+.pp-control { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.82rem; align-items: stretch; min-width: 0; }
+.pp-label { color: var(--ink-muted); font-family: var(--font-heading); font-weight: 500; }
+/* Control slot: uniform height + vertical centering, so a short switch and a taller
+   select/input line up on their centers across the row (instead of all top-aligned). */
+.pp-slot { display: flex; align-items: center; flex: 1; min-height: 2.75rem; min-width: 0; }
+/* The controls are real PDX components (dogfooding) — fill the slot, keep native display. */
+.pp-slot > pdx-select, .pp-slot > pdx-input, .pp-slot > pdx-number-input { flex: 1; min-width: 0; }
+/* Material gives the switch a taller host (touch target) but top-aligns its track;
+   center it so the toggle lines up with select/input centers. */
+.pp-slot > pdx-switch { display: inline-flex; align-items: center; }
+.pp-source { border-top: 1px solid var(--outline); }
+.pp-source > summary {
+  cursor: pointer; padding: 0.55rem 1rem; font-size: 0.8rem; color: var(--ink-muted);
+  font-family: var(--font-heading); list-style: none;
+}
+.pp-source > summary::-webkit-details-marker { display: none; }
+.pp-source pdx-code { display: block; padding: 0.5rem 1rem 1rem; }
+</style>

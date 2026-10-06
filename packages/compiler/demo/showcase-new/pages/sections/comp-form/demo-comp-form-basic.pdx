@@ -1,0 +1,79 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">1. Basic Form (Compiler Auto-Binding)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Just add <code>name="field"</code> to controls inside <code>&lt;pdx-form&gt;</code>.
+      The compiler generates value binding, onChange, and onBlur automatically.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="basicForm" @pdx-submit="saveBasic">
+        <pdx-form-field name="name" label="Full Name" required>
+          <pdx-input name="name" placeholder="John Doe"></pdx-input>
+        </pdx-form-field>
+
+        <pdx-form-field name="email" label="Email" required>
+          <pdx-input name="email" type="email" placeholder="john@example.com"></pdx-input>
+        </pdx-form-field>
+
+        <pdx-form-field name="bio" label="Bio">
+          <pdx-textarea name="bio" placeholder="Tell us about yourself..." rows="3"></pdx-textarea>
+        </pdx-form-field>
+
+        <pdx-form-field name="notifications" label="">
+          <pdx-switch name="notifications" label="Email notifications"></pdx-switch>
+        </pdx-form-field>
+
+        <pdx-form-actions submitLabel="Save Profile" resetLabel="Reset"></pdx-form-actions>
+      </pdx-form>
+
+      <div class="form-status">
+        <span :class="basicDirtyClass()" :textContent="basicDirtyText()"></span>
+        <span :class="basicValidClass()" :textContent="basicValidText()"></span>
+        <span class="form-status-badge" :textContent="basicStateText()"></span>
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>@form basicForm: {
+  name: string { required },
+  email: string { required, email },
+  bio?: string,
+  notifications: boolean
+}
+
+// Validates, moves `state` through submitting → success, and rebases the form.
+const saveBasic = basicForm.handleSubmit(async (values) =&gt; { await api.saveProfile(values); });
+
+&lt;pdx-form :form="basicForm" @pdx-submit="saveBasic"&gt;
+  &lt;pdx-form-field name="name" label="Full Name" required&gt;
+    &lt;pdx-input name="name"&gt;&lt;/pdx-input&gt;
+  &lt;/pdx-form-field&gt;
+  &lt;!-- compiler generates :value, @pdx-change, @pdx-blur --&gt;
+&lt;/pdx-form&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// Helper functions for template — :textContent="${fn}" binds reactively via the template engine.
+// Each helper includes the label text so the binding is a simple function reference (no arrow wrapper).
+function basicDirtyText() { return 'Dirty: ' + (basicForm.dirty() ? 'Yes' : 'No'); }
+
+function basicValidText() { return 'Valid: ' + (basicForm.valid() ? 'Yes' : 'No'); }
+function basicStateText() { return 'State: ' + basicForm.state(); }
+function basicDirtyClass() { return 'form-status-badge' + (basicForm.dirty() ? ' active' : ''); }
+function basicValidClass() { return 'form-status-badge' + (basicForm.valid() ? ' success' : ' error'); }
+
+// ─── 1. Basic Form (via @form rune) ───
+@form basicForm: {
+  name: string { required },
+  email: string { required, email },
+  bio?: string,
+  notifications: boolean
+}
+
+// Submit through the form: validates, and the State badge above shows submitting → success.
+// The save is simulated — a real app awaits its API here.
+const saveBasic = basicForm.handleSubmit(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+});
+</script>

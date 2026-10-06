@@ -1,0 +1,9 @@
+/**
+ * Custom themes — authored in the PDX Builder and saved from its UI.
+ *
+ * This aggregator is the ONE integration point: `pragmatic-design.css` imports it once, and
+ * saving a theme only ever appends a line below and writes a sibling file. Nothing in the
+ * shipped theme list is touched, so a save can never break the design package.
+ *
+ * The files here are ordinary CSS and meant to be committed — a saved theme is a real theme.
+ */

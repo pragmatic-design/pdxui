@@ -1,0 +1,29 @@
+<template>
+  <div class="demo">
+    <h2>Positioning Engine</h2>
+    <p class="desc">Middleware chain: offset, flip, shift, arrow, size. Pure math. autoUpdate on scroll/resize.</p>
+
+    <!-- Placement picker -->
+    <pdx-demo-infra-positioning-placement class="demo-section"></pdx-demo-infra-positioning-placement>
+
+    <!-- Iframe positioning -->
+    <pdx-demo-infra-positioning-iframe class="demo-section"></pdx-demo-infra-positioning-iframe>
+
+    <!-- Virtual element -->
+    <pdx-demo-infra-positioning-virtual class="demo-section"></pdx-demo-infra-positioning-virtual>
+  </div>
+</template>
+
+<script setup>
+@page '/infra/positioning';
+@title 'Positioning Engine';
+</script>
+
+<style scoped>
+  .demo { display: flex; flex-direction: column; gap: 24px; }
+  h2 { font-size: 1.5rem; font-weight: 700; }
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.875rem; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; margin-top: 8px; }
+</style>

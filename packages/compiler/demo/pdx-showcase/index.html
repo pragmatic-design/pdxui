@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Component Showcase</title>
+</head>
+<body>
+    <pdx-app-shell></pdx-app-shell>
+
+    <script type="module">
+        // CSS via JS import (Vite processes @import + @layer)
+        import '../../../design/src/pragmatic-design.css';
+
+        // Register all UI components
+        import '@pdxui/ui';
+
+        // Store
+        import './theme-store.pdx';
+
+        // Pages
+        import './pages/page-button.pdx';
+        import './pages/page-badge.pdx';
+        import './pages/page-input.pdx';
+        import './pages/page-dialog.pdx';
+
+        // App shell (last — depends on pages being registered)
+        import './app-shell.pdx';
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Reduced cell padding with <code>.pdx-table-compact</code>. Combine with other variants.</p>
+
+    <div class="table-wrap">
+      <table class="pdx-table pdx-table-compact pdx-table-striped pdx-table-hover">
+        <thead>
+          <tr><th>Key</th><th>Value</th><th>Type</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>APP_ENV</td><td>production</td><td>string</td></tr>
+          <tr><td>PORT</td><td>8080</td><td>number</td></tr>
+          <tr><td>DEBUG</td><td>false</td><td>boolean</td></tr>
+          <tr><td>MAX_CONN</td><td>100</td><td>number</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;table class="pdx-table pdx-table-compact pdx-table-striped pdx-table-hover"&gt;
+  ...
+&lt;/table&gt;</code></pre>
+    </details>
+  </section>
+</template>

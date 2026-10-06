@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behavior Harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: var(--pdx-color-bg, #fff); color: var(--pdx-color-text, #111); padding: 40px; font-family: var(--pdx-font-sans, system-ui); }
+        /* a roomy host so layout-sensitive components have space to render */
+        #root { display: inline-block; min-width: 220px; }
+    </style>
+    <script type="module">
+        // Generic harness for the component coherence audit: renders ONE component from ?tag, seeds
+        // initial attributes from ?a:<name>=<value>, applies ?theme/?scheme. Playwright then drives
+        // props (window.__el) and measures. Registers the one tag it renders (not the barrel).
+        import '@pdxui/design';
+        import { loadTags } from './generated/component-loaders.js';
+
+        const p = new URLSearchParams(location.search);
+        const theme = p.get('theme'); const scheme = p.get('scheme');
+        if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+        if (scheme) document.documentElement.setAttribute('pdx-scheme', scheme);
+
+        const tag = p.get('tag');
+        if (tag) {
+            await loadTags([tag]);
+            const el = document.createElement(tag);
+            el.setAttribute('data-test', 'subject');
+            for (const [k, v] of p) { if (k.startsWith('a:')) el.setAttribute(k.slice(2), v); }
+            const text = p.get('text'); if (text) el.textContent = text;
+            document.getElementById('root').appendChild(el);
+            window.__el = el;
+            // Imperative prop setter (typed) for reactivity tests.
+            window.__setProp = (name, value) => { try { el[name] = value; } catch (_e) { el.setAttribute(name, String(value)); } };
+            // Signal ready after the element has had two frames to upgrade + render.
+            requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.setAttribute('data-pdx-ready', '1')));
+        } else {
+            document.documentElement.setAttribute('data-pdx-ready', '1');
+        }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>

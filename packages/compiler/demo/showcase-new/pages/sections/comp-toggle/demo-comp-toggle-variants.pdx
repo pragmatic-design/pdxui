@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <div class="demo-stack">
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Outline:</span>
+        <pdx-toggle-group type="single" value="a" variant="outline">
+          <pdx-toggle value="a">A</pdx-toggle><pdx-toggle value="b">B</pdx-toggle><pdx-toggle value="c">C</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Ghost:</span>
+        <pdx-toggle-group type="single" value="a" variant="ghost">
+          <pdx-toggle value="a">A</pdx-toggle><pdx-toggle value="b">B</pdx-toggle><pdx-toggle value="c">C</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Solid:</span>
+        <pdx-toggle-group type="single" value="a" variant="solid">
+          <pdx-toggle value="a">A</pdx-toggle><pdx-toggle value="b">B</pdx-toggle><pdx-toggle value="c">C</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-stack > div { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+</style>

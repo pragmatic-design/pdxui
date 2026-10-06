@@ -1,0 +1,234 @@
+<template>
+  <section class="page" data-test="employee">
+    <pdx-breadcrumb data-test="crumbs"></pdx-breadcrumb>
+
+    <!-- The record's HEAD, as the reference draws it: who, whether they are still
+         employed, a pager through the list the reader came from, and the record's actions. No
+         Delete: an employee is ended, not deleted. -->
+    <header class="record-head" data-test="record-head">
+      <div class="record-who">
+        <h1 class="pdx-txt-title">{{ fullName }}</h1>
+        <p class="pdx-txt-small record-status" :data-active="status.active ? 'true' : 'false'" data-test="record-status">{{ statusText }}</p>
+      </div>
+      <div class="record-tools">
+        <div class="record-pager" :show="position >= 0" data-test="record-pager">
+          <button class="pager-btn" type="button" :aria-label="$t('employees.record.previous')" :disabled="position <= 0" @click="step(-1)">‹</button>
+          <span class="pdx-txt-small pager-position">{{ $t('employees.record.position', { n: position + 1, total: order.length }) }}</span>
+          <button class="pager-btn" type="button" :aria-label="$t('employees.record.next')" :disabled="position < 0 || position >= order.length - 1" @click="step(1)">›</button>
+        </div>
+        <!-- Outlined, each with its icon: as ghost buttons they read as text beside the
+             title, not as actions. -->
+        <pdx-button size="sm" variant="outline" :disabled="!hasOpenContract" @click="askEnd" data-test="end-employment"><pdx-icon name="user-minus" aria-hidden="true"></pdx-icon>{{ $t('employees.record.endEmployment') }}</pdx-button>
+        <pdx-button size="sm" variant="outline" @click="printRecord" data-test="print"><pdx-icon name="printer" aria-hidden="true"></pdx-icon>{{ $t('employees.record.print') }}</pdx-button>
+      </div>
+    </header>
+
+    <!-- The reference's detail: identity at the top of a menu on the LEFT, the section
+         beside it, no right-hand panel. The sections are ROUTES, so a section is a URL that can be
+         shared, reloaded and gone back to — and so leaving one with unsaved edits is a navigation
+         the section's own `onBeforeLeave` can ask about. The menu is part of the page, not a card
+         set inside it, and it stays in view while the section scrolls. -->
+    <div class="detail-grid">
+      <nav class="detail-menu" :aria-label="$t('employees.sections')" data-test="detail-menu">
+        <div class="identity" data-test="identity">
+          <span class="portrait" aria-hidden="true">{{ monogram }}</span>
+          <p class="pdx-txt-heading identity-name" data-test="identity-name">{{ fullName }}</p>
+          <p class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ record?.reference ?? '' }}</p>
+        </div>
+
+        <!-- Groups over a rule, and 48px entries: the reference's `--pdx-section-height`, which
+             the shell states. A section carries its COUNT, and a dot when something in it needs a
+             look — a contract ending within 30 days, a document past its expiry. -->
+        <p class="menu-group pdx-txt-small pdx-ink-muted">{{ $t('employees.groups.person') }}</p>
+        <pdx-link
+          class="menu-row"
+          :to="base + '/personal'"
+          active-class="here"
+          data-test="section-personal">{{ $t('employees.sectionNames.personal') }}</pdx-link>
+        <pdx-link
+          class="menu-row"
+          :to="base + '/contracts'"
+          active-class="here"
+          data-test="section-contracts"><span class="row-label">{{ $t('employees.sectionNames.contracts') }}</span>@if (contractCount > 0) {<span class="pdx-badge row-count" :data-attention="contractsAttention ? 'true' : null" :title="contractsAttention ? $t('employees.record.attention') : null" data-test="count-contracts">{{ contractCount }}</span>}</pdx-link>
+        <pdx-link
+          class="menu-row"
+          :to="base + '/sites'"
+          active-class="here"
+          data-test="section-sites"><span class="row-label">{{ $t('employees.sectionNames.sites') }}</span>@if (siteCount > 0) {<span class="pdx-badge row-count" data-test="count-sites">{{ siteCount }}</span>}</pdx-link>
+        <pdx-link
+          class="menu-row"
+          :to="base + '/documents'"
+          active-class="here"
+          data-test="section-documents"><span class="row-label">{{ $t('employees.sectionNames.documents') }}</span>@if (documentCount > 0) {<span class="pdx-badge row-count" :data-attention="documentsAttention ? 'true' : null" :title="documentsAttention ? $t('employees.record.attention') : null" data-test="count-documents">{{ documentCount }}</span>}</pdx-link>
+      </nav>
+
+      <div class="detail-body" data-test="detail-body">
+        <pdx-router-outlet></pdx-router-outlet>
+      </div>
+    </div>
+
+    <!-- «End employment»: the open contract closes on the day given, and the record stays. -->
+    <pdx-alert-dialog
+      :open="ending"
+      :title="$t('employees.record.endTitle')"
+      :message="$t('employees.record.endBody')"
+      :confirm-label="$t('employees.record.endEmployment')"
+      :cancel-label="$t('employees.record.endCancel')"
+      @pdx-confirm="confirmEnd"
+      @pdx-cancel="ending = false"
+      data-test="end-employment-dialog">
+      <pdx-form-field :label="$t('employees.record.endDate')">
+        <pdx-date-picker editable :value="endDate" @pdx-change="e => endDate = e.detail.value" data-test="end-employment-date"></pdx-date-picker>
+      </pdx-form-field>
+    </pdx-alert-dialog>
+  </section>
+</template>
+
+<script setup>
+@page '/employees/:id' { label: employeeLabel };
+// No `@title` here: this page is the frame around a SECTION, and the section names the tab. A
+// dynamic title on the frame re-runs when the record arrives and writes over the section's.
+
+import { navigate, currentPath } from '@pdxui/router';
+import { employeeById, employeeTransport, employeeWalk, employmentStatus, contractEndingSoon } from '../data/employees';
+import { createEmployeeDocuments } from '../data/employee-documents';
+
+// The param arrives as a PROP, as on the ticket's and the customer's detail.
+@prop id: string = '';
+
+/** Reactive: an edit saved in a section reaches the name up here without a reload. */
+const record = $derived(employeeById(Number(id)));
+const fullName = $derived(record ? `${record.firstName} ${record.lastName}` : $t('employees.unknown'));
+/** A person's face is not something this app has; the initials of their name are. */
+const monogram = $derived(record ? `${record.firstName[0] ?? ''}${record.lastName[0] ?? ''}` : '?');
+const base = $derived('/employees/' + id);
+
+/** The trail names the person, as the ticket's names the ticket. */
+function employeeLabel(params) {
+  const e = employeeById(Number(params.id));
+  return e ? `${e.firstName} ${e.lastName}` : $t('employees.unknown');
+}
+
+// ── Whether they are still employed ────────────────────────────────────────────────────────
+const status = $derived(record ? employmentStatus(record) : { active: false, since: '' });
+const statusText = $derived(status.active
+  ? $t('employees.record.active')
+  : status.since
+    ? $t('employees.record.notActiveSince', { date: $d(status.since, { dateStyle: 'medium' }) })
+    : $t('employees.record.notActive'));
+const hasOpenContract = $derived(!!record && record.contracts.some(c => c.end === ''));
+
+// ── The pager ──────────────────────────────────────────────────────────────────────────────
+// The list's order as the reader left it: its sort and filter, asked of the server again.
+let order = $signal([]);
+onMount(() => { void employeeWalk().then(ids => { order = ids; }); });
+const position = $derived(order.indexOf(Number(id)));
+
+/** The next or the previous record, in the section the reader is in. */
+function step(delta) {
+  const next = order[position + delta];
+  if (next === undefined) return;
+  const section = String(currentPath()).split('/')[3] ?? 'personal';
+  navigate(`/employees/${next}/${section}`);
+}
+
+// ── The counts on the sections ─────────────────────────────────────────────────────────────
+const contractCount = $derived(record?.contracts.length ?? 0);
+const siteCount = $derived(record?.assignments.length ?? 0);
+const contractsAttention = $derived(!!record && contractEndingSoon(record));
+
+// The documents are loaded HERE, once, and handed to the documents section, which asks for them
+// again after a change — so the count on the menu is the section's list (CD-D1).
+const employeeDocs = createEmployeeDocuments(() => id);
+@provide employeeDocuments = employeeDocs;
+// An effect: `id` is read inside it, so the list follows the route.
+$effect(() => { void employeeDocs.reload(); });
+const documentCount = $derived(employeeDocs.documents().length);
+const documentsAttention = $derived(employeeDocs.documents().some(d => d.expires !== '' && d.expires < new Date().toISOString().slice(0, 10)));
+
+// ── End employment ─────────────────────────────────────────────────────────────────────────
+let ending = $signal(false);
+let endDate = $signal('');
+
+function askEnd() {
+  endDate = new Date().toISOString().slice(0, 10);
+  ending = true;
+}
+
+async function confirmEnd() {
+  if (!record || !endDate) return;
+  const contracts = record.contracts.map(c => (c.end === '' ? { ...c, end: endDate } : c));
+  ending = false;
+  await employeeTransport.update({ ...record, contracts });
+}
+
+// ── Print ──────────────────────────────────────────────────────────────────────────────────
+// The shell hides itself in print (`shell.pdx`): what is printed is the record.
+function printRecord() {
+  window.print();
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+
+  .record-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--pdx-space-md); flex-wrap: wrap; }
+  .record-who h1 { margin: 0; }
+  .record-status { margin: var(--pdx-space-2xs) 0 0; color: var(--pdx-color-success-ink); }
+  .record-status[data-active="false"] { color: var(--pdx-color-danger-ink); }
+  .record-tools { display: flex; align-items: center; gap: var(--pdx-space-xs); flex-wrap: wrap; }
+  /* Room around «1 / 12», and a width that does not change with the digits: the arrows stay where
+     the thumb is from «9 / 12» to «10 / 12». */
+  .record-pager { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+  .pager-position { min-width: 7ch; text-align: center; font-variant-numeric: tabular-nums; }
+  .pager-btn {
+    width: 32px; height: 32px; border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface); color: var(--pdx-color-text); cursor: pointer; font-size: 18px; line-height: 1;
+  }
+  .pager-btn:disabled { opacity: .4; cursor: default; }
+
+  .detail-grid { display: flex; gap: var(--pdx-gutter); align-items: flex-start; }
+  /* Part of the page: no card, no shadow, one rule beside it, and in view while the
+     section scrolls — as the rail is. */
+  .detail-menu {
+    flex: 0 0 260px; width: 260px; display: flex; flex-direction: column; align-items: stretch;
+    position: sticky; top: var(--pdx-space-md);
+    padding-right: var(--pdx-space-sm);
+    border-right: 1px solid var(--pdx-color-border);
+  }
+  .detail-body { flex: 1; min-width: 0; }
+
+  .identity { text-align: center; padding: var(--pdx-space-md) 0; border-bottom: 1px solid var(--pdx-color-border); }
+  .portrait {
+    width: 100px; height: 100px; margin: 0 auto var(--pdx-space-sm);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--pdx-color-accent-soft); color: var(--pdx-color-accent-ink);
+    font-size: 28px; font-weight: 700; letter-spacing: .04em;
+  }
+  .identity-name { margin: 0; }
+
+  .menu-group { margin: var(--pdx-space-md) 0 var(--pdx-space-2xs); padding: 0 var(--pdx-space-sm); text-transform: uppercase; letter-spacing: .06em; }
+  /* `pdx-link` is `display: contents`: the row is its anchor. */
+  .menu-row a {
+    display: flex; align-items: center; gap: var(--pdx-space-xs);
+    height: var(--pdx-section-height);
+    padding: 0 var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-muted); text-decoration: none;
+  }
+  .menu-row a:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+  .menu-row.here a { background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink); font-weight: 600; }
+  .row-label { flex: 1; min-width: 0; }
+  .row-count { position: relative; }
+  /* The dot the reference puts on a count that needs a look. */
+  .row-count[data-attention="true"]::after {
+    content: ''; position: absolute; top: -3px; right: -3px;
+    width: 8px; height: 8px; border-radius: 50%; background: var(--pdx-color-danger);
+  }
+
+  /* One column on a phone: the menu above, the section below. */
+  @media (max-width: 767px) {
+    .detail-grid { flex-direction: column; }
+    .detail-menu { width: 100%; flex-basis: auto; position: static; border-right: 0; padding-right: 0; }
+  }
+</style>

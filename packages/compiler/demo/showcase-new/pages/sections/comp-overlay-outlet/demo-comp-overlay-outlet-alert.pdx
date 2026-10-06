@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Alert and message dialog</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>dialog.alert()</code> has one OK button; <code>dialog.open()</code> a close button and a <code>size</code>.
+      Both resolve when closed.
+    </p>
+    <div class="demo-row">
+      <pdx-button @click="showAlert">Show alert</pdx-button>
+      <pdx-button @click="showMessage">Open message dialog</pdx-button>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>await dialog.alert({ title: 'Export ready', message: 'report-2026-09.csv has been downloaded.' });
+await dialog.open({ title: 'What is new in 2.4', message: '…', size: 'md' });</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+
+function showAlert() {
+  dialog.alert({ title: 'Export ready', message: 'report-2026-09.csv has been downloaded.' });
+}
+
+function showMessage() {
+  dialog.open({ title: 'What is new in 2.4', message: 'Saved layouts, CSV export and a faster data grid.', size: 'md' });
+}
+</script>

@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Danger &amp; Disabled Items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Destructive actions in red. Disabled items are skipped by the arrow keys.</p>
+
+    <div class="demo-row">
+      <div class="menu-demo">
+        <button class="pdx-outline" size="sm" :aria-expanded="shown === 'more' ? 'true' : 'false'" @click="show('more')">More</button>
+        <pdx-menu :open="shown === 'more'" :items="dangerItems" @pdx-select="onSelect" @pdx-close="hide"></pdx-menu>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// { key: 'delete', label: 'Delete', danger: true }
+// { key: 'unavail', label: 'Not available', disabled: true }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useMenuDemo } from './state.pdx';
+
+// One menu open at a time across the sections (state.pdx.ts).
+const menuDemo = useMenuDemo();
+const shown = $derived(menuDemo.shown());
+function show(key) { menuDemo.show(key); }
+function hide(e) { menuDemo.hide(e); }
+function onSelect(e) { menuDemo.onSelect(e); }
+
+const dangerItems = [
+  { key: 'duplicate', label: 'Duplicate' },
+  { key: 'archive', label: 'Archive' },
+  { key: 'unavail', label: 'Not available', disabled: true },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'delete', label: 'Delete', danger: true },
+];
+</script>

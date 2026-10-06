@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Validation States</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Error, success, warning — colored border + focus ring. Disabled and readonly.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Error state" required></pdx-label>
+        <pdx-input error placeholder="Invalid input" value="bad@"></pdx-input>
+        <span class="pdx-field-error">Please enter a valid email address</span>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Success state"></pdx-label>
+        <pdx-input success value="john@example.com"></pdx-input>
+        <span class="pdx-field-success">Email is available</span>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Warning state"></pdx-label>
+        <pdx-input warning value="admin"></pdx-input>
+        <span class="pdx-field-hint" style="color:var(--pdx-color-warning)">This username is commonly used</span>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Disabled" disabled></pdx-label>
+        <pdx-input disabled value="Can't edit this"></pdx-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Readonly"></pdx-label>
+        <pdx-input readonly value="Read-only value — selectable but not editable"></pdx-input>
+      </div>
+    </div>
+  </section>
+</template>

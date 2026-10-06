@@ -1,0 +1,60 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Overlay Outlet</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-overlay-outlet&gt;</code> — where the dialogs you open from code appear.
+      <code>dialog.confirm()</code>, <code>dialog.alert()</code> and <code>dialog.open()</code> (from
+      <code>@pdxui/ui/dialog</code>) push to one queue for the page; the outlet draws it, stacking each dialog
+      above the last, trapping focus inside and closing the top one on Escape.
+    </p>
+
+    <!-- ═══ Why ═══ -->
+    <pdx-demo-comp-overlay-outlet-why class="demo-section"></pdx-demo-comp-overlay-outlet-why>
+
+    <!-- ═══ Confirm ═══ -->
+    <pdx-demo-comp-overlay-outlet-confirm class="demo-section"></pdx-demo-comp-overlay-outlet-confirm>
+
+    <!-- ═══ Alert and message dialog ═══ -->
+    <pdx-demo-comp-overlay-outlet-alert class="demo-section"></pdx-demo-comp-overlay-outlet-alert>
+
+    <!-- ═══ Stacking ═══ -->
+    <pdx-demo-comp-overlay-outlet-stacking class="demo-section"></pdx-demo-comp-overlay-outlet-stacking>
+
+    <!-- ═══ Keyboard ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Action</span></div>
+        <div class="opt-row"><code>Tab / Shift+Tab</code><span>Move between the dialog's controls; focus stays inside it</span></div>
+        <div class="opt-row"><code>Escape</code><span>Close the top dialog (a confirm answers <code>false</code>)</span></div>
+        <div class="opt-row"><code>Enter / Space</code><span>Activate the focused button</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Call</span><span>Resolves</span><span>Options</span></div>
+        <div class="opt-row"><code>dialog.confirm()</code><span>boolean</span><span>title, message, confirmLabel, cancelLabel, variant (default, danger), confirmText, confirmDelay</span></div>
+        <div class="opt-row"><code>dialog.alert()</code><span>void</span><span>title, message</span></div>
+        <div class="opt-row"><code>dialog.open()</code><span>void</span><span>title, message, size (sm, md, lg, xl)</span></div>
+        <div class="opt-row"><code>dialog.closeAll()</code><span>—</span><span>Closes every dialog in the queue</span></div>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted note">The outlet itself has no props: it draws the page's queue.</p>
+    </section>
+
+    <!-- This page's outlet. In an app it lives in the shell, once. -->
+    <pdx-overlay-outlet></pdx-overlay-outlet>
+  </div>
+</template>
+
+<script setup>
+@page '/components/overlay-outlet';
+@title 'Overlay Outlet Component';
+</script>
+
+<style scoped>
+  .page { }
+  .note { margin-top: var(--pdx-space-md); }
+</style>

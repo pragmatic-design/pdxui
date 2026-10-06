@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Outline Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default style — colored border + text, transparent background.</p>
+
+    <div class="demo-row">
+      <pdx-chip>Default</pdx-chip>
+      <pdx-chip variant="primary">Primary</pdx-chip>
+      <pdx-chip variant="success">Success</pdx-chip>
+      <pdx-chip variant="danger">Danger</pdx-chip>
+      <pdx-chip variant="warning">Warning</pdx-chip>
+      <pdx-chip variant="info">Info</pdx-chip>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-md)">Selected state (filled):</p>
+    <div class="demo-row">
+      <pdx-chip selected>Default</pdx-chip>
+      <pdx-chip variant="primary" selected>Primary</pdx-chip>
+      <pdx-chip variant="success" selected>Success</pdx-chip>
+      <pdx-chip variant="danger" selected>Danger</pdx-chip>
+      <pdx-chip variant="warning" selected>Warning</pdx-chip>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chip variant="primary"&gt;Primary&lt;/pdx-chip&gt;
+&lt;pdx-chip variant="success" selected&gt;Selected&lt;/pdx-chip&gt;</code></pre>
+    </details>
+  </section>
+</template>

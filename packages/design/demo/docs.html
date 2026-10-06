@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pragmatic Design CSS — Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/pragmatic-design.css">
+    <style>
+        /* Sidebar */
+        .doc-sidebar {
+            background: var(--pdx-color-surface);
+            border-right: 1px solid var(--pdx-color-border);
+            min-height: 100dvh;
+        }
+        .doc-nav-link {
+            display: block;
+            padding: var(--pdx-space-xs) var(--pdx-space-sm);
+            border-radius: var(--pdx-radius-sm);
+            color: var(--pdx-color-muted);
+            font-size: var(--pdx-text-sm);
+            text-decoration: none;
+            transition: all 150ms;
+        }
+        .doc-nav-link:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+        .doc-nav-section { font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-semibold); color: var(--pdx-color-subtle); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--pdx-space-sm) var(--pdx-space-sm) var(--pdx-space-2xs); }
+
+        /* Example block: live preview + source code */
+        .doc-example {
+            border: 1px solid var(--pdx-color-border);
+            border-radius: var(--pdx-radius-lg);
+            overflow: hidden;
+        }
+        .doc-preview {
+            padding: var(--pdx-space-lg);
+            background: var(--pdx-color-bg);
+        }
+        .doc-source {
+            padding: var(--pdx-space-md);
+            background: var(--pdx-color-inset);
+            border-top: 1px solid var(--pdx-color-border);
+            font-family: var(--pdx-font-mono);
+            font-size: var(--pdx-text-xs);
+            color: var(--pdx-color-muted);
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.6;
+        }
+
+        /* Theme bar */
+        .doc-theme-bar {
+            background: var(--pdx-color-surface);
+            border-bottom: 1px solid var(--pdx-color-border);
+            position: sticky;
+            top: 0;
+            z-index: var(--pdx-z-sticky);
+        }
+    </style>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+
+        <!-- Sidebar -->
+        <nav class="doc-sidebar" pdx-sticky>
+            <pdx-stack pad="md" gap="xs">
+                <pdx-row gap="xs" items="center" wrap="no">
+                    <span class="pdx-txt-title">PDX</span>
+                    <span class="pdx-badge pdx-badge-secondary">v0.1</span>
+                </pdx-row>
+                <hr>
+                <span class="doc-nav-section">Foundation</span>
+                <a class="doc-nav-link" href="#layout">Layout</a>
+                <a class="doc-nav-link" href="#surfaces">Surfaces</a>
+                <a class="doc-nav-link" href="#typography">Typography</a>
+                <hr>
+                <span class="doc-nav-section">Components</span>
+                <a class="doc-nav-link" href="#buttons">Buttons</a>
+                <a class="doc-nav-link" href="#forms">Form Controls</a>
+                <a class="doc-nav-link" href="#feedback">Feedback</a>
+                <a class="doc-nav-link" href="#media">Media</a>
+                <a class="doc-nav-link" href="#data">Data Display</a>
+                <hr>
+                <span class="doc-nav-section">Utilities</span>
+                <a class="doc-nav-link" href="#utilities">Helpers</a>
+            </pdx-stack>
+        </nav>
+
+        <!-- Main -->
+        <main>
+            <!-- Sticky theme bar -->
+            <div class="doc-theme-bar">
+                <pdx-row gap="sm" items="center" pad="sm" wrap="no">
+                    <span class="pdx-txt-small pdx-ink-muted" grow>Pragmatic Design CSS — Live Docs</span>
+                    <pdx-row gap="2xs" wrap="no">
+                        <button class="pdx-ghost" size="sm" onclick="setScheme('light')">Light</button>
+                        <button class="pdx-ghost" size="sm" onclick="setScheme('dark')">Dark</button>
+                    </pdx-row>
+                    <span class="pdx-divider-vertical" style="height:1.5rem"></span>
+                    <pdx-row gap="2xs" wrap="no">
+                        <button class="pdx-ghost" size="sm" onclick="setTheme('default')">Default</button>
+                        <button class="pdx-ghost" size="sm" onclick="setTheme('pragmatic')">Pragmatic</button>
+                        <button class="pdx-ghost" size="sm" onclick="setTheme('corporate')">Corporate</button>
+                        <button class="pdx-ghost" size="sm" onclick="setTheme('playful')">Playful</button>
+                    </pdx-row>
+                </pdx-row>
+            </div>
+
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <!-- Hero -->
+                    <pdx-stack gap="sm">
+                        <h1 class="pdx-txt-display">Pragmatic Design CSS</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Context-driven CSS framework. Agent-first, human-friendly. Every example below is live.</p>
+                    </pdx-stack>
+
+                    <!-- ==================== LAYOUT ==================== -->
+                    <section id="layout">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Layout</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">6 custom element tags for structure. CSS-only, no JavaScript.</p>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Stack</h3>
+                                <p class="pdx-txt-small pdx-ink-muted">Vertical flow. Children stack top to bottom.</p>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-stack gap="sm">
+                                            <div class="pdx-surface-inset" style="padding:var(--pdx-space-xs)">Item 1</div>
+                                            <div class="pdx-surface-inset" style="padding:var(--pdx-space-xs)">Item 2</div>
+                                            <div class="pdx-surface-inset" style="padding:var(--pdx-space-xs)">Item 3</div>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="doc-source">&lt;pdx-stack gap="sm"&gt;
+  &lt;div&gt;Item 1&lt;/div&gt;
+  &lt;div&gt;Item 2&lt;/div&gt;
+  &lt;div&gt;Item 3&lt;/div&gt;
+&lt;/pdx-stack&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Row</h3>
+                                <p class="pdx-txt-small pdx-ink-muted">Horizontal flow. Wraps by default, nowrap in header/nav.</p>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="sm" items="center" justify="between">
+                                            <span>Left</span>
+                                            <button class="pdx-primary" size="sm">Action</button>
+                                            <span>Right</span>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;pdx-row gap="sm" items="center" justify="between"&gt;
+  &lt;span&gt;Left&lt;/span&gt;
+  &lt;button class="pdx-primary"&gt;Action&lt;/button&gt;
+  &lt;span&gt;Right&lt;/span&gt;
+&lt;/pdx-row&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Grid</h3>
+                                <p class="pdx-txt-small pdx-ink-muted">CSS Grid. Auto-collapses on narrow containers via Container Queries.</p>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-grid cols="3" gap="sm">
+                                            <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">1</div>
+                                            <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">2</div>
+                                            <div class="pdx-surface-inset" style="padding:var(--pdx-space-sm)">3</div>
+                                        </pdx-grid>
+                                    </div>
+                                    <div class="doc-source">&lt;pdx-grid cols="3" gap="sm"&gt;
+  &lt;div&gt;1&lt;/div&gt;
+  &lt;div&gt;2&lt;/div&gt;
+  &lt;div&gt;3&lt;/div&gt;
+&lt;/pdx-grid&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== SURFACES ==================== -->
+                    <section id="surfaces">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Surfaces</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">Visual containers. Auto dark mode via light-dark().</p>
+                            </pdx-stack>
+
+                            <div class="doc-example">
+                                <div class="doc-preview">
+                                    <pdx-grid cols="2" gap="md">
+                                        <div class="pdx-surface-card"><strong>Card</strong> — border, shadow, radius</div>
+                                        <div class="pdx-surface-inset" style="padding:var(--pdx-space-lg)"><strong>Inset</strong> — recessed area</div>
+                                        <div class="pdx-surface-overlay"><strong>Overlay</strong> — modal, popover</div>
+                                        <div class="pdx-surface-glass" style="padding:var(--pdx-space-lg)"><strong>Glass</strong> — backdrop blur</div>
+                                    </pdx-grid>
+                                </div>
+                                <div class="doc-source">&lt;div class="pdx-surface-card"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-inset"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-overlay"&gt;...&lt;/div&gt;
+&lt;div class="pdx-surface-glass"&gt;...&lt;/div&gt;</div>
+                            </div>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Interactive Card</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="md">
+                                            <div class="pdx-surface-card" interactive style="padding:var(--pdx-space-md)">Hover me</div>
+                                            <div class="pdx-surface-card" selected style="padding:var(--pdx-space-md)">Selected</div>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-surface-card" interactive&gt;Hover me&lt;/div&gt;
+&lt;div class="pdx-surface-card" selected&gt;Selected&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== BUTTONS ==================== -->
+                    <section id="buttons">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Buttons</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">4 variants, 3 sizes, loading state. Works on button, a, and role="button".</p>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Variants</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="sm">
+                                            <button class="pdx-primary">Primary</button>
+                                            <button class="pdx-secondary">Secondary</button>
+                                            <button class="pdx-ghost">Ghost</button>
+                                            <button class="pdx-danger">Danger</button>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;button class="pdx-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="pdx-secondary"&gt;Secondary&lt;/button&gt;
+&lt;button class="pdx-ghost"&gt;Ghost&lt;/button&gt;
+&lt;button class="pdx-danger"&gt;Danger&lt;/button&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Sizes</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="sm" items="center">
+                                            <button class="pdx-primary" size="sm">Small</button>
+                                            <button class="pdx-primary">Medium</button>
+                                            <button class="pdx-primary" size="lg">Large</button>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;button class="pdx-primary" size="sm"&gt;Small&lt;/button&gt;
+&lt;button class="pdx-primary"&gt;Medium (default)&lt;/button&gt;
+&lt;button class="pdx-primary" size="lg"&gt;Large&lt;/button&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">States</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="sm" items="center">
+                                            <button class="pdx-primary" disabled>Disabled</button>
+                                            <button class="pdx-primary pdx-loading">Loading</button>
+                                            <button class="pdx-secondary pdx-loading">Loading</button>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;button class="pdx-primary" disabled&gt;Disabled&lt;/button&gt;
+&lt;button class="pdx-primary pdx-loading"&gt;Loading&lt;/button&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== FORMS ==================== -->
+                    <section id="forms">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Form Controls</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">Input, select, textarea, checkbox, radio, toggle, input groups, validation.</p>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Input with validation</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-grid cols="2" gap="md">
+                                            <pdx-stack gap="xs">
+                                                <label class="pdx-txt-label pdx-ink-muted">Normal</label>
+                                                <input class="pdx-input" placeholder="Enter text..." />
+                                            </pdx-stack>
+                                            <pdx-stack gap="xs">
+                                                <label class="pdx-txt-label pdx-ink-muted">Error</label>
+                                                <input class="pdx-input" aria-invalid="true" value="Bad value" />
+                                                <span class="pdx-field-error">This field is required</span>
+                                            </pdx-stack>
+                                            <pdx-stack gap="xs">
+                                                <label class="pdx-txt-label pdx-ink-muted">Success</label>
+                                                <input class="pdx-input" value="john_doe" />
+                                                <span class="pdx-field-success">Username available</span>
+                                            </pdx-stack>
+                                            <pdx-stack gap="xs">
+                                                <label class="pdx-txt-label pdx-ink-muted">Hint</label>
+                                                <input class="pdx-input" type="password" placeholder="Password" />
+                                                <span class="pdx-field-hint">Min 8 characters</span>
+                                            </pdx-stack>
+                                        </pdx-grid>
+                                    </div>
+                                    <div class="doc-source">&lt;input class="pdx-input" aria-invalid="true" /&gt;
+&lt;span class="pdx-field-error"&gt;Error message&lt;/span&gt;
+&lt;span class="pdx-field-success"&gt;Success message&lt;/span&gt;
+&lt;span class="pdx-field-hint"&gt;Hint text&lt;/span&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Input Group</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-input-group">
+                                            <span class="pdx-input-addon">https://</span>
+                                            <input class="pdx-input" placeholder="example.com" />
+                                            <button class="pdx-primary">Go</button>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-input-group"&gt;
+  &lt;span class="pdx-input-addon"&gt;https://&lt;/span&gt;
+  &lt;input class="pdx-input" /&gt;
+  &lt;button class="pdx-primary"&gt;Go&lt;/button&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Checkbox, Radio, Toggle</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-stack gap="md">
+                                            <pdx-row gap="lg">
+                                                <pdx-row gap="xs" items="center" wrap="no">
+                                                    <input type="checkbox" class="pdx-checkbox" id="d-c1" />
+                                                    <label for="d-c1">Unchecked</label>
+                                                </pdx-row>
+                                                <pdx-row gap="xs" items="center" wrap="no">
+                                                    <input type="checkbox" class="pdx-checkbox" id="d-c2" checked />
+                                                    <label for="d-c2">Checked</label>
+                                                </pdx-row>
+                                                <pdx-row gap="xs" items="center" wrap="no">
+                                                    <input type="checkbox" class="pdx-checkbox" disabled />
+                                                    <label>Disabled</label>
+                                                </pdx-row>
+                                            </pdx-row>
+                                            <pdx-row gap="lg">
+                                                <pdx-row gap="xs" items="center" wrap="no">
+                                                    <input type="radio" class="pdx-radio" name="d-r" id="d-r1" checked />
+                                                    <label for="d-r1">Option A</label>
+                                                </pdx-row>
+                                                <pdx-row gap="xs" items="center" wrap="no">
+                                                    <input type="radio" class="pdx-radio" name="d-r" id="d-r2" />
+                                                    <label for="d-r2">Option B</label>
+                                                </pdx-row>
+                                            </pdx-row>
+                                            <pdx-row gap="lg">
+                                                <pdx-row gap="xs" items="center" wrap="no">
+                                                    <input type="checkbox" class="pdx-toggle" id="d-t1" />
+                                                    <label for="d-t1">Off</label>
+                                                </pdx-row>
+                                                <pdx-row gap="xs" items="center" wrap="no">
+                                                    <input type="checkbox" class="pdx-toggle" id="d-t2" checked />
+                                                    <label for="d-t2">On</label>
+                                                </pdx-row>
+                                            </pdx-row>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="doc-source">&lt;input type="checkbox" class="pdx-checkbox" checked /&gt;
+&lt;input type="radio" class="pdx-radio" checked /&gt;
+&lt;input type="checkbox" class="pdx-toggle" checked /&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== TYPOGRAPHY ==================== -->
+                    <section id="typography">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Typography</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">9 text roles, 9 ink colors, links, code blocks. Fluid sizing via clamp().</p>
+                            </pdx-stack>
+
+                            <div class="doc-example">
+                                <div class="doc-preview">
+                                    <pdx-stack gap="xs">
+                                        <span class="pdx-txt-display">Display</span>
+                                        <span class="pdx-txt-title">Title</span>
+                                        <span class="pdx-txt-heading">Heading</span>
+                                        <span class="pdx-txt-subheading">Subheading</span>
+                                        <span class="pdx-txt-body">Body</span>
+                                        <span class="pdx-txt-small">Small</span>
+                                        <span class="pdx-txt-caption">Caption</span>
+                                        <span class="pdx-txt-label">Label</span>
+                                        <span class="pdx-txt-mono">const x = 42;</span>
+                                    </pdx-stack>
+                                </div>
+                                <div class="doc-source">&lt;span class="pdx-txt-display"&gt;Display&lt;/span&gt;
+&lt;span class="pdx-txt-title"&gt;Title&lt;/span&gt;
+...
+&lt;span class="pdx-txt-mono"&gt;code&lt;/span&gt;</div>
+                            </div>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Ink Colors</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="lg">
+                                            <span class="pdx-ink-default">default</span>
+                                            <span class="pdx-ink-muted">muted</span>
+                                            <span class="pdx-ink-primary">primary</span>
+                                            <span class="pdx-ink-accent">accent</span>
+                                            <span class="pdx-ink-danger">danger</span>
+                                            <span class="pdx-ink-success">success</span>
+                                            <span class="pdx-ink-warning">warning</span>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;span class="pdx-ink-primary"&gt;primary&lt;/span&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Links &amp; Code</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-stack gap="sm">
+                                            <p>Text with a <a class="pdx-link" href="#">link</a> and <code>inline code</code>.</p>
+                                            <pre><code>function greet(name) {
+    return `Hello, ${name}!`;
+}</code></pre>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="doc-source">&lt;a class="pdx-link" href="#"&gt;link&lt;/a&gt;
+&lt;code&gt;inline code&lt;/code&gt;
+&lt;pre&gt;&lt;code&gt;block code&lt;/code&gt;&lt;/pre&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== FEEDBACK ==================== -->
+                    <section id="feedback">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Feedback</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">Alerts, badges, skeleton loading.</p>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Alerts</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-stack gap="sm">
+                                            <div class="pdx-alert pdx-alert-info">Informational message.</div>
+                                            <div class="pdx-alert pdx-alert-success">Operation completed.</div>
+                                            <div class="pdx-alert pdx-alert-warning">Please review.</div>
+                                            <div class="pdx-alert pdx-alert-error">Something went wrong.</div>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-alert pdx-alert-info"&gt;...&lt;/div&gt;
+&lt;div class="pdx-alert pdx-alert-success"&gt;...&lt;/div&gt;
+&lt;div class="pdx-alert pdx-alert-warning"&gt;...&lt;/div&gt;
+&lt;div class="pdx-alert pdx-alert-error"&gt;...&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Badges</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="sm">
+                                            <span class="pdx-badge pdx-badge-primary">Primary</span>
+                                            <span class="pdx-badge pdx-badge-secondary">Secondary</span>
+                                            <span class="pdx-badge pdx-badge-success">Success</span>
+                                            <span class="pdx-badge pdx-badge-danger">Danger</span>
+                                            <span class="pdx-badge pdx-badge-warning">Warning</span>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;span class="pdx-badge pdx-badge-primary"&gt;Primary&lt;/span&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Skeleton Loading</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-surface-card">
+                                            <pdx-row gap="sm" items="center">
+                                                <div class="pdx-skeleton pdx-skeleton-circle"></div>
+                                                <pdx-stack gap="xs" grow>
+                                                    <div class="pdx-skeleton pdx-skeleton-title"></div>
+                                                    <div class="pdx-skeleton pdx-skeleton-text"></div>
+                                                </pdx-stack>
+                                            </pdx-row>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-skeleton pdx-skeleton-circle"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-title"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-text"&gt;&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== MEDIA ==================== -->
+                    <section id="media">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Media</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">Avatar, embed, figure.</p>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Avatar</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="md" items="center">
+                                            <div class="pdx-avatar" size="sm">S</div>
+                                            <div class="pdx-avatar">MD</div>
+                                            <div class="pdx-avatar" size="lg">LG</div>
+                                            <div class="pdx-avatar pdx-avatar-status" size="lg">ON</div>
+                                            <div class="pdx-avatar pdx-avatar-status" size="lg" data-status="busy">BS</div>
+                                            <div class="pdx-avatar pdx-avatar-status" size="lg" data-status="away">AW</div>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-avatar" size="sm"&gt;S&lt;/div&gt;
+&lt;div class="pdx-avatar pdx-avatar-status" size="lg"&gt;ON&lt;/div&gt;
+&lt;div class="pdx-avatar pdx-avatar-status" data-status="busy"&gt;BS&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== DATA DISPLAY ==================== -->
+                    <section id="data">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Data Display</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">Tables, progress, pagination, stepper, timeline, empty state.</p>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Table</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-table-responsive">
+                                            <table class="pdx-table pdx-table-hover">
+                                                <thead>
+                                                    <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td>John Doe</td><td>john@example.com</td><td>Admin</td><td><span class="pdx-dot pdx-dot-success"></span> Active</td></tr>
+                                                    <tr><td>Jane Smith</td><td>jane@example.com</td><td>Editor</td><td><span class="pdx-dot pdx-dot-warning"></span> Away</td></tr>
+                                                    <tr><td>Bob Wilson</td><td>bob@example.com</td><td>Viewer</td><td><span class="pdx-dot pdx-dot-muted"></span> Offline</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;table class="pdx-table pdx-table-hover"&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;...&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody&gt;&lt;tr&gt;&lt;td&gt;John&lt;/td&gt;...&lt;/tr&gt;&lt;/tbody&gt;
+&lt;/table&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Progress</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-stack gap="sm">
+                                            <div class="pdx-progress"><div class="pdx-progress-bar" style="width:65%"></div></div>
+                                            <div class="pdx-progress"><div class="pdx-progress-bar" variant="success" style="width:100%"></div></div>
+                                            <div class="pdx-progress"><div class="pdx-progress-bar" variant="danger" style="width:30%"></div></div>
+                                            <div class="pdx-progress pdx-progress-indeterminate"><div class="pdx-progress-bar"></div></div>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-progress"&gt;
+  &lt;div class="pdx-progress-bar" style="width:65%"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Pagination</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-pagination">
+                                            <button class="pdx-page" disabled>&lt;</button>
+                                            <button class="pdx-page" aria-current="page">1</button>
+                                            <button class="pdx-page">2</button>
+                                            <button class="pdx-page">3</button>
+                                            <button class="pdx-page">...</button>
+                                            <button class="pdx-page">12</button>
+                                            <button class="pdx-page">&gt;</button>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-pagination"&gt;
+  &lt;button class="pdx-page" aria-current="page"&gt;1&lt;/button&gt;
+  &lt;button class="pdx-page"&gt;2&lt;/button&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Stepper</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-stepper">
+                                            <div class="pdx-step" data-status="done">
+                                                <div class="pdx-step-number">1</div>
+                                                <span class="pdx-step-label">Account</span>
+                                            </div>
+                                            <div class="pdx-step-connector"></div>
+                                            <div class="pdx-step" data-status="active">
+                                                <div class="pdx-step-number">2</div>
+                                                <span class="pdx-step-label">Profile</span>
+                                            </div>
+                                            <div class="pdx-step-connector"></div>
+                                            <div class="pdx-step">
+                                                <div class="pdx-step-number">3</div>
+                                                <span class="pdx-step-label">Review</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-stepper"&gt;
+  &lt;div class="pdx-step" data-status="done"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-step-connector"&gt;&lt;/div&gt;
+  &lt;div class="pdx-step" data-status="active"&gt;...&lt;/div&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Tabs</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-tabs">
+                                            <button class="pdx-tab active">Overview</button>
+                                            <button class="pdx-tab">Details</button>
+                                            <button class="pdx-tab">Settings</button>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-tabs"&gt;
+  &lt;button class="pdx-tab active"&gt;Overview&lt;/button&gt;
+  &lt;button class="pdx-tab"&gt;Details&lt;/button&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Breadcrumb</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-breadcrumb">
+                                            <a class="pdx-link" href="#">Home</a>
+                                            <a class="pdx-link" href="#">Products</a>
+                                            <span>Wireless Headphones</span>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-breadcrumb"&gt;
+  &lt;a class="pdx-link"&gt;Home&lt;/a&gt;
+  &lt;a class="pdx-link"&gt;Products&lt;/a&gt;
+  &lt;span&gt;Current Page&lt;/span&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Accordion</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <details class="pdx-accordion" open>
+                                            <summary>What is Pragmatic Design CSS?</summary>
+                                            <p class="pdx-txt-small pdx-ink-muted">A context-driven CSS framework that's agent-first and human-friendly.</p>
+                                        </details>
+                                        <details class="pdx-accordion">
+                                            <summary>How does dark mode work?</summary>
+                                            <p class="pdx-txt-small pdx-ink-muted">Uses CSS light-dark() function. Set pdx-scheme="dark" on html.</p>
+                                        </details>
+                                        <details class="pdx-accordion">
+                                            <summary>Is JavaScript required?</summary>
+                                            <p class="pdx-txt-small pdx-ink-muted">Only for adaptive behaviors (collapse, drawer). Layout is pure CSS.</p>
+                                        </details>
+                                    </div>
+                                    <div class="doc-source">&lt;details class="pdx-accordion" open&gt;
+  &lt;summary&gt;Question?&lt;/summary&gt;
+  &lt;p&gt;Answer.&lt;/p&gt;
+&lt;/details&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Timeline</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-timeline">
+                                            <div class="pdx-timeline-item" data-status="done">
+                                                <pdx-stack gap="2xs">
+                                                    <span class="pdx-txt-body">Order placed</span>
+                                                    <span class="pdx-txt-caption pdx-ink-muted">March 26, 10:00 AM</span>
+                                                </pdx-stack>
+                                            </div>
+                                            <div class="pdx-timeline-item" data-status="active">
+                                                <pdx-stack gap="2xs">
+                                                    <span class="pdx-txt-body">Processing</span>
+                                                    <span class="pdx-txt-caption pdx-ink-muted">March 26, 2:00 PM</span>
+                                                </pdx-stack>
+                                            </div>
+                                            <div class="pdx-timeline-item">
+                                                <pdx-stack gap="2xs">
+                                                    <span class="pdx-txt-body pdx-ink-muted">Shipped</span>
+                                                    <span class="pdx-txt-caption pdx-ink-subtle">Pending</span>
+                                                </pdx-stack>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-timeline"&gt;
+  &lt;div class="pdx-timeline-item" data-status="done"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-timeline-item" data-status="active"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-timeline-item"&gt;...&lt;/div&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Empty State</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <div class="pdx-empty">
+                                            <div class="pdx-empty-icon">📭</div>
+                                            <div class="pdx-empty-title">No results found</div>
+                                            <div class="pdx-empty-description">Try adjusting your search or filter to find what you're looking for.</div>
+                                            <button class="pdx-secondary" size="sm">Clear filters</button>
+                                        </div>
+                                    </div>
+                                    <div class="doc-source">&lt;div class="pdx-empty"&gt;
+  &lt;div class="pdx-empty-title"&gt;No results&lt;/div&gt;
+  &lt;div class="pdx-empty-description"&gt;...&lt;/div&gt;
+  &lt;button class="pdx-secondary"&gt;Action&lt;/button&gt;
+&lt;/div&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Tooltip</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-row gap="lg">
+                                            <button class="pdx-primary" data-pdx-tooltip="Save your changes">Hover me</button>
+                                            <span data-pdx-tooltip="This is a tooltip" class="pdx-link" style="cursor:help">Help text</span>
+                                        </pdx-row>
+                                    </div>
+                                    <div class="doc-source">&lt;button data-pdx-tooltip="Save your changes"&gt;Hover me&lt;/button&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- ==================== UTILITIES ==================== -->
+                    <section id="utilities">
+                        <pdx-stack gap="lg">
+                            <pdx-stack gap="2xs">
+                                <h2 class="pdx-txt-title">Utilities</h2>
+                                <p class="pdx-txt-small pdx-ink-muted">Divider, truncation, screen reader only.</p>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Divider</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <p class="pdx-txt-small">Above</p>
+                                        <hr>
+                                        <p class="pdx-txt-small">Below</p>
+                                    </div>
+                                    <div class="doc-source">&lt;hr&gt;</div>
+                                </div>
+                            </pdx-stack>
+
+                            <pdx-stack gap="md">
+                                <h3 class="pdx-txt-heading">Truncation</h3>
+                                <div class="doc-example">
+                                    <div class="doc-preview">
+                                        <pdx-stack gap="sm">
+                                            <p class="pdx-truncate" style="max-width:20rem">This long text will be truncated with an ellipsis when it exceeds the width.</p>
+                                            <p class="pdx-clamp-2" style="max-width:20rem">This text is clamped to 2 lines maximum. Any content beyond that will show an ellipsis. This is useful for card descriptions or previews.</p>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="doc-source">&lt;p class="pdx-truncate"&gt;...&lt;/p&gt;
+&lt;p class="pdx-clamp-2"&gt;...&lt;/p&gt;</div>
+                                </div>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </section>
+
+                    <!-- Footer -->
+                    <pdx-row justify="center" pad="lg">
+                        <p class="pdx-txt-caption pdx-ink-muted">Pragmatic Design CSS v0.1.0</p>
+                    </pdx-row>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+
+    <script>
+        function setScheme(v) { document.documentElement.setAttribute('pdx-scheme', v); }
+        function setTheme(v) { document.documentElement.setAttribute('pdx-theme', v); }
+    </script>
+</body>
+</html>

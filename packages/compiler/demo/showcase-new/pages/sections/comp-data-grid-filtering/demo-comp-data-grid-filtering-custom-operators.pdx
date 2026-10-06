@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Operators</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>filterOperators</code> on a column limits available operators.
+      Default: text = contains/eq/neq/startswith/endswith, number = eq/neq/gt/gte/lt/lte.
+    </p>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>{ field: 'price', header: 'Price', type: 'currency',
+  filterOperators: ['gt', 'lt', 'eq'] }
+
+// Available operators:
+// Text: contains, eq, neq, startswith, endswith, isnull, isnotnull
+// Number: eq, neq, gt, gte, lt, lte, between, isnull, isnotnull
+// Date:   eq, neq, gt, gte, lt, lte, between, isnull, isnotnull (label: After/Before…)
+// Enum:   in, notin, isnull, isnotnull
+// `between` (range) → two inputs, min and max, in the popover; value [min, max].</code></pre>
+    </details>
+  </section>
+</template>

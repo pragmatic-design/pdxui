@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact Icon-Only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Minimal toolbar for inline editors or table actions.</p>
+    <div class="demo-box">
+      <pdx-toolbar compact bordered label="Row actions">
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Edit"><pdx-icon name="edit" size="13"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Copy"><pdx-icon name="copy" size="13"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Delete"><pdx-icon name="trash" size="13"></pdx-icon></button>
+        <span class="pdx-toolbar-sep"></span>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Search"><pdx-icon name="search" size="13"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Filter"><pdx-icon name="filter" size="13"></pdx-icon></button>
+        <span class="pdx-toolbar-sep"></span>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Download"><pdx-icon name="download" size="13"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Upload"><pdx-icon name="upload" size="13"></pdx-icon></button>
+      </pdx-toolbar>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-toolbar compact bordered label="Row actions"&gt;
+  &lt;button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Edit"&gt;
+    &lt;pdx-icon name="edit" size="13"&gt;&lt;/pdx-icon&gt;
+  &lt;/button&gt;
+  ...
+&lt;/pdx-toolbar&gt;</code></pre>
+    </details>
+  </section>
+</template>

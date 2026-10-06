@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Menu</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple menu with active item highlight.</p>
+
+    <div class="demo-menu-container">
+      <div class="pdx-menu">
+        <button class="pdx-menu-item active">Dashboard</button>
+        <button class="pdx-menu-item">Settings</button>
+        <button class="pdx-menu-item">Profile</button>
+        <button class="pdx-menu-item" disabled>Admin</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-menu"&gt;
+  &lt;button class="pdx-menu-item active"&gt;Dashboard&lt;/button&gt;
+  &lt;button class="pdx-menu-item"&gt;Settings&lt;/button&gt;
+  &lt;button class="pdx-menu-item"&gt;Profile&lt;/button&gt;
+  &lt;button class="pdx-menu-item" disabled&gt;Admin&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Click <strong>+ Add Filter</strong>, pick a field, set operator and value. Active filters appear as chips.
+    </p>
+    <div class="demo-container">
+      <pdx-filter-builder :fields="fields" :source="ds"></pdx-filter-builder>
+      <pdx-data-grid :source="ds" :columns="columns" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const fields = [
+  { field: 'name', label: 'Name', type: 'text' },
+  { field: 'category', label: 'Category', type: 'enum',
+    options: [{ label: 'Electronics', value: 'Electronics' }, ...] },
+  { field: 'price', label: 'Price', type: 'currency' },
+  { field: 'stock', label: 'Stock', type: 'number' },
+];
+
+&lt;pdx-filter-builder :fields="fields" :source="ds"&gt;
+&lt;/pdx-filter-builder&gt;
+&lt;pdx-data-grid :source="ds" :columns="columns" hover striped&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource, toColumnDefs } from '@pdxui/core';
+import { categories, products } from './state.pdx';
+
+const fields = [
+  { field: 'name', label: 'Name', type: 'text' },
+  { field: 'category', label: 'Category', type: 'enum', options: categories.map(function(c) { return { label: c, value: c }; }) },
+  { field: 'price', label: 'Price', type: 'currency' },
+  { field: 'stock', label: 'Stock', type: 'number' },
+];
+
+const columns = toColumnDefs(fields);
+const ds = createDataSource({ data: products, pageSize: 10 });
+</script>

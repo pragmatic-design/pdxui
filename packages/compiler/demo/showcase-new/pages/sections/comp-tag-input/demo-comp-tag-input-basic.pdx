@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Simple tag input. Type a value and press <kbd>Enter</kbd> or <kbd>,</kbd> to add a tag.
+      Press <kbd>Backspace</kbd> on empty input to remove the last tag.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tag-input placeholder="Add tags..." @pdx-change="onBasicChange"></pdx-tag-input>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
+      Current tags: <strong>{{ basicTagsStr() }}</strong>
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input placeholder="Add tags..." @pdx-change="onChange" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useTagInputLog } from './state.pdx';
+
+// The page's event console (state.pdx.ts).
+const tagInputLog = useTagInputLog();
+function addLog(text) { tagInputLog.addLog(text); }
+
+// Basic
+let basicTags = $signal([]);
+
+function onBasicChange(e) {
+    const tags = e.detail ? e.detail.tags : [];
+    basicTags = tags;
+    addLog('basic change: [' + tags.join(', ') + ']');
+}
+
+function basicTagsStr() {
+    return basicTags.length > 0 ? basicTags.join(', ') : 'none';
+}
+</script>

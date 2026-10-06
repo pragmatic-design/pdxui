@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Promise API</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>toast.promise()</code> — loading → success/error automatically.</p>
+    <div class="btn-row">
+      <pdx-button variant="primary" size="sm" @click="showPromiseSuccess">Save (succeeds in 2s)</pdx-button>
+      <pdx-button variant="danger" size="sm" @click="showPromiseFail">Save (fails in 2s)</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showPromiseSuccess() {
+  const p = new Promise(r => setTimeout(r, 2000));
+  toast.promise(p, { loading: 'Saving...', success: 'Saved!', error: 'Failed!' });
+}
+
+function showPromiseFail() {
+  const p = new Promise((_, r) => setTimeout(() => r('err'), 2000));
+  toast.promise(p, { loading: 'Saving...', success: 'Saved!', error: 'Connection failed.' });
+}
+</script>

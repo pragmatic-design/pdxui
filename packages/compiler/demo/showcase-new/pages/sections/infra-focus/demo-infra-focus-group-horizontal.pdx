@@ -1,0 +1,33 @@
+<template>
+  <section data-test="focus-group-h">
+    <h3>Focus Group — Horizontal (Tabs)</h3>
+    <p class="desc">Click a tab first, then use Arrow Left/Right to navigate. Wraps around.</p>
+    <div class="group-row" :ref="horizontalRef" data-test="group-horizontal">
+      @for (tabNames as tab; track tab) {
+        <div class="group-item" role="tab">{{ tab }}</div>
+      }
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { focusGroup, onMount } from '@pdxui/core';
+
+const tabNames = ['Dashboard', 'Users', 'Settings', 'Reports'];
+
+let horizontalRef = $signal(null);
+
+onMount(() => {
+    if (horizontalRef) {
+        focusGroup(horizontalRef, {
+            selector: '[role="tab"]',
+            orientation: 'horizontal',
+            wrap: true,
+        });
+    }
+});
+</script>
+
+<style scoped>
+  .group-row { display: flex; gap: 4px; }
+</style>

@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Multiple</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Multi-select with chip tags. Backspace removes last tag.</p>
+    <div class="demo-row">
+      <pdx-select label="Colors" :options="colors" multiple searchable clearable placeholder="Pick colors..." />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="colors" multiple searchable clearable
+  placeholder="Pick colors..." /&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan', 'Teal'];
+</script>

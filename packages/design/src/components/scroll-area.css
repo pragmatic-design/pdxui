@@ -1,0 +1,42 @@
+/* pdx-scroll-area — Custom scrollbar container */
+
+pdx-scroll-area {
+    display: block;
+    position: relative;
+}
+
+.pdx-scroll-area {
+    position: relative;
+    overflow: hidden;
+}
+
+.pdx-scroll-area-viewport {
+    width: 100%;
+    height: 100%;
+
+    /* Edge fade. The flags below say WHETHER to fade; this is what paints it, and until now
+       nothing did — the two custom properties were computed on every scroll and read by no rule.
+       A MASK, not a gradient overlay: the fade acts on the content, so it is correct on any
+       background. An overlay would have to name the colour behind the scroll area, and gets it
+       wrong the moment the area sits inside a card, a drawer or a tinted panel.
+       At a flag of 0 the two stops coincide, so there is no transition and nothing fades. */
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 calc(var(--pdx-scroll-fade-top, 0) * var(--pdx-space-lg)),
+        #000 calc(100% - var(--pdx-scroll-fade-bottom, 0) * var(--pdx-space-lg)),
+        transparent 100%
+    );
+}
+
+/* Hide native scrollbar */
+.pdx-scroll-area-hide-native::-webkit-scrollbar {
+    display: none;
+}
+
+/* Edge fade state: 1 = there is more content past this edge, 0 = you can see the end.
+   Read by the mask on .pdx-scroll-area-viewport above. */
+pdx-scroll-area[data-at-top] { --pdx-scroll-fade-top: 0; }
+pdx-scroll-area:not([data-at-top]) { --pdx-scroll-fade-top: 1; }
+pdx-scroll-area[data-at-bottom] { --pdx-scroll-fade-bottom: 0; }
+pdx-scroll-area:not([data-at-bottom]) { --pdx-scroll-fade-bottom: 1; }

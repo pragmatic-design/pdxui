@@ -1,0 +1,90 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Form Advanced</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Advanced form patterns: prefill/update, i18n validation, tab wizard, field arrays, nested forms, async validation, cross-field rules.
+    </p>
+
+    <!-- ═══ 1. Prefill / Update Mode ═══ -->
+    <pdx-demo-comp-form-advanced-prefill class="demo-section"></pdx-demo-comp-form-advanced-prefill>
+
+    <!-- ═══ 2. Validation i18n ═══ -->
+    <pdx-demo-comp-form-advanced-validation-i18n class="demo-section"></pdx-demo-comp-form-advanced-validation-i18n>
+
+    <!-- ═══ 3. Tab / Wizard Form ═══ -->
+    <pdx-demo-comp-form-advanced-tab-wizard class="demo-section"></pdx-demo-comp-form-advanced-tab-wizard>
+
+    <!-- ═══ 4. Field Arrays ═══ -->
+    <pdx-demo-comp-form-advanced-field-arrays class="demo-section"></pdx-demo-comp-form-advanced-field-arrays>
+
+    <!-- ═══ 5. Async Validation ═══ -->
+    <pdx-demo-comp-form-advanced-async-validation class="demo-section"></pdx-demo-comp-form-advanced-async-validation>
+
+    <!-- ═══ 6. Cross-Field Validation ═══ -->
+    <pdx-demo-comp-form-advanced-cross-field class="demo-section"></pdx-demo-comp-form-advanced-cross-field>
+
+    <!-- ═══ 7. Nested Forms (Coordinator) ═══ -->
+    <pdx-demo-comp-form-advanced-nested-forms class="demo-section"></pdx-demo-comp-form-advanced-nested-forms>
+
+  </div>
+</template>
+
+<script setup>
+@page '/components/form-advanced';
+@title 'Form Advanced';
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+
+  .demo-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    margin-bottom: var(--pdx-space-lg);
+  }
+
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+  }
+  @media (max-width: 640px) { .form-grid-2 { grid-template-columns: 1fr; } }
+
+  .form-values {
+    margin: var(--pdx-space-xs) 0 0;
+    padding: var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    overflow-x: auto;
+    max-height: 120px;
+  }
+  .wizard-tab {
+    flex: 1;
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border: none;
+    background: none;
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .wizard-tab:hover { color: var(--pdx-color-text); }
+  .wizard-tab.active {
+    color: var(--pdx-color-primary);
+    border-bottom-color: var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-semibold);
+  }
+</style>

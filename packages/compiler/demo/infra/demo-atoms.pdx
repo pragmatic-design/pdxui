@@ -1,0 +1,145 @@
+<template>
+  <div class="demo">
+    <h2>Tier 1 — Atom Components</h2>
+    <p class="desc">13 building block components. Each is a Web Component (pdx-*).</p>
+
+    <section>
+      <h3>Button</h3>
+      <div class="row">
+        <pdx-button variant="solid">Solid</pdx-button>
+        <pdx-button variant="outline">Outline</pdx-button>
+        <pdx-button variant="ghost">Ghost</pdx-button>
+        <pdx-button variant="link">Link</pdx-button>
+        <pdx-button loading="true">Loading</pdx-button>
+        <pdx-button disabled="true">Disabled</pdx-button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <pdx-button size="xs">XS</pdx-button>
+        <pdx-button size="sm">SM</pdx-button>
+        <pdx-button size="md">MD</pdx-button>
+        <pdx-button size="lg">LG</pdx-button>
+        <pdx-button size="xl">XL</pdx-button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Badge</h3>
+      <div class="row">
+        <pdx-badge value="5"></pdx-badge>
+        <pdx-badge value="42" variant="primary"></pdx-badge>
+        <pdx-badge value="150" max="99" variant="error"></pdx-badge>
+        <pdx-badge dot="true" variant="success"></pdx-badge>
+        <pdx-badge value="0" hide-zero="true"></pdx-badge>
+      </div>
+    </section>
+
+    <section>
+      <h3>Chip / Tag</h3>
+      <div class="row">
+        <pdx-chip label="Default"></pdx-chip>
+        <pdx-chip label="Primary" variant="primary"></pdx-chip>
+        <pdx-chip label="Removable" removable="true"></pdx-chip>
+        <pdx-chip label="Success" variant="success"></pdx-chip>
+        <pdx-chip label="Disabled" disabled="true"></pdx-chip>
+      </div>
+    </section>
+
+    <section>
+      <h3>Avatar</h3>
+      <div class="row">
+        <pdx-avatar alt="John Doe" size="sm"></pdx-avatar>
+        <pdx-avatar alt="Jane Smith" size="md"></pdx-avatar>
+        <pdx-avatar alt="A" size="lg"></pdx-avatar>
+        <!-- The showcase's own portrait, not a third-party service; served from compiler/demo, /infra/atoms.html. -->
+        <pdx-avatar src="../showcase-new/public/avatars/person-1.svg" alt="Photo" size="lg"></pdx-avatar>
+        <pdx-avatar alt="Bob Wilson" size="xl" shape="square"></pdx-avatar>
+      </div>
+    </section>
+
+    <section>
+      <h3>Spinner</h3>
+      <div class="row">
+        <pdx-spinner size="sm"></pdx-spinner>
+        <pdx-spinner size="md"></pdx-spinner>
+        <pdx-spinner size="lg"></pdx-spinner>
+        <pdx-spinner variant="dots" size="md"></pdx-spinner>
+        <pdx-spinner variant="bar" size="md"></pdx-spinner>
+      </div>
+    </section>
+
+    <section>
+      <h3>Divider</h3>
+      <p>Above divider</p>
+      <pdx-divider></pdx-divider>
+      <p>Below divider</p>
+      <pdx-divider label="OR"></pdx-divider>
+      <p>Below labeled divider</p>
+      <pdx-divider variant="dashed"></pdx-divider>
+      <p>Below dashed divider</p>
+    </section>
+
+    <section>
+      <h3>Kbd</h3>
+      <div class="row">
+        <pdx-kbd keys="Ctrl+S"></pdx-kbd>
+        <pdx-kbd keys="⌘+K"></pdx-kbd>
+        <pdx-kbd keys="Shift+Enter"></pdx-kbd>
+        <pdx-kbd keys="Esc"></pdx-kbd>
+      </div>
+    </section>
+
+    <section>
+      <h3>Input</h3>
+      <div class="stack">
+        <pdx-label text="Name" required="true"></pdx-label>
+        <pdx-input placeholder="Enter your name..." size="md"></pdx-input>
+        <pdx-label text="Email" hint="We'll never share your email"></pdx-label>
+        <pdx-input type="email" placeholder="you@example.com" size="md"></pdx-input>
+        <pdx-label text="Error state"></pdx-label>
+        <pdx-input placeholder="Invalid input" error="true" size="md"></pdx-input>
+        <pdx-label text="Disabled"></pdx-label>
+        <pdx-input placeholder="Can't edit" disabled="true" size="md"></pdx-input>
+      </div>
+    </section>
+
+    <section>
+      <h3>Checkbox & Radio</h3>
+      <div class="stack">
+        <pdx-checkbox label="Accept terms" checked="false"></pdx-checkbox>
+        <pdx-checkbox label="Pre-checked" checked="true"></pdx-checkbox>
+        <pdx-checkbox label="Indeterminate" indeterminate="true"></pdx-checkbox>
+        <pdx-checkbox label="Disabled" disabled="true"></pdx-checkbox>
+      </div>
+      <div class="stack" style="margin-top:12px">
+        <pdx-radio label="Option A" name="group1" value="a" checked="true"></pdx-radio>
+        <pdx-radio label="Option B" name="group1" value="b"></pdx-radio>
+        <pdx-radio label="Option C (disabled)" name="group1" value="c" disabled="true"></pdx-radio>
+      </div>
+    </section>
+
+    <section>
+      <h3>Switch</h3>
+      <div class="stack">
+        <pdx-switch label="Notifications" checked="true"></pdx-switch>
+        <pdx-switch label="Dark mode" checked="false"></pdx-switch>
+        <pdx-switch label="Disabled" disabled="true"></pdx-switch>
+        <pdx-switch label="Left label" label-position="left"></pdx-switch>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import '@pdxui/ui';
+</script>
+
+<style scoped>
+  .demo { max-width: 700px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  p { margin: 4px 0; font-size: 0.9rem; }
+</style>

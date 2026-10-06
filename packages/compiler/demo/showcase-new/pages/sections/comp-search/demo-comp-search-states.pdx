@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Loading State">
+        <pdx-search-input placeholder="Searching..." loading value="react"></pdx-search-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Custom Debounce (500ms)">
+        <pdx-search-input placeholder="Type slowly..." debounce="500"></pdx-search-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

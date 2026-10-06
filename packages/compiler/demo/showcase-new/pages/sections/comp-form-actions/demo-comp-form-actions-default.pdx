@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Default (Save / Reset)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">End-aligned by default. Inside a form, Save submits and Reset clears.</p>
+    <div class="demo-container">
+      <pdx-form-actions submit-label="Save" reset-label="Reset"></pdx-form-actions>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-form :form="myForm"&gt;
+  … fields …
+  &lt;pdx-form-actions submit-label="Save" reset-label="Reset" /&gt;
+&lt;/pdx-form&gt;</code></pre>
+    </details>
+  </section>
+</template>

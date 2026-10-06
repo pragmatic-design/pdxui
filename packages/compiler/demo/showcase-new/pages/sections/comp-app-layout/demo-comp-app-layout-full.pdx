@@ -1,0 +1,85 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Full Layout</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Header + navbar + main + aside + footer. The hamburger collapses the navbar to its icon rail by binding
+      <code>:navbarCollapsed</code>; it says what it controls and whether the navigation is expanded.
+    </p>
+    <div class="demo-shell">
+      <pdx-app-layout headerheight="44px" navbarwidth="160px" asidewidth="120px" footerheight="36px" :navbarCollapsed="!navOpen">
+        <div data-region="header" class="shell-header">
+          <button type="button" class="shell-hamburger" aria-label="Toggle navigation" aria-controls="demo-nav-1"
+                  :aria-expanded="navOpen ? 'true' : 'false'" @click="navOpen = !navOpen"><pdx-icon name="menu" size="14"></pdx-icon></button>
+          <pdx-icon name="package" size="16"></pdx-icon>
+          <strong>My App</strong>
+        </div>
+        <div data-region="navbar" class="shell-nav" id="demo-nav-1">
+          <button type="button" class="shell-nav-item" :aria-current="page === 'Dashboard' ? 'page' : null" @click="page = 'Dashboard'"><pdx-icon name="home" size="14"></pdx-icon> Dashboard</button>
+          <button type="button" class="shell-nav-item" :aria-current="page === 'Users' ? 'page' : null" @click="page = 'Users'"><pdx-icon name="users" size="14"></pdx-icon> Users</button>
+          <button type="button" class="shell-nav-item" :aria-current="page === 'Settings' ? 'page' : null" @click="page = 'Settings'"><pdx-icon name="settings" size="14"></pdx-icon> Settings</button>
+        </div>
+        <div class="shell-main">
+          <h3>{{ page }}</h3>
+          <p class="pdx-txt-small pdx-ink-muted">This is the primary content area. It takes up the remaining space.</p>
+        </div>
+        <div data-region="aside" class="shell-aside">
+          <strong class="pdx-txt-small">Details</strong>
+          <p class="pdx-txt-small pdx-ink-muted">Right panel info</p>
+        </div>
+        <div data-region="footer" class="shell-footer">
+          <span class="pdx-txt-small pdx-ink-muted">Footer content</span>
+        </div>
+      </pdx-app-layout>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-app-layout headerheight="44px" navbarwidth="160px"
+  asidewidth="120px" footerheight="36px" :navbarCollapsed="!navOpen"&gt;
+  &lt;div data-region="header"&gt;
+    &lt;button type="button" aria-label="Toggle navigation" aria-controls="app-nav"
+      :aria-expanded="navOpen ? 'true' : 'false'" @click="navOpen = !navOpen"&gt;☰&lt;/button&gt;
+    My App
+  &lt;/div&gt;
+  &lt;div data-region="navbar" id="app-nav"&gt;
+    &lt;button type="button" :aria-current="page === 'Dashboard' ? 'page' : null"
+      @click="page = 'Dashboard'"&gt;Dashboard&lt;/button&gt;
+    …
+  &lt;/div&gt;
+  &lt;div&gt;Main content (no slot = main)&lt;/div&gt;
+  &lt;div data-region="aside"&gt;Right panel&lt;/div&gt;
+  &lt;div data-region="footer"&gt;Footer&lt;/div&gt;
+&lt;/pdx-app-layout&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+// The hamburger drives the navbar through its documented property, :navbarCollapsed; collapsed, it
+// is the 60px icon rail.
+let navOpen = $signal(true);
+
+let page = $signal('Dashboard');
+</script>
+
+<style scoped>
+.shell-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--pdx-color-muted);
+  padding: 2px;
+  border-radius: var(--pdx-radius-sm);
+}
+.shell-hamburger:hover { background: var(--pdx-color-inset); }
+.shell-hamburger pdx-icon { display: inline-flex; }
+.shell-aside { padding: var(--pdx-space-md); font-size: var(--pdx-text-sm); }
+.shell-footer {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--pdx-space-md);
+  height: 100%;
+}
+</style>

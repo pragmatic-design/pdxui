@@ -1,0 +1,27 @@
+version: 2
+
+# One pnpm workspace with one lockfile, so npm is watched from the root, and the workflows' `uses:`
+# lines from theirs. Updates are grouped per ecosystem: one pull request a week to review and run
+# through the gate, rather than one per package.
+updates:
+  # Minor and patch only. A major of Vite, Playwright or TypeScript changes the build, the browser
+  # suites or the types, and bundled with the rest it arrives as one red pull request nobody can
+  # merge; a major is an upgrade done on purpose, in its own change.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

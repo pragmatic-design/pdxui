@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Default Banner</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Base <code>.pdx-banner</code> uses primary background color.</p>
+
+    <div class="banner-demo">
+      <div class="pdx-banner">
+        <span class="pdx-banner-text">Welcome to the new dashboard experience.</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-banner"&gt;
+  &lt;span class="pdx-banner-text"&gt;Welcome to the new dashboard.&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

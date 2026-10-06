@@ -1,0 +1,89 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Async Action — Form Submit Error</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Simulates a form submission that fails server-side validation.
+      The global error interceptor (<code>onGlobalError</code>) catches event handler errors.
+    </p>
+    <div class="demo-box">
+      @if (formState === 'idle') {
+        <div class="demo-widget">
+          <div class="pdx-txt-small"><strong>Email:</strong> not-an-email</div>
+          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="submitForm">Submit Form</button>
+        </div>
+      }
+      @if (formState === 'submitting') {
+        <div class="demo-widget state-loading">
+          <div class="pdx-spinner-inline"></div>
+          <span class="pdx-txt-small pdx-ink-muted">Submitting...</span>
+        </div>
+      }
+      @if (formState === 'error') {
+        <div class="pdx-error-fallback pdx-error-warning" role="alert">
+          <div class="pdx-error-icon">&#9888;</div>
+          <div class="pdx-error-msg">Form submission failed</div>
+          <div class="pdx-error-detail">{{ formError }}</div>
+          <button class="pdx-btn pdx-btn-sm pdx-btn-outline retry-btn" @click="resetForm">Fix and Retry</button>
+        </div>
+      }
+      @if (formState === 'success') {
+        <div class="demo-widget success-widget">
+          <div class="pdx-txt-small" style="color: var(--pdx-color-success); font-weight: 600">&#10003; Form submitted</div>
+          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" style="margin-top: var(--pdx-space-xs)" @click="resetForm">Reset</button>
+        </div>
+      }
+    </div>
+  </section>
+</template>
+
+<script setup>
+// ─── Form Submit Simulation ─────────────────────────────
+
+let formState = $signal('idle');
+let formError = $signal('');
+let formAttempts = $signal(0);
+
+function submitForm() {
+  formState = 'submitting';
+  formAttempts = formAttempts + 1;
+  setTimeout(() => {
+    if (formAttempts < 2) {
+      formError = 'ValidationError: "not-an-email" is not a valid email address';
+      formState = 'error';
+    } else {
+      formState = 'success';
+    }
+  }, 800);
+}
+
+function resetForm() {
+  formState = 'idle';
+  formError = '';
+}
+</script>
+
+<style>
+/* The error card the render-error, healthy, network-fetch and async-action sections draw. Global,
+   in one place, and in this order — .pdx-error-warning overrides
+   .pdx-error-fallback by coming after it. */
+.pdx-error-fallback {
+  padding: var(--pdx-space-md);
+  background: var(--pdx-color-danger-soft);
+  border: 1px solid var(--pdx-color-danger);
+  border-radius: var(--pdx-radius-md);
+  text-align: center;
+}
+.pdx-error-warning {
+  background: color-mix(in oklch, var(--pdx-color-warning) 10%, transparent);
+  border-color: var(--pdx-color-warning);
+}
+.pdx-error-icon { font-size: 2rem; margin-bottom: var(--pdx-space-xs); }
+.pdx-error-msg { font-weight: 600; margin-bottom: var(--pdx-space-2xs); }
+.pdx-error-detail {
+  font-size: var(--pdx-text-sm);
+  color: var(--pdx-color-muted);
+  margin-bottom: var(--pdx-space-xs);
+  font-family: monospace;
+  word-break: break-word;
+}
+</style>

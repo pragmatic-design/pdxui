@@ -1,0 +1,129 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Row & Col</h1>
+    <p class="pdx-txt-body pdx-ink-muted">
+      Responsive 12-column grid system as Web Components. Columns animate smoothly when <code>span</code> changes.
+      Breakpoint props (<code>sm</code>, <code>md</code>, <code>lg</code>, <code>xl</code>) override span at viewport thresholds.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-row-col-basic class="demo-section"></pdx-demo-comp-row-col-basic>
+
+    <!-- ═══ Animated Span ═══ -->
+    <pdx-demo-comp-row-col-animated class="demo-section"></pdx-demo-comp-row-col-animated>
+
+    <!-- ═══ Responsive Breakpoints ═══ -->
+    <pdx-demo-comp-row-col-responsive class="demo-section"></pdx-demo-comp-row-col-responsive>
+
+    <!-- ═══ Offset ═══ -->
+    <pdx-demo-comp-row-col-offset class="demo-section"></pdx-demo-comp-row-col-offset>
+
+    <!-- ═══ Gutter Sizes ═══ -->
+    <pdx-demo-comp-row-col-gutter class="demo-section"></pdx-demo-comp-row-col-gutter>
+
+    <!-- ═══ Alignment ═══ -->
+    <pdx-demo-comp-row-col-alignment class="demo-section"></pdx-demo-comp-row-col-alignment>
+
+    <!-- ═══ Nested ═══ -->
+    <pdx-demo-comp-row-col-nested class="demo-section"></pdx-demo-comp-row-col-nested>
+
+    <!-- ═══ Real-world Layout ═══ -->
+    <pdx-demo-comp-row-col-dashboard class="demo-section"></pdx-demo-comp-row-col-dashboard>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Props Reference</h2>
+
+      <h3 class="pdx-txt-label" style="margin-bottom:var(--pdx-space-xs)">pdx-row</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>cols</code><span>number</span><span>12</span><span>Grid columns</span></div>
+        <div class="opt-row"><code>gutter</code><span>string</span><span>"md"</span><span>Gap: 2xs|xs|sm|md|lg|xl|2xl or CSS</span></div>
+        <div class="opt-row"><code>align</code><span>string</span><span>""</span><span>start|center|end|baseline|stretch</span></div>
+        <div class="opt-row"><code>justify</code><span>string</span><span>""</span><span>start|center|end|between|around|evenly</span></div>
+        <div class="opt-row"><code>wrap</code><span>boolean</span><span>true</span><span>Allow column wrapping</span></div>
+      </div>
+
+      <h3 class="pdx-txt-label" style="margin-top:var(--pdx-space-lg);margin-bottom:var(--pdx-space-xs)">pdx-col</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>span</code><span>number</span><span>12</span><span>Columns to span (1-12)</span></div>
+        <div class="opt-row"><code>sm</code><span>number</span><span>0</span><span>Span at >= 640px</span></div>
+        <div class="opt-row"><code>md</code><span>number</span><span>0</span><span>Span at >= 768px</span></div>
+        <div class="opt-row"><code>lg</code><span>number</span><span>0</span><span>Span at >= 1024px</span></div>
+        <div class="opt-row"><code>xl</code><span>number</span><span>0</span><span>Span at >= 1280px</span></div>
+        <div class="opt-row"><code>offset</code><span>number</span><span>0</span><span>Column offset (0-11)</span></div>
+        <div class="opt-row"><code>order</code><span>number</span><span>0</span><span>CSS order override</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/row-col';
+@title 'Row & Col';
+</script>
+
+<style scoped>
+  .page { }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .demo-area {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-md);
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+  }
+  .demo-area.comp { border-style: solid; }
+
+  .demo-row {
+    display: flex;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .demo-labeled {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .box {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-primary-100);
+    border: 1px solid var(--pdx-primary-300);
+    border-radius: var(--pdx-radius-sm);
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-primary-800);
+    text-align: center;
+  }
+  .box.tall { padding: var(--pdx-space-xl) var(--pdx-space-md); }
+  .box.md-h { padding: var(--pdx-space-lg) var(--pdx-space-md); }
+  .box.accent {
+    background: var(--pdx-primary-200);
+    border-color: var(--pdx-primary-400);
+  }
+
+  .options-table { margin-top: var(--pdx-space-sm); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 100px 80px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+</style>

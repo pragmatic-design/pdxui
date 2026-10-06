@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Action Group</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default mode (<code>mode="none"</code>): visual grouping only. No selection logic.</p>
+
+    <div class="demo-row">
+      <pdx-button-group>
+        <pdx-button variant="secondary">Left</pdx-button>
+        <pdx-button variant="secondary">Center</pdx-button>
+        <pdx-button variant="secondary">Right</pdx-button>
+      </pdx-button-group>
+    </div>
+
+    <div class="demo-row">
+      <pdx-button-group>
+        <pdx-button variant="primary">Save</pdx-button>
+        <pdx-button variant="outline">Cancel</pdx-button>
+      </pdx-button-group>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button-group&gt;
+  &lt;pdx-button variant="secondary"&gt;Left&lt;/pdx-button&gt;
+  &lt;pdx-button variant="secondary"&gt;Center&lt;/pdx-button&gt;
+  &lt;pdx-button variant="secondary"&gt;Right&lt;/pdx-button&gt;
+&lt;/pdx-button-group&gt;</code></pre>
+    </details>
+  </section>
+</template>

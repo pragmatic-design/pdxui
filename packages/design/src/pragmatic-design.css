@@ -1,0 +1,40 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Entry Point
+   Context-driven CSS framework. Agent-first, human-friendly.
+
+   @layer ordering controls the cascade:
+   - Consumer's unlayered CSS always wins (zero !important needed)
+   - Themes override tokens because they come later in layer order
+   - Adaptive overrides layout for responsive behavior
+   ========================================================================== */
+
+/*
+  The base — the layer declaration and everything that is not a theme — lives in `base.css`, so an
+  app that uses ONE theme can import the base and one theme instead of all thirteen.
+  This entry is that plus every theme.
+*/
+@import "./base.css";
+
+/* Every component's styles, for the app that would rather not think about it. An app that takes
+   `@pdxui/design/base` instead gets them from the components it actually imports. */
+@import "./components/_all.css"  layer(pdx.components);
+
+/* Themes — all loaded, activated by pdx-theme attribute on <html> */
+@import "./themes/neutral.css"     layer(pdx.themes);
+@import "./themes/pragmatic.css"   layer(pdx.themes);
+@import "./themes/corporate.css"   layer(pdx.themes);
+@import "./themes/playful.css"     layer(pdx.themes);
+@import "./themes/material.css"    layer(pdx.themes);
+@import "./themes/fluent.css"      layer(pdx.themes);
+@import "./themes/cupertino.css"   layer(pdx.themes);
+@import "./themes/neumorphic.css"  layer(pdx.themes);
+@import "./themes/glass.css"       layer(pdx.themes);
+@import "./themes/cyberpunk.css"   layer(pdx.themes);
+@import "./themes/editorial.css"   layer(pdx.themes);
+@import "./themes/metro.css"           layer(pdx.themes);
+@import "./themes/pragmatic-gold.css"  layer(pdx.themes);
+
+/* Themes authored in the builder and saved from its UI. Last, so a custom theme can
+   refine a shipped one of the same name if that is ever wanted. */
+@import "./themes/custom/_custom.css" layer(pdx.themes);
+

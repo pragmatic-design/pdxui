@@ -1,0 +1,61 @@
+<template>
+  <div class="lazy-section">
+    <h3>{{ title }}</h3>
+
+    @defer (viewport) {
+      <div class="loaded-content">
+        <p>This content was loaded lazily when it entered the viewport.</p>
+        <slot name="content"></slot>
+
+        @defer (idle) {
+          <div class="secondary-content">
+            <p>This secondary section loaded when the browser was idle.</p>
+          </div>
+        } @placeholder {
+          <div class="placeholder">Secondary content queued...</div>
+        }
+      </div>
+    } @placeholder {
+      <div class="placeholder">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    } @loading {
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>Loading section...</span>
+      </div>
+    } @error {
+      <div class="error">
+        <p>Failed to load this section.</p>
+        <button @click="retry">Retry</button>
+      </div>
+    }
+  </div>
+</template>
+
+<script setup>
+  @prop title: string = 'Lazy Section';
+  @slot content;
+
+  function retry() {
+    // Placeholder — actual retry depends on how defer is implemented
+    console.log('Retrying lazy load...');
+  }
+</script>
+
+<style scoped>
+  .lazy-section { margin: 1rem 0; border: 1px solid var(--pdx-color-border); border-radius: 8px; padding: 1rem; }
+  .loaded-content { animation: fadeIn 0.3s ease; }
+  .secondary-content { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--pdx-color-border); }
+  .placeholder { padding: 1rem 0; }
+  .skeleton-line { height: 1rem; background: var(--pdx-color-inset); border-radius: 4px; margin-bottom: 0.5rem; animation: pulse 1.5s infinite; }
+  .skeleton-line.short { width: 60%; }
+  .loading { display: flex; align-items: center; gap: 0.5rem; color: var(--pdx-color-muted); padding: 1rem 0; }
+  .spinner { width: 1rem; height: 1rem; border: 2px solid var(--pdx-color-border-strong); border-top-color: var(--pdx-color-primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+  .error { text-align: center; color: var(--pdx-color-danger-ink); padding: 1rem; }
+  .error button { margin-top: 0.5rem; padding: 0.25rem 0.75rem; border: 1px solid var(--pdx-color-danger-ink); color: var(--pdx-color-danger-ink); background: var(--pdx-color-surface); border-radius: 4px; cursor: pointer; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>

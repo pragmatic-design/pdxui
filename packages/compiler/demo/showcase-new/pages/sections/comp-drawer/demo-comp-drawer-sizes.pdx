@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">sm (280px), md (380px), lg (520px), or custom CSS value.</p>
+    <div class="btn-row">
+      <pdx-button variant="outline" size="sm" @click="openSized('sm')">Small</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="openSized('md')">Medium</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="openSized('lg')">Large</pdx-button>
+    </div>
+
+    <pdx-drawer :open="sizedOpen" :size="sizedSize" label="Sized drawer" @pdx-close="closeSized">
+      <span slot="header">Size: {{ sizedSize }}</span>
+      <p>This drawer is <strong>{{ sizedSize }}</strong> width.</p>
+      <span slot="footer">
+        <pdx-button variant="primary" size="sm" @click="closeSized">Close</pdx-button>
+      </span>
+    </pdx-drawer>
+  </section>
+</template>
+
+<script setup>
+// Sized drawer
+let sizedOpen = $signal(false);
+
+let sizedSize = $signal('md');
+
+function openSized(s) { sizedSize = s; sizedOpen = true; }
+function closeSized() { sizedOpen = false; }
+</script>

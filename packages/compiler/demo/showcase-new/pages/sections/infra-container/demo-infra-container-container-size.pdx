@@ -1,0 +1,69 @@
+<template>
+  <section>
+    <h3>useContainerSize()</h3>
+    <p class="desc">Drag the right edge to resize. Border color and content adapt to width.</p>
+    <div class="resize-box" :class="bpClass" :ref="resizeRef">
+      <div class="stats">
+        <span>Width: <strong>{{ width }}px</strong></span>
+        <span>Height: <strong>{{ height }}px</strong></span>
+      </div>
+      <div class="badges">
+        <span class="badge" :class="isCompact ? 'on' : ''">Compact (&lt;480)</span>
+        <span class="badge" :class="isMedium ? 'on' : ''">Medium (480-768)</span>
+        <span class="badge" :class="isWide ? 'on' : ''">Wide (&gt;768)</span>
+      </div>
+      @if (isCompact) {
+        <div class="card">Compact: stacked, minimal</div>
+      }
+      @if (isMedium) {
+        <div class="card-row"><div class="card">Col A</div><div class="card">Col B</div></div>
+      }
+      @if (isWide) {
+        <div class="card-row"><div class="card">Col A</div><div class="card">Col B</div><div class="card">Col C</div></div>
+      }
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useContainerSize, effect, onMount } from '@pdxui/core';
+
+let width = $signal(0);
+let height = $signal(0);
+let isCompact = $signal(true);
+let isMedium = $signal(false);
+let isWide = $signal(false);
+/** The border's class, from the breakpoint: computed, not written by the effect (CD-D2). */
+const bpClass = $derived(isCompact ? 'compact' : isMedium ? 'medium' : 'wide');
+let resizeRef = $signal(null);
+
+onMount(() => {
+    requestAnimationFrame(() => {
+        const el = resizeRef;
+        if (!el) return;
+
+        const cs = useContainerSize(() => el);
+
+        effect(() => {
+            width = cs.width();
+            height = cs.height();
+            isCompact = cs.isCompact();
+            isMedium = cs.isMedium();
+            isWide = cs.isWide();
+        });
+    });
+});
+</script>
+
+<style scoped>
+  .resize-box { resize: horizontal; overflow: auto; border: 2px dashed var(--pdx-color-border); border-radius: 8px; padding: 12px; min-width: 200px; max-width: 100%; width: 600px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .resize-box.compact { border-color: var(--pdx-color-danger); }
+  .resize-box.medium { border-color: var(--pdx-color-warning); }
+  .resize-box.wide { border-color: var(--pdx-color-success); }
+  .stats { display: flex; gap: 20px; font-size: 0.9rem; }
+  .badges { display: flex; gap: 8px; }
+  .badge { padding: 2px 8px; border-radius: 99px; font-size: 0.7rem; font-weight: 600; background: var(--pdx-color-inset); color: var(--pdx-color-muted); }
+  .badge.on { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+  .card { flex: 1; padding: 8px; background: var(--pdx-color-inset); border-radius: 6px; text-align: center; font-size: 0.8rem; }
+  .card-row { display: flex; gap: 8px; }
+</style>

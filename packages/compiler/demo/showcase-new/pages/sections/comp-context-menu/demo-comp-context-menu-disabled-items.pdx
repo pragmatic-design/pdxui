@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Disabled Items</h2>
+    <pdx-context-menu :items="disabledItems" @pdx-select="onSelect">
+      <div class="ctx-target ctx-target-sm" tabindex="0" role="group" aria-label="Area with disabled items">
+        <p class="pdx-ink-muted">Right-click — some items disabled</p>
+      </div>
+    </pdx-context-menu>
+  </section>
+</template>
+
+<script setup>
+import { useContextMenuLog } from './state.pdx';
+
+const contextMenuLog = useContextMenuLog();
+function onSelect(e) { contextMenuLog.onSelect(e); }
+
+const disabledItems = [
+  { key: 'undo', label: 'Undo', icon: 'undo', shortcut: 'Ctrl+Z', disabled: true },
+  { key: 'redo', label: 'Redo', icon: 'redo', shortcut: 'Ctrl+Y', disabled: true },
+  { key: 'sep', type: 'separator' },
+  { key: 'save', label: 'Save', icon: 'save', shortcut: 'Ctrl+S' },
+  { key: 'export', label: 'Export', icon: 'download' },
+];
+</script>

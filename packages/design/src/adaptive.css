@@ -1,0 +1,355 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Adaptive
+   Container Queries, touch adaptation, reduced motion, print.
+   Inspired by XAML AdaptiveTrigger / VisualStateManager.
+   ========================================================================== */
+
+/* ==========================================================================
+   A. Grid auto-collapse (Container Queries)
+   Grids automatically reduce columns based on container width.
+   ========================================================================== */
+
+@container (max-width: 60rem) {
+    pdx-grid[cols="10"],
+    pdx-grid[cols="11"],
+    pdx-grid[cols="12"] { grid-template-columns: repeat(6, 1fr); }
+}
+
+@container (max-width: 45rem) {
+    pdx-grid[cols="3"] { grid-template-columns: repeat(2, 1fr); }
+    pdx-grid[cols="4"] { grid-template-columns: repeat(2, 1fr); }
+    pdx-grid[cols="5"] { grid-template-columns: repeat(3, 1fr); }
+    pdx-grid[cols="6"] { grid-template-columns: repeat(3, 1fr); }
+    pdx-grid[cols="7"],
+    pdx-grid[cols="8"],
+    pdx-grid[cols="9"],
+    pdx-grid[cols="10"],
+    pdx-grid[cols="11"],
+    pdx-grid[cols="12"] { grid-template-columns: repeat(4, 1fr); }
+}
+
+@container (max-width: 30rem) {
+    pdx-grid[cols="2"],
+    pdx-grid[cols="3"],
+    pdx-grid[cols="4"],
+    pdx-grid[cols="5"],
+    pdx-grid[cols="6"],
+    pdx-grid[cols="7"],
+    pdx-grid[cols="8"],
+    pdx-grid[cols="9"],
+    pdx-grid[cols="10"],
+    pdx-grid[cols="11"],
+    pdx-grid[cols="12"] {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Span elements collapse to full-width on narrow containers */
+@container (max-width: 30rem) {
+    pdx-grid > [span] {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ==========================================================================
+   B. Split auto-stack (Container Query)
+   ========================================================================== */
+
+@container (max-width: 40rem) {
+    pdx-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   C. Row auto-stack on narrow (opt-in)
+   ========================================================================== */
+
+@container (max-width: 30rem) {
+    pdx-row[wrap="stack"] {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* ==========================================================================
+   D. Mobile defaults — standard responsive behaviors
+   Container queries for layout, media queries for global defaults.
+   ========================================================================== */
+
+/* ==========================================================================
+   D2. Responsive hide/show (#19)
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    [pdx-hide="mobile"]  { display: none !important; }
+    [pdx-show="desktop"] { display: none !important; }
+}
+
+@media (min-width: 641px) {
+    [pdx-hide="desktop"] { display: none !important; }
+    [pdx-show="mobile"]  { display: none !important; }
+}
+
+/* ==========================================================================
+   D3. Toast positioning (#32)
+   ========================================================================== */
+
+.pdx-toast-container {
+    position: fixed;
+    z-index: var(--pdx-z-toast);
+    padding: var(--pdx-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    pointer-events: none;
+    max-width: 24rem;
+}
+
+.pdx-toast-container[position="top-right"]    { top: 0; right: 0; }
+.pdx-toast-container[position="top-left"]     { top: 0; left: 0; }
+.pdx-toast-container[position="bottom-right"] { bottom: 0; right: 0; }
+.pdx-toast-container[position="bottom-left"]  { bottom: 0; left: 0; }
+.pdx-toast-container[position="top-center"]   { top: 0; left: 50%; transform: translateX(-50%); }
+
+.pdx-toast-container > * {
+    pointer-events: auto;
+}
+
+/* Card padding scales down on small viewports */
+@media (max-width: 480px) {
+    .pdx-surface-card {
+        padding: var(--pdx-space-md);
+    }
+}
+
+@media (max-width: 360px) {
+    .pdx-surface-card {
+        padding: var(--pdx-space-sm);
+    }
+}
+
+/* ==========================================================================
+   E. Touch adaptation — larger targets on coarse pointer
+   Apple HIG / Material: minimum 44x44px touch target.
+   ========================================================================== */
+
+@media (pointer: coarse) {
+    :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-ghost, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
+        min-height: var(--pdx-target-min);
+        min-width: var(--pdx-target-min);
+    }
+
+    .pdx-input {
+        min-height: var(--pdx-target-min);
+    }
+}
+
+/* ==========================================================================
+   E2. Touch targets — the commands INSIDE components
+   --pdx-target-min is 24px with a fine pointer and 44px with a coarse one (tokens.css). The theme's
+   control heights size the host's own control and stop there; these are the menu items, options,
+   ✕ and arrows a panel carries, which on a phone would otherwise be 16-39px. Measured by touch-targets.spec.ts,
+   with a coarse and a fine pointer. What counts is the target, not the glyph.
+   ========================================================================== */
+
+/* ⚠️ This layer comes after the components', so a min-block-size here REPLACES a component's own
+   min-height — it would lower the select option from 2rem to 24px. A command whose component sets its
+   own minimum takes max(own, token) in its own file instead: .pdx-select-option (select.css) and
+   .pdx-autocomplete-option (autocomplete.css). touch-targets.spec.ts pins the desktop sizes. */
+
+/* Text commands: a row of a list, a button with a label. The height reaches the token. */
+:is(.pdx-menu-item, .pdx-cascader-item,
+    .pdx-mention-item, .pdx-alert-cancel, .pdx-alert-confirm, .pdx-date-picker-footer button,
+    .pdx-cal-title, .pdx-time-value, .pdx-otp-cell),
+.pdx-dg-row /* the row opens its record; a virtual grid places rows at the same height (grid-virtual.ts) */ {
+    min-block-size: var(--pdx-target-min);
+    box-sizing: border-box;
+}
+
+/* Icon-only commands: both sides reach it. */
+:is(.pdx-dialog-close, .pdx-cal-nav-btn, .pdx-inline-edit-save, .pdx-inline-edit-cancel, .pdx-time-arrow) {
+    min-block-size: var(--pdx-target-min);
+    min-inline-size: var(--pdx-target-min);
+    box-sizing: border-box;
+}
+
+/* Glyphs the design keeps small (the toast ×, the clear × in a field, the fieldset chevron, a
+   field-group panel's toggle — its label, or its chevron alone without one): the
+   drawing stays where it is, and an invisible square centred on it takes the tap. */
+:is(.pdx-toast-close, .pdx-input-clear, .pdx-fieldset-toggle, .pdx-field-group-toggle) {
+    position: relative;
+}
+:is(.pdx-toast-close, .pdx-input-clear, .pdx-fieldset-toggle, .pdx-field-group-toggle)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, var(--pdx-target-min));
+    height: max(100%, var(--pdx-target-min));
+    transform: translate(-50%, -50%);
+}
+
+/* ==========================================================================
+   E. Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    /* Also zero the motion token so JS-driven animations that read it honor the
+       OS preference, not just CSS transitions (WCAG 2.3.3 / C39). */
+    :root {
+        --pdx-motion-scale: 0;
+    }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================================================
+   F. High contrast
+   ========================================================================== */
+
+@media (prefers-contrast: more) {
+    :root {
+        --pdx-color-border: light-dark(var(--pdx-gray-400), var(--pdx-gray-500));
+        --pdx-color-border-strong: light-dark(var(--pdx-gray-600), var(--pdx-gray-300));
+    }
+
+    .pdx-surface-card {
+        box-shadow: none;
+        border-width: 2px;
+    }
+
+    .pdx-surface-glass {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: var(--pdx-color-surface);
+        border-width: 2px;
+    }
+}
+
+/* ==========================================================================
+   G. Print
+   ========================================================================== */
+
+/* The print rules are not here: this file is `pdx.adaptive`, which comes BEFORE `pdx.themes` in the
+   layer order, so a theme's own card shadow would win over them whatever the specificity. They live
+   in `print.css` — layer `pdx.print`, the last one — where they apply, and where a reader looking
+   for the print stylesheet finds it by name. */
+
+/* ==========================================================================
+   H. Collapse behavior (CSS support for JS runtime)
+   ========================================================================== */
+
+[data-pdx-collapse] {
+    overflow: hidden;
+    transition: max-height var(--pdx-duration) var(--pdx-ease);
+}
+
+[data-pdx-collapse="collapsed"] {
+    max-height: 0;
+}
+
+[data-pdx-collapse="expanded"] {
+    max-height: var(--pdx-collapse-height, 200vh);
+}
+
+/* ==========================================================================
+   I. Elevation utilities
+   ========================================================================== */
+
+/* In light: shadow only. In dark: shadow + lighter surface (Material Design 3 pattern) */
+.pdx-elevation-0 { box-shadow: none; }
+.pdx-elevation-1 { box-shadow: var(--pdx-shadow-sm); background: light-dark(inherit, var(--pdx-gray-850, oklch(0.21 0.01 75))); }
+.pdx-elevation-2 { box-shadow: var(--pdx-shadow-md); background: light-dark(inherit, var(--pdx-gray-800)); }
+.pdx-elevation-3 { box-shadow: var(--pdx-shadow-lg); background: light-dark(inherit, var(--pdx-gray-750, oklch(0.28 0.012 75))); }
+.pdx-elevation-4 { box-shadow: var(--pdx-shadow-xl); background: light-dark(inherit, var(--pdx-gray-700)); }
+
+/* ==========================================================================
+   J. Animation utilities
+   ========================================================================== */
+
+@keyframes pdx-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes pdx-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+@keyframes pdx-slide-up {
+    from { opacity: 0; transform: translateY(0.5rem); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pdx-slide-down {
+    from { opacity: 0; transform: translateY(-0.5rem); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pdx-scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pdx-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+}
+
+/* Utility classes for applying animations */
+.pdx-animate-fade-in   { animation: pdx-fade-in var(--pdx-duration-base) var(--pdx-ease) both; }
+.pdx-animate-slide-up   { animation: pdx-slide-up var(--pdx-duration-base) var(--pdx-ease) both; }
+.pdx-animate-slide-down  { animation: pdx-slide-down var(--pdx-duration-base) var(--pdx-ease) both; }
+.pdx-animate-scale-in   { animation: pdx-scale-in var(--pdx-duration-base) var(--pdx-ease) both; }
+.pdx-animate-bounce      { animation: pdx-bounce 600ms var(--pdx-ease); }
+
+/* Stagger support: delay children for sequential entrance */
+.pdx-stagger > :nth-child(1) { animation-delay: 0ms; }
+.pdx-stagger > :nth-child(2) { animation-delay: 50ms; }
+.pdx-stagger > :nth-child(3) { animation-delay: 100ms; }
+.pdx-stagger > :nth-child(4) { animation-delay: 150ms; }
+.pdx-stagger > :nth-child(5) { animation-delay: 200ms; }
+.pdx-stagger > :nth-child(6) { animation-delay: 250ms; }
+.pdx-stagger > :nth-child(7) { animation-delay: 300ms; }
+.pdx-stagger > :nth-child(8) { animation-delay: 350ms; }
+
+/* Hover-triggered animations */
+.pdx-hover-lift:hover { transform: translateY(-2px); box-shadow: var(--pdx-shadow-md); }
+.pdx-hover-grow:hover { transform: scale(1.02); }
+.pdx-hover-glow:hover { box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2); }
+.pdx-hover-lift, .pdx-hover-grow, .pdx-hover-glow {
+    transition: transform var(--pdx-duration-base) var(--pdx-ease), box-shadow var(--pdx-duration-base) var(--pdx-ease);
+}
+
+/* Ripple effect (CSS-only approximation via radial-gradient) */
+.pdx-ripple {
+    position: relative;
+    overflow: hidden;
+}
+.pdx-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--pdx-ripple-x, 50%) var(--pdx-ripple-y, 50%), oklch(1 0 0 / 0.2) 0%, transparent 60%);
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity var(--pdx-duration-slow), transform var(--pdx-duration-slow);
+    pointer-events: none;
+}
+.pdx-ripple:active::after {
+    opacity: 1;
+    transform: scale(2.5);
+    transition: opacity 0ms, transform 0ms;
+}
+
+/* Transition utilities */
+.pdx-transition-all  { transition: all var(--pdx-transition); }
+.pdx-transition-fast { transition: all 100ms var(--pdx-ease); }
+.pdx-transition-slow { transition: all var(--pdx-duration-slow) var(--pdx-ease); }

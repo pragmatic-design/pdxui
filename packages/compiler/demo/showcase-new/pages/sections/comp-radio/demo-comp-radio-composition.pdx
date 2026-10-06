@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Groups in realistic form contexts.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Account Settings</h3>
+      <div class="comp-form-single">
+        <div class="pdx-field">
+          <pdx-label text="Theme" required size="sm"></pdx-label>
+          <pdx-radio-group orientation="horizontal" value="system" size="sm">
+            <pdx-radio label="Light" value="light"></pdx-radio>
+            <pdx-radio label="Dark" value="dark"></pdx-radio>
+            <pdx-radio label="System" value="system"></pdx-radio>
+          </pdx-radio-group>
+        </div>
+
+        <pdx-divider></pdx-divider>
+
+        <div class="pdx-field">
+          <pdx-label text="Notifications" size="sm"></pdx-label>
+          <pdx-checkbox-group size="sm" value="email,push">
+            <pdx-checkbox label="Email" value="email" description="Daily digest"></pdx-checkbox>
+            <pdx-checkbox label="Push" value="push" description="Real-time alerts"></pdx-checkbox>
+            <pdx-checkbox label="SMS" value="sms" description="Urgent only"></pdx-checkbox>
+          </pdx-checkbox-group>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:var(--pdx-space-sm);margin-top:var(--pdx-space-sm)">
+          <pdx-button variant="ghost" size="sm">Cancel</pdx-button>
+          <pdx-button variant="solid" size="sm">Save Settings</pdx-button>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-form-single { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+</style>

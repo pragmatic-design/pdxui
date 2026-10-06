@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Trend</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Trend arrows with auto-colored direction indicators.</p>
+    <div class="demo-row">
+      <pdx-statistic title="Revenue" prefix="$" value="48,250" trend="up" trend-value="+12.5%"></pdx-statistic>
+      <pdx-statistic title="Bounce Rate" value="24.8" suffix="%" trend="down" trend-value="-3.2%"></pdx-statistic>
+      <pdx-statistic title="Conversion" value="3.6" suffix="%" trend="flat" trend-value="0.0%"></pdx-statistic>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-statistic title="Revenue" prefix="$" value="48,250"
+  trend="up" trend-value="+12.5%"&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic title="Bounce Rate" value="24.8" suffix="%"
+  trend="down" trend-value="-3.2%"&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic title="Conversion" value="3.6" suffix="%"
+  trend="flat" trend-value="0.0%"&gt;&lt;/pdx-statistic&gt;</code></pre>
+    </details>
+  </section>
+</template>

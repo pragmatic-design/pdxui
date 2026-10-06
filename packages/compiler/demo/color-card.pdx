@@ -1,0 +1,48 @@
+<template>
+  <div class="color-card">
+    <h3>bind() CSS Demo</h3>
+    <div class="preview" :style="previewStyle">
+      <span class="emoji">{{ emoji }}</span>
+      <div class="label">Dynamic CSS Variables</div>
+    </div>
+    <div class="controls">
+      <label>Color
+        <input type="color" :value="color" @input="onColor" />
+      </label>
+      <label>Radius: {{ radius }}px
+        <input type="range" min="0" max="50" :value="radius" @input="onRadius" />
+      </label>
+      <label>Scale: {{ scale }}
+        <input type="range" min="50" max="200" :value="scalePercent" @input="onScale" />
+      </label>
+    </div>
+  </div>
+</template>
+
+<script setup>
+  @prop emoji: string = '🎨';
+
+  let color = $signal('#3b82f6');
+  let radius = $signal(12);
+  let scalePercent = $signal(100);
+  const scale = $derived((scalePercent / 100).toFixed(2));
+
+  const previewStyle = $derived(
+    `background: ${color}; border-radius: ${radius}px; transform: scale(${scale})`
+  );
+
+  function onColor(e) { color = e.target.value; }
+  function onRadius(e) { radius = parseInt(e.target.value); }
+  function onScale(e) { scalePercent = parseInt(e.target.value); }
+</script>
+
+<style scoped>
+  .color-card { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .preview { padding: 24px; text-align: center; color: white; transition: all 0.2s ease; margin: 8px 0; }
+  .emoji { font-size: 2rem; }
+  .label { margin-top: 6px; font-size: 0.85rem; opacity: 0.9; }
+  .controls { display: flex; flex-direction: column; gap: 6px; }
+  .controls label { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #666; }
+  .controls input[type="range"] { flex: 1; }
+  .controls input[type="color"] { width: 36px; height: 28px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+</style>

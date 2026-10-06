@@ -1,0 +1,176 @@
+<template>
+  <section class="page" data-test="asset">
+    <pdx-breadcrumb data-test="crumbs"></pdx-breadcrumb>
+    <h1 class="pdx-txt-title">{{ record?.name ?? $t('assets.unknown') }}</h1>
+
+    <!-- The record detail's shell, written once. -->
+    <pdx-record-detail :label="$t('assets.sections')">
+      <span slot="identity" class="portrait" aria-hidden="true">{{ record ? record.serial.slice(0, 3) : '?' }}</span>
+      <p slot="identity" class="pdx-txt-heading identity-name" data-test="identity-name">{{ record?.serial ?? '' }}</p>
+      <p slot="identity" class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ record ? $t('assets.kinds.' + record.kind) + ' · ' + $t('assets.statuses.' + record.status) : '' }}</p>
+
+      <p slot="menu" class="menu-group pdx-txt-small pdx-ink-muted">{{ $t('assets.groups.asset') }}</p>
+      <button slot="menu" type="button" class="menu-row" :aria-pressed="section === 'details' ? 'true' : 'false'"
+        @click="section = 'details'" data-test="section-details">{{ $t('assets.sectionNames.details') }}</button>
+      <button slot="menu" type="button" class="menu-row" :aria-pressed="section === 'tickets' ? 'true' : 'false'"
+        @click="section = 'tickets'" data-test="section-tickets">
+        <span>{{ $t('assets.sectionNames.tickets') }}</span><span class="menu-count" data-test="tickets-count">{{ tickets.length }}</span>
+      </button>
+
+        <!-- Details: the form IS the section, always editable, each field saved after its pause
+             (the employee's personal data's shape). -->
+        <section :show="section === 'details'" data-test="details">
+          <div class="section-head">
+            <h2 class="pdx-txt-heading">{{ $t('assets.sectionNames.details') }}</h2>
+            <span class="save-status pdx-txt-small" role="status" aria-live="polite" data-test="save-status"
+              :data-state="saveState" :title="savedTitle">{{ statusText }}</span>
+          </div>
+          <pdx-form :form="details" data-test="details-form">
+            <div class="grid two">
+              <pdx-form-field name="name" :label="$t('assets.fields.name')">
+                <pdx-input name="name" data-test="name"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="serial" :label="$t('assets.fields.serial')">
+                <pdx-input name="serial" data-test="serial"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="kind" :label="$t('assets.fields.kind')">
+                <pdx-select name="kind" :options="kinds" data-test="kind"></pdx-select>
+              </pdx-form-field>
+              <pdx-form-field name="status" :label="$t('assets.fields.status')">
+                <pdx-segmented name="status" :options="statuses" data-test="status"></pdx-segmented>
+              </pdx-form-field>
+              <pdx-form-field name="installed" :label="$t('assets.fields.installed')">
+                <pdx-date-picker name="installed" editable data-test="installed"></pdx-date-picker>
+              </pdx-form-field>
+              <pdx-form-field name="warrantyEnds" :label="$t('assets.fields.warrantyEnds')">
+                <pdx-date-picker name="warrantyEnds" editable data-test="warrantyEnds"></pdx-date-picker>
+              </pdx-form-field>
+              <!-- The active categories for assets, and any this one carries. -->
+              <pdx-form-field class="wide" name="categories" :label="$t('assets.columns.categories')">
+                <pdx-select name="categories" multiple :options="categoryChoices" data-test="categories"></pdx-select>
+              </pdx-form-field>
+            </div>
+          </pdx-form>
+        </section>
+
+        <!-- Tickets: those opened on this asset, newest first. -->
+        <section :show="section === 'tickets'" data-test="tickets">
+          <h2 class="pdx-txt-heading">{{ $t('assets.sectionNames.tickets') }}</h2>
+          <ul class="rows">
+            @for (tickets as ticket; track ticket.id) {
+              <li>
+                <pdx-link :to="'/tickets/' + ticket.id" data-test="asset-ticket">{{ ticket.reference }} · {{ ticket.subject }}</pdx-link>
+                <span class="pdx-txt-small pdx-ink-muted">{{ $d(ticket.opened, { dateStyle: 'medium' }) }}</span>
+              </li>
+            } @empty {
+              <li data-test="no-tickets">
+                <pdx-empty-state icon="inbox" :title="$t('assets.tickets.emptyTitle')" :description="$t('assets.tickets.emptyBody')"></pdx-empty-state>
+              </li>
+            }
+          </ul>
+        </section>
+    </pdx-record-detail>
+  </section>
+</template>
+
+<script setup>
+@page '/assets/:id' { label: assetLabel };
+@title record?.name ?? $t('assets.unknown');
+
+// The trail names the asset, as the customer's names the customer.
+function assetLabel(params) {
+  const a = assetById(Number(params.id));
+  return a ? `${a.serial} · ${a.name}` : $t('assets.unknown');
+}
+
+import { getLocale } from '@pdxui/core';
+import { assetById, assetTransport, ASSET_KINDS, ASSET_STATUSES } from '../data/assets';
+import { createAutosave } from '../data/autosave';
+import { ticketsOnAsset } from '../data/tickets';
+import { categoryLabel, categoryOptions } from '../data/categories';
+
+@prop id: string = '';
+
+// `getLocale()` hands back the signal; reading it is the second call.
+const localeSignal = getLocale();
+
+const record = $derived(assetById(Number(id)));
+const tickets = $derived(ticketsOnAsset(Number(id)));
+const kinds = $derived(ASSET_KINDS.map(k => ({ value: k, label: $t('assets.kinds.' + k) })));
+const statuses = $derived(ASSET_STATUSES.map(s => ({ value: s, label: $t('assets.statuses.' + s) })));
+/** The active categories for assets, plus any this asset carries that has been deactivated. */
+const categoryChoices = $derived([
+  ...categoryOptions('assets'),
+  ...(record?.categories ?? [])
+    .filter(code => !categoryOptions('assets').some(o => o.value === code))
+    .map(code => ({ value: code, label: categoryLabel(code) })),
+]);
+
+let section = $signal('details');
+
+// ── Details: saved as they change (the employee's personal data's shape) ──
+@form details: {
+  name: string,
+  serial: string,
+  kind: string,
+  status: string,
+  installed: string,
+  warrantyEnds: string,
+  categories: string[]
+} {
+  save: onChange;
+  validate: detailsRule
+};
+
+const FIELDS = Object.keys(details.getValues());
+
+function detailsRule(v) {
+  const errors: Record<string, string> = {};
+  if (!String(v.name ?? '').trim()) errors.name = $t('assets.nameRequired');
+  if (v.installed && v.warrantyEnds && v.warrantyEnds < v.installed) errors.warrantyEnds = $t('assets.warrantyBeforeInstalled');
+  return errors;
+}
+
+// ── Saving (src/data/autosave.ts) ──
+// The load, the queue, the state and the flush on leave are the composable's, as on the employee's
+// page.
+const autosave = createAutosave({
+  form: details,
+  fields: FIELDS,
+  read: () => assetById(Number(id)),
+  write: (record) => assetTransport.update(record),
+});
+$watch(id, () => autosave.load(), { immediate: true });
+
+const saveState = $derived(autosave.state());
+const statusText = $derived(saveState === 'saving' ? $t('assets.saving')
+  : saveState === 'refused' ? $t('assets.notSaved')
+  : saveState === 'saved' ? $t('assets.saved') : '');
+const savedTitle = $derived(autosave.savedAt()
+  ? $t('assets.savedAt', { time: new Intl.DateTimeFormat(localeSignal(), { timeStyle: 'medium' }).format(autosave.savedAt()) })
+  : null);
+
+// A change still inside its pause is saved on the way out, not lost; a refused one stays refused.
+onBeforeLeave(async () => {
+  await autosave.saveChanged();
+  return true;
+});
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  /* The shell — identity, section menu, rows — is <pdx-record-detail>'s. */
+
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--pdx-space-md); }
+  .save-status { color: var(--pdx-color-muted); min-height: 1lh; }
+  .save-status[data-state="refused"] { color: var(--pdx-color-danger-ink); }
+
+  .grid { display: grid; gap: var(--pdx-space-md) var(--pdx-space-lg); align-items: start; }
+  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid .wide { grid-column: 1 / -1; }
+
+  /* A phone: one field a row. */
+  @media (max-width: 640px) {
+    .grid.two { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

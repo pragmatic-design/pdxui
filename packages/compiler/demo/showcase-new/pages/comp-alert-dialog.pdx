@@ -1,0 +1,48 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">AlertDialog</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Confirmation dialog that requires user action. Cannot close via backdrop or Escape.
+      Auto-focuses Cancel (safety-first). Supports danger variant, type-to-confirm, timer-gated confirm.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-alert-dialog-basic class="demo-section"></pdx-demo-comp-alert-dialog-basic>
+
+    <!-- ═══ Danger ═══ -->
+    <pdx-demo-comp-alert-dialog-danger class="demo-section"></pdx-demo-comp-alert-dialog-danger>
+
+    <!-- ═══ Type to Confirm ═══ -->
+    <pdx-demo-comp-alert-dialog-type-to-confirm class="demo-section"></pdx-demo-comp-alert-dialog-type-to-confirm>
+
+    <!-- ═══ Timer Gated ═══ -->
+    <pdx-demo-comp-alert-dialog-timer class="demo-section"></pdx-demo-comp-alert-dialog-timer>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Description</span></div>
+        <div class="opt-row"><code>open</code><span>Open/close state</span></div>
+        <div class="opt-row"><code>title</code><span>Dialog title</span></div>
+        <div class="opt-row"><code>message</code><span>Description text</span></div>
+        <div class="opt-row"><code>variant</code><span>"default" or "danger" (red confirm)</span></div>
+        <div class="opt-row"><code>confirmLabel</code><span>Confirm button text</span></div>
+        <div class="opt-row"><code>cancelLabel</code><span>Cancel button text</span></div>
+        <div class="opt-row"><code>confirmText</code><span>Type-to-confirm: required text match</span></div>
+        <div class="opt-row"><code>confirmDelay</code><span>Timer-gated: seconds before confirm enabled</span></div>
+        <div class="opt-row"><code>loading</code><span>Show spinner on confirm button</span></div>
+        <div class="opt-row"><code>closeOnEscape</code><span>Allow Escape (default false)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/alert-dialog';
+@title 'AlertDialog';
+</script>
+
+<style scoped>
+  .page { }
+</style>

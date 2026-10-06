@@ -1,0 +1,144 @@
+<template>
+  <div class="int shell-wrap">
+    <header class="int-head">
+      <span class="int-kicker">Framework-agnostic</span>
+      <h1 class="int-title metal-gradient">Integration</h1>
+      <p class="int-sub">
+        The same <code>@pdxui/ui</code> Web Components, rendered live in React, Vue 3 and Angular —
+        props, events and the imperative API. One library, any framework. Each demo installs the
+        packages from npm and bundles them, so nothing is framework-specific in the components.
+      </p>
+    </header>
+
+    <div class="int-tabs" role="tablist">
+      @for (frameworks as f; track f.id) {
+        <button
+          type="button" role="tab"
+          :aria-selected="f.id === active ? 'true' : 'false'"
+          :class="f.id === active ? 'int-tab active' : 'int-tab'"
+          @click="selectFw(f.id)">{{ f.label }}</button>
+      }
+    </div>
+
+    <div class="int-grid">
+      <div class="int-demo">
+        <div class="int-demo-bar">
+          <span class="int-dot"></span><span class="int-dot"></span><span class="int-dot"></span>
+          <span class="int-url">{{ activeUrl }}</span>
+        </div>
+        <iframe
+          :src="'/integrations/' + active + '/index.html'"
+          class="int-frame" title="Live demo" loading="lazy"></iframe>
+      </div>
+
+      <aside class="int-notes">
+        <h2 class="int-h2">{{ activeLabel }}</h2>
+        <p class="int-note">{{ activeNote }}</p>
+        <pre class="int-code"><code>{{ activeCode }}</code></pre>
+      </aside>
+    </div>
+
+    <p class="int-foot">
+      Full sources under <code>integrations/{react,vue,angular}</code>. Same pattern for every
+      component: <code>columns</code>/<code>data</code> as properties, <code>pdx-*</code> as events,
+      and imperative methods (<code>dialog.show()</code>, <code>grid.clearAllFilters()</code>, <code>editor.setHTML()</code>).
+    </p>
+  </div>
+</template>
+
+<script setup>
+@page '/integrations';
+@title 'Framework Integration — PDX';
+
+let active = $signal('react');
+
+// Writing a module signal inline in an @click *inside @for* miscompiles
+// (`m(active).set` — scope helper unwraps the signal). Do the write in a
+// function (plain script scope), where the signal rewrite is correct.
+function selectFw(id) { active = id; }
+
+const reactCode = "// React: object props + events via ref (two tiny hooks)\n"
+  + "function useProp(ref, name, value) {\n"
+  + "  useEffect(() => { if (ref.current) ref.current[name] = value; }, [value]);\n"
+  + "}\n"
+  + "function useEvent(ref, event, handler) {\n"
+  + "  useEffect(() => { ref.current?.addEventListener(event, handler); ... }, []);\n"
+  + "}\n\n"
+  + "useProp(gridRef, 'columns', columns);\n"
+  + "useProp(gridRef, 'data', rows);\n"
+  + "useEvent(selectRef, 'pdx-change', e => setRole(e.detail.value));\n\n"
+  + "<pdx-button onClick={() => dialogRef.current.show()}>Open</pdx-button>\n"
+  + "<pdx-data-grid ref={gridRef} />";
+
+const vueCode = "<!-- Vue 3: .prop forces a DOM property; @pdx-* for events -->\n"
+  + "<pdx-select :options.prop=\"roles\" @pdx-change=\"e => role = e.detail.value\" />\n"
+  + "<pdx-data-grid :columns.prop=\"columns\" :data.prop=\"rows\" />\n"
+  + "<pdx-dialog ref=\"dlg\">...</pdx-dialog>\n\n"
+  + "// open it imperatively\n"
+  + "dlg.value.show();\n\n"
+  + "// vite.config: treat <pdx-*> as custom elements\n"
+  + "vue({ template: { compilerOptions: { isCustomElement: t => t.startsWith('pdx-') } } })";
+
+const angularCode = "// Angular: CUSTOM_ELEMENTS_SCHEMA + [prop]/(event) + template ref\n"
+  + "@Component({ schemas: [CUSTOM_ELEMENTS_SCHEMA], template: `\n"
+  + "  <pdx-select [options]=\"roles\" (pdx-change)=\"onChange($event)\" />\n"
+  + "  <pdx-data-grid [columns]=\"columns\" [data]=\"rows\" />\n"
+  + "  <pdx-button (click)=\"dialog.show()\">Open</pdx-button>\n"
+  + "  <pdx-dialog #dialog>...</pdx-dialog>\n"
+  + "` })";
+
+const frameworks = [
+  { id: 'react', label: 'React', url: 'React 18 + Vite',
+    note: 'JSX stringifies object props to attributes and does not wire hyphenated events, so pass them via a ref with two tiny hooks. onClick wires imperative calls. React 19 improves property binding.',
+    code: reactCode },
+  { id: 'vue', label: 'Vue 3', url: 'Vue 3 + Vite',
+    note: 'Configure the compiler with isCustomElement for <pdx-*>. Bind arrays/objects with the .prop modifier so Vue sets them as DOM properties (not stringified attributes). Events use @pdx-...',
+    code: vueCode },
+  { id: 'angular', label: 'Angular', url: 'Angular 18 (JIT) + Vite',
+    note: 'Add CUSTOM_ELEMENTS_SCHEMA to the component. [prop] binds DOM properties (arrays/objects too), (pdx-change) binds the custom event, and a template ref (#dialog) gives the element to call .show().',
+    code: angularCode },
+];
+
+// Scalar deriveds — member access on a derived object isn't auto-called in templates.
+const pick = () => frameworks.find(f => f.id === active) || frameworks[0];
+const activeLabel = $derived(pick().label);
+const activeUrl = $derived(pick().url);
+const activeNote = $derived(pick().note);
+const activeCode = $derived(pick().code);
+</script>
+
+<style scoped>
+/* Width AND gutter aligned with the header: .shell-wrap is max-width + 2rem per side.
+   With the max-width alone, the content started at 0 while the header and footer
+   started at 32px. */
+.int { max-width: var(--content-w); margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+.int-head { margin-bottom: 1.6rem; }
+.int-kicker { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); font-weight: 600; }
+.int-title { font-family: var(--font-heading); font-size: 2.4rem; margin: 0.2rem 0 0; }
+.int-sub { margin-top: 0.6rem; color: var(--ink-variant); font-size: 1.05rem; max-width: 70ch; }
+
+.int-tabs { display: flex; gap: 0.4rem; border-bottom: 1px solid var(--outline); margin-bottom: 1.4rem; }
+.int-tab { font-family: var(--font-mono); font-size: 0.9rem; color: var(--ink-muted); background: transparent; border: none; border-bottom: 2px solid transparent; padding: 0.5rem 1rem; cursor: pointer; margin-bottom: -1px; }
+.int-tab:hover { color: var(--ink); }
+.int-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+.int-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 1.4rem; align-items: start; }
+
+.int-demo { border: 1px solid var(--outline); border-radius: 12px; overflow: hidden; background: var(--surface-container); }
+.int-demo-bar { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--outline); background: var(--surface); }
+.int-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--outline); }
+.int-url { margin-left: 8px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-muted); }
+.int-frame { width: 100%; height: 560px; border: 0; display: block; background: var(--frame-bg); }
+
+.int-notes { position: sticky; top: 80px; }
+.int-h2 { font-size: 1.2rem; margin: 0 0 0.5rem; }
+.int-note { color: var(--ink-variant); font-size: 0.92rem; margin: 0 0 1rem; }
+.int-code { margin: 0; padding: 14px; border-radius: 10px; background: var(--surface-container); border: 1px solid var(--outline); overflow-x: auto; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.5; color: var(--ink); white-space: pre; }
+
+.int-foot { margin-top: 1.6rem; color: var(--ink-muted); font-size: 0.9rem; }
+
+@media (max-width: 980px) {
+  .int-grid { grid-template-columns: minmax(0, 1fr); } /* bare 1fr grows to min-content */
+  .int-notes { position: static; }
+}
+</style>

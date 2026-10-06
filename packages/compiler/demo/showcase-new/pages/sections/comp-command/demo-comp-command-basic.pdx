@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Press <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>⌘</kbd>+<kbd>K</kbd>), or click the button.
+      Type to filter, <kbd>↑</kbd>/<kbd>↓</kbd> to move, <kbd>Enter</kbd> to run, <kbd>Esc</kbd> to close.
+      Items with a <code>group</code> are listed under named groups; "Billing" is <code>disabled</code> — listed,
+      skipped by the arrows, never run. A <code>shortcut</code> is shown and announced as a key shortcut.
+    </p>
+    <div class="demo-container">
+      <button class="pdx-btn pdx-primary" @click="open = true">
+        <pdx-icon name="search" size="14"></pdx-icon> Open command palette
+      </button>
+      <span class="run-note pdx-txt-small pdx-ink-muted">Last run: <strong>{{ lastRun }}</strong></span>
+      <pdx-command
+        :open="open"
+        :items="commandItems"
+        placeholder="Search commands…"
+        @pdx-open="open = true"
+        @pdx-close="open = false"
+        @pdx-select="onSelect">
+      </pdx-command>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { id: 'dashboard', label: 'Go to Dashboard', group: 'Navigate', icon: 'home' },
+  { id: 'team', label: 'Manage Team', group: 'Navigate', icon: 'users' },
+  { id: 'settings', label: 'Settings', group: 'Account', icon: 'settings', shortcut: 'Ctrl ,' },
+];
+
+&lt;pdx-command :open="open" :items="items"
+  @pdx-select="onSelect" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let open = $signal(false);
+let lastRun = $signal('—');
+
+const commandItems = [
+  { id: 'dashboard', label: 'Go to Dashboard', group: 'Navigate', icon: 'home' },
+  { id: 'analytics', label: 'Open Analytics', group: 'Navigate', icon: 'bar-chart' },
+  { id: 'team', label: 'Manage Team', group: 'Navigate', icon: 'users' },
+  { id: 'search', label: 'Search Projects', group: 'Navigate', icon: 'search', shortcut: 'Ctrl P' },
+  { id: 'profile', label: 'View Profile', group: 'Account', icon: 'user' },
+  { id: 'notifications', label: 'Notifications', group: 'Account', icon: 'bell', shortcut: 'Ctrl Shift N' },
+  { id: 'settings', label: 'Settings', group: 'Account', icon: 'settings', shortcut: 'Ctrl ,' },
+  { id: 'billing', label: 'Billing (admins only)', group: 'Account', icon: 'credit-card', disabled: true },
+];
+
+function onSelect(e) {
+  lastRun = (e.detail && e.detail.label) || '—';
+  open = false;
+}
+</script>

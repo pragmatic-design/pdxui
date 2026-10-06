@@ -1,0 +1,135 @@
+name: Quality (every package with a suite)
+
+# The gate that runs the tests. Complements certify.yml (UI components, 5 dimensions):
+# this enforces typecheck, lint (0 explicit-any), THE SUITES, coverage thresholds on the
+# four packages that carry them, and a successful build.
+#
+# `pnpm coverage` filters to four packages, so it cannot stand in for running the suites: on
+# its own it would leave ui, cli, design and the builder's e2e/static tests to no gate at all.
+# Coverage on four packages and running the suites are different goals; both are here, neither
+# substitutes for the other.
+#
+# The path filters list every package that has tests. A step that runs `pnpm test` is worth
+# nothing on a change the workflow does not react to.
+
+on:
+  pull_request:
+    paths:
+      - 'packages/core/**'
+      - 'packages/compiler/**'
+      - 'packages/router/**'
+      - 'packages/lsp/**'
+      - 'packages/vscode-pdx/**'
+      - 'packages/ui/**'
+      - 'packages/cli/**'
+      - 'packages/design/**'
+      - 'packages/responsive/**'
+      - 'packages/builder/**'
+      - 'packages/site/**'
+      - 'packages/showcase/**'
+      - '.github/workflows/quality.yml'
+      - 'eslint.config.mjs'
+      - '.prettierrc.json'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/core/**'
+      - 'packages/compiler/**'
+      - 'packages/router/**'
+      - 'packages/lsp/**'
+      - 'packages/vscode-pdx/**'
+      - 'packages/ui/**'
+      - 'packages/cli/**'
+      - 'packages/design/**'
+      - 'packages/responsive/**'
+      - 'packages/builder/**'
+      - 'packages/site/**'
+      - 'packages/showcase/**'
+      - '.github/workflows/quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: typecheck · lint · test · coverage · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.8.1 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint (0 errors required)
+        run: pnpm lint --max-warnings=-1
+
+      # Three packages answer `pnpm test` with Playwright — design, builder and site — so the
+      # browser has to be here for `pnpm test` to mean anything. One install covers all three:
+      # `playwright install` writes to the shared ~/.cache/ms-playwright, and all three resolve the
+      # same version. The `--filter` only picks which package's CLI does the downloading.
+      - name: Install Chromium (design, builder and site run Playwright)
+        run: pnpm --filter @pdxui/design exec playwright install --with-deps chromium
+
+      - name: Test (every package)
+        run: pnpm test
+
+      - name: Coverage thresholds (core · compiler · router · lsp)
+        run: pnpm coverage
+
+      - name: Build
+        run: pnpm --filter @pdxui/core --filter @pdxui/compiler --filter @pdxui/router --filter @pdxui/lsp run build
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: coverage-report
+          path: |
+            packages/core/coverage
+            packages/compiler/coverage
+            packages/router/coverage
+            packages/lsp/coverage
+
+  # The builder has a `test` script, so `pnpm test` reaches these suites too. This job exists
+  # because it is the only place that installs a browser for them and uploads the report on
+  # failure; naming the two scripts here also keeps the failure attributable to the builder rather
+  # than to whichever package `pnpm -r` happened to be running.
+  #
+  # It is not the only thing that runs them: CI fires on push, and a suite that runs only here
+  # can stay broken locally for as long as commits wait to be pushed.
+  #
+  # test:static is the one that matters most. It builds the site and asserts on CONTENT, never
+  # on status codes, because a build that serves nothing still answers 200 to everything — a
+  # 200 is exactly what a missing file looks like behind an SPA fallback.
+  builder:
+    name: builder · e2e + static build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.8.1 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @pdxui/builder exec playwright install --with-deps chromium
+
+      - name: Builder e2e (dev server)
+        run: pnpm --filter @pdxui/builder run test:e2e
+
+      # Runs against `vite build` output served by `vite preview` — the config starts both, and
+      # refuses to reuse an existing server so it can never certify a stale dist.
+      - name: Builder static build
+        run: pnpm --filter @pdxui/builder run test:static
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: builder-report
+          path: packages/builder/test-results

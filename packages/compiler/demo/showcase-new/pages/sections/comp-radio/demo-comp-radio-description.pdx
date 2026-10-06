@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Description</h2>
+    <div class="demo-stack">
+      <pdx-radio label="Free plan" description="5 projects, 1GB storage, community support" name="plan" value="free" checked></pdx-radio>
+      <pdx-radio label="Pro plan" description="Unlimited projects, 100GB storage, priority support" name="plan" value="pro"></pdx-radio>
+      <pdx-radio label="Enterprise" description="Custom limits, dedicated support, SLA" name="plan" value="enterprise"></pdx-radio>
+    </div>
+  </section>
+</template>

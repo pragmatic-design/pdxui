@@ -1,0 +1,25 @@
+<template>
+  <div class="dashboard-grid">
+    <div class="main-col">
+      <pdx-task-list title="Sprint Backlog"></pdx-task-list>
+    </div>
+    <div class="side-col">
+      <pdx-stats-card :total="store.stats().total" :done="store.stats().done"></pdx-stats-card>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useTasks } from './task-store.pdx';
+
+@page '/dashboard' { keepAlive, preload };
+@transition 'fade';
+@title 'Dashboard — TaskMgr';
+
+const store = useTasks();
+</script>
+
+<style scoped>
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
+  @media (max-width: 800px) { .dashboard-grid { grid-template-columns: 1fr; } }
+</style>

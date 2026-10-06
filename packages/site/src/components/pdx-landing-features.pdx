@@ -1,0 +1,61 @@
+<template>
+  <section class="features shell-wrap">
+    <h2 class="section-title">Why PDX</h2>
+    <div class="feature-grid">
+      <div class="glass feature-card">
+        <span class="feature-icon">⚙︎</span>
+        <h3>Compiler, not runtime</h3>
+        <p>The value is the declaration→code transform. In prod the compiler knows the whole app graph and optimizes to measure.</p>
+      </div>
+      <div class="glass feature-card">
+        <span class="feature-icon">◈</span>
+        <h3>Signal reactivity</h3>
+        <p>Fine-grained <code>$signal</code>, <code>$derived</code>, <code>effect</code>. Updates only what changes — no Virtual DOM.</p>
+      </div>
+      <div class="glass feature-card">
+        <span class="feature-icon">◇</span>
+        <h3>Standard Web Components</h3>
+        <p>Output is plain <code>&lt;pdx-*&gt;</code> custom elements: they run anywhere, zero lock-in.</p>
+      </div>
+      <div class="glass feature-card">
+        <span class="feature-icon">✦</span>
+        <h3>Agent-native</h3>
+        <p>A JSON manifest per component, structured diagnostics, deterministic patterns: an agent gets it right on the first try.</p>
+      </div>
+      <div class="glass feature-card">
+        <span class="feature-icon">⟳</span>
+        <h3>Dual-mode dev/prod</h3>
+        <p>Interpreted in dev for instant DX; compiled and optimized in prod. No build to develop.</p>
+      </div>
+      <div class="glass feature-card">
+        <span class="feature-icon">◐</span>
+        <h3>Themes &amp; tokens</h3>
+        <p>13 themes, OKLCH design tokens, dark mode. Re-theme the whole app at runtime, no rebuild.</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+// The landing page's "Why PDX" section: six cards, no state.
+</script>
+
+<style scoped>
+section { padding-top: 5.5rem; }
+.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; text-align: center; }
+
+/* At most three columns, so six cards always fill their rows: 3 + 3, 2 + 2 + 2, or one column.
+   `auto-fill` with a bare 300px minimum fits five on a wide screen and leaves the sixth alone on a row
+   of its own. A column is never narrower than a third of the grid, nor than 300px. */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max(min(300px, 100%), calc((100% - 2 * 1.4rem) / 3)), 1fr));
+  gap: 1.4rem; margin-top: 2.4rem;
+}
+.feature-card { padding: 1.7rem; border-radius: 16px; transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; }
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--glow-gold); border-color: color-mix(in srgb, var(--gold-display) 30%, transparent); }
+.feature-icon { font-size: 1.5rem; color: var(--gold); }
+.feature-card h3 { margin: 0.8rem 0 0.5rem; font-size: 1.15rem; font-weight: 700; color: var(--ink); }
+.feature-card p { margin: 0; color: var(--ink-variant); line-height: 1.6; font-size: 0.95rem; }
+.feature-card code { color: var(--gold-fixed); }
+</style>

@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Close Button</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Dismissable via <code>.pdx-toast-close</code> button. Hover darkens the icon.</p>
+
+    <div class="toast-demo-container">
+      <div class="pdx-toast pdx-toast-warning" data-open>
+        <div class="pdx-toast-icon">&#9888;</div>
+        <div class="pdx-toast-content">
+          <div class="pdx-toast-title">Unsaved changes</div>
+          <div class="pdx-toast-message">You have unsaved changes that will be lost.</div>
+        </div>
+        <button class="pdx-toast-close">&times;</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toast pdx-toast-warning" data-open&gt;
+  ...content...
+  &lt;button class="pdx-toast-close"&gt;&amp;times;&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Avatar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Avatar</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Avatar</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">User representations. Initials, images, status, ring, badge count, shapes, groups.</p>
+                    </pdx-stack>
+
+                    <!-- Sizes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sizes</h2>
+                        <pdx-row gap="md" items="end">
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar" size="sm">S</div><span class="pdx-txt-caption pdx-ink-muted">sm</span></pdx-stack>
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar">MD</div><span class="pdx-txt-caption pdx-ink-muted">md</span></pdx-stack>
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar" size="lg">LG</div><span class="pdx-txt-caption pdx-ink-muted">lg</span></pdx-stack>
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar" size="xl">XL</div><span class="pdx-txt-caption pdx-ink-muted">xl</span></pdx-stack>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Colors -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Colors</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Set background + color via inline style or theme.</p>
+                        <pdx-row gap="sm">
+                            <div class="pdx-avatar" style="background:oklch(0.65 0.15 250);color:white">JD</div>
+                            <div class="pdx-avatar" style="background:oklch(0.65 0.15 25);color:white">AS</div>
+                            <div class="pdx-avatar" style="background:oklch(0.65 0.15 155);color:white">MK</div>
+                            <div class="pdx-avatar" style="background:oklch(0.65 0.15 85);color:white">RW</div>
+                            <div class="pdx-avatar" style="background:oklch(0.65 0.15 300);color:white">LP</div>
+                            <div class="pdx-avatar" style="background:oklch(0.65 0.15 195);color:white">TN</div>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Status -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Status</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-avatar-status</code> + <code>data-status</code>.</p>
+                        <pdx-row gap="md">
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg" style="background:oklch(0.65 0.15 250);color:white">ON</div><span class="pdx-txt-caption">online</span></pdx-stack>
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg" data-status="busy" style="background:oklch(0.65 0.15 25);color:white">BS</div><span class="pdx-txt-caption">busy</span></pdx-stack>
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg" data-status="away" style="background:oklch(0.65 0.15 85);color:white">AW</div><span class="pdx-txt-caption">away</span></pdx-stack>
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg" data-status="offline" style="background:oklch(0.65 0.15 155);color:white">OF</div><span class="pdx-txt-caption">offline</span></pdx-stack>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Shapes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Shapes</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Default is circle. Add <code>pdx-avatar-square</code> for rounded square.</p>
+                        <pdx-row gap="md" items="end">
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar" size="lg" style="background:oklch(0.65 0.15 250);color:white">JD</div><span class="pdx-txt-caption pdx-ink-muted">circle</span></pdx-stack>
+                            <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-square" size="lg" style="background:oklch(0.65 0.15 25);color:white">AS</div><span class="pdx-txt-caption pdx-ink-muted">square</span></pdx-stack>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Ring -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Ring</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Decorative colored border. Add <code>pdx-avatar-ring</code>.</p>
+                        <pdx-row gap="lg">
+                            <div class="pdx-avatar pdx-avatar-ring" size="lg" style="background:oklch(0.65 0.15 250);color:white">JD</div>
+                            <div class="pdx-avatar pdx-avatar-ring-success" size="lg" style="background:oklch(0.65 0.15 155);color:white">MK</div>
+                            <div class="pdx-avatar pdx-avatar-ring-danger" size="lg" style="background:oklch(0.65 0.15 25);color:white">AS</div>
+                            <div class="pdx-avatar pdx-avatar-ring-warning" size="lg" style="background:oklch(0.65 0.15 85);color:white">RW</div>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Badge count -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Badge Count</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-avatar-badge</code> + <code>data-count</code>. Hidden when 0 or empty.</p>
+                        <pdx-row gap="lg">
+                            <div class="pdx-avatar pdx-avatar-badge" size="lg" data-count="3" style="background:oklch(0.65 0.15 250);color:white">JD</div>
+                            <div class="pdx-avatar pdx-avatar-badge" size="lg" data-count="12" style="background:oklch(0.65 0.15 25);color:white">AS</div>
+                            <div class="pdx-avatar pdx-avatar-badge" size="lg" data-count="99+" style="background:oklch(0.65 0.15 155);color:white">MK</div>
+                            <div class="pdx-avatar pdx-avatar-badge" size="lg" data-count="0" style="background:oklch(0.65 0.15 85);color:white">RW</div>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Group -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Avatar Group</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Stacked overlapping avatars. Hover lifts individual avatar.</p>
+                        <pdx-stack gap="md">
+                            <div class="pdx-avatar-group">
+                                <div class="pdx-avatar" style="background:oklch(0.65 0.15 250);color:white">JD</div>
+                                <div class="pdx-avatar" style="background:oklch(0.65 0.15 25);color:white">AS</div>
+                                <div class="pdx-avatar" style="background:oklch(0.65 0.15 155);color:white">MK</div>
+                                <div class="pdx-avatar" style="background:oklch(0.65 0.15 85);color:white">RW</div>
+                                <div class="pdx-avatar-overflow">+5</div>
+                            </div>
+                            <div class="pdx-avatar-group">
+                                <div class="pdx-avatar" size="lg" style="background:oklch(0.65 0.15 300);color:white">LP</div>
+                                <div class="pdx-avatar" size="lg" style="background:oklch(0.65 0.15 195);color:white">TN</div>
+                                <div class="pdx-avatar" size="lg" style="background:oklch(0.65 0.15 50);color:white">CB</div>
+                            </div>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Composition patterns -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Composition Patterns</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Avatar combined with text in common layouts.</p>
+                        <pdx-stack gap="md">
+                            <!-- Row with name -->
+                            <pdx-row gap="sm" items="center">
+                                <div class="pdx-avatar" style="background:oklch(0.65 0.15 250);color:white">JD</div>
+                                <pdx-stack gap="2xs">
+                                    <strong class="pdx-txt-small">John Doe</strong>
+                                    <span class="pdx-txt-caption pdx-ink-muted">john@example.com</span>
+                                </pdx-stack>
+                            </pdx-row>
+                            <!-- Comment style -->
+                            <div class="pdx-surface-card">
+                                <div class="pdx-card-body">
+                                    <pdx-stack gap="sm">
+                                        <pdx-row gap="sm" items="center">
+                                            <div class="pdx-avatar" size="sm" style="background:oklch(0.65 0.15 25);color:white">AS</div>
+                                            <strong class="pdx-txt-small">Alice Smith</strong>
+                                            <span class="pdx-txt-caption pdx-ink-muted">2 hours ago</span>
+                                        </pdx-row>
+                                        <p class="pdx-txt-small">Great work on the new design! The components look really polished.</p>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                            <!-- Assignees -->
+                            <pdx-row gap="sm" items="center">
+                                <span class="pdx-txt-small pdx-ink-muted">Assignees:</span>
+                                <div class="pdx-avatar-group">
+                                    <div class="pdx-avatar" size="sm" style="background:oklch(0.65 0.15 250);color:white">JD</div>
+                                    <div class="pdx-avatar" size="sm" style="background:oklch(0.65 0.15 155);color:white">MK</div>
+                                </div>
+                                <button class="pdx-ghost" size="sm">+ Add</button>
+                            </pdx-row>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

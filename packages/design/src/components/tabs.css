@@ -1,0 +1,220 @@
+/* Tabs — uses --pdx-tab-indicator-size token for indicator thickness */
+
+pdx-tabs { display: block; }
+
+/* ── BASE: ENCLOSED "linguetta agganciata" (folder tab) ───────────────────────────────────────────
+   The active tab is a tab CONNECTED to a bordered content panel (Ant card / browser folder tabs).
+   Evident by its shape + border in BOTH schemes. Famous themes (material/cupertino/fluent) and the
+   pill variant override this back to their own pattern below. */
+.pdx-tabs {
+    display: flex;
+    /* Narrower than its tabs, the strip wraps them onto another row rather than running past its
+       edge, where a page that clips sideways makes them unreachable. That is all CSS can
+       do: <pdx-tabs> measures its strip and scrolls it instead ([data-overflow] below). */
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--pdx-color-border);   /* the container's top edge */
+    gap: var(--pdx-space-2xs);
+    overflow: visible;
+    position: relative;
+    scrollbar-width: none;
+}
+.pdx-tabs::-webkit-scrollbar { display: none; }
+
+/* Set by <pdx-tabs> only while its tabs do not fit one row: one row, scrolled sideways. Not the
+   default: a scroller clips at its padding box, and the active tab's join to the panel, a theme's
+   indicator and its glow all hang below it. */
+.pdx-tabs[data-overflow] {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.pdx-tabs[data-overflow] > .pdx-tab-indicator { bottom: 0; }
+
+.pdx-tab {
+    /* Difensivo: line-height + box-sizing espliciti per la style-isolation. */
+    box-sizing: border-box;
+    line-height: var(--pdx-line-tight);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    min-height: calc(2.75rem * var(--pdx-density-factor, 1));
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    white-space: nowrap;
+    font-weight: var(--pdx-weight-medium);
+    background: none;
+    border: 1px solid transparent; border-bottom: none;
+    border-radius: var(--pdx-radius-md) var(--pdx-radius-md) 0 0;
+    margin-bottom: -1px;                  /* overlap the tablist border so the active tab merges into the panel */
+    font-family: inherit;
+    transition: color var(--pdx-transition), background var(--pdx-transition);
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Hover: a faint THEME-tinted hint (consistent with the accent) rather than flat grey. Inactive tabs
+   preview the accent; the active tab gets a barely-there lift so it still responds. */
+.pdx-tab:hover:not([aria-selected="true"]) {
+    color: var(--pdx-color-text);
+    background: color-mix(in oklab, var(--pdx-color-primary) 8%, transparent);
+}
+.pdx-tab[aria-selected="true"]:hover {
+    background: color-mix(in oklab, var(--pdx-color-primary) 5%, var(--pdx-color-bg));
+}
+.pdx-tab:focus-visible { outline: none; box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--pdx-color-primary) 40%, transparent); }
+.pdx-tab[aria-selected="true"] {
+    color: var(--pdx-color-text);
+    font-weight: var(--pdx-weight-semibold, 600);
+    background: var(--pdx-color-bg);      /* matches the panel → looks attached */
+    border-color: var(--pdx-color-border);
+    border-top: 2px solid var(--pdx-color-primary);   /* theme ACCENT on top — blue/gold/… so themes differ */
+    padding-top: calc(var(--pdx-space-sm) - 1px);     /* keep height despite the +1px top border */
+}
+.pdx-tab[disabled] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+
+/* The content panel is the container body — border + padding, open at the top where the active tab joins. */
+pdx-tabs [data-tab-panel], pdx-tabs [role="tabpanel"] {
+    border: 1px solid var(--pdx-color-border); border-top: none;
+    border-radius: 0 0 var(--pdx-radius-md) var(--pdx-radius-md);
+    padding: var(--pdx-space-lg);
+}
+.pdx-tab-indicator { display: none; }    /* enclosed uses tab borders, not the animated bar */
+
+/* Animated indicator — positioned by JS via CSS custom properties */
+.pdx-tab-indicator {
+    position: absolute;
+    bottom: calc(-1 * var(--pdx-tab-indicator-size));
+    left: var(--_tab-left, 0);
+    width: var(--_tab-width, 0);
+    height: var(--pdx-tab-indicator-size);
+    background: var(--pdx-color-primary);
+    border-radius: 1px;
+    transition: left 0.2s ease, width 0.2s ease, top 0.2s ease, height 0.2s ease;
+    pointer-events: none;
+}
+
+/* Closable tab close button */
+[data-tab-close] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    border-radius: var(--pdx-radius-full);
+    border: none;
+    background: none;
+    color: var(--pdx-color-muted);
+    font-size: 0.7rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--pdx-transition), background var(--pdx-transition);
+    margin-left: var(--pdx-space-xs);
+}
+.pdx-tab:hover [data-tab-close],
+.pdx-tab[aria-selected="true"] [data-tab-close] { opacity: 1; }
+[data-tab-close]:hover { background: var(--pdx-color-inset); color: var(--pdx-color-danger-ink); }
+
+/* Badge in tab */
+.pdx-tab pdx-badge { margin-left: var(--pdx-space-xs); }
+
+/* ── Bordered — applies to any variant ── */
+.pdx-tabs-bordered {
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    overflow: hidden;
+}
+.pdx-tabs-bordered [data-tab-panel] {
+    padding: var(--pdx-space-lg);
+}
+.pdx-tabs-bordered .pdx-tab-indicator {
+    /* align to the tablist's border-bottom (indicator-size), not border-width — otherwise the
+       coloured indicator sits 1px off the divider line ("staccato"). */
+    bottom: calc(-1 * var(--pdx-tab-indicator-size));
+}
+
+/* ── Card variant — bordered container ── */
+.pdx-tabs-card {
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    overflow: hidden;
+}
+.pdx-tabs-card .pdx-tabs {
+    background: var(--pdx-color-inset);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+}
+.pdx-tabs-card .pdx-tab-indicator {
+    bottom: calc(-1 * var(--pdx-tab-indicator-size));
+}
+.pdx-tabs-card [data-tab-panel] {
+    padding: var(--pdx-space-lg);
+}
+
+/* ── Pills variant — rounded buttons, no underline ──
+   Activated by .pdx-tabs-pills class (per-element) OR
+   [pdx-tab-style="pill"] attribute on ancestor (theme-driven global). */
+:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tabs {
+    border-bottom: none;
+    gap: var(--pdx-space-xs);
+    background: var(--pdx-color-inset);
+    padding: var(--pdx-space-2xs);
+    border-radius: var(--pdx-radius-md);
+    display: flex;   /* full-width track — the grey spans the content width below */
+}
+:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tab {
+    /* reset the enclosed folder look → a flat segment */
+    border: none; margin-bottom: 0;
+    border-radius: var(--pdx-radius-sm);
+    min-height: 2rem;
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+}
+:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tab[aria-selected="true"] {
+    /* the nice coloured active pill (theme accent) */
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    box-shadow: var(--pdx-shadow-sm);
+}
+/* no bordered panel in pill mode, but DO pad the content (it lines up under the full-width track) */
+:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) :is([data-tab-panel], [role="tabpanel"]) {
+    border: none; border-radius: 0; padding: var(--pdx-space-lg) var(--pdx-space-md);
+}
+:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tab-indicator { display: none; }
+
+/* ── Vertical Tabs ── */
+pdx-tabs[orientation="vertical"] {
+    display: flex;
+    flex-direction: row;
+}
+pdx-tabs[orientation="vertical"] .pdx-tabs {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border-bottom: none;
+    border-right: var(--pdx-tab-indicator-size) solid var(--pdx-color-border);
+    overflow-x: visible;
+    overflow-y: auto;
+    min-width: 160px;
+}
+pdx-tabs[orientation="vertical"].pdx-tabs-bordered .pdx-tabs {
+    border-right: var(--pdx-border-width) solid var(--pdx-color-border);
+    background: var(--pdx-color-inset);
+}
+pdx-tabs[orientation="vertical"] .pdx-tab {
+    text-align: left;
+    justify-content: flex-start;
+}
+/* Vertical indicator: reads --_tab-top/--_tab-height from JS, overrides horizontal vars */
+pdx-tabs[orientation="vertical"] .pdx-tab-indicator {
+    bottom: auto;
+    right: calc(-1 * var(--pdx-tab-indicator-size));
+    left: auto;
+    top: var(--_tab-top, 0);
+    width: var(--pdx-tab-indicator-size);
+    height: var(--_tab-height, 0);
+}
+pdx-tabs[orientation="vertical"] [role="tabpanel"] {
+    flex: 1;
+    padding-left: var(--pdx-space-lg);
+}

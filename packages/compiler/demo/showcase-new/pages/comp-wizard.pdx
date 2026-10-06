@@ -1,0 +1,99 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Wizard</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-wizard&gt;</code> — multi-step wizard with stepper header, panel visibility,
+      back/next navigation, linear/free mode, and validation guard.
+    </p>
+
+    <!-- ═══ Basic Wizard ═══ -->
+    <pdx-demo-comp-wizard-basic class="demo-section"></pdx-demo-comp-wizard-basic>
+
+    <!-- ═══ Free Navigation ═══ -->
+    <pdx-demo-comp-wizard-free-navigation class="demo-section"></pdx-demo-comp-wizard-free-navigation>
+
+    <!-- ═══ Vertical Stepper ═══ -->
+    <pdx-demo-comp-wizard-vertical class="demo-section"></pdx-demo-comp-wizard-vertical>
+
+    <!-- ═══ Small Size ═══ -->
+    <pdx-demo-comp-wizard-small class="demo-section"></pdx-demo-comp-wizard-small>
+
+    <!-- ═══ Without Nav Footer ═══ -->
+    <pdx-demo-comp-wizard-custom-navigation class="demo-section"></pdx-demo-comp-wizard-custom-navigation>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-wizard-disabled class="demo-section"></pdx-demo-comp-wizard-disabled>
+
+    <!-- ═══ Events ═══ -->
+    <pdx-demo-comp-wizard-events class="demo-section"></pdx-demo-comp-wizard-events>
+
+    <!-- ═══ With Icons ═══ -->
+    <pdx-demo-comp-wizard-custom-icons class="demo-section"></pdx-demo-comp-wizard-custom-icons>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>value</code></td><td>Number</td><td>0</td><td>Current step (0-based)</td></tr>
+            <tr><td><code>linear</code></td><td>Boolean</td><td>true</td><td>Sequential navigation only</td></tr>
+            <tr><td><code>orientation</code></td><td>String</td><td>'horizontal'</td><td>'horizontal' | 'vertical'</td></tr>
+            <tr><td><code>size</code></td><td>String</td><td>'md'</td><td>'md' | 'sm'</td></tr>
+            <tr><td><code>hide-nav</code></td><td>Boolean</td><td>false</td><td>Hide the Back/Next footer</td></tr>
+            <tr><td><code>hide-stepper</code></td><td>Boolean</td><td>false</td><td>Hide the stepper header</td></tr>
+            <tr><td><code>disabled</code></td><td>Boolean</td><td>false</td><td>Disable all interaction</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Events Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events Reference</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-before-change</code></td><td>{ value, previous }</td><td>Cancelable — call preventDefault() to block</td></tr>
+            <tr><td><code>pdx-change</code></td><td>{ value, previous }</td><td>Step changed</td></tr>
+            <tr><td><code>pdx-complete</code></td><td>{ value }</td><td>Complete clicked on last step</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Keyboard ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard Shortcuts</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Key</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>Arrow Left/Up</kbd></td><td>Focus previous step button</td></tr>
+            <tr><td><kbd>Arrow Right/Down</kbd></td><td>Focus next step button</td></tr>
+            <tr><td><kbd>Enter / Space</kbd></td><td>Activate focused step</td></tr>
+            <tr><td><kbd>Home</kbd></td><td>Focus first step</td></tr>
+            <tr><td><kbd>End</kbd></td><td>Focus last step</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/wizard';
+@title 'Wizard — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-sm);
+  max-width: 360px;
+}
+</style>

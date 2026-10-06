@@ -1,0 +1,71 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Display modes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>display="inline"</code> (default) is a fieldset with its legend. <code>panel</code> folds away on a click
+      on its legend — <code>collapsed</code> starts it closed. <code>dialog</code> shows a button that opens the fields in a dialog.
+      The fields stay in the form whichever way they are shown.
+    </p>
+    <pdx-form :form="profileForm">
+      <div class="form-stack">
+        <pdx-form-field name="displayName" label="Display name">
+          <pdx-input name="displayName"></pdx-input>
+        </pdx-form-field>
+        <pdx-field-group name="contact" label="Contact (panel)" display="panel">
+          <div class="form-grid-2">
+            <pdx-form-field name="phone" label="Phone">
+              <pdx-input name="phone"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="website" label="Website">
+              <pdx-input name="website"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </pdx-field-group>
+        <pdx-field-group name="billing" label="Billing (panel, collapsed)" display="panel" collapsed>
+          <div class="form-grid-2">
+            <pdx-form-field name="vat" label="VAT number">
+              <pdx-input name="vat"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="iban" label="IBAN">
+              <pdx-input name="iban"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </pdx-field-group>
+        <pdx-field-group name="emergency" label="Emergency contact" display="dialog">
+          <div class="form-stack">
+            <pdx-form-field name="person" label="Person">
+              <pdx-input name="person"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="number" label="Number">
+              <pdx-input name="number"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </pdx-field-group>
+      </div>
+    </pdx-form>
+    <div class="values">
+      <span class="pdx-txt-small pdx-weight-semibold">getValues()</span>
+      <pre class="pdx-txt-mono values-json">{{ valuesJson(profileForm) }}</pre>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-field-group name="contact" label="Contact" display="panel"&gt;…&lt;/pdx-field-group&gt;
+&lt;pdx-field-group name="billing" label="Billing" display="panel" collapsed&gt;…&lt;/pdx-field-group&gt;
+&lt;pdx-field-group name="emergency" label="Emergency contact" display="dialog"&gt;…&lt;/pdx-field-group&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { valuesJson } from './state.pdx';
+import { createForm } from '@pdxui/core';
+
+const profileForm = createForm({
+  initialValues: {
+    displayName: 'grace',
+    contact: { phone: '+1 555 0100', website: 'https://example.com' },
+    billing: { vat: '', iban: '' },
+    emergency: { person: '', number: '' },
+  },
+});
+</script>

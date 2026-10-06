@@ -1,0 +1,10 @@
+/* pdx-masonry — CSS columns masonry grid */
+pdx-masonry { display: block; }
+.pdx-masonry {
+    column-fill: balance;
+}
+/* Each direct child is a masonry item — prevent column breaks inside */
+.pdx-masonry > * {
+    break-inside: avoid;
+    margin-bottom: var(--pdx-masonry-gap, 1rem);
+}

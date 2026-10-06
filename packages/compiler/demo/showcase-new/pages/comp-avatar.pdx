@@ -1,0 +1,61 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Avatar</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-avatar&gt;</code> — user avatar with image, initials fallback, auto-color from name, and group stacking.
+    </p>
+
+    <!-- ═══ Initials Fallback ═══ -->
+    <pdx-demo-comp-avatar-initials class="demo-section"></pdx-demo-comp-avatar-initials>
+
+    <!-- ═══ Auto Color ═══ -->
+    <pdx-demo-comp-avatar-auto-color class="demo-section"></pdx-demo-comp-avatar-auto-color>
+
+    <!-- ═══ With Image ═══ -->
+    <pdx-demo-comp-avatar-with-image class="demo-section"></pdx-demo-comp-avatar-with-image>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-avatar-sizes class="demo-section"></pdx-demo-comp-avatar-sizes>
+
+    <!-- ═══ Shape ═══ -->
+    <pdx-demo-comp-avatar-shape class="demo-section"></pdx-demo-comp-avatar-shape>
+
+    <!-- ═══ Group / Stack ═══ -->
+    <pdx-demo-comp-avatar-group class="demo-section"></pdx-demo-comp-avatar-group>
+
+    <!-- ═══ With Status ═══ -->
+    <pdx-demo-comp-avatar-status-dot class="demo-section"></pdx-demo-comp-avatar-status-dot>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-avatar-composition class="demo-section"></pdx-demo-comp-avatar-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>src</code><span>string</span><span>Image URL. Falls back to initials on error.</span></div>
+        <div class="opt-row"><code>alt</code><span>string</span><span>Name — used for initials, aria-label, and auto-color. Without it the avatar is decorative: aria-hidden, no role</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>xs (24px), sm (32px), md (40px), lg (48px), xl (64px)</span></div>
+        <div class="opt-row"><code>shape</code><span>string</span><span>circle (default), square</span></div>
+        <div class="opt-row"><code>color</code><span>string</span><span>auto (default, from name hash), or CSS color value</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/avatar';
+@title 'Avatar Component';
+
+// The portraits are /avatars/person-N.svg, served by the app: public/avatars/, here and in
+// packages/site, not by a third party — whose uptime and privacy terms the page would depend on.
+let _ = $signal(0);
+</script>
+
+<style scoped>
+  .page { }
+
+  .opt-header, .opt-row { grid-template-columns: 120px 140px 1fr; }
+</style>

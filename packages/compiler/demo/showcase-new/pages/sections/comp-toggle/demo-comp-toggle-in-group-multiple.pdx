@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Toggle Group — Multiple</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Multiple toggles can be active simultaneously.</p>
+
+    <div class="demo-row">
+      <pdx-toggle-group type="multiple" :value="formatting" @valuechange="onFormatting" label="Formatting">
+        <pdx-toggle value="bold" aria-label="Bold"><strong>B</strong></pdx-toggle>
+        <pdx-toggle value="italic" aria-label="Italic"><em>I</em></pdx-toggle>
+        <pdx-toggle value="underline" aria-label="Underline"><u>U</u></pdx-toggle>
+        <pdx-toggle value="strike" aria-label="Strikethrough"><s>S</s></pdx-toggle>
+      </pdx-toggle-group>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let formatting = $signal('');
+
+function onFormatting(e) {
+  formatting = e.detail.value;
+}
+</script>

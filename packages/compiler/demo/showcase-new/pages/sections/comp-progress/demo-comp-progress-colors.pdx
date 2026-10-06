@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Color Variants</h2>
+    <div class="demo-stack">
+      <pdx-progress value="80" variant="success" showLabel></pdx-progress>
+      <pdx-progress value="55" variant="warning" showLabel></pdx-progress>
+      <pdx-progress value="30" variant="danger" showLabel></pdx-progress>
+    </div>
+  </section>
+</template>

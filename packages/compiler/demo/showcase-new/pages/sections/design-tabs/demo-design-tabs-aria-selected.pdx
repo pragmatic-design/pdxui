@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With aria-selected</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>aria-selected="true"</code> for accessible active state. Styled identically to <code>.active</code>.</p>
+
+    <div class="pdx-tabs" role="tablist">
+      <button class="pdx-tab" role="tab" aria-selected="true">Account</button>
+      <button class="pdx-tab" role="tab" aria-selected="false">Security</button>
+      <button class="pdx-tab" role="tab" aria-selected="false">Notifications</button>
+      <button class="pdx-tab" role="tab" aria-selected="false" disabled>Billing</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-tabs" role="tablist"&gt;
+  &lt;button class="pdx-tab" role="tab" aria-selected="true"&gt;Account&lt;/button&gt;
+  &lt;button class="pdx-tab" role="tab" aria-selected="false"&gt;Security&lt;/button&gt;
+  &lt;button class="pdx-tab" role="tab" aria-selected="false"&gt;Notifications&lt;/button&gt;
+  &lt;button class="pdx-tab" role="tab" disabled&gt;Billing&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

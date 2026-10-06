@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Error state" error="Invalid code. Try again." showError>
+        <pdx-otp-input length="6" error></pdx-otp-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

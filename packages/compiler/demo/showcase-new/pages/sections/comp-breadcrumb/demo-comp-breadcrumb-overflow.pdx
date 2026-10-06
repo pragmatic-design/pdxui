@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Overflow Collapse</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Long paths collapse to ellipsis. Click … to expand.</p>
+    <div class="demo-row">
+      <pdx-breadcrumb :items="longItems" :maxItems="3"></pdx-breadcrumb>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-breadcrumb :items="longItems" :maxItems="3"&gt;&lt;/pdx-breadcrumb&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const longItems = [
+  { key: 'home', label: 'Home', href: '#' },
+  { key: 'docs', label: 'Documentation', href: '#' },
+  { key: 'api', label: 'API Reference', href: '#' },
+  { key: 'components', label: 'Components', href: '#' },
+  { key: 'navigation', label: 'Navigation', href: '#' },
+  { key: 'breadcrumb', label: 'Breadcrumb' },
+];
+</script>

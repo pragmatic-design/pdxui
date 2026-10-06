@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Bordered</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>bordered</code> prop to any variant for a container border around tabs + panels.</p>
+
+    <pdx-tabs value="tab1" bordered label="Bordered tabs">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="tab1">Dashboard</button>
+        <button class="pdx-tab" data-tab="tab2">Analytics</button>
+        <button class="pdx-tab" data-tab="tab3">Reports</button>
+      </div>
+      <div data-tab-panel="tab1">
+        <p class="pdx-txt-small pdx-ink-muted">Dashboard content with bordered container.</p>
+      </div>
+      <div data-tab-panel="tab2">
+        <p class="pdx-txt-small pdx-ink-muted">Analytics content.</p>
+      </div>
+      <div data-tab-panel="tab3">
+        <p class="pdx-txt-small pdx-ink-muted">Reports content.</p>
+      </div>
+    </pdx-tabs>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="tab1" bordered&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="tab1"&gt;Dashboard&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="tab2"&gt;Analytics&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="tab1"&gt;Dashboard content&lt;/div&gt;
+  &lt;div data-tab-panel="tab2"&gt;Analytics content&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Highlight Matching</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Matching text is highlighted by default (<code>highlight</code> prop).
+      Type a few characters to see the match highlighted in bold.
+    </p>
+    <div class="demo-box">
+      <pdx-autocomplete
+        placeholder="Type to see highlights..."
+        :suggestions="languages"
+        highlight />
+    </div>
+  </section>
+</template>
+
+<script setup>
+// ─── Highlight (languages) ───
+const languages = ['JavaScript', 'TypeScript', 'Python', 'Rust', 'Go', 'Java', 'C#', 'C++', 'Ruby', 'Swift', 'Kotlin', 'Dart', 'PHP', 'Scala', 'Elixir', 'Haskell', 'Clojure', 'F#'];
+</script>

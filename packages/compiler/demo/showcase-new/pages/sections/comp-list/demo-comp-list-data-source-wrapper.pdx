@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">pdx-data-source Wrapper</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Zero wiring: <code>pdx-data-source</code> provides DataSource to both List and Pagination via context. No explicit <code>:source</code> needed.</p>
+    <details class="source-block">
+      <summary>Source (Pattern)</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-source url="/api/users" :page-size="5"&gt;
+  &lt;pdx-list :render-item="renderUser" clickable dividers&gt;
+  &lt;/pdx-list&gt;
+  &lt;pdx-pagination&gt;&lt;/pdx-pagination&gt;
+&lt;/pdx-data-source&gt;
+
+// Both components auto-inject the DataSource from context.
+// Pagination reads total/page, List reads data/isLoading.
+// Page change → DataSource.setPage() → List auto-reloads.</code></pre>
+    </details>
+  </section>
+</template>

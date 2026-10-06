@@ -1,0 +1,8 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Without Icon</h2>
+    <div class="demo-stack">
+      <pdx-banner variant="info" :showIcon="false">A banner without the leading icon.</pdx-banner>
+    </div>
+  </section>
+</template>

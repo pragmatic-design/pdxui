@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Boolean</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to toggle. Saves immediately.</p>
+    <div class="demo-row">
+      <span class="demo-label">Active:</span>
+      <pdx-inline-edit type="boolean" :value="true"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Notifications:</span>
+      <pdx-inline-edit type="boolean" :value="false"></pdx-inline-edit>
+    </div>
+  </section>
+</template>

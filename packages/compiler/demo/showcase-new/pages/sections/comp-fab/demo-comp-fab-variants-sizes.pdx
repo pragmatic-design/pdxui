@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants & Sizes</h2>
+    <div class="demo-row-wrap">
+      <div class="demo-frame" style="width:140px;height:140px">
+        <span class="frame-tag pdx-txt-small">sm / primary</span>
+        <pdx-fab icon="plus" variant="primary" size="sm" position="bottom-right"></pdx-fab>
+      </div>
+      <div class="demo-frame" style="width:140px;height:140px">
+        <span class="frame-tag pdx-txt-small">md / secondary</span>
+        <pdx-fab icon="edit" variant="secondary" size="md" position="bottom-right"></pdx-fab>
+      </div>
+      <div class="demo-frame" style="width:140px;height:140px">
+        <span class="frame-tag pdx-txt-small">lg / danger</span>
+        <pdx-fab icon="trash" variant="danger" size="lg" position="bottom-right"></pdx-fab>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.frame-tag { position: absolute; top: var(--pdx-space-sm); left: var(--pdx-space-sm); color: var(--pdx-color-muted); }
+</style>

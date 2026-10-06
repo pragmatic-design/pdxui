@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Auto-resize</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>minRows</code> and <code>maxRows</code> enable auto-resize. Textarea grows as you type, scrolls when maxRows is reached.
+      Resize handle is disabled in auto mode.
+    </p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Auto-grow (min 2, max 8)"></pdx-label>
+        <pdx-textarea placeholder="Start typing... textarea grows automatically" minRows="2" maxRows="8"></pdx-textarea>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Unlimited grow (min 1)"></pdx-label>
+        <pdx-textarea placeholder="No max — grows forever" minRows="1"></pdx-textarea>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-textarea minRows="2" maxRows="8" placeholder="Grows automatically"&gt;&lt;/pdx-textarea&gt;
+&lt;pdx-textarea minRows="1" placeholder="No max"&gt;&lt;/pdx-textarea&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pragmatic Design CSS — Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/pragmatic-design.css">
+    <style>
+        .showcase-section {
+            border-bottom: 1px solid var(--pdx-color-border);
+            padding-block: var(--pdx-space-xl);
+        }
+        .showcase-section:last-child { border-bottom: none; }
+
+        .showcase-code {
+            display: inline-block;
+            font-family: var(--pdx-font-mono);
+            font-size: var(--pdx-text-xs);
+            color: var(--pdx-color-muted);
+            background: var(--pdx-color-inset);
+            padding: 0.15em 0.5em;
+            border-radius: var(--pdx-radius-sm);
+        }
+
+        /* Color swatch: full width, visible border */
+        .swatch {
+            width: 100%;
+            height: 3.5rem;
+            border-radius: var(--pdx-radius-md);
+            border: 2px solid var(--pdx-color-border);
+        }
+
+        /* Resizable demo container */
+        .resize-box {
+            resize: horizontal;
+            overflow: hidden;
+            border: 2px dashed var(--pdx-color-border);
+            border-radius: var(--pdx-radius-md);
+            padding: var(--pdx-space-md);
+            min-width: 200px;
+            max-width: 100%;
+        }
+
+        /* Switcher active state: selected button is primary, others ghost */
+        .switcher-group [data-active="true"] {
+            background: var(--pdx-color-primary);
+            color: var(--pdx-color-primary-text);
+        }
+
+        /* Layout demo item (replaces inline style) */
+        .demo-item {
+            padding: var(--pdx-space-sm);
+        }
+
+        /* Type specimen label column */
+        .type-label {
+            min-width: 8rem;
+        }
+    </style>
+</head>
+<body>
+    <pdx-center max="xl" pad="lg">
+        <pdx-stack gap="2xl">
+
+            <!-- Header -->
+            <pdx-stack gap="lg">
+                <pdx-stack gap="2xs">
+                    <h1 class="pdx-txt-display">Pragmatic Design CSS</h1>
+                    <p class="pdx-txt-subheading pdx-ink-muted">Context-driven CSS framework. Agent-first, human-friendly.</p>
+                </pdx-stack>
+
+                <!-- Theme Switcher -->
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="md">
+                        <pdx-row gap="sm" items="center" justify="between">
+                            <span class="pdx-txt-heading">Theme Switcher</span>
+                            <span id="state-badge" class="showcase-code">auto / default / normal</span>
+                        </pdx-row>
+                        <pdx-grid cols="3" gap="lg">
+                            <pdx-stack gap="xs">
+                                <span class="pdx-txt-label pdx-ink-muted">Scheme</span>
+                                <pdx-row gap="xs" class="switcher-group" data-group="scheme">
+                                    <button class="pdx-ghost" data-value="auto" data-active="true" onclick="setScheme('auto')">Auto</button>
+                                    <button class="pdx-ghost" data-value="light" onclick="setScheme('light')">Light</button>
+                                    <button class="pdx-ghost" data-value="dark" onclick="setScheme('dark')">Dark</button>
+                                </pdx-row>
+                            </pdx-stack>
+                            <pdx-stack gap="xs">
+                                <span class="pdx-txt-label pdx-ink-muted">Theme</span>
+                                <pdx-row gap="xs" class="switcher-group" data-group="theme">
+                                    <button class="pdx-ghost" data-value="default" data-active="true" onclick="setTheme('default')">Default</button>
+                                    <button class="pdx-ghost" data-value="pragmatic" onclick="setTheme('pragmatic')">Pragmatic</button>
+                                    <button class="pdx-ghost" data-value="corporate" onclick="setTheme('corporate')">Corporate</button>
+                                    <button class="pdx-ghost" data-value="playful" onclick="setTheme('playful')">Playful</button>
+                                </pdx-row>
+                            </pdx-stack>
+                            <pdx-stack gap="xs">
+                                <span class="pdx-txt-label pdx-ink-muted">Density</span>
+                                <pdx-row gap="xs" class="switcher-group" data-group="density">
+                                    <button class="pdx-ghost" data-value="compact" onclick="setDensity('compact')">Compact</button>
+                                    <button class="pdx-ghost" data-value="normal" data-active="true" onclick="setDensity('normal')">Normal</button>
+                                    <button class="pdx-ghost" data-value="comfort" onclick="setDensity('comfort')">Comfort</button>
+                                </pdx-row>
+                            </pdx-stack>
+                        </pdx-grid>
+                    </pdx-stack>
+                </div>
+            </pdx-stack>
+
+            <!-- 1. Color Tokens -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Color Tokens</h2>
+                    <pdx-grid cols="2" gap="xl">
+                        <pdx-stack gap="md">
+                            <h3 class="pdx-txt-heading">Surfaces</h3>
+                            <pdx-grid cols="4" gap="md">
+                                <pdx-stack gap="xs" items="center">
+                                    <div class="swatch pdx-surface-base"></div>
+                                    <span class="showcase-code">bg</span>
+                                </pdx-stack>
+                                <pdx-stack gap="xs" items="center">
+                                    <div class="swatch pdx-surface-card"></div>
+                                    <span class="showcase-code">surface</span>
+                                </pdx-stack>
+                                <pdx-stack gap="xs" items="center">
+                                    <div class="swatch pdx-surface-inset"></div>
+                                    <span class="showcase-code">inset</span>
+                                </pdx-stack>
+                                <pdx-stack gap="xs" items="center">
+                                    <div class="swatch pdx-surface-overlay"></div>
+                                    <span class="showcase-code">overlay</span>
+                                </pdx-stack>
+                            </pdx-grid>
+                        </pdx-stack>
+                        <pdx-stack gap="md">
+                            <h3 class="pdx-txt-heading">Interactive</h3>
+                            <pdx-row gap="md">
+                                <button class="pdx-primary">Primary</button>
+                                <button class="pdx-secondary">Secondary</button>
+                                <button class="pdx-ghost">Ghost</button>
+                                <button class="pdx-danger">Danger</button>
+                            </pdx-row>
+                            <pdx-row gap="md">
+                                <span class="pdx-ink-primary pdx-txt-small">primary</span>
+                                <span class="pdx-ink-accent pdx-txt-small">accent</span>
+                                <span class="pdx-ink-danger pdx-txt-small">danger</span>
+                                <span class="pdx-ink-warning pdx-txt-small">warning</span>
+                                <span class="pdx-ink-success pdx-txt-small">success</span>
+                            </pdx-row>
+                        </pdx-stack>
+                    </pdx-grid>
+                </pdx-stack>
+            </section>
+
+            <!-- 2. Layout Primitives -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Layout Primitives</h2>
+                    <pdx-grid cols="2" gap="lg">
+                        <pdx-stack gap="sm">
+                            <span class="showcase-code">pdx-stack gap=md</span>
+                            <div class="pdx-surface-inset">
+                                <pdx-stack gap="md">
+                                    <div class="pdx-surface-card demo-item">Item 1</div>
+                                    <div class="pdx-surface-card demo-item">Item 2</div>
+                                    <div class="pdx-surface-card demo-item">Item 3</div>
+                                </pdx-stack>
+                            </div>
+                        </pdx-stack>
+                        <pdx-stack gap="sm">
+                            <span class="showcase-code">pdx-row items=center justify=between</span>
+                            <div class="pdx-surface-inset">
+                                <pdx-row gap="md" items="center" justify="between">
+                                    <span>Left</span>
+                                    <button class="pdx-primary">Center</button>
+                                    <span>Right</span>
+                                </pdx-row>
+                            </div>
+                        </pdx-stack>
+                        <pdx-stack gap="sm">
+                            <span class="showcase-code">pdx-grid cols=3 gap=sm</span>
+                            <div class="pdx-surface-inset">
+                                <pdx-grid cols="3" gap="sm">
+                                    <div class="pdx-surface-card demo-item">1</div>
+                                    <div class="pdx-surface-card demo-item">2</div>
+                                    <div class="pdx-surface-card demo-item">3</div>
+                                    <div class="pdx-surface-card demo-item">4</div>
+                                    <div class="pdx-surface-card demo-item">5</div>
+                                    <div class="pdx-surface-card demo-item">6</div>
+                                </pdx-grid>
+                            </div>
+                        </pdx-stack>
+                        <pdx-stack gap="sm">
+                            <span class="showcase-code">pdx-split ratio=1:3 gap=md</span>
+                            <div class="pdx-surface-inset">
+                                <pdx-split ratio="1:3" gap="md">
+                                    <div class="pdx-surface-card demo-item">Sidebar</div>
+                                    <div class="pdx-surface-card demo-item">Main content area</div>
+                                </pdx-split>
+                            </div>
+                        </pdx-stack>
+                    </pdx-grid>
+                </pdx-stack>
+            </section>
+
+            <!-- 3. Surfaces -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Surfaces</h2>
+                    <pdx-grid cols="auto" gap="md">
+                        <pdx-stack gap="xs">
+                            <span class="showcase-code">pdx-surface-card</span>
+                            <div class="pdx-surface-card">Card surface with border, shadow, and rounded corners.</div>
+                        </pdx-stack>
+                        <pdx-stack gap="xs">
+                            <span class="showcase-code">pdx-surface-inset</span>
+                            <div class="pdx-surface-inset">Inset surface for inputs and recessed areas.</div>
+                        </pdx-stack>
+                        <pdx-stack gap="xs">
+                            <span class="showcase-code">pdx-surface-overlay</span>
+                            <div class="pdx-surface-overlay">Overlay surface for modals and popovers.</div>
+                        </pdx-stack>
+                        <pdx-stack gap="xs">
+                            <span class="showcase-code">pdx-surface-glass</span>
+                            <div class="pdx-surface-glass">Glass surface with backdrop blur.</div>
+                        </pdx-stack>
+                    </pdx-grid>
+                </pdx-stack>
+            </section>
+
+            <!-- 4. Form Elements -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Form Elements</h2>
+                    <pdx-grid cols="2" gap="lg">
+                        <pdx-stack gap="sm">
+                            <label class="pdx-txt-label pdx-ink-muted">Text Input</label>
+                            <input class="pdx-input" placeholder="Enter text..." />
+                        </pdx-stack>
+                        <pdx-stack gap="sm">
+                            <label class="pdx-txt-label pdx-ink-muted">Disabled Input</label>
+                            <input class="pdx-input" disabled value="Disabled value" />
+                        </pdx-stack>
+                        <pdx-stack gap="sm">
+                            <label class="pdx-txt-label pdx-ink-muted">Error State</label>
+                            <input class="pdx-input" aria-invalid="true" value="Invalid value" />
+                        </pdx-stack>
+                        <pdx-stack gap="sm">
+                            <label class="pdx-txt-label pdx-ink-muted">Select</label>
+                            <select class="pdx-input">
+                                <option>Option 1</option>
+                                <option>Option 2</option>
+                                <option>Option 3</option>
+                            </select>
+                        </pdx-stack>
+                    </pdx-grid>
+                </pdx-stack>
+            </section>
+
+            <!-- 5. Typography -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Typography</h2>
+                    <pdx-stack gap="md">
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">display</span>
+                            <span class="pdx-txt-display">Display Text</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">title</span>
+                            <span class="pdx-txt-title">Title Text</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">heading</span>
+                            <span class="pdx-txt-heading">Heading Text</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">subheading</span>
+                            <span class="pdx-txt-subheading">Subheading Text</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">body</span>
+                            <span class="pdx-txt-body">Body text for regular content.</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">small</span>
+                            <span class="pdx-txt-small">Small text for secondary info.</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">caption</span>
+                            <span class="pdx-txt-caption">Caption text for fine print.</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">label</span>
+                            <span class="pdx-txt-label">Label Text</span>
+                        </pdx-row>
+                        <pdx-row gap="lg" items="baseline">
+                            <span class="showcase-code type-label">mono</span>
+                            <span class="pdx-txt-mono">const framework = "pdx";</span>
+                        </pdx-row>
+                    </pdx-stack>
+                    <pdx-stack gap="sm">
+                        <h3 class="pdx-txt-heading">Ink Colors</h3>
+                        <pdx-row gap="lg">
+                            <span class="pdx-ink-default">default</span>
+                            <span class="pdx-ink-muted">muted</span>
+                            <span class="pdx-ink-subtle">subtle</span>
+                            <span class="pdx-ink-primary">primary</span>
+                            <span class="pdx-ink-accent">accent</span>
+                            <span class="pdx-ink-danger">danger</span>
+                            <span class="pdx-ink-success">success</span>
+                            <span class="pdx-ink-warning">warning</span>
+                        </pdx-row>
+                    </pdx-stack>
+                </pdx-stack>
+            </section>
+
+            <!-- 6. Adaptive Demo -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Adaptive Demo</h2>
+                    <p class="pdx-txt-small pdx-ink-muted">Drag the right edge to resize. Grid and split auto-collapse via Container Queries.</p>
+                    <div class="resize-box">
+                        <pdx-stack gap="md">
+                            <pdx-row items="center" justify="between">
+                                <span class="pdx-txt-heading">Products</span>
+                                <button class="pdx-primary">Add</button>
+                            </pdx-row>
+                            <pdx-grid cols="3" gap="sm">
+                                <div class="pdx-surface-card demo-item">
+                                    <pdx-stack gap="xs">
+                                        <strong>Widget A</strong>
+                                        <span class="pdx-txt-small pdx-ink-muted">$19.99</span>
+                                    </pdx-stack>
+                                </div>
+                                <div class="pdx-surface-card demo-item">
+                                    <pdx-stack gap="xs">
+                                        <strong>Widget B</strong>
+                                        <span class="pdx-txt-small pdx-ink-muted">$29.99</span>
+                                    </pdx-stack>
+                                </div>
+                                <div class="pdx-surface-card demo-item">
+                                    <pdx-stack gap="xs">
+                                        <strong>Widget C</strong>
+                                        <span class="pdx-txt-small pdx-ink-muted">$39.99</span>
+                                    </pdx-stack>
+                                </div>
+                            </pdx-grid>
+                        </pdx-stack>
+                    </div>
+                </pdx-stack>
+            </section>
+
+            <!-- 7. Density Comparison -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Density Comparison</h2>
+                    <pdx-grid cols="3" gap="md">
+                        <pdx-stack gap="xs">
+                            <span class="showcase-code">compact (0.75x)</span>
+                            <div pdx-density="compact">
+                                <div class="pdx-surface-card">
+                                    <pdx-stack gap="sm">
+                                        <span class="pdx-txt-heading">Compact</span>
+                                        <p class="pdx-txt-small pdx-ink-muted">Tighter spacing for data-dense interfaces.</p>
+                                        <button class="pdx-primary">Action</button>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                        </pdx-stack>
+                        <pdx-stack gap="xs">
+                            <span class="showcase-code">normal (1x)</span>
+                            <div pdx-density="normal">
+                                <div class="pdx-surface-card">
+                                    <pdx-stack gap="sm">
+                                        <span class="pdx-txt-heading">Normal</span>
+                                        <p class="pdx-txt-small pdx-ink-muted">Default spacing for general interfaces.</p>
+                                        <button class="pdx-primary">Action</button>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                        </pdx-stack>
+                        <pdx-stack gap="xs">
+                            <span class="showcase-code">comfort (1.25x)</span>
+                            <div pdx-density="comfort">
+                                <div class="pdx-surface-card">
+                                    <pdx-stack gap="sm">
+                                        <span class="pdx-txt-heading">Comfort</span>
+                                        <p class="pdx-txt-small pdx-ink-muted">Generous spacing for relaxed browsing.</p>
+                                        <button class="pdx-primary">Action</button>
+                                    </pdx-stack>
+                                </div>
+                            </div>
+                        </pdx-stack>
+                    </pdx-grid>
+                </pdx-stack>
+            </section>
+
+            <!-- 8. Spacing Scale -->
+            <section class="showcase-section">
+                <pdx-stack gap="lg">
+                    <h2 class="pdx-txt-title">Spacing Scale</h2>
+                    <pdx-stack gap="sm">
+                        <pdx-row gap="md" items="center">
+                            <span class="showcase-code" style="min-width:3rem">2xs</span>
+                            <div class="pdx-surface-card" style="width: var(--pdx-space-2xs); height: 1rem;"></div>
+                            <span class="pdx-txt-mono pdx-ink-muted">4px</span>
+                        </pdx-row>
+                        <pdx-row gap="md" items="center">
+                            <span class="showcase-code" style="min-width:3rem">xs</span>
+                            <div class="pdx-surface-card" style="width: var(--pdx-space-xs); height: 1rem;"></div>
+                            <span class="pdx-txt-mono pdx-ink-muted">8px</span>
+                        </pdx-row>
+                        <pdx-row gap="md" items="center">
+                            <span class="showcase-code" style="min-width:3rem">sm</span>
+                            <div class="pdx-surface-card" style="width: var(--pdx-space-sm); height: 1rem;"></div>
+                            <span class="pdx-txt-mono pdx-ink-muted">12px</span>
+                        </pdx-row>
+                        <pdx-row gap="md" items="center">
+                            <span class="showcase-code" style="min-width:3rem">md</span>
+                            <div class="pdx-surface-card" style="width: var(--pdx-space-md); height: 1rem;"></div>
+                            <span class="pdx-txt-mono pdx-ink-muted">16px</span>
+                        </pdx-row>
+                        <pdx-row gap="md" items="center">
+                            <span class="showcase-code" style="min-width:3rem">lg</span>
+                            <div class="pdx-surface-card" style="width: var(--pdx-space-lg); height: 1rem;"></div>
+                            <span class="pdx-txt-mono pdx-ink-muted">24px</span>
+                        </pdx-row>
+                        <pdx-row gap="md" items="center">
+                            <span class="showcase-code" style="min-width:3rem">xl</span>
+                            <div class="pdx-surface-card" style="width: var(--pdx-space-xl); height: 1rem;"></div>
+                            <span class="pdx-txt-mono pdx-ink-muted">40px</span>
+                        </pdx-row>
+                        <pdx-row gap="md" items="center">
+                            <span class="showcase-code" style="min-width:3rem">2xl</span>
+                            <div class="pdx-surface-card" style="width: var(--pdx-space-2xl); height: 1rem;"></div>
+                            <span class="pdx-txt-mono pdx-ink-muted">64px</span>
+                        </pdx-row>
+                    </pdx-stack>
+                </pdx-stack>
+            </section>
+
+            <!-- Footer -->
+            <pdx-row justify="center" pad="lg">
+                <p class="pdx-txt-caption pdx-ink-muted">Pragmatic Design CSS v0.1.0 — @pdxui/design</p>
+            </pdx-row>
+
+        </pdx-stack>
+    </pdx-center>
+
+    <script>
+        const html = document.documentElement;
+        const badge = document.getElementById('state-badge');
+
+        function activate(group, value) {
+            const g = document.querySelector(`[data-group="${group}"]`);
+            g.querySelectorAll('button').forEach(b => b.dataset.active = String(b.dataset.value === value));
+        }
+
+        function setScheme(v) {
+            html.setAttribute('pdx-scheme', v);
+            activate('scheme', v);
+            updateBadge();
+        }
+
+        function setTheme(v) {
+            html.setAttribute('pdx-theme', v);
+            activate('theme', v);
+            updateBadge();
+        }
+
+        function setDensity(v) {
+            html.setAttribute('pdx-density', v);
+            activate('density', v);
+            updateBadge();
+        }
+
+        function updateBadge() {
+            const s = html.getAttribute('pdx-scheme') || 'auto';
+            const t = html.getAttribute('pdx-theme') || 'default';
+            const d = html.getAttribute('pdx-density') || 'normal';
+            badge.textContent = `${s} / ${t} / ${d}`;
+        }
+    </script>
+</body>
+</html>

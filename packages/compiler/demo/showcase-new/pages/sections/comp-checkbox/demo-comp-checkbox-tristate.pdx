@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Tristate</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>tristate</code> enables 3-state cycling on click: unchecked → checked → indeterminate → unchecked.
+      Event detail includes <code>state: true | false | null</code> (null = indeterminate).
+      Useful for filters and bulk operations.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-checkbox label="Include archived items" tristate></pdx-checkbox>
+      <pdx-checkbox label="Show completed tasks" tristate checked></pdx-checkbox>
+      <p class="pdx-txt-small pdx-ink-muted">Click each checkbox 3 times to see the full cycle.</p>
+    </div>
+  </section>
+</template>

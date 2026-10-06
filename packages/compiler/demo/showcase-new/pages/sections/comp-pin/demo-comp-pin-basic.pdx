@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="4-digit PIN">
+        <pdx-pin-input length="4"></pdx-pin-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="6-digit PIN">
+        <pdx-pin-input length="6"></pdx-pin-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

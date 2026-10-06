@@ -1,0 +1,97 @@
+<template>
+  <div class="crud-list">
+    <h3>{{ title }}</h3>
+
+    <div class="add-row">
+      <input type="text" ::value="newItemText" placeholder="Add new item..." @keydown="handleKeydown" />
+      <button @click="addItem" :disabled="!newItemText">Add</button>
+    </div>
+
+    <div class="count">{{ items.length }} items</div>
+
+    @if (items.length > 0) {
+      <ul class="items">
+        @for (items as item; track item.id) {
+          <li class="item">
+            @if (editingId === item.id) {
+              <input type="text" ::value="editText" @keydown="handleEditKeydown" />
+              <button @click="saveEdit">Save</button>
+              <button @click="cancelEdit">Cancel</button>
+            } @else {
+              <span>{{ item.text }}</span>
+              <div class="item-actions">
+                <button @click="startEdit(item)">Edit</button>
+                <button class="danger" @click="removeItem(item.id)">Delete</button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="empty">No items yet. Add one above!</div>
+    }
+  </div>
+</template>
+
+<script setup>
+  @prop title: string = 'Items';
+  @event itemschanged: number;
+
+  let items = $signal([]);
+  let newItemText = $signal('');
+  let editingId = $signal(null);
+  let editText = $signal('');
+  let nextId = $signal(1);
+
+  function addItem() {
+    if (!newItemText) return;
+    items = [...items, { id: nextId, text: newItemText }];
+    nextId++;
+    newItemText = '';
+    $emit('itemschanged', items.length);
+  }
+
+  function removeItem(id) {
+    items = items.filter(i => i.id !== id);
+    $emit('itemschanged', items.length);
+  }
+
+  function startEdit(item) {
+    editingId = item.id;
+    editText = item.text;
+  }
+
+  function saveEdit() {
+    items = items.map(i => i.id === editingId ? { ...i, text: editText } : i);
+    editingId = null;
+    editText = '';
+  }
+
+  function cancelEdit() {
+    editingId = null;
+    editText = '';
+  }
+
+  function handleKeydown(e) {
+    if (e.key === 'Enter') addItem();
+  }
+
+  function handleEditKeydown(e) {
+    if (e.key === 'Enter') saveEdit();
+    if (e.key === 'Escape') cancelEdit();
+  }
+</script>
+
+<style scoped>
+  .crud-list { max-width: 500px; }
+  .add-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .add-row input { flex: 1; padding: 0.5rem; border: 1px solid var(--pdx-color-border-strong); border-radius: 4px; }
+  .count { font-size: 0.85rem; color: var(--pdx-color-muted); margin-bottom: 0.5rem; }
+  .items { list-style: none; padding: 0; margin: 0; }
+  .item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-bottom: 1px solid var(--pdx-color-border); }
+  .item span { flex: 1; }
+  .item-actions { display: flex; gap: 0.25rem; }
+  button { padding: 0.25rem 0.5rem; border: 1px solid var(--pdx-color-border-strong); border-radius: 4px; cursor: pointer; }
+  button.danger { color: var(--pdx-color-danger-ink); border-color: var(--pdx-color-danger-ink); }
+  .empty { color: var(--pdx-color-muted); text-align: center; padding: 2rem; }
+</style>

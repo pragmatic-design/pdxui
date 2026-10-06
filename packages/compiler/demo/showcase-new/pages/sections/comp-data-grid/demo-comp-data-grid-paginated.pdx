@@ -1,0 +1,56 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Paginated (DataSource)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Server-simulated pagination with 100 rows, page size 10.
+      Footer shows "1–10 of 100" format with numbered page navigation. The grid tells a screen reader
+      it has 101 rows (the header included), and each row where it sits among them.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="pagedDS" :columns="pagedColumns" label="Products" striped hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const ds = createDataSource({
+  transport: fakeTransport({ data: products, idField: 'id' }),
+  pageSize: 10,
+});
+
+&lt;pdx-data-grid :source="ds" :columns="columns"
+  striped hover&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource, fakeTransport } from '@pdxui/core';
+
+const products = [];
+const categories = ['Electronics', 'Clothing', 'Books', 'Home', 'Sports'];
+for (let i = 1; i <= 100; i++) {
+  products.push({
+    id: i,
+    name: 'Product ' + i,
+    category: categories[(i - 1) % categories.length],
+    price: Math.round(Math.random() * 500 + 10),
+    stock: Math.floor(Math.random() * 200),
+    inStock: Math.random() > 0.2,
+  });
+}
+
+// ─── Paginated ───────────────────────────────
+// Auto-sized by type — no explicit widths needed
+const pagedColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category' },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+  { field: 'inStock', header: 'Available', type: 'boolean' },
+];
+
+const pagedDS = createDataSource({
+  transport: fakeTransport({ data: products, idField: 'id', latency: 200 }),
+  pageSize: 10,
+});
+</script>

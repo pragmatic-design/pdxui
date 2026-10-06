@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": []
+  },
+  // ⚠️ `tests` belongs here: without it this project reads only `src`, and the Playwright suite —
+  // the tests that stand behind the site — is compiled by nothing. Check what the include covers
+  // before believing the green.
+  "include": ["src", "tests", "vite.config.ts"],
+  // A `.pdx.ts` is the compiler's input, like a `.pdx`: its runes (`@store`, `$signal`) are not
+  // TypeScript, and the pdx plugin compiles it. The ported demos carry one.
+  "exclude": ["**/*.pdx.ts"]
+}

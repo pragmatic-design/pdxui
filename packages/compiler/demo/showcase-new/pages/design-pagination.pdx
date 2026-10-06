@@ -1,0 +1,137 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Pagination</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Page navigation and multi-step wizards.
+      <strong>CSS only</strong> — pagination for numbered pages, stepper for sequential flows.
+    </p>
+
+    <!-- ═══ Pagination ═══ -->
+    <pdx-demo-design-pagination-pagination class="demo-section"></pdx-demo-design-pagination-pagination>
+
+    <!-- ═══ Stepper Horizontal ═══ -->
+    <pdx-demo-design-pagination-stepper-horizontal class="demo-section"></pdx-demo-design-pagination-stepper-horizontal>
+
+    <!-- ═══ Stepper Vertical ═══ -->
+    <pdx-demo-design-pagination-stepper-vertical class="demo-section"></pdx-demo-design-pagination-stepper-vertical>
+
+    <!-- ═══ Compact Stepper ═══ -->
+    <pdx-demo-design-pagination-stepper-compact class="demo-section"></pdx-demo-design-pagination-stepper-compact>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-pagination</code><span>Container</span><span>Flex row of page buttons</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-page</code><span>Item</span><span>Individual page button</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-current="page"</code><span>State</span><span>Current page highlight</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-stepper</code><span>Container</span><span>Horizontal step sequence</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-stepper-vertical</code><span>Modifier</span><span>Vertical layout</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-stepper-sm</code><span>Modifier</span><span>Compact size variant</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-step</code><span>Item</span><span>Individual step</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-step-number</code><span>Part</span><span>Numbered circle badge</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-step-label</code><span>Part</span><span>Step description text</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-step-connector</code><span>Part</span><span>Line between steps</span>
+        </div>
+        <div class="opt-row">
+          <code>data-status="done"</code><span>State</span><span>Completed step (primary color)</span>
+        </div>
+        <div class="opt-row">
+          <code>data-status="active"</code><span>State</span><span>Current step (primary, bold)</span>
+        </div>
+        <div class="opt-row">
+          <code>data-status="pending"</code><span>State</span><span>Future step (muted)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/pagination';
+@title 'Pagination';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  /* Source block */
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

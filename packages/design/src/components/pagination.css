@@ -1,0 +1,223 @@
+/* Pagination + Stepper/Wizard */
+
+/* Pagination */
+.pdx-pagination {
+    display: flex;
+    /* Five 44px touch targets and the "x of y" label need ~300px: narrower, they wrap instead of
+       running past the edge of a phone screen. One row wherever it fits. */
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 var(--pdx-space-xs);
+    border-radius: var(--pdx-radius-md);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font: inherit;
+    transition: background var(--pdx-transition), color var(--pdx-transition);
+}
+
+.pdx-page:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+.pdx-page[aria-current="page"] { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+.pdx-page:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+.pdx-page:focus-visible { outline: var(--pdx-focus-width) solid var(--pdx-color-focus); outline-offset: 1px; }
+
+.pdx-page-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+}
+
+.pdx-pagination-info {
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+    margin-right: var(--pdx-space-sm);
+    white-space: nowrap;
+}
+
+.pdx-pagination-simple-info {
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    padding: 0 var(--pdx-space-sm);
+    font-weight: var(--pdx-weight-medium);
+}
+
+/* Rows per page: a pdx-select as wide as "100" and its caret, not as wide as the row. */
+.pdx-pagination-size {
+    flex: none;
+    width: 5.5rem;
+    margin-right: var(--pdx-space-sm);
+}
+
+pdx-pagination { display: block; }
+
+/* Stepper / Wizard */
+.pdx-stepper {
+    display: flex;
+    align-items: center;
+}
+
+/* Narrower than its steps, a stepper shrinks them: the numbers keep their size, the labels truncate.
+   Otherwise the CSS-only stepper runs past a phone's edge; pdx-wizard does the same for its own
+   (wizard.css). */
+.pdx-step {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.pdx-step-number {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    border: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    flex-shrink: 0;
+    transition: all var(--pdx-transition);
+}
+
+.pdx-step-label {
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+}
+.pdx-stepper:not(.pdx-stepper-vertical) .pdx-step-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.pdx-stepper:not(.pdx-stepper-vertical) .pdx-step-content { min-width: 0; }
+
+.pdx-step[data-status="done"] .pdx-step-number {
+    background: var(--pdx-color-primary);
+    border-color: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+.pdx-step[data-status="done"] .pdx-step-label { color: var(--pdx-color-text); }
+
+.pdx-step[data-status="active"] .pdx-step-number {
+    border-color: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-ink);
+}
+.pdx-step[data-status="active"] .pdx-step-label { color: var(--pdx-color-text); font-weight: var(--pdx-weight-medium); }
+
+.pdx-step-connector {
+    flex: 1;
+    height: 2px;
+    background: var(--pdx-color-border);
+    margin-inline: var(--pdx-space-sm);
+}
+
+.pdx-step[data-status="done"] + .pdx-step-connector { background: var(--pdx-color-primary); }
+
+/* Error state */
+.pdx-step[data-status="error"] .pdx-step-number {
+    border-color: var(--pdx-color-danger);
+    color: var(--pdx-color-danger-ink);
+}
+.pdx-step[data-status="error"] .pdx-step-label { color: var(--pdx-color-danger-ink); }
+
+/* Clickable steps */
+.pdx-step[role="button"],
+.pdx-step[onclick] {
+    cursor: pointer;
+}
+.pdx-step[role="button"]:hover .pdx-step-number,
+.pdx-step[onclick]:hover .pdx-step-number {
+    border-color: var(--pdx-color-primary);
+}
+
+/* Step description */
+.pdx-step-desc {
+    display: block;
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+/* Small variant */
+.pdx-stepper-sm .pdx-step-number {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: var(--pdx-text-xs);
+}
+.pdx-stepper-sm .pdx-step-label { font-size: var(--pdx-text-xs); }
+
+/* ===== Vertical Stepper ===== */
+
+.pdx-stepper-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.pdx-stepper-vertical .pdx-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--pdx-space-sm);
+    position: relative;
+    padding-bottom: var(--pdx-space-md);
+}
+
+/* Vertical connector line — centered under the step number circle */
+.pdx-stepper-vertical .pdx-step::before {
+    content: '';
+    position: absolute;
+    left: calc(1rem - 1px);  /* center of 2rem circle minus half line width */
+    top: 2rem;               /* starts right below the 2rem circle */
+    bottom: 0;
+    width: 2px;
+    background: var(--pdx-color-border);
+    z-index: 0;
+}
+
+/* Number above the line */
+.pdx-stepper-vertical .pdx-step-number {
+    z-index: 1;
+    background: var(--pdx-color-surface);
+}
+
+.pdx-stepper-vertical .pdx-step:last-child::before {
+    display: none;
+}
+
+.pdx-stepper-vertical .pdx-step:last-child {
+    padding-bottom: 0;
+}
+
+.pdx-stepper-vertical .pdx-step[data-status="done"]::before {
+    background: var(--pdx-color-primary);
+}
+
+/* Vertical step content — label + description stacked */
+.pdx-stepper-vertical .pdx-step-content {
+    flex: 1;
+    padding-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+/* No horizontal connector in vertical mode */
+.pdx-stepper-vertical .pdx-step-connector {
+    display: none;
+}

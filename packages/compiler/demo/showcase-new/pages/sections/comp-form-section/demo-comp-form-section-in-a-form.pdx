@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sections in a form</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Each section labels a group of fields; the form below has Personal, Contact and Address.</p>
+    <div class="demo-container">
+      <pdx-form :form="profileForm">
+        <pdx-form-section name="personal" label="Personal">
+          <pdx-form-field name="first" label="First name"><pdx-input name="first" placeholder="Ada" /></pdx-form-field>
+          <pdx-form-field name="last" label="Last name"><pdx-input name="last" placeholder="Lovelace" /></pdx-form-field>
+        </pdx-form-section>
+
+        <pdx-form-section name="contact" label="Contact">
+          <pdx-form-field name="email" label="Email"><pdx-input name="email" type="email" placeholder="ada@example.com" /></pdx-form-field>
+          <pdx-form-field name="phone" label="Phone"><pdx-input name="phone" placeholder="+39 …" /></pdx-form-field>
+        </pdx-form-section>
+
+        <pdx-form-section name="address" label="Address">
+          <pdx-form-field name="city" label="City"><pdx-input name="city" placeholder="Torino" /></pdx-form-field>
+          <pdx-form-field name="zip" label="ZIP"><pdx-input name="zip" placeholder="10100" /></pdx-form-field>
+        </pdx-form-section>
+
+        <pdx-form-actions submit-label="Save profile" reset-label="Reset"></pdx-form-actions>
+      </pdx-form>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-form :form="profileForm"&gt;
+  &lt;pdx-form-section name="personal" label="Personal"&gt;
+    &lt;pdx-form-field name="first" label="First name"&gt;&lt;pdx-input name="first" /&gt;&lt;/pdx-form-field&gt;
+    &lt;pdx-form-field name="last"  label="Last name"&gt;&lt;pdx-input name="last" /&gt;&lt;/pdx-form-field&gt;
+  &lt;/pdx-form-section&gt;
+  &lt;pdx-form-section name="contact" label="Contact"&gt; … &lt;/pdx-form-section&gt;
+  &lt;pdx-form-actions submit-label="Save profile" /&gt;
+&lt;/pdx-form&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createForm } from '@pdxui/core';
+
+const profileForm = createForm({ initialValues: { first: '', last: '', email: '', phone: '', city: '', zip: '' } });
+</script>
+
+<style scoped>
+.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); max-width: 720px; }
+</style>

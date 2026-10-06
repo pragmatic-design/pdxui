@@ -1,0 +1,157 @@
+<template>
+  <div class="demo">
+    <h2>Custom Scrollbar</h2>
+    <p class="desc">Cross-browser consistent, overlay mode, controllable API. Hides native scrollbar.</p>
+
+    <section>
+      <h3>Overlay Scrollbar (auto-hide)</h3>
+      <p class="desc">Scroll the list. Custom thumb appears on scroll, fades after 1.2s. Drag the thumb to scroll.</p>
+      <div class="scroll-box" :ref="box1Ref">
+        <div class="item">Item 1 — Apple</div>
+        <div class="item">Item 2 — Banana</div>
+        <div class="item">Item 3 — Cherry</div>
+        <div class="item">Item 4 — Date</div>
+        <div class="item">Item 5 — Elderberry</div>
+        <div class="item">Item 6 — Fig</div>
+        <div class="item">Item 7 — Grape</div>
+        <div class="item">Item 8 — Honeydew</div>
+        <div class="item">Item 9 — Indian Fig</div>
+        <div class="item">Item 10 — Jackfruit</div>
+        <div class="item">Item 11 — Kiwi</div>
+        <div class="item">Item 12 — Lemon</div>
+        <div class="item">Item 13 — Mango</div>
+        <div class="item">Item 14 — Nectarine</div>
+        <div class="item">Item 15 — Orange</div>
+      </div>
+      <div class="stats">
+        <span>scrollTop: <strong>{{ scrollTop1 }}</strong>px</span>
+      </div>
+    </section>
+
+    <section>
+      <h3>Programmatic Control</h3>
+      <p class="desc">Use buttons to scroll. scrollIntoView() makes a specific item visible.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="scrollToTop">Scroll to Top</button>
+        <button class="pdx-primary" @click="scrollToBottom">Scroll to Bottom</button>
+        <button class="pdx-secondary" @click="scrollToItem10">scrollIntoView(Item 10)</button>
+      </div>
+      <div class="scroll-box" :ref="box2Ref">
+        <div class="item">Item 1</div>
+        <div class="item">Item 2</div>
+        <div class="item">Item 3</div>
+        <div class="item">Item 4</div>
+        <div class="item">Item 5</div>
+        <div class="item">Item 6</div>
+        <div class="item">Item 7</div>
+        <div class="item">Item 8</div>
+        <div class="item">Item 9</div>
+        <div class="item" data-item="10">Item 10 — Target</div>
+        <div class="item">Item 11</div>
+        <div class="item">Item 12</div>
+        <div class="item">Item 13</div>
+        <div class="item">Item 14</div>
+        <div class="item">Item 15</div>
+        <div class="item">Item 16</div>
+        <div class="item">Item 17</div>
+        <div class="item">Item 18</div>
+        <div class="item">Item 19</div>
+        <div class="item">Item 20</div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Horizontal Scrollbar</h3>
+      <div class="h-scroll-box" :ref="box3Ref">
+        <div class="h-item">Column A</div>
+        <div class="h-item">Column B</div>
+        <div class="h-item">Column C</div>
+        <div class="h-item">Column D</div>
+        <div class="h-item">Column E</div>
+        <div class="h-item">Column F</div>
+        <div class="h-item">Column G</div>
+        <div class="h-item">Column H</div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Dropdown Simulation</h3>
+      <p class="desc">A scrollable list inside a bounded container — like a Select dropdown. Click to select.</p>
+      <div class="dropdown-box" :ref="box4Ref">
+        @for (options as opt; track opt) {
+          <div class="dropdown-item" @click="selectOption(opt)" :class="selected === opt ? 'active' : ''">{{ opt }}</div>
+        }
+      </div>
+      <div class="log">Selected: <strong>{{ selected }}</strong></div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { useScrollbar, effect, onMount, onDestroy } from '@pdxui/core';
+
+let scrollTop1 = $signal(0);
+let selected = $signal('None');
+let box1Ref = $signal(null);
+let box2Ref = $signal(null);
+let box3Ref = $signal(null);
+let box4Ref = $signal(null);
+
+const options = [
+    'JavaScript', 'TypeScript', 'Python', 'Rust', 'Go',
+    'C#', 'Java', 'Kotlin', 'Swift', 'Ruby',
+    'PHP', 'Scala', 'Elixir', 'Haskell', 'Clojure',
+];
+
+let sb1 = null;
+let sb2 = null;
+let sb3 = null;
+let sb4 = null;
+
+onMount(() => {
+    sb1 = useScrollbar(() => box1Ref, { mode: 'overlay', autoHideMs: 1200 });
+    sb2 = useScrollbar(() => box2Ref, { mode: 'overlay' });
+    sb3 = useScrollbar(() => box3Ref, { mode: 'overlay', axis: 'horizontal' });
+    sb4 = useScrollbar(() => box4Ref, { mode: 'overlay', autoHideMs: 800 });
+
+    const d1 = effect(() => { scrollTop1 = sb1.scrollTop(); });
+
+    onDestroy(() => {
+        d1();
+        sb1?.dispose(); sb2?.dispose(); sb3?.dispose(); sb4?.dispose();
+    });
+});
+
+function scrollToTop() { sb2?.scrollTo({ top: 0, behavior: 'smooth' }); }
+function scrollToBottom() {
+    const el = box2Ref;
+    if (el) sb2?.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+}
+function scrollToItem10() {
+    const el = box2Ref;
+    if (!el) return;
+    const item = el.querySelector('[data-item="10"]');
+    if (item) sb2?.scrollIntoView(item, { block: 'center' });
+}
+function selectOption(opt) { selected = opt; }
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .stats { font-size: 0.9rem; margin-top: 8px; }
+  .scroll-box { height: 200px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; }
+  .item { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+  .item:last-child { border-bottom: none; }
+  .h-scroll-box { height: 60px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; white-space: nowrap; display: flex; }
+  .h-item { min-width: 200px; padding: 16px 24px; border-right: 1px solid #f0f0f0; font-size: 0.9rem; flex-shrink: 0; display: flex; align-items: center; }
+  .dropdown-box { max-height: 180px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; }
+  .dropdown-item { padding: 10px 14px; font-size: 0.9rem; cursor: pointer; transition: background 100ms; }
+  .dropdown-item:hover { background: #f5f5f7; }
+  .dropdown-item.active { background: #3b82f6; color: white; }
+  .log { font-family: monospace; font-size: 0.85rem; margin-top: 8px; }
+</style>

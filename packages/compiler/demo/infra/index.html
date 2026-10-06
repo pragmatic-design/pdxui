@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Infrastructure — Tier 0 Demos</title>
+    <link rel="stylesheet" href="../../../design/src/pragmatic-design.css">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f7; margin: 0; padding: 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .card { background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.25rem; text-decoration: none; color: inherit; transition: transform 150ms, box-shadow 150ms; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .card p { margin: 0; color: #666; font-size: 0.85rem; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 0.7rem; font-weight: 600; color: white; margin-left: 8px; }
+        .b1 { background: #3b82f6; } .b2 { background: #f59e0b; } .b3 { background: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>Tier 0 — Infrastructure Primitives</h1>
+    <p style="color:#666">12 primitives. Every page is standalone and can be tested on its own.</p>
+    <div class="grid">
+        <a class="card" href="overlay.html"><h3>Overlay System <span class="badge b1">B1</span></h3><p>Z-stack, portal, backdrop, Escape, scroll lock</p></a>
+        <a class="card" href="positioning.html"><h3>Positioning <span class="badge b1">B1</span></h3><p>Middleware: offset, flip, shift, arrow. VirtualElement</p></a>
+        <a class="card" href="focus.html"><h3>Focus Management <span class="badge b1">B1</span></h3><p>Trap, group, type-ahead, restore, tab order</p></a>
+        <a class="card" href="icons.html"><h3>Icon System <span class="badge b1">B1</span></h3><p>Agnostic registry, sizing, color, ARIA</p></a>
+        <a class="card" href="container.html"><h3>Container Size <span class="badge b2">B2</span></h3><p>Reactive breakpoints, measure, container queries</p></a>
+        <a class="card" href="selection.html"><h3>Selection Model <span class="badge b2">B2</span></h3><p>Single/multiple, toggle, range, disabled keys</p></a>
+        <a class="card" href="virtualizer.html"><h3>Virtualization <span class="badge b3">B3</span></h3><p>10K items, variable heights, scroll-to</p></a>
+        <a class="card" href="drag.html"><h3>Drag & Drop <span class="badge b3">B3</span></h3><p>PointerEvent, axis, drop zones, auto-scroll</p></a>
+        <a class="card" href="scrollbar.html"><h3>Scrollbar <span class="badge b2">B2</span></h3><p>Custom scrollbar, overlay, controllable API</p></a>
+        <a class="card" href="sortable.html"><h3>Sortable <span class="badge b1">B1</span></h3><p>Drag to reorder: vertical, horizontal, handle</p></a>
+        <a class="card" href="utilities.html"><h3>Utilities <span class="badge b2">B2</span></h3><p>Clipboard, Resize Handle, Toast Queue</p></a>
+        <a class="card" href="datasource.html"><h3>DataSource <span class="badge b1">B1</span></h3><p>CRUD, server sort/filter/page, change tracking</p></a>
+        <a class="card" href="a11y.html"><h3>Accessibility <span class="badge b1">B1</span></h3><p>Active Descendant, Roving Tabindex, Live Region</p></a>
+        <a class="card" href="i18n-mobile.html"><h3>i18n + Mobile <span class="badge b2">B2</span></h3><p>RTL, component strings, bottom sheet, safe area</p></a>
+        <a class="card" href="tier0c.html"><h3>Tier 0C <span class="badge b1">B1</span></h3><p>Compound, Form, Adaptive, Skeleton, Scroll Anim</p></a>
+        <a class="card" href="atoms.html" style="border-color:#3b82f6"><h3>Tier 1 Atoms <span class="badge b1">T1</span></h3><p>Button, Badge, Chip, Avatar, Input, Checkbox, Radio, Switch</p></a>
+    </div>
+</body>
+</html>

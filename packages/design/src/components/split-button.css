@@ -1,0 +1,52 @@
+/* pdx-split-button — Primary action + dropdown arrow */
+
+pdx-split-button { display: inline-block; }
+
+.pdx-split-button-group {
+    display: inline-flex;
+    border-radius: var(--pdx-radius-sm);
+    overflow: hidden;
+}
+
+/* Primary button: no right border-radius.
+   The specificity matches surfaces/buttons.css (:is(button,a,[role=button]).class)
+   instead of an !important war. */
+:is(button, a, [role="button"]).pdx-split-primary {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}
+
+/* Arrow button: no left border-radius, narrow */
+:is(button, a, [role="button"]).pdx-split-arrow {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+    min-width: auto;
+    /* A separator derived from the current text colour: it adapts to dark fills
+       (white label) and light ones (warning, dark label) — no hardcoded white. */
+    border-left: 1px solid color-mix(in oklab, currentColor 25%, transparent);
+}
+.pdx-split-arrow svg { display: block; }
+
+/* Ensure consistent height — no size change on hover */
+.pdx-split-primary, .pdx-split-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+/* Both parts must have the same height */
+.pdx-split-button-group {
+    align-items: stretch;
+}
+
+/* Arrow icon for outline/ghost variants: darker separator */
+/* The variant on the wrapper: it matches the specificity of the arrow rule above
+   and wins on source order in the file (no !important). */
+.pdx-outline :is(button, a, [role="button"]).pdx-split-arrow,
+.pdx-ghost :is(button, a, [role="button"]).pdx-split-arrow,
+.pdx-secondary :is(button, a, [role="button"]).pdx-split-arrow {
+    border-left-color: var(--pdx-color-border);
+}

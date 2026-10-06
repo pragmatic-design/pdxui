@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-stack">
+      <div class="demo-row">
+        <span class="pdx-txt-small pdx-ink-muted size-label">xs</span>
+        <pdx-avatar-group :items="teamItems" :max="4" size="xs" :overlap="-6"></pdx-avatar-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-small pdx-ink-muted size-label">sm</span>
+        <pdx-avatar-group :items="teamItems" :max="4" size="sm" :overlap="-6"></pdx-avatar-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-small pdx-ink-muted size-label">md</span>
+        <pdx-avatar-group :items="teamItems" :max="4" size="md"></pdx-avatar-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-small pdx-ink-muted size-label">lg</span>
+        <pdx-avatar-group :items="teamItems" :max="4" size="lg" :overlap="-10"></pdx-avatar-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-small pdx-ink-muted size-label">xl</span>
+        <pdx-avatar-group :items="teamItems" :max="4" size="xl" :overlap="-12"></pdx-avatar-group>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { teamItems } from './state.pdx';
+</script>

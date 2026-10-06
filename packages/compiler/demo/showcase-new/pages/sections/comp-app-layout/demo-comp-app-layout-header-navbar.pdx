@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Header + Navbar Only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Most common pattern. No aside, no footer.</p>
+    <div class="demo-shell">
+      <pdx-app-layout headerheight="44px" navbarwidth="200px">
+        <div data-region="header" class="shell-header">
+          <pdx-icon name="package" size="16"></pdx-icon>
+          <strong>Dashboard</strong>
+          <span class="shell-spacer"></span>
+          <pdx-icon name="bell" size="16"></pdx-icon>
+          <pdx-icon name="user" size="16"></pdx-icon>
+        </div>
+        <div data-region="navbar" class="shell-nav">
+          <button type="button" class="shell-nav-item" :aria-current="page2 === 'Overview' ? 'page' : null" @click="page2 = 'Overview'"><pdx-icon name="home" size="14"></pdx-icon> Overview</button>
+          <button type="button" class="shell-nav-item" :aria-current="page2 === 'Analytics' ? 'page' : null" @click="page2 = 'Analytics'"><pdx-icon name="bar-chart" size="14"></pdx-icon> Analytics</button>
+          <button type="button" class="shell-nav-item" :aria-current="page2 === 'Projects' ? 'page' : null" @click="page2 = 'Projects'"><pdx-icon name="folder" size="14"></pdx-icon> Projects</button>
+          <button type="button" class="shell-nav-item" :aria-current="page2 === 'Team' ? 'page' : null" @click="page2 = 'Team'"><pdx-icon name="users" size="14"></pdx-icon> Team</button>
+          <button type="button" class="shell-nav-item" :aria-current="page2 === 'Settings' ? 'page' : null" @click="page2 = 'Settings'"><pdx-icon name="settings" size="14"></pdx-icon> Settings</button>
+        </div>
+        <div class="shell-main">
+          <h3>{{ page2 }}</h3>
+          <p class="pdx-txt-small pdx-ink-muted">Welcome back. Here's your dashboard.</p>
+        </div>
+      </pdx-app-layout>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let page2 = $signal('Overview');
+</script>
+
+<style scoped>
+.shell-spacer { flex: 1; }
+</style>

@@ -1,0 +1,928 @@
+{
+    "app": {
+        "name": "PDX Service Desk",
+        "nav": {
+            "dashboard": "Cruscotto",
+            "tickets": "Ticket",
+            "intake": "Richiesta",
+            "board": "Bacheca",
+            "account": "Account",
+            "label": "Principale",
+            "customers": "Clienti",
+            "employees": "Collaboratori",
+            "import": "Importa",
+            "sites": "Sedi",
+            "assets": "Asset",
+            "contracts": "Contratti",
+            "services": "Servizi",
+            "settings": "Impostazioni"
+        },
+        "views": {
+            "label": "Vista",
+            "reset": "Torna alla vista salvata",
+            "saveMenu": "Salva",
+            "save": "Salva",
+            "saveAs": "Salva come…",
+            "rename": "Rinomina",
+            "delete": "Elimina",
+            "keep": "Tienila",
+            "cancel": "Annulla",
+            "name": "Nome",
+            "nameRequired": "Una vista ha bisogno di un nome.",
+            "saveAsTitle": "Salva questa disposizione come vista",
+            "renameTitle": "Rinomina la vista",
+            "deleteTitle": "Eliminare questa vista?",
+            "deleteBody": "«{name}» non sarà più proposta da questa lista. I record non cambiano."
+        },
+        "language": "Lingua",
+        "menu": "Menu di navigazione",
+        "demo": {
+            "open": "Demo",
+            "title": "Controlli della demo",
+            "note": "Questa vetrina gira su un server simulato. Questi controlli agiscono su di lui; non fanno parte del prodotto.",
+            "empty": "Questa schermata non ha controlli della demo.",
+            "close": "Chiudi i controlli della demo"
+        },
+        "profile": {
+            "profile": "Profilo",
+            "settings": "Impostazioni",
+            "signOut": "Esci",
+            "scheme": "Tema",
+            "light": "Chiaro",
+            "dark": "Scuro",
+            "density": "Densità",
+            "compact": "Compatta",
+            "normal": "Normale",
+            "comfortable": "Ampia"
+        },
+        "rail": {
+            "pin": "Appunta {name}",
+            "newTab": "Apri {name} in una nuova scheda",
+            "toggle": "Chiudi o apri la navigazione",
+            "favourites": "Preferiti",
+            "recent": "Recenti",
+            "all": "Tutte le entità",
+            "closeAll": "Chiudi l’elenco di tutte le entità",
+            "search": "Cerca elemento",
+            "noMatch": "Nessun elemento corrisponde a «{query}».",
+            "groups": {
+                "work": "Lavoro",
+                "you": "Tu"
+            }
+        }
+    },
+    "validation": {
+        "required": "Campo obbligatorio",
+        "minLength": "Almeno {min} caratteri",
+        "maxLength": "Al massimo {max} caratteri",
+        "email": "Indirizzo email non valido",
+        "pattern": "Formato non valido",
+        "url": "URL non valido",
+        "min": "Il valore minimo è {min}",
+        "max": "Il valore massimo è {max}",
+        "integer": "Deve essere un numero intero"
+    },
+    "dashboard": {
+        "title": "Service desk",
+        "intro": "A che punto è il desk oggi, e cosa nessuno ha ancora preso in carico.",
+        "kpis": "Conteggio dei ticket",
+        "kpi": {
+            "open": "Aperti",
+            "waiting": "In attesa",
+            "closed": "Chiusi",
+            "unassigned": "Non assegnati"
+        },
+        "kpiHint": {
+            "open": "In lavorazione",
+            "waiting": "In attesa del cliente",
+            "closed": "Risolti",
+            "unassigned": "Aperti, senza un incaricato"
+        },
+        "queue": "Da prendere in carico",
+        "queueEmpty": "Ogni ticket aperto ha qualcuno che se ne occupa.",
+        "queueItem": "{reference} · {subject} · {customer}",
+        "byStatus": "Per stato",
+        "byPriority": "Lavoro aperto per priorità",
+        "loadingChart": "Caricamento del grafico…",
+        "status": {
+            "open": "Aperti",
+            "waiting": "In attesa",
+            "closed": "Chiusi"
+        },
+        "priority": {
+            "low": "Bassa",
+            "normal": "Normale",
+            "high": "Alta"
+        },
+        "count": "Ticket",
+        "demo": {
+            "colleague": "Intanto, a un'altra scrivania:",
+            "raise": "apri un ticket",
+            "close": "chiudi un ticket"
+        }
+    },
+    "ticket": {
+        "title": "Ticket {id}",
+        "summary": "Interventi, fatturazione, allegati e storico del ticket.",
+        "tabs": {
+            "first": "Intervento 2",
+            "second": "Intervento 3",
+            "billing": "Fatturazione",
+            "attachments": "Allegati",
+            "history": "Storico"
+        },
+        "loadingChart": "Caricamento del grafico…",
+        "sla": "Risposta entro {hours} h · {service}",
+        "sections": "Sezioni",
+        "groups": {
+            "work": "Lavoro",
+            "record": "Scheda"
+        }
+    },
+    "intervention": {
+        "title": "Intervento {n}",
+        "onTicket": "Un intervento sul ticket {id}."
+    },
+    "tickets": {
+        "title": "Ticket",
+        "intro": "Tutti i ticket, da filtrare, ordinare e aprire.",
+        "new": "Nuovo ticket",
+        "matching": "{count} corrispondenti",
+        "subjectOf": "Oggetto di {reference}",
+        "deleted": "Archiviato {reference} — è fuori dalla lista, non perduto.",
+        "deletedMany": "Archiviati {count} ticket — sono fuori dalla lista, non perduti.",
+        "refuseNext": "Fai fallire la prossima archiviazione",
+        "undo": "Annulla",
+        "columns": {
+            "categories": "Categorie",
+            "reference": "Rif.",
+            "subject": "Oggetto",
+            "customer": "Cliente",
+            "priority": "Priorità",
+            "status": "Stato",
+            "opened": "Aperto il",
+            "assignee": "Incaricato"
+        },
+        "status": {
+            "open": "Aperto",
+            "waiting": "In attesa",
+            "closed": "Chiuso"
+        },
+        "priority": {
+            "low": "Bassa",
+            "normal": "Normale",
+            "high": "Alta"
+        },
+        "bulk": {
+            "close": "Chiudi",
+            "delete": "Archivia",
+            "export": "Esporta",
+            "exportDenied": "Il tuo ruolo non può esportare i ticket",
+            "status": "Cambia stato",
+            "assign": "Assegna a",
+            "back": "Indietro",
+            "moved": "{count} portati a {value}",
+            "assigned": "{count} affidati a {value}",
+            "partial": "{changed} modificati · {refused} rifiutati"
+        },
+        "edit": "Modifica",
+        "live": {
+            "connected": "In diretta",
+            "disconnected": "Disconnesso — questo elenco potrebbe non essere aggiornato",
+            "drop": "Interrompi la connessione",
+            "reconnect": "Riconnetti",
+            "colleague": "Intanto, a un'altra scrivania:",
+            "pushClose": "chiudi un ticket",
+            "pushRetitle": "rinomina un ticket",
+            "pushRaise": "apri un ticket",
+            "pushWithdraw": "ritira un ticket",
+            "changed": "{reference} è stato modificato da qualcun altro.",
+            "withdrawn": "{reference} è stato ritirato da qualcun altro.",
+            "shadowed": "{reference} è cambiato sul server mentre lo stavi modificando. Vedi ancora la tua versione.",
+            "resynced": "Riconnesso: {count} modifiche sono avvenute mentre eri offline, quindi l'elenco è stato riletto."
+        },
+        "cancel": "Annulla",
+        "create": "Crea",
+        "save": "Salva",
+        "openRecord": "Apri {reference}",
+        "discardTitle": "Uscire senza salvare?",
+        "discardBody": "Il record ha modifiche non salvate.",
+        "discardLeave": "Scarta",
+        "discardStay": "Resta",
+        "empty": {
+            "filtered": {
+                "title": "Nessun ticket corrisponde",
+                "body": "I filtri attivi sono {count}.",
+                "action": "Togli i filtri"
+            },
+            "none": {
+                "title": "Ancora nessun ticket",
+                "body": "Il primo si apre da qui."
+            }
+        },
+        "rowActions": "Azioni per {reference}",
+        "row": {
+            "duplicate": "Duplica",
+            "export": "Esporta questo",
+            "exportDenied": "Il record di un ticket chiuso è archiviato e non si può esportare.",
+            "print": "Stampa",
+            "openTab": "Apri in una nuova scheda",
+            "duplicated": "{reference} è una copia, aperta e non salvata."
+        },
+        "refuseOneBulk": "Fai rifiutare una riga della prossima scrittura",
+        "unassigned": "Non assegnato",
+        "views": {
+            "default": "Tutti i ticket"
+        }
+    },
+    "attachments": {
+        "title": "Allegati",
+        "intro": "I file allegati al ticket. Trascinane uno per aggiungerlo, o scarica quelli che ci sono.",
+        "drop": "Trascina qui un file, o scegline uno",
+        "uploading": "Caricamento di {name}",
+        "bytes": "{loaded} byte su {total}",
+        "cancel": "Annulla",
+        "cancelled": "Annullato. Il server non ha memorizzato nulla, e l'elenco qui sotto è quello del server.",
+        "download": "Scarica",
+        "none": "Nessun allegato.",
+        "savedAs": "Salvato come {name}, il nome inviato dal server."
+    },
+    "intake": {
+        "title": "Nuova richiesta",
+        "intro": "Apri una richiesta in quattro passi: chi la chiede, quando, cosa serve e come si fattura.",
+        "steps": {
+            "requester": "Richiedente",
+            "window": "Finestra",
+            "details": "Dettagli",
+            "billing": "Fatturazione"
+        },
+        "fields": {
+            "requester": "Richiedente",
+            "email": "Email",
+            "customer": "Cliente",
+            "starts": "Inizio",
+            "ends": "Fine",
+            "mode": "Modalità",
+            "address": "Indirizzo",
+            "street": "Via",
+            "city": "Città",
+            "sector": "Settore",
+            "lines": "Attività",
+            "activity": "Attività",
+            "hours": "Ore",
+            "po": "Ordine di acquisto",
+            "attachment": "Allegato"
+        },
+        "modes": {
+            "onsite": "In sede",
+            "remote": "Da remoto"
+        },
+        "remoteNote": "Il lavoro da remoto non richiede un indirizzo.",
+        "addLine": "+ Aggiungi attività",
+        "endsBeforeStarts": "La data di fine precede quella di inizio.",
+        "reviewFor": "Per {customer}",
+        "reviewLines": "{count} attività",
+        "submit": "Invia la richiesta",
+        "refuseNext": "Fai fallire il prossimo invio",
+        "submitted": "Inviata. Il server ha l'intero payload.",
+        "leave": {
+            "title": "Uscire da questa richiesta?",
+            "question": "Questa richiesta ha modifiche non salvate.",
+            "discard": "Scarta ed esci",
+            "stay": "Resta"
+        },
+        "draft": {
+            "saved": "Bozza salvata",
+            "found": "Una bozza di questo modulo è stata salvata {when}.",
+            "lost": "Non ha potuto conservare: {names}",
+            "resume": "Riprendi",
+            "discard": "Scarta"
+        }
+    },
+    "board": {
+        "title": "Bacheca",
+        "intro": "I ticket per stato. Trascina una scheda in un'altra colonna, o spostala da tastiera, per cambiarne lo stato.",
+        "status": {
+            "open": "Aperti",
+            "waiting": "In attesa",
+            "closed": "Chiusi"
+        },
+        "count": "{count, plural, one {# scheda} other {# schede}}",
+        "refuseNext": "Fai fallire il prossimo spostamento",
+        "grab": "Sposta {reference}",
+        "lifted": "{reference} sollevata — frecce per spostare, Esc per annullare",
+        "hint": "Trascina una scheda, oppure porta il fuoco sulla sua maniglia e premi Spazio."
+    },
+    "billing": {
+        "title": "Fatturazione del ticket {id}",
+        "body": "Tariffe, ore e ciò che viene fatturato al cliente."
+    },
+    "login": {
+        "title": "Accedi",
+        "intro": "Accedi per lavorare sul service desk.",
+        "username": "Utente",
+        "password": "Password",
+        "signIn": "Accedi",
+        "signingIn": "Accesso in corso…",
+        "hint": "Questo backend è finto. Due utenze, password pdx:",
+        "hintAdmin": "admin — chiude il mese, legge la fatturazione",
+        "hintTech": "tech — legge l'account e nient'altro"
+    },
+    "account": {
+        "title": "Account",
+        "intro": "Il tuo profilo, le tue preferenze e la tua sessione.",
+        "profileTitle": "Profilo",
+        "email": "Email",
+        "role": "Ruolo",
+        "roleNames": {
+            "admin": "Amministratore",
+            "technician": "Tecnico"
+        },
+        "can": "Cosa puoi fare",
+        "canList": "Lavorare sui ticket, {more}",
+        "canNothing": "Lavorare sui ticket",
+        "canBilling": {
+            "read": "consultare la fatturazione",
+            "write": "chiudere il mese"
+        },
+        "and": " e ",
+        "preferencesTitle": "Preferenze",
+        "billingTitle": "Fatturazione",
+        "billingPending": "Caricamento…",
+        "closedMonths": "Mesi chiusi finora: {count}.",
+        "closeMonth": "Chiudi il mese",
+        "closeMonthHidden": "Chiudere il mese spetta all'amministrazione.",
+        "closed": "Mese chiuso. Mesi chiusi finora: {count}.",
+        "sessionTitle": "Sessione",
+        "signedInUntil": "Accesso valido fino alle {time}.",
+        "signOut": "Esci",
+        "demo": {
+            "closeAnyway": "Chiudi il mese senza il permesso"
+        }
+    },
+    "customers": {
+        "title": "Clienti",
+        "intro": "I clienti, il loro settore e il loro stato.",
+        "new": "Nuovo cliente",
+        "views": { "default": "Tutti i clienti" },
+        "create": "Crea",
+        "edit": "Modifica",
+        "save": "Salva",
+        "cancel": "Annulla",
+        "openRecord": "Apri {name}",
+        "discardTitle": "Uscire senza salvare?",
+        "discardBody": "Il cliente ha modifiche non salvate.",
+        "discardLeave": "Scarta",
+        "discardStay": "Resta",
+        "matching": "{count} corrispondenti",
+        "refuseNext": "Fai fallire la prossima archiviazione",
+        "archived": "Archiviato {reference} — è fuori dalla lista, non perduto.",
+        "archivedMany": "Archiviati {count} clienti — sono fuori dalla lista, non perduti.",
+        "undo": "Annulla",
+        "unknown": "Cliente",
+        "sections": "Sezioni",
+        "columns": {
+            "categories": "Categorie",
+            "reference": "Rif.",
+            "name": "Nome",
+            "sector": "Settore",
+            "tier": "Fascia",
+            "status": "Stato",
+            "since": "Cliente dal"
+        },
+        "tiers": {
+            "standard": "Standard",
+            "business": "Business",
+            "enterprise": "Enterprise"
+        },
+        "statuses": {
+            "active": "Attivo",
+            "onboarding": "In attivazione",
+            "closed": "Chiuso"
+        },
+        "bulk": {
+            "archive": "Archivia"
+        },
+        "groups": {
+            "account": "Scheda"
+        },
+        "sections2": {
+            "profile": "Profilo",
+            "contacts": "Contatti",
+            "services": "Servizi"
+        },
+        "services": {
+            "add": "Aggiungi un servizio",
+            "addShort": "Aggiungi",
+            "dialogTitle": "Sottoscrivi un servizio",
+            "service": "Servizio",
+            "since": "Dal",
+            "save": "Sottoscrivi",
+            "missing": "Scegli un servizio.",
+            "end": "Termina",
+            "running": "Dal {date}",
+            "ended": "{since} – {until}",
+            "sla": "risposta in {hours} h",
+            "endedToast": "{service} terminato: non conta più.",
+            "undo": "Annulla",
+            "emptyTitle": "Ancora nessun servizio",
+            "emptyBody": "Ciò che questo cliente paga, e il tempo di risposta che ognuno promette."
+        },
+        "contacts": {
+            "none": "Ancora nessun contatto.",
+            "add": "Aggiungi un contatto",
+            "remove": "Rimuovi",
+            "added": "{name} è stato aggiunto.",
+            "removed": "{name} è stato rimosso.",
+            "emptyTitle": "Ancora nessun contatto",
+            "emptyBody": "Qui stanno le persone da cercare presso questo cliente."
+        }
+    },
+    "import": {
+        "title": "Importa clienti",
+        "intro": "Trascina un CSV. Non si scrive niente finché non hai visto cosa farebbe.",
+        "drop": "Trascina qui un .csv, o scegline uno",
+        "inLibrary": "{count} clienti nella lista",
+        "ignored": "Ignorate, perché nessun campo le rivendica: {names}",
+        "willImport": "{good} righe su {total} si possono importare",
+        "commit": "Importa {count}",
+        "done": "{count} importate · {refused} ancora da correggere",
+        "exportRefused": "Esporta le righe rifiutate",
+        "expected": "Le colonne del file",
+        "requiredColumn": "obbligatoria",
+        "oneOfColumn": "uno fra: {values}",
+        "template": "Scarica un modello",
+        "columns": {
+            "line": "Riga",
+            "problem": "Problema"
+        },
+        "door": {
+            "empty": "Quel file è vuoto.",
+            "oneColumn": "Quel file ha una colonna sola. Un CSV di clienti ne vuole almeno due: il nome e un’altra.",
+            "noRows": "Quel file ha l’intestazione e nessuna riga.",
+            "noMatch": "Nessuna di quelle colonne è un campo cliente: {names}.",
+            "tooBig": "Quel file supera {max} MB."
+        },
+        "row": {
+            "required": "{field} è vuoto, ed è obbligatorio",
+            "oneOf": "{field} vale «{value}», che non è fra: {allowed}"
+        }
+    },
+    "employees": {
+        "title": "Collaboratori",
+        "intro": "Le persone del team, con i dati personali, il ruolo e i documenti.",
+        "new": "Nuovo collaboratore",
+        "views": { "default": "Tutti i collaboratori" },
+        "create": "Crea",
+        "matching": "{count} corrispondenti",
+        "openRecord": "Apri {name}",
+        "unknown": "Collaboratore",
+        "sections": "Sezioni",
+        "record": {
+            "active": "Attivo",
+            "notActive": "Non attivo",
+            "notActiveSince": "Non attivo dal {date}",
+            "previous": "Precedente",
+            "next": "Successivo",
+            "position": "{n} / {total}",
+            "endEmployment": "Cessa rapporto",
+            "endTitle": "Cessare il rapporto?",
+            "endBody": "Il contratto aperto si chiude alla data indicata. La scheda resta.",
+            "endCancel": "Mantieni",
+            "endDate": "Ultimo giorno",
+            "print": "Stampa",
+            "attention": "Da verificare"
+        },
+        "columns": {
+            "reference": "Rif.",
+            "firstName": "Nome",
+            "lastName": "Cognome",
+            "country": "Paese",
+            "hired": "Assunto il"
+        },
+        "groups": {
+            "person": "Persona"
+        },
+        "sectionNames": {
+            "personal": "Dettagli",
+            "contracts": "Contratti",
+            "sites": "Sedi",
+            "documents": "Documenti"
+        },
+        "personal": {
+            "saving": "Salvataggio…",
+            "saved": "Dati salvati",
+            "savedAt": "Salvati alle {time}",
+            "notSaved": "Non salvato",
+            "taxCodeRequired": "Per chi vive in Italia il codice fiscale è obbligatorio.",
+            "expiresBeforeIssued": "Il documento deve scadere dopo la data di rilascio.",
+            "leaveTitle": "Uscire dall’anagrafica?",
+            "leaveQuestion": "Una modifica non è stata salvata. Uscire senza?",
+            "leaveDiscard": "Scarta",
+            "leaveStay": "Resta",
+            "taxCodeShape": "Il codice fiscale ha 16 caratteri: sei lettere, due cifre, una lettera, due cifre, una lettera, tre cifre, una lettera.",
+            "postcodeShape": "Il CAP ha 5 cifre.",
+            "privacyRequired": "Il consenso privacy è obbligatorio per conservare l’anagrafica.",
+            "tabs": {
+                "personal": "Dati anagrafici",
+                "contacts": "Contatti",
+                "additional": "Dati aggiuntivi"
+            },
+            "tabWithErrors": "{tab}, {count, plural, one {# errore} other {# errori}}",
+            "groups": {
+                "identity": "Identità",
+                "residence": "Residenza",
+                "birthPlace": "Luogo di nascita",
+                "contacts": "Contatti",
+                "emergency": "Contatto di emergenza",
+                "document": "Documento d’identità",
+                "work": "Lavoro",
+                "consents": "Consensi"
+            },
+            "genders": { "female": "Donna", "male": "Uomo", "other": "Altro" },
+            "channels": { "email": "Email", "phone": "Telefono", "sms": "SMS" },
+            "documentTypes": { "idCard": "Carta d’identità", "passport": "Passaporto", "licence": "Patente" },
+            "hireChannels": { "referral": "Segnalazione", "jobBoard": "Portale di annunci", "agency": "Agenzia", "website": "Il nostro sito", "internal": "Mobilità interna" },
+            "fields": {
+                "firstName": "Nome",
+                "lastName": "Cognome",
+                "birthDate": "Data di nascita",
+                "gender": "Sesso",
+                "email": "Email",
+                "phone": "Telefono",
+                "mobile": "Cellulare",
+                "channel": "Canale preferito",
+                "emergencyName": "Contatto di emergenza",
+                "emergencyPhone": "Telefono di emergenza",
+                "street": "Indirizzo",
+                "city": "Comune",
+                "postcode": "CAP",
+                "province": "Provincia",
+                "country": "Paese",
+                "taxCode": "Codice fiscale",
+                "language": "Lingua di contatto",
+                "hireChannel": "Canale di assunzione",
+                "documentType": "Tipo di documento",
+                "documentNumber": "Numero del documento",
+                "documentIssued": "Documento rilasciato il",
+                "documentExpires": "Documento in scadenza il",
+                "skills": "Competenze",
+                "skillsHint": "Scrivi una competenza e premi Invio",
+                "startTime": "Inizio giornata",
+                "remote": "Lavora da remoto",
+                "english": "Inglese",
+                "notes": "Note",
+                "privacy": "Acconsento al trattamento dei miei dati personali",
+                "marketing": "Accetto di ricevere comunicazioni dall’azienda"
+            }
+        },
+        "contracts": {
+            "add": "Aggiungi un contratto",
+            "addShort": "Aggiungi",
+            "create": "Aggiungi",
+            "edit": "Modifica",
+            "save": "Salva",
+            "cancel": "Annulla",
+            "end": "Termina",
+            "endTitle": "Terminare questo contratto?",
+            "endBody": "Il contratto resta nella scheda, chiuso nel giorno che indichi.",
+            "endConfirm": "Termina il contratto",
+            "endCancel": "Lascialo aperto",
+            "endDate": "Ultimo giorno",
+            "ended": "Il contratto {type} è terminato il {end}.",
+            "undo": "Annulla",
+            "emptyTitle": "Nessun contratto",
+            "emptyBody": "Un contratto è un periodo: un tipo, un inizio, una fine quando è concluso, e le ore settimanali.",
+            "endBeforeStart": "Un contratto deve finire dopo l’inizio.",
+            "open": "in corso",
+            "period": "{start} – {end}",
+            "hours": "{hours} h/sett.",
+            "fields": {
+                "type": "Tipo",
+                "start": "Inizio",
+                "end": "Fine",
+                "weeklyHours": "Ore settimanali"
+            },
+            "types": {
+                "permanent": "Tempo indeterminato",
+                "fixedTerm": "Tempo determinato",
+                "apprenticeship": "Apprendistato"
+            }
+        },
+        "sites": {
+            "add": "Assegna una sede",
+            "addShort": "Assegna",
+            "assign": "Assegna",
+            "choose": "Scegli questa sede",
+            "chosen": "Sede: {name}",
+            "missing": "Scegli prima una sede.",
+            "edit": "Modifica",
+            "save": "Salva",
+            "cancel": "Annulla",
+            "end": "Termina",
+            "endTitle": "Terminare questa assegnazione?",
+            "endBody": "L’assegnazione resta nella scheda, chiusa nel giorno che indichi.",
+            "endConfirm": "Termina l’assegnazione",
+            "endCancel": "Lasciala",
+            "endDate": "Ultimo giorno",
+            "ended": "L’assegnazione a {site} è terminata il {end}.",
+            "undo": "Annulla",
+            "endBeforeStart": "Un’assegnazione deve finire dopo l’inizio.",
+            "emptyTitle": "Nessuna sede",
+            "emptyBody": "Un’assegnazione è una sede, un ruolo lì, e il giorno in cui è iniziata.",
+            "current": "in corso",
+            "since": "dal {start}",
+            "span": "{start} – {end}",
+            "fields": {
+                "site": "Sede",
+                "city": "Città",
+                "role": "Ruolo",
+                "start": "Inizio"
+            }
+        },
+        "documents": {
+            "intro": "I documenti di un collaboratore sono un archivio: un documento si ritira, non si elimina.",
+            "emptyTitle": "Nessun documento",
+            "emptyBody": "Trascina qui sopra un contratto, un documento d’identità o un permesso. Ognuno ha un’etichetta e, se ce l’ha, una scadenza.",
+            "edit": "Modifica",
+            "save": "Salva",
+            "cancel": "Annulla",
+            "download": "Scarica",
+            "withdraw": "Ritira",
+            "withdrawn": "{name} è stato ritirato.",
+            "undo": "Annulla",
+            "expired": "Scaduto",
+            "expires": "Scade il {date}",
+            "noLabel": "Senza etichetta",
+            "fields": {
+                "label": "Etichetta",
+                "expires": "Scadenza"
+            }
+        }
+    },
+    "contracts": {
+        "title": "Contratti",
+        "intro": "I contratti di tutti i collaboratori in una lista, e quelli che scadono a breve. Un contratto si modifica dove vive, nei Contratti del suo collaboratore.",
+        "matching": "{count, plural, one {# contratto} other {# contratti}}",
+        "views": {
+            "default": "Tutti i contratti",
+            "endingThisMonth": "In scadenza questo mese"
+        },
+        "columns": {
+            "employee": "Collaboratore",
+            "type": "Tipo",
+            "start": "Inizio",
+            "end": "Fine",
+            "weeklyHours": "Ore settimanali",
+            "state": "Stato"
+        },
+        "types": { "permanent": "Tempo indeterminato", "fixedTerm": "Tempo determinato", "apprenticeship": "Apprendistato" },
+        "states": { "open": "Aperto", "endingSoon": "In scadenza", "ended": "Concluso" },
+        "openEnded": "—"
+    },
+    "assets": {
+        "title": "Asset",
+        "intro": "Ciò su cui si aprono i ticket: stampanti, scanner, portatili, rete e telefoni di ogni cliente, dove sono installati e fino a quando sono in garanzia. Un asset si dismette, non si elimina.",
+        "matching": "{count, plural, one {# asset} other {# asset}}",
+        "openRecord": "Apri {name}",
+        "unknown": "Asset sconosciuto",
+        "new": "Nuovo asset",
+        "create": "Crea",
+        "cancel": "Annulla",
+        "customerMissing": "Scegli il cliente a cui appartiene l’asset.",
+        "sections": "Sezioni dell’asset",
+        "views": { "default": "Tutti gli asset" },
+        "columns": {
+            "categories": "Categorie",
+            "serial": "Matricola",
+            "name": "Nome",
+            "kind": "Tipo",
+            "customer": "Cliente",
+            "site": "Sede",
+            "warrantyEnds": "Fine garanzia",
+            "status": "Stato"
+        },
+        "kinds": { "printer": "Stampante", "scanner": "Scanner", "laptop": "Portatile", "network": "Rete", "phone": "Telefono" },
+        "statuses": { "inService": "In servizio", "inRepair": "In riparazione", "retired": "Dismesso" },
+        "ended": "{date} · scaduta",
+        "groups": { "asset": "Asset" },
+        "sectionNames": { "details": "Dettagli", "tickets": "Ticket" },
+        "fields": {
+            "serial": "Matricola",
+            "name": "Nome",
+            "kind": "Tipo",
+            "installed": "Installato il",
+            "warrantyEnds": "Fine garanzia",
+            "status": "Stato",
+            "sector": "Settore",
+            "city": "Città"
+        },
+        "saving": "Salvataggio…",
+        "saved": "Salvato",
+        "notSaved": "Non salvato",
+        "savedAt": "Salvato alle {time}",
+        "nameRequired": "Un asset ha bisogno di un nome.",
+        "warrantyBeforeInstalled": "La garanzia non può finire prima dell’installazione.",
+        "tickets": {
+            "emptyTitle": "Nessun ticket aperto su questo asset",
+            "emptyBody": "Un ticket indica il suo asset quando viene aperto."
+        },
+        "picker": {
+            "label": "Asset",
+            "hint": "Gli asset del cliente. Indica prima il cliente.",
+            "picked": "Aperto su {name} ({serial})"
+        }
+    },
+    "services": {
+        "title": "Servizi",
+        "intro": "Ciò che i clienti sottoscrivono: ogni servizio promette un tempo di risposta e uno di risoluzione, e a un ticket spetta il tempo di risposta dell’abbonamento del suo cliente. Un servizio si ritira dalla vendita, non si elimina.",
+        "matching": "{count, plural, one {# servizio} other {# servizi}}",
+        "openRecord": "Apri {name}",
+        "unknown": "Servizio sconosciuto",
+        "new": "Nuovo servizio",
+        "create": "Crea",
+        "cancel": "Annulla",
+        "sections": "Sezioni del servizio",
+        "views": { "default": "Tutti i servizi" },
+        "columns": {
+            "code": "Codice",
+            "name": "Nome",
+            "slaHours": "Risposta",
+            "resolveHours": "Risoluzione",
+            "price": "Mensile",
+            "customers": "Clienti",
+            "active": "Stato"
+        },
+        "hours": "{hours} h",
+        "states": { "active": "Attivo", "inactive": "Non attivo" },
+        "groups": { "service": "Servizio" },
+        "sectionNames": { "details": "Dettagli", "customers": "Clienti" },
+        "fields": {
+            "code": "Codice",
+            "name": "Nome",
+            "description": "Descrizione",
+            "slaHours": "Risposta entro (ore)",
+            "resolveHours": "Risoluzione entro (ore)",
+            "price": "Prezzo mensile (€)",
+            "active": "In vendita",
+            "covers": "Copre"
+        },
+        "saving": "Salvataggio…",
+        "saved": "Salvato",
+        "notSaved": "Non salvato",
+        "savedAt": "Salvato alle {time}",
+        "nameRequired": "Un servizio ha bisogno di un nome.",
+        "hoursPositive": "Un numero di ore maggiore di zero.",
+        "resolveBeforeAnswer": "La risoluzione non può arrivare prima della prima risposta.",
+        "customers": {
+            "since": "dal {date}",
+            "emptyTitle": "Nessun cliente lo sottoscrive",
+            "emptyBody": "Un cliente lo sottoscrive dalla sua sezione Servizi."
+        }
+    },
+    "sites": {
+        "title": "Sedi",
+        "intro": "Dove si lavora: l’indirizzo di ogni sede, le persone assegnate lì ora e i ticket aperti lì. Una sede si chiude, non si elimina.",
+        "matching": "{count, plural, one {# sede} other {# sedi}}",
+        "new": "Nuova sede",
+        "create": "Crea",
+        "openRecord": "Apri {name}",
+        "unknown": "Sede sconosciuta",
+        "sections": "Sezioni della sede",
+        "views": { "default": "Tutte le sedi" },
+        "columns": {
+            "name": "Nome",
+            "city": "Città",
+            "province": "Provincia",
+            "people": "Persone",
+            "status": "Stato"
+        },
+        "statuses": { "active": "Attiva", "closed": "Chiusa" },
+        "groups": { "site": "Sede" },
+        "sectionNames": {
+            "details": "Dettagli",
+            "people": "Persone",
+            "tickets": "Ticket"
+        },
+        "fields": {
+            "name": "Nome",
+            "city": "Città",
+            "address": "Indirizzo",
+            "postcode": "CAP",
+            "province": "Provincia",
+            "phone": "Telefono",
+            "status": "Stato"
+        },
+        "saving": "Salvataggio…",
+        "saved": "Salvato",
+        "notSaved": "Non salvato",
+        "savedAt": "Salvato alle {time}",
+        "nameRequired": "Una sede ha bisogno di un nome.",
+        "postcodeShape": "Il CAP ha 5 cifre.",
+        "people": {
+            "role": "{role} dal {start}",
+            "emptyTitle": "Qui ora non lavora nessuno",
+            "emptyBody": "Le persone si assegnano a una sede dalla loro scheda, nella sezione Sedi."
+        },
+        "tickets": {
+            "emptyTitle": "Qui non è stato aperto nessun ticket",
+            "emptyBody": "Un ticket indica la sua sede quando viene aperto."
+        }
+    },
+    "settings": {
+        "title": "Impostazioni",
+        "intro": "Quelle dell’applicazione: i valori di cui sono fatte le liste, le viste salvate, e chi può fare cosa.",
+        "groups": {
+            "system": "Sistema",
+            "access": "Accessi e autorizzazioni"
+        },
+        "tiles": {
+            "lookups": "Lookup",
+            "views": "Viste salvate",
+            "users": "Utenti",
+            "permissions": "Permessi"
+        },
+        "lookups": {
+            "intro": "Gli insiemi chiusi di valori che un record può assumere. Il codice è ciò che si salva; l’etichetta è ciò che si legge, nella propria lingua.",
+            "setsLabel": "Insiemi di valori",
+            "code": "Codice",
+            "label": "Etichetta",
+            "inUse": "Record",
+            "field": "Salvato nel campo {field}",
+            "owner": { "tickets": "Ticket", "customers": "Clienti", "assets": "Asset", "all": "Ticket, clienti, asset" },
+            "sets": {
+                "ticketStatus": "Stato del ticket",
+                "ticketPriority": "Priorità del ticket",
+                "customerTier": "Fascia cliente",
+                "customerStatus": "Stato del cliente",
+                "categories": "Categorie"
+            }
+        },
+        "categories": {
+            "add": "Aggiungi categoria",
+            "en": "Inglese",
+            "it": "Italiano",
+            "color": "Colore",
+            "appliesTo": "Si applica a",
+            "usageHint": "Ticket · clienti · asset",
+            "deactivate": "Disattiva",
+            "reactivate": "Riattiva",
+            "nameRequired": "Una categoria ha bisogno del nome inglese.",
+            "tones": { "primary": "Primario", "success": "Verde", "warning": "Ambra", "danger": "Rosso", "info": "Blu", "muted": "Grigio" }
+        },
+        "views": {
+            "intro": "Le disposizioni della lista ticket che hai salvato con un nome. Ognuna si apre dal selettore di viste della lista.",
+            "name": "Nome",
+            "filter": "Filtro",
+            "sort": "Ordinamento",
+            "pageSize": "Righe per pagina",
+            "actions": "Azioni",
+            "rename": "Rinomina",
+            "delete": "Elimina",
+            "save": "Salva",
+            "cancel": "Annulla",
+            "deleteTitle": "Eliminare questa vista?",
+            "deleteBody": "«{name}» non sarà più proposta dalla lista ticket. I ticket non cambiano.",
+            "keep": "Tienila",
+            "emptyTitle": "Nessuna vista salvata",
+            "emptyBody": "Disponi la lista ticket — un filtro, un ordinamento — e salvala con un nome dal suo selettore di viste."
+        },
+        "users": {
+            "intro": "Gli account che possono accedere, e i ruoli di ciascuno. Un ruolo dato o tolto qui vale dal prossimo accesso di quell’account.",
+            "name": "Nome",
+            "username": "Utente",
+            "email": "Email",
+            "role": "Ruolo",
+            "can": "Può",
+            "rolesOf": "Ruoli di {name}"
+        },
+        "permissions": {
+            "intro": "Cosa può fare ogni ruolo: la tabella che leggono le guardie dell’applicazione.",
+            "introEdit": "Cosa può fare ogni ruolo: la tabella che leggono le guardie dell’applicazione. Una modifica vale subito, e il server verifica di nuovo ogni azione.",
+            "permission": "Permesso",
+            "allows": "Cosa apre",
+            "holds": "{n} su {total}",
+            "inactive": "Disattivato",
+            "descriptions": {
+                "account": { "read": "La pagina account: chi è entrato, il suo ruolo, le sue preferenze." },
+                "billing": {
+                    "read": "I dati di fatturazione nella pagina account.",
+                    "write": "La chiusura del mese. Il server la verifica di nuovo, qualunque cosa mostri la pagina."
+                },
+                "tickets": { "billing": "La scheda Fatturazione di un intervento." },
+                "settings": { "permissions": "Questa schermata e Utenti: cambiare cosa può fare un ruolo, e chi ha quale ruolo." }
+            },
+            "granted": "Concesso",
+            "denied": "Non concesso",
+            "grant": "{permission} per {role}",
+            "rename": "Nome del ruolo {name}",
+            "deactivate": "Disattiva",
+            "newRole": "Nuovo ruolo",
+            "roleName": "Nome",
+            "copyFrom": "Parti dai permessi di",
+            "create": "Crea",
+            "cancel": "Annulla",
+            "saved": "Salvato."
+        }
+    }
+}

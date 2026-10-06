@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Auto-Update</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Updates every 10 seconds. Watch the text change over time.</p>
+    <div class="demo-container">
+      <div class="demo-row-labeled">
+        <span class="pdx-txt-small pdx-ink-muted label-col">Just now:</span>
+        <pdx-relative-time :datetime="justNow" :update-interval="10000"></pdx-relative-time>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-relative-time :datetime="now" :update-interval="10000"&gt;&lt;/pdx-relative-time&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const justNow = new Date().toISOString();
+</script>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products — Pragmatic Design CSS Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/pragmatic-design.css">
+</head>
+<body>
+    <pdx-center max="xl" pad="lg">
+        <pdx-stack gap="xl">
+
+            <!-- Header -->
+            <pdx-row items="center" justify="between">
+                <pdx-stack gap="2xs">
+                    <h1 class="pdx-txt-display">Products</h1>
+                    <p class="pdx-txt-small pdx-ink-muted">Manage your product catalog</p>
+                </pdx-stack>
+                <pdx-row gap="sm">
+                    <button class="pdx-secondary">Export</button>
+                    <button class="pdx-primary">Add Product</button>
+                </pdx-row>
+            </pdx-row>
+
+            <!-- Search + Filters -->
+            <pdx-row gap="md" items="end">
+                <pdx-stack gap="xs" items="stretch" style="flex:1">
+                    <label class="pdx-txt-label pdx-ink-muted">Search</label>
+                    <input class="pdx-input" placeholder="Search products..." />
+                </pdx-stack>
+                <pdx-stack gap="xs">
+                    <label class="pdx-txt-label pdx-ink-muted">Category</label>
+                    <select class="pdx-input">
+                        <option>All Categories</option>
+                        <option>Electronics</option>
+                        <option>Clothing</option>
+                        <option>Home</option>
+                    </select>
+                </pdx-stack>
+                <pdx-stack gap="xs">
+                    <label class="pdx-txt-label pdx-ink-muted">Sort</label>
+                    <select class="pdx-input">
+                        <option>Newest first</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Name A-Z</option>
+                    </select>
+                </pdx-stack>
+            </pdx-row>
+
+            <!-- Stats bar -->
+            <pdx-row gap="lg">
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="2xs" items="center" pad="sm">
+                        <span class="pdx-txt-display pdx-ink-primary">142</span>
+                        <span class="pdx-txt-caption pdx-ink-muted">Total Products</span>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="2xs" items="center" pad="sm">
+                        <span class="pdx-txt-display pdx-ink-success">89</span>
+                        <span class="pdx-txt-caption pdx-ink-muted">In Stock</span>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="2xs" items="center" pad="sm">
+                        <span class="pdx-txt-display pdx-ink-warning">12</span>
+                        <span class="pdx-txt-caption pdx-ink-muted">Low Stock</span>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="2xs" items="center" pad="sm">
+                        <span class="pdx-txt-display pdx-ink-danger">3</span>
+                        <span class="pdx-txt-caption pdx-ink-muted">Out of Stock</span>
+                    </pdx-stack>
+                </div>
+            </pdx-row>
+
+            <!-- Product Grid -->
+            <pdx-grid cols="3" gap="md">
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="sm">
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-heading">Wireless Headphones</span>
+                            <span class="pdx-ink-success pdx-txt-caption">In Stock</span>
+                        </pdx-row>
+                        <p class="pdx-txt-small pdx-ink-muted">Premium noise-cancelling headphones with 30-hour battery life.</p>
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-title pdx-ink-primary">$299.99</span>
+                            <pdx-row gap="xs">
+                                <button class="pdx-ghost">Edit</button>
+                                <button class="pdx-danger">Delete</button>
+                            </pdx-row>
+                        </pdx-row>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="sm">
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-heading">Smart Watch</span>
+                            <span class="pdx-ink-warning pdx-txt-caption">Low Stock</span>
+                        </pdx-row>
+                        <p class="pdx-txt-small pdx-ink-muted">Fitness tracker with heart rate monitor and GPS.</p>
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-title pdx-ink-primary">$199.99</span>
+                            <pdx-row gap="xs">
+                                <button class="pdx-ghost">Edit</button>
+                                <button class="pdx-danger">Delete</button>
+                            </pdx-row>
+                        </pdx-row>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="sm">
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-heading">USB-C Hub</span>
+                            <span class="pdx-ink-success pdx-txt-caption">In Stock</span>
+                        </pdx-row>
+                        <p class="pdx-txt-small pdx-ink-muted">7-in-1 hub with HDMI, USB 3.0, SD card reader.</p>
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-title pdx-ink-primary">$49.99</span>
+                            <pdx-row gap="xs">
+                                <button class="pdx-ghost">Edit</button>
+                                <button class="pdx-danger">Delete</button>
+                            </pdx-row>
+                        </pdx-row>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="sm">
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-heading">Mechanical Keyboard</span>
+                            <span class="pdx-ink-danger pdx-txt-caption">Out of Stock</span>
+                        </pdx-row>
+                        <p class="pdx-txt-small pdx-ink-muted">Cherry MX Blue switches, RGB backlit, full-size layout.</p>
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-title pdx-ink-primary">$129.99</span>
+                            <pdx-row gap="xs">
+                                <button class="pdx-ghost">Edit</button>
+                                <button class="pdx-danger">Delete</button>
+                            </pdx-row>
+                        </pdx-row>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="sm">
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-heading">Webcam 4K</span>
+                            <span class="pdx-ink-success pdx-txt-caption">In Stock</span>
+                        </pdx-row>
+                        <p class="pdx-txt-small pdx-ink-muted">Auto-focus, HDR, noise-cancelling microphone built-in.</p>
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-title pdx-ink-primary">$89.99</span>
+                            <pdx-row gap="xs">
+                                <button class="pdx-ghost">Edit</button>
+                                <button class="pdx-danger">Delete</button>
+                            </pdx-row>
+                        </pdx-row>
+                    </pdx-stack>
+                </div>
+                <div class="pdx-surface-card">
+                    <pdx-stack gap="sm">
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-heading">Monitor Stand</span>
+                            <span class="pdx-ink-success pdx-txt-caption">In Stock</span>
+                        </pdx-row>
+                        <p class="pdx-txt-small pdx-ink-muted">Ergonomic aluminum stand with cable management.</p>
+                        <pdx-row items="center" justify="between">
+                            <span class="pdx-txt-title pdx-ink-primary">$69.99</span>
+                            <pdx-row gap="xs">
+                                <button class="pdx-ghost">Edit</button>
+                                <button class="pdx-danger">Delete</button>
+                            </pdx-row>
+                        </pdx-row>
+                    </pdx-stack>
+                </div>
+            </pdx-grid>
+
+            <!-- Pagination -->
+            <pdx-row items="center" justify="between">
+                <span class="pdx-txt-small pdx-ink-muted">Showing 1-6 of 142 products</span>
+                <pdx-row gap="xs">
+                    <button class="pdx-ghost" disabled>Previous</button>
+                    <button class="pdx-primary">1</button>
+                    <button class="pdx-ghost">2</button>
+                    <button class="pdx-ghost">3</button>
+                    <button class="pdx-ghost">Next</button>
+                </pdx-row>
+            </pdx-row>
+
+        </pdx-stack>
+    </pdx-center>
+</body>
+</html>

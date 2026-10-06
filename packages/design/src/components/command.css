@@ -1,0 +1,225 @@
+/* Command Palette — Cmd+K search dialog.
+   Centered modal with search input + filtered command list.
+   Stile VS Code / Linear / Raycast.
+
+   Usage:
+     <div class="pdx-command-backdrop" data-open></div>
+     <div class="pdx-command" data-open>
+       <div class="pdx-command-input">
+         <i class="pdx-command-search-icon">⌕</i>
+         <input type="text" placeholder="Type a command..." />
+         <kbd class="pdx-command-kbd">ESC</kbd>
+       </div>
+       <div class="pdx-command-list">
+         <span class="pdx-command-group">Navigation</span>
+         <button class="pdx-command-item">
+           <span class="pdx-command-item-icon">📄</span>
+           <span>Go to Dashboard</span>
+           <span class="pdx-command-item-shortcut">Ctrl+D</span>
+         </button>
+       </div>
+       <div class="pdx-command-footer">
+         <span>↑↓ Navigate</span>
+         <span>↵ Select</span>
+         <span>ESC Close</span>
+       </div>
+     </div>
+*/
+
+/* ===== Backdrop ===== */
+
+.pdx-command-backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--pdx-color-backdrop);
+    backdrop-filter: blur(4px);
+    z-index: calc(var(--pdx-z-overlay, 40) + 20);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--pdx-duration-fast), visibility 0ms var(--pdx-duration-fast);
+}
+
+.pdx-command-backdrop[data-open] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--pdx-duration-fast), visibility 0ms;
+}
+
+/* ===== Container ===== */
+
+.pdx-command {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.96);
+    z-index: calc(var(--pdx-z-overlay, 40) + 21);
+    width: 90%;
+    max-width: 36rem;
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-xl), 0 0 60px oklch(0 0 0 / 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--pdx-duration-fast), transform var(--pdx-duration-fast), visibility 0ms var(--pdx-duration-fast);
+}
+
+.pdx-command[data-open] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+    transition: opacity var(--pdx-duration-fast), transform var(--pdx-duration-fast), visibility 0ms;
+}
+
+/* ===== Search input ===== */
+
+.pdx-command-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+
+.pdx-command-search-icon {
+    flex-shrink: 0;
+    color: var(--pdx-color-muted);
+    font-size: 1rem;
+}
+
+.pdx-command-input input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--pdx-color-text);
+}
+
+.pdx-command-input input::placeholder {
+    color: var(--pdx-color-muted);
+}
+
+.pdx-command-kbd {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.6rem;
+    padding: 0.15rem 0.35rem;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-muted);
+    background: var(--pdx-color-inset);
+}
+
+/* ===== Command list ===== */
+
+.pdx-command-list {
+    max-height: 20rem;
+    overflow-y: auto;
+    padding: 0.25rem;
+}
+
+/* ===== Group label ===== */
+
+.pdx-command-group {
+    display: block;
+    padding: 0.4rem 0.5rem 0.15rem;
+    font-size: 0.65rem;
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ===== Command item ===== */
+
+/* A div role="option", not a <button> (which would make each one a tab stop): box-sizing and
+   line-height are the two things a button gets from the user agent. */
+.pdx-command-item {
+    box-sizing: border-box;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--pdx-radius-sm);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    color: var(--pdx-color-text);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: background 80ms;
+}
+
+.pdx-command-item:hover,
+.pdx-command-item[data-active] {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-command-item:focus-visible {
+    background: var(--pdx-color-inset);
+    outline: none;
+}
+
+/* Disabled: listed, skipped by the arrows, never run. */
+.pdx-command-item[aria-disabled="true"] {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+}
+.pdx-command-item[aria-disabled="true"]:hover {
+    background: transparent;
+}
+
+/* Icon */
+.pdx-command-item-icon {
+    flex-shrink: 0;
+    width: 1.1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Shortcut */
+.pdx-command-item-shortcut {
+    margin-left: auto;
+    font-family: var(--pdx-font-mono);
+    font-size: 0.65rem;
+    color: var(--pdx-color-muted);
+}
+
+/* ===== Empty state ===== */
+
+.pdx-command-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--pdx-color-muted);
+    font-size: 0.8125rem;
+}
+
+/* ===== Footer ===== */
+
+.pdx-command-footer {
+    display: flex;
+    gap: 1rem;
+    padding: 0.4rem 0.75rem;
+    border-top: var(--pdx-border-width) solid var(--pdx-color-border);
+    font-size: 0.65rem;
+    color: var(--pdx-color-muted);
+    background: light-dark(oklch(0.97 0 0), oklch(0.12 0 0));
+}
+
+.pdx-command-footer kbd {
+    font-family: var(--pdx-font-mono);
+    padding: 0 0.2rem;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: 2px;
+    font-size: 0.6rem;
+    margin-right: 0.2rem;
+}

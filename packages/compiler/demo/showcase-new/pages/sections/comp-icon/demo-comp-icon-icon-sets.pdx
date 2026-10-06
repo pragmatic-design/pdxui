@@ -1,0 +1,73 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple Icon Sets</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Register multiple sets and use them simultaneously. The first registered becomes the default.
+      Use the <code>set</code> prop to pick a specific set per icon.
+    </p>
+
+    <div class="multi-set-demo">
+      <div class="set-example">
+        <span class="pdx-txt-caption pdx-ink-muted">Default set (pragmatic)</span>
+        <div class="set-row">
+          <pdx-icon name="home" size="lg"></pdx-icon>
+          <pdx-icon name="settings" size="lg"></pdx-icon>
+          <pdx-icon name="user" size="lg"></pdx-icon>
+        </div>
+      </div>
+      <div class="set-example">
+        <span class="pdx-txt-caption pdx-ink-muted">Explicit set="pragmatic"</span>
+        <div class="set-row">
+          <pdx-icon name="home" set="pragmatic" size="lg"></pdx-icon>
+          <pdx-icon name="settings" set="pragmatic" size="lg"></pdx-icon>
+          <pdx-icon name="user" set="pragmatic" size="lg"></pdx-icon>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// Register multiple sets — first one becomes default
+registerPragmaticIcons();  // "pragmatic" set (89 icons)
+
+// Add third-party sets alongside
+registerIconSet('lucide', resolver);
+registerIconSet('heroicons', resolver);
+
+// Usage: default set (first registered)
+&lt;pdx-icon name="home"&gt;&lt;/pdx-icon&gt;
+
+// Usage: explicit set prop
+&lt;pdx-icon name="home" set="lucide"&gt;&lt;/pdx-icon&gt;
+&lt;pdx-icon name="home" set="heroicons"&gt;&lt;/pdx-icon&gt;
+
+// Mix freely in the same UI
+&lt;pdx-icon name="plus"&gt;&lt;/pdx-icon&gt;
+&lt;pdx-icon name="sparkles" set="lucide"&gt;&lt;/pdx-icon&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .multi-set-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+  .set-example {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+  .set-row {
+    display: flex;
+    gap: var(--pdx-space-md);
+    align-items: center;
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    width: fit-content;
+  }
+</style>

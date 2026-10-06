@@ -1,0 +1,73 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Pagination</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-pagination&gt;</code> — page navigation with numbered buttons, prev/next, first/last,
+      ellipsis for large ranges, simple mode, and total info display.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-pagination-basic class="demo-section"></pdx-demo-comp-pagination-basic>
+
+    <!-- ═══ Many Pages ═══ -->
+    <pdx-demo-comp-pagination-many-pages class="demo-section"></pdx-demo-comp-pagination-many-pages>
+
+    <!-- ═══ Start / End ═══ -->
+    <pdx-demo-comp-pagination-start-end class="demo-section"></pdx-demo-comp-pagination-start-end>
+
+    <!-- ═══ Simple Mode ═══ -->
+    <pdx-demo-comp-pagination-simple class="demo-section"></pdx-demo-comp-pagination-simple>
+
+    <!-- ═══ With Total Info ═══ -->
+    <pdx-demo-comp-pagination-total-info class="demo-section"></pdx-demo-comp-pagination-total-info>
+
+    <!-- ═══ Without First/Last ═══ -->
+    <pdx-demo-comp-pagination-no-first-last class="demo-section"></pdx-demo-comp-pagination-no-first-last>
+
+    <!-- ═══ Few Pages ═══ -->
+    <pdx-demo-comp-pagination-few-pages class="demo-section"></pdx-demo-comp-pagination-few-pages>
+
+    <!-- ═══ Slots ═══ -->
+    <pdx-demo-comp-pagination-slots class="demo-section"></pdx-demo-comp-pagination-slots>
+
+    <!-- ═══ Props ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>total</code></td><td>Number</td><td>0</td><td>Total number of items</td></tr>
+            <tr><td><code>pagesize</code></td><td>Number</td><td>10</td><td>Items per page</td></tr>
+            <tr><td><code>page</code></td><td>Number</td><td>1</td><td>Current page (1-based)</td></tr>
+            <tr><td><code>showedges</code></td><td>Boolean</td><td>true</td><td>Show « » first/last buttons</td></tr>
+            <tr><td><code>simple</code></td><td>Boolean</td><td>false</td><td>Simple ‹ X/Y › mode</td></tr>
+            <tr><td><code>showtotal</code></td><td>Boolean</td><td>false</td><td>Show "X–Y of Z" info text</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Events ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-change</code></td><td>{ page, pageSize }</td><td>Page changed</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/pagination';
+@title 'Pagination — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+</style>

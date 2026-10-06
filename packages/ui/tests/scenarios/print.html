@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Print Harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: var(--pdx-color-bg, #fff); color: var(--pdx-color-text, #111); font-family: var(--pdx-font-sans, system-ui); }
+    </style>
+    <script type="module">
+        // What an application looks like on paper, measured under print media.
+        //
+        // An app shell with the chrome a business screen actually has (navbar, sidebar, toolbar,
+        // a floating action button), a scrolling region, a table, and an overlay. Playwright
+        // emulates print media, so every claim about printing is a measurement rather than a
+        // matter of taste.
+        //
+        // The page asserts nothing: `print.spec.ts` measures it in both media and compares.
+        // Classes only, no custom element, and not the barrel — 414 requests a load. The components'
+        // stylesheets travel with the components rather than with `@pdxui/design`, so it imports
+        // those sheets by name: the chrome it draws, and nothing else.
+        import '@pdxui/design';
+        import '@pdxui/design/components/app-layout';
+        import '@pdxui/design/components/navbar';
+        import '@pdxui/design/components/sidebar';
+        import '@pdxui/design/components/toolbar';
+        import '@pdxui/design/components/scroll-area';
+        import '@pdxui/design/components/data-grid';
+        import '@pdxui/design/components/fab';
+        import '@pdxui/design/components/toast';
+
+        const p = new URLSearchParams(location.search);
+        const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+
+        document.body.innerHTML = `
+          <div class="pdx-app-layout">
+            <header class="pdx-app-header" data-test="app-header">
+              <nav class="pdx-navbar" data-test="navbar"><span class="pdx-navbar-brand">Service desk</span></nav>
+            </header>
+            <aside class="pdx-app-aside" data-test="app-aside">
+              <nav class="pdx-sidebar" data-test="sidebar"><a href="#">Tickets</a></nav>
+            </aside>
+            <main class="pdx-app-main" data-test="app-main">
+              <div class="pdx-toolbar" data-test="toolbar"><button class="pdx-btn">New</button></div>
+
+              <!-- A scrolling region: on screen it clips, on paper it must not. -->
+              <div class="pdx-scroll-area" style="max-height: 120px" data-test="scroller">
+                <p data-test="scroller-content" style="height: 600px; margin: 0">A long document that does not fit the box.</p>
+              </div>
+
+              <!-- A table: the header repeats per page, a row is not cut in half. -->
+              <table class="pdx-table" data-test="table">
+                <thead data-test="thead"><tr><th>Ref</th><th>Subject</th></tr></thead>
+                <tbody>
+                  ${Array.from({ length: 12 }, (_, i) => `<tr data-test="row"><td>T-10${i}</td><td>Row ${i + 1}</td></tr>`).join('')}
+                </tbody>
+              </table>
+
+              <!-- A grid's action cell: a control nobody can press on paper. -->
+              <div class="pdx-dg-actions" data-test="grid-actions">
+                <button type="button" class="pdx-dg-action" aria-haspopup="menu">A</button>
+              </div>
+
+              <div class="pdx-surface-card" data-test="card">A card, which on paper needs no shadow.</div>
+            </main>
+            <footer class="pdx-app-footer" data-test="app-footer">footer</footer>
+          </div>
+
+          <button class="pdx-fab" data-test="fab">+</button>
+          <div class="pdx-toast" data-test="toast">Saved</div>
+        `;
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-pdx-ready', '');
+        }));
+    </script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-center</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Horizontally centered container with max-width. Default is <code>--pdx-max-lg</code> (64rem).</p>
+
+    <div class="demo-area">
+      <pdx-center max="sm" pad="md" style="background:var(--pdx-color-inset);border-radius:var(--pdx-radius-md)">
+        <p class="pdx-txt-body">max="sm" (480px)</p>
+      </pdx-center>
+    </div>
+
+    <div class="demo-area">
+      <pdx-center max="md" pad="md" style="background:var(--pdx-color-inset);border-radius:var(--pdx-radius-md)">
+        <p class="pdx-txt-body">max="md" (768px)</p>
+      </pdx-center>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-center max="sm" pad="md"&gt;
+  &lt;p&gt;Centered content (max 480px)&lt;/p&gt;
+&lt;/pdx-center&gt;
+
+&lt;!-- max: xs(320) sm(480) md(768) lg(1024) xl(1280) 2xl(1536) full --&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition — booking a slot</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Inside form fields, with a label and a hint. The end cannot come before the start: its <code>min</code>
+      follows the start's value.
+    </p>
+    <div class="comp-card">
+      <div class="form-grid-2">
+        <pdx-form-field label="Start" hint="Opening hours 08:00–20:00">
+          <pdx-time-picker :value="start" format="24h" min="08:00" max="20:00" step="15" aria-label="Start" @pdx-change="e => start = e.detail.value"></pdx-time-picker>
+        </pdx-form-field>
+        <pdx-form-field label="End" hint="After the start">
+          <pdx-time-picker :value="end" format="24h" :min="start" max="20:00" step="15" aria-label="End" @pdx-change="e => end = e.detail.value"></pdx-time-picker>
+        </pdx-form-field>
+      </div>
+      <p class="pdx-txt-small summary">Booked <strong>{{ start }}</strong> – <strong>{{ end }}</strong> · {{ duration() }}</p>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let start = $signal('10:00');
+let end = $signal('11:30');
+
+function minutes(v) {
+  const [h, m] = (v || '0:0').split(':').map(Number);
+  return h * 60 + m;
+}
+
+function duration() {
+  const d = minutes(end) - minutes(start);
+  if (d <= 0) return 'end before start';
+  return Math.floor(d / 60) + ' h ' + String(d % 60).padStart(2, '0') + ' min';
+}
+</script>
+
+<style scoped>
+  .form-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--pdx-space-lg); }
+  .summary { margin-top: var(--pdx-space-md); }
+</style>

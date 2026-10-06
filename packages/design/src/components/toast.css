@@ -1,0 +1,324 @@
+/* Toast / Notification — screen-edge notifications with stacking.
+
+   Usage:
+     <div class="pdx-toast-container" position="top-right">
+       <div class="pdx-toast pdx-toast-success" data-open>
+         <div class="pdx-toast-icon">✓</div>
+         <div class="pdx-toast-content">
+           <div class="pdx-toast-title">Saved</div>
+           <div class="pdx-toast-message">Changes saved successfully.</div>
+         </div>
+         <button class="pdx-toast-close">&times;</button>
+         <div class="pdx-toast-progress"></div>
+       </div>
+     </div>
+
+   Positions: top-right (default), top-left, bottom-right, bottom-left, top-center, bottom-center
+   Variants: success, error, warning, info
+*/
+
+/* ===== Container — fixed position on screen ===== */
+
+.pdx-toast-container {
+    position: fixed;
+    /* Toasts sit at the top of the stack (above overlays/modals) — use the dedicated token
+       (500) instead of overlay+10, which left them below app chrome / other overlays. */
+    z-index: var(--pdx-z-toast, 500);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+    max-width: 26rem;
+    width: 100%;
+}
+
+/* Positions */
+.pdx-toast-container,
+.pdx-toast-container[position="top-right"] {
+    top: 1rem;
+    right: 1rem;
+    align-items: flex-end;
+}
+
+.pdx-toast-container[position="top-left"] {
+    top: 1rem;
+    left: 1rem;
+    right: auto;
+    align-items: flex-start;
+}
+
+.pdx-toast-container[position="bottom-right"] {
+    bottom: 1rem;
+    right: 1rem;
+    top: auto;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+}
+
+.pdx-toast-container[position="bottom-left"] {
+    bottom: 1rem;
+    left: 1rem;
+    right: auto;
+    top: auto;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+}
+
+.pdx-toast-container[position="top-center"] {
+    top: 1rem;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.pdx-toast-container[position="bottom-center"] {
+    bottom: 1rem;
+    left: 50%;
+    right: auto;
+    top: auto;
+    transform: translateX(-50%);
+    flex-direction: column-reverse;
+    align-items: center;
+}
+
+/* ===== Toast item ===== */
+
+.pdx-toast {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1rem;
+    background: var(--pdx-surface-3, var(--pdx-color-surface));
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-lg);
+    width: 100%;
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+
+    /* Hidden by default */
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity var(--pdx-duration-base) var(--pdx-ease, ease),
+                transform var(--pdx-duration-base) var(--pdx-ease, ease);
+}
+
+.pdx-toast[data-open] {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Slide direction based on container position */
+.pdx-toast-container[position="top-left"] .pdx-toast,
+.pdx-toast-container[position="bottom-left"] .pdx-toast {
+    transform: translateX(-100%);
+}
+.pdx-toast-container[position="top-left"] .pdx-toast[data-open],
+.pdx-toast-container[position="bottom-left"] .pdx-toast[data-open] {
+    transform: translateX(0);
+}
+
+.pdx-toast-container[position="top-center"] .pdx-toast,
+.pdx-toast-container[position="bottom-center"] .pdx-toast {
+    transform: translateY(-1rem);
+}
+.pdx-toast-container[position="top-center"] .pdx-toast[data-open],
+.pdx-toast-container[position="bottom-center"] .pdx-toast[data-open] {
+    transform: translateY(0);
+}
+
+.pdx-toast-container[position="bottom-center"] .pdx-toast {
+    transform: translateY(1rem);
+}
+
+/* ===== Variants ===== */
+
+.pdx-toast-success {
+    border-left: 3px solid var(--pdx-color-success);
+}
+.pdx-toast-error {
+    border-left: 3px solid var(--pdx-color-danger);
+}
+.pdx-toast-warning {
+    border-left: 3px solid var(--pdx-color-warning);
+}
+.pdx-toast-info {
+    border-left: 3px solid var(--pdx-color-primary);
+}
+
+/* ===== Filled variant — solid tinted background ===== */
+.pdx-toast-success:not(.pdx-toast-bordered):not(.pdx-toast-minimal) {
+    background: light-dark(#ecfdf5, #052e16);
+    border: var(--pdx-border-width) solid light-dark(#a7f3d0, #065f46);
+    border-left: 3px solid var(--pdx-color-success);
+}
+.pdx-toast-error:not(.pdx-toast-bordered):not(.pdx-toast-minimal) {
+    background: light-dark(#fef2f2, #2a0a0a);
+    border: var(--pdx-border-width) solid light-dark(#fecaca, #7f1d1d);
+    border-left: 3px solid var(--pdx-color-danger);
+}
+.pdx-toast-warning:not(.pdx-toast-bordered):not(.pdx-toast-minimal) {
+    background: light-dark(#fffbeb, #2a2000);
+    border: var(--pdx-border-width) solid light-dark(#fde68a, #854d0e);
+    border-left: 3px solid var(--pdx-color-warning);
+}
+.pdx-toast-info:not(.pdx-toast-bordered):not(.pdx-toast-minimal) {
+    background: light-dark(#eff6ff, #0a1628);
+    border: var(--pdx-border-width) solid light-dark(#bfdbfe, #1e3a5f);
+    border-left: 3px solid var(--pdx-color-primary);
+}
+
+/* ===== Bordered variant — left border accent, neutral bg ===== */
+.pdx-toast-bordered {
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+.pdx-toast-bordered.pdx-toast-success { border-left: 3px solid var(--pdx-color-success); }
+.pdx-toast-bordered.pdx-toast-error { border-left: 3px solid var(--pdx-color-danger); }
+.pdx-toast-bordered.pdx-toast-warning { border-left: 3px solid var(--pdx-color-warning); }
+.pdx-toast-bordered.pdx-toast-info { border-left: 3px solid var(--pdx-color-primary); }
+
+/* ===== Minimal variant — no border, no background tint ===== */
+.pdx-toast-minimal {
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-left-width: var(--pdx-border-width);
+}
+
+/* ===== Sizes ===== */
+.pdx-toast-compact {
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+}
+.pdx-toast-compact .pdx-toast-title { font-size: 0.75rem; }
+.pdx-toast-compact .pdx-toast-message { font-size: 0.7rem; }
+.pdx-toast-compact:not(.pdx-toast-rich) .pdx-toast-message { font-size: 0.75rem; }
+
+.pdx-toast-large {
+    gap: 0.75rem;
+    padding: 1.125rem 1.25rem;
+}
+.pdx-toast-large .pdx-toast-title { font-size: 1rem; }
+.pdx-toast-large .pdx-toast-message { font-size: 0.875rem; }
+.pdx-toast-large:not(.pdx-toast-rich) .pdx-toast-message { font-size: 1rem; }
+
+/* ===== Rich layout — title + description ===== */
+.pdx-toast-rich {
+    padding: 1rem 1.125rem;
+}
+.pdx-toast-rich.pdx-toast-compact { padding: 0.625rem 0.75rem; }
+.pdx-toast-rich.pdx-toast-large { padding: 1.25rem 1.5rem; }
+.pdx-toast-rich {
+    align-items: flex-start;
+}
+.pdx-toast-rich .pdx-toast-icon {
+    margin-top: 0.15rem;
+}
+
+/* ===== Action button ===== */
+.pdx-toast-action {
+    flex-shrink: 0;
+    background: none;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: var(--pdx-weight-medium);
+    cursor: pointer;
+    color: var(--pdx-color-text);
+    transition: background var(--pdx-transition);
+    align-self: center;
+}
+.pdx-toast-action:hover { background: var(--pdx-color-inset); }
+
+/* Icon color per variant */
+.pdx-toast-success > .pdx-toast-icon { color: var(--pdx-color-success-ink); }
+.pdx-toast-error > .pdx-toast-icon   { color: var(--pdx-color-danger-ink); }
+.pdx-toast-warning > .pdx-toast-icon { color: var(--pdx-color-warning-ink); }
+.pdx-toast-info > .pdx-toast-icon    { color: var(--pdx-color-primary-ink); }
+
+/* ===== Parts ===== */
+
+.pdx-toast-icon {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+    margin-top: 1px;
+}
+
+.pdx-toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.pdx-toast-title {
+    font-weight: var(--pdx-weight-semibold);
+    font-size: 0.875rem;
+    color: var(--pdx-color-text);
+    line-height: 1.4;
+}
+
+.pdx-toast-message {
+    font-size: 0.8125rem;
+    color: var(--pdx-color-muted);
+    line-height: 1.4;
+}
+/* Space between title and message only when both exist */
+.pdx-toast-title + .pdx-toast-message {
+    margin-top: 0.15rem;
+}
+
+/* Without title, message is the main content */
+.pdx-toast:not(.pdx-toast-rich) .pdx-toast-message {
+    color: var(--pdx-color-text);
+    font-size: 0.875rem;
+}
+
+.pdx-toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1;
+    transition: color var(--pdx-transition);
+}
+
+.pdx-toast-close:hover {
+    color: var(--pdx-color-text);
+}
+
+/* ===== Progress bar (auto-dismiss timer) ===== */
+
+.pdx-toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--pdx-color-border);
+    width: 100%;
+    transform-origin: left;
+    animation: pdx-toast-timer 5s linear forwards;
+}
+
+.pdx-toast-success > .pdx-toast-progress { background: var(--pdx-color-success); }
+.pdx-toast-error > .pdx-toast-progress   { background: var(--pdx-color-danger); }
+.pdx-toast-warning > .pdx-toast-progress { background: var(--pdx-color-warning); }
+.pdx-toast-info > .pdx-toast-progress    { background: var(--pdx-color-primary); }
+
+@keyframes pdx-toast-timer {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+/* ===== Mobile ===== */
+
+@media (max-width: 640px) {
+    .pdx-toast-container {
+        max-width: calc(100% - 2rem);
+    }
+}

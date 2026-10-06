@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Invalid with Error</h2>
+
+    <div class="demo-block">
+      <pdx-fieldset legend="Payment" invalid error="Please fill all required fields.">
+        <pdx-form-field label="Card Number" required error="Required">
+          <pdx-input placeholder="4242 4242 4242 4242"></pdx-input>
+        </pdx-form-field>
+      </pdx-fieldset>
+    </div>
+  </section>
+</template>

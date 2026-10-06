@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Media</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Media</span></div>
+                        <h1 class="pdx-txt-display">Media</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Avatar, responsive images, video embed, figure + figcaption.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Avatar</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Sizes: sm, md (default), lg, xl. Add <code>pdx-avatar-status</code> for status dot.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="md" items="end">
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar" size="sm">S</div><span class="pdx-txt-caption">sm</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar">MD</div><span class="pdx-txt-caption">md</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar" size="lg">LG</div><span class="pdx-txt-caption">lg</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar" size="xl">XL</div><span class="pdx-txt-caption">xl</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg">ON</div><span class="pdx-txt-caption">online</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg" data-status="busy">BS</div><span class="pdx-txt-caption">busy</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg" data-status="away">AW</div><span class="pdx-txt-caption">away</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-avatar pdx-avatar-status" size="lg" data-status="offline">OF</div><span class="pdx-txt-caption">offline</span></pdx-stack>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-avatar" size="lg"&gt;LG&lt;/div&gt;
+&lt;div class="pdx-avatar pdx-avatar-status" data-status="busy"&gt;BS&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Responsive Embed</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Aspect ratio containers for video/iframe. Default 16:9.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="2" gap="md">
+                                    <pdx-stack gap="xs">
+                                        <span class="pdx-txt-caption pdx-ink-muted">16:9 (default)</span>
+                                        <div class="pdx-embed"><div class="pdx-image-placeholder" style="position:absolute;inset:0">16:9</div></div>
+                                    </pdx-stack>
+                                    <pdx-stack gap="xs">
+                                        <span class="pdx-txt-caption pdx-ink-muted">4:3</span>
+                                        <div class="pdx-embed" ratio="4:3"><div class="pdx-image-placeholder" style="position:absolute;inset:0">4:3</div></div>
+                                    </pdx-stack>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-embed"&gt;
+  &lt;iframe src="..."&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+&lt;div class="pdx-embed" ratio="4:3"&gt;...&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Figure</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <figure style="max-width:400px">
+                                    <div class="pdx-image-placeholder" ratio="16:9">Image</div>
+                                    <figcaption>A descriptive caption for the image above.</figcaption>
+                                </figure>
+                            </div>
+                            <div class="doc-source">&lt;figure&gt;
+  &lt;img src="..." class="pdx-image" /&gt;
+  &lt;figcaption&gt;Caption&lt;/figcaption&gt;
+&lt;/figure&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Aspect Ratio</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Universal <code>[ratio]</code> attribute on any element.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="4" gap="sm">
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-image-placeholder" ratio="1:1" style="width:100%">1:1</div><span class="pdx-txt-caption">Square</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-image-placeholder" ratio="4:3" style="width:100%">4:3</div><span class="pdx-txt-caption">Classic</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-image-placeholder" ratio="16:9" style="width:100%">16:9</div><span class="pdx-txt-caption">Wide</span></pdx-stack>
+                                    <pdx-stack gap="2xs" items="center"><div class="pdx-image-placeholder" ratio="21:9" style="width:100%">21:9</div><span class="pdx-txt-caption">Ultra</span></pdx-stack>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;div ratio="16:9"&gt;...&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Avatar Group</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Stacked avatars with overlap. Use <code>.pdx-avatar-overflow</code> for the +N indicator.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-avatar-group">
+                                    <div class="pdx-avatar" style="background:oklch(0.7 0.15 250);color:white">JD</div>
+                                    <div class="pdx-avatar" style="background:oklch(0.7 0.15 25);color:white">AS</div>
+                                    <div class="pdx-avatar" style="background:oklch(0.7 0.15 155);color:white">MK</div>
+                                    <div class="pdx-avatar" style="background:oklch(0.7 0.15 85);color:white">RW</div>
+                                    <div class="pdx-avatar-overflow">+5</div>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-avatar-group"&gt;
+  &lt;div class="pdx-avatar"&gt;JD&lt;/div&gt;
+  &lt;div class="pdx-avatar"&gt;AS&lt;/div&gt;
+  &lt;div class="pdx-avatar-overflow"&gt;+5&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

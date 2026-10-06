@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic (Past)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Common past time expressions.</p>
+    <div class="demo-container">
+      <div class="demo-stack">
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">5 min ago:</span>
+          <pdx-relative-time :datetime="fiveMinAgo"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">2 hours ago:</span>
+          <pdx-relative-time :datetime="twoHoursAgo"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Yesterday:</span>
+          <pdx-relative-time :datetime="oneDayAgo"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">3 days ago:</span>
+          <pdx-relative-time :datetime="threeDaysAgo"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Last month:</span>
+          <pdx-relative-time :datetime="oneMonthAgo"></pdx-relative-time>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const fiveMinAgo = new Date(Date.now() - 5 * 60000).toISOString();
+const twoHoursAgo = new Date(Date.now() - 2 * 3600000).toISOString();
+const oneDayAgo = new Date(Date.now() - 86400000).toISOString();
+const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString();
+const oneMonthAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+</script>

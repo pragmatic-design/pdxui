@@ -1,0 +1,50 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Built-in Pragmatic Icons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">{{ iconCount }} icons included. Zero dependencies. Register with <code>registerPragmaticIcons()</code>.</p>
+
+    <div class="icon-grid">
+      @for (iconNames as name; track name) {
+        <div class="icon-cell">
+          <pdx-icon :name="name" size="lg"></pdx-icon>
+          <span class="pdx-txt-caption">{{ name }}</span>
+        </div>
+      }
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+
+&lt;pdx-icon name="check" size="lg"&gt;&lt;/pdx-icon&gt;
+&lt;pdx-icon name="settings" size="md"&gt;&lt;/pdx-icon&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { getPragmaticIconNames, PRAGMATIC_ICON_COUNT } from '@pdxui/ui/icon/pragmatic-icons';
+
+let iconNames = $signal(getPragmaticIconNames());
+let iconCount = $signal(PRAGMATIC_ICON_COUNT);
+</script>
+
+<style scoped>
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: var(--pdx-space-xs);
+    margin-top: var(--pdx-space-md);
+  }
+  .icon-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-sm) var(--pdx-space-2xs);
+    border-radius: var(--pdx-radius-md);
+    transition: background var(--pdx-transition);
+  }
+  .icon-cell:hover { background: var(--pdx-color-inset); }
+</style>

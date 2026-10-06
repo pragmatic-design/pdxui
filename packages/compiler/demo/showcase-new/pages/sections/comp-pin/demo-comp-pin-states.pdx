@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Error" error="Wrong PIN" showError>
+        <pdx-pin-input length="4" error></pdx-pin-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Disabled</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>disabled</code> to prevent the tooltip from showing.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm">No tooltip</pdx-button>
+      <pdx-tooltip text="You won't see this" disabled></pdx-tooltip>
+    </div>
+  </section>
+</template>

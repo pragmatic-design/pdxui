@@ -1,0 +1,61 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Three width sizes for side drawers: sm (240px), md (320px), lg (480px).</p>
+
+    <div class="size-demos">
+      <div class="size-demo-item">
+        <span class="pdx-txt-caption pdx-ink-muted">sm (240px)</span>
+        <div class="drawer-preview" style="height: 120px;">
+          <div class="pdx-drawer drawer-left" style="width: 80px;">
+            <div class="pdx-drawer-header"><span class="pdx-txt-small">sm</span></div>
+            <div class="pdx-drawer-body"></div>
+          </div>
+          <div class="drawer-content-area"></div>
+        </div>
+      </div>
+      <div class="size-demo-item">
+        <span class="pdx-txt-caption pdx-ink-muted">md (320px)</span>
+        <div class="drawer-preview" style="height: 120px;">
+          <div class="pdx-drawer drawer-left" style="width: 120px;">
+            <div class="pdx-drawer-header"><span class="pdx-txt-small">md</span></div>
+            <div class="pdx-drawer-body"></div>
+          </div>
+          <div class="drawer-content-area"></div>
+        </div>
+      </div>
+      <div class="size-demo-item">
+        <span class="pdx-txt-caption pdx-ink-muted">lg (480px)</span>
+        <div class="drawer-preview" style="height: 120px;">
+          <div class="pdx-drawer drawer-left" style="width: 180px;">
+            <div class="pdx-drawer-header"><span class="pdx-txt-small">lg</span></div>
+            <div class="pdx-drawer-body"></div>
+          </div>
+          <div class="drawer-content-area"></div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-drawer" size="sm"&gt;...&lt;/div&gt;
+&lt;div class="pdx-drawer" size="md"&gt;...&lt;/div&gt;  &lt;!-- default --&gt;
+&lt;div class="pdx-drawer" size="lg"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Size demos */
+  .size-demos {
+    margin-top: var(--pdx-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+  }
+  .size-demo-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

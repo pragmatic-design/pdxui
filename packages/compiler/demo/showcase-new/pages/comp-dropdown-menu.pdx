@@ -1,0 +1,53 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Dropdown Menu</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-dropdown-menu&gt;</code> — a button that opens a floating menu from an
+      <code>items</code> array: icons, keyboard shortcuts, dividers, checkbox and radio items,
+      disabled entries. Keyboard navigable, closes on outside click / <kbd>Esc</kbd>.
+    </p>
+
+    <pdx-demo-comp-dropdown-menu-basic class="demo-section"></pdx-demo-comp-dropdown-menu-basic>
+
+    <pdx-demo-comp-dropdown-menu-variants-placement class="demo-section"></pdx-demo-comp-dropdown-menu-variants-placement>
+
+    <pdx-demo-comp-dropdown-menu-checkbox-radio class="demo-section"></pdx-demo-comp-dropdown-menu-checkbox-radio>
+
+    <pdx-demo-comp-dropdown-menu-submenus class="demo-section"></pdx-demo-comp-dropdown-menu-submenus>
+
+    <pdx-demo-comp-dropdown-menu-custom-trigger class="demo-section"></pdx-demo-comp-dropdown-menu-custom-trigger>
+
+    <pdx-demo-comp-dropdown-menu-keyboard class="demo-section"></pdx-demo-comp-dropdown-menu-keyboard>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>items</code><span>MenuItem[]</span><span>{ key, label, type?, icon?, shortcut?, danger?, disabled?, checked?, radioGroup?, children? } — type: 'item' (default) · 'separator' · 'label' · 'checkbox' · 'radio' · 'submenu'</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Trigger button text</span></div>
+        <div class="opt-row"><code>icon</code><span>string</span><span>Leading icon on the trigger</span></div>
+        <div class="opt-row"><code>variant / size</code><span>string</span><span>Forwarded to the trigger button</span></div>
+        <div class="opt-row"><code>placement</code><span>string</span><span>bottom-start (default) · top-start · bottom-end · …</span></div>
+        <div class="opt-row"><code>min-width</code><span>number</span><span>Minimum menu width (px, default 200)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disable the trigger</span></div>
+        <div class="opt-row"><code>slot="trigger"</code><span>element</span><span>Your own trigger; <code>label</code>, <code>icon</code>, <code>variant</code> and <code>size</code> are then ignored</span></div>
+      </div>
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events &amp; methods</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event / method</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-select</code><span>{ key, item }</span></div>
+        <div class="opt-row"><code>pdx-check</code><span>{ key, checked, item, radioGroup? }</span></div>
+        <div class="opt-row"><code>open() / close() / toggle()</code><span>Imperative control on the element</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/dropdown-menu';
+@title 'Dropdown Menu';
+</script>
+
+<style scoped>
+.page { }
+</style>

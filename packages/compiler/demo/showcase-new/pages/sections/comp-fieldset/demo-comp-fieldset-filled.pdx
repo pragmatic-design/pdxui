@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Filled Variant</h2>
+
+    <div class="demo-block">
+      <pdx-fieldset legend="Contact" variant="filled">
+        <pdx-form-field label="Phone">
+          <pdx-input placeholder="+1 555-0100"></pdx-input>
+        </pdx-form-field>
+      </pdx-fieldset>
+    </div>
+  </section>
+</template>

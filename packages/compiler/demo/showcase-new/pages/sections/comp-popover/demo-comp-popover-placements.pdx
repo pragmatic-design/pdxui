@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Placements</h2>
+    <p class="pdx-txt-small pdx-ink-muted">4 main placements. Click each button to see.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm">Top</pdx-button>
+      <pdx-popover placement="top"><p class="pop-text">Popover on top</p></pdx-popover>
+      <pdx-button variant="outline" size="sm">Bottom</pdx-button>
+      <pdx-popover placement="bottom"><p class="pop-text">Popover on bottom</p></pdx-popover>
+      <pdx-button variant="outline" size="sm">Left</pdx-button>
+      <pdx-popover placement="left"><p class="pop-text">Popover on left</p></pdx-popover>
+      <pdx-button variant="outline" size="sm">Right</pdx-button>
+      <pdx-popover placement="right"><p class="pop-text">Popover on right</p></pdx-popover>
+    </div>
+  </section>
+</template>

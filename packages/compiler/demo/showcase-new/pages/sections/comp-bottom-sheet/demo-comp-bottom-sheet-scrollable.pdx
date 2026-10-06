@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Scrollable Content</h2>
+    <p class="pdx-txt-small pdx-ink-muted">When content overflows, the body scrolls internally. Drag the handle (not the body) to resize.</p>
+    <pdx-button variant="outline" @click="openScroll">Open Scrollable Sheet</pdx-button>
+
+    <pdx-bottom-sheet :open="scrollOpen" :detents="scrollDetents" :initialDetent="1" label="Scrollable content" @pdx-close="closeScroll">
+      <span slot="header"><strong>Long Content</strong></span>
+      <div>
+        <p>This sheet has more content than fits in the viewport. Scroll inside the body area.</p>
+        <p>When the body is scrolled to the top, dragging down on the body will resize the sheet instead of scrolling.</p>
+        <hr style="margin: 1rem 0; border-color: var(--pdx-color-border);">
+        <h3 class="pdx-txt-subtitle">Section 1</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+        <h3 class="pdx-txt-subtitle">Section 2</h3>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p>
+        <h3 class="pdx-txt-subtitle">Section 3</h3>
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+        <h3 class="pdx-txt-subtitle">Section 4</h3>
+        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p>
+        <h3 class="pdx-txt-subtitle">Section 5</h3>
+        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti.</p>
+      </div>
+    </pdx-bottom-sheet>
+  </section>
+</template>
+
+<script setup>
+// Scrollable
+let scrollOpen = $signal(false);
+
+const scrollDetents = [0.4, 0.85];
+
+function openScroll() { scrollOpen = true; }
+function closeScroll() { scrollOpen = false; }
+</script>

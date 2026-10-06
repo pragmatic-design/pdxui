@@ -1,0 +1,1422 @@
+/* pdx-data-grid — Enterprise data grid
+   Design references: AG Grid Quartz, Ant Design, MUI DataGrid, PrimeVue */
+
+pdx-data-grid {
+    display: block;
+    position: relative;
+}
+
+/* ── The typed cell `cell: badge({ tones })` — a status pill (soft surface + text at full saturation) ──
+   The grid renders it SAFELY (textContent); the tone is a class from a controlled map. */
+.pdx-dg-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+.pdx-dg-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: 0 0 auto;
+}
+.pdx-dg-badge-success { color: var(--pdx-color-success-ink); background: var(--pdx-color-success-soft); }
+.pdx-dg-badge-info    { color: var(--pdx-color-info-ink);    background: var(--pdx-color-info-soft); }
+.pdx-dg-badge-warning { color: var(--pdx-color-warning-ink); background: var(--pdx-color-warning-soft); }
+.pdx-dg-badge-danger  { color: var(--pdx-color-danger-ink);  background: var(--pdx-color-danger-soft); }
+.pdx-dg-badge-primary { color: var(--pdx-color-primary-ink); background: var(--pdx-color-primary-soft); }
+.pdx-dg-badge-muted   { color: var(--pdx-color-muted);   background: color-mix(in oklab, var(--pdx-color-muted) 14%, transparent); }
+/* A badge per value of a list: in a row, wrapping inside the cell rather than past it. */
+.pdx-dg-badges { display: inline-flex; flex-wrap: wrap; gap: .25rem; min-width: 0; }
+
+/* Typed cell: status — text with a leading colour dot (no pill). */
+.pdx-dg-status { display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap; }
+.pdx-dg-status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
+.pdx-dg-status-success { color: var(--pdx-color-success-ink); }
+.pdx-dg-status-info    { color: var(--pdx-color-info-ink); }
+.pdx-dg-status-warning { color: var(--pdx-color-warning-ink); }
+.pdx-dg-status-danger  { color: var(--pdx-color-danger-ink); }
+.pdx-dg-status-primary { color: var(--pdx-color-primary-ink); }
+.pdx-dg-status-muted   { color: var(--pdx-color-muted); }
+
+/* Typed cell: link. */
+.pdx-dg-link { color: var(--pdx-color-primary-ink); text-decoration: none; text-underline-offset: 2px; }
+.pdx-dg-link:hover { text-decoration: underline; }
+
+/* Typed cell: actions — a row of compact icon/text buttons (click does not select the row). */
+.pdx-dg-actions { display: inline-flex; align-items: center; gap: .25rem; }
+.pdx-dg-action {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 1.75rem; height: 1.75rem; padding: 0 .4rem;
+    border: none; border-radius: var(--pdx-radius-sm, 6px);
+    background: transparent; color: var(--pdx-color-muted); cursor: pointer;
+    font-size: .8rem; transition: background var(--pdx-transition, .15s), color var(--pdx-transition, .15s);
+}
+.pdx-dg-action:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+.pdx-dg-action-danger:hover { color: var(--pdx-color-danger-ink); background: color-mix(in oklab, var(--pdx-color-danger) 12%, transparent); }
+.pdx-dg-action-primary:hover { color: var(--pdx-color-primary-ink); background: color-mix(in oklab, var(--pdx-color-primary) 12%, transparent); }
+
+/* Wrapper — uses surface color to stand out from page bg across themes */
+.pdx-dg {
+    width: 100%;
+    font-size: var(--pdx-text-sm);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+    background: var(--pdx-color-surface);
+}
+
+.pdx-dg-scroll {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Fill mode ──────────────────────────────────────────────
+   The grid fills the available height of its parent (flex) instead of growing with
+   content, so the PAGE doesn't scroll — only the grid body does (virtualized).
+   The consumer just makes the <pdx-data-grid> host a flex child (flex:1) of a
+   full-height column; the rules below make toolbar/header/footer fixed and the body flex. */
+pdx-data-grid:has(.pdx-dg-fill) {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+/* The component wraps .pdx-dg in a .pdx-dg-root div — it must pass the height through. */
+pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+.pdx-dg-fill {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+/* scrollEl owns the HORIZONTAL scroll so header + filter row + body move together when columns
+   exceed the width; the body owns the VERTICAL scroll (virtualized). This keeps the filter row
+   aligned and usable instead of getting clipped/squished on resize. */
+.pdx-dg-fill .pdx-dg-scroll {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.pdx-dg-fill .pdx-dg-header,
+.pdx-dg-fill .pdx-dg-filter-row {
+    flex: 0 0 auto;
+    /* Reserve the same width the body's vertical scrollbar consumes → columns stay aligned. */
+    padding-right: var(--pdx-dg-sbw, 0px);
+    box-sizing: border-box;
+}
+.pdx-dg-fill .pdx-dg-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+}
+
+/* ─── Header ───────────────────────────────────────────────── */
+
+.pdx-dg-header {
+    display: flex;
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-dg-sticky .pdx-dg-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.pdx-dg-th {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px var(--pdx-space-md);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-text);
+    font-size: var(--pdx-text-sm);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    user-select: none;
+    position: relative;
+    transition: background 0.15s;
+}
+
+/* Header label — flex squeeze target (AG Grid pattern) */
+.pdx-dg-th-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Sortable header — interactive */
+.pdx-dg-th-sortable {
+    cursor: pointer;
+}
+
+/* The sort control: a button holding the label and the carets, laid out as they would be in the
+   th. It takes the space the label would take, so the filter icon and the resize handle stay put. */
+.pdx-dg-sort-btn {
+    display: flex;
+    align-items: center;
+    gap: inherit;
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    justify-content: inherit;
+    cursor: pointer;
+    border-radius: var(--pdx-radius-sm);
+}
+
+.pdx-dg-th-sortable:hover {
+    background: var(--pdx-color-inset);
+}
+
+/* ─── Sort indicator — Stacked caret pattern ─────────────── */
+
+.pdx-dg-sort {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-left: 4px;
+    height: 20px;
+}
+
+.pdx-dg-sort-caret {
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    transition: border-color 0.15s, opacity 0.15s;
+}
+
+.pdx-dg-sort-caret-up {
+    border-bottom: 6px solid var(--pdx-color-muted);
+    opacity: 0.3;
+}
+
+.pdx-dg-sort-caret-down {
+    border-top: 6px solid var(--pdx-color-muted);
+    opacity: 0.3;
+}
+
+/* Hover: reveal carets */
+.pdx-dg-th-sortable:hover .pdx-dg-sort-caret {
+    opacity: 0.55;
+}
+
+/* Active sort: bold the active caret, dim the other */
+.pdx-dg-sort-caret-up.active {
+    border-bottom-color: var(--pdx-color-primary);
+    opacity: 1;
+}
+
+.pdx-dg-sort-caret-down.active {
+    border-top-color: var(--pdx-color-primary);
+    opacity: 1;
+}
+
+/* When sorted: hide the inactive caret */
+.pdx-dg-sort.sorted .pdx-dg-sort-caret:not(.active) {
+    opacity: 0.15;
+}
+
+/* Multi-sort badge */
+.pdx-dg-sort-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: color-mix(in oklch, var(--pdx-color-primary) 15%, transparent);
+    color: var(--pdx-color-primary-ink);
+    font-size: 10px;
+    font-weight: var(--pdx-weight-bold);
+    line-height: 1;
+    margin-left: 2px;
+}
+
+/* ─── Column drag reorder ──────────────────────────────────── */
+
+.pdx-dg-th[draggable="true"] {
+    cursor: grab;
+}
+
+.pdx-dg-th-dragging {
+    opacity: 0.4;
+}
+
+.pdx-dg-th-drop-left {
+    box-shadow: inset 3px 0 0 var(--pdx-color-primary);
+}
+
+.pdx-dg-th-drop-right {
+    box-shadow: inset -3px 0 0 var(--pdx-color-primary);
+}
+
+/* ─── Header filter icon ───────────────────────────────────── */
+
+/* Collapsed while it is not shown: `opacity: 0` alone hides the funnel but keeps its 18px, so a
+   narrow column would spend them on an icon nobody can see and truncate its own header — "Code"
+   becomes "C…" in a 100px column. The negative margin cancels the header's 4px gap, which a
+   zero-width child would still claim. No width transition: the room appears at once, and a
+   measurement of it is not a race. */
+.pdx-dg-filter-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0;
+    margin-inline-start: -4px;
+    overflow: hidden;
+    height: 18px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    padding: 0;
+    border-radius: 1px;
+    flex-shrink: 0;
+    line-height: 0;
+}
+
+/* Shown — and only then taking its room: pointer on the header, keyboard focus anywhere in it
+   (so a focus ring never surrounds nothing), or a filter active on the column. */
+.pdx-dg-th:hover .pdx-dg-filter-icon,
+.pdx-dg-th:focus-within .pdx-dg-filter-icon,
+.pdx-dg-filter-icon.active {
+    width: 18px;
+    margin-inline-start: 0;
+    opacity: 0.6;
+}
+
+.pdx-dg-filter-icon:hover,
+.pdx-dg-filter-icon:focus-visible {
+    opacity: 1 !important;
+    color: var(--pdx-color-primary-ink);
+    background: var(--pdx-color-inset);
+}
+
+.pdx-dg-filter-icon.active {
+    opacity: 1;
+    color: var(--pdx-color-primary-ink);
+}
+
+/* ─── Filter popover ───────────────────────────────────────── */
+
+.pdx-dg-filter-popover {
+    position: absolute;
+    z-index: 10;
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-lg);
+    padding: var(--pdx-space-sm);
+    min-width: 280px;
+    max-width: 380px;
+}
+
+.pdx-dg-fp-title {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    margin-bottom: var(--pdx-space-sm);
+    padding-bottom: var(--pdx-space-xs);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-dg-fp-condition {
+    display: flex;
+    gap: var(--pdx-space-xs);
+    margin-bottom: var(--pdx-space-xs);
+}
+
+/* PDX components inside popover conditions — 50/50 split */
+.pdx-dg-fp-condition pdx-select,
+.pdx-dg-fp-condition pdx-input,
+.pdx-dg-fp-condition pdx-number-input,
+.pdx-dg-fp-condition pdx-date-picker {
+    flex: 1;
+    min-width: 0;
+}
+
+/* AND/OR toggle */
+.pdx-dg-fp-logic {
+    display: flex;
+    gap: 2px;
+    margin: var(--pdx-space-xs) 0;
+}
+
+.pdx-dg-fp-logic-btn {
+    flex: 1;
+    padding: 3px 8px;
+    border: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.pdx-dg-fp-logic-btn:first-child {
+    border-radius: var(--pdx-radius-sm) 0 0 var(--pdx-radius-sm);
+}
+
+.pdx-dg-fp-logic-btn:last-child {
+    border-radius: 0 var(--pdx-radius-sm) var(--pdx-radius-sm) 0;
+}
+
+.pdx-dg-fp-logic-btn.active {
+    background: var(--pdx-color-primary);
+    color: white;
+    border-color: var(--pdx-color-primary);
+}
+
+/* "+ Add condition" / "- Remove condition" button */
+.pdx-dg-fp-add-cond {
+    display: block;
+    width: 100%;
+    padding: 4px 8px;
+    margin-top: var(--pdx-space-xs);
+    border: none;
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    cursor: pointer;
+    text-align: left;
+}
+.pdx-dg-fp-add-cond:hover {
+    color: var(--pdx-color-primary-ink);
+}
+
+/* Action buttons — pdx-button xs, follows density */
+.pdx-dg-fp-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--pdx-space-xs);
+    margin-top: var(--pdx-space-sm);
+    padding-top: var(--pdx-space-sm);
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+/* ─── Filter row (under header) ────────────────────────────── */
+
+.pdx-dg-filter-row {
+    display: flex;
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+    padding: 4px 0;
+}
+
+.pdx-dg-sticky .pdx-dg-filter-row {
+    position: sticky;
+    top: 41px; /* header height approx */
+    z-index: 2;
+}
+
+.pdx-dg-compact .pdx-dg-sticky .pdx-dg-filter-row {
+    top: 33px;
+}
+
+.pdx-dg-filter-cell {
+    display: flex;
+    align-items: center;
+    padding: 2px var(--pdx-space-sm);
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+/* PDX components inside filter cells — ensure they fill the cell */
+.pdx-dg-filter-cell pdx-input,
+.pdx-dg-filter-cell pdx-number-input,
+.pdx-dg-filter-cell pdx-select,
+.pdx-dg-filter-cell pdx-date-picker {
+    width: 100%;
+}
+
+/* ─── Body ─────────────────────────────────────────────────── */
+
+.pdx-dg-body {
+    position: relative;
+}
+
+.pdx-dg-row {
+    display: flex;
+    /* The rhythm, not a literal: `min-height`, so a row whose content wraps still grows and a theme
+       that draws taller keeps drawing taller. 45px is what all 13 themes render without it, so the
+       default changes nothing and an app that states a different rhythm moves every row with one
+       declaration. */
+    border-bottom: 1px solid var(--pdx-color-border);
+    transition: background 0.1s;
+}
+
+.pdx-dg-row:last-child {
+    border-bottom: none;
+}
+
+/* Striped */
+.pdx-dg-striped .pdx-dg-row:nth-child(even) {
+    background: light-dark(oklch(0.98 0 0 / 0.5), oklch(0.15 0 0 / 0.3));
+}
+
+/* Hover — 4% opacity neutral (industry standard). Disabled on editing row. */
+.pdx-dg-hover .pdx-dg-row:hover {
+    background: var(--pdx-color-inset);
+}
+.pdx-dg-hover .pdx-dg-row:has(.pdx-dg-cell-editing):hover {
+    background: transparent;
+}
+
+/* Rows that open something (`row-clickable`): the row says it can be clicked. The
+   controls inside it keep their own cursor, and no page needs a rule of its own on this internal
+   class. */
+.pdx-dg-rows-clickable .pdx-dg-row {
+    cursor: pointer;
+}
+
+/* Selected row — 10% primary */
+.pdx-dg-row.pdx-dg-row-selected {
+    background: color-mix(in oklch, var(--pdx-color-primary) 10%, transparent);
+}
+
+.pdx-dg-row.pdx-dg-row-selected:hover {
+    background: color-mix(in oklch, var(--pdx-color-primary) 14%, transparent);
+}
+
+/* Cell */
+.pdx-dg-td {
+    display: flex;
+    align-items: center;
+    /* The row's rhythm lives on the CELL: a row is a flex container of cells, and its own
+       `min-height` does not govern — measured, the row stays 45px with the token set to 80px,
+       because the height a flex row takes is the height of its tallest item.
+       ⚠️ The cell is the rhythm MINUS the row's 1px separator, so what an application states is
+       the height of the ROW, which is the thing it can see. `auto` by default, which is what every
+       theme draws without it — `calc(auto - 1px)` is invalid, so the subtraction lives in
+       its own token and defaults to `auto` with it. */
+    min-height: var(--pdx-row-cell-height, auto);
+    padding: 10px var(--pdx-space-md);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--pdx-color-text);
+}
+
+/* The cell's text, clipped with an ellipsis. Its own box because `.pdx-dg-td` is a flex container,
+   where `text-overflow` on the cell does not reach a bare text node. `min-width: 0` lets
+   it shrink below its content, which is what makes the overflow happen inside it. */
+.pdx-dg-td-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pdx-dg-td-right { justify-content: flex-end; text-align: right; }
+.pdx-dg-td-center { justify-content: center; text-align: center; }
+
+/* ─── Compact ──────────────────────────────────────────────── */
+
+.pdx-dg-compact .pdx-dg-th,
+.pdx-dg-compact .pdx-dg-td {
+    padding: 6px var(--pdx-space-sm);
+}
+
+.pdx-dg-compact .pdx-dg-footer {
+    padding: 6px var(--pdx-space-sm);
+}
+
+/* ─── Virtual scroll ───────────────────────────────────────── */
+
+.pdx-dg-virtual-spacer {
+    width: 100%;
+    pointer-events: none;
+}
+
+.pdx-dg-virtual-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+}
+
+/* ─── Selection checkbox ───────────────────────────────────── */
+
+.pdx-dg-checkbox {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pdx-dg-checkbox input[type="checkbox"] {
+    accent-color: var(--pdx-color-primary);
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+}
+
+/* ─── Empty state (headers visible, message in body) ───────── */
+
+.pdx-dg-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--pdx-space-2xl) var(--pdx-space-md);
+    color: var(--pdx-color-muted);
+    gap: var(--pdx-space-xs);
+}
+
+.pdx-dg-empty-icon {
+    opacity: 0.35;
+}
+
+.pdx-dg-empty-text {
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+}
+
+/* ─── Loading overlay ──────────────────────────────────────── */
+
+.pdx-dg-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in oklch, var(--pdx-color-surface) 70%, transparent);
+    z-index: 3;
+}
+
+/* ─── Column groups — two-row header (BUG 7) ───────────────── */
+
+/* Grouped header stacks two flex rows (group labels on top, leaf headers below). */
+.pdx-dg-header-grouped {
+    flex-direction: column;
+    padding: 0;
+}
+.pdx-dg-header-row {
+    display: flex;
+}
+/* Group label cell — centered, sits above its leaf columns. */
+.pdx-dg-th-group {
+    justify-content: center;
+    text-align: center;
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+.pdx-dg-th-group .pdx-dg-th-label {
+    flex: 0 1 auto;
+    text-align: center;
+}
+/* Top-level column in a grouped header spans both rows: no bottom border on the header cell,
+   invisible placeholder keeps the leaf row aligned to the same width. */
+.pdx-dg-th-span {
+    border-bottom: none;
+}
+.pdx-dg-th-leaf-placeholder {
+    padding: 0;
+    pointer-events: none;
+}
+
+/* ─── Summary / total row (BUG 5) ──────────────────────────── */
+
+/* Sticky aggregate row pinned to the bottom of the scroll area (outside the virtualized body). */
+.pdx-dg-summary {
+    display: flex;
+    background: var(--pdx-color-surface);
+    border-top: 2px solid var(--pdx-color-border);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+}
+.pdx-dg-summary-cell {
+    display: flex;
+    align-items: center;
+    padding: 10px var(--pdx-space-md);
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-text);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* ─── Footer ───────────────────────────────────────────────── */
+
+.pdx-dg-footer {
+    display: flex;
+    /* A grid narrower than info + pagination puts the pagination on its own line. */
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+    gap: var(--pdx-space-md);
+}
+
+.pdx-dg-footer-info {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    white-space: nowrap;
+}
+
+/* pdx-pagination inside footer */
+.pdx-dg-footer pdx-pagination {
+    margin-left: auto;
+}
+
+/* ─── Column resize handle ─────────────────────────────────── */
+
+.pdx-dg-resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    cursor: col-resize;
+    z-index: 1;
+}
+
+.pdx-dg-resize-handle:hover,
+.pdx-dg-resize-handle.active {
+    background: var(--pdx-color-primary);
+    opacity: 0.4;
+}
+
+/* ─── Frozen columns ───────────────────────────────────────── */
+
+.pdx-dg-frozen-left {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--pdx-color-surface);
+    box-shadow: 2px 0 4px -2px color-mix(in oklch, var(--pdx-color-text) 10%, transparent);
+}
+
+.pdx-dg-frozen-right {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    background: var(--pdx-color-surface);
+    box-shadow: -2px 0 4px -2px color-mix(in oklch, var(--pdx-color-text) 10%, transparent);
+}
+
+/* Frozen in header — higher z-index to overlap sticky header + frozen */
+.pdx-dg-header .pdx-dg-frozen-left,
+.pdx-dg-header .pdx-dg-frozen-right {
+    z-index: 3;
+}
+
+/* ─── Group rows ───────────────────────────────────────────── */
+
+.pdx-dg-group-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: 8px var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-bottom: 1px solid var(--pdx-color-border);
+    font-size: var(--pdx-text-sm);
+    user-select: none;
+}
+
+.pdx-dg-group-row:hover {
+    background: color-mix(in oklch, var(--pdx-color-inset) 80%, var(--pdx-color-primary));
+}
+
+/* The group row's one cell, and its toggle button, lay out the row's content as the row did */
+.pdx-dg-group-cell {
+    display: flex;
+    align-items: center;
+    gap: inherit;
+    flex: 1;
+    min-width: 0;
+}
+
+.pdx-dg-group-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: inherit;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+    border-radius: var(--pdx-radius-sm);
+}
+
+.pdx-dg-group-chevron {
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--pdx-color-muted);
+    width: 14px;
+    text-align: center;
+    transition: transform 0.15s;
+}
+
+.pdx-dg-group-label {
+    color: var(--pdx-color-text);
+}
+
+.pdx-dg-group-label strong {
+    color: var(--pdx-color-muted);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.pdx-dg-group-count {
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+}
+
+.pdx-dg-group-agg {
+    margin-left: auto;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ─── Column chooser menu ──────────────────────────────────── */
+
+.pdx-dg-col-menu {
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-lg);
+    padding: var(--pdx-space-xs) 0;
+    min-width: 180px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.pdx-dg-col-menu-title {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-bottom: 1px solid var(--pdx-color-border);
+    margin-bottom: var(--pdx-space-2xs);
+}
+
+.pdx-dg-col-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 4px var(--pdx-space-sm);
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    transition: background 0.1s;
+    user-select: none;
+}
+
+.pdx-dg-col-menu-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-dg-col-menu-item input[type="checkbox"] {
+    accent-color: var(--pdx-color-primary);
+}
+
+.pdx-dg-col-menu-grip {
+    display: inline-flex;
+    align-items: center;
+    cursor: grab;
+    color: var(--pdx-color-muted);
+    opacity: 0.4;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+}
+
+.pdx-dg-col-menu-item:hover .pdx-dg-col-menu-grip {
+    opacity: 0.8;
+}
+
+.pdx-dg-col-menu-item-dragging {
+    opacity: 0.4;
+}
+
+.pdx-dg-col-menu-item-drop {
+    box-shadow: inset 0 -2px 0 var(--pdx-color-primary);
+}
+
+/* Column chooser trigger button in header */
+.pdx-dg-col-chooser-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    transition: color 0.15s, background 0.15s;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.pdx-dg-col-chooser-btn:hover {
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+}
+
+/* ─── Boolean cell ─────────────────────────────────────────── */
+
+.pdx-dg-bool-true { color: var(--pdx-color-success-ink); }
+.pdx-dg-bool-false { color: var(--pdx-color-muted); opacity: 0.4; }
+
+/* ─── Row detail expand ───────────────────────────────────── */
+
+.pdx-dg-expand-cell {
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pdx-dg-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    font-size: 10px;
+    padding: 0;
+    border-radius: var(--pdx-radius-sm);
+    transition: color 0.15s, background 0.15s, transform 0.15s;
+    user-select: none;
+}
+
+.pdx-dg-expand-btn:hover {
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+}
+
+.pdx-dg-detail-row {
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-inset);
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+}
+
+/* ─── Command column ──────────────────────────────────────── */
+
+.pdx-dg-td-command {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
+}
+
+/* ─── Toolbar ─────────────────────────────────────────────── */
+
+.pdx-dg-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-xs);
+    padding: 6px var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+    font-size: var(--pdx-text-sm);
+    min-height: 36px;
+}
+
+.pdx-dg-toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    padding: 0;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.pdx-dg-toolbar-btn:hover {
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+    border-color: var(--pdx-color-muted);
+}
+
+.pdx-dg-toolbar-btn-text {
+    width: auto;
+    padding: 0 var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-primary-ink);
+    border-color: color-mix(in oklch, var(--pdx-color-primary) 30%, transparent);
+}
+
+.pdx-dg-toolbar-btn-text:hover {
+    color: var(--pdx-color-primary-ink);
+    background: color-mix(in oklch, var(--pdx-color-primary) 8%, transparent);
+    border-color: var(--pdx-color-primary);
+}
+
+.pdx-dg-toolbar-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-2xs);
+}
+
+/* ─── Toolbar chips (sort, filter, group) ─────────────────── */
+
+.pdx-dg-toolbar-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px 2px 8px;
+    border-radius: 12px;
+    font-size: var(--pdx-text-xs);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    border: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    user-select: none;
+}
+
+.pdx-dg-toolbar-chip:hover {
+    background: var(--pdx-color-inset);
+    border-color: var(--pdx-color-muted);
+}
+
+.pdx-dg-toolbar-chip-sort {
+    border-color: color-mix(in oklch, var(--pdx-color-primary) 40%, var(--pdx-color-border));
+    background: color-mix(in oklch, var(--pdx-color-primary) 6%, var(--pdx-color-surface));
+}
+
+.pdx-dg-toolbar-chip-filter {
+    border-color: color-mix(in oklch, var(--pdx-color-info, var(--pdx-color-primary)) 40%, var(--pdx-color-border));
+    background: color-mix(in oklch, var(--pdx-color-info, var(--pdx-color-primary)) 6%, var(--pdx-color-surface));
+}
+
+/* A quick filter not set yet: the column's name, muted, on a dashed edge — there, and
+   clearly not applied. `font: inherit` because it is a <button>. */
+.pdx-dg-toolbar-chip[data-empty] {
+    font: inherit;
+    font-size: var(--pdx-text-xs);
+    padding: 2px 8px;
+    border-style: dashed;
+    background: transparent;
+    color: var(--pdx-color-muted);
+}
+
+/* The quick search, at the toolbar's right. */
+.pdx-dg-toolbar-search {
+    width: 14rem;
+    max-width: 40vw;
+    height: 28px;
+    font-size: var(--pdx-text-sm);
+}
+
+.pdx-dg-toolbar-chip-group {
+    border-color: color-mix(in oklch, var(--pdx-color-success, oklch(0.55 0.18 155)) 40%, var(--pdx-color-border));
+    background: color-mix(in oklch, var(--pdx-color-success, oklch(0.55 0.18 155)) 6%, var(--pdx-color-surface));
+}
+
+.pdx-dg-toolbar-chip-remove-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid color-mix(in oklch, var(--pdx-color-danger, oklch(0.55 0.22 25)) 40%, var(--pdx-color-border));
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    color: var(--pdx-color-danger-ink);
+    font-size: 11px;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.pdx-dg-toolbar-chip-remove-all:hover {
+    background: color-mix(in oklch, var(--pdx-color-danger, oklch(0.55 0.22 25)) 12%, transparent);
+}
+
+.pdx-dg-toolbar-chip-icon {
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.6;
+    flex-shrink: 0;
+    line-height: 0;
+}
+
+.pdx-dg-toolbar-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    font-size: 10px;
+    line-height: 1;
+    padding: 0;
+    border-radius: 50%;
+    transition: color 0.15s, background 0.15s;
+}
+
+.pdx-dg-toolbar-chip-remove:hover {
+    color: var(--pdx-color-danger-ink);
+    background: color-mix(in oklch, var(--pdx-color-danger, oklch(0.55 0.22 25)) 12%, transparent);
+}
+
+/* ─── Group bar (drag drop zone) ──────────────────────────── */
+
+.pdx-dg-group-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-xs);
+    padding: 6px var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: color-mix(in oklch, var(--pdx-color-inset) 50%, var(--pdx-color-surface));
+    min-height: 32px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.pdx-dg-group-bar-active {
+    background: color-mix(in oklch, var(--pdx-color-primary) 8%, var(--pdx-color-surface));
+    border-color: var(--pdx-color-primary);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--pdx-color-primary) 30%, transparent);
+}
+
+.pdx-dg-group-bar-hint {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    font-style: italic;
+    user-select: none;
+    pointer-events: none;
+}
+
+.pdx-dg-group-bar-hint-sm {
+    font-style: normal;
+    font-weight: var(--pdx-weight-bold);
+    color: var(--pdx-color-primary-ink);
+    cursor: default;
+}
+
+/* ─── Enum filter in popover ──────────────────────────────── */
+
+.pdx-dg-fp-enum-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin: var(--pdx-space-xs) 0;
+}
+
+.pdx-dg-fp-enum-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 4px var(--pdx-space-xs);
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    transition: background 0.1s;
+    border-radius: var(--pdx-radius-sm);
+}
+
+.pdx-dg-fp-enum-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-dg-fp-enum-item input[type="checkbox"] {
+    accent-color: var(--pdx-color-primary);
+}
+
+/* Select-all toggle — separated from the value list. */
+.pdx-dg-fp-enum-all {
+    border-bottom: 1px solid var(--pdx-color-border);
+    margin-bottom: 2px;
+    font-weight: var(--pdx-weight-medium);
+}
+
+/* Set/Excel filter search box above the value checklist. */
+.pdx-dg-fp-enum-search {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: var(--pdx-space-xs);
+    padding: 4px 8px;
+    font-size: var(--pdx-text-sm);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-bg);
+    color: var(--pdx-color-text);
+}
+
+/* ─── Inline filter operator dropdown ─────────────────────── */
+
+.pdx-dg-filter-cell-with-op {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+}
+
+.pdx-dg-filter-op-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 4px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    flex-shrink: 0;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+}
+
+.pdx-dg-filter-op-btn:hover {
+    color: var(--pdx-color-primary-ink);
+    border-color: var(--pdx-color-primary);
+}
+
+.pdx-dg-filter-op-dropdown {
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-lg);
+    padding: var(--pdx-space-2xs) 0;
+    min-width: 140px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.pdx-dg-filter-op-item {
+    padding: 4px var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    cursor: pointer;
+    color: var(--pdx-color-text);
+    transition: background 0.1s;
+    user-select: none;
+}
+
+.pdx-dg-filter-op-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-dg-filter-op-item.active {
+    color: var(--pdx-color-primary-ink);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+/* ─── A row's own menu ─────────────────────────────────────── */
+
+.pdx-dg-row-menu {
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-lg);
+    padding: var(--pdx-space-2xs) 0;
+    min-width: 180px;
+}
+
+.pdx-dg-row-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 6px var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.1s;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.pdx-dg-row-menu-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-dg-row-menu-item.pdx-dg-menu-danger {
+    color: var(--pdx-color-danger-ink);
+}
+
+/* Refused, not withheld: it stays readable, and its reason is reachable off screen. */
+.pdx-dg-row-menu-item[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pdx-dg-row-menu-item[aria-disabled="true"]:hover {
+    background: transparent;
+}
+
+/* ─── Edit Mode ────────────────────────────────────────── */
+
+.pdx-dg-cell-editing {
+    padding: 4px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Components fill available width, keep their native styling */
+.pdx-dg-cell-editing pdx-input,
+.pdx-dg-cell-editing pdx-number-input,
+.pdx-dg-cell-editing pdx-select,
+.pdx-dg-cell-editing pdx-date-picker {
+    width: 100%;
+}
+
+.pdx-dg-cell-editing .pdx-dg-bool-editor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cell focus indicator (keyboard navigation) — any cell of the grid holds the roving tab stop,
+   a header cell included, and so do the controls that take a cell's stop.
+   `:focus-visible` only: on `:focus` a mouse click would outline one cell like a spreadsheet
+   selection, and the grid has none. The outline itself is in the rule below. */
+.pdx-dg-td[tabindex="0"]:focus-visible,
+.pdx-dg-th[tabindex="0"]:focus-visible,
+.pdx-dg-summary-cell[tabindex="0"]:focus-visible {
+    z-index: 1;
+}
+
+.pdx-dg-td[tabindex="0"]:focus-visible,
+.pdx-dg-th[tabindex="0"]:focus-visible,
+.pdx-dg-summary-cell[tabindex="0"]:focus-visible,
+.pdx-dg-sort-btn:focus-visible,
+.pdx-dg-group-toggle:focus-visible,
+.pdx-dg-expand-btn:focus-visible,
+.pdx-dg-filter-op-item:focus-visible,
+.pdx-dg-row-menu-item:focus-visible,
+.pdx-dg-col-menu-item[role="menuitem"]:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-primary);
+    outline-offset: -2px;
+}
+
+/* The pointer was the last thing used on the grid (`data-pdx-pointer`, grid-input-modality.ts): no
+   ring on a cell or a header, whatever `:focus-visible` says. Chromium makes the focused element
+   `:focus-visible` on ANY keydown — holding Shift for a multi-sort would outline the header just
+   clicked. A real key takes the attribute off, and the rings above come back. Not the grid's
+   inputs: a field shows its focus however it was reached. */
+pdx-data-grid[data-pdx-pointer] :is(.pdx-dg-td, .pdx-dg-th, .pdx-dg-summary-cell, .pdx-dg-sort-btn):focus-visible {
+    outline: none;
+}
+
+.pdx-dg-cell-dirty {
+    background: color-mix(in oklch, var(--pdx-color-warning) 10%, transparent) !important;
+}
+
+.pdx-dg-cell-error {
+    outline: 2px solid var(--pdx-color-danger);
+    outline-offset: -2px;
+}
+
+.pdx-dg-row-editing {
+    background: var(--pdx-color-inset) !important;
+}
+
+.pdx-dg-edit-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdx-dg-td[style*="cursor: cell"]:hover,
+.pdx-dg-td[style*="cursor: pointer"]:hover {
+    background: color-mix(in oklch, var(--pdx-color-primary) 5%, transparent);
+}
+
+.pdx-dg-bool-editor input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* UI-15d edge-fade: opt-in via `edge-fade` attribute. Soft gradient at the bottom of a scrolling grid,
+   lifted above the horizontal scrollbar (--pdx-dg-sbw, measured by the grid); never blocks scroll/click. */
+pdx-data-grid[edge-fade] .pdx-dg-fill { position: relative; }
+pdx-data-grid[edge-fade] .pdx-dg-fill::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: var(--pdx-dg-sbw, 0px);
+    height: 28px;
+    background: linear-gradient(to bottom, transparent, var(--pdx-color-surface));
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* UI-09 row drag-to-reorder (opt-in `row-reorder`) */
+.pdx-dg-row-draggable { cursor: grab; }
+.pdx-dg-row-dragging { opacity: 0.5; cursor: grabbing; }
+.pdx-dg-row-dragover { box-shadow: inset 0 2px 0 0 var(--pdx-color-primary); }

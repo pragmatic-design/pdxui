@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Loading Overlay (CSS)</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>.pdx-loading-overlay</code> adds a frosted overlay with spinner on any container.</p>
+    <div class="comp-card pdx-loading-overlay" style="min-height:120px">
+      <h3 class="pdx-txt-subheading">Content Below</h3>
+      <p class="pdx-txt-small">This content is covered by the loading overlay.</p>
+    </div>
+  </section>
+</template>

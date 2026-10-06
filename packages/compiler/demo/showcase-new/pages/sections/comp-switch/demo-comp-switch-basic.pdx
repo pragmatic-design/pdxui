@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Switch</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to toggle. Label is part of the clickable area.</p>
+
+    <div class="demo-stack">
+      <pdx-switch label="Notifications"></pdx-switch>
+      <pdx-switch label="Dark mode" checked></pdx-switch>
+      <pdx-switch label="Disabled" disabled></pdx-switch>
+      <pdx-switch label="Disabled on" disabled checked></pdx-switch>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-switch label="Notifications"&gt;&lt;/pdx-switch&gt;
+&lt;pdx-switch label="Dark mode" checked&gt;&lt;/pdx-switch&gt;
+&lt;pdx-switch label="Disabled" disabled&gt;&lt;/pdx-switch&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Progress Bar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Auto-dismiss timer via <code>.pdx-toast-progress</code>. Animates from full to zero over 5s.</p>
+
+    <div class="toast-demo-container">
+      <div class="pdx-toast pdx-toast-success" data-open>
+        <div class="pdx-toast-icon">&#10003;</div>
+        <div class="pdx-toast-content">
+          <div class="pdx-toast-title">Saved</div>
+          <div class="pdx-toast-message">Your document has been saved.</div>
+        </div>
+        <div class="pdx-toast-progress"></div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toast pdx-toast-success" data-open&gt;
+  ...content...
+  &lt;div class="pdx-toast-progress"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

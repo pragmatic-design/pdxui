@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">No Duplicates (Default)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      By default, duplicate tags are rejected. Try adding the same tag twice.
+      Set <code>allow-duplicates</code> to override this behavior.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tag-input :value="dupeTags" placeholder="Try adding 'hello' twice..." @pdx-change="onDupeChange"></pdx-tag-input>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
+      {{ dupeMessage }}
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Duplicates rejected (default) --&gt;
+&lt;pdx-tag-input placeholder="Try adding duplicates..." /&gt;
+
+&lt;!-- Duplicates allowed --&gt;
+&lt;pdx-tag-input allow-duplicates placeholder="Duplicates OK" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useTagInputLog } from './state.pdx';
+
+// The page's event console (state.pdx.ts).
+const tagInputLog = useTagInputLog();
+function addLog(text) { tagInputLog.addLog(text); }
+
+// No Duplicates
+let dupeTags = $signal(['hello', 'world']);
+
+let dupeMessage = $signal('Try adding "hello" again — it will be rejected.');
+
+function onDupeChange(e) {
+    const tags = e.detail ? e.detail.tags : [];
+    dupeTags = tags;
+    if (tags.length <= 2) {
+        dupeMessage = 'Duplicates rejected. Current: [' + tags.join(', ') + ']';
+    } else {
+        dupeMessage = 'Tags: [' + tags.join(', ') + ']';
+    }
+    addLog('dupe-test change: [' + tags.join(', ') + ']');
+}
+</script>

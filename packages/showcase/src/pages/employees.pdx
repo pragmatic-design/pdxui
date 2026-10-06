@@ -1,0 +1,110 @@
+<template>
+  <section class="page" data-test="employees">
+    <!-- The list's header, the tickets': views of this list's own. -->
+    <pdx-list-header
+      :title="$t('employees.title')"
+      store-key="employees"
+      :default-name="$t('employees.views.default')"
+      :grid="gridEl"
+      :source="source">
+      <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('employees.matching', { count: total }) }}</span>
+      <pdx-button variant="primary" @click="creating.open.set(true)" data-test="new">{{ $t('employees.new') }}</pdx-button>
+    </pdx-list-header>
+    <!-- For the reader of the source: the third entity, with the reference's detail —
+         identity, sections on the left, edited in the page. -->
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('employees.intro') }}</p>
+
+    <!-- A row is the way into the record, and the record is a PAGE with its sections, not a drawer:
+         the reference's employee record has more than a drawer holds. No selection and no
+         bulk bar: an employee is ended, not archived or deleted, and that is a section's action. -->
+    <pdx-data-grid
+      :ref="gridEl"
+      :source="source"
+      :columns="columns"
+      :page-sizes="[10, 20, 50]"
+      show-toolbar
+      search
+      row-clickable
+      @pdx-row-click="e => openRecord(e.detail.row)"
+      data-test="grid"></pdx-data-grid>
+
+    <!-- CREATE IN A MODAL: a name is all a create asks; the rest is the Anagrafica's, in the page. -->
+    <pdx-dialog
+      :open="createOpen"
+      size="md"
+      :title="$t('employees.new')"
+      @pdx-close="creating.open.set(false)"
+      data-test="create-dialog">
+      <pdx-auto-form
+        :schema="schema"
+        :submit-label="$t('employees.create')"
+        @pdx-submit="e => creating.create(e.detail?.values ?? {})"
+        data-test="create-form"></pdx-auto-form>
+    </pdx-dialog>
+  </section>
+</template>
+
+<script setup>
+// A dictionary key, for the reason in `customers.pdx`: an ancestor of `/employees/:id`, which does
+// not render inside it.
+@page '/employees' { label: $t('employees.title') };
+@title $t('employees.title');
+@scroll 'preserve';
+
+import { createDataSource, actions, getLocale } from '@pdxui/core';
+import { navigate } from '@pdxui/router';
+import { employeeTransport, EMPLOYEE_WALK_KEY } from '../data/employees';
+import { createInModal } from '../data/create-in-modal';
+
+const source = createDataSource({ transport: employeeTransport, pageSize: 10 });
+
+// The order a record's pager walks: this list's sort and filter as the reader left
+// them. The session's, not the browser's: a pager that walks yesterday's filter is a surprise.
+$watch([source.sort, source.filter], ([sort, filter]) => {
+  sessionStorage.setItem(EMPLOYEE_WALK_KEY, JSON.stringify({ sort: sort ?? [], filter: filter ?? [] }));
+}, { immediate: true });
+
+// `getLocale()` hands back the signal; reading it is the second call.
+const localeSignal = getLocale();
+const countryNames = $derived(new Intl.DisplayNames([localeSignal()], { type: 'region' }));
+
+const columns = $derived([
+    { field: 'reference', header: $t('employees.columns.reference'), width: 120 },
+    // Searched by name; narrowed by country from its chip.
+    { field: 'lastName', header: $t('employees.columns.lastName'), filterable: true, searchable: true },
+    { field: 'firstName', header: $t('employees.columns.firstName'), searchable: true },
+    // The country named in the page's language, from the platform, as the personal section does;
+    // the date in the tickets' format.
+    { field: 'country', groupable: true, header: $t('employees.columns.country'), width: 140,
+      format: (v) => (v ? countryNames.of(String(v)) : ''), quickFilter: true,
+      filterOptions: ['IT', 'FR', 'DE', 'ES', 'GB'].map(v => ({ value: v, label: countryNames.of(v) })) },
+    { field: 'hired', header: $t('employees.columns.hired'), width: 140,
+      format: (v) => (v ? $d(String(v), { dateStyle: 'medium' }) : '') },
+    { field: 'id', header: '', width: 56, sortable: false,
+      cell: actions([{ icon: 'eye', label: (row) => $t('employees.openRecord', { name: `${row.firstName} ${row.lastName}` }),
+                       onClick: (row) => openRecord(row) }]) },
+]);
+
+const schema = $derived({
+    fields: [
+        { name: 'firstName', label: $t('employees.columns.firstName'), type: 'text', required: true },
+        { name: 'lastName', label: $t('employees.columns.lastName'), type: 'text', required: true },
+    ],
+});
+
+// Create in a modal, then read the list again (src/data/create-in-modal.ts).
+const creating = createInModal({ source, transport: employeeTransport });
+const createOpen = $derived(creating.open());
+const total = $derived(source.total());
+/** The grid, for the list header's views. A `:ref` binds into a SIGNAL. */
+let gridEl = $signal(null);
+
+/** The record opens on its first section, which is where the reference lands. */
+function openRecord(row) {
+  navigate(`/employees/${row.id}/personal`);
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+</style>

@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5 landscape photos with prev/next arrows and dot indicators.</p>
+    <div class="demo-container">
+      <pdx-carousel :items="basicSlides"></pdx-carousel>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-carousel :items="slides"&gt;&lt;/pdx-carousel&gt;
+
+// slides = [
+//   { src: '/demo-images/mountains.svg', alt: 'Landscape 1' },
+//   { src: '/demo-images/ocean.svg', alt: 'Landscape 2' },
+//   ...
+// ]</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicSlides } from './state.pdx';
+</script>

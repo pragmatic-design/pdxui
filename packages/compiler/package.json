@@ -1,0 +1,45 @@
+{
+  "name": "@pdxui/compiler",
+  "version": "1.0.0-alpha.1",
+  "license": "MIT",
+  "publishConfig": { "access": "public" },
+  "repository": { "type": "git", "url": "git+https://github.com/pragmatic-design/pdxui.git", "directory": "packages/compiler" },
+  "homepage": "https://pdxui.com",
+  "bugs": { "url": "https://github.com/pragmatic-design/pdxui/issues" },
+  "description": "Vite plugin for .pdx Single File Components — compiles @if/@for/@switch to optimized JS",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+"development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "test": "vitest run",
+    "test:perf": "vitest run --config vitest.perf.config.ts",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "typescript": "^5.8.0"
+  },
+  "peerDependencies": {
+    "vite": "^6.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "vite": "^6.4.2",
+    "vitest": "^4.1.0"
+  }
+}

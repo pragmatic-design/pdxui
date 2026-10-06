@@ -1,0 +1,277 @@
+{
+  "name": "PDX Component",
+  "scopeName": "source.pdx",
+  "patterns": [
+    {
+      "include": "#template-block"
+    },
+    {
+      "include": "#script-block"
+    },
+    {
+      "include": "#style-block"
+    }
+  ],
+  "repository": {
+    "template-block": {
+      "begin": "(<)(template)((?:\\s+[^>]*?)?)(?<!/)(>)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.html"
+        },
+        "2": {
+          "name": "entity.name.tag.html"
+        },
+        "3": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "4": {
+          "name": "punctuation.definition.tag.end.html"
+        }
+      },
+      "end": "(</)(template)(>)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.html"
+        },
+        "2": {
+          "name": "entity.name.tag.html"
+        },
+        "3": {
+          "name": "punctuation.definition.tag.end.html"
+        }
+      },
+      "contentName": "text.html.basic",
+      "patterns": [
+        {
+          "include": "#pdx-directives"
+        },
+        {
+          "include": "#pdx-interpolation"
+        },
+        {
+          "include": "#pdx-bindings"
+        },
+        {
+          "include": "text.html.basic"
+        }
+      ]
+    },
+    "script-block": {
+      "begin": "(<)(script)((?:\\s+[^>]*?)?)(?<!/)(>)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.html"
+        },
+        "2": {
+          "name": "entity.name.tag.html"
+        },
+        "3": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "4": {
+          "name": "punctuation.definition.tag.end.html"
+        }
+      },
+      "end": "(</)(script)(>)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.html"
+        },
+        "2": {
+          "name": "entity.name.tag.html"
+        },
+        "3": {
+          "name": "punctuation.definition.tag.end.html"
+        }
+      },
+      "contentName": "source.ts",
+      "patterns": [
+        {
+          "include": "#pdx-decorators"
+        },
+        {
+          "include": "#pdx-runes"
+        },
+        {
+          "include": "source.ts"
+        }
+      ]
+    },
+    "style-block": {
+      "begin": "(<)(style)((?:\\s+[^>]*?)?)(?<!/)(>)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.html"
+        },
+        "2": {
+          "name": "entity.name.tag.html"
+        },
+        "3": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "4": {
+          "name": "punctuation.definition.tag.end.html"
+        }
+      },
+      "end": "(</)(style)(>)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.html"
+        },
+        "2": {
+          "name": "entity.name.tag.html"
+        },
+        "3": {
+          "name": "punctuation.definition.tag.end.html"
+        }
+      },
+      "contentName": "source.css",
+      "patterns": [
+        {
+          "include": "#pdx-css-functions"
+        },
+        {
+          "include": "source.css"
+        }
+      ]
+    },
+    "pdx-directives": {
+      "patterns": [
+        {
+          "match": "@(if|else|for|switch|case|default|show|defer|portal|try|catch|require|stagger|mode|move)\\b",
+          "name": "keyword.control.pdx"
+        },
+        {
+          "match": "\\b(as|track)\\b",
+          "name": "keyword.operator.pdx"
+        }
+      ]
+    },
+    "pdx-interpolation": {
+      "begin": "\\{\\{",
+      "end": "\\}\\}",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.interpolation.begin.pdx"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.interpolation.end.pdx"
+        }
+      },
+      "contentName": "source.ts",
+      "patterns": [
+        {
+          "include": "source.ts"
+        }
+      ]
+    },
+    "pdx-bindings": {
+      "patterns": [
+        {
+          "begin": "(::|:|@)(\\w[\\w.-]*)\\s*(=)\\s*(\")",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.operator.binding.pdx"
+            },
+            "2": {
+              "name": "entity.other.attribute-name.pdx"
+            },
+            "3": {
+              "name": "punctuation.separator.key-value.html"
+            },
+            "4": {
+              "name": "punctuation.definition.string.begin.html"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.html"
+            }
+          },
+          "contentName": "source.ts",
+          "patterns": [
+            {
+              "include": "source.ts"
+            }
+          ]
+        },
+        {
+          "begin": "(::|:|@)(\\w[\\w.-]*)\\s*(=)\\s*(')",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.operator.binding.pdx"
+            },
+            "2": {
+              "name": "entity.other.attribute-name.pdx"
+            },
+            "3": {
+              "name": "punctuation.separator.key-value.html"
+            },
+            "4": {
+              "name": "punctuation.definition.string.begin.html"
+            }
+          },
+          "end": "'",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.html"
+            }
+          },
+          "contentName": "source.ts",
+          "patterns": [
+            {
+              "include": "source.ts"
+            }
+          ]
+        },
+        {
+          "match": "(::|:|@)(\\w[\\w.-]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.operator.binding.pdx"
+            },
+            "2": {
+              "name": "entity.other.attribute-name.pdx"
+            }
+          }
+        }
+      ]
+    },
+    "pdx-decorators": {
+      "patterns": [
+        {
+          "match": "^\\s*@(prop|event|slot|expose|form|fetch|store|page|guard|loader|layout|title|meta|scroll|head|provide|inject|tag|route|params|redirect|alias|outlet|search|prefetch|snippet|i18n|mixin|transition)\\b",
+          "name": "keyword.other.decorator.pdx"
+        }
+      ]
+    },
+    "pdx-runes": {
+      "patterns": [
+        {
+          "match": "\\$(signal|derived|effect|store|watch|emit|t|n|d|r)\\b",
+          "name": "support.function.rune.pdx"
+        },
+        {
+          "match": "\\b(linkedSignal|resource|mutation|createForm|invalidate|invalidateAll)\\b",
+          "name": "support.function.api.pdx"
+        },
+        {
+          "match": "\\b(onMount|onDestroy|onUpdated|onError|onVisible|onResize|useEffect)\\b",
+          "name": "support.function.lifecycle.pdx"
+        }
+      ]
+    },
+    "pdx-css-functions": {
+      "patterns": [
+        {
+          "match": "\\b(bind|responsive|responsiveValue)\\s*\\(",
+          "name": "support.function.css.pdx"
+        }
+      ]
+    }
+  }
+}

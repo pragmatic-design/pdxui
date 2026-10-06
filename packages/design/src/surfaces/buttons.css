@@ -1,0 +1,349 @@
+/* Buttons — 9 semantic variants, sizes, loading state.
+   Uses --_btn-r (local radius) so button groups can override without !important.
+   Uses behavior tokens --pdx-button-radius and --pdx-button-min-height from theme. */
+
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
+    /* Local radius — button groups override this to 0/first/last */
+    --_btn-r: var(--pdx-button-radius, var(--pdx-radius-md));
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    border-radius: var(--_btn-r);
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    line-height: var(--pdx-line-tight);
+    border: var(--pdx-border-width) solid transparent;
+    cursor: pointer;
+    transition: background var(--pdx-transition),
+                color var(--pdx-transition),
+                border-color var(--pdx-transition),
+                box-shadow var(--pdx-transition);
+    text-decoration: none;
+    white-space: nowrap;
+    height: calc(var(--pdx-button-min-height) * var(--pdx-density-factor, 1));
+    min-height: calc(var(--pdx-button-min-height) * var(--pdx-density-factor, 1));
+}
+
+/* Optional premium hover (lift/glow) — opt-in via tokens, default no-op. The glow
+   applies only when NOT focused, so it never overrides the focus ring. */
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):hover {
+    transform: var(--pdx-button-hover-transform, none);
+}
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):hover:not(:focus-visible) {
+    box-shadow: var(--pdx-button-hover-shadow, none);
+}
+
+:is(button, a, [role="button"], .pdx-chip, .pdx-badge).pdx-primary {
+    /* opt-in gradient: themes set --pdx-primary-gradient; default falls back to the solid color */
+    background: var(--pdx-primary-gradient, var(--pdx-color-primary));
+    color: var(--pdx-color-primary-text);
+
+    &:hover { background: var(--pdx-color-primary-hover); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+:is(button, a, [role="button"], .pdx-chip, .pdx-badge).pdx-secondary {
+    background: var(--pdx-color-secondary);
+    color: var(--pdx-color-secondary-text);
+
+    /* Darken the element's OWN background on hover (theme-agnostic) instead of a token-based color —
+       themes that set .pdx-secondary background directly (tonal/transparent) kept the generic token
+       on hover and went dark-on-dark (caught by the hover-contrast contract). brightness() preserves
+       the text↔bg contrast ratio since it scales both. */
+    &:hover { filter: brightness(0.95); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+:is(button, a, [role="button"]).pdx-outline {
+    background: transparent;
+    color: var(--pdx-color-text);
+    border-color: light-dark(var(--pdx-gray-400), var(--pdx-gray-500));
+
+    /* keep the readable text colour on hover — switching it to --pdx-color-primary went dark-on-dark
+       on the inset background in low-chroma themes (caught by the hover-contrast contract). */
+    &:hover { background: var(--pdx-color-inset); border-color: var(--pdx-color-primary); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+/* Outline color variants — border + text colored, tinted bg on hover */
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-primary { border-color: var(--pdx-color-primary); color: var(--pdx-color-primary-ink); }
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-primary:hover { background: var(--pdx-primary-50); }
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-danger { border-color: var(--pdx-color-danger); color: var(--pdx-color-danger-ink); }
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-danger:hover { background: var(--pdx-danger-50); }
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-success { border-color: var(--pdx-color-success); color: var(--pdx-color-success-ink); }
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-success:hover { background: var(--pdx-success-50); }
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-warning { border-color: var(--pdx-color-warning); color: var(--pdx-color-warning-ink); }
+:is(button, a, [role="button"]).pdx-outline.pdx-outline-warning:hover { background: var(--pdx-warning-50); }
+
+:is(button, a, [role="button"]).pdx-ghost {
+    background: transparent;
+    color: var(--pdx-color-muted);
+
+    &:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+:is(button, a, [role="button"], .pdx-chip, .pdx-badge).pdx-danger {
+    background: var(--pdx-color-danger);
+    color: var(--pdx-color-danger-text, white);
+
+    &:hover { background: var(--pdx-color-danger-hover); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+:is(button, a, [role="button"], .pdx-chip, .pdx-badge).pdx-success {
+    background: var(--pdx-color-success);
+    color: var(--pdx-color-success-text, white);
+    &:hover { filter: brightness(1.1); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+:is(button, a, [role="button"], .pdx-chip, .pdx-badge).pdx-warning {
+    background: var(--pdx-color-warning);
+    color: var(--pdx-color-warning-text, var(--pdx-gray-900));
+    &:hover { filter: brightness(0.92); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+/* Filled with the ACCENT, so labelled with the accent's label — not info-text, which is the label of
+   --pdx-color-info: the gate can pass on that pair while cyberpunk's info button reads 1.88. */
+:is(button, a, [role="button"], .pdx-chip, .pdx-badge).pdx-info {
+    background: var(--pdx-color-accent);
+    color: var(--pdx-color-accent-text);
+    &:hover { filter: brightness(1.1); }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+:is(button, a, [role="button"]).pdx-link {
+    background: transparent;
+    color: var(--pdx-color-primary-ink);
+    padding: 0;
+    min-height: auto;
+    border: none;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover { color: var(--pdx-color-primary-hover); text-decoration-thickness: 2px; }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+    &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+/* Sizes — derived from the --pdx-button-min-height token (md) with fixed offsets.
+   It guarantees the hierarchy xs<sm<md<lg<xl mathematically in EVERY theme, including those
+   with a compact min-height (fluent/metro/corporate 2rem). The offsets are anchored to 2.5rem so
+   default/material stay at xs 1.75, sm 2.125, lg 3, xl 3.5.
+   The same offsets are used for .pdx-input-{size} → the button↔input alignment is preserved. */
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="xs"] {
+    padding: 0 var(--pdx-space-xs);
+    font-size: var(--pdx-text-xs);
+    height: calc((var(--pdx-button-min-height) - 0.75rem) * var(--pdx-density-factor, 1));
+    min-height: calc((var(--pdx-button-min-height) - 0.75rem) * var(--pdx-density-factor, 1));
+}
+
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="sm"] {
+    padding: 0 var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    height: calc((var(--pdx-button-min-height) - 0.375rem) * var(--pdx-density-factor, 1));
+    min-height: calc((var(--pdx-button-min-height) - 0.375rem) * var(--pdx-density-factor, 1));
+}
+
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="lg"] {
+    padding: 0 var(--pdx-space-lg);
+    font-size: var(--pdx-text-base);
+    height: calc((var(--pdx-button-min-height) + 0.5rem) * var(--pdx-density-factor, 1));
+    min-height: calc((var(--pdx-button-min-height) + 0.5rem) * var(--pdx-density-factor, 1));
+}
+
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="xl"] {
+    padding: 0 var(--pdx-space-xl);
+    font-size: var(--pdx-text-lg);
+    height: calc((var(--pdx-button-min-height) + 1rem) * var(--pdx-density-factor, 1));
+    min-height: calc((var(--pdx-button-min-height) + 1rem) * var(--pdx-density-factor, 1));
+}
+
+/* Full-width button */
+:is(button, a, [role="button"])[full] {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Active/pressed feedback */
+:is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):active:not(:disabled) {
+    transform: scale(0.97);
+}
+.pdx-ghost:active:not(:disabled) {
+    background: var(--pdx-color-inset);
+}
+[aria-pressed="true"]:is(.pdx-ghost, .pdx-outline) {
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.1), oklch(from var(--pdx-color-primary) l c h / 0.2));
+    color: var(--pdx-color-primary-ink);
+    border-color: var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-medium);
+}
+
+/* ===== Button Group ===== */
+
+/* WC wrapper becomes invisible in layout — inner <button> is the flex child */
+:is(.pdx-btn-group, .pdx-btn-group-vertical) > pdx-button {
+    display: contents;
+}
+
+/* ── Horizontal ── */
+.pdx-btn-group {
+    display: inline-flex;
+}
+
+/* Override --_btn-r on children — no !important needed because buttons read var(--_btn-r).
+   WC selectors use button[class] to beat base button specificity (0,2,0). */
+.pdx-btn-group > :is(button, a, [role="button"]),
+.pdx-btn-group > pdx-button > button[class] {
+    --_btn-r: 0;
+}
+
+/* First child: left radius */
+.pdx-btn-group > :first-child:is(button, a, [role="button"]),
+.pdx-btn-group > pdx-button:first-child > button[class] {
+    --_btn-r: var(--pdx-button-radius, var(--pdx-radius-md)) 0 0 var(--pdx-button-radius, var(--pdx-radius-md));
+}
+
+/* Last child: right radius */
+.pdx-btn-group > :last-child:is(button, a, [role="button"]),
+.pdx-btn-group > pdx-button:last-child > button[class] {
+    --_btn-r: 0 var(--pdx-button-radius, var(--pdx-radius-md)) var(--pdx-button-radius, var(--pdx-radius-md)) 0;
+}
+
+/* Overlap borders: native children */
+.pdx-btn-group > :not(:first-child):is(button, a, [role="button"]) {
+    margin-left: calc(-1 * var(--pdx-border-width));
+}
+
+/* Overlap borders: WC children (margin on inner button since pdx-button is display:contents) */
+.pdx-btn-group > pdx-button:not(:first-child) > button[class] {
+    margin-left: calc(-1 * var(--pdx-border-width));
+}
+
+/* ── Vertical ── */
+.pdx-btn-group-vertical {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+/* Override --_btn-r on children */
+.pdx-btn-group-vertical > :is(button, a, [role="button"]),
+.pdx-btn-group-vertical > pdx-button > button[class] {
+    --_btn-r: 0;
+    width: 100%;
+}
+
+/* First child: top radius */
+.pdx-btn-group-vertical > :first-child:is(button, a, [role="button"]),
+.pdx-btn-group-vertical > pdx-button:first-child > button[class] {
+    --_btn-r: var(--pdx-button-radius, var(--pdx-radius-md)) var(--pdx-button-radius, var(--pdx-radius-md)) 0 0;
+}
+
+/* Last child: bottom radius */
+.pdx-btn-group-vertical > :last-child:is(button, a, [role="button"]),
+.pdx-btn-group-vertical > pdx-button:last-child > button[class] {
+    --_btn-r: 0 0 var(--pdx-button-radius, var(--pdx-radius-md)) var(--pdx-button-radius, var(--pdx-radius-md));
+}
+
+/* Overlap borders: native children */
+.pdx-btn-group-vertical > :not(:first-child):is(button, a, [role="button"]) {
+    margin-top: calc(-1 * var(--pdx-border-width));
+    margin-left: 0;
+}
+
+/* Overlap borders: WC children */
+.pdx-btn-group-vertical > pdx-button:not(:first-child) > button {
+    margin-top: calc(-1 * var(--pdx-border-width));
+    margin-left: 0;
+}
+
+/* Loading button state — uses --_btn-color to hide text without !important */
+.pdx-loading {
+    position: relative;
+    pointer-events: none;
+}
+.pdx-loading,
+.pdx-loading:hover {
+    color: transparent;
+}
+
+.pdx-loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 1.25em;
+    height: 1.25em;
+    border: 2px solid var(--pdx-color-primary-text);
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: pdx-spin 0.6s linear infinite;
+}
+
+.pdx-danger.pdx-loading::after,
+.pdx-primary.pdx-loading::after {
+    border-color: var(--pdx-color-primary-text);
+    border-right-color: transparent;
+}
+
+.pdx-secondary.pdx-loading::after,
+.pdx-ghost.pdx-loading::after {
+    border-color: var(--pdx-color-text);
+    border-right-color: transparent;
+}
+
+.pdx-success.pdx-loading::after,
+.pdx-info.pdx-loading::after {
+    border-color: light-dark(white, var(--pdx-gray-950));
+    border-right-color: transparent;
+}
+
+.pdx-warning.pdx-loading::after {
+    border-color: var(--pdx-gray-900);
+    border-right-color: transparent;
+}
+
+@keyframes pdx-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Toggle Button — pressed state (must override :hover) ── */
+.pdx-pressed,
+.pdx-pressed:hover {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+}
+.pdx-primary.pdx-pressed,
+.pdx-primary.pdx-pressed:hover,
+.pdx-solid.pdx-pressed,
+.pdx-solid.pdx-pressed:hover {
+    background: oklch(from var(--pdx-color-primary) calc(l - 0.08) c h);
+}
+.pdx-secondary.pdx-pressed,
+.pdx-secondary.pdx-pressed:hover {
+    background: var(--pdx-color-border);
+    color: var(--pdx-color-text);
+}
+.pdx-outline.pdx-pressed,
+.pdx-outline.pdx-pressed:hover {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    border-color: var(--pdx-color-primary);
+}
+.pdx-ghost.pdx-pressed,
+.pdx-ghost.pdx-pressed:hover {
+    background: var(--pdx-color-inset);
+}

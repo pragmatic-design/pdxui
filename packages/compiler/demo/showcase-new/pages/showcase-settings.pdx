@@ -1,0 +1,263 @@
+<template>
+  <div class="settings">
+    <pdx-dropdown-menu :label="themeLabel" :items="themeItems" icon="palette" variant="ghost" size="xs" @pdx-select="onThemeSelect"></pdx-dropdown-menu>
+    <pdx-dropdown-menu :label="densityLabel" :items="densityItems" icon="sliders" variant="ghost" size="xs" @pdx-select="onDensitySelect"></pdx-dropdown-menu>
+    <button class="mode-btn" @click="toggleMode" id="mode-toggle">
+      <pdx-icon :name="modeIcon" size="16" id="mode-icon"></pdx-icon>
+    </button>
+    <button class="settings-btn" @click="toggleSettings">
+      <pdx-icon name="settings" size="16"></pdx-icon>
+    </button>
+
+    <div :class="settingsOpen ? 'settings-panel open' : 'settings-panel'" id="settings-panel">
+      <div class="settings-header">
+        <strong>Settings</strong>
+        <button class="settings-close" @click="toggleSettings"><pdx-icon name="x" size="16"></pdx-icon></button>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">Theme</label>
+        <div class="settings-grid">
+          @for (themeItems as opt; track opt.key) {
+            <button :class="opt.key === theme ? 'settings-chip active' : 'settings-chip'" @click="setTheme(opt.key)">{{ opt.label }}</button>
+          }
+        </div>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">Density</label>
+        <div class="settings-row">
+          @for (densityItems as opt; track opt.key) {
+            <button :class="opt.key === density ? 'settings-chip active' : 'settings-chip'" @click="setDensity(opt.key)">{{ opt.label }}</button>
+          }
+        </div>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label">Color Scheme</label>
+        <div class="settings-row">
+          <button :class="dark ? 'settings-chip' : 'settings-chip active'" @click="setDark(false)">Light</button>
+          <button :class="dark ? 'settings-chip active' : 'settings-chip'" @click="setDark(true)">Dark</button>
+        </div>
+      </div>
+    </div>
+    <div :class="settingsOpen ? 'settings-overlay open' : 'settings-overlay'" @click="toggleSettings"></div>
+  </div>
+</template>
+
+<script setup>
+// The showcase's theme, density and colour scheme: the topbar's dropdowns and mode button
+// on a desktop, the settings drawer on a phone — two views of one state, which is why the drawer's
+// chips are rendered from it rather than built once and left behind when the dropdown changes it.
+const themeItems = [
+  { key: 'neutral', label: 'Neutral' }, { key: 'material', label: 'Material' },
+  { key: 'fluent', label: 'Fluent' }, { key: 'cupertino', label: 'Cupertino' },
+  { key: 'pragmatic', label: 'Pragmatic' }, { key: 'pragmatic-gold', label: 'Pragmatic Gold' },
+  { key: 'corporate', label: 'Corporate' }, { key: 'playful', label: 'Playful' },
+  { key: 'cyberpunk', label: 'Cyberpunk' }, { key: 'editorial', label: 'Editorial' },
+  { key: 'neumorphic', label: 'Neumorphic' }, { key: 'glass', label: 'Glass' },
+  { key: 'metro', label: 'Metro' },
+];
+
+const densityItems = [
+  { key: 'compact', label: 'Compact' }, { key: 'normal', label: 'Normal' }, { key: 'comfort', label: 'Comfort' },
+];
+
+// Behavior attributes derived from theme — drives structural CSS variants
+const _inputStyleMap = { material: 'filled', editorial: 'underlined', cyberpunk: 'underlined' };
+const _inputFocusMap = { fluent: 'bottom' };
+const _tabStyleMap = { pragmatic: 'pill', 'pragmatic-gold': 'pill', cupertino: 'pill', playful: 'pill', neumorphic: 'pill' };
+const _cardStyleMap = { material: 'elevated', playful: 'elevated' };
+const _densityMap = { compact: '0.75', normal: '1', comfort: '1.25' };
+
+// Restore theme/scheme/density from querystring or localStorage
+const _params = new URLSearchParams(location.search);
+let theme = $signal(_params.get('theme') || localStorage.getItem('pdx-theme') || 'neutral');
+let density = $signal(_params.get('density') || localStorage.getItem('pdx-density') || 'normal');
+let dark = $signal((_params.get('scheme') || localStorage.getItem('pdx-scheme') || 'light') === 'dark');
+let settingsOpen = $signal(false);
+
+const themeLabel = $derived(themeItems.find(t => t.key === theme)?.label || theme);
+const densityLabel = $derived(densityItems.find(d => d.key === density)?.label || density);
+const modeIcon = $derived(dark ? 'sun' : 'moon');
+
+function _applyBehaviorAttrs(key) {
+    const root = document.documentElement;
+    const _set = (attr, map) => { const v = map[key]; if (v) root.setAttribute(attr, v); else root.removeAttribute(attr); };
+    _set('pdx-input-style', _inputStyleMap);
+    _set('pdx-input-focus', _inputFocusMap);
+    _set('pdx-tab-style', _tabStyleMap);
+    _set('pdx-card-style', _cardStyleMap);
+}
+
+function _applyTheme(key) {
+    document.documentElement.setAttribute('pdx-theme', key);
+    _applyBehaviorAttrs(key);
+}
+
+function _applyDensity(key) {
+    document.documentElement.setAttribute('pdx-density', key);
+    document.documentElement.style.setProperty('--pdx-density-factor', _densityMap[key] || '1');
+}
+
+function _applyScheme(isDark) {
+    document.documentElement.setAttribute('pdx-scheme', isDark ? 'dark' : 'light');
+    if (isDark) document.documentElement.setAttribute('pdx-dark', '');
+    else document.documentElement.removeAttribute('pdx-dark');
+}
+
+function setTheme(key) {
+    theme = key;
+    _applyTheme(key);
+    localStorage.setItem('pdx-theme', key);
+}
+
+function setDensity(key) {
+    density = key;
+    _applyDensity(key);
+    localStorage.setItem('pdx-density', key);
+}
+
+function setDark(isDark) {
+    dark = isDark;
+    _applyScheme(isDark);
+    localStorage.setItem('pdx-scheme', isDark ? 'dark' : 'light');
+}
+
+function onThemeSelect(e) { setTheme(e.detail.key); }
+function onDensitySelect(e) { setDensity(e.detail.key); }
+function toggleMode() { setDark(!dark); }
+function toggleSettings() { settingsOpen = !settingsOpen; }
+
+_applyTheme(theme);
+_applyScheme(dark);
+document.documentElement.setAttribute('pdx-density', density);
+if (density !== 'normal') document.documentElement.style.setProperty('--pdx-density-factor', _densityMap[density] || '1');
+</script>
+
+<style scoped>
+  /* The topbar lays out the dropdowns and buttons: this component adds no box of its own. */
+  .settings { display: contents; }
+
+  /* Topbar dropdown-menus — compact */
+  pdx-dropdown-menu { font-size: 0.78rem; }
+  .mode-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    cursor: pointer;
+    color: var(--pdx-color-text);
+  }
+  .mode-btn pdx-icon { display: inline-flex; }
+
+  /* Settings button — visible only on mobile, next to mode toggle */
+  .settings-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    cursor: pointer;
+    color: var(--pdx-color-text);
+  }
+  .settings-btn pdx-icon { display: inline-flex; }
+
+  /* Settings panel — right drawer */
+  .settings-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 280px;
+    background: var(--pdx-color-surface);
+    border-left: 1px solid var(--pdx-color-border);
+    z-index: 200;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+    padding: 0;
+  }
+  .settings-panel.open { transform: translateX(0); box-shadow: var(--pdx-shadow-xl); }
+  .settings-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--pdx-color-backdrop);
+    z-index: 199;
+  }
+  .settings-overlay.open { display: block; }
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+    font-size: var(--pdx-text-sm);
+  }
+  .settings-close {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    padding: 4px;
+    border-radius: var(--pdx-radius-sm);
+  }
+  .settings-close:hover { background: var(--pdx-color-inset); }
+  .settings-close pdx-icon { display: inline-flex; }
+  .settings-section {
+    padding: var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .settings-label {
+    display: block;
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--pdx-space-sm);
+  }
+  .settings-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .settings-row {
+    display: flex;
+    gap: 6px;
+  }
+  .settings-chip {
+    padding: 4px 10px;
+    font-size: var(--pdx-text-xs);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-full);
+    background: transparent;
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .settings-chip:hover { border-color: var(--pdx-color-text); color: var(--pdx-color-text); }
+  .settings-chip.active {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    border-color: var(--pdx-color-primary);
+  }
+
+  @media (max-width: 768px) {
+    /* Hide theme/density dropdowns + mode toggle on mobile — use settings panel instead */
+    pdx-dropdown-menu { display: none; }
+    .mode-btn { display: none; }
+    .settings-btn { display: inline-flex; }
+  }
+
+  /* Narrow desktop: hide dropdown labels, show only icons */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    pdx-dropdown-menu { font-size: 0.7rem; }
+  }
+</style>

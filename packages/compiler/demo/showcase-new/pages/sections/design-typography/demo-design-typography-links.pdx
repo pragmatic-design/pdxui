@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Links</h2>
+    <p class="pdx-txt-body">
+      Inline <a href="#" class="pdx-link">styled link</a> with underline offset. Hover changes color.
+      Apply <code>.pdx-link</code> to any <code>&lt;a&gt;</code>.
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;a href="/docs" class="pdx-link"&gt;Read the docs&lt;/a&gt;</code></pre>
+    </details>
+  </section>
+</template>

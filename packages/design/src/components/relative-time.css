@@ -1,0 +1,10 @@
+/* pdx-relative-time — Relative time display */
+
+pdx-relative-time {
+    display: inline;
+}
+
+.pdx-rt-root {
+    display: inline;
+    cursor: default;
+}

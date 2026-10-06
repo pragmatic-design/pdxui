@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-container</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Responsive max-width container with auto-padding. Tighter on mobile, wider on desktop. Like Bootstrap's <code>.container</code>.</p>
+
+    <div class="demo-area" style="padding:0;overflow:hidden">
+      <pdx-container style="background:var(--pdx-color-inset);padding-block:var(--pdx-space-md)">
+        <p class="pdx-txt-body">Default container (max 1280px, responsive padding)</p>
+      </pdx-container>
+    </div>
+
+    <div class="demo-area" style="padding:0;overflow:hidden">
+      <pdx-container max="md" style="background:var(--pdx-color-inset);padding-block:var(--pdx-space-md)">
+        <p class="pdx-txt-body">max="md" (768px)</p>
+      </pdx-container>
+    </div>
+
+    <div class="demo-area" style="padding:0;overflow:hidden">
+      <pdx-container fluid style="background:var(--pdx-color-inset);padding-block:var(--pdx-space-md)">
+        <p class="pdx-txt-body">fluid (no max-width, just responsive padding)</p>
+      </pdx-container>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-container&gt;
+  &lt;!-- Responsive padding: sm on mobile, md on tablet, lg on desktop --&gt;
+  &lt;p&gt;Content&lt;/p&gt;
+&lt;/pdx-container&gt;
+
+&lt;pdx-container max="md"&gt;...&lt;/pdx-container&gt;
+&lt;pdx-container fluid&gt;...&lt;/pdx-container&gt;</code></pre>
+    </details>
+  </section>
+</template>

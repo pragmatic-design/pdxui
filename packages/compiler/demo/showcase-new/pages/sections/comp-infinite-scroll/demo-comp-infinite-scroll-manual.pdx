@@ -1,0 +1,78 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Manual Trigger (Disabled auto-scroll)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Auto-scroll disabled. "Load More" button inside the list at the bottom.</p>
+    <div class="demo-container scroll-box" id="manual-scroll-box">
+      <div id="manual-items" :ref="manualItems"></div>
+      <div class="load-more-wrap" id="manual-load-more" :ref="manualLoadMore">
+        <button class="pdx-btn pdx-outline pdx-btn-sm" @click="onManualLoad">Load More</button>
+      </div>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="manual-log">{{ manualLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// Manual trigger — button inside scroll container
+&lt;div class="scroll-box"&gt;
+  &lt;div id="items"&gt;&lt;/div&gt;
+  &lt;button @click="ds.loadMore()"&gt;Load More&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+// --- Manual demo: 50 items ---
+const manualAllItems = [];
+for (let _midx = 1; _midx <= 50; _midx++) {
+    manualAllItems.push({ id: _midx, title: 'Manual Item ' + _midx });
+}
+
+const manualDS = createDataSource({
+    transport: {
+        read: function(params) {
+            return new Promise(function(resolve) {
+                const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
+                const _result = manualAllItems.slice(_off, _off + (params.pageSize || 10));
+                setTimeout(function() { resolve({ data: _result, total: manualAllItems.length }); }, 300);
+            });
+        },
+    },
+    pageSize: 10,
+    autoLoad: true,
+});
+
+let manualItems = $signal(null);
+let manualLoadMore = $signal(null);
+let manualLog = $signal('Click "Load More" to fetch...');
+
+function onManualLoad() {
+    manualDS.loadMore();
+    manualLog = 'Loading more...';
+    // Hide button when no more data after load
+    setTimeout(function() {
+        if (manualLoadMore && !manualDS.hasMore()) manualLoadMore.style.display = 'none';
+    }, 500);
+}
+
+$effect(() => {
+    const _data = manualDS.data();
+    const _container = manualItems;
+    if (_container && _data) {
+        _container.innerHTML = '';
+        for (let _ri = 0; _ri < _data.length; _ri++) {
+            const _item = _data[_ri];
+            const _div = document.createElement('div');
+            _div.className = 'scroll-item';
+            _div.textContent = _item.title;
+            _container.appendChild(_div);
+        }
+        manualLog = 'Showing ' + _data.length + ' of ' + manualDS.total() + ' items';
+    }
+});
+</script>
+
+<style scoped>
+.load-more-wrap { display: flex; justify-content: center; padding: var(--pdx-space-md); }
+</style>

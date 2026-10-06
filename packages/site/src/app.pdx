@@ -1,0 +1,205 @@
+<template>
+  <div class="site">
+    <!-- Diagonal corner banner — PDX is an alpha release. Decorative: the footer and the landing
+         page say it in text. -->
+    <div class="preview-ribbon" aria-hidden="true"><span>Alpha</span></div>
+    <header class="site-header" @keydown="onHeaderKey">
+      <div class="site-header-inner shell-wrap">
+        <a class="site-brand" href="/">
+          <span class="brand-logo" role="img" aria-label="Pragmatic Design"></span>
+          <span class="brand-name"><span class="brand-accent">PDX</span> <span class="brand-ui">UI</span></span>
+        </a>
+        <!-- Phones only: the links and the tools do not fit the bar, so they open from here. -->
+        <button type="button" class="nav-toggle" aria-label="Menu" aria-controls="site-menu" :aria-expanded="menuOpen ? 'true' : 'false'" :ref="menuBtn" @click="menuOpen = !menuOpen">☰</button>
+        <div id="site-menu" :class="menuOpen ? 'site-menu open' : 'site-menu'">
+        <nav class="site-nav">
+          <a class="nav-link" href="/docs" @click="goFromMenu">Docs</a>
+          <a class="nav-link" href="/components" @click="goFromMenu">Components</a>
+          <a class="nav-link" href="/design" @click="goFromMenu">Design</a>
+          <a class="nav-link" href="/playground" @click="goFromMenu">Playground</a>
+          <a class="nav-link" href="/integrations" @click="goFromMenu">Integration</a>
+          <a class="nav-link" href="/search" @click="goFromMenu">Search</a>
+          <!-- Another origin, so no @click="goFromMenu" — the router must not intercept it. -->
+          <a class="nav-link nav-external" href="https://themebuilder.pdxui.com/">Builder ↗</a>
+        </nav>
+        <div class="site-tools">
+          <label class="theme-picker" title="Theme">
+            <span class="theme-icon">◐</span>
+            <select class="theme-select" @change="onTheme">
+              @for (themeItems as t; track t.key) {
+                <option :value="t.key" :selected="t.key === theme">{{ t.label }}</option>
+              }
+            </select>
+          </label>
+          <button class="scheme-toggle" @click="toggleScheme" aria-label="Toggle color scheme">
+            {{ scheme === 'dark' ? '☀' : '☾' }}
+          </button>
+        </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <pdx-router-outlet></pdx-router-outlet>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell-wrap site-footer-inner">
+        <span class="metal-gradient brand-name">PDX</span>
+        <span class="footer-note">Built with PDX UI. Alpha: the APIs still change between releases.</span>
+        <nav class="footer-links" aria-label="Project">
+          <a class="footer-link" href="/docs/licensing" @click="goFromMenu">Licensing — MIT</a>
+          <a class="footer-link" href="https://github.com/pragmatic-design/pdxui">GitHub ↗</a>
+          <a class="footer-link" href="https://github.com/pragmatic-design/pdxui/blob/main/CHANGELOG.md">Changelog ↗</a>
+          <a class="footer-link" href="https://www.npmjs.com/org/pdxui">npm ↗</a>
+        </nav>
+      </div>
+    </footer>
+  </div>
+</template>
+
+<script setup>
+import { onMount } from '@pdxui/core';
+import { followLink } from './lib/follow-link';
+import '@pdxui/router/outlet';
+
+const themeItems = [
+  { key: 'neutral', label: 'Neutral' }, { key: 'material', label: 'Material' },
+  { key: 'fluent', label: 'Fluent' }, { key: 'cupertino', label: 'Cupertino' },
+  { key: 'pragmatic', label: 'Pragmatic' }, { key: 'pragmatic-gold', label: 'Pragmatic Gold' },
+  { key: 'corporate', label: 'Corporate' }, { key: 'playful', label: 'Playful' },
+  { key: 'cyberpunk', label: 'Cyberpunk' }, { key: 'editorial', label: 'Editorial' },
+  { key: 'neumorphic', label: 'Neumorphic' }, { key: 'glass', label: 'Glass' },
+  { key: 'metro', label: 'Metro' },
+];
+
+// Structural behavior attributes derived from theme (same map as the showcase).
+const _inputStyleMap = { material: 'filled', editorial: 'underlined', cyberpunk: 'underlined' };
+const _inputFocusMap = { fluent: 'bottom' };
+const _tabStyleMap = {};   /* tabs default to the enclosed 'linguetta' look in every theme; pills are an explicit opt-in variant (the "Pills Variant" demo), not a theme default */
+const _cardStyleMap = { material: 'elevated', playful: 'elevated' };
+
+function _applyBehaviorAttrs(t) {
+  const root = document.documentElement;
+  const _set = (attr, map) => { const v = map[t]; if (v) root.setAttribute(attr, v); else root.removeAttribute(attr); };
+  _set('pdx-input-style', _inputStyleMap);
+  _set('pdx-input-focus', _inputFocusMap);
+  _set('pdx-tab-style', _tabStyleMap);
+  _set('pdx-card-style', _cardStyleMap);
+}
+
+let theme = $signal(localStorage.getItem('pdx-theme') || document.documentElement.getAttribute('pdx-theme') || 'pragmatic-gold');
+let scheme = $signal(document.documentElement.getAttribute('pdx-scheme') || 'dark');
+
+// Restore + apply behavior attrs after setup (avoids TDZ on the const maps above).
+onMount(() => {
+  document.documentElement.setAttribute('pdx-theme', theme);
+  _applyBehaviorAttrs(theme);
+});
+
+function onTheme(e) {
+  const t = e.target.value;
+  theme = t;
+  document.documentElement.setAttribute('pdx-theme', t);
+  localStorage.setItem('pdx-theme', t);
+  _applyBehaviorAttrs(t);
+}
+
+function toggleScheme() {
+  scheme = scheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('pdx-scheme', scheme);
+}
+
+// The phone menu (under 720px): closed by a choice or by Escape, which gives focus back to its button.
+let menuOpen = $signal(false);
+let menuBtn = $signal(null);
+
+function onHeaderKey(e) {
+  if (e.key !== 'Escape' || !menuOpen) return;
+  menuOpen = false;
+  if (menuBtn) menuBtn.focus();
+}
+
+// A link in the menu closes it, then is followed in the page (lib/follow-link.ts).
+function goFromMenu(e) { menuOpen = false; followLink(e); }
+</script>
+
+<style scoped>
+.site { display: flex; flex-direction: column; min-height: 100vh; }
+
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--surface) 85%, transparent) 0%, color-mix(in srgb, var(--surface-container) 70%, transparent) 100%);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-display) 12%, transparent);
+}
+/* Right gutter keeps the theme/scheme tools clear of the fixed "Preview" corner ribbon. */
+.site-header-inner { display: flex; align-items: center; gap: 2rem; height: 60px; padding-right: 84px; }
+@media (max-width: 640px) { .site-header-inner { padding-right: 62px; } }
+
+/* The lockup (.site-brand, .brand-logo, .brand-name, .brand-accent, .brand-ui) lives in
+   brand/brand.css — one definition, shared with the builder. */
+
+.site-nav { display: flex; align-items: center; gap: 1.5rem; }
+.nav-link {
+  color: var(--ink-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;
+  font-family: var(--font-heading); transition: color 0.15s; cursor: pointer;
+}
+.nav-link:hover { color: var(--gold); }
+/* The builder is a real, working surface, not a doc page — the bar says so. */
+.nav-external { color: var(--gold); }
+
+.site-tools { margin-left: auto; display: inline-flex; align-items: center; gap: 0.6rem; }
+
+.theme-picker { display: inline-flex; align-items: center; gap: 0.35rem; }
+.theme-icon { color: var(--gold); font-size: 0.95rem; }
+.theme-select {
+  background: transparent; border: 1px solid var(--outline); border-radius: 10px;
+  color: var(--ink); font-family: var(--font-heading); font-size: 0.82rem; font-weight: 500;
+  padding: 0.35rem 0.5rem; cursor: pointer; transition: border-color 0.15s;
+}
+.theme-select:hover { border-color: var(--gold); }
+.theme-select option { background: var(--surface-container); color: var(--ink); }
+
+.scheme-toggle {
+  width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--outline); border-radius: 10px; background: transparent;
+  color: var(--gold); cursor: pointer; font-size: 1rem; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.scheme-toggle:hover { border-color: var(--gold); box-shadow: var(--glow-gold); }
+
+.site-main { flex: 1; width: 100%; }
+
+.site-footer { border-top: 1px solid color-mix(in srgb, var(--gold-display) 10%, transparent); margin-top: 4rem; }
+.site-footer-inner { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.75rem; min-height: 72px; padding-block: 1rem; }
+.footer-note { color: var(--ink-muted); font-size: 0.85rem; }
+.footer-links { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+.footer-link { color: var(--ink-muted); font-size: 0.85rem; text-decoration: none; }
+.footer-link:hover { color: var(--gold); }
+
+/* Wide screens: nav and tools sit in the bar, and the menu button does not exist. */
+.site-menu { display: contents; }
+.nav-toggle { display: none; }
+
+/* Phones: in the bar, the links reach x = 778 on a 390px screen and are clipped. They open
+   from a button instead, in a panel under the bar that holds the tools too. */
+@media (max-width: 720px) {
+  .site-header-inner { gap: 1rem; }
+  .nav-toggle {
+    margin-left: auto; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--outline); border-radius: 10px; background: transparent;
+    color: var(--gold); cursor: pointer; font-size: 1.05rem;
+  }
+  .nav-toggle:hover, .nav-toggle[aria-expanded="true"] { border-color: var(--gold); }
+  .site-menu { display: none; }
+  .site-menu.open {
+    display: flex; flex-direction: column; gap: 0.75rem;
+    position: absolute; top: 60px; left: 0; right: 0;
+    padding: 0.75rem 1.25rem 1rem; background: var(--surface-container);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-display) 12%, transparent);
+  }
+  .site-menu.open .site-nav { flex-direction: column; align-items: stretch; gap: 0; }
+  .site-menu.open .nav-link { display: block; padding: 0.55rem 0; }
+  .site-menu.open .site-tools { margin-left: 0; }
+}
+</style>

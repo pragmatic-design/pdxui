@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Fullscreen</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>fullscreen</code> covers the viewport, not the element, and makes the rest of the page inert — the rail, the bar, every button.</p>
+    <div class="demo-actions">
+      <button class="pdx-btn pdx-primary pdx-btn-xs" @click="blockPage">Block the page for 1.5 s</button>
+    </div>
+    <pdx-block-ui :blocked="pageBlocked" fullscreen message="Publishing…"></pdx-block-ui>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-block-ui :blocked="publishing" fullscreen message="Publishing…"&gt;&lt;/pdx-block-ui&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let pageBlocked = $signal(false);
+
+function blockPage() {
+  pageBlocked = true;
+  setTimeout(function() { pageBlocked = false; }, 1500);
+}
+</script>

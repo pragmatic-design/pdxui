@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Inputs in a realistic form context.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Contact Form</h3>
+      <div class="comp-form">
+        <div class="pdx-field">
+          <pdx-label text="First Name" required size="sm"></pdx-label>
+          <pdx-input size="sm" placeholder="Jane"></pdx-input>
+        </div>
+        <div class="pdx-field">
+          <pdx-label text="Last Name" required size="sm"></pdx-label>
+          <pdx-input size="sm" placeholder="Doe"></pdx-input>
+        </div>
+        <div class="pdx-field full-width">
+          <pdx-label text="Email" required size="sm" description="We'll send a confirmation"></pdx-label>
+          <pdx-input size="sm" type="email" inputmode="email" placeholder="jane@example.com" clearable></pdx-input>
+        </div>
+        <div class="pdx-field full-width">
+          <pdx-label text="Website" optional size="sm"></pdx-label>
+          <pdx-input size="sm" prefix="https://" placeholder="example.com" clearable></pdx-input>
+        </div>
+        <div class="pdx-field full-width">
+          <pdx-label text="Message" required size="sm" hint="Minimum 20 characters"></pdx-label>
+          <pdx-input size="sm" placeholder="How can we help?"></pdx-input>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .full-width { grid-column: 1 / -1; }
+  .comp-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--pdx-space-md); }
+</style>

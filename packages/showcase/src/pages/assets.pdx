@@ -1,0 +1,193 @@
+<template>
+  <section class="page" data-test="assets">
+    <!-- The list's header, the tickets': views of this list's own. -->
+    <pdx-list-header
+      :title="$t('assets.title')"
+      store-key="assets"
+      :default-name="$t('assets.views.default')"
+      :grid="gridEl"
+      :source="source"
+      :base-page-size="20">
+      <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('assets.matching', { count: total }) }}</span>
+      <pdx-button variant="primary" @click="openCreate" data-test="new">{{ $t('assets.new') }}</pdx-button>
+    </pdx-list-header>
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('assets.intro') }}</p>
+
+    <!-- A row is the way into the asset, a page with its sections. No selection and no
+         bulk bar: an asset is retired from its Details, never archived or deleted. -->
+    <pdx-data-grid
+      :ref="gridEl"
+      :source="source"
+      :columns="columns"
+      :page-sizes="[10, 20, 50]"
+      show-toolbar
+      search
+      row-clickable
+      @pdx-row-click="e => openRecord(e.detail.row)"
+      data-test="grid"></pdx-data-grid>
+
+    <!-- NEW, in a modal: what it is, whose it is, where it is. The customer and the site
+         come from their own paged sources, as the intake picks a customer; then the asset opens. -->
+    <pdx-dialog :open="createOpen" size="lg" :title="$t('assets.new')" @pdx-close="createOpen = false" data-test="create-dialog">
+      <pdx-form :form="draft" @pdx-submit="onCreate" data-test="create-form">
+        <div class="grid">
+          <pdx-form-field name="name" :label="$t('assets.fields.name')">
+            <pdx-input name="name" data-test="new-name"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="serial" :label="$t('assets.fields.serial')">
+            <pdx-input name="serial" data-test="new-serial"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="kind" :label="$t('assets.fields.kind')">
+            <pdx-select name="kind" :options="kinds" data-test="new-kind"></pdx-select>
+          </pdx-form-field>
+          <pdx-form-field name="installed" :label="$t('assets.fields.installed')">
+            <pdx-date-picker name="installed" editable data-test="new-installed"></pdx-date-picker>
+          </pdx-form-field>
+          <pdx-form-field name="warrantyEnds" :label="$t('assets.fields.warrantyEnds')">
+            <pdx-date-picker name="warrantyEnds" editable data-test="new-warrantyEnds"></pdx-date-picker>
+          </pdx-form-field>
+        </div>
+
+        <p class="pdx-label pick-label">{{ $t('assets.columns.customer') }}</p>
+        <pdx-relation-picker :source="customerSource" :columns="customerColumns" searchable
+          @pdx-pick="e => { customer = e.detail?.items?.[0] ?? null; customerMissing = false; }" data-test="new-customer"></pdx-relation-picker>
+        <p class="pdx-txt-small picked" :show="customer !== null" data-test="new-customer-picked">{{ customer?.name ?? '' }}</p>
+        <p class="pdx-txt-small pdx-ink-danger" :show="customerMissing" role="alert" data-test="new-customer-missing">{{ $t('assets.customerMissing') }}</p>
+
+        <p class="pdx-label pick-label">{{ $t('assets.columns.site') }}</p>
+        <pdx-relation-picker :source="siteSource" :columns="siteColumns" searchable
+          @pdx-pick="e => { site = e.detail?.items?.[0] ?? null; }" data-test="new-site"></pdx-relation-picker>
+        <p class="pdx-txt-small picked" :show="site !== null" data-test="new-site-picked">{{ site?.name ?? '' }}</p>
+
+        <div class="actions">
+          <pdx-button variant="ghost" @click="createOpen = false" data-test="cancel">{{ $t('assets.cancel') }}</pdx-button>
+          <!-- The customer is checked on the click, before the form's own rules: a submit that the
+               rules refuse is never emitted, and the missing customer would go unsaid. -->
+          <pdx-button type="submit" variant="primary" @click="customerMissing = customer === null" data-test="create">{{ $t('assets.create') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </pdx-dialog>
+  </section>
+</template>
+
+<script setup>
+// A dictionary key, for the reason in `customers.pdx`: an ancestor of `/assets/:id`, which does not
+// render inside it.
+@page '/assets' { label: $t('assets.title') };
+@title $t('assets.title');
+@scroll 'preserve';
+
+import { createDataSource, actions, badge } from '@pdxui/core';
+import { navigate } from '@pdxui/router';
+import { assetRowTransport } from '../data/asset-rows';
+import { ASSET_KINDS, ASSET_STATUSES, assetTransport } from '../data/assets';
+import { customerTransport } from '../data/customers';
+import { siteTransport } from '../data/sites';
+import { categoryLabel, categoryTones, categoryOptions } from '../data/categories';
+
+const source = createDataSource({ transport: assetRowTransport, pageSize: 20 });
+
+const STATUS_TONES = { inService: 'success', inRepair: 'warning', retired: 'muted' };
+const today = () => new Date().toISOString().slice(0, 10);
+
+const columns = $derived([
+    { field: 'serial', header: $t('assets.columns.serial'), width: 120, searchable: true },
+    { field: 'name', header: $t('assets.columns.name'), searchable: true },
+    // Stored as a code, read as a word.
+    { field: 'kind', groupable: true, header: $t('assets.columns.kind'), width: 130,
+      format: (v) => $t('assets.kinds.' + String(v)), quickFilter: true,
+      filterOptions: ASSET_KINDS.map(v => ({ value: v, label: $t('assets.kinds.' + v) })) },
+    // Joined by the server as it answers (`asset-rows.ts`): named, not an order a sort can keep.
+    { field: 'customer', groupable: true, header: $t('assets.columns.customer'), width: 200, sortable: false },
+    { field: 'site', header: $t('assets.columns.site'), width: 170, sortable: false },
+    // An ended warranty says so in words, and the class colours it: not colour alone. An asset
+    // created without one has none: a dash, never «ended» — and `$d('')` throws, which
+    // takes the whole grid down with it.
+    { field: 'warrantyEnds', header: $t('assets.columns.warrantyEnds'), width: 190,
+      format: (v) => {
+        if (!v) return '—';
+        const date = $d(String(v), { dateStyle: 'medium' });
+        return String(v) < today() ? $t('assets.ended', { date }) : date;
+      },
+      cellClass: (v) => (v && String(v) < today() ? 'warranty-ended' : '') },
+    // A coloured badge per category, named in the page's language.
+    { field: 'categories', header: $t('assets.columns.categories'), width: 200, sortable: false,
+      format: (v) => categoryLabel(String(v)), cell: badge({ tones: categoryTones() }),
+      filterOptions: categoryOptions('assets'), quickFilter: true },
+    { field: 'status', groupable: true, header: $t('assets.columns.status'), width: 150,
+      format: (v) => $t('assets.statuses.' + String(v)), cell: badge({ tones: STATUS_TONES }), quickFilter: true,
+      filterOptions: ASSET_STATUSES.map(v => ({ value: v, label: $t('assets.statuses.' + v) })) },
+    { field: 'id', header: '', width: 56, sortable: false,
+      cell: actions([{ icon: 'eye', label: (row) => $t('assets.openRecord', { name: String(row.name) }),
+                       onClick: (row) => openRecord(row) }]) },
+]);
+
+const total = $derived(source.total());
+/** The grid, for the list header's views. A `:ref` binds into a SIGNAL. */
+let gridEl = $signal(null);
+
+function openRecord(row) {
+  navigate(`/assets/${row.id}`);
+}
+
+// ── New ─────────────────────────────────────────────────────────────────────────
+const kinds = $derived(ASSET_KINDS.map(k => ({ value: k, label: $t('assets.kinds.' + k) })));
+const customerSource = createDataSource({ transport: customerTransport, idField: 'id', pageSize: 5 });
+const siteSource = createDataSource({ transport: siteTransport, idField: 'id', pageSize: 5 });
+const customerColumns = $derived([
+  { field: 'name', header: $t('assets.columns.customer') },
+  { field: 'sector', header: $t('assets.fields.sector') },
+]);
+const siteColumns = $derived([
+  { field: 'name', header: $t('assets.columns.site') },
+  { field: 'city', header: $t('assets.fields.city') },
+]);
+
+@form draft: {
+  name: string { required },
+  serial: string { required },
+  kind: string { required },
+  installed: string,
+  warrantyEnds: string
+} {
+  validate: draftRule
+};
+
+/** The detail's rule, the same words (`asset.pdx`). */
+function draftRule(v) {
+  return v.installed && v.warrantyEnds && v.warrantyEnds < v.installed
+    ? { warrantyEnds: $t('assets.warrantyBeforeInstalled') } : {};
+}
+
+let createOpen = $signal(false);
+let customer = $signal(null);
+let site = $signal(null);
+let customerMissing = $signal(false);
+
+function openCreate() {
+  draft.reset({ name: '', serial: '', kind: 'printer', installed: new Date().toISOString().slice(0, 10), warrantyEnds: '' });
+  customer = null;
+  site = null;
+  customerMissing = false;
+  createOpen = true;
+}
+
+/** An asset is someone's: without its customer it is not created. Then it opens. */
+async function onCreate(e) {
+  if (!customer) { customerMissing = true; return; }
+  const created = await assetTransport.create({
+    ...e.detail.values, customerId: Number(customer.id), siteId: Number(site?.id ?? 0), status: 'inService', categories: [],
+  });
+  createOpen = false;
+  navigate(`/assets/${created.id}`);
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .page .warranty-ended { color: var(--pdx-color-danger-ink); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--pdx-space-md); }
+  .pick-label { margin: var(--pdx-space-md) 0 var(--pdx-space-xs); }
+  .picked { margin: var(--pdx-space-xs) 0 0; font-weight: 600; }
+  .actions { display: flex; justify-content: flex-end; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-lg); }
+</style>

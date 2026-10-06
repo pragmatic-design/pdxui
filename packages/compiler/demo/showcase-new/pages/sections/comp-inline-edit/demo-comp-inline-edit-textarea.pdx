@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Textarea</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Ctrl+Enter to save, Escape to cancel.</p>
+    <div class="demo-row">
+      <span class="demo-label">Notes:</span>
+      <pdx-inline-edit type="textarea" :value="'This is a multi-line note.\nSecond line here.'"></pdx-inline-edit>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Dialog Edit</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Click <strong>Edit</strong> to open a form dialog auto-generated from editable columns.
+      Full form validation, Save/Cancel buttons.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="dialogDS" :columns="dialogColumns" :editable="true" :edit-mode="'dialog'" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  editable edit-mode="dialog" hover&gt;
+&lt;/pdx-data-grid&gt;
+// Dialog auto-generates a form from editable columns
+// using the same bridge as pdx-form-template</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { data } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+// Dialog edit
+const dialogColumns = [
+  { field: 'name', header: 'Name', width: 180, editable: true, validators: [{ type: 'required' }] },
+  { field: 'email', header: 'Email', type: 'email', width: 220, editable: true, validators: [{ type: 'email' }] },
+  { field: 'role', header: 'Role', width: 120, editable: true },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 130, editable: true },
+  { field: '_actions', header: '', width: 140, command: true },
+];
+
+const dialogDS = createDataSource({ data: data.map(function(r) { return Object.assign({}, r); }), pageSize: 0 });
+</script>

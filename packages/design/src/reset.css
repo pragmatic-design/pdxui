@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Reset
+   Modern CSS reset for Baseline 2024+ browsers.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    color-scheme: light dark;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    hanging-punctuation: first last;
+}
+
+body {
+    min-height: 100dvh;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+    text-wrap: balance;
+}
+
+p {
+    text-wrap: pretty;
+}
+
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+input, button, textarea, select {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+/* Screen-reader only — visually hidden but accessible to assistive technology */
+.pdx-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Skip link — hidden until focused, jumps to main content */
+.pdx-skip-link {
+    position: fixed;
+    top: -100%;
+    left: var(--pdx-space-md);
+    z-index: 9999;
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    border-radius: var(--pdx-radius-md);
+    font-weight: var(--pdx-weight-medium, 500);
+    text-decoration: none;
+    transition: top 0.15s ease;
+}
+.pdx-skip-link:focus {
+    top: var(--pdx-space-md);
+}
+
+:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus, currentColor);
+    outline-offset: var(--pdx-focus-offset);
+}
+
+/* Remove default focus outline (replaced by :focus-visible) */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Selection color (#40) */
+::selection {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+/* Scrollbar styling (#41) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pdx-color-border) transparent;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--pdx-color-border); border-radius: var(--pdx-radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--pdx-color-border-strong); }

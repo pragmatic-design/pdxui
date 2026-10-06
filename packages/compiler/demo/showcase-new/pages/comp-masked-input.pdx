@@ -1,0 +1,51 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Masked Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-masked-input&gt;</code> — auto-formats as you type.
+      Built-in presets (phone, card, date) or custom patterns.
+      <code>#</code> = digit, <code>A</code> = letter, <code>*</code> = any.
+    </p>
+
+    <!-- Presets -->
+    <pdx-demo-comp-masked-input-presets class="demo-section"></pdx-demo-comp-masked-input-presets>
+
+    <!-- Custom Pattern -->
+    <pdx-demo-comp-masked-input-custom-pattern class="demo-section"></pdx-demo-comp-masked-input-custom-pattern>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>mask</code><span>string</span><span>Pattern or preset name</span></div>
+        <div class="opt-row"><code>placeholderChar</code><span>string</span><span>Char for unfilled positions (default "_")</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Current raw value (unmasked)</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Presets</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Pattern</span></div>
+        <div class="opt-row"><code>phone</code><span>(###) ###-####</span></div>
+        <div class="opt-row"><code>phone-intl</code><span>+## (###) ###-####</span></div>
+        <div class="opt-row"><code>card</code><span>#### #### #### ####</span></div>
+        <div class="opt-row"><code>date</code><span>##/##/####</span></div>
+        <div class="opt-row"><code>time</code><span>##:##</span></div>
+        <div class="opt-row"><code>ssn</code><span>###-##-####</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/masked-input';
+@title 'Masked Input';
+</script>
+
+<style scoped>
+  .page { }
+</style>

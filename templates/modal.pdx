@@ -1,0 +1,79 @@
+<template>
+  @if (open) {
+    <div class="modal-backdrop" @click="handleBackdrop" role="presentation" aria-hidden="true"></div>
+    <div class="modal" role="dialog" aria-modal="true" :aria-label="title">
+      <div class="modal-header">
+        <h3>{{ title }}</h3>
+        <button class="close-btn" @click="close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <slot name="body"></slot>
+      </div>
+      <div class="modal-footer">
+        @if (showCancel) {
+          <button class="btn-cancel" @click="close">{{ cancelLabel }}</button>
+        }
+        <button class="btn-confirm" @click="confirm">{{ confirmLabel }}</button>
+      </div>
+    </div>
+  }
+</template>
+
+<script setup>
+  @prop open: boolean = false;
+  @prop title: string = 'Confirm';
+  @prop confirmLabel: string = 'OK';
+  @prop cancelLabel: string = 'Cancel';
+  @prop showCancel: boolean = true;
+  @prop closeOnBackdrop: boolean = true;
+  @event confirmed: void;
+  @event closed: void;
+  @slot body;
+
+  function close() {
+    $emit('closed');
+  }
+
+  function confirm() {
+    $emit('confirmed');
+  }
+
+  function handleBackdrop() {
+    if (closeOnBackdrop) close();
+  }
+
+  function handleKeydown(e) {
+    if (e.key === 'Escape' && open) close();
+  }
+
+  onMount(() => document.addEventListener('keydown', handleKeydown));
+  onDestroy(() => document.removeEventListener('keydown', handleKeydown));
+</script>
+
+<style scoped>
+  .modal-backdrop {
+    position: fixed; inset: 0; background: var(--pdx-color-backdrop); z-index: 1000;
+  }
+  .modal {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: var(--pdx-color-overlay); border-radius: 8px; box-shadow: var(--pdx-shadow-lg);
+    min-width: 320px; max-width: 90vw; max-height: 90vh; z-index: 1001;
+    display: flex; flex-direction: column;
+  }
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem; border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .modal-header h3 { margin: 0; }
+  .close-btn {
+    background: none; border: none; font-size: 1.5rem; cursor: pointer;
+    color: var(--pdx-color-muted); padding: 0; line-height: 1;
+  }
+  .modal-body { padding: 1rem; overflow-y: auto; }
+  .modal-footer {
+    display: flex; justify-content: flex-end; gap: 0.5rem;
+    padding: 1rem; border-top: 1px solid var(--pdx-color-border);
+  }
+  .btn-cancel { padding: 0.5rem 1rem; background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border-strong); border-radius: 4px; cursor: pointer; }
+  .btn-confirm { padding: 0.5rem 1rem; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border: none; border-radius: 4px; cursor: pointer; }
+</style>

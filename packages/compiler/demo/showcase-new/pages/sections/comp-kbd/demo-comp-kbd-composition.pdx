@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <div class="comp-card" style="max-width:360px">
+      <h3 class="pdx-txt-subheading">Shortcut Reference</h3>
+      <div class="ref-list">
+        <div class="ref-row"><span class="pdx-txt-small">New File</span><pdx-kbd keys="Ctrl+N"></pdx-kbd></div>
+        <div class="ref-row"><span class="pdx-txt-small">Open File</span><pdx-kbd keys="Ctrl+O"></pdx-kbd></div>
+        <div class="ref-row"><span class="pdx-txt-small">Save</span><pdx-kbd keys="Ctrl+S"></pdx-kbd></div>
+        <div class="ref-row"><span class="pdx-txt-small">Find</span><pdx-kbd keys="Ctrl+F"></pdx-kbd></div>
+        <div class="ref-row"><span class="pdx-txt-small">Replace</span><pdx-kbd keys="Ctrl+H"></pdx-kbd></div>
+        <div class="ref-row"><span class="pdx-txt-small">Terminal</span><pdx-kbd keys="Ctrl+~"></pdx-kbd></div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .ref-list { display: flex; flex-direction: column; }
+  .ref-row { display: flex; justify-content: space-between; align-items: center; padding: var(--pdx-space-xs) 0; border-bottom: 1px solid var(--pdx-color-border); }
+  .ref-row:last-child { border-bottom: none; }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-sm); }
+</style>

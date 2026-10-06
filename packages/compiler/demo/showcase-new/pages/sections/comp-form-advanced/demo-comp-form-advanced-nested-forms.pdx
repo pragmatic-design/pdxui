@@ -1,0 +1,106 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">7. Nested Forms (Coordinator)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Parent form with child sub-forms. <code>FormCoordinator</code> validates and submits all together.
+    </p>
+
+    <div class="demo-block">
+      <div class="nested-header">
+        <h4 class="pdx-txt-small pdx-weight-semibold">Order Form</h4>
+        <div class="demo-toolbar">
+          <button class="pdx-btn pdx-primary pdx-sm" @click="submitAllNested">Submit Order</button>
+          <span :class="nestedStatusClass()" :textContent="nestedStatusText()"></span>
+        </div>
+      </div>
+
+      <div class="nested-forms">
+        <div class="nested-card">
+          <h5 class="pdx-txt-small pdx-weight-medium">Customer Info</h5>
+          <pdx-form :form="customerForm" name="customer">
+            <pdx-form-field name="name" label="Name" required>
+              <pdx-input name="name" placeholder="Customer name"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field name="email" label="Email" required>
+              <pdx-input name="email" type="email" placeholder="Email"></pdx-input>
+            </pdx-form-field>
+          </pdx-form>
+        </div>
+
+        <div class="nested-card">
+          <h5 class="pdx-txt-small pdx-weight-medium">Shipping</h5>
+          <pdx-form :form="shippingForm" name="shipping">
+            <pdx-form-field name="address" label="Address" required>
+              <pdx-input name="address" placeholder="Street address"></pdx-input>
+            </pdx-form-field>
+            <div class="form-grid-2">
+              <pdx-form-field name="city" label="City" required>
+                <pdx-input name="city" placeholder="City"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="zip" label="ZIP" required>
+                <pdx-input name="zip" placeholder="ZIP code"></pdx-input>
+              </pdx-form-field>
+            </div>
+          </pdx-form>
+        </div>
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const coordinator = createFormCoordinator();
+
+const customerForm = createForm({
+  initialValues: { name: '', email: '' },
+  validators: { name: [required(...)], email: [required(...)] },
+});
+const shippingForm = createForm({
+  initialValues: { address: '', city: '', zip: '' },
+  validators: { address: [required(...)], city: [required(...)], zip: [required(...)] },
+});
+
+coordinator.register('customer', customerForm);
+coordinator.register('shipping', shippingForm);
+
+// Validate + submit all at once
+async function submitOrder() {
+  const valid = await coordinator.validateAll();
+  if (!valid) return;
+  const values = coordinator.getValues();
+  // values = { customer: {...}, shipping: {...} }
+}</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, createFormCoordinator, required, email } from '@pdxui/core';
+
+// ─── 7. Nested Forms (Coordinator) ───
+const coordinator = createFormCoordinator();
+
+const customerForm = createForm({ initialValues: { name: '', email: '' }, validators: { name: [required('Name is required')], email: [required('Email is required'), email('Invalid email')] } });
+const shippingForm = createForm({ initialValues: { address: '', city: '', zip: '' }, validators: { address: [required('Address is required')], city: [required('City is required')], zip: [required('ZIP is required')] } });
+let nestedStatus = $signal('Ready');
+
+function submitAllNested() { coordinator.validateAll().then(valid => { nestedStatus = valid ? 'All valid — order submitted!' : 'Fix errors above'; }); }
+function nestedStatusText() { return nestedStatus; }
+function nestedStatusClass() { return 'form-status-badge' + (nestedStatus.includes('submitted') ? ' success' : nestedStatus.includes('Fix') ? ' error' : ''); }
+
+coordinator.register('customer', customerForm);
+coordinator.register('shipping', shippingForm);
+</script>
+
+<style scoped>
+  .nested-forms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+  .nested-card {
+    padding: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
+  .nested-card h5 { margin-bottom: var(--pdx-space-sm); }
+  .nested-header { display: flex; justify-content: space-between; align-items: center; }
+  @media (max-width: 640px) { .nested-forms { grid-template-columns: 1fr; } }
+</style>

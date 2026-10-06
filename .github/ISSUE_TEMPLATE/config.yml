@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question
+    url: https://github.com/pragmatic-design/pdxui/discussions/categories/q-a
+    about: How to do something, or why something behaves as it does. See SUPPORT.md.
+  - name: Report a security vulnerability
+    url: https://github.com/pragmatic-design/pdxui/security/advisories/new
+    about: Privately, never in a public issue. See SECURITY.md.
+  - name: Documentation
+    url: https://pdxui.com/docs
+    about: Guides, the component reference and every diagnostic.

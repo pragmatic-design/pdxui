@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Simple Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Prev/Next only with page indicator. No numbered buttons.</p>
+    <div class="demo-row">
+      <pdx-pagination :total="100" :pageSize="10" :page="3" simple></pdx-pagination>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="100" :pageSize="10" :page="3" simple&gt;&lt;/pdx-pagination&gt;</code></pre>
+    </details>
+  </section>
+</template>

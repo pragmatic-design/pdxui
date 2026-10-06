@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Bordered</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Border around container and between items.</p>
+    <div class="demo-container">
+      <pdx-description-list :items="basicItems" :bordered="true" label-width="120px"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-description-list :items="items"
+  :bordered="true" label-width="120px"&gt;
+&lt;/pdx-description-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+</script>

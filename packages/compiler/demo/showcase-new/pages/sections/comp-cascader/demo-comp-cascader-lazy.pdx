@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Lazy Loading</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>loadChildren</code> fetches a node's children the first time it is opened; the column says
+      "Loading..." meanwhile. Here each country's regions arrive after 600&nbsp;ms. A node marked
+      <code>isLeaf: true</code> is never asked.
+    </p>
+    <div class="demo-row">
+      <pdx-cascader :options="lazyCountries" :load-children="loadRegions" placeholder="Pick a region"></pdx-cascader>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const countries = [{ value: 'it', label: 'Italy', isLeaf: false }, …];
+function loadRegions(node) {
+  return fetch('/api/regions?country=' + node.value).then(r =&gt; r.json());   // [{ value, label, isLeaf: true }]
+}
+
+&lt;pdx-cascader :options="countries" :load-children="loadRegions"&gt;&lt;/pdx-cascader&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+// Lazy loading: the countries have no children until opened; loadRegions stands in for a server.
+const lazyCountries = [
+  { value: 'it', label: 'Italy', isLeaf: false },
+  { value: 'fr', label: 'France', isLeaf: false },
+  { value: 'jp', label: 'Japan', isLeaf: false },
+];
+
+const REGIONS = {
+  it: ['Lazio', 'Lombardy', 'Tuscany'],
+  fr: ['Brittany', 'Normandy', 'Provence'],
+  jp: ['Hokkaido', 'Kansai', 'Kanto'],
+};
+
+function loadRegions(node) {
+  return new Promise((resolve) => setTimeout(() => resolve(
+    (REGIONS[node.value] || []).map((label) => ({ value: label.toLowerCase(), label, isLeaf: true })),
+  ), 600));
+}
+</script>

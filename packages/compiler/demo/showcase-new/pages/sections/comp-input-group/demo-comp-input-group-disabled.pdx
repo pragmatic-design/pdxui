@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled Group</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>disabled</code> on the group — propagates to all children.</p>
+
+    <div class="demo-stack">
+      <pdx-input-group disabled>
+        <pdx-input placeholder="Disabled group" value="Can't edit"></pdx-input>
+        <pdx-button variant="solid">Go</pdx-button>
+      </pdx-input-group>
+    </div>
+  </section>
+</template>

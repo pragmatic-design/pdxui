@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Line Chart</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Basic line chart with tooltip and legend. Hover for crosshair + values.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="line" :data="lineData" :x-field="'month'" :y-field="'revenue,profit'" :series-names="'Revenue,Profit'" title="Monthly Performance" height="320px"></pdx-chart>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chart type="line" :data="data"
+  :x-field="'month'" :y-field="'revenue,profit'"
+  :series-names="'Revenue,Profit'"
+  title="Monthly Performance" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { lineData } from './state.pdx';
+</script>

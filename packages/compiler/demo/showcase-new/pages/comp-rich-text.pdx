@@ -1,0 +1,89 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Rich Text Editor</h1>
+    <p class="pdx-txt-body pdx-ink-muted">
+      Zero-dependency rich text editor. Design-token native, IME first-class,
+      Markdown shortcuts, 10-language syntax highlighting, CSS Grid tables.
+    </p>
+
+    <!-- ═══ Standard Editor ═══ -->
+    <pdx-demo-comp-rich-text-standard class="demo-section"></pdx-demo-comp-rich-text-standard>
+
+    <!-- ═══ Bubble Toolbar ═══ -->
+    <pdx-demo-comp-rich-text-bubble class="demo-section"></pdx-demo-comp-rich-text-bubble>
+
+    <!-- ═══ Compact / Comments ═══ -->
+    <pdx-demo-comp-rich-text-compact class="demo-section"></pdx-demo-comp-rich-text-compact>
+
+    <!-- ═══ Read Only ═══ -->
+    <pdx-demo-comp-rich-text-read-only class="demo-section"></pdx-demo-comp-rich-text-read-only>
+
+    <!-- ═══ Features ═══ -->
+    <pdx-demo-comp-rich-text-features class="demo-section"></pdx-demo-comp-rich-text-features>
+
+    <!-- ═══ Keyboard Shortcuts ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Keyboard Shortcuts</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Shortcut</span><span>Action</span></div>
+        <div class="opt-row"><code>Ctrl+B</code><span>Bold</span></div>
+        <div class="opt-row"><code>Ctrl+I</code><span>Italic</span></div>
+        <div class="opt-row"><code>Ctrl+U</code><span>Underline</span></div>
+        <div class="opt-row"><code>Ctrl+E</code><span>Code</span></div>
+        <div class="opt-row"><code>Ctrl+K</code><span>Link</span></div>
+        <div class="opt-row"><code>Ctrl+Shift+H</code><span>Highlight</span></div>
+        <div class="opt-row"><code>Ctrl+Shift+X</code><span>Strikethrough</span></div>
+        <div class="opt-row"><code>Ctrl+Alt+1-6</code><span>Heading 1-6</span></div>
+        <div class="opt-row"><code>Ctrl+Shift+8</code><span>Bullet List</span></div>
+        <div class="opt-row"><code>Ctrl+Shift+7</code><span>Ordered List</span></div>
+        <div class="opt-row"><code>Ctrl+Shift+B</code><span>Blockquote</span></div>
+        <div class="opt-row"><code>Ctrl+Z</code><span>Undo</span></div>
+        <div class="opt-row"><code>Ctrl+Shift+Z</code><span>Redo</span></div>
+        <div class="opt-row"><code>Ctrl+A</code><span>Select All</span></div>
+        <div class="opt-row"><code>Tab</code><span>Indent list item</span></div>
+        <div class="opt-row"><code>Shift+Tab</code><span>Outdent list item</span></div>
+        <div class="opt-row"><code>Shift+Enter</code><span>Hard line break</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>object</span><span>null</span><span>Document content (JSON or string)</span></div>
+        <div class="opt-row"><code>output</code><span>string</span><span>"json"</span><span>json, html, markdown, text</span></div>
+        <div class="opt-row"><code>toolbar</code><span>string|bool</span><span>"standard"</span><span>Toolbar config DSL or preset name</span></div>
+        <div class="opt-row"><code>toolbar-mode</code><span>string</span><span>"top"</span><span>top, bubble, none</span></div>
+        <div class="opt-row"><code>preset</code><span>string</span><span>"starter"</span><span>starter, minimal, document</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>""</span><span>Placeholder when empty</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>false</span><span>Read-only mode</span></div>
+        <div class="opt-row"><code>height</code><span>string</span><span>"auto"</span><span>Editor height (CSS value)</span></div>
+        <div class="opt-row"><code>min-height</code><span>string</span><span>"120px"</span><span>Minimum height</span></div>
+        <div class="opt-row"><code>max-height</code><span>string</span><span>"none"</span><span>Maximum height (scrolls)</span></div>
+        <div class="opt-row"><code>source</code><span>DataSource</span><span>null</span><span>DataSource for auto-load/save</span></div>
+      </div>
+    </section>
+
+    <!-- Word count tracked via pdx-change event -->
+  </div>
+</template>
+
+<script setup>
+@page '/components/rich-text';
+@title 'Rich Text Editor';
+</script>
+
+<style scoped>
+  .page { }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-area { margin-top: var(--pdx-space-md); }
+  .options-table { margin-top: var(--pdx-space-sm); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 160px 90px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+  .info-bar { margin-top: var(--pdx-space-md); padding: var(--pdx-space-sm) var(--pdx-space-md); background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); }
+  section:has(.opt-header span:first-child:last-child) .opt-header,
+  section:has(.opt-header span:first-child:last-child) .opt-row { grid-template-columns: 200px 1fr; }
+</style>

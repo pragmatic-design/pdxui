@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Planned Patterns</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The Context Protocol infrastructure enables these future components:
+    </p>
+    <div class="patterns-list">
+      <div class="pattern-item">
+        <strong>Auth Provider</strong>
+        <p class="pdx-txt-small pdx-ink-muted">Wraps app, provides currentUser + permissions to all descendants.</p>
+      </div>
+      <div class="pattern-item">
+        <strong>Form EditContext</strong>
+        <p class="pdx-txt-small pdx-ink-muted">Blazor-style: form provides validation state, dirty tracking, errors to all fields.</p>
+      </div>
+      <div class="pattern-item">
+        <strong>i18n Locale Override</strong>
+        <p class="pdx-txt-small pdx-ink-muted">Override locale for a section without changing the global setting.</p>
+      </div>
+      <div class="pattern-item">
+        <strong>Theme Section Override</strong>
+        <p class="pdx-txt-small pdx-ink-muted">Apply a different theme to a subtree (e.g. dark sidebar in light app).</p>
+      </div>
+    </div>
+  </section>
+</template>

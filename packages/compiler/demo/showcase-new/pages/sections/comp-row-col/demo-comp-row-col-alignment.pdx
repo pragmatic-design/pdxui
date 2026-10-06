@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Alignment</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Control vertical alignment with <code>align</code> and horizontal with <code>justify</code>.</p>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">align="start"</span>
+        <div class="demo-area">
+          <pdx-row gutter="sm" align="start">
+            <pdx-col span="4"><div class="box tall">Tall</div></pdx-col>
+            <pdx-col span="4"><div class="box">Short</div></pdx-col>
+            <pdx-col span="4"><div class="box md-h">Medium</div></pdx-col>
+          </pdx-row>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">align="center"</span>
+        <div class="demo-area">
+          <pdx-row gutter="sm" align="center">
+            <pdx-col span="4"><div class="box tall">Tall</div></pdx-col>
+            <pdx-col span="4"><div class="box">Short</div></pdx-col>
+            <pdx-col span="4"><div class="box md-h">Medium</div></pdx-col>
+          </pdx-row>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-area">
+      <span class="pdx-txt-caption pdx-ink-muted">justify="center" (total span &lt; 12)</span>
+      <pdx-row gutter="sm" justify="center" style="margin-top:var(--pdx-space-xs)">
+        <pdx-col span="3"><div class="box">3</div></pdx-col>
+        <pdx-col span="3"><div class="box">3</div></pdx-col>
+      </pdx-row>
+    </div>
+  </section>
+</template>

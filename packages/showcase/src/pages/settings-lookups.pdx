@@ -1,0 +1,269 @@
+<template>
+  <section class="page" data-test="settings-lookups">
+    <header class="head">
+      <h1 class="pdx-txt-title">{{ $t('settings.tiles.lookups') }}</h1>
+      <p class="pdx-txt-body pdx-ink-muted">{{ $t('settings.lookups.intro') }}</p>
+    </header>
+
+    <!-- The reference's lookup screen: the sets on the left, the chosen one's values on the right,
+         across the page's width. A set is a closed list of codes; what it shows beside each is the
+         label in the reader's language and how many records hold it — asked of the store the way the
+         list asks it, with a filter, not counted over rows the page does not have. -->
+    <div class="layout">
+      <nav class="sets" :aria-label="$t('settings.lookups.setsLabel')" data-test="lookup-sets">
+        @for (sets as set; track set.key) {
+          <button class="set-entry" type="button" :aria-current="current === set.key ? 'true' : null"
+            :data-test="'set-' + set.key" @click="current = set.key">
+            <span class="set-name">{{ $t('settings.lookups.sets.' + set.key) }}</span>
+            <span class="set-meta pdx-txt-small pdx-ink-muted">{{ $t('settings.lookups.owner.' + set.owner) }} · {{ set.codes.length }}</span>
+          </button>
+        }
+        <!-- The one set managed here: across entities, so its owner is «all». -->
+        <button class="set-entry" type="button" :aria-current="current === 'categories' ? 'true' : null"
+          data-test="set-categories" @click="current = 'categories'">
+          <span class="set-name">{{ $t('settings.lookups.sets.categories') }}</span>
+          <span class="set-meta pdx-txt-small pdx-ink-muted">{{ $t('settings.lookups.owner.all') }} · {{ cats.length }}</span>
+        </button>
+      </nav>
+
+      <!-- Categories: edited in place, added in a modal, deactivated and never deleted. A label is
+           saved when its field is left; a deactivated one stays on its records, muted. -->
+      <div class="values" :show="current === 'categories'" role="table" :aria-label="$t('settings.lookups.sets.categories')" data-test="lookup-categories">
+        <div class="values-head">
+          <h2 class="pdx-txt-heading">{{ $t('settings.lookups.sets.categories') }}</h2>
+          <pdx-button size="sm" variant="primary" @click="openAdd" data-test="category-add">{{ $t('settings.categories.add') }}</pdx-button>
+        </div>
+        <div class="row cats head" role="row">
+          <span role="columnheader">{{ $t('settings.lookups.code') }}</span>
+          <span role="columnheader">{{ $t('settings.categories.en') }}</span>
+          <span role="columnheader">{{ $t('settings.categories.it') }}</span>
+          <span role="columnheader">{{ $t('settings.categories.appliesTo') }}</span>
+          <span role="columnheader" class="num" :title="$t('settings.categories.usageHint')">{{ $t('settings.lookups.inUse') }}</span>
+          <span role="columnheader"></span>
+        </div>
+        @for (cats as c; track c.code) {
+          <div class="row cats" role="row" data-test="category" :data-code="c.code" :data-active="c.active ? 'true' : 'false'">
+            <span role="cell"><span :class="'pdx-dg-badge pdx-dg-badge-' + (c.active ? c.color : 'muted')">{{ c.code }}</span></span>
+            <pdx-input role="cell" size="sm" :value="c.label.en" :aria-label="$t('settings.categories.en') + ' — ' + c.code"
+              @pdx-change="e => rename(c, 'en', e.detail.value)" data-test="label-en"></pdx-input>
+            <pdx-input role="cell" size="sm" :value="c.label.it" :aria-label="$t('settings.categories.it') + ' — ' + c.code"
+              @pdx-change="e => rename(c, 'it', e.detail.value)" data-test="label-it"></pdx-input>
+            <span role="cell" class="pdx-txt-small">{{ c.appliesTo.map(a => $t('settings.lookups.owner.' + a)).join(', ') }}</span>
+            <span role="cell" class="num pdx-txt-small" data-test="usage">{{ usageOf(c.code) }}</span>
+            <span role="cell">
+              <pdx-button size="sm" variant="ghost" @click="toggle(c)" data-test="category-toggle">{{ c.active ? $t('settings.categories.deactivate') : $t('settings.categories.reactivate') }}</pdx-button>
+            </span>
+          </div>
+        }
+      </div>
+
+      @for (sets as set; track set.key) {
+        <div class="values" :show="current === set.key" role="table" :aria-label="$t('settings.lookups.sets.' + set.key)" :data-test="'lookup-' + set.key">
+          <div class="values-head">
+            <h2 class="pdx-txt-heading">{{ $t('settings.lookups.sets.' + set.key) }}</h2>
+            <span class="pdx-txt-small pdx-ink-muted">{{ $t('settings.lookups.field', { field: set.field }) }}</span>
+          </div>
+          <div class="row head" role="row">
+            <span role="columnheader">{{ $t('settings.lookups.code') }}</span>
+            <span role="columnheader">{{ $t('settings.lookups.label') }}</span>
+            <span role="columnheader" class="num">{{ $t('settings.lookups.inUse') }}</span>
+          </div>
+          @for (set.codes as code; track code) {
+            <div class="row" role="row">
+              <code role="cell" data-test="code">{{ code }}</code>
+              <span role="cell" data-test="label">{{ $t(set.labels + '.' + code) }}</span>
+              <span role="cell" class="num" data-test="in-use">{{ usage[set.key + ':' + code] ?? '' }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- A new category: its name in both languages, its colour, and what it applies to. -->
+    <pdx-dialog :open="adding" size="md" :title="$t('settings.categories.add')" @pdx-close="adding = false" data-test="category-dialog">
+      <form class="add-form" @submit="saveNew">
+        <pdx-form-field :label="$t('settings.categories.en')" :error="addError" :show-error="addError !== ''">
+          <pdx-input :value="draftEn" @pdx-input="e => { draftEn = e.detail.value; addError = ''; }" data-test="category-en"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field :label="$t('settings.categories.it')">
+          <pdx-input :value="draftIt" @pdx-input="e => draftIt = e.detail.value" data-test="category-it"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field :label="$t('settings.categories.color')">
+          <pdx-select :options="toneOptions" :value="draftColor" @pdx-change="e => draftColor = e.detail.value" data-test="category-color"></pdx-select>
+        </pdx-form-field>
+        <fieldset class="applies">
+          <legend class="pdx-label">{{ $t('settings.categories.appliesTo') }}</legend>
+          @for (ENTITIES as entity; track entity) {
+            <pdx-checkbox :label="$t('settings.lookups.owner.' + entity)" :checked="draftApplies.includes(entity)"
+              @pdx-change="e => toggleApplies(entity, e.detail.checked)" :data-test="'applies-' + entity"></pdx-checkbox>
+          }
+        </fieldset>
+        <div class="add-actions">
+          <pdx-button variant="ghost" @click="adding = false">{{ $t('settings.views.cancel') }}</pdx-button>
+          <pdx-button variant="primary" type="submit" data-test="category-save">{{ $t('settings.views.save') }}</pdx-button>
+        </div>
+      </form>
+    </pdx-dialog>
+  </section>
+</template>
+
+<script setup>
+@page '/settings/lookups' { label: lookupsLabel };
+@title $t('settings.tiles.lookups');
+
+import { ticketTransport } from '../data/tickets';
+import { customerTransport } from '../data/customers';
+import { assetTransport } from '../data/assets';
+import { categories, categoryByCode, createCategory, updateCategory, CATEGORY_ENTITIES, CATEGORY_TONES } from '../data/categories';
+import type { CategoryTone, CategoryEntity } from '../data/categories';
+
+function lookupsLabel() {
+  return $t('settings.tiles.lookups');
+}
+
+/**
+ * The showcase's closed value sets: the field that holds each, and where its labels live — the
+ * dictionary the list that shows them reads, so a label changed there is changed here.
+ */
+const sets = [
+  { key: 'ticketStatus', owner: 'tickets', field: 'status', labels: 'tickets.status', codes: ['open', 'waiting', 'closed'], transport: ticketTransport },
+  { key: 'ticketPriority', owner: 'tickets', field: 'priority', labels: 'tickets.priority', codes: ['low', 'normal', 'high'], transport: ticketTransport },
+  { key: 'customerTier', owner: 'customers', field: 'tier', labels: 'customers.tiers', codes: ['standard', 'business', 'enterprise'], transport: customerTransport },
+  { key: 'customerStatus', owner: 'customers', field: 'status', labels: 'customers.statuses', codes: ['active', 'onboarding', 'closed'], transport: customerTransport },
+];
+
+let current = $signal('ticketStatus');
+let usage = $signal({});
+
+/** How many records hold each code: one filtered read a code, the total and not the rows. */
+onMount(async () => {
+  const counts = {};
+  for (const set of sets) {
+    for (const code of set.codes) {
+      const res = await set.transport.read({ page: 1, pageSize: 1, sort: [], filter: [{ field: set.field, operator: 'eq', value: code }] });
+      counts[set.key + ':' + code] = res.total;
+    }
+  }
+  usage = counts;
+  await countCategories();
+});
+
+// ── Categories ──────────────────────────────────────────────────────
+const ENTITIES = CATEGORY_ENTITIES;
+const TRANSPORTS = { tickets: ticketTransport, customers: customerTransport, assets: assetTransport };
+
+const cats = $derived(categories());
+const toneOptions = $derived(CATEGORY_TONES.map(t => ({ value: t, label: $t('settings.categories.tones.' + t) })));
+let categoryUsage = $signal({});
+
+/**
+ * How many of each kind carry each category — a filtered read per pair, the total and not the rows,
+ * as the other sets count. A kind the category does not apply to is «—», not a zero that reads like a fact.
+ */
+async function countCategories() {
+  const counts = {};
+  for (const c of categories()) {
+    for (const entity of ENTITIES) {
+      if (!c.appliesTo.includes(entity)) continue;
+      const res = await TRANSPORTS[entity].read({ page: 1, pageSize: 1, sort: [], filter: [{ field: 'categories', operator: 'eq', value: c.code }] });
+      counts[c.code + ':' + entity] = res.total;
+    }
+  }
+  categoryUsage = counts;
+}
+
+/** «tickets · customers · assets», each a count or «—». */
+function usageOf(code) {
+  return ENTITIES.map(e => categoryUsage[code + ':' + e] ?? '—').join(' · ');
+}
+
+/** A label is saved when its field is left: in place, as the reference renames a lookup value. */
+function rename(c, locale, value) {
+  const label = String(value ?? '').trim();
+  return write(c.code, (cur) => (label && label !== cur.label[locale]) ? { ...cur, label: { ...cur.label, [locale]: label } } : null);
+}
+
+/** Deactivated, never deleted: it leaves the pickers and stays on its records. */
+function toggle(c) {
+  return write(c.code, (cur) => ({ ...cur, active: !cur.active }));
+}
+
+/**
+ * One write at a time, each reading the category as the one before left it. Unqueued, renaming the
+ * English and then the Italian name sends the second while the first is still on its way, from a
+ * snapshot that still has the old English — and writes it back (as the employee's Details queue).
+ */
+let queue = Promise.resolve();
+function write(code, change) {
+  queue = queue.then(async () => {
+    const cur = categoryByCode(code);
+    const next = cur ? change(cur) : null;
+    if (next) await updateCategory(next);
+  });
+  return queue;
+}
+
+let adding = $signal(false);
+let draftEn = $signal('');
+let draftIt = $signal('');
+let draftColor = $signal<CategoryTone>('primary');
+let draftApplies = $signal<CategoryEntity[]>([]);
+let addError = $signal('');
+
+function openAdd() {
+  draftEn = ''; draftIt = ''; draftColor = 'primary'; draftApplies = []; addError = '';
+  adding = true;
+}
+
+function toggleApplies(entity, on) {
+  draftApplies = on ? [...draftApplies.filter(x => x !== entity), entity] : draftApplies.filter(x => x !== entity);
+}
+
+async function saveNew(e) {
+  e.preventDefault();
+  const en = draftEn.trim();
+  if (!en) { addError = $t('settings.categories.nameRequired'); return; }
+  await createCategory({ label: { en, it: draftIt.trim() || en }, color: draftColor, appliesTo: draftApplies });
+  adding = false;
+  await countCategories();
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+  .head h1, .head p { margin: 0; }
+  .head { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+
+  .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: var(--pdx-space-xl); align-items: start; }
+  .sets { display: flex; flex-direction: column; border-right: 1px solid var(--pdx-color-border); padding-right: var(--pdx-space-md); }
+  .set-entry {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 48px; justify-content: center;
+    padding: var(--pdx-space-xs) var(--pdx-space-md); border: 0; border-radius: var(--pdx-radius-md);
+    background: transparent; color: var(--pdx-color-text); text-align: left; cursor: pointer; font: inherit;
+  }
+  .set-entry:hover { background: var(--pdx-color-inset); }
+  .set-entry[aria-current="true"] { background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink); font-weight: 600; }
+
+  .values { display: flex; flex-direction: column; }
+  .values-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--pdx-space-md); margin-bottom: var(--pdx-space-sm); }
+  .values-head h2 { margin: 0; }
+  .row {
+    display: grid; grid-template-columns: minmax(8rem, 1fr) minmax(10rem, 2fr) minmax(6rem, 1fr); gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) var(--pdx-space-md); border-bottom: 1px solid var(--pdx-color-border); align-items: center;
+  }
+  .row.head { color: var(--pdx-color-muted); font-size: var(--pdx-text-sm, 0.875rem); background: var(--pdx-color-inset); border-bottom: 0; border-radius: var(--pdx-radius-sm); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  /* Categories: code, two names, what it applies to, the counts, the switch. */
+  .row.cats { grid-template-columns: minmax(8rem, 1fr) minmax(10rem, 1.5fr) minmax(10rem, 1.5fr) minmax(9rem, 1.2fr) minmax(7rem, 1fr) auto; }
+  .row.cats[data-active="false"] { color: var(--pdx-color-muted); }
+  .add-form { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .applies { border: 0; margin: 0; padding: 0; display: flex; gap: var(--pdx-space-md); flex-wrap: wrap; }
+  .add-actions { display: flex; justify-content: flex-end; gap: var(--pdx-space-sm); }
+  code { font-family: var(--pdx-font-mono, monospace); justify-self: start; }
+
+  /* A phone: the sets above their values. */
+  @media (max-width: 640px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .sets { border-right: 0; border-bottom: 1px solid var(--pdx-color-border); padding: 0 0 var(--pdx-space-sm); }
+  }
+</style>

@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">With Arrow</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>arrow</code> prop for a directional pointer.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm">Top arrow</pdx-button>
+      <pdx-tooltip text="Tooltip with arrow" placement="top" arrow></pdx-tooltip>
+      <pdx-button variant="outline" size="sm">Bottom arrow</pdx-button>
+      <pdx-tooltip text="Tooltip with arrow" placement="bottom" arrow></pdx-tooltip>
+      <pdx-button variant="outline" size="sm">Left arrow</pdx-button>
+      <pdx-tooltip text="Tooltip with arrow" placement="left" arrow></pdx-tooltip>
+      <pdx-button variant="outline" size="sm">Right arrow</pdx-button>
+      <pdx-tooltip text="Tooltip with arrow" placement="right" arrow></pdx-tooltip>
+    </div>
+  </section>
+</template>

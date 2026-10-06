@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Appearance</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Static preview of popover styling. Shown with <code>data-open</code> attribute in production.</p>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">Default</span>
+        <div class="popover-static">
+          <p class="pdx-txt-small">This is a popover with default styling. Surface background, border, shadow, and padding.</p>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">With Arrow</span>
+        <div class="popover-static has-arrow">
+          <p class="pdx-txt-small">Popover with an arrow pointing to the trigger element.</p>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-popover-trigger"&gt;
+  &lt;button class="pdx-secondary"&gt;Click me&lt;/button&gt;
+  &lt;div class="pdx-popover pdx-popover-bottom" data-open&gt;
+    &lt;div class="pdx-popover-arrow"&gt;&lt;/div&gt;
+    &lt;p&gt;Popover content&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,74 @@
+<template>
+  <div class="responsive-layout">
+    @show (isMobile) {
+      <nav class="mobile-nav">
+        <button class="hamburger" @click="toggleMenu" aria-label="Toggle menu">
+          ☰
+        </button>
+        <h3>{{ title }}</h3>
+      </nav>
+      @if (menuOpen) {
+        <div class="mobile-menu">
+          @for (navItems as item; track item.id) {
+            <a @click="navigate(item)">{{ item.label }}</a>
+          }
+        </div>
+      }
+    }
+
+    @show (!isMobile) {
+      <aside class="sidebar">
+        <h3>{{ title }}</h3>
+        <nav>
+          @for (navItems as item; track item.id) {
+            <a @click="navigate(item)" class="nav-link">{{ item.label }}</a>
+          }
+        </nav>
+      </aside>
+    }
+
+    <main class="content">
+      <slot name="content"></slot>
+    </main>
+  </div>
+</template>
+
+<script setup>
+  import { responsive } from '@pdxui/core';
+
+  @prop title: string = 'App';
+  @prop navItems: object[] = [];
+  @event navigated: object;
+  @slot content;
+
+  const breakpoint = responsive({ mobile: 768, tablet: 1024 });
+  const isMobile = $derived(breakpoint === 'mobile');
+  let menuOpen = $signal(false);
+
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+  }
+
+  function navigate(item) {
+    menuOpen = false;
+    $emit('navigated', item);
+  }
+</script>
+
+<style scoped>
+  .responsive-layout { display: flex; min-height: 100vh; }
+
+  .sidebar { width: 240px; background: var(--pdx-color-inset); padding: 1rem; border-right: 1px solid var(--pdx-color-border); }
+  .sidebar h3 { margin: 0 0 1rem 0; }
+  .nav-link { display: block; padding: 0.5rem 0.75rem; color: var(--pdx-color-text); text-decoration: none; border-radius: 4px; cursor: pointer; }
+  .nav-link:hover { background: var(--pdx-color-surface); }
+
+  .mobile-nav { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--pdx-color-inset); border-bottom: 1px solid var(--pdx-color-border); }
+  .mobile-nav h3 { margin: 0; }
+  .hamburger { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0.25rem; }
+
+  .mobile-menu { background: var(--pdx-color-inset); border-bottom: 1px solid var(--pdx-color-border); }
+  .mobile-menu a { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid var(--pdx-color-border); cursor: pointer; }
+
+  .content { flex: 1; padding: 1.5rem; }
+</style>

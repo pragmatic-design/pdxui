@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h3>measure() / measureRelative()</h3>
+    <div class="measure-row">
+      <div class="box-a" :ref="boxARef">Box A</div>
+      <div class="box-b" :ref="boxBRef">Box B</div>
+    </div>
+    <button class="pdx-primary" @click="doMeasure">Measure</button>
+    <pre class="log">{{ measureLog }}</pre>
+  </section>
+</template>
+
+<script setup>
+import { measure, measureRelative } from '@pdxui/core';
+
+let measureLog = $signal('Click "Measure"');
+let boxARef = $signal(null);
+let boxBRef = $signal(null);
+
+function doMeasure() {
+    const a = boxARef;
+    const b = boxBRef;
+    if (!a || !b) return;
+    const mA = measure(a);
+    const mB = measure(b);
+    const rel = measureRelative(a, b);
+    measureLog = 'A: ' + Math.round(mA.width) + 'x' + Math.round(mA.height) + ' at (' + Math.round(mA.x) + ', ' + Math.round(mA.y) + ')\n' +
+        'B: ' + Math.round(mB.width) + 'x' + Math.round(mB.height) + ' at (' + Math.round(mB.x) + ', ' + Math.round(mB.y) + ')\n' +
+        'Relative: dx=' + Math.round(rel.dx) + ', dy=' + Math.round(rel.dy) + ', overlap=' + rel.overlap;
+}
+</script>
+
+<style scoped>
+  .measure-row { display: flex; gap: 24px; margin: 8px 0; }
+  .box-a { padding: 16px 32px; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border-radius: 8px; font-weight: 600; }
+  .box-b { padding: 16px 32px; background: var(--pdx-color-success); color: var(--pdx-color-success-text); border-radius: 8px; font-weight: 600; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 48px; margin: 8px 0 0; }
+</style>

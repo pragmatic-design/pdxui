@@ -1,0 +1,25 @@
+/* Every shipped theme, layered — the counterpart of `components/_all.css`.
+   For an app that lets the USER pick a theme and therefore needs them all, while still taking its
+   component styles from the components it renders.
+   An app that renders one theme imports `@pdxui/design/themes/<name>` instead.
+
+   NOT inside `src/themes/`: seven different readers enumerate that directory as "the shipped
+   themes" — the contrast gate, the coverage report, the builder's list — and a file there that is
+   not a theme is a fourteenth theme to every one of them. */
+@import "./themes/layered/corporate.css";
+@import "./themes/layered/cupertino.css";
+@import "./themes/layered/cyberpunk.css";
+@import "./themes/layered/editorial.css";
+@import "./themes/layered/fluent.css";
+@import "./themes/layered/glass.css";
+@import "./themes/layered/material.css";
+@import "./themes/layered/metro.css";
+@import "./themes/layered/neumorphic.css";
+@import "./themes/layered/neutral.css";
+@import "./themes/layered/playful.css";
+@import "./themes/layered/pragmatic.css";
+@import "./themes/layered/pragmatic-gold.css";
+
+/* Themes authored in the builder and saved from its UI. Last, so a custom theme can refine a
+   shipped one of the same name if that is ever wanted. */
+@import "./themes/custom/_custom.css" layer(pdx.themes);

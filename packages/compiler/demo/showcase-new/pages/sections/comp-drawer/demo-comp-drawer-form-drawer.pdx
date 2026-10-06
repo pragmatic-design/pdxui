@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Form Drawer</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Real-world example: settings form in a drawer with header, body (scrollable), and footer actions.</p>
+    <pdx-button variant="primary" @click="openForm">Edit Profile</pdx-button>
+
+    <pdx-drawer :open="formOpen" size="md" label="Edit Profile" @pdx-close="closeForm">
+      <span slot="header">
+        <pdx-icon name="user" size="sm"></pdx-icon> Edit Profile
+      </span>
+      <div class="form-stack">
+        <pdx-form-field label="Full Name" size="sm">
+          <pdx-input value="Alessandro Saiani" placeholder="Full name"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Email" size="sm">
+          <pdx-input type="email" value="alex@pragmatic.dev"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Bio" size="sm">
+          <pdx-textarea placeholder="Tell us about yourself" rows="3"></pdx-textarea>
+        </pdx-form-field>
+        <pdx-form-field label="Role" size="sm">
+          <pdx-input value="Lead Architect" placeholder="Your role"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Notifications" size="sm">
+          <pdx-switch label="Email notifications" checked></pdx-switch>
+        </pdx-form-field>
+      </div>
+      <span slot="footer">
+        <pdx-button variant="ghost" size="sm" @click="closeForm">Cancel</pdx-button>
+        <pdx-button variant="primary" size="sm" @click="closeForm">Save Changes</pdx-button>
+      </span>
+    </pdx-drawer>
+  </section>
+</template>
+
+<script setup>
+// Form drawer
+let formOpen = $signal(false);
+
+function openForm() { formOpen = true; }
+function closeForm() { formOpen = false; }
+</script>
+
+<style scoped>
+  .form-stack { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+</style>

@@ -1,0 +1,62 @@
+/* pdx-list — Data-bound list */
+pdx-list { display: block; }
+
+.pdx-list-root { position: relative; }
+.pdx-list-bordered {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+}
+
+.pdx-list {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0; /* Reset typography.css .pdx-list collision */
+}
+
+.pdx-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    font-size: var(--pdx-text-sm);
+    min-height: 40px;
+}
+
+.pdx-list-item-clickable {
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.pdx-list-item-clickable:hover {
+    background: var(--pdx-color-inset);
+}
+
+/* Legacy DOM dividers (backward compat) */
+.pdx-list-divider {
+    border: none;
+    height: 1px;
+    background: var(--pdx-color-border);
+    margin: 0;
+}
+
+/* CSS-based dividers (new: no DOM elements needed) */
+.pdx-list-dividers > .pdx-list-item + .pdx-list-item {
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+/* Slot items: no wrapper padding — slot content controls its own spacing */
+.pdx-list-item-slot {
+    padding: 0;
+    gap: 0;
+}
+
+/* Empty state inside list */
+.pdx-list-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--pdx-space-2xl) var(--pdx-space-lg);
+    text-align: center;
+    gap: var(--pdx-space-sm);
+}

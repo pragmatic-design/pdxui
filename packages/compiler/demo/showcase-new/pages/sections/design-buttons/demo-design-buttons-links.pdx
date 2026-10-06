@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Links as Buttons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Same classes work on <code>&lt;a&gt;</code> and <code>[role="button"]</code>.</p>
+
+    <div class="btn-row">
+      <a href="#" class="pdx-primary">Link Primary</a>
+      <a href="#" class="pdx-outline">Link Outline</a>
+      <span role="button" class="pdx-ghost">Span Ghost</span>
+    </div>
+  </section>
+</template>

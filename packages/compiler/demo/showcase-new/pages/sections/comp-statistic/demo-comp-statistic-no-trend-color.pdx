@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">No Trend Color</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Disable automatic trend coloring with <code>:trend-color="false"</code>.</p>
+    <div class="demo-row">
+      <pdx-statistic title="Revenue" prefix="$" value="48,250" trend="up" trend-value="+12.5%" :trend-color="false"></pdx-statistic>
+      <pdx-statistic title="Churn" value="2.4" suffix="%" trend="down" trend-value="-0.8%" :trend-color="false"></pdx-statistic>
+    </div>
+  </section>
+</template>

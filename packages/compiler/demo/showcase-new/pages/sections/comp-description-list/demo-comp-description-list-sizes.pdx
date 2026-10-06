@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Small, medium (default), and large.</p>
+    <div class="demo-stack">
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">sm</span>
+        <div class="demo-container">
+          <pdx-description-list :items="sizeItems" :bordered="true" size="sm" label-width="80px"></pdx-description-list>
+        </div>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">md</span>
+        <div class="demo-container">
+          <pdx-description-list :items="sizeItems" :bordered="true" size="md" label-width="80px"></pdx-description-list>
+        </div>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">lg</span>
+        <div class="demo-container">
+          <pdx-description-list :items="sizeItems" :bordered="true" size="lg" label-width="80px"></pdx-description-list>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const sizeItems = [
+  { label: 'Name', value: 'Alice' },
+  { label: 'Role', value: 'Viewer' },
+  { label: 'Status', value: 'Active' },
+];
+</script>

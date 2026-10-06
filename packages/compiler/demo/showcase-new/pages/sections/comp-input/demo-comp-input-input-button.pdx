@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Input + Button Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Combining <code>&lt;pdx-input&gt;</code> with <code>&lt;pdx-button&gt;</code> at matching sizes.
+    </p>
+
+    <div class="demo-stack">
+      <div class="demo-row">
+        <pdx-input size="sm" prefix="$" placeholder="Amount" clearable style="flex:1"></pdx-input>
+        <pdx-button variant="solid" size="sm">Pay Now</pdx-button>
+      </div>
+      <div class="demo-row">
+        <pdx-input placeholder="Search products..." clearable style="flex:1"></pdx-input>
+        <pdx-button variant="outline" size="md">Search</pdx-button>
+      </div>
+      <div class="demo-row">
+        <pdx-input size="lg" placeholder="Enter coupon code" suffix="%" style="flex:1"></pdx-input>
+        <pdx-button variant="solid" size="lg">Apply</pdx-button>
+      </div>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Select & MultiSelect</h2>
+    <div class="demo-row">
+      <span class="demo-label">Status:</span>
+      <pdx-inline-edit type="select" :value="'active'" :options="statusOptions"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Tags:</span>
+      <pdx-inline-edit type="multiselect" :value="['frontend', 'design']" :options="tagOptions"></pdx-inline-edit>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const statusOptions = [
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'suspended', label: 'Suspended' },
+];
+
+const tagOptions = [
+  { value: 'frontend', label: 'Frontend' },
+  { value: 'backend', label: 'Backend' },
+  { value: 'design', label: 'Design' },
+  { value: 'devops', label: 'DevOps' },
+  { value: 'mobile', label: 'Mobile' },
+];
+</script>

@@ -1,0 +1,29 @@
+<template>
+  <div class="demo">
+    <h2>Drag and Drop</h2>
+    <p class="desc">Signal-based: PointerEvent unified (touch/mouse/pen), axis, bounds, drop zones, velocity, auto-scroll, keyboard a11y.</p>
+
+    <pdx-demo-infra-drag-free class="demo-section"></pdx-demo-infra-drag-free>
+
+    <pdx-demo-infra-drag-axis class="demo-section"></pdx-demo-infra-drag-axis>
+
+    <pdx-demo-infra-drag-drop-zones class="demo-section"></pdx-demo-infra-drag-drop-zones>
+
+    <pdx-demo-infra-drag-keyboard class="demo-section"></pdx-demo-infra-drag-keyboard>
+
+    <pdx-demo-infra-drag-auto-scroll class="demo-section"></pdx-demo-infra-drag-auto-scroll>
+  </div>
+</template>
+
+<script setup>
+@page '/infra/drag';
+@title 'Drag & Drop';
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
+</style>

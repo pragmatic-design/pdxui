@@ -1,0 +1,86 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Positions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Four anchor positions: left (default), right, top, bottom.</p>
+
+    <div class="position-grid">
+      <div class="position-card">
+        <span class="pdx-txt-caption pdx-ink-muted">Left</span>
+        <div class="position-mini">
+          <div class="mini-drawer mini-left"></div>
+          <div class="mini-content"></div>
+        </div>
+      </div>
+      <div class="position-card">
+        <span class="pdx-txt-caption pdx-ink-muted">Right</span>
+        <div class="position-mini">
+          <div class="mini-content"></div>
+          <div class="mini-drawer mini-right"></div>
+        </div>
+      </div>
+      <div class="position-card">
+        <span class="pdx-txt-caption pdx-ink-muted">Top</span>
+        <div class="position-mini position-mini-vert">
+          <div class="mini-drawer mini-top"></div>
+          <div class="mini-content"></div>
+        </div>
+      </div>
+      <div class="position-card">
+        <span class="pdx-txt-caption pdx-ink-muted">Bottom</span>
+        <div class="position-mini position-mini-vert">
+          <div class="mini-content"></div>
+          <div class="mini-drawer mini-bottom"></div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-drawer" position="left"&gt;...&lt;/div&gt;
+&lt;div class="pdx-drawer" position="right"&gt;...&lt;/div&gt;
+&lt;div class="pdx-drawer" position="top"&gt;...&lt;/div&gt;
+&lt;div class="pdx-drawer" position="bottom"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Position miniatures */
+  .position-grid {
+    margin-top: var(--pdx-space-md);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--pdx-space-md);
+  }
+  .position-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    align-items: center;
+  }
+  .position-mini {
+    display: flex;
+    width: 100%;
+    height: 80px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .position-mini-vert {
+    flex-direction: column;
+  }
+  .mini-drawer {
+    background: var(--pdx-color-surface);
+    flex-shrink: 0;
+  }
+  .mini-left, .mini-right { width: 35%; }
+  .mini-top, .mini-bottom { height: 30%; }
+  .mini-left { border-right: 2px solid var(--pdx-color-primary); }
+  .mini-right { border-left: 2px solid var(--pdx-color-primary); }
+  .mini-top { border-bottom: 2px solid var(--pdx-color-primary); }
+  .mini-bottom { border-top: 2px solid var(--pdx-color-primary); }
+  .mini-content {
+    flex: 1;
+    background: var(--pdx-color-inset);
+  }
+</style>

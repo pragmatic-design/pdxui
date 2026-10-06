@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple Slides</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 slides visible at once with a 16px gap. Great for product cards.</p>
+    <div class="demo-container demo-container-wide">
+      <pdx-carousel :items="cardSlides" :slides-per-view="3" :gap="16" :show-dots="false"></pdx-carousel>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-carousel :items="cards" :slides-per-view="3" :gap="16" :show-dots="false"&gt;&lt;/pdx-carousel&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const cardSlides = [
+  { src: '/demo-images/desk.svg', alt: 'Product 1', caption: 'Product Alpha' },
+  { src: '/demo-images/chair.svg', alt: 'Product 2', caption: 'Product Beta' },
+  { src: '/demo-images/monitor.svg', alt: 'Product 3', caption: 'Product Gamma' },
+  { src: '/demo-images/lamp.svg', alt: 'Product 4', caption: 'Product Delta' },
+  { src: '/demo-images/plant.svg', alt: 'Product 5', caption: 'Product Epsilon' },
+  { src: '/demo-images/mug.svg', alt: 'Product 6', caption: 'Product Zeta' },
+];
+</script>
+
+<style scoped>
+.demo-container-wide { max-width: 100%; }
+</style>

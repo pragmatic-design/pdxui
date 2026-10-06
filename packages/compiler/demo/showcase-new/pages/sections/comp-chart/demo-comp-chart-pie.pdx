@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Pie & Doughnut</h2>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">type="pie"</span>
+        <div class="demo-area">
+          <pdx-chart type="pie" :data="pieData" :x-field="'browser'" :y-field="'share'" height="280px" :legend="false"></pdx-chart>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">type="doughnut"</span>
+        <div class="demo-area">
+          <pdx-chart type="doughnut" :data="pieData" :x-field="'browser'" :y-field="'share'" height="280px" :legend="false"></pdx-chart>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const pieData = [
+  { browser: 'Chrome', share: 64 },
+  { browser: 'Safari', share: 19 },
+  { browser: 'Firefox', share: 4 },
+  { browser: 'Edge', share: 5 },
+  { browser: 'Other', share: 8 },
+];
+</script>
+
+<style scoped>
+  .demo-row { display: flex; gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); flex-wrap: wrap; }
+  .demo-labeled { display: flex; flex-direction: column; gap: var(--pdx-space-2xs); flex: 1; min-width: 280px; }
+</style>

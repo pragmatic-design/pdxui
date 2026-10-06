@@ -1,0 +1,55 @@
+{
+    "assets": {
+        "title": "Assets",
+        "intro": "What tickets are opened on: each customer's printers, scanners, laptops, network and phones, where they are installed and until when they are under warranty. An asset is retired, never deleted.",
+        "matching": "{count, plural, one {# asset} other {# assets}}",
+        "openRecord": "Open {name}",
+        "unknown": "Unknown asset",
+        "new": "New asset",
+        "create": "Create",
+        "cancel": "Cancel",
+        "customerMissing": "Choose the customer the asset belongs to.",
+        "sections": "Asset sections",
+        "views": { "default": "All assets" },
+        "columns": {
+            "categories": "Categories",
+            "serial": "Serial",
+            "name": "Name",
+            "kind": "Kind",
+            "customer": "Customer",
+            "site": "Site",
+            "warrantyEnds": "Warranty ends",
+            "status": "Status"
+        },
+        "kinds": { "printer": "Printer", "scanner": "Scanner", "laptop": "Laptop", "network": "Network", "phone": "Phone" },
+        "statuses": { "inService": "In service", "inRepair": "In repair", "retired": "Retired" },
+        "ended": "{date} · ended",
+        "groups": { "asset": "Asset" },
+        "sectionNames": { "details": "Details", "tickets": "Tickets" },
+        "fields": {
+            "serial": "Serial",
+            "name": "Name",
+            "kind": "Kind",
+            "installed": "Installed",
+            "warrantyEnds": "Warranty ends",
+            "status": "Status",
+            "sector": "Sector",
+            "city": "City"
+        },
+        "saving": "Saving…",
+        "saved": "Saved",
+        "notSaved": "Not saved",
+        "savedAt": "Saved at {time}",
+        "nameRequired": "An asset needs a name.",
+        "warrantyBeforeInstalled": "The warranty cannot end before the asset was installed.",
+        "tickets": {
+            "emptyTitle": "No ticket was opened on it",
+            "emptyBody": "A ticket names its asset when it is opened."
+        },
+        "picker": {
+            "label": "Asset",
+            "hint": "The customer's assets. Name the customer first.",
+            "picked": "Opened on {name} ({serial})"
+        }
+    }
+}

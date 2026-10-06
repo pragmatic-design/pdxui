@@ -1,0 +1,48 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Field Wrapper Integration</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Inside <code>.pdx-field</code> wrapper, labels auto-space with inputs. Error state propagates via <code>:has([aria-invalid])</code>.
+    </p>
+
+    <div class="demo-fields">
+      <div class="pdx-field">
+        <pdx-label text="Full Name" required></pdx-label>
+        <input class="pdx-input" placeholder="John Doe" />
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Email Address" required hint="We'll never share this"></pdx-label>
+        <input class="pdx-input" type="email" placeholder="john@example.com" />
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Invalid Field" required></pdx-label>
+        <input class="pdx-input pdx-input-error" aria-invalid="true" value="bad value" />
+        <span class="pdx-field-error">This field has an error</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-field"&gt;
+  &lt;pdx-label text="Full Name" required&gt;&lt;/pdx-label&gt;
+  &lt;input class="pdx-input" placeholder="John Doe" /&gt;
+&lt;/div&gt;
+
+&lt;!-- Error state: label turns red automatically --&gt;
+&lt;div class="pdx-field"&gt;
+  &lt;pdx-label text="Invalid" required&gt;&lt;/pdx-label&gt;
+  &lt;input class="pdx-input" aria-invalid="true" /&gt;
+  &lt;span class="pdx-field-error"&gt;Error message&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .demo-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+</style>

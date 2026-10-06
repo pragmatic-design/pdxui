@@ -1,0 +1,87 @@
+<template>
+  <section>
+    <h3>Grid Selection</h3>
+    <p class="desc">Click rows. Shift+Click for range. Checkbox header selects all.</p>
+    <div class="grid-table">
+      <div class="grid-header">
+        <span class="grid-cell-ck"><input type="checkbox" @change="handleCheckAll" /></span>
+        <span class="grid-cell-name"><strong>Name</strong></span>
+        <span class="grid-cell-role"><strong>Role</strong></span>
+        <span class="grid-cell-status"><strong>Status</strong></span>
+      </div>
+      @for (people as p; track p.id) {
+        <div class="grid-row" :class="gridClass(p.id)" @click="handleGridClick" style="cursor:pointer">
+          <span class="grid-cell-ck"><input type="checkbox" :checked="gridIsSelected(p.id)" /></span>
+          <span class="grid-cell-name">{{ p.name }}</span>
+          <span class="grid-cell-role">{{ p.role }}</span>
+          <span class="grid-cell-status">{{ p.status }}</span>
+        </div>
+      }
+    </div>
+    <pre class="log">{{ gridInfo }}</pre>
+  </section>
+</template>
+
+<script setup>
+import { createSelection, effect, onMount, onDestroy } from '@pdxui/core';
+
+const people = [
+    { id: 'p1', name: 'Alice Johnson', role: 'Engineer', status: 'Active' },
+    { id: 'p2', name: 'Bob Smith', role: 'Designer', status: 'Active' },
+    { id: 'p3', name: 'Carol Davis', role: 'Manager', status: 'Away' },
+    { id: 'p4', name: 'Dave Wilson', role: 'Engineer', status: 'Active' },
+    { id: 'p5', name: 'Eve Brown', role: 'QA', status: 'Active' },
+];
+const allPeopleKeys = people.map(p => p.id);
+
+let gridInfo = $signal('No rows selected');
+
+// Grid
+const gridSel = createSelection({ mode: 'multiple', behavior: 'toggle' });
+
+// Reactive class helpers — read selection signal inside a function so the
+// template effect tracks changes. Direct isSelected() calls on the selection
+// object would be transformed incorrectly by the compiler's callSignals pass
+// (it adds () to ctx.singleSel, treating the object as a signal).
+function gridClass(id) { return gridSel.selected().has(id) ? 'selected' : ''; }
+function gridIsSelected(id) { return gridSel.selected().has(id); }
+
+onMount(() => {
+    const d3 = effect(() => {
+        const sel = gridSel.selected();
+        gridInfo = sel.size > 0 ? 'Selected: ' + [...sel].join(', ') + ' (' + sel.size + ' rows)' : 'No rows selected';
+    });
+    onDestroy(() => { d3(); });
+});
+
+// Event handlers as simple functions — no inline arrows in template.
+// The compiler double-wraps arrow expressions like (e) => fn(e) into
+// () => (e) => fn(e), losing the event object. Using simple function
+// names + data attributes avoids this.
+
+function handleGridClick(e) {
+    if (e.target.type === 'checkbox') return;
+    const row = e.currentTarget;
+    const rows = [...row.parentElement.querySelectorAll('.grid-row')];
+    const idx = rows.indexOf(row);
+    if (idx < 0 || idx >= people.length) return;
+    const id = people[idx].id;
+    if (e.shiftKey) gridSel.extendTo(id, allPeopleKeys);
+    else gridSel.toggle(id);
+}
+
+function handleCheckAll(e) {
+    if (e.target.checked) gridSel.selectAll(allPeopleKeys);
+    else gridSel.clear();
+}
+</script>
+
+<style scoped>
+  .grid-table { width: 100%; font-size: 0.85rem; margin-top: 8px; }
+  .grid-header, .grid-row { display: grid; grid-template-columns: 36px 1fr 1fr 1fr; align-items: center; border-bottom: 1px solid var(--pdx-color-border); }
+  .grid-header { background: var(--pdx-color-inset); font-weight: 600; }
+  .grid-header span, .grid-row span { padding: 8px 12px; }
+  .grid-row:hover { background: var(--pdx-color-inset); }
+  .grid-row.selected { background: var(--pdx-color-primary-soft); }
+  .grid-header, .grid-row { user-select: none; }
+</style>

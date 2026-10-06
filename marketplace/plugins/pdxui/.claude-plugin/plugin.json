@@ -1,0 +1,17 @@
+{
+  "name": "pdxui",
+  "version": "1.0.0-alpha.3",
+  "description": "Skills for building web app UIs with PDX (@pdxui) — the .pdx language compiled to Web Components, and its pdx-* components: the language itself, a component catalogue split by area with a page per component, topic skills (data layer, validation, routing, i18n, setup, testing), screen recipes (app shell, list/grid, dashboard, CRUD, master-detail), composing a screen, theming (a WCAG-AA theme from one brand color, 13 shipped themes, the semantic tokens), and the measured .pdx gotchas. The catalogue is generated from the library itself.",
+  "author": {
+    "name": "Alessandro Saiani",
+    "email": "info@pragmaticdesign.net"
+  },
+  "keywords": [
+    "pdxui",
+    "pdx",
+    "web-components",
+    "frontend",
+    "design-system",
+    "line-of-business"
+  ]
+}

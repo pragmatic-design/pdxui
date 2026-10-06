@@ -1,0 +1,56 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Schema-driven (grid layout)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Each field declares its <code>type</code>, <code>label</code>, validators and grid
+      <code>size</code>. Submit to see the collected values.
+    </p>
+    <div class="demo-container">
+      <pdx-form-template :schema="profileSchema" @pdx-submit="onSubmit"></pdx-form-template>
+      <p class="pdx-txt-small pdx-ink-muted submitted">Submitted: <code>{{ submitted }}</code></p>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const schema = {
+  layout: 'grid', columns: 12,
+  fields: [
+    { name: 'fullName', label: 'Full Name', type: 'text', required: true,
+      validators: [{ type: 'required' }], size: 6 },
+    { name: 'email', label: 'Email', type: 'email',
+      validators: [{ type: 'email' }], size: 6 },
+    { name: 'role', label: 'Role', type: 'select', size: 6,
+      options: [{ label: 'Engineer', value: 'eng' }, { label: 'Designer', value: 'design' }] },
+    { name: 'startDate', label: 'Start Date', type: 'date', size: 6 },
+    { name: 'bio', label: 'Bio', type: 'textarea' },
+    { name: 'active', label: 'Active', type: 'switch' },
+  ],
+};
+
+&lt;pdx-form-template :schema="schema" @pdx-submit="onSubmit" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let submitted = $signal('—');
+
+const profileSchema = {
+  layout: 'grid', columns: 12,
+  fields: [
+    { name: 'fullName', label: 'Full Name', type: 'text', required: true, validators: [{ type: 'required' }], size: 6 },
+    { name: 'email', label: 'Email', type: 'email', validators: [{ type: 'email' }], size: 6 },
+    { name: 'role', label: 'Role', type: 'select', size: 6, options: [{ label: 'Engineer', value: 'eng' }, { label: 'Designer', value: 'design' }, { label: 'PM', value: 'pm' }] },
+    { name: 'startDate', label: 'Start Date', type: 'date', size: 6 },
+    { name: 'bio', label: 'Bio', type: 'textarea', placeholder: 'A short bio…' },
+    { name: 'active', label: 'Active', type: 'switch' },
+  ],
+};
+
+function onSubmit(e) {
+  submitted = JSON.stringify((e.detail && e.detail.values) || {});
+}
+</script>
+
+<style scoped>
+.submitted { margin-top: var(--pdx-space-md); }
+</style>

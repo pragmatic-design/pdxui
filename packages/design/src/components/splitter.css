@@ -1,0 +1,73 @@
+/* pdx-splitter — Resizable split pane layout */
+
+pdx-splitter { display: block; }
+
+.pdx-splitter {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.pdx-splitter-horizontal { flex-direction: row; }
+.pdx-splitter-vertical { flex-direction: column; }
+
+/* Pane */
+.pdx-splitter-pane {
+    overflow: auto;
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Handle / Gutter */
+.pdx-splitter-handle {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pdx-color-border);
+    transition: background 0.15s;
+    user-select: none;
+    touch-action: none;
+    z-index: 1;
+}
+.pdx-splitter-handle:hover,
+.pdx-splitter-handle-active {
+    background: var(--pdx-color-primary);
+}
+.pdx-splitter-handle:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-primary);
+    outline-offset: -1px;
+}
+
+/* Dot indicator on handle */
+.pdx-splitter-horizontal > .pdx-splitter-handle::after {
+    content: '';
+    width: 2px;
+    height: 20px;
+    border-radius: 1px;
+    background: rgba(128,128,128,0.5);
+}
+.pdx-splitter-vertical > .pdx-splitter-handle::after {
+    content: '';
+    width: 20px;
+    height: 2px;
+    border-radius: 1px;
+    background: rgba(128,128,128,0.5);
+}
+.pdx-splitter-handle:hover::after,
+.pdx-splitter-handle-active::after {
+    background: rgba(255,255,255,0.6);
+}
+
+/* Prevent text selection during drag */
+.pdx-splitter-dragging {
+    user-select: none;
+    cursor: col-resize;
+}
+.pdx-splitter-vertical.pdx-splitter-dragging {
+    cursor: row-resize;
+}
+.pdx-splitter-dragging .pdx-splitter-pane {
+    pointer-events: none;
+}

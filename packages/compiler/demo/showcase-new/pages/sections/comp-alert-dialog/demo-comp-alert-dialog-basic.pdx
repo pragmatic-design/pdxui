@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic Confirm</h2>
+    <pdx-button variant="outline" @click="openBasic">Delete Item</pdx-button>
+
+    <pdx-alert-dialog :open="basicOpen" title="Delete this item?" message="This action cannot be undone. The item will be permanently removed."
+        @pdx-confirm="onBasicConfirm" @pdx-cancel="onBasicCancel"></pdx-alert-dialog>
+  </section>
+</template>
+
+<script setup>
+let basicOpen = $signal(false);
+
+function openBasic() { basicOpen = true; }
+function onBasicConfirm() { basicOpen = false; }
+function onBasicCancel() { basicOpen = false; }
+</script>

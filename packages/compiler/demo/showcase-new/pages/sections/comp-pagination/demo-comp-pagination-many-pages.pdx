@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Many Pages (50)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Ellipsis appears for large ranges. Current page surrounded by neighbors.</p>
+    <div class="demo-row">
+      <pdx-pagination :total="500" :pageSize="10" :page="25"></pdx-pagination>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="500" :pageSize="10" :page="25"&gt;&lt;/pdx-pagination&gt;</code></pre>
+    </details>
+  </section>
+</template>

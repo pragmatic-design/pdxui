@@ -1,0 +1,83 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Real-world: Dashboard</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Combining row/col with other components for a realistic dashboard layout.</p>
+
+    <div class="demo-area comp">
+      <pdx-row gutter="md">
+        <pdx-col span="12" md="6" lg="3">
+          <div class="stat-card">
+            <span class="pdx-txt-caption pdx-ink-muted">Revenue</span>
+            <span class="pdx-txt-heading">$24,500</span>
+          </div>
+        </pdx-col>
+        <pdx-col span="12" md="6" lg="3">
+          <div class="stat-card">
+            <span class="pdx-txt-caption pdx-ink-muted">Orders</span>
+            <span class="pdx-txt-heading">1,240</span>
+          </div>
+        </pdx-col>
+        <pdx-col span="12" md="6" lg="3">
+          <div class="stat-card">
+            <span class="pdx-txt-caption pdx-ink-muted">Customers</span>
+            <span class="pdx-txt-heading">890</span>
+          </div>
+        </pdx-col>
+        <pdx-col span="12" md="6" lg="3">
+          <div class="stat-card">
+            <span class="pdx-txt-caption pdx-ink-muted">Growth</span>
+            <span class="pdx-txt-heading pdx-ink-success">+18%</span>
+          </div>
+        </pdx-col>
+      </pdx-row>
+
+      <pdx-row gutter="md" style="margin-top:var(--pdx-space-md)">
+        <pdx-col span="12" lg="8">
+          <div class="chart-card">
+            <span class="pdx-txt-label">Sales Chart</span>
+            <div class="chart-placeholder">Chart area (span 8 on desktop, 12 on mobile)</div>
+          </div>
+        </pdx-col>
+        <pdx-col span="12" lg="4">
+          <div class="chart-card">
+            <span class="pdx-txt-label">Top Products</span>
+            <div class="chart-placeholder sm">List area</div>
+          </div>
+        </pdx-col>
+      </pdx-row>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  /* Dashboard cards */
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-md);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
+  .chart-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-md);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
+  .chart-placeholder {
+    height: 200px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+  }
+  .chart-placeholder.sm { height: 120px; }
+</style>

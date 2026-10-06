@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Matches input sizing: xs, sm, md (default), lg, xl.</p>
+    <div class="demo-col">
+      <pdx-select label="Color" :options="colors" size="xs" placeholder="Extra small" />
+      <pdx-select label="Color" :options="colors" size="sm" placeholder="Small" />
+      <pdx-select label="Color" :options="colors" placeholder="Medium (default)" />
+      <pdx-select label="Color" :options="colors" size="lg" placeholder="Large" />
+      <pdx-select label="Color" :options="colors" size="xl" placeholder="Extra large" />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="colors" size="xs" placeholder="Extra small" /&gt;
+&lt;pdx-select :options="colors" size="sm" placeholder="Small" /&gt;
+&lt;pdx-select :options="colors" placeholder="Medium (default)" /&gt;
+&lt;pdx-select :options="colors" size="lg" placeholder="Large" /&gt;
+&lt;pdx-select :options="colors" size="xl" placeholder="Extra large" /&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan', 'Teal'];
+</script>

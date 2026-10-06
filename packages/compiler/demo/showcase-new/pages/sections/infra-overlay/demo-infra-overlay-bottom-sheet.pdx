@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h3>Bottom Sheet</h3>
+    <p class="desc">Mobile-optimized overlay. Draggable between detent points (50% / 100%). Swipe below threshold to dismiss.</p>
+    <div class="row">
+      <button class="pdx-primary" @click="openBottomSheet">Open Bottom Sheet</button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createBottomSheet } from '@pdxui/core';
+import { useOverlayDemo } from './state.pdx';
+
+// The stack section shows the log this writes (state.pdx.ts).
+const overlayDemo = useOverlayDemo();
+function log(msg) { overlayDemo.log(msg); }
+
+// ── Bottom Sheet ──
+let bsResult = null;
+function openBottomSheet() {
+    bsResult?.dispose();
+    const content = document.createElement('div');
+    content.style.cssText = 'padding:16px;font-family:system-ui';
+    content.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="margin:0">Bottom Sheet</h3><button id="bs-close" style="background:none;border:none;font-size:1.25rem;cursor:pointer;padding:4px 8px;color:#666;border-radius:4px" aria-label="Close">\u00d7</button></div><p style="color:#666;margin:0 0 12px">Drag the handle to resize. Swipe down past threshold to dismiss. Or tap \u00d7.</p><div style="display:flex;flex-direction:column;gap:8px"><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 1</div><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 2</div><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 3</div><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 4</div></div>';
+    bsResult = createBottomSheet(content, {
+        detents: [0.4, 0.8],
+        onDismiss: function() { log('Bottom sheet dismissed'); bsResult = null; },
+    });
+    content.querySelector('#bs-close').onclick = function() {
+        bsResult?.dispose();
+        log('Bottom sheet closed');
+        bsResult = null;
+    };
+    log('Bottom sheet opened (detents: 40%, 80%)');
+}
+</script>

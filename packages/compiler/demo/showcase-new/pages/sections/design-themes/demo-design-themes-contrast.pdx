@@ -1,0 +1,75 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Contrast is built in, not checked afterwards</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Every figure below is computed <strong>in this page, right now</strong>, by the same
+      <code>wcagContrast</code> the theme gate runs — reading the tokens of the theme you are
+      currently viewing. Change the theme in the header and the numbers change with it.
+    </p>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The rule: a coloured fill carries a <strong>white</strong> label, and when white cannot reach
+      WCAG AA (4.5:1) the <em>fill</em> is darkened until it can — the label is not swapped for a dark
+      one. <code>warning</code> is the single exception: a pale yellow no white will ever survive, so
+      it carries a dark label by design.
+    </p>
+
+    <div class="contrast-table">
+      <div class="ct-head">
+        <span>Fill token</span><span>Label token</span><span>Ratio</span><span>AA</span>
+      </div>
+      @for (contrast as row; track row.token) {
+        <div class="ct-row" data-contrast-row :data-token="row.token" :data-text-token="row.textToken" :data-ratio="row.ratio">
+          <span class="ct-chip" :style="'background: var(' + row.token + '); color: var(' + row.textToken + ')'">Label</span>
+          <code class="pdx-txt-mono ct-code">{{ row.token }}</code>
+          <code class="pdx-txt-mono ct-code">{{ row.textToken }}</code>
+          <span class="ct-ratio">{{ row.ratio }}:1</span>
+          <span :class="row.pass ? 'ct-verdict ok' : 'ct-verdict bad'">{{ row.pass ? 'AA' : 'fail' }}</span>
+        </div>
+      }
+    </div>
+    <p class="pdx-txt-caption pdx-ink-muted">
+      Computed with <code>wcagContrast(parseColorToken(fill), parseColorToken(label))</code> from
+      <code>@pdxui/design/engine</code> — the function <code>createTheme().validate()</code> and
+      <code>pdx theme --strict</code> use to fail a build.
+    </p>
+  </section>
+</template>
+
+<script setup>
+import { useThemeMeasure } from './state.pdx';
+
+// Measured by the page on mount and on every theme change (state.pdx.ts).
+const themeMeasure = useThemeMeasure();
+const contrast = $derived(themeMeasure.contrast());
+</script>
+
+<style scoped>
+.contrast-table {
+    margin-top: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+}
+.ct-head, .ct-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 1fr 90px 60px;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+}
+.ct-head {
+    grid-template-columns: 90px 1fr 1fr 90px 60px;
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+    font-size: 0.78rem;
+    color: var(--pdx-color-muted);
+}
+.ct-head span:first-child { visibility: hidden; }
+.ct-row + .ct-row { border-top: 1px solid var(--pdx-color-border); }
+.ct-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 4px 8px; border-radius: var(--pdx-radius-sm); font-size: 0.75rem;
+}
+.ct-code { font-size: 0.75rem; overflow-wrap: anywhere; }
+.ct-ratio { font-family: var(--pdx-font-mono); font-size: 0.82rem; }
+</style>

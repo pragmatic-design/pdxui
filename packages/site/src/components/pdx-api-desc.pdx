@@ -1,0 +1,29 @@
+<template>
+  <span class="pdx-api-desc" :ref="descRef"></span>
+</template>
+
+<script setup>
+// An API description with its inline code rendered as code. The manifest carries JSDoc text, where
+// `x` marks code; printed as text, the backticks would show. Built as nodes — a text node
+// per run, a <code> per span — so the text is never parsed as HTML.
+@prop text: string = '';
+import { effect } from '@pdxui/core';
+
+let descRef = $signal(null);
+
+effect(() => {
+  const _el = descRef;
+  if (!_el) return;
+  const _parts = String(text || '').split('`');
+  const _nodes = _parts.map((_p, _i) => {
+    // Odd parts sat between two backticks. A trailing unmatched one stays text, backtick and all.
+    if (_i % 2 === 1 && _i < _parts.length - 1) {
+      const _c = document.createElement('code');
+      _c.textContent = _p;
+      return _c;
+    }
+    return document.createTextNode(_i % 2 === 1 ? '`' + _p : _p);
+  });
+  _el.replaceChildren(..._nodes);
+});
+</script>

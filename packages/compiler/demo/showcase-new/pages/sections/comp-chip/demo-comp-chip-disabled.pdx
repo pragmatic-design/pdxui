@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <div class="demo-row">
+      <pdx-chip disabled>Disabled</pdx-chip>
+      <pdx-chip disabled removable>No Remove</pdx-chip>
+      <pdx-chip disabled selected>Selected</pdx-chip>
+      <pdx-chip disabled variant="primary">Primary</pdx-chip>
+    </div>
+  </section>
+</template>

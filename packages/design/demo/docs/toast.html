@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Toast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+    <script>
+        let toastId = 0;
+        function pdxShowToast(variant, position) {
+            const container = document.getElementById('toast-' + position) || document.getElementById('toast-top-right');
+            const titles = { success: 'Success', error: 'Error', warning: 'Warning', info: 'Info' };
+            const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+            const msgs = { success: 'Changes saved successfully.', error: 'Something went wrong.', warning: 'Please review before continuing.', info: 'New update available.' };
+
+            const id = 'toast-item-' + (++toastId);
+            const toast = document.createElement('div');
+            toast.id = id;
+            toast.className = 'pdx-toast pdx-toast-' + variant;
+            toast.innerHTML = `
+                <div class="pdx-toast-icon">${icons[variant]}</div>
+                <div class="pdx-toast-content">
+                    <div class="pdx-toast-title">${titles[variant]}</div>
+                    <div class="pdx-toast-message">${msgs[variant]}</div>
+                </div>
+                <button class="pdx-toast-close" onclick="pdxDismissToast('${id}')">&times;</button>
+                <div class="pdx-toast-progress"></div>
+            `;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.setAttribute('data-open', ''));
+
+            // Auto-dismiss after 5s
+            setTimeout(() => pdxDismissToast(id), 5000);
+        }
+
+        function pdxDismissToast(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.removeAttribute('data-open');
+            setTimeout(() => el.remove(), 300);
+        }
+    </script>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Toast</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Toast / Notification</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Screen-edge notifications. 4 variants, 6 positions, auto-dismiss with progress bar, stacking.</p>
+                    </pdx-stack>
+
+                    <!-- Variants -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Variants</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">4 semantic types. Click to spawn a toast in the top-right corner.</p>
+                        <pdx-row gap="sm" wrap>
+                            <button class="pdx-success" size="sm" onclick="pdxShowToast('success','top-right')">Success</button>
+                            <button class="pdx-danger" size="sm" onclick="pdxShowToast('error','top-right')">Error</button>
+                            <button class="pdx-warning" size="sm" onclick="pdxShowToast('warning','top-right')">Warning</button>
+                            <button class="pdx-info" size="sm" onclick="pdxShowToast('info','top-right')">Info</button>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Positions -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Positions</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">6 screen positions. Toasts stack vertically.</p>
+                        <pdx-grid cols="3" gap="sm">
+                            <button class="pdx-ghost" size="sm" onclick="pdxShowToast('info','top-left')">Top Left</button>
+                            <button class="pdx-ghost" size="sm" onclick="pdxShowToast('info','top-center')">Top Center</button>
+                            <button class="pdx-ghost" size="sm" onclick="pdxShowToast('info','top-right')">Top Right</button>
+                            <button class="pdx-ghost" size="sm" onclick="pdxShowToast('success','bottom-left')">Bottom Left</button>
+                            <button class="pdx-ghost" size="sm" onclick="pdxShowToast('success','bottom-center')">Bottom Center</button>
+                            <button class="pdx-ghost" size="sm" onclick="pdxShowToast('success','bottom-right')">Bottom Right</button>
+                        </pdx-grid>
+                    </pdx-stack>
+
+                    <!-- Stacking -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Stacking</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Multiple toasts stack with a gap. Click rapidly to see.</p>
+                        <button class="pdx-primary" size="sm" onclick="pdxShowToast('success','top-right');pdxShowToast('warning','top-right');pdxShowToast('error','top-right')">Spawn 3 toasts</button>
+                    </pdx-stack>
+
+                    <!-- Code -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Usage</h2>
+                        <div class="pdx-code pdx-code-plain">
+                            <pre class="pdx-code-body"><code><span class="pdx-code-line">&lt;div class="pdx-toast-container" position="top-right"&gt;</span><span class="pdx-code-line">  &lt;div class="pdx-toast pdx-toast-success" data-open&gt;</span><span class="pdx-code-line">    &lt;div class="pdx-toast-icon"&gt;✓&lt;/div&gt;</span><span class="pdx-code-line">    &lt;div class="pdx-toast-content"&gt;</span><span class="pdx-code-line">      &lt;div class="pdx-toast-title"&gt;Saved&lt;/div&gt;</span><span class="pdx-code-line">      &lt;div class="pdx-toast-message"&gt;Changes saved.&lt;/div&gt;</span><span class="pdx-code-line">    &lt;/div&gt;</span><span class="pdx-code-line">    &lt;button class="pdx-toast-close"&gt;&amp;times;&lt;/button&gt;</span><span class="pdx-code-line">    &lt;div class="pdx-toast-progress"&gt;&lt;/div&gt;</span><span class="pdx-code-line">  &lt;/div&gt;</span><span class="pdx-code-line">&lt;/div&gt;</span></code></pre>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+
+    <!-- Toast containers for each position -->
+    <div id="toast-top-right" class="pdx-toast-container" position="top-right"></div>
+    <div id="toast-top-left" class="pdx-toast-container" position="top-left"></div>
+    <div id="toast-top-center" class="pdx-toast-container" position="top-center"></div>
+    <div id="toast-bottom-right" class="pdx-toast-container" position="bottom-right"></div>
+    <div id="toast-bottom-left" class="pdx-toast-container" position="bottom-left"></div>
+    <div id="toast-bottom-center" class="pdx-toast-container" position="bottom-center"></div>
+
+    <script src="docs.js"></script>
+</body>
+</html>

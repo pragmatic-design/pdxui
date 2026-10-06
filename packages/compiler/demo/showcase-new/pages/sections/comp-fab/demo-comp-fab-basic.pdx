@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic FAB</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Single action. Click fires <code>pdx-click</code>.</p>
+    <div class="demo-frame" style="width:200px;height:160px">
+      <pdx-fab icon="plus" label="Add new" position="bottom-right" @pdx-click="onFabClick"></pdx-fab>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="fab-log">{{ fabLog }}</div>
+  </section>
+</template>
+
+<script setup>
+let fabLog = $signal('Click the FAB...');
+
+function onFabClick() {
+  fabLog = 'pdx-click fired!';
+}
+</script>

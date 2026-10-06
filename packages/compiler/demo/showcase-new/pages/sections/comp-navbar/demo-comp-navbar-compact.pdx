@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact (48px)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Denser toolbar for internal tools.</p>
+    <div class="demo-full">
+      <pdx-navbar brand="DevTools" brandicon="terminal" label="Developer tools" :items="simpleNav" compact>
+        <button class="pdx-navbar-icon-btn" aria-label="Settings"><pdx-icon name="settings" size="16"></pdx-icon></button>
+      </pdx-navbar>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-navbar brand="DevTools" brandicon="terminal" :items="simpleNav" compact&gt;
+  &lt;button class="pdx-navbar-icon-btn" aria-label="Settings"&gt;
+    &lt;pdx-icon name="settings" size="16"&gt;&lt;/pdx-icon&gt;
+  &lt;/button&gt;
+&lt;/pdx-navbar&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const simpleNav = [
+  { key: 'console', label: 'Console', active: true },
+  { key: 'sources', label: 'Sources' },
+  { key: 'network', label: 'Network' },
+  { key: 'perf', label: 'Performance' },
+];
+</script>

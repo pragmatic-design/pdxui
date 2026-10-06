@@ -1,0 +1,221 @@
+<template>
+  <div class="demo">
+    <h2>Overlay System</h2>
+    <p class="desc">Z-stack LIFO, portal, backdrop, Escape dismiss, body scroll lock.</p>
+
+    <section>
+      <h3>Stack Management</h3>
+      <p class="desc">Push creates a visible overlay. Escape closes the top one. Modal blocks scrolling.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="pushTooltip">Push Tooltip</button>
+        <button class="pdx-primary" @click="pushDialog">Push Dialog (modal)</button>
+      </div>
+      <div class="row">
+        <button class="pdx-secondary" @click="popTopTooltip">Pop Tooltip</button>
+        <button class="pdx-secondary" @click="popTopDialog">Pop Dialog</button>
+        <button class="pdx-ghost" @click="popAllTooltips">Pop All Tooltips</button>
+        <button class="pdx-ghost" @click="popAllDialogs">Pop All Dialogs</button>
+        <button class="pdx-ghost" @click="popAll">Pop All</button>
+      </div>
+      <div class="stats">
+        <span>Count: <strong>{{ count }}</strong></span>
+        <span>Modal: <strong>{{ modals }}</strong></span>
+        <span>Top: <strong>{{ topName }}</strong></span>
+      </div>
+      <pre class="log">{{ logText }}</pre>
+    </section>
+
+    <section>
+      <h3>Portal</h3>
+      <p class="desc">Render content into document.body. Click to create/remove.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="showPortal">Create Portal</button>
+        <button class="pdx-danger" @click="hidePortal">Remove Portal</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Backdrop</h3>
+      <p class="desc">Dark overlay. Click backdrop to dismiss. Blur variant adds glassmorphism.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="showBdPlain">Backdrop</button>
+        <button class="pdx-primary" @click="showBdBlur">Backdrop + Blur</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Bottom Sheet</h3>
+      <p class="desc">Mobile-optimized overlay. Draggable between detent points (50% / 100%). Swipe below threshold to dismiss.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="openBottomSheet">Open Bottom Sheet</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Nested Overlays</h3>
+      <p class="desc">Opens dialog (modal) then tooltip on top. Escape closes topmost only.</p>
+      <button class="pdx-primary" @click="openNested">Open Nested Demo</button>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { overlayStack, createPortal, createBackdrop, createBottomSheet, effect, onMount, onDestroy } from '@pdxui/core';
+
+let count = $signal(0);
+let modals = $signal(0);
+let topName = $signal('none');
+let logText = $signal('');
+let counter = 0;
+
+onMount(() => {
+    const d1 = effect(() => { count = overlayStack.count(); });
+    const d2 = effect(() => { modals = overlayStack.modalCount(); });
+    const d3 = effect(() => {
+        // Read the stack reactively
+        const c = overlayStack.count();
+        topName = overlayStack.top() ?? 'none';
+    });
+    onDestroy(() => { d1(); d2(); d3(); });
+});
+
+function log(msg) { logText = logText + msg + '\n'; }
+
+// ── Visible overlay elements ──
+const overlayEls = new Map();
+
+function createVisibleOverlay(id, isModal) {
+    const zIndex = overlayStack.push(id, { modal: isModal });
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;' + (isModal ? 'top:50%;left:50%;transform:translate(-50%,-50%)' : 'top:16px;right:16px') + ';z-index:' + zIndex + ';background:' + (isModal ? 'white' : '#1d1d2e') + ';color:' + (isModal ? '#1d1d2e' : 'white') + ';padding:16px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.2);min-width:200px;font-family:system-ui';
+    el.innerHTML = '<strong>' + id + '</strong><br><small>' + (isModal ? 'Modal — locks scroll' : 'Non-modal') + '</small><br><button style="margin-top:8px;padding:4px 12px;border:1px solid #ccc;border-radius:4px;cursor:pointer">Close</button>';
+    el.querySelector('button').onclick = function() { removeOverlay(id); };
+    document.body.appendChild(el);
+    overlayEls.set(id, el);
+    overlayStack.onDismissTop(function() { removeOverlay(id); });
+    return el;
+}
+
+function removeOverlay(id) {
+    const el = overlayEls.get(id);
+    if (el) { el.remove(); overlayEls.delete(id); }
+    overlayStack.pop(id);
+    log('Closed ' + id);
+}
+
+function pushTooltip() {
+    const id = 'tooltip-' + (++counter);
+    createVisibleOverlay(id, false);
+    log('Pushed ' + id);
+}
+
+function pushDialog() {
+    const id = 'dialog-' + (++counter);
+    createVisibleOverlay(id, true);
+    log('Pushed ' + id + ' (modal)');
+}
+
+function popTopTooltip() {
+    for (const [id] of [...overlayEls].reverse()) {
+        if (id.startsWith('tooltip-')) { removeOverlay(id); return; }
+    }
+}
+
+function popTopDialog() {
+    for (const [id] of [...overlayEls].reverse()) {
+        if (id.startsWith('dialog-')) { removeOverlay(id); return; }
+    }
+}
+
+function popAllTooltips() {
+    for (const [id] of [...overlayEls]) {
+        if (id.startsWith('tooltip-')) removeOverlay(id);
+    }
+}
+
+function popAllDialogs() {
+    for (const [id] of [...overlayEls]) {
+        if (id.startsWith('dialog-')) removeOverlay(id);
+    }
+}
+
+function popAll() {
+    while (overlayStack.top()) {
+        removeOverlay(overlayStack.top());
+    }
+}
+
+// ── Portal ──
+let portalDispose = null;
+function showPortal() {
+    portalDispose?.();
+    const content = document.createElement('div');
+    content.style.cssText = 'position:fixed;bottom:16px;right:16px;padding:16px;background:white;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.15);z-index:9999;font-family:system-ui';
+    content.innerHTML = '<strong>Portaled!</strong><br><small>I live in document.body</small>';
+    const result = createPortal(content);
+    portalDispose = result.dispose;
+}
+function hidePortal() { portalDispose?.(); portalDispose = null; }
+
+// ── Backdrop ──
+let bdDispose = null;
+function showBdPlain() { showBd(false); }
+function showBdBlur() { showBd(true); }
+function showBd(blur) {
+    bdDispose?.();
+    const result = createBackdrop({ blur: blur, zIndex: 900, onClick: function() { result.dispose(); bdDispose = null; } });
+    bdDispose = result.dispose;
+}
+
+// ── Bottom Sheet ──
+let bsResult = null;
+function openBottomSheet() {
+    bsResult?.dispose();
+    const content = document.createElement('div');
+    content.style.cssText = 'padding:16px;font-family:system-ui';
+    content.innerHTML = '<h3 style="margin:0 0 8px">Bottom Sheet</h3><p style="color:#666;margin:0 0 12px">Drag the handle to resize. Swipe down past 50% to dismiss.</p><div style="display:flex;flex-direction:column;gap:8px"><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 1</div><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 2</div><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 3</div><div style="padding:12px;background:#f5f5f7;border-radius:8px">Item 4</div></div>';
+    bsResult = createBottomSheet(content, {
+        detents: [0.4, 0.8],
+        onDismiss: function() { log('Bottom sheet dismissed'); bsResult = null; },
+    });
+    log('Bottom sheet opened (detents: 40%, 80%)');
+}
+
+// ── Nested ──
+function openNested() {
+    const dlgId = 'dialog-' + (++counter);
+    const dlgZ = overlayStack.push(dlgId, { modal: true });
+
+    const bdResult = createBackdrop({ blur: true, zIndex: dlgZ - 1 });
+    const dlg = document.createElement('div');
+    dlg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:' + dlgZ + ';background:white;padding:24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.2);min-width:340px;font-family:system-ui';
+    dlg.innerHTML = '<h3 style="margin:0 0 8px">' + dlgId + '</h3><p style="color:#666;margin:0 0 12px">Press Escape or click buttons.</p><button id="tt-btn" style="padding:6px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer;margin-right:8px">Open Tooltip</button><button id="close-btn" style="padding:6px 16px;border:1px solid #ccc;border-radius:6px;cursor:pointer">Close</button>';
+    document.body.appendChild(dlg);
+
+    function closeDlg() { dlg.remove(); bdResult.dispose(); overlayStack.pop(dlgId); log('Closed ' + dlgId); }
+    overlayStack.onDismissTop(closeDlg);
+    dlg.querySelector('#close-btn').onclick = closeDlg;
+
+    dlg.querySelector('#tt-btn').onclick = function() {
+        const ttId = 'tooltip-' + (++counter);
+        const ttZ = overlayStack.push(ttId);
+        const tt = document.createElement('div');
+        tt.style.cssText = 'position:fixed;top:30%;right:15%;z-index:' + ttZ + ';background:#1d1d2e;color:white;padding:12px 20px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-family:system-ui';
+        tt.textContent = ttId + ' — Escape closes me first';
+        document.body.appendChild(tt);
+        overlayStack.onDismissTop(function() { tt.remove(); overlayStack.pop(ttId); log('Closed ' + ttId); });
+    };
+    log('Opened ' + dlgId + ' (modal, z=' + dlgZ + ')');
+}
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .stats { display: flex; gap: 20px; font-size: 0.9rem; }
+  .log { font-family: monospace; font-size: 0.75rem; background: #f5f5f7; padding: 8px; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; margin: 8px 0 0; min-height: 30px; }
+</style>

@@ -1,0 +1,9 @@
+# Keep host artefacts (native Windows binaries, builds) out of the Docker context.
+# Dependencies are reinstalled Linux-native inside the image.
+**/node_modules
+**/dist
+**/.vite
+**/test-results
+**/playwright-report
+**/__screenshots__
+.git

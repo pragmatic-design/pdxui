@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+
+    <div class="demo-block">
+      <pdx-fieldset legend="Disabled Section" disabled>
+        <pdx-form-field label="Name">
+          <pdx-input placeholder="Cannot edit"></pdx-input>
+        </pdx-form-field>
+      </pdx-fieldset>
+    </div>
+  </section>
+</template>

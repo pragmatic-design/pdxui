@@ -1,0 +1,103 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Bottom Sheet</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Draggable sheet from the bottom edge with snap points (detents). Gesture-driven: drag the handle to resize,
+      swipe down to dismiss. Focus trap, Escape close, backdrop click. Mobile-first with desktop max-width.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-bottom-sheet-basic class="demo-section"></pdx-demo-comp-bottom-sheet-basic>
+
+    <!-- ═══ Three Detents ═══ -->
+    <pdx-demo-comp-bottom-sheet-detents class="demo-section"></pdx-demo-comp-bottom-sheet-detents>
+
+    <!-- ═══ Scrollable Content ═══ -->
+    <pdx-demo-comp-bottom-sheet-scrollable class="demo-section"></pdx-demo-comp-bottom-sheet-scrollable>
+
+    <!-- ═══ With Close Button ═══ -->
+    <pdx-demo-comp-bottom-sheet-close-button class="demo-section"></pdx-demo-comp-bottom-sheet-close-button>
+
+    <!-- ═══ No Handle ═══ -->
+    <pdx-demo-comp-bottom-sheet-no-handle class="demo-section"></pdx-demo-comp-bottom-sheet-no-handle>
+
+    <!-- ═══ Action Sheet ═══ -->
+    <pdx-demo-comp-bottom-sheet-action-sheet class="demo-section"></pdx-demo-comp-bottom-sheet-action-sheet>
+
+    <!-- ═══ Nested with Dialog ═══ -->
+    <pdx-demo-comp-bottom-sheet-stacking class="demo-section"></pdx-demo-comp-bottom-sheet-stacking>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Props Reference</h2>
+      <div class="pdx-table-responsive">
+        <table class="pdx-table">
+          <thead>
+            <tr>
+              <th>Prop</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Open/close state (two-way bindable)</td></tr>
+            <tr><td><code>detents</code></td><td>Number[]</td><td>[0.4, 0.85]</td><td>Snap points as viewport height fractions (0-1)</td></tr>
+            <tr><td><code>initialDetent</code></td><td>Number</td><td>0</td><td>Index of initial detent on open</td></tr>
+            <tr><td><code>backdrop</code></td><td>Boolean</td><td>true</td><td>Show backdrop overlay</td></tr>
+            <tr><td><code>closeOnBackdrop</code></td><td>Boolean</td><td>true</td><td>Close when backdrop is clicked</td></tr>
+            <tr><td><code>closeOnEscape</code></td><td>Boolean</td><td>true</td><td>Close on Escape key (via overlayStack)</td></tr>
+            <tr><td><code>closeOnSwipeDown</code></td><td>Boolean</td><td>true</td><td>Close when swiped below minimum detent</td></tr>
+            <tr><td><code>showHandle</code></td><td>Boolean</td><td>true</td><td>Show the drag handle bar</td></tr>
+            <tr><td><code>showClose</code></td><td>Boolean</td><td>false</td><td>Show close button in header</td></tr>
+            <tr><td><code>label</code></td><td>String</td><td>''</td><td>Accessible label (aria-label)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import '@pdxui/ui/button';
+import '@pdxui/ui/bottom-sheet';
+import '@pdxui/ui/dialog';
+import '@pdxui/ui/form-field';
+import '@pdxui/ui/input';
+
+@page '/components/bottom-sheet'
+@title 'Bottom Sheet'
+</script>
+
+<style>
+.page { max-width: 800px; margin: 0 auto; padding: var(--pdx-space-lg); }
+.intro { margin-bottom: var(--pdx-space-xl); }
+section { margin-bottom: var(--pdx-space-2xl); }
+h2 { margin-bottom: var(--pdx-space-sm); }
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-sm); }
+
+.action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    background: none;
+    border: none;
+    font: inherit;
+    color: var(--pdx-color-text);
+    cursor: pointer;
+    border-radius: var(--pdx-radius-sm);
+    transition: background var(--pdx-duration-fast);
+}
+.action-item:hover {
+    background: var(--pdx-color-inset);
+}
+.action-item.danger {
+    color: var(--pdx-color-danger-ink);
+}
+</style>

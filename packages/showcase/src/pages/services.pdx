@@ -1,0 +1,159 @@
+<template>
+  <section class="page" data-test="services">
+    <!-- The list's header, the tickets': views of this list's own. -->
+    <pdx-list-header
+      :title="$t('services.title')"
+      store-key="services"
+      :default-name="$t('services.views.default')"
+      :grid="gridEl"
+      :source="source"
+      :base-page-size="20">
+      <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('services.matching', { count: total }) }}</span>
+      <pdx-button variant="primary" @click="openCreate" data-test="new">{{ $t('services.new') }}</pdx-button>
+    </pdx-list-header>
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('services.intro') }}</p>
+
+    <!-- A row is the way into the service. No selection and no bulk bar: a service is withdrawn from
+         its Details, never deleted. -->
+    <pdx-data-grid
+      :ref="gridEl"
+      :source="source"
+      :columns="columns"
+      :page-sizes="[10, 20, 50]"
+      show-toolbar
+      search
+      row-clickable
+      @pdx-row-click="e => openRecord(e.detail.row)"
+      data-test="grid"></pdx-data-grid>
+
+    <!-- NEW, in a modal: its terms, then the service opens. -->
+    <pdx-dialog :open="createOpen" size="lg" :title="$t('services.new')" @pdx-close="createOpen = false" data-test="create-dialog">
+      <pdx-form :form="draft" @pdx-submit="onCreate" data-test="create-form">
+        <div class="grid">
+          <pdx-form-field name="code" :label="$t('services.fields.code')">
+            <pdx-input name="code" data-test="new-code"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="name" :label="$t('services.fields.name')">
+            <pdx-input name="name" data-test="new-name"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field class="wide" name="description" :label="$t('services.fields.description')">
+            <pdx-textarea name="description" rows="2" data-test="new-description"></pdx-textarea>
+          </pdx-form-field>
+          <pdx-form-field name="slaHours" :label="$t('services.fields.slaHours')">
+            <pdx-number-input name="slaHours" min="1" data-test="new-slaHours"></pdx-number-input>
+          </pdx-form-field>
+          <pdx-form-field name="resolveHours" :label="$t('services.fields.resolveHours')">
+            <pdx-number-input name="resolveHours" min="1" data-test="new-resolveHours"></pdx-number-input>
+          </pdx-form-field>
+          <pdx-form-field name="price" :label="$t('services.fields.price')">
+            <pdx-number-input name="price" min="0" data-test="new-price"></pdx-number-input>
+          </pdx-form-field>
+          <pdx-form-field name="covers" :label="$t('services.fields.covers')">
+            <pdx-select name="covers" multiple :options="kinds" data-test="new-covers"></pdx-select>
+          </pdx-form-field>
+          <pdx-form-field name="active" :label="$t('services.fields.active')">
+            <pdx-switch name="active" data-test="new-active"></pdx-switch>
+          </pdx-form-field>
+        </div>
+        <div class="actions">
+          <pdx-button variant="ghost" @click="createOpen = false" data-test="cancel">{{ $t('services.cancel') }}</pdx-button>
+          <pdx-button type="submit" variant="primary" data-test="create">{{ $t('services.create') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </pdx-dialog>
+  </section>
+</template>
+
+<script setup>
+// A dictionary key, for the reason in `customers.pdx`: an ancestor of `/services/:id`.
+@page '/services' { label: $t('services.title') };
+@title $t('services.title');
+@scroll 'preserve';
+
+import { createDataSource, actions, badge } from '@pdxui/core';
+import { navigate } from '@pdxui/router';
+import { serviceTransport } from '../data/services';
+import { ASSET_KINDS } from '../data/asset-seed';
+
+const source = createDataSource({ transport: serviceTransport, pageSize: 20 });
+
+const STATE_TONES = { true: 'success', false: 'muted' };
+
+const columns = $derived([
+    { field: 'code', header: $t('services.columns.code'), width: 120, searchable: true },
+    { field: 'name', header: $t('services.columns.name'), searchable: true },
+    // Hours are what an SLA is written in: «4 h», not «4».
+    { field: 'slaHours', header: $t('services.columns.slaHours'), width: 120,
+      format: (v) => $t('services.hours', { hours: Number(v) }) },
+    { field: 'resolveHours', header: $t('services.columns.resolveHours'), width: 130,
+      format: (v) => $t('services.hours', { hours: Number(v) }) },
+    // Money in the page's locale: «€120.00» in English, «120,00 €» in Italian.
+    { field: 'price', header: $t('services.columns.price'), width: 130,
+      format: (v) => $n(Number(v), { style: 'currency', currency: 'EUR' }) },
+    // Counted by the server as it answers (`services.ts`): not an order a sort can keep.
+    { field: 'customers', header: $t('services.columns.customers'), width: 120, sortable: false },
+    { field: 'active', header: $t('services.columns.active'), width: 130,
+      format: (v) => $t('services.states.' + (v ? 'active' : 'inactive')), cell: badge({ tones: STATE_TONES }), quickFilter: true,
+      filterOptions: [{ value: 'true', label: $t('services.states.active') }, { value: 'false', label: $t('services.states.inactive') }] },
+    { field: 'id', header: '', width: 56, sortable: false,
+      cell: actions([{ icon: 'eye', label: (row) => $t('services.openRecord', { name: String(row.name) }),
+                       onClick: (row) => openRecord(row) }]) },
+]);
+
+const total = $derived(source.total());
+/** The grid, for the list header's views. A `:ref` binds into a SIGNAL. */
+let gridEl = $signal(null);
+
+function openRecord(row) {
+  navigate(`/services/${row.id}`);
+}
+
+// ── New ─────────────────────────────────────────────────────────────────────────
+const kinds = $derived(ASSET_KINDS.map(k => ({ value: k, label: $t('assets.kinds.' + k) })));
+
+@form draft: {
+  code: string { required },
+  name: string { required },
+  description: string,
+  slaHours: number,
+  resolveHours: number,
+  price: number,
+  covers: string[],
+  active: boolean
+} {
+  validate: draftRule
+};
+
+/** The detail's rules, the same words (`service.pdx`). */
+function draftRule(v) {
+  const errors: Record<string, string> = {};
+  if (!(Number(v.slaHours) > 0)) errors.slaHours = $t('services.hoursPositive');
+  if (!(Number(v.resolveHours) > 0)) errors.resolveHours = $t('services.hoursPositive');
+  else if (Number(v.resolveHours) < Number(v.slaHours)) errors.resolveHours = $t('services.resolveBeforeAnswer');
+  return errors;
+}
+
+let createOpen = $signal(false);
+
+function openCreate() {
+  draft.reset({ code: '', name: '', description: '', slaHours: 8, resolveHours: 24, price: 0, covers: [], active: true });
+  createOpen = true;
+}
+
+async function onCreate(e) {
+  const v = e.detail.values;
+  const created = await serviceTransport.create({
+    ...v, slaHours: Number(v.slaHours), resolveHours: Number(v.resolveHours), price: Number(v.price),
+  });
+  createOpen = false;
+  navigate(`/services/${created.id}`);
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pdx-space-md); }
+  .grid .wide { grid-column: 1 / -1; }
+  .actions { display: flex; justify-content: flex-end; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-lg); }
+  @media (max-width: 640px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+</style>

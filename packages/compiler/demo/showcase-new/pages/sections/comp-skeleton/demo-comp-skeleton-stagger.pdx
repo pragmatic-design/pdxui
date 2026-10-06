@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Stagger Timing</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>--pdx-skeleton-delay</code> CSS variable for stagger effect across multiple items.</p>
+    <div class="demo-col" style="max-width:400px">
+      <div class="pdx-skeleton pdx-skeleton-text" style="--pdx-skeleton-delay:0s"></div>
+      <div class="pdx-skeleton pdx-skeleton-text" style="--pdx-skeleton-delay:0.1s;width:90%"></div>
+      <div class="pdx-skeleton pdx-skeleton-text" style="--pdx-skeleton-delay:0.2s;width:70%"></div>
+      <div class="pdx-skeleton pdx-skeleton-text" style="--pdx-skeleton-delay:0.3s;width:85%"></div>
+    </div>
+  </section>
+</template>

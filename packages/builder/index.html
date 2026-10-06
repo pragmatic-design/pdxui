@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX UI Theme Builder</title>
+    <!-- Without this the browser falls back to requesting /favicon.ico, which
+         does not exist and logs a 404 on every page load. The file ships from
+         deploy/, so it survives the public/ wipe on each build. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <pdx-builder-app></pdx-builder-app>
+    <script type="module">
+        import '@pdxui/design';
+        // The identity, shared with pdxui.com — one definition of the lockup and the gold.
+        import '../../brand/brand.css';
+        import './src/builder-app.pdx';
+    </script>
+</body>
+</html>

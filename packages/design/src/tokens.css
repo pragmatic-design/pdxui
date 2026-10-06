@@ -1,0 +1,551 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Tokens
+   All --pdx-* custom properties. Foundation of the design system.
+   ========================================================================== */
+
+/* The theme's tokens, on the page root AND on every element with its own `pdx-theme`.
+   A custom property inherits its COMPUTED value: declared on :root only, a derived token —
+   `--pdx-color-text: light-dark(var(--pdx-gray-900), …)`, a ramp on a hue anchor, a shadow on the
+   shadow colour, the spacing on the density — would be resolved once with the page theme's primitives,
+   and a nested theme would inherit it: under a nested corporate the text would stay cupertino's. Declared here
+   too, each nested theme root recomputes them from its own theme; the theme blocks, in the later
+   pdx.themes layer, still win. A token a theme leaves out comes back to the default here, so a nested
+   theme computes as it does alone. What is the page's rather than a theme's is in the :root block
+   below. */
+:root, [pdx-theme] {
+
+    /* ======================================================================
+       A. Primitive Colors (oklch neutral scale + hue anchors)
+       Themes override hue anchors and gray tint.
+       ====================================================================== */
+
+    /* Neutral grays — near-zero chroma for a truly vanilla default.
+       Themes inject personality via their own gray overrides. */
+    --pdx-gray-50:  oklch(0.985 0.001 260);
+    --pdx-gray-100: oklch(0.965 0.002 260);
+    --pdx-gray-200: oklch(0.905 0.004 260);
+    --pdx-gray-300: oklch(0.82  0.006 260);
+    --pdx-gray-400: oklch(0.68  0.006 260);
+    --pdx-gray-500: oklch(0.55  0.006 260);
+    --pdx-gray-600: oklch(0.44  0.006 260);
+    --pdx-gray-700: oklch(0.35  0.006 260);
+    --pdx-gray-800: oklch(0.25  0.005 260);
+    --pdx-gray-900: oklch(0.18  0.004 260);
+    --pdx-gray-950: oklch(0.13  0.003 260);
+
+    --pdx-hue-primary:   260;
+    --pdx-hue-secondary: 30;
+    --pdx-hue-accent:    170;
+    --pdx-hue-danger:    25;
+    --pdx-hue-warning:   85;
+    --pdx-hue-success:   155;
+    --pdx-hue-info:      220;
+
+    /* --- Color Shade Ramps (OKLCH lightness scale, constant hue+chroma) --- */
+
+    /* Primary ramp — uses var(--pdx-hue-primary) so themes adapt automatically */
+    --pdx-primary-50:  oklch(0.97 0.03 var(--pdx-hue-primary));
+    --pdx-primary-100: oklch(0.93 0.06 var(--pdx-hue-primary));
+    --pdx-primary-200: oklch(0.86 0.10 var(--pdx-hue-primary));
+    --pdx-primary-300: oklch(0.76 0.14 var(--pdx-hue-primary));
+    --pdx-primary-400: oklch(0.65 0.17 var(--pdx-hue-primary));
+    --pdx-primary-500: oklch(0.55 0.18 var(--pdx-hue-primary));
+    --pdx-primary-600: oklch(0.48 0.20 var(--pdx-hue-primary));
+    --pdx-primary-700: oklch(0.40 0.18 var(--pdx-hue-primary));
+    --pdx-primary-800: oklch(0.32 0.14 var(--pdx-hue-primary));
+    --pdx-primary-900: oklch(0.22 0.10 var(--pdx-hue-primary));
+
+    /* Secondary ramp (inverse brand) */
+    --pdx-secondary-50:  oklch(0.97 0.03 var(--pdx-hue-secondary));
+    --pdx-secondary-100: oklch(0.93 0.06 var(--pdx-hue-secondary));
+    --pdx-secondary-200: oklch(0.86 0.10 var(--pdx-hue-secondary));
+    --pdx-secondary-300: oklch(0.76 0.14 var(--pdx-hue-secondary));
+    --pdx-secondary-400: oklch(0.65 0.17 var(--pdx-hue-secondary));
+    --pdx-secondary-500: oklch(0.55 0.18 var(--pdx-hue-secondary));
+    --pdx-secondary-600: oklch(0.48 0.20 var(--pdx-hue-secondary));
+    --pdx-secondary-700: oklch(0.40 0.18 var(--pdx-hue-secondary));
+    --pdx-secondary-800: oklch(0.32 0.14 var(--pdx-hue-secondary));
+    --pdx-secondary-900: oklch(0.22 0.10 var(--pdx-hue-secondary));
+
+    /* Accent ramp */
+    --pdx-accent-50:  oklch(0.97 0.02 var(--pdx-hue-accent));
+    --pdx-accent-100: oklch(0.93 0.04 var(--pdx-hue-accent));
+    --pdx-accent-200: oklch(0.86 0.07 var(--pdx-hue-accent));
+    --pdx-accent-300: oklch(0.76 0.10 var(--pdx-hue-accent));
+    --pdx-accent-400: oklch(0.65 0.12 var(--pdx-hue-accent));
+    --pdx-accent-500: oklch(0.55 0.12 var(--pdx-hue-accent));
+    --pdx-accent-600: oklch(0.48 0.14 var(--pdx-hue-accent));
+    --pdx-accent-700: oklch(0.40 0.12 var(--pdx-hue-accent));
+    --pdx-accent-800: oklch(0.32 0.10 var(--pdx-hue-accent));
+    --pdx-accent-900: oklch(0.22 0.07 var(--pdx-hue-accent));
+
+    /* Danger ramp */
+    --pdx-danger-50:  oklch(0.97 0.03 var(--pdx-hue-danger));
+    --pdx-danger-100: oklch(0.93 0.06 var(--pdx-hue-danger));
+    --pdx-danger-200: oklch(0.86 0.10 var(--pdx-hue-danger));
+    --pdx-danger-300: oklch(0.76 0.15 var(--pdx-hue-danger));
+    --pdx-danger-400: oklch(0.65 0.18 var(--pdx-hue-danger));
+    --pdx-danger-500: oklch(0.55 0.20 var(--pdx-hue-danger));
+    --pdx-danger-600: oklch(0.48 0.22 var(--pdx-hue-danger));
+    --pdx-danger-700: oklch(0.40 0.20 var(--pdx-hue-danger));
+    --pdx-danger-800: oklch(0.32 0.16 var(--pdx-hue-danger));
+    --pdx-danger-900: oklch(0.22 0.10 var(--pdx-hue-danger));
+
+    /* Warning ramp */
+    --pdx-warning-50:  oklch(0.97 0.03 var(--pdx-hue-warning));
+    --pdx-warning-100: oklch(0.93 0.06 var(--pdx-hue-warning));
+    --pdx-warning-200: oklch(0.88 0.10 var(--pdx-hue-warning));
+    --pdx-warning-300: oklch(0.82 0.13 var(--pdx-hue-warning));
+    --pdx-warning-400: oklch(0.78 0.15 var(--pdx-hue-warning));
+    --pdx-warning-500: oklch(0.75 0.15 var(--pdx-hue-warning));
+    --pdx-warning-600: oklch(0.62 0.14 var(--pdx-hue-warning));
+    --pdx-warning-700: oklch(0.50 0.12 var(--pdx-hue-warning));
+    --pdx-warning-800: oklch(0.38 0.10 var(--pdx-hue-warning));
+    --pdx-warning-900: oklch(0.25 0.07 var(--pdx-hue-warning));
+
+    /* Success ramp */
+    --pdx-success-50:  oklch(0.97 0.03 var(--pdx-hue-success));
+    --pdx-success-100: oklch(0.93 0.05 var(--pdx-hue-success));
+    --pdx-success-200: oklch(0.86 0.08 var(--pdx-hue-success));
+    --pdx-success-300: oklch(0.76 0.12 var(--pdx-hue-success));
+    --pdx-success-400: oklch(0.65 0.15 var(--pdx-hue-success));
+    --pdx-success-500: oklch(0.55 0.18 var(--pdx-hue-success));
+    --pdx-success-600: oklch(0.48 0.18 var(--pdx-hue-success));
+    --pdx-success-700: oklch(0.40 0.15 var(--pdx-hue-success));
+    --pdx-success-800: oklch(0.32 0.12 var(--pdx-hue-success));
+    --pdx-success-900: oklch(0.22 0.08 var(--pdx-hue-success));
+
+    /* Info ramp */
+    --pdx-info-50:  oklch(0.97 0.02 var(--pdx-hue-info));
+    --pdx-info-100: oklch(0.93 0.05 var(--pdx-hue-info));
+    --pdx-info-200: oklch(0.86 0.08 var(--pdx-hue-info));
+    --pdx-info-300: oklch(0.76 0.12 var(--pdx-hue-info));
+    --pdx-info-400: oklch(0.65 0.15 var(--pdx-hue-info));
+    --pdx-info-500: oklch(0.55 0.16 var(--pdx-hue-info));
+    --pdx-info-600: oklch(0.48 0.18 var(--pdx-hue-info));
+    --pdx-info-700: oklch(0.40 0.15 var(--pdx-hue-info));
+    --pdx-info-800: oklch(0.32 0.12 var(--pdx-hue-info));
+    --pdx-info-900: oklch(0.22 0.08 var(--pdx-hue-info));
+
+    /* ======================================================================
+       B. Semantic Colors (light-dark for automatic dark mode)
+       ====================================================================== */
+
+    /* Surfaces */
+    --pdx-color-bg:         light-dark(var(--pdx-gray-50),  var(--pdx-gray-950));
+    --pdx-color-surface:    light-dark(white,               var(--pdx-gray-900));
+    --pdx-color-inset:      light-dark(var(--pdx-gray-100), var(--pdx-gray-800));
+    --pdx-color-overlay:    light-dark(white,               var(--pdx-gray-800));
+    /* Backdrop — the dimmed page behind a dialog, drawer, sheet or palette, one value in both schemes; -strong, the page all but gone behind an image lightbox */
+    --pdx-color-backdrop:   oklch(0 0 0 / 0.5);
+    --pdx-color-backdrop-strong: oklch(0 0 0 / 0.9);
+
+    /* Tonal elevation (Material 3). In DARK, higher elevation = LIGHTER surface —
+       shadows read poorly on dark backgrounds, so overlays/dialogs/menus separate
+       by tone. In LIGHT they stay at ~base surface (the shadow does the work). */
+    --pdx-surface-1:       light-dark(white,                 var(--pdx-gray-900));
+    --pdx-surface-2:       light-dark(oklch(0.995 0.002 260), oklch(0.205 0.010 260));
+    --pdx-surface-3:       light-dark(oklch(0.990 0.003 260), oklch(0.225 0.012 260));
+    --pdx-surface-4:       light-dark(oklch(0.985 0.004 260), oklch(0.245 0.012 260));
+    --pdx-surface-5:       light-dark(oklch(0.980 0.004 260), oklch(0.265 0.014 260));
+
+    /* Text */
+    --pdx-color-text:       light-dark(var(--pdx-gray-900), var(--pdx-gray-100));
+    /* Muted is gray-500, capped at L 0.50 in light: six themes' gray-500 read 4.0–4.45 on their
+       own page and inset, which carry every description. */
+    --pdx-color-muted:      light-dark(oklch(from var(--pdx-gray-500) min(l, 0.50) c h), var(--pdx-gray-400));
+    /* Subtle is not a text colour — borders, dividers, decorative icons and fills only.
+       It reads 2.07–2.89:1 on bg and on surface in all 13 themes × 2 schemes, so text takes muted;
+       packages/core/tests/subtle-is-not-a-text-color.test.ts fails on a `color:` declaration
+       that reads it. */
+    --pdx-color-subtle:     light-dark(var(--pdx-gray-400), var(--pdx-gray-600));
+
+    /* Borders */
+    --pdx-color-border:        light-dark(var(--pdx-gray-200), var(--pdx-gray-700));
+    --pdx-color-border-strong: light-dark(var(--pdx-gray-300), var(--pdx-gray-600));
+
+    /* Interactive — light-dark variants for proper dark mode */
+    /* Neutral charcoal primary — functional, deliberately unbranded.
+       Very low chroma (0.02) = almost pure gray with a hint of cool.
+       Themes override with their own personality color. */
+    --pdx-color-primary:         oklch(0.35 0.02 260);
+    --pdx-color-primary-hover:   oklch(0.28 0.03 260);
+    --pdx-color-primary-text:    oklch(0.98 0.002 260);
+
+    /* The secondary fill carries a near-white label, so it stays as dark in dark as in light — the
+       label rule below. Lightened to 0.65 in dark, it reads 3.27:1 under its label. */
+    --pdx-color-secondary:       light-dark(oklch(0.55 0.18 30),  oklch(0.55 0.16 30));
+    --pdx-color-secondary-hover: light-dark(oklch(0.48 0.20 30),  oklch(0.48 0.18 30));
+    --pdx-color-secondary-text:  oklch(0.98 0.01 30);
+
+    --pdx-color-accent:          light-dark(oklch(0.55 0.12 170), oklch(0.65 0.12 170));
+    --pdx-color-accent-hover:    light-dark(oklch(0.48 0.14 170), oklch(0.58 0.14 170));
+    /* The label on an accent FILL — the info button, a filled info chip or badge are painted with
+       the accent, not with --pdx-color-info. Themes whose accent is light set it dark; checked against
+       the label of --pdx-color-info instead, cyberpunk's info button reads 1.88:1. */
+    --pdx-color-accent-text:     light-dark(white, var(--pdx-gray-900));
+
+    --pdx-color-danger:          light-dark(oklch(0.55 0.20 25),  oklch(0.575 0.18 25));
+    --pdx-color-danger-hover:    light-dark(oklch(0.48 0.22 25),  oklch(0.50 0.20 25));
+
+    --pdx-color-warning:         light-dark(oklch(0.75 0.15 85),  oklch(0.78 0.12 85));
+    --pdx-color-warning-hover:   light-dark(oklch(0.68 0.17 85),  oklch(0.72 0.14 85));
+
+    /* danger/success/info fills darkened (esp. dark scheme 0.65→~0.53) so a WHITE label
+       clears WCAG AA in both schemes — coherent with primary (white label, dark fills). */
+    --pdx-color-success:         light-dark(oklch(0.52 0.18 155), oklch(0.53 0.15 155));
+    --pdx-color-success-hover:   light-dark(oklch(0.45 0.20 155), oklch(0.46 0.18 155));
+
+    --pdx-color-info:            light-dark(oklch(0.52 0.16 220), oklch(0.53 0.14 220));
+    --pdx-color-info-hover:      light-dark(oklch(0.45 0.18 220), oklch(0.46 0.16 220));
+
+    /* Semantic button label colors. danger/success/info keep a WHITE label in both
+       schemes (coherent with primary) — the fills above are darkened until white clears
+       WCAG AA. warning is a light fill (yellow) → dark label. Themes that redefine a
+       semantic fill must keep it dark enough for white (or set their own *-text). */
+    --pdx-color-danger-text:     white;
+    --pdx-color-success-text:    white;
+    --pdx-color-warning-text:    var(--pdx-gray-900);
+    --pdx-color-info-text:       white;
+
+    /* A colour as TEXT, and the tint behind it. A fill cannot double as a text
+       colour: the label rule above keeps fills at L≈0.52–0.58 so white reads on them, which is
+       too light for text on the light page and too dark for text on the dark one — and
+       warning's amber, light on purpose, is unreadable as text on white. Measured in Chromium,
+       tinted badges, outline chips, links and error messages failed AA in 26 of 26
+       theme×scheme combinations.
+       *-ink is the colour for text on bg, surface, inset and on its own *-soft tint: the
+       theme's own colour, darkened in light (L ≤ 0.46) and lightened in dark (L ≥ 0.72), its
+       chroma capped so it stays in gamut. It is DERIVED, so a theme that re-hues danger gets a
+       matching ink without declaring one. *-soft is the tint of a tonal badge or chip.
+       `packages/cli/tests/theme-contrast-shipped.test.ts` gates every pair in every theme. */
+    --pdx-color-primary-ink:  light-dark(oklch(from var(--pdx-color-primary) min(l, 0.46) min(c, 0.15) h), oklch(from var(--pdx-color-primary) max(l, 0.72) min(c, 0.12) h));
+    --pdx-color-accent-ink:   light-dark(oklch(from var(--pdx-color-accent) min(l, 0.46) min(c, 0.15) h), oklch(from var(--pdx-color-accent) max(l, 0.72) min(c, 0.12) h));
+    --pdx-color-danger-ink:   light-dark(oklch(from var(--pdx-color-danger) min(l, 0.46) min(c, 0.15) h), oklch(from var(--pdx-color-danger) max(l, 0.72) min(c, 0.12) h));
+    --pdx-color-success-ink:  light-dark(oklch(from var(--pdx-color-success) min(l, 0.46) min(c, 0.15) h), oklch(from var(--pdx-color-success) max(l, 0.72) min(c, 0.12) h));
+    --pdx-color-warning-ink:  light-dark(oklch(from var(--pdx-color-warning) min(l, 0.46) min(c, 0.15) h), oklch(from var(--pdx-color-warning) max(l, 0.72) min(c, 0.12) h));
+    --pdx-color-info-ink:     light-dark(oklch(from var(--pdx-color-info) min(l, 0.46) min(c, 0.15) h), oklch(from var(--pdx-color-info) max(l, 0.72) min(c, 0.12) h));
+
+    --pdx-color-primary-soft: light-dark(oklch(from var(--pdx-color-primary) 0.94 min(c, 0.05) h), oklch(from var(--pdx-color-primary) 0.27 min(c, 0.05) h));
+    --pdx-color-accent-soft:  light-dark(oklch(from var(--pdx-color-accent) 0.94 min(c, 0.05) h), oklch(from var(--pdx-color-accent) 0.27 min(c, 0.05) h));
+    --pdx-color-danger-soft:  light-dark(oklch(from var(--pdx-color-danger) 0.94 min(c, 0.05) h), oklch(from var(--pdx-color-danger) 0.27 min(c, 0.05) h));
+    --pdx-color-success-soft: light-dark(oklch(from var(--pdx-color-success) 0.94 min(c, 0.05) h), oklch(from var(--pdx-color-success) 0.27 min(c, 0.05) h));
+    --pdx-color-warning-soft: light-dark(oklch(from var(--pdx-color-warning) 0.94 min(c, 0.05) h), oklch(from var(--pdx-color-warning) 0.27 min(c, 0.05) h));
+    --pdx-color-info-soft:    light-dark(oklch(from var(--pdx-color-info) 0.94 min(c, 0.05) h), oklch(from var(--pdx-color-info) 0.27 min(c, 0.05) h));
+
+    /* Focus — single ring via outline (no double-border effect) */
+    --pdx-color-focus: oklch(0.65 0.20 250);
+    --pdx-focus-ring:  0 0 0 3px oklch(from var(--pdx-color-focus) l c h / 0.4);
+
+    /* ======================================================================
+       C. Spacing (density-scaled)
+       ====================================================================== */
+
+    --pdx-density-factor: 1;
+
+    --pdx-space-2xs: calc(0.25rem * var(--pdx-density-factor));
+    --pdx-space-xs:  calc(0.5rem  * var(--pdx-density-factor));
+    --pdx-space-sm:  calc(0.75rem * var(--pdx-density-factor));
+    --pdx-space-md:  calc(1rem    * var(--pdx-density-factor));
+    --pdx-space-lg:  calc(1.5rem  * var(--pdx-density-factor));
+    --pdx-space-xl:  calc(2.5rem  * var(--pdx-density-factor));
+    --pdx-space-2xl: calc(4rem    * var(--pdx-density-factor));
+    --pdx-space-3xl: calc(4.5rem  * var(--pdx-density-factor));
+
+    /* ----------------------------------------------------------------------
+       Rhythm — the height of a KIND of surface, stated once.
+
+       A screen has a vertical rhythm: a row in a list, an item in a navigation, a header inside a
+       detail, a control in a bar. Without these, each of those is whatever its padding and the
+       theme's type scale happen to produce — a value per component rather than a rhythm per
+       surface, which makes density a side effect instead of a decision.
+
+       What the 13 themes render without the tokens, at 1280px, on the certification scenarios:
+
+         a grid row        45.00  in every one of the 13 — already a rhythm, simply undeclared
+         a nav item        37.59 – 43.19  (cyberpunk … editorial): a function of the type scale
+         a bar's control   32.00 – 44.00  (fluent, metro … cupertino): the same
+
+       So the defaults below do not all say what a reference design would: each is the largest value
+       that changes NO theme, because 6429 contract measurements are written against what these
+       surfaces render today, and a token that quietly moves four themes is a worse thing than a
+       token whose default is modest. They are read as `min-height`, so a theme that already draws
+       taller keeps drawing taller — what the token buys is that an APP can state its rhythm and
+       every surface of that kind follows.
+
+       The reference values are the second number on each line: what a professional layout uses, and
+       what the showcase declares on its shell.
+
+       ⚠️ `auto` is the DEFAULT of the two that draw a surface today. Written `2.8125rem`, the row
+       becomes 49.5 in cupertino and 54 in editorial — those themes set a larger root font, and a
+       rhythm that moves with the type is not a rhythm. Written `calc(45px * var(--pdx-density-factor))`
+       it becomes 49.5 and 54 again, for the other reason: those two themes declare a density factor
+       of their own (1.1, 1.2), which is right for a control and wrong for a value that is supposed
+       to leave every theme exactly as it draws.
+       `auto` is content, which is what all 13 render — so the default moves nothing
+       anywhere, and what an application states is a real number that every surface of that kind
+       then takes.
+
+       An app that states one multiplies it by the density factor itself if it wants to; the tokens
+       below that are NOT drawn by anything yet keep the calc, because there is no rendering for
+       them to preserve. */
+
+    --pdx-row-height:       auto;                                    /* content; reference 49 */
+    --pdx-row-cell-height:  var(--pdx-row-height);                   /* what the cell reads: the row minus its separator */
+    --pdx-nav-item-height:  auto;                                    /* content; reference 40 */
+    --pdx-section-height:   calc(48px * var(--pdx-density-factor));  /* 48 — reference */
+    --pdx-control-height:   calc(32px * var(--pdx-density-factor));  /* 32 — reference 36 */
+
+    /* A modal's geometry, so an application can state it.
+     *
+     * The reference uses TWO widths and no others — 650 for everything and 850 for a wizard — and
+     * a header and a footer of a fixed height. The library ships five sizes, and the defaults below
+     * are exactly what each one measures without the tokens, so an app states what it uses and
+     * nothing else moves. The heights default to `auto` for the reason given under Rhythm: a value
+     * scaled by the theme's type or density is not a rhythm, and `auto` is what every theme draws. */
+    --pdx-dialog-width-sm: 360px;
+    --pdx-dialog-width-md: 480px;
+    --pdx-dialog-width-lg: 640px;
+    --pdx-dialog-width-xl: 800px;
+    --pdx-dialog-header-height: auto;
+    --pdx-dialog-footer-height: auto;
+
+    /* The two spacing values a page has: the gutter AROUND a surface and the inset INSIDE it.
+       Two, not one padding everywhere. Density-scaled like the rest. */
+    --pdx-gutter: calc(24px * var(--pdx-density-factor));   /* 24 */
+    --pdx-inset:  calc(16px * var(--pdx-density-factor));   /* 16 */
+
+    /* ======================================================================
+       D. Typography
+       ====================================================================== */
+
+    --pdx-font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+    --pdx-font-heading: 'Manrope', system-ui, sans-serif;
+    --pdx-font-mono:    'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+    /* The fluid type scale is the page's: in the :root block below. */
+
+    /* Line heights */
+    --pdx-line-tight:  1.25;
+    --pdx-line-normal: 1.6;
+    --pdx-line-loose:  1.8;
+
+    /* Font weights */
+    --pdx-weight-normal:   400;
+    --pdx-weight-medium:   500;
+    --pdx-weight-semibold: 600;
+    --pdx-weight-bold:     700;
+
+    /* ======================================================================
+       E. Radius
+       ====================================================================== */
+
+    --pdx-radius-sm:   0.25rem;
+    --pdx-radius-md:   0.5rem;
+    --pdx-radius-lg:   0.75rem;
+    --pdx-radius-xl:   1rem;
+    --pdx-radius-full: 9999px;
+
+    /* ======================================================================
+       F. Shadows (different for light/dark)
+       ====================================================================== */
+
+    /* Shadow color adapts to scheme via light-dark() on the color portion */
+    --pdx-shadow-color: light-dark(oklch(0 0 0 / 0.08), oklch(0 0 0 / 0.4));
+
+    --pdx-shadow-sm:  0 1px 2px var(--pdx-shadow-color);
+    --pdx-shadow-md:  0 4px 6px -1px var(--pdx-shadow-color), 0 2px 4px -2px var(--pdx-shadow-color);
+    --pdx-shadow-lg:  0 10px 15px -3px var(--pdx-shadow-color), 0 4px 6px -4px var(--pdx-shadow-color);
+    --pdx-shadow-xl:  0 20px 25px -5px var(--pdx-shadow-color), 0 8px 10px -6px var(--pdx-shadow-color);
+
+    /* G. Z-index scale and H. max-widths: the page's, in the :root block below. */
+
+    /* ======================================================================
+       I. Motion — easings, transitions (the durations are the page's: below)
+       ====================================================================== */
+
+    /* Easings (Material 3 spec) */
+    --pdx-ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+    --pdx-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+    --pdx-ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+    /* Legacy aliases (backward compat) */
+    --pdx-ease:       var(--pdx-ease-standard);
+    --pdx-transition: var(--pdx-duration) var(--pdx-ease);
+
+    /* ======================================================================
+       J. Border, Opacity, Focus — extracted from hardcoded values
+       ====================================================================== */
+
+    --pdx-border-width:       1px;
+    --pdx-border-width-focus: 2px;
+    /* State layer opacities (Material 3 spec): hover 8%, focus 10%, pressed 10%, dragged 16%. */
+    --pdx-opacity-disabled:   0.5;
+    --pdx-opacity-hover:      0.08;
+    --pdx-opacity-focus:      0.10;
+    --pdx-opacity-pressed:    0.10;
+    --pdx-opacity-dragged:    0.16;
+    --pdx-focus-width:        3px;
+    --pdx-focus-offset:       2px;
+
+    /* ======================================================================
+       K. Behavior Tokens — control structural patterns, not just colors.
+       Themes override these to switch input style, button shape, etc.
+       Component CSS reads these via data-attributes or direct var().
+       ====================================================================== */
+
+    /* Input */
+    --pdx-input-style:       outlined;     /* outlined | filled | underlined */
+    --pdx-input-min-height:  2.5rem;       /* 40px default */
+    --pdx-input-border-width: var(--pdx-border-width);
+
+    /* Touch target: the page's (the pointer decides it), in the :root block below. */
+
+    /* Form field — the space a pdx-form-field leaves below itself, in any container.
+       space-md already carries the density factor. */
+    --pdx-form-field-gap:    var(--pdx-space-md);
+
+    /* Button — shape is expressed by --pdx-button-radius (what the CSS actually reads);
+       the engine derives it from the design-language's buttonShape. */
+    --pdx-button-min-height: 2.5rem;       /* 40px default */
+
+    /* Floating elements (popover, tooltip, dropdown, select, autocomplete) */
+    --pdx-float-offset:      4px;
+    --pdx-float-radius:      var(--pdx-radius-md);
+    --pdx-float-shadow:      var(--pdx-shadow-lg);
+
+    /* Tabs */
+    --pdx-tab-indicator:     underline;    /* underline | pill | filled */
+    --pdx-tab-indicator-size: 2px;
+
+    /* Cards — `--pdx-card-style` picks the STRUCTURE; these three carry the VALUES. */
+    --pdx-card-style:        bordered;     /* bordered | elevated | flat */
+    --pdx-card-radius:       var(--pdx-radius-lg);
+    --pdx-card-shadow:       var(--pdx-shadow-sm);
+    --pdx-card-border-color: var(--pdx-color-border);
+
+    /* Accordion — the disclosure glyph + its open-state transform are behavior
+       tokens: the base reads them so a simple theme can set a glyph without a full
+       summary::after override (e.g. '+' rotates 45° → ×, a chevron rotates 90°).
+       Signature themes may still override for per-glyph size/color/weight. */
+    --pdx-accordion-glyph:          '+';
+    --pdx-accordion-glyph-size:     var(--pdx-text-lg);
+    --pdx-accordion-open-transform: rotate(45deg);
+
+    /* Breadcrumb — single source of truth for the separator glyph, read by BOTH
+       the CSS breadcrumb (::after) and the WC (.pdx-breadcrumb-sep). A theme sets
+       the glyph; per-theme size/color stay as thin ::after overrides. */
+    --pdx-breadcrumb-separator:     '/';
+
+    /* Table header — the most theme-specific surface in a table. Tokenized so a theme
+       (or the engine) supplies VALUES and the base owns the structure. */
+    --pdx-table-header-font:           inherit;
+    --pdx-table-header-weight:         var(--pdx-weight-semibold);
+    --pdx-table-header-size:           var(--pdx-text-xs);
+    --pdx-table-header-color:          var(--pdx-color-muted);
+    --pdx-table-header-bg:             transparent;
+    --pdx-table-header-transform:      uppercase;
+    --pdx-table-header-letter-spacing: 0.03em;
+    --pdx-table-header-border-width:   2px;
+    --pdx-table-header-border-color:   var(--pdx-color-border);
+
+    /* Labels */
+    --pdx-label-behavior:    static;       /* static | floating */
+
+    /* Decorative leves — OPT-IN, neutral by default (no JS, no attributes). A theme sets
+       a value; components read it with a fallback so "unset" = off.
+       (The card accent edge is already a system of classes: .pdx-card-accent-{success|danger|…}.) */
+    --pdx-primary-gradient:       initial;  /* e.g. linear-gradient(135deg, …) on the primary button */
+    --pdx-button-hover-transform: none;     /* e.g. translateY(-1px) → a premium "lift" */
+    --pdx-button-hover-shadow:    none;     /* e.g. a glow on hover (not on focus) */
+
+    /* Toggle/Switch */
+    --pdx-toggle-width:      2.75rem;
+    --pdx-toggle-height:     1.5rem;
+
+    /* Checkbox/Radio */
+    --pdx-check-size:        1.25rem;
+    --pdx-check-radius:      var(--pdx-radius-sm);
+
+    /* Tokens themes declare with no default here: the components read them with a fallback.
+       `initial` is "not set", so under a nested theme that leaves one out the fallback applies,
+       not the outer theme's value. */
+    --pdx-button-radius:       initial;
+    --pdx-select-caret-size:   initial;
+    --pdx-select-caret-stroke: initial;
+    --pdx-weight-heading:      initial;
+}
+
+/* The page's tokens: set once on the root, and inherited through every nested theme, so an app's
+   choice reaches it — the motion scale (0 stops every transition, for a reduced-motion user), the
+   touch target the pointer calls for, the type scale, the z-index and max-width scales. No theme
+   declares them. */
+:root {
+    /* Fluid type scale */
+    --pdx-text-xs:      clamp(0.7rem,   0.65rem + 0.25vw, 0.75rem);
+    --pdx-text-sm:      clamp(0.875rem, 0.825rem + 0.25vw, 0.9375rem);
+    --pdx-text-base:    clamp(0.925rem, 0.875rem + 0.25vw, 1rem);
+    --pdx-text-lg:      clamp(1.05rem,  1rem + 0.25vw,    1.125rem);
+    --pdx-text-xl:      clamp(1.15rem,  1.05rem + 0.5vw,  1.25rem);
+    --pdx-text-2xl:     clamp(1.35rem,  1.2rem + 0.75vw,  1.5rem);
+    --pdx-text-3xl:     clamp(1.6rem,   1.4rem + 1vw,     1.875rem);
+    --pdx-text-display: clamp(2rem,     1.7rem + 1.5vw,   2.5rem);
+
+    /* G. Z-index scale */
+    --pdx-z-dropdown: 100;
+    --pdx-z-popover:  150;
+    --pdx-z-sticky:   200;
+    --pdx-z-tooltip:  250;
+    --pdx-z-overlay:  300;
+    --pdx-z-modal:    400;
+    --pdx-z-toast:    500;
+
+    /* H. Max-width (for pdx-center) */
+    --pdx-max-xs:  20rem;
+    --pdx-max-sm:  30rem;
+    --pdx-max-md:  48rem;
+    --pdx-max-lg:  64rem;
+    --pdx-max-xl:  80rem;
+    --pdx-max-2xl: 96rem;
+
+    /* Durations. Scaled by --pdx-motion-scale (default 1), which is what makes it a lever instead
+       of a number: 0 stops every transition in the system at once, 1.5 slows them for a demo, and
+       at the default the arithmetic resolves to exactly the value written here. */
+    --pdx-duration-fast: calc(100ms * var(--pdx-motion-scale, 1));
+    --pdx-duration-base: calc(200ms * var(--pdx-motion-scale, 1));
+    --pdx-duration-slow: calc(350ms * var(--pdx-motion-scale, 1));
+    --pdx-duration:      var(--pdx-duration-base);
+
+    /* Motion scale — 0 = no motion, 1 = normal */
+    --pdx-motion-scale: 1;
+
+    /* Touch target — the smallest a command inside a component may be: a menu item, an option, a ✕.
+       24px is WCAG 2.5.8 (AA) with a fine pointer; a coarse pointer switches to 44px (WCAG 2.5.5,
+       Apple HIG). The two control-height tokens size the host's own control, not these. */
+    --pdx-target-min-fine:   24px;
+    --pdx-target-min-coarse: 44px;
+    --pdx-target-min:        var(--pdx-target-min-fine);
+}
+
+
+/* ==========================================================================
+   Theme Context — attributes on <html>
+   ========================================================================== */
+
+/* Scheme: controls color-scheme property → drives light-dark() */
+[pdx-scheme="light"] { color-scheme: light; }
+[pdx-scheme="dark"]  { color-scheme: dark; }
+[pdx-scheme="auto"]  { color-scheme: light dark; }
+
+/* Density: scales all spacing/sizing tokens.
+   Note: themes may set a default --pdx-density-factor (e.g. cyberpunk=0.85).
+   The user-facing density selector in app.pdx overrides via inline style
+   (style.setProperty) which always wins over stylesheet declarations. */
+[pdx-density="compact"] { --pdx-density-factor: 0.75; }
+[pdx-density="normal"]  { --pdx-density-factor: 1; }
+[pdx-density="comfort"] { --pdx-density-factor: 1.25; }
+
+/* Touch targets: a finger gets the coarse minimum, without app CSS. */
+@media (pointer: coarse) {
+    :root { --pdx-target-min: var(--pdx-target-min-coarse); }
+}

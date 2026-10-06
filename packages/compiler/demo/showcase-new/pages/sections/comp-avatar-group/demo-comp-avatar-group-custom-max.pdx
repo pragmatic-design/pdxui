@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Max</h2>
+    <div class="demo-stack">
+      <div class="demo-row">
+        <span class="pdx-txt-small pdx-ink-muted size-label">max=3</span>
+        <pdx-avatar-group :items="teamItems" :max="3"></pdx-avatar-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-small pdx-ink-muted size-label">max=7</span>
+        <pdx-avatar-group :items="teamItems" :max="7"></pdx-avatar-group>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { teamItems } from './state.pdx';
+</script>

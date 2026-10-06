@@ -1,0 +1,81 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Realistic example combining surface, text, border, and interactive color tokens.</p>
+
+    <div class="composition-demo">
+      <div class="comp-card">
+        <div class="comp-header">
+          <span class="pdx-txt-label pdx-ink-primary">DEPLOYMENT</span>
+          <span class="pdx-txt-caption pdx-ink-success">LIVE</span>
+        </div>
+        <h3 class="pdx-txt-subheading">Production v2.4.1</h3>
+        <p class="pdx-txt-body">Deployed to 3 regions. All health checks passing. 99.98% uptime this month.</p>
+        <div class="comp-meta">
+          <span class="pdx-txt-caption pdx-ink-muted">Last deploy: 2 hours ago</span>
+          <span class="pdx-txt-caption pdx-ink-muted">by CI/CD pipeline</span>
+        </div>
+        <div class="comp-actions">
+          <span class="comp-badge comp-badge-success">Healthy</span>
+          <span class="comp-badge comp-badge-warning">1 alert</span>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div style="background: var(--pdx-color-surface);
+            border: 1px solid var(--pdx-color-border);
+            border-radius: var(--pdx-radius-lg)"&gt;
+  &lt;span class="pdx-txt-label pdx-ink-primary"&gt;DEPLOYMENT&lt;/span&gt;
+  &lt;span class="pdx-txt-caption pdx-ink-success"&gt;LIVE&lt;/span&gt;
+  &lt;h3 class="pdx-txt-subheading"&gt;Production v2.4.1&lt;/h3&gt;
+  &lt;p class="pdx-txt-body"&gt;Deployed to 3 regions...&lt;/p&gt;
+  &lt;span class="pdx-txt-caption pdx-ink-muted"&gt;Last deploy&lt;/span&gt;
+  &lt;span class="comp-badge"
+        style="background: oklch(from var(--pdx-color-success) l c h / 0.15);
+               color: var(--pdx-color-success)"&gt;Healthy&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Composition demo */
+  .composition-demo { margin-top: var(--pdx-space-md); }
+  .comp-card {
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .comp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--pdx-space-xs);
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-sm); }
+  .comp-card p { margin: 0 0 var(--pdx-space-sm); }
+  .comp-meta {
+    display: flex;
+    gap: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-md);
+  }
+  .comp-actions { display: flex; gap: var(--pdx-space-sm); }
+  .comp-badge {
+    display: inline-block;
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-full);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+  }
+  .comp-badge-success {
+    background: light-dark(oklch(0.93 0.05 155), oklch(0.25 0.05 155));
+    color: var(--pdx-color-success);
+  }
+  .comp-badge-warning {
+    background: light-dark(oklch(0.93 0.05 85), oklch(0.25 0.05 85));
+    color: var(--pdx-color-warning);
+  }
+</style>

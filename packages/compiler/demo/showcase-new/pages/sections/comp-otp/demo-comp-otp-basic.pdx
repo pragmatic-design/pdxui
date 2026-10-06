@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="6-digit code" hint="Check your email for the code">
+        <pdx-otp-input length="6"></pdx-otp-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="4-digit code">
+        <pdx-otp-input length="4"></pdx-otp-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-otp-input length="6"&gt;&lt;/pdx-otp-input&gt;</code></pre>
+    </details>
+  </section>
+</template>

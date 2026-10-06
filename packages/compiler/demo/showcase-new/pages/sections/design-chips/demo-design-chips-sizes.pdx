@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Three sizes: sm, default, and lg.</p>
+
+    <div class="chip-row">
+      <span class="pdx-chip pdx-chip-sm">Small</span>
+      <span class="pdx-chip">Default</span>
+      <span class="pdx-chip pdx-chip-lg">Large</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-chip pdx-chip-sm"&gt;Small&lt;/span&gt;
+&lt;span class="pdx-chip"&gt;Default&lt;/span&gt;
+&lt;span class="pdx-chip pdx-chip-lg"&gt;Large&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>

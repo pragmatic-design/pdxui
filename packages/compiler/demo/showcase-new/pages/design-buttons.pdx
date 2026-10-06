@@ -1,0 +1,169 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Buttons</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      9 semantic button variants, 3 sizes, groups, loading state.
+      <strong>CSS only</strong> — apply classes to <code>&lt;button&gt;</code>, <code>&lt;a&gt;</code>, or <code>[role="button"]</code>.
+    </p>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-design-buttons-variants class="demo-section"></pdx-demo-design-buttons-variants>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-design-buttons-sizes class="demo-section"></pdx-demo-design-buttons-sizes>
+
+    <!-- ═══ States ═══ -->
+    <pdx-demo-design-buttons-states class="demo-section"></pdx-demo-design-buttons-states>
+
+    <!-- ═══ Full Width ═══ -->
+    <pdx-demo-design-buttons-full-width class="demo-section"></pdx-demo-design-buttons-full-width>
+
+    <!-- ═══ Button Groups ═══ -->
+    <pdx-demo-design-buttons-groups class="demo-section"></pdx-demo-design-buttons-groups>
+
+    <!-- ═══ Links as Buttons ═══ -->
+    <pdx-demo-design-buttons-links class="demo-section"></pdx-demo-design-buttons-links>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-buttons-composition class="demo-section"></pdx-demo-design-buttons-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-primary</code><span>Variant</span><span>Solid brand background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-secondary</code><span>Variant</span><span>Filled tonal (inverse brand)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-outline</code><span>Variant</span><span>Bordered, transparent bg</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ghost</code><span>Variant</span><span>No border, no bg, muted text</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-link</code><span>Variant</span><span>Underlined text, no bg/border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-danger</code><span>Variant</span><span>Solid danger background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-success</code><span>Variant</span><span>Solid success background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-warning</code><span>Variant</span><span>Solid warning background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-info</code><span>Variant</span><span>Solid accent background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-outline-{color}</code><span>Modifier</span><span>Colored border + text for outline</span>
+        </div>
+        <div class="opt-row">
+          <code>size="sm"</code><span>Size</span><span>Compact (2rem min-height)</span>
+        </div>
+        <div class="opt-row">
+          <code>size="lg"</code><span>Size</span><span>Large (3.25rem min-height)</span>
+        </div>
+        <div class="opt-row">
+          <code>full</code><span>Attribute</span><span>Full width (width: 100%)</span>
+        </div>
+        <div class="opt-row">
+          <code>disabled</code><span>State</span><span>50% opacity, no pointer events</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-loading</code><span>State</span><span>Spinner overlay, no interactions</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-pressed="true"</code><span>State</span><span>Toggle pressed (ghost/outline)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-btn-group</code><span>Group</span><span>Horizontal joined buttons</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-btn-group-vertical</code><span>Group</span><span>Vertical joined buttons</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/buttons';
+@title 'Buttons';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .btn-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+  }
+
+  /* Source block */
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 220px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Toggle / Switch</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Apply <code>.pdx-toggle</code> to a <code>&lt;input type="checkbox"&gt;</code>. Uses <code>::before</code> pseudo-element for the thumb.</p>
+
+    <div class="control-list">
+      <label class="control-row"><input type="checkbox" class="pdx-toggle" /><span>Off</span></label>
+      <label class="control-row"><input type="checkbox" class="pdx-toggle" checked /><span>On</span></label>
+      <label class="control-row"><input type="checkbox" class="pdx-toggle" disabled /><span>Disabled off</span></label>
+      <label class="control-row"><input type="checkbox" class="pdx-toggle" checked disabled /><span>Disabled on</span></label>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;label&gt;
+  &lt;input type="checkbox" class="pdx-toggle" /&gt;
+  Off
+&lt;/label&gt;
+&lt;label&gt;
+  &lt;input type="checkbox" class="pdx-toggle" checked /&gt;
+  On
+&lt;/label&gt;</code></pre>
+    </details>
+  </section>
+</template>

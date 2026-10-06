@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Interactive Card</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>interactive</code> attribute for hover lift + pointer cursor.</p>
+
+    <div class="card-demo">
+      <div class="pdx-surface-card" interactive>
+        <div class="pdx-card-header">Hover me</div>
+        <div class="pdx-card-body">
+          <p class="pdx-txt-small" style="margin: 0;">This card lifts on hover with increased shadow and <code>translateY(-1px)</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-surface-card" interactive&gt;
+  &lt;div class="pdx-card-header"&gt;Title&lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;Content&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

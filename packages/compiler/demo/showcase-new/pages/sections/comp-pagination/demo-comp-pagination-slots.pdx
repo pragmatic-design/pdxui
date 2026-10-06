@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slots</h2>
+    <div class="options-table">
+      <table>
+        <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>page</code></td><td><code>{ page, isActive }</code></td><td>Custom page button content</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>

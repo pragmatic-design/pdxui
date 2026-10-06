@@ -1,0 +1,45 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p>
+
+    <pdx-tabs value="overview" label="Product">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="overview">Overview</button>
+        <button class="pdx-tab" data-tab="features">Features</button>
+        <button class="pdx-tab" data-tab="pricing">Pricing</button>
+        <button class="pdx-tab" data-tab="reviews">Reviews</button>
+      </div>
+      <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)">
+        <h3 class="pdx-txt-subheading">Overview</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p>
+      </div>
+      <div data-tab-panel="features" style="padding:var(--pdx-space-lg)">
+        <h3 class="pdx-txt-subheading">Features</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 115 components.</p>
+      </div>
+      <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)">
+        <h3 class="pdx-txt-subheading">Pricing</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p>
+      </div>
+      <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)">
+        <h3 class="pdx-txt-subheading">Reviews</h3>
+        <p class="pdx-txt-small pdx-ink-muted">"Best DX I've ever experienced." — A happy developer</p>
+      </div>
+    </pdx-tabs>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;
+  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;
+  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </details>
+  </section>
+</template>

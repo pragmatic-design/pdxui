@@ -1,0 +1,79 @@
+<template>
+  <!-- A record's detail, as the reference draws it: identity on top of a section menu on the LEFT,
+       part of the page and not a card, and the chosen section beside it. Written once for the
+       customer, the site and the asset: a copy of this shell and its CSS per record would let a fix
+       made in one — the phone layout — miss the others.
+       The page projects its own content: `slot="identity"` (the portrait and the lines under it),
+       `slot="menu"` (the section rows, `button.menu-row[aria-pressed]`, and `p.menu-group`
+       headings), and the sections themselves in the default slot. -->
+  <div class="detail-grid">
+    <nav class="detail-menu" :aria-label="label" data-test="detail-menu">
+      <div class="identity" data-test="identity">
+        <slot name="identity"></slot>
+      </div>
+      <slot name="menu"></slot>
+    </nav>
+    <div class="detail-body">
+      <slot></slot>
+    </div>
+  </div>
+</template>
+
+<script setup>
+/** The section menu's accessible name: «Customer sections». */
+@prop label: string = '';
+</script>
+
+<style scoped>
+  .detail-grid { display: flex; gap: var(--pdx-gutter); align-items: flex-start; }
+  /* Part of the page, not a card set inside it: a rule beside it is what
+     sets it apart from the section, and it stays in view while the section scrolls. */
+  .detail-menu {
+    flex: 0 0 260px; width: 260px;
+    display: flex; flex-direction: column; align-items: stretch;
+    position: sticky; top: var(--pdx-space-md);
+    padding-right: var(--pdx-space-sm);
+    border-right: 1px solid var(--pdx-color-border);
+  }
+  .detail-body { flex: 1; min-width: 0; }
+  .detail-body > section { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .detail-body h2 { margin: 0; }
+
+  .identity { text-align: center; padding: var(--pdx-space-md); border-bottom: 1px solid var(--pdx-color-border); }
+  .identity .portrait {
+    width: 100px; height: 100px; margin: 0 auto var(--pdx-space-sm);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--pdx-color-accent-soft); color: var(--pdx-color-accent-ink);
+    font-size: 28px; font-weight: 700; letter-spacing: .04em;
+  }
+  .identity p { margin: 0; }
+
+  /* Inset as the rows are: inside the panel it would otherwise touch its edge. */
+  .detail-menu .menu-group { margin: var(--pdx-space-md) 0 var(--pdx-space-2xs); padding: 0 var(--pdx-space-sm); text-transform: uppercase; letter-spacing: .06em; }
+  .detail-menu .menu-row {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    min-height: var(--pdx-section-height);
+    padding: 0 var(--pdx-space-sm);
+    border: 0; border-radius: var(--pdx-radius-sm);
+    background: transparent; color: var(--pdx-color-muted);
+    font: inherit; text-align: left; cursor: pointer;
+  }
+  .detail-menu .menu-row:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+  .detail-menu .menu-row[aria-pressed="true"] { background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink); font-weight: 600; }
+  .detail-menu .menu-count { font-variant-numeric: tabular-nums; }
+
+  /* A section's list of related records: each row a way to its record, drawn as a link. */
+  .detail-body .rows { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+  .detail-body .rows > li {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) 0; border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .detail-body .rows a { color: var(--pdx-color-primary-ink); text-decoration: none; font-weight: 500; }
+  .detail-body .rows a:hover { text-decoration: underline; }
+
+  /* A phone: the menu above the section, and the section the frame's width. */
+  @media (max-width: 640px) {
+    .detail-grid { flex-direction: column; align-items: stretch; }
+    .detail-menu { position: static; width: 100%; flex-basis: auto; border-right: 0; padding-right: 0; }
+  }
+</style>

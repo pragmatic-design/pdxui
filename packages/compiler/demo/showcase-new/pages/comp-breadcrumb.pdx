@@ -1,0 +1,56 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Breadcrumb</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-breadcrumb&gt;</code> — navigation breadcrumbs with overflow collapse and custom separators.
+    </p>
+
+    <pdx-demo-comp-breadcrumb-basic class="demo-section"></pdx-demo-comp-breadcrumb-basic>
+
+    <pdx-demo-comp-breadcrumb-with-icons class="demo-section"></pdx-demo-comp-breadcrumb-with-icons>
+
+    <pdx-demo-comp-breadcrumb-custom-separator class="demo-section"></pdx-demo-comp-breadcrumb-custom-separator>
+
+    <pdx-demo-comp-breadcrumb-overflow class="demo-section"></pdx-demo-comp-breadcrumb-overflow>
+
+    <pdx-demo-comp-breadcrumb-slot-template class="demo-section"></pdx-demo-comp-breadcrumb-slot-template>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>item</code></td><td><code>{ item, index, isFirst, isLast }</code></td><td>Custom breadcrumb item rendering</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>BreadcrumbItem[]</td><td>[]</td><td>Breadcrumb items</td></tr>
+            <tr><td><code>separator</code></td><td>String</td><td>''</td><td>Separator text. Empty uses the theme's <code>--pdx-breadcrumb-separator</code>: '/' by default, '›' in Pragmatic and Cupertino</td></tr>
+            <tr><td><code>maxitems</code></td><td>Number</td><td>0</td><td>Max visible items (0 = all)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/breadcrumb';
+@title 'Breadcrumb — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+</style>

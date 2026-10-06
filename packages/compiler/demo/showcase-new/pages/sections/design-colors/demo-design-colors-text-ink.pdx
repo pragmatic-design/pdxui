@@ -1,0 +1,56 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Text & Ink Colors</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 text hierarchy tokens + semantic ink classes. Apply <code>.pdx-ink-*</code> to any element.</p>
+
+    <div class="ink-showcase">
+      <div class="ink-pair">
+        <div class="ink-demo">
+          <span class="pdx-txt-body pdx-ink-default">Default — primary content</span>
+        </div>
+        <div class="ink-info">
+          <code>--pdx-color-text</code>
+          <span class="pdx-txt-caption pdx-ink-muted">.pdx-ink-default</span>
+        </div>
+      </div>
+      <div class="ink-pair">
+        <div class="ink-demo">
+          <span class="pdx-txt-body pdx-ink-muted">Muted — secondary content</span>
+        </div>
+        <div class="ink-info">
+          <code>--pdx-color-muted</code>
+          <span class="pdx-txt-caption pdx-ink-muted">.pdx-ink-muted</span>
+        </div>
+      </div>
+      <div class="ink-pair">
+        <div class="ink-demo">
+          <span class="pdx-txt-body pdx-ink-subtle">Subtle — an alias of muted</span>
+        </div>
+        <div class="ink-info">
+          <code>--pdx-color-muted</code>
+          <span class="pdx-txt-caption pdx-ink-muted">.pdx-ink-subtle</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  /* Ink showcase */
+  .ink-showcase { margin-top: var(--pdx-space-md); }
+  .ink-pair {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-lg);
+    padding: var(--pdx-space-sm) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .ink-demo { flex: 1; }
+  .ink-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: right;
+    min-width: 180px;
+  }
+</style>

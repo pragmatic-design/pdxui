@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Cell Edit</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <strong>Double-click</strong> a cell to edit. <kbd>Enter</kbd> saves, <kbd>Escape</kbd> cancels.
+      Editors auto-created from column type (text → input, number → number input, boolean → checkbox).
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="cellDS" :columns="cellColumns" :editable="true" :edit-mode="'cell'" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  editable edit-mode="cell" hover striped&gt;
+&lt;/pdx-data-grid&gt;
+
+const columns = [
+  { field: 'name', header: 'Name', editable: true },
+  { field: 'email', header: 'Email', type: 'email', editable: true },
+  { field: 'salary', header: 'Salary', type: 'currency', editable: true },
+  { field: 'isActive', header: 'Active', type: 'boolean', editable: true },
+];</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { data } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+// Cell edit
+const cellColumns = [
+  { field: 'name', header: 'Name', width: 180, editable: true },
+  { field: 'email', header: 'Email', width: 220, editable: true },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 130, editable: true },
+  { field: 'isActive', header: 'Active', type: 'boolean', width: 80, editable: true },
+];
+
+const cellDS = createDataSource({ data: data.map(function(r) { return Object.assign({}, r); }), pageSize: 0 });
+</script>

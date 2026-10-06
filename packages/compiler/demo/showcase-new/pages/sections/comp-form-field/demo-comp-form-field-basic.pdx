@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic FormField</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Wraps label + input + hint. Auto-generates IDs and aria-describedby.</p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="Username" required hint="Must be unique">
+        <pdx-input placeholder="Enter username..."></pdx-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Email" hint="We'll never share your email">
+        <pdx-input type="email" placeholder="you@example.com"></pdx-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Bio" optional description="Tell others about yourself">
+        <pdx-textarea placeholder="Write something..." minRows="2" maxRows="5"></pdx-textarea>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-form-field label="Username" required hint="Must be unique"&gt;
+  &lt;pdx-input placeholder="Enter username..."&gt;&lt;/pdx-input&gt;
+&lt;/pdx-form-field&gt;</code></pre>
+    </details>
+  </section>
+</template>

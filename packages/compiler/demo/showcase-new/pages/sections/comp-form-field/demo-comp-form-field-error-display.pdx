@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Error Display (touched-gated)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Error shows only when <code>touched=true</code> (user has interacted).
+      This prevents showing errors on pristine fields. Use <code>showError</code> to force display (e.g. on submit).
+    </p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="Not touched yet" error="This field is required">
+        <pdx-input placeholder="Error hidden — not touched yet"></pdx-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Touched field" error="Email is invalid" touched>
+        <pdx-input placeholder="Error visible — field was touched" value="bad@"></pdx-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Force error" error="Required field" showError>
+        <pdx-input placeholder="Error forced via showError (e.g. on submit)"></pdx-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Error hidden: not touched --&gt;
+&lt;pdx-form-field label="Email" error="Invalid"&gt;...&lt;/pdx-form-field&gt;
+
+&lt;!-- Error visible: touched --&gt;
+&lt;pdx-form-field label="Email" error="Invalid" touched&gt;...&lt;/pdx-form-field&gt;
+
+&lt;!-- Error forced: on submit --&gt;
+&lt;pdx-form-field label="Email" error="Required" showError&gt;...&lt;/pdx-form-field&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 drop zone sizes: sm, default, lg.</p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Small</span>
+        <pdx-file-upload size="sm" label="Small drop zone"></pdx-file-upload>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Default</span>
+        <pdx-file-upload label="Default drop zone"></pdx-file-upload>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Large</span>
+        <pdx-file-upload size="lg" label="Large drop zone"></pdx-file-upload>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-labeled {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

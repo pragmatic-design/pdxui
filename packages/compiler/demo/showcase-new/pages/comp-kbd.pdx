@@ -1,0 +1,64 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Kbd</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-kbd&gt;</code> — keyboard shortcut display. Parses <code>keys</code> prop by <code>+</code> separator. Optional modifier symbols.
+    </p>
+
+    <!-- ═══ Single Keys ═══ -->
+    <pdx-demo-comp-kbd-single-keys class="demo-section"></pdx-demo-comp-kbd-single-keys>
+
+    <!-- ═══ Combos ═══ -->
+    <pdx-demo-comp-kbd-combinations class="demo-section"></pdx-demo-comp-kbd-combinations>
+
+    <!-- ═══ Symbols Mode ═══ -->
+    <pdx-demo-comp-kbd-modifiers class="demo-section"></pdx-demo-comp-kbd-modifiers>
+
+    <!-- ═══ CSS Only ═══ -->
+    <pdx-demo-comp-kbd-css-only class="demo-section"></pdx-demo-comp-kbd-css-only>
+
+    <!-- ═══ Inline ═══ -->
+    <pdx-demo-comp-kbd-inline class="demo-section"></pdx-demo-comp-kbd-inline>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-kbd-composition class="demo-section"></pdx-demo-comp-kbd-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>keys</code><span>string</span><span>Key combination, + separated (e.g. "Ctrl+S")</span></div>
+        <div class="opt-row"><code>symbols</code><span>boolean</span><span>Replace modifiers with symbols (⌘⌥⌃⇧)</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>CSS size class</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Symbol Map</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key Name</span><span>Symbol</span></div>
+        <div class="opt-row"><code>Cmd / Command</code><span>⌘</span></div>
+        <div class="opt-row"><code>Alt / Option</code><span>⌥</span></div>
+        <div class="opt-row"><code>Ctrl / Control</code><span>⌃</span></div>
+        <div class="opt-row"><code>Shift</code><span>⇧</span></div>
+        <div class="opt-row"><code>Enter / Return</code><span>↵</span></div>
+        <div class="opt-row"><code>Backspace / Delete</code><span>⌫ / ⌦</span></div>
+        <div class="opt-row"><code>Tab</code><span>⇥</span></div>
+        <div class="opt-row"><code>Up/Down/Left/Right</code><span>↑↓←→</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/kbd';
+@title 'Kbd Component';
+let _ = $signal(0);
+</script>
+
+<style scoped>
+  .page { }
+  .shortcut-list { display: flex; flex-direction: column; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+  .shortcut-row { display: flex; gap: var(--pdx-space-md); align-items: center; }
+
+  .opt-header, .opt-row { grid-template-columns: 160px 1fr; }
+</style>

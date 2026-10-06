@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Textarea in a realistic form context.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Feedback Form</h3>
+      <div class="comp-form-single">
+        <div class="pdx-field">
+          <pdx-label text="Subject" required size="sm"></pdx-label>
+          <pdx-input size="sm" placeholder="What is this about?"></pdx-input>
+        </div>
+        <div class="pdx-field">
+          <pdx-label text="Details" required size="sm" description="Be as specific as possible"></pdx-label>
+          <pdx-textarea size="sm" placeholder="Describe the issue or suggestion..." showCount wordCount maxlength="1000" minRows="4" maxRows="12"></pdx-textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:var(--pdx-space-sm)">
+          <pdx-button variant="ghost" size="sm">Cancel</pdx-button>
+          <pdx-button variant="solid" size="sm">Submit Feedback</pdx-button>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-form-single { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+</style>

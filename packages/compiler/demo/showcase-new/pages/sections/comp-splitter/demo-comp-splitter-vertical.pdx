@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Vertical Split</h2>
+    <div class="demo-split">
+      <pdx-splitter orientation="vertical" :panes="vPanes">
+        <div class="pane-content">
+          <strong>Top Pane</strong>
+          <p class="pdx-txt-small pdx-ink-muted">Editor area</p>
+        </div>
+        <div class="pane-content">
+          <strong>Bottom Pane</strong>
+          <p class="pdx-txt-small pdx-ink-muted">Terminal / output panel</p>
+        </div>
+      </pdx-splitter>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const vPanes = [
+  { min: 15, defaultSize: 60 },
+  { min: 15, defaultSize: 40 },
+];
+</script>

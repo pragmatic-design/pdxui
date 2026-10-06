@@ -1,0 +1,66 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">DataSource & pdx-data-source</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>DataSource</code> is the reactive data layer for lists, tables, and selects.
+      <code>&lt;pdx-data-source&gt;</code> is a non-rendering component that creates one declaratively.
+    </p>
+
+    <!-- ═══ Basic: Programmatic DataSource ═══ -->
+    <pdx-demo-comp-data-source-programmatic class="demo-section"></pdx-demo-comp-data-source-programmatic>
+
+    <!-- ═══ Declarative: pdx-data-source ═══ -->
+    <pdx-demo-comp-data-source-declarative class="demo-section"></pdx-demo-comp-data-source-declarative>
+
+    <!-- ═══ Wrapping Children ═══ -->
+    <pdx-demo-comp-data-source-provider class="demo-section"></pdx-demo-comp-data-source-provider>
+
+    <!-- ═══ Remote Simulation ═══ -->
+    <pdx-demo-comp-data-source-remote class="demo-section"></pdx-demo-comp-data-source-remote>
+
+    <!-- ═══ Cascading DataSources ═══ -->
+    <pdx-demo-comp-data-source-cascading class="demo-section"></pdx-demo-comp-data-source-cascading>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">pdx-data-source Props</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>url</code></td><td>String</td><td>''</td><td>REST endpoint. Creates restTransport.</td></tr>
+            <tr><td><code>:data</code></td><td>Array</td><td>null</td><td>Static data. Creates arrayTransport.</td></tr>
+            <tr><td><code>:transport</code></td><td>Object</td><td>null</td><td>Custom IDataTransport (priority).</td></tr>
+            <tr><td><code>id-field</code></td><td>String</td><td>'id'</td><td>Unique ID field.</td></tr>
+            <tr><td><code>:page-size</code></td><td>Number</td><td>0</td><td>Pagination. 0 = none.</td></tr>
+            <tr><td><code>auto-load</code></td><td>Boolean</td><td>true</td><td>Load on creation.</td></tr>
+            <tr><td><code>name</code></td><td>String</td><td>''</td><td>Context key for provide (ds:{name}).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-source';
+@title 'DataSource — PDX UI';
+
+import '@pdxui/ui/select';
+import '@pdxui/ui/data-source';
+</script>
+
+<style>
+.demo-row { max-width: 320px; }
+.demo-col { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 400px; }
+.field { display: flex; flex-direction: column; gap: var(--pdx-space-2xs); }
+
+.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
+.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }
+.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }
+
+details.source { margin-top: var(--pdx-space-sm); }
+details.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }
+details.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }
+</style>

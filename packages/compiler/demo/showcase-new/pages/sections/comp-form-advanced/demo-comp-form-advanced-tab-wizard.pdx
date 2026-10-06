@@ -1,0 +1,116 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">3. Tab / Wizard Form</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Multi-step form with per-section validation. Must complete each step before advancing.
+    </p>
+
+    <div class="demo-block">
+      <div class="wizard-tabs">
+        <button :class="tabClass0()" @click="goToStep(0)">1. Account</button>
+        <button :class="tabClass1()" @click="goToStep(1)">2. Profile</button>
+        <button :class="tabClass2()" @click="goToStep(2)">3. Confirm</button>
+      </div>
+
+      <pdx-form :form="wizardForm">
+        <div :style="step0Style()">
+          <pdx-form-field name="username" label="Username" required>
+            <pdx-input name="username" placeholder="Choose username"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="password" label="Password" required>
+            <pdx-password-input name="password" placeholder="Min 6 characters"></pdx-password-input>
+          </pdx-form-field>
+        </div>
+
+        <div :style="step1Style()">
+          <pdx-form-field name="fullName" label="Full Name" required>
+            <pdx-input name="fullName" placeholder="John Doe"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="avatar" label="Avatar URL">
+            <pdx-input name="avatar" type="url" placeholder="https://..."></pdx-input>
+          </pdx-form-field>
+        </div>
+
+        <div :style="step2Style()">
+          <div class="confirm-summary">
+            <h4 class="pdx-txt-small pdx-weight-semibold">Review your details:</h4>
+            <pre class="pdx-txt-mono form-values" :textContent="wizardSummary()"></pre>
+          </div>
+        </div>
+      </pdx-form>
+
+      <div class="wizard-nav">
+        <button class="pdx-btn pdx-ghost pdx-sm" :disabled="isFirstStep()" @click="prevStep">← Previous</button>
+        <span class="pdx-txt-small pdx-ink-muted" :textContent="stepLabel()"></span>
+        <button :class="nextBtnClass()" @click="nextStep" :textContent="nextBtnText()"></button>
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>let wizardStep = $signal(0);
+const wizardForm = createForm({
+  initialValues: { username: '', password: '', fullName: '', avatar: '' },
+  validators: {
+    username: [required(...), minLength(3, ...)],
+    password: [required(...), minLength(6, ...)],
+    fullName: [required(...)],
+  },
+});
+
+// Validate current step fields before advancing
+const stepFields = [['username', 'password'], ['fullName', 'avatar'], []];
+function nextStep() {
+  const fields = stepFields[wizardStep];
+  let valid = true;
+  for (const f of fields) {
+    wizardForm.fields[f]?.onBlur();
+    if (wizardForm.fields[f]?.error()) valid = false;
+  }
+  if (valid) wizardStep++;
+}
+
+// Template: :style="stepNStyle()" to show/hide panels</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required, minLength } from '@pdxui/core';
+
+// ─── 3. Wizard Form ───
+let wizardStep = $signal(0);
+
+const wizardForm = createForm({ initialValues: { username: '', password: '', fullName: '', avatar: '' }, validators: { username: [required('Username is required'), minLength(3, 'Min 3 characters')], password: [required('Password is required'), minLength(6, 'Min 6 characters')], fullName: [required('Full name is required')] }, validateOn: 'onBlur' });
+const stepFields = [['username', 'password'], ['fullName', 'avatar'], []];
+
+function goToStep(n) { wizardStep = n; }
+function prevStep() { if (wizardStep > 0) wizardStep = wizardStep - 1; }
+function nextStep() { if (wizardStep >= 2) { wizardForm.validate(); return; } const fields = stepFields[wizardStep]; let valid = true; for (const f of fields) { const field = wizardForm.fields[f]; if (field) { field.onBlur(); const err = field.error(); if (err) valid = false; } } if (valid) wizardStep = wizardStep + 1; }
+function wizardSummary() { const v = wizardForm.dirty(); return JSON.stringify({ username: wizardForm.fields.username?.value(), password: wizardForm.fields.password?.value() ? '***' : '', fullName: wizardForm.fields.fullName?.value(), avatar: wizardForm.fields.avatar?.value() }, null, 2); }
+function tabClass0() { return 'wizard-tab' + (wizardStep === 0 ? ' active' : ''); }
+function tabClass1() { return 'wizard-tab' + (wizardStep === 1 ? ' active' : ''); }
+function tabClass2() { return 'wizard-tab' + (wizardStep === 2 ? ' active' : ''); }
+function step0Style() { return wizardStep === 0 ? '' : 'display:none'; }
+function step1Style() { return wizardStep === 1 ? '' : 'display:none'; }
+function step2Style() { return wizardStep === 2 ? '' : 'display:none'; }
+function isFirstStep() { return wizardStep === 0; }
+function stepLabel() { return 'Step ' + (wizardStep + 1) + ' of 3'; }
+function nextBtnClass() { return wizardStep < 2 ? 'pdx-btn pdx-primary pdx-sm' : 'pdx-btn pdx-success pdx-sm'; }
+function nextBtnText() { return wizardStep < 2 ? 'Next →' : 'Submit ✓'; }
+</script>
+
+<style scoped>
+  .wizard-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: var(--pdx-space-lg);
+    border-bottom: 2px solid var(--pdx-color-border);
+  }
+  .wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--pdx-space-lg);
+    padding-top: var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+  }
+  .confirm-summary { padding: var(--pdx-space-md); }
+</style>

@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Accessibility</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Set <code>aria-busy="true"</code> on the container while loading. Screen readers will announce
+      the loading state. When content loads, remove the attribute and the skeletons.
+      Individual skeleton elements should use <code>aria-hidden="true"</code> since they're decorative.
+    </p>
+    <details class="source-block">
+      <summary>Pattern</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div aria-busy="true"&gt;
+  &lt;div class="pdx-skeleton pdx-skeleton-title" aria-hidden="true"&gt;&lt;/div&gt;
+  &lt;div class="pdx-skeleton pdx-skeleton-text" aria-hidden="true"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- When loaded: remove aria-busy, replace skeletons with content --&gt;</code></pre>
+    </details>
+  </section>
+</template>

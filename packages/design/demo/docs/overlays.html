@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Overlays</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Overlays</span></div>
+                        <h1 class="pdx-txt-display">Overlays</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Dialog (modal), tooltip, callout.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Dialog</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Native <code>&lt;dialog&gt;</code> with <code>size="sm|lg|xl|full"</code>. Sections: header, body, footer.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm">
+                                    <button class="pdx-primary" size="sm" onclick="document.getElementById('dlg-sm').showModal()">Small</button>
+                                    <button class="pdx-primary" size="sm" onclick="document.getElementById('dlg-md').showModal()">Default</button>
+                                    <button class="pdx-primary" size="sm" onclick="document.getElementById('dlg-lg').showModal()">Large</button>
+                                </pdx-row>
+
+                                <dialog id="dlg-sm" class="pdx-dialog" size="sm">
+                                    <div class="pdx-dialog-header"><span>Confirm</span><button class="pdx-dialog-close" onclick="this.closest('dialog').close()">&times;</button></div>
+                                    <div class="pdx-dialog-body"><p>Are you sure you want to delete this?</p></div>
+                                    <div class="pdx-dialog-footer">
+                                        <button class="pdx-ghost" size="sm" onclick="this.closest('dialog').close()">Cancel</button>
+                                        <button class="pdx-danger" size="sm" onclick="this.closest('dialog').close()">Delete</button>
+                                    </div>
+                                </dialog>
+
+                                <dialog id="dlg-md" class="pdx-dialog">
+                                    <div class="pdx-dialog-header"><span>Edit Profile</span><button class="pdx-dialog-close" onclick="this.closest('dialog').close()">&times;</button></div>
+                                    <div class="pdx-dialog-body">
+                                        <pdx-stack gap="md">
+                                            <div class="pdx-field"><label>Name</label><input class="pdx-input" value="John Doe"></div>
+                                            <div class="pdx-field"><label>Bio</label><textarea class="pdx-input" placeholder="Tell us about yourself..."></textarea></div>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="pdx-dialog-footer">
+                                        <button class="pdx-ghost" size="sm" onclick="this.closest('dialog').close()">Cancel</button>
+                                        <button class="pdx-primary" size="sm" onclick="this.closest('dialog').close()">Save</button>
+                                    </div>
+                                </dialog>
+
+                                <dialog id="dlg-lg" class="pdx-dialog" size="lg">
+                                    <div class="pdx-dialog-header"><span>Terms</span><button class="pdx-dialog-close" onclick="this.closest('dialog').close()">&times;</button></div>
+                                    <div class="pdx-dialog-body" style="max-height:250px">
+                                        <pdx-stack gap="md">
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.</p>
+                                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</p>
+                                        </pdx-stack>
+                                    </div>
+                                    <div class="pdx-dialog-footer">
+                                        <button class="pdx-ghost" size="sm" onclick="this.closest('dialog').close()">Decline</button>
+                                        <button class="pdx-primary" size="sm" onclick="this.closest('dialog').close()">Accept</button>
+                                    </div>
+                                </dialog>
+                            </div>
+                            <div class="doc-source">&lt;dialog class="pdx-dialog" size="sm"&gt;
+  &lt;div class="pdx-dialog-header"&gt;Title &lt;button class="pdx-dialog-close"&gt;&amp;times;&lt;/button&gt;&lt;/div&gt;
+  &lt;div class="pdx-dialog-body"&gt;Content&lt;/div&gt;
+  &lt;div class="pdx-dialog-footer"&gt;Buttons&lt;/div&gt;
+&lt;/dialog&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Tooltip</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">CSS-only via <code>data-pdx-tooltip</code>. Shows on hover.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="lg">
+                                    <button class="pdx-primary" data-pdx-tooltip="Save your changes">Hover me</button>
+                                    <span data-pdx-tooltip="Extra info here" class="pdx-link" style="cursor:help">Help text</span>
+                                    <button class="pdx-secondary" data-pdx-tooltip="Delete permanently">Danger</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;button data-pdx-tooltip="Tooltip text"&gt;Hover&lt;/button&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Callout</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Admonition blocks for notes, tips, warnings, and danger alerts in documentation.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <div class="pdx-callout pdx-callout-info"><div class="pdx-callout-title">Note</div><p class="pdx-txt-small">This is an informational callout for documentation.</p></div>
+                                    <div class="pdx-callout pdx-callout-tip"><div class="pdx-callout-title">Tip</div><p class="pdx-txt-small">Use pdx-surface-card for elevated content areas.</p></div>
+                                    <div class="pdx-callout pdx-callout-warning"><div class="pdx-callout-title">Warning</div><p class="pdx-txt-small">This API is experimental and may change.</p></div>
+                                    <div class="pdx-callout pdx-callout-danger"><div class="pdx-callout-title">Danger</div><p class="pdx-txt-small">This action cannot be undone.</p></div>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-callout pdx-callout-info"&gt;
+  &lt;div class="pdx-callout-title"&gt;Note&lt;/div&gt;
+  &lt;p&gt;Content&lt;/p&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

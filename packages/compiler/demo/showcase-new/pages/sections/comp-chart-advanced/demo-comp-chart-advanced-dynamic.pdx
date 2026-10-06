@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Dynamic Data</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click "Randomize" to see animated data transitions.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="bar" :data="dynamicData" :x-field="'category'" :y-field="'value'" :legend="false" height="280px"></pdx-chart>
+    </div>
+    <div class="controls">
+      <button class="pdx-primary" @click="randomize">Randomize Data</button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let dynamicData = $signal([
+  { category: 'A', value: 42 },
+  { category: 'B', value: 68 },
+  { category: 'C', value: 35 },
+  { category: 'D', value: 91 },
+  { category: 'E', value: 55 },
+  { category: 'F', value: 73 },
+]);
+
+function randomize() {
+  dynamicData = dynamicData.map(d => ({ ...d, value: Math.floor(Math.random() * 100) + 10 }));
+}
+</script>
+
+<style scoped>
+  .controls { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+</style>

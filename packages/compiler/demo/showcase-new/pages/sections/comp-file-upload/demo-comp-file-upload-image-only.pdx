@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Image Only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Accept only images with <code>accept="image/*"</code>. Multiple files allowed.
+      Image thumbnails are generated automatically from file previews.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-file-upload accept="image/*" multiple @pdx-select="onImageSelect"></pdx-file-upload>
+      <div class="result-box">
+        <span class="pdx-txt-small pdx-ink-muted">Images: </span>
+        <span class="pdx-txt-small">{{ imageFiles }}</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-file-upload accept="image/*" multiple
+  @pdx-select="onImageSelect" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let imageFiles = $signal('None');
+
+function onImageSelect(e) {
+  const names = e.detail.files.map(f => f.name);
+  imageFiles = names.join(', ') || 'None';
+}
+</script>

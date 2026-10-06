@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use the <code>tag</code> slot to customize tag chip rendering.</p>
+
+    <div class="demo-stack">
+      <pdx-tag-input :value="slotTags">
+        <slot name="tag" let:tag let:index>
+          <span class="tag-colored">{{ tag }}</span>
+        </slot>
+      </pdx-tag-input>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input :value="tags"&gt;
+  &lt;slot name="tag" let:tag let:index&gt;
+    &lt;span class="tag-colored"&gt;$&lbrace;tag&rbrace;&lt;/span&gt;
+  &lt;/slot&gt;
+&lt;/pdx-tag-input&gt;
+
+.tag-colored {
+  padding: 2px 8px;
+  border-radius: var(--pdx-radius-sm);
+  font-size: var(--pdx-text-xs);
+  font-weight: 600;
+  background: var(--pdx-color-primary);
+  color: var(--pdx-color-primary-text, #fff);
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+// Slot demo
+let slotTags = $signal(['Frontend', 'Backend', 'DevOps']);
+</script>
+
+<style scoped>
+  .tag-colored { display: inline-block; padding: 2px 8px; border-radius: var(--pdx-radius-sm); font-size: var(--pdx-text-xs); font-weight: 600; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+</style>

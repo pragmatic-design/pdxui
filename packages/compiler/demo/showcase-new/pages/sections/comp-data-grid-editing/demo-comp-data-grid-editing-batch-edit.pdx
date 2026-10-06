@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Batch Edit</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Double-click to edit cells. Changes are <strong>buffered</strong> (yellow highlight)
+      until Save All. Revert discards all pending changes.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="batchDS" :columns="batchColumns" :editable="true" :edit-mode="'batch'" :show-toolbar="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  editable edit-mode="batch" show-toolbar
+  hover striped&gt;
+&lt;/pdx-data-grid&gt;
+// Batch mode: changes highlighted in yellow
+// Toolbar shows Save All / Revert when changes exist</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { data } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+// Batch edit
+const batchColumns = [
+  { field: 'name', header: 'Name', width: 180, editable: true },
+  { field: 'email', header: 'Email', width: 220, editable: true },
+  { field: 'role', header: 'Role', width: 120, editable: true },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 130, editable: true },
+];
+
+const batchDS = createDataSource({ data: data.map(function(r) { return Object.assign({}, r); }), pageSize: 0 });
+</script>

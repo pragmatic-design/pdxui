@@ -1,0 +1,69 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Checkbox</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-checkbox&gt;</code> — custom checkbox with label, description, indeterminate, tristate, sizes.
+      Tristate cycles: unchecked → checked → indeterminate.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-checkbox-basic class="demo-section"></pdx-demo-comp-checkbox-basic>
+
+    <!-- ═══ With Description ═══ -->
+    <pdx-demo-comp-checkbox-description class="demo-section"></pdx-demo-comp-checkbox-description>
+
+    <!-- ═══ Indeterminate ═══ -->
+    <pdx-demo-comp-checkbox-indeterminate class="demo-section"></pdx-demo-comp-checkbox-indeterminate>
+
+    <!-- ═══ Tristate ═══ -->
+    <pdx-demo-comp-checkbox-tristate class="demo-section"></pdx-demo-comp-checkbox-tristate>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-checkbox-sizes class="demo-section"></pdx-demo-comp-checkbox-sizes>
+
+    <!-- ═══ Label Position ═══ -->
+    <pdx-demo-comp-checkbox-label-position class="demo-section"></pdx-demo-comp-checkbox-label-position>
+
+    <!-- ═══ Error ═══ -->
+    <pdx-demo-comp-checkbox-error class="demo-section"></pdx-demo-comp-checkbox-error>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-checkbox-composition class="demo-section"></pdx-demo-comp-checkbox-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>checked</code><span>boolean</span><span>Checked state</span></div>
+        <div class="opt-row"><code>indeterminate</code><span>boolean</span><span>Visual "—" state, announced as mixed; a click settles it</span></div>
+        <div class="opt-row"><code>tristate</code><span>boolean</span><span>Enable 3-state cycle on click</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Label text (or use default slot)</span></div>
+        <div class="opt-row"><code>description</code><span>string</span><span>Help text below label</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>labelPosition</code><span>string</span><span>right (default), left</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Red border for validation</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Value in event detail</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ checked, value }</span><span>Normal mode: toggled</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ checked, indeterminate, value, state }</span><span>Tristate: state = true/false/null</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/checkbox';
+@title 'Checkbox Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

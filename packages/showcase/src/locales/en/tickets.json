@@ -1,0 +1,94 @@
+{
+    "tickets": {
+        "title": "Tickets",
+        "intro": "Every ticket, to filter, sort and open.",
+        "new": "New ticket",
+        "matching": "{count} matching",
+        "subjectOf": "Subject of {reference}",
+        "deleted": "Archived {reference} — it is out of the list, not gone.",
+        "deletedMany": "Archived {count} tickets — they are out of the list, not gone.",
+        "refuseNext": "Make the next archive fail",
+        "undo": "Undo",
+        "columns": {
+            "categories": "Categories",
+            "reference": "Ref",
+            "subject": "Subject",
+            "customer": "Customer",
+            "priority": "Priority",
+            "status": "Status",
+            "opened": "Opened",
+            "assignee": "Assignee"
+        },
+        "status": {
+            "open": "Open",
+            "waiting": "Waiting",
+            "closed": "Closed"
+        },
+        "priority": {
+            "low": "Low",
+            "normal": "Normal",
+            "high": "High"
+        },
+        "bulk": {
+            "close": "Close",
+            "delete": "Archive",
+            "export": "Export",
+            "exportDenied": "Your role cannot export tickets",
+            "status": "Change status",
+            "assign": "Assign to",
+            "back": "Back",
+            "moved": "{count} moved to {value}",
+            "assigned": "{count} handed to {value}",
+            "partial": "{changed} changed · {refused} refused"
+        },
+        "edit": "Edit",
+        "live": {
+            "connected": "Live",
+            "disconnected": "Disconnected — this list may be out of date",
+            "drop": "Drop the connection",
+            "reconnect": "Reconnect",
+            "colleague": "Meanwhile, at another desk:",
+            "pushClose": "close a ticket",
+            "pushRetitle": "retitle a ticket",
+            "pushRaise": "raise a ticket",
+            "pushWithdraw": "withdraw a ticket",
+            "changed": "{reference} was changed by someone else.",
+            "withdrawn": "{reference} was withdrawn by someone else.",
+            "shadowed": "{reference} changed on the server while you were editing it. Your version is still shown.",
+            "resynced": "Reconnected: {count} change(s) happened while you were offline, so the list was re-read."
+        },
+        "cancel": "Cancel",
+        "create": "Create",
+        "save": "Save",
+        "openRecord": "Open {reference}",
+        "discardTitle": "Leave without saving?",
+        "discardBody": "This record has changes that have not been saved.",
+        "discardLeave": "Discard",
+        "discardStay": "Stay",
+        "empty": {
+            "filtered": {
+                "title": "No ticket matches",
+                "body": "{count} filter is narrowing the list.",
+                "action": "Clear filters"
+            },
+            "none": {
+                "title": "No tickets yet",
+                "body": "The first one can be raised here."
+            }
+        },
+        "rowActions": "Actions for {reference}",
+        "row": {
+            "duplicate": "Duplicate",
+            "export": "Export this one",
+            "exportDenied": "A closed ticket’s record is archived and cannot be exported.",
+            "print": "Print",
+            "openTab": "Open in a new tab",
+            "duplicated": "{reference} is a copy, open and unsaved."
+        },
+        "refuseOneBulk": "Make the next bulk write refuse one",
+        "unassigned": "Unassigned",
+        "views": {
+            "default": "All tickets"
+        }
+    }
+}

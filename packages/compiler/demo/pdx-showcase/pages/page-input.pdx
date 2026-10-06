@@ -1,0 +1,120 @@
+<template>
+  <div class="page">
+    <h2>Input</h2>
+    <p class="desc">Text input, password toggle, search with clear, number stepper. All interactive.</p>
+
+    <section>
+      <h3>Text Input</h3>
+      <div class="field">
+        <label class="pdx-field-label">Name <span class="pdx-field-required">*</span></label>
+        <input class="pdx-input" placeholder="Type your name..." @input="onNameInput" :value="name" />
+        <span class="pdx-field-hint">You typed: {{ name }}</span>
+      </div>
+    </section>
+
+    <section>
+      <h3>Password with Toggle</h3>
+      <div class="field">
+        <label class="pdx-field-label">Password</label>
+        <div class="input-with-action">
+          <input class="pdx-input" :type="showPw ? 'text' : 'password'" placeholder="Enter password..." />
+          <button class="toggle-btn" @click="togglePw">
+            @if (showPw) { 🙈 } @else { 👁 }
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Search with Clear</h3>
+      <div class="field">
+        <div class="input-with-action">
+          <span class="input-icon">🔍</span>
+          <input class="pdx-input" style="padding-left:2rem" placeholder="Search..." @input="onSearchInput" :value="search" />
+          @if (search) {
+            <button class="toggle-btn" @click="clearSearch">✕</button>
+          }
+        </div>
+        @if (search) {
+          <span class="pdx-field-hint">Searching for: "{{ search }}"</span>
+        }
+      </div>
+    </section>
+
+    <section>
+      <h3>Number Stepper</h3>
+      <div class="field">
+        <label class="pdx-field-label">Quantity (0–100)</label>
+        <div class="stepper">
+          <button class="pdx-secondary" @click="decNum" :disabled="num <= 0">−</button>
+          <input class="pdx-input stepper-input" type="number" :value="num" @input="onNumInput" min="0" max="100" />
+          <button class="pdx-secondary" @click="incNum" :disabled="num >= 100">+</button>
+        </div>
+        <span class="pdx-field-hint">Value: {{ num }}</span>
+      </div>
+    </section>
+
+    <section>
+      <h3>Textarea</h3>
+      <div class="field">
+        <label class="pdx-field-label">Description</label>
+        <textarea class="pdx-input" rows="3" placeholder="Enter description..." @input="onDescInput"></textarea>
+        <span class="pdx-field-hint">{{ descLen }} characters</span>
+      </div>
+    </section>
+
+    <section>
+      <h3>States</h3>
+      <div class="field">
+        <label class="pdx-field-label">Error state</label>
+        <input class="pdx-input" value="Invalid email" aria-invalid="true" style="border-color:var(--pdx-color-danger)" />
+        <span class="pdx-field-error">Please enter a valid email address</span>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label class="pdx-field-label">Disabled</label>
+        <input class="pdx-input" value="Can't edit this" disabled />
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/input';
+@title 'Input — PDX Components';
+
+let name = $signal('');
+let search = $signal('');
+let showPw = $signal(false);
+let num = $signal(5);
+let descLen = $signal(0);
+
+function onNameInput(e) { name = e.target.value; }
+function onSearchInput(e) { search = e.target.value; }
+function clearSearch() { search = ''; }
+function togglePw() { showPw = !showPw; }
+function incNum() { if (num < 100) num++; }
+function decNum() { if (num > 0) num--; }
+function onNumInput(e) {
+    var v = parseInt(e.target.value);
+    if (!isNaN(v)) num = Math.max(0, Math.min(100, v));
+}
+function onDescInput(e) { descLen = e.target.value.length; }
+</script>
+
+<style scoped>
+  .page { max-width: 500px; }
+  h2 { font-size: 1.3rem; font-weight: 700; margin: 0 0 4px; }
+  h3 { font-size: 0.9rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { font-size: 0.82rem; color: var(--pdx-color-muted, #999); margin: 0 0 20px; }
+  section { margin-bottom: 24px; padding: 16px; border: 1px solid var(--pdx-color-border, #e0e0e0); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-surface, white); }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .input-with-action { position: relative; display: flex; align-items: center; }
+  .input-with-action .pdx-input { width: 100%; padding-right: 2.5rem; }
+  .input-icon { position: absolute; left: 10px; font-size: 0.85rem; opacity: 0.4; pointer-events: none; z-index: 1; }
+  .toggle-btn { position: absolute; right: 8px; background: none; border: none; cursor: pointer; padding: 4px; font-size: 0.9rem; opacity: 0.6; }
+  .toggle-btn:hover { opacity: 1; }
+  .stepper { display: inline-flex; align-items: stretch; border-radius: var(--pdx-radius-md, 6px); overflow: hidden; }
+  .stepper button { border-radius: 0; min-width: 36px; }
+  .stepper-input { border-radius: 0; text-align: center; width: 80px; -moz-appearance: textfield; }
+  .stepper-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+</style>

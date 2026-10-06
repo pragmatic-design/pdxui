@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Full Width</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>full</code> attribute to stretch items evenly across the container.</p>
+
+    <div class="demo-row" style="max-width: 400px;">
+      <div class="pdx-segmented" full>
+        <button class="pdx-segmented-item active">All</button>
+        <button class="pdx-segmented-item">Active</button>
+        <button class="pdx-segmented-item">Archived</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-segmented" full&gt;
+  &lt;button class="pdx-segmented-item active"&gt;All&lt;/button&gt;
+  &lt;button class="pdx-segmented-item"&gt;Active&lt;/button&gt;
+  &lt;button class="pdx-segmented-item"&gt;Archived&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Enum Filter (filterOptions)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Columns with <code>filterOptions</code> show a predefined dropdown.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="enumFilterDS" :columns="enumFilterColumns" :filterable="true" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>{ field: 'category', filterOptions: [
+    { label: 'Electronics', value: 'Electronics' },
+    { label: 'Clothing', value: 'Clothing' },
+  ]}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// ─── Enum filter ────────────────────────────
+const enumFilterColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category', filterOptions: [
+    { label: 'Electronics', value: 'Electronics' },
+    { label: 'Clothing', value: 'Clothing' },
+    { label: 'Books', value: 'Books' },
+    { label: 'Home', value: 'Home' },
+    { label: 'Sports', value: 'Sports' },
+  ]},
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+  { field: 'inStock', header: 'Available', type: 'boolean' },
+];
+
+const enumFilterDS = createDataSource({ data: products.slice(0, 30), pageSize: 10 });
+</script>

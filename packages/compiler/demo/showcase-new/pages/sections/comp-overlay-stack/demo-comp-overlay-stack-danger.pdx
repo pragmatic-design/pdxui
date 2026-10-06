@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Danger + Type-to-Confirm</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Red variant with type-to-confirm protection.</p>
+    <div class="demo-row">
+      <pdx-button variant="danger" size="sm" @click="onDangerConfirm">Delete Account</pdx-button>
+      <span class="pdx-txt-small pdx-ink-muted">Result: {{ dangerResult }}</span>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+
+let dangerResult = $signal('(none)');
+
+async function onDangerConfirm() {
+    const result = await dialog.confirm({
+        title: 'Delete Account?',
+        message: 'This action is permanent and cannot be undone.',
+        variant: 'danger',
+        confirmLabel: 'Delete',
+        confirmText: 'delete my account',
+    });
+    dangerResult = result ? 'DELETED' : 'cancelled';
+}
+</script>

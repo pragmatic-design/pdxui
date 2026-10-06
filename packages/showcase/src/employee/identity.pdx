@@ -1,0 +1,54 @@
+<template>
+  <!-- The identity group of the employee's personal data, as a SECTION of the page's form: its
+       named controls are wired to that form because the script calls tryUseForm(). It is its own component for the one thing no other group has — a field that
+       appears for a condition: the tax code, asked only of someone living in Italy. The rule that
+       requires it is the form's (`personalRule`), not this component's. -->
+  <fieldset class="group" data-test="group-identity">
+    <legend class="group-title">{{ $t('employees.personal.groups.identity') }}</legend>
+    <div class="grid two">
+      <pdx-form-field name="firstName" :label="$t('employees.personal.fields.firstName')">
+        <pdx-input name="firstName" data-test="firstName"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field name="lastName" :label="$t('employees.personal.fields.lastName')">
+        <pdx-input name="lastName" data-test="lastName"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field name="birthDate" :label="$t('employees.personal.fields.birthDate')">
+        <pdx-date-picker name="birthDate" editable data-test="birthDate"></pdx-date-picker>
+      </pdx-form-field>
+      <pdx-form-field name="gender" :label="$t('employees.personal.fields.gender')">
+        <pdx-radio-group name="gender" orientation="horizontal" data-test="gender">
+          <pdx-radio value="female" :label="$t('employees.personal.genders.female')"></pdx-radio>
+          <pdx-radio value="male" :label="$t('employees.personal.genders.male')"></pdx-radio>
+          <pdx-radio value="other" :label="$t('employees.personal.genders.other')"></pdx-radio>
+        </pdx-radio-group>
+      </pdx-form-field>
+      <!-- CONDITIONAL: asked, and required by the form's rule, only of someone living in Italy.
+           Masked to the codice fiscale's shape; the rule refuses one not complete. -->
+      <pdx-form-field name="taxCode" :label="$t('employees.personal.fields.taxCode')" :show="country === 'IT'">
+        <pdx-masked-input name="taxCode" mask="AAAAAA##A##A###A" data-test="taxCode"></pdx-masked-input>
+      </pdx-form-field>
+      <pdx-form-field name="language" :label="$t('employees.personal.fields.language')">
+        <pdx-select name="language" :options="languages" data-test="language"></pdx-select>
+      </pdx-form-field>
+    </div>
+  </fieldset>
+</template>
+
+<script setup>
+import { getLocale, tryUseForm } from '@pdxui/core';
+
+/** The country of residence: the tax code is asked only for Italy. The form holds it; the page reads it. */
+@prop country: string = '';
+
+// The declaration that this component is a section of the form above it. `tryUseForm`,
+// not `useForm`: a section can set up before its <pdx-form>, and the wired controls look the form
+// up themselves.
+tryUseForm();
+
+// `getLocale()` hands back the signal; reading it is the second call.
+const localeSignal = getLocale();
+const LANGUAGES = ['it', 'en', 'fr', 'de', 'es'];
+/** Each language in the reader's language, from the platform rather than from a dictionary. */
+const languageNames = $derived(new Intl.DisplayNames([localeSignal()], { type: 'language' }));
+const languages = $derived(LANGUAGES.map(code => ({ value: code, label: languageNames.of(code) })));
+</script>

@@ -1,0 +1,2278 @@
+{
+  "components": [
+    {
+      "name": "accordion",
+      "tags": [
+        "pdx-accordion"
+      ],
+      "tier": "2B",
+      "status": "wip",
+      "page": "tier-2b",
+      "scenarios": [
+        {
+          "id": "accordion-two-instances",
+          "title": "Accordion — two instances on one page"
+        },
+        {
+          "id": "accordion-disabled-item",
+          "title": "Accordion — a disabled item"
+        },
+        {
+          "id": "accordion-basic",
+          "title": "Accordion — Basic"
+        }
+      ]
+    },
+    {
+      "name": "affix",
+      "tags": [
+        "pdx-affix"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "affix-basic",
+          "title": "Affix — Basic (static, content wrapper)"
+        }
+      ]
+    },
+    {
+      "name": "alert-dialog",
+      "tags": [
+        "pdx-alert-dialog"
+      ],
+      "tier": "2A",
+      "status": "wip",
+      "page": "tier-2a",
+      "scenarios": [
+        {
+          "id": "alert-open",
+          "title": "Alert Dialog — Open (confirm/cancel)"
+        },
+        {
+          "id": "alert-danger",
+          "title": "Alert Dialog — Open (danger variant)"
+        }
+      ]
+    },
+    {
+      "name": "app-layout",
+      "tags": [
+        "pdx-app-layout"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "app-layout-basic",
+          "title": "App Layout — Header + Navbar + Main + Footer"
+        }
+      ]
+    },
+    {
+      "name": "aspect-ratio",
+      "tags": [
+        "pdx-aspect-ratio"
+      ],
+      "tier": "7",
+      "status": "wip",
+      "page": "tier-7",
+      "scenarios": [
+        {
+          "id": "aspect-ratio-16-9",
+          "title": "Aspect Ratio — 16:9 (width fixed 320px)"
+        },
+        {
+          "id": "aspect-ratio-1-1",
+          "title": "Aspect Ratio — 1:1 (square)"
+        }
+      ]
+    },
+    {
+      "name": "auto-form",
+      "tags": [
+        "pdx-auto-form"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "auto-form-fields",
+          "title": "Auto Form — Fields-driven grid (2 cols, 2 fields)"
+        }
+      ]
+    },
+    {
+      "name": "autocomplete",
+      "tags": [
+        "pdx-autocomplete"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "autocomplete-closed",
+          "title": "Autocomplete — Closed with a typed value"
+        },
+        {
+          "id": "autocomplete-open",
+          "title": "Autocomplete — Open (suggestions listbox visible below the input)"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "tags": [
+        "pdx-avatar"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "avatar-sizes",
+          "title": "Avatar — Sizes (xs/sm/md/lg/xl)"
+        },
+        {
+          "id": "avatar-shapes",
+          "title": "Avatar — Shapes (circle/square)"
+        },
+        {
+          "id": "avatar-no-alt",
+          "title": "Avatar — without a name (decorative)"
+        }
+      ]
+    },
+    {
+      "name": "avatar-group",
+      "tags": [
+        "pdx-avatar-group"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "avatar-group-stack",
+          "title": "Avatar Group — 4 members, max 3 (+1 counter)"
+        },
+        {
+          "id": "avatar-group-clickable",
+          "title": "Avatar Group — clickable, 4 members, max 3"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "tags": [
+        "pdx-badge"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "badge-variants",
+          "title": "Badge — Variants"
+        },
+        {
+          "id": "badge-shape",
+          "title": "Badge — Shape"
+        },
+        {
+          "id": "badge-dot",
+          "title": "Badge — Named status dots"
+        },
+        {
+          "id": "badge-outline",
+          "title": "Badge — Outline variants"
+        }
+      ]
+    },
+    {
+      "name": "banner",
+      "tags": [
+        "pdx-banner"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "banner-variants",
+          "title": "Banner — Variants (info/success/warning/danger)"
+        },
+        {
+          "id": "banner-closable",
+          "title": "Banner — Closable"
+        }
+      ]
+    },
+    {
+      "name": "block-ui",
+      "tags": [
+        "pdx-block-ui"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "block-ui-blocked",
+          "title": "Block UI — Blocked (overlay + spinner + message)"
+        },
+        {
+          "id": "block-ui-tall",
+          "title": "Block UI — Tall block (2,000px), blocked"
+        },
+        {
+          "id": "block-ui-fullscreen",
+          "title": "Block UI — Fullscreen, blocked"
+        }
+      ]
+    },
+    {
+      "name": "bottom-nav",
+      "tags": [
+        "pdx-bottom-nav"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "bottom-nav-basic",
+          "title": "Bottom Nav — Basic"
+        }
+      ]
+    },
+    {
+      "name": "bottom-sheet",
+      "tags": [
+        "pdx-bottom-sheet"
+      ],
+      "tier": "2A",
+      "status": "wip",
+      "page": "tier-2a",
+      "scenarios": [
+        {
+          "id": "bottom-sheet-open",
+          "title": "Bottom Sheet — Open"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumb",
+      "tags": [
+        "pdx-breadcrumb"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "breadcrumb-basic",
+          "title": "Breadcrumb — Basic"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "tags": [
+        "pdx-button"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "button-variants",
+          "title": "Button — Variants"
+        },
+        {
+          "id": "button-sizes",
+          "title": "Button — Sizes"
+        },
+        {
+          "id": "button-disabled",
+          "title": "Button — Disabled"
+        },
+        {
+          "id": "button-icon-only",
+          "title": "Button — Icon-only, named"
+        },
+        {
+          "id": "button-labels",
+          "title": "Button — Labels of every variant"
+        }
+      ]
+    },
+    {
+      "name": "button-group",
+      "tags": [
+        "pdx-button-group"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "button-group-basic",
+          "title": "Button Group — 3 connected buttons"
+        },
+        {
+          "id": "button-group-single",
+          "title": "Button Group — single selection (radio group)"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "tags": [
+        "pdx-calendar"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "calendar-month",
+          "title": "Calendar — June 2024, day 15 selected (inline)"
+        },
+        {
+          "id": "calendar-disabled",
+          "title": "Calendar — Disabled"
+        },
+        {
+          "id": "calendar-minmax",
+          "title": "Calendar — June 2024 with min/max bounds"
+        },
+        {
+          "id": "calendar-two-months",
+          "title": "Calendar — two months, June and July 2024"
+        },
+        {
+          "id": "calendar-two-months-narrow",
+          "title": "Calendar — two months in a box narrower than both"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "tags": [
+        "pdx-card"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "card-basic",
+          "title": "Card — Basic (sectioned)"
+        },
+        {
+          "id": "card-clickable",
+          "title": "Card — Clickable"
+        },
+        {
+          "id": "card-selected",
+          "title": "Card — Selected"
+        },
+        {
+          "id": "card-disabled",
+          "title": "Card — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "carousel",
+      "tags": [
+        "pdx-carousel"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "carousel-basic",
+          "title": "Carousel — 3 slides (autoplay off)"
+        }
+      ]
+    },
+    {
+      "name": "cascader",
+      "tags": [
+        "pdx-cascader"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "cascader-closed",
+          "title": "Cascader — Closed (trigger with a selected path)"
+        },
+        {
+          "id": "cascader-open",
+          "title": "Cascader — Open (cascading columns panel)"
+        },
+        {
+          "id": "cascader-disabled",
+          "title": "Cascader — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "chart",
+      "tags": [
+        "pdx-chart"
+      ],
+      "tier": "7",
+      "status": "wip",
+      "page": "tier-7",
+      "scenarios": [
+        {
+          "id": "chart-bar",
+          "title": "Chart — Bar (fixed data, 400×300 wrapper, no animation settle)"
+        },
+        {
+          "id": "chart-two-series",
+          "title": "Chart — two series, legend as buttons"
+        },
+        {
+          "id": "chart-doughnut",
+          "title": "Chart — doughnut, one series, a legend of its slices"
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "tags": [
+        "pdx-checkbox"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "checkbox-basic",
+          "title": "Checkbox — Basic"
+        },
+        {
+          "id": "checkbox-mixed",
+          "title": "Checkbox — Indeterminate"
+        }
+      ]
+    },
+    {
+      "name": "checkbox-group",
+      "tags": [
+        "pdx-checkbox-group"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "checkbox-group-basic",
+          "title": "Checkbox Group — Basic"
+        },
+        {
+          "id": "checkbox-group-disabled",
+          "title": "Checkbox Group — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "chip",
+      "tags": [
+        "pdx-chip"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "chip-variants",
+          "title": "Chip — Variants"
+        },
+        {
+          "id": "chip-disabled",
+          "title": "Chip — Disabled"
+        },
+        {
+          "id": "chip-selectable-removable",
+          "title": "Chip — Selectable and removable"
+        },
+        {
+          "id": "chip-text-colours",
+          "title": "Chip — Outline and tonal colours"
+        }
+      ]
+    },
+    {
+      "name": "col",
+      "tags": [
+        "pdx-col"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "col-halves",
+          "title": "Col — two span=6 columns (halves) in a row",
+          "viewport": 1280
+        },
+        {
+          "id": "col-asymmetric",
+          "title": "Col — span=4 + span=8 (narrow + wide) in a row",
+          "viewport": 1280
+        }
+      ]
+    },
+    {
+      "name": "color-picker",
+      "tags": [
+        "pdx-color-picker"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "cp-closed",
+          "title": "Color Picker — Closed (swatch trigger)"
+        },
+        {
+          "id": "cp-open",
+          "title": "Color Picker — Open (spectrum + hue slider + hex input panel below trigger)"
+        },
+        {
+          "id": "cp-disabled",
+          "title": "Color Picker — Disabled swatch"
+        }
+      ]
+    },
+    {
+      "name": "command",
+      "tags": [
+        "pdx-command"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "command-open",
+          "title": "Command Palette — Open (search + grouped results)"
+        }
+      ]
+    },
+    {
+      "name": "context-menu",
+      "tags": [
+        "pdx-context-menu"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "ctxmenu-open",
+          "title": "Context Menu — Open (menu panel at cursor)"
+        },
+        {
+          "id": "ctxmenu-keyboard",
+          "title": "Context Menu — From the keyboard (focusable area)"
+        },
+        {
+          "id": "ctxmenu-closed",
+          "title": "Context Menu — Closed (host wraps target, no panel visible)"
+        }
+      ]
+    },
+    {
+      "name": "data-grid",
+      "tags": [
+        "pdx-data-grid"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "data-grid-basic",
+          "title": "Data grid — read-only, a sortable column, named"
+        },
+        {
+          "id": "data-grid-row-clickable",
+          "title": "Data grid — rows that open a record (row-clickable)"
+        },
+        {
+          "id": "data-grid-select-filter",
+          "title": "Data grid — multiple selection and the inline filter row"
+        },
+        {
+          "id": "data-grid-grouped-toolbar",
+          "title": "Data grid — grouped by category, with the toolbar"
+        },
+        {
+          "id": "data-grid-filtered-toolbar",
+          "title": "Data grid — the toolbar with an active filter"
+        },
+        {
+          "id": "data-grid-narrow-column",
+          "title": "Data grid — a 100px column, and the filter icon that shares it"
+        },
+        {
+          "id": "data-grid-quick-filters",
+          "title": "Data grid — quick-filter chips and the search field"
+        },
+        {
+          "id": "data-grid-empty",
+          "title": "Data grid — no rows"
+        },
+        {
+          "id": "data-grid-row-menu",
+          "title": "Data grid — a row's own menu, open"
+        }
+      ]
+    },
+    {
+      "name": "date-picker",
+      "tags": [
+        "pdx-date-picker"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "date-picker-closed",
+          "title": "Date Picker — Closed (input with a fixed value)"
+        },
+        {
+          "id": "date-picker-open",
+          "title": "Date Picker — Open (calendar popover below the input)"
+        },
+        {
+          "id": "date-picker-month-open",
+          "title": "Date Picker — Month mode, open"
+        },
+        {
+          "id": "date-picker-editable",
+          "title": "Date Picker — Editable (typed date), valid and invalid"
+        },
+        {
+          "id": "date-picker-disabled",
+          "title": "Date Picker — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "description-list",
+      "tags": [
+        "pdx-description-list"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "description-list-basic",
+          "title": "Description List — Basic (horizontal, single column)"
+        },
+        {
+          "id": "description-list-bordered",
+          "title": "Description List — Bordered"
+        },
+        {
+          "id": "description-list-columns",
+          "title": "Description List — Multi-column grid (2)"
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "tags": [
+        "pdx-dialog"
+      ],
+      "tier": "2A",
+      "status": "wip",
+      "page": "tier-2a",
+      "scenarios": [
+        {
+          "id": "dialog-open",
+          "title": "Dialog — Open (md)"
+        }
+      ]
+    },
+    {
+      "name": "divider",
+      "tags": [
+        "pdx-divider"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "divider-orientation",
+          "title": "Divider — Horizontal & Vertical"
+        },
+        {
+          "id": "divider-label",
+          "title": "Divider — With Label"
+        },
+        {
+          "id": "divider-vertical-row",
+          "title": "Divider — Vertical, in a wrapping row"
+        },
+        {
+          "id": "divider-text-label",
+          "title": "Divider — Text content as the label"
+        }
+      ]
+    },
+    {
+      "name": "drawer",
+      "tags": [
+        "pdx-drawer"
+      ],
+      "tier": "2A",
+      "status": "wip",
+      "page": "tier-2a",
+      "scenarios": [
+        {
+          "id": "drawer-right",
+          "title": "Drawer — Right (open)"
+        },
+        {
+          "id": "drawer-left",
+          "title": "Drawer — Left (open)"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "tags": [
+        "pdx-dropdown-menu"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "dd-closed",
+          "title": "Dropdown Menu — Trigger closed"
+        },
+        {
+          "id": "dd-open",
+          "title": "Dropdown Menu — Open (menu panel visible below trigger)"
+        },
+        {
+          "id": "dd-custom-trigger",
+          "title": "Dropdown Menu — Custom trigger (slot=\"trigger\")"
+        },
+        {
+          "id": "dd-disabled",
+          "title": "Dropdown Menu — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "empty-state",
+      "tags": [
+        "pdx-empty-state"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "empty-state-basic",
+          "title": "Empty State — Basic (icon + title + desc)"
+        },
+        {
+          "id": "empty-state-action",
+          "title": "Empty State — With action button"
+        }
+      ]
+    },
+    {
+      "name": "fab",
+      "tags": [
+        "pdx-fab"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "fab-basic",
+          "title": "FAB — Basic (single action button)"
+        },
+        {
+          "id": "fab-sizes",
+          "title": "FAB — Sizes (sm/md/lg)"
+        },
+        {
+          "id": "fab-speed-dial",
+          "title": "FAB — Speed dial (keyboard)"
+        }
+      ]
+    },
+    {
+      "name": "field-group",
+      "tags": [
+        "pdx-field-group"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "field-group-basic",
+          "title": "Field Group — Inline group with label + stacked fields"
+        },
+        {
+          "id": "field-group-panels",
+          "title": "Field Group — Panels, collapsed and expanded"
+        }
+      ]
+    },
+    {
+      "name": "field-list",
+      "tags": [
+        "pdx-field-list"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "field-list-empty",
+          "title": "Field List — Empty state (Add button + empty message)"
+        }
+      ]
+    },
+    {
+      "name": "fieldset",
+      "tags": [
+        "pdx-fieldset"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "fieldset-basic",
+          "title": "Fieldset — Bordered with legend + fields"
+        },
+        {
+          "id": "fieldset-collapsible",
+          "title": "Fieldset — Collapsible, with and without a legend"
+        },
+        {
+          "id": "fieldset-disabled",
+          "title": "Fieldset — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "file-upload",
+      "tags": [
+        "pdx-file-upload"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "file-upload-empty",
+          "title": "File Upload — Empty dropzone"
+        },
+        {
+          "id": "file-upload-disabled",
+          "title": "File Upload — Disabled dropzone"
+        }
+      ]
+    },
+    {
+      "name": "filter-builder",
+      "tags": [
+        "pdx-filter-builder"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "filter-builder-empty",
+          "title": "Filter Builder — Empty bar (Add Filter button)"
+        }
+      ]
+    },
+    {
+      "name": "form",
+      "tags": [
+        "pdx-form"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "form-basic",
+          "title": "Form — Native <form> with two fields + action"
+        }
+      ]
+    },
+    {
+      "name": "form-actions",
+      "tags": [
+        "pdx-form-actions"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "form-actions-end",
+          "title": "Form actions — slotted buttons, align end"
+        }
+      ]
+    },
+    {
+      "name": "form-field",
+      "tags": [
+        "pdx-form-field"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "form-field-basic",
+          "title": "Form Field — Label + Input + Hint"
+        },
+        {
+          "id": "form-field-error",
+          "title": "Form Field — Error state"
+        },
+        {
+          "id": "form-field-nested",
+          "title": "Form Field — Nested in a plain div"
+        },
+        {
+          "id": "form-field-in-form",
+          "title": "Form Field — Direct children of pdx-form"
+        },
+        {
+          "id": "form-field-in-stack",
+          "title": "Form Field — Children of pdx-stack gap=\"md\""
+        }
+      ]
+    },
+    {
+      "name": "form-section",
+      "tags": [
+        "pdx-form-section"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "form-section-basic",
+          "title": "Form Section — Label header + slotted fields"
+        }
+      ]
+    },
+    {
+      "name": "form-template",
+      "tags": [
+        "pdx-form-template"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "form-template-grid",
+          "title": "Form Template — Schema-driven grid (2 cols, 2 fields)"
+        }
+      ]
+    },
+    {
+      "name": "icon",
+      "tags": [
+        "pdx-icon"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "icon-decorative",
+          "title": "Icon — Decorative (aria-hidden)"
+        },
+        {
+          "id": "icon-semantic",
+          "title": "Icon — Semantic (role=img + aria-label)"
+        },
+        {
+          "id": "icon-sizes",
+          "title": "Icon — Sizes (sm / md / lg)"
+        }
+      ]
+    },
+    {
+      "name": "image",
+      "tags": [
+        "pdx-image"
+      ],
+      "tier": "7",
+      "status": "wip",
+      "page": "tier-7",
+      "scenarios": [
+        {
+          "id": "image-basic",
+          "title": "Image — Basic (16/9, eager, deterministic SVG)"
+        },
+        {
+          "id": "image-rounded",
+          "title": "Image — Rounded (circular, 1/1)"
+        },
+        {
+          "id": "image-lightbox",
+          "title": "Image — Lightbox trigger (keyboard)"
+        },
+        {
+          "id": "image-lightbox-open",
+          "title": "Image — Lightbox open"
+        }
+      ]
+    },
+    {
+      "name": "infinite-scroll",
+      "tags": [
+        "pdx-infinite-scroll"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "infinite-scroll-idle",
+          "title": "InfiniteScroll — Idle (slotted items, sentinel at end, no loading)"
+        }
+      ]
+    },
+    {
+      "name": "inline-edit",
+      "tags": [
+        "pdx-inline-edit"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "inline-edit-display",
+          "title": "Inline Edit — Display (text)"
+        },
+        {
+          "id": "inline-edit-textarea-display",
+          "title": "Inline Edit — Display (textarea)"
+        },
+        {
+          "id": "inline-edit-readonly",
+          "title": "Inline Edit — Readonly"
+        },
+        {
+          "id": "inline-edit-disabled",
+          "title": "Inline Edit — Disabled"
+        },
+        {
+          "id": "inline-edit-editing",
+          "title": "Inline Edit — Editing (text input visible)"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "tags": [
+        "pdx-input"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "input-basic",
+          "title": "Input — Basic"
+        },
+        {
+          "id": "input-disabled",
+          "title": "Input — Disabled"
+        },
+        {
+          "id": "input-error",
+          "title": "Input — Error"
+        },
+        {
+          "id": "input-sizes",
+          "title": "Input — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "input-group",
+      "tags": [
+        "pdx-input-group"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "input-group",
+          "title": "Input Group — Button"
+        },
+        {
+          "id": "input-group-3",
+          "title": "Input Group — Addon + Input + Button"
+        }
+      ]
+    },
+    {
+      "name": "kbd",
+      "tags": [
+        "pdx-kbd"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "kbd-basic",
+          "title": "Kbd — Single & Combo"
+        },
+        {
+          "id": "kbd-sizes",
+          "title": "Kbd — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "tags": [
+        "pdx-label"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "label-variants",
+          "title": "Label — Variants"
+        },
+        {
+          "id": "label-disabled",
+          "title": "Label — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "list",
+      "tags": [
+        "pdx-list"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "list-basic",
+          "title": "List — Basic (bordered, dividers)"
+        },
+        {
+          "id": "list-clickable",
+          "title": "List — Clickable items"
+        }
+      ]
+    },
+    {
+      "name": "masked-input",
+      "tags": [
+        "pdx-masked-input"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "masked-input-basic",
+          "title": "Masked Input — Basic (phone)"
+        },
+        {
+          "id": "masked-input-disabled",
+          "title": "Masked Input — Disabled"
+        },
+        {
+          "id": "masked-input-sizes",
+          "title": "Masked Input — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "masonry",
+      "tags": [
+        "pdx-masonry"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "masonry-columns",
+          "title": "Masonry — 3 columns, fixed-height items",
+          "viewport": 1280
+        },
+        {
+          "id": "masonry-auto",
+          "title": "Masonry — columns=\"auto\", responsive from columnWidth",
+          "viewport": 1280
+        }
+      ]
+    },
+    {
+      "name": "mention",
+      "tags": [
+        "pdx-mention"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "mention-closed",
+          "title": "Mention — Closed (textarea with text, no suggestions panel)"
+        },
+        {
+          "id": "mention-type",
+          "title": "Mention — Typing a mention"
+        },
+        {
+          "id": "mention-open",
+          "title": "Mention — Open (suggestions panel visible after typing @)"
+        }
+      ]
+    },
+    {
+      "name": "menu",
+      "tags": [
+        "pdx-menu"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "menu-open",
+          "title": "Menu — Standalone, visible inline (open)"
+        },
+        {
+          "id": "menu-submenu",
+          "title": "Menu — a submenu beside its item"
+        }
+      ]
+    },
+    {
+      "name": "menubar",
+      "tags": [
+        "pdx-menubar"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "menubar-closed",
+          "title": "Menubar — Closed top-level bar (File | Edit | View | Help)"
+        },
+        {
+          "id": "menubar-open",
+          "title": "Menubar — Open (File menu panel visible below trigger)"
+        }
+      ]
+    },
+    {
+      "name": "nav-menu",
+      "tags": [
+        "pdx-nav-menu"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "nav-menu-basic",
+          "title": "Nav Menu — Basic"
+        },
+        {
+          "id": "nav-menu-heading",
+          "title": "Nav Menu — Section headings"
+        },
+        {
+          "id": "nav-menu-folding",
+          "title": "Nav Menu — A group heading that folds"
+        },
+        {
+          "id": "nav-menu-flyout",
+          "title": "Nav Menu — Collapsed, a group in a flyout"
+        },
+        {
+          "id": "nav-menu-sm",
+          "title": "Nav Menu — size=\"sm\" beside the default"
+        },
+        {
+          "id": "nav-menu-border",
+          "title": "Nav Menu — indicator=\"border\""
+        },
+        {
+          "id": "nav-menu-chevron",
+          "title": "Nav Menu — chevron=\"start\" and chevron=\"end\""
+        }
+      ]
+    },
+    {
+      "name": "navbar",
+      "tags": [
+        "pdx-navbar"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "navbar-basic",
+          "title": "Navbar — Basic (desktop)"
+        },
+        {
+          "id": "navbar-narrow",
+          "title": "Navbar — Narrow container (600px, desktop viewport)"
+        },
+        {
+          "id": "navbar-phone",
+          "title": "Navbar — collapsed, actions wider than what is left of the bar"
+        }
+      ]
+    },
+    {
+      "name": "number-input",
+      "tags": [
+        "pdx-number-input"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "number-input-both",
+          "title": "Number Input — Both Controls"
+        },
+        {
+          "id": "number-input-right",
+          "title": "Number Input — Right Stack"
+        },
+        {
+          "id": "number-input-sign",
+          "title": "Number Input — Colored by sign"
+        },
+        {
+          "id": "number-input-range",
+          "title": "Number Input — Range keys"
+        },
+        {
+          "id": "number-input-caret",
+          "title": "Number Input — Caret step mode"
+        },
+        {
+          "id": "number-input-sizes",
+          "title": "Number Input — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "otp-input",
+      "tags": [
+        "pdx-otp-input"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "otp-input-basic",
+          "title": "OTP Input — Basic (6 cells)"
+        },
+        {
+          "id": "otp-input-disabled",
+          "title": "OTP Input — Disabled"
+        },
+        {
+          "id": "otp-input-sizes",
+          "title": "OTP Input — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "tags": [
+        "pdx-pagination"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "pagination-basic",
+          "title": "Pagination — 5 pages, on page 1"
+        },
+        {
+          "id": "pagination-narrow",
+          "title": "Pagination — in a box narrower than its row"
+        }
+      ]
+    },
+    {
+      "name": "password-input",
+      "tags": [
+        "pdx-password-input"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "password-input-basic",
+          "title": "Password Input — Basic"
+        },
+        {
+          "id": "password-input-disabled",
+          "title": "Password Input — Disabled"
+        },
+        {
+          "id": "password-input-sizes",
+          "title": "Password Input — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "pin-input",
+      "tags": [
+        "pdx-pin-input"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "pin-basic",
+          "title": "PIN Input — Basic (4 cells, masked)"
+        },
+        {
+          "id": "pin-disabled",
+          "title": "PIN Input — Disabled"
+        },
+        {
+          "id": "pin-sizes",
+          "title": "PIN Input — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "popover",
+      "tags": [
+        "pdx-popover"
+      ],
+      "tier": "2A",
+      "status": "wip",
+      "page": "tier-2a",
+      "scenarios": [
+        {
+          "id": "popover-bottom",
+          "title": "Popover — Bottom (click)"
+        },
+        {
+          "id": "popover-open",
+          "title": "Popover — Open (the panel is in the picture)"
+        },
+        {
+          "id": "popover-top",
+          "title": "Popover — Top (click)"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "tags": [
+        "pdx-progress"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "progress-determinate",
+          "title": "Progress — Determinate"
+        },
+        {
+          "id": "progress-indeterminate",
+          "title": "Progress — Indeterminate"
+        }
+      ]
+    },
+    {
+      "name": "radio",
+      "tags": [
+        "pdx-radio"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "radio-basic",
+          "title": "Radio — Basic"
+        },
+        {
+          "id": "radio-group",
+          "title": "Radio — Group"
+        },
+        {
+          "id": "radio-disabled",
+          "title": "Radio — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "radio-group",
+      "tags": [
+        "pdx-radio-group"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "radio-group-basic",
+          "title": "Radio Group — Basic"
+        },
+        {
+          "id": "radio-group-disabled",
+          "title": "Radio Group — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "rating",
+      "tags": [
+        "pdx-rating"
+      ],
+      "tier": "3C",
+      "status": "wip",
+      "page": "tier-3c",
+      "scenarios": [
+        {
+          "id": "rating-basic",
+          "title": "Rating — Basic"
+        },
+        {
+          "id": "rating-sizes",
+          "title": "Rating — Sizes"
+        },
+        {
+          "id": "rating-disabled",
+          "title": "Rating — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "relation-picker",
+      "tags": [
+        "pdx-relation-picker"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "relation-picker-basic",
+          "title": "Relation picker — 6 rows, 3 per page, nothing picked"
+        },
+        {
+          "id": "relation-picker-searchable",
+          "title": "Relation picker — searchable: the grid carries a filter row"
+        }
+      ]
+    },
+    {
+      "name": "relative-time",
+      "tags": [
+        "pdx-relative-time"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "relative-time-past",
+          "title": "Relative Time — fixed far-past datetime (deterministic \"N years ago\")"
+        }
+      ]
+    },
+    {
+      "name": "rich-text",
+      "tags": [
+        "pdx-rich-text"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "rich-text-basic",
+          "title": "Rich text — toolbar (top) + contenteditable editor"
+        }
+      ]
+    },
+    {
+      "name": "row",
+      "tags": [
+        "pdx-row"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "row-cols",
+          "title": "Row — 3 columns side by side (span 4, gutter md)"
+        }
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "tags": [
+        "pdx-scroll-area"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "scroll-area-vertical",
+          "title": "ScrollArea — Vertical (content exceeds max-height)"
+        }
+      ]
+    },
+    {
+      "name": "scroll-spy",
+      "tags": [
+        "pdx-scroll-spy"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "scroll-spy-basic",
+          "title": "Scroll Spy — Basic (scroll-top, first link active)"
+        }
+      ]
+    },
+    {
+      "name": "search-input",
+      "tags": [
+        "pdx-search-input"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "search-input-basic",
+          "title": "Search Input — Basic"
+        },
+        {
+          "id": "search-input-value",
+          "title": "Search Input — With value (clear visible)"
+        },
+        {
+          "id": "search-input-disabled",
+          "title": "Search Input — Disabled"
+        },
+        {
+          "id": "search-input-sizes",
+          "title": "Search Input — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "segmented",
+      "tags": [
+        "pdx-segmented"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "segmented-basic",
+          "title": "Segmented — Basic"
+        },
+        {
+          "id": "segmented-disabled",
+          "title": "Segmented — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "tags": [
+        "pdx-select"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "select-closed",
+          "title": "Select — Closed with a selected value"
+        },
+        {
+          "id": "select-open",
+          "title": "Select — Open (listbox panel visible below trigger)"
+        },
+        {
+          "id": "select-searchable",
+          "title": "Select — Searchable (the search input is the combobox)"
+        },
+        {
+          "id": "select-disabled",
+          "title": "Select — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "tags": [
+        "pdx-sidebar"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "sidebar-expanded",
+          "title": "Sidebar — Expanded (default, left)"
+        },
+        {
+          "id": "sidebar-collapsed",
+          "title": "Sidebar — Collapsed (width 0)"
+        },
+        {
+          "id": "sidebar-mini",
+          "title": "Sidebar — Mini collapsed (icons-only width)"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "tags": [
+        "pdx-slider"
+      ],
+      "tier": "1C",
+      "status": "wip",
+      "page": "tier-1c",
+      "scenarios": [
+        {
+          "id": "slider-basic",
+          "title": "Slider — Basic"
+        },
+        {
+          "id": "slider-sizes",
+          "title": "Slider — Sizes"
+        },
+        {
+          "id": "slider-disabled",
+          "title": "Slider — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "sortable-list",
+      "tags": [
+        "pdx-sortable-list"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "sortable-basic",
+          "title": "Sortable list — vertical"
+        },
+        {
+          "id": "sortable-horizontal",
+          "title": "Sortable list — horizontal"
+        },
+        {
+          "id": "sortable-disabled",
+          "title": "Sortable list — disabled"
+        }
+      ]
+    },
+    {
+      "name": "spinner",
+      "tags": [
+        "pdx-spinner"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "spinner-variants",
+          "title": "Spinner — Variants"
+        },
+        {
+          "id": "spinner-sizes",
+          "title": "Spinner — Sizes"
+        }
+      ]
+    },
+    {
+      "name": "split-button",
+      "tags": [
+        "pdx-split-button"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "split-basic",
+          "title": "Split Button — Primary + chevron (closed)"
+        },
+        {
+          "id": "split-menu",
+          "title": "Split Button — Dropdown menu open (after click on chevron)"
+        },
+        {
+          "id": "split-open",
+          "title": "Split Button — Open (the menu is in the picture)"
+        },
+        {
+          "id": "split-disabled",
+          "title": "Split Button — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "splitter",
+      "tags": [
+        "pdx-splitter"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "splitter-horizontal",
+          "title": "Splitter — horizontal (side-by-side panes + handle)"
+        },
+        {
+          "id": "splitter-vertical",
+          "title": "Splitter — vertical (stacked panes + handle)"
+        }
+      ]
+    },
+    {
+      "name": "statistic",
+      "tags": [
+        "pdx-statistic"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "statistic-basic",
+          "title": "Statistic — KPI with title, value, trend"
+        }
+      ]
+    },
+    {
+      "name": "switch-toggle",
+      "tags": [
+        "pdx-switch"
+      ],
+      "tier": "1",
+      "status": "wip",
+      "page": "tier-1",
+      "scenarios": [
+        {
+          "id": "switch-basic",
+          "title": "Switch — Basic (off / on / with label)"
+        },
+        {
+          "id": "switch-sizes",
+          "title": "Switch — Sizes (sm / md / lg)"
+        },
+        {
+          "id": "switch-disabled",
+          "title": "Switch — Disabled"
+        },
+        {
+          "id": "switch-in-form",
+          "title": "Switch — In a form, beside a text field (compact / normal / comfortable)"
+        }
+      ]
+    },
+    {
+      "name": "tab",
+      "tags": [
+        "pdx-tabs"
+      ],
+      "tier": "2B",
+      "status": "wip",
+      "page": "tier-2b",
+      "scenarios": [
+        {
+          "id": "tab-basic",
+          "title": "Tabs — Basic"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "tags": [
+        "pdx-table"
+      ],
+      "tier": "5A",
+      "status": "wip",
+      "page": "tier-5a",
+      "scenarios": [
+        {
+          "id": "table-basic",
+          "title": "Table — Basic"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "tags": [
+        "pdx-tabs"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "tabs-basic",
+          "title": "Tabs — Basic (3 tabs, \"two\" active)"
+        },
+        {
+          "id": "tabs-bordered",
+          "title": "Tabs — Bordered container"
+        },
+        {
+          "id": "tabs-two-instances",
+          "title": "Tabs — two instances with the same values"
+        },
+        {
+          "id": "tabs-nested",
+          "title": "Tabs — tabs inside a tabs panel"
+        },
+        {
+          "id": "tabs-narrow",
+          "title": "Tabs — five tabs in a box narrower than them, the last one active"
+        }
+      ]
+    },
+    {
+      "name": "tag-input",
+      "tags": [
+        "pdx-tag-input"
+      ],
+      "tier": "3A",
+      "status": "wip",
+      "page": "tier-3a",
+      "scenarios": [
+        {
+          "id": "tag-input-basic",
+          "title": "Tag Input — Basic"
+        },
+        {
+          "id": "tag-input-disabled",
+          "title": "Tag Input — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "tags": [
+        "pdx-textarea"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "textarea-basic",
+          "title": "Textarea — Basic"
+        },
+        {
+          "id": "textarea-disabled",
+          "title": "Textarea — Disabled"
+        },
+        {
+          "id": "textarea-error",
+          "title": "Textarea — Error"
+        }
+      ]
+    },
+    {
+      "name": "time-picker",
+      "tags": [
+        "pdx-time-picker"
+      ],
+      "tier": "4",
+      "status": "wip",
+      "page": "tier-4",
+      "scenarios": [
+        {
+          "id": "time-picker-default",
+          "title": "Time Picker — 24h, value 14:30 (segmented spinbutton input)"
+        }
+      ]
+    },
+    {
+      "name": "timeline",
+      "tags": [
+        "pdx-timeline"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "timeline-basic",
+          "title": "Timeline — Basic (vertical, left)"
+        },
+        {
+          "id": "timeline-horizontal",
+          "title": "Timeline — Horizontal"
+        }
+      ]
+    },
+    {
+      "name": "toast",
+      "tags": [
+        "pdx-toast"
+      ],
+      "tier": "2",
+      "status": "wip",
+      "page": "tier-2",
+      "scenarios": [
+        {
+          "id": "toast-stack",
+          "title": "Toast — Stack (success + error, persistent)"
+        },
+        {
+          "id": "toast-variants",
+          "title": "Toast — Variants (success/error/warning/info, persistent)"
+        },
+        {
+          "id": "toast-rich",
+          "title": "Toast — Rich (title + message)"
+        }
+      ]
+    },
+    {
+      "name": "toggle",
+      "tags": [
+        "pdx-switch"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "toggle-basic",
+          "title": "Toggle — Basic"
+        }
+      ]
+    },
+    {
+      "name": "toolbar",
+      "tags": [
+        "pdx-toolbar"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "toolbar-basic",
+          "title": "Toolbar — buttons, separator, group, spacer"
+        },
+        {
+          "id": "toolbar-bordered",
+          "title": "Toolbar — bordered variant"
+        },
+        {
+          "id": "toolbar-icons",
+          "title": "Toolbar — named, with icon-only buttons"
+        },
+        {
+          "id": "toolbar-vertical",
+          "title": "Toolbar — vertical orientation"
+        },
+        {
+          "id": "toolbar-narrow",
+          "title": "Toolbar — more controls than the box is wide"
+        }
+      ]
+    },
+    {
+      "name": "tooltip",
+      "tags": [
+        "pdx-tooltip"
+      ],
+      "tier": "2A",
+      "status": "wip",
+      "page": "tier-2a",
+      "scenarios": [
+        {
+          "id": "tooltip-top",
+          "title": "Tooltip — Top"
+        },
+        {
+          "id": "tooltip-bottom",
+          "title": "Tooltip — Bottom"
+        },
+        {
+          "id": "tooltip-left",
+          "title": "Tooltip — Left"
+        },
+        {
+          "id": "tooltip-right",
+          "title": "Tooltip — Right"
+        },
+        {
+          "id": "tooltip-open",
+          "title": "Tooltip — Open (the tooltip is in the picture)"
+        }
+      ]
+    },
+    {
+      "name": "transfer",
+      "tags": [
+        "pdx-transfer"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "transfer-basic",
+          "title": "Transfer — Checkbox mode (4 items, 1 in target)"
+        },
+        {
+          "id": "transfer-narrow",
+          "title": "Transfer — in a box narrower than its two lists"
+        }
+      ]
+    },
+    {
+      "name": "tree",
+      "tags": [
+        "pdx-tree"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "tree-basic",
+          "title": "Tree — expanded"
+        },
+        {
+          "id": "tree-collapsed",
+          "title": "Tree — collapsed"
+        },
+        {
+          "id": "tree-checkable",
+          "title": "Tree — with checkboxes"
+        },
+        {
+          "id": "tree-selected",
+          "title": "Tree — single selection"
+        }
+      ]
+    },
+    {
+      "name": "tree-select",
+      "tags": [
+        "pdx-tree-select"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "tree-select-closed",
+          "title": "Tree Select — Closed with a selected value"
+        },
+        {
+          "id": "tree-select-open",
+          "title": "Tree Select — Open (tree panel visible below trigger)"
+        },
+        {
+          "id": "tree-select-disabled",
+          "title": "Tree Select — Disabled"
+        }
+      ]
+    },
+    {
+      "name": "wizard",
+      "tags": [
+        "pdx-wizard"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "wizard-basic",
+          "title": "Wizard — 3 steps, step 2 active, step 1 done"
+        },
+        {
+          "id": "wizard-vertical",
+          "title": "Wizard — vertical orientation"
+        }
+      ]
+    }
+  ]
+}

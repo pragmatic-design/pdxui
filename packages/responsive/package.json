@@ -1,0 +1,26 @@
+{
+  "name": "@pdxui/responsive",
+  "version": "1.0.0-alpha.0",
+  "description": "PDX contract-test harness — validates PDX components/design system with @responsivejs/design (r$). The library itself now lives standalone at @responsivejs/* (github.com/AleSaiani/ResponsiveJS).",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "echo 'Contract tests run via `pnpm certify` (needs a dev server on the scenarios port).' && exit 0",
+    "test:e2e": "npx playwright test",
+    "test:gen": "node tests/tooling/generate.ts",
+    "test:certify": "node tests/tooling/generate.ts && npx playwright test --config tests/playwright-ui.config.ts && npx playwright test --config tests/playwright-behavior.config.ts",
+    "test:docker": "node tests/docker/run.mjs",
+    "design-score": "npx playwright test --config tests/playwright-design-score.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@responsivejs/design": "1.0.0-alpha.0",
+    "axe-core": "^4.10.0",
+    "@playwright/test": "^1.50.0",
+    "@axe-core/playwright": "^4.10.0",
+    "vitest": "^4.1.0",
+    "typescript": "^5.7.0"
+  }
+}

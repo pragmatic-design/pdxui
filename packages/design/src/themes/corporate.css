@@ -1,0 +1,134 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Corporate Theme
+   Business blue, sharp edges, serious tone.
+   ========================================================================== */
+
+[pdx-theme="corporate"] {
+    --pdx-hue-primary: 220;
+    --pdx-hue-accent:  200;
+
+    /* Explicit colors (oklch doesn't support var() in hue) */
+    --pdx-color-primary:       oklch(0.515 0.18 220);
+    --pdx-color-primary-hover: oklch(0.48 0.20 220);
+    --pdx-color-primary-text:  oklch(0.98 0.01 220);
+    --pdx-color-accent:        oklch(0.65 0.15 200);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.65 0.20 220);
+
+    /* Cool gray tint */
+    --pdx-gray-50:  oklch(0.985 0.003 240);
+    --pdx-gray-100: oklch(0.965 0.005 240);
+    --pdx-gray-900: oklch(0.18  0.010 240);
+    --pdx-gray-950: oklch(0.13  0.008 240);
+
+    /* Serious, professional typography */
+    --pdx-font-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+    --pdx-font-heading: 'IBM Plex Sans', system-ui, sans-serif;
+    --pdx-font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+
+    /* Sharp corners — zero rounding */
+    --pdx-radius-sm:  0.125rem;
+    --pdx-radius-md:  0.1875rem;
+    --pdx-radius-lg:  0.25rem;
+    --pdx-radius-xl:  0.375rem;
+
+    /* Corporate surfaces — very clean white, neutral */
+    --pdx-color-bg:      light-dark(oklch(0.98 0.002 240), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(white, oklch(0.17 0.006 240));
+    --pdx-color-inset:   light-dark(oklch(0.97 0.003 240), oklch(0.21 0.006 240));
+
+    /* Borders — precise, visible, structured */
+    --pdx-color-border: light-dark(oklch(0.86 0.003 240), oklch(0.30 0.006 240));
+    --pdx-color-border-strong: light-dark(oklch(0.75 0.005 240), oklch(0.42 0.008 240));
+
+    /* No shadows — corporate is flat, data-driven, structured */
+    --pdx-shadow-sm: none;
+    --pdx-shadow-md: 0 1px 2px oklch(0 0 0 / 0.06);
+    --pdx-shadow-lg: 0 2px 6px oklch(0 0 0 / 0.08);
+    --pdx-shadow-color: oklch(0 0 0 / 0.04);
+
+    /* Compact density — enterprise data-dense */
+    --pdx-density-factor: 0.88;
+
+    /* Focus — single pixel precise */
+    --pdx-focus-ring: 0 0 0 2px var(--pdx-color-primary);
+
+    /* Corporate behavior tokens */
+    --pdx-button-radius: var(--pdx-radius-sm);
+    /* The rendered height is `min-height × --pdx-density-factor`, and corporate's own factor is
+       0.88: a plain 2.25rem renders 31.7px, not the 36 the theme states. Dividing it
+       out gives 36px at the theme's density, and an app's `pdx-density` still scales from there —
+       compact 0.75 → 30.7, comfort 1.25 → 51. Spacing keeps the 0.88. */
+    --pdx-button-min-height: calc(2.25rem / 0.88);   /* 36px at corporate's density */
+    --pdx-input-min-height: calc(2.25rem / 0.88);    /* the same, so a row of both aligns */
+    --pdx-input-style: outlined;
+    --pdx-card-style: bordered;
+    --pdx-tab-indicator: underline;
+    --pdx-tab-indicator-size: 3px;
+    --pdx-border-width: 1px;
+}
+
+/* Tab: thicker underline, subtle bg on active */
+[pdx-theme="corporate"] .pdx-tab.active:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)),
+[pdx-theme="corporate"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    border-bottom: var(--pdx-tab-indicator-size) solid var(--pdx-color-primary);
+    background: var(--pdx-color-inset);
+}
+
+/* Breadcrumb: pipe separator */
+[pdx-theme="corporate"] .pdx-breadcrumb:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) { --pdx-breadcrumb-separator: '|'; }
+[pdx-theme="corporate"] .pdx-breadcrumb > *:not(:last-child):not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *))::after {
+    font-size: 0.8em;
+}
+
+/* Table: strong header, no uppercase removed (keep uppercase — it's business) */
+[pdx-theme="corporate"] .pdx-table th:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    --pdx-table-header-border-width: 3px;
+    --pdx-table-header-border-color: var(--pdx-color-primary);
+}
+
+/* Accordion: simple arrow */
+[pdx-theme="corporate"] details.pdx-accordion summary:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *))::after {
+    content: '▸';
+    font-size: 0.9em;
+}
+[pdx-theme="corporate"] details.pdx-accordion[open] summary:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *))::after {
+    transform: rotate(90deg);
+}
+
+/* Card: no accent, clean border, flat */
+[pdx-theme="corporate"] .pdx-surface-card:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    --pdx-card-radius: var(--pdx-radius-md);
+    --pdx-card-shadow: none;
+    --pdx-card-border-color: var(--pdx-color-border);
+}
+
+/* Buttons: corporate — uppercase, structured, heavier weight */
+[pdx-theme="corporate"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    text-transform: uppercase;
+    font-size: var(--pdx-text-xs);
+    letter-spacing: 0.06em;
+    font-weight: var(--pdx-weight-bold);
+}
+
+/* Input: outlined with border-strong — sharper, structured. Focus ring = single pixel primary. */
+[pdx-theme="corporate"] .pdx-input-wrap:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    border-color: var(--pdx-color-border-strong);
+}
+[pdx-theme="corporate"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    box-shadow: 0 0 0 1px var(--pdx-color-primary);
+}
+
+/* ── Select: corporate — smaller caret, sharp corners ── */
+[pdx-theme="corporate"] .pdx-select-dropdown:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    border-radius: var(--pdx-radius-sm);
+}
+[pdx-theme="corporate"] .pdx-select-caret:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    --pdx-select-caret-size: 1rem;
+}
+/* Corporate: bold precise caret */
+[pdx-theme="corporate"] .pdx-select-caret svg:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+    --pdx-select-caret-stroke: 2.5;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+}

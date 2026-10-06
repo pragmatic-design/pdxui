@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">12-hour and 24-hour clock</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>format="auto"</code> (the default) follows the locale — the page's <code>lang</code>, then the browser's.
+      <code>12h</code> adds an AM/PM segment; the value stays on the 24-hour clock.
+    </p>
+    <div class="demo-grid">
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">24h</span>
+        <pdx-time-picker value="14:45" format="24h" aria-label="24-hour"></pdx-time-picker>
+      </div>
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">12h</span>
+        <pdx-time-picker value="14:45" format="12h" aria-label="12-hour"></pdx-time-picker>
+      </div>
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">auto, locale en-US</span>
+        <pdx-time-picker value="14:45" locale="en-US" aria-label="Auto, en-US"></pdx-time-picker>
+      </div>
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">auto, locale it-IT</span>
+        <pdx-time-picker value="14:45" locale="it-IT" aria-label="Auto, it-IT"></pdx-time-picker>
+      </div>
+    </div>
+  </section>
+</template>

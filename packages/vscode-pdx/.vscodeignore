@@ -1,0 +1,18 @@
+# Sources and dev files — they do not go into the .vsix (only the compiled output ships)
+.vscode/**
+src/**
+**/*.ts
+!out/**
+build.mjs
+tsconfig.json
+.gitignore
+.vscodeignore
+node_modules/**
+# The generators: how the grammar and the icon were made, not what the extension runs
+scripts/**
+# Exclude the source maps AFTER re-including out/** (otherwise they would come back in)
+**/*.map
+
+# The LSP server is included as server/server.cjs (a self-contained esbuild bundle);
+# only its heavy source map, if any, is excluded.
+server/**/*.map

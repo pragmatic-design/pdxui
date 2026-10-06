@@ -1,0 +1,194 @@
+/* pdx-carousel — Carousel / Slider */
+
+pdx-carousel {
+    display: block;
+}
+
+.pdx-carousel-root {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--pdx-radius-md, 8px);
+}
+
+.pdx-carousel-track {
+    display: flex;
+    transition: transform 0.4s ease;
+    will-change: transform;
+}
+
+.pdx-carousel-slide {
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.pdx-carousel-slide img {
+    display: block;
+}
+
+/* Fade mode */
+.pdx-carousel-fade .pdx-carousel-track {
+    position: relative;
+    transition: none;
+    transform: none !important;
+}
+
+.pdx-carousel-fade .pdx-carousel-slide {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.pdx-carousel-fade .pdx-carousel-slide:first-child {
+    position: relative;
+}
+
+.pdx-carousel-fade .pdx-carousel-slide-active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* Caption overlay */
+.pdx-carousel-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--pdx-space-md, 12px) var(--pdx-space-lg, 16px);
+    background: linear-gradient(transparent, oklch(0.15 0 0 / 0.7));
+    color: white;
+    font-size: var(--pdx-text-sm);
+}
+
+/* Arrow buttons */
+.pdx-carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: oklch(1 0 0 / 0.75);
+    color: var(--pdx-color-text, oklch(0.2 0 0));
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--pdx-shadow-sm, 0 1px 3px oklch(0 0 0 / 0.12));
+}
+
+/* Force icon centering inside arrow buttons */
+.pdx-carousel-arrow pdx-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.pdx-carousel-arrow:hover {
+    background: oklch(1 0 0 / 0.92);
+    box-shadow: var(--pdx-shadow-md, 0 4px 8px oklch(0 0 0 / 0.15));
+}
+
+.pdx-carousel-arrow:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus, oklch(0.55 0.2 235));
+    outline-offset: var(--pdx-focus-offset);
+}
+
+.pdx-carousel-arrow-prev {
+    left: 12px;
+}
+
+.pdx-carousel-arrow-next {
+    right: 12px;
+}
+
+/* Without loop, an arrow that cannot move is disabled. */
+.pdx-carousel-arrow:disabled {
+    opacity: 0.4;
+    cursor: default;
+    box-shadow: none;
+}
+
+/* The autoplay rotation control (stop / start), top-left over the slides. */
+.pdx-carousel-rotation {
+    top: 12px;
+    left: 12px;
+    transform: none;
+}
+
+/* Dot indicators */
+.pdx-carousel-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: var(--pdx-space-sm, 8px) 0;
+}
+
+.pdx-carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: var(--pdx-gray-300, oklch(0.8 0 0));
+    cursor: pointer;
+    transition: background 0.2s ease, width 0.2s ease, border-radius 0.2s ease;
+}
+
+.pdx-carousel-dot:hover {
+    background: var(--pdx-gray-500, oklch(0.55 0 0));
+}
+
+.pdx-carousel-dot:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus, oklch(0.55 0.2 235));
+    outline-offset: var(--pdx-focus-offset);
+}
+
+.pdx-carousel-dot-active {
+    background: var(--pdx-color-primary, oklch(0.55 0.2 235));
+    width: 24px;
+    border-radius: 4px;
+}
+
+/* Dark mode adjustments */
+[pdx-scheme="dark"] .pdx-carousel-arrow {
+    background: oklch(0.2 0 0 / 0.75);
+    color: oklch(0.95 0 0);
+}
+
+[pdx-scheme="dark"] .pdx-carousel-arrow:hover {
+    background: oklch(0.25 0 0 / 0.92);
+}
+
+[pdx-scheme="dark"] .pdx-carousel-dot {
+    background: var(--pdx-gray-600, oklch(0.4 0 0));
+}
+
+/* Focus outline for root when keyboard navigating */
+.pdx-carousel-root:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus, oklch(0.55 0.2 235));
+    outline-offset: var(--pdx-focus-offset);
+}
+
+.pdx-carousel-root:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Touch: disable text selection during swipe */
+.pdx-carousel-root {
+    touch-action: pan-y;
+    user-select: none;
+}

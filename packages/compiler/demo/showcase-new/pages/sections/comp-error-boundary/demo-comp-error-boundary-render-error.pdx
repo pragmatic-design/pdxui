@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Render Error — @@try / @@catch</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      When content throws during render, the catch block shows with the actual error message.
+    </p>
+    <div class="demo-box">
+      @try {
+        <div class="demo-widget">{{ throwRenderError() }}</div>
+      } @catch (err) {
+        <div class="pdx-error-fallback" role="alert">
+          <div class="pdx-error-icon">&#9888;</div>
+          <div class="pdx-error-msg">Widget failed to render</div>
+          <div class="pdx-error-detail">{{ err.message }}</div>
+        </div>
+      }
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>@@try {
+  &lt;pdx-risky-widget /&gt;
+} @@catch (err) {
+  &lt;div role="alert"&gt;
+    &lt;p&gt;{{ err.message }}&lt;/p&gt;
+  &lt;/div&gt;
+}</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+function throwRenderError() {
+  throw new Error('NullReferenceError: widget data source returned null — check API connection');
+}
+</script>

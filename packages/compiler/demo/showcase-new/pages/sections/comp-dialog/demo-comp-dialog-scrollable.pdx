@@ -1,0 +1,58 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Scrollable Content</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Long content scrolls within the body — header and footer stay fixed. Scroll shadows appear at edges.</p>
+    <pdx-button variant="outline" size="sm" @click="openScroll">Open Scrollable</pdx-button>
+    <pdx-dialog :open="scrollOpen" title="Terms of Service" size="md" @pdx-close="closeScroll">
+      <div class="long-content">
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing and using this service, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using this service, you shall be subject to any posted guidelines or rules applicable to such services.</p>
+        <h3>2. Description of Service</h3>
+        <p>The service provides users with access to a collection of resources, including various communications tools, forums, shopping services, search services, and personalized content.</p>
+        <h3>3. Registration Obligations</h3>
+        <p>In consideration of your use of the service, you agree to: (a) provide true, accurate, current and complete information about yourself as prompted by the registration form, and (b) maintain and promptly update the registration data to keep it true, accurate, current and complete.</p>
+        <h3>4. Privacy Policy</h3>
+        <p>Registration data and certain other information about you are subject to our applicable privacy policy. For more information, see our full privacy policy.</p>
+        <h3>5. Member Conduct</h3>
+        <p>You understand that all information, data, text, software, music, sound, photographs, graphics, video, messages, tags, or other materials, whether publicly posted or privately transmitted, are the sole responsibility of the person from whom such content originated.</p>
+        <h3>6. Content Submitted</h3>
+        <p>The service does not claim ownership of content you submit or make available for inclusion on the service. However, with respect to content you submit or make available for inclusion on publicly accessible areas, you grant the following worldwide, royalty-free and non-exclusive license(s).</p>
+        <h3>7. Indemnity</h3>
+        <p>You agree to indemnify and hold the service and its subsidiaries, affiliates, officers, agents, employees, partners and licensors harmless from any claim or demand, including reasonable attorneys' fees, made by any third party due to or arising out of content you submit.</p>
+        <h3>8. Modifications to Service</h3>
+        <p>The service reserves the right at any time and from time to time to modify or discontinue, temporarily or permanently, the service (or any part thereof) with or without notice.</p>
+      </div>
+      <span slot="footer">
+        <pdx-button variant="ghost" size="sm" @click="closeScroll">Decline</pdx-button>
+        <pdx-button variant="primary" size="sm" @click="closeScroll">I Agree</pdx-button>
+      </span>
+    </pdx-dialog>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="scrollOpen" title="Terms of Service" size="md" @pdx-close="closeScroll"&gt;
+  &lt;div class="long-content"&gt;
+    &lt;h3&gt;1. Acceptance of Terms&lt;/h3&gt;
+    &lt;p&gt;Long scrollable content...&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;span slot="footer"&gt;
+    &lt;pdx-button variant="ghost" @click="closeScroll"&gt;Decline&lt;/pdx-button&gt;
+    &lt;pdx-button variant="primary" @click="closeScroll"&gt;I Agree&lt;/pdx-button&gt;
+  &lt;/span&gt;
+&lt;/pdx-dialog&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let scrollOpen = $signal(false);
+
+function openScroll() { scrollOpen = true; }
+function closeScroll() { scrollOpen = false; }
+</script>
+
+<style scoped>
+  .long-content h3 { margin-top: var(--pdx-space-lg); margin-bottom: var(--pdx-space-xs); font-weight: var(--pdx-weight-semibold); }
+  .long-content h3:first-child { margin-top: 0; }
+  .long-content p { color: var(--pdx-color-muted); font-size: var(--pdx-text-sm); line-height: 1.6; }
+</style>

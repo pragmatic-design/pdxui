@@ -1,0 +1,193 @@
+/* Dialog / Modal — overlay panel with backdrop, focus trap, keyboard.
+
+   Usage (WC):
+     <pdx-dialog :open="isOpen" title="Title" size="md">
+       <div slot="body">Content</div>
+       <div slot="footer"><button>Cancel</button><button>Save</button></div>
+     </pdx-dialog>
+
+   Sizes: sm (360px), md (480px), lg (640px), xl (800px), full
+*/
+
+/* ===== Backdrop ===== */
+
+.pdx-dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pdx-color-backdrop);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--pdx-duration-base, 200ms) ease,
+                visibility 0s linear var(--pdx-duration-base, 200ms);
+}
+
+.pdx-dialog-backdrop[data-open] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--pdx-duration-base, 200ms) ease,
+                visibility 0s linear 0s;
+}
+
+/* ===== Panel ===== */
+
+.pdx-dialog-panel {
+    border: none;
+    border-radius: var(--pdx-radius-lg);
+    padding: 0;
+    box-shadow: var(--pdx-shadow-xl);
+    max-width: 480px;
+    width: 90%;
+    background: var(--pdx-surface-3, var(--pdx-color-surface));
+    color: var(--pdx-color-text);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    transform: scale(0.95) translateY(8px);
+    opacity: 0;
+    transition: transform var(--pdx-duration-base, 200ms) var(--pdx-ease, ease),
+                opacity var(--pdx-duration-base, 200ms) var(--pdx-ease, ease);
+}
+
+/* ⚠️ An open panel rests at `transform: none`, NOT `scale(1) translateY(0)`.
+ *
+ * The identity matrix is still an ACTIVE transform, and an element carrying one becomes the
+ * containing block for every `position: fixed` descendant. A select dropdown, a popover, a tooltip
+ * or a date picker opened from inside an open dialog would therefore be positioned against the
+ * PANEL instead of the viewport: measured at 1440 wide, a trigger at x=564 opens its menu at x=1104.
+ *
+ * `none` still animates — CSS interpolates it as the identity — so the scale-in is unchanged, and
+ * the containing block exists only while the transition is actually running.
+ *
+ * The drawer follows the same rule. If you add another overlay that animates with a transform, it
+ * needs this too.
+ */
+.pdx-dialog-backdrop[data-open] .pdx-dialog-panel {
+    transform: none;
+    opacity: 1;
+}
+
+/* ===== Size variants ===== */
+
+/* A size is a token with a default value, so an application can state the widths it
+   uses — the reference uses two and no others — without a stylesheet of its own. */
+.pdx-dialog-sm { max-width: var(--pdx-dialog-width-sm); }
+.pdx-dialog-md { max-width: var(--pdx-dialog-width-md); }
+.pdx-dialog-lg { max-width: var(--pdx-dialog-width-lg); }
+.pdx-dialog-xl { max-width: var(--pdx-dialog-width-xl); }
+.pdx-dialog-full {
+    max-width: 95vw;
+    width: 95vw;
+    height: 90vh;
+    border-radius: var(--pdx-radius-md);
+}
+
+/* ===== Sections ===== */
+
+.pdx-dialog-header {
+    display: flex;
+    /* `auto` by default, which is what every theme draws without it: the height is the app's to
+       state, and a default in pixels would move 13 themes. */
+    min-height: var(--pdx-dialog-header-height);
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+    font-weight: var(--pdx-weight-semibold);
+    font-size: var(--pdx-text-lg);
+    flex-shrink: 0;
+}
+
+.pdx-dialog-body {
+    padding: var(--pdx-space-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Scroll shadow indicators */
+.pdx-dialog-body.pdx-scroll-top {
+    box-shadow: inset 0 8px 6px -6px oklch(0 0 0 / 0.08);
+}
+.pdx-dialog-body.pdx-scroll-bottom {
+    box-shadow: inset 0 -8px 6px -6px oklch(0 0 0 / 0.08);
+}
+.pdx-dialog-body.pdx-scroll-top.pdx-scroll-bottom {
+    box-shadow: inset 0 8px 6px -6px oklch(0 0 0 / 0.08),
+                inset 0 -8px 6px -6px oklch(0 0 0 / 0.08);
+}
+
+.pdx-dialog-footer {
+    display: flex;
+    min-height: var(--pdx-dialog-footer-height);
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    border-top: var(--pdx-border-width) solid var(--pdx-color-border);
+    flex-shrink: 0;
+}
+
+/* Hide footer when no real content (slot projection makes :empty unreliable) */
+.pdx-dialog-footer:not(:has(*)) {
+    display: none;
+}
+
+.pdx-dialog-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--pdx-radius-sm);
+    border: none;
+    background: none;
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    font-size: var(--pdx-text-lg);
+    flex-shrink: 0;
+    transition: background var(--pdx-transition), color var(--pdx-transition);
+}
+.pdx-dialog-close:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+
+/* ===== Native <dialog> fallback (kept for backward compat) ===== */
+
+dialog.pdx-dialog {
+    border: none;
+    border-radius: var(--pdx-radius-lg);
+    padding: 0;
+    box-shadow: var(--pdx-shadow-xl);
+    max-width: var(--pdx-max-sm);
+    width: 90%;
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    overflow: hidden;
+}
+
+dialog.pdx-dialog::backdrop {
+    background: var(--pdx-color-backdrop);
+    backdrop-filter: blur(4px);
+}
+
+dialog.pdx-dialog[size="sm"] { max-width: var(--pdx-max-xs); }
+dialog.pdx-dialog[size="lg"] { max-width: var(--pdx-max-md); }
+dialog.pdx-dialog[size="xl"] { max-width: var(--pdx-max-lg); }
+dialog.pdx-dialog[size="full"] { max-width: none; width: calc(100% - var(--pdx-space-lg)); height: calc(100% - var(--pdx-space-lg)); }
+
+/* ===== Mobile responsive ===== */
+
+@media (max-width: 640px) {
+    .pdx-dialog-panel {
+        width: calc(100% - 2rem);
+        max-height: 90vh;
+    }
+    .pdx-dialog-full {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+}

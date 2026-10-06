@@ -1,0 +1,85 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Animations</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      CSS-only entrance animations, stagger delays, hover effects, and transitions.
+      <strong>CSS only</strong> — apply classes to trigger. Uses <code>--pdx-duration</code> and <code>--pdx-ease</code> tokens.
+    </p>
+
+    <!-- ═══ Entrance Animations ═══ -->
+    <pdx-demo-design-animations-entrance class="demo-section"></pdx-demo-design-animations-entrance>
+
+    <!-- ═══ Stagger ═══ -->
+    <pdx-demo-design-animations-stagger class="demo-section"></pdx-demo-design-animations-stagger>
+
+    <!-- ═══ Hover Effects ═══ -->
+    <pdx-demo-design-animations-hover class="demo-section"></pdx-demo-design-animations-hover>
+
+    <!-- ═══ Motion Tokens ═══ -->
+    <pdx-demo-design-animations-tokens class="demo-section"></pdx-demo-design-animations-tokens>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-animate-fade-in</code><span>Entrance</span><span>Opacity 0 → 1</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-animate-slide-up</code><span>Entrance</span><span>Translate Y 1rem → 0 + fade</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-animate-slide-down</code><span>Entrance</span><span>Translate Y -1rem → 0 + fade</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-animate-scale-in</code><span>Entrance</span><span>Scale 0.95 → 1 + fade</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-animate-bounce</code><span>Entrance</span><span>Scale overshoot (1.05 → 0.98 → 1)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-stagger</code><span>Container</span><span>50ms delay per child (up to 8)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-hover-lift</code><span>Hover</span><span>translateY(-2px) + shadow</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-hover-grow</code><span>Hover</span><span>scale(1.02)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-hover-glow</code><span>Hover</span><span>Primary ring glow</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ripple</code><span>Click</span><span>Radial ripple effect (needs JS coords)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/animations';
+@title 'Animations';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .anim-idle { opacity: 0; transform: translateY(8px); }
+  .stagger-item.anim-idle { opacity: 0; transform: translateY(8px); }
+
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 220px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

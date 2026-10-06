@@ -1,0 +1,63 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Textarea</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-textarea&gt;</code> — multi-line input with auto-resize, character/word count, sizes, and validation states.
+      Uses the same wrapper pattern as <code>&lt;pdx-input&gt;</code>.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-textarea-basic class="demo-section"></pdx-demo-comp-textarea-basic>
+
+    <!-- ═══ Auto-resize ═══ -->
+    <pdx-demo-comp-textarea-auto-resize class="demo-section"></pdx-demo-comp-textarea-auto-resize>
+
+    <!-- ═══ Character & Word Count ═══ -->
+    <pdx-demo-comp-textarea-count class="demo-section"></pdx-demo-comp-textarea-count>
+
+    <!-- ═══ Resize Control ═══ -->
+    <pdx-demo-comp-textarea-resize class="demo-section"></pdx-demo-comp-textarea-resize>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-textarea-sizes class="demo-section"></pdx-demo-comp-textarea-sizes>
+
+    <!-- ═══ States ═══ -->
+    <pdx-demo-comp-textarea-validation class="demo-section"></pdx-demo-comp-textarea-validation>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-textarea-composition class="demo-section"></pdx-demo-comp-textarea-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Current value</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>Placeholder text</span></div>
+        <div class="opt-row"><code>rows</code><span>number</span><span>Initial row count (default 3)</span></div>
+        <div class="opt-row"><code>minRows</code><span>number</span><span>Min rows for auto-resize (enables auto mode)</span></div>
+        <div class="opt-row"><code>maxRows</code><span>number</span><span>Max rows before scrolling (0 = unlimited)</span></div>
+        <div class="opt-row"><code>resize</code><span>string</span><span>Resize handle: vertical (default), horizontal, both, none</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>xs, sm, (default md), lg, xl</span></div>
+        <div class="opt-row"><code>showCount</code><span>boolean</span><span>Show character counter</span></div>
+        <div class="opt-row"><code>wordCount</code><span>boolean</span><span>Show word counter (left side)</span></div>
+        <div class="opt-row"><code>maxlength</code><span>number</span><span>Max characters (counter turns red when over)</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Error state (red border)</span></div>
+        <div class="opt-row"><code>success</code><span>boolean</span><span>Success state (green border)</span></div>
+        <div class="opt-row"><code>warning</code><span>boolean</span><span>Warning state</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>Readonly</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/textarea';
+@title 'Textarea Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

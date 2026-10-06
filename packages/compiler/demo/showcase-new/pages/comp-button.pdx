@@ -1,0 +1,158 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Button</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-button&gt;</code> — Web Component wrapper over Pragmatic CSS buttons.
+      Props: <code>variant</code>, <code>size</code>, <code>loading</code>, <code>disabled</code>, <code>full</code>. Slot for icons + text.
+    </p>
+
+    <!-- ═══ Event Console ═══ -->
+    <div class="event-console">
+      <div class="console-header">
+        <span class="pdx-txt-caption pdx-ink-muted">Event Console</span>
+        <button class="pdx-ghost" size="sm" @click="clearLog">Clear</button>
+      </div>
+      <div class="console-body pdx-txt-mono">
+        @if (logs.length === 0) {
+          <span class="pdx-ink-muted">Click any button below...</span>
+        } @else {
+          @for (logs as entry; track entry.id) {
+            <div class="log-entry">
+              <span class="log-time">{{ entry.time }}</span>
+              <span class="log-variant" :style="'color:' + entry.color">{{ entry.variant }}</span>
+              <span>{{ entry.text }}</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-comp-button-variants class="demo-section"></pdx-demo-comp-button-variants>
+
+    <!-- ═══ With Icons ═══ -->
+    <pdx-demo-comp-button-icons class="demo-section"></pdx-demo-comp-button-icons>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-button-sizes class="demo-section"></pdx-demo-comp-button-sizes>
+
+    <!-- ═══ Toggle Button ═══ -->
+    <pdx-demo-comp-button-toggle class="demo-section"></pdx-demo-comp-button-toggle>
+
+    <!-- ═══ Loading ═══ -->
+    <pdx-demo-comp-button-loading class="demo-section"></pdx-demo-comp-button-loading>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-button-disabled class="demo-section"></pdx-demo-comp-button-disabled>
+
+    <!-- ═══ Full Width ═══ -->
+    <pdx-demo-comp-button-full-width class="demo-section"></pdx-demo-comp-button-full-width>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-button-composition class="demo-section"></pdx-demo-comp-button-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Prop</span><span>Type</span><span>Description</span>
+        </div>
+        <div class="opt-row">
+          <code>variant</code><span>string</span><span>primary, secondary, outline, ghost, link, danger, success, warning, info</span>
+        </div>
+        <div class="opt-row">
+          <code>size</code><span>string</span><span>sm, (default), lg</span>
+        </div>
+        <div class="opt-row">
+          <code>disabled</code><span>boolean</span><span>Blocks click, 50% opacity</span>
+        </div>
+        <div class="opt-row">
+          <code>loading</code><span>boolean</span><span>Spinner overlay, aria-busy, blocks click</span>
+        </div>
+        <div class="opt-row">
+          <code>type</code><span>string</span><span>button (default), submit, reset</span>
+        </div>
+        <div class="opt-row">
+          <code>full</code><span>boolean</span><span>Full width (100%)</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-label</code><span>string</span><span>Names an icon-only button; forwarded to the inner &lt;button&gt;. A button with no text and no name warns in the console</span>
+        </div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">CSS vs WC</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Use CSS classes (<code>.pdx-primary</code>) on native <code>&lt;button&gt;</code> for maximum control.
+        Use <code>&lt;pdx-button&gt;</code> for prop-driven API, automatic loading/disabled management, and consistent icon spacing.
+      </p>
+    </section>
+
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+import { useButtonConsole } from './sections/comp-button/state.pdx';
+
+@page '/components/button';
+@title 'Button Component';
+
+registerPragmaticIcons();
+
+// Event console: every section writes to it, the page shows it (sections/comp-button/state.pdx.ts).
+const buttonConsole = useButtonConsole();
+const logs = $derived(buttonConsole.logs());
+
+function clearLog() {
+    buttonConsole.clearLog();
+}
+</script>
+
+<style scoped>
+  .page { }
+
+  /* Shared by five of the sections: the page's scoped style reaches them, they render in its light DOM. */
+  .btn-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+  }
+
+  /* Event console — own name (not .console-panel) so it doesn't inherit the
+     shared self-scroll box; header stays fixed, .console-body is the sole
+     scroll, panel grows to fit it. Latest entry (prepended) shows at top. */
+  .event-console {
+    margin-bottom: var(--pdx-space-xl);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .console-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .console-body {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    max-height: 160px;
+    overflow-y: auto;
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-surface);
+  }
+  .log-entry {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    padding: 2px 0;
+    line-height: 1.5;
+  }
+  .log-time { color: var(--pdx-color-muted); min-width: 90px; }
+  .log-variant { min-width: 80px; font-weight: var(--pdx-weight-medium); }
+
+  .opt-header, .opt-row { grid-template-columns: 120px 120px 1fr; }
+</style>

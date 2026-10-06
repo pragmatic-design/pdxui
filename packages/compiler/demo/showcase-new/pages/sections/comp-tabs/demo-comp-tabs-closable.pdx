@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Closable Tabs</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Close button appears on hover. Emits <code>pdx-close</code> with tab value.</p>
+
+    <pdx-tabs value="file1" label="Open files">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="file1">
+          index.ts <span data-tab-close role="button" tabindex="-1" aria-label="Close">&times;</span>
+        </button>
+        <button class="pdx-tab" data-tab="file2">
+          app.pdx <span data-tab-close role="button" tabindex="-1" aria-label="Close">&times;</span>
+        </button>
+        <button class="pdx-tab" data-tab="file3">
+          styles.css <span data-tab-close role="button" tabindex="-1" aria-label="Close">&times;</span>
+        </button>
+      </div>
+      <div data-tab-panel="file1" style="padding:var(--pdx-space-lg)">
+        <pre class="pdx-txt-mono" style="font-size:var(--pdx-text-xs);background:var(--pdx-color-inset);padding:var(--pdx-space-md);border-radius:var(--pdx-radius-md)">export function main() {
+  console.log('Hello Pragmatic!');
+}</pre>
+      </div>
+      <div data-tab-panel="file2" style="padding:var(--pdx-space-lg)">
+        <pre class="pdx-txt-mono" style="font-size:var(--pdx-text-xs);background:var(--pdx-color-inset);padding:var(--pdx-space-md);border-radius:var(--pdx-radius-md)">&lt;template&gt;
+  &lt;h1&gt;Hello World&lt;/h1&gt;
+&lt;/template&gt;</pre>
+      </div>
+      <div data-tab-panel="file3" style="padding:var(--pdx-space-lg)">
+        <pre class="pdx-txt-mono" style="font-size:var(--pdx-text-xs);background:var(--pdx-color-inset);padding:var(--pdx-space-md);border-radius:var(--pdx-radius-md)">body { margin: 0; font-family: system-ui; }</pre>
+      </div>
+    </pdx-tabs>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="file1"&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="file1"&gt;
+      index.ts &lt;span data-tab-close role="button" aria-label="Close"&gt;&amp;times;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="file2"&gt;
+      app.pdx &lt;span data-tab-close role="button" aria-label="Close"&gt;&amp;times;&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="file1"&gt;File content&lt;/div&gt;
+  &lt;div data-tab-panel="file2"&gt;File content&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </details>
+  </section>
+</template>

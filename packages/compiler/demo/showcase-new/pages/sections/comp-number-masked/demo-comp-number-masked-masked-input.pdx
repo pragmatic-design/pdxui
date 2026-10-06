@@ -1,0 +1,50 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Masked Input</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Auto-formats as you type. Built-in presets (phone, card, date) or custom patterns.
+      <code>#</code> = digit, <code>A</code> = letter, <code>*</code> = any.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="Phone Number">
+        <pdx-masked-input mask="phone"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Phone (International)">
+        <pdx-masked-input mask="phone-intl"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Credit Card">
+        <pdx-masked-input mask="card"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Date (MM/DD/YYYY)">
+        <pdx-masked-input mask="date"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Time (HH:MM)">
+        <pdx-masked-input mask="time"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="SSN">
+        <pdx-masked-input mask="ssn"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Custom (License Plate: AA-###-AA)">
+        <pdx-masked-input mask="AA-###-AA"></pdx-masked-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Built-in presets --&gt;
+&lt;pdx-masked-input mask="phone"&gt;&lt;/pdx-masked-input&gt;
+&lt;pdx-masked-input mask="card"&gt;&lt;/pdx-masked-input&gt;
+&lt;pdx-masked-input mask="date"&gt;&lt;/pdx-masked-input&gt;
+
+&lt;!-- Custom pattern: # digit, A letter, * any --&gt;
+&lt;pdx-masked-input mask="AA-###-AA"&gt;&lt;/pdx-masked-input&gt;</code></pre>
+    </details>
+  </section>
+</template>

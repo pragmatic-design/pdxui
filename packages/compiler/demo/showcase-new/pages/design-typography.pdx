@@ -1,0 +1,136 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Typography</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Pragmatic CSS typography: semantic role classes, ink colors, and font stacks.
+      <strong>CSS only</strong> — no JS component needed. Apply classes directly to any element.
+    </p>
+
+    <!-- ═══ Type Scale ═══ -->
+    <pdx-demo-design-typography-scale class="demo-section"></pdx-demo-design-typography-scale>
+
+    <!-- ═══ Ink Colors ═══ -->
+    <pdx-demo-design-typography-ink class="demo-section"></pdx-demo-design-typography-ink>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-typography-composition class="demo-section"></pdx-demo-design-typography-composition>
+
+    <!-- ═══ Font Stacks ═══ -->
+    <pdx-demo-design-typography-font-stacks class="demo-section"></pdx-demo-design-typography-font-stacks>
+
+    <!-- ═══ Links ═══ -->
+    <pdx-demo-design-typography-links class="demo-section"></pdx-demo-design-typography-links>
+
+    <!-- ═══ Options Table ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">CSS Classes Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class</span><span>Purpose</span><span>CSS Properties</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-display</code><span>Hero, splash</span><span>font-heading, text-display, bold, tight</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-title</code><span>Page title</span><span>font-heading, text-2xl, semibold, tight</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-heading</code><span>Section heading</span><span>font-heading, text-xl, semibold, tight</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-subheading</code><span>Sub-section</span><span>font-heading, text-lg, medium, normal</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-body</code><span>Paragraphs</span><span>text-base, normal line-height</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-small</code><span>Secondary text</span><span>text-sm, normal line-height</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-caption</code><span>Metadata, timestamps</span><span>text-xs, slight letter-spacing</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-label</code><span>Labels, badges</span><span>text-sm, medium, uppercase, 0.02em</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-txt-mono</code><span>Code, data</span><span>font-mono, text-sm</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-ink-*</code><span>Text color</span><span>default, muted, subtle, primary, accent, danger, success, warning</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-link</code><span>Hyperlinks</span><span>primary color, underline, hover, focus-ring</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/typography';
+@title 'Typography';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  /* Source block */
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 150px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  /* Shared */
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

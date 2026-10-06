@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Form Integration</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Form-associated: the rating is submitted with a native form, under its <code>name</code>.</p>
+
+    <div class="demo-row">
+      <form @submit="onSubmit">
+        <pdx-form-field label="Your rating" required>
+          <pdx-rating :value="rating1" name="score" @pdx-change="onRating1"></pdx-rating>
+        </pdx-form-field>
+        <button type="submit" class="pdx-primary" style="margin-top:var(--pdx-space-sm)">Submit</button>
+      </form>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useRatingDemo } from './state.pdx';
+
+// The basic rating shows and sets the same value (state.pdx.ts).
+const ratingDemo = useRatingDemo();
+const rating1 = $derived(ratingDemo.rating1());
+function onRating1(e) { ratingDemo.onRating1(e); }
+
+// pdx-ignore PDX_REPEATED_LOGIC: each form demo shows its whole submit handler, so a reader copies one page and has it all
+function onSubmit(e) {
+  e.preventDefault();
+  const data = new FormData(e.target);
+  alert('Submitted: ' + data.get('score'));
+}
+</script>

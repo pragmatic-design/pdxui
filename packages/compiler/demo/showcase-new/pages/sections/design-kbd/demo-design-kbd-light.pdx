@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Light Variant</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>.pdx-kbd-light</code> on dark backgrounds.</p>
+
+    <div class="dark-demo">
+      <kbd class="pdx-kbd pdx-kbd-light">Esc</kbd>
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd pdx-kbd-light">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-light">Z</kbd>
+      </span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;kbd class="pdx-kbd pdx-kbd-light"&gt;Esc&lt;/kbd&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .dark-demo {
+    display: flex;
+    gap: var(--pdx-space-md);
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    background: var(--pdx-gray-900);
+    border-radius: var(--pdx-radius-lg);
+  }
+</style>

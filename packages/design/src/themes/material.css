@@ -1,0 +1,402 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Material Theme
+   Material Design 3 "Expressive" inspired.
+   Reference: m3.material.io, material-web.dev
+   Key traits: tonal surfaces, warm cream bg, filled inputs, rounded shapes.
+   ========================================================================== */
+
+[pdx-theme="material"] {
+    --pdx-hue-primary: 280;
+    --pdx-hue-accent:  155;
+
+    /* M3 purple primary (#6442d6) */
+    --pdx-color-primary:       oklch(0.50 0.20 280);
+    --pdx-color-primary-hover: oklch(0.43 0.22 280);
+    --pdx-color-primary-text:  oklch(0.98 0.01 280);
+    --pdx-color-accent:        oklch(0.60 0.12 155);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.60 0.20 280);
+
+    /* M3 error */
+    --pdx-hue-danger: 30;
+    --pdx-color-danger:       light-dark(oklch(0.55 0.22 30), oklch(0.57 0.18 30));
+    --pdx-color-danger-hover: light-dark(oklch(0.48 0.24 30), oklch(0.62 0.20 30));
+
+    /* M3 warm cream grays */
+    --pdx-gray-50:  oklch(0.97 0.010 70);
+    --pdx-gray-100: oklch(0.95 0.012 70);
+    --pdx-gray-200: oklch(0.91 0.010 70);
+    --pdx-gray-300: oklch(0.85 0.008 75);
+    --pdx-gray-800: oklch(0.25 0.008 280);
+    --pdx-gray-900: oklch(0.18 0.010 280);
+    --pdx-gray-950: oklch(0.12 0.008 280);
+
+    /* Warm cream surfaces */
+    --pdx-color-bg:      light-dark(oklch(0.965 0.012 70), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(oklch(0.99 0.006 70), oklch(0.17 0.010 280));
+    --pdx-color-inset:   light-dark(oklch(0.945 0.014 70), oklch(0.22 0.010 280));
+    --pdx-color-overlay: light-dark(oklch(0.99 0.004 70), oklch(0.22 0.012 280));
+
+    /* M3 borders */
+    --pdx-color-border: light-dark(oklch(0.80 0.012 75), oklch(0.35 0.010 280));
+    --pdx-color-border-strong: light-dark(oklch(0.70 0.015 75), oklch(0.45 0.012 280));
+
+    /* Roboto */
+    --pdx-font-sans: 'Roboto', system-ui, sans-serif;
+    --pdx-font-heading: 'Roboto', system-ui, sans-serif;
+
+    /* M3 shape scale — official spec: extra-small=4, small=8, medium=12, large=16, extra-large=28 */
+    --pdx-radius-sm:  0.25rem;   /* 4px — corner-extra-small */
+    --pdx-radius-md:  0.5rem;    /* 8px — corner-small */
+    --pdx-radius-lg:  0.75rem;   /* 12px — corner-medium */
+    --pdx-radius-xl:  1rem;      /* 16px — corner-large */
+
+    /* M3 elevation shadows — 5 levels mapped to pdx-shadow-* tokens.
+       M3 uses two shadow layers: ambient (spread) + key (directional).
+       Dark mode: stronger shadows for visibility on dark surfaces. */
+    --pdx-shadow-sm:  0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);    /* level1 */
+    --pdx-shadow-md:  0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);    /* level2 */
+    --pdx-shadow-lg:  0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);    /* level3 */
+    --pdx-shadow-xl:  0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.3);   /* level4 */
+    --pdx-shadow-color: light-dark(oklch(0 0 0 / 0.12), oklch(0 0 0 / 0.45));
+
+    /* M3 semantic colors — adapted from Material 3 palette */
+    --pdx-color-danger:       light-dark(oklch(0.5 0.20 25), oklch(0.57 0.16 25));
+    --pdx-color-danger-hover: light-dark(oklch(0.43 0.22 25), oklch(0.62 0.18 25));
+    --pdx-color-success:      light-dark(oklch(0.52 0.14 165), oklch(0.535 0.12 165));
+    --pdx-color-warning:      light-dark(oklch(0.72 0.14 80), oklch(0.75 0.11 80));
+    --pdx-color-info:         light-dark(oklch(0.52 0.14 245), oklch(0.55 0.12 245));
+
+    /* M3 focus */
+    --pdx-focus-ring: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.3);
+
+    /* M3 type weights */
+    --pdx-weight-medium: 500;
+    --pdx-weight-semibold: 500;
+    --pdx-line-tight: 1.2;
+
+    /* M3 motion — standard and emphasized curves */
+    --pdx-ease-standard: cubic-bezier(0.2, 0.0, 0, 1.0);
+    --pdx-ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    --pdx-ease-accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15);
+
+    /* M3 behavior tokens */
+    --pdx-button-radius: 9999px;       /* pill buttons — M3 Expressive uses 20dp+ */
+    --pdx-button-min-height: 2.5rem;   /* 40px — M3 standard button height */
+    --pdx-input-style: filled;
+    --pdx-input-min-height: 3.5rem;    /* 56px M3 filled */
+    --pdx-tab-indicator: underline;
+    --pdx-tab-indicator-size: 3px;
+    --pdx-card-style: elevated;
+    --pdx-toggle-width: 3.25rem;
+    --pdx-toggle-height: 2rem;
+    --pdx-opacity-hover: 0.08;
+    --pdx-opacity-pressed: 0.12;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   M3 Component Overrides
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Input: structural variant (filled) driven by [pdx-input-style="filled"] in inputs.css.
+   Only M3-specific size overrides remain here. */
+[pdx-theme="material"] :is(.pdx-input-wrap, .pdx-number-group, .pdx-input-group).pdx-input-lg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    height: 4rem; min-height: 4rem;    /* 64px — M3 lg */
+}
+[pdx-theme="material"] :is(.pdx-input-wrap, .pdx-number-group, .pdx-input-group).pdx-input-xl:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    height: 4.5rem; min-height: 4.5rem; /* 72px — M3 xl */
+}
+
+/* M3 filled: primary/danger/success buttons inside group lose own border (group provides container). */
+[pdx-theme="material"] :is(.pdx-input-group, pdx-input-group) button:is(.pdx-primary, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border: none;
+}
+
+/* M3 input-group: buttons must match the taller 56px filled input at default size,
+   but respect smaller sizes (xs/sm) when the group specifies them. */
+[pdx-theme="material"] :is(.pdx-input-group, pdx-input-group):not([size]) > pdx-button > button[class]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] :is(.pdx-input-group, pdx-input-group):not([size]) > button:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    height: var(--pdx-input-min-height);
+    min-height: var(--pdx-input-min-height);
+}
+[pdx-theme="material"] :is(.pdx-input-group, pdx-input-group)[size="lg"] > pdx-button > button[class]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] :is(.pdx-input-group, pdx-input-group)[size="lg"] > button:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    height: 4rem; min-height: 4rem;
+}
+[pdx-theme="material"] :is(.pdx-input-group, pdx-input-group)[size="xl"] > pdx-button > button[class]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] :is(.pdx-input-group, pdx-input-group)[size="xl"] > button:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    height: 4.5rem; min-height: 4.5rem;
+}
+
+/* M3 button sizes lg/xl — match the taller M3 inputs (lg=64px, xl=72px) */
+[pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="lg"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    height: 4rem; min-height: 4rem;
+}
+[pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="xl"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    height: 4.5rem; min-height: 4.5rem;
+}
+
+/* M3 number addon tonal background */
+[pdx-theme="material"] .pdx-number-group > .pdx-input-addon:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.06), oklch(from var(--pdx-color-primary) l c h / 0.10));
+}
+
+/* Buttons: M3 — label-large typography. Shape via --pdx-button-radius token. */
+[pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    padding: var(--pdx-space-sm) 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.00625rem;   /* M3 label-large: 0.1px */
+    font-size: var(--pdx-text-sm);    /* M3 label-large: 14px */
+    line-height: 1.25rem;         /* M3 label-large: 20px */
+}
+
+/* Toggle: M3 — wider track, larger thumb */
+[pdx-theme="material"] .pdx-toggle:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    width: 3.25rem;
+    height: 2rem;
+}
+[pdx-theme="material"] .pdx-toggle:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+    width: calc(2rem - 6px);
+    height: calc(2rem - 6px);
+    top: 3px;
+    left: 3px;
+}
+[pdx-theme="material"] .pdx-toggle:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+    transform: translateX(1.25rem);
+}
+/* M3 size variants: the `.pdx-toggle` override (specificity 0,2,0) beat the base variants
+   .pdx-toggle-sm/-lg (0,1,0) → sm=md=lg. We redefine the sizes at the same specificity
+   (they win on source order), so sm < md < lg holds in the Material theme too.
+   Thumb = height - 6px, gap 3px per lato; translateX = trackWidth - thumb - 6px. */
+[pdx-theme="material"] .pdx-toggle-sm:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    width: 2.75rem;
+    height: 1.65rem;
+}
+[pdx-theme="material"] .pdx-toggle-sm:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+    width: calc(1.65rem - 6px);
+    height: calc(1.65rem - 6px);
+    top: 3px;
+    left: 3px;
+}
+[pdx-theme="material"] .pdx-toggle-sm:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+    transform: translateX(1.1rem);
+}
+[pdx-theme="material"] .pdx-toggle-lg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    width: 3.75rem;
+    height: 2.35rem;
+}
+[pdx-theme="material"] .pdx-toggle-lg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+    width: calc(2.35rem - 6px);
+    height: calc(2.35rem - 6px);
+    top: 3px;
+    left: 3px;
+}
+[pdx-theme="material"] .pdx-toggle-lg:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+    transform: translateX(1.4rem);
+}
+
+/* Checkbox: rounder */
+[pdx-theme="material"] .pdx-checkbox:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: var(--pdx-radius-sm);
+    border-width: 2.5px;
+}
+
+/* Card: elevated variant driven by [pdx-card-style="elevated"] in base.css.
+   M3 corner-medium radius kept as theme-specific. */
+[pdx-theme="material"] .pdx-surface-card:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    --pdx-card-radius: var(--pdx-radius-lg);  /* 12px = corner-medium */
+}
+
+/* Field labels: M3 caption style — smaller, muted */
+[pdx-theme="material"] .pdx-field-label:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] .pdx-field > label:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    font-size: var(--pdx-text-xs);
+    letter-spacing: 0.03em;
+    color: var(--pdx-color-muted);
+}
+
+/* Tab: M3 keeps its UNDERLINE pattern, not the base 'enclosed folder' look — reset the folder borders
+   + panel border and re-show the animated 3dp indicator. */
+[pdx-theme="material"] .pdx-tabs:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) { border-bottom: var(--pdx-tab-indicator-size) solid var(--pdx-color-border); gap: 0; }
+[pdx-theme="material"] .pdx-tab:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) { border: none; margin-bottom: 0; }
+[pdx-theme="material"] :is([data-tab-panel], [role="tabpanel"]):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) { border: none; border-radius: 0; padding: var(--pdx-space-lg) 0; }
+[pdx-theme="material"] .pdx-tab-indicator:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) { display: block; }
+
+/* M3 primary tab — tonal state-layer bg + the 3dp indicator (top-rounded shape) */
+[pdx-theme="material"] .pdx-tab.active:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    /* M3 state layer + top-rounded shape. The active line is the single animated .pdx-tab-indicator
+       (3dp) on the divider — a border-bottom here added a SECOND offset line above it ("strana"). */
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.15));
+    border-radius: var(--pdx-radius-md) var(--pdx-radius-md) 0 0;
+}
+
+/* CSS-only tabs (no <pdx-tabs>, so no .pdx-tab-indicator element): the 3dp indicator on the active tab
+   itself. An outer shadow offset by the indicator size is clipped out of the tab's own box,
+   so it shows only as the strip under the tab — on the divider, where the element sits. No layout
+   change, and no second line. The focus variant keeps the base focus ring, a box-shadow too. */
+[pdx-theme="material"] .pdx-tabs:not(:has(> .pdx-tab-indicator)) > .pdx-tab:is(.active, [aria-selected="true"]):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    box-shadow: 0 var(--pdx-tab-indicator-size) 0 0 var(--pdx-color-primary);
+}
+[pdx-theme="material"] .pdx-tabs:not(:has(> .pdx-tab-indicator)) > .pdx-tab:is(.active, [aria-selected="true"]):focus-visible:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    box-shadow: 0 var(--pdx-tab-indicator-size) 0 0 var(--pdx-color-primary),
+                inset 0 0 0 2px color-mix(in oklab, var(--pdx-color-primary) 40%, transparent);
+}
+
+/* ── Breadcrumb: dot separator (M3 style) ── */
+[pdx-theme="material"] .pdx-breadcrumb:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) { --pdx-breadcrumb-separator: '·'; }
+[pdx-theme="material"] .pdx-breadcrumb > *:not(:last-child):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::after {
+    font-size: 1.4em;
+    font-weight: var(--pdx-weight-bold);
+}
+
+/* ── Accordion: M3 expand icon, rounded container ── */
+[pdx-theme="material"] details.pdx-accordion:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: var(--pdx-radius-md);
+}
+[pdx-theme="material"] details.pdx-accordion summary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::after {
+    content: '▾';
+    font-size: 1.1em;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease-standard);
+}
+[pdx-theme="material"] details.pdx-accordion[open] summary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::after {
+    transform: rotate(180deg);
+}
+
+/* ── Table: M3 tonal header, no uppercase ── */
+[pdx-theme="material"] .pdx-table th:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    --pdx-table-header-transform: none;
+    --pdx-table-header-letter-spacing: normal;
+    --pdx-table-header-weight: var(--pdx-weight-medium);
+    --pdx-table-header-size: var(--pdx-text-sm);
+    --pdx-table-header-color: var(--pdx-color-muted);
+    --pdx-table-header-bg: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.04), oklch(from var(--pdx-color-primary) l c h / 0.08));
+}
+
+/* ── Headings: ensure contrast — M3 uses onSurface which is high-contrast ── */
+[pdx-theme="material"] :is(h1, h2, h3, h4, h5, h6):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    color: var(--pdx-color-text);
+}
+
+/* ── Button: M3 Filled — state layer on hover (onPrimary at 8%) ── */
+[pdx-theme="material"] .pdx-primary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    --pdx-button-hover-shadow: var(--pdx-shadow-sm);
+}
+[pdx-theme="material"] .pdx-primary:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    filter: brightness(1.08);
+}
+
+/* ── Button: M3 Tonal (secondary) — secondary-container bg, on-secondary-container text ── */
+[pdx-theme="material"] .pdx-secondary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: light-dark(oklch(from var(--pdx-color-primary) 0.90 0.04 h), oklch(from var(--pdx-color-primary) 0.30 0.06 h));
+    color: light-dark(oklch(from var(--pdx-color-primary) 0.25 0.08 h), oklch(from var(--pdx-color-primary) 0.90 0.04 h));
+    border-color: transparent;
+}
+[pdx-theme="material"] .pdx-secondary:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    box-shadow: var(--pdx-shadow-sm);
+    filter: brightness(0.96);
+}
+
+/* ── Button: M3 Outlined — neutral stroke, surface bg ── */
+[pdx-theme="material"] .pdx-outline:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-color: var(--pdx-color-border);
+}
+[pdx-theme="material"] .pdx-outline:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.12));
+}
+
+/* ── Select: M3 filled style, dropdown with elevation ── */
+[pdx-theme="material"] .pdx-select-dropdown:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    box-shadow: var(--pdx-shadow-lg);
+}
+[pdx-theme="material"] .pdx-select-option:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] .pdx-select-option.active:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+[pdx-theme="material"] .pdx-select-caret:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    --pdx-select-caret-size: 1.5rem;
+}
+/* M3: thicker stroke, bolder feel */
+[pdx-theme="material"] .pdx-select-caret svg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    --pdx-select-caret-stroke: 2.5;
+    stroke: var(--pdx-color-text);
+}
+[pdx-theme="material"] .pdx-select-check:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: var(--pdx-radius-xs, 2px);
+}
+
+/* ── Calendar: M3 — circle selected, state layer hover, tonal container ── */
+[pdx-theme="material"] .pdx-cal-cell:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: 9999px;  /* M3: full circle for day cells */
+    width: 40px;
+    height: 40px;
+}
+[pdx-theme="material"] .pdx-cal-cell:hover:not(.pdx-cal-disabled):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08); /* M3 state layer */
+}
+[pdx-theme="material"] .pdx-cal-selected:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: 9999px;
+}
+[pdx-theme="material"] .pdx-cal-today:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::after {
+    width: 5px;
+    height: 5px;
+}
+/* M3 range: pill ends, flat middle */
+[pdx-theme="material"] .pdx-cal-range-start:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: 9999px 0 0 9999px;
+}
+[pdx-theme="material"] .pdx-cal-range-end:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: 0 9999px 9999px 0;
+}
+[pdx-theme="material"] .pdx-cal-range-start.pdx-cal-range-end:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: 9999px;
+}
+/* M3 calendar container: elevated surface */
+[pdx-theme="material"] .pdx-calendar-inline:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border: none;
+    box-shadow: var(--pdx-shadow-sm);
+    border-radius: var(--pdx-radius-lg);
+}
+/* M3 nav buttons: circular */
+[pdx-theme="material"] .pdx-cal-nav-btn:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: 9999px;
+}
+[pdx-theme="material"] .pdx-cal-nav-btn:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+/* M3 month/year cells: pill shape */
+[pdx-theme="material"] .pdx-cal-month-cell:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] .pdx-cal-year-cell:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: 9999px;
+}
+[pdx-theme="material"] .pdx-cal-month-cell:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)),
+[pdx-theme="material"] .pdx-cal-year-cell:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+
+/* ── Date Picker: M3 — elevated panel, no border ── */
+[pdx-theme="material"] .pdx-date-picker-panel:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border: none;
+    box-shadow: var(--pdx-shadow-lg);
+    border-radius: var(--pdx-radius-xl);
+}
+[pdx-theme="material"] .pdx-date-picker-preset-btn:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+
+/* ── Time Picker: M3 — rounded container, tonal hover ── */
+[pdx-theme="material"] .pdx-time-picker:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+}
+[pdx-theme="material"] .pdx-time-value:focus:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.12);
+    border-radius: var(--pdx-radius-md);
+}
+[pdx-theme="material"] .pdx-time-arrow:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+    border-radius: 9999px;
+}
+
+/* Group composition radius enforced by pdx.composition layer (composition.css) */

@@ -1,0 +1,108 @@
+<template>
+  <div class="page">
+    <h2>Button</h2>
+    <p class="desc">8 semantic variants, 2 sizes (sm/lg), loading and disabled states. Click to interact.</p>
+
+    <section>
+      <h3>Primary Variants</h3>
+      <p class="hint">Click any button — it shows feedback for 1 second.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="flash">Primary</button>
+        <button class="pdx-secondary" @click="flash">Secondary</button>
+        <button class="pdx-ghost" @click="flash">Ghost</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Semantic Variants</h3>
+      <div class="row">
+        <button class="pdx-danger" @click="flash">Danger</button>
+        <button class="pdx-success" @click="flash">Success</button>
+        <button class="pdx-warning" @click="flash">Warning</button>
+        <button class="pdx-info" @click="flash">Info</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Sizes</h3>
+      <div class="row">
+        <button class="pdx-primary" size="sm" @click="flash">Small</button>
+        <button class="pdx-primary" @click="flash">Default</button>
+        <button class="pdx-primary" size="lg" @click="flash">Large</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Loading State</h3>
+      <p class="hint">Click to trigger a 1.5s loading state.</p>
+      <div class="row">
+        <button class="pdx-primary" :class="loading1 ? 'pdx-loading' : ''" :disabled="loading1" @click="doLoad1">
+          @if (loading1) { Saving... } @else { Save Changes }
+        </button>
+        <button class="pdx-danger" :class="loading2 ? 'pdx-loading' : ''" :disabled="loading2" @click="doLoad2">
+          @if (loading2) { Deleting... } @else { Delete Item }
+        </button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Disabled</h3>
+      <div class="row">
+        <button class="pdx-primary" disabled>Primary Disabled</button>
+        <button class="pdx-secondary" disabled>Secondary Disabled</button>
+        <button class="pdx-danger" disabled>Danger Disabled</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Button Group</h3>
+      <div class="pdx-btn-group">
+        <button class="pdx-secondary" @click="flash">Left</button>
+        <button class="pdx-secondary" @click="flash">Center</button>
+        <button class="pdx-secondary" @click="flash">Right</button>
+      </div>
+    </section>
+
+    <div class="log">{{ log }}</div>
+  </div>
+</template>
+
+<script setup>
+@page '/button';
+@title 'Button — PDX Components';
+
+let log = $signal('Click a button...');
+let loading1 = $signal(false);
+let loading2 = $signal(false);
+
+function flash(e) {
+    var btn = e.target;
+    var original = btn.textContent;
+    btn.textContent = '✓ Clicked!';
+    log = 'Clicked: ' + original.trim() + ' at ' + new Date().toLocaleTimeString();
+    setTimeout(function() { btn.textContent = original; }, 1000);
+}
+
+function doLoad1() {
+    loading1 = true;
+    log = 'Saving...';
+    setTimeout(function() { loading1 = false; log = 'Saved successfully!'; }, 1500);
+}
+
+function doLoad2() {
+    loading2 = true;
+    log = 'Deleting...';
+    setTimeout(function() { loading2 = false; log = 'Deleted.'; }, 1500);
+}
+</script>
+
+<style scoped>
+  .page { max-width: 680px; }
+  h2 { font-size: 1.3rem; font-weight: 700; margin: 0 0 4px; }
+  h3 { font-size: 0.9rem; font-weight: 600; margin: 0 0 8px; color: var(--pdx-color-text, #333); }
+  .desc { font-size: 0.82rem; color: var(--pdx-color-muted, #999); margin: 0 0 20px; }
+  .hint { font-size: 0.75rem; color: var(--pdx-color-muted, #aaa); margin: 0 0 8px; }
+  section { margin-bottom: 24px; padding: 16px; border: 1px solid var(--pdx-color-border, #e0e0e0); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-surface, white); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .log { margin-top: 12px; font-size: 0.8rem; font-family: monospace; padding: 8px 12px; background: var(--pdx-color-inset, #f5f5f7); border-radius: var(--pdx-radius-sm, 4px); color: var(--pdx-color-muted, #666); }
+</style>

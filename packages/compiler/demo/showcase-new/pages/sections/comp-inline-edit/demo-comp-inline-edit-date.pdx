@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Date & DateTime</h2>
+    <div class="demo-row">
+      <span class="demo-label">Birthday:</span>
+      <pdx-inline-edit type="date" :value="'1990-05-15'"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Appointment:</span>
+      <pdx-inline-edit type="datetime" :value="'2026-04-08T14:30'"></pdx-inline-edit>
+    </div>
+  </section>
+</template>

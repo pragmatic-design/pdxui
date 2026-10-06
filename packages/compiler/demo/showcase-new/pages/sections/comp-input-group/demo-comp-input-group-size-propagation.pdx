@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Size Propagation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Set <code>size</code> on the group — it propagates to all children. Input and button heights match perfectly.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-input-group size="xs">
+        <pdx-input placeholder="Extra Small group"></pdx-input>
+        <pdx-button variant="solid">Go</pdx-button>
+      </pdx-input-group>
+
+      <pdx-input-group size="sm">
+        <pdx-input placeholder="Small group"></pdx-input>
+        <pdx-button variant="solid">Go</pdx-button>
+      </pdx-input-group>
+
+      <pdx-input-group>
+        <pdx-input placeholder="Default group"></pdx-input>
+        <pdx-button variant="solid">Go</pdx-button>
+      </pdx-input-group>
+
+      <pdx-input-group size="lg">
+        <pdx-input placeholder="Large group"></pdx-input>
+        <pdx-button variant="solid">Go</pdx-button>
+      </pdx-input-group>
+
+      <pdx-input-group size="xl">
+        <pdx-input placeholder="Extra Large group"></pdx-input>
+        <pdx-button variant="solid">Go</pdx-button>
+      </pdx-input-group>
+    </div>
+  </section>
+</template>

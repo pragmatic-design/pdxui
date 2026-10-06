@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Feedback</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Feedback</span></div>
+                        <h1 class="pdx-txt-display">Feedback</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Alerts, badges, skeleton loading, progress bars.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Alerts</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <div class="pdx-alert pdx-alert-info" style="align-items:center"><i data-lucide="info" style="width:18px;height:18px;flex-shrink:0"></i>This is an informational message.</div>
+                                    <div class="pdx-alert pdx-alert-success" style="align-items:center"><i data-lucide="circle-check" style="width:18px;height:18px;flex-shrink:0"></i>Operation completed successfully.</div>
+                                    <div class="pdx-alert pdx-alert-warning" style="align-items:center"><i data-lucide="triangle-alert" style="width:18px;height:18px;flex-shrink:0"></i>Please review before continuing.</div>
+                                    <div class="pdx-alert pdx-alert-error" style="align-items:center"><i data-lucide="circle-x" style="width:18px;height:18px;flex-shrink:0"></i>Something went wrong. Please try again.</div>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-alert pdx-alert-info"&gt;...&lt;/div&gt;
+&lt;div class="pdx-alert pdx-alert-success"&gt;...&lt;/div&gt;
+&lt;div class="pdx-alert pdx-alert-warning"&gt;...&lt;/div&gt;
+&lt;div class="pdx-alert pdx-alert-error"&gt;...&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Badges</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm">
+                                    <span class="pdx-badge pdx-badge-primary">Primary</span>
+                                    <span class="pdx-badge pdx-badge-secondary">Secondary</span>
+                                    <span class="pdx-badge pdx-badge-success">Success</span>
+                                    <span class="pdx-badge pdx-badge-danger">Danger</span>
+                                    <span class="pdx-badge pdx-badge-warning">Warning</span>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;span class="pdx-badge pdx-badge-primary"&gt;Primary&lt;/span&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Skeleton Loading</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Shimmer animation shows UI structure during loading.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="md">
+                                    <div class="pdx-surface-card">
+                                        <pdx-row gap="sm" items="center">
+                                            <div class="pdx-skeleton pdx-skeleton-circle"></div>
+                                            <pdx-stack gap="xs" grow>
+                                                <div class="pdx-skeleton pdx-skeleton-title"></div>
+                                                <div class="pdx-skeleton pdx-skeleton-text"></div>
+                                            </pdx-stack>
+                                        </pdx-row>
+                                    </div>
+                                    <pdx-row gap="md">
+                                        <div class="pdx-skeleton pdx-skeleton-button"></div>
+                                        <div class="pdx-skeleton pdx-skeleton-button"></div>
+                                    </pdx-row>
+                                    <div class="pdx-skeleton pdx-skeleton-image" style="max-width:24rem"></div>
+                                    <div class="pdx-skeleton pdx-skeleton-input"></div>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-skeleton pdx-skeleton-circle"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-title"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-text"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-image"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-button"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-input"&gt;&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Progress Bar</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <div class="pdx-progress"><div class="pdx-progress-bar" style="width:65%"></div></div>
+                                    <div class="pdx-progress"><div class="pdx-progress-bar" variant="success" style="width:100%"></div></div>
+                                    <div class="pdx-progress"><div class="pdx-progress-bar" variant="danger" style="width:25%"></div></div>
+                                    <span class="pdx-txt-caption pdx-ink-muted">Indeterminate:</span>
+                                    <div class="pdx-progress pdx-progress-indeterminate"><div class="pdx-progress-bar"></div></div>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-progress"&gt;
+  &lt;div class="pdx-progress-bar" style="width:65%"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="pdx-progress pdx-progress-indeterminate"&gt;
+  &lt;div class="pdx-progress-bar"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Status Dot</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="lg">
+                                    <pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-success"></span><span>Online</span></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-warning"></span><span>Away</span></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-danger"></span><span>Busy</span></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-muted"></span><span>Offline</span></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-success pdx-dot-pulse"></span><span>Live</span></pdx-row>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;span class="pdx-dot pdx-dot-success"&gt;&lt;/span&gt;
+&lt;span class="pdx-dot pdx-dot-success pdx-dot-pulse"&gt;&lt;/span&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

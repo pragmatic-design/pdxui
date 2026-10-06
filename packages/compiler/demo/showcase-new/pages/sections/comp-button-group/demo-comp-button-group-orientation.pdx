@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Orientation</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>orientation="vertical"</code> stacks buttons vertically.</p>
+
+    <div class="demo-row align-start">
+      <pdx-button-group orientation="vertical">
+        <pdx-button variant="outline">Top</pdx-button>
+        <pdx-button variant="outline">Middle</pdx-button>
+        <pdx-button variant="outline">Bottom</pdx-button>
+      </pdx-button-group>
+
+      <pdx-button-group orientation="vertical" mode="single" label="Priority" :value="priority" variant="outline" @pdx-change="onPriority">
+        <pdx-button value="high">High</pdx-button>
+        <pdx-button value="medium">Medium</pdx-button>
+        <pdx-button value="low">Low</pdx-button>
+      </pdx-button-group>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useButtonGroupDemo } from './state.pdx';
+
+const demo = useButtonGroupDemo();
+const priority = $derived(demo.priority());
+
+function onPriority(e) { demo.onPriority(e); }
+</script>

@@ -1,0 +1,153 @@
+/* pdx-filter-builder — Notion-style chip-based filter bar */
+
+pdx-filter-builder { display: block; }
+
+.pdx-filter-builder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: var(--pdx-space-xs) 0;
+}
+
+/* ─── Chip ─── */
+.pdx-fb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px 3px 10px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-full);
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    user-select: none;
+    transition: border-color 0.15s;
+}
+
+.pdx-fb-chip:hover {
+    border-color: var(--pdx-color-primary);
+}
+
+/* A button, so the filter can be edited from the keyboard: drawn as plain text. */
+.pdx-fb-chip-label {
+    all: unset;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: var(--pdx-radius-sm);
+}
+
+.pdx-fb-chip-label:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-primary);
+    outline-offset: 2px;
+}
+
+.pdx-fb-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.pdx-fb-chip-remove:hover {
+    background: var(--pdx-color-danger);
+    color: white;
+}
+
+/* ─── Buttons ─── */
+.pdx-fb-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-full);
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.pdx-fb-add-btn:hover {
+    border-color: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-ink);
+}
+
+.pdx-fb-add-btn svg {
+    flex-shrink: 0;
+}
+
+.pdx-fb-clear-btn {
+    padding: 4px 8px;
+    border: none;
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    cursor: pointer;
+}
+
+.pdx-fb-clear-btn:hover {
+    color: var(--pdx-color-danger-ink);
+}
+
+/* ─── Popover ─── */
+.pdx-fb-popover {
+    min-width: 200px;
+    max-width: 280px;
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-lg);
+    padding: var(--pdx-space-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+}
+
+.pdx-fb-popover-title {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 4px;
+}
+
+.pdx-fb-field-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 6px 8px;
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    color: var(--pdx-color-text);
+    font-size: var(--pdx-text-sm);
+    cursor: pointer;
+}
+
+.pdx-fb-field-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-fb-condition {
+    min-width: 240px;
+}
+
+.pdx-fb-actions {
+    display: flex;
+    gap: var(--pdx-space-xs);
+    justify-content: flex-end;
+    padding-top: var(--pdx-space-xs);
+    border-top: 1px solid var(--pdx-color-border);
+}

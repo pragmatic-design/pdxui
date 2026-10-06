@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple Triggers</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use <code>@</code> for users and <code>#</code> for tags.
+    </p>
+
+    <div class="demo-row">
+      <pdx-mention
+        trigger="@, #"
+        :items="usersAndTags"
+        label="Post"
+        placeholder="Type @ for users, # for tags..."
+        :rows="4"
+      ></pdx-mention>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const usersAndTags = [
+  { value: 'alice', label: 'Alice Johnson' },
+  { value: 'bob', label: 'Bob Smith' },
+  { value: 'bug', label: 'bug' },
+  { value: 'feature', label: 'feature' },
+  { value: 'urgent', label: 'urgent' },
+  { value: 'docs', label: 'documentation' },
+];
+</script>

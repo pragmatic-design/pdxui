@@ -1,0 +1,271 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Fluent Theme
+   Microsoft Fluent UI 2 inspired.
+   Reference: fluent2.microsoft.design, github.com/microsoft/fluentui
+   Key traits: brand blue #0f6cbd, tight radius (2-8px), compact, Segoe UI,
+   clean white surfaces, subtle borders, bottom-accent on focus.
+   ========================================================================== */
+
+[pdx-theme="fluent"] {
+    --pdx-hue-primary: 210;
+    --pdx-hue-accent:  175;
+
+    /* Fluent brand Web blue (#0f6cbd) */
+    --pdx-color-primary:       oklch(0.52 0.16 215);
+    --pdx-color-primary-hover: oklch(0.46 0.18 215);
+    --pdx-color-primary-text:  oklch(0.99 0.005 215);
+    --pdx-color-accent:        oklch(0.60 0.12 175);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.52 0.16 215);
+
+    /* Cool neutral grays — very slight blue tint */
+    --pdx-gray-50:  oklch(0.988 0.002 210);
+    --pdx-gray-100: oklch(0.97  0.003 210);
+    --pdx-gray-200: oklch(0.93  0.004 210);
+    --pdx-gray-300: oklch(0.87  0.005 210);
+    --pdx-gray-800: oklch(0.26  0.006 210);
+    --pdx-gray-900: oklch(0.19  0.008 210);
+    --pdx-gray-950: oklch(0.14  0.006 210);
+
+    /* Clean white surfaces — Fluent is very white-dominant in light */
+    --pdx-color-bg:      light-dark(oklch(0.99 0.001 210), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(white, oklch(0.17 0.006 210));
+    --pdx-color-inset:   light-dark(oklch(0.97 0.003 210), oklch(0.21 0.006 210));
+
+    /* Fluent typography — Segoe UI */
+    --pdx-font-sans: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+    --pdx-font-heading: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+    --pdx-font-mono: 'Cascadia Code', 'Consolas', monospace;
+
+    /* Fluent radii — very tight: 2/4/6/8px */
+    --pdx-radius-sm:  0.125rem;
+    --pdx-radius-md:  0.25rem;
+    --pdx-radius-lg:  0.375rem;
+    --pdx-radius-xl:  0.5rem;
+
+    /* Compact density */
+    --pdx-density-factor: 0.9;
+
+    /* Fluent 2 shadows — dual-layer: ambient (spread) + key (directional) */
+    --pdx-shadow-color: light-dark(oklch(0 0 0 / 0.06), oklch(0 0 0 / 0.3));
+    --pdx-shadow-sm:  0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);    /* shadow2 */
+    --pdx-shadow-md:  0 0 2px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.14);    /* shadow4 */
+    --pdx-shadow-lg:  0 0 2px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.14);    /* shadow8 */
+    --pdx-shadow-xl:  0 0 2px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.14);   /* shadow16 */
+
+    /* Thin borders — neutralStroke1 */
+    --pdx-color-border: light-dark(oklch(0.87 0.003 210), oklch(0.32 0.006 210));
+    --pdx-color-border-strong: light-dark(oklch(0.78 0.005 210), oklch(0.42 0.008 210));
+
+    /* Fluent 2 focus: double-ring — 2px black inner + 1px white outer for visibility on any bg */
+    --pdx-focus-ring: 0 0 0 2px var(--pdx-color-text), 0 0 0 3px var(--pdx-color-surface);
+
+    /* Fluent semantic colors — adapted from Fluent UI 2 palette */
+    --pdx-color-danger:       light-dark(oklch(0.5 0.18 20), oklch(0.57 0.15 20));
+    --pdx-color-danger-hover: light-dark(oklch(0.43 0.20 20), oklch(0.58 0.17 20));
+    --pdx-color-success:      light-dark(oklch(0.48 0.14 145), oklch(0.54 0.12 145));
+    --pdx-color-warning:      light-dark(oklch(0.70 0.14 75), oklch(0.73 0.11 75));
+    --pdx-color-info:         light-dark(oklch(0.52 0.16 215), oklch(0.525 0.14 215));
+
+    /* Weights */
+    --pdx-weight-semibold: 600;
+
+    /* Fluent motion — decelerate for enters, accelerate for exits */
+    --pdx-ease-standard: cubic-bezier(0.33, 0, 0.67, 1);
+    --pdx-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+    --pdx-ease-accelerate: cubic-bezier(1, 0, 1, 1);
+    --pdx-duration-base: 200ms;
+
+    /* Fluent behavior tokens */
+    --pdx-button-radius: var(--pdx-radius-md);  /* 4px — subtle rounding, not pill */
+    /* The rendered height is `min-height × --pdx-density-factor`, and fluent's own factor is
+       0.9: a plain 2rem renders 28.8px, not the 32 Fluent medium states (the same call as
+       corporate's). Dividing it out gives 32px at the theme's density, and
+       an app's `pdx-density` still scales from there. Spacing keeps the 0.9. */
+    --pdx-button-min-height: calc(2rem / 0.9);     /* 32px Fluent medium, at fluent's density */
+    --pdx-input-style: outlined;
+    --pdx-input-min-height: calc(2rem / 0.9);      /* the same, so a row of both aligns */
+    --pdx-tab-indicator-size: 3px;     /* strokeWidthThicker */
+    --pdx-card-style: bordered;
+    --pdx-border-width: 1px;
+    --pdx-opacity-hover: 0.04;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Fluent Component Overrides
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Input: focus bottom-accent driven by [pdx-input-focus="bottom"] in inputs.css.
+   No size overrides — height flows from --pdx-input-min-height × density,
+   and base size variants in inputs.css scale with density automatically. */
+/* Fluent uses border-strong on inputs by default */
+[pdx-theme="fluent"] .pdx-input-wrap:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-color: var(--pdx-color-border-strong);
+}
+
+/* Buttons: Fluent — compact (32px medium), no letter-spacing, semibold 600 */
+[pdx-theme="fluent"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    letter-spacing: 0;
+    font-weight: var(--pdx-weight-semibold);
+    font-size: var(--pdx-text-sm);  /* body1Strong: 14px */
+    line-height: 1.25rem;       /* 20px */
+    padding: 5px 12px;          /* Fluent medium: 5px 12px → 32px height */
+}
+/* Fluent button sizes: height flows from --pdx-button-min-height, which divides the 0.9 density
+   back out so the rendered height is the 32px Fluent medium states.
+   No explicit height override — the token system handles alignment with inputs.
+   Size variants (xs/sm) use the base buttons.css calc() with density scaling. */
+
+/* Secondary: Fluent "outline" — thin border, transparent bg, neutral text */
+[pdx-theme="fluent"] .pdx-secondary:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-color: var(--pdx-color-border-strong);
+    background: transparent;
+    color: var(--pdx-color-text);
+}
+[pdx-theme="fluent"] .pdx-secondary:hover:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    background: var(--pdx-color-inset);
+}
+
+/* Card: Fluent uses default bordered style — no overrides needed. */
+
+/* Tab: subtle bg reveal on hover, thin underline */
+[pdx-theme="fluent"] .pdx-tab:hover:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    background: var(--pdx-color-inset);
+}
+[pdx-theme="fluent"] .pdx-tab.active:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)),
+[pdx-theme="fluent"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-bottom: var(--pdx-tab-indicator-size) solid var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+/* ── Select: Fluent 2 style — bottom border accent, thin caret ── */
+[pdx-theme="fluent"] .pdx-select-trigger:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-bottom: var(--pdx-border-width-focus) solid var(--pdx-color-border-strong);
+    border-radius: var(--pdx-radius-sm) var(--pdx-radius-sm) 0 0;
+}
+[pdx-theme="fluent"] .pdx-select-trigger:focus-within:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-bottom-color: var(--pdx-color-primary);
+}
+[pdx-theme="fluent"] .pdx-select-dropdown:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-sm);
+    box-shadow: var(--pdx-shadow-md);
+}
+[pdx-theme="fluent"] .pdx-select-caret:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    --pdx-select-caret-size: 1.125rem;
+}
+/* Fluent 2: thin precise stroke */
+[pdx-theme="fluent"] .pdx-select-caret svg:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    --pdx-select-caret-stroke: 1.5;
+}
+
+/* ── Breadcrumb: chevron separator (Fluent standard) ── */
+[pdx-theme="fluent"] .pdx-breadcrumb:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) { --pdx-breadcrumb-separator: '/'; }
+[pdx-theme="fluent"] .pdx-breadcrumb > *:not(:last-child):not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *))::after {
+    font-size: 0.85em;
+    color: var(--pdx-color-muted);
+}
+
+/* ── Table: Fluent 2 — subtle header, no uppercase, tight ── */
+[pdx-theme="fluent"] .pdx-table th:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    --pdx-table-header-transform: none;
+    --pdx-table-header-letter-spacing: normal;
+    --pdx-table-header-weight: var(--pdx-weight-semibold);
+    --pdx-table-header-size: var(--pdx-text-xs);
+    --pdx-table-header-color: var(--pdx-color-muted);
+    --pdx-table-header-border-color: var(--pdx-color-border);
+}
+[pdx-theme="fluent"] .pdx-table td:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-bottom-color: var(--pdx-color-border);
+}
+
+/* ── Accordion: Fluent 2 — chevron, clean divider ── */
+[pdx-theme="fluent"] details.pdx-accordion:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-md);
+}
+[pdx-theme="fluent"] details.pdx-accordion summary:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *))::after {
+    content: '▾';
+    font-size: 0.9em;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease-decelerate);
+}
+[pdx-theme="fluent"] details.pdx-accordion[open] summary:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *))::after {
+    transform: rotate(180deg);
+}
+
+/* ── Card: Fluent 2 — thin border, subtle shadow on hover ── */
+[pdx-theme="fluent"] .pdx-surface-card:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    --pdx-card-radius: var(--pdx-radius-lg);
+}
+[pdx-theme="fluent"] .pdx-surface-card[interactive]:hover:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    box-shadow: var(--pdx-shadow-md);
+}
+
+/* ── Calendar: Fluent 2 — circle selected, subtle hover, compact ── */
+[pdx-theme="fluent"] .pdx-cal-cell:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: 9999px;
+    width: 34px;
+    height: 34px;
+}
+[pdx-theme="fluent"] .pdx-cal-cell:hover:not(.pdx-cal-disabled):not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    background: var(--pdx-color-inset);
+}
+[pdx-theme="fluent"] .pdx-cal-selected:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: 9999px;
+}
+/* Fluent range: pill ends */
+[pdx-theme="fluent"] .pdx-cal-range-start:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: 9999px 0 0 9999px;
+}
+[pdx-theme="fluent"] .pdx-cal-range-end:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: 0 9999px 9999px 0;
+}
+[pdx-theme="fluent"] .pdx-cal-range-start.pdx-cal-range-end:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: 9999px;
+}
+/* Fluent calendar container: bordered, tight radius */
+[pdx-theme="fluent"] .pdx-calendar-inline:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+}
+/* Fluent nav: compact */
+[pdx-theme="fluent"] .pdx-cal-nav-btn:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-sm);
+    width: 28px;
+    height: 28px;
+}
+/* Fluent month/year cells */
+[pdx-theme="fluent"] .pdx-cal-month-cell:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)),
+[pdx-theme="fluent"] .pdx-cal-year-cell:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-md);
+}
+/* Fluent focus: double ring */
+[pdx-theme="fluent"] .pdx-cal-cell:focus-visible:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    outline: 2px solid var(--pdx-color-focus);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 1px var(--pdx-color-surface);
+}
+
+/* ── Date Picker: Fluent 2 — bordered panel, tight radius ── */
+[pdx-theme="fluent"] .pdx-date-picker-panel:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-lg);
+}
+/* Fluent trigger: bottom accent on focus */
+[pdx-theme="fluent"] .pdx-date-picker-trigger:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-color: var(--pdx-color-border-strong);
+}
+[pdx-theme="fluent"] .pdx-date-picker-trigger:focus-visible:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-width: 2px;
+}
+
+/* ── Time Picker: Fluent 2 — compact, bordered ── */
+[pdx-theme="fluent"] .pdx-time-picker:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-md);
+}
+[pdx-theme="fluent"] .pdx-time-value:focus:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    background: var(--pdx-color-inset);
+    outline: 2px solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}
+[pdx-theme="fluent"] .pdx-time-arrow:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+    border-radius: var(--pdx-radius-sm);
+}

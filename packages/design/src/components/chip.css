@@ -1,0 +1,268 @@
+/* Chip / Tag — selectable, removable, inline input.
+   Extends badges with interactivity: click to select, X to remove.
+
+   Usage:
+     <span class="pdx-chip">Default</span>
+     <span class="pdx-chip" selected>Selected</span>
+     <span class="pdx-chip">Label <button class="pdx-chip-remove">&times;</button></span>
+
+   Variants: default, primary, success, danger, warning
+   States: selected, disabled
+   Group: pdx-chip-group (wrapping row with gap)
+   Input: pdx-chip-input (inline text input inside group)
+*/
+
+/* ===== Base ===== */
+
+.pdx-chip {
+    /* box-sizing esplicito: difesa style-isolation contro reset host (`*{box-sizing}`) */
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--pdx-radius-full);
+    font-size: 0.75rem;
+    font-weight: var(--pdx-weight-medium);
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    background: transparent;
+    color: var(--pdx-color-text);
+    transition: all var(--pdx-transition);
+}
+
+.pdx-chip:hover {
+    background: var(--pdx-color-inset);
+    border-color: var(--pdx-color-border-strong, var(--pdx-color-border));
+}
+
+/* Selected state */
+.pdx-chip[selected],
+.pdx-chip.selected {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    border-color: var(--pdx-color-primary);
+}
+
+.pdx-chip[selected]:hover,
+.pdx-chip.selected:hover {
+    filter: brightness(1.1);
+}
+
+/* Disabled */
+.pdx-chip[disabled],
+.pdx-chip.disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ===== Variants ===== */
+
+.pdx-chip-primary {
+    border-color: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-ink);
+}
+.pdx-chip-primary[selected] {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+.pdx-chip-success {
+    border-color: var(--pdx-color-success);
+    color: var(--pdx-color-success-ink);
+}
+.pdx-chip-success[selected] {
+    background: var(--pdx-color-success);
+    color: var(--pdx-color-success-text);
+}
+
+.pdx-chip-danger {
+    border-color: var(--pdx-color-danger);
+    color: var(--pdx-color-danger-ink);
+}
+.pdx-chip-danger[selected] {
+    background: var(--pdx-color-danger);
+    color: var(--pdx-color-danger-text);
+}
+
+.pdx-chip-warning {
+    border-color: var(--pdx-color-warning);
+    color: var(--pdx-color-warning-ink);
+}
+.pdx-chip-warning[selected] {
+    background: var(--pdx-color-warning);
+    color: var(--pdx-color-warning-text);
+}
+
+.pdx-chip-info {
+    border-color: var(--pdx-color-accent);
+    color: var(--pdx-color-accent-ink);
+}
+.pdx-chip-info[selected] {
+    background: var(--pdx-color-accent);
+    color: var(--pdx-color-accent-text);
+}
+
+/* Tonal/subtle — muted background, no border, colored text */
+.pdx-chip-tonal {
+    border-color: transparent;
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+}
+.pdx-chip-tonal-primary {
+    border-color: transparent;
+    background: var(--pdx-color-primary-soft);
+    color: var(--pdx-color-primary-ink);
+}
+.pdx-chip-tonal-success {
+    border-color: transparent;
+    background: var(--pdx-color-success-soft);
+    color: var(--pdx-color-success-ink);
+}
+.pdx-chip-tonal-danger {
+    border-color: transparent;
+    background: var(--pdx-color-danger-soft);
+    color: var(--pdx-color-danger-ink);
+}
+.pdx-chip-tonal-warning {
+    border-color: transparent;
+    background: var(--pdx-color-warning-soft);
+    color: var(--pdx-color-warning-ink);
+}
+
+/* ===== CE host semantic class forwarding ===== */
+/* When .pdx-success/.pdx-warning/etc. is on the CE host <pdx-chip>,
+   forward the styling to the inner .pdx-chip span.
+   Pattern: pdx-{tag}.pdx-{variant} > .pdx-{inner} */
+pdx-chip.pdx-success > .pdx-chip { background: var(--pdx-color-success); color: var(--pdx-color-success-text); border-color: var(--pdx-color-success); }
+pdx-chip.pdx-danger > .pdx-chip { background: var(--pdx-color-danger); color: var(--pdx-color-danger-text); border-color: var(--pdx-color-danger); }
+pdx-chip.pdx-warning > .pdx-chip { background: var(--pdx-color-warning); color: var(--pdx-color-warning-text); border-color: var(--pdx-color-warning); }
+pdx-chip.pdx-info > .pdx-chip { background: var(--pdx-color-accent, var(--pdx-color-primary)); color: var(--pdx-color-accent-text); border-color: var(--pdx-color-accent, var(--pdx-color-primary)); }
+pdx-chip.pdx-primary > .pdx-chip { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border-color: var(--pdx-color-primary); }
+pdx-chip.pdx-secondary > .pdx-chip { background: var(--pdx-color-secondary, var(--pdx-gray-200)); color: var(--pdx-color-text); border-color: var(--pdx-color-secondary, var(--pdx-gray-200)); }
+
+/* The label part: avatar, icon, text. The toggle of a selectable + removable chip, beside its ×;
+   spaced like the pill it sits in. */
+.pdx-chip-body {
+    display: inline-flex;
+    align-items: center;
+    gap: inherit;
+}
+
+/* ===== Remove button ===== */
+
+.pdx-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.7rem;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+    transition: all var(--pdx-transition);
+    margin-left: 0.1rem;
+    margin-right: -0.2rem;
+}
+
+.pdx-chip-remove:hover {
+    opacity: 1;
+    background: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.15));
+}
+
+.pdx-chip[selected] .pdx-chip-remove:hover {
+    background: oklch(1 0 0 / 0.2);
+}
+
+/* ===== Chip with icon/avatar ===== */
+
+.pdx-chip-icon {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-left: -0.15rem;
+}
+
+/* ===== Group ===== */
+
+.pdx-chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+/* ===== Chip input (inline text field inside group) ===== */
+
+.pdx-chip-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.75rem;
+    color: var(--pdx-color-text);
+    min-width: 4rem;
+    flex: 1;
+    padding: 0.2rem 0;
+}
+
+.pdx-chip-input::placeholder {
+    color: var(--pdx-color-muted);
+}
+
+/* ===== Chip input wrapper (looks like an input field with chips inside) ===== */
+
+.pdx-chip-field {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+    min-height: 2.25rem;
+    cursor: text;
+    transition: border-color var(--pdx-transition), box-shadow var(--pdx-transition);
+}
+
+.pdx-chip-field:focus-within {
+    border-color: var(--pdx-color-primary);
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* Chips inside field are smaller */
+.pdx-chip-field .pdx-chip {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.5rem;
+}
+
+/* ===== Size variants ===== */
+
+.pdx-chip-sm {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.45rem;
+}
+
+.pdx-chip-lg {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.75rem;
+}
+
+/* Summary chip: collapsed multi-select count ("N selected" / "+K") — muted, non-removable. */
+.pdx-chip-summary {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    white-space: nowrap;
+}

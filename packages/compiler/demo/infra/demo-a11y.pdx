@@ -1,0 +1,116 @@
+<template>
+  <div class="demo">
+    <h2>Advanced Accessibility</h2>
+    <p class="desc">Active Descendant, Roving Tabindex, Live Region — three a11y primitives.</p>
+
+    <!-- Active Descendant -->
+    <section>
+      <h3>Active Descendant (Combobox pattern)</h3>
+      <p class="desc">Type in the input. Arrow keys navigate the list. Enter selects. Escape clears.</p>
+      <input type="text" :ref="adInputRef" role="combobox" aria-expanded="true" :aria-activedescendant="adActiveId" autocomplete="off" class="input" placeholder="Search fruits..." />
+      <ul class="listbox" :ref="adListRef" role="listbox">
+        <li role="option" id="fruit-0">Apple</li>
+        <li role="option" id="fruit-1">Banana</li>
+        <li role="option" id="fruit-2">Cherry</li>
+        <li role="option" id="fruit-3">Date</li>
+        <li role="option" id="fruit-4">Elderberry</li>
+        <li role="option" id="fruit-5">Fig</li>
+        <li role="option" id="fruit-6">Grape</li>
+      </ul>
+      <div class="log">Active: <strong>{{ adActiveId }}</strong> | Selected: <strong>{{ adSelected }}</strong></div>
+    </section>
+
+    <!-- Roving Tabindex -->
+    <section>
+      <h3>Roving Tabindex (Toolbar pattern)</h3>
+      <p class="desc">Tab into the toolbar, then Arrow keys to navigate. Only the active button is tab-focusable.</p>
+      <div class="toolbar" :ref="rovingRef" role="toolbar" aria-label="Formatting">
+        <button role="tab">Bold</button>
+        <button role="tab">Italic</button>
+        <button role="tab">Underline</button>
+        <button role="tab" aria-disabled="true">Strikethrough (disabled)</button>
+        <button role="tab">Code</button>
+      </div>
+      <div class="log">Active index: <strong>{{ rovingIndex }}</strong></div>
+    </section>
+
+    <!-- Live Region -->
+    <section>
+      <h3>Live Region (Screen Reader)</h3>
+      <p class="desc">Click buttons to announce messages. Check with a screen reader or inspect the DOM for aria-live elements.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="announcePolite">Announce (polite)</button>
+        <button @click="announceAssertive" style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Announce (assertive)</button>
+        <button @click="clearLive" style="background:#666;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Clear</button>
+      </div>
+      <div class="log">Last: <strong>{{ liveMsg }}</strong></div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { useActiveDescendant, useRovingTabindex, createLiveRegion, effect, onMount, onDestroy } from '@pdxui/core';
+
+let adActiveId = $signal('');
+let adSelected = $signal('none');
+let rovingIndex = $signal(0);
+let liveMsg = $signal('');
+
+let adInputRef = $signal(null);
+let adListRef = $signal(null);
+let rovingRef = $signal(null);
+
+// Active Descendant
+const ad = useActiveDescendant(() => adInputRef, () => adListRef, {
+    onActiveChange: function(id) { adActiveId = id || ''; },
+    onSelect: function(id, idx) {
+        var items = adListRef ? adListRef.querySelectorAll('[role="option"]') : [];
+        adSelected = items[idx] ? items[idx].textContent : '';
+    },
+});
+
+// Roving Tabindex
+const roving = useRovingTabindex(() => rovingRef, {
+    orientation: 'horizontal',
+    onActiveChange: function(el, idx) { rovingIndex = idx; },
+});
+
+// Live Region
+const live = createLiveRegion();
+let announceN = 1;
+
+function announcePolite() {
+    var msg = 'Item saved successfully #' + announceN++;
+    live.announce(msg, 'polite');
+    liveMsg = msg;
+}
+function announceAssertive() {
+    var msg = 'Error: connection lost #' + announceN++;
+    live.announce(msg, 'assertive');
+    liveMsg = msg;
+}
+function clearLive() { live.clear(); liveMsg = 'cleared'; }
+
+onMount(() => {
+    onDestroy(() => { ad.dispose(); roving.dispose(); live.dispose(); });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .row { display: flex; gap: 8px; }
+  .input { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+  .listbox { list-style: none; padding: 0; margin: 8px 0 0; border: 1px solid #e0e0e0; border-radius: 6px; max-height: 160px; overflow-y: auto; }
+  .listbox li { padding: 8px 12px; cursor: pointer; font-size: 0.9rem; }
+  .listbox li:hover { background: #f5f5f7; }
+  .listbox li[data-active] { background: #3b82f6; color: white; }
+  .toolbar { display: flex; gap: 4px; padding: 8px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; }
+  .toolbar button { padding: 6px 14px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; cursor: pointer; font-size: 0.85rem; }
+  .toolbar button:focus { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  .toolbar button[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
+  .log { font-size: 0.85rem; margin-top: 8px; }
+</style>

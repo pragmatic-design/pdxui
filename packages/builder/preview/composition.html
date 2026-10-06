@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<!--
+  The composite preview — what the EYE judges a theme on.
+
+  The manifest scenarios are what the oracle measures: isolated, exhaustive, already
+  generated. They are the right thing to measure and the wrong thing to look at. A theme's
+  personality only shows up in composition — how the surfaces stack, whether the borders
+  agree with the radii, whether the muted text still reads next to a filled button. A row of
+  isolated buttons never answers that.
+
+  Rules for anything added here:
+    · design-system classes and shipped components ONLY, no local styling that a real app
+      could not write. The page must be a fair sample of the system, not a showcase of CSS
+      written for this page;
+    · same contract as the generated scenario pages — ?theme / ?scheme, and data-pdx-ready
+      when it has settled — so the builder can host it in the same iframe and measure it with
+      the same oracle.
+-->
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Composition — theme preview</title>
+    <style>
+        /* Layout only. Every colour, radius, shadow and space comes from the theme. */
+        body { margin: 0; font-family: var(--pdx-font-sans); background: var(--pdx-color-bg); color: var(--pdx-color-text); }
+        .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+        .side { border-right: 1px solid var(--pdx-color-border); background: var(--pdx-color-surface); padding: var(--pdx-space-md); }
+        .side nav { display: flex; flex-direction: column; gap: 2px; margin-top: var(--pdx-space-md); }
+        .side a { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-radius: var(--pdx-radius-md); color: var(--pdx-color-muted); text-decoration: none; font-size: var(--pdx-text-sm); }
+        .side a.on { background: var(--pdx-color-inset); color: var(--pdx-color-text); font-weight: var(--pdx-weight-medium); }
+        .main { display: flex; flex-direction: column; min-width: 0; }
+        .top { display: flex; align-items: center; gap: var(--pdx-space-md); padding: var(--pdx-space-md) var(--pdx-space-lg); border-bottom: 1px solid var(--pdx-color-border); background: var(--pdx-color-surface); }
+        .top .grow { flex: 1; }
+        .body { padding: var(--pdx-space-lg); display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--pdx-space-md); }
+        .kpi { padding: var(--pdx-space-md); }
+        .kpi .n { font-size: var(--pdx-text-2xl); font-weight: var(--pdx-weight-semibold); }
+        .cols { display: grid; grid-template-columns: 2fr 1fr; gap: var(--pdx-space-lg); align-items: start; }
+        .row { display: flex; align-items: center; gap: var(--pdx-space-sm); flex-wrap: wrap; }
+        .stack { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+        .pad { padding: var(--pdx-space-md); }
+        @media (max-width: 860px) { .shell { grid-template-columns: 1fr; } .side { display: none; } .cols { grid-template-columns: 1fr; } }
+    </style>
+    <script type="module">
+        import '@pdxui/design';
+        import '@pdxui/ui';
+
+        const params = new URLSearchParams(location.search);
+        const theme = params.get('theme');
+        const scheme = params.get('scheme');
+        if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+        if (scheme) document.documentElement.setAttribute('pdx-scheme', scheme);
+
+        customElements.whenDefined('pdx-button').finally(() => {
+            requestAnimationFrame(() => requestAnimationFrame(() =>
+                document.documentElement.setAttribute('data-pdx-ready', '1')));
+        });
+    </script>
+</head>
+<body>
+<div class="shell">
+
+    <aside class="side">
+        <strong class="pdx-txt-body">Northwind</strong>
+        <nav>
+            <a href="#" class="on">Overview</a>
+            <a href="#">Orders</a>
+            <a href="#">Customers</a>
+            <a href="#">Invoices</a>
+            <a href="#">Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main">
+        <header class="top">
+            <strong class="pdx-txt-body">Orders</strong>
+            <span class="pdx-badge pdx-badge-primary">12 open</span>
+            <span class="grow"></span>
+            <input class="pdx-input" type="search" placeholder="Search orders…" aria-label="Search orders" style="max-width: 220px">
+            <button class="pdx-btn pdx-ghost">Export</button>
+            <button class="pdx-btn pdx-primary">New order</button>
+        </header>
+
+        <div class="body">
+
+            <section class="kpis">
+                <div class="pdx-surface pdx-surface-card kpi">
+                    <div class="pdx-txt-caption pdx-ink-muted">Revenue</div>
+                    <div class="n">€ 48,120</div>
+                    <div class="pdx-txt-caption pdx-ink-success">+12.4% vs last month</div>
+                </div>
+                <div class="pdx-surface pdx-surface-card kpi">
+                    <div class="pdx-txt-caption pdx-ink-muted">Orders</div>
+                    <div class="n">1,284</div>
+                    <div class="pdx-txt-caption pdx-ink-muted">312 this week</div>
+                </div>
+                <div class="pdx-surface pdx-surface-card kpi">
+                    <div class="pdx-txt-caption pdx-ink-muted">Refunds</div>
+                    <div class="n">37</div>
+                    <div class="pdx-txt-caption pdx-ink-danger">−4.1% vs last month</div>
+                </div>
+                <div class="pdx-surface pdx-surface-card kpi">
+                    <div class="pdx-txt-caption pdx-ink-muted">Avg. basket</div>
+                    <div class="n">€ 37.48</div>
+                    <div class="pdx-txt-caption pdx-ink-muted">stable</div>
+                </div>
+            </section>
+
+            <div class="pdx-alert pdx-alert-warning pad" role="status">
+                Two invoices are past due. Chase them before the month closes.
+            </div>
+
+            <section class="cols">
+
+                <div class="pdx-surface pdx-surface-card">
+                    <div class="pdx-card-header">Recent orders</div>
+                    <div class="pdx-card-body">
+                        <table class="pdx-table pdx-table-hover">
+                            <thead>
+                                <tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>#10248</td><td>Vins et Alcools</td><td><span class="pdx-badge pdx-badge-success">Paid</span></td><td>€ 440.00</td></tr>
+                                <tr><td>#10249</td><td>Toms Spezialitäten</td><td><span class="pdx-badge pdx-badge-warning">Pending</span></td><td>€ 1,863.40</td></tr>
+                                <tr><td>#10250</td><td>Hanari Carnes</td><td><span class="pdx-badge pdx-badge-danger">Overdue</span></td><td>€ 1,552.60</td></tr>
+                                <tr><td>#10251</td><td>Victuailles en stock</td><td><span class="pdx-badge pdx-badge-secondary">Draft</span></td><td>€ 654.06</td></tr>
+                                <tr><td>#10252</td><td>Suprêmes délices</td><td><span class="pdx-badge pdx-badge-success">Paid</span></td><td>€ 3,597.90</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pdx-card-footer">
+                        <div class="row">
+                            <button class="pdx-btn pdx-outline">Previous</button>
+                            <button class="pdx-btn pdx-outline">Next</button>
+                            <span class="pdx-txt-caption pdx-ink-muted">Showing 5 of 1,284</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stack">
+                    <div class="pdx-surface pdx-surface-card">
+                        <div class="pdx-card-header">New customer</div>
+                        <div class="pdx-card-body stack">
+                            <div class="pdx-field">
+                                <label class="pdx-field-label" for="c-name">Company</label>
+                                <input class="pdx-input" id="c-name" type="text" placeholder="Acme Ltd">
+                            </div>
+                            <div class="pdx-field">
+                                <label class="pdx-field-label" for="c-mail">Billing e-mail</label>
+                                <input class="pdx-input" id="c-mail" type="email" placeholder="billing@acme.com">
+                                <span class="pdx-field-hint">Invoices are sent here.</span>
+                            </div>
+                            <div class="pdx-field">
+                                <label class="pdx-field-label" for="c-plan">Plan</label>
+                                <select class="pdx-input" id="c-plan">
+                                    <option>Standard</option>
+                                    <option>Business</option>
+                                    <option>Enterprise</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <button class="pdx-btn pdx-primary">Create</button>
+                                <button class="pdx-btn pdx-ghost">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pdx-surface pdx-surface-card pad stack">
+                        <strong class="pdx-txt-body">Actions</strong>
+                        <div class="row">
+                            <button class="pdx-btn pdx-secondary">Duplicate</button>
+                            <button class="pdx-btn pdx-outline">Archive</button>
+                            <button class="pdx-btn pdx-danger">Delete</button>
+                        </div>
+                        <span class="pdx-txt-caption pdx-ink-muted">Deleting an order cannot be undone.</span>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+</html>

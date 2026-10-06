@@ -1,0 +1,598 @@
+<template>
+  <div class="app" :data-side="effectiveSide" :data-open="menuOpen ? '' : null" @keydown="onShellKey" @click="onShellClick">
+    <!-- ── The navigation, a TWO-STATE rail and a catalogue beside it ─────────────────────────
+         80 collapsed · 300 expanded, measured from the reference's layout. «All entities» opens a second panel beside
+         it rather than widening it. `<pdx-sidebar>` is the container and it is
+         in the ENTRY chunk on purpose: measured at +3.9 KB gzip, against +22.9 for a breadcrumb.
+         An app layout the reference application cannot afford to use would be a
+         finding about the app layout; 3.9 KB is not that. -->
+    <pdx-sidebar
+      class="rail"
+      mini
+      :open="effectiveSide !== 'collapsed'"
+      :width="300"
+      :collapsed-width="80"
+      :ref="railEl"
+      data-test="sidebar">
+
+      <div class="rail-head">
+        <pdx-link class="brand" to="/" data-test="brand" :aria-label="$t('app.name')">PDX</pdx-link>
+      </div>
+
+      <!-- The framework's navigation menu, two levels deep: the keyboard, folding headings, a flyout
+           when collapsed, navigation under the router. It loads `pdx-icon` only for an item that
+           names an icon — this rail names none, it draws glyphs in the `item` slot. The router
+           navigates (`onNavSelect`) and prefetches a route's chunk on hover and focus
+           (`onNavPrefetch`), as `<pdx-link>` does per link. -->
+      <pdx-nav-menu
+        class="rail-nav"
+        :items="navItems"
+        :active-key="activeKey"
+        :collapsed="effectiveSide === 'collapsed'"
+        :indent="24"
+        chevron="end"
+        actions="overlay"
+        @pdx-select="onNavSelect"
+        @pdx-toggle="onNavToggle"
+        @pointerover="onNavPrefetch"
+        @focusin="onNavPrefetch"
+        data-test="nav">
+        <slot name="item" let:item>
+          <span class="pdx-nav-icon rail-icon" aria-hidden="true">{{ item.glyph }}</span>
+          <span class="pdx-nav-label rail-label">{{ item.label }}</span>
+          @if (item.count) {
+            <span class="rail-count pdx-badge" :data-test="item.data.test + '-count'">{{ item.count }}</span>
+          }
+        </slot>
+        <!-- The two affordances the reference puts on an expanded item: pin it near the top, and
+             open it in a new tab. BESIDE the entry's link, in the menu's `actions` slot: inside it
+             they would make the link hold a button and a second link. Shown with the label,
+             hidden with it. -->
+        <slot name="actions" let:item>
+          @if (item.href && !item.fixed) {
+            <span class="rail-tools">
+              <button
+                class="rail-tool"
+                type="button"
+                :aria-pressed="isPinned(item.pin) ? 'true' : 'false'"
+                :aria-label="$t('app.rail.pin', { name: item.label })"
+                :data-test="item.data.test + '-pin'"
+                @click.prevent.stop="togglePin(item.pin)"><svg class="pushpin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pushpin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
+              <a
+                class="rail-tool"
+                :href="item.href"
+                target="_blank"
+                rel="noopener"
+                :aria-label="$t('app.rail.newTab', { name: item.label })"
+                :data-test="item.data.test + '-new'"
+                @click.stop>↗</a>
+            </span>
+          }
+        </slot>
+      </pdx-nav-menu>
+
+      <!-- The catalogue's opener, as a row that SAYS what it opens. An unlabelled ≡ beside the logo
+           reads as a second menu button, and nothing says what it does. -->
+      <button
+        class="rail-item rail-all"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="catalog"
+        :aria-expanded="catalogOpen ? 'true' : 'false'"
+        :ref="allEl"
+        data-test="side-all"
+        @click="toggleCatalog">
+        <span class="rail-icon" aria-hidden="true">≡</span>
+        <span class="rail-label">{{ $t('app.rail.all') }}</span>
+      </button>
+
+      <div class="rail-foot">
+        <span class="env pdx-badge pdx-warning" data-test="env">{{ environment }}</span>
+        <span class="version pdx-txt-small pdx-ink-muted" data-test="version">{{ version }}</span>
+      </div>
+
+    </pdx-sidebar>
+
+    <!-- ── The rail's SECOND LEVEL, the catalogue: `src/shell/catalog.pdx` ──
+         The shell owns whether it is open (the Escape order is between it and the drawer) and
+         the pins it shares with the rail. -->
+    <pdx-catalog :open="catalogOpen" :favourites="favourites" @dismiss="closeCatalog()" @picked="catalogOpen = false"></pdx-catalog>
+
+    <!-- `inert` while the drawer is open: the page behind a MODAL drawer takes no focus and no
+         click, natively, as `<dialog>.showModal()` does to the rest of a document. -->
+    <div class="frame" :inert="menuOpen">
+      <!-- The handle sits at the CROSSING — the rail's edge and the bar's baseline — and it lives
+           in the frame rather than in the rail: `.pdx-sidebar` is `overflow: hidden` (it clips its
+           own content while collapsing), so a control on its border loses half of itself. The
+           frame's left edge is the rail's right edge, so `left: -11px` straddles it exactly. -->
+      <button
+        class="rail-handle"
+        type="button"
+        :aria-expanded="effectiveSide === 'collapsed' ? 'false' : 'true'"
+        :aria-label="$t('app.rail.toggle')"
+        data-test="side-handle"
+        @click="toggleSide">{{ effectiveSide === 'collapsed' ? '›' : '‹' }}</button>
+      <!-- ── The topbar, a SERVICE bar: `src/shell/topbar.pdx`. The shell keeps the drawer's
+           state; the ☰ asks for it, and gets the focus back when it closes. -->
+      <pdx-topbar :menu-open="menuOpen" @openmenu="openMenu()"></pdx-topbar>
+
+      <main>
+        <!-- The breadcrumb is NOT here, and that is measured rather than preferred: the shell is in
+             the entry, so a `<pdx-*>` in it is in the first download. `<pdx-breadcrumb>` costs
+             **22.9 KB gzip** there — 8 of itself and the rest of `ui/src/shared/i18n.ts` — against
+             3.9 for the sidebar, measured by building the shell three ways. It lives
+             on the pages that show one, where it costs their chunk and nothing else. -->
+        <!-- The page. The shell is the app's DEFAULT LAYOUT (`pdx({ defaultLayout: 'shell' })`):
+             the outlet builds it around every route that declares no layout of its own
+             and puts the page in this slot. A page that must stand alone, the sign-in, says
+             `@layout 'none'`. -->
+        <slot></slot>
+      </main>
+    </div>
+  </div>
+</template>
+
+<script setup>
+// The app's chrome — the rail, the bar, the compact drawer — as its DEFAULT LAYOUT, not `app.pdx`
+// itself around the outlet: there every route would get it, the sign-in included. `app.pdx` keeps what is the APP's rather than the chrome's: the outlet, the locale gate, the
+// dictionary warm-up.
+import { device, getDialogQueue } from '@pdxui/core';
+import { onBeforeNavigate, navigate, currentPath, prefetchRoute } from '@pdxui/router';
+import { auth } from './auth';
+import { storedDensity, applyDensity } from './preferences';
+import { DASHBOARD, byKey, activeFor, listOf } from './shell/nav-model';
+import { createFavourites } from './shell/favourites';
+import { createRecents } from './shell/recents';
+
+// ── The dialog queue's outlet, loaded when the first dialog is asked for ─────────
+//
+// The question on leaving with unsaved work is the queue's modal, not an in-page question, and `<pdx-overlay-outlet>` is what draws it. In the shell's template it costs
+// every first download 2.4 KB of blocking bytes (measured: 81.9 → 84.4 against a budget of 82), for
+// a dialog most visits never open. So it is imported the first time the queue holds one; it reads
+// the queue when it mounts, and draws what is already waiting.
+const dialogs = getDialogQueue();
+let outletAsked = false;
+$effect(() => {
+  if (outletAsked || dialogs.items().length === 0) return;
+  outletAsked = true;
+  void import('@pdxui/ui/overlay-outlet').then(() => {
+    document.body.appendChild(document.createElement('pdx-overlay-outlet'));
+  });
+});
+
+// A navigation from the open rail lands on the page it chose, not under the rail.
+// Registered on mount and removed on destroy: the layout comes and goes (the sign-in has none).
+onMount(() => {
+  const off = onBeforeNavigate(() => {
+    if (menuOpen) closeMenu();
+    return true;
+  });
+  onDestroy(off);
+});
+
+// ── The rail's two states ──────────────────────────────────────────────────────────────────
+//
+// `collapsed` 80 · `expanded` 300, the widths measured from the reference. The entity list is not
+// a third, wider state of the rail: it is the catalogue beside it. A stored `all` reads as
+// expanded.
+//
+// Persisted, because a navigation that forgets how it was left is a navigation the visitor sets
+// again on every reload.
+const SIDE_KEY = 'showcase.side';
+let side = $signal(localStorage.getItem(SIDE_KEY) === 'collapsed' ? 'collapsed' : 'expanded');
+
+// On a phone the rail is ICONS, whatever the visitor last chose on a desktop: 300px of a 390px
+// screen is not a navigation, it is the screen — measured as 130px of sideways scroll, which is
+// what `topbar.spec.ts` guards. The CHOICE is not overwritten: `side` is what
+// a wide viewport goes back to.
+//
+// Below 600px — Material 3's COMPACT window — even icons are too much: they take 80 of 390 and the
+// bar beside them breaks its title one letter per line. There the rail is a modal
+// drawer, and the stylesheet says so; all the script holds is whether it is open, and an open
+// drawer is the expanded rail.
+const narrow = device.isMobile;
+let menuOpen = $signal(false);
+const effectiveSide = $derived(menuOpen ? 'expanded' : narrow() ? 'collapsed' : side);
+
+let railEl = $signal(null);
+
+/** Open the drawer and put the focus in it: the button that opened it goes inert with the page. */
+function openMenu() {
+    menuOpen = true;
+    requestAnimationFrame(() => railEl?.querySelector('a')?.focus());
+}
+
+/** Close the drawer and give the focus back to the button that opened it. */
+function closeMenu() {
+    menuOpen = false;
+}
+
+/** A tap on the scrim: it is the shell's own `::after`, so the event's target is the shell itself.
+ *  And a click anywhere outside the open catalogue, or its opener, closes it.
+ *
+ *  «Outside» is read from the event's PATH, not from `target.closest()`: folding a group rebuilds the
+ *  menu while the click is still bubbling, and by the time it reaches here the heading clicked is out
+ *  of the document — `closest()` would find no catalogue, and folding a group would close it. The
+ *  path is fixed when the event is dispatched. */
+function onShellClick(e) {
+    if (menuOpen && e.target === e.currentTarget) closeMenu();
+    if (catalogOpen && !e.composedPath().some(n => n.matches?.('[data-test="catalog"], [data-test="side-all"]'))) closeCatalog();
+}
+
+/** Escape, from anywhere in the shell: the catalogue first, then the drawer. */
+function onShellKey(e) {
+    if (e.key !== 'Escape') return;
+    if (catalogOpen) { closeCatalog(); return; }
+    if (menuOpen) closeMenu();
+}
+
+function toggleSide() {
+    side = side === 'collapsed' ? 'expanded' : 'collapsed';
+    localStorage.setItem(SIDE_KEY, side);
+}
+
+// ── The catalogue ──────────────────────────────────────────────────────────────
+let catalogOpen = $signal(false);
+let allEl = $signal(null);
+
+/** «All entities» opens it, and closes it again. What it opens on is the catalogue's. */
+function toggleCatalog() {
+    if (catalogOpen) { closeCatalog(); return; }
+    catalogOpen = true;
+}
+
+/** Close it and give the focus back to «All entities», which opened it. */
+function closeCatalog() {
+    catalogOpen = false;
+    allEl?.focus();
+}
+
+// ── What the rail navigates: `src/shell/nav-model.ts` ─────────────────────────────
+
+// ── Which groups are open ──────────────────────────────────────────────────────────────────
+//
+// The menu keeps nothing across a reload: the app does, from `pdx-toggle`. A plain
+// object and not a signal: a toggle is the menu's own change, and making it rebuild its items for
+// it would be the menu drawing twice.
+const GROUPS_KEY = 'showcase.navGroups';
+const groupsOpen = JSON.parse(localStorage.getItem(GROUPS_KEY) ?? '{}');
+
+function onNavToggle(e) {
+    groupsOpen[e.detail.key] = e.detail.expanded;
+    localStorage.setItem(GROUPS_KEY, JSON.stringify(groupsOpen));
+}
+
+/** A choice in the rail is the router's to make: no page load. */
+function onNavSelect(e) {
+    if (!e.detail.href) return;
+    e.preventDefault();
+    navigate(e.detail.href);
+}
+
+/** Hover and focus fetch the route's chunk ahead of the click, as `<pdx-link>` does. */
+function onNavPrefetch(e) {
+    prefetchRoute(e.target.closest?.('a.pdx-nav-item[href]')?.getAttribute('href'));
+}
+
+// ── Favourites and recents: `src/shell/favourites.ts`, `src/shell/recents.ts` ──
+const favourites = createFavourites();
+const pins = $derived(favourites.pins());
+function isPinned(key) { return favourites.isPinned(key); }
+function togglePin(key) { favourites.togglePin(key); }
+
+const recents = createRecents(currentPath, () => favourites.pins(), () => auth.user()?.sub || '');
+const recentsShown = $derived(recents.shown());
+
+/** An entry as the menu takes it: its label in the page's language. `pin` is the key a pin is
+ *  stored under, whatever the entry's own key is in the rail. */
+function entry(i, key = i.key, test = i.data.test) {
+    return { ...i, key, pin: i.key, label: typeof i.label === 'function' ? i.label() : i.label, data: { test } };
+}
+
+function header(key, label, children) {
+    return { type: 'header', key, label, data: { test: 'group-' + key }, collapsed: groupsOpen[key] === false, children };
+}
+
+const navItems = $derived([
+    entry(DASHBOARD),
+    ...pins.length
+        ? [header('h-fav', $t('app.rail.favourites'), pins.map(byKey).filter(i => i && !i.fixed).map(i => entry(i)))]
+        : [],
+    ...recentsShown.length
+        ? [header('h-recent', $t('app.rail.recent'), recentsShown.map(byKey).filter(Boolean)
+            .map(i => entry(i, 'recent-' + i.key, 'recent-' + i.key)))]
+        : [],
+]);
+
+/** The rail entry the current page belongs to: the entry itself when it is in the rail, else its
+ *  LIST — a record under `/employees/1` lights the Employees favourite or recent, as it counted. */
+const activeKey = $derived(railKey(currentPath()));
+
+function railKey(path) {
+    const key = activeFor(path);
+    if (key === 'dashboard' || pins.includes(key)) return key;
+    const list = listOf(path);
+    if (list && pins.includes(list)) return list;
+    if (list && recentsShown.includes(list)) return 'recent-' + list;
+    return key;
+}
+
+// ── What the foot of the rail says ─────────────────────────────────────────────────────────
+// An environment badge and a version, pinned at the bottom over a rule — the reference's, and the
+// two things a person asks a screenshot of a service desk.
+const environment = 'STAGING';
+const version = 'v1.1.23';
+
+// The density, as the visitor left it, before the first paint. `src/preferences.ts` owns it, and
+// the account page and the profile menu set it.
+applyDensity(storedDensity());
+</script>
+
+<style scoped>
+  /* The rhythm this application states.
+   *
+   * Every one of these is a token the design system declares with a default that changes nothing;
+   * what an app does is SAY which values it uses, once, and every surface of that kind follows. The
+   * showcase says the reference layout's: a 49px row, a 40px navigation item, a 48px section
+   * header, a 36px control in a bar, a 24px gutter around a surface and a 16px inset inside it.
+   *
+   * Two spacing values, not one padding everywhere — the gutter between surfaces and the inset
+   * within one — and the reason `.app-bar` and `main` above read `--pdx-gutter`/`--pdx-inset`
+   * rather than a spacing step each.
+   *
+   * On `.app`, not on `:root`: a theme's own defaults stay where they are, and what is scoped here
+   * is this application's decision. `packages/showcase/tests/rhythm.spec.ts` measures that the
+   * declaration reaches the surfaces. */
+  .app {
+    /* The row a visitor sees is 49: the cell states 48 and the row adds its 1px separator. The
+       design system's token is the CELL's, because `calc(auto - 1px)` is not a thing and the
+       default has to be `auto` — the measurement is in tokens.css. */
+    --pdx-row-cell-height: 48px;
+    --pdx-nav-item-height: 40px;
+    --pdx-section-height: 48px;
+    --pdx-control-height: 36px;
+    /* Two modal widths and no others, with the header and footer the reference measures.
+       The design system defaults to its own five sizes; this is the app saying
+       which two it uses. */
+    --pdx-dialog-width-md: 650px;
+    --pdx-dialog-width-lg: 850px;
+    --pdx-dialog-header-height: 64px;
+    --pdx-dialog-footer-height: 68px;
+    --pdx-gutter: 24px;
+    --pdx-inset: 16px;
+    /* The service bar's height, stated once so the rail's head can end on the same rule: its two
+       insets, the design system's input height (40) — the height of a bar holding a control — and
+       its 1px rule. */
+    --app-bar-height: calc(2 * var(--pdx-inset) + var(--pdx-input-min-height) * var(--pdx-density-factor, 1) + 1px);
+  }
+
+
+  /* Three items on one row, and each one says how it behaves under pressure. Left to the defaults,
+     a control keeps `.pdx-input { width: 100% }`, takes a flex-basis of the whole row, and
+     everything else is compressed to its min-content — which, with the reset's word breaking, is
+     narrower than the word: labels broken mid-word and horizontal overflow at 390px. */
+  /* ── The shell's grid ─────────────────────────────────────────────────────────────────────
+     The rail owns the left edge for the whole height and the topbar starts AFTER it — which is
+     the reference's grid, measured: `x=0 80×1080` rail, `x=80 1840×60` topbar. A topbar that
+     spans the rail is the arrangement every admin template ships and the reference does not. */
+  /* A ROW, said out loud: the rail owns the left edge for the whole height and the frame takes the
+     rest. A one-column rule here renders the rail as a 300×231 box ABOVE the topbar, with every
+     width still right: the POSITION is what has to be measured. */
+  .app { display: flex; flex-direction: row; align-items: stretch; min-height: 100vh; }
+  .frame { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; }
+
+  /* ── The rail ─────────────────────────────────────────────────────────────────────────── */
+  .rail {
+    /* As tall as the WINDOW, and it stays put while the page scrolls. Stretched to the whole shell,
+       its foot would be at the bottom of the PAGE: on a long list the environment and version would
+       be below the fold and the rail would scroll away with the content.
+       An explicit height, not `100%`: `pdx-sidebar` ships `height: 100%`, which against a parent
+       that is only `min-height: 100vh` resolves to auto and stops the rail at its content. The
+       list in between scrolls inside it (`.rail-nav`), so the foot is in the window at any height. */
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    transition: width var(--pdx-transition, .15s);
+  }
+  /* 80 · 300, the two the reference measures. `pdx-sidebar` takes them as props and writes the
+     width itself; these are the paddings that go with each. */
+  .app[data-side="collapsed"] .rail { --rail-pad: var(--pdx-space-2xs); }
+  .app[data-side="expanded"] .rail { --rail-pad: var(--pdx-space-xs); }
+
+  /* The catalogue: a panel of its own beside the rail, over the content — its own
+     surface and edge, a heading, a way out. Its left is the rail's right, at either width. */
+  /* The rail's SECOND COLUMN: the rail's surface and edge, the window's height, and no shadow — a
+     card with a large shadow reads as floating over the page. Its head is the rail head's height with the same rule under it, so the two read as one
+     strip. */
+  .catalog {
+    position: fixed; top: 0; bottom: 0; left: 300px; z-index: 30;
+    width: 320px; max-width: calc(100vw - 300px);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    --rail-pad: var(--pdx-space-xs);
+  }
+  .app[data-side="collapsed"] .catalog { left: 80px; max-width: calc(100vw - 80px); }
+  /* The pin is a pushpin: outlined when the entry is not pinned, filled when it is. */
+  .pushpin { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .rail-tool[aria-pressed="true"] .pushpin-head { fill: currentColor; }
+
+  .rail-head {
+    position: relative;
+    display: flex; align-items: center; justify-content: center; gap: var(--pdx-space-xs);
+    /* The bar's height, not the reference's 120: that room is for a graphic logo, the showcase has
+       none, and a head taller than the bar draws its rule 47px below the bar's. */
+    height: var(--app-bar-height);
+    background: var(--pdx-color-inset);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .brand {
+    font-weight: 700; letter-spacing: .08em; text-decoration: none;
+    color: var(--pdx-color-primary-ink);
+  }
+
+  /* The same row as a navigation entry, because that is what it is — it opens a list. */
+  .rail-all {
+    margin: 0 var(--rail-pad) var(--pdx-space-xs);
+    border: 0; background: transparent; font: inherit; cursor: pointer;
+    /* A button centres its text by default, which pushes the label away from its icon and makes
+       this row read differently from every other one. */
+    justify-content: flex-start; text-align: left;
+    width: calc(100% - 2 * var(--rail-pad));
+  }
+  .rail-all[aria-expanded="true"] { background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink); }
+
+  /* The menu's host is the rail's scrolling column; the entries, headings and groups are the
+     menu's own, dressed by `nav.css`. */
+  .rail-nav {
+    flex: 1 1 auto; min-width: 0;
+    display: block;
+    overflow-x: hidden; overflow-y: auto;
+    padding: var(--rail-pad);
+  }
+  /* A group's chevron at the end of its row, where the reference draws it (`chevron="end"`), and the
+     collapsed menu's entries centred with a rule between its groups: the menu's own. */
+
+  /* An entry is the navigation's rhythm, and the three zones the reference draws:
+     icon, label, and the two affordances on the right. `.rail-item` is the «all entities» row,
+     drawn as an entry because that is what it is. */
+  .rail-item {
+    position: relative;
+    display: flex; align-items: center; gap: var(--pdx-space-sm);
+    min-height: var(--pdx-nav-item-height);
+    padding: 0 var(--pdx-space-xs);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .rail-item:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+  .rail-icon { width: 24px; text-align: center; flex: 0 0 auto; }
+  .rail-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  /* The counter is ON the entry — the reference has no notification bell, and a count that lives
+     in one tells you something is somewhere. */
+  /* Flush right, and it takes the space the TOOLS were holding: they are `opacity: 0` until the
+     row is hovered, and an invisible element still occupies its box — in the row, the count would
+     sit 44px short of the edge. They overlay the row, on hover, where they cost nothing. */
+  .rail-count { flex: 0 0 auto; margin-left: auto; }
+  /* The tools are the menu's `actions`, laid over the row's end and shown on hover and
+     focus (`actions="overlay"`); the entry keeps its highlight under them. */
+  .rail-tools {
+    display: flex; gap: 2px;
+    background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm);
+  }
+  .rail-tool {
+    width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
+    border: 0; border-radius: var(--pdx-radius-sm); background: transparent;
+    color: inherit; font-size: 11px; cursor: pointer; text-decoration: none;
+  }
+  .rail-tool[aria-pressed="true"] { color: var(--pdx-color-primary-ink); }
+
+  /* Collapsed: icons only, and nothing that needs a label — the count included, which the menu's
+     own badge also drops there: an entry is 40px wide. The RAIL's: the catalogue beside it uses the
+     same classes and keeps its names. */
+  .app[data-side="collapsed"] .rail .rail-label,
+  .app[data-side="collapsed"] .rail .rail-tools,
+  .app[data-side="collapsed"] .rail .rail-count,
+  .app[data-side="collapsed"] .rail .rail-foot .version { display: none; }
+  .app[data-side="collapsed"] .rail .rail-item { justify-content: center; }
+
+  .rail-foot {
+    display: flex; align-items: center; gap: var(--pdx-space-xs);
+    flex-wrap: wrap; justify-content: center;
+    padding: var(--pdx-space-xs);
+    border-top: 1px solid var(--pdx-color-border);
+  }
+
+  /* The handle straddles the edge, as the reference's 16×16 at x=72 does. */
+  /* INSIDE the edge, not straddling it. The reference's handle sits across the border and ours
+     cannot: `.pdx-sidebar` is `overflow: hidden` — it clips its content while it collapses — so a
+     button at `right: -10px` loses 9 of its 20px and the pointer at its centre finds the sidebar
+     rather than the button. Measured in a browser: it is not a z-index problem, it is the clip. */
+  .rail-handle {
+    /* At the bar's lower edge, on the rail's border: the crossing of the two. From the bar's own
+       height, which follows the density: a fixed 62px is that edge at density 1 only. */
+    /* Above the catalogue (z-index 30), which opens right at this edge: under it the handle would
+       be half hidden and its centre would be the panel's. */
+    position: absolute; top: calc(var(--app-bar-height) - 11px); left: -11px; z-index: 31;
+    width: 20px; height: 20px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--pdx-color-border); border-radius: 50%;
+    background: var(--pdx-color-bg); color: var(--pdx-color-muted);
+    cursor: pointer; line-height: 1;
+  }
+  .rail-handle:hover { color: var(--pdx-color-text); }
+
+  .brand {
+    flex: 0 0 auto;
+    font-weight: 700; color: var(--pdx-color-text); text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* The nav is the item that gives. `min-width: 0` is what lets it shrink below its content at
+     all — a flex item's floor is `min-content` until you say otherwise — and the scroll is where
+     it goes instead of pushing the document sideways. */
+  /* `:not(.pdx-nav)`: the rail is a `pdx-nav-menu`, whose `<nav>` is a column `nav.css` dresses;
+     this rule would turn it into a clipped row and its entries' colour into muted. */
+  nav:not(:where(.pdx-nav)) {
+    display: flex; gap: var(--pdx-space-md);
+    flex: 1 1 auto; min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav:not(:where(.pdx-nav))::-webkit-scrollbar { display: none; }
+
+  /* `nowrap`: a label is a label. Without it the header's height depends on the language — 73px
+     in English, 110px in Italian, measured — which is the same defect seen from above. */
+  /* A control in the bar has the BAR's rhythm, stated once above — the links and the language
+     select, which would otherwise each be whatever their own padding produced. Here rather than in
+     `@pdxui/design`: a toolbar imposing a height on a `<pdx-button>` fights the button's own
+     size system, measured on the certification scenarios (32–44 across the 13 themes), and losing
+     to it. What a bar can state is the rhythm of the plain controls it draws itself.
+     ⚠️ The navigation LINKS are deliberately not in this rule, and that is measured: a stated
+     height makes every label 36px tall, and `topbar.spec.ts` reads a label taller than 1.5 lines as
+     a label that WRAPPED. A link in a bar is text, not a control; giving it a control's height
+     costs that check its signal and buys nothing. */
+
+  nav:not(:where(.pdx-nav)) a {
+    color: var(--pdx-color-muted); text-decoration: none; font-size: var(--pdx-text-sm);
+    white-space: nowrap;
+  }
+  nav:not(:where(.pdx-nav)) a:hover { color: var(--pdx-color-primary-ink); }
+  nav:not(:where(.pdx-nav)) .here a { color: var(--pdx-color-text); font-weight: 600; }
+
+  main { flex: 1; padding: var(--pdx-gutter); }
+
+  /* ── Material 3's window size classes ──────────────────────────────────────
+     COMPACT, below 600px: the navigation is a modal drawer, opened from the bar. MEDIUM keeps the
+     rail as icons, EXPANDED as the visitor left it. The layout is the stylesheet's decision; the
+     menu button is always in the document and only this query shows it. LAST in the file, because
+     a media query adds no specificity and the rules it overrides are declared above. */
+  @media (max-width: 599px) {
+    .rail {
+      position: fixed; top: 0; bottom: 0; left: 0; z-index: 30;
+      box-shadow: var(--pdx-shadow-lg);
+    }
+    .app:not([data-open]) .rail,
+    .rail-handle { display: none; }
+    /* The scrim of a modal drawer: a pseudo-element, so it costs no markup and no
+       script. A tap on it is a click on `.app` itself, which is how the shell tells it apart. */
+    .app[data-open]::after {
+      content: ''; position: fixed; inset: 0; z-index: 29;
+      background: color-mix(in oklch, var(--pdx-color-text) 32%, transparent);
+    }
+  }
+
+  /* A printed page is the record, not the application around it: the rail, the
+     catalogue, the handle and the service bar stay on screen. */
+  @media print {
+    .rail, .catalog, .rail-handle { display: none !important; }
+  }
+</style>

@@ -1,0 +1,56 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Loading State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>loading</code> prop. Button becomes disabled with spinner overlay. <code>aria-busy="true"</code> set automatically. Click to toggle.</p>
+
+    <div class="btn-row">
+      <pdx-button variant="primary" :loading="loadingPrimary" @click="toggleLoading">
+        @if (loadingPrimary) { Saving... } @else { Save }
+      </pdx-button>
+      <pdx-button variant="secondary" :loading="loadingSecondary" @click="toggleLoadingSec">
+        @if (loadingSecondary) { Loading... } @else { Load Data }
+      </pdx-button>
+      <pdx-button variant="danger" :loading="loadingDanger" @click="toggleLoadingDanger">
+        @if (loadingDanger) { Deleting... } @else { Delete }
+      </pdx-button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button variant="primary" :loading="isSaving"&gt;
+  Save
+&lt;/pdx-button&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useButtonConsole } from './state.pdx';
+
+const buttonConsole = useButtonConsole();
+
+let loadingPrimary = $signal(false);
+let loadingSecondary = $signal(false);
+let loadingDanger = $signal(false);
+
+function toggleLoading() {
+    if (loadingPrimary) return;
+    loadingPrimary = true;
+    buttonConsole.log({ target: { closest: () => ({ textContent: 'Save', getAttribute: () => 'primary', className: '' }) } });
+    setTimeout(() => { loadingPrimary = false; }, 2000);
+}
+
+function toggleLoadingSec() {
+    if (loadingSecondary) return;
+    loadingSecondary = true;
+    buttonConsole.log({ target: { closest: () => ({ textContent: 'Load Data', getAttribute: () => 'secondary', className: '' }) } });
+    setTimeout(() => { loadingSecondary = false; }, 2000);
+}
+
+function toggleLoadingDanger() {
+    if (loadingDanger) return;
+    loadingDanger = true;
+    buttonConsole.log({ target: { closest: () => ({ textContent: 'Delete', getAttribute: () => 'danger', className: '' }) } });
+    setTimeout(() => { loadingDanger = false; }, 2000);
+}
+</script>

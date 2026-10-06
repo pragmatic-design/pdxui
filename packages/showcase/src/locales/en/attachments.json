@@ -1,0 +1,14 @@
+{
+    "attachments": {
+        "title": "Attachments",
+        "intro": "Files attached to this ticket. Drop one to add it, or download what is here.",
+        "drop": "Drop a file here, or choose one",
+        "uploading": "Uploading {name}",
+        "bytes": "{loaded} of {total} bytes",
+        "cancel": "Cancel",
+        "cancelled": "Cancelled. The server stored nothing, and the list below is the server's.",
+        "download": "Download",
+        "none": "No attachments yet.",
+        "savedAs": "Saved as {name}, the name the server sent."
+    }
+}

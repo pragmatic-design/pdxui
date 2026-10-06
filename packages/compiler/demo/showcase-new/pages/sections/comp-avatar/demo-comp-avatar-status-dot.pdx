@@ -1,0 +1,53 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Status Dot</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Combine with <code>.pdx-badge-anchor</code> + <code>&lt;pdx-badge dot&gt;</code> for presence indicators. Write the status next to the dot: a colour alone says nothing to a screen reader, or to someone who cannot tell green from red. Offline is <code>muted</code>, not <code>danger</code> — being away is not an error.</p>
+
+    <div class="demo-row">
+      <div class="status-item">
+        <span class="pdx-badge-anchor">
+          <pdx-avatar src="/avatars/person-1.svg" alt="Jane Doe"></pdx-avatar>
+          <pdx-badge label="Online" dot variant="success"></pdx-badge>
+        </span>
+        <span class="pdx-txt-caption">Online</span>
+      </div>
+      <div class="status-item">
+        <span class="pdx-badge-anchor">
+          <pdx-avatar src="/avatars/person-2.svg" alt="Alex Smith"></pdx-avatar>
+          <pdx-badge label="Away" dot variant="warning"></pdx-badge>
+        </span>
+        <span class="pdx-txt-caption">Away</span>
+      </div>
+      <div class="status-item">
+        <span class="pdx-badge-anchor">
+          <pdx-avatar alt="Mary Kim"></pdx-avatar>
+          <pdx-badge label="Offline" dot variant="muted"></pdx-badge>
+        </span>
+        <span class="pdx-txt-caption">Offline</span>
+      </div>
+      <div class="status-item">
+        <span class="pdx-badge-anchor">
+          <pdx-avatar alt="Sam Park" size="lg"></pdx-avatar>
+          <pdx-badge label="Busy" dot variant="danger" pulse></pdx-badge>
+        </span>
+        <span class="pdx-txt-caption">Busy</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-badge-anchor"&gt;
+  &lt;pdx-avatar src="..." alt="Jane Doe"&gt;&lt;/pdx-avatar&gt;
+  &lt;pdx-badge dot variant="success" label="Online"&gt;&lt;/pdx-badge&gt;
+&lt;/span&gt;
+&lt;span class="pdx-txt-caption"&gt;Online&lt;/span&gt;
+
+&lt;pdx-badge dot variant="muted"&gt;&lt;/pdx-badge&gt;          &lt;!-- offline --&gt;
+&lt;pdx-badge dot variant="danger" pulse&gt;&lt;/pdx-badge&gt;   &lt;!-- busy --&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .status-item { display: flex; flex-direction: column; align-items: center; gap: var(--pdx-space-xs); }
+</style>

@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <div class="demo-row">
+      <pdx-split-button label="Disabled" icon="save" variant="primary" disabled :items="saveItems"></pdx-split-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const saveItems = [
+  { key: 'save-as', label: 'Save As...', icon: 'file-text' },
+  { key: 'save-copy', label: 'Save a Copy', icon: 'copy' },
+  { key: 'sep', type: 'separator' },
+  { key: 'export', label: 'Export', icon: 'download' },
+];
+</script>

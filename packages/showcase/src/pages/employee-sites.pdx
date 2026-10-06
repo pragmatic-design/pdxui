@@ -1,0 +1,234 @@
+<template>
+  <section class="section" data-test="sites">
+    <div class="section-head">
+      <h2 class="pdx-txt-heading">{{ $t('employees.sectionNames.sites') }}</h2>
+      <pdx-button size="sm" :show="!editing && filled" @click="openAdd" data-test="site-add">{{ $t('employees.sites.addShort') }}</pdx-button>
+    </div>
+
+    <!-- VOID: an invitation with the action in it. -->
+    <div :show="!editing && !filled" data-test="sites-empty">
+      <pdx-empty-state
+        icon="map-pin"
+        :title="$t('employees.sites.emptyTitle')"
+        :description="$t('employees.sites.emptyBody')"
+        :action-label="$t('employees.sites.add')"
+        @pdx-action="openAdd"></pdx-empty-state>
+    </div>
+
+    <!-- FILLED: rows of a grid, not a <table> — `@for` inside a table is a known trap. -->
+    <div class="assignments" :show="!editing && filled" role="list" data-test="site-list">
+      @for (assignments as a; track a.id) {
+        <div class="assignment" role="listitem" data-test="site-row">
+          <span class="assignment-site">{{ a.siteName }}</span>
+          <span>{{ a.role }}</span>
+          <span class="assignment-span">{{ span(a) }}</span>
+          <span class="assignment-actions">
+            <pdx-button size="sm" variant="ghost" @click="startEdit(a)" data-test="site-edit">{{ $t('employees.sites.edit') }}</pdx-button>
+            @if (!a.end) {
+              <pdx-button size="sm" variant="outline" @click="periods.askEnd(a)" data-test="site-end">{{ $t('employees.sites.end') }}</pdx-button>
+            }
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- EDIT, in the page: the role and the start. The site is what the assignment IS; another
+         site is another assignment. `:show`, not `@if`: the form projects its fields through a slot. -->
+    <div :show="editing">
+      <pdx-form :form="assignment" @pdx-submit="onSave" data-test="site-form">
+        <p class="pdx-txt-small pdx-ink-muted" data-test="site-form-site">{{ editing?.siteName ?? '' }}</p>
+        <div class="grid">
+          <pdx-form-field name="role" :label="$t('employees.sites.fields.role')">
+            <pdx-input name="role" data-test="role"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="start" :label="$t('employees.sites.fields.start')">
+            <pdx-date-picker name="start" editable data-test="start"></pdx-date-picker>
+          </pdx-form-field>
+        </div>
+        <div class="actions">
+          <pdx-button type="submit" variant="primary" data-test="site-save">{{ $t('employees.sites.save') }}</pdx-button>
+          <pdx-button variant="ghost" @click="periods.editing.set(null)" data-test="site-cancel">{{ $t('employees.sites.cancel') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </div>
+
+    <!-- ADD, in a modal. The site comes from a PAGED, SEARCHED source, as intake picks a customer:
+         the picker asks for a page, `siteTransport` answers with that page and a total. -->
+    <pdx-dialog
+      :open="addOpen"
+      size="lg"
+      :title="$t('employees.sites.add')"
+      @pdx-close="addOpen = false"
+      data-test="site-dialog">
+      <pdx-relation-picker
+        :source="sites"
+        :columns="siteColumns"
+        :add-label="$t('employees.sites.choose')"
+        searchable
+        @pdx-pick="onPicked"
+        data-test="site-picker"></pdx-relation-picker>
+      <p class="chosen pdx-txt-small" :show="chosen !== null" data-test="site-chosen">{{ chosenLabel }}</p>
+      <p class="pdx-txt-small pdx-ink-danger" :show="missingSite" role="alert" data-test="site-missing">{{ $t('employees.sites.missing') }}</p>
+      <pdx-form :form="adding" @pdx-submit="onAdd" data-test="site-add-form">
+        <div class="grid">
+          <pdx-form-field name="role" :label="$t('employees.sites.fields.role')">
+            <pdx-input name="role" data-test="new-role"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="start" :label="$t('employees.sites.fields.start')">
+            <pdx-date-picker name="start" editable data-test="new-start"></pdx-date-picker>
+          </pdx-form-field>
+        </div>
+        <div class="actions">
+          <pdx-button type="submit" variant="primary" data-test="site-assign">{{ $t('employees.sites.assign') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </pdx-dialog>
+
+    <!-- TERMINA, not delete: it asks for the last day, and the toast carries the way back. -->
+    <pdx-alert-dialog
+      :open="ending !== null"
+      :title="$t('employees.sites.endTitle')"
+      :message="$t('employees.sites.endBody')"
+      :confirm-label="$t('employees.sites.endConfirm')"
+      :cancel-label="$t('employees.sites.endCancel')"
+      @pdx-confirm="periods.confirmEnd()"
+      @pdx-cancel="periods.ending.set(null)"
+      data-test="site-end-dialog">
+      <pdx-form-field :label="$t('employees.sites.endDate')" :error="endError">
+        <pdx-date-picker editable :value="endDate" @pdx-change="e => periods.endDate.set(e.detail.value)" data-test="site-end-date"></pdx-date-picker>
+      </pdx-form-field>
+    </pdx-alert-dialog>
+
+    <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
+  </section>
+</template>
+
+<script setup>
+@page '/employees/:id/sites' { label: sitesLabel };
+@title $t('employees.sectionNames.sites');
+
+// The crumb and the tab title in the page's language: a label read from the dictionary.
+function sitesLabel() {
+  return $t('employees.sectionNames.sites');
+}
+
+import { createDataSource } from '@pdxui/core';
+// Created from JS, so the compiler cannot auto-import it from a tag.
+import { toast } from '@pdxui/ui/toast';
+import { createPeriodList } from '../data/periods';
+import { siteTransport } from '../data/sites';
+
+@prop id: string = '';
+
+// ── The assignments: edited in the page, ended rather than deleted (src/data/periods.ts) ──
+const periods = createPeriodList({
+  key: 'assignments',
+  employeeId: () => Number(id),
+  // An assignment ends after it starts, as a contract does.
+  endRefusal: (a, last) => (!last || last <= a.start) ? $t('employees.sites.endBeforeStart') : '',
+  ended: (a, last, undo) => toast.add({
+    type: 'info',
+    message: $t('employees.sites.ended', { site: a.siteName, end: last }),
+    duration: 8000,
+    action: { label: $t('employees.sites.undo'), onClick: undo },
+  }),
+});
+const assignments = $derived(periods.items());
+const editing = $derived(periods.editing());
+const ending = $derived(periods.ending());
+const endDate = $derived(periods.endDate());
+const endError = $derived(periods.endError());
+const filled = $derived(assignments.length > 0);
+
+const sites = createDataSource({ transport: siteTransport, idField: 'id', pageSize: 5 });
+const siteColumns = $derived([
+  { field: 'name', header: $t('employees.sites.fields.site') },
+  { field: 'city', header: $t('employees.sites.fields.city') },
+]);
+
+function span(a) {
+  return a.end
+    ? $t('employees.sites.span', { start: a.start, end: a.end })
+    : $t('employees.sites.since', { start: a.start });
+}
+
+// ── Add, in the modal ──────────────────────────────────────────────────────────────────────
+@form adding: {
+  role: string { required },
+  start: string { required }
+};
+
+let addOpen = $signal(false);
+let chosen = $signal(null);
+let missingSite = $signal(false);
+const chosenLabel = $derived(chosen ? $t('employees.sites.chosen', { name: chosen.name }) : '');
+
+function openAdd() {
+  adding.reset({ role: '', start: '' });
+  chosen = null;
+  missingSite = false;
+  addOpen = true;
+}
+
+/** One site per assignment: the first of what was picked. */
+function onPicked(e) {
+  const items = e.detail?.items ?? [];
+  chosen = items[0] ?? null;
+  missingSite = false;
+}
+
+async function onAdd(e) {
+  if (!chosen) { missingSite = true; return; }
+  const v = e.detail.values;
+  await periods.save([...assignments, {
+    id: periods.nextId(), siteId: chosen.id, siteName: chosen.name, role: v.role, start: v.start, end: '',
+  }]);
+  addOpen = false;
+}
+
+// ── Edit, in the page ──────────────────────────────────────────────────────────────────────
+@form assignment: {
+  role: string { required },
+  start: string { required }
+};
+
+function startEdit(a) {
+  assignment.reset({ role: a.role, start: a.start });
+  periods.editing.set(a);
+}
+
+async function onSave(e) {
+  if (!editing) return;
+  const v = e.detail.values;
+  await periods.saveEdited({ ...editing, role: v.role, start: v.start });
+}
+
+// ── Termina, and its way back: `periods.askEnd` / `periods.confirmEnd`, the toast is `ended` above ──
+</script>
+
+<style scoped>
+  .section { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-md); }
+  .section-head h2 { margin: 0; }
+
+  .assignments { display: flex; flex-direction: column; }
+  /* Fixed tracks, as on the contracts: each row is its own grid. */
+  .assignment {
+    display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 12.5rem 10.5rem;
+    align-items: center; gap: var(--pdx-space-md);
+    min-height: var(--pdx-section-height);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .assignment-site { font-weight: 600; }
+  .assignment-span { font-variant-numeric: tabular-nums; }
+  .assignment-actions { display: flex; gap: var(--pdx-space-xs); justify-content: flex-end; }
+
+  .chosen { margin: var(--pdx-space-sm) 0 0; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); }
+  .actions { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+
+  @media (max-width: 767px) {
+    .assignment { grid-template-columns: 1fr auto; padding-block: var(--pdx-space-xs); }
+    .assignment-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+</style>

@@ -1,0 +1,80 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">8. All Control Types in Form</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Every pdx-* control works with compiler auto-binding inside a form.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="allTypesForm">
+        <div class="form-grid-2">
+          <pdx-form-field name="text" label="Text Input">
+            <pdx-input name="text" placeholder="Text"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="password" label="Password">
+            <pdx-password-input name="password" placeholder="Password"></pdx-password-input>
+          </pdx-form-field>
+          <pdx-form-field name="number" label="Number">
+            <pdx-number-input name="number"></pdx-number-input>
+          </pdx-form-field>
+          <pdx-form-field name="slider" label="Slider">
+            <pdx-slider name="slider" :min="0" :max="100"></pdx-slider>
+          </pdx-form-field>
+          <pdx-form-field name="rating" label="Rating">
+            <pdx-rating name="rating"></pdx-rating>
+          </pdx-form-field>
+          <pdx-form-field name="color" label="Color">
+            <pdx-color-picker name="color" inline></pdx-color-picker>
+          </pdx-form-field>
+        </div>
+
+        <pdx-form-field name="textarea" label="Textarea">
+          <pdx-textarea name="textarea" rows="2" placeholder="Multi-line text"></pdx-textarea>
+        </pdx-form-field>
+
+        <div class="form-grid-2">
+          <pdx-form-field name="checkbox" label="">
+            <pdx-checkbox name="checkbox" label="I agree to terms"></pdx-checkbox>
+          </pdx-form-field>
+          <pdx-form-field name="switch" label="">
+            <pdx-switch name="switch" label="Enable feature"></pdx-switch>
+          </pdx-form-field>
+        </div>
+
+        <pdx-form-actions submitLabel="Submit All" resetLabel="Reset All"></pdx-form-actions>
+      </pdx-form>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>&lt;pdx-form :form="allTypesForm"&gt;
+  &lt;pdx-form-field name="text" label="Text Input"&gt;
+    &lt;pdx-input name="text"&gt;&lt;/pdx-input&gt;
+  &lt;/pdx-form-field&gt;
+  &lt;pdx-form-field name="slider" label="Slider"&gt;
+    &lt;pdx-slider name="slider" :min="0" :max="100"&gt;&lt;/pdx-slider&gt;
+  &lt;/pdx-form-field&gt;
+  &lt;!-- Every pdx-* control with name="x" is auto-wired by the compiler --&gt;
+  &lt;pdx-form-actions submitLabel="Submit All" /&gt;
+&lt;/pdx-form&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm } from '@pdxui/core';
+
+// ─── 7. All Types Form ───
+const allTypesForm = createForm({
+  initialValues: {
+    text: '', password: '', number: 0, slider: 50, rating: 3,
+    color: '#3b82f6', textarea: '', checkbox: false, switch: true,
+  },
+});
+</script>
+
+<style scoped>
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+  }
+  @media (max-width: 640px) { .form-grid-2 { grid-template-columns: 1fr; } }
+</style>

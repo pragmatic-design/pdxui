@@ -1,0 +1,127 @@
+<template>
+  <div class="demo">
+    <h2>Virtualization</h2>
+    <p class="desc">Render only visible items. 10,000 items, binary search, GPU transforms.</p>
+
+    <section>
+      <h3>10,000 Fixed Height Items (48px each)</h3>
+      <div class="stats">
+        <span>Rendered: <strong>{{ rendered1 }}</strong> / 10,000</span>
+        <span>Total: <strong>{{ totalH1 }}</strong></span>
+      </div>
+      <div class="row">
+        <button class="pdx-ghost" @click="scrollTop1">Top</button>
+        <button class="pdx-ghost" @click="scrollMid1">#5000</button>
+        <button class="pdx-ghost" @click="scrollEnd1">End</button>
+      </div>
+      <div class="scroll-box" :ref="scroll1Ref">
+        <div :ref="inner1Ref" style="position:relative"></div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Variable Heights (5,000 items, 30-80px)</h3>
+      <div class="stats">
+        <span>Rendered: <strong>{{ rendered2 }}</strong> / 5,000</span>
+      </div>
+      <div class="scroll-box" :ref="scroll2Ref">
+        <div :ref="inner2Ref" style="position:relative"></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { createVirtualizer, effect, onMount, onDestroy } from '@pdxui/core';
+
+let rendered1 = $signal(0);
+let totalH1 = $signal('0');
+let rendered2 = $signal(0);
+
+let scroll1Ref = $signal(null);
+let inner1Ref = $signal(null);
+let scroll2Ref = $signal(null);
+let inner2Ref = $signal(null);
+
+const COUNT1 = 10000;
+const COUNT2 = 5000;
+const heights2 = Array.from({ length: COUNT2 }, () => 30 + Math.floor(Math.random() * 50));
+
+let v1 = null;
+let v2 = null;
+
+function scrollTop1() { v1?.scrollTo(0); }
+function scrollMid1() { v1?.scrollTo(5000, { align: 'center' }); }
+function scrollEnd1() { v1?.scrollTo(COUNT1 - 1, { align: 'end' }); }
+
+onMount(() => {
+    // Wait a tick for :ref to be set
+    requestAnimationFrame(() => {
+        const scrollEl1 = scroll1Ref;
+        const innerEl1 = inner1Ref;
+        const scrollEl2 = scroll2Ref;
+        const innerEl2 = inner2Ref;
+
+        if (scrollEl1 && innerEl1) {
+            v1 = createVirtualizer({
+                count: () => COUNT1,
+                estimateSize: () => 48,
+                getScrollElement: () => scrollEl1,
+                overscan: 5,
+            });
+
+            effect(() => {
+                const items = v1.items();
+                const total = v1.totalSize();
+                rendered1 = items.length;
+                totalH1 = (total / 1000).toFixed(0) + 'K px';
+                innerEl1.style.height = total + 'px';
+                let html = '';
+                for (const item of items) {
+                    html += '<div class="v-item' + (item.index % 2 === 0 ? ' even' : '') + '" style="height:48px;transform:translateY(' + item.offsetStart + 'px)"><span>#' + item.index + '</span><span class="muted">Item ' + (item.index + 1) + ' / 10,000</span></div>';
+                }
+                innerEl1.innerHTML = html;
+            });
+        }
+
+        if (scrollEl2 && innerEl2) {
+            v2 = createVirtualizer({
+                count: () => COUNT2,
+                estimateSize: (i) => heights2[i],
+                getScrollElement: () => scrollEl2,
+                overscan: 5,
+            });
+
+            effect(() => {
+                const items = v2.items();
+                const total = v2.totalSize();
+                rendered2 = items.length;
+                innerEl2.style.height = total + 'px';
+                let html = '';
+                for (const item of items) {
+                    html += '<div class="v-item' + (item.index % 2 === 0 ? ' even' : '') + '" style="height:' + item.size + 'px;transform:translateY(' + item.offsetStart + 'px)"><span>#' + item.index + '</span><span class="muted">' + item.size + 'px</span></div>';
+                }
+                innerEl2.innerHTML = html;
+            });
+        }
+    });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .stats { display: flex; gap: 24px; font-size: 0.9rem; margin-bottom: 8px; }
+  .row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .scroll-box { height: 400px; overflow-y: auto; border: 2px solid #e0e0e0; border-radius: 8px; }
+</style>
+
+<style>
+  .v-item { position: absolute; left: 0; right: 0; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
+  .v-item:hover { background: #f5f5f7; }
+  .v-item.even { background: rgba(0,0,0,0.02); }
+  .v-item .muted { color: #999; font-size: 0.8rem; }
+</style>

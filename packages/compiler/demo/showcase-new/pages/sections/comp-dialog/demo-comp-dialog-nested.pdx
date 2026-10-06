@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Nested Dialogs</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Dialogs stack via overlayStack — each gets a higher z-index. Escape closes only the topmost.</p>
+    <pdx-button variant="outline" size="sm" @click="openNested1">Open First Dialog</pdx-button>
+    <pdx-dialog :open="nested1Open" title="First Dialog" size="lg" @pdx-close="closeNested1">
+      <p>This is the first dialog. Click below to open a nested one on top.</p>
+      <div style="margin-top: var(--pdx-space-md)">
+        <pdx-button variant="primary" size="sm" @click="openNested2">Open Nested Dialog</pdx-button>
+      </div>
+    </pdx-dialog>
+    <pdx-dialog :open="nested2Open" title="Nested Dialog" size="sm" @pdx-close="closeNested2">
+      <p>This nested dialog sits on top. Press Escape — only this one closes.</p>
+      <span slot="footer">
+        <pdx-button variant="primary" size="sm" @click="closeNested2">Close Nested</pdx-button>
+      </span>
+    </pdx-dialog>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="nested1Open" title="First Dialog" size="lg" @pdx-close="closeNested1"&gt;
+  &lt;p&gt;First dialog content.&lt;/p&gt;
+  &lt;pdx-button variant="primary" @click="openNested2"&gt;Open Nested&lt;/pdx-button&gt;
+&lt;/pdx-dialog&gt;
+
+&lt;pdx-dialog :open="nested2Open" title="Nested Dialog" size="sm" @pdx-close="closeNested2"&gt;
+  &lt;p&gt;Nested dialog on top. Escape closes only this one.&lt;/p&gt;
+&lt;/pdx-dialog&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let nested1Open = $signal(false);
+let nested2Open = $signal(false);
+
+function openNested1() { nested1Open = true; }
+function closeNested1() { nested1Open = false; }
+function openNested2() { nested2Open = true; }
+function closeNested2() { nested2Open = false; }
+</script>

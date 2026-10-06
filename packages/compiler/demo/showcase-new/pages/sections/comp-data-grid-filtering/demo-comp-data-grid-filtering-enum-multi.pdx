@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Enum Filter (Multi-select)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Columns of <code>type: 'enum'</code> with <code>filterOptions</code> render a multi-select
+      (operator <code>in</code>) with select-all. Pick several categories at once.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="enumDS" :columns="enumColumns" :filterable="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>{ field: 'category', header: 'Category', type: 'enum',
+  filterOptions: [
+    { label: 'Electronics', value: 'Electronics' },
+    { label: 'Clothing', value: 'Clothing' },
+    { label: 'Books', value: 'Books' },
+  ] }
+// Multi-select → operator `in` (matches any selected value)</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products, categories } from './state.pdx';
+
+const enumColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category', type: 'enum', filterOptions: categories.map(function(c) { return { label: c, value: c }; }) },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+];
+
+const enumDS = createDataSource({ data: products.slice(), pageSize: 10 });
+</script>

@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Single Mode (FAQ)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Only one section open at a time. Opening a new one closes the previous.</p>
+
+    <pdx-accordion>
+      <div data-accordion-item data-open>
+        <button data-accordion-trigger>What is Pragmatic Design?</button>
+        <div data-accordion-content>
+          <p class="answer">A full-stack framework ecosystem combining .NET backend source generators with a reactive frontend UI system. CSS-first design tokens, 13 themes, and agent-native DX.</p>
+        </div>
+      </div>
+      <div data-accordion-item>
+        <button data-accordion-trigger>How does the compiler work?</button>
+        <div data-accordion-content>
+          <p class="answer">The PDX compiler transforms .pdx Single File Components into optimized JavaScript modules. It handles signal rewriting, template compilation, CSS scoping, auto-imports, and route generation.</p>
+        </div>
+      </div>
+      <div data-accordion-item>
+        <button data-accordion-trigger>Can I use it without the backend?</button>
+        <div data-accordion-content>
+          <p class="answer">Absolutely. The UI framework works standalone with any backend. The .NET integration is optional and additive.</p>
+        </div>
+      </div>
+      <div data-accordion-item>
+        <button data-accordion-trigger>What browsers are supported?</button>
+        <div data-accordion-content>
+          <p class="answer">All modern evergreen browsers: Chrome, Firefox, Safari, Edge. Uses standard Web Components, CSS custom properties, and ES2022+.</p>
+        </div>
+      </div>
+    </pdx-accordion>
+  </section>
+</template>

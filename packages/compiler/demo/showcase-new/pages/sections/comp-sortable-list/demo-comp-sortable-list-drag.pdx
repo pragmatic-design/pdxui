@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Drag a handle, or use the keyboard</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Grab the handle with the pointer, or Tab to it and press Space to lift, the arrows to move,
+      Space to drop, Escape to cancel.
+    </p>
+
+    <div class="demo-stack narrow">
+      <pdx-sortable-list :items="tasks" @pdx-reorder="onReorder"></pdx-sortable-list>
+      <p class="pdx-txt-small pdx-ink-muted">Order: {{ orderLine }}</p>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-sortable-list :items="tasks" @pdx-reorder="onReorder"&gt;&lt;/pdx-sortable-list&gt;
+
+let tasks = $signal([{ id: 1, label: 'Triage' }, …]);
+
+function onReorder(e) {
+  const next = tasks.slice();
+  next.splice(e.detail.to, 0, ...next.splice(e.detail.from, 1));
+  tasks = next;
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useSortableTasks } from './state.pdx';
+
+// The disabled section shows the same list, in the order this one leaves it (state.pdx.ts).
+const sortableTasks = useSortableTasks();
+const tasks = $derived(sortableTasks.tasks());
+function onReorder(e) { sortableTasks.onReorder(e); }
+
+const orderLine = $derived(tasks.map(t => t.label).join(' · '));
+</script>

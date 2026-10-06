@@ -1,0 +1,328 @@
+/* Feedback — alerts, badges, skeleton, loading overlay, status dots, empty state, tooltip, callout */
+
+/* Alerts — base styles apply to .pdx-alert AND all variant classes */
+:is(.pdx-alert, .pdx-alert-info, .pdx-alert-success, .pdx-alert-warning, .pdx-alert-error) {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border-radius: var(--pdx-radius-md);
+    border-left: 4px solid var(--pdx-color-border);
+    display: flex;
+    gap: var(--pdx-space-sm);
+    align-items: flex-start;
+    font-size: var(--pdx-text-sm);
+    margin-bottom: var(--pdx-space-xs);
+}
+
+.pdx-alert-info {
+    border-left-color: var(--pdx-color-primary);
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.2));
+}
+
+.pdx-alert-success {
+    border-left-color: var(--pdx-color-success);
+    background: light-dark(oklch(0.95 0.03 155), oklch(0.22 0.04 155));
+}
+
+.pdx-alert-warning {
+    border-left-color: var(--pdx-color-warning);
+    background: light-dark(oklch(0.97 0.03 85), oklch(0.24 0.04 85));
+}
+
+.pdx-alert-error {
+    border-left-color: var(--pdx-color-danger);
+    background: light-dark(oklch(0.97 0.03 25), oklch(0.22 0.04 25));
+}
+
+/* Badges — base styles apply to .pdx-badge AND all variant classes */
+:is(.pdx-badge, .pdx-badge-primary, .pdx-badge-secondary, .pdx-badge-success, .pdx-badge-danger, .pdx-badge-warning, .pdx-badge-info, [class*="pdx-badge-outline"]) {
+    /* box-sizing + border espliciti: difesa style-isolation contro host `span{border}` e reset */
+    box-sizing: border-box;
+    border: var(--pdx-border-width) solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-full);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    white-space: nowrap;
+    line-height: var(--pdx-line-tight);
+}
+
+.pdx-badge-primary   { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+.pdx-badge-secondary { background: var(--pdx-color-inset); color: var(--pdx-color-text); border: var(--pdx-border-width) solid var(--pdx-color-border); }
+.pdx-badge-success   { background: var(--pdx-color-success-soft); color: var(--pdx-color-success-ink); }
+.pdx-badge-danger    { background: var(--pdx-color-danger-soft); color: var(--pdx-color-danger-ink); }
+.pdx-badge-warning   { background: var(--pdx-color-warning-soft); color: var(--pdx-color-warning-ink); }
+.pdx-badge-info      { background: var(--pdx-color-accent-soft); color: var(--pdx-color-accent-ink); }
+
+/* Badge outline variants — border + text colored, transparent bg */
+.pdx-badge-outline          { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-border); color: var(--pdx-color-text); }
+.pdx-badge-outline-primary  { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-primary); color: var(--pdx-color-primary-ink); }
+.pdx-badge-outline-success  { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-success); color: var(--pdx-color-success-ink); }
+.pdx-badge-outline-danger   { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-danger); color: var(--pdx-color-danger-ink); }
+.pdx-badge-outline-warning  { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-warning); color: var(--pdx-color-warning-ink); }
+
+/* Badge sizes */
+.pdx-badge-sm { font-size: 0.65rem; padding: 1px var(--pdx-space-xs); }
+.pdx-badge-lg { font-size: var(--pdx-text-sm); padding: var(--pdx-space-xs) var(--pdx-space-md); }
+
+/* Badge shape */
+.pdx-badge-square { border-radius: var(--pdx-radius-sm); }
+
+/* Badge overlay — position badge on corner of parent */
+.pdx-badge-anchor {
+    position: relative;
+    display: inline-flex;
+}
+
+.pdx-badge-anchor > .pdx-badge,
+.pdx-badge-anchor > .pdx-dot,
+.pdx-badge-anchor > pdx-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+    z-index: 1;
+}
+
+/* Skeleton / Placeholder loading */
+.pdx-skeleton {
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+    animation: pdx-shimmer 1.5s ease-in-out infinite;
+    animation-delay: var(--pdx-skeleton-delay, 0s);
+}
+
+.pdx-skeleton-text    { height: 1em; width: 80%; border-radius: var(--pdx-radius-sm); }
+.pdx-skeleton-title   { height: 1.5em; width: 50%; border-radius: var(--pdx-radius-sm); }
+.pdx-skeleton-image   { aspect-ratio: 16/9; width: 100%; }
+.pdx-skeleton-circle  { width: 2.5rem; height: 2.5rem; border-radius: 50%; }
+.pdx-skeleton-button  { height: 2.5rem; width: 6rem; }
+.pdx-skeleton-input   { height: 2.75rem; width: 100%; }
+
+/* Pulse animation (default) */
+@keyframes pdx-shimmer {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+/* Wave animation — left-to-right sweep (MUI, Fluent, Shoelace pattern) */
+.pdx-skeleton-wave {
+    animation: pdx-wave 1.6s linear infinite;
+    animation-delay: var(--pdx-skeleton-delay, 0s);
+    background: linear-gradient(
+        90deg,
+        var(--pdx-color-inset) 25%,
+        light-dark(oklch(0.92 0 0), oklch(0.25 0 0)) 37%,
+        var(--pdx-color-inset) 63%
+    );
+    background-size: 400% 100%;
+}
+
+@keyframes pdx-wave {
+    0%   { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* No animation variant */
+.pdx-skeleton-static {
+    animation: none;
+}
+
+/* Component-specific skeleton shapes */
+.pdx-skeleton-avatar  { width: 2.5rem; height: 2.5rem; border-radius: 50%; }
+.pdx-skeleton-badge   { height: 1.25rem; width: 3rem; border-radius: var(--pdx-radius-full); }
+.pdx-skeleton-chip    { height: 2rem; width: 5rem; border-radius: var(--pdx-radius-full); }
+.pdx-skeleton-tab     { height: 2.75rem; width: 5rem; border-radius: var(--pdx-radius-sm) var(--pdx-radius-sm) 0 0; }
+.pdx-skeleton-card    { height: 12rem; width: 100%; border-radius: var(--pdx-radius-lg); }
+.pdx-skeleton-table-row { height: 3rem; width: 100%; border-radius: var(--pdx-radius-sm); }
+.pdx-skeleton-switch  { height: 1.5rem; width: 2.75rem; border-radius: var(--pdx-radius-full); }
+.pdx-skeleton-slider  { height: 0.25rem; width: 100%; border-radius: var(--pdx-radius-full); }
+.pdx-skeleton-select  { height: var(--pdx-input-min-height, 2.5rem); width: 100%; border-radius: var(--pdx-radius-md); }
+
+/* ── Universal loading overlay via aria-busy ──
+   Any component with aria-busy="true" gets a subtle loading overlay.
+   Components can override with more specific loading behavior. */
+[aria-busy="true"] {
+    position: relative;
+    pointer-events: none;
+}
+[aria-busy="true"]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: light-dark(oklch(1 0 0 / 0.5), oklch(0 0 0 / 0.4));
+    border-radius: inherit;
+    z-index: 1;
+    animation: pdx-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Loading overlay */
+.pdx-loading-overlay {
+    position: relative;
+    pointer-events: none;
+}
+
+.pdx-loading-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: light-dark(oklch(1 0 0 / 0.6), oklch(0 0 0 / 0.5));
+    border-radius: inherit;
+    z-index: 1;
+}
+
+.pdx-loading-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid var(--pdx-color-primary);
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: pdx-spin 0.6s linear infinite;
+    z-index: 2;
+}
+
+/* Status dot */
+.pdx-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pdx-dot-success { background: var(--pdx-color-success); }
+.pdx-dot-danger  { background: var(--pdx-color-danger); }
+.pdx-dot-warning { background: var(--pdx-color-warning); }
+.pdx-dot-muted   { background: var(--pdx-color-muted); }
+.pdx-dot-primary { background: var(--pdx-color-primary); }
+
+.pdx-dot-pulse {
+    animation: pdx-pulse 2s ease-in-out infinite;
+}
+
+@keyframes pdx-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+}
+
+/* Empty state */
+.pdx-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--pdx-space-2xl);
+    text-align: center;
+    color: var(--pdx-color-muted);
+    gap: var(--pdx-space-md);
+}
+
+.pdx-empty-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+}
+
+.pdx-empty-title {
+    font-size: var(--pdx-text-lg);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-text);
+}
+
+.pdx-empty-description {
+    font-size: var(--pdx-text-sm);
+    max-width: 24rem;
+}
+
+/* Timeline */
+.pdx-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.pdx-timeline::before {
+    content: '';
+    position: absolute;
+    left: calc(0.5rem + 0.375rem - 1px);
+    top: 0.25rem;
+    bottom: 0.25rem;
+    width: 2px;
+    background: var(--pdx-color-border);
+}
+
+.pdx-timeline-item {
+    position: relative;
+    padding-bottom: var(--pdx-space-lg);
+}
+
+.pdx-timeline-item:last-child { padding-bottom: 0; }
+
+.pdx-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.25rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--pdx-color-surface);
+    border: 2px solid var(--pdx-color-border);
+}
+
+.pdx-timeline-item[data-status="done"]::before {
+    background: var(--pdx-color-primary);
+    border-color: var(--pdx-color-primary);
+}
+
+.pdx-timeline-item[data-status="active"]::before {
+    border-color: var(--pdx-color-primary);
+    box-shadow: 0 0 0 3px light-dark(oklch(from var(--pdx-color-primary) l c h / 0.2), oklch(from var(--pdx-color-primary) l c h / 0.3));
+}
+
+/* Tooltip (CSS-only) */
+[data-pdx-tooltip] {
+    position: relative;
+}
+
+[data-pdx-tooltip]::after {
+    content: attr(data-pdx-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    background: var(--pdx-gray-900);
+    color: var(--pdx-gray-50);
+    font-size: var(--pdx-text-xs);
+    border-radius: var(--pdx-radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--pdx-transition);
+    z-index: var(--pdx-z-tooltip);
+}
+
+[data-pdx-tooltip]:hover::after { opacity: 1; }
+
+/* Callout / Admonition */
+.pdx-callout {
+    padding: var(--pdx-space-md);
+    border-radius: var(--pdx-radius-md);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+}
+
+.pdx-callout-info    { border-color: var(--pdx-color-primary); }
+.pdx-callout-tip     { border-color: var(--pdx-color-success); }
+.pdx-callout-warning { border-color: var(--pdx-color-warning); }
+.pdx-callout-danger  { border-color: var(--pdx-color-danger); }
+
+.pdx-callout-title {
+    font-weight: var(--pdx-weight-semibold);
+    margin-bottom: var(--pdx-space-xs);
+}

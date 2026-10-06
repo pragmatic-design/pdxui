@@ -1,0 +1,41 @@
+/* pdx-json-editor — recursive JSON form editor + body-level sub-modal. Token-only (theme/dark safe). */
+.pdx-json-editor-root { display: block; }
+
+/* Sub-modal (body-level) */
+.jed-back { position: fixed; inset: 0; z-index: 4000; background: var(--pdx-color-backdrop); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.jed-box { width: min(1000px, 96vw); max-height: 88vh; display: flex; flex-direction: column; background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border); border-radius: 12px; box-shadow: var(--pdx-shadow-lg, 0 20px 60px rgba(0, 0, 0, .3)); overflow: hidden; }
+.jed-head { padding: .9rem 1.2rem; font-size: 1.05rem; font-weight: 700; color: var(--pdx-color-text); border-bottom: 1px solid var(--pdx-color-border); }
+.jed-body { padding: 1rem 1.2rem; overflow: auto; display: flex; flex-direction: column; gap: .8rem; }
+.jed-foot { padding: .8rem 1.2rem; display: flex; justify-content: flex-end; gap: .6rem; border-top: 1px solid var(--pdx-color-border); }
+.jed-foot button { height: 36px; padding: 0 1.1rem; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; border: 1px solid var(--pdx-color-border); }
+.jed-cancel { background: var(--pdx-color-surface); color: var(--pdx-color-text); }
+.jed-ok { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border-color: var(--pdx-color-primary); }
+
+/* Fields */
+.jfld { display: flex; flex-direction: column; gap: .3rem; font-size: .8rem; color: var(--pdx-color-muted); }
+/* A switch carries its own label beside it: it sits on the controls' row, not the captions'. */
+.jfld-bool { justify-content: flex-end; }
+.jfld-bool > pdx-switch { display: flex; align-items: center; min-height: calc(var(--pdx-input-min-height) * var(--pdx-density-factor, 1)); }
+.jdt { height: 34px; padding: 0 .6rem; border-radius: 6px; border: 1px solid var(--pdx-color-border); background: var(--pdx-color-surface); color: var(--pdx-color-text); }
+
+/* Object body (grid of fields) */
+.jobj-b { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem .9rem; }
+
+/* Complex branch row (label + summary + Edit button → sub-modal) */
+.jcomplex { grid-column: 1 / -1; display: flex; align-items: center; gap: .7rem; padding: .55rem .7rem; border: 1px dashed var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-bg); }
+.jcomplex-l { font-size: .85rem; font-weight: 600; color: var(--pdx-color-text); }
+.jcomplex-s { flex: 1; font-size: .78rem; color: var(--pdx-color-muted); }
+.jcomplex-b { padding: .35rem .8rem; border: 1px solid var(--pdx-color-border); border-radius: 6px; background: var(--pdx-color-surface); color: var(--pdx-color-primary-ink); font-size: .8rem; font-weight: 600; cursor: pointer; }
+.jcomplex-b:hover { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border-color: var(--pdx-color-primary); }
+
+/* List / repeater (numbered rows, empty hint, add button at bottom) */
+.jlist { display: flex; flex-direction: column; gap: .6rem; }
+.jlist-empty { font-size: .82rem; color: var(--pdx-color-muted); font-style: italic; padding: .4rem .2rem; }
+.jlist-add { display: flex; }
+.jrows { display: flex; flex-direction: column; gap: .55rem; }
+.jrow { display: flex; align-items: flex-start; gap: .5rem; padding: .6rem; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
+.jrow-n { flex: 0 0 auto; align-self: flex-start; min-width: 26px; padding-top: .35rem; font-size: .78rem; font-weight: 700; color: var(--pdx-color-muted); }
+.jrow-f { flex: 1; min-width: 0; }
+.jrow-f.jrow-dict { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem .7rem; }
+.jrow-del { flex: 0 0 auto; width: 30px; height: 30px; border: 1px solid var(--pdx-color-border); border-radius: 7px; background: var(--pdx-color-surface); cursor: pointer; }
+.jrow-del:hover { background: var(--pdx-color-danger, #c0392b); border-color: var(--pdx-color-danger, #c0392b); }

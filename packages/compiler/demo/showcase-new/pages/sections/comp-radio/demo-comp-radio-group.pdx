@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Radio Group</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>&lt;pdx-radio-group&gt;</code> manages selection, propagates name/size/disabled, and adds arrow key navigation (roving tabindex).
+    </p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Shipping Method" required></pdx-label>
+        <pdx-radio-group value="standard">
+          <pdx-radio label="Standard (5-7 days)" value="standard"></pdx-radio>
+          <pdx-radio label="Express (2-3 days)" value="express"></pdx-radio>
+          <pdx-radio label="Overnight (next day)" value="overnight"></pdx-radio>
+        </pdx-radio-group>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-radio-group value="standard"&gt;
+  &lt;pdx-radio label="Standard (5-7 days)" value="standard"&gt;&lt;/pdx-radio&gt;
+  &lt;pdx-radio label="Express (2-3 days)" value="express"&gt;&lt;/pdx-radio&gt;
+  &lt;pdx-radio label="Overnight" value="overnight"&gt;&lt;/pdx-radio&gt;
+&lt;/pdx-radio-group&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Toggle the blocked state. Content underneath is non-interactive while blocked.</p>
+    <div class="demo-actions">
+      <button class="pdx-btn pdx-primary pdx-btn-xs" @click="toggleBlock">Toggle Block</button>
+    </div>
+    <div class="demo-wrap">
+      <pdx-block-ui :blocked="blocked" id="demo-block">
+        <div class="demo-panel">
+          <h3>Panel Content</h3>
+          <p class="pdx-txt-small pdx-ink-muted">This content is blocked during loading. Buttons are non-clickable.</p>
+          <div style="display:flex;gap:8px;margin-top:var(--pdx-space-sm)">
+            <button class="pdx-btn pdx-outline pdx-btn-xs">Action A</button>
+            <button class="pdx-btn pdx-outline pdx-btn-xs">Action B</button>
+            <button class="pdx-btn pdx-primary pdx-btn-xs">Save</button>
+          </div>
+        </div>
+      </pdx-block-ui>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-block-ui :blocked="isLoading"&gt;
+  &lt;div class="panel"&gt;
+    &lt;p&gt;Content here...&lt;/p&gt;
+    &lt;button&gt;Save&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/pdx-block-ui&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let blocked = $signal(false);
+
+function toggleBlock() { blocked = !blocked; }
+</script>

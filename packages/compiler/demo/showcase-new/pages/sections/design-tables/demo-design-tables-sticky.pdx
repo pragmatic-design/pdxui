@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sticky Header</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>.pdx-table-sticky</code> keeps the header row in view while the rows scroll. It sticks to
+      the nearest scrolling ancestor: give the wrapper a height. Scroll the table below.
+    </p>
+
+    <div class="table-wrap table-scroll">
+      <table class="pdx-table pdx-table-sticky pdx-table-striped">
+        <thead>
+          <tr><th>Order</th><th>Customer</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>#1001</td><td>Acme Corp</td><td>$1,240</td></tr>
+          <tr><td>#1002</td><td>Globex</td><td>$860</td></tr>
+          <tr><td>#1003</td><td>Initech</td><td>$2,315</td></tr>
+          <tr><td>#1004</td><td>Umbrella</td><td>$415</td></tr>
+          <tr><td>#1005</td><td>Stark Industries</td><td>$3,980</td></tr>
+          <tr><td>#1006</td><td>Wayne Enterprises</td><td>$1,105</td></tr>
+          <tr><td>#1007</td><td>Hooli</td><td>$720</td></tr>
+          <tr><td>#1008</td><td>Vandelay</td><td>$1,560</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div style="max-height: 12rem; overflow-y: auto"&gt;
+  &lt;table class="pdx-table pdx-table-sticky"&gt;...&lt;/table&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* A height for the sticky example, so there is something to scroll. */
+  .table-scroll {
+    max-height: 12rem;
+    overflow-y: auto;
+  }
+</style>

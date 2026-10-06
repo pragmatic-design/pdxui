@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Positions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">4 positions: left, right (default), top, bottom. Click to open, Escape or backdrop to close.</p>
+    <div class="btn-row">
+      <pdx-button variant="outline" @click="openDrawer('right')">Right</pdx-button>
+      <pdx-button variant="outline" @click="openDrawer('left')">Left</pdx-button>
+      <pdx-button variant="outline" @click="openDrawer('top')">Top</pdx-button>
+      <pdx-button variant="outline" @click="openDrawer('bottom')">Bottom</pdx-button>
+    </div>
+
+    <pdx-drawer :open="drawerOpen" :position="drawerPos" label="Demo drawer" @pdx-close="closeDrawer">
+      <span slot="header">Drawer — {{ drawerPos }}</span>
+      <p>This drawer slides in from the <strong>{{ drawerPos }}</strong>.</p>
+      <p class="pdx-txt-small pdx-ink-muted">Press Escape or click the backdrop to close. On mobile, swipe to dismiss.</p>
+      <pdx-form-field label="Name" size="sm">
+        <pdx-input placeholder="Enter your name"></pdx-input>
+      </pdx-form-field>
+      <span slot="footer">
+        <pdx-button variant="ghost" size="sm" @click="closeDrawer">Cancel</pdx-button>
+        <pdx-button variant="primary" size="sm" @click="closeDrawer">Save</pdx-button>
+      </span>
+    </pdx-drawer>
+  </section>
+</template>
+
+<script setup>
+// Position drawer
+let drawerOpen = $signal(false);
+
+let drawerPos = $signal('right');
+
+function openDrawer(pos) { drawerPos = pos; drawerOpen = true; }
+function closeDrawer() { drawerOpen = false; }
+</script>

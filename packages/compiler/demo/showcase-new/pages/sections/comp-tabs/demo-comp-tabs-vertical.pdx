@@ -1,0 +1,82 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Vertical</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>orientation="vertical"</code>. Arrow Up/Down for keyboard nav. Indicator slides vertically.</p>
+
+    <pdx-tabs value="general" orientation="vertical" label="Settings">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="general">General</button>
+        <button class="pdx-tab" data-tab="appearance">Appearance</button>
+        <button class="pdx-tab" data-tab="keybindings">Key Bindings</button>
+        <button class="pdx-tab" data-tab="extensions">Extensions</button>
+      </div>
+      <div data-tab-panel="general">
+        <h3 class="pdx-txt-subheading">General Settings</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Language, auto-save, telemetry, updates.</p>
+      </div>
+      <div data-tab-panel="appearance">
+        <h3 class="pdx-txt-subheading">Appearance</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Theme, font size, icon pack, zoom level.</p>
+      </div>
+      <div data-tab-panel="keybindings">
+        <h3 class="pdx-txt-subheading">Key Bindings</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Customize keyboard shortcuts.</p>
+      </div>
+      <div data-tab-panel="extensions">
+        <h3 class="pdx-txt-subheading">Extensions</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Manage installed extensions.</p>
+      </div>
+    </pdx-tabs>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-xl)">Vertical + Bordered</h3>
+    <pdx-tabs value="account" orientation="vertical" bordered label="Workspace">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="account">
+          <pdx-icon name="user" size="sm"></pdx-icon> Account
+        </button>
+        <button class="pdx-tab" data-tab="billing">
+          <pdx-icon name="tag" size="sm"></pdx-icon> Billing
+        </button>
+        <button class="pdx-tab" data-tab="team">
+          <pdx-icon name="users" size="sm"></pdx-icon> Team
+        </button>
+      </div>
+      <div data-tab-panel="account">
+        <h3 class="pdx-txt-subheading">Account</h3>
+        <pdx-form-field label="Email" size="sm">
+          <pdx-input type="email" value="alex@pragmatic.dev"></pdx-input>
+        </pdx-form-field>
+      </div>
+      <div data-tab-panel="billing">
+        <h3 class="pdx-txt-subheading">Billing</h3>
+        <p class="pdx-txt-small pdx-ink-muted">Current plan: Pro ($29/mo)</p>
+      </div>
+      <div data-tab-panel="team">
+        <h3 class="pdx-txt-subheading">Team</h3>
+        <p class="pdx-txt-small pdx-ink-muted">3 members. Invite more.</p>
+      </div>
+    </pdx-tabs>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="general" orientation="vertical"&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="general"&gt;General&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="appearance"&gt;Appearance&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="general"&gt;General settings&lt;/div&gt;
+  &lt;div data-tab-panel="appearance"&gt;Appearance settings&lt;/div&gt;
+&lt;/pdx-tabs&gt;
+
+&lt;!-- Vertical + Bordered --&gt;
+&lt;pdx-tabs value="account" orientation="vertical" bordered&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="account"&gt;Account&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="billing"&gt;Billing&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="account"&gt;Account content&lt;/div&gt;
+  &lt;div data-tab-panel="billing"&gt;Billing content&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </details>
+  </section>
+</template>

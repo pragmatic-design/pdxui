@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Collapsible</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click the chevron to expand/collapse.</p>
+
+    <div class="demo-block">
+      <pdx-fieldset legend="Advanced Options" collapsible :collapsed="collapsed1" @toggle="onToggle">
+        <pdx-form-field label="Timeout">
+          <pdx-input placeholder="5000"></pdx-input>
+        </pdx-form-field>
+      </pdx-fieldset>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let collapsed1 = $signal(false);
+
+function onToggle(e) {
+  collapsed1 = e.detail.collapsed;
+}
+</script>

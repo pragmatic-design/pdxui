@@ -1,0 +1,58 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-stack</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Vertical flow. Children stack top-to-bottom. Control spacing with <code>gap</code>, alignment with <code>items</code>.</p>
+
+    <div class="demo-area">
+      <pdx-stack gap="sm">
+        <div class="box">1</div>
+        <div class="box">2</div>
+        <div class="box">3</div>
+      </pdx-stack>
+    </div>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">items="start"</span>
+        <div class="demo-area narrow">
+          <pdx-stack gap="xs" items="start">
+            <div class="box sm">A</div>
+            <div class="box md">B</div>
+            <div class="box sm">C</div>
+          </pdx-stack>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">items="center"</span>
+        <div class="demo-area narrow">
+          <pdx-stack gap="xs" items="center">
+            <div class="box sm">A</div>
+            <div class="box md">B</div>
+            <div class="box sm">C</div>
+          </pdx-stack>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">items="end"</span>
+        <div class="demo-area narrow">
+          <pdx-stack gap="xs" items="end">
+            <div class="box sm">A</div>
+            <div class="box md">B</div>
+            <div class="box sm">C</div>
+          </pdx-stack>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-stack gap="sm"&gt;
+  &lt;div&gt;1&lt;/div&gt;
+  &lt;div&gt;2&lt;/div&gt;
+  &lt;div&gt;3&lt;/div&gt;
+&lt;/pdx-stack&gt;
+
+&lt;pdx-stack gap="xs" items="center"&gt;...&lt;/pdx-stack&gt;</code></pre>
+    </details>
+  </section>
+</template>

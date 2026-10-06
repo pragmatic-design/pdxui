@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Touch Targets Harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: var(--pdx-color-bg, #fff); color: var(--pdx-color-text, #111); font-family: var(--pdx-font-sans, system-ui); padding: 16px; }
+        #stage { max-width: 360px; }
+    </style>
+    <script type="module">
+        // The commands INSIDE a component, measured where a finger acts on them.
+        //
+        // One component per `?c=`, alone on the page. `open()` does what a user does to reach the
+        // commands (open the panel, type the trigger character, start editing), and `targets` names
+        // each command and whether it is an icon (width and height count) or a text command (height).
+        // The page asserts nothing: touch-targets.spec.ts measures.
+        import '@pdxui/design';
+        // Not the barrel: one component per load (the barrel is 414 requests a load, ~500 loads a run).
+        import { loadTags, tagsIn } from './generated/component-loaders.js';
+        import { toast } from '@pdxui/ui/toast';
+
+        const p = new URLSearchParams(location.search);
+        const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+        const which = p.get('c') ?? '';
+        const stage = () => document.getElementById('stage');
+        const put = (markup) => { stage().innerHTML = markup; return stage().firstElementChild; };
+        const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const click = (sel) => { const el = document.querySelector(sel); if (!el) throw new Error('no ' + sel); el.click(); };
+        const type = async (sel, text) => {
+            const el = document.querySelector(sel);
+            if (!el) throw new Error('no ' + sel);
+            el.focus();
+            el.value = text;
+            el.setSelectionRange?.(text.length, text.length);
+            el.dispatchEvent(new InputEvent('input', { bubbles: true, data: text.slice(-1), inputType: 'insertText' }));
+            el.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: text.slice(-1) }));
+        };
+
+        const OPTIONS = [
+            { value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }, { value: 'c', label: 'Gamma' },
+        ];
+        const MENU = [{ label: 'Edit', value: 'edit' }, { label: 'Duplicate', value: 'dup' }, { label: 'Delete', value: 'del' }];
+
+        /** name → { mount, open, targets: [{ sel, kind: 'icon' | 'text' }] } */
+        const CASES = {
+            'dropdown-menu': {
+                mount: () => { put('<pdx-dropdown-menu label="Actions"></pdx-dropdown-menu>').items = MENU; },
+                open: () => click('pdx-dropdown-menu button[aria-haspopup="menu"]'),
+                targets: [{ sel: '.pdx-menu-item', kind: 'text' }],
+            },
+            'split-button': {
+                mount: () => { put('<pdx-split-button label="Save"></pdx-split-button>').items = MENU; },
+                open: () => click('pdx-split-button .pdx-split-arrow'),
+                targets: [{ sel: '.pdx-menu-item', kind: 'text' }],
+            },
+            select: {
+                mount: () => { put('<pdx-select placeholder="Pick one"></pdx-select>').options = OPTIONS; },
+                open: () => click('pdx-select .pdx-select-trigger'),
+                targets: [{ sel: '.pdx-select-option', kind: 'text' }],
+            },
+            autocomplete: {
+                mount: () => { put('<pdx-autocomplete placeholder="Search"></pdx-autocomplete>').suggestions = OPTIONS; },
+                open: () => type('pdx-autocomplete input', 'a'),
+                targets: [{ sel: '.pdx-autocomplete-option', kind: 'text' }],
+            },
+            cascader: {
+                mount: () => {
+                    put('<pdx-cascader placeholder="Region"></pdx-cascader>').options = [
+                        { value: 'it', label: 'Italy', children: [{ value: 'ven', label: 'Veneto' }] },
+                        { value: 'fr', label: 'France', children: [{ value: 'idf', label: 'Île-de-France' }] },
+                    ];
+                },
+                open: () => click('pdx-cascader .pdx-cascader-trigger'),
+                targets: [{ sel: '.pdx-cascader-item', kind: 'text' }],
+            },
+            mention: {
+                mount: () => {
+                    put('<pdx-mention></pdx-mention>').items = [
+                        { id: 'ada', label: 'Ada' }, { id: 'grace', label: 'Grace' }, { id: 'kat', label: 'Katherine' },
+                    ];
+                },
+                open: () => type('pdx-mention .pdx-mention-textarea', '@'),
+                targets: [{ sel: '.pdx-mention-item', kind: 'text' }],
+            },
+            dialog: {
+                mount: () => { put('<pdx-dialog title="Visit"><p>Body</p></pdx-dialog>'); },
+                open: () => { document.querySelector('pdx-dialog').open = true; },
+                targets: [{ sel: 'pdx-dialog .pdx-dialog-close', kind: 'icon' }],
+            },
+            drawer: {
+                mount: () => { put('<pdx-drawer label="Filters"><p>Body</p></pdx-drawer>'); },
+                open: () => { document.querySelector('pdx-drawer').open = true; },
+                targets: [{ sel: '.pdx-drawer-close', kind: 'icon' }],
+            },
+            'alert-dialog': {
+                mount: () => { put('<pdx-alert-dialog title="Delete the visit?" description="It cannot be undone."></pdx-alert-dialog>'); },
+                open: () => { document.querySelector('pdx-alert-dialog').open = true; },
+                targets: [{ sel: '.pdx-alert-cancel', kind: 'text' }, { sel: '.pdx-alert-confirm', kind: 'text' }],
+            },
+            'date-picker': {
+                mount: () => { put('<pdx-date-picker value="2026-09-11"></pdx-date-picker>'); },
+                open: () => click('pdx-date-picker .pdx-date-picker-trigger'),
+                targets: [
+                    { sel: '.pdx-cal-nav-btn', kind: 'icon' },
+                    { sel: '.pdx-cal-title', kind: 'text' },
+                    { sel: '.pdx-date-picker-footer button', kind: 'text' },
+                ],
+            },
+            'time-picker': {
+                mount: () => { put('<pdx-time-picker value="09:30"></pdx-time-picker>'); },
+                open: () => {},
+                targets: [{ sel: 'pdx-time-picker .pdx-time-value', kind: 'text' }, { sel: 'pdx-time-picker .pdx-time-arrow', kind: 'icon' }],
+            },
+            'inline-edit': {
+                mount: () => { put('<pdx-inline-edit value="Rex" save-on="action"></pdx-inline-edit>'); },
+                open: () => click('pdx-inline-edit .pdx-inline-edit-display'),
+                targets: [{ sel: '.pdx-inline-edit-save', kind: 'icon' }, { sel: '.pdx-inline-edit-cancel', kind: 'icon' }],
+            },
+            input: {
+                mount: () => { put('<pdx-input clearable value="Rossi"></pdx-input>'); },
+                open: () => {},
+                targets: [{ sel: 'pdx-input .pdx-input-clear', kind: 'icon' }],
+            },
+            toast: {
+                mount: () => { put('<pdx-toast position="bottom-center"></pdx-toast>'); },
+                open: () => { toast.info('Saved', { duration: 0 }); },
+                targets: [{ sel: '.pdx-toast-close', kind: 'icon' }],
+            },
+            'otp-input': {
+                mount: () => { put('<pdx-otp-input length="4"></pdx-otp-input>'); },
+                open: () => {},
+                targets: [{ sel: 'pdx-otp-input .pdx-otp-cell', kind: 'text' }],
+            },
+            'data-grid': {
+                mount: () => {
+                    const g = put('<pdx-data-grid></pdx-data-grid>');
+                    g.columns = [{ field: 'name', header: 'Name' }, { field: 'role', header: 'Role' }];
+                    g.data = [{ id: 1, name: 'Ada', role: 'engineer' }, { id: 2, name: 'Grace', role: 'admiral' }];
+                },
+                open: () => {},
+                targets: [{ sel: 'pdx-data-grid .pdx-dg-row', kind: 'text' }],
+            },
+            // Virtual scrolling places rows by `rowHeight` in JS, not by their CSS height.
+            'data-grid-virtual': {
+                mount: () => {
+                    const g = put('<pdx-data-grid virtual-scroll max-height="300"></pdx-data-grid>');
+                    g.columns = [{ field: 'name', header: 'Name' }, { field: 'role', header: 'Role' }];
+                    g.data = Array.from({ length: 200 }, (_, i) => ({ id: i + 1, name: 'Patient ' + (i + 1), role: 'dog' }));
+                },
+                open: () => {},
+                targets: [{ sel: 'pdx-data-grid .pdx-dg-row', kind: 'text' }],
+            },
+            fieldset: {
+                mount: () => { put('<pdx-fieldset legend="Owner" collapsible><p>Body</p></pdx-fieldset>'); },
+                open: () => {},
+                targets: [{ sel: 'pdx-fieldset .pdx-fieldset-toggle', kind: 'icon' }],
+            },
+            // A panel's toggle: its label with a label, its chevron alone without one.
+            // The two panels are 48px apart: a collapsed panel is ~25px tall, and two stacked closer
+            // than the 44px target share their tap areas — the later one's covers the earlier one's.
+            // That is the page's spacing, not the component's target, which is what is measured here.
+            'field-group': {
+                mount: () => {
+                    put('<div style="display: grid; gap: 48px"><pdx-field-group display="panel" label="Billing" collapsed><p>Body</p></pdx-field-group>'
+                        + '<pdx-field-group display="panel" collapsed><p>Body</p></pdx-field-group></div>');
+                },
+                open: () => {},
+                targets: [
+                    { sel: 'pdx-field-group[label] .pdx-field-group-toggle', kind: 'text' },
+                    { sel: 'pdx-field-group:not([label]) .pdx-field-group-toggle', kind: 'icon' },
+                ],
+            },
+        };
+
+        const api = {
+            cases: Object.keys(CASES),
+            targets: CASES[which]?.targets ?? [],
+            async open() {
+                await CASES[which].open();
+                await frame();
+                // A panel that slides or fades in is measured where it lands, not on its way there.
+                await Promise.allSettled(document.getAnimations().map((a) => a.finished));
+                await frame();
+            },
+            coarse: () => matchMedia('(pointer: coarse)').matches,
+        };
+        window.__touch = api;
+
+        // The tags the case mounts, registered before it sets their properties.
+        await loadTags(tagsIn(String(CASES[which]?.mount ?? '')));
+        CASES[which]?.mount();
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+            document.documentElement.setAttribute('data-pdx-ready', '1')));
+    </script>
+</head>
+<body>
+    <div id="stage"></div>
+</body>
+</html>

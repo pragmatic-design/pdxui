@@ -1,0 +1,89 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Container Positions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Six positions via <code>position</code> attribute on <code>.pdx-toast-container</code>.</p>
+
+    <div class="position-grid">
+      <div class="position-cell">
+        <span class="pdx-txt-caption pdx-ink-muted">top-left</span>
+        <div class="position-box">
+          <div class="position-dot" style="top: 4px; left: 4px;"></div>
+        </div>
+      </div>
+      <div class="position-cell">
+        <span class="pdx-txt-caption pdx-ink-muted">top-center</span>
+        <div class="position-box">
+          <div class="position-dot" style="top: 4px; left: 50%; transform: translateX(-50%);"></div>
+        </div>
+      </div>
+      <div class="position-cell">
+        <span class="pdx-txt-caption pdx-ink-muted">top-right</span>
+        <div class="position-box">
+          <div class="position-dot" style="top: 4px; right: 4px;"></div>
+        </div>
+      </div>
+      <div class="position-cell">
+        <span class="pdx-txt-caption pdx-ink-muted">bottom-left</span>
+        <div class="position-box">
+          <div class="position-dot" style="bottom: 4px; left: 4px;"></div>
+        </div>
+      </div>
+      <div class="position-cell">
+        <span class="pdx-txt-caption pdx-ink-muted">bottom-center</span>
+        <div class="position-box">
+          <div class="position-dot" style="bottom: 4px; left: 50%; transform: translateX(-50%);"></div>
+        </div>
+      </div>
+      <div class="position-cell">
+        <span class="pdx-txt-caption pdx-ink-muted">bottom-right</span>
+        <div class="position-box">
+          <div class="position-dot" style="bottom: 4px; right: 4px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toast-container" position="top-right"&gt;
+  &lt;div class="pdx-toast pdx-toast-success" data-open&gt;
+    ...
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Positions: top-right, top-left, top-center,
+     bottom-right, bottom-left, bottom-center --&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Position diagram */
+  .position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    max-width: 400px;
+  }
+  .position-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+  }
+  .position-box {
+    position: relative;
+    width: 80px;
+    height: 50px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+  }
+  .position-dot {
+    position: absolute;
+    width: 24px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--pdx-color-primary);
+  }
+</style>

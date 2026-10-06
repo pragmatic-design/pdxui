@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">DataSource Integration</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Connect to a DataSource for server-side search. Debounce 300ms, loading state.
+    </p>
+
+    <div class="demo-row">
+      <pdx-mention
+        :source="remoteSource"
+        :debounce="300"
+        :minLength="1"
+        label="Search mention"
+        placeholder="Type @ to search users remotely..."
+        :rows="4"
+      ></pdx-mention>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const allUsers = [
+  { value: 'alice', label: 'Alice Johnson' },
+  { value: 'bob', label: 'Bob Smith' },
+  { value: 'charlie', label: 'Charlie Brown' },
+  { value: 'diana', label: 'Diana Prince' },
+  { value: 'eve', label: 'Eve Williams' },
+  { value: 'frank', label: 'Frank Castle' },
+  { value: 'grace', label: 'Grace Hopper' },
+  { value: 'henry', label: 'Henry Ford' },
+];
+
+const remoteSource = {
+  _data: [],
+  data() { return this._data; },
+  async fetch(params) {
+    await new Promise(r => setTimeout(r, 500));
+    this._data = allUsers.filter(u => u.label.toLowerCase().includes((params.search || '').toLowerCase()));
+  }
+};
+</script>

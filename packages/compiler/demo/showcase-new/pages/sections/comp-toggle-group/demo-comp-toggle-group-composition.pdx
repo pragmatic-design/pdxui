@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition — an editor toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Two groups in one toolbar: formatting (multiple) and alignment (single).</p>
+    <div class="comp-card">
+      <div class="toolbar" role="toolbar" aria-label="Text formatting">
+        <pdx-toggle-group type="multiple" label="Style" size="sm" :value="formatting" @pdx-change="e => setFormatting(e.detail.value)">
+          <pdx-toggle value="bold" aria-label="Bold"><strong>B</strong></pdx-toggle>
+          <pdx-toggle value="italic" aria-label="Italic"><em>I</em></pdx-toggle>
+          <pdx-toggle value="underline" aria-label="Underline"><u>U</u></pdx-toggle>
+        </pdx-toggle-group>
+        <span class="toolbar-sep" aria-hidden="true"></span>
+        <pdx-toggle-group type="single" label="Alignment" size="sm" :value="align" @pdx-change="e => setAlign(e.detail.value)">
+          <pdx-toggle value="left">Left</pdx-toggle>
+          <pdx-toggle value="center">Center</pdx-toggle>
+          <pdx-toggle value="right">Right</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+      <p class="pdx-txt-small sample" :style="sampleStyle() + ';text-align:' + (align || 'left')">
+        The toolbar and the sections above share their state: press a button here and watch the groups above follow.
+      </p>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useToggleGroupDemo } from './state.pdx';
+
+// The single and multiple sections show and set the same two values (state.pdx.ts).
+const toggleGroupDemo = useToggleGroupDemo();
+const align = $derived(toggleGroupDemo.align());
+const formatting = $derived(toggleGroupDemo.formatting());
+function setAlign(v) { toggleGroupDemo.setAlign(v); }
+function setFormatting(v) { toggleGroupDemo.setFormatting(v); }
+function sampleStyle() { return toggleGroupDemo.sampleStyle(); }
+</script>
+
+<style scoped>
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pdx-space-sm); }
+  .toolbar-sep { width: 1px; align-self: stretch; background: var(--pdx-color-border); }
+</style>

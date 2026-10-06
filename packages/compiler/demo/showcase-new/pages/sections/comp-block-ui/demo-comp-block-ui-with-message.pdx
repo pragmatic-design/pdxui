@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Message</h2>
+    <div class="demo-wrap">
+      <pdx-block-ui blocked message="Saving changes...">
+        <div class="demo-panel">
+          <h3>Form Panel</h3>
+          <p class="pdx-txt-small pdx-ink-muted">A custom message is shown below the spinner.</p>
+        </div>
+      </pdx-block-ui>
+    </div>
+  </section>
+</template>

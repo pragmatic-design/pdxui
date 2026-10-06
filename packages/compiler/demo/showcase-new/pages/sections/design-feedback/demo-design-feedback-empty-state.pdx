@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Empty State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Placeholder for empty lists or search results.</p>
+
+    <div class="pdx-empty">
+      <div class="pdx-empty-icon">&#128269;</div>
+      <div class="pdx-empty-title">No results found</div>
+      <div class="pdx-empty-description">Try adjusting your search or filter criteria.</div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-empty"&gt;
+  &lt;div class="pdx-empty-icon"&gt;&amp;#128269;&lt;/div&gt;
+  &lt;div class="pdx-empty-title"&gt;No results found&lt;/div&gt;
+  &lt;div class="pdx-empty-description"&gt;Try adjusting your search.&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

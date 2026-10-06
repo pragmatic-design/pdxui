@@ -1,0 +1,140 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Tables</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Data tables with striped, hover, compact, sticky, and sortable variants.
+      <strong>CSS only</strong> — apply classes to native <code>&lt;table&gt;</code> elements.
+    </p>
+
+    <!-- ═══ Base Table ═══ -->
+    <pdx-demo-design-tables-base class="demo-section"></pdx-demo-design-tables-base>
+
+    <!-- ═══ Striped ═══ -->
+    <pdx-demo-design-tables-striped class="demo-section"></pdx-demo-design-tables-striped>
+
+    <!-- ═══ Hover ═══ -->
+    <pdx-demo-design-tables-hover class="demo-section"></pdx-demo-design-tables-hover>
+
+    <!-- ═══ Compact ═══ -->
+    <pdx-demo-design-tables-compact class="demo-section"></pdx-demo-design-tables-compact>
+
+    <!-- ═══ Sticky Header ═══ -->
+    <pdx-demo-design-tables-sticky class="demo-section"></pdx-demo-design-tables-sticky>
+
+    <!-- ═══ Responsive ═══ -->
+    <pdx-demo-design-tables-responsive class="demo-section"></pdx-demo-design-tables-responsive>
+
+    <!-- ═══ Sort Indicators ═══ -->
+    <pdx-demo-design-tables-sort class="demo-section"></pdx-demo-design-tables-sort>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-tables-composition class="demo-section"></pdx-demo-design-tables-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Element</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-table</code><span>table</span><span>Base table styling, borders, padding</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-table-striped</code><span>table</span><span>Alternating row backgrounds</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-table-hover</code><span>table</span><span>Highlight rows on hover</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-table-compact</code><span>table</span><span>Reduced cell padding</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-table-responsive</code><span>div</span><span>Horizontal scroll wrapper</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-table-sticky</code><span>table</span><span>Sticky header on scroll</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-sort="ascending"</code><span>th</span><span>Ascending sort indicator (alias: <code>data-sort="asc"</code>)</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-sort="descending"</code><span>th</span><span>Descending sort indicator (alias: <code>data-sort="desc"</code>)</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-sort="none"</code><span>th</span><span>Sortable, no active sort (alias: <code>data-sort="none"</code>)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/tables';
+@title 'Tables';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .table-wrap {
+    margin-top: var(--pdx-space-md);
+    overflow-x: auto;
+  }
+
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

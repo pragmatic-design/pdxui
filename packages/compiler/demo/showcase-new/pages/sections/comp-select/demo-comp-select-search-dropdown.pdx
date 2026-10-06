@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Search in Dropdown</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Search input inside the dropdown panel. Use <code>searchPosition="dropdown"</code>.</p>
+    <div class="demo-row">
+      <pdx-select label="Fruit" :options="fruits" searchable searchPosition="dropdown" clearable placeholder="Select fruit..." />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="fruits" searchable
+  searchPosition="dropdown" clearable
+  placeholder="Select fruit..." /&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew', 'Kiwi', 'Lemon', 'Mango', 'Nectarine', 'Orange', 'Papaya', 'Quince'];
+</script>

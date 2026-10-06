@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Labels in a realistic form layout.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Registration Form</h3>
+      <div class="comp-form">
+        <div class="pdx-field">
+          <pdx-label text="First Name" required size="sm"></pdx-label>
+          <input class="pdx-input pdx-input-sm" placeholder="Jane" />
+        </div>
+        <div class="pdx-field">
+          <pdx-label text="Last Name" required size="sm"></pdx-label>
+          <input class="pdx-input pdx-input-sm" placeholder="Doe" />
+        </div>
+        <div class="pdx-field full-width">
+          <pdx-label text="Email" required size="sm" description="Your primary email address"></pdx-label>
+          <input class="pdx-input pdx-input-sm" type="email" placeholder="jane@example.com" />
+        </div>
+        <div class="pdx-field full-width">
+          <pdx-label text="Company" optional size="sm"></pdx-label>
+          <input class="pdx-input pdx-input-sm" placeholder="Acme Inc." />
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .full-width { grid-column: 1 / -1; }
+  .comp-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+  }
+</style>

@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Single Named Value</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Provide one value by name. Children inject it with <code>@inject</code> or <code>useProvided()</code>.
+    </p>
+    <div class="demo-box">
+      <pdx-provide name="greeting" :value="greetingMsg">
+        <div class="demo-child">
+          Child sees greeting: <strong>{{ greetingMsg }}</strong>
+        </div>
+        <div class="demo-controls">
+          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="changeGreeting">Change Greeting</button>
+        </div>
+      </pdx-provide>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide name="greeting" :value="greetingMsg"&gt;
+  &lt;!-- all descendants can inject('greeting') --&gt;
+  &lt;pdx-my-widget /&gt;
+&lt;/pdx-provide&gt;
+
+// In pdx-my-widget setup:
+const greeting = useProvided('greeting');</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import '@pdxui/ui/provide';
+
+let greetingMsg = $signal('Hello from provider!');
+
+function changeGreeting() {
+  greetingMsg = greetingMsg === 'Hello from provider!' ? 'Ciao dal provider!' : 'Hello from provider!';
+}
+</script>

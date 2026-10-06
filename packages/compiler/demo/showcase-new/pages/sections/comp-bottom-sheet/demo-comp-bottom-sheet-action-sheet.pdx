@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Action Sheet Pattern</h2>
+    <p class="pdx-txt-small pdx-ink-muted">iOS-style action list. Small detent, list of actions, cancel at bottom.</p>
+    <pdx-button variant="outline" @click="openAction">Show Actions</pdx-button>
+
+    <pdx-bottom-sheet :open="actionOpen" :detents="actionDetents" label="Actions" @pdx-close="closeAction">
+      <span slot="header"><strong>Choose Action</strong></span>
+      <div class="action-list">
+        <button class="action-item" @click="pickAction('Share')">
+          <span>📤</span> Share
+        </button>
+        <button class="action-item" @click="pickAction('Copy Link')">
+          <span>🔗</span> Copy Link
+        </button>
+        <button class="action-item" @click="pickAction('Edit')">
+          <span>✏️</span> Edit
+        </button>
+        <button class="action-item danger" @click="pickAction('Delete')">
+          <span>🗑️</span> Delete
+        </button>
+      </div>
+      <span slot="footer">
+        <pdx-button variant="ghost" @click="closeAction" style="width:100%">Cancel</pdx-button>
+      </span>
+    </pdx-bottom-sheet>
+  </section>
+</template>
+
+<script setup>
+// Action sheet
+let actionOpen = $signal(false);
+
+const actionDetents = [0.35];
+
+function openAction() { actionOpen = true; }
+function closeAction() { actionOpen = false; }
+
+function pickAction(name) {
+    closeAction();
+}
+</script>

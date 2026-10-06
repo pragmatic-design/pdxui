@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants &amp; placement</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Inherits button <code>variant</code>/<code>size</code>; <code>placement</code> controls where it opens.</p>
+    <div class="demo-row">
+      <pdx-dropdown-menu label="Primary" variant="primary" :items="basicItems"></pdx-dropdown-menu>
+      <pdx-dropdown-menu label="Ghost" variant="ghost" :items="basicItems"></pdx-dropdown-menu>
+      <pdx-dropdown-menu label="Icon" icon="menu" :items="basicItems"></pdx-dropdown-menu>
+      <pdx-dropdown-menu label="Open up" placement="top-start" :items="basicItems"></pdx-dropdown-menu>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './data.pdx';
+</script>

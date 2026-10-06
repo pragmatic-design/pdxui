@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-row">
+      <pdx-chip size="sm">Small</pdx-chip>
+      <pdx-chip>Default</pdx-chip>
+      <pdx-chip size="lg">Large</pdx-chip>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Editable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">With <code>editable</code> the date can be typed, in the locale's pattern or as ISO (2024-06-23), and is committed on Enter or when the field loses focus. A date that does not exist, or one outside min/max, marks the field invalid and keeps the last good value. In <code>datetime</code> the time typed after the date is read too. The calendar button, or Alt+ArrowDown, opens the calendar.</p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">en-US — month/day/year, 2024 only</span>
+        <pdx-date-picker editable locale="en-US" min="2024-01-01" max="2024-12-31" value="2024-06-23" aria-label="Delivery date"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">it-IT — day/month/year</span>
+        <pdx-date-picker editable locale="it-IT" aria-label="Data di consegna"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">datetime — the time after the date, 24-hour or with AM/PM</span>
+        <pdx-date-picker editable mode="datetime" locale="en-US" aria-label="Appointment"></pdx-date-picker>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker editable locale="en-US" min="2024-01-01" max="2024-12-31" aria-label="Delivery date"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker editable mode="datetime" locale="en-US" aria-label="Appointment"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

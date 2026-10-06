@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Validation States</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Same states as input: error, success, warning, disabled, readonly.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Error" required></pdx-label>
+        <pdx-textarea error value="This is too short" rows="2"></pdx-textarea>
+        <span class="pdx-field-error">Message must be at least 20 characters</span>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Success"></pdx-label>
+        <pdx-textarea success value="This looks great! Thank you for the detailed message." rows="2"></pdx-textarea>
+        <span class="pdx-field-success">Message accepted</span>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Disabled" disabled></pdx-label>
+        <pdx-textarea disabled value="Can't edit this" rows="2"></pdx-textarea>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Readonly"></pdx-label>
+        <pdx-textarea readonly value="Read-only content — selectable but not editable. Lorem ipsum dolor sit amet." rows="2"></pdx-textarea>
+      </div>
+    </div>
+  </section>
+</template>

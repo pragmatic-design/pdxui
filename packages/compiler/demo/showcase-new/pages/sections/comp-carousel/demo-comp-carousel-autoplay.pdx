@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Autoplay</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Auto-advances every 3 seconds and pauses on hover. The control at the top left stops and
+      restarts the rotation, and it also stops when keyboard focus moves into the carousel.
+    </p>
+    <div class="demo-container">
+      <pdx-carousel :items="basicSlides" autoplay :interval="3000" pause-on-hover></pdx-carousel>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-carousel :items="slides" autoplay :interval="3000" pause-on-hover&gt;&lt;/pdx-carousel&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicSlides } from './state.pdx';
+</script>

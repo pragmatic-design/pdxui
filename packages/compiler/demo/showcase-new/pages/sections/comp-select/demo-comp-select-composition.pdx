@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Composition — Registration Form</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Realistic form with multiple selects.</p>
+    <div class="demo-form">
+      <div class="field">
+        <pdx-label text="Country"></pdx-label>
+        <pdx-select :options="countries" searchable clearable placeholder="Select country..." />
+      </div>
+      <div class="field">
+        <pdx-label text="Preferred Languages"></pdx-label>
+        <pdx-select :options="languages" multiple searchable clearable placeholder="Select languages..." />
+      </div>
+      <div class="field">
+        <pdx-label text="Role"></pdx-label>
+        <pdx-select :options="roles" placeholder="Select role..." />
+      </div>
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;div class="demo-form"&gt;
+  &lt;div class="field"&gt;
+    &lt;pdx-label text="Country"&gt;&lt;/pdx-label&gt;
+    &lt;pdx-select :options="countries" searchable clearable /&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;pdx-label text="Preferred Languages"&gt;&lt;/pdx-label&gt;
+    &lt;pdx-select :options="languages" multiple searchable clearable /&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;pdx-label text="Role"&gt;&lt;/pdx-label&gt;
+    &lt;pdx-select :options="roles" /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'China', 'Denmark', 'Egypt', 'France', 'Germany', 'India', 'Italy', 'Japan', 'Mexico', 'Netherlands', 'Norway', 'Portugal', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom', 'United States'];
+const languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Korean', 'Arabic', 'Hindi', 'Russian'];
+const roles = ['Admin', 'Editor', 'Viewer', 'Moderator', 'Developer'];
+</script>

@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Form Integration</h2>
+    <div class="demo-row">
+      <form @submit="onSubmit">
+        <pdx-form-field label="Billing period">
+          <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Yearly","value":"yearly"}]' name="period" @change="onPeriod"></pdx-segmented>
+        </pdx-form-field>
+        <button type="submit" class="pdx-primary" style="margin-top:var(--pdx-space-sm)">Submit</button>
+      </form>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useSegmentedPeriod } from './state.pdx';
+
+// The object-options control shows and sets the same period (state.pdx.ts).
+const segmentedPeriod = useSegmentedPeriod();
+const period = $derived(segmentedPeriod.period());
+function onPeriod(e) { segmentedPeriod.onPeriod(e); }
+
+// pdx-ignore PDX_REPEATED_LOGIC: each form demo shows its whole submit handler, so a reader copies one page and has it all
+function onSubmit(e) {
+  e.preventDefault();
+  const data = new FormData(e.target);
+  alert('Period: ' + data.get('period'));
+}
+</script>

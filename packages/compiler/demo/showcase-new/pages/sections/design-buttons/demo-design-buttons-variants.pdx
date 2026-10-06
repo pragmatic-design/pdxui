@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Each variant has hover, focus-visible, disabled, and active (scale) states.</p>
+
+    <div class="btn-row">
+      <button class="pdx-primary">Primary</button>
+      <button class="pdx-secondary">Secondary</button>
+      <button class="pdx-outline">Outline</button>
+      <button class="pdx-ghost">Ghost</button>
+      <button class="pdx-link">Link</button>
+      <button class="pdx-danger">Danger</button>
+      <button class="pdx-success">Success</button>
+      <button class="pdx-warning">Warning</button>
+      <button class="pdx-info">Info</button>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-md)">Outline with color variants:</p>
+    <div class="btn-row">
+      <button class="pdx-outline">Default</button>
+      <button class="pdx-outline pdx-outline-primary">Primary</button>
+      <button class="pdx-outline pdx-outline-danger">Danger</button>
+      <button class="pdx-outline pdx-outline-success">Success</button>
+      <button class="pdx-outline pdx-outline-warning">Warning</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button class="pdx-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="pdx-secondary"&gt;Secondary (filled tonal)&lt;/button&gt;
+&lt;button class="pdx-outline"&gt;Outline (bordered)&lt;/button&gt;
+&lt;button class="pdx-ghost"&gt;Ghost&lt;/button&gt;
+&lt;button class="pdx-link"&gt;Link (underline)&lt;/button&gt;
+
+&lt;!-- Outline color variants --&gt;
+&lt;button class="pdx-outline pdx-outline-primary"&gt;Outline Primary&lt;/button&gt;
+&lt;button class="pdx-outline pdx-outline-danger"&gt;Outline Danger&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>

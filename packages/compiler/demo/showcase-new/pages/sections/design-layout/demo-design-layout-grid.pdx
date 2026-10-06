@@ -1,0 +1,76 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-grid</h2>
+    <p class="pdx-txt-small pdx-ink-muted">CSS Grid with <code>cols</code> 1-12. Use <code>cols="auto"</code> for responsive auto-fit. Children support <code>span</code> attribute.</p>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">cols="3"</span>
+        <div class="demo-area">
+          <pdx-grid cols="3" gap="sm">
+            <div class="box">1</div>
+            <div class="box">2</div>
+            <div class="box">3</div>
+            <div class="box">4</div>
+            <div class="box">5</div>
+            <div class="box">6</div>
+          </pdx-grid>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">cols="auto"</span>
+        <div class="demo-area">
+          <pdx-grid cols="auto" gap="sm" style="--pdx-grid-min:8rem">
+            <div class="box">A</div>
+            <div class="box">B</div>
+            <div class="box">C</div>
+            <div class="box">D</div>
+          </pdx-grid>
+        </div>
+      </div>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">Grid span:</p>
+    <div class="demo-area">
+      <pdx-grid cols="4" gap="sm">
+        <div class="box" span="2">span 2</div>
+        <div class="box">3</div>
+        <div class="box">4</div>
+        <div class="box">5</div>
+        <div class="box" span="3">span 3</div>
+        <div class="box" span="full">span full</div>
+      </pdx-grid>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">12-column grid:</p>
+    <div class="demo-area">
+      <pdx-grid cols="12" gap="2xs">
+        <div class="box mini" span="3">3</div>
+        <div class="box mini" span="6">6</div>
+        <div class="box mini" span="3">3</div>
+        <div class="box mini" span="4">4</div>
+        <div class="box mini" span="4">4</div>
+        <div class="box mini" span="4">4</div>
+        <div class="box mini" span="2">2</div>
+        <div class="box mini" span="8">8</div>
+        <div class="box mini" span="2">2</div>
+      </pdx-grid>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-grid cols="4" gap="sm"&gt;
+  &lt;div span="2"&gt;Spans 2 columns&lt;/div&gt;
+  &lt;div&gt;Single&lt;/div&gt;
+  &lt;div span="full"&gt;Full width row&lt;/div&gt;
+&lt;/pdx-grid&gt;
+
+&lt;!-- 12-column layout --&gt;
+&lt;pdx-grid cols="12" gap="2xs"&gt;
+  &lt;div span="3"&gt;Sidebar&lt;/div&gt;
+  &lt;div span="6"&gt;Content&lt;/div&gt;
+  &lt;div span="3"&gt;Aside&lt;/div&gt;
+&lt;/pdx-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>

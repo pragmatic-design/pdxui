@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Item and Empty Text</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The <code>item</code> slot draws each command from <code>{ item, active, index }</code>; the option around it keeps
+      its role, id and highlight. <code>empty-text</code> replaces "No results found." — type something no file matches.
+      This one sets <code>:hotkey="false"</code>, so Ctrl+K stays with the palette above.
+    </p>
+    <div class="demo-container">
+      <button class="pdx-btn pdx-outline" @click="filesOpen = true">Find a file</button>
+      <span class="run-note pdx-txt-small pdx-ink-muted">Opened: <strong>{{ lastFile }}</strong></span>
+      <pdx-command
+        :open="filesOpen"
+        :items="fileItems"
+        :hotkey="false"
+        placeholder="Find a file…"
+        empty-text="No file with that name — check the spelling."
+        @pdx-open="filesOpen = true"
+        @pdx-close="filesOpen = false"
+        @pdx-select="onFile">
+        <slot name="item" let:item let:active>
+          <span class="file-row"><strong>{{ item.label }}</strong><span class="pdx-txt-small pdx-ink-muted">{{ item.keywords }}</span></span>
+        </slot>
+      </pdx-command>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let filesOpen = $signal(false);
+let lastFile = $signal('—');
+
+const fileItems = [
+  { id: 'readme', label: 'README.md', keywords: 'docs · 2 KB' },
+  { id: 'app', label: 'app.pdx', keywords: 'src · 5 KB' },
+  { id: 'theme', label: 'theme.css', keywords: 'styles · 9 KB' },
+];
+
+function onFile(e) {
+  lastFile = (e.detail && e.detail.label) || '—';
+}
+</script>
+
+<style scoped>
+.file-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--pdx-space-md); width: 100%; }
+</style>

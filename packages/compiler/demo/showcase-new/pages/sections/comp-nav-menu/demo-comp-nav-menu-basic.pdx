@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Navigation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple flat list of navigation items.</p>
+
+    <div class="demo-sidebar">
+      <pdx-nav-menu :items="basicItems" activekey="dashboard"></pdx-nav-menu>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-nav-menu :items="items" activekey="dashboard"&gt;&lt;/pdx-nav-menu&gt;
+
+// items = [
+//   { key: 'dashboard', label: 'Dashboard' },
+//   { key: 'projects', label: 'Projects' },
+//   { key: 'settings', label: 'Settings' },
+// ]</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const basicItems = [
+  { key: 'dashboard', label: 'Dashboard' },
+  { key: 'projects', label: 'Projects' },
+  { key: 'tasks', label: 'Tasks' },
+  { key: 'calendar', label: 'Calendar' },
+  { key: 'settings', label: 'Settings' },
+];
+</script>

@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Clickable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click an event to see the detail.</p>
+    <div class="demo-container">
+      <pdx-timeline :items="basicEvents" clickable @pdx-click="onTimelineClick"></pdx-timeline>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="timeline-log">{{ timelineLog }}</div>
+  </section>
+</template>
+
+<script setup>
+const basicEvents = [
+  { title: 'Order Placed', description: 'Your order #12345 has been placed.', date: 'Apr 1, 2026' },
+  { title: 'Payment Confirmed', description: 'Payment received via credit card.', date: 'Apr 1, 2026' },
+  { title: 'Shipped', description: 'Package left the warehouse.', date: 'Apr 3, 2026' },
+  { title: 'Out for Delivery', description: 'Package is with the courier.', date: 'Apr 5, 2026' },
+  { title: 'Delivered', description: 'Package delivered to front door.', date: 'Apr 5, 2026' },
+];
+
+let timelineLog = $signal('Click an event...');
+
+function onTimelineClick(evt) {
+  timelineLog = 'Clicked: ' + evt.detail.item.title + ' (index: ' + evt.detail.index + ')';
+}
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 500px; }
+</style>

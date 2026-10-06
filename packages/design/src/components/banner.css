@@ -1,0 +1,121 @@
+/* Banner / Announcement — full-width bar for announcements.
+   Top or bottom of page, dismissable, semantic variants.
+
+   Usage:
+     <div class="pdx-banner pdx-banner-info">
+       <span class="pdx-banner-text">New version available.</span>
+       <a class="pdx-banner-action" href="#">Update now</a>
+       <button class="pdx-banner-close">&times;</button>
+     </div>
+
+   Variants: info (default), success, warning, danger
+   Position: top of page (default) or inline
+*/
+
+/* ===== Base ===== */
+
+.pdx-banner {
+    /* box-sizing + line-height + border espliciti: difesa style-isolation contro host
+       `div{line-height/border}` e reset (`*{box-sizing}`). */
+    box-sizing: border-box;
+    line-height: var(--pdx-line-normal);
+    border: var(--pdx-border-width) solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    width: 100%;
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+/* ===== Variants ===== */
+
+.pdx-banner-info {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+.pdx-banner-success {
+    background: var(--pdx-color-success);
+    color: var(--pdx-color-success-text);
+}
+
+.pdx-banner-warning {
+    background: var(--pdx-color-warning);
+    color: var(--pdx-color-warning-text);
+}
+
+.pdx-banner-danger {
+    background: var(--pdx-color-danger);
+    color: var(--pdx-color-danger-text);
+}
+
+/* Subtle variant — light background */
+.pdx-banner-subtle {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+
+/* ===== Parts ===== */
+
+.pdx-banner-icon {
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+.pdx-banner-text {
+    flex: 1;
+}
+
+.pdx-banner-action {
+    font-weight: var(--pdx-weight-semibold);
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+}
+
+.pdx-banner-action:hover {
+    opacity: 0.8;
+}
+
+.pdx-banner-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity var(--pdx-transition);
+    line-height: 1;
+}
+
+.pdx-banner-close:hover {
+    opacity: 1;
+}
+
+/* ===== Centered content ===== */
+
+.pdx-banner-centered {
+    justify-content: center;
+    text-align: center;
+}
+
+/* ===== Sticky top ===== */
+
+.pdx-banner[pdx-sticky] {
+    position: sticky;
+    top: 0;
+    z-index: var(--pdx-z-sticky, 10);
+}
+
+/* ===== Dismissable — hidden after close ===== */
+
+.pdx-banner[hidden] {
+    display: none;
+}

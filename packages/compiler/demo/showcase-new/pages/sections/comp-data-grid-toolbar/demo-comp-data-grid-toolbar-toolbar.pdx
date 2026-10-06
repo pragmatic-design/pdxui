@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Toolbar with sort recap chips, reload button, and column chooser.
+      Sort columns then see chips appear. Click chip to toggle direction, ✕ to remove.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="toolbarDS" :columns="toolbarColumns" :show-toolbar="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  show-toolbar hover striped&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { typedData } from './state.pdx';
+
+// ─── Toolbar ────────────────────────────────
+const toolbarColumns = [
+  { field: 'name', header: 'Name', width: 180 },
+  { field: 'role', header: 'Role', width: 120 },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 120 },
+  { field: 'isActive', header: 'Active', type: 'boolean', width: 80 },
+  { field: 'joinedAt', header: 'Joined', type: 'date', width: 130 },
+];
+
+const toolbarDS = createDataSource({ data: typedData, pageSize: 0 });
+</script>

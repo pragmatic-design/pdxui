@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Object Options</h2>
+    <p class="pdx-txt-small pdx-ink-muted">With label/value objects.</p>
+
+    <div class="demo-row">
+      <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Quarterly","value":"quarterly"},{"label":"Yearly","value":"yearly"}]' @change="onPeriod"></pdx-segmented>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useSegmentedPeriod } from './state.pdx';
+
+// The form-integration control shows and sets the same period (state.pdx.ts).
+const segmentedPeriod = useSegmentedPeriod();
+const period = $derived(segmentedPeriod.period());
+function onPeriod(e) { segmentedPeriod.onPeriod(e); }
+</script>

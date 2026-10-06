@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Chips</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+    <script>
+        function pdxToggleChip(el) { el.toggleAttribute('selected'); }
+        function pdxRemoveChip(btn) { btn.closest('.pdx-chip').remove(); }
+    </script>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Chips</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Chips / Tags</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Selectable, removable tags. For filters, categories, multi-select. Click to select, X to remove.</p>
+                    </pdx-stack>
+
+                    <!-- Basic -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Basic</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Click to toggle selection.</p>
+                        <div class="pdx-chip-group">
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)">React</span>
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)" selected>Vue</span>
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)">Angular</span>
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)">Svelte</span>
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)" selected>Solid</span>
+                            <span class="pdx-chip" disabled>Disabled</span>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Removable -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Removable</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-chip-remove</code> button inside.</p>
+                        <div class="pdx-chip-group">
+                            <span class="pdx-chip" selected>JavaScript <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                            <span class="pdx-chip" selected>TypeScript <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                            <span class="pdx-chip" selected>CSS <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                            <span class="pdx-chip">HTML <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                            <span class="pdx-chip">Rust <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Variants -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Variants</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Semantic color variants. Click to toggle.</p>
+                        <div class="pdx-chip-group">
+                            <span class="pdx-chip pdx-chip-primary" onclick="pdxToggleChip(this)">Primary</span>
+                            <span class="pdx-chip pdx-chip-success" onclick="pdxToggleChip(this)" selected>Success</span>
+                            <span class="pdx-chip pdx-chip-danger" onclick="pdxToggleChip(this)">Danger</span>
+                            <span class="pdx-chip pdx-chip-warning" onclick="pdxToggleChip(this)">Warning</span>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Sizes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sizes</h2>
+                        <div class="pdx-chip-group" style="align-items:center">
+                            <span class="pdx-chip pdx-chip-sm">Small</span>
+                            <span class="pdx-chip">Default</span>
+                            <span class="pdx-chip pdx-chip-lg">Large</span>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Chip Input Field -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Chip Input Field</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Input wrapper with chips inside. Looks like a form field.</p>
+                        <div class="pdx-chip-field" onclick="this.querySelector('input')?.focus()">
+                            <span class="pdx-chip" selected>design <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                            <span class="pdx-chip" selected>css <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                            <span class="pdx-chip" selected>components <button class="pdx-chip-remove" onclick="pdxRemoveChip(this)">&times;</button></span>
+                            <input class="pdx-chip-input" placeholder="Add tag..." />
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Filter example -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Filter Example</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Common pattern: filter chips above a content area.</p>
+                        <div class="pdx-chip-group">
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)" selected>All</span>
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)">Active</span>
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)">Pending</span>
+                            <span class="pdx-chip" onclick="pdxToggleChip(this)">Archived</span>
+                        </div>
+                        <div class="pdx-surface-card">
+                            <p class="pdx-txt-small pdx-ink-muted" style="text-align:center;padding:var(--pdx-space-lg)">Filtered content area</p>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

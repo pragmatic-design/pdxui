@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Shortcuts</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Right-aligned keyboard shortcut labels.</p>
+
+    <div class="demo-menu-container">
+      <div class="pdx-menu">
+        <button class="pdx-menu-item">Cut <span class="pdx-menu-shortcut">Ctrl+X</span></button>
+        <button class="pdx-menu-item">Copy <span class="pdx-menu-shortcut">Ctrl+C</span></button>
+        <button class="pdx-menu-item">Paste <span class="pdx-menu-shortcut">Ctrl+V</span></button>
+        <button class="pdx-menu-item">Select All <span class="pdx-menu-shortcut">Ctrl+A</span></button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button class="pdx-menu-item"&gt;
+  Cut &lt;span class="pdx-menu-shortcut"&gt;Ctrl+X&lt;/span&gt;
+&lt;/button&gt;
+&lt;button class="pdx-menu-item"&gt;
+  Copy &lt;span class="pdx-menu-shortcut"&gt;Ctrl+C&lt;/span&gt;
+&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="pragmatic" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Pragmatic Design CSS Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/pragmatic-design.css">
+    <script type="module" src="../runtime/adaptive.js"></script>
+    <style>
+        /* Sidebar nav link: full width ghost button */
+        .nav-link {
+            display: flex;
+            width: 100%;
+            text-align: left;
+            padding: var(--pdx-space-xs) var(--pdx-space-sm);
+            border-radius: var(--pdx-radius-md);
+            color: var(--pdx-color-muted);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font: inherit;
+            transition: background var(--pdx-transition), color var(--pdx-transition);
+        }
+        .nav-link:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+        .nav-link[aria-current="page"] { background: var(--pdx-color-inset); color: var(--pdx-color-text); font-weight: var(--pdx-weight-medium); }
+
+        /* Stat badge */
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--pdx-space-2xs);
+            padding: var(--pdx-space-2xs) var(--pdx-space-xs);
+            border-radius: var(--pdx-radius-full);
+            font-size: var(--pdx-text-xs);
+        }
+    </style>
+</head>
+<body>
+    <pdx-split ratio="1:4" gap="0">
+
+        <!-- Sidebar -->
+        <aside class="pdx-surface-card" style="border-radius: 0; border-right: 1px solid var(--pdx-color-border); min-height: 100dvh;">
+            <pdx-stack gap="lg" pad="md">
+                <pdx-stack gap="2xs">
+                    <span class="pdx-txt-title">Acme Inc.</span>
+                    <span class="pdx-txt-caption pdx-ink-muted">Admin Panel</span>
+                </pdx-stack>
+
+                <pdx-stack gap="2xs">
+                    <span class="pdx-txt-label pdx-ink-muted">Main</span>
+                    <nav>
+                        <pdx-stack gap="2xs">
+                            <a class="nav-link" aria-current="page" href="#">Dashboard</a>
+                            <a class="nav-link" href="products.html">Products</a>
+                            <a class="nav-link" href="#">Orders</a>
+                            <a class="nav-link" href="#">Customers</a>
+                        </pdx-stack>
+                    </nav>
+                </pdx-stack>
+
+                <pdx-stack gap="2xs">
+                    <span class="pdx-txt-label pdx-ink-muted">Settings</span>
+                    <nav>
+                        <pdx-stack gap="2xs">
+                            <a class="nav-link" href="#">General</a>
+                            <a class="nav-link" href="#">Team</a>
+                            <a class="nav-link" href="#">Billing</a>
+                        </pdx-stack>
+                    </nav>
+                </pdx-stack>
+            </pdx-stack>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <pdx-stack gap="xl" pad="lg">
+
+                <!-- Top bar -->
+                <pdx-stack gap="md">
+                    <h1 class="pdx-txt-display">Dashboard</h1>
+                    <pdx-row gap="sm" items="center" justify="end">
+                        <select class="pdx-input">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>This month</option>
+                            <option>This year</option>
+                        </select>
+                        <button class="pdx-primary">Download Report</button>
+                    </pdx-row>
+                </pdx-stack>
+
+                <!-- KPI Cards -->
+                <pdx-grid cols="auto" gap="md">
+                    <div class="pdx-surface-card">
+                        <pdx-stack gap="xs">
+                            <span class="pdx-txt-caption pdx-ink-muted">Revenue</span>
+                            <span class="pdx-txt-display">$48,250</span>
+                            <span class="pdx-txt-caption pdx-ink-success">+12.5% vs last week</span>
+                        </pdx-stack>
+                    </div>
+                    <div class="pdx-surface-card">
+                        <pdx-stack gap="xs">
+                            <span class="pdx-txt-caption pdx-ink-muted">Orders</span>
+                            <span class="pdx-txt-display">384</span>
+                            <span class="pdx-txt-caption pdx-ink-success">+8.2% vs last week</span>
+                        </pdx-stack>
+                    </div>
+                    <div class="pdx-surface-card">
+                        <pdx-stack gap="xs">
+                            <span class="pdx-txt-caption pdx-ink-muted">Customers</span>
+                            <span class="pdx-txt-display">1,249</span>
+                            <span class="pdx-txt-caption pdx-ink-warning">+2.1% vs last week</span>
+                        </pdx-stack>
+                    </div>
+                    <div class="pdx-surface-card">
+                        <pdx-stack gap="xs">
+                            <span class="pdx-txt-caption pdx-ink-muted">Conversion</span>
+                            <span class="pdx-txt-display">3.2%</span>
+                            <span class="pdx-txt-caption pdx-ink-danger">-0.4% vs last week</span>
+                        </pdx-stack>
+                    </div>
+                </pdx-grid>
+
+                <!-- Two-column: Recent Orders + Top Products -->
+                <pdx-grid cols="2" gap="lg">
+
+                    <!-- Recent Orders -->
+                    <div class="pdx-surface-card">
+                        <pdx-stack gap="md">
+                            <pdx-row items="center" justify="between">
+                                <span class="pdx-txt-heading">Recent Orders</span>
+                                <button class="pdx-ghost">View All</button>
+                            </pdx-row>
+                            <pdx-stack gap="sm">
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">#ORD-2847</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">John Doe — 2 items</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">$185.00</span>
+                                        <span class="pdx-ink-success pdx-txt-caption">Completed</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">#ORD-2846</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">Jane Smith — 1 item</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">$299.99</span>
+                                        <span class="pdx-ink-warning pdx-txt-caption">Processing</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">#ORD-2845</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">Bob Wilson — 5 items</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">$542.50</span>
+                                        <span class="pdx-ink-primary pdx-txt-caption">Shipped</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">#ORD-2844</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">Alice Brown — 3 items</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">$98.50</span>
+                                        <span class="pdx-ink-danger pdx-txt-caption">Cancelled</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="pdx-surface-card">
+                        <pdx-stack gap="md">
+                            <pdx-row items="center" justify="between">
+                                <span class="pdx-txt-heading">Top Products</span>
+                                <button class="pdx-ghost">View All</button>
+                            </pdx-row>
+                            <pdx-stack gap="sm">
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">Wireless Headphones</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">Electronics</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">142 sold</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">$42,558</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">Smart Watch</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">Electronics</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">98 sold</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">$19,600</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">USB-C Hub</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">Accessories</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">87 sold</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">$4,350</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                                <pdx-row items="center" justify="between">
+                                    <pdx-stack gap="2xs" grow>
+                                        <span class="pdx-txt-body">Webcam 4K</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">Electronics</span>
+                                    </pdx-stack>
+                                    <pdx-stack gap="2xs" items="end">
+                                        <span class="pdx-txt-body">65 sold</span>
+                                        <span class="pdx-txt-caption pdx-ink-muted">$5,850</span>
+                                    </pdx-stack>
+                                </pdx-row>
+                            </pdx-stack>
+                        </pdx-stack>
+                    </div>
+
+                </pdx-grid>
+
+            </pdx-stack>
+        </main>
+
+    </pdx-split>
+</body>
+</html>

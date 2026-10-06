@@ -1,0 +1,165 @@
+<template>
+  <section class="page" data-test="dashboard">
+    <h1 class="pdx-txt-title" data-test="title">{{ $t('dashboard.title') }}</h1>
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('dashboard.intro') }}</p>
+
+    <!-- ─── The counts ──────────────────────────────────────────────────────────────────
+         Each one is the way into the list it counts, filtered on it: a count you cannot open is a
+         number to take on trust. The tile is a block and the link fills it, as the ticket's
+         section menu does — `<pdx-link>` has no box of its own. -->
+    <div class="kpis" role="list" :aria-label="$t('dashboard.kpis')" data-test="kpis">
+      @for (kpis as k; track k.key) {
+        <div class="kpi pdx-surface-card" role="listitem" :data-test="'kpi-' + k.key">
+          <pdx-link :to="k.href">
+            <span class="kpi-label pdx-txt-small">{{ k.label }}</span>
+            <!-- The cascade guard: a component rule that must beat
+                 `.pdx-txt-title`, the design system's class on the same element. Measured in
+                 tests/production-build.spec.ts against the page's `h1`, which carries the class
+                 untouched. -->
+            <span class="kpi-value pdx-txt-title" data-test="kpi-value">{{ k.value }}</span>
+            <span class="kpi-hint pdx-txt-small pdx-ink-muted">{{ k.hint }}</span>
+          </pdx-link>
+        </div>
+      }
+    </div>
+
+    <!-- ─── The queue ───────────────────────────────────────────────────────────────────
+         What a desk opens the morning for: the open tickets nobody has taken, oldest first. Not
+         «my tickets»: the people who sign in are not on the tickets' roster,
+         and a guest sees this page too. -->
+    <section class="queue" data-test="queue">
+      <h2 class="pdx-txt-heading">{{ $t('dashboard.queue') }}</h2>
+      <pdx-list :items="queueItems" id-field="id" clickable @pdx-click="openTicket">
+        <slot name="empty" let:_>
+          <p class="pdx-txt-small pdx-ink-muted" data-test="queue-empty">{{ $t('dashboard.queueEmpty') }}</p>
+        </slot>
+      </pdx-list>
+    </section>
+
+    <!-- ─── The load ────────────────────────────────────────────────────────────────────
+         Behind a `@defer (viewport)`, as the ticket's history is: the charts are below the fold
+         and their chunk is not the first screen's (dashboard.spec.ts watches the network). -->
+    <section class="charts" data-test="charts">
+      @defer (viewport) {
+        <div class="chart pdx-surface-card">
+          <h2 class="pdx-txt-heading">{{ $t('dashboard.byStatus') }}</h2>
+          <!-- The reference's doughnut. Its legend lists the slices, not the one series, so each
+               slice is named. -->
+          <pdx-chart type="doughnut" :data="statusSeries" x-field="label" y-field="count" :series-names="$t('dashboard.count')" height="240px" data-test="chart-status"></pdx-chart>
+        </div>
+        <div class="chart pdx-surface-card">
+          <h2 class="pdx-txt-heading">{{ $t('dashboard.byPriority') }}</h2>
+          <pdx-chart type="bar" :data="prioritySeries" x-field="label" y-field="count" :series-names="$t('dashboard.count')" :legend="false" height="240px" data-test="chart-priority"></pdx-chart>
+        </div>
+      } @placeholder {
+        <div class="skeleton pdx-txt-small pdx-ink-muted" data-test="chart-placeholder">{{ $t('dashboard.loadingChart') }}</div>
+      }
+    </section>
+  </section>
+</template>
+
+<script setup>
+@page '/';
+@title $t('dashboard.title');
+
+// The desk's morning view: the counts, the queue, the load. It also carries the production build's
+// claims: the component and the list are the queue's `pdx-list`, the reactivity is the counts
+// following a colleague's ticket, the cascade guard is the KPI value.
+import { navigate } from '@pdxui/router';
+import { registerDemo } from '../demo';
+
+// The server's answer, ASKED FOR after the first paint, and again on every event from the feed: a
+// colleague's ticket moves the counts without a reload.
+//
+// Asked for, not imported: this is the landing route, preloaded with the entry, and a static import
+// of `data/tickets` brings the whole simulated server — the store, its filtering and paging, the
+// live feed — into the bytes before the first paint: blocking 74.3 → 78.9 KB, and the shared chunk
+// it makes is named `tickets-*`, which `first-paint-waves.spec.ts` reads, rightly, as a route the
+// visitor has not asked for. A real dashboard fetches its numbers; so does this one.
+let summary = $signal(null);
+let server = null;
+
+onMount(() => {
+  let stop = () => {};
+  let gone = false;
+  Promise.all([import('../data/tickets'), import('../data/live')]).then(([tickets, live]) => {
+    if (gone) return;
+    server = { tickets, live };
+    summary = tickets.ticketSummary();
+    stop = live.connectTicketEvents(() => { summary = tickets.ticketSummary(); });
+  });
+  onDestroy(() => { gone = true; stop(); });
+});
+
+// A signal declared and never read anywhere. It is here on purpose: the production compiler claims
+// "semantic dead code elimination (a signal never read → removed)", and claims are measured in this
+// package, not believed. See tests/compiler-claims.spec.ts.
+// ⚠️ NOT prefixed with an underscore, and that is the point. The compiler suggests `_name` to
+// suppress PDX_UNUSED_REACTIVE, and here that suggestion is a trap: measured, a prefixed signal is
+// not EMITTED at all, so the bundler would have nothing to eliminate and
+// compiler-claims.spec.ts would pass while proving nothing. The warning is correct and this page
+// wants it, so it is written down in tests/page-warnings.spec.ts instead.
+let neverReadByAnything = $signal('pdx-dead-signal-marker');
+
+// Until the answer arrives a count is a dash, not a zero: «0 open» is a claim, «—» is a wait.
+const kpis = $derived([
+  { key: 'open', href: '/tickets?status=open', value: summary?.byStatus.open },
+  { key: 'waiting', href: '/tickets?status=waiting', value: summary?.byStatus.waiting },
+  { key: 'closed', href: '/tickets?status=closed', value: summary?.byStatus.closed },
+  // The same set as the queue below, so the number and the list it opens agree.
+  { key: 'unassigned', href: '/tickets?status=open&assignee=none', value: summary?.unassigned },
+].map(k => ({
+  ...k, value: k.value ?? '—',
+  label: $t('dashboard.kpi.' + k.key), hint: $t('dashboard.kpiHint.' + k.key),
+})));
+
+const queueItems = $derived((summary?.queue ?? []).map(t => ({
+  id: t.id,
+  label: $t('dashboard.queueItem', { reference: t.reference, subject: t.subject, customer: t.customer }),
+})));
+
+const statusSeries = $derived(['open', 'waiting', 'closed'].map(s => ({
+  label: $t('dashboard.status.' + s), count: summary?.byStatus[s] ?? 0,
+})));
+
+const prioritySeries = $derived(['high', 'normal', 'low'].map(p => ({
+  label: $t('dashboard.priority.' + p), count: summary?.byPriority[p] ?? 0,
+})));
+
+function openTicket(e) {
+  navigate('/tickets/' + e.detail.id);
+}
+
+// The simulated server's knobs, in the Demo panel: what makes the counts move.
+onMount(() => onDestroy(registerDemo([
+  { test: 'push-raise', label: 'dashboard.demo.raise', group: 'dashboard.demo.colleague',
+    run: () => server?.live.colleagueRaisesTicket('Raised from another desk') },
+  { test: 'push-close', label: 'dashboard.demo.close', group: 'dashboard.demo.colleague',
+    run: () => { const t = summary?.queue[0]; if (t) server?.live.colleagueClosesTicket(t.id); } },
+])));
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--pdx-space-md); }
+  .kpi { display: block; padding: 0; }
+  /* The link IS the tile: the anchor gets the box, the `<pdx-link>` host has none. */
+  .kpi a {
+    display: flex; flex-direction: column; gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    color: inherit; text-decoration: none; border-radius: inherit;
+  }
+  .kpi a:hover { background: var(--pdx-color-inset); }
+  .kpi a:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: 2px; }
+  .kpi-label { color: var(--pdx-color-muted); font-weight: 600; }
+  /* Contested on purpose, and a style anyone would want: a count is read from across the room.
+     `.pdx-txt-title` declares `font-size` too — this rule has to win. */
+  .kpi-value { font-size: 2.25rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+  .queue { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+
+  .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--pdx-space-md); }
+  .chart { display: flex; flex-direction: column; gap: var(--pdx-space-sm); padding: var(--pdx-space-md) var(--pdx-space-lg); }
+  .skeleton { padding: var(--pdx-space-lg); }
+</style>

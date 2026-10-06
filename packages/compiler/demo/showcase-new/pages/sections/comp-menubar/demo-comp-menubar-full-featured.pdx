@@ -1,0 +1,128 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Full-Featured: Icons, Shortcuts, Checkbox, Radio, Submenus</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Edit menu has icons + shortcuts. View menu has checkbox items. Format has radio groups. Insert has nested submenus.
+    </p>
+
+    <div class="demo-box">
+      <pdx-menubar :items="fullMenubar" @pdx-select="onSelect" @pdx-check="onCheck"></pdx-menubar>
+      <div class="event-log pdx-txt-mono pdx-txt-small" id="menubar-event-log">{{ menubarLog }}</div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-menubar :items="fullMenubar" @pdx-select="onSelect" @pdx-check="onCheck"&gt;&lt;/pdx-menubar&gt;
+
+// Items support: icon, shortcut, type: 'checkbox'|'radio'|'submenu'|'separator'|'label'
+// { key: 'undo', label: 'Undo', icon: 'undo', shortcut: 'Ctrl+Z' }
+// { key: 'sidebar', label: 'Sidebar', type: 'checkbox', checked: true }
+// { key: 'sm', label: 'Small', type: 'radio', radioGroup: 'size' }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const fullMenubar = [
+  {
+    key: 'file', label: 'File',
+    children: [
+      { key: 'new', label: 'New File', icon: 'file', shortcut: 'Ctrl+N' },
+      { key: 'open', label: 'Open...', icon: 'folder', shortcut: 'Ctrl+O' },
+      { key: 'save', label: 'Save', icon: 'save', shortcut: 'Ctrl+S' },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'recent', label: 'Recent Files', type: 'submenu', children: [
+        { key: 'r1', label: 'project.ts' },
+        { key: 'r2', label: 'styles.css' },
+        { key: 'r3', label: 'config.json' },
+      ]},
+      { key: 'sep2', label: '', type: 'separator' },
+      { key: 'exit', label: 'Exit' },
+    ]
+  },
+  {
+    key: 'edit', label: 'Edit',
+    children: [
+      { key: 'undo', label: 'Undo', icon: 'undo', shortcut: 'Ctrl+Z' },
+      { key: 'redo', label: 'Redo', icon: 'redo', shortcut: 'Ctrl+Y' },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'cut', label: 'Cut', icon: 'copy', shortcut: 'Ctrl+X' },
+      { key: 'copy', label: 'Copy', icon: 'clipboard', shortcut: 'Ctrl+C' },
+      { key: 'paste', label: 'Paste', icon: 'clipboard', shortcut: 'Ctrl+V' },
+      { key: 'sep2', label: '', type: 'separator' },
+      { key: 'find', label: 'Find & Replace', icon: 'search', shortcut: 'Ctrl+H' },
+      { key: 'sep3', label: '', type: 'separator' },
+      { key: 'selectall', label: 'Select All', shortcut: 'Ctrl+A' },
+    ]
+  },
+  {
+    key: 'view', label: 'View',
+    children: [
+      { key: 'lbl', label: 'Panels', type: 'label' },
+      { key: 'sidebar', label: 'Sidebar', type: 'checkbox', checked: true },
+      { key: 'minimap', label: 'Minimap', type: 'checkbox', checked: false },
+      { key: 'statusbar', label: 'Status Bar', type: 'checkbox', checked: true },
+      { key: 'terminal', label: 'Terminal', type: 'checkbox', checked: false },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'zoom-in', label: 'Zoom In', shortcut: 'Ctrl+=' },
+      { key: 'zoom-out', label: 'Zoom Out', shortcut: 'Ctrl+-' },
+      { key: 'zoom-reset', label: 'Reset Zoom', shortcut: 'Ctrl+0' },
+    ]
+  },
+  {
+    key: 'format', label: 'Format',
+    children: [
+      { key: 'lbl1', label: 'Style', type: 'label' },
+      { key: 'bold', label: 'Bold', type: 'checkbox', checked: false, shortcut: 'Ctrl+B' },
+      { key: 'italic', label: 'Italic', type: 'checkbox', checked: false, shortcut: 'Ctrl+I' },
+      { key: 'underline', label: 'Underline', type: 'checkbox', checked: false, shortcut: 'Ctrl+U' },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'lbl2', label: 'Text Size', type: 'label' },
+      { key: 'sm', label: 'Small', type: 'radio', radioGroup: 'size' },
+      { key: 'md', label: 'Medium', type: 'radio', radioGroup: 'size', checked: true },
+      { key: 'lg', label: 'Large', type: 'radio', radioGroup: 'size' },
+    ]
+  },
+  {
+    key: 'insert', label: 'Insert',
+    children: [
+      { key: 'image', label: 'Image' },
+      { key: 'table', label: 'Table' },
+      { key: 'link', label: 'Link', shortcut: 'Ctrl+K' },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'shapes', label: 'Shapes', type: 'submenu', children: [
+        { key: 'rect', label: 'Rectangle' },
+        { key: 'circle', label: 'Circle' },
+        { key: 'triangle', label: 'Triangle' },
+        { key: 'line', label: 'Line' },
+        { key: 'arrow', label: 'Arrow' },
+      ]},
+      { key: 'charts', label: 'Charts', type: 'submenu', children: [
+        { key: 'bar', label: 'Bar Chart' },
+        { key: 'line-chart', label: 'Line Chart' },
+        { key: 'pie', label: 'Pie Chart' },
+        { key: 'scatter', label: 'Scatter Plot' },
+      ]},
+      { key: 'sep2', label: '', type: 'separator' },
+      { key: 'delete', label: 'Delete Selection', danger: true },
+    ]
+  },
+];
+
+let menubarLog = $signal('Click a menu item...');
+
+function onSelect(e) {
+  menubarLog = 'pdx-select: ' + e.detail.key;
+}
+
+function onCheck(e) {
+  menubarLog = 'pdx-check: ' + e.detail.key + ' = ' + e.detail.checked;
+}
+</script>
+
+<style scoped>
+.event-log {
+  padding: var(--pdx-space-sm) var(--pdx-space-md);
+  background: var(--pdx-color-inset);
+  border-top: 1px solid var(--pdx-color-border);
+}
+</style>

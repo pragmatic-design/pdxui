@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Healthy Content — No Error</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      When content renders successfully, the catch block is never shown.
+    </p>
+    <div class="demo-box">
+      @try {
+        <div class="demo-widget">
+          <p>Widget loaded successfully.</p>
+          <p class="pdx-txt-small pdx-ink-muted">No error here — the catch block is invisible.</p>
+        </div>
+      } @catch (err) {
+        <div class="pdx-error-fallback" role="alert">
+          <div class="pdx-error-icon">&#9888;</div>
+          <div class="pdx-error-msg">{{ err.message }}</div>
+        </div>
+      }
+    </div>
+  </section>
+</template>

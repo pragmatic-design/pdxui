@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Dashboard Grid</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Statistics in a real dashboard context with card borders.</p>
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <pdx-statistic icon="dollar-sign" title="Total Revenue" prefix="$" value="284500" :precision="0" group-separator="," trend="up" trend-value="+18.2%"></pdx-statistic>
+      </div>
+      <div class="dashboard-card">
+        <pdx-statistic icon="users" title="New Customers" value="1,429" trend="up" trend-value="+7.4%"></pdx-statistic>
+      </div>
+      <div class="dashboard-card">
+        <pdx-statistic icon="shopping-cart" title="Orders" value="3,672" trend="down" trend-value="-2.1%"></pdx-statistic>
+      </div>
+      <div class="dashboard-card">
+        <pdx-statistic icon="activity" title="Avg. Session" value="4.8" suffix="min" trend="flat" trend-value="+0.1%"></pdx-statistic>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.dashboard-card {
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  padding: var(--pdx-space-lg);
+  background: var(--pdx-color-bg);
+}
+</style>

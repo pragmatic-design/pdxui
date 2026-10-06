@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact, a Bar, the Chevron at the End</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>size="sm"</code> makes a dense sidebar's menu: smaller type, icons, chevrons and rows.
+      <code>indicator="border"</code> marks the current entry with a bar on its start edge.
+      <code>chevron="end"</code> moves a group's chevron to the end of its row, so its icon stays in the column.
+    </p>
+    <div class="demo-row">
+      <div class="demo-sidebar">
+        <pdx-nav-menu :items="nestedItems" activekey="users"></pdx-nav-menu>
+      </div>
+      <div class="demo-sidebar">
+        <pdx-nav-menu :items="nestedItems" activekey="users" size="sm" indicator="border" chevron="end"></pdx-nav-menu>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-nav-menu :items="items" activekey="users" size="sm" indicator="border" chevron="end"&gt;&lt;/pdx-nav-menu&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { nestedItems } from './state.pdx';
+</script>

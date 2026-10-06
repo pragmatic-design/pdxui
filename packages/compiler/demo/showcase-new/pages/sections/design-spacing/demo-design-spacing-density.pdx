@@ -1,0 +1,73 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Density</h2>
+    <p class="pdx-txt-small pdx-ink-muted">All spacing tokens are multiplied by <code>--pdx-density-factor</code>. Set via <code>pdx-density</code> attribute on <code>&lt;html&gt;</code> or any container.</p>
+
+    <div class="density-demo">
+      <div class="density-card" style="--pdx-density-factor:0.75">
+        <span class="pdx-txt-label pdx-ink-muted">COMPACT (0.75x)</span>
+        <div class="density-sample">
+          <div class="density-item">Item 1</div>
+          <div class="density-item">Item 2</div>
+          <div class="density-item">Item 3</div>
+        </div>
+      </div>
+      <div class="density-card">
+        <span class="pdx-txt-label pdx-ink-muted">NORMAL (1x)</span>
+        <div class="density-sample">
+          <div class="density-item">Item 1</div>
+          <div class="density-item">Item 2</div>
+          <div class="density-item">Item 3</div>
+        </div>
+      </div>
+      <div class="density-card" style="--pdx-density-factor:1.25">
+        <span class="pdx-txt-label pdx-ink-muted">COMFORT (1.25x)</span>
+        <div class="density-sample">
+          <div class="density-item">Item 1</div>
+          <div class="density-item">Item 2</div>
+          <div class="density-item">Item 3</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;html pdx-density="compact"&gt;  &lt;!-- 0.75x --&gt;
+&lt;html pdx-density="normal"&gt;   &lt;!-- 1x (default) --&gt;
+&lt;html pdx-density="comfort"&gt;  &lt;!-- 1.25x --&gt;
+
+/* Or on any container for local density: */
+&lt;div style="--pdx-density-factor: 0.75"&gt;
+  Compact section
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Density */
+  .density-demo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+  .density-card {
+    padding: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+  }
+  .density-sample {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    margin-top: var(--pdx-space-sm);
+  }
+  .density-item {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    font-size: var(--pdx-text-sm);
+  }
+</style>

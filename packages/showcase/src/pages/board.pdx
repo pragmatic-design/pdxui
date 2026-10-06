@@ -1,0 +1,253 @@
+<template>
+  <section class="page" data-test="board">
+    <h1 class="pdx-txt-title">{{ $t('board.title') }}</h1>
+    <!-- For the reader of the source: every move is shown first and told to the server
+         afterwards — optimistic, and put back if the server refuses. -->
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('board.intro') }}</p>
+
+    <div class="toolbar">
+      <span class="pdx-txt-small pdx-ink-muted" :show="lifted !== null" role="status" data-test="lifted">{{ $t('board.lifted', { reference: liftedReference }) }}</span>
+    </div>
+
+    <!-- One `:ref` on the whole board, not one per card: `@for` renders the cards and a ref inside
+         it would be a single binding overwritten by each row. The drag is armed per card from
+         `armCards()`, which walks what `@for` produced. -->
+    <div class="columns" :ref="boardEl" data-test="columns">
+      @for (columns as column; track column.status) {
+        <section class="column" :data-status="column.status" :data-test="'column-' + column.status">
+          <h2 class="pdx-txt-heading">{{ column.label }}</h2>
+          <span class="pdx-txt-small pdx-ink-muted">{{ $t('board.count', { count: column.cards.length }) }}</span>
+
+          <!-- `@move` is what makes the cards that shift MOVE rather than repaint: the list is
+               keyed by id, so a card that changes column keeps its element and animates to its
+               new place. -->
+          <ul class="cards">
+            @for (column.cards as card; track card.id) @move(160) {
+              <li class="card" :data-id="card.id" :data-test="'card-' + card.reference">
+                <span class="pdx-txt-small pdx-ink-muted">{{ card.reference }}</span>
+                <span class="pdx-txt-body">{{ card.subject }}</span>
+                <!-- The keyboard path is a real button, because a board that only works with a
+                     mouse is not shippable. Space/Enter lifts, arrows move, Escape cancels. -->
+                <button class="grab" type="button"
+                  :aria-label="$t('board.grab', { reference: card.reference })"
+                  aria-roledescription="draggable"
+                  :data-card="card.id"
+                  @keydown="onGrabKey($event, card)"
+                  data-test="grab">⠿</button>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" data-test="hint">{{ $t('board.hint') }}</p>
+    <!-- Rule 3's host. On the SCREEN, not in the shell: the shell is the entry chunk, and
+         a toast answers an action that has not happened on the first paint. -->
+    <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
+  </section>
+</template>
+
+<script setup>
+@page '/board';
+@title $t('board.title');
+
+import { useSortable } from '@pdxui/core';
+import { cards, applyMove, restore, persistMove, refuseNextMove } from '../data/board';
+import { registerDemo } from '../demo';
+// Created from JS, so the compiler cannot auto-import it from a tag; the answers use it.
+import { toast } from '@pdxui/ui/toast';
+import { createAnswer } from '../data/answer';
+
+const STATUSES = ['open', 'waiting', 'closed'];
+
+/** One column's cards, in the order the server put them. The sortable's indices are into this. */
+function cardsOf(status) {
+  return cards().filter(c => c.status === status).sort((a, b) => a.rank - b.rank);
+}
+
+let boardEl = $signal(null);
+let lifted = $signal(null);
+const liftedReference = $derived(lifted ? lifted.reference : '');
+
+const columns = $derived(STATUSES.map(status => ({
+  status,
+  label: $t('board.status.' + status),
+  cards: cardsOf(status),
+})));
+
+// ─── The move, optimistic, with a visible rollback ─────────────────────────────
+
+/**
+ * Show the move NOW and tell the server afterwards; put the board back exactly as it was if it
+ * refuses.
+ *
+ * `applyMove` returns the snapshot it replaced, so the rollback is a RESTORE and not a second
+ * move: computing the inverse of a reorder is how a board ends up with two cards at rank 3.
+ */
+async function move(id, to, toIndex) {
+  answer.clearRefusal();
+  const card = cards().find(c => c.id === id);
+  if (!card) return;
+  const from = card.status;
+  const snapshot = applyMove(id, to, toIndex);
+  try {
+    await persistMove({ id: id, from: from, to: to, toIndex: toIndex });
+  } catch (err) {
+    restore(snapshot);
+    answer.refused(String(err?.message ?? err));
+  }
+}
+
+/** Rule 3 — refused: a toast in view that stays until it is dismissed, one at a time; the next
+ *  move takes the old one away. The lists' answer, written once. */
+const answer = createAnswer(toast);
+
+// ─── Pointer ───────────────────────────────────────────────────────────────────
+
+// One disposer per armed column, keyed by the element: `@for` reuses elements it already
+// rendered, so arming is idempotent and only the elements that went away are disposed.
+const armed = new Map();
+
+/**
+ * Arm every column as one sortable list, and all three as one group.
+ *
+ * Not `useDrag` on each card plus `useDropZone` on each column: that moves the card with the
+ * pointer and lights the column up, but cannot show WHERE the card will land, because neither
+ * primitive knows the column is a list — the weakest of the destination feedbacks.
+ * `group: 'board'` makes the three columns
+ * one destination: the space opens in the column under the pointer and closes in the one the card
+ * came from.
+ *
+ * In a `requestAnimationFrame` after reading the signal, which is the documented shape for
+ * imperative DOM in a setup: read the signal synchronously so the effect subscribes, then touch
+ * the DOM once the template has rendered it.
+ */
+function armColumns() {
+  const el = boardEl;
+  if (!el) return;
+
+  for (const [node, dispose] of armed) {
+    if (!node.isConnected) { dispose(); armed.delete(node); }
+  }
+
+  for (const columnEl of el.querySelectorAll('.column')) {
+    if (armed.has(columnEl)) continue;
+    const status = columnEl.dataset.status;
+    const sortable = useSortable(() => columnEl, {
+      group: 'board',
+      // The container is the whole column — its heading is part of the drop target, so a card
+      // released over the title lands in the column rather than nowhere. `itemSelector` is what
+      // keeps the heading out of the rows.
+      itemSelector: '.card',
+      items: () => cardsOf(status),
+      // The board owns its keyboard reorder: a real button on every card, and the lift is
+      // announced from `lifted`. Two keyboard paths over one list lift the same card twice.
+      a11y: false,
+      onReorder: (from, to) => {
+        const card = cardsOf(status)[from];
+        if (card) void move(card.id, status, to);
+      },
+      // Only the RECEIVER acts. `onRemove` fires on the source right after, and a second `move`
+      // would ask the server to move a card that has already moved.
+      onReceive: (card, _fromIndex, toIndex) => { void move(card.id, status, toIndex); },
+    });
+    armed.set(columnEl, sortable.dispose);
+  }
+}
+
+$effect(() => {
+  // Read FIRST, so this effect subscribes to the board's contents; the DOM work goes in the frame
+  // after, when the template has rendered what was read.
+  void columns;
+  requestAnimationFrame(armColumns);
+});
+
+onDestroy(() => {
+  for (const dispose of armed.values()) dispose();
+  armed.clear();
+});
+
+// ─── Keyboard ──────────────────────────────────────────────────────────────────
+
+/**
+ * The same operation without a pointer: Space or Enter lifts, Left/Right change column, Up/Down
+ * change position, Space or Enter drops, Escape cancels.
+ *
+ * `lifted` holds the card, so the announcement and the moves read from one place.
+ */
+function onGrabKey(e, card) {
+  const key = e.key;
+  if (key === ' ' || key === 'Enter') {
+    e.preventDefault();
+    lifted = lifted && lifted.id === card.id ? null : card;
+    return;
+  }
+  if (key === 'Escape' && lifted) { e.preventDefault(); lifted = null; return; }
+  if (!lifted || lifted.id !== card.id) return;
+
+  const current = cards().find(c => c.id === card.id);
+  if (!current) return;
+  const column = STATUSES.indexOf(current.status);
+  const within = columns[column].cards.findIndex(c => c.id === card.id);
+
+  if (key === 'ArrowRight' || key === 'ArrowLeft') {
+    e.preventDefault();
+    const target = STATUSES[column + (key === 'ArrowRight' ? 1 : -1)];
+    if (target) void move(card.id, target, 0);
+    return;
+  }
+  if (key === 'ArrowUp' || key === 'ArrowDown') {
+    e.preventDefault();
+    void move(card.id, current.status, within + (key === 'ArrowDown' ? 1 : -1));
+  }
+}
+
+function armRefusal() { refuseNextMove(); }
+
+// The simulated server's knob, in the Demo panel of the service bar.
+onMount(() => onDestroy(registerDemo([
+  { test: 'refuse-next', label: 'board.refuseNext', run: armRefusal },
+])));
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+
+  .toolbar { display: flex; align-items: center; gap: var(--pdx-space-md); min-height: 2rem; }
+
+  .columns { display: flex; gap: var(--pdx-space-md); align-items: flex-start; }
+
+  .column {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-md);
+    background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md);
+    min-height: 12rem;
+  }
+
+  .cards { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+
+  .card {
+    /* Without this a real pointer drag selects the card's text, the browser starts its OWN
+       drag-and-drop with that selection, and dropping it navigates the page away — in a spec,
+       "Execution context was destroyed". `useDrag` does not suppress it. */
+    user-select: none; -webkit-user-select: none;
+    display: flex; flex-direction: column; gap: var(--pdx-space-3xs);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    position: relative;
+  }
+
+  .grab {
+    position: absolute; top: var(--pdx-space-2xs); right: var(--pdx-space-2xs);
+    background: none; border: 0; cursor: grab; color: var(--pdx-color-muted);
+    font-size: 1rem; line-height: 1; padding: var(--pdx-space-3xs);
+  }
+
+  /* One column per row on a phone: three columns of 120px are three columns nobody can drop into. */
+  @media (max-width: 640px) {
+    .columns { flex-direction: column; }
+  }
+</style>

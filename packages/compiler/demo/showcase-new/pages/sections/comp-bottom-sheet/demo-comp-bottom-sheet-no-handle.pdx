@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">No Handle</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Handle hidden — close via backdrop, Escape, or close button only. Fixed height.</p>
+    <pdx-button variant="outline" @click="openNoHandle">Open Without Handle</pdx-button>
+
+    <pdx-bottom-sheet :open="noHandleOpen" :showHandle="noHandle" showClose :closeOnSwipeDown="noSwipe" label="Fixed sheet" @pdx-close="closeNoHandle">
+      <span slot="header"><strong>Fixed Sheet</strong></span>
+      <p>No drag handle — this sheet stays at its initial detent.</p>
+      <p>Use the close button, backdrop click, or Escape to dismiss.</p>
+    </pdx-bottom-sheet>
+  </section>
+</template>
+
+<script setup>
+// No handle
+let noHandleOpen = $signal(false);
+
+let noHandle = $signal(false);
+let noSwipe = $signal(false);
+
+function openNoHandle() { noHandleOpen = true; }
+function closeNoHandle() { noHandleOpen = false; }
+</script>

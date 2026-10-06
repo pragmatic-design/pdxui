@@ -1,0 +1,131 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Spacing & Sizing</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Spacing tokens, border radius, shadows, max-widths, and density scaling.
+      <strong>CSS only</strong> — all values are CSS custom properties, density-aware via <code>--pdx-density-factor</code>.
+    </p>
+
+    <!-- ═══ Spacing Scale ═══ -->
+    <pdx-demo-design-spacing-scale class="demo-section"></pdx-demo-design-spacing-scale>
+
+    <!-- ═══ Density ═══ -->
+    <pdx-demo-design-spacing-density class="demo-section"></pdx-demo-design-spacing-density>
+
+    <!-- ═══ Border Radius ═══ -->
+    <pdx-demo-design-spacing-radius class="demo-section"></pdx-demo-design-spacing-radius>
+
+    <!-- ═══ Shadows ═══ -->
+    <pdx-demo-design-spacing-shadows class="demo-section"></pdx-demo-design-spacing-shadows>
+
+    <!-- ═══ Max-Width ═══ -->
+    <pdx-demo-design-spacing-max-width class="demo-section"></pdx-demo-design-spacing-max-width>
+
+    <!-- ═══ Motion ═══ -->
+    <pdx-demo-design-spacing-motion class="demo-section"></pdx-demo-design-spacing-motion>
+
+    <!-- ═══ Z-Index ═══ -->
+    <pdx-demo-design-spacing-z-index class="demo-section"></pdx-demo-design-spacing-z-index>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Token</span><span>Scale</span><span>Values</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-space-*</code><span>7 steps</span><span>2xs(4) xs(8) sm(12) md(16) lg(24) xl(40) 2xl(64) px</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-radius-*</code><span>5 steps</span><span>sm(4) md(8) lg(12) xl(16) full(pill) px</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-shadow-*</code><span>4 steps</span><span>sm md lg xl — light-dark adaptive</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-max-*</code><span>6 steps</span><span>xs(320) sm(480) md(768) lg(1024) xl(1280) 2xl(1536) px</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-duration-*</code><span>3 steps</span><span>fast(100) base(200) slow(350) ms</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-ease-*</code><span>3 curves</span><span>standard, decelerate, accelerate</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-z-*</code><span>5 layers</span><span>dropdown(100) sticky(200) overlay(300) modal(400) toast(500)</span>
+        </div>
+        <div class="opt-row">
+          <code>--pdx-density-factor</code><span>3 modes</span><span>compact(0.75) normal(1) comfort(1.25)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/spacing';
+@title 'Spacing & Sizing';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  /* Source block */
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

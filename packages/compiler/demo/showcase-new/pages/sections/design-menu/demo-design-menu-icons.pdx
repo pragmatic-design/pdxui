@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Prepend an icon span for visual context.</p>
+
+    <div class="demo-menu-container">
+      <div class="pdx-menu">
+        <button class="pdx-menu-item"><span class="pdx-menu-icon">&#9998;</span> Edit</button>
+        <button class="pdx-menu-item"><span class="pdx-menu-icon">&#128203;</span> Duplicate</button>
+        <button class="pdx-menu-item"><span class="pdx-menu-icon">&#128194;</span> Archive</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-menu"&gt;
+  &lt;button class="pdx-menu-item"&gt;
+    &lt;span class="pdx-menu-icon"&gt;&amp;#9998;&lt;/span&gt; Edit
+  &lt;/button&gt;
+  &lt;button class="pdx-menu-item"&gt;
+    &lt;span class="pdx-menu-icon"&gt;&amp;#128203;&lt;/span&gt; Duplicate
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

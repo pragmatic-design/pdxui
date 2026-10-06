@@ -1,0 +1,154 @@
+<template>
+  <section data-test="pos-placement">
+    <h3>Placements + autoUpdate</h3>
+    <p class="desc">Click a placement. Scroll inside the dashed area to move the Reference near the edges — flip swaps side, shift slides to stay visible. autoUpdate keeps the tooltip attached.</p>
+    <div class="placement-grid">
+      @for (placements as p; track p) {
+        @if (p) {
+          <button @click="setPlacement(p)" :class="currentPlacement === p ? 'active' : ''" class="pdx-ghost" data-test="placement-btn">{{ p }}</button>
+        } @else {
+          <span></span>
+        }
+      }
+    </div>
+
+    <div class="arena" data-test="arena" :ref="arenaEl">
+      <div class="arena-scroll" :ref="arenaScrollEl">
+        <div class="arena-content">
+          <div class="spacer"></div>
+          <div class="ref-box" :ref="refBoxRef" data-test="reference">Reference</div>
+          <div class="spacer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="log" data-test="pos-log">{{ posLog }}</div>
+  </section>
+
+  <!-- Middleware toggles: they rerun the placement above, with its refs and its state, so the two
+       sections are one component. -->
+  <section data-test="pos-middleware">
+    <h3>Middleware Pipeline</h3>
+    <p class="desc">Offset adds distance. Flip swaps side when near viewport edge (scroll down so Reference is near bottom). Shift slides along axis to stay visible.</p>
+    <div class="row">
+      <label><input type="checkbox" checked @change="toggleOffset"> offset(8)</label>
+      <label><input type="checkbox" checked @change="toggleFlip"> flip()</label>
+      <label><input type="checkbox" checked @change="toggleShift"> shift()</label>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { computeFloatingPosition, autoUpdate, offset, flip, shift, hideMiddleware, onMount, onDestroy } from '@pdxui/core';
+
+const placements = [
+    'top-start', 'top', 'top-end', null,
+    'left-start', null, null, 'right-start',
+    'left', null, null, 'right',
+    'left-end', null, null, 'right-end',
+    null, 'bottom-start', 'bottom', 'bottom-end',
+];
+
+let currentPlacement = $signal('bottom');
+let posLog = $signal('Click a placement');
+let useOffset = $signal(true);
+let useFlip = $signal(true);
+let useShift = $signal(true);
+let refBoxRef = $signal(null);
+let arenaEl = $signal(null);
+let arenaScrollEl = $signal(null);
+
+let floatEl = null;
+let autoUpdateDispose = null;
+
+function ensureFloatEl() {
+    if (floatEl) return floatEl;
+    floatEl = document.createElement('div');
+    floatEl.style.cssText = 'position:fixed;background:#1d1d2e;color:white;padding:6px 12px;border-radius:6px;font-size:0.8rem;z-index:100;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+    floatEl.textContent = 'Floating';
+    document.body.appendChild(floatEl);
+    return floatEl;
+}
+
+function setPlacement(p) {
+    currentPlacement = p;
+    startAutoUpdate();
+}
+
+function toggleOffset(e) { useOffset = e.target.checked; updatePosition(); }
+function toggleFlip(e) { useFlip = e.target.checked; updatePosition(); }
+function toggleShift(e) { useShift = e.target.checked; updatePosition(); }
+
+function buildMiddleware() {
+    // Use the arena's visible area as boundary for flip/shift —
+    // same pattern a dropdown would use with its scroll container.
+    // Order: offset → flip → shift → hide (hide checks AFTER flip corrects)
+    const arena = arenaEl;
+    const mw = [];
+    if (useOffset) mw.push(offset(8));
+    if (useFlip) mw.push(flip({ boundary: arena }));
+    if (useShift) mw.push(shift({ padding: 8, boundary: arena }));
+    mw.push(hideMiddleware({ boundary: arena }));
+    return mw;
+}
+
+function updatePosition() {
+    const refEl = refBoxRef;
+    if (!refEl) return;
+    const fl = ensureFloatEl();
+
+    const result = computeFloatingPosition(refEl, fl, {
+        placement: currentPlacement,
+        middleware: buildMiddleware(),
+    });
+
+    // hide middleware sets data.hidden when reference is out of boundary
+    const hidden = result.middlewareData.hide?.hidden;
+    if (hidden) {
+        fl.style.display = 'none';
+        posLog = 'Reference out of bounds — floating hidden';
+        return;
+    }
+
+    fl.style.display = 'block';
+    fl.style.left = result.x + 'px';
+    fl.style.top = result.y + 'px';
+    posLog = 'placement: ' + result.placement + ' | x: ' + Math.round(result.x) + ' | y: ' + Math.round(result.y);
+}
+
+function startAutoUpdate() {
+    autoUpdateDispose?.();
+    const refEl = refBoxRef;
+    if (!refEl) return;
+    const fl = ensureFloatEl();
+    fl.style.display = 'block';
+    // autoUpdate calls updatePosition on scroll/resize
+    autoUpdateDispose = autoUpdate(refEl, fl, updatePosition);
+}
+
+// Center the arena scroll so Reference is visible on load
+onMount(() => {
+    requestAnimationFrame(function() {
+        var arenaScroll = arenaScrollEl;
+        if (arenaScroll) { arenaScroll.scrollTop = 190; arenaScroll.scrollLeft = 100; }
+    });
+});
+
+onDestroy(function() {
+    autoUpdateDispose?.();
+    if (floatEl) floatEl.remove();
+});
+</script>
+
+<style scoped>
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row label { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; }
+  .placement-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 12px; }
+  .placement-grid button { font-size: 0.7rem; padding: 4px; }
+  .placement-grid button.active { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+  .arena { width: 400px; height: 220px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; overflow: hidden; }
+  .arena-scroll { height: 100%; overflow: auto; }
+  .arena-content { width: 600px; min-height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .spacer { flex-shrink: 0; height: 250px; width: 100%; }
+  .ref-box { flex-shrink: 0; width: 120px; height: 48px; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+</style>

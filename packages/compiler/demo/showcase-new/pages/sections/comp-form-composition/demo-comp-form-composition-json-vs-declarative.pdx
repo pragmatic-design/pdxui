@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">5. JSON vs Declarative</h2>
+    <div class="comparison-table">
+      <div class="cmp-header"><span>Aspect</span><span>JSON Schema</span><span>Declarative Template</span></div>
+      <div class="cmp-row"><span>Best for</span><span>Backend-driven, dynamic forms</span><span>Known, static forms</span></div>
+      <div class="cmp-row"><span>Nested objects</span><span><code>type: 'group'</code></span><span><code>&lt;pdx-field-group&gt;</code></span></div>
+      <div class="cmp-row"><span>Arrays</span><span><code>type: 'list'</code></span><span><code>&lt;pdx-field-list&gt;</code></span></div>
+      <div class="cmp-row"><span>Validation</span><span><code>required: true, validators: [...]</code></span><span><code>validators: { 'path': [...] }</code></span></div>
+      <div class="cmp-row"><span>Layout</span><span>Grid columns via <code>size</code></span><span>CSS classes in template</span></div>
+      <div class="cmp-row"><span>Sections</span><span><code>sections: [...]</code></span><span><code>&lt;pdx-form-section&gt;</code></span></div>
+      <div class="cmp-row"><span>Compiler binding</span><span>N/A (runtime)</span><span>Auto (:value, @change, @blur)</span></div>
+      <div class="cmp-row"><span>Wizard</span><span><code>layout: 'wizard'</code></span><span>Manual step logic</span></div>
+      <div class="cmp-row"><span>Display modes</span><span>Planned</span><span><code>display="panel|dialog"</code></span></div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comparison-table { margin-top: var(--pdx-space-md); }
+  .cmp-header, .cmp-row { display: grid; grid-template-columns: 160px 1fr 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); }
+  .cmp-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; }
+  .cmp-row { border-bottom: 1px solid var(--pdx-color-border); }
+</style>

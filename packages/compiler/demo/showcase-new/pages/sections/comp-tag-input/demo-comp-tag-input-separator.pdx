@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Separator</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use <code>separator=";"</code> to split tags by semicolon instead of comma.
+      Type values separated by <kbd>;</kbd> to add multiple tags at once.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tag-input separator=";" placeholder="Use ; to separate..." @pdx-change="onSepChange"></pdx-tag-input>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input separator=";" placeholder="Use ; to separate..." /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useTagInputLog } from './state.pdx';
+
+// The page's event console (state.pdx.ts).
+const tagInputLog = useTagInputLog();
+function addLog(text) { tagInputLog.addLog(text); }
+
+// Custom Separator
+function onSepChange(e) {
+    const tags = e.detail ? e.detail.tags : [];
+    addLog('separator change: [' + tags.join('; ') + ']');
+}
+</script>

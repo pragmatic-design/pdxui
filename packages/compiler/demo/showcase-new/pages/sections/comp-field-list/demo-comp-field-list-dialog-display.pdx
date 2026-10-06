@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Dialog display</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>display="dialog"</code> shows the rows as a read-only summary; a click on a row, on ✎, or on add opens
+      its fields in a dialog. Escape or <em>Done</em> closes it.
+    </p>
+    <pdx-form :form="addressForm">
+      <pdx-field-list name="addresses" label="Addresses" display="dialog" addLabel="+ Add address" :itemFields="addressFields" :itemDefault="addressDefault"></pdx-field-list>
+    </pdx-form>
+  </section>
+</template>
+
+<script setup>
+import { createForm } from '@pdxui/core';
+
+const addressFields = [
+  { name: 'label', type: 'text', label: 'Label' },
+  { name: 'city', type: 'text', label: 'City' },
+  { name: 'zip', type: 'text', label: 'ZIP' },
+];
+
+const addressDefault = { label: '', city: '', zip: '' };
+
+const addressForm = createForm({
+  initialValues: { addresses: [{ label: 'Home', city: 'London', zip: 'NW1 6XE' }, { label: 'Office', city: 'Cambridge', zip: 'CB2 1TN' }] },
+});
+</script>

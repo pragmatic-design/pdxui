@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS System Contracts</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: var(--pdx-color-bg, #fff); color: var(--pdx-color-text, #111); padding: 40px; font-family: var(--pdx-font-sans, system-ui); }
+        section { margin-bottom: 48px; }
+        section[hidden] { display: none; }
+        .card { background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md, 8px); padding: var(--pdx-space-lg, 16px); }
+        .inset { background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md, 8px); padding: var(--pdx-space-md, 12px); }
+        .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .box { display: inline-block; background: var(--pdx-color-primary); }
+    </style>
+    <script type="module">
+        import '@pdxui/design';
+        const params = new URLSearchParams(location.search);
+        const theme = params.get('theme'); const scheme = params.get('scheme'); const scenario = params.get('scenario');
+        if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+        if (scheme) document.documentElement.setAttribute('pdx-scheme', scheme);
+        if (scenario) document.querySelectorAll('section[data-scenario]').forEach(s => { s.hidden = s.getAttribute('data-scenario') !== scenario; });
+    </script>
+</head>
+<body>
+
+<!-- ═══ TYPOGRAPHY SCALE (size monotonicity + text contrast on page bg) ═══ -->
+<section data-scenario="typography">
+    <p class="pdx-txt-caption"    data-test="txt-caption">Caption — the quick brown fox</p>
+    <p class="pdx-txt-small"      data-test="txt-small">Small — the quick brown fox</p>
+    <p class="pdx-txt-body"       data-test="txt-body">Body — the quick brown fox</p>
+    <p class="pdx-txt-subheading" data-test="txt-subheading">Subheading — the quick brown fox</p>
+    <p class="pdx-txt-heading"    data-test="txt-heading">Heading — the quick brown fox</p>
+    <p class="pdx-txt-title"      data-test="txt-title">Title — the quick brown fox</p>
+</section>
+
+<!-- ═══ INK ON SURFACES (text contrast on card / inset — catches dark-on-dark) ═══ -->
+<section data-scenario="surfaces">
+    <div class="card" data-test="card">
+        <p class="pdx-txt-body"  data-test="ink-text-on-card">Primary text on a surface card.</p>
+        <p class="pdx-ink-muted" data-test="ink-muted-on-card">Muted helper text on a surface card.</p>
+    </div>
+    <div class="inset" data-test="inset" style="margin-top:16px">
+        <p class="pdx-txt-body"  data-test="ink-text-on-inset">Primary text on an inset panel.</p>
+        <p class="pdx-ink-muted" data-test="ink-muted-on-inset">Muted helper text on an inset panel.</p>
+    </div>
+</section>
+
+<!-- ═══ FLOATING PANELS (real dropdown/menu surfaces — the dark-on-dark dropdown case) ═══ -->
+<section data-scenario="panel">
+    <div class="pdx-menu" data-test="menu-panel" style="width:220px">
+        <button class="pdx-menu-item" data-test="menu-item">First option</button>
+        <button class="pdx-menu-item" data-test="menu-item-2">Second option</button>
+        <button class="pdx-menu-item" disabled data-test="menu-item-disabled">Disabled option</button>
+    </div>
+    <!-- Actual component-panel classes (each uses var(--pdx-color-surface)) with text on them. -->
+    <div class="pdx-autocomplete-dropdown" style="width:220px;padding:10px;margin-top:16px">
+        <p class="pdx-txt-body"  data-test="ac-text" style="margin:0">Autocomplete suggestion</p>
+        <p class="pdx-ink-muted" data-test="ac-muted" style="margin:4px 0 0">secondary detail</p>
+    </div>
+    <div class="pdx-tree-select-panel" style="width:220px;padding:10px;margin-top:16px">
+        <p class="pdx-txt-body" data-test="ts-text" style="margin:0">Tree node label</p>
+    </div>
+    <div class="pdx-color-panel" style="width:220px;padding:10px;margin-top:16px">
+        <p class="pdx-txt-body" data-test="cp-text" style="margin:0">Color panel text</p>
+    </div>
+    <div class="pdx-date-picker-panel" style="width:240px;padding:10px;margin-top:16px">
+        <p class="pdx-txt-body" data-test="dp-text" style="margin:0">Mon 12</p>
+    </div>
+</section>
+
+<!-- ═══ CONTROLS (input + primary button text contrast) ═══ -->
+<section data-scenario="controls">
+    <div class="row">
+        <span class="pdx-input-wrap" data-test="input-wrap" style="width:200px"><input class="pdx-input" value="Input value" data-test="input"></span>
+        <button class="pdx-btn pdx-primary" data-test="btn-primary">Primary</button>
+        <button class="pdx-btn pdx-secondary" data-test="btn-secondary">Secondary</button>
+        <button class="pdx-btn pdx-outline" data-test="btn-outline">Outline</button>
+        <button class="pdx-btn pdx-ghost" data-test="btn-ghost">Ghost</button>
+    </div>
+</section>
+
+<!-- ═══ SPACING SCALE (xs < sm < md < lg < xl box sizes) ═══ -->
+<section data-scenario="spacing">
+    <span class="box" data-test="space-xs" style="padding: var(--pdx-space-xs)"></span>
+    <span class="box" data-test="space-sm" style="padding: var(--pdx-space-sm)"></span>
+    <span class="box" data-test="space-md" style="padding: var(--pdx-space-md)"></span>
+    <span class="box" data-test="space-lg" style="padding: var(--pdx-space-lg)"></span>
+    <span class="box" data-test="space-xl" style="padding: var(--pdx-space-xl)"></span>
+</section>
+
+</body>
+</html>

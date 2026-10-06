@@ -1,0 +1,87 @@
+<template>
+  <div class="theme-picker">
+    <h2>Settings</h2>
+
+    <div class="section">
+      <h3>Theme</h3>
+      <div class="theme-row">
+        <button @click="setLight" :class="theme === 'light' ? 'active' : ''">☀️ Light</button>
+        <button @click="setDark" :class="theme === 'dark' ? 'active' : ''">🌙 Dark</button>
+        <button @click="doToggle">Toggle</button>
+      </div>
+      <div class="theme-info">Current: <code>{{ theme }}</code> (persisted)</div>
+    </div>
+
+    <div class="section">
+      <h3>Colors</h3>
+      <div class="color-row">
+        <label>Primary
+          <input type="color" :value="primary" @input="onPrimary" />
+        </label>
+        <label>Accent
+          <input type="color" :value="accent" @input="onAccent" />
+        </label>
+      </div>
+      <div class="preview" :style="previewStyle">
+        <span>{{ primary }} / {{ accent }}</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Debounced Search</h3>
+      <input type="text" :value="searchRaw" @input="onSearch" placeholder="Type to search (300ms debounce)..." class="search-input" />
+      <div class="search-info">
+        Raw: <code>{{ searchRaw }}</code> | Debounced: <code>{{ searchDebounced }}</code>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { setTheme, toggleDarkMode, currentTheme, debounced } from '@pdxui/core';
+
+@page '/settings' { preload };
+@transition 'slide-left';
+@title 'Settings — TaskMgr';
+
+const theme = $derived(currentTheme());
+
+let primary = $signal('#3949ab');
+let accent = $signal('#ff5722');
+let searchRaw = $signal('');
+
+const _debouncedSearch = debounced(() => searchRaw, 300);
+const searchDebounced = $derived(_debouncedSearch());
+
+const previewStyle = $derived(
+  `background: linear-gradient(135deg, ${primary}, ${accent}); color: white; padding: 12px; border-radius: 8px; text-align: center; font-family: monospace; font-size: 0.8rem;`
+);
+
+function setLight() { setTheme('light'); }
+function setDark() { setTheme('dark'); }
+function doToggle() { toggleDarkMode(); }
+function onPrimary(e) { primary = e.target.value; }
+function onAccent(e) { accent = e.target.value; }
+function onSearch(e) { searchRaw = e.target.value; }
+</script>
+
+<style scoped>
+  .theme-picker { background: white; border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .theme-picker h2 { font-size: 1.2rem; margin: 0 0 1rem 0; }
+  .section { margin-bottom: 16px; }
+  .section h3 { font-size: 0.9rem; margin: 0 0 8px; color: #555; }
+  .theme-row { display: flex; gap: 8px; }
+  .theme-row button { padding: 6px 14px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 0.82rem; background: #f9f9f9; }
+  .theme-row button:hover { background: #eee; }
+  .theme-row button.active { background: #3949ab; color: white; border-color: #3949ab; }
+  .theme-info { font-size: 0.75rem; color: #888; margin-top: 6px; }
+  .theme-info code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+  .color-row { display: flex; gap: 16px; margin-bottom: 10px; }
+  .color-row label { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #666; }
+  .color-row input[type="color"] { width: 36px; height: 28px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; }
+  .preview { margin-top: 8px; transition: all 0.3s ease; }
+  .search-input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; }
+  .search-input:focus { border-color: #3949ab; outline: none; }
+  .search-info { font-size: 0.75rem; color: #888; margin-top: 6px; font-family: monospace; }
+  .search-info code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+</style>

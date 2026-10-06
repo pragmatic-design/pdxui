@@ -1,0 +1,68 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Click Mode (default)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A click opens a menu; while one is open, moving onto another item switches to it. Crossing the bar with the pointer opens nothing. Default behavior.</p>
+
+    <div class="demo-box">
+      <pdx-menubar :items="basicMenubar"></pdx-menubar>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-menubar :items="menuItems"&gt;&lt;/pdx-menubar&gt;
+
+// items = [
+//   { key: 'file', label: 'File', children: [
+//     { key: 'new', label: 'New File' },
+//     { key: 'sep1', label: '', type: 'separator' },
+//     { key: 'exit', label: 'Exit' },
+//   ]},
+//   { key: 'edit', label: 'Edit', children: [...] },
+// ]</code></pre>
+    </details>
+
+    <h2 class="pdx-txt-heading section-heading" style="margin-top: var(--pdx-space-2xl)">Hover Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Menus open on hover alone. Set <code>trigger="hover"</code>.</p>
+
+    <div class="demo-box">
+      <pdx-menubar :items="basicMenubar" trigger="hover"></pdx-menubar>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-menubar :items="menuItems" trigger="hover"&gt;&lt;/pdx-menubar&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const basicMenubar = [
+  {
+    key: 'file', label: 'File',
+    children: [
+      { key: 'new', label: 'New File' },
+      { key: 'open', label: 'Open...' },
+      { key: 'save', label: 'Save' },
+      { key: 'saveas', label: 'Save As...' },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'exit', label: 'Exit' },
+    ]
+  },
+  {
+    key: 'edit', label: 'Edit',
+    children: [
+      { key: 'undo', label: 'Undo' },
+      { key: 'redo', label: 'Redo' },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'cut', label: 'Cut' },
+      { key: 'copy', label: 'Copy' },
+      { key: 'paste', label: 'Paste' },
+    ]
+  },
+  {
+    key: 'help', label: 'Help',
+    children: [
+      { key: 'docs', label: 'Documentation' },
+      { key: 'about', label: 'About' },
+    ]
+  },
+];
+</script>

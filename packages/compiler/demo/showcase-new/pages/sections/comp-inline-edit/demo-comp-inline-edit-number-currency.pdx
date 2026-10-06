@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Number & Currency</h2>
+    <div class="demo-row">
+      <span class="demo-label">Quantity:</span>
+      <pdx-inline-edit type="number" :value="42"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Price:</span>
+      <pdx-inline-edit type="currency" :value="1234.50" currency="EUR"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">USD Price:</span>
+      <pdx-inline-edit type="currency" :value="99.99" currency="USD"></pdx-inline-edit>
+    </div>
+  </section>
+</template>

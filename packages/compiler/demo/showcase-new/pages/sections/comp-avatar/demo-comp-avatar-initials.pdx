@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Initials Fallback</h2>
+    <p class="pdx-txt-small pdx-ink-muted">When no <code>src</code>, extracts initials from <code>alt</code>. Full name = first + last, single name = first 2 chars.</p>
+
+    <div class="demo-row">
+      <pdx-avatar alt="Jane Doe"></pdx-avatar>
+      <pdx-avatar alt="Alex Smith"></pdx-avatar>
+      <pdx-avatar alt="Mary Kim Lee"></pdx-avatar>
+      <pdx-avatar alt="Bob"></pdx-avatar>
+      <pdx-avatar></pdx-avatar>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-xs)">
+      JD · AS · ML · BO · ? (no alt — decorative: hidden from screen readers, with no role)
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-avatar alt="Jane Doe"&gt;&lt;/pdx-avatar&gt;
+&lt;pdx-avatar alt="Bob"&gt;&lt;/pdx-avatar&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">No Close Button</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Hide close button with <code>show-close="false"</code>. User must use footer actions.</p>
+    <pdx-button variant="outline" size="sm" @click="openNoClose">Open Required Action</pdx-button>
+    <pdx-dialog :open="noCloseOpen" title="Session Expired" size="sm" :show-close="false" :close-on-backdrop="false" :close-on-escape="false">
+      <p>Your session has expired. Please log in again to continue.</p>
+      <span slot="footer">
+        <pdx-button variant="primary" size="sm" @click="closeNoClose">Log In</pdx-button>
+      </span>
+    </pdx-dialog>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="noCloseOpen" title="Session Expired" size="sm"
+  :show-close="false" :close-on-backdrop="false" :close-on-escape="false"&gt;
+  &lt;p&gt;Your session has expired. Please log in again.&lt;/p&gt;
+  &lt;span slot="footer"&gt;
+    &lt;pdx-button variant="primary" @click="closeNoClose"&gt;Log In&lt;/pdx-button&gt;
+  &lt;/span&gt;
+&lt;/pdx-dialog&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let noCloseOpen = $signal(false);
+
+function openNoClose() { noCloseOpen = true; }
+function closeNoClose() { noCloseOpen = false; }
+</script>

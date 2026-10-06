@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Icons provide visual context for each metric.</p>
+    <div class="demo-row">
+      <pdx-statistic icon="users" title="Total Users" value="15,420" trend="up" trend-value="+5.3%"></pdx-statistic>
+      <pdx-statistic icon="dollar-sign" title="Avg. Order" prefix="$" value="67.50"></pdx-statistic>
+      <pdx-statistic icon="shopping-cart" title="Cart Items" value="3,891" trend="down" trend-value="-1.8%"></pdx-statistic>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-statistic icon="users" title="Total Users" value="15,420"
+  trend="up" trend-value="+5.3%"&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic icon="dollar-sign" title="Avg. Order" prefix="$"
+  value="67.50"&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic icon="shopping-cart" title="Cart Items" value="3,891"
+  trend="down" trend-value="-1.8%"&gt;&lt;/pdx-statistic&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,53 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Arrow keys move between items, Enter or Space activates, typing jumps to an item.</p>
+
+    <div class="demo-row">
+      <div class="menu-demo">
+        <button class="pdx-outline" size="sm" :aria-expanded="shown === 'basic' ? 'true' : 'false'" @click="show('basic')">File</button>
+        <pdx-menu :open="shown === 'basic'" :items="fileItems" @pdx-select="onSelect" @pdx-close="hide"></pdx-menu>
+      </div>
+      <span class="event-log pdx-txt-mono pdx-txt-small" id="menu-event-log">{{ menuLog }}</span>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-menu :open="shown" :items="fileItems" @pdx-select="onSelect" @pdx-close="hide"&gt;&lt;/pdx-menu&gt;
+
+// items = [
+//   { key: 'new', label: 'New File' },
+//   { key: 'sep1', label: '', type: 'separator' },
+//   { key: 'exit', label: 'Exit' },
+// ]</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useMenuDemo } from './state.pdx';
+
+// One menu open at a time across the sections, and the line every menu writes (state.pdx.ts).
+const menuDemo = useMenuDemo();
+const shown = $derived(menuDemo.shown());
+const menuLog = $derived(menuDemo.menuLog());
+function show(key) { menuDemo.show(key); }
+function hide(e) { menuDemo.hide(e); }
+function onSelect(e) { menuDemo.onSelect(e); }
+
+const fileItems = [
+  { key: 'new', label: 'New File' },
+  { key: 'open', label: 'Open...' },
+  { key: 'save', label: 'Save' },
+  { key: 'saveas', label: 'Save As...' },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'exit', label: 'Exit' },
+];
+</script>
+
+<style scoped>
+.event-log {
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+}
+</style>

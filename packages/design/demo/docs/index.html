@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Overview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="sm">
+                        <h1 class="pdx-txt-display">Pragmatic Design CSS</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Context-driven CSS framework. Agent-first, human-friendly. 100+ components, 11 themes, ~12KB.</p>
+                    </pdx-stack>
+
+                    <pdx-grid cols="3" gap="md">
+                        <a href="layout.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="layout-grid" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Layout</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">6 primitives: stack, row, grid, center, cluster, split</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="surfaces.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="layers" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Surfaces</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Card, inset, overlay, glass, interactive</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="buttons.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="mouse-pointer-click" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Buttons</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">7 variants, 3 sizes, loading, disabled</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="forms.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="text-cursor-input" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Form Controls</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Input, checkbox, radio, toggle, groups</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="typography.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="type" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Typography</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">9 roles, ink colors, links, code</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="feedback.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="bell" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Feedback</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Alerts, badges, skeleton, progress</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="data.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="table-2" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Data Display</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Tables, tabs, accordion, timeline</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="navigation.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="compass" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Navigation</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Breadcrumb, pagination, stepper, navbar</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="overlays.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="panel-top" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Overlays</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Dialog, drawer, tooltip, dropdown</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="media.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="image" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Media</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Avatar, images, video, figure</span>
+                            </pdx-stack>
+                        </a>
+                        <a href="utilities.html" class="pdx-surface-card" interactive style="text-decoration:none">
+                            <pdx-stack gap="xs">
+                                <pdx-row gap="xs" items="center"><i data-lucide="wrench" style="width:18px;height:18px;color:var(--pdx-color-primary)"></i><span class="pdx-txt-heading">Utilities</span></pdx-row>
+                                <span class="pdx-txt-small pdx-ink-muted">Divider, truncate, sticky, snap</span>
+                            </pdx-stack>
+                        </a>
+                    </pdx-grid>
+
+                    <hr>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Quick Start</h2>
+                        <pre><code>&lt;link rel="stylesheet" href="@pdxui/design/src/pragmatic-design.css"&gt;
+
+&lt;html pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal"&gt;</code></pre>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Architecture</h2>
+                        <pre><code>@layer pdx.reset      — Modern CSS reset
+@layer pdx.tokens     — 80+ custom properties
+@layer pdx.layout     — 6 layout primitives
+@layer pdx.surfaces   — Surfaces + buttons + inputs
+@layer pdx.typography  — Text roles + ink colors
+@layer pdx.media      — Images, avatar, embed
+@layer pdx.components — Table, tabs, accordion...
+@layer pdx.adaptive   — Container queries, touch, motion
+@layer pdx.themes     — 11 themes (override tokens + structure)
+
+Your CSS (unlayered) always wins.</code></pre>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

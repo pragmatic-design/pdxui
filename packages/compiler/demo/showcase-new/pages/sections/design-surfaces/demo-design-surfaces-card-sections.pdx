@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Card Sections</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Header, body, and footer with automatic border separators. Default padding resets when sections are used.</p>
+
+    <div class="card-demo">
+      <div class="pdx-surface-card">
+        <div class="pdx-card-header">Project Settings</div>
+        <div class="pdx-card-body">
+          <p class="pdx-txt-small" style="margin: 0;">Configure your project name, description, and visibility settings. Changes are saved automatically.</p>
+        </div>
+        <div class="pdx-card-footer">
+          <div class="card-footer-actions">
+            <button class="pdx-ghost" size="sm">Cancel</button>
+            <button class="pdx-primary" size="sm">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-surface-card"&gt;
+  &lt;div class="pdx-card-header"&gt;Title&lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;Content&lt;/div&gt;
+  &lt;div class="pdx-card-footer"&gt;Actions&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .card-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--pdx-space-sm);
+  }
+</style>

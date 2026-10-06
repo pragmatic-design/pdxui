@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Range Slider</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Native range input styled with <code>.pdx-range</code>.</p>
+
+    <div class="range-demo">
+      <input class="pdx-range" type="range" min="0" max="100" value="50" />
+      <input class="pdx-range" type="range" min="0" max="100" value="25" disabled />
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;input class="pdx-range" type="range" min="0" max="100" value="50" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .range-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    max-width: 400px;
+  }
+</style>

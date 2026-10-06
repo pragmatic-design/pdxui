@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-stack">
+      <pdx-otp-input length="4" size="sm"></pdx-otp-input>
+      <pdx-otp-input length="4"></pdx-otp-input>
+      <pdx-otp-input length="4" size="lg"></pdx-otp-input>
+    </div>
+  </section>
+</template>

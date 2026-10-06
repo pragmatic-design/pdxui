@@ -1,0 +1,88 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Dialog</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Modal dialog with backdrop blur, focus trap, Escape close, scroll shadow, animation, and footer actions. 5 sizes.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-dialog-basic class="demo-section"></pdx-demo-comp-dialog-basic>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-dialog-sizes class="demo-section"></pdx-demo-comp-dialog-sizes>
+
+    <!-- ═══ With Footer ═══ -->
+    <pdx-demo-comp-dialog-footer-actions class="demo-section"></pdx-demo-comp-dialog-footer-actions>
+
+    <!-- ═══ Scrollable Content ═══ -->
+    <pdx-demo-comp-dialog-scrollable class="demo-section"></pdx-demo-comp-dialog-scrollable>
+
+    <!-- ═══ Prevent Close ═══ -->
+    <pdx-demo-comp-dialog-prevent-close class="demo-section"></pdx-demo-comp-dialog-prevent-close>
+
+    <!-- ═══ No Close Button ═══ -->
+    <pdx-demo-comp-dialog-no-close-button class="demo-section"></pdx-demo-comp-dialog-no-close-button>
+
+    <!-- ═══ Nested Dialogs ═══ -->
+    <pdx-demo-comp-dialog-nested class="demo-section"></pdx-demo-comp-dialog-nested>
+
+    <!-- ═══ Initial Focus ═══ -->
+    <pdx-demo-comp-dialog-initial-focus class="demo-section"></pdx-demo-comp-dialog-initial-focus>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>open</code><span>boolean</span><span>false</span><span>Controls visibility</span></div>
+        <div class="opt-row"><code>title</code><span>string</span><span>''</span><span>Dialog header title</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>'md'</span><span>sm | md | lg | xl | full</span></div>
+        <div class="opt-row"><code>close-on-backdrop</code><span>boolean</span><span>true</span><span>Close on backdrop click</span></div>
+        <div class="opt-row"><code>close-on-escape</code><span>boolean</span><span>true</span><span>Close on Escape key</span></div>
+        <div class="opt-row"><code>show-close</code><span>boolean</span><span>true</span><span>Show X close button in header</span></div>
+        <div class="opt-row"><code>initial-focus</code><span>string</span><span>''</span><span>CSS selector for initial focus target</span></div>
+        <div class="opt-row"><code>prevent-close</code><span>boolean</span><span>false</span><span>Dispatch pdx-before-close (cancelable) before closing</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-close</code><span>Emitted when dialog closes</span></div>
+        <div class="opt-row"><code>pdx-before-close</code><span>Cancelable — call preventDefault() to prevent close</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Slots</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Slot</span><span>Description</span></div>
+        <div class="opt-row"><code>default</code><span>Dialog body content</span></div>
+        <div class="opt-row"><code>footer</code><span>Footer with action buttons</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Imperative API</h3>
+      <pre class="pdx-txt-mono source-code"><code>&lt;pdx-dialog :open="isOpen" title="Confirm" @pdx-close="close"&gt;
+  &lt;p&gt;Are you sure?&lt;/p&gt;
+  &lt;div slot="footer"&gt;
+    &lt;pdx-button variant="ghost" @click="close"&gt;Cancel&lt;/pdx-button&gt;
+    &lt;pdx-button variant="primary" @click="confirm"&gt;OK&lt;/pdx-button&gt;
+  &lt;/div&gt;
+&lt;/pdx-dialog&gt;</code></pre>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+@page '/components/dialog';
+@title 'Dialog';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
+  .form-fields { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+  .form-fields label { margin-top: var(--pdx-space-xs); }
+  .source-code { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; }
+</style>

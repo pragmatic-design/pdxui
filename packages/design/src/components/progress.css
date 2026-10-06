@@ -1,0 +1,98 @@
+/* Progress bar */
+
+.pdx-progress {
+    width: 100%;
+    height: 0.5rem;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-full);
+    overflow: hidden;
+}
+
+.pdx-progress-bar {
+    /* A block whatever the element: an inline <span> bar ignores its width and height. */
+    display: block;
+    height: 100%;
+    background: var(--pdx-color-primary);
+    border-radius: var(--pdx-radius-full);
+    transition: width 0.3s var(--pdx-ease);
+}
+
+.pdx-progress-bar[variant="success"] { background: var(--pdx-color-success); }
+.pdx-progress-bar[variant="danger"]  { background: var(--pdx-color-danger); }
+.pdx-progress-bar[variant="warning"] { background: var(--pdx-color-warning); }
+
+/* Indeterminate */
+.pdx-progress-indeterminate .pdx-progress-bar {
+    width: 30%;
+    animation: pdx-progress-slide 1.5s var(--pdx-ease) infinite;
+}
+
+@keyframes pdx-progress-slide {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+}
+
+/* Sizes */
+.pdx-progress-sm { height: 0.25rem; }
+.pdx-progress-lg { height: 0.75rem; }
+
+/* Striped */
+.pdx-progress-striped .pdx-progress-bar {
+    background-image: linear-gradient(
+        45deg,
+        rgba(255,255,255,0.15) 25%, transparent 25%,
+        transparent 50%, rgba(255,255,255,0.15) 50%,
+        rgba(255,255,255,0.15) 75%, transparent 75%,
+        transparent
+    );
+    background-size: 1rem 1rem;
+    animation: pdx-progress-stripe 0.75s linear infinite;
+}
+@keyframes pdx-progress-stripe {
+    0% { background-position: 1rem 0; }
+    100% { background-position: 0 0; }
+}
+
+/* ── Circular / Ring ── */
+.pdx-progress-circular {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+}
+.pdx-progress-circular.pdx-progress-sm { width: 2rem; height: 2rem; }
+.pdx-progress-circular.pdx-progress-lg { width: 5rem; height: 5rem; }
+
+.pdx-progress-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+.pdx-progress-ring-track {
+    stroke: var(--pdx-color-inset);
+}
+.pdx-progress-ring-value {
+    stroke: var(--pdx-color-primary);
+    transition: stroke-dashoffset 0.3s var(--pdx-ease);
+}
+.pdx-progress-ring-value[data-variant="success"] { stroke: var(--pdx-color-success); }
+.pdx-progress-ring-value[data-variant="warning"] { stroke: var(--pdx-color-warning); }
+.pdx-progress-ring-value[data-variant="danger"]  { stroke: var(--pdx-color-danger); }
+
+.pdx-progress-ring-spin {
+    animation: pdx-ring-spin 1.2s linear infinite;
+}
+@keyframes pdx-ring-spin {
+    to { transform: rotate(270deg); }
+}
+
+.pdx-progress-circular-label {
+    position: absolute;
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-text);
+}
+.pdx-progress-circular.pdx-progress-sm .pdx-progress-circular-label { font-size: 0.5rem; }
+.pdx-progress-circular.pdx-progress-lg .pdx-progress-circular-label { font-size: var(--pdx-text-sm); }

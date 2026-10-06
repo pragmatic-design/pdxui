@@ -1,0 +1,55 @@
+<template>
+  <div class="pdx-demo">
+    <div class="pdx-demo-head" :style="title ? '' : 'display:none'">
+      <span class="pdx-demo-title">{{ title }}</span>
+    </div>
+    <p class="pdx-demo-desc" :style="description ? '' : 'display:none'">{{ description }}</p>
+    <div class="pdx-demo-preview" :ref="previewRef"></div>
+    <details class="pdx-demo-source">
+      <summary>Source</summary>
+      <pdx-code :code="code"></pdx-code>
+    </details>
+  </div>
+</template>
+
+<script setup>
+import { effect, onMount } from '@pdxui/core';
+
+@prop title: string = '';
+@prop description: string = '';
+// The demo's HTML source. Not `src`: core treats a custom element's `src` as a media URL, and a
+// newline is a control character there — a multi-line source would be dropped.
+@prop code: string = '';
+
+let previewRef = $signal(null);
+let ready = $signal(false);
+
+// The same `code` string is both rendered live (here) and shown highlighted in the accordion
+// (<pdx-code>), so preview and code can never drift apart.
+onMount(() => { import('@pdxui/ui/all').then(() => { ready = true; }); });
+
+effect(() => {
+  const _code = code;
+  const _ready = ready;
+  const _el = previewRef;
+  if (!_el || !_ready) return;
+  _el.innerHTML = _code;
+});
+</script>
+
+<style scoped>
+.pdx-demo { border: 1px solid var(--outline); border-radius: 14px; overflow: hidden; margin-top: 1rem; background: var(--surface); }
+.pdx-demo-head { padding: 0.6rem 1rem 0; }
+.pdx-demo-title { font-family: var(--font-heading); font-weight: 600; font-size: 0.95rem; color: var(--ink); }
+.pdx-demo-desc { margin: 0.25rem 1rem 0; color: var(--ink-muted); font-size: 0.88rem; }
+.pdx-demo-preview { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; padding: 1.75rem 1.25rem; }
+.pdx-demo-source { border-top: 1px solid var(--outline); }
+.pdx-demo-source > summary {
+  cursor: pointer; padding: 0.55rem 1rem; font-size: 0.8rem; color: var(--ink-muted);
+  font-family: var(--font-heading); user-select: none; list-style: none; background: color-mix(in srgb, var(--gold-display) 3%, transparent);
+}
+.pdx-demo-source > summary::-webkit-details-marker { display: none; }
+.pdx-demo-source > summary::before { content: '‹ ›  '; color: var(--gold); }
+.pdx-demo-source[open] > summary { color: var(--gold); }
+.pdx-demo-source pdx-code { display: block; padding: 0.75rem 1rem 1rem; }
+</style>

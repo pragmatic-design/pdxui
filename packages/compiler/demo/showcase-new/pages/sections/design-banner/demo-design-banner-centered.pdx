@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Centered</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>.pdx-banner-centered</code> for centered text alignment.</p>
+
+    <div class="banner-demo">
+      <div class="pdx-banner pdx-banner-success pdx-banner-centered">
+        <span class="pdx-banner-text">Black Friday Sale — 50% off all plans!</span>
+        <a href="#" class="pdx-banner-action">Shop now</a>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-banner pdx-banner-success pdx-banner-centered"&gt;
+  &lt;span class="pdx-banner-text"&gt;Black Friday Sale!&lt;/span&gt;
+  &lt;a href="#" class="pdx-banner-action"&gt;Shop now&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

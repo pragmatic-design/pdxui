@@ -1,0 +1,85 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Menubar</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-menubar&gt;</code> — horizontal menu bar with dropdown submenus (File | Edit | View).
+      Supports nested submenus, checkbox/radio items, icons, keyboard shortcuts, danger items, and mega menu panels.
+    </p>
+
+    <!-- ═══ Basic Menubar ═══ -->
+    <pdx-demo-comp-menubar-click-mode class="demo-section"></pdx-demo-comp-menubar-click-mode>
+
+    <!-- ═══ Full-featured ═══ -->
+    <pdx-demo-comp-menubar-full-featured class="demo-section"></pdx-demo-comp-menubar-full-featured>
+
+    <!-- ═══ Mega Menu ═══ -->
+    <pdx-demo-comp-menubar-mega-menu class="demo-section"></pdx-demo-comp-menubar-mega-menu>
+
+    <!-- ═══ Disabled Items ═══ -->
+    <pdx-demo-comp-menubar-disabled class="demo-section"></pdx-demo-comp-menubar-disabled>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Menubar Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>MenubarItem[]</td><td>[]</td><td>Top-level menu definitions</td></tr>
+            <tr><td><code>trigger</code></td><td>String</td><td>'click'</td><td>'click' (a click opens; the pointer then switches between menus) or 'hover' (mouseenter alone opens)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ MenubarItem Interface ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">MenubarItem Interface</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>key</code></td><td>string</td><td>Unique identifier</td></tr>
+            <tr><td><code>label</code></td><td>string</td><td>Trigger button text</td></tr>
+            <tr><td><code>children</code></td><td>MenuItem[]</td><td>Dropdown items</td></tr>
+            <tr><td><code>mega</code></td><td>boolean</td><td>Enable mega menu panel</td></tr>
+            <tr><td><code>megaColumns</code></td><td>MegaColumn[]</td><td>Mega menu column groups</td></tr>
+            <tr><td><code>disabled</code></td><td>boolean</td><td>Disable trigger</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Keyboard ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard Shortcuts</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Key</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>Arrow Left/Right</kbd></td><td>Switch between top-level menus (bar + inside dropdown)</td></tr>
+            <tr><td><kbd>Arrow Down</kbd></td><td>Open menu / next item</td></tr>
+            <tr><td><kbd>Arrow Up</kbd></td><td>Previous item</td></tr>
+            <tr><td><kbd>Arrow Right (on submenu item)</kbd></td><td>Open submenu</td></tr>
+            <tr><td><kbd>Enter / Space</kbd></td><td>Open menu / activate item</td></tr>
+            <tr><td><kbd>Escape</kbd></td><td>Close menu, focus returns to bar</td></tr>
+            <tr><td><kbd>Home / End</kbd></td><td>First / last item</td></tr>
+            <tr><td><kbd>Type character</kbd></td><td>Typeahead search</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/menubar';
+@title 'Menubar — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+</style>

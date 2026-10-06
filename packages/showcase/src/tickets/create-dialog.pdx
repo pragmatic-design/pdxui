@@ -1,0 +1,71 @@
+<template>
+  <!-- CREATE IN A MODAL. Measured over the reference's whole area with no exception: `add` is a
+       modal, `edit` is in the page. The logic is in the difference — a new record has no place in
+       the page yet, an existing one already has one. -->
+  <pdx-dialog
+    :open="open"
+    size="md"
+    :title="$t('tickets.new')"
+    @pdx-close="close()"
+    data-test="create-dialog">
+    <!-- The fields are `<pdx-auto-form>`'s; the submit is this component's, because the asset picker
+         sits between the fields and it. The form is reached through what it exposes —
+         `validate()` and `getValues()` — and the customer typed into it is read from the native
+         `input` that bubbles out of its `<pdx-input>`. -->
+    <div class="create-body" @input="onCreateInput">
+      <pdx-auto-form
+        :ref="createFormEl"
+        :schema="schema"
+        :show-actions="false"
+        data-test="create-form"></pdx-auto-form>
+      <pdx-asset-picker :customer="createCustomer" @picked="e => createAssetId = e.detail.id" data-test="asset-picker"></pdx-asset-picker>
+      <div class="create-actions">
+        <pdx-button variant="primary" @click="submitCreate" data-test="create-submit">{{ $t('tickets.create') }}</pdx-button>
+      </div>
+    </div>
+  </pdx-dialog>
+</template>
+
+<script setup>
+// The tickets list's create modal, for `pages/tickets.pdx`: its form, the customer
+// typed into it, and the asset picked for it. The page owns whether it is open and what a
+// create does — `list.create(values)` — so the modal says what was filled in, and nothing else.
+
+/** Whether the modal is open: the page's, through the list's `createOpen`. */
+@prop open: boolean = false;
+/** The ticket's fields, the same schema the drawer edits with. */
+@prop schema: object = null;
+/** The form was filled in and is valid: its values, and the asset picked for it. */
+@event create: object;
+/** The modal was dismissed. */
+@event close: void;
+
+let createFormEl = $signal(null);
+let createCustomer = $signal('');
+let createAssetId = $signal(0);
+
+// A new ticket starts with no customer typed and no asset picked.
+$watch(open, (isOpen) => {
+  if (!isOpen) return;
+  createCustomer = '';
+  createAssetId = 0;
+});
+
+/** The customer field, as it is typed: the asset picker offers that customer's assets. */
+function onCreateInput(e) {
+  if (e.target?.name === 'customer') createCustomer = e.target.value;
+}
+
+/** The submit: the form validates itself, and the ticket carries the asset picked. */
+async function submitCreate() {
+  if (!createFormEl || !(await createFormEl.validate())) return;
+  // RULE 2: what confirms a create is the row appearing. No toast — two answers to one action is
+  // how a screen ends up shouting.
+  create({ ...createFormEl.getValues(), assetId: createAssetId });
+}
+</script>
+
+<style scoped>
+  .create-body { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+  .create-actions { display: flex; justify-content: flex-end; }
+</style>

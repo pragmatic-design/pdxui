@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Alerts</h2>
+    <p class="pdx-txt-small pdx-ink-muted">4 semantic alert variants for inline messages.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-alert-info">Your session will expire in 5 minutes.</div>
+      <div class="pdx-alert-success">Account created successfully.</div>
+      <div class="pdx-alert-warning">Your trial ends in 3 days.</div>
+      <div class="pdx-alert-error">Payment failed. Please update your card.</div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-alert-info"&gt;Info message&lt;/div&gt;
+&lt;div class="pdx-alert-success"&gt;Success message&lt;/div&gt;
+&lt;div class="pdx-alert-warning"&gt;Warning message&lt;/div&gt;
+&lt;div class="pdx-alert-error"&gt;Error message&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

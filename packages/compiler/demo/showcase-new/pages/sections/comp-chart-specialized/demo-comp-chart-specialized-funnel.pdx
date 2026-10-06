@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Funnel</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Conversion pipeline. Shows values and percentages relative to first stage.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="funnel" :data="funnelData" :x-field="'stage'" :y-field="'users'" :legend="false" height="300px"></pdx-chart>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const funnelData = [
+  { stage: 'Visitors', users: 10000 },
+  { stage: 'Sign-ups', users: 4200 },
+  { stage: 'Trials', users: 2100 },
+  { stage: 'Paid', users: 890 },
+  { stage: 'Enterprise', users: 320 },
+];
+</script>

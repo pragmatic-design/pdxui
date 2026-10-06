@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Overflow Only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Tooltip only shows when text is truncated. Resize the window to test.</p>
+    <div class="overflow-demo">
+      <span class="truncate-text" tabindex="0">This is a short text</span>
+      <pdx-tooltip text="This text is not truncated" overflowOnly></pdx-tooltip>
+      <span class="truncate-text" tabindex="0" style="max-width: 150px">This text is very long and will be truncated by the container width</span>
+      <pdx-tooltip text="This text is very long and will be truncated by the container width" overflowOnly></pdx-tooltip>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .overflow-demo { display: flex; flex-direction: column; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+  .truncate-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); font-size: var(--pdx-text-sm); }
+</style>

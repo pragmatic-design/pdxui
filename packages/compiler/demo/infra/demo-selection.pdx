@@ -1,0 +1,172 @@
+<template>
+  <div class="demo">
+    <h2>Selection Model</h2>
+    <p class="desc">Key-based: single/multiple, toggle/replace, range select (Shift+Click), disabled keys.</p>
+
+    <section>
+      <h3>Single Select (replace)</h3>
+      <p class="desc">Click an item. Previous selection is replaced.</p>
+      <div class="two-col">
+        <div class="list">
+          @for (fruits as fruit; track fruit) {
+            <div class="item" :class="singleClass(fruit)" @click="singleSel.select(fruit)">{{ fruit }}</div>
+          }
+        </div>
+        <pre class="log">{{ singleInfo }}</pre>
+      </div>
+    </section>
+
+    <section>
+      <h3>Multiple Select (toggle + range)</h3>
+      <p class="desc">Click toggles. Shift+Click for range. "Cherry" is disabled.</p>
+      <div class="two-col">
+        <div>
+          <div class="list">
+            @for (fruits as fruit; track fruit) {
+              <div class="item"
+                :class="multiClass(fruit)"
+                @click="handleMultiClick">{{ fruit }}</div>
+            }
+          </div>
+          <div class="row">
+            <button class="pdx-ghost" @click="multiSel.selectAll(enabledFruits)">Select All</button>
+            <button class="pdx-ghost" @click="multiSel.clear()">Clear</button>
+          </div>
+        </div>
+        <pre class="log">{{ multiInfo }}</pre>
+      </div>
+    </section>
+
+    <section>
+      <h3>Grid Selection</h3>
+      <p class="desc">Click rows. Shift+Click for range. Checkbox header selects all.</p>
+      <div class="grid-table">
+        <div class="grid-header">
+          <span class="grid-cell-ck"><input type="checkbox" @change="handleCheckAll" /></span>
+          <span class="grid-cell-name"><strong>Name</strong></span>
+          <span class="grid-cell-role"><strong>Role</strong></span>
+          <span class="grid-cell-status"><strong>Status</strong></span>
+        </div>
+        @for (people as p; track p.id) {
+          <div class="grid-row" :class="gridClass(p.id)" @click="handleGridClick" style="cursor:pointer">
+            <span class="grid-cell-ck"><input type="checkbox" :checked="gridIsSelected(p.id)" /></span>
+            <span class="grid-cell-name">{{ p.name }}</span>
+            <span class="grid-cell-role">{{ p.role }}</span>
+            <span class="grid-cell-status">{{ p.status }}</span>
+          </div>
+        }
+      </div>
+      <pre class="log">{{ gridInfo }}</pre>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { createSelection, effect, onMount, onDestroy } from '@pdxui/core';
+
+const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape'];
+const enabledFruits = fruits.filter(f => f !== 'Cherry');
+const people = [
+    { id: 'p1', name: 'Alice Johnson', role: 'Engineer', status: 'Active' },
+    { id: 'p2', name: 'Bob Smith', role: 'Designer', status: 'Active' },
+    { id: 'p3', name: 'Carol Davis', role: 'Manager', status: 'Away' },
+    { id: 'p4', name: 'Dave Wilson', role: 'Engineer', status: 'Active' },
+    { id: 'p5', name: 'Eve Brown', role: 'QA', status: 'Active' },
+];
+const allPeopleKeys = people.map(p => p.id);
+
+let singleInfo = $signal('Nothing selected');
+let multiInfo = $signal('Nothing selected');
+let gridInfo = $signal('No rows selected');
+
+// Single
+const singleSel = createSelection({ mode: 'single', behavior: 'replace' });
+// Multiple
+const multiSel = createSelection({
+    mode: 'multiple', behavior: 'toggle',
+    disabledKeys: () => new Set(['Cherry']),
+});
+// Grid
+const gridSel = createSelection({ mode: 'multiple', behavior: 'toggle' });
+
+// Reactive class helpers — read selection signal inside a function so the
+// template effect tracks changes. Direct isSelected() calls on the selection
+// object would be transformed incorrectly by the compiler's callSignals pass
+// (it adds () to ctx.singleSel, treating the object as a signal).
+function singleClass(fruit) { return singleSel.selected().has(fruit) ? 'selected' : ''; }
+function multiClass(fruit) {
+    const sel = multiSel.selected().has(fruit) ? 'selected ' : '';
+    return sel + (fruit === 'Cherry' ? 'disabled' : '');
+}
+function gridClass(id) { return gridSel.selected().has(id) ? 'selected' : ''; }
+function gridIsSelected(id) { return gridSel.selected().has(id); }
+
+onMount(() => {
+    const d1 = effect(() => {
+        const sel = singleSel.selected();
+        singleInfo = sel.size > 0 ? 'Selected: ' + [...sel].join(', ') : 'Nothing selected';
+    });
+    const d2 = effect(() => {
+        const sel = multiSel.selected();
+        multiInfo = sel.size > 0
+            ? 'Selected (' + sel.size + '): ' + [...sel].join(', ') + '\nAnchor: ' + multiSel.anchor()
+            : 'Nothing selected';
+    });
+    const d3 = effect(() => {
+        const sel = gridSel.selected();
+        gridInfo = sel.size > 0 ? 'Selected: ' + [...sel].join(', ') + ' (' + sel.size + ' rows)' : 'No rows selected';
+    });
+    onDestroy(() => { d1(); d2(); d3(); });
+});
+
+// Event handlers as simple functions — no inline arrows in template.
+// The compiler double-wraps arrow expressions like (e) => fn(e) into
+// () => (e) => fn(e), losing the event object. Using simple function
+// names + data attributes avoids this.
+
+function handleMultiClick(e) {
+    const fruit = e.currentTarget.textContent.trim();
+    if (fruit === 'Cherry') return;
+    if (e.shiftKey) multiSel.extendTo(fruit, fruits);
+    else multiSel.toggle(fruit);
+}
+
+function handleGridClick(e) {
+    if (e.target.type === 'checkbox') return;
+    const row = e.currentTarget;
+    const rows = [...row.parentElement.querySelectorAll('.grid-row')];
+    const idx = rows.indexOf(row);
+    if (idx < 0 || idx >= people.length) return;
+    const id = people[idx].id;
+    if (e.shiftKey) gridSel.extendTo(id, allPeopleKeys);
+    else gridSel.toggle(id);
+}
+
+function handleCheckAll(e) {
+    if (e.target.checked) gridSel.selectAll(allPeopleKeys);
+    else gridSel.clear();
+}
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+  .list { display: flex; flex-direction: column; gap: 4px; }
+  .row { display: flex; gap: 8px; margin-top: 8px; }
+  .item { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; font-size: 0.85rem; user-select: none; -webkit-user-select: none; transition: all 150ms; }
+  .item:hover { background: #f5f5f7; }
+  .item.selected { background: #3b82f6; color: white; border-color: #3b82f6; }
+  .item.disabled { opacity: 0.4; cursor: not-allowed; }
+  .grid-table { width: 100%; font-size: 0.85rem; margin-top: 8px; }
+  .grid-header, .grid-row { display: grid; grid-template-columns: 36px 1fr 1fr 1fr; align-items: center; border-bottom: 1px solid #e0e0e0; }
+  .grid-header { background: #f5f5f7; font-weight: 600; }
+  .grid-header span, .grid-row span { padding: 8px 12px; }
+  .grid-row:hover { background: #f5f8ff; }
+  .grid-row.selected { background: #eff6ff; }
+  .grid-header, .grid-row { user-select: none; }
+  .log { font-family: monospace; font-size: 0.75rem; background: #f5f5f7; padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 36px; margin: 8px 0 0; }
+</style>

@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Vertical</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>orientation="vertical"</code> stacks the toggles, and ↑ / ↓ move between them.
+    </p>
+    <div class="demo-row">
+      <pdx-toggle-group type="single" label="Panel" value="files" orientation="vertical">
+        <pdx-toggle value="files">Files</pdx-toggle>
+        <pdx-toggle value="search">Search</pdx-toggle>
+        <pdx-toggle value="git">Source control</pdx-toggle>
+      </pdx-toggle-group>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,58 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Data Grid — Advanced</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Toolbar with sort/filter chips, virtual scroll for large datasets,
+      pagination position, column freeze, row detail, and external API.
+    </p>
+
+    <pdx-demo-comp-data-grid-toolbar-toolbar class="demo-section"></pdx-demo-comp-data-grid-toolbar-toolbar>
+
+    <pdx-demo-comp-data-grid-toolbar-toolbar-paginated class="demo-section"></pdx-demo-comp-data-grid-toolbar-toolbar-paginated>
+
+    <pdx-demo-comp-data-grid-toolbar-inline-filters class="demo-section"></pdx-demo-comp-data-grid-toolbar-inline-filters>
+
+    <pdx-demo-comp-data-grid-toolbar-enum-filter class="demo-section"></pdx-demo-comp-data-grid-toolbar-enum-filter>
+
+    <pdx-demo-comp-data-grid-toolbar-group-bar class="demo-section"></pdx-demo-comp-data-grid-toolbar-group-bar>
+
+    <pdx-demo-comp-data-grid-toolbar-grouping-declarative class="demo-section"></pdx-demo-comp-data-grid-toolbar-grouping-declarative>
+
+    <pdx-demo-comp-data-grid-toolbar-pagination-position class="demo-section"></pdx-demo-comp-data-grid-toolbar-pagination-position>
+
+    <pdx-demo-comp-data-grid-toolbar-frozen-columns class="demo-section"></pdx-demo-comp-data-grid-toolbar-frozen-columns>
+
+    <pdx-demo-comp-data-grid-toolbar-virtual-scroll class="demo-section"></pdx-demo-comp-data-grid-toolbar-virtual-scroll>
+
+    <pdx-demo-comp-data-grid-toolbar-row-detail class="demo-section"></pdx-demo-comp-data-grid-toolbar-row-detail>
+
+    <pdx-demo-comp-data-grid-toolbar-command-column class="demo-section"></pdx-demo-comp-data-grid-toolbar-command-column>
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-grid-toolbar';
+@title 'Data Grid Toolbar & Filters — PDX Components';
+</script>
+
+<style scoped>
+.page {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--pdx-space-xl) var(--pdx-space-md);
+}
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-sm); }
+.demo-container {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  overflow: hidden;
+}
+.source-block { margin-top: var(--pdx-space-sm); }
+.source-block summary { cursor: pointer; font-size: var(--pdx-text-xs); color: var(--pdx-color-muted); }
+.source-block pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); overflow-x: auto; font-size: var(--pdx-text-xs); }
+</style>

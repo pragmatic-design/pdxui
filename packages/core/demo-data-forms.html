@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDX UI — Data Layer + Forms Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #0f1117; color: #e1e4e8; padding: 16px; }
+        h1 { font-size: 1.4rem; margin-bottom: 16px; color: #58a6ff; }
+        h2 { font-size: 1rem; margin-bottom: 8px; color: #79c0ff; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px; }
+        .card h2 { border-bottom: 1px solid #21262d; padding-bottom: 6px; margin-bottom: 10px; }
+        button { background: #238636; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin: 2px; }
+        button:hover { background: #2ea043; }
+        button:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+        button.danger { background: #da3633; }
+        button.secondary { background: #30363d; }
+        input, select { background: #0d1117; border: 1px solid #30363d; color: #e1e4e8; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; width: 100%; margin-bottom: 4px; }
+        input:focus { border-color: #58a6ff; outline: none; }
+        input.error { border-color: #da3633; }
+        .mono { font-family: 'Fira Code', 'Cascadia Code', monospace; font-size: 0.8rem; }
+        .tag { display: inline-block; background: #1f6feb33; color: #58a6ff; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; margin: 1px; }
+        .tag.success { background: #23863633; color: #3fb950; }
+        .tag.error { background: #da363333; color: #f85149; }
+        .tag.warn { background: #d29922aa; color: #e3b341; }
+        .tag.info { background: #30363d; color: #8b949e; }
+        .state-bar { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0; }
+        .log { background: #0d1117; border: 1px solid #21262d; border-radius: 6px; padding: 8px; max-height: 160px; overflow-y: auto; margin-top: 8px; }
+        .log-entry { font-size: 0.78rem; padding: 2px 0; border-bottom: 1px solid #161b2244; }
+        .err-msg { color: #f85149; font-size: 0.78rem; margin-top: 2px; }
+        .field-row { margin-bottom: 8px; }
+        .field-row label { display: block; font-size: 0.78rem; color: #8b949e; margin-bottom: 2px; }
+        .items-list { margin: 8px 0; }
+        .item-row { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+        .item-row input { flex: 1; margin-bottom: 0; }
+        .bind-demo { padding: 20px; border-radius: 8px; text-align: center; transition: all 0.3s ease; }
+        .responsive-bar { height: 24px; background: #238636; border-radius: 4px; transition: width 0.2s; }
+    </style>
+</head>
+<body>
+    <h1>PDX UI — Sprint A.3 Data Layer + Sprint C Forms/CSS</h1>
+
+    <div class="grid">
+        <!-- 1. HTTP Client + Resource -->
+        <div class="card" id="demo-resource">
+            <h2>1. Resource (7 States)</h2>
+            <div id="resource-state" class="state-bar"></div>
+            <div id="resource-data" class="mono"></div>
+            <div style="margin-top:8px">
+                <button id="btn-fetch">Fetch Users</button>
+                <button id="btn-refetch" class="secondary">Refetch</button>
+                <button id="btn-mutate-res" class="secondary">Mutate Local</button>
+                <button id="btn-error" class="danger">Simulate Error</button>
+            </div>
+            <div id="resource-log" class="log"></div>
+        </div>
+
+        <!-- 2. Cache + Invalidation -->
+        <div class="card" id="demo-cache">
+            <h2>2. Cache + Invalidation</h2>
+            <div id="cache-stats" class="mono"></div>
+            <div style="margin-top:8px">
+                <button id="btn-cache-set">Set 3 Entries</button>
+                <button id="btn-cache-inv-exact" class="secondary">Invalidate Exact</button>
+                <button id="btn-cache-inv-wild" class="secondary">Invalidate Wildcard</button>
+                <button id="btn-cache-inv-tag" class="secondary">Invalidate by Tag</button>
+                <button id="btn-cache-clear" class="danger">Clear All</button>
+            </div>
+            <div id="cache-log" class="log"></div>
+        </div>
+
+        <!-- 3. Mutation -->
+        <div class="card" id="demo-mutation">
+            <h2>3. Mutation (Optimistic + Rollback)</h2>
+            <div id="mutation-state" class="state-bar"></div>
+            <div id="mutation-data" class="mono"></div>
+            <div style="margin-top:8px">
+                <button id="btn-mut-success">Mutate (Success)</button>
+                <button id="btn-mut-fail" class="danger">Mutate (Fail → Rollback)</button>
+                <button id="btn-mut-reset" class="secondary">Reset</button>
+            </div>
+            <div id="mutation-log" class="log"></div>
+        </div>
+
+        <!-- 4. Linked Signal -->
+        <div class="card" id="demo-linked">
+            <h2>4. LinkedSignal (Writable Derived)</h2>
+            <div class="field-row">
+                <label>Category (source)</label>
+                <select id="linked-category">
+                    <option value="books">Books</option>
+                    <option value="movies">Movies</option>
+                    <option value="music">Music</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>Page (linked — resets on category change)</label>
+                <div style="display:flex;gap:6px;align-items:center">
+                    <button id="btn-page-prev" class="secondary">←</button>
+                    <span id="linked-page" class="mono" style="min-width:30px;text-align:center">1</span>
+                    <button id="btn-page-next" class="secondary">→</button>
+                </div>
+            </div>
+            <div id="linked-log" class="log"></div>
+        </div>
+
+        <!-- 5. Form — Basic -->
+        <div class="card" id="demo-form">
+            <h2>5. Form (Validation + State Machine)</h2>
+            <div id="form-state" class="state-bar"></div>
+            <form id="contact-form" novalidate>
+                <div class="field-row">
+                    <label>Name *</label>
+                    <input id="f-name" type="text" placeholder="Min 3 chars" />
+                    <div id="f-name-err" class="err-msg"></div>
+                </div>
+                <div class="field-row">
+                    <label>Email *</label>
+                    <input id="f-email" type="email" placeholder="valid@email.com" />
+                    <div id="f-email-err" class="err-msg"></div>
+                </div>
+                <div class="field-row">
+                    <label>Message</label>
+                    <input id="f-message" type="text" placeholder="Optional" />
+                </div>
+                <div style="margin-top:8px">
+                    <button type="submit" id="btn-submit">Submit</button>
+                    <button type="button" id="btn-form-reset" class="secondary">Reset</button>
+                    <span id="form-flags" class="mono" style="margin-left:8px"></span>
+                </div>
+            </form>
+            <div id="form-log" class="log"></div>
+        </div>
+
+        <!-- 6. Field Array -->
+        <div class="card" id="demo-array">
+            <h2>6. Field Array (Dynamic Items)</h2>
+            <div id="array-items" class="items-list"></div>
+            <div style="margin-top:8px">
+                <button id="btn-arr-add">+ Add Item</button>
+                <button id="btn-arr-swap" class="secondary">Swap 0↔1</button>
+                <button id="btn-arr-reset" class="secondary">Reset</button>
+            </div>
+            <div id="array-values" class="mono" style="margin-top:6px"></div>
+        </div>
+
+        <!-- 7. bind() CSS -->
+        <div class="card" id="demo-bind">
+            <h2>7. bind() CSS (Signal → CSS Variable)</h2>
+            <div id="bind-box" class="bind-demo" style="--demo-bg: #238636; --demo-radius: 8px; --demo-rotation: 0deg;">
+                <span style="font-size:1.5rem">🎨</span>
+                <div class="mono" style="margin-top:6px">Dynamic CSS Vars</div>
+            </div>
+            <div style="margin-top:8px">
+                <label style="font-size:0.78rem;color:#8b949e">Background</label>
+                <input id="bind-color" type="color" value="#238636" style="width:60px;height:30px" />
+                <label style="font-size:0.78rem;color:#8b949e;margin-left:8px">Radius</label>
+                <input id="bind-radius" type="range" min="0" max="50" value="8" style="width:100px" />
+                <label style="font-size:0.78rem;color:#8b949e;margin-left:8px">Rotate</label>
+                <input id="bind-rotate" type="range" min="0" max="360" value="0" style="width:100px" />
+            </div>
+        </div>
+
+        <!-- 8. responsiveValue -->
+        <div class="card" id="demo-responsive">
+            <h2>8. responsiveValue() — CSS clamp()</h2>
+            <div class="mono" id="responsive-formula"></div>
+            <div style="margin-top:8px">
+                <div id="responsive-bar" class="responsive-bar"></div>
+                <div id="responsive-value" class="mono" style="margin-top:4px"></div>
+            </div>
+            <div style="margin-top:8px; font-size:0.78rem; color:#8b949e">
+                Resize the browser window to see the value change.
+                <br/>Tier 1 = pure CSS (zero JS). Tier 3 shown here for visualization.
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            signal, computed, effect, batch,
+            createCache, invalidate, invalidateAll,
+            resource,
+            mutation,
+            linkedSignal,
+            createForm,
+            createFieldArray,
+            required, minLength, email,
+            responsiveCSS, responsiveValue,
+        } from './src/index.ts';
+
+        // ─── Utility ──────────────────────────────────────────────
+        function log(containerId, msg, type = '') {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="tag ${type}">${new Date().toLocaleTimeString()}</span> ${msg}`;
+            el.prepend(entry);
+            while (el.children.length > 20) el.removeChild(el.lastChild);
+        }
+
+        function renderTags(containerId, tags) {
+            document.getElementById(containerId).innerHTML = tags.map(
+                ([label, cls]) => `<span class="tag ${cls}">${label}</span>`
+            ).join(' ');
+        }
+
+        // ─── 1. Resource ──────────────────────────────────────────
+        (() => {
+            let shouldFail = false;
+            const users = resource(
+                async () => {
+                    await new Promise(r => setTimeout(r, 800));
+                    if (shouldFail) throw new Error('Network error');
+                    return [
+                        { id: 1, name: 'Alice' },
+                        { id: 2, name: 'Bob' },
+                        { id: 3, name: 'Charlie' },
+                    ];
+                },
+                { key: 'GET:/api/users', staleTime: 5000, retry: 0, tags: ['users'] }
+            );
+
+            effect(() => {
+                const state = users.state();
+                const st = users.status();
+                renderTags('resource-state', [
+                    [`state: ${state}`, state === 'success' ? 'success' : state === 'error' ? 'error' : state === 'loading' || state === 'reloading' ? 'warn' : 'info'],
+                    [`hasData: ${st.hasData}`, st.hasData ? 'success' : 'info'],
+                ]);
+                const data = users.data();
+                document.getElementById('resource-data').textContent = data
+                    ? `${data.length} users loaded`
+                    : state === 'loading' ? 'Loading...' : 'No data';
+                log('resource-log', `State → ${state}`, state === 'error' ? 'error' : 'info');
+            });
+
+            document.getElementById('btn-fetch').onclick = () => { shouldFail = false; users.refetch(); };
+            document.getElementById('btn-refetch').onclick = () => { shouldFail = false; users.refetch(); };
+            document.getElementById('btn-mutate-res').onclick = () => {
+                users.mutate([{ id: 99, name: 'Optimistic User' }]);
+                log('resource-log', 'Mutated locally → state: local', 'warn');
+            };
+            document.getElementById('btn-error').onclick = () => { shouldFail = true; users.refetch(); };
+        })();
+
+        // ─── 2. Cache ─────────────────────────────────────────────
+        (() => {
+            const cache = createCache({ staleTime: 10000, gcInterval: 0 });
+
+            function updateStats() {
+                const el = document.getElementById('cache-stats');
+                el.textContent = `Entries: ${cache.size}`;
+            }
+
+            document.getElementById('btn-cache-set').onclick = () => {
+                cache.set('GET:/api/users', [1, 2, 3], { tags: ['users'] });
+                cache.set('GET:/api/users/42', { id: 42 }, { tags: ['users'] });
+                cache.set('GET:/api/roles', ['admin'], { tags: ['config'] });
+                updateStats();
+                log('cache-log', 'Set 3 entries (2 tagged "users", 1 tagged "config")', 'success');
+            };
+            document.getElementById('btn-cache-inv-exact').onclick = () => {
+                const n = cache.invalidate('GET:/api/users');
+                updateStats();
+                log('cache-log', `Invalidated exact "GET:/api/users" → ${n} removed`, 'warn');
+            };
+            document.getElementById('btn-cache-inv-wild').onclick = () => {
+                const n = cache.invalidate('GET:/api/users*');
+                updateStats();
+                log('cache-log', `Invalidated wildcard "GET:/api/users*" → ${n} removed`, 'warn');
+            };
+            document.getElementById('btn-cache-inv-tag').onclick = () => {
+                const n = cache.invalidate(['users']);
+                updateStats();
+                log('cache-log', `Invalidated tag "users" → ${n} removed`, 'warn');
+            };
+            document.getElementById('btn-cache-clear').onclick = () => {
+                cache.clear();
+                updateStats();
+                log('cache-log', 'Cleared all', 'error');
+            };
+            updateStats();
+        })();
+
+        // ─── 3. Mutation ──────────────────────────────────────────
+        (() => {
+            const cache = createCache({ gcInterval: 0 });
+            cache.set('todos', ['Buy milk', 'Walk dog']);
+
+            const addTodo = mutation({
+                fn: async (text) => {
+                    await new Promise(r => setTimeout(r, 600));
+                    if (text === 'FAIL') throw new Error('Server rejected');
+                    return text;
+                },
+                optimistic: {
+                    key: 'todos',
+                    update: (current, input) => [...(current || []), input],
+                },
+                cache,
+            });
+
+            effect(() => {
+                const state = addTodo.state();
+                renderTags('mutation-state', [
+                    [`state: ${state}`, state === 'success' ? 'success' : state === 'error' ? 'error' : state === 'pending' ? 'warn' : 'info'],
+                    [`pending: ${addTodo.pending()}`, addTodo.pending() ? 'warn' : 'info'],
+                ]);
+                const todos = cache.get('todos');
+                document.getElementById('mutation-data').textContent = todos
+                    ? `Todos: ${JSON.stringify(todos.data)}`
+                    : 'No cache';
+            });
+
+            document.getElementById('btn-mut-success').onclick = async () => {
+                try {
+                    await addTodo.execute('New todo ' + Date.now() % 1000);
+                    log('mutation-log', 'Mutation succeeded', 'success');
+                } catch(e) { log('mutation-log', e.message, 'error'); }
+            };
+            document.getElementById('btn-mut-fail').onclick = async () => {
+                try {
+                    await addTodo.execute('FAIL');
+                } catch(e) {
+                    log('mutation-log', `Mutation failed → rolled back: ${e.message}`, 'error');
+                }
+            };
+            document.getElementById('btn-mut-reset').onclick = () => {
+                addTodo.reset();
+                cache.set('todos', ['Buy milk', 'Walk dog']);
+                log('mutation-log', 'Reset', 'info');
+            };
+        })();
+
+        // ─── 4. LinkedSignal ──────────────────────────────────────
+        (() => {
+            const category = signal('books');
+            const page = linkedSignal({
+                source: () => category(),
+                computation: (cat, prev) => {
+                    if (prev && prev.source === cat) return prev.value;
+                    return 1; // reset on category change
+                },
+            });
+
+            effect(() => {
+                document.getElementById('linked-page').textContent = String(page());
+                log('linked-log', `category=${category()}, page=${page()}`, 'info');
+            });
+
+            document.getElementById('linked-category').onchange = (e) => {
+                category.set(e.target.value);
+            };
+            document.getElementById('btn-page-prev').onclick = () => {
+                if (page() > 1) page.set(page.peek() - 1);
+            };
+            document.getElementById('btn-page-next').onclick = () => {
+                page.set(page.peek() + 1);
+            };
+        })();
+
+        // ─── 5. Form ─────────────────────────────────────────────
+        (() => {
+            const form = createForm({
+                initialValues: { name: '', email: '', message: '' },
+                validators: {
+                    name: [required('Name is required'), minLength(3, 'Min 3 characters')],
+                    email: [required('Email is required'), email('Invalid email')],
+                },
+                validateOn: 'onBlur',
+            });
+
+            const nameInput = document.getElementById('f-name');
+            const emailInput = document.getElementById('f-email');
+            const msgInput = document.getElementById('f-message');
+
+            nameInput.oninput = (e) => form.fields.name.onChange(e.target.value);
+            nameInput.onblur = () => form.fields.name.onBlur();
+            emailInput.oninput = (e) => form.fields.email.onChange(e.target.value);
+            emailInput.onblur = () => form.fields.email.onBlur();
+            msgInput.oninput = (e) => form.fields.message.onChange(e.target.value);
+
+            effect(() => {
+                const s = form.state();
+                renderTags('form-state', [
+                    [`state: ${s}`, s === 'success' ? 'success' : s === 'error' ? 'error' : s === 'submitting' ? 'warn' : 'info'],
+                    [`valid: ${form.valid()}`, form.valid() ? 'success' : 'error'],
+                ]);
+                document.getElementById('form-flags').textContent =
+                    `dirty:${form.dirty()} touched:${form.touched()}`;
+            });
+
+            effect(() => {
+                const err = form.fields.name.error();
+                document.getElementById('f-name-err').textContent = err || '';
+                nameInput.classList.toggle('error', !!err);
+            });
+            effect(() => {
+                const err = form.fields.email.error();
+                document.getElementById('f-email-err').textContent = err || '';
+                emailInput.classList.toggle('error', !!err);
+            });
+
+            const handler = form.handleSubmit(async (values) => {
+                await new Promise(r => setTimeout(r, 500));
+                log('form-log', `Submitted: ${JSON.stringify(values)}`, 'success');
+            });
+
+            document.getElementById('contact-form').onsubmit = handler;
+            document.getElementById('btn-form-reset').onclick = () => {
+                form.reset();
+                nameInput.value = '';
+                emailInput.value = '';
+                msgInput.value = '';
+                log('form-log', 'Form reset', 'info');
+            };
+        })();
+
+        // ─── 6. Field Array ──────────────────────────────────────
+        (() => {
+            const arr = createFieldArray([
+                { text: 'First item' },
+                { text: 'Second item' },
+            ]);
+
+            function renderItems() {
+                const container = document.getElementById('array-items');
+                const items = arr.items();
+                container.innerHTML = items.map((item, i) =>
+                    `<div class="item-row">
+                        <span class="tag info">#${item.__id}</span>
+                        <input value="${item.value.text}" data-idx="${i}" />
+                        <button class="danger arr-remove" data-idx="${i}">×</button>
+                    </div>`
+                ).join('');
+
+                // Wire remove buttons
+                container.querySelectorAll('.arr-remove').forEach(btn => {
+                    btn.onclick = () => { arr.remove(parseInt(btn.dataset.idx)); renderItems(); };
+                });
+
+                document.getElementById('array-values').textContent =
+                    `Values: ${JSON.stringify(arr.getValues())}`;
+            }
+
+            document.getElementById('btn-arr-add').onclick = () => {
+                arr.append({ text: `Item ${arr.items().length + 1}` });
+                renderItems();
+            };
+            document.getElementById('btn-arr-swap').onclick = () => {
+                if (arr.items().length >= 2) { arr.swap(0, 1); renderItems(); }
+            };
+            document.getElementById('btn-arr-reset').onclick = () => { arr.reset(); renderItems(); };
+
+            renderItems();
+        })();
+
+        // ─── 7. bind() CSS ───────────────────────────────────────
+        (() => {
+            const bgColor = signal('#238636');
+            const radius = signal(8);
+            const rotation = signal(0);
+
+            const box = document.getElementById('bind-box');
+
+            // This simulates what the compiler generates for bind(bgColor) etc.
+            effect(() => {
+                box.style.setProperty('--demo-bg', bgColor());
+                box.style.setProperty('--demo-radius', radius() + 'px');
+                box.style.setProperty('--demo-rotation', rotation() + 'deg');
+                box.style.background = `var(--demo-bg)`;
+                box.style.borderRadius = `var(--demo-radius)`;
+                box.style.transform = `rotate(var(--demo-rotation))`;
+            });
+
+            document.getElementById('bind-color').oninput = (e) => bgColor.set(e.target.value);
+            document.getElementById('bind-radius').oninput = (e) => radius.set(parseInt(e.target.value));
+            document.getElementById('bind-rotate').oninput = (e) => rotation.set(parseInt(e.target.value));
+        })();
+
+        // ─── 8. responsiveValue ──────────────────────────────────
+        (() => {
+            // Show the CSS clamp formula (Tier 1 — pure CSS)
+            const cssExpr = responsiveCSS(16, 64);
+            document.getElementById('responsive-formula').textContent = `Tier 1 CSS: font-size: ${cssExpr};`;
+
+            // Show Tier 3 JS signal for visualization
+            const fluidSize = responsiveValue(16, 64, { easing: 'ease-in-out' });
+            const bar = document.getElementById('responsive-bar');
+            const valueEl = document.getElementById('responsive-value');
+
+            function update() {
+                // Read the computed value (depends on window.innerWidth)
+                const val = fluidSize();
+                bar.style.width = `${val}%`;
+                valueEl.textContent = `Tier 3 JS: ${val.toFixed(1)}px (viewport: ${window.innerWidth}px)`;
+            }
+
+            update();
+            window.addEventListener('resize', update);
+        })();
+    </script>
+</body>
+</html>

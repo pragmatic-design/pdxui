@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic (Static Array)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple list from a static items array with a render function.</p>
+    <div class="demo-container">
+      <pdx-list :items="basicItems" :render-item="renderBasicItem" clickable dividers @pdx-click="onItemClick"></pdx-list>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="list-log">{{ listLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="users" :render-item="renderUser" clickable dividers
+  @pdx-click="onUserClick"&gt;
+&lt;/pdx-list&gt;
+
+// renderUser = (user) => {
+//   return '&lt;strong&gt;' + user.name + '&lt;/strong&gt; — ' + user.role;
+// }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const basicItems = [
+  { id: 1, name: 'Alice Johnson', role: 'Frontend Developer' },
+  { id: 2, name: 'Bob Smith', role: 'Backend Developer' },
+  { id: 3, name: 'Carol White', role: 'Designer' },
+  { id: 4, name: 'David Brown', role: 'Product Manager' },
+  { id: 5, name: 'Eve Davis', role: 'DevOps Engineer' },
+];
+
+function renderBasicItem(userItem) {
+  return '<strong>' + userItem.name + '</strong><span style="color:var(--pdx-color-muted);margin-left:auto;font-size:0.8rem">' + userItem.role + '</span>';
+}
+
+function onItemClick(evt) {
+  listLog = 'Clicked: ' + evt.detail.item.name + ' (id: ' + evt.detail.id + ')';
+}
+
+let listLog = $signal('Click an item...');
+</script>

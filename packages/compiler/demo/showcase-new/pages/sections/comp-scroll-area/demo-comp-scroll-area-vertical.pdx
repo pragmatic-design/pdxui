@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Vertical (Default)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Scroll the content below. Overlay scrollbar appears on scroll/hover.</p>
+    <div class="demo-container">
+      <pdx-scroll-area maxheight="250px" type="auto">
+        <div class="scroll-content">
+          <h3>Section 1</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+          <h3>Section 2</h3>
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p>
+          <h3>Section 3</h3>
+          <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem.</p>
+          <h3>Section 4</h3>
+          <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+          <h3>Section 5</h3>
+          <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit. At vero eos et accusamus et iusto odio dignissimos ducimus.</p>
+        </div>
+      </pdx-scroll-area>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-scroll-area maxheight="250px" type="auto"&gt;
+  &lt;div&gt;...long content...&lt;/div&gt;
+&lt;/pdx-scroll-area&gt;</code></pre>
+    </details>
+  </section>
+</template>

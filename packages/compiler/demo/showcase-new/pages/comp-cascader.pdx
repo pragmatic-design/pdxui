@@ -1,0 +1,79 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Cascader</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-cascader&gt;</code> — multi-level drill-down selector.
+      Each selection opens the next column of children (Country → Region → City).
+      Supports lazy loading, search, disabled nodes, clearable.
+    </p>
+
+    <!-- ═══ 1. Basic ═══ -->
+    <pdx-demo-comp-cascader-basic class="demo-section"></pdx-demo-comp-cascader-basic>
+
+    <!-- ═══ 2. Pre-selected ═══ -->
+    <pdx-demo-comp-cascader-preselected class="demo-section"></pdx-demo-comp-cascader-preselected>
+
+    <!-- ═══ 3. Searchable ═══ -->
+    <pdx-demo-comp-cascader-searchable class="demo-section"></pdx-demo-comp-cascader-searchable>
+
+    <!-- ═══ 4. Change on select ═══ -->
+    <pdx-demo-comp-cascader-change-on-select class="demo-section"></pdx-demo-comp-cascader-change-on-select>
+
+    <!-- ═══ 5. Disabled items ═══ -->
+    <pdx-demo-comp-cascader-disabled class="demo-section"></pdx-demo-comp-cascader-disabled>
+
+    <!-- ═══ Lazy loading ═══ -->
+    <pdx-demo-comp-cascader-lazy class="demo-section"></pdx-demo-comp-cascader-lazy>
+
+    <!-- ═══ 6. Custom separator ═══ -->
+    <pdx-demo-comp-cascader-separator class="demo-section"></pdx-demo-comp-cascader-separator>
+
+    <!-- ═══ Slots ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>option</code></td><td><code>{ node, level, selected }</code></td><td>Custom cascader option.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>options</code><span>CascaderNode[]</span><span>Tree of { value, label, children?, disabled? }</span></div>
+        <div class="opt-row"><code>value</code><span>string[]</span><span>Selected path from root to leaf</span></div>
+        <div class="opt-row"><code>searchable</code><span>boolean</span><span>Enable search across all levels</span></div>
+        <div class="opt-row"><code>separator</code><span>string</span><span>Display separator (default: ' / ')</span></div>
+        <div class="opt-row"><code>changeOnSelect</code><span>boolean</span><span>Allow selecting non-leaf nodes</span></div>
+        <div class="opt-row"><code>loadChildren</code><span>function</span><span>Lazy load: (node) => Promise&lt;CascaderNode[]&gt;</span></div>
+        <div class="opt-row"><code>clearable</code><span>boolean</span><span>Show clear button (default: true)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>Placeholder text</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ value, labels }</span><span>Selection changed</span></div>
+        <div class="opt-row"><code>pdx-open</code><span>—</span><span>Panel opened</span></div>
+        <div class="opt-row"><code>pdx-close</code><span>—</span><span>Panel closed</span></div>
+        <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Value cleared</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/cascader';
+@title 'Cascader Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

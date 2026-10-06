@@ -1,0 +1,53 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Form Template</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-form-template&gt;</code> — renders a complete form from a <code>FormSchema</code>:
+      field types map to the right controls, validators run from the schema, sections become
+      fieldsets, and <code>size</code> drives a 12-column grid. One JSON, a full form.
+    </p>
+
+    <pdx-demo-comp-form-template-schema-driven class="demo-section"></pdx-demo-comp-form-template-schema-driven>
+
+    <pdx-demo-comp-form-template-sections class="demo-section"></pdx-demo-comp-form-template-sections>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>schema</code><span>FormSchema</span><span>{ fields, sections?, layout?, columns? }</span></div>
+        <div class="opt-row"><code>form</code><span>Form</span><span>Pre-existing Form instance (else one is built from schema)</span></div>
+        <div class="opt-row"><code>autocomplete</code><span>string</span><span>autocomplete attr for the generated form (default 'off')</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">FormFieldSchema</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Field key (matches the form value)</span></div>
+        <div class="opt-row"><code>type</code><span>FormFieldType</span><span>text · email · number · select · switch · date · textarea · slider · …</span></div>
+        <div class="opt-row"><code>label / placeholder / hint</code><span>string</span><span>Display text around the control</span></div>
+        <div class="opt-row"><code>required / validators</code><span>boolean / ValidatorSchema[]</span><span>Validation from the schema</span></div>
+        <div class="opt-row"><code>options</code><span>{ label, value }[]</span><span>For select / radio / segmented</span></div>
+        <div class="opt-row"><code>size</code><span>number (1–12)</span><span>Grid column span</span></div>
+        <div class="opt-row"><code>section</code><span>string</span><span>Section this field belongs to</span></div>
+        <div class="opt-row"><code>visibleWhen</code><span>VisibilityCondition</span><span>Conditional visibility from another field</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-submit</code><span>{ values }</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/form-template';
+@title 'Form Template';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); max-width: 720px; }
+</style>

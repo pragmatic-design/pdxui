@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Drag primitives harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: #fff; color: #111; font-family: system-ui; }
+        section[hidden] { display: none !important; }
+
+        /* Explicit geometry, because that is the whole subject.
+           The unit tests stub the rects; here the browser computes them, so every size that the
+           index arithmetic depends on is written down and nothing is inherited from a theme. */
+        .list { width: 260px; margin: 80px 0 0 120px; padding: 0; list-style: none; }
+        .row { height: 40px; line-height: 40px; box-sizing: border-box; padding: 0 12px;
+               border: 1px solid #ccc; margin: 0; background: #f6f6f6; user-select: none; }
+        .grip { display: inline-block; width: 24px; cursor: grab; }
+
+        /* The horizontal axis: the one the file header claims for tab reorder. */
+        .hlist { display: flex; margin: 80px 0 0 120px; padding: 0; list-style: none; }
+        .hcol { width: 60px; height: 40px; line-height: 40px; box-sizing: border-box; text-align: center;
+                border: 1px solid #ccc; background: #f6f6f6; user-select: none; }
+
+        /* Two lists side by side, each one its own sortable, sharing a group. The widths are
+           explicit for the same reason the row height is: the arithmetic depends on them. */
+        .two-lists { display: flex; gap: 60px; align-items: flex-start; }
+        .two-lists .list { margin: 80px 0 0 0; }
+        #group-a { margin-left: 120px; }
+
+        .zones { display: flex; gap: 40px; margin: 80px 0 0 120px; }
+        .zone { width: 200px; height: 200px; border: 2px dashed #999; box-sizing: border-box; }
+        .puck { position: absolute; left: 700px; top: 120px; width: 80px; height: 80px;
+                background: #48c; color: #fff; text-align: center; line-height: 80px; touch-action: none; }
+    </style>
+</head>
+<body>
+
+<section id="case-sortable" hidden>
+    <ul class="list" id="sortable-list"></ul>
+</section>
+
+<section id="case-sortable-handle" hidden>
+    <ul class="list" id="handle-list"></ul>
+</section>
+
+<section id="case-sortable-groups" hidden>
+    <div class="two-lists">
+        <ul class="list" id="group-a"></ul>
+        <ul class="list" id="group-b"></ul>
+    </div>
+</section>
+
+<section id="case-sortable-horizontal" hidden>
+    <ul class="hlist" id="horizontal-list"></ul>
+</section>
+
+<section id="case-mechanisms" hidden>
+    <div class="zones">
+        <div class="zone" id="mech-zone" data-test="mech-zone"></div>
+    </div>
+    <div class="puck" id="mech-puck" data-test="mech-puck">pointer</div>
+    <pdx-data-grid id="mech-grid" data-test="mech-grid" row-reorder style="position:absolute;left:380px;top:80px;width:280px"></pdx-data-grid>
+</section>
+
+<section id="case-drop-zones" hidden>
+    <div class="zones">
+        <div class="zone" id="zone-a" data-test="zone-a" aria-label="Inbox"></div>
+        <div class="zone" id="zone-b" data-test="zone-b" aria-label="Archive"></div>
+    </div>
+    <div class="puck" id="puck" data-test="puck" tabindex="0">drag me</div>
+</section>
+
+<script type="module">
+    // The bench for useSortable / useDrag / useDropZone, driven by REAL pointer events.
+    //
+    // Their 64 unit tests run in happy-dom, which lays nothing out, so every rect they reason about
+    // is one the test itself wrote — `sortable-more.test.ts` says so in its own header. This page
+    // measures what the arithmetic does against rects a browser computed.
+    //
+    // Nothing here asserts. The page builds the situation and hands the pieces to the spec through
+    // window.__drag.
+    import { useSortable, useDrag, useDropZone, effect } from '@pdxui/core';
+    // The one component it renders, not the barrel: the scenarios' config resolves every sub-path.
+    import '@pdxui/ui/data-grid';
+    // The FOUNDATION. It matters beyond appearance: a drop zone's feedback is painted by the
+    // design system (`components/drop-zone.css`), so without it the zone carries the right
+    // attribute and looks identical. The page's own `<style>` is unlayered and still wins over all of it.
+    import '@pdxui/design/base';
+
+    const p = new URLSearchParams(location.search);
+    const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+    const which = p.get('case') ?? '';
+
+    const api = {
+        /** Two frames, for the rAF throttle inside useDrag's pointermove. */
+        frame: () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+    };
+    window.__drag = api;
+
+    /** Reveal one case and remove the others, so a document-wide selector cannot find a stranger. */
+    function show(id) {
+        for (const sec of document.querySelectorAll('section')) {
+            if (sec.id !== id) sec.remove();
+            else sec.hidden = false;
+        }
+        return document.getElementById(id);
+    }
+
+    const LABELS = ['alpha', 'bravo', 'charlie', 'delta', 'echo'];
+
+    /**
+     * A keyed list: one element per item, kept across reorders. The reorder moves the SAME nodes,
+     * which is what a real consumer does and what makes "the row landed two places down" a
+     * statement about the DOM rather than about a re-render.
+     */
+    function buildList(ul, withHandle, rowClass = 'row') {
+        const items = LABELS.map((label) => ({ label }));
+        const nodes = new Map();
+        for (const item of items) {
+            const li = document.createElement('li');
+            li.className = rowClass;
+            li.dataset.test = item.label;
+            li.innerHTML = withHandle ? `<span class="grip" data-test="grip-${item.label}">::</span>${item.label}` : item.label;
+            nodes.set(item, li);
+            ul.appendChild(li);
+        }
+        return { items, nodes };
+    }
+
+    function wireSortable(ul, options, rowClass) {
+        const { items, nodes } = buildList(ul, !!options.handle, rowClass);
+        // Focusable rows: a keyboard reorder needs somewhere to start, and `useSortable` does not
+        // impose a tabindex on markup it did not write.
+        for (const li of nodes.values()) li.tabIndex = 0;   // `nodes` is a Map, keyed by item
+        const reorders = [];
+
+        const sortable = useSortable(() => ul, {
+            items: () => items,
+            onReorder(from, to) {
+                reorders.push([from, to]);
+                const [moved] = items.splice(from, 1);
+                items.splice(to, 0, moved);
+                for (const item of items) ul.appendChild(nodes.get(item));
+            },
+            ...options,
+        });
+
+        api.reorders = reorders;
+        api.order = () => Array.from(ul.children).map((li) => li.dataset.test);
+        api.model = () => items.map((i) => i.label);
+        api.state = () => ({
+            activeIndex: sortable.activeIndex(),
+            overIndex: sortable.overIndex(),
+            isDragging: sortable.isDragging(),
+        });
+        api.styles = () => Array.from(ul.children).map((li) => ({
+            test: li.dataset.test, transform: li.style.transform, opacity: li.style.opacity,
+        }));
+        api.ghosts = () => document.querySelectorAll(`body > .${rowClass ?? 'row'}`).length;
+        api.dispose = () => sortable.dispose();
+    }
+
+    if (which === 'sortable') {
+        show('case-sortable');
+        // `?feedback=` selects what the list shows while an item is dragged:
+        // nothing, the default gap, or the preview that puts the item in its landing slot.
+        const fb = p.get('feedback');
+        const noA11y = p.get('a11y') === 'off';
+        wireSortable(document.getElementById('sortable-list'),
+            fb === 'none' ? { feedback: false, ...(noA11y ? { a11y: false } : {}) }
+            : fb === 'preview' ? { feedback: { gap: 'preview' }, ...(noA11y ? { a11y: false } : {}) }
+            : (noA11y ? { a11y: false } : {}));
+    }
+
+    if (which === 'sortable-handle') {
+        show('case-sortable-handle');
+        wireSortable(document.getElementById('handle-list'), { handle: '.grip' });
+    }
+
+    // Two lists, one group. What the page measures is the gap opening in the list the
+    // pointer moved INTO, and the pair of callbacks that fire on release.
+    if (which === 'sortable-groups') {
+        show('case-sortable-groups');
+        const received = [];
+        const removed = [];
+        api.received = () => received.slice();
+        api.removed = () => removed.slice();
+
+        const model = { a: ['alpha', 'bravo', 'charlie'], b: ['delta', 'echo'] };
+        const render = (id, key) => {
+            const ul = document.getElementById(id);
+            ul.innerHTML = '';
+            for (const label of model[key]) {
+                const li = document.createElement('li');
+                li.className = 'row';
+                li.dataset.test = label;
+                li.textContent = label;
+                ul.appendChild(li);
+            }
+        };
+        render('group-a', 'a');
+        render('group-b', 'b');
+
+        const wire = (id, key) => useSortable(() => document.getElementById(id), {
+            items: () => model[key],
+            group: 'cards',
+            onReorder: (from, to) => {
+                const next = model[key].slice();
+                next.splice(to, 0, next.splice(from, 1)[0]);
+                model[key] = next;
+                render(id, key);
+            },
+            onRemove: (item, from) => {
+                removed.push({ list: key, item, from });
+                model[key] = model[key].filter((_, i) => i !== from);
+                render(id, key);
+            },
+            onReceive: (item, from, to) => {
+                received.push({ list: key, item, from, to });
+                const next = model[key].slice();
+                next.splice(to, 0, item);
+                model[key] = next;
+                render(id, key);
+            },
+        });
+        const a = wire('group-a', 'a');
+        const b = wire('group-b', 'b');
+
+        api.model = () => ({ a: model.a.slice(), b: model.b.slice() });
+        api.styles = () => Array.from(document.querySelectorAll('.two-lists .row')).map(r => ({
+            test: r.dataset.test, transform: r.style.transform, opacity: r.style.opacity,
+        }));
+        api.state = () => ({ isDragging: a.isDragging() || b.isDragging() });
+        api.dispose = () => { a.dispose(); b.dispose(); };
+    }
+
+    if (which === 'sortable-horizontal') {
+        show('case-sortable-horizontal');
+        wireSortable(document.getElementById('horizontal-list'), { axis: 'horizontal' }, 'hcol');
+    }
+
+    // The boundary between the two event models, on one page. The composables are POINTER events;
+    // the data grid's row reorder is HTML5 `dataTransfer`. They share no code, and the question this
+    // case answers is whether they can meet: a row dragged out of a grid, onto a useDropZone.
+    if (which === 'mechanisms') {
+        show('case-mechanisms');
+        const events = [];
+        api.events = events;
+
+        const puck = document.getElementById('mech-puck');
+        const drag = useDrag(() => puck, { data: () => ({ id: 'puck' }) });
+        const zone = useDropZone(() => document.getElementById('mech-zone'), {
+            onEnter: (data) => events.push({ type: 'enter', data }),
+            onDrop: (data) => events.push({ type: 'drop', data }),
+        });
+
+        const grid = document.getElementById('mech-grid');
+        grid.columns = [{ field: 'name', header: 'Name' }];
+        grid.data = [{ id: 1, name: 'Ada' }, { id: 2, name: 'Grace' }, { id: 3, name: 'Katherine' }];
+        grid.addEventListener('pdx-row-reorder', (e) => events.push({ type: 'row-reorder', detail: e.detail }));
+
+        api.state = () => ({ isDragging: drag.isDragging(), over: zone.isOver(), edge: zone.edge() });
+        api.dispose = () => { drag.dispose(); zone.dispose(); };
+    }
+
+    if (which === 'drop-zones') {
+        show('case-drop-zones');
+        const puck = document.getElementById('puck');
+        const events = [];
+        api.events = events;
+
+        const drag = useDrag(() => puck, { data: () => ({ id: 'puck' }) });
+
+        // `useDrag` does not move anything — it reports the gesture, and nothing touches the DOM
+        // unless the caller paints it. That matters here beyond appearance: the drop
+        // zones are hit-tested against the draggable's BOUNDING RECT, so an unpainted keyboard
+        // drag never reaches a zone however many arrows are pressed. An app paints; so does this.
+        effect(() => {
+            const p = drag.position();
+            puck.style.transform = drag.isDragging() ? `translate(${p.x}px, ${p.y}px)` : '';
+        });
+
+        const zoneA = useDropZone(() => document.getElementById('zone-a'), {
+            // `line: true` — zone A is the one that has an order, so it asks for the insertion
+            // line as well as the highlight. Zone B takes the defaults.
+            feedback: { line: true },
+            onEnter: (data) => events.push({ zone: 'a', type: 'enter', data }),
+            onLeave: () => events.push({ zone: 'a', type: 'leave' }),
+            onDrop: (data, pos) => events.push({ zone: 'a', type: 'drop', data, edge: pos.edge }),
+        });
+        // Rejects everything: a zone the pointer is over that must still report isOver === false.
+        const zoneB = useDropZone(() => document.getElementById('zone-b'), {
+            accept: () => false,
+            onEnter: () => events.push({ zone: 'b', type: 'enter' }),
+            onDrop: () => events.push({ zone: 'b', type: 'drop' }),
+        });
+
+        api.state = () => ({
+            isDragging: drag.isDragging(),
+            position: drag.position(),
+            velocity: drag.velocity(),
+            overA: zoneA.isOver(),
+            edgeA: zoneA.edge(),
+            overB: zoneB.isOver(),
+            // What the DESTINATION says about itself: the state signals, put on the element.
+            rejectedB: zoneB.isRejected(),
+            dropA: document.getElementById('zone-a').getAttribute('data-pdx-drop'),
+            dropEdgeA: document.getElementById('zone-a').getAttribute('data-pdx-drop-edge'),
+            dropB: document.getElementById('zone-b').getAttribute('data-pdx-drop'),
+            // `aria-grabbed` is deprecated in WAI-ARIA 1.1 and useDrag does not set it. Still
+            // read here, so the spec can assert its ABSENCE rather than
+            // stop looking.
+            grabbed: puck.getAttribute('aria-grabbed'),
+            roleDescription: puck.getAttribute('aria-roledescription'),
+            describedBy: puck.getAttribute('aria-describedby'),
+            // The text the description actually resolves to — an aria-describedby pointing at
+            // nothing is worse than none, and only following it catches that.
+            describedText: (() => {
+                const id = puck.getAttribute('aria-describedby');
+                const el = id ? document.getElementById(id) : null;
+                return el ? el.textContent.trim() : null;
+            })(),
+        });
+        api.dispose = () => { drag.dispose(); zoneA.dispose(); zoneB.dispose(); };
+    }
+
+    requestAnimationFrame(() => requestAnimationFrame(() =>
+        document.documentElement.setAttribute('data-pdx-ready', '1')));
+</script>
+</body>
+</html>

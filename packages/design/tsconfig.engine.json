@@ -1,0 +1,9 @@
+{
+  "//": "Compiles the theme engine to dist/engine for consumers: Node will not load TypeScript from node_modules, so `exports[\"./engine\"]` points at this output everywhere except this repository.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist/engine",
+    "rootDir": "src/engine"
+  },
+  "include": ["src/engine/**/*.ts"]
+}

@@ -1,0 +1,59 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Size Limit</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Max 2 MB per file. A file over the limit is refused: the component lists it under the zone
+      (and announces it), and emits <code>pdx-error</code> for your app to react.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-file-upload :max-size="2097152" @pdx-error="onError" @pdx-select="onSizeSelect"></pdx-file-upload>
+      @if (errorMsg) {
+        <div class="error-box">
+          <span class="pdx-txt-small pdx-ink-muted">Last pdx-error: </span>
+          <span class="pdx-txt-small">{{ errorMsg }}</span>
+        </div>
+      }
+      @if (sizeFiles) {
+        <div class="result-box">
+          <span class="pdx-txt-small pdx-ink-muted">Accepted: </span>
+          <span class="pdx-txt-small">{{ sizeFiles }}</span>
+        </div>
+      }
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-file-upload :max-size="2097152"
+  @pdx-error="onError" /&gt;
+
+function onError(e) {
+  errorMsg = e.detail.file.name + ': ' + e.detail.error;
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let errorMsg = $signal('');
+let sizeFiles = $signal('');
+
+function onError(e) {
+  errorMsg = e.detail.file.name + ': ' + e.detail.error;
+}
+
+function onSizeSelect(e) {
+  const names = e.detail.files.map(f => f.name);
+  sizeFiles = names.join(', ');
+}
+</script>
+
+<style scoped>
+  .error-box {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-danger-soft);
+    border-radius: var(--pdx-radius-md);
+    border: 1px solid var(--pdx-color-danger);
+    color: var(--pdx-color-danger-ink);
+  }
+</style>

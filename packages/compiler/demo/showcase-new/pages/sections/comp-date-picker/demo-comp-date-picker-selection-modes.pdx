@@ -1,0 +1,55 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">9 Selection Modes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      date, datetime, daterange, datetimerange, time, week, month, year, quarter.
+    </p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">date</span>
+        <pdx-date-picker mode="date" placeholder="Select date"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">datetime</span>
+        <pdx-date-picker mode="datetime" placeholder="Date + time"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">daterange</span>
+        <pdx-date-picker mode="daterange" placeholder="Start — End"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">time</span>
+        <pdx-date-picker mode="time" placeholder="Select time"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">week</span>
+        <pdx-date-picker mode="week" placeholder="Select week"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">month</span>
+        <pdx-date-picker mode="month" placeholder="Select month"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">year</span>
+        <pdx-date-picker mode="year" placeholder="Select year"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">quarter</span>
+        <pdx-date-picker mode="quarter" placeholder="Select quarter"></pdx-date-picker>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker mode="date" placeholder="Select date"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker mode="datetime" placeholder="Date + time"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker mode="daterange" placeholder="Start — End"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker mode="time" placeholder="Select time"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker mode="week" placeholder="Select week"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker mode="month" placeholder="Select month"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker mode="year" placeholder="Select year"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker mode="quarter" placeholder="Select quarter"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

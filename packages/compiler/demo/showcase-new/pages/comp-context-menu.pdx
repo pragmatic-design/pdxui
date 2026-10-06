@@ -1,0 +1,80 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">ContextMenu</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-context-menu&gt;</code> — right-click context menu. Cursor-following position,
+      long-press mobile, Shift+F10 keyboard, icons, shortcuts, disabled items.
+    </p>
+
+    <pdx-demo-comp-context-menu-right-click class="demo-section"></pdx-demo-comp-context-menu-right-click>
+
+    <pdx-demo-comp-context-menu-disabled-items class="demo-section"></pdx-demo-comp-context-menu-disabled-items>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>item</code></td><td><code>{ item, key, type }</code></td><td>Custom menu item content.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>MenuItem[]</td><td>[]</td><td>Menu items (same format as pdx-menu)</td></tr>
+            <tr><td><code>disabled</code></td><td>Boolean</td><td>false</td><td>Prevent menu from opening</td></tr>
+            <tr><td><code>min-width</code></td><td>Number</td><td>180</td><td>Minimum panel width (px)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Triggers</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Trigger</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Right-click</td><td>Desktop — opens at cursor position</td></tr>
+            <tr><td>Long-press (500ms)</td><td>Touch devices — opens at finger position</td></tr>
+            <tr><td>Shift+F10 / menu key</td><td>Keyboard — opens at the focused element's center; the area needs a focusable element</td></tr>
+            <tr><td>Arrow keys, Enter / Space</td><td>Move between items; choose one, like a click</td></tr>
+            <tr><td>Click outside / Escape</td><td>Closes the menu; from the keyboard, focus returns to the area</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/context-menu';
+@title 'ContextMenu — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.ctx-target {
+  width: 100%;
+  height: 200px;
+  border: 2px dashed var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pdx-color-inset);
+  user-select: none;
+  cursor: context-menu;
+}
+.ctx-target-sm { height: 120px; }
+</style>

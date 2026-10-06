@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Dashboard</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Mixed card types in a dashboard-style grid.</p>
+
+    <div class="dashboard-grid">
+      <div class="pdx-surface-card pdx-card-accent pdx-card-compact">
+        <div class="pdx-card-body">
+          <span class="pdx-txt-caption pdx-ink-muted">Revenue</span>
+          <div class="pdx-txt-title" style="margin-top: 4px;">$12,450</div>
+          <span class="pdx-txt-caption pdx-ink-muted">+12% from last month</span>
+        </div>
+      </div>
+
+      <div class="pdx-surface-card pdx-card-accent-success pdx-card-compact">
+        <div class="pdx-card-body">
+          <span class="pdx-txt-caption pdx-ink-muted">Users</span>
+          <div class="pdx-txt-title" style="margin-top: 4px;">1,234</div>
+          <span class="pdx-txt-caption pdx-ink-muted">+8% from last month</span>
+        </div>
+      </div>
+
+      <div class="pdx-surface-card pdx-card-accent-warning pdx-card-compact">
+        <div class="pdx-card-body">
+          <span class="pdx-txt-caption pdx-ink-muted">Pending</span>
+          <div class="pdx-txt-title" style="margin-top: 4px;">23</div>
+          <span class="pdx-txt-caption pdx-ink-muted">Requires attention</span>
+        </div>
+      </div>
+
+      <div class="pdx-surface-card pdx-card-accent-danger pdx-card-compact">
+        <div class="pdx-card-body">
+          <span class="pdx-txt-caption pdx-ink-muted">Errors</span>
+          <div class="pdx-txt-title" style="margin-top: 4px;">3</div>
+          <span class="pdx-txt-caption pdx-ink-muted">Last 24 hours</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+</style>

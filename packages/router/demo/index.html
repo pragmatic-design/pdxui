@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pragmatic Router Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: #f8f9fa; color: #1a1a2e; }
+        .app { max-width: 900px; margin: 0 auto; }
+        nav { background: #4361ee; padding: 0.75rem 1.5rem; display: flex; gap: 1rem; align-items: center; }
+        nav a { color: white; text-decoration: none; padding: 0.35rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+        nav a:hover, nav a.active { background: rgba(255,255,255,0.2); }
+        nav .brand { font-weight: bold; font-size: 1.1rem; margin-right: auto; }
+        .page { padding: 1.5rem; }
+        .page h2 { margin-bottom: 0.75rem; }
+        .card { background: white; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .user-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid #eee; cursor: pointer; }
+        .user-row:hover { background: #f0f4ff; }
+        .user-row:last-child { border-bottom: none; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #4361ee; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 99px; font-size: 0.7rem; font-weight: 600; background: #cce5ff; color: #004085; }
+        .mono { font-family: monospace; font-size: 0.8rem; color: #888; }
+        #route-info { background: #1a1a2e; color: #4cc9f0; padding: 0.75rem 1.5rem; font-family: monospace; font-size: 0.8rem; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+        .product-card { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); text-align: center; }
+        .price { color: #2a9d8f; font-weight: bold; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <nav id="nav"></nav>
+        <div id="route-info"></div>
+        <div id="outlet"></div>
+    </div>
+
+<script type="module">
+import { signal, computed, effect, html } from '../../core/src/index.ts';
+import { generateRouter } from '../src/compiler.ts';
+
+// ═══ Define our routes (simulating what the compiler would extract from @page) ═══
+
+const routes = [
+    { path: '/', file: 'home', params: [], prefetch: 'eager' },
+    { path: '/users', file: 'users', params: [], guard: 'admin.users' },
+    { path: '/users/:id', file: 'user-detail', params: [{ name: 'id', type: 'string' }] },
+    { path: '/products', file: 'products', params: [], prefetch: 'hover' },
+    { path: '/products/:category', file: 'product-category', params: [{ name: 'category', type: 'string' }] },
+    { path: '/about', file: 'about', params: [] },
+];
+
+// ═══ Generate optimized router at "compile time" (in this demo, at load time) ═══
+const generated = generateRouter(routes);
+
+// ═══ Runtime: signals for current route ═══
+const currentPath = signal(location.pathname);
+const currentParams = signal({});
+const currentRoute = signal(null);
+
+// Simple route resolver (mirrors what the generated code does)
+function resolve(path) {
+    const segments = path.split('/').filter(Boolean);
+
+    if (segments.length === 0) return { name: 'home', params: {}, path: '/' };
+
+    switch (segments[0]) {
+        case 'users':
+            if (segments.length === 1) return { name: 'users', params: {}, path: '/users' };
+            return { name: 'user-detail', params: { id: segments[1] }, path: '/users/:id' };
+        case 'products':
+            if (segments.length === 1) return { name: 'products', params: {}, path: '/products' };
+            return { name: 'product-category', params: { category: segments[1] }, path: '/products/:category' };
+        case 'about':
+            return { name: 'about', params: {}, path: '/about' };
+        default:
+            return { name: '404', params: {}, path: path };
+    }
+}
+
+// ═══ Page renderers ═══
+
+const users = [
+    { id: '1', name: 'Alice Johnson', role: 'Admin', email: 'alice@example.com' },
+    { id: '2', name: 'Bob Smith', role: 'Editor', email: 'bob@example.com' },
+    { id: '3', name: 'Charlie Brown', role: 'Viewer', email: 'charlie@example.com' },
+    { id: '4', name: 'Diana Prince', role: 'Admin', email: 'diana@example.com' },
+];
+
+const products = [
+    { id: 'p1', name: 'Widget Pro', category: 'tools', price: 29.99 },
+    { id: 'p2', name: 'Gadget X', category: 'electronics', price: 149.99 },
+    { id: 'p3', name: 'Bolt Kit', category: 'tools', price: 12.50 },
+    { id: 'p4', name: 'Smart Sensor', category: 'electronics', price: 79.99 },
+    { id: 'p5', name: 'Cable Pack', category: 'accessories', price: 9.99 },
+];
+
+function renderPage(route) {
+    switch (route.name) {
+        case 'home':
+            return html`<div class="page">
+                <h2>Home</h2>
+                <div class="card">
+                    <p>Welcome to the Pragmatic Router Demo!</p>
+                    <p style="margin-top:0.5rem; color:#888;">This router is <strong>generated at compile time</strong> — zero regex, zero runtime overhead.</p>
+                    <p style="margin-top:0.5rem;">Try navigating with the links above.</p>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:0.5rem;">Features demonstrated:</h3>
+                    <ul style="padding-left:1.5rem; line-height:1.8;">
+                        <li>Switch-based routing (no regex matching)</li>
+                        <li>Typed route params (/users/:id)</li>
+                        <li>Navigation API (with History fallback)</li>
+                        <li>Reactive signals for current route</li>
+                        <li>Guard support (@guard)</li>
+                        <li>Speculation Rules generation</li>
+                    </ul>
+                </div>
+            </div>`;
+
+        case 'users':
+            return html`<div class="page">
+                <h2>Users</h2>
+                <div class="card">
+                    ${users.map(u => html`
+                        <div class="user-row" @click=${() => navigateTo('/users/' + u.id)}>
+                            <div class="avatar">${u.name[0]}</div>
+                            <div style="flex:1">
+                                <strong>${u.name}</strong>
+                                <div class="mono">${u.email}</div>
+                            </div>
+                            <span class="tag">${u.role}</span>
+                        </div>
+                    `)}
+                </div>
+            </div>`;
+
+        case 'user-detail': {
+            const user = users.find(u => u.id === route.params.id);
+            if (!user) return html`<div class="page"><h2>User not found</h2></div>`;
+            return html`<div class="page">
+                <h2>User: ${user.name}</h2>
+                <div class="card">
+                    <div style="display:flex; gap:1rem; align-items:center;">
+                        <div class="avatar" style="width:64px; height:64px; font-size:1.5rem;">${user.name[0]}</div>
+                        <div>
+                            <strong style="font-size:1.2rem;">${user.name}</strong>
+                            <div class="mono">${user.email}</div>
+                            <span class="tag">${user.role}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:1rem;">
+                        <p>Route param <code>:id</code> = <strong>${route.params.id}</strong></p>
+                        <p style="margin-top:0.25rem;" class="mono">Type-safe: params.id is string</p>
+                    </div>
+                </div>
+                <button style="margin-top:0.5rem; padding:0.35rem 1rem; cursor:pointer;" @click=${() => navigateTo('/users')}>← Back to Users</button>
+            </div>`;
+        }
+
+        case 'products':
+            return html`<div class="page">
+                <h2>Products</h2>
+                <div style="margin-bottom:0.75rem;">
+                    Filter:
+                    <button @click=${() => navigateTo('/products')}>All</button>
+                    <button @click=${() => navigateTo('/products/tools')}>Tools</button>
+                    <button @click=${() => navigateTo('/products/electronics')}>Electronics</button>
+                    <button @click=${() => navigateTo('/products/accessories')}>Accessories</button>
+                </div>
+                <div class="product-grid">
+                    ${products.map(p => html`
+                        <div class="product-card">
+                            <strong>${p.name}</strong>
+                            <div class="mono">${p.category}</div>
+                            <div class="price">$${p.price.toFixed(2)}</div>
+                        </div>
+                    `)}
+                </div>
+            </div>`;
+
+        case 'product-category': {
+            const filtered = products.filter(p => p.category === route.params.category);
+            return html`<div class="page">
+                <h2>Products: ${route.params.category}</h2>
+                <div style="margin-bottom:0.75rem;">
+                    <button @click=${() => navigateTo('/products')}>← All Products</button>
+                </div>
+                <div class="product-grid">
+                    ${filtered.map(p => html`
+                        <div class="product-card">
+                            <strong>${p.name}</strong>
+                            <div class="price">$${p.price.toFixed(2)}</div>
+                        </div>
+                    `)}
+                </div>
+                ${filtered.length === 0 ? html`<p style="color:#888;">No products in this category.</p>` : ''}
+            </div>`;
+        }
+
+        case 'about':
+            return html`<div class="page">
+                <h2>About</h2>
+                <div class="card">
+                    <p><strong>Pragmatic Router</strong> — compiled, not runtime.</p>
+                    <p style="margin-top:0.5rem;">The compiler analyzes all @page declarations and generates an optimized switch-based resolver. No regex, no loop, no router library.</p>
+                </div>
+                <div class="card">
+                    <h3>Generated Router Info</h3>
+                    <pre class="mono" style="margin-top:0.5rem; white-space:pre-wrap; font-size:0.75rem;">${generated.dts}</pre>
+                </div>
+                ${generated.speculationRules ? html`<div class="card">
+                    <h3>Speculation Rules (generated)</h3>
+                    <pre class="mono" style="margin-top:0.5rem; font-size:0.75rem;">${generated.speculationRules}</pre>
+                </div>` : ''}
+            </div>`;
+
+        default:
+            return html`<div class="page"><h2>404 — Page not found</h2><p>Path: ${route.path}</p></div>`;
+    }
+}
+
+// ═══ Navigation ═══
+
+function navigateTo(path) {
+    history.pushState(null, '', path);
+    updateRoute(path);
+}
+
+function updateRoute(path) {
+    const route = resolve(path);
+    currentPath.set(path);
+    currentParams.set(route.params);
+    currentRoute.set(route);
+}
+
+window.addEventListener('popstate', () => updateRoute(location.pathname));
+
+// Make navigateTo global for onclick handlers
+window.navigateTo = navigateTo;
+
+// ═══ Render ═══
+
+const navEl = document.getElementById('nav');
+const infoEl = document.getElementById('route-info');
+const outletEl = document.getElementById('outlet');
+
+navEl.appendChild(html`
+    <span class="brand">Pragmatic Router</span>
+    <a @click=${() => navigateTo('/')}>Home</a>
+    <a @click=${() => navigateTo('/users')}>Users</a>
+    <a @click=${() => navigateTo('/products')}>Products</a>
+    <a @click=${() => navigateTo('/about')}>About</a>
+`);
+
+// Reactive route info bar
+effect(() => {
+    const route = currentRoute();
+    if (!route) return;
+    infoEl.textContent = `Route: ${route.path}  |  Params: ${JSON.stringify(route.params)}  |  Path: ${currentPath()}`;
+});
+
+// Reactive page rendering
+effect(() => {
+    const route = currentRoute();
+    if (!route) return;
+    outletEl.innerHTML = '';
+    outletEl.appendChild(renderPage(route));
+});
+
+// Initial route
+updateRoute(location.pathname);
+</script>
+</body>
+</html>

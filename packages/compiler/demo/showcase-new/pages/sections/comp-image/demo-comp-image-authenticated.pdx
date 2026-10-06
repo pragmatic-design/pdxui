@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Authenticated Image</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Uses <code>:fetch-fn</code> to load images from protected endpoints. The function adds JWT headers and returns a Blob. Below: simulated auth fetch with a 1s delay (same-origin in production).</p>
+    <div class="demo-row">
+      <pdx-image src="/demo-images/city.svg" alt="Authenticated" width="300px" height="200px" :fetch-fn="authFetchFn" :lazy="false"></pdx-image>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="auth-log">{{ authLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// Production: fetch with JWT headers
+function authFetch(url) {
+  return fetch(url, {
+    headers: { Authorization: 'Bearer ' + getToken() }
+  }).then(r =&gt; r.blob());
+}
+
+&lt;pdx-image src="/api/images/123"
+  :fetch-fn="authFetch"&gt;
+&lt;/pdx-image&gt;
+
+// Or use auth-src + auth-provider:
+&lt;pdx-image auth-src="/api/images/123"
+  :auth-provider="() =&gt; ({ Authorization: 'Bearer ...' })"&gt;
+&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let authLog = $signal('Waiting for auth fetch...');
+
+const authFetchFn = function(url) {
+    authLog = 'Fetching with auth: Authorization: Bearer fake-jwt-...';
+    return new Promise(function(resolve) {
+        setTimeout(function() {
+            fetch(url).then(function(r) { return r.blob(); }).then(function(blob) {
+                authLog = 'Auth fetch complete. Token: Bearer fake-jwt-12345';
+                resolve(blob);
+            });
+        }, 1000);
+    });
+};
+</script>

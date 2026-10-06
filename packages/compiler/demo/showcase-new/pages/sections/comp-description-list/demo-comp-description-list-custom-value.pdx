@@ -1,0 +1,102 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Value Rendering</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>render-value</code> callback to render badges, links, or custom HTML for each value.</p>
+    <div class="demo-container">
+      <pdx-description-list :items="customItems" :render-value="renderCustomValue" :bordered="true" label-width="120px"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { label: 'Status', value: 'Active', type: 'badge' },
+  { label: 'Website', value: 'https://example.com', type: 'link' },
+  { label: 'Tags', value: 'admin,editor', type: 'tags' },
+];
+
+function renderValue(item) {
+  if (item.type === 'badge') {
+    const span = document.createElement('span');
+    span.className = 'pdx-badge pdx-badge-success';
+    span.textContent = item.value;
+    return span;
+  }
+  if (item.type === 'link') {
+    const a = document.createElement('a');
+    a.href = sanitizeUrl(item.value) || '#'; // block javascript:/data: (good practice, in demos too)
+    a.textContent = item.value;
+    return a;
+  }
+  if (item.type === 'tags') {
+    const div = document.createElement('div');
+    item.value.split(',').forEach(t =&gt; {
+      const chip = document.createElement('pdx-chip');
+      chip.setAttribute('label', t.trim());
+      chip.setAttribute('size', 'sm');
+      div.appendChild(chip);
+    });
+    return div;
+  }
+  return null; // fallback to default string render
+}
+
+&lt;pdx-description-list :items="items"
+  :render-value="renderValue"&gt;
+&lt;/pdx-description-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { sanitizeUrl } from '@pdxui/core';
+
+const customItems = [
+  { label: 'Name', value: 'Alice Johnson' },
+  { label: 'Status', value: 'Active', type: 'badge-success' },
+  { label: 'Website', value: 'https://example.com', type: 'link' },
+  { label: 'Tags', value: 'admin,editor,viewer', type: 'tags' },
+  { label: 'Progress', value: '75', type: 'progress' },
+];
+
+function renderCustomValue(item) {
+  if (item.type === 'badge-success') {
+    const span = document.createElement('span');
+    span.style.cssText = 'display:inline-flex;padding:2px 10px;border-radius:9999px;font-size:0.75rem;font-weight:600;background:var(--pdx-color-success);color:#fff';
+    span.textContent = item.value;
+    return span;
+  }
+  if (item.type === 'link') {
+    const a = document.createElement('a');
+    a.href = '#';
+    a.style.color = 'var(--pdx-color-primary)';
+    a.textContent = item.value;
+    return a;
+  }
+  if (item.type === 'tags') {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
+    item.value.split(',').forEach(function(tag) {
+      const chip = document.createElement('pdx-chip');
+      chip.setAttribute('label', tag.trim());
+      chip.setAttribute('size', 'sm');
+      div.appendChild(chip);
+    });
+    return div;
+  }
+  if (item.type === 'progress') {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:8px';
+    const bar = document.createElement('div');
+    bar.style.cssText = 'flex:1;height:6px;border-radius:3px;background:var(--pdx-color-inset);max-width:120px';
+    const fill = document.createElement('div');
+    fill.style.cssText = 'height:100%;border-radius:3px;background:var(--pdx-color-primary);width:' + item.value + '%';
+    bar.appendChild(fill);
+    wrap.appendChild(bar);
+    const text = document.createElement('span');
+    text.style.cssText = 'font-size:0.75rem;color:var(--pdx-color-muted)';
+    text.textContent = item.value + '%';
+    wrap.appendChild(text);
+    return wrap;
+  }
+  return null;
+}
+</script>

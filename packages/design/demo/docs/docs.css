@@ -1,0 +1,196 @@
+/* Shared docs styles */
+
+/* ===================== Layout ===================== */
+
+.doc-sidebar {
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    min-height: 100dvh;
+    overflow-y: auto;
+}
+
+.doc-nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+    text-decoration: none;
+    transition: all 150ms;
+}
+.doc-nav-link:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+.doc-nav-link.active { background: var(--pdx-color-inset); color: var(--pdx-color-primary); font-weight: var(--pdx-weight-medium); }
+
+.doc-nav-section {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--pdx-space-sm) var(--pdx-space-sm) var(--pdx-space-2xs);
+}
+
+/* ===================== Topbar ===================== */
+
+.doc-topbar {
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    z-index: var(--pdx-z-sticky);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    min-height: 2.75rem;
+}
+
+.doc-topbar-spacer { flex: 1; min-width: var(--pdx-space-sm); }
+
+/* Active state for topbar selectors */
+.doc-topbar .pdx-ghost[data-active="true"] {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+/* Group labels in topbar */
+.doc-topbar-label {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+/* Hamburger button — hidden on desktop */
+.doc-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--pdx-radius-sm);
+    background: none;
+    border: none;
+    color: var(--pdx-color-text);
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    padding: 0;
+}
+.doc-hamburger:hover { background: var(--pdx-color-inset); }
+
+/* ===================== Examples ===================== */
+
+.doc-example {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    overflow: hidden;
+}
+
+.doc-preview {
+    padding: var(--pdx-space-lg);
+    background: var(--pdx-color-bg);
+    overflow-x: auto;
+}
+
+.doc-source {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-top: 1px solid var(--pdx-color-border);
+    font-family: var(--pdx-font-mono);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+    max-height: 12rem;
+    overflow-y: auto;
+}
+
+/* Collapsible source blocks */
+.doc-source[data-collapsed="true"] {
+    max-height: 2.5rem;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+.doc-source[data-collapsed="true"]::after {
+    content: '... show code';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-primary);
+    cursor: pointer;
+}
+
+/* ===================== Section dividers ===================== */
+
+/* Visual rhythm between sections — subtle top border on h2 inside main content */
+.doc-section-divider {
+    border-top: 1px solid var(--pdx-color-border);
+    padding-top: var(--pdx-space-lg);
+}
+
+/* ===================== Mobile drawer ===================== */
+
+.doc-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: oklch(0 0 0 / 0.5);
+    z-index: calc(var(--pdx-z-overlay) - 1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms, visibility 200ms;
+}
+.doc-drawer-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ===================== Mobile responsive ===================== */
+
+@media (max-width: 768px) {
+    /* Collapse the split — sidebar becomes fixed drawer */
+    body > pdx-split {
+        display: block;
+    }
+
+    .doc-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 16rem;
+        z-index: var(--pdx-z-overlay);
+        transform: translateX(-100%);
+        transition: transform 250ms var(--pdx-ease);
+        display: block;
+        min-height: auto;
+    }
+    .doc-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .doc-hamburger { display: flex; }
+
+    .doc-topbar-label { display: none; }
+    .doc-topbar .pdx-divider-vertical { display: none; }
+
+    .doc-preview { padding: var(--pdx-space-md); }
+}
+
+@media (max-width: 480px) {
+    .doc-topbar {
+        gap: var(--pdx-space-2xs);
+        padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    }
+    .doc-topbar .pdx-txt-small { display: none; }
+    .doc-preview { padding: var(--pdx-space-sm); }
+}

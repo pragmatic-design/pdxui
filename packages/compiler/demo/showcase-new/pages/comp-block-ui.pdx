@@ -1,0 +1,54 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">BlockUI</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-block-ui&gt;</code> — loading overlay that blocks interaction on a container.
+      Wraps content. When <code>blocked</code>, shows a semi-transparent overlay with spinner.
+    </p>
+
+    <pdx-demo-comp-block-ui-basic class="demo-section"></pdx-demo-comp-block-ui-basic>
+
+    <pdx-demo-comp-block-ui-with-message class="demo-section"></pdx-demo-comp-block-ui-with-message>
+
+    <pdx-demo-comp-block-ui-simulated-fetch class="demo-section"></pdx-demo-comp-block-ui-simulated-fetch>
+
+    <pdx-demo-comp-block-ui-delay class="demo-section"></pdx-demo-comp-block-ui-delay>
+
+    <pdx-demo-comp-block-ui-fullscreen class="demo-section"></pdx-demo-comp-block-ui-fullscreen>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>blocked</code></td><td>Boolean</td><td>false</td><td>Show overlay + spinner</td></tr>
+            <tr><td><code>message</code></td><td>String</td><td>''</td><td>Message below spinner</td></tr>
+            <tr><td><code>variant</code></td><td>String</td><td>'spinner'</td><td>spinner or none</td></tr>
+            <tr><td><code>fullscreen</code></td><td>Boolean</td><td>false</td><td>Cover the viewport; the rest of the page is inert</td></tr>
+            <tr><td><code>delay</code></td><td>Number</td><td>300</td><td>Ms before the overlay is drawn (input blocked at once)</td></tr>
+            <tr><td><code>min-duration</code></td><td>Number</td><td>200</td><td>Ms the overlay stays once drawn</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/block-ui';
+@title 'BlockUI — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.demo-actions { margin-bottom: var(--pdx-space-sm); }
+.demo-wrap { max-width: 500px; }
+.demo-panel {
+  padding: var(--pdx-space-lg);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  min-height: 120px;
+  max-width: 500px;
+}
+</style>

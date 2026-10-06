@@ -1,0 +1,35 @@
+<template>
+  <div class="admin-page">
+    <h2>🔒 Admin Panel</h2>
+    <p>This page is protected by <code>@guard 'admin'</code>.</p>
+    <p>If you see this, the guard check passed.</p>
+    <div class="admin-content">
+      <div class="stat-box">
+        <span class="stat-val">12</span>
+        <span class="stat-label">Active users</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val">3</span>
+        <span class="stat-label">Pending invites</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+@page '/admin' { preload };
+@guard 'admin';
+@title 'Admin — TaskMgr';
+@meta { permissions: ['admin'], breadcrumb: 'Admin' };
+</script>
+
+<style scoped>
+  .admin-page { background: white; border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .admin-page h2 { font-size: 1.2rem; margin: 0 0 8px; }
+  .admin-page p { font-size: 0.88rem; color: #555; margin-bottom: 6px; }
+  .admin-page code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 0.82rem; }
+  .admin-content { display: flex; gap: 12px; margin-top: 16px; }
+  .stat-box { background: #f0f4ff; padding: 16px; border-radius: 8px; text-align: center; flex: 1; }
+  .stat-val { display: block; font-size: 1.8rem; font-weight: 700; color: #3949ab; }
+  .stat-label { font-size: 0.75rem; color: #666; }
+</style>

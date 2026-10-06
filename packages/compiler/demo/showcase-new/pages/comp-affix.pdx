@@ -1,0 +1,50 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Affix</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-affix&gt;</code> — makes an element sticky when scrolling past a threshold, and says when it is.
+      Inside a scroll container (<code>target</code>) it is CSS sticky, and an IntersectionObserver rooted at the
+      container reports the change. Against the window it becomes fixed, with a placeholder keeping its space.
+    </p>
+
+    <pdx-demo-comp-affix-live class="demo-section"></pdx-demo-comp-affix-live>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>offsetTop</code></td><td>Number</td><td>0</td><td>Offset from top when affixed (px)</td></tr>
+            <tr><td><code>offsetBottom</code></td><td>Number</td><td>-1</td><td>Offset from bottom (-1 = disabled)</td></tr>
+            <tr><td><code>target</code></td><td>String</td><td>''</td><td>Scroll container CSS selector; empty = the window. A selector that matches nothing is warned about</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-change</code></td><td>{ affixed: boolean }</td><td>Fired once each time the element starts or stops sticking; the class <code>pdx-affix-fixed</code> follows the same state</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/affix';
+@title 'Affix — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+</style>

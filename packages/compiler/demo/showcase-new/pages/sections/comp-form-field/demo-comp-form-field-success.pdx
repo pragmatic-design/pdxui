@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Success State</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Username" success="Username is available" touched>
+        <pdx-input value="john_doe"></pdx-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

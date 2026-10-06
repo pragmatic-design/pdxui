@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Pattern</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use <code>#</code> for digit, <code>A</code> for letter, <code>*</code> for any character.
+    </p>
+    <div class="demo-stack">
+      <pdx-form-field label="License Plate (AA-###-AA)">
+        <pdx-masked-input mask="AA-###-AA"></pdx-masked-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-masked-input mask="AA-###-AA"&gt;&lt;/pdx-masked-input&gt;</code></pre>
+    </details>
+  </section>
+</template>

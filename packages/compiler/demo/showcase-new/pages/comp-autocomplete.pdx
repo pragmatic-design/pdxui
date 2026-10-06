@@ -1,0 +1,128 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Autocomplete</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Text input with suggestions. Unlike Select, the value is <strong>free text</strong> — the user can type anything.
+      Supports local arrays, remote DataSource, debounced search, forceSelection, and highlight matching.
+    </p>
+
+    <!-- ═══ Basic — Local Array ═══ -->
+    <pdx-demo-comp-autocomplete-basic class="demo-section"></pdx-demo-comp-autocomplete-basic>
+
+    <!-- ═══ Object Array ═══ -->
+    <pdx-demo-comp-autocomplete-object-array class="demo-section"></pdx-demo-comp-autocomplete-object-array>
+
+    <!-- ═══ Remote DataSource ═══ -->
+    <pdx-demo-comp-autocomplete-remote class="demo-section"></pdx-demo-comp-autocomplete-remote>
+
+    <!-- ═══ Force Selection ═══ -->
+    <pdx-demo-comp-autocomplete-force-selection class="demo-section"></pdx-demo-comp-autocomplete-force-selection>
+
+    <!-- ═══ Highlight ═══ -->
+    <pdx-demo-comp-autocomplete-highlight class="demo-section"></pdx-demo-comp-autocomplete-highlight>
+
+    <!-- ═══ Declarative DataSource ═══ -->
+    <pdx-demo-comp-autocomplete-cascading class="demo-section"></pdx-demo-comp-autocomplete-cascading>
+
+    <!-- ═══ Select with Creatable ═══ -->
+    <pdx-demo-comp-autocomplete-creatable class="demo-section"></pdx-demo-comp-autocomplete-creatable>
+
+    <!-- ═══ Autocomplete vs Select ═══ -->
+    <pdx-demo-comp-autocomplete-vs-select class="demo-section"></pdx-demo-comp-autocomplete-vs-select>
+
+    <!-- ═══ Slots ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Slots</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>option</code></td><td><code>{ label, value, raw, highlighted, index }</code></td><td>Custom suggestion item.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Props Reference</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>suggestions</code></td><td>Array</td><td>[]</td><td>Array of suggestion items (strings or objects).</td></tr>
+            <tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource for remote/local querying.</td></tr>
+            <tr><td><code>label-field</code></td><td>String</td><td>label</td><td>Property name for display text (objects).</td></tr>
+            <tr><td><code>value-field</code></td><td>String</td><td>value</td><td>Property name for value (objects).</td></tr>
+            <tr><td><code>min-length</code></td><td>Number</td><td>1</td><td>Min characters before suggestions appear.</td></tr>
+            <tr><td><code>debounce</code></td><td>Number</td><td>200</td><td>Debounce delay (ms) for search.</td></tr>
+            <tr><td><code>force-selection</code></td><td>Boolean</td><td>false</td><td>Clear on blur if no match.</td></tr>
+            <tr><td><code>highlight</code></td><td>Boolean</td><td>true</td><td>Highlight matching text.</td></tr>
+            <tr><td><code>clearable</code></td><td>Boolean</td><td>false</td><td>Show clear button.</td></tr>
+            <tr><td><code>max-items</code></td><td>Number</td><td>10</td><td>Max visible suggestions.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Events ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Events</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-change</code></td><td><code>{ value, label, item }</code></td><td>Fired when a suggestion is chosen (and on clear). <code>value</code> is the suggestion's value field — the string itself for string suggestions — and <code>label</code> the text shown.</td></tr>
+            <tr><td><code>pdx-input</code></td><td><code>{ value }</code></td><td>Fired on every keystroke.</td></tr>
+            <tr><td><code>pdx-clear</code></td><td>—</td><td>Fired when clear button is clicked.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</template>
+
+<script setup>
+@page '/components/autocomplete';
+@title 'Autocomplete — PDX UI';
+
+import '@pdxui/ui/autocomplete';
+import '@pdxui/ui/select';
+import '@pdxui/ui/data-source';
+</script>
+
+<style>
+.demo-box {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  max-width: 400px;
+}
+.result {
+  margin-top: var(--pdx-space-sm);
+}
+.comparison {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  flex-wrap: wrap;
+}
+.comparison-col {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-inset);
+}
+.comparison-col ul { padding-left: 1.2rem; margin: var(--pdx-space-xs) 0 0; }
+.comparison-col li { margin-bottom: var(--pdx-space-2xs); }
+
+.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
+.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }
+.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }
+
+details.source { margin-top: var(--pdx-space-sm); }
+details.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }
+details.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }
+</style>

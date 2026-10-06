@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Text Editor Toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Google Docs-style toolbar with icon groups, separators, and spacer.</p>
+    <pdx-toolbar bordered label="Text formatting">
+      <div class="pdx-toolbar-group">
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Bold"><pdx-icon name="bold" size="15"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Italic"><pdx-icon name="italic" size="15"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Underline"><pdx-icon name="underline" size="15"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Strikethrough"><pdx-icon name="strikethrough" size="15"></pdx-icon></button>
+      </div>
+      <span class="pdx-toolbar-sep"></span>
+      <div class="pdx-toolbar-group" data-radio>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs active" title="Align Left"><pdx-icon name="align-left" size="15"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Align Center"><pdx-icon name="align-center" size="15"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Align Right"><pdx-icon name="align-right" size="15"></pdx-icon></button>
+      </div>
+      <span class="pdx-toolbar-sep"></span>
+      <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Bulleted List"><pdx-icon name="list" size="15"></pdx-icon></button>
+      <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Numbered List"><pdx-icon name="list-ordered" size="15"></pdx-icon></button>
+      <span class="pdx-toolbar-sep"></span>
+      <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Link"><pdx-icon name="link" size="15"></pdx-icon></button>
+      <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Image"><pdx-icon name="image" size="15"></pdx-icon></button>
+      <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Code"><pdx-icon name="code" size="15"></pdx-icon></button>
+      <span class="pdx-toolbar-spacer"></span>
+      <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Undo"><pdx-icon name="undo" size="15"></pdx-icon></button>
+      <button class="pdx-btn pdx-ghost pdx-btn-xs" title="Redo"><pdx-icon name="redo" size="15"></pdx-icon></button>
+    </pdx-toolbar>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-toolbar bordered label="Text formatting"&gt;
+  &lt;div class="pdx-toolbar-group"&gt;
+    &lt;button class="pdx-btn pdx-ghost pdx-btn-xs" title="Bold"&gt;&lt;pdx-icon name="bold"&gt;&lt;/pdx-icon&gt;&lt;/button&gt;
+    &lt;button class="pdx-btn pdx-ghost pdx-btn-xs" title="Italic"&gt;&lt;pdx-icon name="italic"&gt;&lt;/pdx-icon&gt;&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;span class="pdx-toolbar-sep"&gt;&lt;/span&gt;
+  ...
+&lt;/pdx-toolbar&gt;</code></pre>
+    </details>
+  </section>
+</template>

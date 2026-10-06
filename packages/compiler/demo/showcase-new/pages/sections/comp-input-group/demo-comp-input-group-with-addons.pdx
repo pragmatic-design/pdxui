@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Addons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Static text addons using <code>.pdx-input-addon</code>. Addons are non-interactive labels (domain prefix, currency, etc.).
+    </p>
+
+    <div class="demo-stack">
+      <pdx-input-group>
+        <span class="pdx-input-addon">@</span>
+        <pdx-input placeholder="username"></pdx-input>
+      </pdx-input-group>
+
+      <pdx-input-group>
+        <span class="pdx-input-addon">https://</span>
+        <pdx-input placeholder="your-domain"></pdx-input>
+        <span class="pdx-input-addon">.com</span>
+      </pdx-input-group>
+
+      <pdx-input-group>
+        <span class="pdx-input-addon">$</span>
+        <pdx-input placeholder="0.00" inputmode="decimal"></pdx-input>
+        <pdx-button variant="solid">Pay</pdx-button>
+      </pdx-input-group>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-input-group&gt;
+  &lt;span class="pdx-input-addon"&gt;https://&lt;/span&gt;
+  &lt;pdx-input placeholder="your-domain"&gt;&lt;/pdx-input&gt;
+  &lt;span class="pdx-input-addon"&gt;.com&lt;/span&gt;
+&lt;/pdx-input-group&gt;</code></pre>
+    </details>
+  </section>
+</template>

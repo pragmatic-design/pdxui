@@ -1,0 +1,52 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Stagger</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Wrap children in <code>.pdx-stagger</code> — each child gets 50ms incremental delay (up to 8 children).</p>
+
+    <button class="pdx-primary" style="margin-bottom:var(--pdx-space-md)" @click="playStagger">Play Stagger</button>
+
+    <div class="stagger-demo" :class="staggerPlaying ? 'pdx-stagger' : ''">
+      <div class="stagger-item" :class="staggerPlaying ? 'pdx-animate-slide-up' : 'anim-idle'">Item 1</div>
+      <div class="stagger-item" :class="staggerPlaying ? 'pdx-animate-slide-up' : 'anim-idle'">Item 2</div>
+      <div class="stagger-item" :class="staggerPlaying ? 'pdx-animate-slide-up' : 'anim-idle'">Item 3</div>
+      <div class="stagger-item" :class="staggerPlaying ? 'pdx-animate-slide-up' : 'anim-idle'">Item 4</div>
+      <div class="stagger-item" :class="staggerPlaying ? 'pdx-animate-slide-up' : 'anim-idle'">Item 5</div>
+      <div class="stagger-item" :class="staggerPlaying ? 'pdx-animate-slide-up' : 'anim-idle'">Item 6</div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-stagger"&gt;
+  &lt;div class="pdx-animate-slide-up"&gt;Item 1&lt;/div&gt;
+  &lt;div class="pdx-animate-slide-up"&gt;Item 2&lt;/div&gt;
+  &lt;div class="pdx-animate-slide-up"&gt;Item 3&lt;/div&gt;
+  &lt;!-- 50ms delay per child, up to 8 --&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let staggerPlaying = $signal(false);
+
+function playStagger() {
+    staggerPlaying = false;
+    setTimeout(() => { staggerPlaying = true; }, 30);
+}
+</script>
+
+<style scoped>
+  .stagger-demo {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .stagger-item {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    font-size: var(--pdx-text-sm);
+  }
+</style>

@@ -1,0 +1,137 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Menu</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-menu&gt;</code> — a menu drawn in place from an <code>items</code> array: icons, shortcuts,
+      checkbox and radio items, submenus, keyboard navigation and type-ahead. It shows while <code>open</code> is set,
+      and takes focus when it opens. Here each one opens from a button; Escape or a choice closes it and returns focus.
+      For a ready-made button menu, see <strong>DropdownMenu</strong>; for a menu bar, <strong>Menubar</strong>.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-menu-basic class="demo-section"></pdx-demo-comp-menu-basic>
+
+    <!-- ═══ Icons & Shortcuts ═══ -->
+    <pdx-demo-comp-menu-icons-shortcuts class="demo-section"></pdx-demo-comp-menu-icons-shortcuts>
+
+    <!-- ═══ Checkbox & Radio ═══ -->
+    <pdx-demo-comp-menu-checkbox-radio class="demo-section"></pdx-demo-comp-menu-checkbox-radio>
+
+    <!-- ═══ Submenus ═══ -->
+    <pdx-demo-comp-menu-submenus class="demo-section"></pdx-demo-comp-menu-submenus>
+
+    <!-- ═══ Danger & Disabled ═══ -->
+    <pdx-demo-comp-menu-danger-disabled class="demo-section"></pdx-demo-comp-menu-danger-disabled>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Menu Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>MenuItem[]</td><td>[]</td><td>Menu items array</td></tr>
+            <tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Shows the menu and focuses its first item</td></tr>
+            <tr><td><code>min-width</code></td><td>Number</td><td>180</td><td>Minimum menu width (px)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-select</code></td><td><code>{ key, item }</code></td><td>An item was activated</td></tr>
+            <tr><td><code>pdx-check</code></td><td><code>{ key, checked, item }</code></td><td>A checkbox or radio item changed</td></tr>
+            <tr><td><code>pdx-close</code></td><td>—</td><td>Escape on the top-level menu</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Slots ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>item</code></td><td><code>{ item, key, type }</code></td><td>Custom menu item content (leaf items only, excludes submenus).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ MenuItem Interface ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">MenuItem Interface</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>key</code></td><td>string</td><td>Unique identifier</td></tr>
+            <tr><td><code>label</code></td><td>string</td><td>Display text</td></tr>
+            <tr><td><code>type</code></td><td>'item' | 'checkbox' | 'radio' | 'separator' | 'label' | 'submenu'</td><td>Item type</td></tr>
+            <tr><td><code>icon</code></td><td>string</td><td>Icon HTML</td></tr>
+            <tr><td><code>shortcut</code></td><td>string</td><td>Keyboard shortcut display</td></tr>
+            <tr><td><code>disabled</code></td><td>boolean</td><td>Disabled state</td></tr>
+            <tr><td><code>danger</code></td><td>boolean</td><td>Destructive styling</td></tr>
+            <tr><td><code>checked</code></td><td>boolean</td><td>Checked state (checkbox/radio)</td></tr>
+            <tr><td><code>radioGroup</code></td><td>string</td><td>Radio group name</td></tr>
+            <tr><td><code>children</code></td><td>MenuItem[]</td><td>Submenu items</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Keyboard ═══ -->
+    <pdx-demo-comp-menu-keyboard class="demo-section"></pdx-demo-comp-menu-keyboard>
+  </div>
+</template>
+
+<script setup>
+@page '/components/menu';
+@title 'Menu — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page {
+  max-width: none;
+  margin: 0 auto;
+  padding: var(--pdx-space-xl) var(--pdx-space-lg);
+}
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-xs); }
+.demo-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pdx-space-md);
+  flex-wrap: wrap;
+  padding: var(--pdx-space-md) 0;
+}
+.menu-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pdx-space-xs);
+}
+.options-table { overflow-x: auto; }
+.options-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--pdx-text-sm);
+}
+.options-table th, .options-table td {
+  text-align: left;
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  border-bottom: 1px solid var(--pdx-color-border);
+}
+.options-table th {
+  font-weight: var(--pdx-weight-semibold);
+  background: var(--pdx-color-inset);
+}
+</style>

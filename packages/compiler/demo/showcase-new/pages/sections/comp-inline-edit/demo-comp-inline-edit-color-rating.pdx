@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Color & Rating</h2>
+    <div class="demo-row">
+      <span class="demo-label">Brand color:</span>
+      <pdx-inline-edit type="color" :value="'#3b82f6'"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Score:</span>
+      <pdx-inline-edit type="rating" :value="3"></pdx-inline-edit>
+    </div>
+  </section>
+</template>

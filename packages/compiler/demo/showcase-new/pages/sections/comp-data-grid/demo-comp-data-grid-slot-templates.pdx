@@ -1,0 +1,88 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slot Templates</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Custom cell rendering via <code>&lt;slot name="col:field"&gt;</code>.
+      Custom header via <code>&lt;slot name="header:field"&gt;</code>.
+      Custom empty state via <code>&lt;slot name="empty"&gt;</code>.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="slotDS" :columns="slotColumns" label="Users" hover>
+        <slot name="col:name" let:row let:value>
+          <div class="user-cell">
+            <pdx-avatar size="xs" :alt="row.name"></pdx-avatar>
+            <strong>{{ value }}</strong>
+          </div>
+        </slot>
+      </pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source (Slot Pattern)</summary>
+      <pre class="pdx-txt-mono"><code>import { status } from '@pdxui/core';
+
+const columns = [
+  { field: 'name', header: 'User', width: 220 },
+  { field: 'email', header: 'Email', width: 200 },
+  { field: 'role', header: 'Role', width: 120 },
+  // A typed cell renderer: built DOM, no HTML string
+  { field: 'status', header: 'Status', cell: status({ tones: { Active: 'success', Away: 'warning', Offline: 'muted' } }) },
+];
+
+&lt;pdx-data-grid :source="ds" :columns="columns" hover&gt;
+
+  &lt;!-- Custom cell for 'name' column --&gt;
+  &lt;slot name="col:name" let:row let:value&gt;
+    &lt;div class="user-cell"&gt;
+      &lt;pdx-avatar size="xs" :alt="row.name"&gt;&lt;/pdx-avatar&gt;
+      &lt;strong&gt;&#123;&#123; value &#125;&#125;&lt;/strong&gt;
+    &lt;/div&gt;
+  &lt;/slot&gt;
+
+  &lt;!-- Custom header --&gt;
+  &lt;slot name="header:name" let:col&gt;
+    &lt;pdx-icon name="user" size="14"&gt;&lt;/pdx-icon&gt;
+    {col.header}
+  &lt;/slot&gt;
+
+  &lt;!-- Custom empty state --&gt;
+  &lt;slot name="empty" let:_&gt;
+    &lt;pdx-empty-state title="No results" icon="search"&gt;
+    &lt;/pdx-empty-state&gt;
+  &lt;/slot&gt;
+
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource, status } from '@pdxui/core';
+
+// ─── Slot/cell demo — custom cell rendering ───────────
+// The name column renders through the `col:name` slot in the template; the status column through a
+// typed cell renderer — not HTML-string `format` functions, which the grid deprecates and warns
+// about on every tab.
+const slotColumns = [
+  { field: 'name', header: 'User', width: 220 },
+  { field: 'email', header: 'Email', width: 200 },
+  { field: 'role', header: 'Role', width: 120 },
+  { field: 'status', header: 'Status', width: 110, cell: status({ tones: { Active: 'success', Away: 'warning', Offline: 'muted' } }) },
+];
+
+const slotData = [
+  { id: 1, name: 'Alice Johnson', email: 'alice@acme.com', role: 'Engineer', status: 'Active' },
+  { id: 2, name: 'Bob Smith', email: 'bob@acme.com', role: 'Designer', status: 'Away' },
+  { id: 3, name: 'Carol White', email: 'carol@acme.com', role: 'PM', status: 'Active' },
+  { id: 4, name: 'David Brown', email: 'david@acme.com', role: 'Engineer', status: 'Offline' },
+];
+
+const slotDS = createDataSource({ data: slotData, pageSize: 0 });
+</script>
+
+<style scoped>
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--pdx-space-xs);
+}
+</style>

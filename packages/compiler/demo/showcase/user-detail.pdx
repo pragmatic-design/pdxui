@@ -1,0 +1,52 @@
+<template>
+  <div class="user-detail">
+    <h2>User #{{ userId }}</h2>
+    <div class="detail-card">
+      <div class="field"><label>ID</label><span class="val">{{ userId }}</span></div>
+      <div class="field"><label>Type</label><span class="val">Constrained to number</span></div>
+      @if (fromList) {
+        <div class="badge">Navigated from list (virtual state)</div>
+      }
+    </div>
+    <div class="nav-links">
+      <button @click="goBack" class="btn-back">← Back</button>
+      <button @click="goNext" class="btn-next">Next user →</button>
+    </div>
+    <div class="meta-info">
+      Route meta: {{ JSON.stringify(routeMeta) }}
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { navigate, currentParams, currentState, currentMeta } from '@pdxui/router';
+
+@page '/users/:id(number)';
+@transition 'slide-right';
+@title 'User Detail — TaskMgr';
+@meta { section: 'users', permissions: ['users.view'] };
+
+const userId = $derived(currentParams().id);
+const fromList = $derived(currentState()?.fromList === true);
+const routeMeta = $derived(currentMeta());
+
+function goBack() { navigate('/dashboard'); }
+function goNext() {
+  const next = Number(currentParams().id) + 1;
+  navigate('/users/:id(number)', { id: String(next) }, { fromList: false });
+}
+</script>
+
+<style scoped>
+  .user-detail { background: white; border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .user-detail h2 { font-size: 1.2rem; margin: 0 0 12px; }
+  .detail-card { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .field { display: flex; gap: 8px; align-items: center; }
+  .field label { font-size: 0.78rem; color: #888; min-width: 60px; }
+  .val { font-family: monospace; font-size: 0.9rem; }
+  .badge { background: #e3f2fd; color: #1565c0; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; }
+  .nav-links { display: flex; gap: 8px; margin-bottom: 12px; }
+  .btn-back, .btn-next { padding: 6px 14px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 0.82rem; background: #f9f9f9; }
+  .btn-back:hover, .btn-next:hover { background: #eee; }
+  .meta-info { font-size: 0.72rem; color: #aaa; font-family: monospace; margin-top: 8px; }
+</style>

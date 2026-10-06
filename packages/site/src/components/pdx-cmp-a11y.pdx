@@ -1,0 +1,38 @@
+<template>
+  <section id="a11y" class="cmp-section">
+    <h2 class="cmp-h2">Accessibility</h2>
+    <p class="cmp-lead" :style="notes ? '' : 'display:none'">{{ notes }}</p>
+    @if (keyboard.length > 0) {
+      <table class="kbd-table">
+        <thead><tr><th>Keys</th><th>Action</th></tr></thead>
+        <tbody>
+          @for (keyboard as k; track k.keys) {
+            <tr><td><code>{{ k.keys }}</code></td><td>{{ k.desc }}</td></tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</template>
+
+<script setup>
+// A component page's accessibility section: the notes and the keyboard table written for
+// the component in content/components/<name>.ts.
+import { a11yOf } from '../lib/component-content';
+
+@prop tag: string = '';
+
+const keyboard = $derived(a11yOf(tag).keyboard);
+const notes = $derived(a11yOf(tag).notes);
+</script>
+
+<style scoped>
+.cmp-section { margin-top: 2.6rem; }
+.cmp-h2 { font-size: 1.35rem; margin: 0 0 0.6rem; }
+.cmp-lead { color: var(--ink-muted); font-size: 0.92rem; margin: 0 0 0.4rem; }
+.kbd-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin-top: 0.4rem; }
+.kbd-table th, .kbd-table td { border: 1px solid var(--outline); padding: 0.5rem 0.7rem; text-align: left; }
+.kbd-table th { background: var(--surface-container); color: var(--gold-fixed); font-weight: 600; }
+.kbd-table td { color: var(--ink-variant); }
+.kbd-table code { color: var(--gold-fixed); font-family: var(--font-mono); font-size: 0.85em; }
+</style>

@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Formatted Values</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Automatic number formatting with precision and group separator.</p>
+    <div class="demo-row">
+      <pdx-statistic title="Balance" prefix="$" value="1234567.89" :precision="2" group-separator=","></pdx-statistic>
+      <pdx-statistic title="Percentage" value="87.456" suffix="%" :precision="1"></pdx-statistic>
+      <pdx-statistic title="Score" value="9876" :precision="0" group-separator="."></pdx-statistic>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-statistic title="Balance" prefix="$" value="1234567.89"
+  :precision="2" group-separator=","&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic title="Percentage" value="87.456" suffix="%"
+  :precision="1"&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic title="Score" value="9876"
+  :precision="0" group-separator="."&gt;&lt;/pdx-statistic&gt;</code></pre>
+    </details>
+  </section>
+</template>

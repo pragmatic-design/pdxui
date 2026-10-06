@@ -1,0 +1,265 @@
+/* pdx-date-picker — Trigger input, popover panel, presets */
+
+/* Trigger */
+.pdx-date-picker-trigger {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+}
+
+.pdx-date-picker-trigger:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}
+
+/* Disabled: not clickable → cursor not-allowed + reduced opacity (the state is marked with .disabled). */
+.pdx-date-picker-trigger.disabled {
+    cursor: not-allowed;
+    opacity: var(--pdx-opacity-disabled);
+}
+
+/* Icon — inline SVG, inherits currentColor */
+.pdx-date-picker-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    color: var(--pdx-color-muted);
+    pointer-events: none;
+    line-height: 0;
+}
+
+.pdx-date-picker-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.pdx-date-picker-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--pdx-color-text);
+    font-size: var(--pdx-text-sm);
+}
+
+.pdx-date-picker-placeholder {
+    color: var(--pdx-color-muted);
+}
+
+/* Editable: the text is an input — the combobox — and the icon is the button that
+   opens the calendar. The trigger stays the field's box: the ring is drawn on it while the input
+   has focus, and an entry that is not a date it accepts marks it with the danger border. */
+.pdx-date-picker-trigger:has(.pdx-date-picker-input) {
+    cursor: text;
+}
+
+.pdx-date-picker-trigger:has(.pdx-date-picker-input:focus-visible) {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}
+
+.pdx-date-picker-trigger:has(.pdx-date-picker-input[aria-invalid="true"]) {
+    border-color: var(--pdx-color-danger);
+}
+
+.pdx-date-picker-input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+}
+
+.pdx-date-picker-input::placeholder {
+    color: var(--pdx-color-muted);
+}
+
+button.pdx-date-picker-icon {
+    pointer-events: auto;
+    cursor: pointer;
+    margin: -2px;
+    padding: 2px;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: none;
+}
+
+button.pdx-date-picker-icon:hover {
+    color: var(--pdx-color-text);
+}
+
+button.pdx-date-picker-icon:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: 1px;
+}
+
+/* Panel */
+.pdx-date-picker-panel {
+    position: absolute;
+    z-index: var(--pdx-z-popover);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-lg);
+    overflow: hidden;
+    min-width: 300px;
+}
+
+.pdx-date-picker-panel-inner {
+    display: flex;
+}
+
+.pdx-date-picker-has-presets {
+    /* Layout with presets sidebar */
+}
+
+/* Presets sidebar */
+.pdx-date-picker-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--pdx-space-sm);
+    border-right: 1px solid var(--pdx-color-border);
+    min-width: 140px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.pdx-date-picker-preset-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.pdx-date-picker-preset-btn:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-date-picker-preset-btn:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}
+
+/* Main content area */
+.pdx-date-picker-main {
+    flex: 1;
+    padding: var(--pdx-space-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+}
+
+/* Calendar inside panel: remove its own border (panel provides the container) */
+.pdx-date-picker-panel .pdx-calendar-inline {
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+/* Time picker area */
+.pdx-date-picker-time {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    justify-content: center;
+    padding: var(--pdx-space-xs) 0;
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+.pdx-date-picker-time-sep {
+    color: var(--pdx-color-muted);
+}
+
+/* Compare toggle */
+.pdx-date-picker-compare {
+    display: flex;
+    align-items: center;
+    padding: var(--pdx-space-xs) 0;
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+.pdx-date-picker-compare-label {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    cursor: pointer;
+}
+
+/* Footer */
+.pdx-date-picker-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+/* Responsive: mobile bottom sheet */
+@media (max-width: 640px) {
+    .pdx-date-picker-panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        border-radius: var(--pdx-radius-lg) var(--pdx-radius-lg) 0 0;
+        max-height: 80vh;
+        overflow-y: auto;
+        min-width: 0;
+        width: 100%;
+        z-index: 1100;
+    }
+
+    .pdx-date-picker-panel-inner {
+        flex-direction: column;
+    }
+
+    .pdx-date-picker-presets {
+        border-right: none;
+        border-bottom: 1px solid var(--pdx-color-border);
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-height: none;
+        min-width: 0;
+    }
+
+    /* Calendar grid: single column on mobile, centered */
+    .pdx-date-picker-panel .pdx-cal-grids {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Calendar cells smaller on mobile for better fit */
+    .pdx-date-picker-panel .pdx-cal-cell {
+        width: 40px;
+        height: 40px;
+        min-height: 44px; /* touch target */
+    }
+
+    .pdx-date-picker-panel .pdx-calendar {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .pdx-date-picker-panel .pdx-cal-grid {
+        width: 100%;
+    }
+}

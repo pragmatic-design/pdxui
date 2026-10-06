@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">@form Integration Pattern</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      When using the PDX <code>@form</code> rune, FormField reads validation state from the form object.
+      The form handles all validation — FormField is purely presentational.
+    </p>
+
+    <div class="code-block">
+      <pre class="pdx-txt-mono"><code>@form contact: {
+  name: string { required, minLength: 3 },
+  email: string { required, email },
+}
+
+&lt;pdx-form-field
+  label="Name"
+  required
+  :error="contact.fields.name.error()"
+  :touched="contact.fields.name.touched()"&gt;
+  &lt;pdx-input
+    :value="contact.fields.name.value()"
+    @input="contact.fields.name.onChange($event.detail.value)"
+    @blur="contact.fields.name.onBlur()"&gt;
+  &lt;/pdx-input&gt;
+&lt;/pdx-form-field&gt;</code></pre>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .code-block { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-inset); overflow-x: auto; }
+  .code-block pre { margin: 0; font-size: var(--pdx-text-xs); }
+</style>

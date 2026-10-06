@@ -1,0 +1,338 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Layout Primitives
+   CSS-only custom element tags. NOT registered as Web Components.
+   CRITICAL: unregistered CE default to display:inline — explicit display required.
+   ========================================================================== */
+
+/* ==========================================================================
+   Shared: gap, pad, items for ALL layout elements
+   Using :is() to avoid 42+ duplicate selectors.
+   ========================================================================== */
+
+/* Base rules for all layout elements */
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container) {
+    container-type: inline-size;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* FIX: container-type: inline-size sets intrinsic inline-size to 0.
+   In flex-column (pdx-stack): children width = auto resolves to 0. Fix: width: 100%.
+   In flex-row (pdx-row): children width = auto resolves to 0. Fix: flex: 1 1 0 (grow to fill).
+   In grid: no issue — grid tracks are sized independently from content. */
+pdx-stack > :is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container) {
+    width: 100%;
+}
+pdx-row > :is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container) {
+    flex: 1 1 0%;
+}
+
+/* Gap */
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[gap="2xs"] { gap: var(--pdx-space-2xs); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[gap="xs"]  { gap: var(--pdx-space-xs); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[gap="sm"]  { gap: var(--pdx-space-sm); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[gap="md"]  { gap: var(--pdx-space-md); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[gap="lg"]  { gap: var(--pdx-space-lg); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[gap="xl"]  { gap: var(--pdx-space-xl); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[gap="2xl"] { gap: var(--pdx-space-2xl); }
+
+/* Pad */
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[pad="2xs"] { padding: var(--pdx-space-2xs); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[pad="xs"]  { padding: var(--pdx-space-xs); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[pad="sm"]  { padding: var(--pdx-space-sm); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[pad="md"]  { padding: var(--pdx-space-md); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[pad="lg"]  { padding: var(--pdx-space-lg); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[pad="xl"]  { padding: var(--pdx-space-xl); }
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container)[pad="2xl"] { padding: var(--pdx-space-2xl); }
+
+/* ==========================================================================
+   pdx-stack — Vertical flow (XAML: StackPanel Vertical)
+   ========================================================================== */
+
+pdx-stack {
+    display: flex;
+    flex-direction: column;
+}
+
+pdx-stack[items="start"]   { align-items: flex-start; }
+pdx-stack[items="center"]  { align-items: center; }
+pdx-stack[items="end"]     { align-items: flex-end; }
+pdx-stack[items="stretch"] { align-items: stretch; }
+
+/* ==========================================================================
+   pdx-row — Horizontal flow (XAML: StackPanel Horizontal)
+   ========================================================================== */
+
+pdx-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Semantic context: navigation/header rows don't wrap */
+:is(header, nav, [role="navigation"], [role="toolbar"]) > pdx-row,
+header pdx-row,
+nav pdx-row {
+    flex-wrap: nowrap;
+}
+
+/* Flex children must be able to shrink below intrinsic width */
+pdx-row > * {
+    min-width: 0;
+}
+
+pdx-row[items="start"]    { align-items: flex-start; }
+pdx-row[items="center"]   { align-items: center; }
+pdx-row[items="end"]      { align-items: flex-end; }
+pdx-row[items="baseline"] { align-items: baseline; }
+pdx-row[items="stretch"]  { align-items: stretch; }
+
+pdx-row[justify="start"]   { justify-content: flex-start; }
+pdx-row[justify="center"]  { justify-content: center; }
+pdx-row[justify="end"]     { justify-content: flex-end; }
+pdx-row[justify="between"] { justify-content: space-between; }
+pdx-row[justify="around"]  { justify-content: space-around; }
+pdx-row[justify="evenly"]  { justify-content: space-evenly; }
+
+pdx-row[wrap="yes"]  { flex-wrap: wrap; }
+pdx-row[wrap="no"]   { flex-wrap: nowrap; }
+
+/* Child utilities: grow to fill available space */
+:is(pdx-stack, pdx-row, pdx-grid, pdx-center, pdx-cluster, pdx-split, pdx-container) > [grow] { flex: 1; }
+
+/* ==========================================================================
+   pdx-grid — CSS Grid (XAML: Grid)
+   ========================================================================== */
+
+pdx-grid {
+    display: grid;
+}
+
+/* Fixed columns */
+pdx-grid[cols="1"] { grid-template-columns: 1fr; }
+pdx-grid[cols="2"] { grid-template-columns: repeat(2, 1fr); }
+pdx-grid[cols="3"] { grid-template-columns: repeat(3, 1fr); }
+pdx-grid[cols="4"] { grid-template-columns: repeat(4, 1fr); }
+pdx-grid[cols="5"] { grid-template-columns: repeat(5, 1fr); }
+pdx-grid[cols="6"] { grid-template-columns: repeat(6, 1fr); }
+
+pdx-grid[cols="7"]  { grid-template-columns: repeat(7, 1fr); }
+pdx-grid[cols="8"]  { grid-template-columns: repeat(8, 1fr); }
+pdx-grid[cols="9"]  { grid-template-columns: repeat(9, 1fr); }
+pdx-grid[cols="10"] { grid-template-columns: repeat(10, 1fr); }
+pdx-grid[cols="11"] { grid-template-columns: repeat(11, 1fr); }
+pdx-grid[cols="12"] { grid-template-columns: repeat(12, 1fr); }
+
+/* Auto-fit: columns collapse responsively */
+pdx-grid[cols="auto"] {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--pdx-grid-min, 16rem)), 1fr));
+}
+
+/* Grid child span: occupy multiple columns */
+pdx-grid > [span="2"]  { grid-column: span 2; }
+pdx-grid > [span="3"]  { grid-column: span 3; }
+pdx-grid > [span="4"]  { grid-column: span 4; }
+pdx-grid > [span="5"]  { grid-column: span 5; }
+pdx-grid > [span="6"]  { grid-column: span 6; }
+pdx-grid > [span="7"]  { grid-column: span 7; }
+pdx-grid > [span="8"]  { grid-column: span 8; }
+pdx-grid > [span="9"]  { grid-column: span 9; }
+pdx-grid > [span="10"] { grid-column: span 10; }
+pdx-grid > [span="11"] { grid-column: span 11; }
+pdx-grid > [span="12"] { grid-column: span 12; }
+pdx-grid > [span="full"] { grid-column: 1 / -1; }
+
+/* ==========================================================================
+   pdx-center — Centered content with max-width (Viewbox-like)
+   ========================================================================== */
+
+pdx-center {
+    display: flex;
+    flex-direction: column;
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--pdx-max-lg);
+}
+
+pdx-center[max="xs"]   { max-width: var(--pdx-max-xs); }
+pdx-center[max="sm"]   { max-width: var(--pdx-max-sm); }
+pdx-center[max="md"]   { max-width: var(--pdx-max-md); }
+pdx-center[max="lg"]   { max-width: var(--pdx-max-lg); }
+pdx-center[max="xl"]   { max-width: var(--pdx-max-xl); }
+pdx-center[max="2xl"]  { max-width: var(--pdx-max-2xl); }
+pdx-center[max="full"] { max-width: 100%; }
+
+/* ==========================================================================
+   pdx-cluster — Wrapping flow for tags/badges (XAML: WrapPanel)
+   ========================================================================== */
+
+pdx-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+pdx-cluster[justify="start"]   { justify-content: flex-start; }
+pdx-cluster[justify="center"]  { justify-content: center; }
+pdx-cluster[justify="end"]     { justify-content: flex-end; }
+
+/* ==========================================================================
+   pdx-split — Two-panel layout via grid (XAML: Grid with ColumnDefinitions)
+   ========================================================================== */
+
+pdx-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+}
+
+/* Grid/split children must be able to shrink within their track */
+pdx-split > *,
+pdx-grid > * {
+    min-width: 0;
+}
+
+pdx-split[ratio="1:1"] { grid-template-columns: 1fr 1fr; }
+pdx-split[ratio="1:2"] { grid-template-columns: 1fr 2fr; }
+pdx-split[ratio="1:3"] { grid-template-columns: 1fr 3fr; }
+pdx-split[ratio="1:4"] { grid-template-columns: 1fr 4fr; }
+pdx-split[ratio="2:1"] { grid-template-columns: 2fr 1fr; }
+pdx-split[ratio="2:3"] { grid-template-columns: 2fr 3fr; }
+pdx-split[ratio="3:1"] { grid-template-columns: 3fr 1fr; }
+pdx-split[ratio="3:2"] { grid-template-columns: 3fr 2fr; }
+pdx-split[ratio="4:1"] { grid-template-columns: 4fr 1fr; }
+pdx-split[ratio="1:5"] { grid-template-columns: 1fr 5fr; }
+pdx-split[ratio="5:1"] { grid-template-columns: 5fr 1fr; }
+pdx-split[ratio="1:6"] { grid-template-columns: 1fr 6fr; }
+
+/* ==========================================================================
+   pdx-spacer — Flexible space filler (SwiftUI Spacer)
+   Pushes siblings apart in flex containers. Self-sizing in stack/row.
+   ========================================================================== */
+
+pdx-spacer {
+    display: block;
+    flex: 1;
+}
+
+/* Fixed size spacer (overrides flex) */
+pdx-spacer[size="2xs"] { flex: none; height: var(--pdx-space-2xs); width: var(--pdx-space-2xs); }
+pdx-spacer[size="xs"]  { flex: none; height: var(--pdx-space-xs);  width: var(--pdx-space-xs); }
+pdx-spacer[size="sm"]  { flex: none; height: var(--pdx-space-sm);  width: var(--pdx-space-sm); }
+pdx-spacer[size="md"]  { flex: none; height: var(--pdx-space-md);  width: var(--pdx-space-md); }
+pdx-spacer[size="lg"]  { flex: none; height: var(--pdx-space-lg);  width: var(--pdx-space-lg); }
+pdx-spacer[size="xl"]  { flex: none; height: var(--pdx-space-xl);  width: var(--pdx-space-xl); }
+pdx-spacer[size="2xl"] { flex: none; height: var(--pdx-space-2xl); width: var(--pdx-space-2xl); }
+
+/* ==========================================================================
+   pdx-divider has no rules here. The tag is the @pdxui/ui component (orientation, label,
+   variant, labelPosition), and a second, CSS-only API on the same tag (orient, weight, color,
+   style-type, spacing, label-align) would disagree with it: its width:100% makes every vertical
+   divider take a whole row, and its ::before/::after draw two extra lines beside the component's
+   own. The CSS-only divider is the class: .pdx-divider / .pdx-divider-vertical (typography.css).
+   ========================================================================== */
+
+/* ==========================================================================
+   pdx-container — Responsive max-width container
+   Auto-selects max-width and padding based on container/viewport size.
+   Like Bootstrap's .container but CSS-only custom element.
+   ========================================================================== */
+
+pdx-container {
+    display: block;
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: var(--pdx-space-md);
+    max-width: var(--pdx-max-xl);
+}
+
+pdx-container[max="xs"]   { max-width: var(--pdx-max-xs); }
+pdx-container[max="sm"]   { max-width: var(--pdx-max-sm); }
+pdx-container[max="md"]   { max-width: var(--pdx-max-md); }
+pdx-container[max="lg"]   { max-width: var(--pdx-max-lg); }
+pdx-container[max="xl"]   { max-width: var(--pdx-max-xl); }
+pdx-container[max="2xl"]  { max-width: var(--pdx-max-2xl); }
+pdx-container[max="full"] { max-width: 100%; }
+
+/* Fluid: no max-width, just padding */
+pdx-container[fluid] {
+    max-width: 100%;
+}
+
+/* Responsive padding: tighter on narrow viewports */
+@media (max-width: 640px) {
+    pdx-container { padding-inline: var(--pdx-space-sm); }
+}
+@media (min-width: 1280px) {
+    pdx-container { padding-inline: var(--pdx-space-lg); }
+}
+
+/* ==========================================================================
+   pdx-visually-hidden — Accessible content (screen reader only)
+   Content is hidden visually but accessible to assistive technology.
+   ========================================================================== */
+
+pdx-visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Focusable variant: visible when focused (skip links) */
+pdx-visually-hidden[focusable]:focus,
+pdx-visually-hidden[focusable]:focus-within {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: var(--pdx-space-xs) var(--pdx-space-md) !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+}
+
+/* ==========================================================================
+   Utilities: aspect-ratio, sticky, scroll-snap
+   ========================================================================== */
+
+[ratio="1:1"]  { aspect-ratio: 1; }
+[ratio="4:3"]  { aspect-ratio: 4 / 3; }
+[ratio="3:2"]  { aspect-ratio: 3 / 2; }
+[ratio="16:9"] { aspect-ratio: 16 / 9; }
+[ratio="21:9"] { aspect-ratio: 21 / 9; }
+
+[pdx-sticky] {
+    position: sticky;
+    top: 0;
+    z-index: var(--pdx-z-sticky);
+    background: var(--pdx-color-bg);
+}
+
+/* Scroll snap (#42) */
+.pdx-snap-x {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    gap: var(--pdx-space-md);
+    -webkit-overflow-scrolling: touch;
+}
+
+.pdx-snap-x > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+}
+
+.pdx-snap-y {
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+}
+
+.pdx-snap-y > * {
+    scroll-snap-align: start;
+}

@@ -1,0 +1,147 @@
+/* Toolbar — horizontal action bar with buttons, separators, groups, spacer.
+   Used in card headers, editors, form actions, page toolbars.
+
+   Usage:
+     <div class="pdx-toolbar">
+       <button class="pdx-ghost" size="sm">Bold</button>
+       <button class="pdx-ghost" size="sm">Italic</button>
+       <span class="pdx-toolbar-sep"></span>
+       <button class="pdx-ghost" size="sm">Left</button>
+       <button class="pdx-ghost" size="sm">Center</button>
+       <span class="pdx-toolbar-spacer"></span>
+       <button class="pdx-primary" size="sm">Save</button>
+     </div>
+*/
+
+/* ===== Container ===== */
+
+/* Narrower than its controls, a toolbar wraps them onto another row: on one row, on a phone,
+   the controls past the edge are cut off by the page's sideways clip. Not a
+   scroller: that would clip the focus ring of the controls at its edges and hide the ones past it. */
+.pdx-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.25rem 0.35rem;
+    flex-wrap: wrap;
+}
+
+/* Icon-only buttons in toolbar — tight square sizing */
+.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-btn-xs, .pdx-btn-sm) {
+    padding: 0.3rem;
+    min-height: 1.75rem;
+    font-size: 0.8rem;
+}
+.pdx-toolbar :is(button, a, [role="button"]) pdx-icon {
+    display: inline-flex;
+}
+
+/* Bordered variant — with background and border */
+.pdx-toolbar-bordered {
+    background: light-dark(oklch(0.97 0 0), oklch(0.15 0 0));
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    padding: 0.25rem 0.4rem;
+}
+
+/* ===== Vertical orientation ===== */
+/* The `vertical` prop adds .pdx-toolbar-vertical on the host: it stacks the items in a column
+   e ruota i separatori (diventano linee orizzontali a tutta larghezza). */
+.pdx-toolbar-vertical {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+}
+
+.pdx-toolbar-vertical .pdx-toolbar-sep {
+    width: 1.2rem;
+    height: 1px;
+    margin: 0.15rem auto;
+}
+
+.pdx-toolbar-vertical .pdx-toolbar-spacer {
+    flex: 1 0 auto;
+}
+
+/* ===== Vertical separator ===== */
+
+.pdx-toolbar-sep {
+    width: 1px;
+    height: 1.2rem;
+    background: var(--pdx-color-border);
+    margin: 0 0.15rem;
+    flex-shrink: 0;
+}
+
+/* ===== Spacer (pushes rest to right) ===== */
+
+.pdx-toolbar-spacer {
+    flex: 1;
+}
+
+/* ===== Toolbar group (buttons fused like btn-group) ===== */
+
+.pdx-toolbar-group {
+    display: inline-flex;
+    gap: 0;
+    flex-shrink: 0;
+}
+
+.pdx-toolbar-group > :is(button, a, [role="button"]) {
+    border-radius: 0;
+}
+
+.pdx-toolbar-group > :first-child {
+    border-radius: var(--pdx-radius-sm) 0 0 var(--pdx-radius-sm);
+}
+
+.pdx-toolbar-group > :last-child {
+    border-radius: 0 var(--pdx-radius-sm) var(--pdx-radius-sm) 0;
+}
+
+.pdx-toolbar-group > :not(:first-child) {
+    margin-left: calc(-1 * var(--pdx-border-width));
+}
+
+/* ===== Button hover inside toolbar — stronger contrast on gray bg ===== */
+
+.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-ghost):hover {
+    background: light-dark(oklch(0.88 0 0), oklch(0.25 0 0));
+}
+
+.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-ghost)[aria-pressed="true"],
+.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-ghost).active {
+    background: light-dark(oklch(0.85 0 0), oklch(0.28 0 0));
+    color: var(--pdx-color-primary-ink);
+}
+
+/* ===== Label inside toolbar ===== */
+
+.pdx-toolbar-label {
+    font-size: 0.75rem;
+    color: var(--pdx-color-muted);
+    padding: 0 0.3rem;
+    white-space: nowrap;
+}
+
+/* ===== Compact variant ===== */
+
+.pdx-toolbar-compact {
+    gap: 0.1rem;
+    padding: 0.2rem;
+}
+
+.pdx-toolbar-compact .pdx-toolbar-sep {
+    height: 1rem;
+    margin: 0 0.1rem;
+}
+
+/* ===== Sticky toolbar ===== */
+
+.pdx-toolbar[pdx-sticky] {
+    position: sticky;
+    top: 0;
+    z-index: var(--pdx-z-sticky, 10);
+    background: var(--pdx-color-surface);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+}

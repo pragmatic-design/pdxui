@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Circular Layouts</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Actions in circle, semi-circle, or quarter-circle around the FAB.</p>
+    <div class="demo-row-wrap">
+      <div>
+        <h3 class="pdx-txt-small">type="circle"</h3>
+        <div class="demo-frame" style="width:260px;height:260px">
+          <pdx-fab icon="plus" :actions="circleActions" type="circle" position="bottom-right"></pdx-fab>
+        </div>
+      </div>
+      <div>
+        <h3 class="pdx-txt-small">type="semi-circle"</h3>
+        <div class="demo-frame" style="width:260px;height:260px">
+          <pdx-fab icon="plus" :actions="speedDialActions" type="semi-circle" direction="up" position="bottom-right"></pdx-fab>
+        </div>
+      </div>
+      <div>
+        <h3 class="pdx-txt-small">type="quarter-circle" direction="up-left"</h3>
+        <div class="demo-frame" style="width:260px;height:260px">
+          <pdx-fab icon="plus" :actions="speedDialActions" type="quarter-circle" direction="up-left" position="bottom-right"></pdx-fab>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { speedDialActions } from './state.pdx';
+
+const circleActions = [
+  { key: 'note', label: 'Note', icon: 'file-text' },
+  { key: 'photo', label: 'Photo', icon: 'image' },
+  { key: 'share', label: 'Share', icon: 'share' },
+  { key: 'link', label: 'Link', icon: 'link' },
+  { key: 'bookmark', label: 'Save', icon: 'bookmark' },
+];
+</script>

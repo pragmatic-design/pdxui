@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Button Groups Inside Toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Nest <code>.pdx-toolbar-group</code> for joined button clusters within a toolbar.</p>
+
+    <div class="pdx-toolbar pdx-toolbar-bordered">
+      <div class="pdx-toolbar-group">
+        <button class="pdx-ghost" aria-pressed="true">B</button>
+        <button class="pdx-ghost">I</button>
+        <button class="pdx-ghost">U</button>
+      </div>
+      <div class="pdx-toolbar-sep"></div>
+      <div class="pdx-toolbar-group">
+        <button class="pdx-ghost">L</button>
+        <button class="pdx-ghost" aria-pressed="true">C</button>
+        <button class="pdx-ghost">R</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toolbar pdx-toolbar-bordered"&gt;
+  &lt;div class="pdx-toolbar-group"&gt;
+    &lt;button class="pdx-ghost" aria-pressed="true"&gt;B&lt;/button&gt;
+    &lt;button class="pdx-ghost"&gt;I&lt;/button&gt;
+    &lt;button class="pdx-ghost"&gt;U&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-toolbar-sep"&gt;&lt;/div&gt;
+  &lt;div class="pdx-toolbar-group"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

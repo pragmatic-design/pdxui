@@ -1,0 +1,155 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Chips</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Compact elements for tags, filters, and selections.
+      <strong>CSS only</strong> — apply <code>.pdx-chip</code> classes to <code>&lt;span&gt;</code> or <code>&lt;button&gt;</code>.
+    </p>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-design-chips-variants class="demo-section"></pdx-demo-design-chips-variants>
+
+    <!-- ═══ Selected ═══ -->
+    <pdx-demo-design-chips-selected class="demo-section"></pdx-demo-design-chips-selected>
+
+    <!-- ═══ Removable ═══ -->
+    <pdx-demo-design-chips-removable class="demo-section"></pdx-demo-design-chips-removable>
+
+    <!-- ═══ With Icon ═══ -->
+    <pdx-demo-design-chips-icon class="demo-section"></pdx-demo-design-chips-icon>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-design-chips-sizes class="demo-section"></pdx-demo-design-chips-sizes>
+
+    <!-- ═══ Chip Group ═══ -->
+    <pdx-demo-design-chips-group class="demo-section"></pdx-demo-design-chips-group>
+
+    <!-- ═══ Chip Field ═══ -->
+    <pdx-demo-design-chips-field class="demo-section"></pdx-demo-design-chips-field>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-chips-composition class="demo-section"></pdx-demo-design-chips-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip</code><span>Base</span><span>Default neutral chip</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-primary</code><span>Variant</span><span>Primary color chip</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-success</code><span>Variant</span><span>Success color chip</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-danger</code><span>Variant</span><span>Danger color chip</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-warning</code><span>Variant</span><span>Warning color chip</span>
+        </div>
+        <div class="opt-row">
+          <code>[selected]</code><span>State</span><span>Active/selected appearance</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-remove</code><span>Action</span><span>Dismiss button inside chip</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-icon</code><span>Slot</span><span>Leading icon/indicator</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-sm</code><span>Size</span><span>Small chip</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-lg</code><span>Size</span><span>Large chip</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-group</code><span>Layout</span><span>Flex-wrap container for chips</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-field</code><span>Layout</span><span>Input wrapper with inline chips</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-chip-input</code><span>Input</span><span>Inline text input inside chip field</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/chips';
+@title 'Chips';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .chip-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+  }
+
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Single Selection</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Radio-style: only one row can be selected at a time.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="singleDS" :columns="columns" selection="single" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  selection="single" hover&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { data, columns } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+const singleDS = createDataSource({ data: data.slice(), pageSize: 0 });
+</script>

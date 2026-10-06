@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Same 5 sizes as input — font size and padding change, not the row count.</p>
+
+    <div class="demo-stack">
+      <pdx-textarea size="xs" placeholder="Extra Small (xs)" rows="2"></pdx-textarea>
+      <pdx-textarea size="sm" placeholder="Small (sm)" rows="2"></pdx-textarea>
+      <pdx-textarea placeholder="Default (md)" rows="2"></pdx-textarea>
+      <pdx-textarea size="lg" placeholder="Large (lg)" rows="2"></pdx-textarea>
+      <pdx-textarea size="xl" placeholder="Extra Large (xl)" rows="2"></pdx-textarea>
+    </div>
+  </section>
+</template>

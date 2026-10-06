@@ -1,0 +1,96 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Icon</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-icon&gt;</code> — universal icon component. Renders SVG from registered sets, inline markup, or URL.
+      Theme-reactive weight, optical size compensation, RTL mirroring, accessibility built-in.
+    </p>
+
+    <!-- ═══ Built-in Set ═══ -->
+    <pdx-demo-comp-icon-built-in class="demo-section"></pdx-demo-comp-icon-built-in>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-icon-sizes class="demo-section"></pdx-demo-comp-icon-sizes>
+
+    <!-- ═══ Weight ═══ -->
+    <pdx-demo-comp-icon-weight class="demo-section"></pdx-demo-comp-icon-weight>
+
+    <!-- ═══ Color Inheritance ═══ -->
+    <pdx-demo-comp-icon-color class="demo-section"></pdx-demo-comp-icon-color>
+
+    <!-- ═══ Accessibility ═══ -->
+    <pdx-demo-comp-icon-accessibility class="demo-section"></pdx-demo-comp-icon-accessibility>
+
+    <!-- ═══ Inline SVG & URL ═══ -->
+    <pdx-demo-comp-icon-inline-svg class="demo-section"></pdx-demo-comp-icon-inline-svg>
+
+    <!-- ═══ Multiple Icon Sets ═══ -->
+    <pdx-demo-comp-icon-icon-sets class="demo-section"></pdx-demo-comp-icon-icon-sets>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-icon-composition class="demo-section"></pdx-demo-comp-icon-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Prop</span><span>Type</span><span>Description</span>
+        </div>
+        <div class="opt-row">
+          <code>name</code><span>string</span><span>Icon name from registered set</span>
+        </div>
+        <div class="opt-row">
+          <code>set</code><span>string</span><span>Icon set name (default: first registered)</span>
+        </div>
+        <div class="opt-row">
+          <code>svg</code><span>string</span><span>Inline SVG markup</span>
+        </div>
+        <div class="opt-row">
+          <code>src</code><span>string</span><span>URL to external SVG file</span>
+        </div>
+        <div class="opt-row">
+          <code>size</code><span>string</span><span>xs(12) sm(16) md(20) lg(24) xl(32)</span>
+        </div>
+        <div class="opt-row">
+          <code>weight</code><span>string</span><span>thin(1) light(1.5) regular(2) bold(2.5)</span>
+        </div>
+        <div class="opt-row">
+          <code>label</code><span>string</span><span>Accessible name (enables role="img")</span>
+        </div>
+        <div class="opt-row">
+          <code>rtl</code><span>string</span><span>'mirror' or 'none' (default)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+
+@page '/components/icon';
+@title 'Icon Component';
+
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+
+  .size-row {
+    display: flex;
+    gap: var(--pdx-space-xl);
+    align-items: flex-end;
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .size-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+  }
+
+  .opt-header, .opt-row { grid-template-columns: 80px 80px 1fr; }
+</style>

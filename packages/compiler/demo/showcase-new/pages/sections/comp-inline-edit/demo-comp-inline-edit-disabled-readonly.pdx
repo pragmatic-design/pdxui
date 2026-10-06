@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled & Readonly</h2>
+    <div class="demo-row">
+      <span class="demo-label">Disabled:</span>
+      <pdx-inline-edit disabled type="text" :value="'Cannot edit'"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Readonly:</span>
+      <pdx-inline-edit readonly type="text" :value="'View only'"></pdx-inline-edit>
+    </div>
+  </section>
+</template>

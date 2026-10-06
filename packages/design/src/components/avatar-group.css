@@ -1,0 +1,73 @@
+/* avatar-group — stacked avatars with overflow badge */
+
+/* Override media.css legacy .pdx-avatar-group rule */
+.pdx-avatar-group-root .pdx-avatar-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.pdx-avatar-group-root .pdx-avatar-group-reverse {
+    flex-direction: row-reverse;
+}
+
+.pdx-avatar-group-item {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.pdx-avatar-group-bordered {
+    box-shadow: 0 0 0 2px var(--pdx-color-surface, #fff);
+    border-radius: 50%;
+}
+
+/* Overflow badge — circular, matches avatar sizes */
+.pdx-avatar-group-overflow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    font-weight: 600;
+    user-select: none;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Size variants for overflow badge (match pdx-avatar sizes) */
+.pdx-avatar-size-xs { width: 24px; height: 24px; font-size: 9px; }
+.pdx-avatar-size-sm { width: 32px; height: 32px; font-size: 11px; }
+.pdx-avatar-size-md { width: 40px; height: 40px; font-size: 13px; }
+.pdx-avatar-size-lg { width: 48px; height: 48px; font-size: 15px; }
+.pdx-avatar-size-xl { width: 64px; height: 64px; font-size: 18px; }
+
+/* Clickable avatars */
+.pdx-avatar-group-clickable {
+    cursor: pointer;
+    transition: transform 0.15s ease, z-index 0s;
+}
+
+.pdx-avatar-group-clickable:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+/* Keyboard focus on a clickable avatar or "+N" — they are buttons */
+.pdx-avatar-group-clickable:focus-visible,
+.pdx-avatar-group-overflow[role="button"]:focus-visible {
+    outline: 2px solid var(--pdx-color-focus);
+    outline-offset: 2px;
+    z-index: 10;
+}
+
+/* Overflow badge hover */
+.pdx-avatar-group-overflow:hover {
+    background: var(--pdx-color-border);
+}
+
+/* Root host element */
+.pdx-avatar-group-root {
+    display: inline-block;
+}

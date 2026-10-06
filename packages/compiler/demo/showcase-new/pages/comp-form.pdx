@@ -1,0 +1,131 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Form System</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-form&gt;</code> — compound form with auto-binding, validation, save modes, schema-driven templates, and DataSource integration.
+      The compiler auto-wires controls inside <code>&lt;pdx-form&gt;</code> when they have a <code>name</code> attribute.
+    </p>
+
+    <!-- ═══ 1. Basic Form — Compiler Binding ═══ -->
+    <pdx-demo-comp-form-basic class="demo-section"></pdx-demo-comp-form-basic>
+
+    <!-- ═══ 2. Nested DTO — Field Groups ═══ -->
+    <pdx-demo-comp-form-nested-dto class="demo-section"></pdx-demo-comp-form-nested-dto>
+
+    <!-- ═══ 3. Validation Modes ═══ -->
+    <pdx-demo-comp-form-validation-modes class="demo-section"></pdx-demo-comp-form-validation-modes>
+
+    <!-- ═══ 4. Warning Rules ═══ -->
+    <pdx-demo-comp-form-warning-rules class="demo-section"></pdx-demo-comp-form-warning-rules>
+
+    <!-- ═══ 5. Programmatic Form (Code) ═══ -->
+    <pdx-demo-comp-form-programmatic class="demo-section"></pdx-demo-comp-form-programmatic>
+
+    <!-- ═══ 6. DataSource Integration ═══ -->
+    <pdx-demo-comp-form-data-source class="demo-section"></pdx-demo-comp-form-data-source>
+
+    <!-- ═══ 7. Schema-Driven Form Template ═══ -->
+    <pdx-demo-comp-form-form-template class="demo-section"></pdx-demo-comp-form-form-template>
+
+    <!-- ═══ 8. Multiple Control Types ═══ -->
+    <pdx-demo-comp-form-all-controls class="demo-section"></pdx-demo-comp-form-all-controls>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+
+      <h3 class="pdx-txt-small pdx-weight-semibold" style="margin-bottom: var(--pdx-space-sm)">pdx-form Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>form</code><span>Form</span><span>Form instance from createForm() or @form rune</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Name for nested form registration</span></div>
+        <div class="opt-row"><code>autocomplete</code><span>string</span><span>HTML autocomplete attribute (default: 'off')</span></div>
+        <div class="opt-row"><code>scrollToError</code><span>boolean</span><span>Scroll to first error on failed validation (default: true)</span></div>
+        <div class="opt-row"><code>source</code><span>DataSource</span><span>DataSource for auto-load/save (Phase D)</span></div>
+        <div class="opt-row"><code>recordId</code><span>string</span><span>Record ID to load from DataSource</span></div>
+      </div>
+
+      <h3 class="pdx-txt-small pdx-weight-semibold" style="margin-top: var(--pdx-space-lg); margin-bottom: var(--pdx-space-sm)">pdx-field-group Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Nested object key — scopes child field paths</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Optional fieldset legend</span></div>
+        <div class="opt-row"><code>display</code><span>string</span><span>'inline' (default) | 'dialog' | 'panel' (Phase E)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-small pdx-weight-semibold" style="margin-top: var(--pdx-space-lg); margin-bottom: var(--pdx-space-sm)">pdx-field-list Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Array field name in the form</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Label above the list</span></div>
+        <div class="opt-row"><code>itemFields</code><span>array</span><span>Field definitions per array item</span></div>
+        <div class="opt-row"><code>itemDefault</code><span>object</span><span>Default values for new items</span></div>
+        <div class="opt-row"><code>minItems</code><span>number</span><span>Minimum items (default: 0)</span></div>
+        <div class="opt-row"><code>maxItems</code><span>number</span><span>Maximum items (default: 999)</span></div>
+        <div class="opt-row"><code>addLabel</code><span>string</span><span>Add button text (default: '+ Add')</span></div>
+        <div class="opt-row"><code>removable</code><span>boolean</span><span>Allow removing items (default: true)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-small pdx-weight-semibold" style="margin-top: var(--pdx-space-lg); margin-bottom: var(--pdx-space-sm)">createForm() Config</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Option</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>initialValues</code><span>T</span><span>Initial field values object</span></div>
+        <div class="opt-row"><code>validators</code><span>object</span><span>Per-field sync validators</span></div>
+        <div class="opt-row"><code>asyncValidators</code><span>object</span><span>Per-field async validators</span></div>
+        <div class="opt-row"><code>validateOn</code><span>string</span><span>'onChange' | 'onBlur' | 'onSubmit' (default: 'onBlur')</span></div>
+        <div class="opt-row"><code>saveMode</code><span>string</span><span>'onSubmit' | 'onChange' | 'onBlur' | 'immediate'</span></div>
+        <div class="opt-row"><code>saveDebounce</code><span>number</span><span>Debounce ms for onChange/immediate (default: 500)</span></div>
+        <div class="opt-row"><code>warnings</code><span>object</span><span>Per-field warning validators (non-blocking)</span></div>
+        <div class="opt-row"><code>fieldConfig</code><span>object</span><span>Per-field save mode overrides</span></div>
+        <div class="opt-row"><code>warnUnsaved</code><span>boolean</span><span>Navigation guard for unsaved changes</span></div>
+        <div class="opt-row"><code>schema</code><span>StandardSchema</span><span>External schema (Zod, Valibot, ArkType)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-small pdx-weight-semibold" style="margin-top: var(--pdx-space-lg); margin-bottom: var(--pdx-space-sm)">Form Instance API</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Method/Signal</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>fields</code><span>object</span><span>Per-field accessors: value, error, warning, touched, dirty, onChange, onBlur</span></div>
+        <div class="opt-row"><code>valid</code><span>Signal&lt;boolean&gt;</span><span>Whether all fields pass validation</span></div>
+        <div class="opt-row"><code>dirty</code><span>Signal&lt;boolean&gt;</span><span>Whether any field has been modified</span></div>
+        <div class="opt-row"><code>errors</code><span>Signal&lt;object&gt;</span><span>All current errors keyed by field name</span></div>
+        <div class="opt-row"><code>warnings</code><span>Signal&lt;object&gt;</span><span>All current warnings keyed by field name</span></div>
+        <div class="opt-row"><code>handleSubmit(fn)</code><span>function</span><span>Wrap submit handler with validation + state</span></div>
+        <div class="opt-row"><code>reset(newValues?)</code><span>function</span><span>Reset all fields to initial values</span></div>
+        <div class="opt-row"><code>validate()</code><span>Promise</span><span>Run all validators, return true if valid</span></div>
+        <div class="opt-row"><code>getValues()</code><span>T</span><span>Get current values snapshot (reconstructs nested objects)</span></div>
+        <div class="opt-row"><code>array(name)</code><span>FieldArray</span><span>Access field array for array-typed fields</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/form';
+@title 'Form System';
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .form-values {
+    margin: var(--pdx-space-md) 0 0;
+    padding: var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    overflow-x: auto;
+    max-height: 200px;
+  }
+  .form-values pre {
+    margin: var(--pdx-space-xs) 0 0;
+    font-family: var(--pdx-font-mono);
+    white-space: pre-wrap;
+  }
+</style>

@@ -1,0 +1,78 @@
+/* pdx-sortable-list — a list the user can reorder, by pointer and by keyboard */
+pdx-sortable-list { display: block; }
+
+.pdx-sortable-root { position: relative; }
+
+.pdx-sortable-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding-left: 0; /* Reset the typography.css .pdx-list-style rules on a <ul> */
+    list-style: none;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+}
+
+.pdx-sortable-list[data-axis='horizontal'] { flex-direction: row; }
+
+.pdx-sortable-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    font-size: var(--pdx-text-sm);
+    min-height: 40px;
+    background: var(--pdx-color-surface);
+    /* The drag moves this element with a transform; a transition on it is what makes the other rows
+       slide aside rather than jump. useSortable writes the transition itself while dragging. */
+    box-sizing: border-box;
+}
+
+.pdx-sortable-list:not([data-axis='horizontal']) .pdx-sortable-item + .pdx-sortable-item {
+    border-top: 1px solid var(--pdx-color-border);
+}
+.pdx-sortable-list[data-axis='horizontal'] .pdx-sortable-item + .pdx-sortable-item {
+    border-left: 1px solid var(--pdx-color-border);
+}
+
+/* Lifted from the keyboard: the same affordance a pointer drag gives, for the gesture that has no
+   pointer to follow. */
+.pdx-sortable-item-lifted {
+    background: var(--pdx-color-primary-soft);
+    box-shadow: var(--pdx-shadow-md);
+    position: relative;
+    z-index: 1;
+}
+
+.pdx-sortable-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    color: var(--pdx-color-muted);
+    cursor: grab;
+    /* The pointer gesture owns this element: without it the browser scrolls instead of dragging. */
+    touch-action: none;
+}
+
+.pdx-sortable-handle:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
+.pdx-sortable-handle:active { cursor: grabbing; }
+.pdx-sortable-handle[aria-disabled='true'] { cursor: default; opacity: 0.5; }
+
+/* The grip: six dots, drawn rather than shipped as an icon, so the handle costs no request. */
+.pdx-sortable-grip {
+    width: 10px;
+    height: 16px;
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: 5px 5px;
+    background-position: 0 2px;
+}
+
+.pdx-sortable-body { flex: 1; min-width: 0; }

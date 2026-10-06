@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Keyboard Shortcuts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Keyboard Shortcuts</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Keyboard Shortcuts</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Styled key indicators. Single keys, combinations, sequences. Physical key look with shadow.</p>
+                    </pdx-stack>
+
+                    <!-- Single keys -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Single Keys</h2>
+                        <pdx-row gap="sm" wrap items="center">
+                            <kbd class="pdx-kbd">A</kbd>
+                            <kbd class="pdx-kbd">Ctrl</kbd>
+                            <kbd class="pdx-kbd">Shift</kbd>
+                            <kbd class="pdx-kbd">Alt</kbd>
+                            <kbd class="pdx-kbd">⌘</kbd>
+                            <kbd class="pdx-kbd">Tab</kbd>
+                            <kbd class="pdx-kbd">Enter</kbd>
+                            <kbd class="pdx-kbd">Esc</kbd>
+                            <kbd class="pdx-kbd">Space</kbd>
+                            <kbd class="pdx-kbd">↑</kbd>
+                            <kbd class="pdx-kbd">↓</kbd>
+                            <kbd class="pdx-kbd">←</kbd>
+                            <kbd class="pdx-kbd">→</kbd>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Combinations -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Combinations</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Wrap in <code>pdx-kbd-combo</code> for auto <code>+</code> separator.</p>
+                        <pdx-stack gap="sm">
+                            <pdx-row gap="lg" wrap items="center">
+                                <span class="pdx-kbd-combo"><kbd class="pdx-kbd">Ctrl</kbd><kbd class="pdx-kbd">C</kbd></span>
+                                <span class="pdx-txt-small pdx-ink-muted">Copy</span>
+                            </pdx-row>
+                            <pdx-row gap="lg" wrap items="center">
+                                <span class="pdx-kbd-combo"><kbd class="pdx-kbd">Ctrl</kbd><kbd class="pdx-kbd">Shift</kbd><kbd class="pdx-kbd">P</kbd></span>
+                                <span class="pdx-txt-small pdx-ink-muted">Command Palette</span>
+                            </pdx-row>
+                            <pdx-row gap="lg" wrap items="center">
+                                <span class="pdx-kbd-combo"><kbd class="pdx-kbd">⌘</kbd><kbd class="pdx-kbd">K</kbd></span>
+                                <span class="pdx-txt-small pdx-ink-muted">Quick Search</span>
+                            </pdx-row>
+                            <pdx-row gap="lg" wrap items="center">
+                                <span class="pdx-kbd-combo"><kbd class="pdx-kbd">Alt</kbd><kbd class="pdx-kbd">F4</kbd></span>
+                                <span class="pdx-txt-small pdx-ink-muted">Close Window</span>
+                            </pdx-row>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Sequences -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sequences</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Press keys one after another. Wrap in <code>pdx-kbd-seq</code>.</p>
+                        <pdx-stack gap="sm">
+                            <pdx-row gap="lg" items="center">
+                                <span class="pdx-kbd-seq"><kbd class="pdx-kbd">G</kbd> then <kbd class="pdx-kbd">D</kbd></span>
+                                <span class="pdx-txt-small pdx-ink-muted">Go to Dashboard</span>
+                            </pdx-row>
+                            <pdx-row gap="lg" items="center">
+                                <span class="pdx-kbd-seq"><kbd class="pdx-kbd">G</kbd> then <kbd class="pdx-kbd">S</kbd></span>
+                                <span class="pdx-txt-small pdx-ink-muted">Go to Settings</span>
+                            </pdx-row>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Sizes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sizes</h2>
+                        <pdx-row gap="lg" wrap items="end">
+                            <pdx-stack gap="2xs" items="center">
+                                <kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd>
+                                <span class="pdx-txt-caption pdx-ink-muted">sm</span>
+                            </pdx-stack>
+                            <pdx-stack gap="2xs" items="center">
+                                <kbd class="pdx-kbd">Ctrl</kbd>
+                                <span class="pdx-txt-caption pdx-ink-muted">default</span>
+                            </pdx-stack>
+                            <pdx-stack gap="2xs" items="center">
+                                <kbd class="pdx-kbd pdx-kbd-lg">Ctrl</kbd>
+                                <span class="pdx-txt-caption pdx-ink-muted">lg</span>
+                            </pdx-stack>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- In context -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">In Context</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Inline with text, in menus, in tooltips.</p>
+                        <pdx-stack gap="sm">
+                            <p class="pdx-txt-small">Press <span class="pdx-kbd-combo"><kbd class="pdx-kbd">Ctrl</kbd><kbd class="pdx-kbd">K</kbd></span> to open the command palette.</p>
+                            <p class="pdx-txt-small">Use <kbd class="pdx-kbd">Tab</kbd> to move focus and <kbd class="pdx-kbd">Enter</kbd> to confirm.</p>
+                            <p class="pdx-txt-small">Navigate with <kbd class="pdx-kbd">↑</kbd> <kbd class="pdx-kbd">↓</kbd> arrows, press <kbd class="pdx-kbd">Esc</kbd> to close.</p>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Shortcut table -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Shortcut Reference</h2>
+                        <div class="pdx-table-responsive">
+                            <table class="pdx-table">
+                                <thead>
+                                    <tr><th>Action</th><th>Windows</th><th>Mac</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Save</td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">S</kbd></span></td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">⌘</kbd><kbd class="pdx-kbd pdx-kbd-sm">S</kbd></span></td></tr>
+                                    <tr><td>Undo</td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">Z</kbd></span></td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">⌘</kbd><kbd class="pdx-kbd pdx-kbd-sm">Z</kbd></span></td></tr>
+                                    <tr><td>Search</td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">K</kbd></span></td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">⌘</kbd><kbd class="pdx-kbd pdx-kbd-sm">K</kbd></span></td></tr>
+                                    <tr><td>Format</td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Shift</kbd><kbd class="pdx-kbd pdx-kbd-sm">Alt</kbd><kbd class="pdx-kbd pdx-kbd-sm">F</kbd></span></td><td><span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">⇧</kbd><kbd class="pdx-kbd pdx-kbd-sm">⌥</kbd><kbd class="pdx-kbd pdx-kbd-sm">F</kbd></span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

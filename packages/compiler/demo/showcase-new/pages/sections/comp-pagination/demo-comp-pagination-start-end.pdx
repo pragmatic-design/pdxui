@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">At Start & End</h2>
+    <div class="demo-stack">
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Page 1 (prev disabled):</span>
+        <pdx-pagination :total="200" :pageSize="10" :page="1"></pdx-pagination>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Last page (next disabled):</span>
+        <pdx-pagination :total="200" :pageSize="10" :page="20"></pdx-pagination>
+      </div>
+    </div>
+  </section>
+</template>

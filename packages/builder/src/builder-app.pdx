@@ -1,0 +1,1312 @@
+<template>
+  <div class="app">
+
+    <!-- The identity bar. The builder is a satellite of pdxui.com, not a separate product,
+         and the lockup is the shared one (brand/brand.css) rather than a copy. Everything
+         on the right leaves for the site: a theme built here has to land in docs someone
+         can read. Fixed height, so it never participates in a mode switch reflow. -->
+    <header class="topbar">
+      <a class="site-brand" href="https://pdxui.com/">
+        <span class="brand-logo" role="img" aria-label="Pragmatic Design"></span>
+        <span class="brand-name"><span class="brand-accent">PDX</span> <span class="brand-ui">UI</span></span>
+      </a>
+      <span class="topbar-here">Theme Builder</span>
+      <nav class="topbar-nav">
+        <a class="topbar-link" href="https://pdxui.com/design">Design</a>
+        <a class="topbar-link" href="https://pdxui.com/components">Components</a>
+        <a class="topbar-link" href="https://pdxui.com/docs">Docs</a>
+        <a class="topbar-link topbar-back" href="https://pdxui.com/" data-test="back-to-site">pdxui.com ↗</a>
+      </nav>
+    </header>
+
+    <div class="shell">
+
+    <aside class="picker">
+      <div class="picker-head">
+        <div class="modes" data-test="modes">
+          <button :class="mode === 'component' ? 'mode-btn active' : 'mode-btn'" @click="setMode('component')" data-test="mode-component">Components</button>
+          <button :class="mode === 'theme' ? 'mode-btn active' : 'mode-btn'" @click="setMode('theme')" data-test="mode-theme">Theme</button>
+        </div>
+        <input class="search" type="search" placeholder="Filter components…" :value="query" @input="onFilter" data-test="filter" />
+      </div>
+
+      @if (mode === 'theme') {
+        <section class="knobs" data-test="knobs">
+          <label class="knob">
+            <span class="knob-label">Name</span>
+            <input class="knob-in" type="text" id="pdx-knob-name" name="theme-name" aria-label="Theme name" :value="draft.name" @input="setDraft('name', $event.target.value)" data-test="knob-name" />
+          </label>
+          <label class="knob">
+            <span class="knob-label">Brand</span>
+            <div class="knob-row">
+              <input class="knob-swatch" type="color" :value="brandHex" @input="setDraft('brand', $event.target.value)" data-test="knob-brand-picker" title="Pick a brand colour" />
+              <input class="knob-in" type="text" :value="draft.brand" @input="setDraft('brand', $event.target.value)" placeholder="#3b5bdb or oklch(L C H)" id="pdx-knob-brand" name="brand" aria-label="Brand colour" data-test="knob-brand" />
+            </div>
+          </label>
+          <label class="knob">
+            <span class="knob-label">Archetype</span>
+            <select class="knob-in" id="pdx-knob-language" name="language" aria-label="Archetype" @change="setDraft('language', $event.target.value)" data-test="knob-language">
+              @for (languages as l; track l) {
+                <option :value="l" :selected="l === draft.language">{{ l }}</option>
+              }
+            </select>
+          </label>
+          <label class="knob">
+            <span class="knob-label">Accent</span>
+            <input class="knob-in" type="text" :value="draft.accent" @input="setDraft('accent', $event.target.value)" placeholder="auto" data-test="knob-accent" />
+          </label>
+          <label class="knob">
+            <span class="knob-label">Focus ring</span>
+            <input class="knob-in" type="text" :value="draft.focus" @input="setDraft('focus', $event.target.value)" placeholder="auto" data-test="knob-focus" />
+          </label>
+          <label class="knob">
+            <span class="knob-label">Neutral hue</span>
+            <input class="knob-in" type="text" :value="draft.neutral" @input="setDraft('neutral', $event.target.value)" placeholder="auto (brand hue)" data-test="knob-neutral" />
+          </label>
+          <label class="knob">
+            <span class="knob-label">Density</span>
+            <select class="knob-in" id="pdx-knob-density" name="density" aria-label="Density" @change="setDraft('density', $event.target.value)" data-test="knob-density">
+              @for (densities as d; track d) {
+                <option :value="d" :selected="d === draft.density">{{ d }}</option>
+              }
+            </select>
+          </label>
+          <label class="knob">
+            <span class="knob-label">Radius</span>
+            <select class="knob-in" id="pdx-knob-radius" name="radius" aria-label="Radius" @change="setDraft('radius', $event.target.value)" data-test="knob-radius">
+              @for (radii as r; track r) {
+                <option :value="r" :selected="r === draft.radius">{{ r || 'from archetype' }}</option>
+              }
+            </select>
+          </label>
+
+          <details class="tokens-box" data-test="tokens-box">
+            <summary class="tokens-summary">Tokens — {{ tokenCount }} overridden</summary>
+            @for (tokenGroups as g; track g.id) {
+              <details class="tok-group" :data-group="g.id">
+                <summary class="tok-group-sum">{{ g.label }} <span class="tok-count">{{ g.tokens.length }}</span></summary>
+                <p class="tok-hint">{{ g.hint }}</p>
+                @for (g.tokens as t; track t.name) {
+                  <div :class="tokenValue(t.name) ? 'tok-row set' : 'tok-row'" :data-token-row="t.name">
+                    <div class="tok-head">
+                      @if (t.kind === 'color') {
+                        <span class="tok-swatch" :style="'background:' + resolvedOf(t.name)"></span>
+                      } @else if (t.kind === 'length') {
+                        <span class="tok-bar" :style="'width:' + resolvedOf(t.name)"></span>
+                      } @else if (t.kind === 'shadow') {
+                        <span class="tok-shadow" :style="'box-shadow:' + resolvedOf(t.name)"></span>
+                      } @else if (t.kind === 'font') {
+                        <span class="tok-font" :style="'font-family:' + resolvedOf(t.name)">Ag</span>
+                      } @else {
+                        <span class="tok-plain">{{ resolvedOf(t.name) }}</span>
+                      }
+                      <span class="tok-label" :title="t.name">{{ t.label }}</span>
+                      <span class="tok-resolved">{{ resolvedOf(t.name) }}</span>
+                      @if (tokenValue(t.name)) {
+                        <button class="tok-reset" @click="setToken(t.name, '')" :data-reset="t.name" title="Back to the generated value">↺</button>
+                      }
+                    </div>
+                    <input class="knob-in tok-in" type="text" :value="tokenValue(t.name)" :placeholder="generatedValue(t.name)" @input="setToken(t.name, $event.target.value)" :data-token="t.name" />
+                  </div>
+                }
+              </details>
+            }
+          </details>
+
+          <label class="knob">
+            <span class="knob-label">Custom CSS</span>
+            <textarea class="knob-in css-box" rows="4" :value="draft.css" @input="setCss($event.target.value)" placeholder="anything the tokens cannot express" data-test="knob-css"></textarea>
+          </label>
+
+          <div class="knob-actions">
+            @if (canSave) {
+              <button class="ctl-btn primary" @click="save" data-test="save-theme">Save to project</button>
+            }
+            <button :class="canSave ? 'ctl-btn' : 'ctl-btn primary'" @click="exportCss" data-test="export-css">Export CSS</button>
+            <button class="ctl-btn" @click="exportDtcg" data-test="export-dtcg">DTCG</button>
+          </div>
+          @if (saveMsg) {
+            <p :class="saveOk ? 'save-msg ok' : 'save-msg err'" data-test="save-msg">{{ saveMsg }}</p>
+          }
+        </section>
+      }
+
+      <nav class="picker-list" data-test="component-list">
+        <button :class="component === compositionName ? 'grp-btn composition active' : 'grp-btn composition'" @click="selectComposition" data-test="composition">
+          <span class="grp-name">Composition</span>
+          <span class="grp-tier">page</span>
+        </button>
+        @if (loadError) {
+          <p class="load-error" data-test="load-error">{{ loadError }}</p>
+        }
+        @for (filtered as c; track c.name) {
+          <div class="grp">
+            <button :class="c.name === component ? 'grp-btn active' : 'grp-btn'" @click="selectComponent(c)" :data-component="c.name">
+              <span class="grp-name">{{ c.name }}</span>
+              <span class="grp-tier">{{ c.tier }}</span>
+            </button>
+            @if (c.name === component) {
+              @for (c.scenarios as s; track s.id) {
+                <button :class="s.id === scenario ? 'sc-btn active' : 'sc-btn'" @click="selectScenario(s.id)" :data-scenario="s.id">{{ s.title }}</button>
+              }
+            }
+          </div>
+        }
+      </nav>
+
+      <div class="picker-foot">{{ filtered.length }} / {{ catalog.length }} components</div>
+    </aside>
+
+    <div class="main">
+      <header class="bar">
+        @if (mode === 'theme') {
+          <span class="ctl">
+            <span class="ctl-label">Previewing</span>
+            <span class="ctl-static" data-test="previewing">{{ draft.name }} (draft)</span>
+          </span>
+        } @else {
+          <label class="ctl">
+            <span class="ctl-label" id="lbl-theme">Theme</span>
+            <select class="ctl-select" id="pdx-theme-select" aria-labelledby="lbl-theme" :value="theme" @change="onTheme" data-test="theme">
+              @for (allThemes as t; track t) {
+                <option :value="t" :selected="t === theme">{{ t }}</option>
+              }
+            </select>
+          </label>
+        }
+
+        <button class="ctl-btn" @click="toggleScheme" data-test="scheme">{{ scheme === 'dark' ? 'Dark' : 'Light' }}</button>
+
+        <div class="ctl-group" data-test="viewports">
+          @for (viewports as v; track v.id) {
+            <button :class="v.width === width ? 'ctl-btn active' : 'ctl-btn'" @click="selectWidth(v.width)" :data-width="v.width">{{ v.label }}</button>
+          }
+        </div>
+
+        <button class="ctl-btn" @click="measure" data-test="measure">Measure</button>
+
+        <span class="spacer"></span>
+        <span class="crumb" data-test="crumb">{{ component }}{{ scenario ? ' · ' + scenario : '' }}</span>
+      </header>
+
+      <div class="stage">
+        <iframe class="frame" :src="frameSrc" :style="frameStyle" title="preview" data-test="preview" @load="onFrameLoad($event)"></iframe>
+      </div>
+    </div>
+
+    <aside class="oracle" data-test="oracle">
+      <div class="oracle-head">
+        <span class="oracle-title">Verdict</span>
+        @if (measuring) {
+          <span class="verdict measuring" data-test="verdict">measuring…</span>
+        } @else if (!report) {
+          <span class="verdict idle" data-test="verdict">—</span>
+        } @else if (report.error) {
+          <span class="verdict err" data-test="verdict">error</span>
+        } @else if (report.pass) {
+          <span class="verdict ok" data-test="verdict">pass</span>
+        } @else {
+          <span class="verdict fail" data-test="verdict">fail</span>
+        }
+      </div>
+
+      <!-- Colour verdict. Only theme mode has a ThemeInput to gate, and this is the check
+           the rendered oracle cannot make (see the note at the bottom of the panel). -->
+      @if (mode === 'theme') {
+        <div class="gate" data-test="gate">
+          <div class="gate-head">
+            <span class="gate-title">WCAG token gate</span>
+            @if (build.error) {
+              <span class="verdict err" data-test="gate-verdict">input</span>
+            } @else if (build.errors > 0) {
+              <span class="verdict fail" data-test="gate-verdict">{{ build.errors }} fail</span>
+            } @else {
+              <span class="verdict ok" data-test="gate-verdict">AA clean</span>
+            }
+          </div>
+          @if (build.error) {
+            <p class="oracle-error" data-test="gate-error">{{ build.error }}</p>
+          }
+          @if (build.errors > 0) {
+            <button class="ctl-btn" @click="applyFixes" data-test="apply-fixes">Apply suggested fixes</button>
+          }
+          <ul class="violations">
+            @for (build.issues as i; track i.code + i.message) {
+              <li :class="'viol ' + (i.level === 'error' ? 'error' : 'warning')">
+                <span class="viol-rule">{{ i.code }}</span>
+                <span class="viol-detail">{{ i.message }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      <!-- What this theme leaves to the base. Not a verdict: whether a gap is deliberate is a design
+           judgement per theme, and the source cannot tell a choice from a hole. Shown outside theme
+           mode because that is where a SHIPPED theme is selected; theme mode gates a draft instead. -->
+      @if (mode !== 'theme') {
+        <div class="gate" data-test="inherit">
+          <div class="gate-head">
+            <span class="gate-title">Inherited from base</span>
+            @if (inherited.length === 0) {
+              <span class="verdict ok" data-test="inherit-count">0 tokens</span>
+            } @else {
+              <span class="verdict idle" data-test="inherit-count">{{ inherited.length }} token{{ inherited.length === 1 ? '' : 's' }}</span>
+            }
+          </div>
+          @if (inherited.length > 0) {
+            <ul class="violations" data-test="inherit-list">
+              @for (inherited as t; track t) {
+                <li class="viol warning"><span class="viol-rule">{{ t }}</span></li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      @if (report) {
+        @if (report.error) {
+          <p class="oracle-error" data-test="oracle-error">{{ report.error }}</p>
+        } @else {
+          <div class="counts">
+            <span class="count err" data-test="errors">{{ report.errors }} err</span>
+            <span class="count warn">{{ report.warnings }} warn</span>
+            <span class="count info">{{ report.info }} info</span>
+          </div>
+          <div class="meta">
+            <span>{{ report.passed }}/{{ report.total }} checks</span>
+            @if (report.aesthetic != null) {
+              <span data-test="aesthetic">aesthetic {{ report.aesthetic.toFixed(3) }}</span>
+            }
+            <span>{{ report.durationMs }}ms</span>
+          </div>
+
+          <ul class="violations" data-test="violations">
+            @for (report.violations as v; track v.rule + (v.element ?? '') + v.detail) {
+              <li :class="'viol ' + v.severity">
+                <span class="viol-rule">{{ v.rule }}</span>
+                @if (v.element) {
+                  <span class="viol-el">{{ v.element }}</span>
+                }
+                <span class="viol-detail">{{ v.detail }}</span>
+              </li>
+            }
+          </ul>
+
+          @if (report.violations.length === 0) {
+            <p class="oracle-none">No violation on this scenario.</p>
+          }
+
+          <!-- Always visible: a verdict is only worth as much as its stated coverage. -->
+          @for (report.notes as note; track note) {
+            <p class="oracle-note" data-test="oracle-note">{{ note }}</p>
+          }
+        }
+      }
+    </aside>
+
+    </div>
+
+  </div>
+</template>
+
+<script setup>
+import { onMount } from '@pdxui/core';
+import { CATALOG_URL, THEMES, VIEWPORTS, CAN_SAVE, scenarioUrl, compositionUrl, COMPOSITION_NAME } from './config';
+import { runOracle, injectCss, clearCss } from './oracle';
+import { inheritedFromBase } from '@pdxui/design/engine';
+import { TOKEN_GROUPS, ALL_EDITABLE_TOKENS, resolveTokens } from './tokens';
+import { LANGUAGES, DENSITIES, RADIUS_SCALES, ensureCustomThemeCss, seedDraftFromTheme, draftFromParams, draftToParams, buildTheme, applyToPreview, clearPreviewTheme, download, saveTheme, fetchThemes, hexForPicker, suggestFixes } from './theme-mode';
+
+// Static lists exposed to the template.
+const themes = THEMES;
+const viewports = VIEWPORTS;
+const languages = LANGUAGES;
+const densities = DENSITIES;
+const radii = RADIUS_SCALES;
+const tokenGroups = TOKEN_GROUPS;
+const compositionName = COMPOSITION_NAME;
+const canSave = CAN_SAVE;
+
+// ── State. Every field below is mirrored into the query string by syncUrl(), and read
+// back from it on load. That is the whole reason an agent can drive this surface without
+// a dedicated API: the URL *is* the API.
+const params = new URLSearchParams(location.search);
+
+let catalog = $signal([]);
+let loadError = $signal('');
+let query = $signal('');
+let component = $signal(params.get('component') ?? '');
+let scenario = $signal(params.get('scenario') ?? '');
+let theme = $signal(params.get('theme') ?? 'neutral');
+let scheme = $signal(params.get('scheme') ?? 'light');
+let width = $signal(Number(params.get('w') ?? 0));
+let report = $signal(null);
+let measuring = $signal(false);
+let mode = $signal(params.get('mode') === 'theme' ? 'theme' : 'component');
+let draft = $signal(draftFromParams(params));
+
+// Recomputed at its two mutation sites rather than derived: building a theme is the expensive
+// call in this file, and the explicit call sites say when it happens.
+let build = $signal(buildTheme(draftFromParams(params)));
+let customThemes = $signal([]);
+let saveMsg = $signal('');
+let saveOk = $signal(false);
+let brandHex = $signal(hexForPicker(draftFromParams(params).brand));
+let tokenCount = $signal(Object.keys(draftFromParams(params).tokens).length);
+// What the browser resolves each token to, read from the preview. Refreshed whenever the
+// preview is restyled, so the numbers next to the inputs are never stale.
+let resolved = $signal({});
+// The preview is revealed only once it has settled. In dev Vite serves CSS as a JS module,
+// so the scenario page is parsed and painted BEFORE the styles are injected and before the
+// custom elements upgrade - you watch the components draw unstyled and then snap into the
+// theme. Opacity, not visibility: Playwright still treats the content as visible, so the
+// suite keeps asserting on it.
+let frameReady = $signal(false);
+// Shipped list is the fallback for the first paint. The list from the server replaces it on
+// mount, so a theme saved from this UI appears without a restart.
+let allThemes = $signal(THEMES.slice());
+// The first question a theme author asks and nothing answered: which tokens does this theme leave
+// to the base? An inherited token still renders, so the gap never surfaces as a defect.
+
+function rebuild(next) {
+    draft = next;
+    build = buildTheme(next);
+    brandHex = hexForPicker(next.brand);
+    tokenCount = Object.keys(next.tokens ?? {}).length;
+    saveMsg = '';           // a changed draft is no longer the thing that was saved
+}
+
+// Functions, not deriveds: they take a key, so there is nothing to memoise per token, and each
+// is a map lookup.
+function tokenValue(key) {
+    return draft.tokens[key] ?? '';
+}
+
+function generatedValue(key) {
+    return build.theme ? (build.theme.tokens[key] ?? '') : '';
+}
+
+function resolvedOf(key) {
+    return resolved[key] ?? '';
+}
+
+function refreshResolved() {
+    const doc = frameEl?.contentDocument;
+    if (!doc || !doc.body) return;
+    resolved = resolveTokens(doc, ALL_EDITABLE_TOKENS.map(n => tokenDefOf(n)).filter(Boolean));
+}
+
+const TOKEN_DEFS = {};
+for (const g of TOKEN_GROUPS) { for (const t of g.tokens) TOKEN_DEFS[t.name] = t; }
+function tokenDefOf(name) {
+    return TOKEN_DEFS[name];
+}
+
+function setToken(key, value) {
+    const next = Object.assign({}, draft.tokens);
+    if (value.trim()) next[key] = value.trim();
+    else delete next[key];
+    rebuild(Object.assign({}, draft, { tokens: next }));
+    syncUrl();
+    applyThemeToPreview();
+    return measure();
+}
+
+function setCss(value) {
+    rebuild(Object.assign({}, draft, { css: value }));
+    syncUrl();
+    applyThemeToPreview();
+    return measure();
+}
+
+/** Apply every suggested fix at once. Returns what was applied, so a caller can loop. */
+function applyFixes() {
+    const fixes = suggestFixes(build);
+    if (!fixes.length) return [];
+    const next = Object.assign({}, draft.tokens);
+    for (const f of fixes) next[f.token] = f.to;
+    rebuild(Object.assign({}, draft, { tokens: next }));
+    syncUrl();
+    applyThemeToPreview();
+    measure();
+    return fixes;
+}
+
+async function refreshThemes() {
+    const list = await fetchThemes();
+    customThemes = list.custom;
+    allThemes = list.shipped.concat(list.custom.filter(t => !list.shipped.includes(t)));
+}
+
+async function save() {
+    if (build.error) { saveOk = false; saveMsg = build.error; return; }
+    const res = await saveTheme(draft.name, build.css, draft);
+    // Refresh BEFORE announcing. The confirmation has to mean the whole operation is done,
+    // list included - otherwise "Saved" is true while the theme is not yet on offer, which
+    // is both a lie to the user and a race for anything reading the list on that signal.
+    if (res.ok) await refreshThemes();
+    saveOk = !!res.ok;
+    // One line on purpose: the signal rewriter is line-based, so a multi-line assignment
+    // gets closed at the first line and the rest dangles as a syntax error.
+    saveMsg = res.ok ? ((res.replaced ? 'Replaced ' : 'Saved ') + res.written.join(' + ')) : res.error;
+    // The stylesheet the preview loads was transformed before this theme existed, so the
+    // frame has to re-fetch it. Reloading the FRAME only - reloading the page is what this
+    // whole path was built to avoid.
+    if (res.ok) reloadPreview();
+    // Returned, not just displayed: a human reads the toast, a caller needs the outcome.
+    // Without this an agent cannot tell a save from a refusal.
+    return res;
+}
+
+function reloadPreview() {
+    try { frameEl?.contentWindow?.location.reload(); } catch { /* cross-origin cannot happen here */ }
+}
+
+// The iframe element, kept as a plain reference: nothing in the template depends on it,
+// so making it reactive would only add a signal nobody reads.
+let frameEl = null;
+
+// When the picked custom theme's stylesheet is in force in the preview. Plain, like frameEl: only
+// runMeasure awaits it, and nothing renders from it.
+let themeSheet = Promise.resolve();
+
+// Which tokens this theme leaves to the base: a derived like the four below.
+const inherited = $derived(inheritedFromBase(theme).slice());
+const filtered = $derived(query ? catalog.filter(c => c.name.includes(query)) : catalog);
+const current = $derived(catalog.find(c => c.name === component) ?? null);
+const frameSrc = $derived(component === COMPOSITION_NAME ? compositionUrl(theme, scheme) : (current && scenario ? scenarioUrl(current.page, scenario, theme, scheme) : 'about:blank'));
+const frameStyle = $derived((width ? 'width:' + width + 'px' : 'width:100%') + ';opacity:' + (frameReady ? '1' : '0'));
+
+// Written on every state change rather than reactively: one explicit call site per
+// mutation is greppable, and it keeps history untouched (replaceState, no new entry).
+function syncUrl() {
+    const q = new URLSearchParams();
+    if (mode === 'theme') q.set('mode', 'theme');
+    if (component) q.set('component', component);
+    if (scenario) q.set('scenario', scenario);
+    // In theme mode the previewed theme is the DRAFT, applied live — pinning `theme=` too
+    // would put a second, contradictory answer in the URL.
+    if (mode !== 'theme') q.set('theme', theme);
+    q.set('scheme', scheme);
+    if (width) q.set('w', String(width));
+    if (mode === 'theme') draftToParams(draft, q);
+    history.replaceState(null, '', location.pathname + '?' + q.toString());
+}
+
+function setMode(next) {
+    // Entering theme mode CONTINUES from what is on screen instead of swapping it.
+    if (next === 'theme') rebuild(seedDraftFromTheme(draft, theme, frameEl?.contentDocument));
+    mode = next;
+    syncUrl();
+    applyThemeToPreview();
+    measure();
+}
+
+function setDraft(key, value) {
+    // Object.assign, not spread: the signal rewriter is documented not to handle array
+    // spread, and a plain call site leaves no room for that class of surprise.
+    rebuild(Object.assign({}, draft, { [key]: value }));
+    syncUrl();
+    applyThemeToPreview();
+    measure();
+}
+
+/** Push the generated theme onto the preview document (or restore the picked one). */
+function applyThemeToPreview() {
+    const doc = frameEl?.contentDocument;
+    if (!doc || !doc.documentElement) return;
+    if (mode === 'theme') {
+        applyToPreview(build, doc);
+    } else {
+        // Order matters: put the picked theme in force FIRST, then drop the generated
+        // sheet. Clearing first leaves a frame with no theme at all, which is the flash you
+        // see on the way out of theme mode.
+        doc.documentElement.setAttribute('pdx-theme', theme);
+        themeSheet = ensureCustomThemeCss(doc, customThemes.includes(theme) ? theme : '');
+        clearPreviewTheme(build, doc);
+    }
+    refreshResolved();
+}
+
+function exportCss() {
+    if (build.css) download(draft.name + '.css', build.css, 'text/css');
+}
+
+function exportDtcg() {
+    if (build.dtcg) download(draft.name + '.tokens.json', build.dtcg, 'application/json');
+}
+
+function selectComponent(c) {
+    frameReady = false;
+    component = c.name;
+    scenario = c.scenarios.length ? c.scenarios[0].id : '';
+    syncUrl();
+}
+
+/** The composite page has no manifest and no scenarios — it is one page. */
+function selectComposition() {
+    frameReady = false;
+    component = compositionName;
+    scenario = '';
+    syncUrl();
+}
+
+function selectScenario(id) {
+    frameReady = false;
+    scenario = id;
+    syncUrl();
+}
+
+function onFilter(e) {
+    query = e.target.value.toLowerCase();
+}
+
+function onTheme(e) {
+    frameReady = false;
+    theme = e.target.value;
+    syncUrl();
+}
+
+function toggleScheme() {
+    frameReady = false;
+    scheme = scheme === 'dark' ? 'light' : 'dark';
+    syncUrl();
+}
+
+function selectWidth(w) {
+    // NOT frameReady = false. Every other setter changes the iframe's src, so the reload fires
+    // @load, which measures and turns the flag back on. A width change reloads nothing, so
+    // clearing the flag would leave the preview at opacity 0 with nothing able to restore it — the
+    // button would apply, and the stage go blank.
+    //
+    // What a width change DOES invalidate is the verdict: it was measured at the old width, and
+    // the report carries the width it was measured at. Drop it and measure the new layout.
+    width = w;
+    report = null;
+    syncUrl();
+    measure();
+}
+
+// ── Oracle ────────────────────────────────────────────────────────────────────
+// Measuring before the preview has mounted reads a half-built DOM and reports
+// violations that do not exist, so wait for the scenario page's own ready flag.
+function previewReady() {
+    // documentElement is null for a beat while the frame navigates — reading through it
+    // unguarded throws inside the poll and kills the measurement.
+    const root = frameEl?.contentDocument?.documentElement;
+    return !!root && root.hasAttribute('data-pdx-ready');
+}
+
+async function waitForPreview(timeoutMs = 5000) {
+    const deadline = Date.now() + timeoutMs;
+    while (!previewReady() && Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 50));
+    }
+    return previewReady();
+}
+
+// Measurements are SERIALISED. Callers are many - the frame load handler, every knob, the
+// button, a driving agent - and two overlapping runs share one preview and one colour shim.
+// Chaining them is cheaper than making every path re-entrant, and it removes a whole class
+// of intermittent result rather than one instance of it.
+let measureChain = Promise.resolve(null);
+
+function measure() {
+    measureChain = measureChain.then(runMeasure, runMeasure);
+    return measureChain;
+}
+
+async function runMeasure() {
+    if (!frameEl) return null;
+    measuring = true;
+    try {
+        const ready = await waitForPreview();
+        // Re-apply once the preview is actually ready. A change made while the frame was
+        // still loading is dropped by applyThemeToPreview (there is no document to style
+        // yet), and the measurement would then judge an unthemed page.
+        if (ready) applyThemeToPreview();
+        // And wait for a custom theme's stylesheet to be in force. Mounted is not themed: the
+        // sheet is a <link> that loads on its own time, and revealing or judging the preview
+        // before it lands shows the default theme under the picked theme's name.
+        await themeSheet;
+        frameReady = true;
+        // In theme mode the thing on screen is the draft, so that is what the report names.
+        const themeName = mode === 'theme' ? draft.name : theme;
+        report = runOracle(frameEl, { component, scenario, theme: themeName, scheme, width });
+        return report;
+    } finally {
+        measuring = false;
+    }
+}
+
+function onFrameLoad(e) {
+    frameEl = e.target;
+    frameReady = false;
+    report = null;      // the previous verdict belongs to the previous preview
+    // A reload wipes the inline tokens, so the draft has to be put back before measuring.
+    applyThemeToPreview();
+    measure();
+}
+
+onMount(async () => {
+    // The machine-readable half of the surface. An agent drives the builder through the
+    // URL and reads the verdict here — same page, no dedicated API to keep in sync.
+    globalThis.__pdx_builder = {
+        state: () => ({ mode, component, scenario, theme, scheme, width, draft }),
+        report: () => report,
+        measure,
+        // ── Theme mode: author, judge, take away — the agent-facing half.
+        /** The engine's WCAG token gate + the generated CSS/DTCG for the current draft. */
+        theme: () => ({ css: build.css, dtcg: build.dtcg, issues: build.issues, errors: build.errors, warnings: build.warnings, error: build.error }),
+        setDraft: (patch) => {
+            rebuild(Object.assign({}, draft, patch));
+            syncUrl();
+            applyThemeToPreview();
+            return measure();
+        },
+        setMode,
+        save,
+        setToken,
+        setCss,
+        /** Verdict → applicable changes. Empty when the gate is clean. */
+        fixes: () => suggestFixes(build),
+        applyFixes,
+        themes: () => ({ all: allThemes, custom: customThemes }),
+        /** Apply CSS inside the preview (theme mode lands a generated theme's toCSS() here). */
+        injectCss: (css) => { if (frameEl?.contentDocument) injectCss(frameEl.contentDocument, css); },
+        clearCss: () => { if (frameEl?.contentDocument) clearCss(frameEl.contentDocument); },
+    };
+
+    let data;
+    try {
+        const res = await fetch(CATALOG_URL);
+        if (!res.ok) throw new Error('catalog HTTP ' + res.status);
+        data = await res.json();
+    } catch (err) {
+        loadError = 'Could not load the component catalog: ' + err.message
+            + ' — run `node packages/responsive/tests/tooling/generate.ts`.';
+        return;
+    }
+    catalog = data.components;
+
+    // Resolve the URL's request against what actually exists: an unknown component, or a
+    // scenario that does not belong to it, falls back instead of showing a blank stage.
+    // The composite page is not in the catalog by design, so it must not be treated as an
+    // unknown component and replaced by the fallback.
+    if (component === compositionName) {
+        await themeListArrived();
+        document.documentElement.setAttribute('data-builder-ready', '1');
+        return;
+    }
+    const found = catalog.find(c => c.name === component);
+    if (!found) {
+        if (catalog.length) selectComponent(catalog[0]);
+    } else if (!found.scenarios.some(s => s.id === scenario)) {
+        selectComponent(found);
+    }
+    await themeListArrived();
+    document.documentElement.setAttribute('data-builder-ready', '1');
+});
+
+/**
+ * Load the theme list, then put the picked theme back in force. The preview decides whether the
+ * picked theme is a custom one from this list, and the list is a request of its own: a frame that
+ * loads first is themed with an empty list, and nothing would look again. If the frame has not
+ * loaded yet, its own load handler will find the list in place.
+ */
+async function themeListArrived() {
+    await refreshThemes();
+    if (frameEl) {
+        applyThemeToPreview();
+        measure();
+    }
+}
+</script>
+
+<style scoped>
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--pdx-color-bg);
+}
+
+/* ── Identity bar ──
+   The lockup and the gold come from brand/brand.css; everything here is chrome. It follows
+   the design tokens rather than the site's dark glass, because the working surface below it
+   must stay neutral — the only coloured thing on this screen should be the theme under test. */
+.topbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-lg);
+    height: 48px;
+    padding: 0 var(--pdx-space-md);
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.topbar-here {
+    font-family: var(--pdx-brand-font);
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    padding-left: var(--pdx-space-lg);
+    border-left: 1px solid var(--pdx-color-border);
+}
+
+.topbar-nav {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-lg);
+}
+
+.topbar-link {
+    font-family: var(--pdx-brand-font);
+    font-size: var(--pdx-text-sm);
+    font-weight: 500;
+    color: var(--pdx-color-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.topbar-link:hover { color: var(--pdx-brand-gold); }
+
+.topbar-back { color: var(--pdx-brand-gold); }
+
+.shell {
+    display: grid;
+    /* One width for BOTH modes. A wider column in theme mode would make the switch reflow the
+       whole grid and resize the preview iframe — a visible redraw on every toggle. 320px fits a
+       token row and leaves the component list roomy. */
+    grid-template-columns: 320px 1fr 320px;
+    /* Fills what the identity bar leaves. min-height:0 so the three panes scroll inside the
+       viewport instead of pushing the page taller — the failure that put Save at y=1794. */
+    flex: 1;
+    min-height: 0;
+    background: var(--pdx-color-bg);
+    color: var(--pdx-color-text);
+    font-family: var(--pdx-font-sans);
+}
+
+/* ── Picker ── */
+.picker {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+    min-height: 0;
+}
+
+.picker-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.brand {
+    font-weight: var(--pdx-weight-semibold);
+    font-size: var(--pdx-text-sm);
+    letter-spacing: 0.02em;
+}
+
+.search {
+    width: 100%;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-bg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+}
+
+.picker-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--pdx-space-xs);
+    min-height: 0;
+}
+
+/* ── Mode switch + theme knobs ── */
+.modes { display: flex; gap: 2px; }
+
+.mode-btn {
+    flex: 1;
+    padding: var(--pdx-space-2xs) var(--pdx-space-xs);
+    font: inherit;
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    background: var(--pdx-color-bg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+}
+
+.mode-btn.active {
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.knobs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+    /* Bounded and scrollable. Without this the knobs grow with their content and push the
+       actions past the bottom of the window with nothing to scroll - Save and Export become
+       unreachable, which is exactly what opening the token editor did. */
+    max-height: 70vh;
+    overflow-y: auto;
+    min-height: 0;
+    flex: 0 1 auto;
+}
+
+.knob { display: flex; flex-direction: column; gap: 2px; }
+
+.knob-label {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+.knob-in {
+    width: 100%;
+    padding: var(--pdx-space-2xs) var(--pdx-space-xs);
+    font: inherit;
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-bg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+}
+
+.knob-actions {
+    display: flex;
+    gap: var(--pdx-space-xs);
+    margin-top: var(--pdx-space-xs);
+}
+
+.knob-row { display: flex; gap: var(--pdx-space-xs); align-items: center; }
+
+.tokens-box {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    padding: var(--pdx-space-xs);
+    /* The 18 token rows are what makes this section explode when opened, so they scroll
+       here rather than pushing everything below them off-screen. */
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.tokens-summary {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.tok-group {
+    border-top: 1px solid var(--pdx-color-border);
+    padding: var(--pdx-space-2xs) 0;
+}
+
+.tok-group-sum {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    cursor: pointer;
+    user-select: none;
+}
+
+.tok-count {
+    color: var(--pdx-color-muted);
+    font-family: var(--pdx-font-mono);
+    font-size: 10px;
+}
+
+.tok-hint {
+    margin: var(--pdx-space-2xs) 0 var(--pdx-space-xs);
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--pdx-color-muted);
+}
+
+.tok-row { margin-bottom: var(--pdx-space-xs); }
+.tok-row.set .tok-label { color: var(--pdx-color-primary); font-weight: var(--pdx-weight-medium); }
+
+.tok-head {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    margin-bottom: 2px;
+}
+
+.tok-label { font-size: 10px; flex: none; }
+
+.tok-resolved {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+    font-family: var(--pdx-font-mono);
+    font-size: 10px;
+    color: var(--pdx-color-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Each preview says what the value MEANS, in the shape the value has. */
+.tok-swatch {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: 3px;
+}
+
+.tok-bar {
+    height: 8px;
+    max-width: 60px;
+    flex: none;
+    background: var(--pdx-color-primary);
+    border-radius: 2px;
+}
+
+.tok-shadow {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    background: var(--pdx-color-surface);
+    border-radius: 3px;
+}
+
+.tok-font { font-size: 12px; flex: none; }
+
+.tok-plain {
+    font-family: var(--pdx-font-mono);
+    font-size: 10px;
+    flex: none;
+}
+
+.tok-reset {
+    flex: none;
+    padding: 0 4px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--pdx-color-muted);
+    background: none;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+}
+
+.tok-in { font-size: 10px; font-family: var(--pdx-font-mono); }
+
+.css-box {
+    font-family: var(--pdx-font-mono);
+    resize: vertical;
+    min-height: 60px;
+}
+
+.knob-swatch {
+    width: 32px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: none;
+    cursor: pointer;
+    flex: none;
+}
+
+.ctl-btn.primary {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    border-color: var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.save-msg {
+    font-size: var(--pdx-text-xs);
+    line-height: 1.5;
+    word-break: break-all;
+}
+
+.save-msg.ok { color: var(--pdx-color-success); }
+.save-msg.err { color: var(--pdx-color-danger); }
+
+.gate {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    padding-bottom: var(--pdx-space-sm);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.gate-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gate-title {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+}
+
+.load-error {
+    margin: var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-danger);
+    line-height: 1.5;
+}
+
+.grp-btn,
+.sc-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    width: 100%;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font: inherit;
+    text-align: left;
+    color: var(--pdx-color-text);
+    background: none;
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+}
+
+.grp-btn { font-size: var(--pdx-text-sm); }
+.grp-btn:hover,
+.sc-btn:hover { background: var(--pdx-color-inset); }
+.grp-btn.active { background: var(--pdx-color-inset); font-weight: var(--pdx-weight-medium); }
+.grp-btn.composition { border-bottom: 1px solid var(--pdx-color-border); margin-bottom: var(--pdx-space-2xs); }
+
+.grp-name { flex: 1; }
+
+.grp-tier {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    font-family: var(--pdx-font-mono);
+}
+
+.sc-btn {
+    padding-left: var(--pdx-space-lg);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+.sc-btn.active {
+    color: var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.picker-foot {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+/* ── Stage ── */
+.main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.bar {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+}
+
+.ctl {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+}
+
+.ctl-label {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+.ctl-select,
+.ctl-btn {
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    font: inherit;
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-bg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+}
+
+.ctl-group { display: flex; gap: 2px; }
+.ctl-btn.active {
+    background: var(--pdx-color-inset);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.spacer { flex: 1; }
+
+.ctl-static {
+    font-size: var(--pdx-text-xs);
+    font-family: var(--pdx-font-mono);
+    color: var(--pdx-color-text);
+}
+
+.crumb {
+    font-size: var(--pdx-text-xs);
+    font-family: var(--pdx-font-mono);
+    color: var(--pdx-color-muted);
+}
+
+.stage {
+    flex: 1;
+    display: flex;
+    /* `safe` centring: an item WIDER than the stage aligns to the start instead of overflowing
+       equally on both sides, where the left half is unreachable — a scroll container cannot
+       scroll to a negative offset. Without it, "1280" on a narrow window hides its own left edge. */
+    justify-content: safe center;
+    overflow: auto;
+    padding: var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    min-height: 0;
+}
+
+/* The preview is isolated on purpose: the previewed theme sets [pdx-theme] on its own
+   <html>, so without the iframe it would restyle this shell too. */
+.frame {
+    height: 100%;
+    /* A flex item shrinks by default, so the explicit width of a viewport preset would be a
+       request the layout is free to ignore: "768" renders at 428 on a 460px stage, and the stage
+       does not even scroll. A preview at a width nobody chose is a measurement of the wrong thing. */
+    flex: none;
+    /* Short fade so the reveal reads as intentional rather than as a blink. */
+    transition: opacity 120ms ease-out;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-bg);
+}
+
+/* ── Oracle panel ── */
+.oracle {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-md);
+    border-left: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.oracle-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.oracle-title {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+.verdict {
+    padding: 2px var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-full);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.verdict.ok { background: var(--pdx-color-success); color: var(--pdx-color-success-text); }
+.verdict.fail { background: var(--pdx-color-danger); color: var(--pdx-color-danger-text); }
+.verdict.err { background: var(--pdx-color-warning); color: var(--pdx-color-warning-text); }
+.verdict.idle,
+.verdict.measuring { background: var(--pdx-color-inset); color: var(--pdx-color-muted); }
+
+.counts { display: flex; gap: var(--pdx-space-sm); }
+
+.count {
+    font-size: var(--pdx-text-xs);
+    font-family: var(--pdx-font-mono);
+}
+
+.count.err { color: var(--pdx-color-danger); }
+.count.warn { color: var(--pdx-color-warning); }
+.count.info { color: var(--pdx-color-muted); }
+
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    font-family: var(--pdx-font-mono);
+}
+
+.oracle-error,
+.oracle-none {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    line-height: 1.5;
+}
+
+.violations {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+}
+
+.viol {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-left: 3px solid var(--pdx-color-border);
+    background: var(--pdx-color-bg);
+    border-radius: var(--pdx-radius-sm);
+    font-size: var(--pdx-text-xs);
+    line-height: 1.5;
+}
+
+.viol.error { border-left-color: var(--pdx-color-danger); }
+.viol.warning { border-left-color: var(--pdx-color-warning); }
+.viol.info { border-left-color: var(--pdx-color-border); }
+
+.viol-rule {
+    font-family: var(--pdx-font-mono);
+    font-weight: var(--pdx-weight-medium);
+    margin-right: var(--pdx-space-xs);
+}
+
+.viol-el {
+    font-family: var(--pdx-font-mono);
+    color: var(--pdx-color-muted);
+    margin-right: var(--pdx-space-xs);
+}
+
+.viol-detail { color: var(--pdx-color-muted); }
+
+.oracle-note {
+    margin-top: auto;
+    padding-top: var(--pdx-space-sm);
+    border-top: 1px dashed var(--pdx-color-border);
+    font-size: var(--pdx-text-xs);
+    line-height: 1.5;
+    color: var(--pdx-color-muted);
+}
+</style>

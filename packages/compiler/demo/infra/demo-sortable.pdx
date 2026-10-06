@@ -1,0 +1,101 @@
+<template>
+  <div class="demo">
+    <h2>Sortable List</h2>
+    <p class="desc">Drag to reorder. Uses useSortable() — builds on useDrag. Ghost preview, animated gap, FLIP transitions.</p>
+
+    <section>
+      <h3>Vertical List</h3>
+      <div class="list" :ref="listRef">
+        @for (items as item; track item.id) {
+          <div class="list-item">
+            <span class="grip">⠿</span>
+            <span>{{ item.label }}</span>
+          </div>
+        }
+      </div>
+      <pre class="log">Order: {{ orderLog }}</pre>
+    </section>
+
+    <section>
+      <h3>Horizontal Tabs</h3>
+      <div class="tabs" :ref="tabsRef">
+        @for (tabs as tab; track tab.id) {
+          <div class="tab">{{ tab.label }}</div>
+        }
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { useSortable, effect, onMount, onDestroy } from '@pdxui/core';
+
+let items = $signal([
+    { id: '1', label: 'First item' },
+    { id: '2', label: 'Second item' },
+    { id: '3', label: 'Third item' },
+    { id: '4', label: 'Fourth item' },
+    { id: '5', label: 'Fifth item' },
+]);
+
+let tabs = $signal([
+    { id: 't1', label: 'Home' },
+    { id: 't2', label: 'Profile' },
+    { id: 't3', label: 'Settings' },
+    { id: 't4', label: 'Help' },
+]);
+
+let orderLog = $signal('');
+let listRef = $signal(null);
+let tabsRef = $signal(null);
+
+function reorderItems(from, to) {
+    var current = items;
+    var arr = current.slice();
+    var moved = arr.splice(from, 1)[0];
+    arr.splice(to, 0, moved);
+    items = arr;
+    orderLog = arr.map(function(i) { return i.label; }).join(' → ');
+}
+
+function reorderTabs(from, to) {
+    var current = tabs;
+    var arr = current.slice();
+    var moved = arr.splice(from, 1)[0];
+    arr.splice(to, 0, moved);
+    tabs = arr;
+}
+
+const vSort = useSortable(() => listRef, {
+    items: function() { return items; },
+    onReorder: reorderItems,
+    handle: '.grip',
+});
+
+const hSort = useSortable(() => tabsRef, {
+    items: function() { return tabs; },
+    onReorder: reorderTabs,
+    axis: 'horizontal',
+});
+
+onMount(() => {
+    orderLog = items.map(function(i) { return i.label; }).join(' → ');
+    onDestroy(() => { vSort.dispose(); hSort.dispose(); });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .list { display: flex; flex-direction: column; gap: 4px; }
+  .list-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; user-select: none; }
+  .grip { cursor: grab; color: #999; font-size: 1.2rem; }
+  .grip:active { cursor: grabbing; }
+  .tabs { display: flex; gap: 4px; }
+  .tab { padding: 8px 18px; background: #f0f0f0; border: 1px solid #e0e0e0; border-radius: 6px 6px 0 0; cursor: grab; user-select: none; font-size: 0.9rem; }
+  .tab:active { cursor: grabbing; }
+  .log { font-family: monospace; font-size: 0.8rem; background: #f5f5f7; padding: 8px; border-radius: 6px; margin: 8px 0 0; white-space: pre-wrap; }
+</style>

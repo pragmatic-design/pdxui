@@ -1,0 +1,8 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <div class="demo-row">
+      <pdx-segmented label="Disabled options" value="opt1" options='["opt1","opt2","opt3"]' disabled></pdx-segmented>
+    </div>
+  </section>
+</template>

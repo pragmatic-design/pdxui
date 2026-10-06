@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Size, Disabled and Error</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set on the group; every child follows.</p>
+
+    <div class="demo-stack">
+      <pdx-checkbox-group label="Small" size="sm" value="a">
+        <pdx-checkbox label="Small A" value="a"></pdx-checkbox>
+        <pdx-checkbox label="Small B" value="b"></pdx-checkbox>
+      </pdx-checkbox-group>
+      <pdx-checkbox-group label="Disabled" disabled value="a">
+        <pdx-checkbox label="Disabled A" value="a"></pdx-checkbox>
+        <pdx-checkbox label="Disabled B" value="b"></pdx-checkbox>
+      </pdx-checkbox-group>
+      <div class="pdx-field">
+        <pdx-label text="Terms" required></pdx-label>
+        <pdx-checkbox-group error>
+          <pdx-checkbox label="I accept the terms" value="terms"></pdx-checkbox>
+          <pdx-checkbox label="I accept the privacy policy" value="privacy"></pdx-checkbox>
+        </pdx-checkbox-group>
+        <span class="pdx-field-error">Accept both to continue</span>
+      </div>
+    </div>
+  </section>
+</template>

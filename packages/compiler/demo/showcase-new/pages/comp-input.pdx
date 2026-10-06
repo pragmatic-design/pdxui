@@ -1,0 +1,117 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-input&gt;</code> — wrapper-based input with prefix/suffix, clearable, loading, sizes, and validation states.
+      Foundation for all specialized inputs (number, password, search, masked, date).
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-input-basic class="demo-section"></pdx-demo-comp-input-basic>
+
+    <!-- ═══ Prefix & Suffix ═══ -->
+    <pdx-demo-comp-input-prefix-suffix class="demo-section"></pdx-demo-comp-input-prefix-suffix>
+
+    <!-- ═══ Clearable ═══ -->
+    <pdx-demo-comp-input-clearable class="demo-section"></pdx-demo-comp-input-clearable>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-input-sizes class="demo-section"></pdx-demo-comp-input-sizes>
+
+    <!-- ═══ States ═══ -->
+    <pdx-demo-comp-input-validation class="demo-section"></pdx-demo-comp-input-validation>
+
+    <!-- ═══ Loading ═══ -->
+    <pdx-demo-comp-input-loading class="demo-section"></pdx-demo-comp-input-loading>
+
+    <!-- ═══ Character Count ═══ -->
+    <pdx-demo-comp-input-char-count class="demo-section"></pdx-demo-comp-input-char-count>
+
+    <!-- ═══ Input Types ═══ -->
+    <pdx-demo-comp-input-types class="demo-section"></pdx-demo-comp-input-types>
+
+    <!-- ═══ Input Group (CSS) ═══ -->
+    <pdx-demo-comp-input-input-group class="demo-section"></pdx-demo-comp-input-input-group>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-input-composition class="demo-section"></pdx-demo-comp-input-composition>
+
+    <!-- ═══ Input + Button Composition ═══ -->
+    <pdx-demo-comp-input-input-button class="demo-section"></pdx-demo-comp-input-input-button>
+
+    <!-- ═══ Mobile Behavior ═══ -->
+    <pdx-demo-comp-input-mobile class="demo-section"></pdx-demo-comp-input-mobile>
+
+    <!-- ═══ Specialized inputs built on this wrapper ═══ -->
+    <pdx-demo-comp-input-specialized class="demo-section"></pdx-demo-comp-input-specialized>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>type</code><span>string</span><span>Input type: text, email, tel, url, password, search (default: text)</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Current value (one-way binding)</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>Placeholder text</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>xs, sm, (default md), lg, xl — matches button sizes</span></div>
+        <div class="opt-row"><code>prefix</code><span>string</span><span>Text prefix inside border (or use slot="prefix" for icons)</span></div>
+        <div class="opt-row"><code>suffix</code><span>string</span><span>Text suffix inside border (or use slot="suffix" for icons)</span></div>
+        <div class="opt-row"><code>clearable</code><span>boolean</span><span>Show clear button (hover on desktop, always on touch)</span></div>
+        <div class="opt-row"><code>loading</code><span>boolean</span><span>Show spinner in suffix position</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Error state (red border + focus ring)</span></div>
+        <div class="opt-row"><code>success</code><span>boolean</span><span>Success state (green border)</span></div>
+        <div class="opt-row"><code>warning</code><span>boolean</span><span>Warning state (yellow border)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled (not focusable, muted)</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>Readonly (focusable, selectable, not editable)</span></div>
+        <div class="opt-row"><code>maxlength</code><span>number</span><span>Max character count</span></div>
+        <div class="opt-row"><code>showCount</code><span>boolean</span><span>Show character counter below input</span></div>
+        <div class="opt-row"><code>inputmode</code><span>string</span><span>Mobile keyboard: numeric, decimal, email, tel, url, search</span></div>
+        <div class="opt-row"><code>autofocus</code><span>boolean</span><span>Focus on mount</span></div>
+        <div class="opt-row"><code>autocomplete</code><span>string</span><span>Browser autocomplete hint</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>On every keystroke</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ value }</span><span>On blur / commit</span></div>
+        <div class="opt-row"><code>pdx-focus</code><span>—</span><span>Input focused</span></div>
+        <div class="opt-row"><code>pdx-blur</code><span>—</span><span>Input blurred</span></div>
+        <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Clear button clicked</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Accessibility</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Native <code>&lt;input&gt;</code> inside wrapper — screen readers see the real input, not the wrapper.
+        <code>aria-invalid</code> auto-set on error. <code>aria-required</code> from required prop.
+        Clear button has <code>aria-label="Clear"</code> and <code>tabindex="-1"</code> (not in tab order — use Escape or backspace instead).
+        Mobile: <code>inputmode</code> triggers correct keyboard. Font ≥16px prevents iOS auto-zoom.
+      </p>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">CSS Classes</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Class</span><span>Description</span></div>
+        <div class="opt-row"><code>.pdx-input</code><span>Standalone input (border on input itself)</span></div>
+        <div class="opt-row"><code>.pdx-input-wrap</code><span>Wrapper: border on wrapper, input inside unstyled</span></div>
+        <div class="opt-row"><code>.pdx-input-{size}</code><span>Size: xs, sm, lg, xl (apply on .pdx-input or .pdx-input-wrap)</span></div>
+        <div class="opt-row"><code>.pdx-input-prefix/suffix</code><span>Prefix/suffix container inside wrapper</span></div>
+        <div class="opt-row"><code>.pdx-input-clear</code><span>Clear button (× circle)</span></div>
+        <div class="opt-row"><code>.pdx-input-count</code><span>Character counter below input</span></div>
+        <div class="opt-row"><code>.error / .success / .warning</code><span>State classes on .pdx-input-wrap</span></div>
+        <div class="opt-row"><code>.disabled / .readonly</code><span>State classes on .pdx-input-wrap</span></div>
+        <div class="opt-row"><code>.pdx-input-group</code><span>External addon group (joins inputs + addons)</span></div>
+        <div class="opt-row"><code>.pdx-input-addon</code><span>External addon (text/icon outside border)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/input';
+@title 'Input Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

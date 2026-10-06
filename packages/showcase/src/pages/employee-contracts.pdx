@@ -1,0 +1,225 @@
+<template>
+  <section class="section" data-test="contracts">
+    <div class="section-head">
+      <h2 class="pdx-txt-heading">{{ $t('employees.sectionNames.contracts') }}</h2>
+      <pdx-button size="sm" :show="!editing && filled" @click="openAdd" data-test="contract-add">{{ $t('employees.contracts.addShort') }}</pdx-button>
+    </div>
+
+    <!-- VOID: what a create leaves. An invitation with the action in it. -->
+    <div :show="!editing && !filled" data-test="contracts-empty">
+      <pdx-empty-state
+        icon="briefcase"
+        :title="$t('employees.contracts.emptyTitle')"
+        :description="$t('employees.contracts.emptyBody')"
+        :action-label="$t('employees.contracts.add')"
+        @pdx-action="openAdd"></pdx-empty-state>
+    </div>
+
+    <!-- FILLED: the periods, newest last, as they happened. Rows of a grid, not a <table>: `@for`
+         inside a table is a known trap of the template engine. -->
+    <div class="periods" :show="!editing && filled" role="list" data-test="contract-list">
+      @for (contracts as c; track c.id) {
+        <div class="period" role="listitem" data-test="contract-row">
+          <span class="period-type">{{ typeName(c.type) }}</span>
+          <span class="period-span">{{ span(c) }}</span>
+          <span class="pdx-ink-muted">{{ $t('employees.contracts.hours', { hours: c.weeklyHours }) }}</span>
+          <span class="period-actions">
+            <pdx-button size="sm" variant="ghost" @click="startEdit(c)" data-test="contract-edit">{{ $t('employees.contracts.edit') }}</pdx-button>
+            @if (!c.end) {
+              <pdx-button size="sm" variant="outline" @click="periods.askEnd(c)" data-test="contract-end">{{ $t('employees.contracts.end') }}</pdx-button>
+            }
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- EDIT, in the page: the URL does not move and no modal opens («create in a modal, edit in the
+         page»). `:show` and not `@if`: the form projects its fields through a slot. -->
+    <div :show="editing">
+      <pdx-form :form="contract" @pdx-submit="onSave" data-test="contract-form">
+        <div class="grid">
+          <pdx-form-field name="type" :label="$t('employees.contracts.fields.type')">
+            <pdx-select name="type" :options="typeOptions" data-test="type"></pdx-select>
+          </pdx-form-field>
+          <pdx-form-field name="weeklyHours" :label="$t('employees.contracts.fields.weeklyHours')">
+            <pdx-number-input name="weeklyHours" data-test="weeklyHours"></pdx-number-input>
+          </pdx-form-field>
+          <pdx-form-field name="start" :label="$t('employees.contracts.fields.start')">
+            <pdx-date-picker name="start" editable data-test="start"></pdx-date-picker>
+          </pdx-form-field>
+          <pdx-form-field name="end" :label="$t('employees.contracts.fields.end')">
+            <pdx-date-picker name="end" editable data-test="end"></pdx-date-picker>
+          </pdx-form-field>
+        </div>
+        <div class="actions">
+          <pdx-button type="submit" variant="primary" data-test="contract-save">{{ $t('employees.contracts.save') }}</pdx-button>
+          <pdx-button variant="ghost" @click="periods.editing.set(null)" data-test="contract-cancel">{{ $t('employees.contracts.cancel') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </div>
+
+    <!-- ADD, in a modal, from a schema — as the lists create. The schema carries the same rule the
+         page's form does: a schema takes a form-level `validate` since this story. -->
+    <pdx-dialog
+      :open="addOpen"
+      size="md"
+      :title="$t('employees.contracts.add')"
+      @pdx-close="addOpen = false"
+      data-test="contract-dialog">
+      <pdx-auto-form
+        :schema="schema"
+        :submit-label="$t('employees.contracts.create')"
+        @pdx-submit="onAdd"
+        data-test="contract-add-form"></pdx-auto-form>
+    </pdx-dialog>
+
+    <!-- TERMINA, not delete: it asks for the last day, and the toast carries the way back (rule 1 of
+         the showcase's README). -->
+    <pdx-alert-dialog
+      :open="ending !== null"
+      :title="$t('employees.contracts.endTitle')"
+      :message="$t('employees.contracts.endBody')"
+      :confirm-label="$t('employees.contracts.endConfirm')"
+      :cancel-label="$t('employees.contracts.endCancel')"
+      @pdx-confirm="periods.confirmEnd()"
+      @pdx-cancel="periods.ending.set(null)"
+      data-test="end-dialog">
+      <pdx-form-field :label="$t('employees.contracts.endDate')" :error="endError">
+        <pdx-date-picker editable :value="endDate" @pdx-change="e => periods.endDate.set(e.detail.value)" data-test="end-date"></pdx-date-picker>
+      </pdx-form-field>
+    </pdx-alert-dialog>
+
+    <!-- The toast's host is the SCREEN's, as on customers: it travels with what can raise one. -->
+    <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
+  </section>
+</template>
+
+<script setup>
+@page '/employees/:id/contracts' { label: contractsLabel };
+@title $t('employees.sectionNames.contracts');
+
+// The crumb and the tab title in the page's language: a label read from the dictionary.
+function contractsLabel() {
+  return $t('employees.sectionNames.contracts');
+}
+
+// Created from JS, so the compiler cannot auto-import it from a tag.
+import { toast } from '@pdxui/ui/toast';
+import { CONTRACT_TYPES } from '../data/employees';
+import type { ContractType } from '../data/employees';
+import { createPeriodList } from '../data/periods';
+
+@prop id: string = '';
+
+// ── The periods: edited in the page, ended rather than deleted (src/data/periods.ts) ──
+const periods = createPeriodList({
+  key: 'contracts',
+  employeeId: () => Number(id),
+  // The same rule as the forms': a period ends after it starts.
+  endRefusal: (c, last) => last ? (endAfterStart({ start: c.start, end: last }).end ?? '') : $t('employees.contracts.endBeforeStart'),
+  ended: (c, last, undo) => toast.add({
+    type: 'info',
+    message: $t('employees.contracts.ended', { type: typeName(c.type), end: last }),
+    duration: 8000,
+    action: { label: $t('employees.contracts.undo'), onClick: undo },
+  }),
+});
+const contracts = $derived(periods.items());
+const editing = $derived(periods.editing());
+const ending = $derived(periods.ending());
+const endDate = $derived(periods.endDate());
+const endError = $derived(periods.endError());
+const filled = $derived(contracts.length > 0);
+
+const typeOptions = $derived(CONTRACT_TYPES.map(t => ({ value: t, label: $t('employees.contracts.types.' + t) })));
+
+function typeName(type) {
+  return $t('employees.contracts.types.' + type);
+}
+
+function span(c) {
+  return $t('employees.contracts.period', { start: c.start, end: c.end || $t('employees.contracts.open') });
+}
+
+/** The one rule that reads two fields, where both forms put it: on the field it is about. */
+function endAfterStart(v) {
+  return v.start && v.end && v.end <= v.start ? { end: $t('employees.contracts.endBeforeStart') } : {};
+}
+
+// ── Add, in the modal ──────────────────────────────────────────────────────────────────────
+let addOpen = $signal(false);
+
+const schema = $derived({
+  fields: [
+    { name: 'type', label: $t('employees.contracts.fields.type'), type: 'select', options: typeOptions, default: 'permanent', required: true },
+    { name: 'start', label: $t('employees.contracts.fields.start'), type: 'date', required: true },
+    { name: 'end', label: $t('employees.contracts.fields.end'), type: 'date' },
+    { name: 'weeklyHours', label: $t('employees.contracts.fields.weeklyHours'), type: 'number', default: 40, required: true },
+  ],
+  validate: endAfterStart,
+});
+
+function openAdd() {
+  addOpen = true;
+}
+
+async function onAdd(e) {
+  const v = e.detail?.values ?? {};
+  await periods.save([...contracts, {
+    // The select offers CONTRACT_TYPES and nothing else: its value is one of them.
+    id: periods.nextId(), type: String(v.type || 'permanent') as ContractType, start: String(v.start), end: String(v.end ?? ''),
+    weeklyHours: Number(v.weeklyHours),
+  }]);
+  addOpen = false;
+}
+
+// ── Edit, in the page ──────────────────────────────────────────────────────────────────────
+@form contract: {
+  type: string { required },
+  start: string { required },
+  end: string,
+  weeklyHours: string { required }
+} {
+  validate: endAfterStart
+};
+
+function startEdit(c) {
+  contract.reset({ type: c.type, start: c.start, end: c.end, weeklyHours: c.weeklyHours });
+  periods.editing.set(c);
+}
+
+async function onSave(e) {
+  if (!editing) return;
+  const v = e.detail.values;
+  await periods.saveEdited({ ...editing, type: v.type, start: v.start, end: v.end ?? '', weeklyHours: Number(v.weeklyHours) });
+}
+
+// ── Termina, and its way back: `periods.askEnd` / `periods.confirmEnd`, the toast is `ended` above ──
+</script>
+
+<style scoped>
+  .section { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-md); }
+  .section-head h2 { margin: 0; }
+
+  .periods { display: flex; flex-direction: column; }
+  .period {
+    /* Fixed tracks: each row is its own grid, and `auto` tracks sized each one to its own content,
+       so the columns did not line up from one period to the next. */
+    display: grid; grid-template-columns: minmax(0, 1fr) 12.5rem 5.5rem 10.5rem;
+    align-items: center; gap: var(--pdx-space-md);
+    min-height: var(--pdx-section-height);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .period-type { font-weight: 600; }
+  .period-span { font-variant-numeric: tabular-nums; }
+  .period-actions { display: flex; gap: var(--pdx-space-xs); justify-content: flex-end; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--pdx-space-md); }
+  .actions { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+
+  @media (max-width: 767px) {
+    .period { grid-template-columns: 1fr auto; padding-block: var(--pdx-space-xs); }
+    .period-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+</style>

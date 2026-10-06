@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Dashed Connector</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Connector style can be solid, dashed, or dotted.</p>
+    <div class="demo-container">
+      <pdx-timeline :items="basicEvents" connector-style="dashed"></pdx-timeline>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const basicEvents = [
+  { title: 'Order Placed', description: 'Your order #12345 has been placed.', date: 'Apr 1, 2026' },
+  { title: 'Payment Confirmed', description: 'Payment received via credit card.', date: 'Apr 1, 2026' },
+  { title: 'Shipped', description: 'Package left the warehouse.', date: 'Apr 3, 2026' },
+  { title: 'Out for Delivery', description: 'Package is with the courier.', date: 'Apr 5, 2026' },
+  { title: 'Delivered', description: 'Package delivered to front door.', date: 'Apr 5, 2026' },
+];
+</script>

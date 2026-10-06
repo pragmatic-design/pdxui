@@ -1,0 +1,140 @@
+<template>
+  <!-- Standalone: a visitor who is not signed in has nowhere the rail could take them,
+       so the sign-in declares `@layout 'none'` and draws a panel of its own, centred. -->
+  <div class="stage">
+  <section class="page" data-test="login">
+    <div class="head">
+      <p class="product pdx-txt-small" data-test="product">{{ $t('app.name') }}</p>
+      <!-- The language, before anyone is signed in: there is no profile menu yet. The
+           same entries as the bar and Settings, each in its own language. -->
+      <pdx-dropdown-menu
+        variant="ghost"
+        placement="bottom-end"
+        :label="localeLabel"
+        :items="localeMenu"
+        @pdx-check="onLocalePick"
+        data-test="login-locale"></pdx-dropdown-menu>
+    </div>
+    <h1 class="pdx-txt-title">{{ $t('login.title') }}</h1>
+    <!-- For the reader of the source: the session end to end — a real token,
+         permissions rebuilt from it, and routes that check them. -->
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('login.intro') }}</p>
+
+    <!-- A real form: `<pdx-form>` validates before it emits, so `onSubmit` is only ever called
+         with values that passed. The Enter key works because it is a real `<form>` underneath. -->
+    <pdx-form :form="credentials" @pdx-submit="onSubmit" data-test="login-form">
+      <pdx-form-field name="username" :label="$t('login.username')">
+        <pdx-input name="username" autocomplete="username" data-test="username"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field name="password" :label="$t('login.password')">
+        <pdx-input name="password" type="password" autocomplete="current-password" data-test="password"></pdx-input>
+      </pdx-form-field>
+
+      <pdx-button type="submit" variant="primary" :disabled="pending" data-test="sign-in">
+        {{ pending ? $t('login.signingIn') : $t('login.signIn') }}
+      </pdx-button>
+    </pdx-form>
+
+    <!-- The server's own message, where the person is looking and where a screen reader hears it.
+         `role="alert"`: a refusal that only appears in the console is a refusal nobody gets. -->
+    <p class="pdx-txt-small failed" :show="failure !== ''" role="alert" data-test="login-error">{{ failure }}</p>
+
+    <!-- A showcase has to say how to get in. The mock server holds these two and nothing else. -->
+    <div class="hint pdx-txt-small pdx-ink-muted">
+      <p>{{ $t('login.hint') }}</p>
+      <ul>
+        <li data-test="hint-admin">{{ $t('login.hintAdmin') }}</li>
+        <li data-test="hint-tech">{{ $t('login.hintTech') }}</li>
+      </ul>
+    </div>
+  </section>
+  </div>
+</template>
+
+<script setup>
+@page '/login' { label: loginLabel };
+@title $t('login.title');
+
+// The crumb and the tab title in the page's language: a label read from the dictionary.
+function loginLabel() {
+  return $t('login.title');
+}
+@layout 'none';
+
+import { navigate } from '@pdxui/router';
+import { getLocale } from '@pdxui/core';
+import { nextAfterSignIn } from '../auth';
+import { login } from '../api';
+import { switchLocale, localeName, localeItems } from '../i18n';
+
+// `getLocale()` hands back the signal; reading it is the second call.
+const localeSignal = getLocale();
+const localeLabel = $derived(localeName(localeSignal()));
+const localeMenu = $derived(localeItems(localeSignal()));
+
+/** Switch, and close: a picked language is an answer. */
+function onLocalePick(e) {
+  switchLocale(e.detail.key);
+  e.target.close();
+}
+
+// Where the visitor was going: `?next=`, checked to be a path of this app. Read ONCE,
+// at setup: signing in navigates, and the address is not this page's after that.
+const destination = nextAfterSignIn(location.search);
+
+// `ttl` is not a field: it is a lever the expiry test pulls, through the query string, and it is
+// the only way to watch a session lapse without waiting an hour. Clamped by the server.
+const ttl = Number(new URLSearchParams(location.search).get('ttl')) || undefined;
+
+@form credentials: {
+  username: string { required },
+  password: string { required }
+};
+
+let pending = $signal(false);
+let failure = $signal('');
+
+async function onSubmit(e) {
+  // The double-submit guard. `<pdx-form>` validates and emits, and two fast clicks emit twice —
+  // the button is disabled below, and this is what makes the guard true rather than visual.
+  if (pending) return;
+  pending = true;
+  failure = '';
+  try {
+    await login({ ...e.detail.values, ttl });
+    // The permissions are already rebuilt: the effect in `src/auth.ts` runs on `setTokens`, so the
+    // guard on the destination has something to read by the time the router asks.
+    navigate(destination);
+  } catch (err) {
+    // The SERVER's message, not one invented here: it is the server that knows why.
+    failure = String(err?.data?.error ?? err?.message ?? err);
+  } finally {
+    pending = false;
+  }
+}
+</script>
+
+<style scoped>
+  /* The whole viewport, the panel in its middle: there is no shell to sit in. */
+  .stage {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: var(--pdx-gutter, 24px); background: var(--pdx-color-bg);
+  }
+  .page {
+    width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: var(--pdx-space-md);
+    padding: var(--pdx-space-xl); border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg); background: var(--pdx-color-surface);
+  }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-sm); }
+  .product { margin: 0; font-weight: 700; letter-spacing: .06em; color: var(--pdx-color-primary-ink); }
+
+  .failed { color: var(--pdx-color-danger-ink); }
+
+  .hint {
+    padding: var(--pdx-space-md);
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
+  .hint p { margin: 0 0 var(--pdx-space-2xs); }
+  .hint ul { margin: 0; padding-left: var(--pdx-space-lg); }
+</style>

@@ -1,0 +1,16 @@
+{
+    "board": {
+        "title": "Board",
+        "intro": "Tickets by status. Drag a card to another column, or move it from the keyboard, to change its status.",
+        "status": {
+            "open": "Open",
+            "waiting": "Waiting",
+            "closed": "Closed"
+        },
+        "count": "{count, plural, one {# card} other {# cards}}",
+        "refuseNext": "Make the next move fail",
+        "grab": "Move {reference}",
+        "lifted": "{reference} lifted — arrows to move, Escape to cancel",
+        "hint": "Drag a card, or focus its handle and press Space."
+    }
+}

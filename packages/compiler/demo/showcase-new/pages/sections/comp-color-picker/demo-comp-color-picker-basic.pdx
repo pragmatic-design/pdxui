@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic — Hex Color Picker</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Default color picker with a swatch trigger. Click the swatch to open the panel.
+    </p>
+    <div class="demo-box">
+      <pdx-color-picker value="#3b82f6" @pdx-change="onColorChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">Selected: {{ colorValue }}</p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker
+  value="#3b82f6"
+  @pdx-change="onColorChange" /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Basic ───
+let colorValue = $signal('#3b82f6');
+
+function onColorChange(e) { colorValue = e.detail.value ?? e.detail; }
+</script>

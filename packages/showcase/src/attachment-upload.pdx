@@ -1,0 +1,138 @@
+<template>
+  <div class="upload" data-test="upload">
+    <pdx-file-upload
+      :label="$t('attachments.drop')"
+      :max-size="maxSize"
+      :accept="accept"
+      multiple
+      @pdx-select="onSelect"
+      @pdx-error="onRejected"
+      :ref="pickerEl"
+      data-test="picker"></pdx-file-upload>
+
+    <!-- A refusal belongs where the user is looking, not in the console. The component lists it
+         too; this line is the one an assistive technology announces. -->
+    <p class="pdx-txt-small rejected" :show="rejected !== ''" role="alert" data-test="rejected">{{ rejected }}</p>
+
+    <!-- The transfer in flight, and the whole handle on screen: the percentage is `progress()`,
+         the bytes are `loaded()` of `total()`, and Cancel is `abort()`. -->
+    <div class="transfer" :show="transferName !== ''" data-test="transfer">
+      <span class="pdx-txt-small">{{ $t('attachments.uploading', { name: transferName }) }}</span>
+      <pdx-progress :value="progress" show-label data-test="progress"></pdx-progress>
+      <span class="pdx-txt-small pdx-ink-muted" data-test="progress-value">{{ progress }}</span>
+      <span class="pdx-txt-small pdx-ink-muted" data-test="bytes">{{ $t('attachments.bytes', { loaded: loaded, total: totalBytes }) }}</span>
+      <pdx-button size="sm" variant="ghost" @click="cancelTransfer" data-test="cancel">{{ $t('attachments.cancel') }}</pdx-button>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" :show="cancelled" role="status" data-test="cancelled">{{ $t('attachments.cancelled') }}</p>
+  </div>
+</template>
+
+<script setup>
+// The upload half of an attachments panel: the drop zone, one transfer at a time with its handle on
+// screen, the cancel, and the refusals.
+//
+// A ticket's files and the employee's documents upload the same way, and a second copy of it is
+// what the framework's first rule calls a bug. The LIST stays with each page:
+// a ticket's files and an employee's documents are not the same list (a document has a label, an
+// expiry, and is withdrawn rather than deleted).
+//
+// It drives `uploadFile` itself rather than letting <pdx-file-upload> upload — the component has its
+// own XHR and never exposes a handle, so `auto`/`action` are left off and it does what it is best
+// at: the drop zone, the accept and size checks, and the rejection list.
+import { uploadFile } from '@pdxui/core';
+
+/** Where a file is POSTed: the owner's query, which this appends `&name=` to. */
+@prop endpoint: string = '';
+@prop accept: string = '.pdf,.png,.txt';
+
+/** A transfer ended — stored, or cancelled and not stored. The page re-reads its list either way. */
+@event settled: { stored: boolean };
+
+const maxSize = 8 * 1024 * 1024;
+
+let rejected = $signal('');
+let cancelled = $signal(false);
+
+// The handle's signals, mirrored into the component's own so the template can read them. The
+// handle is created per transfer and the template cannot re-bind itself to a new object, so the
+// panel subscribes to the handle instead and writes what it reads.
+let transferName = $signal('');
+let progress = $signal(0);
+let loaded = $signal(0);
+let totalBytes = $signal(0);
+
+// The live handle, on the instance and NOT a signal: Cancel needs the object, nothing renders it,
+// and a signal holding a function-bearing object is the shape `setRaw` exists for.
+let handle = null;
+
+/** Every refused file, named with its reason, where the user is looking. */
+function onRejected(e) {
+  const name = e.detail?.file?.name ?? '';
+  rejected = `${name}: ${e.detail?.error ?? ''}`;
+}
+
+/** The picker, for `clear()`. A `:ref` binds into a SIGNAL; a plain let stays null. */
+let pickerEl = $signal(null);
+
+async function onSelect(e) {
+  const picked = e.detail?.files ?? [];
+  for (const file of picked) await send(file);
+  // The drop zone lists what it was given, each with a ×. Once the files are the SERVER's, that ×
+  // reads as «delete this document» and does nothing of the kind — it only drops the picker's own
+  // entry. The list below is the one that says what is stored.
+  pickerEl?.clear();
+}
+
+/**
+ * One file, through `uploadFile`, with the handle on screen while it runs.
+ *
+ * The URL carries the name: the mock takes the raw body rather than multipart, because what is
+ * being demonstrated is the handle, and a FormData boundary in the middle of it would be one more
+ * thing to explain.
+ */
+async function send(file) {
+  rejected = '';
+  cancelled = false;
+  transferName = file.name;
+  progress = 0;
+  loaded = 0;
+  totalBytes = file.size;
+
+  handle = uploadFile(`${endpoint}&name=${encodeURIComponent(file.name)}`, file, { method: 'POST' });
+
+  // `effect`, not a one-off read: `progress` is a signal and the bar is the point. The disposer
+  // runs when the transfer ends, so a finished upload stops holding a subscription.
+  const stop = effect(() => {
+    progress = handle.progress();
+    loaded = handle.loaded();
+    totalBytes = handle.total();
+  });
+
+  let stored = false;
+  try {
+    await handle.result;
+    stored = true;
+  } catch (err) {
+    // An abort rejects, and it is not an error to report as one: the server stored nothing and
+    // the page re-reads its list to show exactly that.
+    cancelled = String(err?.message ?? '').toLowerCase().includes('abort');
+    if (!cancelled) rejected = String(err?.message ?? err);
+  } finally {
+    stop();
+    handle = null;
+    transferName = '';
+  }
+  settled({ stored });
+}
+
+function cancelTransfer() {
+  if (handle) handle.abort();
+}
+</script>
+
+<style scoped>
+  .upload { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+  .rejected { color: var(--pdx-color-danger-ink); }
+  .transfer { display: flex; align-items: center; gap: var(--pdx-space-sm); flex-wrap: wrap; }
+</style>

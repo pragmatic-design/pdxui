@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default neutral chip plus 4 semantic color variants.</p>
+
+    <div class="chip-row">
+      <span class="pdx-chip">Default</span>
+      <span class="pdx-chip pdx-chip-primary">Primary</span>
+      <span class="pdx-chip pdx-chip-success">Success</span>
+      <span class="pdx-chip pdx-chip-danger">Danger</span>
+      <span class="pdx-chip pdx-chip-warning">Warning</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-chip"&gt;Default&lt;/span&gt;
+&lt;span class="pdx-chip pdx-chip-primary"&gt;Primary&lt;/span&gt;
+&lt;span class="pdx-chip pdx-chip-success"&gt;Success&lt;/span&gt;
+&lt;span class="pdx-chip pdx-chip-danger"&gt;Danger&lt;/span&gt;
+&lt;span class="pdx-chip pdx-chip-warning"&gt;Warning&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>

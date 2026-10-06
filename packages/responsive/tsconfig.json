@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "typeRoots": ["../compiler/node_modules/@types"],
+        "types": ["node"]
+    },
+    "//": "This package is now a PDX contract-test harness (the lib lives at @responsivejs/*). tsc guards the drop-in API contract; the Playwright specs run via their own pipeline.",
+    "include": ["tests/**/*.ts"]
+}

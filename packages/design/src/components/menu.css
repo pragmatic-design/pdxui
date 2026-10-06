@@ -1,0 +1,298 @@
+/* Dropdown Menu — contextual action list built on popover surface.
+   Separator, icons, shortcut labels, danger items, checkbox items, groups.
+
+   Usage:
+     <div class="pdx-menu">
+       <button class="pdx-menu-item">Profile</button>
+       <button class="pdx-menu-item">Settings</button>
+       <hr class="pdx-menu-separator">
+       <button class="pdx-menu-item pdx-menu-danger">Delete</button>
+     </div>
+
+   Wrap in pdx-popover for floating behavior.
+   Standalone: just a vertical list in a card/surface.
+*/
+
+/* ===== Container ===== */
+
+.pdx-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 0.25rem;
+    min-width: 10rem;
+    background: var(--pdx-surface-2, var(--pdx-color-surface));
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-float-radius);
+    box-shadow: var(--pdx-float-shadow);
+}
+
+/* ===== Item ===== */
+
+.pdx-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--pdx-radius-sm);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    color: var(--pdx-color-text);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    white-space: nowrap;
+    transition: background 100ms;
+}
+
+.pdx-menu-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-menu-item:focus-visible {
+    background: var(--pdx-color-inset);
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--pdx-color-primary);
+}
+
+/* Active/selected */
+.pdx-menu-item.active,
+.pdx-menu-item[aria-current] {
+    background: light-dark(
+        oklch(from var(--pdx-color-primary) l c h / 0.08),
+        oklch(from var(--pdx-color-primary) l c h / 0.15)
+    );
+    color: var(--pdx-color-primary-ink);
+}
+
+/* Disabled */
+.pdx-menu-item:disabled,
+.pdx-menu-item[disabled] {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Danger */
+.pdx-menu-danger {
+    color: var(--pdx-color-danger-ink);
+}
+.pdx-menu-danger:hover {
+    background: light-dark(oklch(0.96 0.03 25), oklch(0.18 0.04 25));
+}
+
+/* ===== Icon ===== */
+
+.pdx-menu-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+/* ===== Shortcut label ===== */
+
+.pdx-menu-shortcut {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--pdx-color-muted);
+    font-family: var(--pdx-font-mono);
+}
+
+/* ===== Separator ===== */
+
+.pdx-menu-separator {
+    border: none;
+    height: 1px;
+    background: var(--pdx-color-border);
+    margin: 0.25rem 0;
+}
+
+/* ===== Group label ===== */
+
+.pdx-menu-label {
+    padding: 0.35rem 0.5rem 0.15rem;
+    font-size: 0.65rem;
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ===== Checkbox / Radio items ===== */
+
+.pdx-menu-check {
+    width: 1rem;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 0.75rem;
+}
+
+.pdx-menu-check:empty::after {
+    content: '';
+    display: inline-block;
+    width: 1rem;
+}
+
+.pdx-menu-item[aria-checked="true"] .pdx-menu-check::after {
+    content: '✓';
+    color: var(--pdx-color-primary-ink);
+    font-weight: bold;
+}
+
+/* ===== Sub-menu indicator ===== */
+
+/* Empty alt text: the arrow is drawn, not read — read, it becomes part of the item's name,
+   "Shapes ›". aria-haspopup already says there is a submenu. The plain declaration stays first for
+   a browser that does not know the alt-text form. */
+.pdx-menu-sub::after {
+    content: '›';
+    content: '›' / '';
+    margin-left: auto;
+    color: var(--pdx-color-muted);
+    font-size: 1rem;
+}
+
+/* ===== Sub-menu panel ===== */
+
+.pdx-menu-sub-panel {
+    animation: pdx-menu-fade-in 0.12s ease;
+}
+
+@keyframes pdx-menu-fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Dropdown menu trigger ===== */
+
+pdx-dropdown-menu {
+    display: inline-block;
+    position: relative;
+}
+
+/* Chevron icon — matches pdx-select caret */
+.pdx-dropdown-chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.25em;
+    flex-shrink: 0;
+    transition: transform var(--pdx-transition);
+}
+
+.pdx-dropdown-chevron svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.5;
+}
+
+/* Rotate when open */
+button[aria-expanded="true"] .pdx-dropdown-chevron {
+    transform: rotate(180deg);
+}
+
+/* ===== Item label flex ===== */
+
+.pdx-menu-item-label {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/* ===== Menubar ===== */
+/* ═══════════════════════════════════════════════════════ */
+
+pdx-menubar {
+    display: block;
+}
+
+.pdx-menubar-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+    padding: 0 var(--pdx-space-xs);
+}
+
+.pdx-menubar-trigger {
+    display: flex;
+    align-items: center;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    cursor: pointer;
+    border-radius: var(--pdx-radius-sm);
+    white-space: nowrap;
+    transition: background 100ms;
+}
+
+.pdx-menubar-trigger:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-menubar-trigger.active {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-primary-ink);
+}
+
+/* No outline by default — only show on keyboard Tab navigation */
+.pdx-menubar-trigger:focus,
+.pdx-menubar-trigger:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Keyboard focus ring: only when navigating via Tab (not mouse/hover) */
+.pdx-menubar-bar:focus-within .pdx-menubar-trigger:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--pdx-color-focus);
+}
+
+.pdx-menubar-trigger:disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+}
+
+/* ===== Menubar panel (dropdown) ===== */
+
+.pdx-menubar-panel {
+    animation: pdx-menu-fade-in 0.12s ease;
+}
+
+/* ===== Mega menu ===== */
+
+.pdx-menubar-mega {
+    padding: var(--pdx-space-md);
+    min-width: 500px;
+}
+
+.pdx-mega-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--pdx-space-lg);
+}
+
+.pdx-mega-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.pdx-mega-column .pdx-menu-label {
+    margin-bottom: var(--pdx-space-xs);
+}
+
+.pdx-mega-column .pdx-menu-item {
+    font-size: var(--pdx-text-sm);
+}

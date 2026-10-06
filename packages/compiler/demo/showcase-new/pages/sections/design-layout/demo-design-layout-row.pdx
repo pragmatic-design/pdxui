@@ -1,0 +1,48 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-row</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Horizontal flow. Wraps by default. Use <code>justify</code> for distribution, <code>grow</code> on children to fill space.</p>
+
+    <div class="demo-area">
+      <pdx-row gap="sm">
+        <div class="box">1</div>
+        <div class="box">2</div>
+        <div class="box" grow>3 (grow)</div>
+      </pdx-row>
+    </div>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">justify="between"</span>
+        <div class="demo-area">
+          <pdx-row gap="sm" justify="between">
+            <div class="box sm">A</div>
+            <div class="box sm">B</div>
+            <div class="box sm">C</div>
+          </pdx-row>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">justify="evenly"</span>
+        <div class="demo-area">
+          <pdx-row gap="sm" justify="evenly">
+            <div class="box sm">A</div>
+            <div class="box sm">B</div>
+            <div class="box sm">C</div>
+          </pdx-row>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-row gap="sm"&gt;
+  &lt;div&gt;1&lt;/div&gt;
+  &lt;div&gt;2&lt;/div&gt;
+  &lt;div grow&gt;3 (fills remaining space)&lt;/div&gt;
+&lt;/pdx-row&gt;
+
+&lt;pdx-row gap="sm" justify="between"&gt;...&lt;/pdx-row&gt;</code></pre>
+    </details>
+  </section>
+</template>

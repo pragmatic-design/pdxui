@@ -1,0 +1,77 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">FormField</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-form-field&gt;</code> — layout wrapper: label + input (slot) + hint + error.
+      Auto-wires <code>aria-describedby</code>, <code>aria-invalid</code>, <code>htmlFor</code>.
+      Error display is touched-gated. Zero validation built-in — use <code>@form</code> or manual.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-form-field-basic class="demo-section"></pdx-demo-comp-form-field-basic>
+
+    <!-- ═══ Error Display ═══ -->
+    <pdx-demo-comp-form-field-error-display class="demo-section"></pdx-demo-comp-form-field-error-display>
+
+    <!-- ═══ Success ═══ -->
+    <pdx-demo-comp-form-field-success class="demo-section"></pdx-demo-comp-form-field-success>
+
+    <!-- ═══ With Various Inputs ═══ -->
+    <pdx-demo-comp-form-field-all-inputs class="demo-section"></pdx-demo-comp-form-field-all-inputs>
+
+    <!-- ═══ Horizontal Layout ═══ -->
+    <pdx-demo-comp-form-field-horizontal class="demo-section"></pdx-demo-comp-form-field-horizontal>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-form-field-disabled class="demo-section"></pdx-demo-comp-form-field-disabled>
+
+    <!-- ═══ Size Propagation ═══ -->
+    <pdx-demo-comp-form-field-size-propagation class="demo-section"></pdx-demo-comp-form-field-size-propagation>
+
+    <!-- ═══ Composition: Full Form ═══ -->
+    <pdx-demo-comp-form-field-registration class="demo-section"></pdx-demo-comp-form-field-registration>
+
+    <!-- ═══ @form Integration ═══ -->
+    <pdx-demo-comp-form-field-form-integration class="demo-section"></pdx-demo-comp-form-field-form-integration>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Field label text</span></div>
+        <div class="opt-row"><code>hint</code><span>string</span><span>Helper text below input (hidden when error shows)</span></div>
+        <div class="opt-row"><code>description</code><span>string</span><span>Supplemental text below label</span></div>
+        <div class="opt-row"><code>error</code><span>string</span><span>Error message (shown only when touched or showError)</span></div>
+        <div class="opt-row"><code>success</code><span>string</span><span>Success message (shown when no error)</span></div>
+        <div class="opt-row"><code>touched</code><span>boolean</span><span>Field has been interacted with (gates error display)</span></div>
+        <div class="opt-row"><code>showError</code><span>boolean</span><span>Force error display (e.g. on submit)</span></div>
+        <div class="opt-row"><code>required</code><span>boolean</span><span>Red asterisk on label</span></div>
+        <div class="opt-row"><code>optional</code><span>boolean</span><span>"(optional)" text on label</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Muted, propagated to children</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>Propagated to label + input children</span></div>
+        <div class="opt-row"><code>horizontal</code><span>boolean</span><span>Label left, input right layout</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Auto-wiring</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>What</span><span>How</span></div>
+        <div class="opt-row"><code>htmlFor</code><span>Label for → first input ID (auto-generated)</span></div>
+        <div class="opt-row"><code>aria-describedby</code><span>Input → hint ID + error ID (chained)</span></div>
+        <div class="opt-row"><code>aria-invalid</code><span>Set on input when error is visible</span></div>
+        <div class="opt-row"><code>role="alert"</code><span>On error message (screen reader announces)</span></div>
+        <div class="opt-row"><code>error/disabled/size</code><span>Propagated to WC children (pdx-input, pdx-textarea, etc.)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/form-field';
+@title 'FormField Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

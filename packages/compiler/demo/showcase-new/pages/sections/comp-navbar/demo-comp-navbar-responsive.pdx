@@ -1,0 +1,102 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Responsive Preview</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Drag the right edge to resize. Below ~500px: hamburger appears, nav links hide, drawer toggles on click.</p>
+    <div class="responsive-frame" id="resp-frame" :ref="respFrame">
+      <div class="resp-navbar-wrap">
+        <div class="pdx-navbar-bar">
+          <div class="pdx-navbar-brand">
+            <pdx-icon name="package" size="20"></pdx-icon>
+            <strong>App</strong>
+          </div>
+          <button class="pdx-navbar-hamburger" id="resp-hamburger" :ref="respHamburger" style="display: none" @click="toggleResp">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+          </button>
+          <nav class="pdx-navbar-nav" id="resp-nav" :ref="respNav" role="navigation">
+            <a class="pdx-navbar-link active" href="#">Dashboard</a>
+            <a class="pdx-navbar-link" href="#">Projects</a>
+            <a class="pdx-navbar-link" href="#">Team</a>
+            <a class="pdx-navbar-link" href="#">Settings</a>
+          </nav>
+          <div class="pdx-navbar-spacer"></div>
+          <div class="pdx-navbar-actions">
+            <button class="pdx-navbar-icon-btn"><pdx-icon name="bell" size="18"></pdx-icon></button>
+            <span class="pdx-navbar-user"><span class="pdx-navbar-user-avatar">A</span></span>
+          </div>
+        </div>
+        <div class="pdx-navbar-drawer" id="resp-drawer" :ref="respDrawer">
+          <a class="pdx-navbar-link active" href="#">Dashboard</a>
+          <a class="pdx-navbar-link" href="#">Projects</a>
+          <a class="pdx-navbar-link" href="#">Team</a>
+          <a class="pdx-navbar-link" href="#">Settings</a>
+        </div>
+      </div>
+      <div class="resp-content">
+        <p class="pdx-ink-muted pdx-txt-small">Main content area. Drag the right edge of this frame to see responsive behavior.</p>
+        <p class="pdx-txt-mono pdx-txt-small" id="resp-width-display">{{ respWidth }}</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let respFrame = $signal(null);
+let respHamburger = $signal(null);
+let respNav = $signal(null);
+let respDrawer = $signal(null);
+let respWidth = $signal('Width: —');
+
+function toggleResp() {
+  if (respDrawer) respDrawer.classList.toggle('pdx-navbar-drawer-open');
+}
+
+// The frame's width decides hamburger or links. The effect runs again when the refs fill, so it
+// attaches once the elements exist, and its cleanup disconnects the observer with the page.
+$effect(() => {
+  const frame = respFrame;
+  const hamburger = respHamburger;
+  const nav = respNav;
+  if (!frame || !hamburger || !nav) return;
+  const observer = new ResizeObserver((entries) => {
+    const w = Math.round(entries[0].contentRect.width);
+    respWidth = 'Width: ' + w + 'px';
+    if (w < 500) {
+      hamburger.style.display = 'flex';
+      nav.style.display = 'none';
+    } else {
+      hamburger.style.display = 'none';
+      nav.style.display = 'flex';
+      if (respDrawer) respDrawer.classList.remove('pdx-navbar-drawer-open');
+    }
+  });
+  observer.observe(frame);
+  return () => observer.disconnect();
+});
+</script>
+
+<style scoped>
+.responsive-frame {
+  width: 700px;
+  min-width: 280px;
+  max-width: 100%;
+  border: 2px solid var(--pdx-color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  resize: horizontal;
+  background: var(--pdx-color-bg);
+}
+.resp-navbar-wrap {
+  background: var(--pdx-color-surface);
+  border-bottom: 1px solid var(--pdx-color-border);
+}
+.resp-content {
+  padding: var(--pdx-space-xl);
+  text-align: center;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pdx-space-sm);
+}
+</style>

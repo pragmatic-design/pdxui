@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Close Button</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Positioned in the header with <code>.pdx-dialog-close</code>. Uses <code>&amp;times;</code> or an icon.</p>
+
+    <div class="dialog-preview-bg">
+      <div class="pdx-dialog" style="max-width: 400px;">
+        <div class="pdx-dialog-header">
+          <h3 class="pdx-txt-subheading">Closeable</h3>
+          <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="pdx-dialog-body">
+          <p class="pdx-txt-small pdx-ink-muted">The close button sits in the top-right of the header. It has hover and focus-visible styles.</p>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-dialog-header"&gt;
+  &lt;h3&gt;Closeable&lt;/h3&gt;
+  &lt;button class="pdx-dialog-close" aria-label="Close"&gt;&amp;times;&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

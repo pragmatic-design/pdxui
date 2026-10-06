@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A simple horizontal bar with buttons.</p>
+
+    <div class="pdx-toolbar">
+      <button class="pdx-ghost">New</button>
+      <button class="pdx-ghost">Open</button>
+      <button class="pdx-ghost">Save</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toolbar"&gt;
+  &lt;button class="pdx-ghost"&gt;New&lt;/button&gt;
+  &lt;button class="pdx-ghost"&gt;Open&lt;/button&gt;
+  &lt;button class="pdx-ghost"&gt;Save&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

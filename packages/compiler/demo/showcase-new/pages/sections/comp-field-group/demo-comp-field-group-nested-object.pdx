@@ -1,0 +1,82 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">A nested object</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The form validates <code>onChange</code>: clear the customer's email, or type a wrong one, and the error
+      appears under the field as you type — on the nested path <code>customer.email</code>.
+    </p>
+    <div class="demo-split">
+      <pdx-form :form="orderForm" @pdx-submit="submitOrder">
+        <div class="form-stack">
+          <pdx-form-field name="reference" label="Order reference" required>
+            <pdx-input name="reference"></pdx-input>
+          </pdx-form-field>
+          <pdx-field-group name="customer" label="Customer">
+            <div class="form-grid-2">
+              <pdx-form-field name="name" label="Name" required>
+                <pdx-input name="name"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="email" label="Email" required>
+                <pdx-input name="email" type="email"></pdx-input>
+              </pdx-form-field>
+            </div>
+          </pdx-field-group>
+          <pdx-form-actions submitLabel="Place order"></pdx-form-actions>
+        </div>
+      </pdx-form>
+      <div class="values">
+        <span class="pdx-txt-small pdx-weight-semibold">getValues()</span>
+        <pre class="pdx-txt-mono values-json">{{ valuesJson(orderForm) }}</pre>
+        <span class="pdx-txt-small pdx-ink-muted">{{ submitted }}</span>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-form :form="orderForm" @pdx-submit="submitOrder"&gt;
+  &lt;pdx-form-field name="reference" label="Order reference" required&gt;
+    &lt;pdx-input name="reference"&gt;&lt;/pdx-input&gt;
+  &lt;/pdx-form-field&gt;
+  &lt;pdx-field-group name="customer" label="Customer"&gt;
+    &lt;pdx-form-field name="name" label="Name" required&gt;
+      &lt;pdx-input name="name"&gt;&lt;/pdx-input&gt;
+    &lt;/pdx-form-field&gt;
+    &lt;pdx-form-field name="email" label="Email" required&gt;
+      &lt;pdx-input name="email" type="email"&gt;&lt;/pdx-input&gt;
+    &lt;/pdx-form-field&gt;
+  &lt;/pdx-field-group&gt;
+  &lt;pdx-form-actions submitLabel="Place order"&gt;&lt;/pdx-form-actions&gt;
+&lt;/pdx-form&gt;
+
+const orderForm = createForm({
+  initialValues: { reference: 'ORD-1042', customer: { name: 'Ada Lovelace', email: 'ada@example.com' } },
+  validators: {
+    reference: [required()],
+    'customer.name': [required()],
+    'customer.email': [required(), email()],
+  },
+  validateOn: 'onChange',
+});</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { valuesJson } from './state.pdx';
+import { createForm, required, email } from '@pdxui/core';
+
+const orderForm = createForm({
+  initialValues: { reference: 'ORD-1042', customer: { name: 'Ada Lovelace', email: 'ada@example.com' } },
+  validators: {
+    reference: [required()],
+    'customer.name': [required()],
+    'customer.email': [required(), email()],
+  },
+  validateOn: 'onChange',
+});
+
+let submitted = $signal('');
+
+function submitOrder(e) {
+  submitted = 'Submitted: ' + JSON.stringify(e.detail.values);
+}
+</script>

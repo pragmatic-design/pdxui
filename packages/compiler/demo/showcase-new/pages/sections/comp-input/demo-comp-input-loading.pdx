@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Loading State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Spinner in suffix position while validating or fetching. Input remains interactive.</p>
+
+    <div class="demo-stack">
+      <pdx-input loading placeholder="Checking availability..." value="john_doe"></pdx-input>
+      <pdx-input loading clearable prefix="@" placeholder="username"></pdx-input>
+    </div>
+  </section>
+</template>

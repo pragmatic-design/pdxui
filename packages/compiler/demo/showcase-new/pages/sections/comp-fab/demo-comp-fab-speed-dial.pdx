@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Speed Dial — Directions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click each FAB to expand. Actions appear in the specified direction.</p>
+
+    <h3 class="pdx-txt-small" style="margin-top:var(--pdx-space-md)">direction="up" (default)</h3>
+    <div class="demo-frame" style="width:320px;height:280px">
+      <pdx-fab icon="plus" :actions="speedDialActions" direction="up" position="bottom-right" :show-tooltip="true" @pdx-select="onDialSelect"></pdx-fab>
+    </div>
+
+    <h3 class="pdx-txt-small" style="margin-top:var(--pdx-space-lg)">direction="left"</h3>
+    <div class="demo-frame" style="width:500px;height:120px">
+      <pdx-fab icon="plus" :actions="speedDialActions" direction="left" position="bottom-right" :show-tooltip="false" @pdx-select="onDialSelect"></pdx-fab>
+    </div>
+
+    <h3 class="pdx-txt-small" style="margin-top:var(--pdx-space-lg)">direction="down"</h3>
+    <div class="demo-frame" style="width:320px;height:280px">
+      <pdx-fab icon="plus" :actions="speedDialActions" direction="down" position="top-right" :show-tooltip="true" @pdx-select="onDialSelect"></pdx-fab>
+    </div>
+
+    <h3 class="pdx-txt-small" style="margin-top:var(--pdx-space-lg)">direction="right"</h3>
+    <div class="demo-frame" style="width:500px;height:120px">
+      <pdx-fab icon="plus" :actions="speedDialActions" direction="right" position="bottom-left" :show-tooltip="false" @pdx-select="onDialSelect"></pdx-fab>
+    </div>
+
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="dial-log">{{ dialLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-fab icon="plus" :actions="actions" direction="up" :show-tooltip="true"&gt;
+&lt;/pdx-fab&gt;
+
+&lt;pdx-fab icon="plus" :actions="actions" direction="left"&gt;
+&lt;/pdx-fab&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { speedDialActions } from './state.pdx';
+
+let dialLog = $signal('Click a FAB, then select an action...');
+
+function onDialSelect(e) {
+  dialLog = 'pdx-select: ' + e.detail.key + ' — ' + e.detail.action.label;
+}
+</script>

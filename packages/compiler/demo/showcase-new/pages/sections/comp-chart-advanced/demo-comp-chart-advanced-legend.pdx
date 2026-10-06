@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Legend Positions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Legend can be placed top (default), bottom, left, or right.</p>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">bottom</span>
+        <div class="demo-area">
+          <pdx-chart type="line" :data="lineData" :x-field="'month'" :y-field="'revenue,profit'" :series-names="'Revenue,Profit'" :legend-position="'bottom'" height="240px"></pdx-chart>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">right</span>
+        <div class="demo-area">
+          <pdx-chart type="line" :data="lineData" :x-field="'month'" :y-field="'revenue,profit'" :series-names="'Revenue,Profit'" :legend-position="'right'" height="240px"></pdx-chart>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { lineData } from './state.pdx';
+</script>

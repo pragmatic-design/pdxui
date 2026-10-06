@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Radio</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Standalone radios. Use <code>name</code> for native grouping or <code>&lt;pdx-radio-group&gt;</code> for managed selection.</p>
+
+    <div class="demo-stack">
+      <pdx-radio label="Option A" name="demo1" value="a" checked></pdx-radio>
+      <pdx-radio label="Option B" name="demo1" value="b"></pdx-radio>
+      <pdx-radio label="Option C (disabled)" name="demo1" value="c" disabled></pdx-radio>
+    </div>
+  </section>
+</template>

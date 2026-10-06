@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Cascade Close (LIFO)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Opens 3 dialogs stacked. Press Escape to close them one by one (LIFO order).</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm" @click="onCascade">Open 3 Stacked</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+
+async function onCascade() {
+    dialog.alert({ title: 'Layer 1', message: 'First dialog. Press Escape to close.' });
+    setTimeout(() => {
+        dialog.alert({ title: 'Layer 2', message: 'Second dialog. Press Escape to close.' });
+        setTimeout(() => {
+            dialog.alert({ title: 'Layer 3 (Top)', message: 'Third dialog. Escape closes this first (LIFO).' });
+        }, 100);
+    }, 100);
+}
+</script>

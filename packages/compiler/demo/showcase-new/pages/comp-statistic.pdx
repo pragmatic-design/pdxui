@@ -1,0 +1,85 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Statistic</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-statistic&gt;</code> — display numeric KPI values with labels, trends, and icons.
+      Ideal for dashboard cards, analytics summaries, and stat panels.
+    </p>
+
+    <!-- Basic -->
+    <pdx-demo-comp-statistic-basic class="demo-section"></pdx-demo-comp-statistic-basic>
+
+    <!-- With Trend -->
+    <pdx-demo-comp-statistic-trend class="demo-section"></pdx-demo-comp-statistic-trend>
+
+    <!-- With Icons -->
+    <pdx-demo-comp-statistic-icons class="demo-section"></pdx-demo-comp-statistic-icons>
+
+    <!-- Sizes -->
+    <pdx-demo-comp-statistic-sizes class="demo-section"></pdx-demo-comp-statistic-sizes>
+
+    <!-- Loading -->
+    <pdx-demo-comp-statistic-loading class="demo-section"></pdx-demo-comp-statistic-loading>
+
+    <!-- Formatted -->
+    <pdx-demo-comp-statistic-formatted class="demo-section"></pdx-demo-comp-statistic-formatted>
+
+    <!-- Dashboard Grid -->
+    <pdx-demo-comp-statistic-dashboard class="demo-section"></pdx-demo-comp-statistic-dashboard>
+
+    <!-- With Description -->
+    <pdx-demo-comp-statistic-description class="demo-section"></pdx-demo-comp-statistic-description>
+
+    <!-- Comparison -->
+    <pdx-demo-comp-statistic-comparison class="demo-section"></pdx-demo-comp-statistic-comparison>
+
+    <!-- No Trend Color -->
+    <pdx-demo-comp-statistic-no-trend-color class="demo-section"></pdx-demo-comp-statistic-no-trend-color>
+
+    <!-- Props -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>title</code></td><td>String</td><td>''</td><td>Label text</td></tr>
+            <tr><td><code>value</code></td><td>String</td><td>'0'</td><td>Main display value</td></tr>
+            <tr><td><code>prefix</code></td><td>String</td><td>''</td><td>Text/symbol before value</td></tr>
+            <tr><td><code>suffix</code></td><td>String</td><td>''</td><td>Text/symbol after value</td></tr>
+            <tr><td><code>icon</code></td><td>String</td><td>''</td><td>Icon name</td></tr>
+            <tr><td><code>trend</code></td><td>String</td><td>''</td><td>'up' | 'down' | 'flat' | ''</td></tr>
+            <tr><td><code>trend-value</code></td><td>String</td><td>''</td><td>Trend text e.g. '+12.5%'</td></tr>
+            <tr><td><code>trend-color</code></td><td>Boolean</td><td>true</td><td>Auto-color trend (green/red)</td></tr>
+            <tr><td><code>size</code></td><td>String</td><td>'md'</td><td>'sm' | 'md' | 'lg'</td></tr>
+            <tr><td><code>loading</code></td><td>Boolean</td><td>false</td><td>Show skeleton placeholder</td></tr>
+            <tr><td><code>precision</code></td><td>Number</td><td>-1</td><td>Decimal places (-1 = no format)</td></tr>
+            <tr><td><code>group-separator</code></td><td>String</td><td>','</td><td>Thousands separator</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/statistic';
+@title 'Statistic — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--pdx-space-lg);
+  margin-top: var(--pdx-space-md);
+  max-width: 640px;
+}
+@media (max-width: 480px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+</style>

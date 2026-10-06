@@ -1,0 +1,59 @@
+<template>
+  <section>
+    <h3>Stack Management</h3>
+    <p class="desc">Push creates a visible overlay. Escape closes the top one. Modal locks scrolling.</p>
+    <div class="row">
+      <button class="pdx-primary" @click="pushTooltip">Push Tooltip</button>
+      <button class="pdx-primary" @click="pushDialog">Push Dialog (modal)</button>
+    </div>
+    <div class="row">
+      <button class="pdx-secondary" @click="popTopTooltip">Pop Tooltip</button>
+      <button class="pdx-secondary" @click="popTopDialog">Pop Dialog</button>
+      <button class="pdx-ghost" @click="popAllTooltips">Pop All Tooltips</button>
+      <button class="pdx-ghost" @click="popAllDialogs">Pop All Dialogs</button>
+      <button class="pdx-ghost" @click="popAll">Pop All</button>
+    </div>
+    <div class="stats">
+      <span>Count: <strong>{{ count }}</strong></span>
+      <span>Modal: <strong>{{ modals }}</strong></span>
+      <span>Top: <strong>{{ topName }}</strong></span>
+    </div>
+    <pre class="log">{{ logText }}</pre>
+  </section>
+</template>
+
+<script setup>
+import { overlayStack, effect, onMount, onDestroy } from '@pdxui/core';
+import { useOverlayDemo } from './state.pdx';
+
+// The log, the overlay ids and the stack operations are shared with the other sections (state.pdx.ts).
+const overlayDemo = useOverlayDemo();
+const logText = $derived(overlayDemo.logText());
+function pushTooltip() { overlayDemo.pushTooltip(); }
+function pushDialog() { overlayDemo.pushDialog(); }
+function popTopTooltip() { overlayDemo.popTopTooltip(); }
+function popTopDialog() { overlayDemo.popTopDialog(); }
+function popAllTooltips() { overlayDemo.popAllTooltips(); }
+function popAllDialogs() { overlayDemo.popAllDialogs(); }
+function popAll() { overlayDemo.popAll(); }
+
+let count = $signal(0);
+let modals = $signal(0);
+let topName = $signal('none');
+
+onMount(() => {
+    const d1 = effect(() => { count = overlayStack.count(); });
+    const d2 = effect(() => { modals = overlayStack.modalCount(); });
+    const d3 = effect(() => {
+        // Read the stack reactively
+        const c = overlayStack.count();
+        topName = overlayStack.top() ?? 'none';
+    });
+    onDestroy(() => { d1(); d2(); d3(); });
+});
+</script>
+
+<style scoped>
+  .stats { display: flex; gap: 20px; font-size: 0.9rem; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; max-height: 120px; overflow-y: auto; white-space: pre-wrap; margin: 8px 0 0; min-height: 30px; }
+</style>

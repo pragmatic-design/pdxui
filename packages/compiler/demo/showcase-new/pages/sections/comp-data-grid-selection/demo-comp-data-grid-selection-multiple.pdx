@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple Selection</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Checkbox column with select-all header. Hold <kbd>Shift</kbd> for range select.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="multiDS" :columns="columns" selection="multiple" hover @pdx-selection-change="onSelect"></pdx-data-grid>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="sel-log">{{ selLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  selection="multiple" hover
+  @pdx-selection-change="onSelect"&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { data, columns } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+const multiDS = createDataSource({ data: data.slice(), pageSize: 0 });
+let selLog = $signal('Select rows to see events...');
+
+function onSelect(evt) {
+  const count = evt.detail.count;
+  const ids = evt.detail.selected;
+  selLog = count + ' row' + (count !== 1 ? 's' : '') + ' selected: IDs [' + ids.join(', ') + ']';
+}
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-muted); }
+</style>

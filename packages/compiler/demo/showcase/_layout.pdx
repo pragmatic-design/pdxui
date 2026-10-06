@@ -1,0 +1,22 @@
+<template>
+  <div class="layout-wrapper">
+    <div class="breadcrumb">
+      <span class="crumb-icon">📁</span>
+      <span class="crumb-path">{{ currentPage }}</span>
+    </div>
+    <slot />
+  </div>
+</template>
+
+<script setup>
+import { currentPath } from '@pdxui/router';
+
+const currentPage = $derived(currentPath());
+</script>
+
+<style scoped>
+  .layout-wrapper { display: flex; flex-direction: column; gap: 12px; }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #888; padding: 4px 0; }
+  .crumb-icon { font-size: 0.9rem; }
+  .crumb-path { font-family: monospace; color: #666; }
+</style>

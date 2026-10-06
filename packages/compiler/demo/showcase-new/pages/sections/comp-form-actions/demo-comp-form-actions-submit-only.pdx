@@ -1,0 +1,9 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Submit only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>reset-label="none"</code> to hide the reset button.</p>
+    <div class="demo-container">
+      <pdx-form-actions submit-label="Continue" reset-label="none"></pdx-form-actions>
+    </div>
+  </section>
+</template>

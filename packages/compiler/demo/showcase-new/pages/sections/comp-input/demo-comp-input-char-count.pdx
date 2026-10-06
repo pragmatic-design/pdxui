@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Character Count</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>showCount</code> with optional <code>maxlength</code>. Counter turns red when over limit.</p>
+
+    <div class="demo-stack">
+      <pdx-input showCount maxlength="50" placeholder="Max 50 characters..."></pdx-input>
+      <pdx-input showCount placeholder="No limit — just counting..."></pdx-input>
+    </div>
+  </section>
+</template>

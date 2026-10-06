@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Row Detail (Master-Detail)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>expandable</code> adds a chevron to each row. Click to expand and show a detail panel.
+      Use the <code>detail</code> slot for custom content.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="detailDS" :columns="detailColumns" :expandable="true" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  expandable hover&gt;
+
+  &lt;slot name="detail" let:row let:id&gt;
+    &lt;div style="padding: 16px"&gt;
+      &lt;strong&gt;Details for {row.name}&lt;/strong&gt;
+      &lt;p&gt;Role: {row.role}&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/slot&gt;
+
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { typedData } from './state.pdx';
+
+// ─── Row detail ────────────────────────────
+const detailColumns = [
+  { field: 'name', header: 'Name', width: 180 },
+  { field: 'role', header: 'Role', width: 120 },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 120 },
+];
+
+const detailDS = createDataSource({ data: typedData, pageSize: 0 });
+</script>

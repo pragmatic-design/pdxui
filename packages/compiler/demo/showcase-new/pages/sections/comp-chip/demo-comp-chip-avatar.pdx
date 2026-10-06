@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Avatar</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>avatar</code> prop renders a small circle image before the label.</p>
+
+    <div class="demo-row">
+      @for (people as person; track person.name) {
+        <pdx-chip :avatar="person.avatar" :variant="person.variant" removable :value="person.name" @pdx-remove="e => people = dropPerson(people, e)">{{ person.name }}</pdx-chip>
+      }
+      <pdx-chip avatar="/avatars/person-3.svg" variant="tonal-success">Mary Kim</pdx-chip>
+      @if (people.length < 2) {
+        <button class="pdx-ghost" size="sm" @click="people = startPeople()">Reset</button>
+      }
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chip avatar="https://..." removable @pdx-remove="onRemove"&gt;
+  Jane Doe
+&lt;/pdx-chip&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useChipConsole } from './state.pdx';
+
+const chipConsole = useChipConsole();
+function dropPerson(list, e) { return chipConsole.dropPerson(list, e); }
+
+// Avatar chips and the team card: removable for real. The portraits are this app's
+// (public/avatars/), not a third party's.
+function startPeople() {
+    return [
+        { name: 'Jane Doe', avatar: '/avatars/person-1.svg', variant: '' },
+        { name: 'Alex Smith', avatar: '/avatars/person-2.svg', variant: 'primary' },
+    ];
+}
+
+let people = $signal(startPeople());
+</script>

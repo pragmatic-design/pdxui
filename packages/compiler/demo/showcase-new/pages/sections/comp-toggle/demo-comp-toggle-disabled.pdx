@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <div class="demo-row">
+      <pdx-toggle-group type="single" value="a" disabled>
+        <pdx-toggle value="a">A</pdx-toggle><pdx-toggle value="b">B</pdx-toggle>
+      </pdx-toggle-group>
+    </div>
+  </section>
+</template>

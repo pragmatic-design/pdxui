@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Badges</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Badges show counts on tabs. Click to switch.</p>
+    <div class="phone-frame">
+      <div class="phone-content">
+        <p class="pdx-ink-muted pdx-txt-small phone-label" id="badge-label">{{ badgeLabel }}</p>
+      </div>
+      <pdx-bottom-nav :items="badgeItems" activekey="messages" @pdx-select="onBadgeSelect"></pdx-bottom-nav>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// Badge items
+// { key: 'messages', label: 'Messages', icon: 'message-circle',
+//   badge: '3', badgeVariant: 'danger' }
+// { key: 'notifications', label: 'Alerts', icon: 'bell',
+//   badge: '12', badgeVariant: 'primary' }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const badgeItems = [
+  { key: 'home', label: 'Home', icon: 'home' },
+  { key: 'search', label: 'Search', icon: 'search' },
+  { key: 'messages', label: 'Messages', icon: 'message-circle', badge: '3', badgeVariant: 'danger' },
+  { key: 'notifications', label: 'Alerts', icon: 'bell', badge: '12', badgeVariant: 'primary' },
+  { key: 'profile', label: 'Profile', icon: 'user' },
+];
+
+let badgeLabel = $signal('Messages');
+
+function onBadgeSelect(e) {
+  const nav = e.target;
+  if (nav) nav.setAttribute('activekey', e.detail.key);
+  badgeLabel = e.detail.item.label;
+}
+</script>

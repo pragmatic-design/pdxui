@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Tooltips</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Hover a star to see the label.</p>
+
+    <div class="demo-row">
+      <pdx-rating value="0" tooltips="Terrible,Bad,OK,Good,Excellent"></pdx-rating>
+    </div>
+  </section>
+</template>

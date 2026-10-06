@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="light" pdx-theme="pragmatic">
+<head>
+    <meta charset="UTF-8">
+    <title>PDX — one theme, the documented way</title>
+
+    <!--
+      The single-theme path, exactly as an application would write it. `@pdxui/design` imports
+      all thirteen themes; an app that uses one is supposed to be able to take one, and both entries
+      below are what `package.json` exports.
+
+      The question this page answers is not whether the theme applies — it does — but whether the
+      CASCADE survives. The design system's first promise is at the top of `pragmatic-design.css`:
+      "Consumer's unlayered CSS always wins (zero !important needed)". Everything it ships is inside
+      an `@layer`, and unlayered CSS beats layered CSS. A theme that arrives OUTSIDE the layers takes
+      that promise away — and it is a theme rule, `[pdx-theme] .pdx-primary`, with more specificity
+      than the one class an application would write.
+    -->
+    <link rel="stylesheet" href="../src/base.css">
+    <link rel="stylesheet" href="../src/themes/layered/pragmatic.css">
+
+    <!--
+      The consumer's own CSS. Unlayered, one class, no !important — the way the design system says
+      you override it. It has to win over the theme's gradient.
+    -->
+    <style>
+        .brand-button { background: rgb(1, 2, 3); }
+    </style>
+</head>
+<body>
+    <button class="pdx-primary brand-button" data-test="overridden">Save</button>
+    <button class="pdx-primary" data-test="themed">Save</button>
+</body>
+</html>

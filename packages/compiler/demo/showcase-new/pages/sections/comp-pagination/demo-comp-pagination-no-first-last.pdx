@@ -1,0 +1,8 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Without First/Last Buttons</h2>
+    <div class="demo-row">
+      <pdx-pagination :total="100" :pageSize="10" :page="5" :showEdges="false"></pdx-pagination>
+    </div>
+  </section>
+</template>

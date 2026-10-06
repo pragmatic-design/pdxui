@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Interactive States</h2>
+    <div class="demo-grid">
+      <pdx-card clickable>
+        <div class="pdx-card-body">
+          <h4 class="pdx-txt-subheading">Clickable</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Emits pdx-click. Tab + Enter works.</p>
+        </div>
+      </pdx-card>
+      <pdx-card selected>
+        <div class="pdx-card-body">
+          <h4 class="pdx-txt-subheading">Selected</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Primary ring. For pricing/option selection.</p>
+        </div>
+      </pdx-card>
+      <pdx-card disabled>
+        <div class="pdx-card-body">
+          <h4 class="pdx-txt-subheading">Disabled</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Faded, non-interactive.</p>
+        </div>
+      </pdx-card>
+    </div>
+  </section>
+</template>

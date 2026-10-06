@@ -1,0 +1,69 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Button groups in realistic UI contexts.</p>
+
+    <div class="comp-card">
+      <div class="comp-toolbar">
+        <h3 class="pdx-txt-subheading" style="flex:1">Document Editor</h3>
+        <pdx-button-group mode="multiple" label="Formatting" :value="formatting" variant="ghost" size="sm" @pdx-change="onFormatting">
+          <pdx-button value="bold"><strong>B</strong></pdx-button>
+          <pdx-button value="italic"><em>I</em></pdx-button>
+          <pdx-button value="underline"><u>U</u></pdx-button>
+        </pdx-button-group>
+        <pdx-button-group mode="single" label="Alignment" :value="alignment" variant="ghost" size="sm" @pdx-change="onAlignment">
+          <pdx-button value="left" aria-label="Align left"><pdx-icon name="align-left" size="sm"></pdx-icon></pdx-button>
+          <pdx-button value="center" aria-label="Align center"><pdx-icon name="align-center" size="sm"></pdx-icon></pdx-button>
+          <pdx-button value="right" aria-label="Align right"><pdx-icon name="align-right" size="sm"></pdx-icon></pdx-button>
+        </pdx-button-group>
+      </div>
+      <div class="comp-body pdx-txt-small pdx-ink-muted">
+        Formatting: {{ formatting || 'none' }} | Alignment: {{ alignment || 'none' }}
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Split Action</h3>
+      <p class="pdx-txt-small pdx-ink-muted">Primary action + secondary options grouped together.</p>
+      <div class="comp-actions">
+        <pdx-button-group>
+          <pdx-button variant="primary"><pdx-icon name="download" size="sm"></pdx-icon> Download</pdx-button>
+          <pdx-button variant="primary" aria-label="More options"><pdx-icon name="chevron-down" size="sm"></pdx-icon></pdx-button>
+        </pdx-button-group>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useButtonGroupDemo } from './state.pdx';
+
+// The same alignment and formatting the toggle sections above set.
+const demo = useButtonGroupDemo();
+const formatting = $derived(demo.formatting());
+const alignment = $derived(demo.alignment());
+
+function onFormatting(e) { demo.onFormatting(e); }
+function onAlignment(e) { demo.onAlignment(e); }
+</script>
+
+<style scoped>
+  .comp-card p { margin: 0 0 var(--pdx-space-md); }
+  .comp-actions {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    justify-content: flex-end;
+  }
+  .comp-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding-bottom: var(--pdx-space-sm);
+    border-bottom: 1px solid var(--pdx-color-border);
+    margin-bottom: var(--pdx-space-sm);
+  }
+  .comp-body {
+    padding: var(--pdx-space-sm) 0;
+  }
+</style>

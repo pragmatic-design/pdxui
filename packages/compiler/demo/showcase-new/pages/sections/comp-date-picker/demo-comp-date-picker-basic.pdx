@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Date Picker</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to open calendar. Select a date. Clearable by default.</p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Default (empty)</span>
+        <pdx-date-picker placeholder="Pick a date"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Pre-selected value</span>
+        <pdx-date-picker value="2024-06-15"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Disabled</span>
+        <pdx-date-picker disabled value="2024-06-15"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Readonly</span>
+        <pdx-date-picker readonly value="2024-03-10"></pdx-date-picker>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker placeholder="Pick a date"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker disabled value="2024-06-15"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker readonly value="2024-03-10"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

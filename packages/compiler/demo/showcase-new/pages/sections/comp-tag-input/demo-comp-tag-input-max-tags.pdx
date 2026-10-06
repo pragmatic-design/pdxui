@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Max Tags</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Limited to 5 tags. The input field disappears when the limit is reached.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tag-input :max-tags="5" placeholder="Max 5 tags..." @pdx-change="onMaxChange"></pdx-tag-input>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
+      Tags: <strong>{{ maxTagsStr() }}</strong>
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input :max-tags="5" placeholder="Max 5 tags..." /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useTagInputLog } from './state.pdx';
+
+// The page's event console (state.pdx.ts).
+const tagInputLog = useTagInputLog();
+function addLog(text) { tagInputLog.addLog(text); }
+
+// Max Tags
+let maxTags = $signal([]);
+
+function onMaxChange(e) {
+    const tags = e.detail ? e.detail.tags : [];
+    maxTags = tags;
+    addLog('max-tags change (' + tags.length + '/5): [' + tags.join(', ') + ']');
+}
+
+function maxTagsStr() {
+    return maxTags.length > 0 ? maxTags.join(', ') + ' (' + maxTags.length + '/5)' : 'none';
+}
+</script>

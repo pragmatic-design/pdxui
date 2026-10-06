@@ -1,0 +1,71 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">1. Prefill / Update Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Simulates loading existing data (e.g. from API) into a form for editing.
+      Click <strong>Load User</strong> to prefill, edit, then save.
+    </p>
+
+    <div class="demo-block">
+      <div class="demo-toolbar">
+        <button class="pdx-btn pdx-secondary pdx-sm" @click="loadUser">Load User #42</button>
+        <span :class="prefillStatusClass()" :textContent="prefillStatusText()"></span>
+      </div>
+
+      <pdx-form :form="prefillForm" @pdx-submit="savePrefill">
+        <div class="form-grid-2">
+          <pdx-form-field name="name" label="Full Name" required>
+            <pdx-input name="name" placeholder="Name"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="email" label="Email" required>
+            <pdx-input name="email" type="email" placeholder="Email"></pdx-input>
+          </pdx-form-field>
+        </div>
+        <div class="form-grid-2">
+          <pdx-form-field name="role" label="Role">
+            <pdx-select name="role" :options="roleOptions" placeholder="Select role"></pdx-select>
+          </pdx-form-field>
+          <pdx-form-field name="department" label="Department">
+            <pdx-input name="department" placeholder="Engineering"></pdx-input>
+          </pdx-form-field>
+        </div>
+        <pdx-form-field name="bio" label="Bio">
+          <pdx-textarea name="bio" rows="2" placeholder="Short bio..."></pdx-textarea>
+        </pdx-form-field>
+        <pdx-form-actions submitLabel="Save Changes" resetLabel="Discard"></pdx-form-actions>
+      </pdx-form>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const prefillForm = createForm({
+  initialValues: { name: '', email: '', role: '', department: '', bio: '' },
+  validators: { name: [required(...)], email: [required(...), email(...)] },
+});
+
+// Load data from API or storage
+function loadUser() {
+  const data = await fetchUser(42); // or sessionStorage
+  prefillForm.reset(data); // fills all fields reactively
+}
+
+// Save — form.reset(currentValues) marks new baseline
+function savePrefill() {
+  await saveUser(prefillForm.getValues());
+  prefillForm.reset(prefillForm.getValues());
+}</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required, email } from '@pdxui/core';
+
+// ─── 1. Prefill / Update Mode ───
+const roleOptions = ['Admin', 'Editor', 'Viewer', 'Guest'];
+
+const prefillForm = createForm({ initialValues: { name: '', email: '', role: '', department: '', bio: '' }, validators: { name: [required('Name is required')], email: [required('Email is required'), email('Invalid email')] }, validateOn: 'onBlur' });
+let prefillStatus = $signal('No data loaded');
+
+function loadUser() { try { const saved = sessionStorage.getItem('pdx-demo-user42'); if (saved) { prefillForm.reset(JSON.parse(saved)); prefillStatus = 'Loaded saved data'; return; } } catch {} const mockUser = { name: 'Jane Cooper', email: 'jane.cooper@acme.com', role: 'Editor', department: 'Engineering', bio: 'Senior frontend developer with 8 years of experience.' }; prefillForm.reset(mockUser); prefillStatus = 'Loaded user #42 (mock)'; }
+function savePrefill() { const values = prefillForm.getValues(); sessionStorage.setItem('pdx-demo-user42', JSON.stringify(values)); prefillForm.reset(values); prefillStatus = 'Saved at ' + new Date().toLocaleTimeString(); }
+function prefillStatusText() { return prefillStatus; }
+function prefillStatusClass() { return 'form-status-badge' + (prefillStatus !== 'No data loaded' ? ' active' : ''); }
+</script>

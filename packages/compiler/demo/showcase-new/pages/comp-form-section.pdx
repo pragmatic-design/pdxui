@@ -1,0 +1,37 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Form Section</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-form-section&gt;</code> — groups related fields under a labelled heading inside a
+      <code>&lt;pdx-form&gt;</code>. Sections give a long form structure and can scope validation
+      (<code>validate="onLeave" | "onSubmit" | "blocking"</code>) to just their own fields.
+    </p>
+
+    <pdx-demo-comp-form-section-in-a-form class="demo-section"></pdx-demo-comp-form-section-in-a-form>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Section identifier</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Heading shown above the grouped fields</span></div>
+        <div class="opt-row"><code>fields</code><span>string</span><span>Comma-separated field names that belong to the section</span></div>
+        <div class="opt-row"><code>validate</code><span>string</span><span>onLeave · onSubmit (default) · blocking</span></div>
+        <div class="opt-row"><code>active</code><span>boolean</span><span>Whether the section is currently visible (default true)</span></div>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
+        Tip: for a full schema-driven form with sections as a single JSON, see
+        <code>&lt;pdx-form-template&gt;</code>.
+      </p>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/form-section';
+@title 'Form Section';
+</script>
+
+<style scoped>
+.page { }
+</style>

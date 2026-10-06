@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Why an app needs one</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      A <code>&lt;pdx-dialog&gt;</code> lives in your template, next to the state that opens it. A question asked from
+      a function — "discard changes?" in a save handler, a confirmation before a delete — has no template to live in.
+      The service puts it in the queue, and the outlet is the one place in the page that renders it. Mount it
+      <strong>once</strong>, in the app shell, as the last child of the layout:
+    </p>
+    <pre class="pdx-txt-mono shell"><code>&lt;!-- app.pdx --&gt;
+&lt;pdx-app-layout&gt;
+  …
+  &lt;pdx-router-outlet&gt;&lt;/pdx-router-outlet&gt;
+&lt;/pdx-app-layout&gt;
+&lt;pdx-overlay-outlet&gt;&lt;/pdx-overlay-outlet&gt;</code></pre>
+    <p class="pdx-txt-small pdx-ink-muted">
+      A form's <code>warnUnsaved</code> guard asks through the same queue, and mounts an outlet itself when the page has none.
+    </p>
+  </section>
+</template>
+
+<style scoped>
+  .shell { margin: var(--pdx-space-md) 0; }
+</style>

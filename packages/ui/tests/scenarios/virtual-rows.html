@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Virtual Rows Harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: var(--pdx-color-bg, #fff); color: var(--pdx-color-text, #111); font-family: var(--pdx-font-sans, system-ui); padding: 16px; }
+        #stage { max-width: 720px; }
+    </style>
+    <script type="module">
+        // What "the framework can render a long list" is worth, as a number.
+        //
+        // `?rows=N` builds a virtualised grid over N rows. The page asserts nothing; the spec reads
+        // how many row elements are actually in the DOM and whether that count follows N or stays
+        // put. A page about performance that contains no number is an opinion, and the number in
+        // `components.md` has to come from somewhere this repository measured.
+        //
+        // The grid's own virtualisation is FIXED-HEIGHT (`grid-virtual.ts`), which is why
+        // `max-height` and `row-height` are set here: they are what the windowing arithmetic reads.
+        import '@pdxui/design';
+        // The one component it renders, not the barrel.
+        import '@pdxui/ui/data-grid';
+
+        const p = new URLSearchParams(location.search);
+        const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+        const rows = Number(p.get('rows') ?? '200');
+        const virtual = p.get('virtual') !== 'off';
+
+        const stage = document.createElement('div');
+        stage.id = 'stage';
+        document.body.appendChild(stage);
+
+        const grid = document.createElement('pdx-data-grid');
+        if (virtual) {
+            grid.setAttribute('virtual-scroll', '');
+            grid.setAttribute('row-height', '40');
+        }
+        grid.setAttribute('max-height', '400');
+        grid.setAttribute('data-test', 'grid');
+        stage.appendChild(grid);
+
+        grid.columns = [
+            { field: 'id', header: 'Id', width: 80 },
+            { field: 'name', header: 'Name' },
+            { field: 'city', header: 'City', width: 160 },
+        ];
+        grid.data = Array.from({ length: rows }, (_, i) => ({
+            id: i + 1,
+            name: 'Row ' + (i + 1),
+            city: ['Turin', 'Milan', 'Rome', 'Naples'][i % 4],
+        }));
+
+        // `data-pdx-ready` on <html> is the harness's contract — `openPage` waits for it and names
+        // what the page reported if it never comes. `data-rows` beside it lets a spec
+        // wait for THIS row count rather than for a page that is merely ready.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-rows', String(rows));
+            document.documentElement.setAttribute('data-pdx-ready', '');
+        }));
+    </script>
+</head>
+<body>
+</body>
+</html>

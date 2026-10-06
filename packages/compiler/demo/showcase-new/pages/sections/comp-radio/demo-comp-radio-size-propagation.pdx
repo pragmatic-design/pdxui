@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Group Size Propagation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>size</code> on the group — propagates to all children.</p>
+
+    <div class="demo-stack">
+      <pdx-radio-group size="sm" value="a">
+        <pdx-radio label="Small A" value="a"></pdx-radio>
+        <pdx-radio label="Small B" value="b"></pdx-radio>
+      </pdx-radio-group>
+
+      <pdx-radio-group value="a">
+        <pdx-radio label="Default A" value="a"></pdx-radio>
+        <pdx-radio label="Default B" value="b"></pdx-radio>
+      </pdx-radio-group>
+
+      <pdx-radio-group size="lg" value="a">
+        <pdx-radio label="Large A" value="a"></pdx-radio>
+        <pdx-radio label="Large B" value="b"></pdx-radio>
+      </pdx-radio-group>
+    </div>
+  </section>
+</template>

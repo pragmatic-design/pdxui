@@ -1,0 +1,76 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">DescriptionList</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-description-list&gt;</code> — displays key-value pairs in a structured layout.
+      Supports horizontal/vertical layout, multi-column grid, bordered and striped variants.
+      Values can be plain strings or custom HTML via a <code>render-value</code> callback.
+    </p>
+
+    <pdx-demo-comp-description-list-basic class="demo-section"></pdx-demo-comp-description-list-basic>
+
+    <pdx-demo-comp-description-list-horizontal class="demo-section"></pdx-demo-comp-description-list-horizontal>
+
+    <pdx-demo-comp-description-list-vertical class="demo-section"></pdx-demo-comp-description-list-vertical>
+
+    <pdx-demo-comp-description-list-multi-column class="demo-section"></pdx-demo-comp-description-list-multi-column>
+
+    <pdx-demo-comp-description-list-bordered class="demo-section"></pdx-demo-comp-description-list-bordered>
+
+    <pdx-demo-comp-description-list-bordered-striped class="demo-section"></pdx-demo-comp-description-list-bordered-striped>
+
+    <pdx-demo-comp-description-list-icons class="demo-section"></pdx-demo-comp-description-list-icons>
+
+    <pdx-demo-comp-description-list-custom-value class="demo-section"></pdx-demo-comp-description-list-custom-value>
+
+    <pdx-demo-comp-description-list-sizes class="demo-section"></pdx-demo-comp-description-list-sizes>
+
+    <pdx-demo-comp-description-list-slot-template class="demo-section"></pdx-demo-comp-description-list-slot-template>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>value</code></td><td><code>{ item, label, value, index }</code></td><td>Custom value rendering. Priority: slot &gt; renderValue &gt; default.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>Array</td><td>null</td><td>Array of { label, value, span?, icon? }</td></tr>
+            <tr><td><code>columns</code></td><td>Number</td><td>1</td><td>Number of grid columns</td></tr>
+            <tr><td><code>layout</code></td><td>String</td><td>'horizontal'</td><td>'horizontal' or 'vertical'</td></tr>
+            <tr><td><code>bordered</code></td><td>Boolean</td><td>false</td><td>Border around and between items</td></tr>
+            <tr><td><code>striped</code></td><td>Boolean</td><td>false</td><td>Alternating row background</td></tr>
+            <tr><td><code>size</code></td><td>String</td><td>'md'</td><td>'sm', 'md', or 'lg'</td></tr>
+            <tr><td><code>label-width</code></td><td>String</td><td>'auto'</td><td>Fixed label width (horizontal only)</td></tr>
+            <tr><td><code>colon</code></td><td>Boolean</td><td>true</td><td>Show colon after labels</td></tr>
+            <tr><td><code>render-value</code></td><td>Function</td><td>null</td><td>(item) => HTMLElement | null. Custom value rendering.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/description-list';
+@title 'DescriptionList — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-container { max-width: 500px; }
+.demo-wide { max-width: 700px; }
+</style>

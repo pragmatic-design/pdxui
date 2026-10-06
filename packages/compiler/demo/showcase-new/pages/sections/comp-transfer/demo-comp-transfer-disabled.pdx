@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <div class="demo-row">
+      <pdx-transfer
+        disabled
+        :items="basicItems"
+        :value="['cat', 'dog']"
+      ></pdx-transfer>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+</script>

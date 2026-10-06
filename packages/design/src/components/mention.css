@@ -1,0 +1,147 @@
+/* pdx-mention — Textarea with @mention trigger and floating suggestions */
+
+pdx-mention {
+    display: block;
+    position: relative;
+}
+
+.pdx-mention-wrap {
+    position: relative;
+    display: block;
+}
+
+/* Mirror div — sits behind textarea, shows highlighted mentions */
+.pdx-mention-mirror {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: var(--pdx-space-sm);
+    border: 1px solid transparent;
+    border-radius: var(--pdx-radius-md);
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-sm);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
+    pointer-events: none;
+    color: transparent;
+}
+
+/* Mention tag highlight in mirror — only background visible, text stays transparent */
+.pdx-mention-tag {
+    color: transparent;
+    background: color-mix(in oklch, var(--pdx-color-primary) 15%, transparent);
+    border-radius: var(--pdx-radius-sm);
+    padding: 1px 2px;
+    border-bottom: 2px solid var(--pdx-color-primary);
+}
+
+/* Textarea — transparent text so mirror shows through */
+.pdx-mention-textarea {
+    position: relative;
+    width: 100%;
+    min-height: 80px;
+    padding: var(--pdx-space-sm);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: transparent;
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-sm);
+    line-height: 1.5;
+    color: var(--pdx-color-text);
+    caret-color: var(--pdx-color-text);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.pdx-mention-textarea:focus {
+    border-color: var(--pdx-color-focus);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--pdx-color-focus) 20%, transparent);
+}
+
+.pdx-mention-textarea::placeholder {
+    color: var(--pdx-color-muted);
+}
+
+.pdx-mention-textarea:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Floating suggestion dropdown — fixed against the viewport and placed under the caret by
+   pdx-mention, so a scrolling ancestor cannot clip it. */
+.pdx-mention-dropdown {
+    position: fixed;
+    z-index: var(--pdx-z-popover);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-lg);
+    min-width: 180px;
+    max-width: 320px;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: var(--pdx-space-xs) 0;
+}
+
+/* Suggestion item */
+.pdx-mention-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    transition: background 0.1s;
+}
+
+.pdx-mention-item:hover,
+.pdx-mention-item.active {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-mention-item.active {
+    color: var(--pdx-color-primary-ink);
+}
+
+.pdx-mention-item-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pdx-mention-item-desc {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+/* Loading state */
+.pdx-mention-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--pdx-space-sm);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+}
+
+/* No results */
+.pdx-mention-empty {
+    padding: var(--pdx-space-sm);
+    text-align: center;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+}
+
+/* Highlight match in suggestion */
+.pdx-mention-highlight {
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-primary-ink);
+}

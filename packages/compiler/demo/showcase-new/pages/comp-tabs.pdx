@@ -1,0 +1,78 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Tabs</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Tab navigation with animated indicator, keyboard nav (Arrow/Home/End), lazy mount, vertical orientation, closable tabs.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-tabs-basic class="demo-section"></pdx-demo-comp-tabs-basic>
+
+    <!-- ═══ Bordered ═══ -->
+    <pdx-demo-comp-tabs-bordered class="demo-section"></pdx-demo-comp-tabs-bordered>
+
+    <!-- ═══ Card Variant ═══ -->
+    <pdx-demo-comp-tabs-card class="demo-section"></pdx-demo-comp-tabs-card>
+
+    <!-- ═══ Pills Variant ═══ -->
+    <pdx-demo-comp-tabs-pills class="demo-section"></pdx-demo-comp-tabs-pills>
+
+    <!-- ═══ With Icons ═══ -->
+    <pdx-demo-comp-tabs-icons class="demo-section"></pdx-demo-comp-tabs-icons>
+
+    <!-- ═══ Closable ═══ -->
+    <pdx-demo-comp-tabs-closable class="demo-section"></pdx-demo-comp-tabs-closable>
+
+    <!-- ═══ Vertical ═══ -->
+    <pdx-demo-comp-tabs-vertical class="demo-section"></pdx-demo-comp-tabs-vertical>
+
+    <!-- ═══ Keyboard ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Keyboard</h2>
+      <div class="shortcut-list">
+        <div><kbd>←</kbd> / <kbd>→</kbd> Navigate tabs (horizontal)</div>
+        <div><kbd>↑</kbd> / <kbd>↓</kbd> Navigate tabs (vertical)</div>
+        <div><kbd>Home</kbd> / <kbd>End</kbd> First / last tab</div>
+        <div><kbd>Enter</kbd> / <kbd>Space</kbd> Activate tab (manual mode)</div>
+      </div>
+    </section>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>Active tab value (matches data-tab)</span></div>
+        <div class="opt-row"><code>variant</code><span>"line" (default), "card" (bordered bg), "pills" (segmented)</span></div>
+        <div class="opt-row"><code>bordered</code><span>Add border container around tabs + panels (any variant)</span></div>
+        <div class="opt-row"><code>orientation</code><span>"horizontal" (default) or "vertical"</span></div>
+        <div class="opt-row"><code>mount</code><span>"eager" (default), "lazy", or "unmount"</span></div>
+        <div class="opt-row"><code>activation</code><span>"automatic" (default) or "manual"</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Structure</h3>
+      <pre class="pdx-txt-mono source-code"><code>&lt;pdx-tabs value="tab1"&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="tab1"&gt;Tab 1&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="tab2"&gt;Tab 2&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="tab1"&gt;Content 1&lt;/div&gt;
+  &lt;div data-tab-panel="tab2"&gt;Content 2&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+@page '/components/tabs';
+@title 'Tabs';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+  .shortcut-list { display: flex; flex-direction: column; gap: var(--pdx-space-xs); font-size: var(--pdx-text-sm); }
+  .shortcut-list kbd { font-family: var(--pdx-font-mono); font-size: var(--pdx-text-xs); padding: 2px 6px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm); }
+  .source-code { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; }
+</style>

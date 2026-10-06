@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Delay and minimum duration</h2>
+    <p class="pdx-txt-small pdx-ink-muted">The input is blocked at once; the overlay is drawn only after <code>delay</code> (300 ms), then kept for at least <code>min-duration</code> (200 ms). A quick save never flashes a spinner, and a slow one does not blink.</p>
+    <div class="demo-actions">
+      <button class="pdx-btn pdx-outline pdx-btn-xs" @click="save(120)">Save in 120 ms</button>
+      <button class="pdx-btn pdx-outline pdx-btn-xs" @click="save(350)">Save in 350 ms</button>
+    </div>
+    <div class="demo-wrap">
+      <pdx-block-ui :blocked="saving" message="Saving…">
+        <div class="demo-panel">
+          <p class="pdx-txt-small pdx-ink-muted">The first button blocks for less than the delay: nothing is drawn. The second is drawn at 300 ms and stays until 500.</p>
+        </div>
+      </pdx-block-ui>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let saving = $signal(false);
+
+function save(ms) {
+  saving = true;
+  setTimeout(function() { saving = false; }, ms);
+}
+</script>

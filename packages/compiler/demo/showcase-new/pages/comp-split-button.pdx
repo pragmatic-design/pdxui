@@ -1,0 +1,59 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">SplitButton</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-split-button&gt;</code> — primary action button with a dropdown arrow for secondary actions.
+    </p>
+
+    <pdx-demo-comp-split-button-basic class="demo-section"></pdx-demo-comp-split-button-basic>
+
+    <pdx-demo-comp-split-button-variants class="demo-section"></pdx-demo-comp-split-button-variants>
+
+    <pdx-demo-comp-split-button-sizes class="demo-section"></pdx-demo-comp-split-button-sizes>
+
+    <pdx-demo-comp-split-button-disabled class="demo-section"></pdx-demo-comp-split-button-disabled>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>label</code></td><td>String</td><td>''</td><td>Primary button text</td></tr>
+            <tr><td><code>icon</code></td><td>String</td><td>''</td><td>Primary button icon</td></tr>
+            <tr><td><code>items</code></td><td>MenuItem[]</td><td>[]</td><td>Dropdown items</td></tr>
+            <tr><td><code>variant</code></td><td>String</td><td>'primary'</td><td>primary, secondary, outline, ghost, danger</td></tr>
+            <tr><td><code>size</code></td><td>String</td><td>'sm'</td><td>xs, sm, md, lg</td></tr>
+            <tr><td><code>loading</code></td><td>Boolean</td><td>false</td><td>Loading spinner on primary</td></tr>
+            <tr><td><code>disabled</code></td><td>Boolean</td><td>false</td><td>Disable entire button</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-click</code></td><td>{}</td><td>Primary button clicked</td></tr>
+            <tr><td><code>pdx-select</code></td><td>{ key, item }</td><td>Dropdown item selected</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/split-button';
+@title 'SplitButton — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+</style>

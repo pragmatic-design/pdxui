@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Persistent & Hover Pause</h2>
+    <div class="btn-row">
+      <pdx-button variant="outline" size="sm" @click="showPersistent">Persistent (no auto-dismiss)</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="showLong">8s Toast (hover to pause)</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showPersistent() { toast.warning('Action required: verify your email.', { duration: 0 }); }
+function showLong() { toast.info('This toast lasts 8 seconds. Hover to pause the progress bar.', { duration: 8000 }); }
+</script>

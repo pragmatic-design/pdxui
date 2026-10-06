@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Mask Overlay + Hover Trigger</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Hover to expand. Dark overlay behind. Click outside or Escape to close.</p>
+    <div class="demo-frame" style="width:320px;height:280px">
+      <pdx-fab icon="plus" :actions="speedDialActions" mask trigger="hover" position="bottom-right" :show-tooltip="true"></pdx-fab>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { speedDialActions } from './state.pdx';
+</script>

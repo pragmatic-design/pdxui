@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Hint & Description</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>description</code> renders below the label (supplemental context).
+      <code>hint</code> renders below description (helper text for the input).
+    </p>
+
+    <div class="demo-stack">
+      <pdx-label text="Password" required description="Must be at least 8 characters" hint="Include letters, numbers, and symbols"></pdx-label>
+      <input class="pdx-input" type="password" placeholder="Enter password..." />
+    </div>
+    <div class="demo-stack" style="margin-top:var(--pdx-space-lg)">
+      <pdx-label text="Bio" description="Tell us about yourself"></pdx-label>
+      <textarea class="pdx-input" rows="3" placeholder="Write something..."></textarea>
+    </div>
+  </section>
+</template>

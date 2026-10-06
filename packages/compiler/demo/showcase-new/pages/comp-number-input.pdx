@@ -1,0 +1,66 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Number Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-number-input&gt;</code> — number input with a step, or a step on the digit before the caret,
+      sign toggle, locale formatting, and scroll wheel support.
+    </p>
+
+    <!-- Basic -->
+    <pdx-demo-comp-number-input-basic class="demo-section"></pdx-demo-comp-number-input-basic>
+
+    <!-- Controls -->
+    <pdx-demo-comp-number-input-control-styles class="demo-section"></pdx-demo-comp-number-input-control-styles>
+
+    <!-- Step mode -->
+    <pdx-demo-comp-number-input-digit-step class="demo-section"></pdx-demo-comp-number-input-digit-step>
+
+    <!-- Sign Toggle -->
+    <pdx-demo-comp-number-input-sign-toggle class="demo-section"></pdx-demo-comp-number-input-sign-toggle>
+
+    <!-- Locale -->
+    <pdx-demo-comp-number-input-locale class="demo-section"></pdx-demo-comp-number-input-locale>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>number</span><span>Current numeric value</span></div>
+        <div class="opt-row"><code>min / max</code><span>number</span><span>Range constraints</span></div>
+        <div class="opt-row"><code>step</code><span>number</span><span>Default step (1). In caret mode the cursor's digit is stepped instead.</span></div>
+        <div class="opt-row"><code>step-mode</code><span>string</span><span>'auto' (default: caret without steppers, fixed with them), 'fixed', 'caret'</span></div>
+        <div class="opt-row"><code>precision</code><span>number</span><span>Decimal places (-1 = auto from step)</span></div>
+        <div class="opt-row"><code>trim-zeros</code><span>boolean</span><span>Show only the decimals the value has, up to <code>precision</code> (still rounded to it)</span></div>
+        <div class="opt-row"><code>controls</code><span>string</span><span>'both' (default), 'right' (stacked), 'none' (free mode)</span></div>
+        <div class="opt-row"><code>allowNegative</code><span>boolean</span><span>Enable sign toggle button (+/-)</span></div>
+        <div class="opt-row"><code>colorBySign</code><span>boolean</span><span>Green for positive, red for negative</span></div>
+        <div class="opt-row"><code>allowWheel</code><span>boolean</span><span>Enable scroll wheel when focused</span></div>
+        <div class="opt-row"><code>locale</code><span>string</span><span>Intl.NumberFormat locale (e.g. "en-US")</span></div>
+        <div class="opt-row"><code>currency</code><span>string</span><span>Currency code (e.g. "USD", "EUR")</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Action</span></div>
+        <div class="opt-row"><kbd>Arrow Up/Down</kbd><span>One step; in caret mode, the digit before the cursor</span></div>
+        <div class="opt-row"><kbd>Shift + Arrow</kbd><span>Ten steps; in caret mode, ten of that digit</span></div>
+        <div class="opt-row"><kbd>Page Up/Down</kbd><span>Step x10 (with steppers)</span></div>
+        <div class="opt-row"><kbd>Home / End</kbd><span>Go to min / max, when set (with steppers)</span></div>
+        <div class="opt-row"><kbd>+/-</kbd><span>Toggle sign (when allowNegative)</span></div>
+        <div class="opt-row"><kbd>Scroll wheel</kbd><span>As the arrows, in the same mode (when allowWheel + focused)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/number-input';
+@title 'Number Input';
+</script>
+
+<style scoped>
+  .page { }
+</style>

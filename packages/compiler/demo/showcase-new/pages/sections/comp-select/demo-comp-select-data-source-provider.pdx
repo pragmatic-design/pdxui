@@ -1,0 +1,54 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">&lt;pdx-data-source&gt; — Declarative Provider</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Non-rendering component that creates a DataSource from declarative props.
+      Accepts <code>:data</code> (array), <code>url</code> (REST), or <code>:transport</code> (custom).
+      Exposes <code>source</code> property for binding.
+    </p>
+    <div class="demo-col" style="max-width: 400px">
+      <pdx-data-source :transport="slowTransport" id-field="id" :ref="dsProviderRef" />
+      <pdx-select label="User" :source="dsProviderRef" labelField="name" valueField="id" searchable clearable placeholder="From &lt;pdx-data-source&gt; (slow)..." />
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>// pdx-data-source creates the DataSource declaratively
+&lt;pdx-data-source :transport="slowTransport" id-field="id"
+  :ref="providerRef" /&gt;
+
+// Pass the ref directly — select auto-extracts the DataSource
+&lt;pdx-select :source="providerRef"
+  labelField="name" valueField="id"
+  searchable clearable /&gt;
+
+// Or pass a DataSource object directly:
+&lt;pdx-select :source="myDataSource" /&gt;
+
+// Or with static data (no transport needed):
+&lt;pdx-data-source :data="users" id-field="id" /&gt;
+
+// Or with REST URL:
+&lt;pdx-data-source url="/api/products" :page-size="25" /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { arrayTransport, delayTransport } from '@pdxui/core';
+
+const dsUsers = [
+  { id: 1, name: 'Alice Johnson', role: 'Lead' },
+  { id: 2, name: 'Bob Smith', role: 'Developer' },
+  { id: 3, name: 'Charlie Brown', role: 'Designer' },
+  { id: 4, name: 'Diana Prince', role: 'PM' },
+  { id: 5, name: 'Edward Norton', role: 'DevOps' },
+  { id: 6, name: 'Fiona Apple', role: 'QA' },
+  { id: 7, name: 'George Lucas', role: 'Architect' },
+  { id: 8, name: 'Helen Troy', role: 'Lead' },
+];
+
+// pdx-data-source demo — pass ref directly to :source (select auto-extracts DataSource)
+const slowTransport = delayTransport({
+  transport: arrayTransport({ data: dsUsers, idField: 'id' }),
+  readDelay: 1500,
+});
+
+let dsProviderRef = $signal(null);
+</script>

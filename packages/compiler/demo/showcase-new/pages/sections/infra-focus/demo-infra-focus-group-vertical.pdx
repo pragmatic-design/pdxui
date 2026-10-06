@@ -1,0 +1,38 @@
+<template>
+  <section data-test="focus-group">
+    <h3>Focus Group — Vertical</h3>
+    <p class="desc">Click an item first, then use Arrow Up/Down to navigate, Enter/Space to select. Home/End jump to first/last. Disabled items (Cherry) are skipped.</p>
+    <div class="group-list" :ref="verticalRef" data-test="group-vertical">
+      @for (fruits as fruit; track fruit) {
+        <div class="group-item" role="option" :aria-disabled="fruit === 'Cherry' ? 'true' : null">
+          {{ fruit }}
+        </div>
+      }
+    </div>
+    <div class="log" data-test="group-log">{{ groupLog }}</div>
+  </section>
+</template>
+
+<script setup>
+import { focusGroup, onMount } from '@pdxui/core';
+
+const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
+
+let groupLog = $signal('');
+
+let verticalRef = $signal(null);
+
+onMount(() => {
+    // Focus groups — use ref elements, guaranteed to be in the DOM at onMount
+    if (verticalRef) {
+        focusGroup(verticalRef, {
+            selector: '[role="option"]',
+            orientation: 'vertical',
+            wrap: true,
+            skipDisabled: true,
+            onFocus: (el, i) => { groupLog = `Focused: ${el.textContent.trim()} (index ${i})`; },
+            onSelect: (el, i) => { groupLog = `Selected: ${el.textContent.trim()} (index ${i})`; },
+        });
+    }
+});
+</script>

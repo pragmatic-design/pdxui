@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Standalone Calendar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>&lt;pdx-calendar&gt;</code> can be used standalone without the picker wrapper.
+      Inline mode, week numbers, multiple months.
+    </p>
+
+    <div class="demo-row">
+      <pdx-calendar inline></pdx-calendar>
+    </div>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">With Week Numbers</h3>
+    <div class="demo-row">
+      <pdx-calendar inline :week-numbers="true"></pdx-calendar>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-calendar inline&gt;&lt;/pdx-calendar&gt;
+
+&lt;!-- With week numbers --&gt;
+&lt;pdx-calendar inline :week-numbers="true"&gt;&lt;/pdx-calendar&gt;</code></pre>
+    </details>
+  </section>
+</template>

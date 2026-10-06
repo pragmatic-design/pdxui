@@ -1,0 +1,53 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Selectable (Toggle)</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>selectable</code> makes the chip a toggle button (<code>role="button"</code> + <code>aria-pressed</code>): click, Enter or Space. Plain chips are not tab stops.</p>
+
+    <div class="demo-row">
+      @for (interests as item; track item.label) {
+        <pdx-chip selectable variant="primary" :selected="item.selected" :value="item.label" @pdx-toggle="toggleInterest">{{ item.label }}</pdx-chip>
+      }
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-xs)">
+      Selected: {{ selectedStr() }}
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chip selectable variant="primary" :selected="sel" @pdx-toggle="onToggle"&gt;
+  Music
+&lt;/pdx-chip&gt;
+// event.detail = { selected: true, value: "Music" }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useChipConsole } from './state.pdx';
+
+const chipConsole = useChipConsole();
+function addLog(text) { chipConsole.addLog(text); }
+
+// Selectable
+let interests = $signal([
+    { label: 'Music', selected: true },
+    { label: 'Sports', selected: false },
+    { label: 'Travel', selected: true },
+    { label: 'Food', selected: false },
+    { label: 'Tech', selected: true },
+    { label: 'Art', selected: false },
+]);
+
+function toggleInterest(e) {
+    const val = e.detail ? e.detail.value : '';
+    if (val) {
+        interests = interests.map(i => i.label === val ? { label: i.label, selected: !i.selected } : i);
+        addLog('toggle: ' + val + ' → ' + (e.detail.selected ? 'on' : 'off'));
+    }
+}
+
+function selectedStr() {
+    const sel = interests.filter(i => i.selected).map(i => i.label);
+    return sel.length > 0 ? sel.join(', ') : 'none';
+}
+</script>

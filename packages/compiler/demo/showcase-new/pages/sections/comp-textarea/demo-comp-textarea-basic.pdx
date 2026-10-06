@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Textarea</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default 3 rows with vertical resize handle. Wrapper pattern: border on wrapper.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Message" required></pdx-label>
+        <pdx-textarea placeholder="Write your message..."></pdx-textarea>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Notes" optional></pdx-label>
+        <pdx-textarea placeholder="Additional notes..." rows="5"></pdx-textarea>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-textarea placeholder="Write your message..."&gt;&lt;/pdx-textarea&gt;
+&lt;pdx-textarea placeholder="Additional notes..." rows="5"&gt;&lt;/pdx-textarea&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>axis="horizontal"</code> lays the rows side by side, and the left/right arrows move
+      them. Tab order and the announcements are the same.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-sortable-list axis="horizontal" :items="columns" @pdx-reorder="onColumnReorder"></pdx-sortable-list>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { move } from './data.pdx';
+
+let columns = $signal([
+  { id: 'n', label: 'Name' },
+  { id: 's', label: 'Status' },
+  { id: 'o', label: 'Owner' },
+]);
+
+function onColumnReorder(e) { columns = move(columns, e.detail); }
+</script>

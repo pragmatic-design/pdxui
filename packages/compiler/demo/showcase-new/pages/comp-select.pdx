@@ -1,0 +1,174 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Select</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Unified Select / Combobox / MultiSelect. Single component controlled via <code>searchable</code>
+      and <code>multiple</code> props. Consumes arrays or DataSource. Virtual scroll auto-activates for large lists.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-select-basic class="demo-section"></pdx-demo-comp-select-basic>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-select-sizes class="demo-section"></pdx-demo-comp-select-sizes>
+
+    <!-- ═══ States ═══ -->
+    <pdx-demo-comp-select-states class="demo-section"></pdx-demo-comp-select-states>
+
+    <!-- ═══ Clearable ═══ -->
+    <pdx-demo-comp-select-clearable class="demo-section"></pdx-demo-comp-select-clearable>
+
+    <!-- ═══ Searchable (Combobox) ═══ -->
+    <pdx-demo-comp-select-searchable class="demo-section"></pdx-demo-comp-select-searchable>
+
+    <!-- ═══ Search in Dropdown ═══ -->
+    <pdx-demo-comp-select-search-dropdown class="demo-section"></pdx-demo-comp-select-search-dropdown>
+
+    <!-- ═══ Multiple ═══ -->
+    <pdx-demo-comp-select-multiple class="demo-section"></pdx-demo-comp-select-multiple>
+
+    <!-- ═══ Object Data ═══ -->
+    <pdx-demo-comp-select-object-data class="demo-section"></pdx-demo-comp-select-object-data>
+
+    <!-- ═══ Grouped ═══ -->
+    <pdx-demo-comp-select-grouped class="demo-section"></pdx-demo-comp-select-grouped>
+
+    <!-- ═══ Large List (Virtual Scroll) ═══ -->
+    <pdx-demo-comp-select-large-list class="demo-section"></pdx-demo-comp-select-large-list>
+
+    <!-- ═══ Loading (Remote Simulation) ═══ -->
+    <pdx-demo-comp-select-loading class="demo-section"></pdx-demo-comp-select-loading>
+
+    <!-- ═══ DataSource (source prop) ═══ -->
+    <pdx-demo-comp-select-datasource class="demo-section"></pdx-demo-comp-select-datasource>
+
+    <!-- ═══ Cascading Selects ═══ -->
+    <pdx-demo-comp-select-cascading class="demo-section"></pdx-demo-comp-select-cascading>
+
+    <!-- ═══ pdx-data-source Component ═══ -->
+    <pdx-demo-comp-select-data-source-provider class="demo-section"></pdx-demo-comp-select-data-source-provider>
+
+    <!-- ═══ Custom Item Template (Function Prop) ═══ -->
+    <pdx-demo-comp-select-template-function class="demo-section"></pdx-demo-comp-select-template-function>
+
+    <!-- ═══ Scoped Slot ═══ -->
+    <pdx-demo-comp-select-template-slot class="demo-section"></pdx-demo-comp-select-template-slot>
+
+    <!-- ═══ Width / Sizing ═══ -->
+    <pdx-demo-comp-select-width class="demo-section"></pdx-demo-comp-select-width>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-select-composition class="demo-section"></pdx-demo-comp-select-composition>
+
+  </div>
+</template>
+
+<script setup>
+@page '/components/select';
+@title 'Select — PDX UI';
+
+import '@pdxui/ui/select';
+import '@pdxui/ui/data-source';
+</script>
+
+<style>
+.demo-row {
+  max-width: 320px;
+}
+
+.demo-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-sm);
+  max-width: 320px;
+}
+
+.demo-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-md);
+  max-width: 400px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-2xs);
+}
+
+.demo-sizing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-md);
+  max-width: 500px;
+}
+
+/* Team template styles */
+.team-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.team-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--pdx-color-primary);
+  color: var(--pdx-color-primary-text);
+  font-size: 0.65rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.team-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.team-name {
+  font-weight: 500;
+}
+.team-role {
+  font-size: 0.7rem;
+  color: var(--pdx-color-muted);
+}
+.team-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.team-avatar-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--pdx-color-primary);
+  color: var(--pdx-color-primary-text);
+  font-size: 0.55rem;
+  font-weight: 600;
+}
+
+/* Source code blocks */
+details.source {
+  margin-top: var(--pdx-space-sm);
+}
+details.source summary {
+  cursor: pointer;
+  font-size: var(--pdx-text-sm);
+  color: var(--pdx-color-muted);
+  user-select: none;
+}
+details.source pre {
+  margin-top: var(--pdx-space-xs);
+  padding: var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-md);
+  font-size: var(--pdx-text-xs);
+  overflow-x: auto;
+  line-height: 1.5;
+}
+</style>

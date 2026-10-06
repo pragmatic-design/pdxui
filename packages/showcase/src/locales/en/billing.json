@@ -1,0 +1,6 @@
+{
+    "billing": {
+        "title": "Billing for ticket {id}",
+        "body": "Rates, hours and what the customer is invoiced."
+    }
+}

@@ -1,0 +1,108 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Mega Menu</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The "Products" menu opens a wide multi-column panel instead of a dropdown list. Ideal for site navigation headers.
+    </p>
+
+    <div class="demo-box">
+      <pdx-menubar :items="megaMenubar"></pdx-menubar>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-menubar :items="megaMenubar"&gt;&lt;/pdx-menubar&gt;
+
+// { key: 'products', label: 'Products', mega: true,
+//   megaColumns: [
+//     { title: 'Development', items: [
+//       { key: 'ide', label: 'Code Editor' }, ...
+//     ]},
+//   ]
+// }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const megaMenubar = [
+  {
+    key: 'home', label: 'Home',
+    children: [
+      { key: 'dashboard', label: 'Dashboard' },
+      { key: 'feed', label: 'Activity Feed' },
+    ]
+  },
+  {
+    key: 'products', label: 'Products', mega: true,
+    megaColumns: [
+      {
+        title: 'Development',
+        items: [
+          { key: 'ide', label: 'Code Editor' },
+          { key: 'debug', label: 'Debugger' },
+          { key: 'git', label: 'Version Control' },
+          { key: 'ci', label: 'CI/CD Pipeline' },
+        ]
+      },
+      {
+        title: 'Design',
+        items: [
+          { key: 'figma', label: 'UI Designer' },
+          { key: 'proto', label: 'Prototyping' },
+          { key: 'assets', label: 'Asset Library' },
+          { key: 'tokens', label: 'Design Tokens' },
+        ]
+      },
+      {
+        title: 'Infrastructure',
+        items: [
+          { key: 'cloud', label: 'Cloud Hosting' },
+          { key: 'db', label: 'Databases' },
+          { key: 'monitor', label: 'Monitoring' },
+          { key: 'logs', label: 'Log Analytics' },
+        ]
+      },
+      {
+        title: 'Enterprise',
+        items: [
+          { key: 'sso', label: 'Single Sign-On' },
+          { key: 'audit', label: 'Audit Logs' },
+          { key: 'compliance', label: 'Compliance' },
+          { key: 'support', label: 'Priority Support' },
+        ]
+      },
+    ]
+  },
+  {
+    key: 'solutions', label: 'Solutions', mega: true,
+    megaColumns: [
+      {
+        title: 'By Industry',
+        items: [
+          { key: 'fintech', label: 'Fintech' },
+          { key: 'health', label: 'Healthcare' },
+          { key: 'edu', label: 'Education' },
+        ]
+      },
+      {
+        title: 'By Team Size',
+        items: [
+          { key: 'startup', label: 'Startups' },
+          { key: 'smb', label: 'Small Business' },
+          { key: 'enterprise', label: 'Enterprise' },
+        ]
+      },
+    ]
+  },
+  {
+    key: 'pricing', label: 'Pricing',
+    children: [
+      { key: 'free', label: 'Free Tier' },
+      { key: 'pro', label: 'Professional' },
+      { key: 'enterprise', label: 'Enterprise' },
+      { key: 'sep1', label: '', type: 'separator' },
+      { key: 'compare', label: 'Compare Plans' },
+    ]
+  },
+];
+</script>

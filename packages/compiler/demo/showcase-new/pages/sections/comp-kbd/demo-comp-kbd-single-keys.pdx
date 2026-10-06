@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Single Keys</h2>
+    <div class="demo-row">
+      <pdx-kbd keys="Enter"></pdx-kbd>
+      <pdx-kbd keys="Esc"></pdx-kbd>
+      <pdx-kbd keys="Tab"></pdx-kbd>
+      <pdx-kbd keys="Space"></pdx-kbd>
+      <pdx-kbd keys="Delete"></pdx-kbd>
+    </div>
+  </section>
+</template>

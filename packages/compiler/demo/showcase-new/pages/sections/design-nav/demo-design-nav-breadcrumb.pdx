@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Breadcrumb</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Horizontal breadcrumb with auto <code>/</code> separators via <code>::after</code>. Last item is bold.</p>
+
+    <div class="demo-box">
+      <nav class="pdx-breadcrumb">
+        <a href="#">Home</a>
+        <a href="#">Projects</a>
+        <a href="#">Acme Corp</a>
+        <span>Settings</span>
+      </nav>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;nav class="pdx-breadcrumb"&gt;
+  &lt;a href="#"&gt;Home&lt;/a&gt;
+  &lt;a href="#"&gt;Projects&lt;/a&gt;
+  &lt;a href="#"&gt;Acme Corp&lt;/a&gt;
+  &lt;span&gt;Settings&lt;/span&gt;
+&lt;/nav&gt;</code></pre>
+    </details>
+  </section>
+</template>

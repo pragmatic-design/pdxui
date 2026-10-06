@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Popover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+    <script>
+        function pdxTogglePopover(id) {
+            const el = document.getElementById(id);
+            if (el.hasAttribute('data-open')) {
+                el.removeAttribute('data-open');
+            } else {
+                document.querySelectorAll('.pdx-popover[data-open]').forEach(p => p.removeAttribute('data-open'));
+                el.setAttribute('data-open', '');
+            }
+        }
+        // Close on click outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.pdx-popover-trigger')) {
+                document.querySelectorAll('.pdx-popover[data-open]').forEach(p => p.removeAttribute('data-open'));
+            }
+        });
+    </script>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Popover</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Popover</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Floating surface with optional arrow. 12 placements, fade+scale animation. Base for dropdowns, selects, date pickers.</p>
+                    </pdx-stack>
+
+                    <!-- Basic -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Basic Popover</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Click to toggle. Popover appears below with an arrow.</p>
+                        <pdx-row justify="center" style="padding:3rem 0">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-primary" size="sm" onclick="pdxTogglePopover('pop-basic')">Click me</button>
+                                <div id="pop-basic" class="pdx-popover pdx-popover-bottom">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <pdx-stack gap="xs">
+                                        <strong class="pdx-txt-body">Popover Title</strong>
+                                        <span class="pdx-txt-small pdx-ink-muted">Basic popover with an arrow pointing to the trigger.</span>
+                                    </pdx-stack>
+                                </div>
+                            </span>
+                        </pdx-row>
+                        <div class="doc-example">
+                            <div class="doc-source">&lt;span class="pdx-popover-trigger"&gt;
+  &lt;button onclick="toggle()"&gt;Click me&lt;/button&gt;
+  &lt;div class="pdx-popover pdx-popover-bottom" data-open&gt;
+    &lt;div class="pdx-popover-arrow"&gt;&lt;/div&gt;
+    Content
+  &lt;/div&gt;
+&lt;/span&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Placements -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Placements</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">12 positions: top/bottom/left/right with start/center/end alignment.</p>
+                        <pdx-grid cols="3" gap="lg" style="padding:5rem 3rem">
+                            <!-- Top row -->
+                            <span class="pdx-popover-trigger" style="justify-self:start">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-top-start')">top-start</button>
+                                <div id="pop-top-start" class="pdx-popover pdx-popover-top-start">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">top-start</span>
+                                </div>
+                            </span>
+                            <span class="pdx-popover-trigger" style="justify-self:center">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-top')">top</button>
+                                <div id="pop-top" class="pdx-popover pdx-popover-top">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">top</span>
+                                </div>
+                            </span>
+                            <span class="pdx-popover-trigger" style="justify-self:end">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-top-end')">top-end</button>
+                                <div id="pop-top-end" class="pdx-popover pdx-popover-top-end">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">top-end</span>
+                                </div>
+                            </span>
+
+                            <!-- Middle row -->
+                            <span class="pdx-popover-trigger" style="justify-self:start">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-left')">left</button>
+                                <div id="pop-left" class="pdx-popover pdx-popover-left">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">left</span>
+                                </div>
+                            </span>
+                            <span style="justify-self:center;text-align:center" class="pdx-txt-caption pdx-ink-subtle">trigger</span>
+                            <span class="pdx-popover-trigger" style="justify-self:end">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-right')">right</button>
+                                <div id="pop-right" class="pdx-popover pdx-popover-right">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">right</span>
+                                </div>
+                            </span>
+
+                            <!-- Bottom row -->
+                            <span class="pdx-popover-trigger" style="justify-self:start">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-bot-start')">bottom-start</button>
+                                <div id="pop-bot-start" class="pdx-popover pdx-popover-bottom-start">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">bottom-start</span>
+                                </div>
+                            </span>
+                            <span class="pdx-popover-trigger" style="justify-self:center">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-bot')">bottom</button>
+                                <div id="pop-bot" class="pdx-popover pdx-popover-bottom">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">bottom</span>
+                                </div>
+                            </span>
+                            <span class="pdx-popover-trigger" style="justify-self:end">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-bot-end')">bottom-end</button>
+                                <div id="pop-bot-end" class="pdx-popover pdx-popover-bottom-end">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">bottom-end</span>
+                                </div>
+                            </span>
+                        </pdx-grid>
+                    </pdx-stack>
+
+                    <!-- Corner Placements -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Corner Placements</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">4 diagonal positions: popover sits at the corner of the trigger, not along an axis.</p>
+                        <pdx-row gap="xl" justify="center" style="padding:5rem 2rem">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-tl')">top-left</button>
+                                <div id="pop-tl" class="pdx-popover pdx-popover-top-left">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">top-left</span>
+                                </div>
+                            </span>
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-tr')">top-right</button>
+                                <div id="pop-tr" class="pdx-popover pdx-popover-top-right">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">top-right</span>
+                                </div>
+                            </span>
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-bl')">bottom-left</button>
+                                <div id="pop-bl" class="pdx-popover pdx-popover-bottom-left">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">bottom-left</span>
+                                </div>
+                            </span>
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-ghost" size="sm" onclick="pdxTogglePopover('pop-br')">bottom-right</button>
+                                <div id="pop-br" class="pdx-popover pdx-popover-bottom-right">
+                                    <div class="pdx-popover-arrow"></div>
+                                    <span class="pdx-txt-small">bottom-right</span>
+                                </div>
+                            </span>
+                        </pdx-row>
+                        <div class="doc-example">
+                            <div class="doc-source">&lt;!-- 16 total placements --&gt;
+&lt;!-- Axial: top, top-start, top-end, bottom, bottom-start, bottom-end,
+     left, left-start, left-end, right, right-start, right-end --&gt;
+&lt;!-- Corner: top-left, top-right, bottom-left, bottom-right --&gt;
+
+&lt;div class="pdx-popover pdx-popover-bottom-right"&gt;
+  &lt;div class="pdx-popover-arrow"&gt;&lt;/div&gt;
+  Diagonal placement
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Without Arrow -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Without Arrow</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Omit <code>.pdx-popover-arrow</code> for a clean flat look.</p>
+                        <pdx-row justify="center" style="padding:3rem 0">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-secondary" size="sm" onclick="pdxTogglePopover('pop-noarrow')">No Arrow</button>
+                                <div id="pop-noarrow" class="pdx-popover pdx-popover-bottom">
+                                    <pdx-stack gap="xs">
+                                        <strong class="pdx-txt-body">Clean Surface</strong>
+                                        <span class="pdx-txt-small pdx-ink-muted">No arrow — floating surface. Radix/shadcn style.</span>
+                                    </pdx-stack>
+                                </div>
+                            </span>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Menu Popover -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Menu Popover</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Use <code>pdx-popover-bare</code> with <code>pdx-nav</code> for dropdown menus.</p>
+                        <pdx-row style="padding:1rem 0 8rem 0">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-secondary" size="sm" onclick="pdxTogglePopover('pop-menu')">Menu &#9662;</button>
+                                <div id="pop-menu" class="pdx-popover pdx-popover-bare pdx-popover-bottom-start" style="min-width:12rem">
+                                    <nav class="pdx-nav" style="padding:var(--pdx-space-xs)">
+                                        <a class="pdx-nav-item" href="#" onclick="event.preventDefault();pdxTogglePopover('pop-menu')">Profile</a>
+                                        <a class="pdx-nav-item" href="#" onclick="event.preventDefault();pdxTogglePopover('pop-menu')">Settings</a>
+                                        <a class="pdx-nav-item" href="#" onclick="event.preventDefault();pdxTogglePopover('pop-menu')">Billing</a>
+                                        <hr style="margin:var(--pdx-space-2xs) 0">
+                                        <a class="pdx-nav-item" href="#" onclick="event.preventDefault();pdxTogglePopover('pop-menu')" style="color:var(--pdx-color-danger)">Logout</a>
+                                    </nav>
+                                </div>
+                            </span>
+                        </pdx-row>
+                        <div class="doc-example">
+                            <div class="doc-source">&lt;div class="pdx-popover pdx-popover-bare pdx-popover-bottom-start"&gt;
+  &lt;nav class="pdx-nav"&gt;
+    &lt;a class="pdx-nav-item"&gt;Profile&lt;/a&gt;
+    &lt;a class="pdx-nav-item"&gt;Settings&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

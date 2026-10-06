@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Action Button</h2>
+    <div class="demo-container">
+      <pdx-empty-state icon="file-plus" title="No documents" description="Get started by creating your first document." action-label="Create Document" @pdx-action="onAction"></pdx-empty-state>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="action-log">{{ actionLog }}</div>
+  </section>
+</template>
+
+<script setup>
+let actionLog = $signal('Click the action button...');
+
+function onAction() {
+  actionLog = 'pdx-action fired! Create document...';
+}
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 500px; }
+</style>

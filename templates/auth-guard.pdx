@@ -1,0 +1,36 @@
+<template>
+  <div class="auth-guard">
+    @require ('admin.dashboard') {
+      <div class="authorized">
+        <h3>Admin Dashboard</h3>
+        <p>Welcome! You have full access.</p>
+        <slot name="content"></slot>
+      </div>
+    } @else {
+      <div class="unauthorized">
+        <h3>Access Denied</h3>
+        <p>You need the <code>admin.dashboard</code> permission to view this page.</p>
+        @if (showLogin) {
+          <button @click="goToLogin">Log In</button>
+        }
+      </div>
+    }
+  </div>
+</template>
+
+<script setup>
+  @prop showLogin: boolean = true;
+  @event loginrequested: void;
+  @slot content;
+
+  function goToLogin() {
+    $emit('loginrequested');
+  }
+</script>
+
+<style scoped>
+  .authorized { padding: 1.5rem; background: var(--pdx-color-success-soft); border-radius: 8px; }
+  .unauthorized { padding: 1.5rem; background: var(--pdx-color-danger-soft); border-radius: 8px; text-align: center; }
+  .unauthorized code { background: var(--pdx-color-inset); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.85rem; }
+  button { margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border: none; border-radius: 4px; cursor: pointer; }
+</style>

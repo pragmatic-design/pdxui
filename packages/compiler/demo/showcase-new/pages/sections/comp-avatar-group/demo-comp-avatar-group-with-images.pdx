@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Images</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Avatars with profile images.</p>
+    <div class="demo-container">
+      <pdx-avatar-group :items="imageItems" :max="4"></pdx-avatar-group>
+    </div>
+  </section>
+</template>
+
+<script setup>
+// Served by the app: public/avatars/, here and in packages/site, not by a third party — whose uptime
+// and privacy terms the page would depend on.
+const imageItems = [
+  { name: 'Alex', src: '/avatars/person-1.svg' },
+  { name: 'Beth', src: '/avatars/person-2.svg' },
+  { name: 'Chris', src: '/avatars/person-3.svg' },
+  { name: 'Diana', src: '/avatars/person-4.svg' },
+  { name: 'Evan', src: '/avatars/person-5.svg' },
+  { name: 'Fiona', src: '/avatars/person-6.svg' },
+];
+</script>

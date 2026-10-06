@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Step on the digit before the cursor</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>step-mode="caret"</code>: Arrow Up/Down (and the wheel) change the digit before the cursor —
+      <code>12|3</code> ↑ is 133, <code>1.2|5</code> ↑ is 1.35 — and the cursor stays on that digit, also when the
+      number gains one (99 → 109). <code>auto</code>, the default, is this without steppers and one <code>step</code> with them;
+      <code>fixed</code> is always one <code>step</code>.
+    </p>
+    <div class="demo-stack">
+      <pdx-form-field label="Caret mode, with steppers" hint="Put the cursor after a digit and press Arrow Up">
+        <pdx-number-input value="1234.56" step="0.01" precision="2" step-mode="caret"></pdx-number-input>
+      </pdx-form-field>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-number-input value="1234.56" step="0.01" precision="2" step-mode="caret"&gt;&lt;/pdx-number-input&gt;</code></pre>
+    </details>
+  </section>
+</template>

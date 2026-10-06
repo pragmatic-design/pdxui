@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Aspect Ratio</h2>
+    <p class="pdx-txt-small pdx-ink-muted">16/9, 4/3, 1/1 aspect ratios with fixed width.</p>
+    <div class="demo-row fit-demos">
+      <div class="fit-card">
+        <div class="fit-label pdx-txt-small pdx-ink-muted">16/9</div>
+        <pdx-image src="/demo-images/ocean.svg" alt="16:9" width="200px" ratio="16/9" :lazy="false"></pdx-image>
+      </div>
+      <div class="fit-card">
+        <div class="fit-label pdx-txt-small pdx-ink-muted">4/3</div>
+        <pdx-image src="/demo-images/desert.svg" alt="4:3" width="200px" ratio="4/3" :lazy="false"></pdx-image>
+      </div>
+      <div class="fit-card">
+        <div class="fit-label pdx-txt-small pdx-ink-muted">1/1</div>
+        <pdx-image src="/demo-images/city.svg" alt="1:1" width="150px" ratio="1/1" :lazy="false"></pdx-image>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-image src="..." width="200px" ratio="16/9"&gt;&lt;/pdx-image&gt;
+&lt;pdx-image src="..." width="200px" ratio="4/3"&gt;&lt;/pdx-image&gt;
+&lt;pdx-image src="..." width="150px" ratio="1/1"&gt;&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>

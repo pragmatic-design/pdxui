@@ -1,0 +1,276 @@
+/* Select / Combobox / MultiSelect dropdown */
+
+/* Host element */
+pdx-select {
+    display: block;
+    position: relative;
+}
+
+/* ── Trigger — reuses .pdx-input-wrap for sizing, border, focus ring, states ── */
+.pdx-select-trigger {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+.pdx-select-trigger.disabled { cursor: not-allowed; }
+.pdx-select-trigger.readonly { cursor: default; }
+
+/* Value display (non-searchable) */
+.pdx-select-value {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* No vertical padding: the trigger has a fixed height and centres the value. With the padding
+       the value box is ~40px tall and runs ~6px past a 29px trigger in the compact themes (fluent,
+       metro, corporate, cyberpunk). */
+    padding: 0;
+    line-height: var(--pdx-line-normal);
+}
+.pdx-select-placeholder {
+    color: var(--pdx-color-muted);
+}
+
+/* Search input inside trigger (searchable mode) */
+.pdx-select-search {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: var(--pdx-space-xs) 0;
+    font: inherit;
+    color: inherit;
+    line-height: var(--pdx-line-normal);
+    box-shadow: none;
+    border-radius: 0;
+}
+.pdx-select-search::placeholder { color: var(--pdx-color-muted); }
+
+/* Caret arrow — CSS-only icon, fully themeable via custom properties */
+.pdx-select-caret {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--pdx-select-caret-size, 1.25rem);
+    height: var(--pdx-select-caret-size, 1.25rem);
+    transition: transform var(--pdx-transition);
+    pointer-events: none;
+}
+/* Inline SVG styling */
+.pdx-select-caret svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--pdx-color-muted);
+    stroke-width: var(--pdx-select-caret-stroke, 2);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+/* Size-responsive caret */
+.pdx-input-xs .pdx-select-caret { width: 0.875rem; height: 0.875rem; }
+.pdx-input-sm .pdx-select-caret { width: 1rem; height: 1rem; }
+.pdx-input-lg .pdx-select-caret { width: 1.5rem; height: 1.5rem; }
+.pdx-input-xl .pdx-select-caret { width: 1.75rem; height: 1.75rem; }
+
+/* Open: the trigger is the combobox, or holds it — with a search field, the input is the combobox and
+   carries aria-expanded. */
+.pdx-select-trigger:is([aria-expanded="true"], :has([role="combobox"][aria-expanded="true"])) .pdx-select-caret {
+    transform: rotate(180deg);
+}
+
+/* ── Tags (multiple mode) ── */
+.pdx-select-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    padding: 0.15rem 0;
+}
+
+/* Multiple mode: auto-height trigger */
+.pdx-select-trigger.multiple {
+    height: auto;
+    min-height: 2.5rem;
+}
+.pdx-select-trigger.multiple.pdx-input-xs { min-height: 1.75rem; }
+.pdx-select-trigger.multiple.pdx-input-sm { min-height: 2.125rem; }
+.pdx-select-trigger.multiple.pdx-input-lg { min-height: 3rem; }
+.pdx-select-trigger.multiple.pdx-input-xl { min-height: 3.5rem; }
+
+/* Tag search input inline */
+.pdx-select-tag-search {
+    flex: 1 1 3rem;
+    min-width: 3rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.1rem 0;
+    font: inherit;
+    color: inherit;
+    line-height: var(--pdx-line-normal);
+    box-shadow: none;
+}
+.pdx-select-tag-search::placeholder { color: var(--pdx-color-muted); }
+
+/* ── Dropdown (positioned by usePopover — position/left/top set inline) ── */
+.pdx-select-dropdown {
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-float-radius);
+    box-shadow: var(--pdx-float-shadow);
+    overflow: hidden;
+    display: none;
+}
+.pdx-select-dropdown.open {
+    display: block;
+}
+
+/* ── Dropdown search input ── */
+.pdx-select-search-wrap {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+.pdx-select-dropdown-search {
+    display: block;
+    width: 100%;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-surface);
+    outline: none;
+}
+.pdx-select-dropdown-search:focus {
+    border-color: var(--pdx-color-primary);
+    box-shadow: var(--pdx-focus-ring);
+}
+.pdx-select-dropdown-search::placeholder {
+    color: var(--pdx-color-muted);
+}
+
+/* ── Listbox ── */
+.pdx-select-list {
+    max-height: 15rem;
+    overflow-y: auto;
+    padding: var(--pdx-space-2xs) 0;
+}
+
+/* Virtual scroll: fixed height container */
+.pdx-select-list.virtual {
+    overflow-y: auto;
+    position: relative;
+}
+
+/* ── Option ── */
+.pdx-select-option {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    line-height: 1;
+    color: var(--pdx-color-text);
+    transition: background var(--pdx-transition);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* The option's own 2rem, or the touch target when it is larger. */
+    min-height: max(2rem, var(--pdx-target-min));
+}
+.pdx-select-option:hover,
+.pdx-select-option.active {
+    background: var(--pdx-color-inset);
+}
+.pdx-select-option[aria-selected="true"] {
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-primary-ink);
+}
+.pdx-select-option[aria-disabled="true"] {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+}
+/* Check mark for single select */
+.pdx-select-option[aria-selected="true"]::after {
+    content: '\2713';
+    margin-left: auto;
+    font-size: 0.85em;
+    color: var(--pdx-color-primary-ink);
+}
+/* Hide checkmark in multi mode (checkbox used instead) */
+.pdx-select-list[aria-multiselectable="true"] .pdx-select-option[aria-selected="true"]::after {
+    display: none;
+}
+
+/* Checkbox in multi-select options */
+.pdx-select-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    border: 1.5px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    transition: background var(--pdx-transition), border-color var(--pdx-transition);
+}
+.pdx-select-option[aria-selected="true"] .pdx-select-check {
+    background: var(--pdx-color-primary);
+    border-color: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+.pdx-select-check svg {
+    width: 0.7rem;
+    height: 0.7rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+}
+.pdx-select-option[aria-selected="true"] .pdx-select-check svg {
+    opacity: 1;
+}
+
+/* ── Group header ── */
+.pdx-select-group-header {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    pointer-events: none;
+}
+.pdx-select-group-header:not(:first-child) {
+    margin-top: var(--pdx-space-xs);
+    border-top: var(--pdx-border-width) solid var(--pdx-color-border);
+    padding-top: var(--pdx-space-sm);
+}
+
+/* ── Empty state ── */
+.pdx-select-empty {
+    padding: var(--pdx-space-md);
+    text-align: center;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+}
+
+/* ── Mobile ── */
+@media (pointer: coarse) {
+    .pdx-select-option {
+        padding: var(--pdx-space-sm) var(--pdx-space-sm);
+    }
+    .pdx-select-list {
+        max-height: 50vh;
+    }
+}

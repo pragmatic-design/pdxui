@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Nested Splits (IDE Layout)</h2>
+    <div class="demo-split demo-split-tall">
+      <pdx-splitter orientation="horizontal" :panes="idePanesH">
+        <div class="pane-content pane-left">
+          <pdx-icon name="folder" size="18"></pdx-icon>
+          <span class="pdx-txt-small">Files</span>
+        </div>
+        <pdx-splitter orientation="vertical" :panes="idePanesV">
+          <div class="pane-content">
+            <pdx-icon name="code" size="18"></pdx-icon>
+            <span class="pdx-txt-small">Editor</span>
+          </div>
+          <div class="pane-content">
+            <pdx-icon name="terminal" size="18"></pdx-icon>
+            <span class="pdx-txt-small">Terminal</span>
+          </div>
+        </pdx-splitter>
+      </pdx-splitter>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const idePanesH = [
+  { min: 10, max: 30, defaultSize: 20 },
+  { min: 40 },
+];
+
+const idePanesV = [
+  { min: 20, defaultSize: 65 },
+  { min: 15, defaultSize: 35 },
+];
+</script>

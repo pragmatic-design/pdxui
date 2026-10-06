@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Action Link</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>.pdx-banner-action</code> for an underlined, semibold call-to-action.</p>
+
+    <div class="banner-demo">
+      <div class="pdx-banner pdx-banner-warning">
+        <span class="pdx-banner-icon">&#9888;</span>
+        <span class="pdx-banner-text">Your trial expires in 3 days.</span>
+        <a href="#" class="pdx-banner-action">Upgrade now</a>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-banner pdx-banner-warning"&gt;
+  &lt;span class="pdx-banner-text"&gt;Trial expires in 3 days.&lt;/span&gt;
+  &lt;a href="#" class="pdx-banner-action"&gt;Upgrade now&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

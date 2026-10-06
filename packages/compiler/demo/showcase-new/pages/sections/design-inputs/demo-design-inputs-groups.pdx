@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Input Groups</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Combine inputs with addons (labels, icons) or buttons. Joined borders.</p>
+
+    <div class="demo-stack narrow">
+      <div class="pdx-input-group">
+        <span class="pdx-input-addon">@</span>
+        <input class="pdx-input" type="text" placeholder="username" />
+      </div>
+
+      <div class="pdx-input-group">
+        <input class="pdx-input" type="text" placeholder="Search..." />
+        <button class="pdx-primary">Go</button>
+      </div>
+
+      <div class="pdx-input-group">
+        <span class="pdx-input-addon">https://</span>
+        <input class="pdx-input" type="text" placeholder="example.com" />
+        <span class="pdx-input-addon">/path</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-input-group"&gt;
+  &lt;span class="pdx-input-addon"&gt;@&lt;/span&gt;
+  &lt;input class="pdx-input" placeholder="username" /&gt;
+&lt;/div&gt;
+
+&lt;div class="pdx-input-group"&gt;
+  &lt;input class="pdx-input" placeholder="Search..." /&gt;
+  &lt;button class="pdx-primary"&gt;Go&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

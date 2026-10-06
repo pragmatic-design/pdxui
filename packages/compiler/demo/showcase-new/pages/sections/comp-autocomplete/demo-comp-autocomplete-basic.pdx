@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic — Local Suggestions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Pass an array of strings. Suggestions appear after typing.
+    </p>
+    <div class="demo-box">
+      <pdx-autocomplete
+        placeholder="Type a fruit..."
+        :suggestions="fruits"
+        clearable
+        @pdx-change="onFruitChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">Selected: {{ fruitValue }}</p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-autocomplete
+  placeholder="Type a fruit..."
+  :suggestions="['Apple', 'Banana', 'Cherry', ...]"
+  clearable
+  @pdx-change="onSelect" /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Basic fruits ───
+const fruits = ['Apple', 'Apricot', 'Avocado', 'Banana', 'Blackberry', 'Blueberry', 'Cherry', 'Coconut', 'Cranberry', 'Date', 'Dragon Fruit', 'Fig', 'Grape', 'Grapefruit', 'Guava', 'Kiwi', 'Lemon', 'Lime', 'Lychee', 'Mango', 'Melon', 'Nectarine', 'Orange', 'Papaya', 'Passion Fruit', 'Peach', 'Pear', 'Pineapple', 'Plum', 'Pomegranate', 'Raspberry', 'Strawberry', 'Watermelon'];
+
+let fruitValue = $signal('');
+
+function onFruitChange(e) { fruitValue = e.detail.value ?? e.detail; }
+</script>

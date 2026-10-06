@@ -1,0 +1,62 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">OTP Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-otp-input&gt;</code> — N-cell code entry for verification codes.
+      Auto-advance on type, paste spreads across cells, backspace navigates back.
+    </p>
+
+    <!-- Basic -->
+    <pdx-demo-comp-otp-basic class="demo-section"></pdx-demo-comp-otp-basic>
+
+    <!-- Separator -->
+    <pdx-demo-comp-otp-separator class="demo-section"></pdx-demo-comp-otp-separator>
+
+    <!-- States -->
+    <pdx-demo-comp-otp-states class="demo-section"></pdx-demo-comp-otp-states>
+
+    <!-- Sizes -->
+    <pdx-demo-comp-otp-sizes class="demo-section"></pdx-demo-comp-otp-sizes>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6)</span></div>
+        <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div>
+        <div class="opt-row"><code>separator</code><span>number</span><span>Add "-" separator every N cells</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Red border styling</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-input</code><span>On every cell change</span></div>
+        <div class="opt-row"><code>pdx-complete</code><span>All cells filled</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Action</span></div>
+        <div class="opt-row"><kbd>0-9</kbd><span>Enter digit, auto-advance</span></div>
+        <div class="opt-row"><kbd>Backspace</kbd><span>Clear current, move to previous</span></div>
+        <div class="opt-row"><kbd>Arrow Left/Right</kbd><span>Navigate between cells</span></div>
+        <div class="opt-row"><kbd>Ctrl+V</kbd><span>Paste spreads across cells</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/otp';
+@title 'OTP Input';
+</script>
+
+<style scoped>
+  .page { }
+</style>

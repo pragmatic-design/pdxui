@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5 sizes matching button sizes for perfect alignment in input groups.</p>
+
+    <div class="demo-stack">
+      <pdx-input size="xs" placeholder="Extra Small (xs)"></pdx-input>
+      <pdx-input size="sm" placeholder="Small (sm)"></pdx-input>
+      <pdx-input placeholder="Default (md)"></pdx-input>
+      <pdx-input size="lg" placeholder="Large (lg)"></pdx-input>
+      <pdx-input size="xl" placeholder="Extra Large (xl)"></pdx-input>
+    </div>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Size + Button alignment</h3>
+    <div class="demo-row">
+      <pdx-input size="xs" placeholder="Search..." style="flex:1"></pdx-input>
+      <pdx-button variant="solid" size="xs">Go</pdx-button>
+    </div>
+    <div class="demo-row" style="margin-top:var(--pdx-space-sm)">
+      <pdx-input size="sm" placeholder="Search..." style="flex:1"></pdx-input>
+      <pdx-button variant="solid" size="sm">Go</pdx-button>
+    </div>
+    <div class="demo-row" style="margin-top:var(--pdx-space-sm)">
+      <pdx-input placeholder="Search..." style="flex:1"></pdx-input>
+      <pdx-button variant="solid">Go</pdx-button>
+    </div>
+    <div class="demo-row" style="margin-top:var(--pdx-space-sm)">
+      <pdx-input size="lg" placeholder="Search..." style="flex:1"></pdx-input>
+      <pdx-button variant="solid" size="lg">Go</pdx-button>
+    </div>
+    <div class="demo-row" style="margin-top:var(--pdx-space-sm)">
+      <pdx-input size="xl" placeholder="Search..." style="flex:1"></pdx-input>
+      <pdx-button variant="solid" size="xl">Go</pdx-button>
+    </div>
+  </section>
+</template>

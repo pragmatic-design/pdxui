@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Group Bar (Drag & Drop)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Enable <code>show-group-bar</code> to show a drop zone above the grid.
+      Drag column headers to the bar to group. Remove chips to ungroup.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="groupDS" :columns="columns" :show-group-bar="true" :show-toolbar="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  show-group-bar show-toolbar
+  hover striped&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products, columns } from './state.pdx';
+
+const groupDS = createDataSource({ data: products.slice(), pageSize: 0 });
+</script>

@@ -1,0 +1,39 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sections</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Each section is optional. Body scrolls when content overflows.</p>
+
+    <div class="dialog-preview-bg">
+      <div class="pdx-dialog" style="max-width: 440px;">
+        <div class="pdx-dialog-header">
+          <h3 class="pdx-txt-subheading">Header with border</h3>
+        </div>
+        <div class="pdx-dialog-body" style="max-height: 120px; overflow-y: auto;">
+          <p class="pdx-txt-small">This body has limited height to demonstrate scrolling behavior. Add enough content and the body section will scroll independently while header and footer remain fixed.</p>
+          <p class="pdx-txt-small">Additional paragraph to show scroll. The dialog body handles overflow gracefully with its own scrollbar.</p>
+          <p class="pdx-txt-small">Third paragraph for extra length. Content keeps flowing within the constrained body area.</p>
+        </div>
+        <div class="pdx-dialog-footer">
+          <button class="pdx-ghost">Back</button>
+          <div style="flex:1"></div>
+          <button class="pdx-secondary">Skip</button>
+          <button class="pdx-primary">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-dialog-header"&gt;
+  &lt;h3&gt;Header with border&lt;/h3&gt;
+&lt;/div&gt;
+&lt;div class="pdx-dialog-body"&gt;
+  &lt;p&gt;Scrollable body content...&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="pdx-dialog-footer"&gt;
+  &lt;button class="pdx-ghost"&gt;Back&lt;/button&gt;
+  &lt;button class="pdx-primary"&gt;Next&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

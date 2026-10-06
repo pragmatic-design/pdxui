@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Auto-dismiss</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      This banner disappears 5 seconds after it is shown. <code>show()</code> brings it back and
+      starts the 5 seconds over.
+    </p>
+    <div class="demo-stack">
+      <pdx-banner variant="success" autoDismiss="5000" closable data-test="auto-dismiss" :ref="autoBanner">Auto-dismiss in 5 seconds...</pdx-banner>
+      <div>
+        <button type="button" class="pdx-outline" @click="showAgain">Show again</button>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-banner variant="success" autoDismiss="5000" closable :ref="banner"&gt;…&lt;/pdx-banner&gt;
+&lt;button @click="banner.show()"&gt;Show again&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let autoBanner = $signal(null);
+
+function showAgain() { autoBanner?.show(); }
+</script>

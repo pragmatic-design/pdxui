@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">CSS Only</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>.pdx-kbd</code> class on <code>&lt;kbd&gt;</code> elements.</p>
+    <div class="demo-row">
+      <kbd class="pdx-kbd">Ctrl</kbd>
+      <kbd class="pdx-kbd">Alt</kbd>
+      <kbd class="pdx-kbd">Del</kbd>
+    </div>
+    <div class="demo-row">
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd">⌘</kbd>
+        <kbd class="pdx-kbd">⇧</kbd>
+        <kbd class="pdx-kbd">F</kbd>
+      </span>
+    </div>
+  </section>
+</template>

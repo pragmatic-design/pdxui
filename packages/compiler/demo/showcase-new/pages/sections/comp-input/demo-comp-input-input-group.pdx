@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Input Group (CSS-only)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">External addons using <code>.pdx-input-group</code> + <code>.pdx-input-addon</code>. Works with both standalone and wrapper inputs.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-input-group">
+        <span class="pdx-input-addon">@</span>
+        <input class="pdx-input" placeholder="username" />
+      </div>
+      <div class="pdx-input-group">
+        <input class="pdx-input" placeholder="amount" />
+        <span class="pdx-input-addon">.00</span>
+        <button class="pdx-primary" style="border-radius:0 var(--pdx-radius-md) var(--pdx-radius-md) 0">Pay</button>
+      </div>
+    </div>
+  </section>
+</template>

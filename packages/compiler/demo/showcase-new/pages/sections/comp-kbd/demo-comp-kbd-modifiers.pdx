@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Modifier Symbols</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>symbols</code> prop replaces modifier names with symbols: Cmd→⌘, Alt→⌥, Ctrl→⌃, Shift→⇧.</p>
+    <div class="shortcut-list">
+      <div class="shortcut-row"><pdx-kbd keys="Cmd+C" symbols></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Copy (macOS)</span></div>
+      <div class="shortcut-row"><pdx-kbd keys="Cmd+Shift+P" symbols></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Command Palette</span></div>
+      <div class="shortcut-row"><pdx-kbd keys="Ctrl+Alt+Delete" symbols></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Task Manager</span></div>
+      <div class="shortcut-row"><pdx-kbd keys="Cmd+Option+Esc" symbols></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Force Quit</span></div>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">Comparison: text vs symbols</p>
+    <div class="demo-row">
+      <pdx-kbd keys="Cmd+Shift+F"></pdx-kbd>
+      <span class="pdx-txt-small pdx-ink-muted">→</span>
+      <pdx-kbd keys="Cmd+Shift+F" symbols></pdx-kbd>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-kbd keys="Cmd+C" symbols&gt;&lt;/pdx-kbd&gt;  &lt;!-- shows ⌘ C --&gt;
+&lt;pdx-kbd keys="Cmd+Shift+P" symbols&gt;&lt;/pdx-kbd&gt;  &lt;!-- shows ⌘ ⇧ P --&gt;</code></pre>
+    </details>
+  </section>
+</template>

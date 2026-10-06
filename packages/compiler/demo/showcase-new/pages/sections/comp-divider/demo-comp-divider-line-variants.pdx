@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Line Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>variant</code>: solid (default), dashed, dotted.</p>
+    <div class="demo-box">
+      <pdx-divider></pdx-divider>
+      <span class="pdx-txt-caption pdx-ink-muted">solid</span>
+      <pdx-divider variant="dashed"></pdx-divider>
+      <span class="pdx-txt-caption pdx-ink-muted">dashed</span>
+      <pdx-divider variant="dotted"></pdx-divider>
+      <span class="pdx-txt-caption pdx-ink-muted">dotted</span>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Fade Animation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Crossfade between slides instead of sliding.</p>
+    <div class="demo-container">
+      <pdx-carousel :items="basicSlides" animation="fade"></pdx-carousel>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-carousel :items="slides" animation="fade"&gt;&lt;/pdx-carousel&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicSlides } from './state.pdx';
+</script>

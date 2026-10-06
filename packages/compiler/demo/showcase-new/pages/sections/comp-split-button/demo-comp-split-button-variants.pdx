@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <div class="demo-row">
+      <pdx-split-button label="Primary" icon="save" variant="primary" :items="saveItems"></pdx-split-button>
+      <pdx-split-button label="Secondary" variant="secondary" :items="saveItems"></pdx-split-button>
+      <pdx-split-button label="Outline" variant="outline" :items="saveItems"></pdx-split-button>
+      <pdx-split-button label="Danger" icon="trash" variant="danger" :items="deleteItems"></pdx-split-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const saveItems = [
+  { key: 'save-as', label: 'Save As...', icon: 'file-text' },
+  { key: 'save-copy', label: 'Save a Copy', icon: 'copy' },
+  { key: 'sep', type: 'separator' },
+  { key: 'export', label: 'Export', icon: 'download' },
+];
+
+const deleteItems = [
+  { key: 'trash', label: 'Move to Trash', icon: 'trash' },
+  { key: 'delete-perm', label: 'Delete Permanently', icon: 'x-circle', danger: true },
+];
+</script>

@@ -1,0 +1,306 @@
+/* Popover — floating surface with optional arrow.
+   12 placement positions, fade+scale animation, theme-aware.
+
+   CSS provides: visual surface, arrow, placement classes, animation.
+   JS (future WC) provides: dynamic positioning, flip/shift, open/close behavior.
+
+   Usage (static):
+     <div class="pdx-popover pdx-popover-bottom" data-open>
+       <div class="pdx-popover-arrow"></div>
+       Content here
+     </div>
+
+   Usage (WC will set inline styles for position):
+     <div class="pdx-popover" data-open style="top:120px;left:300px">
+       Content
+     </div>
+
+   Placements: top, top-start, top-end, bottom, bottom-start, bottom-end,
+               left, left-start, left-end, right, right-start, right-end
+*/
+
+/* ===== Base Surface ===== */
+
+.pdx-popover {
+    position: absolute;
+    z-index: calc(var(--pdx-z-overlay, 40) + 2);
+    background: var(--pdx-color-overlay, var(--pdx-color-surface));
+    color: var(--pdx-color-text);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-float-radius);
+    box-shadow: var(--pdx-float-shadow);
+    padding: var(--pdx-space-md);
+    min-width: 8rem;
+    max-width: 24rem;
+
+    /* Hidden by default — and this rule is also the CLOSING transition, which is why it eases
+       differently from the open state below. Material 3: entering decelerates into place,
+       leaving accelerates away, because a thing going away does not need to be watched. */
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition: opacity var(--pdx-duration-fast) var(--pdx-ease-accelerate),
+                transform var(--pdx-duration-fast) var(--pdx-ease-accelerate),
+                visibility 0ms var(--pdx-duration-fast);
+}
+
+.pdx-popover[data-open] {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition: opacity var(--pdx-duration-fast) var(--pdx-ease, ease),
+                transform var(--pdx-duration-fast) var(--pdx-ease, ease),
+                visibility 0ms;
+}
+
+/* No padding variant — for menus/lists that handle their own padding */
+.pdx-popover-bare {
+    padding: 0;
+}
+
+/* ===== Arrow ===== */
+
+.pdx-popover-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: inherit;
+    border: inherit;
+    border-radius: 1px;
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+/* Arrow placement — positioned by parent's placement class */
+
+/* Bottom placements → arrow on top */
+.pdx-popover-bottom > .pdx-popover-arrow,
+.pdx-popover-bottom-start > .pdx-popover-arrow,
+.pdx-popover-bottom-end > .pdx-popover-arrow {
+    top: -5px;
+    border-bottom: none;
+    border-right: none;
+}
+
+/* Top placements → arrow on bottom */
+.pdx-popover-top > .pdx-popover-arrow,
+.pdx-popover-top-start > .pdx-popover-arrow,
+.pdx-popover-top-end > .pdx-popover-arrow {
+    bottom: -5px;
+    border-top: none;
+    border-left: none;
+}
+
+/* Left/Right arrows — hidden in CSS-only mode (diamond artifact).
+   WC will use SVG arrow for pixel-perfect placement on all sides. */
+.pdx-popover-right > .pdx-popover-arrow,
+.pdx-popover-right-start > .pdx-popover-arrow,
+.pdx-popover-right-end > .pdx-popover-arrow,
+.pdx-popover-left > .pdx-popover-arrow,
+.pdx-popover-left-start > .pdx-popover-arrow,
+.pdx-popover-left-end > .pdx-popover-arrow {
+    display: none;
+}
+
+/* Arrow centering */
+.pdx-popover-top > .pdx-popover-arrow,
+.pdx-popover-bottom > .pdx-popover-arrow {
+    left: 50%;
+    margin-left: -5px;
+}
+
+.pdx-popover-top-start > .pdx-popover-arrow,
+.pdx-popover-bottom-start > .pdx-popover-arrow {
+    left: var(--pdx-space-lg);
+}
+
+.pdx-popover-top-end > .pdx-popover-arrow,
+.pdx-popover-bottom-end > .pdx-popover-arrow {
+    right: var(--pdx-space-lg);
+    left: auto;
+}
+
+.pdx-popover-left > .pdx-popover-arrow,
+.pdx-popover-right > .pdx-popover-arrow {
+    top: 50%;
+    margin-top: -5px;
+}
+
+.pdx-popover-left-start > .pdx-popover-arrow,
+.pdx-popover-right-start > .pdx-popover-arrow {
+    top: var(--pdx-space-lg);
+}
+
+.pdx-popover-left-end > .pdx-popover-arrow,
+.pdx-popover-right-end > .pdx-popover-arrow {
+    bottom: var(--pdx-space-lg);
+    top: auto;
+}
+
+/* Corner arrows — rotated square at the corner, pointing diagonally toward trigger.
+   The popover clips the inner half via overflow:hidden on a wrapper.
+   For CSS-only we accept a simpler approach: no arrow on corners.
+   The WC will handle diagonal arrows with JS positioning.
+   For now, hide cleanly — corners look good without arrow. */
+.pdx-popover-top-left > .pdx-popover-arrow,
+.pdx-popover-top-right > .pdx-popover-arrow,
+.pdx-popover-bottom-left > .pdx-popover-arrow,
+.pdx-popover-bottom-right > .pdx-popover-arrow {
+    display: none;
+}
+
+/* ===== Animation origin per placement ===== */
+
+.pdx-popover-top,
+.pdx-popover-top-start,
+.pdx-popover-top-end {
+    transform-origin: bottom center;
+}
+
+.pdx-popover-bottom,
+.pdx-popover-bottom-start,
+.pdx-popover-bottom-end {
+    transform-origin: top center;
+}
+
+.pdx-popover-left,
+.pdx-popover-left-start,
+.pdx-popover-left-end {
+    transform-origin: right center;
+}
+
+.pdx-popover-right,
+.pdx-popover-right-start,
+.pdx-popover-right-end {
+    transform-origin: left center;
+}
+
+/* Corner placements — origin at the facing corner */
+.pdx-popover-top-left    { transform-origin: bottom right; }
+.pdx-popover-top-right   { transform-origin: bottom left; }
+.pdx-popover-bottom-left { transform-origin: top right; }
+.pdx-popover-bottom-right { transform-origin: top left; }
+
+/* ===== WC-based popover (pdx-popover) ===== */
+
+pdx-popover {
+    display: contents;
+}
+
+.pdx-popover-float {
+    position: fixed;
+    padding: var(--pdx-space-md);
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-float-radius);
+    box-shadow: var(--pdx-float-shadow);
+    max-width: 320px;
+}
+
+/* The dialog takes focus itself when nothing inside it can (pdx-popover.ts), so a screen reader
+   announces it and the next Tab starts inside. It is not a control: no ring around the whole panel.
+   The controls inside draw their own. */
+.pdx-popover-float:focus-visible {
+    outline: none;
+}
+
+/* ===== Static Placement Classes ===== */
+/* Used for CSS-only demos. WC overrides with inline styles. */
+
+/* Wrapper: trigger + popover together */
+.pdx-popover-trigger {
+    position: relative;
+    display: inline-block;
+}
+
+/* Gap between trigger and popover */
+:root { --_popover-gap: 8px; }
+
+/* Bottom (default) */
+.pdx-popover-bottom {
+    top: calc(100% + var(--_popover-gap));
+    left: 50%;
+    translate: -50% 0;
+}
+.pdx-popover-bottom-start {
+    top: calc(100% + var(--_popover-gap));
+    left: 0;
+}
+.pdx-popover-bottom-end {
+    top: calc(100% + var(--_popover-gap));
+    right: 0;
+    left: auto;
+}
+
+/* Top */
+.pdx-popover-top {
+    bottom: calc(100% + var(--_popover-gap));
+    left: 50%;
+    translate: -50% 0;
+}
+.pdx-popover-top-start {
+    bottom: calc(100% + var(--_popover-gap));
+    left: 0;
+}
+.pdx-popover-top-end {
+    bottom: calc(100% + var(--_popover-gap));
+    right: 0;
+    left: auto;
+}
+
+/* Right */
+.pdx-popover-right {
+    left: calc(100% + var(--_popover-gap));
+    top: 50%;
+    translate: 0 -50%;
+}
+.pdx-popover-right-start {
+    left: calc(100% + var(--_popover-gap));
+    top: 0;
+}
+.pdx-popover-right-end {
+    left: calc(100% + var(--_popover-gap));
+    bottom: 0;
+    top: auto;
+}
+
+/* Left */
+.pdx-popover-left {
+    right: calc(100% + var(--_popover-gap));
+    top: 50%;
+    translate: 0 -50%;
+}
+.pdx-popover-left-start {
+    right: calc(100% + var(--_popover-gap));
+    top: 0;
+}
+.pdx-popover-left-end {
+    right: calc(100% + var(--_popover-gap));
+    bottom: 0;
+    top: auto;
+}
+
+/* ===== Corner / Diagonal Placements ===== */
+/* Container position describes where the popover sits relative to trigger corner */
+
+.pdx-popover-bottom-right {
+    top: calc(100% + var(--_popover-gap));
+    left: calc(100% + var(--_popover-gap));
+}
+
+.pdx-popover-bottom-left {
+    top: calc(100% + var(--_popover-gap));
+    right: calc(100% + var(--_popover-gap));
+    left: auto;
+}
+
+.pdx-popover-top-right {
+    bottom: calc(100% + var(--_popover-gap));
+    left: calc(100% + var(--_popover-gap));
+}
+
+.pdx-popover-top-left {
+    bottom: calc(100% + var(--_popover-gap));
+    right: calc(100% + var(--_popover-gap));
+    left: auto;
+}

@@ -1,0 +1,41 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Form Actions</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-form-actions&gt;</code> — the submit/reset button bar for a form. Inside a
+      <code>&lt;pdx-form&gt;</code> it auto-wires submit and reset; standalone it renders the buttons
+      with configurable labels, alignment and an optional loading state. Slot in your own buttons
+      to fully customise it.
+    </p>
+
+    <pdx-demo-comp-form-actions-default class="demo-section"></pdx-demo-comp-form-actions-default>
+
+    <pdx-demo-comp-form-actions-alignment class="demo-section"></pdx-demo-comp-form-actions-alignment>
+
+    <pdx-demo-comp-form-actions-submit-only class="demo-section"></pdx-demo-comp-form-actions-submit-only>
+
+    <pdx-demo-comp-form-actions-custom-buttons class="demo-section"></pdx-demo-comp-form-actions-custom-buttons>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>submit-label</code><span>string</span><span>Submit button text (i18n default if unset)</span></div>
+        <div class="opt-row"><code>reset-label</code><span>string</span><span>Reset button text; <code>"none"</code> hides it</span></div>
+        <div class="opt-row"><code>align</code><span>string</span><span>start · center · end (default) · between</span></div>
+        <div class="opt-row"><code>show-loading</code><span>boolean</span><span>Spinner on submit while the form is submitting (default true)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/form-actions';
+@title 'Form Actions';
+let _pdxKeep = $signal(0);
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+</style>

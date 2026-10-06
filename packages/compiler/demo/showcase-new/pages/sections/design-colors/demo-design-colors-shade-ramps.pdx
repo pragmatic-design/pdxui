@@ -1,0 +1,162 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Shade Ramps</h2>
+    <p class="pdx-txt-small pdx-ink-muted">10-step lightness scale for each semantic color. OKLCH: same hue & chroma, vary lightness from 0.97 (lightest) to 0.22 (darkest). Like the gray scale but for every color.</p>
+
+    <div class="ramp-section">
+      <span class="pdx-txt-label pdx-ink-primary ramp-label">Primary</span>
+      <div class="color-ramp">
+        <div class="ramp-chip" style="background:var(--pdx-primary-50)"><span class="ramp-num dark-text">50</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-100)"><span class="ramp-num dark-text">100</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-200)"><span class="ramp-num dark-text">200</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-300)"><span class="ramp-num dark-text">300</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-400)"><span class="ramp-num light-text">400</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-500)"><span class="ramp-num light-text">500</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-600)"><span class="ramp-num light-text">600</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-700)"><span class="ramp-num light-text">700</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-800)"><span class="ramp-num light-text">800</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-primary-900)"><span class="ramp-num light-text">900</span></div>
+      </div>
+    </div>
+
+    <div class="ramp-section">
+      <span class="pdx-txt-label pdx-ink-secondary ramp-label">Secondary</span>
+      <div class="color-ramp">
+        <div class="ramp-chip" style="background:var(--pdx-secondary-50)"><span class="ramp-num dark-text">50</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-100)"><span class="ramp-num dark-text">100</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-200)"><span class="ramp-num dark-text">200</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-300)"><span class="ramp-num dark-text">300</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-400)"><span class="ramp-num light-text">400</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-500)"><span class="ramp-num light-text">500</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-600)"><span class="ramp-num light-text">600</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-700)"><span class="ramp-num light-text">700</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-800)"><span class="ramp-num light-text">800</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-secondary-900)"><span class="ramp-num light-text">900</span></div>
+      </div>
+    </div>
+
+    <div class="ramp-section">
+      <span class="pdx-txt-label pdx-ink-accent ramp-label">Accent</span>
+      <div class="color-ramp">
+        <div class="ramp-chip" style="background:var(--pdx-accent-50)"><span class="ramp-num dark-text">50</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-100)"><span class="ramp-num dark-text">100</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-200)"><span class="ramp-num dark-text">200</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-300)"><span class="ramp-num dark-text">300</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-400)"><span class="ramp-num light-text">400</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-500)"><span class="ramp-num light-text">500</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-600)"><span class="ramp-num light-text">600</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-700)"><span class="ramp-num light-text">700</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-800)"><span class="ramp-num light-text">800</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-accent-900)"><span class="ramp-num light-text">900</span></div>
+      </div>
+    </div>
+
+    <div class="ramp-section">
+      <span class="pdx-txt-label pdx-ink-danger ramp-label">Danger</span>
+      <div class="color-ramp">
+        <div class="ramp-chip" style="background:var(--pdx-danger-50)"><span class="ramp-num dark-text">50</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-100)"><span class="ramp-num dark-text">100</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-200)"><span class="ramp-num dark-text">200</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-300)"><span class="ramp-num dark-text">300</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-400)"><span class="ramp-num light-text">400</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-500)"><span class="ramp-num light-text">500</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-600)"><span class="ramp-num light-text">600</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-700)"><span class="ramp-num light-text">700</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-800)"><span class="ramp-num light-text">800</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-danger-900)"><span class="ramp-num light-text">900</span></div>
+      </div>
+    </div>
+
+    <div class="ramp-section">
+      <span class="pdx-txt-label pdx-ink-success ramp-label">Success</span>
+      <div class="color-ramp">
+        <div class="ramp-chip" style="background:var(--pdx-success-50)"><span class="ramp-num dark-text">50</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-100)"><span class="ramp-num dark-text">100</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-200)"><span class="ramp-num dark-text">200</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-300)"><span class="ramp-num dark-text">300</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-400)"><span class="ramp-num light-text">400</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-500)"><span class="ramp-num light-text">500</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-600)"><span class="ramp-num light-text">600</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-700)"><span class="ramp-num light-text">700</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-800)"><span class="ramp-num light-text">800</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-success-900)"><span class="ramp-num light-text">900</span></div>
+      </div>
+    </div>
+
+    <div class="ramp-section">
+      <span class="pdx-txt-label pdx-ink-warning ramp-label">Warning</span>
+      <div class="color-ramp">
+        <div class="ramp-chip" style="background:var(--pdx-warning-50)"><span class="ramp-num dark-text">50</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-100)"><span class="ramp-num dark-text">100</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-200)"><span class="ramp-num dark-text">200</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-300)"><span class="ramp-num dark-text">300</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-400)"><span class="ramp-num dark-text">400</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-500)"><span class="ramp-num dark-text">500</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-600)"><span class="ramp-num light-text">600</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-700)"><span class="ramp-num light-text">700</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-800)"><span class="ramp-num light-text">800</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-warning-900)"><span class="ramp-num light-text">900</span></div>
+      </div>
+    </div>
+
+    <div class="ramp-section">
+      <span class="pdx-txt-label pdx-ink-info ramp-label">Info</span>
+      <div class="color-ramp">
+        <div class="ramp-chip" style="background:var(--pdx-info-50)"><span class="ramp-num dark-text">50</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-100)"><span class="ramp-num dark-text">100</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-200)"><span class="ramp-num dark-text">200</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-300)"><span class="ramp-num dark-text">300</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-400)"><span class="ramp-num light-text">400</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-500)"><span class="ramp-num light-text">500</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-600)"><span class="ramp-num light-text">600</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-700)"><span class="ramp-num light-text">700</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-800)"><span class="ramp-num light-text">800</span></div>
+        <div class="ramp-chip" style="background:var(--pdx-info-900)"><span class="ramp-num light-text">900</span></div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>/* OKLCH shade ramp: vary Lightness, keep Chroma + Hue constant */
+--pdx-primary-50:  oklch(0.97 0.03 var(--pdx-hue-primary));  /* lightest */
+--pdx-primary-100: oklch(0.93 0.06 var(--pdx-hue-primary));
+--pdx-primary-200: oklch(0.86 0.10 var(--pdx-hue-primary));
+  ...
+--pdx-primary-500: oklch(0.55 0.18 var(--pdx-hue-primary));
+  ...
+--pdx-primary-900: oklch(0.22 0.10 var(--pdx-hue-primary));  /* darkest */
+
+/* Use ramp tokens for tinted backgrounds, subtle borders, etc. */
+.alert-danger {
+  background: var(--pdx-danger-50);
+  border-left: 3px solid var(--pdx-danger-500);
+  color: var(--pdx-danger-800);
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Shade ramps */
+  .ramp-section { margin-bottom: var(--pdx-space-md); }
+  .ramp-label { margin-bottom: var(--pdx-space-2xs); display: block; }
+  .color-ramp {
+    display: flex;
+    gap: 0;
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--pdx-color-border);
+  }
+  .ramp-chip {
+    flex: 1;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ramp-num {
+    font-size: 10px;
+    font-weight: var(--pdx-weight-semibold);
+    font-family: var(--pdx-font-mono);
+  }
+</style>

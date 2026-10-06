@@ -1,0 +1,60 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Header, Body, Footer</h2>
+    <p class="pdx-txt-small pdx-ink-muted">All three sections are optional. Body scrolls independently.</p>
+
+    <div class="drawer-preview" style="height: 280px;">
+      <div class="pdx-drawer drawer-left" style="width: 240px;">
+        <div class="pdx-drawer-header">
+          <h3 class="pdx-txt-small" style="margin:0; font-weight: var(--pdx-weight-semibold);">Filters</h3>
+        </div>
+        <div class="pdx-drawer-body" style="overflow-y: auto;">
+          <p class="pdx-txt-small pdx-ink-muted">Status</p>
+          <div class="filter-group">
+            <label class="pdx-txt-small"><input type="checkbox" checked /> Active</label>
+            <label class="pdx-txt-small"><input type="checkbox" /> Archived</label>
+            <label class="pdx-txt-small"><input type="checkbox" checked /> Draft</label>
+          </div>
+          <p class="pdx-txt-small pdx-ink-muted" style="margin-top: var(--pdx-space-md);">Category</p>
+          <div class="filter-group">
+            <label class="pdx-txt-small"><input type="checkbox" checked /> Design</label>
+            <label class="pdx-txt-small"><input type="checkbox" /> Engineering</label>
+            <label class="pdx-txt-small"><input type="checkbox" /> Marketing</label>
+          </div>
+        </div>
+        <div class="pdx-drawer-footer">
+          <button class="pdx-ghost" size="sm">Reset</button>
+          <button class="pdx-primary" size="sm">Apply</button>
+        </div>
+      </div>
+      <div class="drawer-content-area">
+        <span class="pdx-txt-small pdx-ink-muted">Content area</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-drawer"&gt;
+  &lt;div class="pdx-drawer-header"&gt;
+    &lt;h3&gt;Filters&lt;/h3&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-drawer-body"&gt;
+    &lt;!-- scrollable filter content --&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-drawer-footer"&gt;
+    &lt;button class="pdx-ghost"&gt;Reset&lt;/button&gt;
+    &lt;button class="pdx-primary"&gt;Apply&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Filter group */
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

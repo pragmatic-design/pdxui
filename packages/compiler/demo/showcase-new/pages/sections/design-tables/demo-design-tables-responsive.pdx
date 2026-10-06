@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Responsive</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Wrap a wide table in <code>.pdx-table-responsive</code>: it scrolls sideways inside the wrapper
+      instead of widening the page. Narrow the window to see it.
+    </p>
+
+    <div class="pdx-table-responsive">
+      <table class="pdx-table pdx-table-compact">
+        <thead>
+          <tr><th>SKU</th><th>Product</th><th>Category</th><th>Warehouse</th><th>Stock</th><th>Reorder at</th><th>Supplier</th><th>Last order</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>A-1001</td><td>Standing desk</td><td>Furniture</td><td>Milan North</td><td>42</td><td>10</td><td>Nordic Office Supply</td><td>2026-08-28</td></tr>
+          <tr><td>A-1002</td><td>Monitor arm</td><td>Accessories</td><td>Milan North</td><td>118</td><td>25</td><td>ErgoParts Ltd</td><td>2026-09-02</td></tr>
+          <tr><td>A-1003</td><td>Task chair</td><td>Furniture</td><td>Turin East</td><td>7</td><td>12</td><td>Nordic Office Supply</td><td>2026-07-19</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-table-responsive"&gt;
+  &lt;table class="pdx-table"&gt;...&lt;/table&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

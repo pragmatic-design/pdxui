@@ -1,0 +1,60 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Shortcut reference card.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Keyboard Shortcuts</h3>
+      <div class="shortcut-list">
+        <div class="shortcut-row">
+          <span class="pdx-txt-small">Save</span>
+          <span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">S</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="pdx-txt-small">Undo</span>
+          <span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">Z</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="pdx-txt-small">Redo</span>
+          <span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">Shift</kbd><kbd class="pdx-kbd pdx-kbd-sm">Z</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="pdx-txt-small">Command palette</span>
+          <span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">Shift</kbd><kbd class="pdx-kbd pdx-kbd-sm">P</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="pdx-txt-small">Search</span>
+          <span class="pdx-kbd-combo"><kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd><kbd class="pdx-kbd pdx-kbd-sm">K</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="pdx-txt-small">Go to issues</span>
+          <span class="pdx-kbd-seq"><kbd class="pdx-kbd pdx-kbd-sm">g</kbd><kbd class="pdx-kbd pdx-kbd-sm">i</kbd></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    max-width: 400px;
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-md); }
+  .shortcut-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .shortcut-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--pdx-space-xs) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .shortcut-row:last-child { border-bottom: none; }
+</style>

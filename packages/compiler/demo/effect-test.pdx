@@ -1,0 +1,34 @@
+<template>
+  <div class="effect-demo">
+    <h3>Effect/Lifecycle Test</h3>
+    <div>Count: {{ count }}</div>
+    <div>Doubled: {{ doubled }}</div>
+    <div>Mount message: {{ mountMsg }}</div>
+    <button @click="inc">+</button>
+  </div>
+</template>
+
+<script setup>
+  @prop initial: number = 0;
+
+  let count = $signal(0);
+  let mountMsg = $signal('not mounted');
+  const doubled = $derived(count * 2);
+
+  function inc() { count++; }
+
+  onMount(() => {
+    count = initial;
+    mountMsg = 'mounted with ' + initial;
+  });
+
+  $effect(() => {
+    if (count > 10) {
+      console.log('count exceeded 10:', count);
+    }
+  });
+</script>
+
+<style scoped>
+  .effect-demo { padding: 1rem; background: white; border-radius: 8px; }
+</style>

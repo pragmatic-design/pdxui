@@ -1,0 +1,150 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Neumorphic Theme
+   Soft shadows, muted palette, pillowy surfaces.
+   ========================================================================== */
+
+[pdx-theme="neumorphic"] {
+    --pdx-hue-primary: 260;
+    --pdx-hue-accent:  220;
+
+    --pdx-color-primary:       oklch(0.555 0.10 260);
+    --pdx-color-primary-hover: oklch(0.58 0.12 260);
+    --pdx-color-primary-text:  oklch(0.98 0.01 260);
+    --pdx-color-accent:        oklch(0.68 0.08 220);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.65 0.10 260);
+
+    /* Off-white grays (#e0e5ec range) — room to go lighter AND darker for dual shadows */
+    --pdx-gray-50:  oklch(0.935 0.005 260);
+    --pdx-gray-100: oklch(0.915 0.006 260);
+    --pdx-gray-200: oklch(0.88  0.006 260);
+    --pdx-gray-800: oklch(0.30  0.008 260);
+    --pdx-gray-900: oklch(0.25  0.006 260);
+    --pdx-gray-950: oklch(0.20  0.005 260);
+
+    --pdx-font-sans:    'Quicksand', system-ui, sans-serif;
+    --pdx-font-heading: 'Quicksand', system-ui, sans-serif;
+
+    /* Very round */
+    --pdx-radius-sm:  0.75rem;
+    --pdx-radius-md:  1rem;
+    --pdx-radius-lg:  1.5rem;
+    --pdx-radius-xl:  2rem;
+
+    --pdx-density-factor: 1.15;
+
+    /* The rendered height is `min-height × --pdx-density-factor`, and this theme declares no
+       control height of its own: the inherited 2.5rem default would render at 46px. Dividing the
+       factor out gives the 40px the default means. The rule across the design system is that
+       the factor governs SPACING, not control height — a theme that wants different controls
+       declares them. */
+    --pdx-button-min-height: calc(2.5rem / 1.15);   /* 40px at this theme's density */
+    --pdx-input-min-height:  calc(2.5rem / 1.15);   /* the same, so a row of both aligns */
+
+    /* Neumorphic double shadows: light above, dark below */
+    --pdx-shadow-color: oklch(0 0 0 / 0.06);
+    --pdx-shadow-sm:  -2px -2px 4px oklch(1 0 0 / 0.7), 2px 2px 4px oklch(0 0 0 / 0.06);
+    --pdx-shadow-md:  -4px -4px 8px oklch(1 0 0 / 0.7), 4px 4px 8px oklch(0 0 0 / 0.08);
+    --pdx-shadow-lg:  -6px -6px 12px oklch(1 0 0 / 0.7), 6px 6px 12px oklch(0 0 0 / 0.10);
+    --pdx-shadow-xl:  -8px -8px 16px oklch(1 0 0 / 0.7), 8px 8px 16px oklch(0 0 0 / 0.12);
+
+    /* Neumorphic behavior tokens */
+    --pdx-button-radius: var(--pdx-radius-lg);
+    --pdx-input-style: outlined;
+    --pdx-card-style: flat;
+    --pdx-tab-indicator: pill;
+}
+
+/* Tab: inset shadow on active (pressed feel) */
+[pdx-theme="neumorphic"] .pdx-tabs:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border-bottom: none;
+    gap: var(--pdx-space-xs);
+}
+[pdx-theme="neumorphic"] .pdx-tab:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border-bottom: none;
+    border-radius: var(--pdx-radius-md);
+}
+[pdx-theme="neumorphic"] .pdx-tab.active:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)),
+[pdx-theme="neumorphic"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border-bottom: none;
+    box-shadow: inset 2px 2px 4px oklch(0 0 0 / 0.08), inset -1px -1px 3px oklch(1 0 0 / 0.6);
+    background: var(--pdx-color-inset);
+}
+
+/* ── Breadcrumb: soft dot separator ── */
+[pdx-theme="neumorphic"] .pdx-breadcrumb:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) { --pdx-breadcrumb-separator: '•'; }
+[pdx-theme="neumorphic"] .pdx-breadcrumb > *:not(:last-child):not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *))::after {
+    font-size: 0.8em;
+    color: var(--pdx-color-muted);
+}
+
+/* ── Accordion: pillowy, inset shadow when open ── */
+[pdx-theme="neumorphic"] details.pdx-accordion:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border: none;
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-sm);
+    background: var(--pdx-color-surface);
+}
+[pdx-theme="neumorphic"] details.pdx-accordion summary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *))::after {
+    content: '▾';
+    font-size: 1em;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease-decelerate);
+}
+[pdx-theme="neumorphic"] details.pdx-accordion[open] summary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *))::after {
+    transform: rotate(180deg);
+}
+[pdx-theme="neumorphic"] details.pdx-accordion[open]:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    box-shadow: inset 2px 2px 5px oklch(0 0 0 / 0.06), inset -2px -2px 5px oklch(1 0 0 / 0.5);
+}
+
+/* ── Table: soft header, no uppercase ── */
+[pdx-theme="neumorphic"] .pdx-table th:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    --pdx-table-header-transform: none;
+    --pdx-table-header-letter-spacing: normal;
+    --pdx-table-header-weight: var(--pdx-weight-medium);
+    --pdx-table-header-color: var(--pdx-color-muted);
+    --pdx-table-header-border-width: var(--pdx-border-width-focus);
+    --pdx-table-header-border-color: var(--pdx-color-border);
+}
+[pdx-theme="neumorphic"] .pdx-table td:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border-bottom-color: light-dark(oklch(0.92 0.004 260), oklch(0.28 0.006 260));
+}
+
+/* ── Card: neumorphic raised surface ── */
+[pdx-theme="neumorphic"] .pdx-surface-card:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border: none;
+    box-shadow: var(--pdx-shadow-md);
+}
+[pdx-theme="neumorphic"] .pdx-surface-card[interactive]:hover:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    box-shadow: var(--pdx-shadow-lg);
+}
+
+/* ── Input: inset shadow (pressed feel) — both standalone and wrapper ── */
+[pdx-theme="neumorphic"] :is(.pdx-input:not(.pdx-input-wrap > *), .pdx-input-wrap):not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border-color: transparent;
+    background: var(--pdx-color-bg);
+    box-shadow: inset 2px 2px 5px oklch(0 0 0 / 0.07), inset -2px -2px 4px oklch(1 0 0 / 0.6);
+}
+[pdx-theme="neumorphic"] :is(.pdx-input:not(.pdx-input-wrap > *):focus-visible, .pdx-input-wrap:focus-within):not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border-color: var(--pdx-color-primary);
+    box-shadow: inset 2px 2px 5px oklch(0 0 0 / 0.07), inset -2px -2px 4px oklch(1 0 0 / 0.6),
+                0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.15);
+}
+
+/* ── Button: raised neumorphic surface ── */
+[pdx-theme="neumorphic"] .pdx-primary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    box-shadow: var(--pdx-shadow-sm);
+}
+[pdx-theme="neumorphic"] .pdx-primary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    --pdx-button-hover-shadow: var(--pdx-shadow-md);
+}
+[pdx-theme="neumorphic"] .pdx-primary:active:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    box-shadow: inset 2px 2px 4px oklch(0 0 0 / 0.1), inset -1px -1px 3px oklch(1 0 0 / 0.4);
+}
+[pdx-theme="neumorphic"] .pdx-secondary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    border: none;
+    box-shadow: var(--pdx-shadow-sm);
+}
+[pdx-theme="neumorphic"] .pdx-secondary:hover:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    box-shadow: var(--pdx-shadow-md);
+}

@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <div class="demo-stack">
+      <pdx-banner variant="info">This is an informational message.</pdx-banner>
+      <pdx-banner variant="success">Operation completed successfully!</pdx-banner>
+      <pdx-banner variant="warning">Please review your settings before continuing.</pdx-banner>
+      <pdx-banner variant="danger">An error occurred while saving.</pdx-banner>
+    </div>
+  </section>
+</template>

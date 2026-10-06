@@ -1,0 +1,80 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">3. Validation Modes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>validateOn</code> controls when validation runs: <code>onBlur</code> (default), <code>onChange</code>, or <code>onSubmit</code>.
+    </p>
+
+    <div class="demo-grid">
+      <div class="demo-card">
+        <h3 class="pdx-txt-small pdx-weight-semibold">onBlur (default)</h3>
+        <pdx-form :form="blurForm">
+          <pdx-form-field name="email" label="Email" required>
+            <pdx-input name="email" placeholder="Validate on blur"></pdx-input>
+          </pdx-form-field>
+        </pdx-form>
+      </div>
+
+      <div class="demo-card">
+        <h3 class="pdx-txt-small pdx-weight-semibold">onChange</h3>
+        <pdx-form :form="changeForm">
+          <pdx-form-field name="email" label="Email" required>
+            <pdx-input name="email" placeholder="Validate on change"></pdx-input>
+          </pdx-form-field>
+        </pdx-form>
+      </div>
+
+      <div class="demo-card">
+        <h3 class="pdx-txt-small pdx-weight-semibold">onSubmit</h3>
+        <pdx-form :form="submitForm">
+          <pdx-form-field name="email" label="Email" required>
+            <pdx-input name="email" placeholder="Validate on submit"></pdx-input>
+          </pdx-form-field>
+          <button type="submit" class="pdx-btn pdx-primary pdx-sm">Submit</button>
+        </pdx-form>
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const blurForm = createForm({
+  initialValues: { email: '' },
+  validators: { email: [required('...'), email('...')] },
+  validateOn: 'onBlur',  // default — validates after field loses focus
+});
+
+const changeForm = createForm({ ..., validateOn: 'onChange' }); // validates on every keystroke
+const submitForm = createForm({ ..., validateOn: 'onSubmit' }); // validates only on form submit</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required, email } from '@pdxui/core';
+
+// ─── 3. Validation Modes ───
+const blurForm = createForm({
+  initialValues: { email: '' },
+  validators: { email: [required('Email is required'), email('Invalid email')] },
+  validateOn: 'onBlur',
+});
+
+const changeForm = createForm({
+  initialValues: { email: '' },
+  validators: { email: [required('Email is required'), email('Invalid email')] },
+  validateOn: 'onChange',
+});
+
+const submitForm = createForm({
+  initialValues: { email: '' },
+  validators: { email: [required('Email is required'), email('Invalid email')] },
+  validateOn: 'onSubmit',
+});
+</script>
+
+<style scoped>
+  .demo-card {
+    padding: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+  }
+  .demo-card h3 { margin-bottom: var(--pdx-space-sm); }
+</style>

@@ -1,0 +1,68 @@
+<template>
+  <div class="user-list">
+    <h3>{{ title }}</h3>
+    <div class="status-bar">
+      <span class="tag" :class="stateClass">{{ users.state() }}</span>
+      <span class="tag info">{{ userCount }} users</span>
+    </div>
+    @if (users.loading()) {
+      <div class="loading">Loading users...</div>
+    }
+    @if (users.state() === 'success' || users.state() === 'local') {
+      <ul class="list">
+        @for (userData as user; track user.name) {
+          <li>{{ user.name }} — {{ user.role }}</li>
+        }
+      </ul>
+    }
+    @if (users.state() === 'error') {
+      <div class="error">Failed to load</div>
+    }
+    <div class="actions">
+      <button @click="doRefetch">Refetch</button>
+      <button @click="addLocal">+ Add Local</button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+  @prop title: string = 'Users';
+
+  let users = resource(() => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve([
+        { name: 'Alice', role: 'Admin' },
+        { name: 'Bob', role: 'Developer' },
+        { name: 'Charlie', role: 'Designer' },
+      ]), 600);
+    });
+  }, { key: 'demo-users', staleTime: 10000 });
+
+  const userData = $derived(users.data() || []);
+  const userCount = $derived(userData.length);
+  const stateClass = $derived(
+    users.state() === 'success' ? 'success' : users.state() === 'error' ? 'error' : 'info'
+  );
+
+  function doRefetch() { users.refetch(); }
+  function addLocal() {
+    const current = users.data() || [];
+    users.mutate([...current, { name: 'New User', role: 'Guest' }]);
+  }
+</script>
+
+<style scoped>
+  .user-list { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .status-bar { display: flex; gap: 6px; margin: 8px 0; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; }
+  .tag.success { background: #d4edda; color: #155724; }
+  .tag.error { background: #f8d7da; color: #721c24; }
+  .tag.info { background: #e2e3e5; color: #383d41; }
+  .list { list-style: none; padding: 0; }
+  .list li { padding: 6px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+  .loading { color: #856404; background: #fff3cd; padding: 8px; border-radius: 4px; }
+  .error { color: #721c24; background: #f8d7da; padding: 8px; border-radius: 4px; }
+  .actions { margin-top: 8px; display: flex; gap: 6px; }
+  button { padding: 6px 14px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: #f8f9fa; }
+  button:hover { background: #e9ecef; }
+</style>

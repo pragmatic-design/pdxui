@@ -1,0 +1,60 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Rating</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-rating&gt;</code> — star rating with precision, keyboard nav, hover preview, form integration.
+      Uses <code>role="slider"</code> with <code>aria-valuenow</code>.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-rating-basic class="demo-section"></pdx-demo-comp-rating-basic>
+
+    <!-- ═══ Half-Star ═══ -->
+    <pdx-demo-comp-rating-half-star class="demo-section"></pdx-demo-comp-rating-half-star>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-rating-sizes class="demo-section"></pdx-demo-comp-rating-sizes>
+
+    <!-- ═══ Tooltips ═══ -->
+    <pdx-demo-comp-rating-tooltips class="demo-section"></pdx-demo-comp-rating-tooltips>
+
+    <!-- ═══ Threshold Colors ═══ -->
+    <pdx-demo-comp-rating-thresholds class="demo-section"></pdx-demo-comp-rating-thresholds>
+
+    <!-- ═══ States ═══ -->
+    <pdx-demo-comp-rating-states class="demo-section"></pdx-demo-comp-rating-states>
+
+    <!-- ═══ Form ═══ -->
+    <pdx-demo-comp-rating-form class="demo-section"></pdx-demo-comp-rating-form>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>number</span><span>Current rating value</span></div>
+        <div class="opt-row"><code>count</code><span>number</span><span>Number of stars (default 5)</span></div>
+        <div class="opt-row"><code>precision</code><span>number</span><span>Step: 1, 0.5, or 0.25</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>Display only, no interaction</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Grayed out, no interaction</span></div>
+        <div class="opt-row"><code>tooltips</code><span>string</span><span>Comma-separated hover labels</span></div>
+        <div class="opt-row"><code>colors</code><span>string</span><span>Threshold:color pairs</span></div>
+        <div class="opt-row"><code>clearable</code><span>boolean</span><span>Click same value to clear</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/rating';
+@title 'Rating Component';
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-stack > div { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+  .label-w { min-width: 80px; }
+</style>

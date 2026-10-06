@@ -1,0 +1,92 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Number Input</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <strong>Figma-style:</strong> Place cursor on a digit → Arrow Up/Down increments that digit position.
+      Shift×10 multiplier, Ctrl for min/max. Scroll wheel support.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="Basic (step=1, 0-100)">
+        <pdx-number-input value="42" min="0" max="100"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Decimal (step=0.01)" hint="Try placing cursor on different digits">
+        <pdx-number-input value="1234.56" step="0.01" precision="2"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="With Scroll Wheel" hint="Focus and scroll mouse wheel">
+        <pdx-number-input value="50" min="0" max="1000" allowWheel></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Free Mode (no steppers)" hint="Arrow keys step by cursor position — place cursor on different digits and try ↑↓">
+        <pdx-number-input value="1234" controls="none"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Free Mode + Sign + Color" hint="Cursor-position step + sign toggle + colored number">
+        <pdx-number-input value="500" controls="none" allowNegative colorBySign precision="2"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Stacked Controls (right)" hint="Both buttons on the right side">
+        <pdx-number-input value="25" min="0" max="100" controls="right"></pdx-number-input>
+      </pdx-form-field>
+    </div>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Sign Toggle (allowNegative)</h3>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Green (+) / red (−) toggle button. Press +/- keys or click. Visually distinct from stepper.
+    </p>
+    <div class="demo-stack">
+      <pdx-form-field label="Amount" hint="Click the +/− button or press +/- key">
+        <pdx-number-input value="100" allowNegative precision="2"></pdx-number-input>
+      </pdx-form-field>
+      <pdx-form-field label="Negative value">
+        <pdx-number-input value="-50.00" allowNegative precision="2"></pdx-number-input>
+      </pdx-form-field>
+      <pdx-form-field label="With colored number" hint="Number turns green/red based on sign">
+        <pdx-number-input value="250.00" allowNegative colorBySign precision="2"></pdx-number-input>
+      </pdx-form-field>
+      <pdx-form-field label="Colored negative">
+        <pdx-number-input value="-75.50" allowNegative colorBySign precision="2"></pdx-number-input>
+      </pdx-form-field>
+    </div>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Locale Formatting</h3>
+    <div class="demo-stack">
+      <pdx-form-field label="US Dollar">
+        <pdx-number-input value="1234.50" locale="en-US" currency="USD" precision="2"></pdx-number-input>
+      </pdx-form-field>
+      <pdx-form-field label="Euro (German)">
+        <pdx-number-input value="1234.50" locale="de-DE" currency="EUR" precision="2"></pdx-number-input>
+      </pdx-form-field>
+    </div>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard — Two Modes</h3>
+    <div class="shortcut-list">
+      <div><strong>With steppers</strong> (controls="both"/"right"): <kbd>↑</kbd>/<kbd>↓</kbd> = fixed step, <kbd>Shift</kbd> = ×10</div>
+      <div><strong>Free mode</strong> (controls="none"): <kbd>↑</kbd>/<kbd>↓</kbd> = cursor-position step (Figma-style), <kbd>Shift</kbd> = ×10</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> Toggle sign (when allowNegative)</div>
+      <div><kbd>Scroll wheel</kbd> Step (when allowWheel + focused)</div>
+      <div>Invalid chars blocked — only digits, one decimal separator</div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-number-input
+  value="1234.56"
+  step="0.01"
+  precision="2"
+  min="0"
+  max="9999"
+  allowWheel
+  locale="en-US"
+  currency="USD"&gt;
+&lt;/pdx-number-input&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .shortcut-list { margin-top: var(--pdx-space-md); display: flex; flex-direction: column; gap: var(--pdx-space-xs); font-size: var(--pdx-text-sm); }
+  .shortcut-list kbd { font-family: var(--pdx-font-mono); font-size: var(--pdx-text-xs); padding: 2px 6px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm); }
+</style>

@@ -1,0 +1,51 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">&lt;pdx-error-boundary&gt; — Component Wrapper</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Declarative error boundary with built-in fallback UI, retry button, max retries, and
+      <code>pdx-error</code> event for logging. Provides <code>errorContext</code> to descendants.
+    </p>
+    <div class="demo-controls demo-row">
+      <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="breakWidget">Make it throw</button>
+      <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="fixWidget">Fix the data source</button>
+    </div>
+    <div class="demo-box">
+      <pdx-error-boundary fallback-message="Dashboard widget crashed." :max-retries="3" @pdx-error="onBoundaryError">
+        <div class="demo-widget">
+          <demo-flaky-widget></demo-flaky-widget>
+          <p class="pdx-txt-small pdx-ink-muted">Wrapped in &lt;pdx-error-boundary&gt;. "Make it throw" breaks its data source: the fallback shows, with Retry. Retry while it is still broken counts toward <code>max-retries</code>; fix it first and Retry brings it back.</p>
+        </div>
+      </pdx-error-boundary>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted">Errors logged: {{ boundaryErrorCount }}</p>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-error-boundary
+  fallback-message="Dashboard widget crashed."
+  :max-retries="3"
+  @pdx-error="onError"&gt;
+  &lt;pdx-dashboard-widget /&gt;
+&lt;/pdx-error-boundary&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { signal as rawSignal, computed as rawComputed, component as defineComponent, html as h } from '@pdxui/core';
+
+let boundaryErrorCount = $signal(0);
+
+// A child that throws on a signal change, as a real widget whose data source fails: the boundary
+// catches what its children throw after the screen is up. The controls sit outside the
+// boundary, since its fallback replaces what is inside it.
+const widgetBroken = rawSignal(false);
+
+const widgetStatus = rawComputed(() => {
+  if (widgetBroken()) throw new Error('Dashboard data source returned HTTP 500');
+  return 'Dashboard widget — healthy';
+});
+if (!customElements.get('demo-flaky-widget')) {
+  defineComponent('demo-flaky-widget', { render: () => h`<p>${() => widgetStatus()}</p>` });
+}
+
+function breakWidget() { widgetBroken.set(true); }
+function fixWidget() { widgetBroken.set(false); }
+function onBoundaryError(e) { boundaryErrorCount++; }
+</script>

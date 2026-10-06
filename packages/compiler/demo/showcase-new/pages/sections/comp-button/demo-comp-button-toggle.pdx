@@ -1,0 +1,39 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Toggle Button</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Add <code>toggle</code> prop for stateful on/off buttons. Uses <code>aria-pressed</code>. Emits <code>pdx-toggle</code>.
+    </p>
+
+    <div class="demo-grid" style="margin-top:var(--pdx-space-md)">
+      <div>
+        <h4 class="pdx-txt-small pdx-ink-muted" style="margin-bottom:var(--pdx-space-xs)">Toolbar style (outline)</h4>
+        <div style="display:flex;gap:var(--pdx-space-xs)">
+          <pdx-button toggle variant="outline" size="sm">B</pdx-button>
+          <pdx-button toggle variant="outline" size="sm">I</pdx-button>
+          <pdx-button toggle variant="outline" size="sm">U</pdx-button>
+        </div>
+      </div>
+      <div>
+        <h4 class="pdx-txt-small pdx-ink-muted" style="margin-bottom:var(--pdx-space-xs)">Secondary + Ghost</h4>
+        <div style="display:flex;gap:var(--pdx-space-sm)">
+          <pdx-button toggle variant="secondary">Mute</pdx-button>
+          <pdx-button toggle variant="ghost">Bookmark</pdx-button>
+        </div>
+      </div>
+      <div>
+        <h4 class="pdx-txt-small pdx-ink-muted" style="margin-bottom:var(--pdx-space-xs)">Pre-pressed + Disabled</h4>
+        <div style="display:flex;gap:var(--pdx-space-sm)">
+          <pdx-button toggle variant="primary" pressed>Active</pdx-button>
+          <pdx-button toggle variant="outline" disabled>Disabled</pdx-button>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block" style="margin-top:var(--pdx-space-md)">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button toggle variant="outline"&gt;Bold&lt;/pdx-button&gt;
+&lt;pdx-button toggle variant="primary" pressed&gt;Active&lt;/pdx-button&gt;</code></pre>
+    </details>
+  </section>
+</template>

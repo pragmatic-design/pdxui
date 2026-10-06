@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Horizontal layout for step-like flows.</p>
+    <div class="demo-container demo-container-wide">
+      <pdx-timeline :items="horizontalEvents" mode="horizontal"></pdx-timeline>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const horizontalEvents = [
+  { title: 'Draft', status: 'success', icon: 'pencil' },
+  { title: 'Review', status: 'success', icon: 'eye' },
+  { title: 'Approved', status: 'success', icon: 'check-circle' },
+  { title: 'Published', status: 'info', icon: 'globe' },
+];
+</script>

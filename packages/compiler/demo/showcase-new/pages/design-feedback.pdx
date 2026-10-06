@@ -1,0 +1,144 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Badges, Dots &amp; Alerts</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Feedback primitives: alerts, badges, status dots, callouts, tooltips, skeletons, empty states, and timelines.
+      <strong>CSS only</strong> — apply classes to native HTML elements.
+    </p>
+
+    <!-- ═══ Alerts ═══ -->
+    <pdx-demo-design-feedback-alerts class="demo-section"></pdx-demo-design-feedback-alerts>
+
+    <!-- ═══ Badges ═══ -->
+    <pdx-demo-design-feedback-badges class="demo-section"></pdx-demo-design-feedback-badges>
+
+    <!-- ═══ Status Dots ═══ -->
+    <pdx-demo-design-feedback-status-dots class="demo-section"></pdx-demo-design-feedback-status-dots>
+
+    <!-- ═══ Callouts ═══ -->
+    <pdx-demo-design-feedback-callouts class="demo-section"></pdx-demo-design-feedback-callouts>
+
+    <!-- ═══ Tooltips ═══ -->
+    <pdx-demo-design-feedback-tooltips class="demo-section"></pdx-demo-design-feedback-tooltips>
+
+    <!-- ═══ Skeleton ═══ -->
+    <pdx-demo-design-feedback-skeleton class="demo-section"></pdx-demo-design-feedback-skeleton>
+
+    <!-- ═══ Empty State ═══ -->
+    <pdx-demo-design-feedback-empty-state class="demo-section"></pdx-demo-design-feedback-empty-state>
+
+    <!-- ═══ Timeline ═══ -->
+    <pdx-demo-design-feedback-timeline class="demo-section"></pdx-demo-design-feedback-timeline>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Category</span><span>Effect</span>
+        </div>
+        <div class="opt-row"><code>.pdx-alert-info</code><span>Alert</span><span>Info alert (blue)</span></div>
+        <div class="opt-row"><code>.pdx-alert-success</code><span>Alert</span><span>Success alert (green)</span></div>
+        <div class="opt-row"><code>.pdx-alert-warning</code><span>Alert</span><span>Warning alert (amber)</span></div>
+        <div class="opt-row"><code>.pdx-alert-error</code><span>Alert</span><span>Error alert (red)</span></div>
+        <div class="opt-row"><code>.pdx-badge</code><span>Badge</span><span>Default neutral badge</span></div>
+        <div class="opt-row"><code>.pdx-badge-primary</code><span>Badge</span><span>Primary color badge</span></div>
+        <div class="opt-row"><code>.pdx-badge-secondary</code><span>Badge</span><span>Secondary badge</span></div>
+        <div class="opt-row"><code>.pdx-badge-success</code><span>Badge</span><span>Success color badge</span></div>
+        <div class="opt-row"><code>.pdx-badge-danger</code><span>Badge</span><span>Danger color badge</span></div>
+        <div class="opt-row"><code>.pdx-badge-warning</code><span>Badge</span><span>Warning color badge</span></div>
+        <div class="opt-row"><code>.pdx-dot</code><span>Dot</span><span>Base status dot</span></div>
+        <div class="opt-row"><code>.pdx-dot-{color}</code><span>Dot</span><span>success/danger/warning/muted/primary</span></div>
+        <div class="opt-row"><code>.pdx-dot-pulse</code><span>Dot</span><span>Animated pulse effect</span></div>
+        <div class="opt-row"><code>.pdx-callout</code><span>Callout</span><span>Base callout block</span></div>
+        <div class="opt-row"><code>.pdx-callout-{variant}</code><span>Callout</span><span>info/tip/warning/danger</span></div>
+        <div class="opt-row"><code>[data-pdx-tooltip]</code><span>Tooltip</span><span>CSS-only hover tooltip</span></div>
+        <div class="opt-row"><code>.pdx-skeleton</code><span>Skeleton</span><span>Base shimmer placeholder</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-{shape}</code><span>Skeleton</span><span>text/title/image/circle/button/input</span></div>
+        <div class="opt-row"><code>.pdx-empty</code><span>Empty</span><span>Empty state container</span></div>
+        <div class="opt-row"><code>.pdx-timeline</code><span>Timeline</span><span>Vertical timeline container</span></div>
+        <div class="opt-row"><code>data-status</code><span>Timeline</span><span>done/active/pending</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/feedback';
+@title 'Badges, Dots & Alerts';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .demo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+  }
+
+  .chip-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+  }
+
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 210px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

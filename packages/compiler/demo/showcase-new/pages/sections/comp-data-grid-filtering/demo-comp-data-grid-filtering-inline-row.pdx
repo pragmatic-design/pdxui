@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Inline Filter Row</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>filterable</code> or <code>filter-mode="row"</code> adds a filter input below each header.
+      Type to filter — operators available via the dropdown button.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="filterDS" :columns="filterColumns" :filterable="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  filterable hover striped&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products, filterColumns } from './state.pdx';
+
+const filterDS = createDataSource({ data: products.slice(), pageSize: 10 });
+</script>

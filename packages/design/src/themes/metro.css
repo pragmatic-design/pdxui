@@ -1,0 +1,268 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Metro Theme
+   Microsoft Windows 8 "Modern UI" inspired.
+   Zero radius, zero shadows, bold flat colors, sharp geometry.
+   Reference: Microsoft Design Language (MDL), Windows 8 tile system.
+   ========================================================================== */
+
+[pdx-theme="metro"] {
+    --pdx-hue-primary: 207;
+    --pdx-hue-accent:  170;
+
+    /* Windows cobalt blue (#0078D4 → oklch) */
+    --pdx-color-primary:       oklch(0.505 0.19 207);
+    --pdx-color-primary-hover: oklch(0.48 0.21 207);
+    --pdx-color-primary-text:  white;
+    --pdx-color-accent:        oklch(0.60 0.14 170);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.55 0.19 207);
+
+    /* Pure neutral grays — zero tint, maximum clarity */
+    --pdx-gray-50:  oklch(0.985 0 0);
+    --pdx-gray-100: oklch(0.965 0 0);
+    --pdx-gray-200: oklch(0.92  0 0);
+    --pdx-gray-300: oklch(0.85  0 0);
+    --pdx-gray-800: oklch(0.25  0 0);
+    --pdx-gray-900: oklch(0.18  0 0);
+    --pdx-gray-950: oklch(0.12  0 0);
+
+    /* Clean white surfaces */
+    --pdx-color-bg:      light-dark(white, var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(white, oklch(0.16 0 0));
+    --pdx-color-inset:   light-dark(oklch(0.97 0 0), oklch(0.20 0 0));
+
+    /* Segoe UI — the Metro typeface */
+    --pdx-font-sans: 'Segoe UI', system-ui, sans-serif;
+    --pdx-font-heading: 'Segoe UI', system-ui, sans-serif;
+    --pdx-font-mono: 'Consolas', monospace;
+
+    /* Zero radius — the signature Metro look */
+    --pdx-radius-sm:  0;
+    --pdx-radius-md:  0;
+    --pdx-radius-lg:  0;
+    --pdx-radius-xl:  0;
+
+    /* Compact, data-dense */
+    --pdx-density-factor: 0.9;
+
+    /* Zero shadows — completely flat */
+    --pdx-shadow-sm:  none;
+    --pdx-shadow-md:  none;
+    --pdx-shadow-lg:  none;
+    --pdx-shadow-xl:  none;
+    --pdx-shadow-color: transparent;
+
+    /* Bold focus — thick colored outline (Metro style) */
+    --pdx-focus-ring: 0 0 0 2px var(--pdx-color-primary);
+
+    /* Stronger borders */
+    --pdx-color-border: light-dark(oklch(0.82 0 0), oklch(0.32 0 0));
+    --pdx-color-border-strong: light-dark(oklch(0.65 0 0), oklch(0.50 0 0));
+    --pdx-border-width: 2px;
+
+    /* Metro semantic colors — bold, high-chroma, flat */
+    --pdx-color-danger:       light-dark(oklch(0.55 0.22 25), oklch(0.575 0.18 25));
+    --pdx-color-danger-hover: light-dark(oklch(0.48 0.24 25), oklch(0.58 0.20 25));
+    --pdx-color-success:      light-dark(oklch(0.53 0.18 145), oklch(0.535 0.15 145));
+    --pdx-color-warning:      light-dark(oklch(0.75 0.16 80), oklch(0.72 0.13 80));
+    --pdx-color-info:         light-dark(oklch(0.505 0.19 207), oklch(0.515 0.16 207));
+
+    /* Typography weights — light for headings (Metro signature), semibold for buttons */
+    --pdx-weight-heading: 300;
+    --pdx-weight-semibold: 600;
+
+    /* Metro behavior tokens */
+    --pdx-button-radius: 0;
+    /* The rendered height is `min-height × --pdx-density-factor`, and metro's own factor is
+       0.9: a plain 2rem renders 28.8px, not the 32 this theme states (the same call as
+       corporate's). Dividing it out gives 32px at the theme's density. */
+    --pdx-button-min-height: calc(2rem / 0.9);        /* 32px — compact tile feel, at metro's density */
+    --pdx-input-style: outlined;
+    --pdx-input-min-height: calc(2rem / 0.9);         /* 32px — match buttons */
+    --pdx-card-style: bordered;
+    --pdx-tab-indicator: underline;
+    --pdx-tab-indicator-size: 3px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Metro Component Overrides — flat, sharp, bold
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Buttons: uppercase, semibold, flat with no hover shadow — just color shift */
+[pdx-theme="metro"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    text-transform: uppercase;
+    font-weight: var(--pdx-weight-semibold);
+    font-size: var(--pdx-text-xs);
+    letter-spacing: 0.08em;
+}
+
+/* No transform on active — Metro is rigid, not bouncy */
+[pdx-theme="metro"] :is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-danger):active:not(:disabled):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    transform: none;
+    filter: brightness(0.85);
+}
+
+/* Secondary: transparent bg with strong border */
+[pdx-theme="metro"] .pdx-secondary:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    background: transparent;
+    border-color: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-ink);
+}
+[pdx-theme="metro"] .pdx-secondary:hover:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+/* Tab: bold underline, no bg change */
+[pdx-theme="metro"] .pdx-tab.active:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)),
+[pdx-theme="metro"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-bottom: var(--pdx-tab-indicator-size) solid var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+/* Breadcrumb: backslash separator (Windows path style) */
+[pdx-theme="metro"] .pdx-breadcrumb:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) { --pdx-breadcrumb-separator: '\\'; }
+[pdx-theme="metro"] .pdx-breadcrumb > *:not(:last-child):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *))::after {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+}
+
+/* Table: strong header, uppercase, primary accent line */
+[pdx-theme="metro"] .pdx-table th:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    --pdx-table-header-transform: uppercase;
+    --pdx-table-header-letter-spacing: 0.08em;
+    --pdx-table-header-size: var(--pdx-text-xs);
+    --pdx-table-header-weight: var(--pdx-weight-semibold);
+    --pdx-table-header-border-width: 3px;
+    --pdx-table-header-border-color: var(--pdx-color-primary);
+}
+
+/* Accordion: sharp, arrow rotates */
+[pdx-theme="metro"] details.pdx-accordion:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+[pdx-theme="metro"] details.pdx-accordion summary:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *))::after {
+    content: '▶';
+    font-size: 0.6em;
+    color: var(--pdx-color-primary-ink);
+}
+[pdx-theme="metro"] details.pdx-accordion[open] summary:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *))::after {
+    transform: rotate(90deg);
+}
+
+/* Card: flat, bold border, no shadow, tile-like */
+[pdx-theme="metro"] .pdx-surface-card:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    box-shadow: none;
+}
+[pdx-theme="metro"] .pdx-surface-card[interactive]:hover:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-color: var(--pdx-color-primary);
+}
+
+/* Input: sharp, strong border */
+[pdx-theme="metro"] .pdx-input-wrap:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-color: var(--pdx-color-border-strong);
+}
+[pdx-theme="metro"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-color: var(--pdx-color-primary);
+}
+
+/* Select: sharp corners, flat dropdown */
+[pdx-theme="metro"] .pdx-select-dropdown:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+    border: var(--pdx-border-width) solid var(--pdx-color-primary);
+    box-shadow: none;
+}
+[pdx-theme="metro"] .pdx-select-caret svg:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    --pdx-select-caret-stroke: 2.5;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+}
+
+/* Toggle: square track */
+[pdx-theme="metro"] .pdx-toggle:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+[pdx-theme="metro"] .pdx-toggle:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *))::before {
+    border-radius: 0;
+}
+
+/* Checkbox: no rounding */
+[pdx-theme="metro"] .pdx-checkbox:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+
+/* ── Calendar: Metro — square cells, bold selected, flat, no shadow ── */
+[pdx-theme="metro"] .pdx-cal-cell:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+    width: 36px;
+    height: 36px;
+}
+[pdx-theme="metro"] .pdx-cal-cell:hover:not(.pdx-cal-disabled):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    background: var(--pdx-color-inset);
+    outline: 2px solid var(--pdx-color-border-strong);
+    outline-offset: -2px;
+}
+[pdx-theme="metro"] .pdx-cal-selected:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+[pdx-theme="metro"] .pdx-cal-today:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    font-weight: var(--pdx-weight-semibold);
+}
+[pdx-theme="metro"] .pdx-cal-today:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *))::after {
+    border-radius: 0;
+    width: 6px;
+    height: 2px;  /* dash instead of dot — Metro style */
+}
+/* Metro range: square */
+[pdx-theme="metro"] .pdx-cal-range-start:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)),
+[pdx-theme="metro"] .pdx-cal-range-end:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)),
+[pdx-theme="metro"] .pdx-cal-range-start.pdx-cal-range-end:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+/* Metro calendar container: flat, bordered, no shadow */
+[pdx-theme="metro"] .pdx-calendar-inline:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+    border-width: var(--pdx-border-width);
+    box-shadow: none;
+}
+/* Metro nav buttons: square */
+[pdx-theme="metro"] .pdx-cal-nav-btn:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+/* Metro month/year cells: square */
+[pdx-theme="metro"] .pdx-cal-month-cell:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)),
+[pdx-theme="metro"] .pdx-cal-year-cell:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+/* Metro focus: thick colored outline */
+[pdx-theme="metro"] .pdx-cal-cell:focus-visible:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    outline: 2px solid var(--pdx-color-primary);
+    outline-offset: -2px;
+}
+
+/* ── Date Picker: Metro — flat panel, sharp edges, primary border ── */
+[pdx-theme="metro"] .pdx-date-picker-panel:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+    border: var(--pdx-border-width) solid var(--pdx-color-primary);
+    box-shadow: none;
+}
+[pdx-theme="metro"] .pdx-date-picker-trigger:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-color: var(--pdx-color-border-strong);
+}
+
+/* ── Time Picker: Metro — square, bold borders ── */
+[pdx-theme="metro"] .pdx-time-picker:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+[pdx-theme="metro"] .pdx-time-value:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}
+[pdx-theme="metro"] .pdx-time-value:focus:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    background: var(--pdx-color-inset);
+    outline: 2px solid var(--pdx-color-primary);
+    outline-offset: -2px;
+}
+[pdx-theme="metro"] .pdx-time-arrow:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+    border-radius: 0;
+}

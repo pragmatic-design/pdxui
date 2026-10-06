@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Sidebar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A realistic sidebar combining headings, nested items, and active states.</p>
+
+    <div class="sidebar-demo">
+      <nav class="pdx-nav">
+        <div class="pdx-nav-heading">Workspace</div>
+        <a href="#" class="pdx-nav-item active">Home</a>
+        <a href="#" class="pdx-nav-item">Inbox</a>
+        <a href="#" class="pdx-nav-item">My Tasks</a>
+        <div class="pdx-nav-heading">Projects</div>
+        <a href="#" class="pdx-nav-item">Website Redesign</a>
+        <nav class="pdx-nav">
+          <a href="#" class="pdx-nav-item">Design</a>
+          <a href="#" class="pdx-nav-item">Development</a>
+          <a href="#" class="pdx-nav-item">QA</a>
+        </nav>
+        <a href="#" class="pdx-nav-item">Mobile App v2</a>
+        <a href="#" class="pdx-nav-item" aria-disabled="true">Archived Projects</a>
+        <div class="pdx-nav-heading">Account</div>
+        <a href="#" class="pdx-nav-item">Profile</a>
+        <a href="#" class="pdx-nav-item">Settings</a>
+      </nav>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .sidebar-demo {
+    margin-top: var(--pdx-space-md);
+    max-width: 260px;
+    padding: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+</style>

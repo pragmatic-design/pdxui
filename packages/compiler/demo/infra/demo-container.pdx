@@ -1,0 +1,108 @@
+<template>
+  <div class="demo">
+    <h2>Layout / Sizing</h2>
+    <p class="desc">Signal-based container awareness, measure utilities, container queries.</p>
+
+    <section>
+      <h3>useContainerSize()</h3>
+      <p class="desc">Drag the right edge to resize. Border color and content adapt to width.</p>
+      <div class="resize-box" :class="bpClass" :ref="resizeRef">
+        <div class="stats">
+          <span>Width: <strong>{{ width }}px</strong></span>
+          <span>Height: <strong>{{ height }}px</strong></span>
+        </div>
+        <div class="badges">
+          <span class="badge" :class="isCompact ? 'on' : ''">Compact (&lt;480)</span>
+          <span class="badge" :class="isMedium ? 'on' : ''">Medium (480-768)</span>
+          <span class="badge" :class="isWide ? 'on' : ''">Wide (&gt;768)</span>
+        </div>
+        @if (isCompact) {
+          <div class="card">Compact: stacked, minimal</div>
+        }
+        @if (isMedium) {
+          <div class="card-row"><div class="card">Col A</div><div class="card">Col B</div></div>
+        }
+        @if (isWide) {
+          <div class="card-row"><div class="card">Col A</div><div class="card">Col B</div><div class="card">Col C</div></div>
+        }
+      </div>
+    </section>
+
+    <section>
+      <h3>measure() / measureRelative()</h3>
+      <div class="measure-row">
+        <div class="box-a" :ref="boxARef">Box A</div>
+        <div class="box-b" :ref="boxBRef">Box B</div>
+      </div>
+      <button class="pdx-primary" @click="doMeasure">Measure</button>
+      <pre class="log">{{ measureLog }}</pre>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { useContainerSize, measure, measureRelative, effect, onMount, onDestroy } from '@pdxui/core';
+
+let width = $signal(0);
+let height = $signal(0);
+let isCompact = $signal(true);
+let isMedium = $signal(false);
+let isWide = $signal(false);
+/** The border's class, from the breakpoint: computed, not written by the effect (CD-D2). */
+const bpClass = $derived(isCompact ? 'compact' : isMedium ? 'medium' : 'wide');
+let measureLog = $signal('Click "Measure"');
+let resizeRef = $signal(null);
+let boxARef = $signal(null);
+let boxBRef = $signal(null);
+
+onMount(() => {
+    requestAnimationFrame(() => {
+        const el = resizeRef;
+        if (!el) return;
+
+        const cs = useContainerSize(() => el);
+
+        effect(() => {
+            width = cs.width();
+            height = cs.height();
+            isCompact = cs.isCompact();
+            isMedium = cs.isMedium();
+            isWide = cs.isWide();
+        });
+    });
+});
+
+function doMeasure() {
+    const a = boxARef;
+    const b = boxBRef;
+    if (!a || !b) return;
+    const mA = measure(a);
+    const mB = measure(b);
+    const rel = measureRelative(a, b);
+    measureLog = 'A: ' + Math.round(mA.width) + 'x' + Math.round(mA.height) + ' at (' + Math.round(mA.x) + ', ' + Math.round(mA.y) + ')\n' +
+        'B: ' + Math.round(mB.width) + 'x' + Math.round(mB.height) + ' at (' + Math.round(mB.x) + ', ' + Math.round(mB.y) + ')\n' +
+        'Relative: dx=' + Math.round(rel.dx) + ', dy=' + Math.round(rel.dy) + ', overlap=' + rel.overlap;
+}
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .resize-box { resize: horizontal; overflow: auto; border: 2px dashed #e0e0e0; border-radius: 8px; padding: 12px; min-width: 200px; max-width: 100%; width: 600px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .resize-box.compact { border-color: #ef4444; }
+  .resize-box.medium { border-color: #f59e0b; }
+  .resize-box.wide { border-color: #22c55e; }
+  .stats { display: flex; gap: 20px; font-size: 0.9rem; }
+  .badges { display: flex; gap: 8px; }
+  .badge { padding: 2px 8px; border-radius: 99px; font-size: 0.7rem; font-weight: 600; background: #e0e0e0; color: #999; }
+  .badge.on { background: #3b82f6; color: white; }
+  .card { flex: 1; padding: 8px; background: #f5f5f7; border-radius: 6px; text-align: center; font-size: 0.8rem; }
+  .card-row { display: flex; gap: 8px; }
+  .measure-row { display: flex; gap: 24px; margin: 8px 0; }
+  .box-a { padding: 16px 32px; background: #3b82f6; color: white; border-radius: 8px; font-weight: 600; }
+  .box-b { padding: 16px 32px; background: #22c55e; color: white; border-radius: 8px; font-weight: 600; }
+  .log { font-family: monospace; font-size: 0.75rem; background: #f5f5f7; padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 48px; margin: 8px 0 0; }
+</style>

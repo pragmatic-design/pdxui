@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Badges</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Badges for counts, status, or notifications.</p>
+
+    <div class="demo-sidebar">
+      <pdx-nav-menu :items="badgeItems" activekey="inbox"></pdx-nav-menu>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-nav-menu :items="items" activekey="inbox"&gt;&lt;/pdx-nav-menu&gt;
+
+// { key: 'inbox', label: 'Inbox', icon: 'mail', badge: '12', badgeVariant: 'primary' }
+// { key: 'spam', label: 'Spam', icon: 'alert-triangle', badge: '99+', badgeVariant: 'danger' }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const badgeItems = [
+  { key: 'inbox', label: 'Inbox', icon: 'mail', badge: '12', badgeVariant: 'primary' },
+  { key: 'sent', label: 'Sent', icon: 'send' },
+  { key: 'drafts', label: 'Drafts', icon: 'file-text', badge: '3' },
+  { key: 'spam', label: 'Spam', icon: 'alert-triangle', badge: '99+', badgeVariant: 'danger' },
+  { key: 'trash', label: 'Trash', icon: 'trash' },
+];
+</script>

@@ -1,0 +1,143 @@
+<template>
+  <section class="page" data-test="settings-views">
+    <header class="head">
+      <h1 class="pdx-txt-title">{{ $t('settings.tiles.views') }}</h1>
+      <p class="pdx-txt-body pdx-ink-muted">{{ $t('settings.views.intro') }}</p>
+    </header>
+
+    <div :show="saved.length === 0" data-test="views-empty">
+      <pdx-empty-state icon="list" :title="$t('settings.views.emptyTitle')" :description="$t('settings.views.emptyBody')"></pdx-empty-state>
+    </div>
+
+    <!-- What each view IS, not only its name: the filter, the sort and the page size it opens the
+         list with, and a link that opens it there. A div grid with the table's roles («Bug noti»). -->
+    <div class="table" role="table" :aria-label="$t('settings.tiles.views')" :show="saved.length > 0">
+      <div class="row head" role="row">
+        <span role="columnheader">{{ $t('settings.views.name') }}</span>
+        <span role="columnheader">{{ $t('settings.views.filter') }}</span>
+        <span role="columnheader">{{ $t('settings.views.sort') }}</span>
+        <span role="columnheader" class="num">{{ $t('settings.views.pageSize') }}</span>
+        <span role="columnheader"><span class="sr-only">{{ $t('settings.views.actions') }}</span></span>
+      </div>
+      @for (saved as view; track view.key) {
+        <div class="row" role="row" data-test="view-row">
+          <span role="cell" class="name-cell">
+            @if (renaming === view.key) {
+              <form class="rename" @submit="commitRename($event, view.key)">
+                <pdx-input :value="draft" :aria-label="$t('settings.views.name')" autofocus @pdx-input="e => draft = e.detail.value" data-test="rename-input"></pdx-input>
+                <pdx-button size="sm" variant="primary" type="submit">{{ $t('settings.views.save') }}</pdx-button>
+                <pdx-button size="sm" variant="ghost" @click="renaming = ''">{{ $t('settings.views.cancel') }}</pdx-button>
+              </form>
+            } @else {
+              <a class="name" :href="'/tickets?view=' + view.key" @click="followLink($event, '/tickets?view=' + view.key)">{{ view.name }}</a>
+            }
+          </span>
+          <span role="cell" class="summary">{{ filterSummary(view.state) }}</span>
+          <span role="cell" class="summary">{{ sortSummary(view.state) }}</span>
+          <span role="cell" class="num">{{ view.state.pageSize || '—' }}</span>
+          <span role="cell" class="actions">
+            <pdx-button size="sm" variant="ghost" @click="startRename(view)">{{ $t('settings.views.rename') }}</pdx-button>
+            <pdx-button size="sm" variant="ghost" @click="askDelete(view)">{{ $t('settings.views.delete') }}</pdx-button>
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- A delete asks first: the view is someone's arrangement, and it does not come back. -->
+    <pdx-alert-dialog
+      :open="doomed !== null"
+      variant="danger"
+      :title="$t('settings.views.deleteTitle')"
+      :message="doomed ? $t('settings.views.deleteBody', { name: doomed.name }) : ''"
+      :confirm-label="$t('settings.views.delete')"
+      :cancel-label="$t('settings.views.keep')"
+      close-on-escape
+      @pdx-confirm="confirmDelete"
+      @pdx-cancel="doomed = null"
+      data-test="delete-dialog"></pdx-alert-dialog>
+  </section>
+</template>
+
+<script setup>
+@page '/settings/views' { label: viewsLabel };
+@title $t('settings.tiles.views');
+
+// The list, opened on the view: the router's navigation, a new tab on a modified click.
+import { followLink } from '../data/follow-link';
+import { createViewStore } from '../data/views';
+
+function viewsLabel() {
+  return $t('settings.tiles.views');
+}
+
+/** The tickets list's own store: what is deleted here is what its picker stops offering. */
+const store = createViewStore('tickets');
+let saved = $signal(store.list());
+
+let renaming = $signal('');
+let draft = $signal('');
+let doomed = $signal(null);
+
+/** «status = closed · priority = high», or a dash: what the view narrows the list to. */
+function filterSummary(state) {
+  const parts = (state.filter ?? []).filter(f => f && f.field).map(f => `${f.field} ${f.operator === 'eq' ? '=' : f.operator} ${f.value}`);
+  return parts.length ? parts.join(' · ') : '—';
+}
+
+/** «created ↓», or a dash. */
+function sortSummary(state) {
+  const parts = (state.sort ?? []).filter(s => s && s.field).map(s => `${s.field} ${s.dir === 'desc' ? '↓' : '↑'}`);
+  return parts.length ? parts.join(' · ') : '—';
+}
+
+function startRename(view) {
+  draft = view.name;
+  renaming = view.key;
+}
+
+function commitRename(e, key) {
+  e.preventDefault();
+  const name = draft.trim();
+  if (name) store.rename(key, name);
+  renaming = '';
+  saved = store.list();
+}
+
+function askDelete(view) {
+  doomed = view;
+}
+
+function confirmDelete() {
+  if (doomed) store.remove(doomed.key);
+  doomed = null;
+  saved = store.list();
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+  .head { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+  .head h1, .head p { margin: 0; }
+  .table { display: flex; flex-direction: column; }
+  .row {
+    display: grid; grid-template-columns: minmax(12rem, 1.5fr) minmax(10rem, 2fr) minmax(8rem, 1fr) minmax(5rem, 0.6fr) auto;
+    gap: var(--pdx-space-md); align-items: center;
+    padding: var(--pdx-space-sm) var(--pdx-space-md); border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .row.head { color: var(--pdx-color-muted); font-size: var(--pdx-text-sm, 0.875rem); background: var(--pdx-color-inset); border-bottom: 0; border-radius: var(--pdx-radius-sm); }
+  .name { font-weight: 600; color: var(--pdx-color-primary-ink); text-decoration: none; }
+  .name:hover { text-decoration: underline; }
+  .summary { font-family: var(--pdx-font-mono, monospace); font-size: var(--pdx-text-sm, 0.875rem); color: var(--pdx-color-muted); overflow-wrap: anywhere; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .actions { display: flex; gap: var(--pdx-space-2xs); justify-content: flex-end; }
+  .rename { display: flex; align-items: center; gap: var(--pdx-space-xs); flex-wrap: wrap; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* A phone: each view a block, its actions at the end. */
+  @media (max-width: 640px) {
+    .row { grid-template-columns: minmax(0, 1fr); gap: var(--pdx-space-2xs); }
+    .row.head { display: none; }
+    .num { text-align: left; }
+    .actions { justify-content: flex-start; }
+  }
+</style>

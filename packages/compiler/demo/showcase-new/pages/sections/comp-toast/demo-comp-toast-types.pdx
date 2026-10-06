@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Types</h2>
+    <p class="pdx-txt-small pdx-ink-muted">4 semantic types with auto-matched icons and colors.</p>
+    <div class="btn-row">
+      <pdx-button variant="primary" size="sm" @click="showSuccess">Success</pdx-button>
+      <pdx-button variant="danger" size="sm" @click="showError">Error</pdx-button>
+      <pdx-button variant="warning" size="sm" @click="showWarning">Warning</pdx-button>
+      <pdx-button variant="secondary" size="sm" @click="showInfo">Info</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showSuccess() { toast.success('Changes saved successfully!'); }
+function showError() { toast.error('Failed to connect to server.'); }
+function showWarning() { toast.warning('Your session expires in 5 minutes.'); }
+function showInfo() { toast.info('A new version is available.'); }
+</script>

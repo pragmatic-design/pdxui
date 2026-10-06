@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Nested Grids</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Rows can be nested inside columns for complex layouts.</p>
+
+    <div class="demo-area">
+      <pdx-row gutter="md">
+        <pdx-col span="4"><div class="box tall">Sidebar</div></pdx-col>
+        <pdx-col span="8">
+          <pdx-row gutter="sm">
+            <pdx-col span="6"><div class="box">Nested 6</div></pdx-col>
+            <pdx-col span="6"><div class="box">Nested 6</div></pdx-col>
+            <pdx-col span="4"><div class="box">Nested 4</div></pdx-col>
+            <pdx-col span="8"><div class="box">Nested 8</div></pdx-col>
+          </pdx-row>
+        </pdx-col>
+      </pdx-row>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-row gutter="md"&gt;
+  &lt;pdx-col span="4"&gt;Sidebar&lt;/pdx-col&gt;
+  &lt;pdx-col span="8"&gt;
+    &lt;pdx-row gutter="sm"&gt;
+      &lt;pdx-col span="6"&gt;Nested&lt;/pdx-col&gt;
+      &lt;pdx-col span="6"&gt;Nested&lt;/pdx-col&gt;
+    &lt;/pdx-row&gt;
+  &lt;/pdx-col&gt;
+&lt;/pdx-row&gt;</code></pre>
+    </details>
+  </section>
+</template>

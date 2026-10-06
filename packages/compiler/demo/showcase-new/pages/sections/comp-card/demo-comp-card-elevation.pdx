@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Elevation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5 levels of shadow depth via <code>elevation</code> prop. Overrides variant shadow. Theme-adaptive.</p>
+    <div class="elevation-row">
+      <pdx-card elevation="0">
+        <div class="pdx-card-body elev-label"><span class="elev-num">0</span><span class="pdx-txt-small pdx-ink-muted">none</span></div>
+      </pdx-card>
+      <pdx-card elevation="1">
+        <div class="pdx-card-body elev-label"><span class="elev-num">1</span><span class="pdx-txt-small pdx-ink-muted">sm</span></div>
+      </pdx-card>
+      <pdx-card elevation="2">
+        <div class="pdx-card-body elev-label"><span class="elev-num">2</span><span class="pdx-txt-small pdx-ink-muted">md</span></div>
+      </pdx-card>
+      <pdx-card elevation="3">
+        <div class="pdx-card-body elev-label"><span class="elev-num">3</span><span class="pdx-txt-small pdx-ink-muted">lg</span></div>
+      </pdx-card>
+      <pdx-card elevation="4">
+        <div class="pdx-card-body elev-label"><span class="elev-num">4</span><span class="pdx-txt-small pdx-ink-muted">xl</span></div>
+      </pdx-card>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .elevation-row { display: flex; gap: var(--pdx-space-lg); flex-wrap: wrap; margin-top: var(--pdx-space-lg); }
+  .elevation-row > pdx-card { flex: 0 0 auto; }
+  .elev-label { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 80px; }
+  .elev-num { font-size: 1.5rem; font-weight: 700; }
+</style>

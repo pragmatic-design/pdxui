@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Loading State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Spinner replaces the thumb dot while an async operation completes.
+      Switch is disabled during loading.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-switch label="Syncing preferences..." loading></pdx-switch>
+      <pdx-switch label="Enabling feature..." loading checked></pdx-switch>
+    </div>
+  </section>
+</template>

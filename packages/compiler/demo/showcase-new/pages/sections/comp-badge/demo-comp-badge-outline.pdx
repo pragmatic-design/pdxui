@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Outline Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Bordered, transparent background. Use <code>variant="outline-primary"</code> etc.</p>
+
+    <div class="demo-row">
+      <pdx-badge variant="outline" value="Default"></pdx-badge>
+      <pdx-badge variant="outline-primary" value="Primary"></pdx-badge>
+      <pdx-badge variant="outline-success" value="Active"></pdx-badge>
+      <pdx-badge variant="outline-danger" value="Critical"></pdx-badge>
+      <pdx-badge variant="outline-warning" value="Warning"></pdx-badge>
+    </div>
+  </section>
+</template>

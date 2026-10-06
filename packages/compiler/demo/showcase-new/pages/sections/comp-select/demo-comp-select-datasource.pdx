@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">DataSource — <code>source</code> prop</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use the dedicated <code>:source</code> prop for DataSource binding. Clearer intent
+      than passing a DataSource via <code>:options</code>. Search delegates to <code>ds.setFilter()</code>.
+    </p>
+    <div class="demo-row">
+      <pdx-select label="User" :source="userDS" labelField="name" valueField="id" searchable clearable placeholder="Search users (DataSource)..." />
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>import { createDataSource } from '@pdxui/core';
+
+const userDS = createDataSource({
+  data: [
+    { id: 1, name: 'Alice Johnson', role: 'Lead' },
+    { id: 2, name: 'Bob Smith', role: 'Developer' },
+    ...
+  ],
+  idField: 'id',
+});
+
+&lt;pdx-select :source="userDS" labelField="name" valueField="id"
+  searchable clearable placeholder="Search users..." /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+const dsUsers = [
+  { id: 1, name: 'Alice Johnson', role: 'Lead' },
+  { id: 2, name: 'Bob Smith', role: 'Developer' },
+  { id: 3, name: 'Charlie Brown', role: 'Designer' },
+  { id: 4, name: 'Diana Prince', role: 'PM' },
+  { id: 5, name: 'Edward Norton', role: 'DevOps' },
+  { id: 6, name: 'Fiona Apple', role: 'QA' },
+  { id: 7, name: 'George Lucas', role: 'Architect' },
+  { id: 8, name: 'Helen Troy', role: 'Lead' },
+];
+
+const userDS = createDataSource({ data: dsUsers, idField: 'id' });
+</script>

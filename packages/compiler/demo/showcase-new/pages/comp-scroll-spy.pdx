@@ -1,0 +1,47 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">ScrollSpy</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-scroll-spy&gt;</code> — automatically highlights navigation links based on which section
+      is currently visible. Uses IntersectionObserver.
+    </p>
+
+    <pdx-demo-comp-scroll-spy-live class="demo-section"></pdx-demo-comp-scroll-spy-live>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>sectionselector</code></td><td>String</td><td>'[data-section]'</td><td>CSS selector for sections</td></tr>
+            <tr><td><code>linkselector</code></td><td>String</td><td>'[data-spy-link]'</td><td>CSS selector for nav links</td></tr>
+            <tr><td><code>offset</code></td><td>Number</td><td>100</td><td>Activation threshold from top (px)</td></tr>
+            <tr><td><code>smoothscroll</code></td><td>Boolean</td><td>true</td><td>Smooth scroll on link click</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-change</code></td><td>{ section: string }</td><td>Active section changed</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/scroll-spy';
+@title 'ScrollSpy — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+</style>

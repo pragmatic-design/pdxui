@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Circular</h2>
+    <div class="demo-row">
+      <div class="demo-col">
+        <pdx-progress value="75" circular showLabel></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted">75%</span>
+      </div>
+      <div class="demo-col">
+        <pdx-progress value="40" circular variant="success" showLabel></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted">Success</span>
+      </div>
+      <div class="demo-col">
+        <pdx-progress value="90" circular variant="danger" showLabel></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted">Danger</span>
+      </div>
+      <div class="demo-col">
+        <pdx-progress circular></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted">Loading</span>
+      </div>
+    </div>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Circular Sizes</h3>
+    <div class="demo-row" style="margin-top:var(--pdx-space-md)">
+      <div class="demo-col">
+        <pdx-progress value="50" circular size="sm"></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted">sm</span>
+      </div>
+      <div class="demo-col">
+        <pdx-progress value="50" circular showLabel></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted">md</span>
+      </div>
+      <div class="demo-col">
+        <pdx-progress value="50" circular size="lg" showLabel></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted">lg</span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-col { display: flex; flex-direction: column; align-items: center; gap: var(--pdx-space-xs); }
+</style>

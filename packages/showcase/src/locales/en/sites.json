@@ -1,0 +1,51 @@
+{
+    "sites": {
+        "title": "Sites",
+        "intro": "Where the work happens: each site's address, the people assigned there now, and the tickets opened there. A site is closed, never deleted.",
+        "matching": "{count, plural, one {# site} other {# sites}}",
+        "new": "New site",
+        "create": "Create",
+        "openRecord": "Open {name}",
+        "unknown": "Unknown site",
+        "sections": "Site sections",
+        "views": { "default": "All sites" },
+        "columns": {
+            "name": "Name",
+            "city": "City",
+            "province": "Province",
+            "people": "People",
+            "status": "Status"
+        },
+        "statuses": { "active": "Active", "closed": "Closed" },
+        "groups": { "site": "Site" },
+        "sectionNames": {
+            "details": "Details",
+            "people": "People",
+            "tickets": "Tickets"
+        },
+        "fields": {
+            "name": "Name",
+            "city": "City",
+            "address": "Address",
+            "postcode": "Postcode",
+            "province": "Province",
+            "phone": "Phone",
+            "status": "Status"
+        },
+        "saving": "Saving…",
+        "saved": "Saved",
+        "notSaved": "Not saved",
+        "savedAt": "Saved at {time}",
+        "nameRequired": "A site needs a name.",
+        "postcodeShape": "A postcode is 5 digits.",
+        "people": {
+            "role": "{role} since {start}",
+            "emptyTitle": "Nobody works here now",
+            "emptyBody": "People are assigned to a site from their own record, in its Sites section."
+        },
+        "tickets": {
+            "emptyTitle": "No ticket was opened here",
+            "emptyBody": "A ticket names its site when it is opened."
+        }
+    }
+}

@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Confirm</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>await dialog.confirm({…})</code> resolves <code>true</code> on confirm, <code>false</code> on cancel or Escape.
+      Focus starts on <em>Cancel</em>, the safe answer.
+    </p>
+    <div class="demo-row">
+      <pdx-button variant="danger" @click="askDelete">Delete project…</pdx-button>
+      <pdx-button variant="outline" @click="askTyped">Delete with type-to-confirm…</pdx-button>
+      <pdx-button variant="outline" @click="askDelayed">Confirm after 3 seconds…</pdx-button>
+    </div>
+    <p class="pdx-txt-small result" aria-live="polite">Last answer: <strong>{{ answer }}</strong></p>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>async function askDelete() {
+  const ok = await dialog.confirm({
+    title: 'Delete project?',
+    message: 'The project and its 12 files will be removed. This cannot be undone.',
+    confirmLabel: 'Delete', cancelLabel: 'Keep it', variant: 'danger',
+  });
+  answer = ok ? 'deleted' : 'kept';
+}
+
+// Type the name to enable the button:
+dialog.confirm({ title: 'Delete "atlas"?', confirmText: 'atlas', variant: 'danger' });
+// The button waits 3 seconds:
+dialog.confirm({ title: 'Publish now?', confirmDelay: 3 });</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useOutletAnswer } from './state.pdx';
+
+// The stacking section writes the same answer (state.pdx.ts).
+const outletAnswer = useOutletAnswer();
+const answer = $derived(outletAnswer.answer());
+function askDelete() { outletAnswer.askDelete(); }
+function askTyped() { outletAnswer.askTyped(); }
+function askDelayed() { outletAnswer.askDelayed(); }
+</script>
+
+<style scoped>
+  .result { margin-top: var(--pdx-space-md); }
+</style>

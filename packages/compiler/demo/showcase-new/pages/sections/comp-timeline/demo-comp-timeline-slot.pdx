@@ -1,0 +1,52 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use the <code>content</code> slot with PDX components for rich timeline entries.</p>
+    <div class="demo-container">
+      <pdx-timeline :items="slotTimelineItems" :dot-align="'center'">
+        <slot name="content" let:item let:index>
+          <pdx-card variant="outline" compact>
+            <div class="tl-slot-header">
+              <strong>{{ item.title }}</strong>
+              <pdx-chip size="xs" :class="item.status === 'success' ? 'pdx-success' : item.status === 'warning' ? 'pdx-warning' : 'pdx-info'">{{ item.status }}</pdx-chip>
+            </div>
+            <p class="tl-slot-desc">{{ item.description }}</p>
+            <small class="pdx-ink-muted">{{ item.date }}</small>
+          </pdx-card>
+        </slot>
+      </pdx-timeline>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- PDX components inside a scoped slot --&gt;
+&lt;pdx-timeline :items="events"&gt;
+  &lt;slot name="content" let:item let:index&gt;
+    &lt;pdx-card variant="outline" compact&gt;
+      &lt;div class="header"&gt;
+        &lt;strong&gt;{item.title}&lt;/strong&gt;
+        &lt;pdx-chip size="xs" :variant="{item.status}"&gt;
+          {item.status}
+        &lt;/pdx-chip&gt;
+      &lt;/div&gt;
+      &lt;p&gt;{item.description}&lt;/p&gt;
+      &lt;small&gt;{item.date}&lt;/small&gt;
+    &lt;/pdx-card&gt;
+  &lt;/slot&gt;
+&lt;/pdx-timeline&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const slotTimelineItems = [
+  { title: 'Started', description: 'Project kicked off with initial planning.', date: 'Jan 2026', status: 'success' },
+  { title: 'Design Phase', description: 'UI/UX wireframes and prototypes completed.', date: 'Feb 2026', status: 'success' },
+  { title: 'Development', description: 'Core features implemented and reviewed.', date: 'Mar 2026', status: 'info' },
+  { title: 'Testing', description: 'QA and integration tests in progress.', date: 'Apr 2026', status: 'warning' },
+];
+</script>
+
+<style scoped>
+.tl-slot-header { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-sm); }
+.tl-slot-desc { margin: var(--pdx-space-xs) 0; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); }
+</style>

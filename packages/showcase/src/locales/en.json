@@ -1,0 +1,113 @@
+{
+    "app": {
+        "name": "PDX Service Desk",
+        "nav": {
+            "dashboard": "Dashboard",
+            "tickets": "Tickets",
+            "intake": "Intake",
+            "board": "Board",
+            "account": "Account",
+            "label": "Main",
+            "customers": "Customers",
+            "employees": "Employees",
+            "import": "Import",
+            "sites": "Sites",
+            "assets": "Assets",
+            "contracts": "Contracts",
+            "services": "Services",
+            "settings": "Settings"
+        },
+        "views": {
+            "label": "View",
+            "reset": "Reset to the saved view",
+            "saveMenu": "Save",
+            "save": "Save",
+            "saveAs": "Save as…",
+            "rename": "Rename",
+            "delete": "Delete",
+            "keep": "Keep it",
+            "cancel": "Cancel",
+            "name": "Name",
+            "nameRequired": "A view needs a name.",
+            "saveAsTitle": "Save this arrangement as a view",
+            "renameTitle": "Rename the view",
+            "deleteTitle": "Delete this view?",
+            "deleteBody": "“{name}” is no longer offered by this list. The records themselves do not change."
+        },
+        "language": "Language",
+        "menu": "Navigation menu",
+        "demo": {
+            "open": "Demo",
+            "title": "Demo controls",
+            "note": "This showcase runs on a simulated server. These controls act on it; they are not part of the product.",
+            "empty": "This screen has no demo controls.",
+            "close": "Close the demo controls"
+        },
+        "profile": {
+            "profile": "Profile",
+            "settings": "Settings",
+            "signOut": "Sign out",
+            "scheme": "Theme",
+            "light": "Light",
+            "dark": "Dark",
+            "density": "Density",
+            "compact": "Compact",
+            "normal": "Normal",
+            "comfortable": "Comfortable"
+        },
+        "rail": {
+            "pin": "Pin {name}",
+            "newTab": "Open {name} in a new tab",
+            "toggle": "Collapse or expand the navigation",
+            "favourites": "Favourites",
+            "recent": "Recent",
+            "all": "All entities",
+            "closeAll": "Close the list of all entities",
+            "search": "Search entries",
+            "noMatch": "Nothing matches «{query}».",
+            "groups": {
+                "work": "Work",
+                "you": "You"
+            }
+        }
+    },
+    "dashboard": {
+        "title": "Service desk",
+        "intro": "Where the desk stands today, and what nobody has picked up yet.",
+        "kpis": "Ticket counts",
+        "kpi": {
+            "open": "Open",
+            "waiting": "Waiting",
+            "closed": "Closed",
+            "unassigned": "Unassigned"
+        },
+        "kpiHint": {
+            "open": "Being worked on",
+            "waiting": "Waiting on the customer",
+            "closed": "Resolved",
+            "unassigned": "Open, with nobody on them"
+        },
+        "queue": "To pick up",
+        "queueEmpty": "Every open ticket has someone on it.",
+        "queueItem": "{reference} · {subject} · {customer}",
+        "byStatus": "By status",
+        "byPriority": "Open work by priority",
+        "loadingChart": "Loading the chart…",
+        "status": {
+            "open": "Open",
+            "waiting": "Waiting",
+            "closed": "Closed"
+        },
+        "priority": {
+            "low": "Low",
+            "normal": "Normal",
+            "high": "High"
+        },
+        "count": "Tickets",
+        "demo": {
+            "colleague": "Meanwhile, at another desk:",
+            "raise": "open a ticket",
+            "close": "close a ticket"
+        }
+    }
+}

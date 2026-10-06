@@ -1,0 +1,47 @@
+{
+  "private": true,
+  "name": "@pdxui/workspace",
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.8.1",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm run test:unit && pnpm run test:browser",
+    "test:unit": "pnpm -r --workspace-concurrency=4 --filter=!@pdxui/design --filter=!@pdxui/builder --filter=!@pdxui/site --filter=!@pdxui/showcase run test",
+    "test:browser": "pnpm -r --workspace-concurrency=1 --filter @pdxui/design --filter @pdxui/builder --filter @pdxui/site --filter @pdxui/showcase run test",
+    "test:perf": "pnpm --filter @pdxui/compiler --filter @pdxui/core run test:perf",
+    "clean": "pnpm -r exec rm -rf dist",
+    "lint": "eslint packages/core/src packages/compiler/src packages/router/src packages/lsp/src packages/vscode-pdx/src packages/cli/src && node packages/design/scripts/lint-tokens.mjs",
+    "lint:fix": "eslint packages/core/src packages/compiler/src packages/router/src packages/lsp/src packages/vscode-pdx/src packages/cli/src --fix",
+    "format": "prettier --write \"packages/{core,compiler,router,lsp,vscode-pdx}/src/**/*.ts\"",
+    "format:check": "prettier --check \"packages/{core,compiler,router,lsp,vscode-pdx}/src/**/*.ts\"",
+    "typecheck": "pnpm --filter @pdxui/core --filter @pdxui/compiler --filter @pdxui/router --filter @pdxui/ui --filter @pdxui/lsp --filter @pdxui/cli --filter @pdxui/responsive --filter @pdxui/framework --filter @pdxui/site --filter @pdxui/builder --filter @pdxui/showcase --filter pragmatic-pdx exec tsc --noEmit && pnpm --filter @pdxui/design exec tsc --noEmit -p tsconfig.engine.json && pnpm --filter @pdxui/design exec tsc --noEmit -p tsconfig.test.json && pnpm --filter @pdxui/framework exec tsc --noEmit -p tsconfig.test.json && pnpm --filter @pdxui/router exec tsc --noEmit -p tsconfig.test.json && pnpm --filter @pdxui/cli exec tsc --noEmit -p tsconfig.test.json && pnpm --filter @pdxui/compiler exec tsc --noEmit -p tsconfig.test.json && pnpm --filter @pdxui/core exec tsc --noEmit -p tsconfig.test.json && pnpm --filter @pdxui/ui exec tsc --noEmit -p tsconfig.test.json",
+    "coverage": "pnpm --no-bail --filter @pdxui/core --filter @pdxui/compiler --filter @pdxui/router --filter @pdxui/lsp exec vitest run --coverage",
+    "quality": "pnpm typecheck && pnpm lint && pnpm coverage",
+    "certify": "pnpm --filter @pdxui/responsive run test:certify",
+    "certify:visual": "pnpm --filter @pdxui/responsive run test:docker",
+    "certify:gen": "pnpm --filter @pdxui/responsive run test:gen",
+    "design-score": "pnpm --filter @pdxui/responsive run design-score",
+    "prepare": "git config core.hooksPath .githooks || true"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.0",
+    "eslint": "^10.4.1",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3",
+    "typescript-eslint": "^8.60.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "defu": ">=6.1.5",
+      "postcss": ">=8.5.10",
+      "fast-uri": ">=3.1.1",
+      "vite": ">=6.4.2 <7",
+      "brace-expansion": ">=1.1.12",
+      "brace-expansion@>=5.0.0 <5.0.6": ">=5.0.6",
+      "happy-dom": ">=20.8.9",
+      "vitest": ">=4.1.0",
+      "@vitest/coverage-v8": ">=4.1.0"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 sizes via <code>size</code> attribute: sm, default, lg.</p>
+
+    <div class="btn-row">
+      <button class="pdx-primary" size="sm">Small</button>
+      <button class="pdx-primary">Default</button>
+      <button class="pdx-primary" size="lg">Large</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="pdx-outline" size="sm">Small</button>
+      <button class="pdx-outline">Default</button>
+      <button class="pdx-outline" size="lg">Large</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button class="pdx-primary" size="sm"&gt;Small&lt;/button&gt;
+&lt;button class="pdx-primary"&gt;Default&lt;/button&gt;
+&lt;button class="pdx-primary" size="lg"&gt;Large&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>

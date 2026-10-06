@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-stack">
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted label-w">Small</span>
+        <pdx-segmented label="Small" value="a" options='["a","b","c"]' size="sm"></pdx-segmented>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted label-w">Default</span>
+        <pdx-segmented label="Default" value="a" options='["a","b","c"]'></pdx-segmented>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted label-w">Large</span>
+        <pdx-segmented label="Large" value="a" options='["a","b","c"]' size="lg"></pdx-segmented>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-stack > div { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+  .label-w { min-width: 80px; }
+</style>

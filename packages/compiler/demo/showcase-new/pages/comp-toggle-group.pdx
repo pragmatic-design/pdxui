@@ -1,0 +1,77 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Toggle Group</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-toggle-group&gt;</code> — a set of <code>&lt;pdx-toggle&gt;</code> buttons that share one value.
+      <code>type="single"</code> keeps at most one pressed; <code>type="multiple"</code> keeps any number, as a comma-separated value.
+      The arrow keys move between the buttons, skipping the disabled ones.
+    </p>
+
+    <!-- ═══ Single ═══ -->
+    <pdx-demo-comp-toggle-group-single class="demo-section"></pdx-demo-comp-toggle-group-single>
+
+    <!-- ═══ Multiple ═══ -->
+    <pdx-demo-comp-toggle-group-multiple class="demo-section"></pdx-demo-comp-toggle-group-multiple>
+
+    <!-- ═══ Disabled item ═══ -->
+    <pdx-demo-comp-toggle-group-disabled-item class="demo-section"></pdx-demo-comp-toggle-group-disabled-item>
+
+    <!-- ═══ Disabled group ═══ -->
+    <pdx-demo-comp-toggle-group-disabled-group class="demo-section"></pdx-demo-comp-toggle-group-disabled-group>
+
+    <!-- ═══ Variants and sizes ═══ -->
+    <pdx-demo-comp-toggle-group-variants class="demo-section"></pdx-demo-comp-toggle-group-variants>
+
+    <!-- ═══ Vertical ═══ -->
+    <pdx-demo-comp-toggle-group-vertical class="demo-section"></pdx-demo-comp-toggle-group-vertical>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-toggle-group-composition class="demo-section"></pdx-demo-comp-toggle-group-composition>
+
+    <!-- ═══ Keyboard ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Action</span></div>
+        <div class="opt-row"><code>← / →</code><span>Previous / next toggle (horizontal); disabled toggles are skipped</span></div>
+        <div class="opt-row"><code>↑ / ↓</code><span>Previous / next toggle (vertical)</span></div>
+        <div class="opt-row"><code>Home / End</code><span>First / last enabled toggle</span></div>
+        <div class="opt-row"><code>Space / Enter</code><span>Press or release the focused toggle</span></div>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted">With <code>loop</code> (the default) the arrows wrap from the last toggle to the first.</p>
+    </section>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>type</code><span>string</span><span>single (default) or multiple</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Pressed value; comma-separated for multiple</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Accessible name of the group</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables every toggle</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal (default) or vertical</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>outline (default), ghost, solid — passed to the toggles</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg — passed to the toggles</span></div>
+        <div class="opt-row"><code>loop</code><span>boolean</span><span>Arrow keys wrap around (default true)</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>event</span><span><code>detail.value</code> and <code>detail.values</code></span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/toggle-group';
+@title 'Toggle Group Component';
+</script>
+
+<style scoped>
+  .page { }
+
+  .aligned, .sample {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-md);
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
+</style>

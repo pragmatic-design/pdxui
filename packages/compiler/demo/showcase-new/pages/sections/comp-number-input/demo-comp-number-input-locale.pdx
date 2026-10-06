@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Locale Formatting</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="US Dollar">
+        <pdx-number-input value="1234.50" locale="en-US" currency="USD" precision="2"></pdx-number-input>
+      </pdx-form-field>
+      <pdx-form-field label="Euro (German)">
+        <pdx-number-input value="1234.50" locale="de-DE" currency="EUR" precision="2"></pdx-number-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

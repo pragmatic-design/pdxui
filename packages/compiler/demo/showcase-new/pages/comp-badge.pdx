@@ -1,0 +1,104 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Badge</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-badge&gt;</code> — notification badge with count, dot, and overlay modes.
+      Props: <code>value</code>, <code>variant</code>, <code>max</code>, <code>dot</code>, <code>pulse</code>, <code>size</code>, <code>hideZero</code>.
+    </p>
+
+    <!-- ═══ Filled Variants ═══ -->
+    <pdx-demo-comp-badge-filled class="demo-section"></pdx-demo-comp-badge-filled>
+
+    <!-- ═══ Outline Variants ═══ -->
+    <pdx-demo-comp-badge-outline class="demo-section"></pdx-demo-comp-badge-outline>
+
+    <!-- ═══ Count ═══ -->
+    <pdx-demo-comp-badge-count class="demo-section"></pdx-demo-comp-badge-count>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-badge-sizes class="demo-section"></pdx-demo-comp-badge-sizes>
+
+    <!-- ═══ Dot ═══ -->
+    <pdx-demo-comp-badge-dot class="demo-section"></pdx-demo-comp-badge-dot>
+
+    <!-- ═══ Overlay ═══ -->
+    <pdx-demo-comp-badge-overlay class="demo-section"></pdx-demo-comp-badge-overlay>
+
+    <!-- ═══ Interactive ═══ -->
+    <pdx-demo-comp-badge-interactive class="demo-section"></pdx-demo-comp-badge-interactive>
+
+    <!-- ═══ CSS Only ═══ -->
+    <pdx-demo-comp-badge-css-only class="demo-section"></pdx-demo-comp-badge-css-only>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-badge-composition class="demo-section"></pdx-demo-comp-badge-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Badge content (text or number)</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>primary, secondary, success, danger, warning, info, outline-*</span></div>
+        <div class="opt-row"><code>max</code><span>number</span><span>Max count before overflow (default 99, shows "99+")</span></div>
+        <div class="opt-row"><code>dot</code><span>boolean</span><span>Render as small status dot instead of text</span></div>
+        <div class="opt-row"><code>pulse</code><span>boolean</span><span>Pulse animation on dot variant</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>What the badge means, read instead of its colour or bare number ("Online", "3 unread"). A dot without it is read as "&lt;variant&gt; indicator"</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>hideZero</code><span>boolean</span><span>Hide when value is 0 or empty (default true)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Accessibility</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Badge uses <code>role="status"</code> + <code>aria-live="polite"</code> so screen readers
+        announce count changes automatically. <code>label</code> names it ("3 unread messages");
+        a dot without one is read as its variant ("danger indicator").
+      </p>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">CSS Classes</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Class</span><span>Description</span></div>
+        <div class="opt-row"><code>.pdx-badge</code><span>Base pill badge</span></div>
+        <div class="opt-row"><code>.pdx-badge-{color}</code><span>Filled variant (primary, success, danger, warning, info)</span></div>
+        <div class="opt-row"><code>.pdx-badge-outline-{color}</code><span>Outline variant (bordered, transparent bg)</span></div>
+        <div class="opt-row"><code>.pdx-badge-sm / -lg</code><span>Size modifiers</span></div>
+        <div class="opt-row"><code>.pdx-dot</code><span>Small status dot</span></div>
+        <div class="opt-row"><code>.pdx-dot-{color}</code><span>Dot color (success, danger, warning, muted, primary)</span></div>
+        <div class="opt-row"><code>.pdx-dot-pulse</code><span>Pulse animation</span></div>
+        <div class="opt-row"><code>.pdx-badge-anchor</code><span>Positions child badge on corner of first child</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+
+@page '/components/badge';
+@title 'Badge Component';
+
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+
+  .avatar-placeholder {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--pdx-color-inset);
+    border: 1px solid var(--pdx-color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+  }
+  .avatar-placeholder.sm {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.65rem;
+  }
+</style>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Command Palette</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+    <script>
+        function pdxOpenCommand() {
+            document.getElementById('cmd-backdrop').setAttribute('data-open', '');
+            document.getElementById('cmd-palette').setAttribute('data-open', '');
+            setTimeout(() => document.getElementById('cmd-input').focus(), 100);
+        }
+        function pdxCloseCommand() {
+            document.getElementById('cmd-backdrop').removeAttribute('data-open');
+            document.getElementById('cmd-palette').removeAttribute('data-open');
+        }
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); pdxOpenCommand(); }
+            if (e.key === 'Escape') pdxCloseCommand();
+        });
+    </script>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Command Palette</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Command Palette</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Cmd+K search dialog. Centered modal with search input, grouped command list, keyboard shortcuts. Press <kbd>Ctrl+K</kbd> or click below.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Demo</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Press <kbd>Ctrl+K</kbd> or click the button to open.</p>
+                        <button class="pdx-primary" size="sm" onclick="pdxOpenCommand()">Open Command Palette</button>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Static Preview</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">How it looks (non-floating, for reference).</p>
+                        <div style="max-width:36rem">
+                            <div class="pdx-command" style="position:static;transform:none;opacity:1;visibility:visible;width:100%">
+                                <div class="pdx-command-input">
+                                    <span class="pdx-command-search-icon"><i data-lucide="search" style="width:16px;height:16px"></i></span>
+                                    <input type="text" placeholder="Type a command..." />
+                                    <kbd class="pdx-command-kbd">ESC</kbd>
+                                </div>
+                                <div class="pdx-command-list">
+                                    <span class="pdx-command-group">Navigation</span>
+                                    <button class="pdx-command-item" data-active><span class="pdx-command-item-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></span> Dashboard <span class="pdx-command-item-shortcut">Ctrl+D</span></button>
+                                    <button class="pdx-command-item"><span class="pdx-command-item-icon"><i data-lucide="users" style="width:14px;height:14px"></i></span> Users <span class="pdx-command-item-shortcut">Ctrl+U</span></button>
+                                    <button class="pdx-command-item"><span class="pdx-command-item-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></span> Settings</button>
+                                    <span class="pdx-command-group">Actions</span>
+                                    <button class="pdx-command-item"><span class="pdx-command-item-icon"><i data-lucide="plus" style="width:14px;height:14px"></i></span> New Project <span class="pdx-command-item-shortcut">Ctrl+N</span></button>
+                                    <button class="pdx-command-item"><span class="pdx-command-item-icon"><i data-lucide="upload" style="width:14px;height:14px"></i></span> Import Data</button>
+                                    <button class="pdx-command-item"><span class="pdx-command-item-icon"><i data-lucide="download" style="width:14px;height:14px"></i></span> Export CSV</button>
+                                    <span class="pdx-command-group">Theme</span>
+                                    <button class="pdx-command-item"><span class="pdx-command-item-icon"><i data-lucide="sun" style="width:14px;height:14px"></i></span> Light Mode</button>
+                                    <button class="pdx-command-item"><span class="pdx-command-item-icon"><i data-lucide="moon" style="width:14px;height:14px"></i></span> Dark Mode</button>
+                                </div>
+                                <div class="pdx-command-footer">
+                                    <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+                                    <span><kbd>↵</kbd> Select</span>
+                                    <span><kbd>ESC</kbd> Close</span>
+                                </div>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+
+    <!-- Floating command palette -->
+    <div id="cmd-backdrop" class="pdx-command-backdrop" onclick="pdxCloseCommand()"></div>
+    <div id="cmd-palette" class="pdx-command">
+        <div class="pdx-command-input">
+            <span class="pdx-command-search-icon"><i data-lucide="search" style="width:16px;height:16px"></i></span>
+            <input id="cmd-input" type="text" placeholder="Type a command..." />
+            <kbd class="pdx-command-kbd">ESC</kbd>
+        </div>
+        <div class="pdx-command-list">
+            <span class="pdx-command-group">Navigation</span>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></span> Dashboard <span class="pdx-command-item-shortcut">Ctrl+D</span></button>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="users" style="width:14px;height:14px"></i></span> Users <span class="pdx-command-item-shortcut">Ctrl+U</span></button>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></span> Settings</button>
+            <span class="pdx-command-group">Actions</span>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="plus" style="width:14px;height:14px"></i></span> New Project <span class="pdx-command-item-shortcut">Ctrl+N</span></button>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="upload" style="width:14px;height:14px"></i></span> Import Data</button>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="download" style="width:14px;height:14px"></i></span> Export CSV</button>
+            <span class="pdx-command-group">Theme</span>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="sun" style="width:14px;height:14px"></i></span> Light Mode</button>
+            <button class="pdx-command-item" onclick="pdxCloseCommand()"><span class="pdx-command-item-icon"><i data-lucide="moon" style="width:14px;height:14px"></i></span> Dark Mode</button>
+        </div>
+        <div class="pdx-command-footer">
+            <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+            <span><kbd>↵</kbd> Select</span>
+            <span><kbd>ESC</kbd> Close</span>
+        </div>
+    </div>
+
+    <script src="docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+    // Everything this package holds that is TypeScript, compiled by something.
+    //
+    // `tsconfig.engine.json` compiles `src/engine` because that is what SHIPS as JavaScript: Node
+    // will not load TypeScript from node_modules, so the package's `./engine` export points at its
+    // output. What it leaves out is the rest — 13 Playwright specs and a generator — and without
+    // this project the type gate would never look at them.
+    //
+    // The same shape of project as the other packages' test projects: emits nothing, includes the
+    // tests. `gate-coverage.test.ts` in core
+    // fails if a directory of TypeScript is left out of every project without a written reason.
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": true,
+        // The workspace root: nothing is emitted, so there is no output tree to protect, and a
+        // spec may legitimately read a sibling package's source.
+        "rootDir": "../..",
+        "declaration": false,
+        "declarationMap": false,
+        "types": ["node"],
+        "typeRoots": ["../compiler/node_modules/@types"],
+        // The generators are .mjs and the suites import them; without this the import is an error
+        // and everything it hands back is implicitly any, which is the opposite of a type gate.
+        "allowJs": true
+    },
+    "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+}

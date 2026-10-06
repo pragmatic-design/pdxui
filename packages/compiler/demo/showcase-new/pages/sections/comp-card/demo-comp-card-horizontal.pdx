@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal Layout</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Media + content side by side. Great for article lists, notifications, user profiles.</p>
+    <div class="demo-stack">
+      <pdx-card horizontal hoverable>
+        <div class="pdx-card-media"><img src="/demo-images/mountains.svg" alt="Article" /></div>
+        <div class="pdx-card-body">
+          <p class="pdx-txt-small pdx-ink-muted">Mar 28, 2026 · 5 min read</p>
+          <h4 class="pdx-txt-subheading" style="margin:4px 0">Building a Design System from Scratch</h4>
+          <p class="pdx-txt-small pdx-ink-muted">How we created Pragmatic Design with CSS-first approach, token system, and 13 themes.</p>
+        </div>
+      </pdx-card>
+      <pdx-card horizontal hoverable>
+        <div class="pdx-card-media"><img src="/demo-images/city.svg" alt="Article" /></div>
+        <div class="pdx-card-body">
+          <p class="pdx-txt-small pdx-ink-muted">Mar 15, 2026 · 8 min read</p>
+          <h4 class="pdx-txt-subheading" style="margin:4px 0">Source Generators: Zero Reflection at Scale</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Why we replaced runtime reflection with compile-time code generation across 15 modules.</p>
+        </div>
+      </pdx-card>
+    </div>
+  </section>
+</template>

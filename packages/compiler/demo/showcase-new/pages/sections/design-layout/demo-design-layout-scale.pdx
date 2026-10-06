@@ -1,0 +1,67 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Gap & Pad Scale</h2>
+    <p class="pdx-txt-small pdx-ink-muted">7-step spacing scale. Density-scaled via <code>--pdx-density-factor</code>.</p>
+
+    <div class="gap-demo">
+      <div class="gap-row">
+        <code class="gap-label">2xs</code>
+        <div class="dot-row" style="gap:var(--pdx-space-2xs)"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="pdx-txt-caption pdx-ink-muted">4px</span>
+      </div>
+      <div class="gap-row">
+        <code class="gap-label">xs</code>
+        <div class="dot-row" style="gap:var(--pdx-space-xs)"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="pdx-txt-caption pdx-ink-muted">8px</span>
+      </div>
+      <div class="gap-row">
+        <code class="gap-label">sm</code>
+        <div class="dot-row" style="gap:var(--pdx-space-sm)"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="pdx-txt-caption pdx-ink-muted">12px</span>
+      </div>
+      <div class="gap-row">
+        <code class="gap-label">md</code>
+        <div class="dot-row" style="gap:var(--pdx-space-md)"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="pdx-txt-caption pdx-ink-muted">16px</span>
+      </div>
+      <div class="gap-row">
+        <code class="gap-label">lg</code>
+        <div class="dot-row" style="gap:var(--pdx-space-lg)"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="pdx-txt-caption pdx-ink-muted">24px</span>
+      </div>
+      <div class="gap-row">
+        <code class="gap-label">xl</code>
+        <div class="dot-row" style="gap:var(--pdx-space-xl)"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="pdx-txt-caption pdx-ink-muted">40px</span>
+      </div>
+      <div class="gap-row">
+        <code class="gap-label">2xl</code>
+        <div class="dot-row" style="gap:var(--pdx-space-2xl)"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="pdx-txt-caption pdx-ink-muted">64px</span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  /* Gap demo */
+  .gap-demo { margin-top: var(--pdx-space-md); }
+  .gap-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-xs) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .gap-label { min-width: 40px; }
+  .dot-row { display: flex; align-items: center; }
+  .dot {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    flex-shrink: 0;
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-primary);
+  }
+</style>

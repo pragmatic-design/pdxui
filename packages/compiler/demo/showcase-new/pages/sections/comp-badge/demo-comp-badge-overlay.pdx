@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Overlay (Anchor)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Wrap with <code>.pdx-badge-anchor</code> to position badge on corner of another element.</p>
+
+    <div class="demo-row">
+      <span class="pdx-badge-anchor">
+        <pdx-button variant="ghost" aria-label="Notifications"><pdx-icon name="bell" size="md"></pdx-icon></pdx-button>
+        <pdx-badge label="5 unread notifications" variant="danger" value="5"></pdx-badge>
+      </span>
+
+      <span class="pdx-badge-anchor">
+        <pdx-button variant="ghost" aria-label="Messages"><pdx-icon name="mail" size="md"></pdx-icon></pdx-button>
+        <pdx-badge label="12 unread messages" variant="primary" value="12"></pdx-badge>
+      </span>
+
+      <span class="pdx-badge-anchor">
+        <pdx-button variant="ghost" aria-label="Comments"><pdx-icon name="message-circle" size="md"></pdx-icon></pdx-button>
+        <pdx-badge label="New comments" dot variant="success"></pdx-badge>
+      </span>
+
+      <span class="pdx-badge-anchor">
+        <div class="avatar-placeholder">AB</div>
+        <pdx-badge label="Online" dot variant="success" pulse></pdx-badge>
+      </span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-badge-anchor"&gt;
+  &lt;pdx-button variant="ghost"&gt;
+    &lt;pdx-icon name="bell"&gt;&lt;/pdx-icon&gt;
+  &lt;/pdx-button&gt;
+  &lt;pdx-badge variant="danger" value="5"&gt;&lt;/pdx-badge&gt;
+&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>

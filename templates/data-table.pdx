@@ -1,0 +1,105 @@
+<template>
+  <div class="data-table">
+    <div class="toolbar">
+      <input type="text" ::value="filterText" placeholder="Search..." class="search" />
+      <span class="info">{{ filteredRows.length }} of {{ rows.length }} rows</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          @for (columns as col; track col.key) {
+            <th @click="toggleSort(col.key)" class="sortable">
+              {{ col.label }}
+              @if (sortKey === col.key) {
+                <span class="sort-icon">{{ sortDir === 'asc' ? '▲' : '▼' }}</span>
+              }
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (paginatedRows as row; track row.id) {
+          <tr>
+            @for (columns as col; track col.key) {
+              <td>{{ row[col.key] }}</td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage <= 1">Prev</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage >= totalPages">Next</button>
+      </div>
+    }
+  </div>
+</template>
+
+<script setup>
+  @prop columns: object[] = [];
+  @prop rows: object[] = [];
+  @prop pageSize: number = 10;
+
+  let filterText = $signal('');
+  let sortKey = $signal('');
+  let sortDir = $signal('asc');
+  let currentPage = $signal(1);
+
+  const filteredRows = $derived(
+    rows.filter(row =>
+      columns.some(col =>
+        String(row[col.key] ?? '').toLowerCase().includes(filterText.toLowerCase())
+      )
+    )
+  );
+
+  const sortedRows = $derived(
+    sortKey
+      ? [...filteredRows].sort((a, b) => {
+          const va = a[sortKey] ?? '';
+          const vb = b[sortKey] ?? '';
+          const cmp = String(va).localeCompare(String(vb));
+          return sortDir === 'asc' ? cmp : -cmp;
+        })
+      : filteredRows
+  );
+
+  const totalPages = $derived(Math.ceil(sortedRows.length / pageSize));
+
+  const paginatedRows = $derived(
+    sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  );
+
+  function toggleSort(key) {
+    if (sortKey === key) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortKey = key;
+      sortDir = 'asc';
+    }
+    currentPage = 1;
+  }
+
+  function prevPage() { if (currentPage > 1) currentPage--; }
+  function nextPage() { if (currentPage < totalPages) currentPage++; }
+</script>
+
+<style scoped>
+  .data-table { border: 1px solid var(--pdx-color-border); border-radius: 8px; overflow: hidden; }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--pdx-color-inset); }
+  .search { padding: 0.4rem 0.75rem; border: 1px solid var(--pdx-color-border-strong); border-radius: 4px; width: 200px; }
+  .info { font-size: 0.85rem; color: var(--pdx-color-muted); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--pdx-color-border); }
+  th { background: var(--pdx-color-inset); font-weight: 600; font-size: 0.85rem; }
+  .sortable { cursor: pointer; user-select: none; }
+  .sortable:hover { background: var(--pdx-color-surface); }
+  .sort-icon { margin-left: 0.25rem; font-size: 0.7rem; }
+  .pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 0.75rem; }
+  .pagination button { padding: 0.25rem 0.75rem; border: 1px solid var(--pdx-color-border-strong); border-radius: 4px; cursor: pointer; }
+  .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>

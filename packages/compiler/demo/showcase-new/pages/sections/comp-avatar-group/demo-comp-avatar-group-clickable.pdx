@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Clickable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click on an avatar or the overflow badge, or Tab to it and press Enter or Space. Each avatar is a button named by its person, the badge one named "4 more". Hover scales up.</p>
+    <div class="demo-container">
+      <pdx-avatar-group :items="teamItems" :max="4" :clickable="true" @pdx-click="onAvatarClick" @pdx-overflow-click="onOverflowClick"></pdx-avatar-group>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="click-log">{{ clickLog }}</div>
+  </section>
+</template>
+
+<script setup>
+import { teamItems } from './state.pdx';
+
+let clickLog = $signal('Click an avatar...');
+
+function onAvatarClick(e) {
+  clickLog = 'pdx-click: ' + e.detail.item.name + ' (index ' + e.detail.index + ')';
+}
+
+function onOverflowClick(e) {
+  clickLog = 'pdx-overflow-click: +' + e.detail.count + ' hidden avatars';
+}
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+</style>

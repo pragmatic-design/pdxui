@@ -1,0 +1,46 @@
+<!-- Hand-written demo for @pdxui/router's <pdx-router-outlet>: the router's elements have no
+     showcase page. An outlet renders the app's routes, so this page shows the code, not a live outlet. -->
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Router Outlet</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Where the page the current route matches is rendered. The app shell places one; the pages are the
+      <code>.pdx</code> files that declare <code>@@page</code>.
+    </p>
+
+    <section>
+      <h2 class="pdx-txt-heading">The app shell</h2>
+      <p class="pdx-txt-small pdx-ink-muted">The main outlet, inside the layout every page shares: the navigation stays, the page changes.</p>
+      <details class="source">
+        <summary>Source</summary>
+        <pre><code>&lt;header&gt;
+  &lt;pdx-link to="/"&gt;Home&lt;/pdx-link&gt;
+  &lt;pdx-link to="/settings"&gt;Settings&lt;/pdx-link&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;pdx-router-outlet&gt;&lt;/pdx-router-outlet&gt;
+&lt;/main&gt;</code></pre>
+      </details>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading">A named outlet</h2>
+      <p class="pdx-txt-small pdx-ink-muted">Beside the main one, an outlet with a <code>name</code> renders the component its route assigns to that name in <code>outlets</code>: a side panel that follows the route.</p>
+      <details class="source">
+        <summary>Source</summary>
+        <pre><code>&lt;main&gt;
+  &lt;pdx-router-outlet&gt;&lt;/pdx-router-outlet&gt;
+&lt;/main&gt;
+&lt;aside&gt;
+  &lt;pdx-router-outlet name="details"&gt;&lt;/pdx-router-outlet&gt;
+&lt;/aside&gt;</code></pre>
+      </details>
+    </section>
+  </div>
+</template>
+
+<style scoped>
+.page { max-width: 760px; }
+.intro { margin-bottom: var(--pdx-space-xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+</style>

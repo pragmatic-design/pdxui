@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">A Type per Level</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Custom properties on the menu, for levels 1 to 3 (the third stands for every deeper one). Here: categories bold,
+      sub-groups muted, the third level smaller and further in.
+    </p>
+    <div class="demo-sidebar">
+      <pdx-nav-menu class="tree-look" :items="nestedItems" activekey="users" size="sm" indicator="border"></pdx-nav-menu>
+    </div>
+    <div class="options-table">
+      <table>
+        <thead><tr><th>Property</th><th>Applies to</th><th>Default</th></tr></thead>
+        <tbody>
+          <tr><td><code>--pdx-nav-level{1,2,3}-size</code></td><td>every entry of the level</td><td>the menu's text size</td></tr>
+          <tr><td><code>--pdx-nav-level{1,2,3}-indent</code></td><td>every entry of the level: start padding</td><td><code>indent</code> × depth + 8px</td></tr>
+          <tr><td><code>--pdx-nav-level{1,2,3}-group-weight</code></td><td>a group's entry</td><td>medium</td></tr>
+          <tr><td><code>--pdx-nav-level{1,2,3}-group-color</code></td><td>a group's entry, at rest</td><td><code>--pdx-color-muted</code></td></tr>
+          <tr><td><code>--pdx-nav-level{1,2,3}-group-space</code></td><td>a group's entry: space above</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>.tree-look {
+  --pdx-nav-level1-group-weight: 600;
+  --pdx-nav-level1-group-color: var(--pdx-color-text);
+  --pdx-nav-level2-size: 0.76rem;
+  --pdx-nav-level3-size: 0.72rem;
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { nestedItems } from './state.pdx';
+</script>
+
+<style scoped>
+/* The menu's documented per-level properties, set on its host. */
+.tree-look {
+  --pdx-nav-level1-group-weight: 600;
+  --pdx-nav-level1-group-color: var(--pdx-color-text);
+  --pdx-nav-level2-size: 0.76rem;
+  --pdx-nav-level3-size: 0.72rem;
+}
+</style>

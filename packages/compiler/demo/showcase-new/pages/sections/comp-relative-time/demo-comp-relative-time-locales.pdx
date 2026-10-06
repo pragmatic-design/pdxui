@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Locales</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Same date rendered in different locales.</p>
+    <div class="demo-container">
+      <div class="demo-stack">
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">English:</span>
+          <pdx-relative-time :datetime="twoHoursAgo" locale="en"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Italiano:</span>
+          <pdx-relative-time :datetime="twoHoursAgo" locale="it"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Deutsch:</span>
+          <pdx-relative-time :datetime="twoHoursAgo" locale="de"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Japanese:</span>
+          <pdx-relative-time :datetime="twoHoursAgo" locale="ja"></pdx-relative-time>
+        </div>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-relative-time :datetime="date" locale="it"&gt;&lt;/pdx-relative-time&gt;
+&lt;pdx-relative-time :datetime="date" locale="de"&gt;&lt;/pdx-relative-time&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const twoHoursAgo = new Date(Date.now() - 2 * 3600000).toISOString();
+</script>

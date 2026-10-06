@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal</h2>
+    <div class="demo-container">
+      <pdx-scroll-area axis="horizontal" height="100px">
+        <div class="scroll-horizontal">
+          <div class="scroll-card">Card 1</div>
+          <div class="scroll-card">Card 2</div>
+          <div class="scroll-card">Card 3</div>
+          <div class="scroll-card">Card 4</div>
+          <div class="scroll-card">Card 5</div>
+          <div class="scroll-card">Card 6</div>
+          <div class="scroll-card">Card 7</div>
+          <div class="scroll-card">Card 8</div>
+          <div class="scroll-card">Card 9</div>
+          <div class="scroll-card">Card 10</div>
+          <div class="scroll-card">Card 11</div>
+          <div class="scroll-card">Card 12</div>
+          <div class="scroll-card">Card 13</div>
+          <div class="scroll-card">Card 14</div>
+          <div class="scroll-card">Card 15</div>
+        </div>
+      </pdx-scroll-area>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.scroll-horizontal {
+  display: flex;
+  gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-md);
+  width: max-content;
+}
+.scroll-card {
+  width: 160px;
+  height: 60px;
+  background: var(--pdx-color-inset);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--pdx-text-sm);
+  flex-shrink: 0;
+}
+</style>

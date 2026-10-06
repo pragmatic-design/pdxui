@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Fiscal Year / Quarter</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Configurable fiscal start month. Q1 starts in April if <code>fiscal-start-month="4"</code>.
+    </p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Quarter picker (fiscal April start)</span>
+        <pdx-date-picker mode="quarter" :fiscal-start-month="4" placeholder="Select fiscal quarter"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Quarter picker (calendar year)</span>
+        <pdx-date-picker mode="quarter" :fiscal-start-month="1" placeholder="Select calendar quarter"></pdx-date-picker>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker mode="quarter" :fiscal-start-month="4"
+  placeholder="Select fiscal quarter"&gt;&lt;/pdx-date-picker&gt;
+
+&lt;pdx-date-picker mode="quarter" :fiscal-start-month="1"
+  placeholder="Select calendar quarter"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

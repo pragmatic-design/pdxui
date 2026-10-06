@@ -1,0 +1,77 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Entrance Animations</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click "Play" to trigger each animation. The class is added dynamically.</p>
+
+    <button class="pdx-primary" style="margin-bottom:var(--pdx-space-md)" @click="play">Play Animations</button>
+
+    <div class="anim-grid">
+      <div class="anim-cell">
+        <div class="anim-box" :class="playing ? 'pdx-animate-fade-in' : 'anim-idle'">fade-in</div>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-animate-fade-in</span>
+      </div>
+      <div class="anim-cell">
+        <div class="anim-box" :class="playing ? 'pdx-animate-slide-up' : 'anim-idle'">slide-up</div>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-animate-slide-up</span>
+      </div>
+      <div class="anim-cell">
+        <div class="anim-box" :class="playing ? 'pdx-animate-slide-down' : 'anim-idle'">slide-down</div>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-animate-slide-down</span>
+      </div>
+      <div class="anim-cell">
+        <div class="anim-box" :class="playing ? 'pdx-animate-scale-in' : 'anim-idle'">scale-in</div>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-animate-scale-in</span>
+      </div>
+      <div class="anim-cell">
+        <div class="anim-box" :class="playing ? 'pdx-animate-bounce' : 'anim-idle'">bounce</div>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-animate-bounce</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-animate-fade-in"&gt;Fades in&lt;/div&gt;
+&lt;div class="pdx-animate-slide-up"&gt;Slides up&lt;/div&gt;
+&lt;div class="pdx-animate-slide-down"&gt;Slides down&lt;/div&gt;
+&lt;div class="pdx-animate-scale-in"&gt;Scales in&lt;/div&gt;
+&lt;div class="pdx-animate-bounce"&gt;Bounces&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let playing = $signal(false);
+
+function play() {
+    playing = false;
+    setTimeout(() => { playing = true; }, 30);
+}
+</script>
+
+<style scoped>
+  .anim-grid {
+    display: flex;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .anim-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+  }
+  .anim-box {
+    width: 100px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pdx-primary-100);
+    border: 1px solid var(--pdx-primary-300);
+    border-radius: var(--pdx-radius-md);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-primary-800);
+    font-weight: var(--pdx-weight-medium);
+  }
+</style>

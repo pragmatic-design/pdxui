@@ -1,0 +1,84 @@
+<template>
+  <section class="page" data-test="contracts-list">
+    <!-- The list's header, the tickets', with a view the list ships with. -->
+    <pdx-list-header
+      :title="$t('contracts.title')"
+      store-key="contracts"
+      :default-name="$t('contracts.views.default')"
+      :built-in="builtInViews"
+      :grid="gridEl"
+      :source="source"
+      :base-page-size="25">
+      <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('contracts.matching', { count: total }) }}</span>
+    </pdx-list-header>
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('contracts.intro') }}</p>
+
+    <!-- READ-ONLY: no selection, no row action. A contract is changed in its employee, and the
+         employee's name is the way there. The link is the router's on a plain click, and a new tab
+         on a modified one, as a link should be. -->
+    <div @click="followLink">
+      <pdx-data-grid
+        :ref="gridEl"
+        :source="source"
+        :columns="columns"
+        :page-sizes="[25, 50]"
+        show-toolbar
+        search
+        data-test="grid"></pdx-data-grid>
+    </div>
+  </section>
+</template>
+
+<script setup>
+@page '/contracts' { label: $t('contracts.title') };
+@title $t('contracts.title');
+@scroll 'preserve';
+
+import { createDataSource, badge, link } from '@pdxui/core';
+import { navigate } from '@pdxui/router';
+import { contractTransport, CONTRACT_STATES } from '../data/contracts';
+import { CONTRACT_TYPES } from '../data/employees';
+
+// Twenty-two in the seed: one page of twenty-five holds them all.
+const source = createDataSource({ transport: contractTransport, pageSize: 25 });
+
+const STATE_TONES = { open: 'success', endingSoon: 'warning', ended: 'muted' };
+
+/** «Ending this month»: the list's own view, which a reader uses and cannot delete. */
+const builtInViews = $derived([
+  { key: 'ending-this-month', name: $t('contracts.views.endingThisMonth'),
+    filter: [{ field: 'state', operator: 'eq', value: 'endingSoon' }] },
+]);
+
+const columns = $derived([
+    { field: 'employeeName', header: $t('contracts.columns.employee'), searchable: true,
+      cell: link({ href: (_v, row) => `/employees/${row.employeeId}/contracts` }) },
+    { field: 'type', header: $t('contracts.columns.type'), width: 180,
+      format: (v) => $t('contracts.types.' + String(v)), quickFilter: true,
+      filterOptions: CONTRACT_TYPES.map(v => ({ value: v, label: $t('contracts.types.' + v) })) },
+    { field: 'start', header: $t('contracts.columns.start'), width: 140,
+      format: (v) => (v ? $d(String(v), { dateStyle: 'medium' }) : '') },
+    { field: 'end', header: $t('contracts.columns.end'), width: 140,
+      format: (v) => (v ? $d(String(v), { dateStyle: 'medium' }) : $t('contracts.openEnded')) },
+    { field: 'weeklyHours', header: $t('contracts.columns.weeklyHours'), width: 130, align: 'right' },
+    { field: 'state', header: $t('contracts.columns.state'), width: 150,
+      format: (v) => $t('contracts.states.' + String(v)), cell: badge({ tones: STATE_TONES }), quickFilter: true,
+      filterOptions: CONTRACT_STATES.map(v => ({ value: v, label: $t('contracts.states.' + v) })) },
+]);
+
+const total = $derived(source.total());
+/** The grid, for the list header's views. A `:ref` binds into a SIGNAL. */
+let gridEl = $signal(null);
+
+/** A plain click on the employee's link is the router's; a modified one keeps the browser's new tab. */
+function followLink(e) {
+  const a = e.target.closest?.('a.pdx-dg-link');
+  if (!a || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  navigate(a.getAttribute('href'));
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+</style>

@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Chip Field</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Input with chips inside using <code>.pdx-chip-field</code>.</p>
+
+    <div class="pdx-chip-field">
+      <span class="pdx-chip pdx-chip-sm">design <button class="pdx-chip-remove" aria-label="Remove">&times;</button></span>
+      <span class="pdx-chip pdx-chip-sm">ui <button class="pdx-chip-remove" aria-label="Remove">&times;</button></span>
+      <input class="pdx-chip-input" type="text" placeholder="Add tag..." />
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-chip-field"&gt;
+  &lt;span class="pdx-chip pdx-chip-sm"&gt;
+    design &lt;button class="pdx-chip-remove"&gt;&amp;times;&lt;/button&gt;
+  &lt;/span&gt;
+  &lt;input class="pdx-chip-input" placeholder="Add tag..." /&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

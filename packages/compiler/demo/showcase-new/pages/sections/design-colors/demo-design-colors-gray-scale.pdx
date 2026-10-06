@@ -1,0 +1,83 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Gray Scale</h2>
+    <p class="pdx-txt-small pdx-ink-muted">11-step neutral ramp in OKLCH. Each theme can override these to add warm/cool tinting. Used as primitives for semantic tokens.</p>
+
+    <div class="gray-ramp">
+      <div class="gray-chip" style="background:var(--pdx-gray-50)">
+        <span class="chip-label dark-text">50</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-100)">
+        <span class="chip-label dark-text">100</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-200)">
+        <span class="chip-label dark-text">200</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-300)">
+        <span class="chip-label dark-text">300</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-400)">
+        <span class="chip-label dark-text">400</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-500)">
+        <span class="chip-label light-text">500</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-600)">
+        <span class="chip-label light-text">600</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-700)">
+        <span class="chip-label light-text">700</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-800)">
+        <span class="chip-label light-text">800</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-900)">
+        <span class="chip-label light-text">900</span>
+      </div>
+      <div class="gray-chip" style="background:var(--pdx-gray-950)">
+        <span class="chip-label light-text">950</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>--pdx-gray-50:  oklch(0.985 0.002 75)
+--pdx-gray-100: oklch(0.965 0.004 75)
+--pdx-gray-200: oklch(0.905 0.008 75)
+  ...
+--pdx-gray-950: oklch(0.13  0.005 75)
+
+/* Themes override with warm/cool tint:
+   pragmatic → hue 80 (warm gold)
+   material  → hue 280 (cool violet) */</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Gray ramp */
+  .gray-ramp {
+    display: flex;
+    /* Ten 64px chips do not fit a phone: they wrap instead of being clipped by overflow. */
+    flex-wrap: wrap;
+    gap: 0;
+    margin-top: var(--pdx-space-md);
+    border-radius: var(--pdx-radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--pdx-color-border);
+  }
+  .gray-chip {
+    flex: 1 0 64px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: var(--pdx-space-xs);
+    min-height: 64px;
+  }
+  .chip-label {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    font-family: var(--pdx-font-mono);
+  }
+</style>

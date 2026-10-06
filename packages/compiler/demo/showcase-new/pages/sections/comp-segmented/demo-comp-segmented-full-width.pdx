@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Full Width</h2>
+    <div class="demo-row">
+      <pdx-segmented label="Layout" :value="layout" options='[{"label":"Grid","value":"grid"},{"label":"List","value":"list"},{"label":"Table","value":"table"}]' full @change="onLayout"></pdx-segmented>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let layout = $signal('grid');
+
+function onLayout(e) {
+  layout = e.detail.value;
+}
+</script>

@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Uses Pragmatic icon set. Required for collapsed mode.</p>
+
+    <div class="demo-sidebar">
+      <pdx-nav-menu :items="iconItems" activekey="inbox"></pdx-nav-menu>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-nav-menu :items="items" activekey="inbox"&gt;&lt;/pdx-nav-menu&gt;
+
+// { key: 'inbox', label: 'Inbox', icon: 'mail' }
+// { key: 'sent', label: 'Sent', icon: 'send' }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { iconItems } from './state.pdx';
+</script>

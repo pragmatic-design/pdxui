@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Close Button</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Dismissable via <code>.pdx-banner-close</code>. Hover increases opacity.</p>
+
+    <div class="banner-demo">
+      <div class="pdx-banner pdx-banner-info">
+        <span class="pdx-banner-icon">&#128232;</span>
+        <span class="pdx-banner-text">New feature: dark mode is now available in settings.</span>
+        <button class="pdx-banner-close">&times;</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-banner pdx-banner-info"&gt;
+  &lt;span class="pdx-banner-text"&gt;New feature available.&lt;/span&gt;
+  &lt;button class="pdx-banner-close"&gt;&amp;times;&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

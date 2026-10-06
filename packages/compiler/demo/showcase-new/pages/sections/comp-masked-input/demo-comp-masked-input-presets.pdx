@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Built-in Presets</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Phone Number">
+        <pdx-masked-input mask="phone"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Phone (International)">
+        <pdx-masked-input mask="phone-intl"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Credit Card">
+        <pdx-masked-input mask="card"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Date (MM/DD/YYYY)">
+        <pdx-masked-input mask="date"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Time (HH:MM)">
+        <pdx-masked-input mask="time"></pdx-masked-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="SSN">
+        <pdx-masked-input mask="ssn"></pdx-masked-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-masked-input mask="phone"&gt;&lt;/pdx-masked-input&gt;
+&lt;pdx-masked-input mask="card"&gt;&lt;/pdx-masked-input&gt;
+&lt;pdx-masked-input mask="date"&gt;&lt;/pdx-masked-input&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Border & Focus</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Border tokens for dividers and containers, plus focus ring for keyboard navigation.</p>
+
+    <div class="border-demo">
+      <div class="border-box" style="border:1px solid var(--pdx-color-border)">
+        <code>--pdx-color-border</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Default dividers</span>
+      </div>
+      <div class="border-box" style="border:2px solid var(--pdx-color-border-strong)">
+        <code>--pdx-color-border-strong</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Emphasized borders</span>
+      </div>
+      <div class="border-box focus-ring-demo">
+        <code>--pdx-focus-ring</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Keyboard focus indicator</span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  /* Border demo */
+  .border-demo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+  .border-box {
+    padding: var(--pdx-space-md);
+    border-radius: var(--pdx-radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    background: var(--pdx-color-surface);
+  }
+  .focus-ring-demo {
+    border: 1px solid var(--pdx-color-border);
+    box-shadow: var(--pdx-focus-ring);
+  }
+</style>

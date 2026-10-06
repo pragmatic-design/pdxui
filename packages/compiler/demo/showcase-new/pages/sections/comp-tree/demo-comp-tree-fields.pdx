@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">The fields are yours</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      A tree renders the objects the application already has: name the fields with
+      <code>id-field</code>, <code>label-field</code> and <code>children-field</code> instead of
+      converting the data to a shape the component prefers.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tree label="Org chart" default-expand-all id-field="code" label-field="name"
+                children-field="reports" :nodes="org"></pdx-tree>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tree id-field="code" label-field="name" children-field="reports"
+          :nodes="org"&gt;&lt;/pdx-tree&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const org = [
+  {
+    code: 'ceo', name: 'Chief Executive', reports: [
+      {
+        code: 'cto', name: 'Chief Technology', reports: [
+          { code: 'eng', name: 'Engineering' },
+          { code: 'inf', name: 'Infrastructure' },
+        ]
+      },
+      { code: 'cfo', name: 'Chief Financial' },
+    ]
+  },
+];
+</script>

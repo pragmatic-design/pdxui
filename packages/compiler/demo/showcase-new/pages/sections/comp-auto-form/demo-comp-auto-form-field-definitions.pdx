@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">From FieldDefinition[]</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Pass the same field definitions used for the grid. The form auto-generates inputs
+      with labels, types, and validation from the field schema.
+    </p>
+    <div class="demo-container">
+      <pdx-auto-form :fields="formFields" layout="grid" :columns="12"></pdx-auto-form>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const fields = [
+  { field: 'name', label: 'Name', type: 'text', required: true,
+    validators: [{ type: 'required' }] },
+  { field: 'email', label: 'Email', type: 'email',
+    validators: [{ type: 'email' }] },
+  { field: 'role', label: 'Role', type: 'enum',
+    options: [{ label: 'Engineer', value: 'Engineer' }, ...] },
+  { field: 'salary', label: 'Salary', type: 'currency' },
+  { field: 'active', label: 'Active', type: 'boolean' },
+];
+
+&lt;pdx-auto-form :fields="fields" layout="grid" :columns="12"&gt;
+&lt;/pdx-auto-form&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];
+
+const formFields = [
+  { field: 'name', label: 'Full Name', type: 'text', required: true, validators: [{ type: 'required' }] },
+  { field: 'email', label: 'Email', type: 'email', validators: [{ type: 'email' }] },
+  { field: 'role', label: 'Role', type: 'enum', options: roles.map(function(r) { return { label: r, value: r }; }) },
+  { field: 'salary', label: 'Salary', type: 'currency', editorProps: { min: 0 } },
+  { field: 'active', label: 'Active', type: 'boolean' },
+];
+</script>

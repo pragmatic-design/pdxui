@@ -1,0 +1,50 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Progress</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Linear and circular progress indicators. Determinate (with value) or indeterminate (animated). Sizes, colors, striped, labels.
+    </p>
+
+    <!-- ═══ Linear ═══ -->
+    <pdx-demo-comp-progress-linear class="demo-section"></pdx-demo-comp-progress-linear>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-comp-progress-colors class="demo-section"></pdx-demo-comp-progress-colors>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-progress-sizes class="demo-section"></pdx-demo-comp-progress-sizes>
+
+    <!-- ═══ Striped ═══ -->
+    <pdx-demo-comp-progress-striped class="demo-section"></pdx-demo-comp-progress-striped>
+
+    <!-- ═══ Circular ═══ -->
+    <pdx-demo-comp-progress-circular class="demo-section"></pdx-demo-comp-progress-circular>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>Current value (0-max). Omit for indeterminate.</span></div>
+        <div class="opt-row"><code>max</code><span>Maximum value (default 100)</span></div>
+        <div class="opt-row"><code>variant</code><span>success, warning, danger</span></div>
+        <div class="opt-row"><code>size</code><span>sm, lg</span></div>
+        <div class="opt-row"><code>showLabel</code><span>Show percentage text</span></div>
+        <div class="opt-row"><code>label</code><span>Custom label text</span></div>
+        <div class="opt-row"><code>striped</code><span>Animated stripe pattern</span></div>
+        <div class="opt-row"><code>circular</code><span>Ring/circular mode</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/progress';
+@title 'Progress';
+</script>
+
+<style scoped>
+  .page { }
+
+  .opt-header, .opt-row { grid-template-columns: 150px 1fr; }
+</style>

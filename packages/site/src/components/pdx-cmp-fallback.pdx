@@ -1,0 +1,52 @@
+<template>
+  @if (placeholder) {
+    <section id="overview" class="cmp-section">
+      <div class="cmp-placeholder glass">
+        <p class="cmp-ph-title">Full interactive demos are being finalized</p>
+        <p class="cmp-ph-text">Explore this component's API reference below in the meantime.</p>
+      </div>
+    </section>
+  } @else {
+    <section id="overview" class="cmp-section">
+      <h2 class="cmp-h2">Overview</h2>
+      <pdx-demo :code="heroSrc"></pdx-demo>
+    </section>
+  }
+  @if (exDemos.length > 0) {
+    <section class="cmp-section">
+      <h2 class="cmp-h2">Examples</h2>
+      @for (exDemos as d; track d.title) {
+        <pdx-demo :title="d.title" :description="d.description || ''" :code="d.src"></pdx-demo>
+      }
+    </section>
+  }
+  @if (useCases.length > 0) {
+    <section class="cmp-section">
+      <h2 class="cmp-h2">Use cases</h2>
+      @for (useCases as u; track u.title) {
+        <pdx-demo :title="u.title" :description="u.description || ''" :code="u.src"></pdx-demo>
+      }
+    </section>
+  }
+</template>
+
+<script setup>
+// What a component page shows when it has no gallery: a hero demo — or, for a component
+// that needs data to show anything, a placeholder — then the examples and use cases written for it.
+import { contentOf, heroSourceOf } from '../lib/component-content';
+
+@prop tag: string = '';
+@prop placeholder: boolean = false;
+
+const heroSrc = $derived(heroSourceOf(tag));
+const exDemos = $derived(contentOf(tag)?.demos || []);
+const useCases = $derived(contentOf(tag)?.useCases || []);
+</script>
+
+<style scoped>
+.cmp-section { margin-top: 2.6rem; }
+.cmp-h2 { font-size: 1.35rem; margin: 0 0 0.6rem; }
+.cmp-placeholder { padding: 2rem 1.5rem; border-radius: 14px; border: 1px dashed var(--outline); text-align: center; }
+.cmp-ph-title { margin: 0 0 0.3rem; font-family: var(--font-heading); font-weight: 600; color: var(--ink); }
+.cmp-ph-text { margin: 0; color: var(--ink-muted); font-size: 0.9rem; }
+</style>

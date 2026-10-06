@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Pre-selected</h2>
+    <div class="demo-row">
+      <pdx-tree-select label="Department" :options="departments" :value="'frontend'"></pdx-tree-select>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { departments } from './state.pdx';
+</script>

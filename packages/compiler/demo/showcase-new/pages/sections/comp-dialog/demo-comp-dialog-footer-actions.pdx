@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">With Footer Actions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Footer slot for action buttons — confirm/cancel pattern.</p>
+    <div class="btn-row">
+      <pdx-button variant="primary" size="sm" @click="openFooter">Edit Profile</pdx-button>
+    </div>
+    <pdx-dialog :open="footerOpen" title="Edit Profile" size="md" @pdx-close="closeFooter">
+      <div class="form-fields">
+        <label class="pdx-txt-small pdx-ink-muted">Full Name</label>
+        <input type="text" class="pdx-input" value="Jane Smith" />
+        <label class="pdx-txt-small pdx-ink-muted">Email</label>
+        <input type="email" class="pdx-input" value="jane@example.com" />
+        <label class="pdx-txt-small pdx-ink-muted">Bio</label>
+        <textarea class="pdx-input" rows="3">Software engineer passionate about UI.</textarea>
+      </div>
+      <span slot="footer">
+        <pdx-button variant="ghost" size="sm" @click="closeFooter">Cancel</pdx-button>
+        <pdx-button variant="primary" size="sm" @click="closeFooter">Save Changes</pdx-button>
+      </span>
+    </pdx-dialog>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="footerOpen" title="Edit Profile" size="md" @pdx-close="closeFooter"&gt;
+  &lt;div class="form-fields"&gt;
+    &lt;label&gt;Full Name&lt;/label&gt;
+    &lt;input type="text" class="pdx-input" value="Jane Smith" /&gt;
+  &lt;/div&gt;
+  &lt;span slot="footer"&gt;
+    &lt;pdx-button variant="ghost" @click="closeFooter"&gt;Cancel&lt;/pdx-button&gt;
+    &lt;pdx-button variant="primary" @click="closeFooter"&gt;Save Changes&lt;/pdx-button&gt;
+  &lt;/span&gt;
+&lt;/pdx-dialog&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let footerOpen = $signal(false);
+
+function openFooter() { footerOpen = true; }
+function closeFooter() { footerOpen = false; }
+</script>

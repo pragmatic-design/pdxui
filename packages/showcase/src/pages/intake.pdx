@@ -1,0 +1,338 @@
+<template>
+  <!-- Every write on this screen goes through here on its way to the draft. A listener on the
+       section rather than a watch on the forms: `getValues()` reads with `.peek()` and is not
+       reactive, and the rows a `<pdx-field-list>` adds are not in `fields` until they exist. A
+       native `input` bubbles out of every `<pdx-input>` in light DOM, which is what this rides.
+       A `<pdx-date-picker editable>` is the exception: its value lands on blur, AFTER the native
+       `change` of its text box, so it is `pdx-change` that carries a typed date. -->
+  <section class="page" data-test="intake" @input="touchDraft" @change="touchDraft" @pdx-change="touchDraft">
+    <h1 class="pdx-txt-title">{{ $t('intake.title') }}</h1>
+    <!-- For the reader of the source: a four-step wizard — two forms, one Save, a rule
+         that reads two fields, and a guard on leaving. -->
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('intake.intro') }}</p>
+
+    <!-- THE OFFER, and it restores nothing until it is answered. A form that silently
+         refills itself is how someone submits last week's answers without noticing — so the page
+         says a draft exists, says WHEN, says what it could not keep, and waits. -->
+    <div class="draft-offer" :show="draftOffer !== null" role="status" data-test="draft-offer">
+      <span class="pdx-txt-small">{{ $t('intake.draft.found', { when: draftWhen }) }}</span>
+      <span class="pdx-txt-small draft-lost" :show="draftLost !== ''">{{ $t('intake.draft.lost', { names: draftLost }) }}</span>
+      <pdx-button size="sm" variant="primary" @click="resumeDraft" data-test="draft-resume">{{ $t('intake.draft.resume') }}</pdx-button>
+      <pdx-button size="sm" variant="ghost" @click="discardDraft" data-test="draft-discard">{{ $t('intake.draft.discard') }}</pdx-button>
+    </div>
+
+    <!-- That the work is safe is not something to leave to trust. -->
+    <span class="pdx-txt-small pdx-ink-muted" :show="draftSavedAt !== ''" data-test="draft-saved">{{ $t('intake.draft.saved') }}</span>
+
+    <!-- `:value="step"` and panels grouped by form: both arrangements work, a panel one level down
+         (here, inside its `<pdx-form>`) and a bound `value`.
+
+         Only the `intake` form carries `name`: the coordinator keys by name, and the three panels
+         share one Form object — registering it three times is the same entry, but saying so once
+         is clearer than relying on that. -->
+    <pdx-wizard :value="step" @pdx-before-change.self="onBeforeStep" @pdx-change.self="onStep" data-test="wizard">
+
+        <!-- The three steps of the intake form are grouped BY FORM: a <form> inside a
+             <form> is invalid HTML, so one form wrapping its panels is the arrangement an
+             author reaches for, and the wizard finds a panel that is not its direct child. -->
+        <pdx-form :form="intake" name="intake" data-test="form-intake">
+        <!-- ─── 1 · who is asking: `src/intake/requester-step.pdx` ─── -->
+        <pdx-requester-step
+          :customer-name="customerName"
+          :customer-id="assetCustomerId"
+          @customerpicked="onCustomerPicked"
+          @assetpicked="e => assetId = e.detail"></pdx-requester-step>
+
+        <!-- ─── 2 · the window and the mode: `src/intake/window-step.pdx` ─── -->
+        <pdx-window-step :mode="mode" @modechange="e => mode = e.detail"></pdx-window-step>
+
+        <!-- ─── 3 · what step 2 asked for: `src/intake/details-step.pdx` ─── -->
+        <pdx-details-step :mode="mode" :form="intake" @attach="onAttach" @detach="onDetach"></pdx-details-step>
+        </pdx-form>
+
+        <!-- ─── 4 · the second form, and one Save for both ─────────────────── -->
+        <pdx-form :form="billing" name="billing" data-test="form-billing">
+        <!-- `src/intake/billing-step.pdx`: the Save it shows is this page's `submitAll`. -->
+        <pdx-billing-step
+          :customer-name="customerName"
+          :line-count="lineCount"
+          :can-submit="canSubmit"
+          :submitted="submitted"
+          :server-error="serverError"
+          @submit="submitAll"></pdx-billing-step>
+        </pdx-form>
+    </pdx-wizard>
+
+  </section>
+</template>
+
+<script setup>
+@page '/intake';
+@title $t('intake.title');
+
+import { createFormCoordinator, provideFormCoordinator, getDialogQueue } from '@pdxui/core';
+import { submitIntake, refuseNextSubmit } from '../data/intake';
+import { registerDemo } from '../demo';
+import { createDraft } from '../data/draft';
+
+// `validate` is the CROSS-FIELD rule: it reads every value and returns messages by field, so
+// "the end precedes the start" is the `ends` field's own error — it shows in its
+// `<pdx-form-field>`, `intake.valid()` knows about it, and a submit that never went through the
+// wizard still sees it.
+@form intake: {
+  requester: string { required },
+  email: string { required, email },
+  starts: string { required },
+  ends: string { required },
+  address: { street: string, city: string },
+  lines: [{ activity: string, hours: number }]
+} {
+  validate: windowRule
+};
+
+/** The window has to end after it starts. `$t` so the message follows the locale. */
+function windowRule(v) {
+  return v.starts && v.ends && v.ends < v.starts
+    ? { ends: $t('intake.endsBeforeStarts') }
+    : {};
+}
+
+@form billing: {
+  po: string { required }
+};
+
+// One Save for two forms. `submitAll` validates EVERY registered form before submitting ANY of
+// them, which is the claim this screen is here to show: a half-saved screen is not reachable.
+const coordinator = createFormCoordinator();
+provideFormCoordinator(coordinator);
+
+let step = $signal(0);
+let mode = $signal('onsite');
+let customerName = $signal('');
+/** The asset the request is about, or 0. */
+let assetId = $signal(0);
+/** Whose assets the picker offers: the first customer picked, by id — an asset has one owner. */
+let assetCustomerId = $signal(0);
+let serverError = $signal('');
+let submitted = $signal(false);
+
+// ─── The draft ─────────────────────────────────────────────────────
+//
+// Read at mount, applied only if the reader says so. `onSave` is what turns the write into
+// something on screen: «saved» that nobody can see is a promise, not a fact.
+let draftSavedAt = $signal('');
+let draftOffer = $signal(null);
+let attachment = $signal(null);
+
+const draft = createDraft('showcase.intake', {
+  onSave: (record) => { draftSavedAt = record.savedAt; },
+});
+
+/** When the offered draft was written, in the reader's own locale. */
+const draftWhen = $derived(draftOffer ? $d(draftOffer.savedAt, { dateStyle: 'medium', timeStyle: 'short' }) : '');
+/** What it could not keep, named. Empty when it kept everything. */
+const draftLost = $derived(draftOffer ? (draftOffer.dropped ?? []).join(', ') : '');
+
+onMount(() => {
+  const found = draft.read();
+  // OFFERED, never applied. The fields stay empty until `resumeDraft`.
+  if (found) draftOffer = found;
+});
+
+// The box listens for the page going away so the last keystrokes are not the ones lost; leaving
+// this route is the same kind of departure, and nothing else would take those listeners off.
+onDestroy(() => { draft.flush(); draft.dispose(); });
+
+/** Anything typed, picked or toggled on this screen. The box owns the debounce. */
+function touchDraft() {
+  if (submitted) return;
+  draft.save({
+    intake: intake.getValues(),
+    billing: billing.getValues(),
+    mode: mode,
+    customerName: customerName,
+    customerId: assetCustomerId,
+    // Handed over as the File it is: the module is what refuses to serialise it, and what says
+    // which one it refused. A page that stripped it here would have to remember to.
+    attachment: attachment,
+  }, step);
+}
+
+function resumeDraft() {
+  const found = draftOffer;
+  draftOffer = null;
+  if (!found) return;
+  const v = found.values ?? {};
+  intake.setValues(v.intake ?? {});
+  billing.setValues(v.billing ?? {});
+  mode = v.mode ?? 'onsite';
+  customerName = v.customerName ?? '';
+  assetCustomerId = Number(v.customerId ?? 0);
+  // The wizard's `value` track moves the step WITHOUT re-running `pdx-before-change`
+  // (`pdx-wizard.ts:444`), so restoring step 2 does not have to pass step 1's guard on the way —
+  // which is right: those answers are the ones being restored.
+  step = found.step ?? 0;
+}
+
+function discardDraft() {
+  draft.clear();
+  draftOffer = null;
+  draftSavedAt = '';
+}
+
+/** Step 3 attached a file: `detail` is the File, or null. */
+function onAttach(e) {
+  attachment = e.detail ?? null;
+  touchDraft();
+}
+
+function onDetach() {
+  attachment = null;
+  touchDraft();
+}
+
+// The rows as <pdx-field-list> keeps them: on the FIELD, not on a FieldArray. Asking for
+// `intake.array('lines')` is the other representation of the same list, and the two do not
+// compose — reading it here, only to show a count, creates an empty one that then erases
+// every row from the submitted payload.
+const lineCount = $derived((intake.fields.lines.value() ?? []).length);
+
+const canSubmit = $derived(intake.valid() && !coordinator.submitting());
+
+// ─── The wizard's guard ────────────────────────────────────────────────────────
+
+/**
+ * `pdx-before-change` is cancellable, which is how a step validates before it is left.
+ *
+ * SYNCHRONOUS, and that is not a style choice: `goTo` reads `event.defaultPrevented` on the line
+ * after `dispatchEvent`, so a handler that awaits anything calls `preventDefault()` on an event
+ * nobody is looking at any more. Written `async`, it lets the wizard walk straight past an empty
+ * required field.
+ *
+ * Only forward: going BACK is never blocked — a wizard that will not let you return to fix what it
+ * is complaining about is the worst version of this pattern.
+ */
+function onBeforeStep(e) {
+  const to = e.detail?.value ?? 0;
+  const from = e.detail?.previous ?? 0;
+  if (to <= from) return;
+  if (!stepValid(from)) e.preventDefault();
+}
+
+/**
+ * The wizard's own step change — and ONLY its own.
+ *
+ * `pdx-change` is not the wizard's private name: `<pdx-input>` emits it too, it bubbles, and the
+ * listener is on an ancestor of every field on every step. Without a guard, typing one character
+ * delivers `{ value: 'A' }` here (`target=pdx-input detail={"value":"A"}`), `step` becomes the
+ * string, and the wizard's `:value` coerces it to NaN.
+ *
+ * So the listener says `.self`, which is the modifier for exactly this and the one `gotchas.md` names — an event
+ * belongs to the element it was dispatched on, and a name is not private to a component.
+ */
+function onStep(e) {
+  step = e.detail?.value ?? 0;
+  // Where the reader got to is part of the work: resuming at the beginning of a four-step form is
+  // most of the loss the draft is there to prevent.
+  touchDraft();
+}
+
+/**
+ * Is the step being left good enough to leave?
+ *
+ * `form.validate()` is all-or-nothing AND async, so it is no use here twice over: at step 1 it
+ * fails on the fields of step 3 that nobody has reached, and its promise resolves after the event
+ * has been decided. Touching each field of the step and reading its error is what a per-step check
+ * comes down to with the API as it is — `onBlur()` validates synchronously, which is what makes
+ * this possible at all.
+ */
+function stepValid(index) {
+  if (index === 0) return touchAndCheck(['requester', 'email']);
+  // No separate check for the window: the rule is the form's, so its message IS
+  // `ends`'s error and `touchAndCheck` reads it like any other.
+  if (index === 1) return touchAndCheck(['starts', 'ends']);
+  if (index === 2) {
+    // The rows' own fields, by the dotted paths `<pdx-field-list>` registers as each row is
+    // added — read from the field for the reason `lineCount` gives.
+    const rows = intake.fields.lines.value() ?? [];
+    return touchAndCheck(rows.map((_, i) => `lines.${i}.activity`));
+  }
+  return true;
+}
+
+function touchAndCheck(paths) {
+  let ok = true;
+  for (const path of paths) {
+    const field = intake.fields[path];
+    if (!field) continue;
+    field.onBlur();
+    if (field.error()) ok = false;
+  }
+  return ok;
+}
+
+/** The customers step 1 picked, `{ items }`: the name every step shows and the submit sends. */
+function onCustomerPicked(e) {
+  const items = e.detail?.items ?? [];
+  customerName = items.map(r => r.name).join(', ');
+  // By id, not by a piece of the name: the first customer picked owns the asset.
+  assetCustomerId = Number(items[0]?.id ?? 0);
+}
+
+function armRefusal() { refuseNextSubmit(); }
+
+// The simulated server's knob, in the Demo panel of the service bar.
+onMount(() => onDestroy(registerDemo([
+  { test: 'refuse-next', label: 'intake.refuseNext', run: armRefusal },
+])));
+
+async function submitAll() {
+  serverError = '';
+  submitted = false;
+  try {
+    // `submitAll` validates EVERY registered form before it calls this handler, so a handler that
+    // runs at all is one where both forms were good. What it does NOT do is catch what the
+    // handler throws: the server's refusal comes back out here, and without this try the page
+    // would simply never say anything.
+    const ok = await coordinator.submitAll(async (values) => {
+      await submitIntake({ intake: { ...values.intake, customer: customerName, customerId: assetCustomerId, assetId: assetId, mode: mode }, billing: values.billing });
+    });
+    if (!ok) return;
+    submitted = true;
+    // It landed: there is nothing left to resume. A refused submit falls to the `catch` and the
+    // draft stays exactly where it was — that is the case it exists for.
+    draft.clear();
+    draftSavedAt = '';
+  } catch (err) {
+    serverError = String(err?.message ?? err);
+  }
+}
+
+// ─── The leave guard ───────────────────────────────────────────────────────────
+
+// A dirty wizard does not vanish because someone clicked the nav. The question is the dialog
+// queue's modal, asked in this page's words; the navigation waits on the answer. Not the forms' own `warnUnsaved`: the wizard is
+// TWO forms, dirty together through the coordinator, and a submitted one is not asked about.
+onBeforeLeave(() => {
+  if (submitted || !coordinator.dirty()) return true;
+  return getDialogQueue().push({
+    type: 'confirm',
+    variant: 'danger',
+    title: $t('intake.leave.title'),
+    message: $t('intake.leave.question'),
+    confirmLabel: $t('intake.leave.discard'),
+    cancelLabel: $t('intake.leave.stay'),
+  }).then(answer => answer === true);
+});
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+
+  .draft-offer {
+    display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap;
+    padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md); background: var(--pdx-color-inset);
+  }
+  .draft-lost { color: var(--pdx-color-warning-ink); }
+</style>

@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Z-Index Scale</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5-step z-index scale for layering.</p>
+
+    <div class="options-table">
+      <div class="opt-header">
+        <span>Token</span><span>Value</span><span>Use</span>
+      </div>
+      <div class="opt-row">
+        <code>--pdx-z-dropdown</code><span>100</span><span>Dropdown menus, popovers</span>
+      </div>
+      <div class="opt-row">
+        <code>--pdx-z-sticky</code><span>200</span><span>Sticky headers, toolbars</span>
+      </div>
+      <div class="opt-row">
+        <code>--pdx-z-overlay</code><span>300</span><span>Overlays, backdrops</span>
+      </div>
+      <div class="opt-row">
+        <code>--pdx-z-modal</code><span>400</span><span>Modal dialogs</span>
+      </div>
+      <div class="opt-row">
+        <code>--pdx-z-toast</code><span>500</span><span>Toast notifications</span>
+      </div>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,106 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Live Demo</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Scroll the content below. The nav links highlight automatically.</p>
+    <div class="spy-layout">
+      <pdx-scroll-spy>
+        <nav class="spy-nav">
+          <a href="#spy-intro" data-spy-link data-spy-target="spy-intro" class="spy-link">Introduction</a>
+          <a href="#spy-install" data-spy-link data-spy-target="spy-install" class="spy-link">Installation</a>
+          <a href="#spy-usage" data-spy-link data-spy-target="spy-usage" class="spy-link">Usage</a>
+          <a href="#spy-api" data-spy-link data-spy-target="spy-api" class="spy-link">API Reference</a>
+          <a href="#spy-faq" data-spy-link data-spy-target="spy-faq" class="spy-link">FAQ</a>
+        </nav>
+        <div class="spy-content">
+          <div data-section="spy-intro" id="spy-intro" class="spy-section">
+            <h3>Introduction</h3>
+            <p>ScrollSpy observes which section is currently in the viewport and highlights the corresponding navigation link. This is useful for long documentation pages, landing pages, and single-page navigation.</p>
+            <p>The component uses IntersectionObserver for efficient, performant section detection — no scroll event polling.</p>
+          </div>
+          <div data-section="spy-install" id="spy-install" class="spy-section">
+            <h3>Installation</h3>
+            <p>Import the component from <code>@pdxui/ui</code>. It auto-registers as <code>&lt;pdx-scroll-spy&gt;</code>.</p>
+            <p>Wrap your navigation links and content sections inside the component. Add <code>data-spy-link</code> to nav links and <code>data-section</code> to content sections.</p>
+          </div>
+          <div data-section="spy-usage" id="spy-usage" class="spy-section">
+            <h3>Usage</h3>
+            <p>Place <code>data-spy-target="sectionId"</code> on each link to match the section's <code>data-section</code> value. The component automatically adds an <code>active</code> class to the currently visible section's link.</p>
+            <p>Clicking a link scrolls smoothly to the target section (configurable via <code>smoothscroll</code> prop).</p>
+          </div>
+          <div data-section="spy-api" id="spy-api" class="spy-section">
+            <h3>API Reference</h3>
+            <p>Configure the observation threshold with the <code>offset</code> prop. Customize selectors with <code>sectionselector</code> and <code>linkselector</code> props.</p>
+            <p>The component emits a <code>pdx-change</code> event when the active section changes, with the section key in the event detail.</p>
+          </div>
+          <div data-section="spy-faq" id="spy-faq" class="spy-section">
+            <h3>FAQ</h3>
+            <p><strong>Q: Does it work with dynamic content?</strong><br/>A: Yes, the observer watches for DOM mutations and re-initializes automatically.</p>
+            <p><strong>Q: Can I use custom selectors?</strong><br/>A: Yes, use the <code>sectionselector</code> and <code>linkselector</code> props.</p>
+          </div>
+        </div>
+      </pdx-scroll-spy>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-scroll-spy&gt;
+  &lt;nav&gt;
+    &lt;a data-spy-link data-spy-target="intro"&gt;Intro&lt;/a&gt;
+    &lt;a data-spy-link data-spy-target="usage"&gt;Usage&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;div data-section="intro" id="intro"&gt;...&lt;/div&gt;
+  &lt;div data-section="usage" id="usage"&gt;...&lt;/div&gt;
+&lt;/pdx-scroll-spy&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+.spy-layout {
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+}
+.spy-layout pdx-scroll-spy {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  height: 400px;
+}
+.spy-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pdx-space-sm);
+  border-right: 1px solid var(--pdx-color-border);
+  background: var(--pdx-color-surface);
+}
+.spy-link {
+  display: block;
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  font-size: var(--pdx-text-sm);
+  color: var(--pdx-color-muted);
+  text-decoration: none;
+  border-radius: var(--pdx-radius-sm);
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.spy-link:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
+.spy-link.active {
+  color: var(--pdx-color-primary);
+  border-left-color: var(--pdx-color-primary);
+  background: var(--pdx-color-inset);
+  font-weight: var(--pdx-weight-medium);
+}
+.spy-content {
+  overflow-y: auto;
+  padding: var(--pdx-space-lg);
+}
+.spy-section {
+  min-height: 250px;
+  padding-bottom: var(--pdx-space-xl);
+  border-bottom: 1px solid var(--pdx-color-border);
+  margin-bottom: var(--pdx-space-lg);
+}
+.spy-section:last-child { border-bottom: none; min-height: 350px; }
+.spy-section h3 { margin-bottom: var(--pdx-space-sm); }
+.spy-section p { font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); margin-bottom: var(--pdx-space-sm); }
+</style>

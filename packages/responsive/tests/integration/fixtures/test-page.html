@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>r$ Integration Test Page</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui; font-size: clamp(14px, 1vw + 10px, 18px); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+        .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .toolbar h1 { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; margin-top: 16px; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+
+        .btn { display: inline-flex; align-items: center; padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: #0066cc; color: white; cursor: pointer; font: inherit; }
+        .input { display: block; width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font: inherit; }
+
+        .split { display: grid; grid-template-columns: 1fr 3fr; gap: 16px; margin-top: 16px; }
+        @container (max-width: 600px) { .split { grid-template-columns: 1fr; } }
+
+        .sidebar { border: 1px solid #ddd; padding: 16px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="toolbar">
+            <h1>Dashboard</h1>
+            <button class="btn">Export</button>
+            <button class="btn">Add New</button>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Revenue</h3>
+                <p style="font-size: 2em">$48,250</p>
+            </div>
+            <div class="card">
+                <h3>Orders</h3>
+                <p style="font-size: 2em">384</p>
+            </div>
+            <div class="card">
+                <h3>Customers</h3>
+                <p style="font-size: 2em">1,249</p>
+            </div>
+        </div>
+
+        <div class="split" style="container-type: inline-size">
+            <div class="sidebar">Sidebar</div>
+            <div class="card">Main content area with some text.</div>
+        </div>
+    </div>
+</body>
+</html>

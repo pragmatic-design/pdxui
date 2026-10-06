@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">With Action</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Toast with an action button (e.g., Undo).</p>
+    <pdx-button variant="outline" size="sm" @click="showWithAction">Delete Item (with Undo)</pdx-button>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showWithAction() {
+  toast.info('Item deleted.', { action: { label: 'Undo', onClick: () => toast.success('Item restored!') } });
+}
+</script>

@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Row Edit</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Click <strong>Edit</strong> in the command column. The entire row becomes editable
+      with Save/Cancel buttons. Validation runs on Save.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="rowDS" :columns="rowColumns" :editable="true" :edit-mode="'row'" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  editable edit-mode="row" hover&gt;
+&lt;/pdx-data-grid&gt;
+
+const columns = [
+  { field: 'name', header: 'Name', editable: true,
+    validators: [{ type: 'required' }] },
+  { field: 'role', header: 'Role', editable: true },
+  { field: 'salary', header: 'Salary', type: 'currency', editable: true },
+  { field: '_actions', header: '', width: 140, command: true },
+];</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { data } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+// Row edit
+const rowColumns = [
+  { field: 'name', header: 'Name', width: 180, editable: true, validators: [{ type: 'required' }] },
+  { field: 'role', header: 'Role', width: 120, editable: true },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 130, editable: true },
+  { field: 'isActive', header: 'Active', type: 'boolean', width: 80, editable: true },
+  { field: '_actions', header: '', width: 140, command: true },
+];
+
+const rowDS = createDataSource({ data: data.map(function(r) { return Object.assign({}, r); }), pageSize: 0 });
+</script>

@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Area Chart (Smooth)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Smooth area fill with gradient. Set <code>smooth</code> prop.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="area" :data="lineData" :x-field="'month'" :y-field="'revenue'" :series-names="'Revenue'" smooth :legend="false" height="280px"></pdx-chart>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { lineData } from './state.pdx';
+</script>

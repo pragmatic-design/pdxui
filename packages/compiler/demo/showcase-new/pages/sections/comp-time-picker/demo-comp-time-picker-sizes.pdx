@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-row">
+      <pdx-time-picker value="10:00" format="24h" size="sm" aria-label="Small"></pdx-time-picker>
+      <pdx-time-picker value="10:00" format="24h" aria-label="Default"></pdx-time-picker>
+      <pdx-time-picker value="10:00" format="24h" size="lg" aria-label="Large"></pdx-time-picker>
+    </div>
+  </section>
+</template>

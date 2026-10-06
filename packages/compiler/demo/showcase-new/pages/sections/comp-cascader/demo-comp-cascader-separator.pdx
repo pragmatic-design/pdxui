@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Separator</h2>
+    <div class="demo-row">
+      <pdx-cascader :options="locations" :value="['asia', 'japan', 'tokyo']" separator=" → "></pdx-cascader>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { locations } from './state.pdx';
+</script>

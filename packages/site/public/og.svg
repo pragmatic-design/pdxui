@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="Manrope, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe088"/>
+      <stop offset="0.5" stop-color="#f2ca50"/>
+      <stop offset="1" stop-color="#b8962a"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="0.5" cy="-0.1" r="0.9">
+      <stop offset="0" stop-color="#2a2410"/>
+      <stop offset="0.6" stop-color="#131313"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <path d="M150 235 L215 300 L150 365 L85 300 Z" fill="url(#g)"/>
+  <text x="245" y="320" font-size="120" font-weight="800" fill="url(#g)">PDX UI</text>
+  <text x="152" y="430" font-size="40" font-weight="600" fill="#e5e2e1">Signals + a .pdx compiler</text>
+  <text x="152" y="485" font-size="40" font-weight="600" fill="#e5e2e1">that emits standard Web Components.</text>
+  <text x="152" y="560" font-size="30" font-weight="500" fill="#99907c" letter-spacing="2">AGENT-NATIVE · BUILT WITH PDX · pdxui.com</text>
+</svg>

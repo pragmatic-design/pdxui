@@ -1,0 +1,58 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Toggle Button</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-toggle&gt;</code> — stateful action buttons with pressed state.
+      Single or grouped. Uses <code>aria-pressed</code> for accessibility.
+    </p>
+
+    <!-- ═══ Standalone ═══ -->
+    <pdx-demo-comp-toggle-standalone class="demo-section"></pdx-demo-comp-toggle-standalone>
+
+    <!-- ═══ Group Multiple ═══ -->
+    <pdx-demo-comp-toggle-in-group-multiple class="demo-section"></pdx-demo-comp-toggle-in-group-multiple>
+
+    <!-- ═══ Group Single ═══ -->
+    <pdx-demo-comp-toggle-in-group-single class="demo-section"></pdx-demo-comp-toggle-in-group-single>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-comp-toggle-variants class="demo-section"></pdx-demo-comp-toggle-variants>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-toggle-disabled class="demo-section"></pdx-demo-comp-toggle-disabled>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <h3 class="pdx-txt-subheading">pdx-toggle</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>pressed</code><span>boolean</span><span>Toggle on/off state</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Value for group mode</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>outline, ghost, solid</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>aria-label</code><span>string</span><span>Its name when the content does not say it ("B" is Bold)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">pdx-toggle-group</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>type</code><span>string</span><span>single or multiple</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Active value(s), comma-separated for multiple</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables all child toggles</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>Propagated to children</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal or vertical</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/toggle';
+@title 'Toggle Button';
+</script>
+
+<style scoped>
+  .page { }
+</style>

@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Non-interactive state. Drop zone is visually muted and ignores clicks and drops.</p>
+
+    <div class="demo-stack">
+      <pdx-file-upload disabled></pdx-file-upload>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-file-upload disabled /&gt;</code></pre>
+    </details>
+  </section>
+</template>

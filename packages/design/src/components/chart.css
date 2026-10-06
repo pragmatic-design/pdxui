@@ -1,0 +1,70 @@
+/* ==========================================================================
+   pdx-chart — the accessible layer around the canvas
+   The legend is real buttons (aria-pressed = the series is shown), the host is focusable (the
+   arrow keys walk the points), and the data table is visually hidden (.pdx-sr-only).
+   ========================================================================== */
+
+pdx-chart {
+    gap: var(--pdx-space-xs);
+}
+
+pdx-chart:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: 2px;
+    border-radius: var(--pdx-radius-sm);
+}
+
+pdx-chart .pdx-chart-canvas {
+    flex: 1;
+    min-width: 0;
+}
+
+.pdx-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-xs) var(--pdx-space-md);
+}
+
+.pdx-chart-legend[hidden] {
+    display: none;
+}
+
+.pdx-chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 2px var(--pdx-space-xs);
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    color: var(--pdx-color-text);
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    cursor: pointer;
+}
+
+.pdx-chart-legend-item:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-chart-legend-item:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: 1px;
+}
+
+/* A hidden series: struck through and dimmed, but still a readable label. */
+.pdx-chart-legend-item[aria-pressed="false"] {
+    color: var(--pdx-color-muted);
+    text-decoration: line-through;
+}
+
+.pdx-chart-legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.pdx-chart-legend-item[aria-pressed="false"] .pdx-chart-legend-swatch {
+    opacity: 0.35;
+}

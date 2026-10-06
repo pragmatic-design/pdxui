@@ -1,0 +1,56 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Three sizes: <code>.pdx-segmented-sm</code>, default, <code>.pdx-segmented-lg</code>.</p>
+
+    <div class="demo-col">
+      <div class="size-label">
+        <span class="pdx-txt-caption pdx-ink-muted">Small</span>
+        <div class="pdx-segmented pdx-segmented-sm">
+          <button class="pdx-segmented-item active">On</button>
+          <button class="pdx-segmented-item">Off</button>
+        </div>
+      </div>
+
+      <div class="size-label">
+        <span class="pdx-txt-caption pdx-ink-muted">Default</span>
+        <div class="pdx-segmented">
+          <button class="pdx-segmented-item active">On</button>
+          <button class="pdx-segmented-item">Off</button>
+        </div>
+      </div>
+
+      <div class="size-label">
+        <span class="pdx-txt-caption pdx-ink-muted">Large</span>
+        <div class="pdx-segmented pdx-segmented-lg">
+          <button class="pdx-segmented-item active">On</button>
+          <button class="pdx-segmented-item">Off</button>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-segmented pdx-segmented-sm"&gt;...&lt;/div&gt;
+&lt;div class="pdx-segmented"&gt;...&lt;/div&gt;
+&lt;div class="pdx-segmented pdx-segmented-lg"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .demo-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+  .size-label {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+  }
+  .size-label span {
+    min-width: 60px;
+  }
+</style>

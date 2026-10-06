@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Input groups in realistic form contexts.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">URL Builder</h3>
+      <div class="pdx-field">
+        <pdx-label text="Website URL" required size="sm"></pdx-label>
+        <pdx-input-group size="sm">
+          <span class="pdx-input-addon">https://</span>
+          <pdx-input placeholder="example"></pdx-input>
+          <span class="pdx-input-addon">.com</span>
+          <pdx-button variant="outline">Verify</pdx-button>
+        </pdx-input-group>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Coupon Code</h3>
+      <div class="pdx-field">
+        <pdx-label text="Discount Code" optional size="sm"></pdx-label>
+        <pdx-input-group size="sm">
+          <pdx-input placeholder="Enter code..." clearable></pdx-input>
+          <pdx-button variant="solid">Apply</pdx-button>
+        </pdx-input-group>
+        <span class="pdx-field-hint">Enter a valid coupon code for a discount</span>
+      </div>
+    </div>
+  </section>
+</template>

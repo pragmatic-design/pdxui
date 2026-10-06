@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Select a time period.</p>
+
+    <div class="demo-row">
+      <pdx-segmented label="Calendar view" :value="view" options='["day","week","month","year"]' @change="onView"></pdx-segmented>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-segmented :value="view" options='["day","week","month","year"]' @change="onView"&gt;&lt;/pdx-segmented&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let view = $signal('day');
+
+function onView(e) {
+  view = e.detail.value;
+}
+</script>

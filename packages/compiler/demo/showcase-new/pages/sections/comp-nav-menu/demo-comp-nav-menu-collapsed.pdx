@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Collapsed Mode (Icon Only)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>collapsed</code> for icon-only mode. Hover shows tooltip with label.</p>
+
+    <div class="demo-row">
+      <div class="demo-sidebar demo-sidebar-narrow">
+        <pdx-nav-menu :items="iconItems" activekey="inbox" collapsed></pdx-nav-menu>
+      </div>
+      <div class="demo-sidebar">
+        <pdx-nav-menu :items="iconItems" activekey="inbox"></pdx-nav-menu>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { iconItems } from './state.pdx';
+</script>

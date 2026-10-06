@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Visual Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 styles: filled (colored bg), bordered (left accent), minimal (neutral).</p>
+    <div class="btn-row">
+      <pdx-button variant="outline" size="sm" @click="showFilled">Filled (default)</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="showBordered">Bordered</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="showMinimal">Minimal</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showFilled() { toast.success('Filled variant — colored background.'); }
+function showBordered() { toast.success('Bordered variant — left accent border.', { variant: 'bordered' }); }
+function showMinimal() { toast.success('Minimal variant — neutral style.', { variant: 'minimal' }); }
+</script>

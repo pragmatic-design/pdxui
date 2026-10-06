@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Nested Collapsible Groups</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click a group header to expand/collapse. Supports multiple nesting levels.</p>
+
+    <div class="demo-sidebar">
+      <pdx-nav-menu :items="nestedItems" activekey="users"></pdx-nav-menu>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-nav-menu :items="items" activekey="users"&gt;&lt;/pdx-nav-menu&gt;
+
+// { key: 'admin', label: 'Administration', icon: 'settings', expanded: true, children: [
+//   { key: 'users', label: 'Users' },
+//   { key: 'roles', label: 'Roles' },
+// ]}
+// { key: 'content', label: 'Content', icon: 'file-text', children: [
+//   { key: 'media', label: 'Media Library', children: [
+//     { key: 'images', label: 'Images' },
+//   ]},
+// ]}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { nestedItems } from './state.pdx';
+</script>

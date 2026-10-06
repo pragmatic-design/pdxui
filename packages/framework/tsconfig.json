@@ -1,0 +1,21 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "declaration": true,
+        // The base turns on `customConditions: ["development"]`, which is right everywhere else:
+        // in-repo, `@pdxui/core` should resolve to core's SOURCE so a typecheck never runs
+        // against a stale build. Here it is wrong. This package is nothing but `export *` from its
+        // three siblings, so following the development condition makes tsc typecheck all of their
+        // sources — and it fails, because each sibling's ambient declarations (`pdx-globals.d.ts`
+        // and friends) live in that sibling's own `include` and not in this one.
+        //
+        // Emptying it resolves them through `types` instead, to `dist/*.d.ts`. That is also what
+        // this build should be checking against: a meta-package's declarations are correct when
+        // they agree with what its dependencies PUBLISH, which is what a consumer receives.
+        // It makes the build order real — the siblings must be built first — rather than hiding it.
+        "customConditions": []
+    },
+    "include": ["src/**/*.ts"]
+}

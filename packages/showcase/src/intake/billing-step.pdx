@@ -1,0 +1,49 @@
+<template>
+  <!-- ─── 4 · the second form, and one Save for both ─────────────────── -->
+  <div data-wizard-step :data-label="$t('intake.steps.billing')">
+    <pdx-form-field name="po" :label="$t('intake.fields.po')">
+      <pdx-input name="po" data-test="po"></pdx-input>
+    </pdx-form-field>
+
+    <div class="review" data-test="review">
+      <span class="pdx-txt-small pdx-ink-muted">{{ $t('intake.reviewFor', { customer: customerName }) }}</span>
+      <span class="pdx-txt-small pdx-ink-muted" data-test="review-lines">{{ $t('intake.reviewLines', { count: lineCount }) }}</span>
+    </div>
+
+    <div class="actions">
+      <pdx-button variant="primary" :disabled="!canSubmit" @click="submit()" data-test="submit">{{ $t('intake.submit') }}</pdx-button>
+    </div>
+
+    <p class="pdx-txt-small cross-error" :show="serverError !== ''" role="alert" data-test="server-error">{{ serverError }}</p>
+    <p class="pdx-txt-small" :show="submitted" role="status" data-test="submitted">{{ $t('intake.submitted') }}</p>
+  </div>
+</template>
+
+<script setup>
+// Intake's last step: the `billing` form's field, the review, and the one Save. A section of the
+// `billing` form. The Save itself is the page's: it is the coordinator's
+// `submitAll` over BOTH forms, so this step only asks for it.
+import { tryUseForm } from '@pdxui/core';
+
+/** The customers picked in step 1, by name. */
+@prop customerName: string = '';
+/** How many lines step 3 holds. */
+@prop lineCount: number = 0;
+/** Whether the Save can be pressed: the intake form is valid and nothing is being submitted. */
+@prop canSubmit: boolean = false;
+/** The last submit went through. */
+@prop submitted: boolean = false;
+/** What the server said when it refused, or ''. */
+@prop serverError: string = '';
+/** Save was pressed. */
+@event submit: void;
+
+tryUseForm();
+</script>
+
+<style scoped>
+  .cross-error { color: var(--pdx-color-danger-ink); }
+
+  .review, .actions { display: flex; align-items: center; gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); }
+  .review { flex-direction: column; align-items: flex-start; gap: var(--pdx-space-2xs); }
+</style>

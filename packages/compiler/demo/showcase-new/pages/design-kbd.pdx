@@ -1,0 +1,128 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Kbd</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Keyboard key representations for shortcuts and documentation.
+      <strong>CSS only</strong> — apply <code>.pdx-kbd</code> to <code>&lt;kbd&gt;</code> elements.
+    </p>
+
+    <!-- ═══ Single Keys ═══ -->
+    <pdx-demo-design-kbd-single class="demo-section"></pdx-demo-design-kbd-single>
+
+    <!-- ═══ Key Combos ═══ -->
+    <pdx-demo-design-kbd-combos class="demo-section"></pdx-demo-design-kbd-combos>
+
+    <!-- ═══ Key Sequences ═══ -->
+    <pdx-demo-design-kbd-sequences class="demo-section"></pdx-demo-design-kbd-sequences>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-design-kbd-sizes class="demo-section"></pdx-demo-design-kbd-sizes>
+
+    <!-- ═══ Light Variant ═══ -->
+    <pdx-demo-design-kbd-light class="demo-section"></pdx-demo-design-kbd-light>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-kbd-composition class="demo-section"></pdx-demo-design-kbd-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-kbd</code><span>Base</span><span>Keyboard key appearance</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-kbd-combo</code><span>Layout</span><span>Keys pressed simultaneously (+)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-kbd-seq</code><span>Layout</span><span>Keys pressed in sequence (then)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-kbd-sm</code><span>Size</span><span>Small key</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-kbd-lg</code><span>Size</span><span>Large key</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-kbd-light</code><span>Variant</span><span>Light keys for dark backgrounds</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/kbd';
+@title 'Kbd';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .key-row {
+    display: flex;
+    gap: var(--pdx-space-md);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+  }
+
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

@@ -1,0 +1,58 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Button Groups</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Horizontal and vertical grouping with joined borders.</p>
+
+    <div class="group-demos">
+      <div class="group-demo">
+        <span class="pdx-txt-caption pdx-ink-muted">Horizontal</span>
+        <div class="pdx-btn-group">
+          <button class="pdx-secondary">Left</button>
+          <button class="pdx-secondary">Center</button>
+          <button class="pdx-secondary">Right</button>
+        </div>
+      </div>
+      <div class="group-demo">
+        <span class="pdx-txt-caption pdx-ink-muted">Mixed</span>
+        <div class="pdx-btn-group">
+          <button class="pdx-primary">Save</button>
+          <button class="pdx-outline">Cancel</button>
+        </div>
+      </div>
+      <div class="group-demo">
+        <span class="pdx-txt-caption pdx-ink-muted">Vertical</span>
+        <div class="pdx-btn-group-vertical">
+          <button class="pdx-outline">Top</button>
+          <button class="pdx-outline">Middle</button>
+          <button class="pdx-outline">Bottom</button>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-btn-group"&gt;
+  &lt;button class="pdx-secondary"&gt;Left&lt;/button&gt;
+  &lt;button class="pdx-secondary"&gt;Center&lt;/button&gt;
+  &lt;button class="pdx-secondary"&gt;Right&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class="pdx-btn-group-vertical"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .group-demos {
+    display: flex;
+    gap: var(--pdx-space-xl);
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-top: var(--pdx-space-md);
+  }
+  .group-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

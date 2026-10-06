@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Stacking: Sheet + Dialog</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Open a dialog from within a bottom sheet. overlayStack manages z-index and Escape order.</p>
+    <pdx-button variant="outline" @click="openNested">Open Sheet → Dialog</pdx-button>
+
+    <pdx-bottom-sheet :open="nestedOpen" label="Nested sheet" @pdx-close="closeNested">
+      <span slot="header"><strong>Sheet with nested dialog</strong></span>
+      <p>Click the button below to open a dialog on top of this sheet.</p>
+      <pdx-button variant="primary" size="sm" @click="openNestedDialog">Open Dialog</pdx-button>
+
+      <pdx-dialog :open="nestedDialogOpen" title="Confirm" size="sm" @pdx-close="closeNestedDialog">
+        <p>This dialog is stacked above the bottom sheet.</p>
+        <p class="pdx-txt-small pdx-ink-muted">Escape closes this dialog first, then the sheet.</p>
+        <span slot="footer">
+          <pdx-button variant="ghost" size="sm" @click="closeNestedDialog">Cancel</pdx-button>
+          <pdx-button variant="primary" size="sm" @click="closeNestedDialog">OK</pdx-button>
+        </span>
+      </pdx-dialog>
+    </pdx-bottom-sheet>
+  </section>
+</template>
+
+<script setup>
+// Nested
+let nestedOpen = $signal(false);
+
+let nestedDialogOpen = $signal(false);
+
+function openNested() { nestedOpen = true; }
+function closeNested() { nestedOpen = false; }
+function openNestedDialog() { nestedDialogOpen = true; }
+function closeNestedDialog() { nestedDialogOpen = false; }
+</script>

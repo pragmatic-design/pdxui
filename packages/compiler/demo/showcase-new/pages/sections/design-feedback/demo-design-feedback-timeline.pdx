@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Timeline</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Vertical timeline with status indicators via <code>data-status</code>.</p>
+
+    <div class="pdx-timeline">
+      <div class="pdx-timeline-item" data-status="done">
+        <div class="pdx-txt-small"><strong>Order placed</strong></div>
+        <div class="pdx-txt-caption pdx-ink-muted">March 28, 2026 at 10:30 AM</div>
+      </div>
+      <div class="pdx-timeline-item" data-status="done">
+        <div class="pdx-txt-small"><strong>Payment confirmed</strong></div>
+        <div class="pdx-txt-caption pdx-ink-muted">March 28, 2026 at 10:32 AM</div>
+      </div>
+      <div class="pdx-timeline-item" data-status="active">
+        <div class="pdx-txt-small"><strong>Shipping in progress</strong></div>
+        <div class="pdx-txt-caption pdx-ink-muted">Expected April 2, 2026</div>
+      </div>
+      <div class="pdx-timeline-item" data-status="pending">
+        <div class="pdx-txt-small"><strong>Delivered</strong></div>
+        <div class="pdx-txt-caption pdx-ink-muted">Pending</div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-timeline"&gt;
+  &lt;div class="pdx-timeline-item" data-status="done"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-timeline-item" data-status="active"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-timeline-item" data-status="pending"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,55 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">TreeSelect</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-tree-select&gt;</code> — select with hierarchical tree dropdown.
+      Single or multi-select, search filter, expand/collapse, lazy loading.
+    </p>
+
+    <pdx-demo-comp-tree-select-single class="demo-section"></pdx-demo-comp-tree-select-single>
+
+    <pdx-demo-comp-tree-select-multi class="demo-section"></pdx-demo-comp-tree-select-multi>
+
+    <pdx-demo-comp-tree-select-searchable class="demo-section"></pdx-demo-comp-tree-select-searchable>
+
+    <pdx-demo-comp-tree-select-expand-all class="demo-section"></pdx-demo-comp-tree-select-expand-all>
+
+    <pdx-demo-comp-tree-select-pre-selected class="demo-section"></pdx-demo-comp-tree-select-pre-selected>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>node</code></td><td><code>{ node, level, expanded }</code></td><td>Custom tree node label.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>options</code><span>TreeSelectNode[]</span><span>{ value, label, children?, disabled? }</span></div>
+        <div class="opt-row"><code>value</code><span>string | string[]</span><span>Selected value(s)</span></div>
+        <div class="opt-row"><code>multiple</code><span>boolean</span><span>Multi-select with checkboxes</span></div>
+        <div class="opt-row"><code>searchable</code><span>boolean</span><span>Show search filter</span></div>
+        <div class="opt-row"><code>expandAll</code><span>boolean</span><span>Expand all nodes on open</span></div>
+        <div class="opt-row"><code>loadChildren</code><span>function</span><span>Lazy: (node) => Promise&lt;TreeSelectNode[]&gt;</span></div>
+        <div class="opt-row"><code>clearable</code><span>boolean</span><span>Show clear button (default: true)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/tree-select';
+@title 'TreeSelect Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

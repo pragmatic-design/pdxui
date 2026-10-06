@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">In a screen</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      What the component is for: the pane on the left of an editor, next to what it selects.
+    </p>
+
+    <div class="explorer">
+      <div class="explorer-pane">
+        <pdx-tree label="Explorer" default-expand-all selection-mode="single" :nodes="files"></pdx-tree>
+      </div>
+      <div class="explorer-main">
+        <p class="pdx-txt-small pdx-ink-muted">Pick a file on the left.</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { files } from './state.pdx';
+</script>
+
+<style scoped>
+  .explorer-main { flex: 1; padding: var(--pdx-space-lg); }
+</style>

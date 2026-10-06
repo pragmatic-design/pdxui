@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Context Menu</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A realistic right-click menu with mixed features.</p>
+
+    <div class="comp-card">
+      <div class="pdx-menu">
+        <button class="pdx-menu-item"><span class="pdx-menu-icon">&#9998;</span> Edit <span class="pdx-menu-shortcut">F2</span></button>
+        <button class="pdx-menu-item"><span class="pdx-menu-icon">&#128203;</span> Copy <span class="pdx-menu-shortcut">Ctrl+C</span></button>
+        <button class="pdx-menu-item"><span class="pdx-menu-icon">&#128196;</span> Paste <span class="pdx-menu-shortcut">Ctrl+V</span></button>
+        <div class="pdx-menu-separator"></div>
+        <div class="pdx-menu-label">View</div>
+        <button class="pdx-menu-item pdx-menu-check" role="menuitemcheckbox" aria-checked="true">Show Hidden</button>
+        <button class="pdx-menu-item pdx-menu-check" role="menuitemcheckbox" aria-checked="false">Compact Mode</button>
+        <div class="pdx-menu-separator"></div>
+        <button class="pdx-menu-item pdx-menu-danger"><span class="pdx-menu-icon">&#128465;</span> Delete <span class="pdx-menu-shortcut">Del</span></button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-sm);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    max-width: 300px;
+    box-shadow: var(--pdx-shadow-lg);
+  }
+</style>

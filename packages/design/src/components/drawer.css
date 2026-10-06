@@ -1,0 +1,262 @@
+/* Drawer / Sheet — slide-in panel from any edge.
+   Uses <div> with position:fixed (not <dialog> — UA !important blocks drawer positioning).
+
+   Usage:
+     <div class="pdx-drawer-backdrop" data-open></div>
+     <div class="pdx-drawer" position="right" size="md" data-open>
+       <div class="pdx-drawer-header">Title <button class="pdx-dialog-close">&times;</button></div>
+       <div class="pdx-drawer-body">Content</div>
+       <div class="pdx-drawer-footer">Actions</div>
+     </div>
+
+   Toggle: add/remove [data-open] attribute on both backdrop and drawer.
+
+   Positions: left (default), right, top, bottom
+   Sizes: sm (280px), md (380px), lg (520px), custom via --pdx-drawer-width
+   Modes: overlay (default), push (shifts page content)
+*/
+
+/* ===== Backdrop ===== */
+
+.pdx-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--pdx-color-backdrop);
+    backdrop-filter: blur(4px);
+    z-index: var(--pdx-z-overlay, 40);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--pdx-duration-base) ease-out, visibility var(--pdx-duration-base);
+}
+
+.pdx-drawer-backdrop[data-open] {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ===== Base ===== */
+
+.pdx-drawer {
+    --_drawer-width: var(--pdx-drawer-width, 380px);
+
+    position: fixed;
+    z-index: calc(var(--pdx-z-overlay, 40) + 1);
+    margin: 0;
+    border: none;
+    padding: 0;
+    background: var(--pdx-surface-2, var(--pdx-color-surface));
+    color: var(--pdx-color-text);
+    box-shadow: var(--pdx-shadow-xl), 0 0 40px oklch(0 0 0 / 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    /* Hidden by default — slides in on [data-open] */
+    visibility: hidden;
+}
+
+.pdx-drawer[data-open] {
+    visibility: visible;
+}
+
+/* ⚠️ An open panel rests at `transform: none`, NOT `translateX(0)`.
+ *
+ * They look equivalent and are not: the identity matrix is still an ACTIVE transform, and an element
+ * with one becomes the containing block for every `position: fixed` descendant. So a select dropdown,
+ * a tooltip, a popover or a date picker opened from inside an open drawer would be positioned against
+ * the PANEL instead of the viewport. Measured at 1280 wide with the panel at 900-1280: the dropdown
+ * lands at left 1826, 546px off screen; clearing the transform puts it back at 925.
+ *
+ * `none` still animates — CSS interpolates it as the identity — so the slide-in is unchanged, and the
+ * containing block exists only while the transition is actually running.
+ */
+
+/* ===== Positions ===== */
+
+/* Left (default) */
+.pdx-drawer,
+.pdx-drawer[position="left"] {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--_drawer-width);
+    height: 100dvh;
+    border-right: var(--pdx-border-width) solid var(--pdx-color-border);
+    transform: translateX(-100%);
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
+}
+
+.pdx-drawer[data-open],
+.pdx-drawer[position="left"][data-open] {
+    transform: none;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
+}
+
+/* Right */
+.pdx-drawer[position="right"] {
+    top: 0;
+    right: 0;
+    left: auto;
+    bottom: 0;
+    width: var(--_drawer-width);
+    height: 100dvh;
+    border-left: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-right: none;
+    transform: translateX(100%);
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
+}
+
+.pdx-drawer[position="right"][data-open] {
+    transform: none;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
+}
+
+/* Top */
+.pdx-drawer[position="top"] {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    width: 100%;
+    height: var(--_drawer-width);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-right: none;
+    transform: translateY(-100%);
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
+}
+
+.pdx-drawer[position="top"][data-open] {
+    transform: none;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
+}
+
+/* Bottom */
+.pdx-drawer[position="bottom"] {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    height: var(--_drawer-width);
+    border-top: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-right: none;
+    border-radius: var(--pdx-radius-lg) var(--pdx-radius-lg) 0 0;
+    transform: translateY(100%);
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
+}
+
+.pdx-drawer[position="bottom"][data-open] {
+    transform: none;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
+}
+
+/* ===== Sizes ===== */
+
+.pdx-drawer[size="sm"] { --_drawer-width: 280px; }
+.pdx-drawer[size="md"] { --_drawer-width: 380px; }
+.pdx-drawer[size="lg"] { --_drawer-width: 520px; }
+
+/* ===== Sections ===== */
+
+.pdx-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+    font-weight: var(--pdx-weight-semibold);
+    font-size: var(--pdx-text-lg);
+    flex-shrink: 0;
+}
+
+/* No header content AND no close button → only the empty <slot> placeholder remains. Hide it so a header-less
+   drawer doesn't show a stray separator + padding at the top. The close button (when shown) keeps it visible. */
+.pdx-drawer-header:not(:has(> *:not(slot))) {
+    display: none;
+}
+
+.pdx-drawer-body {
+    padding: var(--pdx-space-lg);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.pdx-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    border-top: var(--pdx-border-width) solid var(--pdx-color-border);
+    flex-shrink: 0;
+}
+
+/* No footer slot content → only the empty <slot> placeholder remains. Hide it so a footer-less drawer doesn't
+   show a stray full-width separator + padding at the bottom. */
+.pdx-drawer-footer:not(:has(> *:not(slot))) {
+    display: none;
+}
+
+/* ===== Resize Handle ===== */
+
+.pdx-drawer-resize {
+    position: absolute;
+    background: transparent;
+    z-index: 1;
+    transition: background var(--pdx-duration-fast);
+}
+
+.pdx-drawer-resize:hover {
+    background: var(--pdx-color-primary);
+    opacity: 0.3;
+}
+
+.pdx-drawer .pdx-drawer-resize,
+.pdx-drawer[position="left"] .pdx-drawer-resize {
+    top: 0; right: 0; width: 4px; height: 100%; cursor: ew-resize;
+}
+
+.pdx-drawer[position="right"] .pdx-drawer-resize {
+    top: 0; left: 0; right: auto; width: 4px; height: 100%; cursor: ew-resize;
+}
+
+.pdx-drawer[position="top"] .pdx-drawer-resize {
+    bottom: 0; left: 0; width: 100%; height: 4px; cursor: ns-resize;
+}
+
+.pdx-drawer[position="bottom"] .pdx-drawer-resize {
+    top: 0; left: 0; width: 100%; height: 4px; cursor: ns-resize;
+}
+
+/* ===== Push Mode ===== */
+
+.pdx-drawer[push] ~ .pdx-drawer-backdrop {
+    background: transparent;
+    backdrop-filter: none;
+    pointer-events: none;
+}
+
+/* ===== Mobile Responsive ===== */
+
+@media (max-width: 640px) {
+    .pdx-drawer,
+    .pdx-drawer[position="left"],
+    .pdx-drawer[position="right"] {
+        width: 100%;
+    }
+
+    .pdx-drawer[position="bottom"] {
+        height: min(var(--_drawer-width), 80dvh);
+        border-radius: var(--pdx-radius-lg) var(--pdx-radius-lg) 0 0;
+    }
+
+    .pdx-drawer-resize {
+        display: none;
+    }
+}
+
+/* Edit-drawer hosts a pdx-form-template but provides its own Cancel/Save footer — hide the
+   form-template's built-in actions bar (and its top-border separator that reads as a stray
+   "hr" under the inputs). showActions=false can't be expressed via the boolean attribute. */
+.pdx-edit-drawer pdx-form-actions { display: none; }

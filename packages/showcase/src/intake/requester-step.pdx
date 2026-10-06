@@ -1,0 +1,74 @@
+<template>
+  <!-- ─── 1 · who is asking ─────────────────────────────────────────── -->
+  <!-- The wizard's panel is THIS element: `pdx-wizard` finds its steps with a deep
+       `querySelectorAll('[data-wizard-step]')`, so a panel inside a step component is found as one
+       in the page is. -->
+  <div data-wizard-step :data-label="$t('intake.steps.requester')">
+    <pdx-form-field name="requester" :label="$t('intake.fields.requester')">
+      <pdx-input name="requester" data-test="requester"></pdx-input>
+    </pdx-form-field>
+    <pdx-form-field name="email" :label="$t('intake.fields.email')">
+      <pdx-input name="email" type="email" data-test="email"></pdx-input>
+    </pdx-form-field>
+
+    <!-- PAGED and SEARCHED at the source, not a preloaded list: the picker asks for a page
+         and `customerTransport` answers with that page and a total. Asserted — five rows of
+         fourteen, page 2 a different five, and a name typed into the filter narrows the list
+         through a request rather than through a slice of what was already downloaded.
+         `searchable` is what turns the grid's filter row on. -->
+    <label class="pdx-label">{{ $t('intake.fields.customer') }}</label>
+    <pdx-relation-picker
+      :source="customers"
+      :columns="customerColumns"
+      searchable
+      @pdx-pick="onCustomerPicked"
+      data-test="customer-picker"></pdx-relation-picker>
+    <p class="pdx-txt-small picked" :show="customerName !== ''" data-test="customer-picked">{{ customerName }}</p>
+
+    <!-- What the request is about: the picked customer's assets, and only theirs. -->
+    <pdx-asset-picker :customer-id="customerId" @picked="e => assetpicked(e.detail.id)" data-test="asset-picker"></pdx-asset-picker>
+  </div>
+</template>
+
+<script setup>
+// Intake's first step: who is asking, and for which customer and asset. Its fields are the
+// `intake` form's — `tryUseForm()` makes this component a section of the form above it, so its
+// named controls are wired to that form. What it picks goes to the page, which holds the values
+// every step and the submit read (CD-S1).
+import { createDataSource, tryUseForm } from '@pdxui/core';
+import { customerTransport } from '../data/intake';
+
+/** The customer picked, as the page holds it: its name, for the line under the picker. */
+@prop customerName: string = '';
+/** Whose assets the asset picker offers: the first customer picked, by id. */
+@prop customerId: number = 0;
+/** Customers were picked: `{ items }`, as `pdx-relation-picker` gives them. */
+@event customerpicked: object;
+/** An asset was picked: its id, or 0. */
+@event assetpicked: number;
+
+tryUseForm();
+
+const customers = createDataSource({ transport: customerTransport, idField: 'id', pageSize: 5 });
+
+const customerColumns = $derived([
+  { field: 'name', header: $t('intake.fields.customer') },
+  // The customers store's own field: the intake keeps no customers of its own beside the store.
+  { field: 'sector', header: $t('intake.fields.sector') },
+]);
+
+/**
+ * `pdx-pick` carries `{ items }`.
+ *
+ * Not `detail.rows` or `detail.row`, neither of which exists: read, they find nothing, and leave the
+ * name empty — and the submitted payload's `customer` empty with it. Nothing fails: a guessed key is
+ * simply undefined.
+ */
+function onCustomerPicked(e) {
+  customerpicked({ items: e.detail?.items ?? [] });
+}
+</script>
+
+<style scoped>
+  .picked { color: var(--pdx-color-primary-ink); }
+</style>

@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">CSS Only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Same styles with plain HTML classes — no JS needed.</p>
+
+    <div class="demo-row">
+      <span class="pdx-badge pdx-badge-primary">New</span>
+      <span class="pdx-badge pdx-badge-success">Active</span>
+      <span class="pdx-badge pdx-badge-danger">3</span>
+      <span class="pdx-badge pdx-badge-outline-primary">Outline</span>
+      <span class="pdx-badge pdx-badge-sm pdx-badge-warning">Small</span>
+      <span class="pdx-badge pdx-badge-lg pdx-badge-info">Large</span>
+    </div>
+    <div class="demo-row">
+      <span class="pdx-dot pdx-dot-success"></span>
+      <span class="pdx-dot pdx-dot-danger pdx-dot-pulse"></span>
+      <span class="pdx-dot pdx-dot-primary"></span>
+    </div>
+  </section>
+</template>

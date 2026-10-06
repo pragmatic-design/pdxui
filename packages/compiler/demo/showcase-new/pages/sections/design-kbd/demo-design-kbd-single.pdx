@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Single Keys</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Individual key representations.</p>
+
+    <div class="key-row">
+      <kbd class="pdx-kbd">Esc</kbd>
+      <kbd class="pdx-kbd">Tab</kbd>
+      <kbd class="pdx-kbd">Enter</kbd>
+      <kbd class="pdx-kbd">Space</kbd>
+      <kbd class="pdx-kbd">Backspace</kbd>
+      <kbd class="pdx-kbd">Shift</kbd>
+      <kbd class="pdx-kbd">Ctrl</kbd>
+      <kbd class="pdx-kbd">Alt</kbd>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;kbd class="pdx-kbd"&gt;Esc&lt;/kbd&gt;
+&lt;kbd class="pdx-kbd"&gt;Tab&lt;/kbd&gt;
+&lt;kbd class="pdx-kbd"&gt;Enter&lt;/kbd&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Large List — 10,000 Items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Virtual scroll activates automatically for &gt;100 items. Smooth scrolling with binary search.</p>
+    <div class="demo-row">
+      <pdx-select label="Item" :options="largeList" searchable clearable placeholder="Search 10K items..." />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="largeList" searchable clearable
+  placeholder="Search 10K items..." /&gt;
+
+const largeList = Array.from({ length: 10000 }, (_, i) =&gt; 'Item ' + (i + 1));</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const largeList = Array.from({ length: 10000 }, (_, i) => 'Item ' + (i + 1));
+</script>

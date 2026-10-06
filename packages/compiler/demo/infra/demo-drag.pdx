@@ -1,0 +1,257 @@
+<template>
+  <div class="demo">
+    <h2>Drag and Drop</h2>
+    <p class="desc">Signal-based: PointerEvent unified (touch/mouse/pen), axis, bounds, drop zones, velocity, auto-scroll, keyboard a11y.</p>
+
+    <section>
+      <h3>Free Drag (bounded)</h3>
+      <p class="desc">Drag the blue box. Stays within the dashed area. Velocity tracked.</p>
+      <div class="arena">
+        <div class="drag-box" :ref="freeRef">Drag me</div>
+      </div>
+      <div class="stats">
+        <span>isDragging: <strong>{{ freeDragging }}</strong></span>
+        <span>x: <strong>{{ freeX }}</strong>, y: <strong>{{ freeY }}</strong></span>
+        <span>velocity: <strong>{{ freeVel }}</strong> px/s</span>
+      </div>
+    </section>
+
+    <section>
+      <h3>Axis Constrained (bounded)</h3>
+      <div class="axis-row">
+        <div class="h-track">
+          <div class="drag-small" :ref="xRef">X only</div>
+        </div>
+        <div class="v-track">
+          <div class="drag-small" :ref="yRef">Y</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Drop Zones</h3>
+      <p class="desc">Drag cards between Zone A and Zone B. Cards move to the drop zone on release. Zone highlights when hovered.</p>
+      <div class="zones">
+        <div>
+          <span class="zone-label">Zone A</span>
+          <div class="drop-zone" :ref="zoneARef" data-zone="A">
+            <div class="card" data-id="c1" :ref="c1Ref">Task 1: Design review</div>
+            <div class="card" data-id="c2" :ref="c2Ref">Task 2: Code cleanup</div>
+            <div class="card" data-id="c3" :ref="c3Ref">Task 3: Write tests</div>
+          </div>
+        </div>
+        <div>
+          <span class="zone-label">Zone B</span>
+          <div class="drop-zone" :ref="zoneBRef" data-zone="B">
+            <div class="card" data-id="c4" :ref="c4Ref">Task 4: Deploy</div>
+          </div>
+        </div>
+      </div>
+      <pre class="log">{{ dropLog }}</pre>
+    </section>
+
+    <section>
+      <h3>Keyboard Drag (a11y)</h3>
+      <p class="desc">Focus the box, then <strong>Space</strong> to grab, <strong>Arrow keys</strong> to move, <strong>Space/Enter</strong> to drop, <strong>Escape</strong> to cancel.</p>
+      <div class="arena-small">
+        <div class="drag-box-small" :ref="kbRef" tabindex="0">Alt+Arrow</div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Auto-Scroll</h3>
+      <p class="desc">Drag the item to the top or bottom edge of the scrollable list. The list auto-scrolls.</p>
+      <div class="scroll-list" :ref="scrollRef">
+        <div class="scroll-item drag-handle" :ref="scrollItemRef">Drag me ↕</div>
+        <div class="scroll-item">Item 2</div>
+        <div class="scroll-item">Item 3</div>
+        <div class="scroll-item">Item 4</div>
+        <div class="scroll-item">Item 5</div>
+        <div class="scroll-item">Item 6</div>
+        <div class="scroll-item">Item 7</div>
+        <div class="scroll-item">Item 8</div>
+        <div class="scroll-item">Item 9</div>
+        <div class="scroll-item">Item 10</div>
+        <div class="scroll-item">Item 11</div>
+        <div class="scroll-item">Item 12</div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { useDrag, useDropZone, effect, onMount, onDestroy } from '@pdxui/core';
+
+let freeDragging = $signal(false);
+let freeX = $signal(0);
+let freeY = $signal(0);
+let freeVel = $signal(0);
+let dropLog = $signal('Drag cards between zones...');
+
+let freeRef = $signal(null);
+let xRef = $signal(null);
+let yRef = $signal(null);
+let zoneARef = $signal(null);
+let zoneBRef = $signal(null);
+let c1Ref = $signal(null);
+let c2Ref = $signal(null);
+let c3Ref = $signal(null);
+let c4Ref = $signal(null);
+let kbRef = $signal(null);
+let scrollRef = $signal(null);
+let scrollItemRef = $signal(null);
+
+// Drag instances with bounds
+const freeDrag = useDrag(() => freeRef, { bounds: 'parent' });
+const xDrag = useDrag(() => xRef, { axis: 'x', bounds: 'parent' });
+const yDrag = useDrag(() => yRef, { axis: 'y', bounds: 'parent' });
+const kbDrag = useDrag(() => kbRef, { bounds: 'parent' });
+const scrollDrag = useDrag(() => scrollItemRef);
+
+// Card drags — each card sends its data-id as payload
+const c1Drag = useDrag(() => c1Ref, { data: function() { return 'c1'; } });
+const c2Drag = useDrag(() => c2Ref, { data: function() { return 'c2'; } });
+const c3Drag = useDrag(() => c3Ref, { data: function() { return 'c3'; } });
+const c4Drag = useDrag(() => c4Ref, { data: function() { return 'c4'; } });
+
+// Move card element to target zone on drop
+function moveCard(cardId, targetZone) {
+    const card = ({ c1: c1Ref, c2: c2Ref, c3: c3Ref, c4: c4Ref })[cardId];
+    if (card && targetZone) {
+        card.style.transform = '';
+        card.style.zIndex = '';
+        card.style.opacity = '';
+        card.style.boxShadow = '';
+        targetZone.appendChild(card);
+    }
+}
+
+// Drop zones — actual card movement on drop
+const dropA = useDropZone(() => zoneARef, {
+    onDrop: function(data) {
+        moveCard(data, zoneARef);
+        dropLog = dropLog + '> Moved ' + data + ' → Zone A\n';
+    },
+    onEnter: function() { },
+    onLeave: function() { },
+});
+const dropB = useDropZone(() => zoneBRef, {
+    onDrop: function(data) {
+        moveCard(data, zoneBRef);
+        dropLog = dropLog + '> Moved ' + data + ' → Zone B\n';
+    },
+});
+
+onMount(() => {
+    // Free drag position + velocity tracking
+    const d1 = effect(() => {
+        freeDragging = freeDrag.isDragging();
+        const pos = freeDrag.position();
+        freeX = Math.round(pos.x);
+        freeY = Math.round(pos.y);
+        const vel = freeDrag.velocity();
+        freeVel = Math.round(Math.sqrt(vel.vx * vel.vx + vel.vy * vel.vy));
+        const el = freeRef;
+        if (el) el.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
+    });
+
+    const d2 = effect(() => {
+        const pos = xDrag.position();
+        const el = xRef;
+        if (el) el.style.transform = 'translateX(' + pos.x + 'px)';
+    });
+
+    const d3 = effect(() => {
+        const pos = yDrag.position();
+        const el = yRef;
+        if (el) el.style.transform = 'translateY(' + pos.y + 'px)';
+    });
+
+    // Drop zone highlight
+    const d4 = effect(() => {
+        const el = zoneARef;
+        if (el) el.classList.toggle('over', dropA.isOver());
+    });
+    const d5 = effect(() => {
+        const el = zoneBRef;
+        if (el) el.classList.toggle('over', dropB.isOver());
+    });
+
+    // Card drag visual feedback
+    function cardEffect(drag, getRef) {
+        return effect(() => {
+            const el = getRef;
+            if (!el) return;
+            const pos = drag.position();
+            const dragging = drag.isDragging();
+            if (dragging) {
+                el.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
+                el.style.zIndex = '100';
+                el.style.opacity = '0.85';
+                el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+            } else {
+                el.style.transform = '';
+                el.style.zIndex = '';
+                el.style.opacity = '';
+                el.style.boxShadow = '';
+            }
+        });
+    }
+    const d6 = cardEffect(c1Drag, c1Ref);
+    const d7 = cardEffect(c2Drag, c2Ref);
+    const d8 = cardEffect(c3Drag, c3Ref);
+    const d9 = cardEffect(c4Drag, c4Ref);
+
+    // Keyboard drag visual
+    const d10 = effect(() => {
+        const pos = kbDrag.position();
+        const el = kbRef;
+        if (el) el.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
+    });
+
+    // Auto-scroll drag visual
+    const d11 = effect(() => {
+        const pos = scrollDrag.position();
+        const el = scrollItemRef;
+        if (el) el.style.transform = 'translateY(' + pos.y + 'px)';
+    });
+
+    onDestroy(() => {
+        d1(); d2(); d3(); d4(); d5(); d6(); d7(); d8(); d9(); d10(); d11();
+        freeDrag.dispose(); xDrag.dispose(); yDrag.dispose(); kbDrag.dispose(); scrollDrag.dispose();
+        c1Drag.dispose(); c2Drag.dispose(); c3Drag.dispose(); c4Drag.dispose();
+        dropA.dispose(); dropB.dispose();
+    });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .stats { display: flex; gap: 20px; font-size: 0.9rem; margin-top: 8px; }
+  .arena { position: relative; width: 100%; height: 250px; border: 2px dashed #e0e0e0; border-radius: 8px; }
+  .arena-small { position: relative; width: 300px; height: 150px; border: 2px dashed #e0e0e0; border-radius: 8px; }
+  .drag-box { position: absolute; top: 90px; left: calc(50% - 60px); width: 120px; height: 70px; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: grab; user-select: none; touch-action: none; font-weight: 600; }
+  .drag-box:active { cursor: grabbing; opacity: 0.8; }
+  .drag-box-small { position: absolute; top: 40px; left: 100px; width: 100px; height: 50px; background: #8b5cf6; color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: grab; user-select: none; touch-action: none; font-size: 0.8rem; font-weight: 600; }
+  .drag-box-small:focus { outline: 3px solid #3b82f6; outline-offset: 2px; }
+  .drag-small { position: absolute; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: grab; user-select: none; touch-action: none; font-size: 0.75rem; font-weight: 600; }
+  .axis-row { display: flex; gap: 24px; align-items: flex-start; margin-top: 8px; }
+  .h-track { width: 300px; height: 50px; border: 2px dashed #e0e0e0; border-radius: 8px; position: relative; }
+  .h-track .drag-small { width: 80px; height: 36px; top: 7px; left: 110px; }
+  .v-track { width: 50px; height: 200px; border: 2px dashed #e0e0e0; border-radius: 8px; position: relative; }
+  .v-track .drag-small { width: 36px; height: 36px; top: 82px; left: 7px; }
+  .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0; }
+  .zone-label { font-size: 0.75rem; color: #888; font-weight: 600; }
+  .drop-zone { min-height: 140px; border: 2px dashed #e0e0e0; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; transition: all 200ms; margin-top: 4px; }
+  .drop-zone.over { border-color: #3b82f6; background: #eff6ff; }
+  .card { padding: 10px 14px; background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; cursor: grab; user-select: none; touch-action: none; font-size: 0.85rem; }
+  .card:active { cursor: grabbing; }
+  .log { font-family: monospace; font-size: 0.75rem; background: #f5f5f7; padding: 8px; border-radius: 6px; max-height: 100px; overflow-y: auto; white-space: pre-wrap; min-height: 30px; margin: 0; }
+  .scroll-list { max-height: 200px; overflow-y: auto; border: 2px dashed #e0e0e0; border-radius: 8px; padding: 4px; margin-top: 8px; }
+  .scroll-item { padding: 10px 14px; background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; margin: 4px 0; font-size: 0.85rem; }
+  .scroll-item.drag-handle { background: #3b82f6; color: white; cursor: grab; touch-action: none; user-select: none; font-weight: 600; }
+</style>

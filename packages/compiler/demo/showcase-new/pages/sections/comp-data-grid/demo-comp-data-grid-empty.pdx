@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Empty State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      When there is no data, a customizable empty state appears. It is a status, so a filter that
+      leaves nothing is announced; the pager reads "0 of 0" and offers no page.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :data="emptyData" :columns="typedColumns" label="Archived employees" empty-title="No records found" empty-icon="search"></pdx-data-grid>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { typedColumns } from './state.pdx';
+
+const emptyData = [];
+</script>

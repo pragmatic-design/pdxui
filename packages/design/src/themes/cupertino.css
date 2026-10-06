@@ -1,0 +1,293 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Cupertino Theme
+   Apple HIG inspired: iOS blue, generous radius, spacious, warm grays.
+   ========================================================================== */
+
+[pdx-theme="cupertino"] {
+    --pdx-hue-primary: 230;
+    --pdx-hue-accent:  350;
+
+    /* iOS blue primary, pink accent */
+    --pdx-color-primary:       oklch(0.525 0.18 230);
+    --pdx-color-primary-hover: oklch(0.53 0.20 230);
+    --pdx-color-primary-text:  oklch(0.98 0.01 230);
+    --pdx-color-accent:        oklch(0.65 0.16 350);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.65 0.18 230);
+
+    /* Warm subtle grays (very low chroma) */
+    --pdx-gray-50:  oklch(0.985 0.002 60);
+    --pdx-gray-100: oklch(0.965 0.004 60);
+    --pdx-gray-200: oklch(0.92  0.005 60);
+    --pdx-gray-800: oklch(0.25  0.006 60);
+    --pdx-gray-900: oklch(0.18  0.005 60);
+    --pdx-gray-950: oklch(0.13  0.004 60);
+
+    /* Apple system fonts */
+    --pdx-font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    --pdx-font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    --pdx-font-mono: 'SF Mono', 'Menlo', monospace;
+
+    /* Apple HIG corner radius: small=6, medium=10, large=12(btn)/14, xLarge=20 */
+    --pdx-radius-sm:  0.375rem;  /* 6px — Apple small */
+    --pdx-radius-md:  0.625rem;  /* 10px — Apple medium (text fields, cards) */
+    --pdx-radius-lg:  0.75rem;   /* 12px — Apple large (buttons) */
+    --pdx-radius-xl:  1.25rem;   /* 20px — Apple xLarge */
+
+    /* Apple semantic colors — adapted from iOS system colors */
+    --pdx-color-danger:       light-dark(oklch(0.575 0.22 28), oklch(0.57 0.18 28));
+    --pdx-color-danger-hover: light-dark(oklch(0.50 0.24 28), oklch(0.60 0.20 28));
+    --pdx-color-success:      light-dark(oklch(0.53 0.17 150), oklch(0.535 0.14 150));
+    --pdx-color-warning:      light-dark(oklch(0.78 0.16 70), oklch(0.75 0.13 70));
+    --pdx-color-info:         light-dark(oklch(0.55 0.15 255), oklch(0.555 0.13 255));
+
+    /* Spacious density */
+    --pdx-density-factor: 1.1;
+
+    /* Apple-style extremely subtle shadows — layered: small sharp + large soft */
+    --pdx-shadow-color: light-dark(oklch(0 0 0 / 0.04), oklch(0 0 0 / 0.25));
+    --pdx-shadow-sm:  0 1px 2px oklch(0 0 0 / 0.04), 0 0 1px oklch(0 0 0 / 0.06);
+    --pdx-shadow-md:  0 2px 8px oklch(0 0 0 / 0.06), 0 0 1px oklch(0 0 0 / 0.04);
+    --pdx-shadow-lg:  0 4px 16px oklch(0 0 0 / 0.08), 0 0 2px oklch(0 0 0 / 0.04);
+    --pdx-shadow-xl:  0 8px 32px oklch(0 0 0 / 0.10), 0 0 2px oklch(0 0 0 / 0.04);
+
+    /* Apple warm surfaces */
+    --pdx-color-bg:      light-dark(oklch(0.97 0.003 60), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(white, oklch(0.17 0.005 60));
+    --pdx-color-inset:   light-dark(oklch(0.96 0.003 60), oklch(0.22 0.005 60));
+
+    /* iOS borders — very subtle, slightly warm */
+    --pdx-color-border: light-dark(oklch(0.88 0.004 60), oklch(0.30 0.004 60));
+    --pdx-color-border-strong: light-dark(oklch(0.80 0.005 60), oklch(0.40 0.005 60));
+
+    /* Apple focus ring — blue glow (not solid ring) */
+    --pdx-focus-ring: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.3), 0 0 0 1px oklch(from var(--pdx-color-primary) l c h / 0.5);
+
+    /* Cupertino behavior tokens */
+    --pdx-button-radius: var(--pdx-radius-lg);   /* Apple uses large radius for buttons */
+    /* The rendered height is `min-height × --pdx-density-factor`, and cupertino's own factor is
+       1.1: a plain 2.75rem renders 48.4px, OVERSHOOTING the 44 the HIG asks for.
+       44px is an accessibility target, WCAG 2.5.8 and the HIG both, so it is the one number here
+       that has to be exact rather than close. Dividing the factor out gives it. */
+    --pdx-button-min-height: calc(2.75rem / 1.1);  /* 44px Apple touch target, at cupertino's density */
+    --pdx-input-style: outlined;
+    --pdx-input-min-height: calc(2.75rem / 1.1);   /* the same, so a row of both aligns */
+    --pdx-tab-indicator: pill;         /* segmented control style */
+    --pdx-tab-indicator-size: 2px;
+    --pdx-card-style: bordered;
+    --pdx-toggle-width: 3rem;
+    --pdx-toggle-height: 1.75rem;      /* iOS toggle is taller */
+    --pdx-border-width: 1px;
+}
+
+/* Input: Apple gray-fill style — transparent border until focus.
+   Height driven by the --pdx-input-min-height token, which divides cupertino's 1.1 density back
+   out so the rendered height is 44px, not 48.4. */
+[pdx-theme="cupertino"] :is(.pdx-input-wrap, .pdx-input:not(.pdx-input-wrap > *)):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-color: transparent;
+    background: light-dark(oklch(0.96 0.003 60), oklch(0.22 0.004 60));
+}
+[pdx-theme="cupertino"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-color: var(--pdx-color-primary);
+    box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
+}
+[pdx-theme="cupertino"] .pdx-input:not(.pdx-input-wrap > *):focus-visible:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-color: var(--pdx-color-primary);
+    box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
+    outline: none;
+}
+
+/* Buttons: Apple — 44px touch target (default), generous padding.
+   border-radius flows from --pdx-button-radius token via --_btn-r — NOT set directly here,
+   otherwise button groups can't override radius to 0 for middle children. */
+[pdx-theme="cupertino"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    padding: var(--pdx-space-sm) var(--pdx-space-xl);
+}
+/* Apple 44px touch target: flows from --pdx-button-min-height, which divides the 1.1 density
+   back out so the rendered height is exactly the 44px the HIG asks for.
+   No explicit height override — the token system handles alignment with inputs. */
+
+/* Tab: pill variant driven by [pdx-tab-style="pill"] in tabs.css.
+   Apple HIG specifics: 32pt height, tighter segmented control sizing. */
+[pdx-tab-style="pill"][pdx-theme="cupertino"] .pdx-tabs:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 0.5rem;   /* 8px — Apple segmented control outer */
+    padding: 2px;
+    gap: 2px;
+    /* 32px — Apple segmented control height. A minimum, with the segment's 28px set on the segment:
+       a strip that wraps its tabs sizes each row by its tallest tab, so a fixed height here would
+       let the 32px-tall content of a tab run 4px past the control. */
+    min-height: 2rem;
+}
+[pdx-tab-style="pill"][pdx-theme="cupertino"] .pdx-tab:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 0.4375rem; /* 7px — 1px inset from container */
+    font-size: 0.8125rem;     /* 13px — Apple segmented control font */
+    /* The segment fills the 28px inside the 32px control. The pill variant's 2rem min-height would
+       make it 32px, running 2px past the control's rounded bottom. */
+    min-height: 0;
+    height: calc(2rem - 4px);
+}
+[pdx-tab-style="pill"][pdx-theme="cupertino"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    color: var(--pdx-color-text);
+}
+
+/* ── Select: iOS-style rounded, subtle shadow ── */
+[pdx-theme="cupertino"] .pdx-select-dropdown:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-lg);
+}
+[pdx-theme="cupertino"] .pdx-select-option:hover:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)),
+[pdx-theme="cupertino"] .pdx-select-option.active:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: var(--pdx-color-inset);
+}
+[pdx-theme="cupertino"] .pdx-select-caret:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    --pdx-select-caret-size: 1rem;
+}
+/* iOS: thin, subtle chevron */
+[pdx-theme="cupertino"] .pdx-select-caret svg:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    --pdx-select-caret-stroke: 1.5;
+    opacity: 0.45;
+}
+[pdx-theme="cupertino"] .pdx-select-check:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: var(--pdx-radius-full);
+}
+
+/* ── Breadcrumb: thin chevron (iOS navigation style) ── */
+[pdx-theme="cupertino"] .pdx-breadcrumb:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) { --pdx-breadcrumb-separator: '›'; }
+[pdx-theme="cupertino"] .pdx-breadcrumb > *:not(:last-child):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *))::after {
+    font-size: 1.1em;
+    font-weight: 300;
+    color: var(--pdx-color-muted);
+}
+
+/* ── Table: Apple HIG — clean, minimal header, no uppercase ── */
+[pdx-theme="cupertino"] .pdx-table th:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    --pdx-table-header-transform: none;
+    --pdx-table-header-letter-spacing: normal;
+    --pdx-table-header-weight: var(--pdx-weight-semibold);
+    --pdx-table-header-size: var(--pdx-text-xs);
+    --pdx-table-header-color: var(--pdx-color-muted);
+    --pdx-table-header-border-width: var(--pdx-border-width);
+    --pdx-table-header-border-color: var(--pdx-color-border);
+}
+[pdx-theme="cupertino"] .pdx-table td:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-bottom-color: var(--pdx-color-border);
+}
+
+/* ── Accordion: Apple disclosure — clean, subtle chevron ── */
+[pdx-theme="cupertino"] details.pdx-accordion:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: var(--pdx-radius-md);
+}
+[pdx-theme="cupertino"] details.pdx-accordion summary:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *))::after {
+    content: '›';
+    font-size: 1.2em;
+    font-weight: 300;
+    transition: transform 0.25s ease;
+}
+[pdx-theme="cupertino"] details.pdx-accordion[open] summary:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *))::after {
+    transform: rotate(90deg);
+}
+
+/* ── Card: Liquid Glass hint — translucent surface with subtle backdrop ── */
+[pdx-theme="cupertino"] .pdx-surface-card:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: light-dark(oklch(1 0 0 / 0.8), oklch(0.18 0.005 60 / 0.8));
+    backdrop-filter: blur(8px) saturate(1.1);
+    -webkit-backdrop-filter: blur(8px) saturate(1.1);
+    border: var(--pdx-border-width) solid light-dark(oklch(0 0 0 / 0.06), oklch(1 0 0 / 0.08));
+    box-shadow: var(--pdx-shadow-sm);
+}
+[pdx-theme="cupertino"] .pdx-surface-card[interactive]:hover:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    box-shadow: var(--pdx-shadow-md);
+}
+
+/* ── Dialog/Overlay: iOS vibrancy ── */
+[pdx-theme="cupertino"] .pdx-surface-overlay:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: light-dark(oklch(1 0 0 / 0.85), oklch(0.15 0.005 60 / 0.85));
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    border-radius: var(--pdx-radius-xl);
+}
+
+/* ── Button: iOS subtle active state ── */
+[pdx-theme="cupertino"] :is(.pdx-primary, .pdx-secondary, .pdx-outline):active:not(:disabled):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    transform: scale(0.98);
+    filter: brightness(0.95);
+}
+
+/* ── Calendar: Apple HIG — circle selected, ultra-subtle hover, vibrancy ── */
+[pdx-theme="cupertino"] .pdx-cal-cell:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 9999px;
+    width: 38px;
+    height: 38px;
+    transition: background 0.2s ease;
+}
+[pdx-theme="cupertino"] .pdx-cal-cell:hover:not(.pdx-cal-disabled):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: light-dark(oklch(0 0 0 / 0.04), oklch(1 0 0 / 0.06));
+}
+[pdx-theme="cupertino"] .pdx-cal-selected:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 9999px;
+}
+[pdx-theme="cupertino"] .pdx-cal-today:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    color: var(--pdx-color-primary-ink);
+}
+/* Apple range: pill ends */
+[pdx-theme="cupertino"] .pdx-cal-range-start:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 9999px 0 0 9999px;
+}
+[pdx-theme="cupertino"] .pdx-cal-range-end:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 0 9999px 9999px 0;
+}
+[pdx-theme="cupertino"] .pdx-cal-range-start.pdx-cal-range-end:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 9999px;
+}
+/* Apple calendar container: Liquid Glass hint */
+[pdx-theme="cupertino"] .pdx-calendar-inline:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: light-dark(oklch(1 0 0 / 0.8), oklch(0.18 0.005 60 / 0.8));
+    backdrop-filter: blur(8px) saturate(1.1);
+    -webkit-backdrop-filter: blur(8px) saturate(1.1);
+    border: 1px solid light-dark(oklch(0 0 0 / 0.06), oklch(1 0 0 / 0.08));
+    border-radius: var(--pdx-radius-xl);
+}
+/* Apple nav buttons: subtle gray fill */
+[pdx-theme="cupertino"] .pdx-cal-nav-btn:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 9999px;
+    color: var(--pdx-color-primary-ink);
+}
+[pdx-theme="cupertino"] .pdx-cal-nav-btn:hover:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: light-dark(oklch(0 0 0 / 0.04), oklch(1 0 0 / 0.06));
+}
+/* Apple month/year cells: rounded */
+[pdx-theme="cupertino"] .pdx-cal-month-cell:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)),
+[pdx-theme="cupertino"] .pdx-cal-year-cell:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+}
+
+/* ── Date Picker: Apple HIG — vibrancy panel, generous radius ── */
+[pdx-theme="cupertino"] .pdx-date-picker-panel:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: light-dark(oklch(1 0 0 / 0.85), oklch(0.15 0.005 60 / 0.85));
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    border: 1px solid light-dark(oklch(0 0 0 / 0.06), oklch(1 0 0 / 0.08));
+    border-radius: var(--pdx-radius-xl);
+    box-shadow: var(--pdx-shadow-lg);
+}
+
+/* ── Time Picker: Apple HIG — rounded, subtle ── */
+[pdx-theme="cupertino"] .pdx-time-picker:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+}
+[pdx-theme="cupertino"] .pdx-time-value:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: var(--pdx-radius-md);
+}
+[pdx-theme="cupertino"] .pdx-time-value:focus:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    background: light-dark(oklch(0 0 0 / 0.05), oklch(1 0 0 / 0.08));
+    box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
+}
+[pdx-theme="cupertino"] .pdx-time-arrow:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    border-radius: 9999px;
+    color: var(--pdx-color-primary-ink);
+    opacity: 0.6;
+}
+[pdx-theme="cupertino"] .pdx-time-arrow:hover:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+    opacity: 1;
+    background: light-dark(oklch(0 0 0 / 0.04), oklch(1 0 0 / 0.06));
+}

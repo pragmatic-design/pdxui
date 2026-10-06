@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Declarative + Programmatic Mix</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A declarative <code>&lt;pdx-dialog&gt;</code> with a programmatic <code>dialog.confirm()</code> on top.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm" @click="openDeclarative">Open Dialog</pdx-button>
+    </div>
+    <pdx-dialog :open="declOpen" title="Declarative Dialog" size="md">
+      <p style="margin:0 0 var(--pdx-space-md)">This dialog is opened via <code>:open</code> binding.</p>
+      <p style="margin:0">Click below to open a programmatic confirm on top of this dialog.</p>
+      <span slot="footer">
+        <pdx-button variant="danger" size="sm" @click="onNestedConfirm">Delete (Programmatic)</pdx-button>
+        <pdx-button variant="ghost" size="sm" @click="closeDeclarative">Close</pdx-button>
+      </span>
+    </pdx-dialog>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+import { toast } from '@pdxui/ui/toast';
+
+let declOpen = $signal(false);
+
+function openDeclarative() { declOpen = true; }
+function closeDeclarative() { declOpen = false; }
+
+async function onNestedConfirm() {
+    const result = await dialog.confirm({
+        title: 'Delete Item?',
+        message: 'This programmatic confirm sits on top of the declarative dialog.',
+        variant: 'danger',
+        confirmLabel: 'Delete',
+    });
+    if (result) {
+        toast.success('Item deleted!');
+        declOpen = false;
+    }
+}
+</script>

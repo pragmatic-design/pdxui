@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form — Pragmatic Design CSS Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/pragmatic-design.css">
+</head>
+<body>
+    <pdx-center max="md" pad="lg">
+        <pdx-stack gap="xl">
+
+            <!-- Header -->
+            <pdx-stack gap="2xs">
+                <h1 class="pdx-txt-display">Create Product</h1>
+                <p class="pdx-txt-small pdx-ink-muted">Fill in the details to add a new product to the catalog.</p>
+            </pdx-stack>
+
+            <!-- Form -->
+            <form>
+                <pdx-stack gap="lg">
+
+                    <!-- Basic Info Section -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-heading">Basic Information</h2>
+                        <div class="pdx-surface-card">
+                            <pdx-stack gap="md">
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted" for="name">Product Name</label>
+                                    <input class="pdx-input" id="name" placeholder="e.g. Wireless Headphones" required />
+                                </pdx-stack>
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted" for="desc">Description</label>
+                                    <textarea class="pdx-input" id="desc" placeholder="Describe the product..."></textarea>
+                                </pdx-stack>
+                                <pdx-grid cols="2" gap="md">
+                                    <pdx-stack gap="xs">
+                                        <label class="pdx-txt-label pdx-ink-muted" for="category">Category</label>
+                                        <select class="pdx-input" id="category">
+                                            <option value="">Select category...</option>
+                                            <option>Electronics</option>
+                                            <option>Clothing</option>
+                                            <option>Home &amp; Garden</option>
+                                            <option>Sports</option>
+                                        </select>
+                                    </pdx-stack>
+                                    <pdx-stack gap="xs">
+                                        <label class="pdx-txt-label pdx-ink-muted" for="sku">SKU</label>
+                                        <input class="pdx-input" id="sku" placeholder="e.g. WH-1000XM5" />
+                                    </pdx-stack>
+                                </pdx-grid>
+                            </pdx-stack>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Pricing Section -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-heading">Pricing</h2>
+                        <div class="pdx-surface-card">
+                            <pdx-grid cols="3" gap="md">
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted" for="price">Price</label>
+                                    <input class="pdx-input" id="price" type="number" placeholder="0.00" step="0.01" />
+                                </pdx-stack>
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted" for="cost">Cost</label>
+                                    <input class="pdx-input" id="cost" type="number" placeholder="0.00" step="0.01" />
+                                </pdx-stack>
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted" for="tax">Tax Rate (%)</label>
+                                    <input class="pdx-input" id="tax" type="number" placeholder="22" />
+                                </pdx-stack>
+                            </pdx-grid>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Inventory Section -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-heading">Inventory</h2>
+                        <div class="pdx-surface-card">
+                            <pdx-grid cols="2" gap="md">
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted" for="stock">Stock Quantity</label>
+                                    <input class="pdx-input" id="stock" type="number" placeholder="0" />
+                                </pdx-stack>
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted" for="low">Low Stock Threshold</label>
+                                    <input class="pdx-input" id="low" type="number" placeholder="10" />
+                                </pdx-stack>
+                            </pdx-grid>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Validation Example -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-heading">Validation States</h2>
+                        <div class="pdx-surface-card">
+                            <pdx-stack gap="md">
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted">Valid Field</label>
+                                    <input class="pdx-input" value="wireless-headphones" />
+                                    <span class="pdx-txt-caption pdx-ink-success">Slug is available</span>
+                                </pdx-stack>
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted">Error Field</label>
+                                    <input class="pdx-input" aria-invalid="true" value="-1" />
+                                    <span class="pdx-txt-caption pdx-ink-danger">Price must be greater than zero</span>
+                                </pdx-stack>
+                                <pdx-stack gap="xs">
+                                    <label class="pdx-txt-label pdx-ink-muted">Disabled Field</label>
+                                    <input class="pdx-input" disabled value="Auto-generated" />
+                                    <span class="pdx-txt-caption pdx-ink-muted">This field is computed automatically</span>
+                                </pdx-stack>
+                            </pdx-stack>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Actions -->
+                    <pdx-row gap="sm" justify="end">
+                        <button type="button" class="pdx-ghost">Cancel</button>
+                        <button type="button" class="pdx-secondary">Save Draft</button>
+                        <button type="submit" class="pdx-primary">Publish Product</button>
+                    </pdx-row>
+
+                </pdx-stack>
+            </form>
+
+        </pdx-stack>
+    </pdx-center>
+</body>
+</html>

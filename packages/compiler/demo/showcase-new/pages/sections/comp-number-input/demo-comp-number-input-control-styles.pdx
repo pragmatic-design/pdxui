@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Control Styles</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Both sides (default)">
+        <pdx-number-input value="42" min="0" max="100"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Stacked right">
+        <pdx-number-input value="25" min="0" max="100" controls="right"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Free mode (no steppers)" hint="Arrow keys step the digit before the cursor">
+        <pdx-number-input value="1234" controls="none"></pdx-number-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

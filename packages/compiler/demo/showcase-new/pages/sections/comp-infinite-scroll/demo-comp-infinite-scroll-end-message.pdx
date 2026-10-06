@@ -1,0 +1,52 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With End Message (20 items total)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Only 20 items. After 2 pages, shows "No more data".</p>
+    <div class="demo-container scroll-box" id="end-scroll-box">
+      <pdx-infinite-scroll :source="endDS" :threshold="100" end-message="All items loaded!" show-end-message id="end-inf-scroll">
+        <div id="end-items" :ref="endItems"></div>
+      </pdx-infinite-scroll>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+// --- End message demo: 20 items ---
+const endAllItems = [];
+for (let _eidx = 1; _eidx <= 20; _eidx++) {
+    endAllItems.push({ id: _eidx, title: 'Short Item ' + _eidx });
+}
+
+const endDS = createDataSource({
+    transport: {
+        read: function(params) {
+            return new Promise(function(resolve) {
+                const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
+                const _result = endAllItems.slice(_off, _off + (params.pageSize || 10));
+                setTimeout(function() { resolve({ data: _result, total: endAllItems.length }); }, 400);
+            });
+        },
+    },
+    pageSize: 10,
+    autoLoad: true,
+});
+
+let endItems = $signal(null);
+
+$effect(() => {
+    const _data = endDS.data();
+    const _container = endItems;
+    if (_container && _data) {
+        _container.innerHTML = '';
+        for (let _ri = 0; _ri < _data.length; _ri++) {
+            const _item = _data[_ri];
+            const _div = document.createElement('div');
+            _div.className = 'scroll-item';
+            _div.textContent = _item.title;
+            _container.appendChild(_div);
+        }
+    }
+});
+</script>

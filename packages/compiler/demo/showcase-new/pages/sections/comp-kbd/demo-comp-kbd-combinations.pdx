@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Key Combinations</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>+</code> separated modifier combinations.</p>
+    <div class="shortcut-list">
+      <div class="shortcut-row"><pdx-kbd keys="Ctrl+C"></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Copy</span></div>
+      <div class="shortcut-row"><pdx-kbd keys="Ctrl+V"></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Paste</span></div>
+      <div class="shortcut-row"><pdx-kbd keys="Ctrl+Shift+P"></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Command Palette</span></div>
+      <div class="shortcut-row"><pdx-kbd keys="Alt+F4"></pdx-kbd><span class="pdx-txt-small pdx-ink-muted">Close Window</span></div>
+      <div class="shortcut-row">
+        <span><pdx-kbd keys="Ctrl+K"></pdx-kbd> then <pdx-kbd keys="Ctrl+S"></pdx-kbd></span>
+        <span class="pdx-txt-small pdx-ink-muted">Save All (sequential)</span>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-kbd keys="Ctrl+C"&gt;&lt;/pdx-kbd&gt;
+&lt;pdx-kbd keys="Ctrl+Shift+P"&gt;&lt;/pdx-kbd&gt;
+&lt;pdx-kbd keys="Ctrl+K"&gt;&lt;/pdx-kbd&gt; then &lt;pdx-kbd keys="Ctrl+S"&gt;&lt;/pdx-kbd&gt;</code></pre>
+    </details>
+  </section>
+</template>

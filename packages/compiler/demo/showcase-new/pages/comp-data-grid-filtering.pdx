@@ -1,0 +1,57 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Data Grid — Filtering</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Three filter modes: inline row, toolbar chips, and popover. Supports text, number, date,
+      boolean, and enum filters with configurable operators.
+    </p>
+
+    <!-- Inline Filter Row -->
+    <pdx-demo-comp-data-grid-filtering-inline-row class="demo-section"></pdx-demo-comp-data-grid-filtering-inline-row>
+
+    <!-- Toolbar Filter Mode -->
+    <pdx-demo-comp-data-grid-filtering-toolbar-mode class="demo-section"></pdx-demo-comp-data-grid-filtering-toolbar-mode>
+
+    <!-- Enum Filter -->
+    <pdx-demo-comp-data-grid-filtering-enum-multi class="demo-section"></pdx-demo-comp-data-grid-filtering-enum-multi>
+
+    <!-- Server-side enum -->
+    <pdx-demo-comp-data-grid-filtering-enum-server class="demo-section"></pdx-demo-comp-data-grid-filtering-enum-server>
+
+    <!-- Set / Excel Filter -->
+    <pdx-demo-comp-data-grid-filtering-set-filter class="demo-section"></pdx-demo-comp-data-grid-filtering-set-filter>
+
+    <!-- Relative Date Filters -->
+    <pdx-demo-comp-data-grid-filtering-relative-date class="demo-section"></pdx-demo-comp-data-grid-filtering-relative-date>
+
+    <!-- Custom Operators -->
+    <pdx-demo-comp-data-grid-filtering-custom-operators class="demo-section"></pdx-demo-comp-data-grid-filtering-custom-operators>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Filter Props</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop / Column</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>filterable</code><span>boolean</span><span>Enable inline filter row (shorthand for filter-mode="row")</span></div>
+        <div class="opt-row"><code>filter-mode</code><span>string</span><span>'none' | 'row' | 'toolbar'</span></div>
+        <div class="opt-row"><code>show-toolbar</code><span>boolean</span><span>Toolbar implies filter-mode="toolbar"</span></div>
+        <div class="opt-row"><code>col.filterable</code><span>boolean</span><span>Per-column: allow filtering (default true)</span></div>
+        <div class="opt-row"><code>col.filterOperators</code><span>string[]</span><span>Limit operators for this column</span></div>
+        <div class="opt-row"><code>col.filterOptions</code><span>array</span><span>Enum filter: { label, value }[] (multi-select, operator in)</span></div>
+        <div class="opt-row"><code>col.filterMultiple</code><span>boolean</span><span>Allow selecting multiple enum values (default for enum)</span></div>
+        <div class="opt-row"><code>col.filterSearchable</code><span>boolean</span><span>Type-to-search in the enum value editor</span></div>
+        <div class="opt-row"><code>col.filterOptionsSource</code><span>function</span><span>(query) =&gt; Promise&lt;Option[]&gt; — server-side options</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-grid-filtering';
+@title 'Data Grid Filtering — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-bg); overflow: hidden; }
+</style>

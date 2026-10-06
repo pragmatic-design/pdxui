@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Read Only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Content renderer — same styling, no editing.</p>
+
+    <div class="demo-area">
+      <pdx-rich-text
+        :value="sampleDoc"
+        :readonly="true"
+        :toolbar="false"
+        min-height="auto"
+      ></pdx-rich-text>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const sampleDoc = {
+  type: 'doc',
+  content: [
+    { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Welcome to pdx-rich-text' }] },
+    { type: 'paragraph', content: [
+      { type: 'text', text: 'This is a ' },
+      { type: 'text', text: 'zero-dependency', marks: [{ type: 'bold' }] },
+      { type: 'text', text: ' rich text editor with ' },
+      { type: 'text', text: 'design-token', marks: [{ type: 'italic' }] },
+      { type: 'text', text: ' native theming.' },
+    ]},
+    { type: 'bulletList', content: [
+      { type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Markdown shortcuts' }] }] },
+      { type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: '10-language syntax highlighting' }] }] },
+      { type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'CSS Grid tables (no contentEditable quirks)' }] }] },
+    ]},
+    { type: 'paragraph', content: [
+      { type: 'text', text: 'Try the ' },
+      { type: 'text', text: 'editor above', marks: [{ type: 'highlight' }] },
+      { type: 'text', text: ' to see it in action.' },
+    ]},
+  ],
+};
+</script>

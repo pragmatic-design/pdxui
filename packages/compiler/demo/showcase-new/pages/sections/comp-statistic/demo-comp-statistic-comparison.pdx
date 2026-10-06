@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Comparison</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Show previous period value for comparison.</p>
+    <div class="demo-row">
+      <pdx-statistic title="Revenue" prefix="$" value="284500" :precision="0" group-separator="," trend="up" trend-value="+18.2%" :compare-value="'240600'" :compare-label="'vs last month:'"></pdx-statistic>
+      <pdx-statistic title="Users" value="15420" :precision="0" group-separator="," trend="up" trend-value="+5.3%" :compare-value="'14640'" :compare-label="'vs last month:'"></pdx-statistic>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-statistic title="Revenue" prefix="$"
+  value="284500" :precision="0"
+  trend="up" trend-value="+18.2%"
+  compare-value="240600"
+  compare-label="vs last month:"&gt;
+&lt;/pdx-statistic&gt;</code></pre>
+    </details>
+  </section>
+</template>

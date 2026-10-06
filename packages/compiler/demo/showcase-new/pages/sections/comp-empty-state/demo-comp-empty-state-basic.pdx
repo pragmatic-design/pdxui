@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <div class="demo-container">
+      <pdx-empty-state icon="inbox" title="No messages" description="Your inbox is empty. New messages will appear here."></pdx-empty-state>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-empty-state icon="inbox" title="No messages"
+  description="Your inbox is empty."&gt;
+&lt;/pdx-empty-state&gt;</code></pre>
+    </details>
+  </section>
+</template>

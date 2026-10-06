@@ -1,0 +1,14 @@
+/* pdx-relation-picker — candidate grid + pick/create footer. Token-only. */
+.pdx-relation-picker { display: flex; flex-direction: column; gap: var(--pdx-space-sm); height: 100%; min-height: 0; }
+/* overflow: auto — a grid taller than its share would scroll over the footer and hide Add / New. */
+.pdx-relation-picker-grid { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.pdx-relation-picker-foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--pdx-space-xs);
+    padding-top: var(--pdx-space-xs);
+    border-top: 1px solid var(--pdx-color-border);
+    flex: 0 0 auto;
+}
+.pdx-relation-picker-count { margin-right: auto; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); }

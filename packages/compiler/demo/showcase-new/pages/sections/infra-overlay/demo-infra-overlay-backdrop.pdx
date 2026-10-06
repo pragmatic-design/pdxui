@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h3>Backdrop</h3>
+    <p class="desc">Dark overlay. Click backdrop to dismiss. Blur variant adds glassmorphism.</p>
+    <div class="row">
+      <button class="pdx-primary" @click="showBdPlain">Backdrop</button>
+      <button class="pdx-primary" @click="showBdBlur">Backdrop + Blur</button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createBackdrop } from '@pdxui/core';
+
+// ── Backdrop ──
+let bdDispose = null;
+function showBdPlain() { showBd(false); }
+function showBdBlur() { showBd(true); }
+function showBd(blur) {
+    bdDispose?.();
+    const result = createBackdrop({ blur: blur, zIndex: 900, onClick: function() { result.dispose(); bdDispose = null; } });
+    bdDispose = result.dispose;
+}
+</script>

@@ -1,0 +1,13 @@
+{
+    "login": {
+        "title": "Sign in",
+        "intro": "Sign in to work on the service desk.",
+        "username": "Username",
+        "password": "Password",
+        "signIn": "Sign in",
+        "signingIn": "Signing in…",
+        "hint": "This backend is a mock. Two accounts, password pdx:",
+        "hintAdmin": "admin — closes the month, reads billing",
+        "hintTech": "tech — reads the account and nothing else"
+    }
+}

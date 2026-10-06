@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Utilities</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Utilities</span></div>
+                        <h1 class="pdx-txt-display">Utilities</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Divider, sticky, responsive hide/show, scroll snap, screen reader only.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Divider</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <p class="pdx-txt-small">Content above the divider</p>
+                                    <hr>
+                                    <p class="pdx-txt-small">Content below the divider</p>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;hr&gt;
+&lt;div class="pdx-divider"&gt;&lt;/div&gt;
+&lt;span class="pdx-divider-vertical"&gt;&lt;/span&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sticky</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>[pdx-sticky]</code> to pin an element to the top on scroll.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pre><code>&lt;header pdx-sticky&gt;
+  &lt;!-- Stays at top when scrolling --&gt;
+&lt;/header&gt;</code></pre>
+                            </div>
+                            <div class="doc-source">&lt;header pdx-sticky&gt;...&lt;/header&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Responsive Hide/Show</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Hide/show elements based on viewport. Breakpoint at 640px.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <pdx-row gap="sm" items="center">
+                                        <span class="pdx-badge pdx-badge-primary" pdx-hide="mobile">Visible on desktop</span>
+                                        <span class="pdx-badge pdx-badge-secondary" pdx-hide="desktop">Visible on mobile</span>
+                                        <span class="pdx-badge pdx-badge-success">Always visible</span>
+                                    </pdx-row>
+                                    <span class="pdx-txt-caption pdx-ink-muted">Resize viewport to 640px to see the change.</span>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;div pdx-hide="mobile"&gt;Desktop only&lt;/div&gt;
+&lt;div pdx-hide="desktop"&gt;Mobile only&lt;/div&gt;
+&lt;div pdx-show="mobile"&gt;Shows on mobile&lt;/div&gt;
+&lt;div pdx-show="desktop"&gt;Shows on desktop&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Scroll Snap</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Horizontal carousel with snap points.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-snap-x" style="max-width:100%">
+                                    <div class="pdx-surface-card" style="min-width:200px"><pdx-stack gap="xs"><strong>Card 1</strong><span class="pdx-txt-small pdx-ink-muted">Scroll horizontally</span></pdx-stack></div>
+                                    <div class="pdx-surface-card" style="min-width:200px"><pdx-stack gap="xs"><strong>Card 2</strong><span class="pdx-txt-small pdx-ink-muted">Snaps to position</span></pdx-stack></div>
+                                    <div class="pdx-surface-card" style="min-width:200px"><pdx-stack gap="xs"><strong>Card 3</strong><span class="pdx-txt-small pdx-ink-muted">Works on touch</span></pdx-stack></div>
+                                    <div class="pdx-surface-card" style="min-width:200px"><pdx-stack gap="xs"><strong>Card 4</strong><span class="pdx-txt-small pdx-ink-muted">Pure CSS</span></pdx-stack></div>
+                                    <div class="pdx-surface-card" style="min-width:200px"><pdx-stack gap="xs"><strong>Card 5</strong><span class="pdx-txt-small pdx-ink-muted">No JavaScript</span></pdx-stack></div>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-snap-x"&gt;
+  &lt;div style="min-width:200px"&gt;Card 1&lt;/div&gt;
+  &lt;div style="min-width:200px"&gt;Card 2&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Screen Reader Only</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <p class="pdx-txt-small">This button has a <code>pdx-sr-only</code> label: <button class="pdx-primary" size="sm">X <span class="pdx-sr-only">Close dialog</span></button></p>
+                            </div>
+                            <div class="doc-source">&lt;span class="pdx-sr-only"&gt;Close dialog&lt;/span&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Grow</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>[grow]</code> to a flex child to fill remaining space.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm" items="center">
+                                    <span>Fixed</span>
+                                    <input class="pdx-input" placeholder="I grow to fill space" grow />
+                                    <button class="pdx-primary">Go</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;pdx-row&gt;
+  &lt;span&gt;Fixed&lt;/span&gt;
+  &lt;input class="pdx-input" grow /&gt;
+  &lt;button class="pdx-primary"&gt;Go&lt;/button&gt;
+&lt;/pdx-row&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Lists</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Styled lists with <code>.pdx-list</code>. Nested <code>ul</code> gets circle bullets. Use <code>.pdx-list-none</code> to remove bullets.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="xl" wrap>
+                                    <pdx-stack gap="xs">
+                                        <strong class="pdx-txt-small">ul.pdx-list</strong>
+                                        <ul class="pdx-list">
+                                            <li>First item</li>
+                                            <li>Second item
+                                                <ul class="pdx-list">
+                                                    <li>Nested circle</li>
+                                                    <li>Another nested</li>
+                                                </ul>
+                                            </li>
+                                            <li>Third item</li>
+                                        </ul>
+                                    </pdx-stack>
+                                    <pdx-stack gap="xs">
+                                        <strong class="pdx-txt-small">ol.pdx-list</strong>
+                                        <ol class="pdx-list">
+                                            <li>Step one</li>
+                                            <li>Step two</li>
+                                            <li>Step three</li>
+                                        </ol>
+                                    </pdx-stack>
+                                    <pdx-stack gap="xs">
+                                        <strong class="pdx-txt-small">.pdx-list-none</strong>
+                                        <ul class="pdx-list-none">
+                                            <li>No bullet A</li>
+                                            <li>No bullet B</li>
+                                            <li>No bullet C</li>
+                                        </ul>
+                                    </pdx-stack>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;ul class="pdx-list"&gt;
+  &lt;li&gt;First item&lt;/li&gt;
+  &lt;li&gt;Second item
+    &lt;ul class="pdx-list"&gt;
+      &lt;li&gt;Nested circle&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol class="pdx-list"&gt;
+  &lt;li&gt;Step one&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ul class="pdx-list-none"&gt;
+  &lt;li&gt;No bullet&lt;/li&gt;
+&lt;/ul&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Keyboard Shortcuts</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Styled <code>&lt;kbd&gt;</code> elements for keyboard shortcuts.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="lg" wrap items="center">
+                                    <span class="pdx-txt-small"><kbd>Ctrl</kbd> + <kbd>S</kbd> Save</span>
+                                    <span class="pdx-txt-small"><kbd>Ctrl</kbd> + <kbd>K</kbd> Command palette</span>
+                                    <span class="pdx-txt-small"><kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd> Format</span>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;S&lt;/kbd&gt; Save
+&lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;K&lt;/kbd&gt; Command palette
+&lt;kbd&gt;Shift&lt;/kbd&gt; + &lt;kbd&gt;Alt&lt;/kbd&gt; + &lt;kbd&gt;F&lt;/kbd&gt; Format</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Elevation</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Shadow levels from <code>.pdx-elevation-0</code> (flat) to <code>.pdx-elevation-4</code> (highest).</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="md" wrap>
+                                    <div class="pdx-surface-card pdx-elevation-0" style="padding:var(--pdx-space-md);min-width:100px;text-align:center"><span class="pdx-txt-small">0</span></div>
+                                    <div class="pdx-surface-card pdx-elevation-1" style="padding:var(--pdx-space-md);min-width:100px;text-align:center"><span class="pdx-txt-small">1</span></div>
+                                    <div class="pdx-surface-card pdx-elevation-2" style="padding:var(--pdx-space-md);min-width:100px;text-align:center"><span class="pdx-txt-small">2</span></div>
+                                    <div class="pdx-surface-card pdx-elevation-3" style="padding:var(--pdx-space-md);min-width:100px;text-align:center"><span class="pdx-txt-small">3</span></div>
+                                    <div class="pdx-surface-card pdx-elevation-4" style="padding:var(--pdx-space-md);min-width:100px;text-align:center"><span class="pdx-txt-small">4</span></div>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-surface-card pdx-elevation-0"&gt;0&lt;/div&gt;
+&lt;div class="pdx-surface-card pdx-elevation-1"&gt;1&lt;/div&gt;
+&lt;div class="pdx-surface-card pdx-elevation-2"&gt;2&lt;/div&gt;
+&lt;div class="pdx-surface-card pdx-elevation-3"&gt;3&lt;/div&gt;
+&lt;div class="pdx-surface-card pdx-elevation-4"&gt;4&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Animations</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Entrance animations play on page load. Hover interactions below.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="md">
+                                    <p class="pdx-txt-caption pdx-ink-subtle">Entrance (play once on load)</p>
+                                    <pdx-row gap="md" wrap items="center">
+                                        <span class="pdx-badge pdx-badge-primary pdx-animate-fade-in">Fade In</span>
+                                        <span class="pdx-badge pdx-badge-success pdx-animate-slide-up">Slide Up</span>
+                                        <span class="pdx-badge pdx-badge-warning pdx-animate-scale-in">Scale In</span>
+                                    </pdx-row>
+                                    <p class="pdx-txt-caption pdx-ink-subtle">Hover interactions</p>
+                                    <pdx-row gap="md" wrap items="stretch">
+                                        <div class="pdx-surface-card pdx-hover-lift" style="padding:var(--pdx-space-md);text-align:center;cursor:pointer">
+                                            <span class="pdx-txt-small">Hover Lift</span>
+                                        </div>
+                                        <div class="pdx-surface-card pdx-hover-grow" style="padding:var(--pdx-space-md);text-align:center;cursor:pointer">
+                                            <span class="pdx-txt-small">Hover Grow</span>
+                                        </div>
+                                        <div class="pdx-surface-card pdx-hover-glow" style="padding:var(--pdx-space-md);text-align:center;cursor:pointer">
+                                            <span class="pdx-txt-small">Hover Glow</span>
+                                        </div>
+                                        <button class="pdx-primary pdx-ripple">Ripple Click</button>
+                                    </pdx-row>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;!-- Entrance --&gt;
+&lt;span class="pdx-animate-fade-in"&gt;...&lt;/span&gt;
+&lt;span class="pdx-animate-slide-up"&gt;...&lt;/span&gt;
+&lt;span class="pdx-animate-scale-in"&gt;...&lt;/span&gt;
+
+&lt;!-- Hover interactions --&gt;
+&lt;div class="pdx-hover-lift"&gt;Lifts on hover&lt;/div&gt;
+&lt;div class="pdx-hover-grow"&gt;Grows on hover&lt;/div&gt;
+&lt;div class="pdx-hover-glow"&gt;Glows on hover&lt;/div&gt;
+&lt;button class="pdx-primary pdx-ripple"&gt;Ripple&lt;/button&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

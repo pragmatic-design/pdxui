@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Groups inside groups</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      A group inside a group adds its name to the path: <code>city</code> inside <code>address</code> inside
+      <code>customer</code> is <code>customer.address.city</code>.
+    </p>
+    <div class="demo-split">
+      <pdx-form :form="nestedForm">
+        <pdx-field-group name="customer" label="Customer">
+          <div class="form-stack">
+            <pdx-form-field name="name" label="Name">
+              <pdx-input name="name"></pdx-input>
+            </pdx-form-field>
+            <pdx-field-group name="address" label="Address">
+              <div class="form-grid-2">
+                <pdx-form-field name="street" label="Street">
+                  <pdx-input name="street"></pdx-input>
+                </pdx-form-field>
+                <pdx-form-field name="city" label="City">
+                  <pdx-input name="city"></pdx-input>
+                </pdx-form-field>
+              </div>
+            </pdx-field-group>
+          </div>
+        </pdx-field-group>
+      </pdx-form>
+      <div class="values">
+        <span class="pdx-txt-small pdx-weight-semibold">getValues()</span>
+        <pre class="pdx-txt-mono values-json">{{ valuesJson(nestedForm) }}</pre>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { valuesJson } from './state.pdx';
+import { createForm } from '@pdxui/core';
+
+const nestedForm = createForm({
+  initialValues: { customer: { name: 'Grace Hopper', address: { street: '1 Navy Yard', city: 'Arlington' } } },
+});
+</script>

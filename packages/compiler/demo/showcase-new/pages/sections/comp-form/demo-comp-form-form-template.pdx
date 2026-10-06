@@ -1,0 +1,45 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">7. Form Template (JSON Schema)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>&lt;pdx-form-template&gt;</code> generates an entire form from a JSON schema.
+      Fields, types, validation, layout — all declarative.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form-template :schema="contactSchema"></pdx-form-template>
+    </div>
+
+    <details class="source-block">
+      <summary>Schema (JSON)</summary>
+      <pre class="pdx-txt-mono"><code :textContent="schemaJsonText()"></code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+// ─── 6. Schema-Driven Form ───
+const contactSchema = {
+  fields: [
+    { name: 'contactType', type: 'select', label: 'Contact Type', required: true, options: ['General', 'Sales', 'Support', 'Partnership'], section: 'info' },
+    { name: 'firstName', type: 'text', label: 'First Name', required: true, size: 6, section: 'info' },
+    { name: 'lastName', type: 'text', label: 'Last Name', required: true, size: 6, section: 'info' },
+    { name: 'email', type: 'email', label: 'Email', required: true, validators: [{ type: 'email' }], section: 'info' },
+    { name: 'company', type: 'text', label: 'Company', visibleWhen: { field: 'contactType', op: 'eq', value: 'Partnership' }, section: 'info' },
+    { name: 'phone', type: 'tel', label: 'Phone', placeholder: '+1 (555) 000-0000', section: 'details' },
+    { name: 'message', type: 'textarea', label: 'Message', hint: 'How can we help you?', section: 'details' },
+    { name: 'priority', type: 'slider', label: 'Priority (1-5)', visibleWhen: { field: 'contactType', op: 'eq', value: 'Support' }, section: 'details' },
+    { name: 'newsletter', type: 'switch', label: 'Subscribe to newsletter', default: true, section: 'prefs' },
+    { name: 'rating', type: 'rating', label: 'Rate your experience', section: 'prefs' },
+  ],
+  sections: [
+    { name: 'info', label: 'Contact Information' },
+    { name: 'details', label: 'Message Details', collapsible: true },
+    { name: 'prefs', label: 'Preferences', collapsible: true, collapsed: true },
+  ],
+  layout: 'grid',
+  columns: 12,
+};
+
+function schemaJsonText() { return JSON.stringify(contactSchema, null, 2); }
+</script>

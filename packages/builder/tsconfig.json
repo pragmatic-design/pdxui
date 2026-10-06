@@ -1,0 +1,23 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "declaration": false,
+        "declarationMap": false,
+        // See the same line in `@pdxui/showcase` and `@pdxui/responsive`: @types/node lives
+        // under the compiler in this workspace. The builder's Playwright fixtures write theme files
+        // with `node:fs`, and its Vite config reads `process`.
+        "typeRoots": ["../compiler/node_modules/@types"],
+        "types": ["node"],
+        // The same two lines as `@pdxui/showcase`, for the same reason: the `pdx()` plugin
+        // auto-discovers the workspace packages for the bundler and tsc does not read Vite's
+        // config. `@pdxui/design/engine` is the one this package imports — `theme-mode.ts`
+        // builds a theme with it — and it has no entry in this package.json either.
+        "paths": {
+            "@pdxui/design/engine": ["../design/src/engine/index.ts"]
+        }
+    },
+    // The shell's own modules, the Playwright suite and its two configs, and the root-level Vite
+    // config. `scripts/` is `.mjs` and has no types to check.
+    "include": ["src/**/*.ts", "tests/**/*.ts", "*.ts"]
+}

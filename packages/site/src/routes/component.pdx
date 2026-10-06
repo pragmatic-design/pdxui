@@ -1,0 +1,318 @@
+<template>
+  <div class="cmp shell-wrap">
+    <!-- Sidebar: components by category -->
+    <nav class="cmp-nav" aria-label="Components">
+      <a class="cmp-nav-back" href="/components" @click="goFromNav">← All components</a>
+      <!-- Narrow screens only: the 120 links sit behind this, so the page starts with its component. -->
+      <button type="button" class="cmp-nav-toggle" aria-controls="cmp-nav-list" :aria-expanded="navOpen ? 'true' : 'false'" @click="navOpen = !navOpen">Components <span class="cmp-nav-chevron" aria-hidden="true">▾</span></button>
+      <div id="cmp-nav-list" :class="navOpen ? 'cmp-nav-list open' : 'cmp-nav-list'">
+        @for (categories as cat; track cat.category) {
+          <span class="cmp-nav-cat">{{ cat.category }}</span>
+          @for (cat.items as it; track it.tagName) {
+            <a :class="it.tagName === tag ? 'cmp-nav-link active' : 'cmp-nav-link'" :href="'/components/' + it.tagName" @click="goFromNav">{{ prettyName(it.tagName) }}</a>
+          }
+        }
+      </div>
+    </nav>
+
+    <!-- Body -->
+    <article class="cmp-body">
+      <header class="cmp-head">
+        <span class="cmp-kicker">Component</span>
+        <h1 class="cmp-title metal-gradient">{{ displayName }}</h1>
+        <code class="cmp-tag">&lt;{{ tag }}&gt;</code>
+        <p class="cmp-summary" :style="summary ? '' : 'display:none'">{{ summary }}</p>
+      </header>
+
+      <!-- Gallery: full showcase demos (when a ported page exists for this component) -->
+      <section id="demos" class="cmp-section" :style="hasGallery ? '' : 'display:none'">
+        <div class="cmp-gallery" :ref="galleryRef"></div>
+      </section>
+
+      <!-- Fallback (no gallery): curated hero, or a placeholder for data-driven/empty ones -->
+      @if (showFallback) {
+        <pdx-cmp-fallback :tag="tag" :placeholder="showPlaceholder"></pdx-cmp-fallback>
+      }
+
+      <!-- Playground (skipped for data-driven components) -->
+      @if (showPlayground) {
+        <section id="playground" class="cmp-section">
+          <h2 class="cmp-h2">Props playground</h2>
+          <p class="cmp-lead">Toggle props live — the source below updates with you.</p>
+          <pdx-props-playground :tag="tag"></pdx-props-playground>
+        </section>
+      }
+
+      <!-- API -->
+      <section id="api" class="cmp-section">
+        <h2 class="cmp-h2">API</h2>
+        <pdx-api-tables :tag="tag"></pdx-api-tables>
+      </section>
+
+      <!-- Accessibility -->
+      @if (hasA11y) {
+        <pdx-cmp-a11y :tag="tag"></pdx-cmp-a11y>
+      }
+    </article>
+
+    <!-- On-this-page -->
+    <aside class="cmp-toc">
+      @if (galleryTabs.length > 1) {
+        <span class="cmp-toc-title">Examples</span>
+        <div class="cmp-examples" role="tablist">
+          @for (galleryTabs as t; track t.name) {
+            <button type="button" role="tab" :aria-selected="t.name === activeTab ? 'true' : 'false'" :class="t.name === activeTab ? 'cmp-ex active' : 'cmp-ex'" @click="selectTab(t.name)">{{ t.label }}</button>
+          }
+        </div>
+      }
+      <span class="cmp-toc-title">On this page</span>
+      @if (hasGallery) {
+        @for (galleryToc as t; track t.id) {
+          <a class="cmp-toc-link" :href="'#' + t.id">{{ t.text }}</a>
+        }
+      }
+      @if (showFallback) {
+        <a class="cmp-toc-link" href="#overview">Overview</a>
+        <a class="cmp-toc-link" href="#demos">Examples</a>
+      }
+      @if (showPlayground) { <a class="cmp-toc-link" href="#playground">Playground</a> }
+      <a class="cmp-toc-link" href="#api">API</a>
+      @if (hasA11y) { <a class="cmp-toc-link" href="#a11y">Accessibility</a> }
+    </aside>
+  </div>
+</template>
+
+<script setup>
+@page '/components/:tag';
+@title 'Component — PDX';
+import { currentParams } from '@pdxui/router';
+import { followLink } from '../lib/follow-link';
+import { onMount, effect } from '@pdxui/core';
+import { getComponent, byCategory } from '../lib/manifest';
+import { contentOf, a11yOf, shortName } from '../lib/component-content';
+
+// Galleries (full reactive demos), loaded lazily per component: the ported showcase pages
+// (generated into ../demos/) and the pages written for the site (../demos-authored/), which are
+// read from their own directory — a copy next to the ported ones would make two files claim one
+// tag. Both are keyed as '../demos/comp-NAME.pdx', so the lookups below see one set.
+const _galleryGlobs = { ...import.meta.glob('../demos/comp-*.pdx'), ...import.meta.glob('../demos-authored/comp-*.pdx') };
+const _galleryMods = {};
+for (const _k in _galleryGlobs) _galleryMods['../demos/' + _k.slice(_k.lastIndexOf('/') + 1)] = _galleryGlobs[_k];
+const _PFX = '../demos/comp-';
+// Some component tags don't match their showcase page name 1:1 — map them.
+const _galleryAlias = {
+  'password-input': 'password', 'search-input': 'search', 'otp-input': 'otp',
+  'pin-input': 'pin', 'radio-group': 'radio',
+  'col': 'row-col', 'row': 'row-col',
+};
+
+onMount(() => { import('@pdxui/ui/all'); });
+
+// The component list on narrow screens: closed by default, closed again once a component is chosen.
+let navOpen = $signal(false);
+
+// A link in the component list closes it, then is followed in the page (lib/follow-link.ts).
+function goFromNav(e) { navOpen = false; followLink(e); }
+// Human label: 'pdx-data-grid' → 'Data Grid'.
+function prettyName(t) { return shortName(t).split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+
+const categories = byCategory();
+
+const _decl = $derived(getComponent(currentParams().tag || '') || null);
+const tag = $derived(_decl ? _decl.tagName : (currentParams().tag || 'unknown'));
+const displayName = $derived(prettyName(tag));
+const _doc = $derived(contentOf(tag));
+
+const summary = $derived(_doc && _doc.summary ? _doc.summary : (_decl ? (_decl.summary || _decl.description || '') : ''));
+const hasA11y = $derived(a11yOf(tag).keyboard.length > 0 || !!a11yOf(tag).notes);
+
+// Galleries to skip → graceful placeholder (none currently — splitter/filter-builder render fine in
+// a real browser; a "HANG" in a headless sweep is an artifact of the sweep, not a page freeze). The
+// runtime 0-section safety net still catches any gallery that genuinely fails to render.
+const _galleryDeny = [];
+const _dataDriven = ['data-grid', 'data-table', 'data-source', 'chart', 'sparkline', 'tree-select', 'transfer', 'cascader', 'filter-builder', 'mention', 'rich-text', 'calendar', 'auto-form', 'breadcrumb', 'list', 'timeline', 'tree', 'wizard', 'carousel', 'pagination', 'tabs', 'accordion', 'dialog', 'drawer', 'alert-dialog', 'popover', 'tooltip', 'bottom-sheet', 'context-menu', 'menu', 'dropdown-menu', 'toast', 'command', 'overlay-stack', 'overlay-outlet', 'affix', 'aspect-ratio', 'button-group', 'checkbox-group', 'radio-group', 'input-group', 'col', 'row', 'masonry', 'scroll-spy', 'scroll-area', 'sidebar', 'navbar', 'toolbar', 'menubar', 'nav-menu', 'bottom-nav', 'app-layout', 'splitter', 'error-boundary', 'provide', 'field-group', 'field-list', 'fieldset', 'form-section', 'form-actions', 'form-template', 'form', 'avatar-group', 'infinite-scroll', 'block-ui', 'relation-picker', 'json-editor', 'page-header'];
+
+const _short = $derived(shortName(tag));
+const _base = $derived(_galleryAlias[_short] || _short);
+// An element of another package — the router's outlet and link — renders only inside
+// the app's router: no live demo, no playground, the API below.
+const _isLibrary = $derived(!_decl || _decl.package === '@pdxui/ui');
+const _isDataDriven = $derived(_dataDriven.includes(_short) || !_isLibrary);
+// No playground for a component that needs data — or a router — to show anything.
+const showPlayground = $derived(!_isDataDriven);
+
+// Feature sub-tabs: the base demo + every comp-<base>-<feature>.pdx whose <base>-<feature> isn't
+// itself a real component (a real sub-component has its own route).
+function _featureTabs(base) {
+  const tabs = [];
+  if (_galleryMods[_PFX + base + '.pdx']) tabs.push({ name: base, label: 'Overview' });
+  const vpfx = _PFX + base + '-';
+  for (const k in _galleryMods) {
+    if (k.indexOf(vpfx) !== 0) continue;
+    const variant = k.slice(_PFX.length).replace('.pdx', '');
+    if (getComponent(variant)) continue;
+    const suffix = variant.slice(base.length + 1);
+    tabs.push({ name: variant, label: suffix.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') });
+  }
+  return tabs;
+}
+const galleryTabs = $derived(_featureTabs(_base));
+// The tab a reader picked; another component starts on its first tab.
+let _picked = $signal('');
+$watch(tag, () => { _picked = ''; });
+const activeTab = $derived(galleryTabs.some(t => t.name === _picked)
+  ? _picked
+  : (galleryTabs.length ? galleryTabs[0].name : _base));
+function selectTab(name) { _picked = name; }
+
+// Gallery: render the ported showcase page (<pdx-comp-NAME>) when one exists for this tag.
+let galleryRef = $signal(null);
+const _galleryName = $derived(activeTab || _base);
+const _galleryKey = $derived(_PFX + _galleryName + '.pdx');
+const _denied = $derived(_galleryDeny.includes(_short) || _galleryDeny.includes(_galleryName));
+const _placeholder = $derived(_isDataDriven || _denied);
+// A gallery that rendered no section after its frames, by module: its page falls back. The loader
+// below writes it, once the answer is in.
+let _emptyGallery = $signal('');
+const hasGallery = $derived(!!_galleryMods[_galleryKey] && !_denied && _emptyGallery !== _galleryKey);
+const showFallback = $derived(!hasGallery);
+const showPlaceholder = $derived(!hasGallery && _placeholder);
+// The gallery's section headings, for the module they were read from: another gallery shows none
+// until its own are read.
+let _toc = $signal({ key: '', items: [] });
+const galleryToc = $derived(_toc.key === _galleryKey ? _toc.items : []);
+
+// Which gallery run is current, and the demo module the gallery holds or is loading. A second
+// resolution of the same route re-runs the effect below with the same values (a $derived passes a
+// new params object on as a change), and a first run that kept polling the element the second has
+// removed would, twenty frames later, empty the second run's gallery after it has rendered.
+let _galleryRun = 0;
+let _builtKey = '';
+let _galleryHost = null;
+
+// Loads the gallery's module and mounts it: the DOM and the import are what this effect is for. What
+// it learns — the headings, or that the gallery stayed empty — it writes when the answer comes.
+effect(() => {
+  const _ref = galleryRef;        // no host mounted yet: nothing to load into
+  if (!_ref) return;
+  const _key = _galleryKey;
+  const _name = _galleryName;
+  const _show = hasGallery;
+  // The same demo in the same gallery: nothing to rebuild.
+  if (_key === _builtKey && _ref === _galleryHost) return;
+  _builtKey = _key;
+  _galleryHost = _ref;
+  const _run = ++_galleryRun;
+  const _stale = () => _run !== _galleryRun || !galleryRef; // a newer run, or the page is gone
+  _ref.innerHTML = '';
+  if (!_show) return;
+  _galleryMods[_key]().then(() => {
+    if (_stale()) return; // navigated, tab-switched away, or superseded
+    galleryRef.innerHTML = '';
+    const _el = document.createElement('pdx-comp-' + _name);
+    galleryRef.appendChild(_el);
+    // Build the on-this-page list from the gallery's section headings (assign ids to anchor).
+    const _buildToc = () => {
+      const _items = [];
+      _el.querySelectorAll('section > h2').forEach((h, _i) => {
+        const _txt = (h.textContent || '').trim();
+        if (!_txt) return;
+        const _id = 'g' + _i + '-' + _txt.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const _sec = h.closest('section');
+        if (_sec) _sec.id = _id;
+        _items.push({ id: _id, text: _txt });
+      });
+      _toc = { key: _key, items: _items };
+    };
+    // The gallery CE renders its <section>s asynchronously; on client-side nav it may
+    // not be ready in a single frame. Poll a few frames before concluding it errored —
+    // otherwise the "demos are being finalized" placeholder flashes until an F5.
+    let _tries = 0;
+    const _check = () => {
+      if (_stale()) return; // navigated, tab-switched away, or superseded
+      if (_el.querySelectorAll('section').length > 0) { _buildToc(); return; }
+      if (++_tries < 20) { requestAnimationFrame(_check); return; } // ~20 frames before giving up
+      // Genuinely empty after retries → graceful fallback.
+      galleryRef.innerHTML = ''; _emptyGallery = _key;
+    };
+    requestAnimationFrame(_check);
+  });
+});
+</script>
+
+<style scoped>
+.cmp {
+  /* Wider than the default --content-w (1400) so live galleries (grids, charts, wizards,
+     wide inputs) get real horizontal room; trimmed side rails + gap feed the centre.
+     Kept moderate so content doesn't stretch edge-to-edge on large monitors. */
+  max-width: 1760px;
+  display: grid; grid-template-columns: 200px minmax(0, 1fr) 160px; gap: 2rem;
+  padding-top: 2.5rem; padding-bottom: 4rem; align-items: start;
+}
+/* The ported demo host fills the centre column so its inner .page/.demo-container can too. */
+.cmp-gallery > * { display: block; width: 100%; }
+/* The sections these pieces render lay out as the page's own. */
+.cmp-body > pdx-cmp-fallback, .cmp-body > pdx-cmp-a11y { display: contents; }
+
+/* Feature examples (Overview · Filtering · Grouping…) — DevExpress-style demo splitting,
+   in the right rail above the on-this-page TOC. */
+.cmp-examples { display: flex; flex-direction: column; gap: 0.1rem; margin-bottom: 1rem; }
+.cmp-ex { text-align: left; font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-muted); background: transparent; border: none; border-left: 2px solid transparent; border-radius: 0 7px 7px 0; padding: 0.24rem 0.6rem; cursor: pointer; transition: color 0.15s, background 0.15s; }
+.cmp-ex:hover { color: var(--ink); background: color-mix(in srgb, var(--gold-display) 5%, transparent); }
+.cmp-ex.active { color: var(--gold); border-left-color: var(--gold); background: color-mix(in srgb, var(--gold-display) 7%, transparent); }
+
+/* Sidebar */
+.cmp-nav { display: flex; flex-direction: column; gap: 0.08rem; position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+.cmp-nav-back { color: var(--ink-muted); text-decoration: none; font-size: 0.82rem; margin-bottom: 0.8rem; }
+.cmp-nav-back:hover { color: var(--gold); }
+.cmp-nav-cat { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 700; margin: 0.9rem 0 0.3rem; }
+.cmp-nav-link { color: var(--ink-muted); text-decoration: none; font-size: 0.85rem; padding: 0.22rem 0.6rem; border-radius: 7px; border-left: 2px solid transparent; font-family: var(--font-mono); }
+.cmp-nav-link:hover { color: var(--ink); background: color-mix(in srgb, var(--gold-display) 5%, transparent); }
+.cmp-nav-link.active { color: var(--gold); border-left-color: var(--gold); background: color-mix(in srgb, var(--gold-display) 7%, transparent); }
+/* Wide screens: the list is part of the sidebar column and the toggle does not exist. */
+.cmp-nav-list { display: contents; }
+.cmp-nav-toggle { display: none; }
+
+/* Body */
+.cmp-head { margin-bottom: 1rem; }
+.cmp-kicker { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); font-weight: 600; }
+.cmp-title { font-family: var(--font-heading); font-size: 2rem; margin: 0.2rem 0 0; }
+.cmp-tag { display: inline-block; margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-muted); }
+.cmp-summary { margin-top: 0.5rem; color: var(--ink-variant); font-size: 1.05rem; max-width: 60ch; }
+.cmp-section { margin-top: 2.6rem; }
+.cmp-h2 { font-size: 1.35rem; margin: 0 0 0.6rem; }
+.cmp-lead { color: var(--ink-muted); font-size: 0.92rem; margin: 0 0 0.4rem; }
+.cmp-placeholder { padding: 2rem 1.5rem; border-radius: 14px; border: 1px dashed var(--outline); text-align: center; }
+.cmp-ph-title { margin: 0 0 0.3rem; font-family: var(--font-heading); font-weight: 600; color: var(--ink); }
+.cmp-ph-text { margin: 0; color: var(--ink-muted); font-size: 0.9rem; }
+
+.kbd-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin-top: 0.4rem; }
+.kbd-table th, .kbd-table td { border: 1px solid var(--outline); padding: 0.5rem 0.7rem; text-align: left; }
+.kbd-table th { background: var(--surface-container); color: var(--gold-fixed); font-weight: 600; }
+.kbd-table td { color: var(--ink-variant); }
+.kbd-table code { color: var(--gold-fixed); font-family: var(--font-mono); font-size: 0.85em; }
+
+/* TOC */
+.cmp-toc { display: flex; flex-direction: column; gap: 0.15rem; position: sticky; top: 80px; }
+.cmp-toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; margin-bottom: 0.5rem; }
+.cmp-toc-link { color: var(--ink-muted); text-decoration: none; font-size: 0.82rem; padding: 2px 0; }
+.cmp-toc-link:hover { color: var(--gold); }
+
+@media (max-width: 1100px) {
+  /* minmax(0, 1fr), not 1fr: a bare 1fr is minmax(auto, 1fr), and the track grows to the widest
+     demo's min-content — 660px on a 390px phone, clipped by overflow-x: clip. */
+  .cmp { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .cmp-nav, .cmp-toc { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.4rem 1rem; }
+  .cmp-nav-back { margin-bottom: 0; }
+  .cmp-nav-toggle {
+    display: inline-flex; align-items: center; gap: 0.35rem; margin-left: auto;
+    background: transparent; border: 1px solid var(--outline); border-radius: 10px; color: var(--ink);
+    font-family: var(--font-heading); font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.7rem; cursor: pointer;
+  }
+  .cmp-nav-toggle:hover { border-color: var(--gold); }
+  .cmp-nav-toggle[aria-expanded="true"] .cmp-nav-chevron { transform: rotate(180deg); }
+  .cmp-nav-list { display: none; }
+  .cmp-nav-list.open { display: flex; flex-wrap: wrap; gap: 0.4rem; width: 100%; }
+  .cmp-nav-cat { width: 100%; }
+}
+</style>

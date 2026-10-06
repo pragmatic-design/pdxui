@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Striped</h2>
+    <div class="demo-stack">
+      <pdx-progress value="70" striped showLabel></pdx-progress>
+      <pdx-progress value="45" variant="success" striped></pdx-progress>
+      <pdx-progress value="90" variant="danger" striped size="lg"></pdx-progress>
+    </div>
+  </section>
+</template>

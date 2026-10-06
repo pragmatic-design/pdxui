@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Form Controls</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Form Controls</span></div>
+                        <h1 class="pdx-txt-display">Form Controls</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Input, select, textarea, checkbox, radio, toggle, input groups, validation messages.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Text Input</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="2" gap="md">
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Normal</label><input class="pdx-input" placeholder="Enter text..." /></pdx-stack>
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Disabled</label><input class="pdx-input" disabled value="Disabled" /></pdx-stack>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;input class="pdx-input" placeholder="Enter text..." /&gt;
+&lt;input class="pdx-input" disabled value="Disabled" /&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Validation Messages</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="3" gap="md">
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Error</label><input class="pdx-input" aria-invalid="true" value="Bad" /><span class="pdx-field-error">Required field</span></pdx-stack>
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Success</label><input class="pdx-input" value="john_doe" /><span class="pdx-field-success">Available</span></pdx-stack>
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Hint</label><input class="pdx-input" type="password" placeholder="Password" /><span class="pdx-field-hint">Min 8 chars</span></pdx-stack>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;span class="pdx-field-error"&gt;Error&lt;/span&gt;
+&lt;span class="pdx-field-success"&gt;Success&lt;/span&gt;
+&lt;span class="pdx-field-hint"&gt;Hint&lt;/span&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Select &amp; Textarea</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="2" gap="md">
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Select</label><select class="pdx-input"><option>Option 1</option><option>Option 2</option><option>Option 3</option></select></pdx-stack>
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Textarea</label><textarea class="pdx-input" placeholder="Write something..."></textarea></pdx-stack>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;select class="pdx-input"&gt;...&lt;/select&gt;
+&lt;textarea class="pdx-input"&gt;&lt;/textarea&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Input Group</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="md">
+                                    <div class="pdx-input-group"><span class="pdx-input-addon">https://</span><input class="pdx-input" placeholder="example.com" /><button class="pdx-primary">Go</button></div>
+                                    <div class="pdx-input-group"><span class="pdx-input-addon">@</span><input class="pdx-input" placeholder="username" /></div>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-input-group"&gt;
+  &lt;span class="pdx-input-addon"&gt;https://&lt;/span&gt;
+  &lt;input class="pdx-input" /&gt;
+  &lt;button class="pdx-primary"&gt;Go&lt;/button&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Checkbox</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="lg">
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="checkbox" class="pdx-checkbox" id="fc1" /><label for="fc1">Unchecked</label></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="checkbox" class="pdx-checkbox" id="fc2" checked /><label for="fc2">Checked</label></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="checkbox" class="pdx-checkbox" disabled /><label>Disabled</label></pdx-row>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;input type="checkbox" class="pdx-checkbox" checked /&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Radio</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="lg">
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="radio" class="pdx-radio" name="fr" id="fr1" checked /><label for="fr1">Option A</label></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="radio" class="pdx-radio" name="fr" id="fr2" /><label for="fr2">Option B</label></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="radio" class="pdx-radio" disabled /><label>Disabled</label></pdx-row>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;input type="radio" class="pdx-radio" name="group" checked /&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Toggle / Switch</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="lg">
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="checkbox" class="pdx-toggle" id="ft1" /><label for="ft1">Off</label></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="checkbox" class="pdx-toggle" id="ft2" checked /><label for="ft2">On</label></pdx-row>
+                                    <pdx-row gap="xs" items="center" wrap="no"><input type="checkbox" class="pdx-toggle" disabled /><label>Disabled</label></pdx-row>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;input type="checkbox" class="pdx-toggle" checked /&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Field Wrapper</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="3" gap="md">
+                                    <div class="pdx-field">
+                                        <label class="pdx-field-label">Username</label>
+                                        <input class="pdx-input" placeholder="john_doe" />
+                                        <span class="pdx-field-hint">Letters and underscores only</span>
+                                    </div>
+                                    <div class="pdx-field">
+                                        <label class="pdx-field-label pdx-field-required">Email</label>
+                                        <input class="pdx-input" type="email" placeholder="you@example.com" />
+                                    </div>
+                                    <div class="pdx-field">
+                                        <label class="pdx-field-label">Phone</label>
+                                        <input class="pdx-input" aria-invalid="true" value="abc" />
+                                        <span class="pdx-field-error">Must be a valid number</span>
+                                    </div>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-field"&gt;
+  &lt;label class="pdx-field-label"&gt;Username&lt;/label&gt;
+  &lt;input class="pdx-input" placeholder="john_doe" /&gt;
+  &lt;span class="pdx-field-hint"&gt;Letters and underscores only&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Required indicator --&gt;
+&lt;label class="pdx-field-label pdx-field-required"&gt;Email&lt;/label&gt;
+
+&lt;!-- Error state propagates to label via :has() --&gt;
+&lt;div class="pdx-field"&gt;
+  &lt;label class="pdx-field-label"&gt;Phone&lt;/label&gt;
+  &lt;input class="pdx-input" aria-invalid="true" /&gt;
+  &lt;span class="pdx-field-error"&gt;Must be a valid number&lt;/span&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Range Slider</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-grid cols="2" gap="md">
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Normal</label><input type="range" class="pdx-range" min="0" max="100" value="60" /></pdx-stack>
+                                    <pdx-stack gap="xs"><label class="pdx-txt-label pdx-ink-muted">Disabled</label><input type="range" class="pdx-range" min="0" max="100" value="40" disabled /></pdx-stack>
+                                </pdx-grid>
+                            </div>
+                            <div class="doc-source">&lt;input type="range" class="pdx-range" min="0" max="100" value="60" /&gt;
+&lt;input type="range" class="pdx-range" disabled /&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Fieldset &amp; Legend</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <fieldset class="pdx-fieldset">
+                                    <legend class="pdx-legend">Personal Information</legend>
+                                    <pdx-grid cols="2" gap="md">
+                                        <div class="pdx-field">
+                                            <label class="pdx-field-label">First Name</label>
+                                            <input class="pdx-input" placeholder="Jane" />
+                                        </div>
+                                        <div class="pdx-field">
+                                            <label class="pdx-field-label">Last Name</label>
+                                            <input class="pdx-input" placeholder="Doe" />
+                                        </div>
+                                    </pdx-grid>
+                                </fieldset>
+                            </div>
+                            <div class="doc-source">&lt;fieldset class="pdx-fieldset"&gt;
+  &lt;legend class="pdx-legend"&gt;Personal Information&lt;/legend&gt;
+  &lt;div class="pdx-field"&gt;
+    &lt;label class="pdx-field-label"&gt;First Name&lt;/label&gt;
+    &lt;input class="pdx-input" placeholder="Jane" /&gt;
+  &lt;/div&gt;
+&lt;/fieldset&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

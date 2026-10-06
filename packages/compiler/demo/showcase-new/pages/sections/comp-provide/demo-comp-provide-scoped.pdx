@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Scoped Override</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Nested providers shadow outer ones. The nearest ancestor wins — like CSS cascading.
+    </p>
+    <div class="demo-box">
+      <pdx-provide name="color" :value="'blue'">
+        <div class="demo-child">
+          Outer color: <strong style="color: blue">blue</strong>
+        </div>
+        <pdx-provide name="color" :value="'red'">
+          <div class="demo-child">
+            Inner override: <strong style="color: red">red</strong>
+          </div>
+        </pdx-provide>
+        <div class="demo-child">
+          Back to outer: <strong style="color: blue">blue</strong>
+        </div>
+      </pdx-provide>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide name="color" :value="'blue'"&gt;
+  &lt;!-- inject('color') → 'blue' --&gt;
+  &lt;pdx-provide name="color" :value="'red'"&gt;
+    &lt;!-- inject('color') → 'red' (nearest wins) --&gt;
+  &lt;/pdx-provide&gt;
+  &lt;!-- inject('color') → 'blue' again --&gt;
+&lt;/pdx-provide&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import '@pdxui/ui/provide';
+</script>

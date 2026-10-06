@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple informational dialog with title and close button.</p>
+    <div class="btn-row">
+      <pdx-button variant="primary" size="sm" @click="openBasic">Open Dialog</pdx-button>
+    </div>
+    <pdx-dialog :open="basicOpen" title="Welcome" @pdx-close="closeBasic">
+      <p>This is a simple dialog with a title and close button. Click the backdrop or press Escape to close.</p>
+    </pdx-dialog>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button variant="primary" @click="openBasic"&gt;Open Dialog&lt;/pdx-button&gt;
+
+&lt;pdx-dialog :open="basicOpen" title="Welcome" @pdx-close="closeBasic"&gt;
+  &lt;p&gt;Dialog body content here.&lt;/p&gt;
+&lt;/pdx-dialog&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let basicOpen = $signal(false);
+
+function openBasic() { basicOpen = true; }
+function closeBasic() { basicOpen = false; }
+</script>

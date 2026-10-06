@@ -1,0 +1,53 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Motion Tokens</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Duration and easing tokens used by all animations.</p>
+
+    <div class="token-list">
+      <div class="token-row">
+        <code>--pdx-duration-fast</code>
+        <span class="pdx-txt-small pdx-ink-muted">100ms</span>
+        <span class="pdx-txt-caption pdx-ink-muted">Micro-interactions, toggles</span>
+      </div>
+      <div class="token-row">
+        <code>--pdx-duration-base</code>
+        <span class="pdx-txt-small pdx-ink-muted">200ms</span>
+        <span class="pdx-txt-caption pdx-ink-muted">Default for all animations</span>
+      </div>
+      <div class="token-row">
+        <code>--pdx-duration-slow</code>
+        <span class="pdx-txt-small pdx-ink-muted">350ms</span>
+        <span class="pdx-txt-caption pdx-ink-muted">Page transitions, modals</span>
+      </div>
+      <div class="token-row">
+        <code>--pdx-ease-standard</code>
+        <span class="pdx-txt-small pdx-ink-muted">cubic-bezier(0.2, 0, 0, 1)</span>
+        <span class="pdx-txt-caption pdx-ink-muted">Default easing (Material 3)</span>
+      </div>
+      <div class="token-row">
+        <code>--pdx-ease-decelerate</code>
+        <span class="pdx-txt-small pdx-ink-muted">cubic-bezier(0, 0, 0, 1)</span>
+        <span class="pdx-txt-caption pdx-ink-muted">Enter animations</span>
+      </div>
+      <div class="token-row">
+        <code>--pdx-ease-accelerate</code>
+        <span class="pdx-txt-small pdx-ink-muted">cubic-bezier(0.3, 0, 1, 1)</span>
+        <span class="pdx-txt-caption pdx-ink-muted">Exit animations</span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .token-list { margin-top: var(--pdx-space-md); }
+  .token-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .token-row code { min-width: 200px; }
+  .token-row span:nth-child(2) { min-width: 180px; }
+</style>

@@ -1,0 +1,383 @@
+<template>
+  <section class="section" data-test="personal">
+    <div class="section-head">
+      <h2 class="pdx-txt-heading">{{ $t('employees.sectionNames.personal') }}</h2>
+      <!-- What the last change came to: Saving…, Saved (the time on hover), or Not saved — the
+           reason is on the field that was refused, next to what asked (showcase README, rule 3). -->
+      <!-- «Not saved» is a way to the refused field: on another tab it is out of sight. -->
+      <span class="save-status pdx-txt-small" role="status" aria-live="polite" data-test="save-status"
+        :data-state="saveState" :title="savedTitle">
+        @if (saveState === 'refused') {
+          <button class="save-status-link" type="button" @click="goToRefused">{{ statusText }}</button>
+        } @else {
+          {{ statusText }}
+        }
+      </span>
+    </div>
+
+    <!-- The form IS the page: no Edit to open it, no read view, no Save. A field saves
+         itself after the pause, one `@form` bound by `name`, nothing below wires a value by hand. -->
+    <pdx-form :form="personal" data-test="personal-form">
+      <pdx-tabs value="personal" :ref="tabsEl" :label="$t('employees.sectionNames.personal')" data-test="personal-tabs">
+        <!-- A tab holding a refused value says how many, in its name as well as in the
+             badge: a colour alone tells a screen reader nothing. -->
+        <div class="pdx-tabs" role="tablist">
+          <button class="pdx-tab" type="button" data-tab="personal" :aria-label="tabName('personal')">
+            {{ $t('employees.personal.tabs.personal') }}<span class="tab-errors" :show="refusedIn.personal > 0" data-test="tab-errors-personal" aria-hidden="true">{{ refusedIn.personal || '' }}</span>
+          </button>
+          <button class="pdx-tab" type="button" data-tab="contacts" :aria-label="tabName('contacts')">
+            {{ $t('employees.personal.tabs.contacts') }}<span class="tab-errors" :show="refusedIn.contacts > 0" data-test="tab-errors-contacts" aria-hidden="true">{{ refusedIn.contacts || '' }}</span>
+          </button>
+          <button class="pdx-tab" type="button" data-tab="additional" :aria-label="tabName('additional')">
+            {{ $t('employees.personal.tabs.additional') }}<span class="tab-errors" :show="refusedIn.additional > 0" data-test="tab-errors-additional" aria-hidden="true">{{ refusedIn.additional || '' }}</span>
+          </button>
+        </div>
+
+        <div class="tab-panel" data-tab-panel="personal">
+          <!-- The identity group is a section of this form in its own component: the one
+               group with a field that appears for a condition. -->
+          <pdx-identity :country="country"></pdx-identity>
+
+          <!-- An address is the reference's row of four under a full-width street. -->
+          <fieldset class="group" data-test="group-residence">
+            <legend class="group-title">{{ $t('employees.personal.groups.residence') }}</legend>
+            <div class="grid four">
+              <pdx-form-field class="wide" name="street" :label="$t('employees.personal.fields.street')">
+                <pdx-input name="street" data-test="street"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="city" :label="$t('employees.personal.fields.city')">
+                <pdx-autocomplete name="city" :suggestions="cities" data-test="city"></pdx-autocomplete>
+              </pdx-form-field>
+              <pdx-form-field name="postcode" :label="$t('employees.personal.fields.postcode')">
+                <pdx-masked-input name="postcode" mask="#####" data-test="postcode"></pdx-masked-input>
+              </pdx-form-field>
+              <pdx-form-field name="province" :label="$t('employees.personal.fields.province')">
+                <pdx-masked-input name="province" mask="AA" data-test="province"></pdx-masked-input>
+              </pdx-form-field>
+              <pdx-form-field name="country" :label="$t('employees.personal.fields.country')">
+                <pdx-select name="country" :options="countries" data-test="country"></pdx-select>
+              </pdx-form-field>
+            </div>
+          </fieldset>
+
+          <fieldset class="group" data-test="group-birthPlace">
+            <legend class="group-title">{{ $t('employees.personal.groups.birthPlace') }}</legend>
+            <div class="grid four">
+              <pdx-form-field name="birthCity" :label="$t('employees.personal.fields.city')">
+                <pdx-autocomplete name="birthCity" :suggestions="cities" data-test="birthCity"></pdx-autocomplete>
+              </pdx-form-field>
+              <pdx-form-field name="birthPostcode" :label="$t('employees.personal.fields.postcode')">
+                <pdx-masked-input name="birthPostcode" mask="#####" data-test="birthPostcode"></pdx-masked-input>
+              </pdx-form-field>
+              <pdx-form-field name="birthProvince" :label="$t('employees.personal.fields.province')">
+                <pdx-masked-input name="birthProvince" mask="AA" data-test="birthProvince"></pdx-masked-input>
+              </pdx-form-field>
+              <pdx-form-field name="birthCountry" :label="$t('employees.personal.fields.country')">
+                <pdx-select name="birthCountry" :options="countries" data-test="birthCountry"></pdx-select>
+              </pdx-form-field>
+            </div>
+          </fieldset>
+
+          <fieldset class="group" data-test="group-document">
+            <legend class="group-title">{{ $t('employees.personal.groups.document') }}</legend>
+            <div class="grid four">
+              <pdx-form-field name="documentType" :label="$t('employees.personal.fields.documentType')">
+                <pdx-select name="documentType" :options="documentTypes" data-test="documentType"></pdx-select>
+              </pdx-form-field>
+              <pdx-form-field name="documentNumber" :label="$t('employees.personal.fields.documentNumber')">
+                <pdx-input name="documentNumber" data-test="documentNumber"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="documentIssued" :label="$t('employees.personal.fields.documentIssued')">
+                <pdx-date-picker name="documentIssued" editable data-test="documentIssued"></pdx-date-picker>
+              </pdx-form-field>
+              <pdx-form-field name="documentExpires" :label="$t('employees.personal.fields.documentExpires')">
+                <pdx-date-picker name="documentExpires" editable data-test="documentExpires"></pdx-date-picker>
+              </pdx-form-field>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tab-panel" data-tab-panel="contacts">
+          <fieldset class="group" data-test="group-contacts">
+            <legend class="group-title">{{ $t('employees.personal.groups.contacts') }}</legend>
+            <div class="grid two">
+              <pdx-form-field name="email" :label="$t('employees.personal.fields.email')">
+                <pdx-input name="email" type="email" data-test="email"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="phone" :label="$t('employees.personal.fields.phone')">
+                <pdx-input name="phone" type="tel" data-test="phone"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="mobile" :label="$t('employees.personal.fields.mobile')">
+                <pdx-masked-input name="mobile" mask="+39 ### ### ####" data-test="mobile"></pdx-masked-input>
+              </pdx-form-field>
+              <pdx-form-field name="channel" :label="$t('employees.personal.fields.channel')">
+                <pdx-segmented name="channel" :options="channels" data-test="channel"></pdx-segmented>
+              </pdx-form-field>
+            </div>
+          </fieldset>
+
+          <fieldset class="group" data-test="group-emergency">
+            <legend class="group-title">{{ $t('employees.personal.groups.emergency') }}</legend>
+            <div class="grid two">
+              <pdx-form-field name="emergencyName" :label="$t('employees.personal.fields.emergencyName')">
+                <pdx-input name="emergencyName" data-test="emergencyName"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="emergencyPhone" :label="$t('employees.personal.fields.emergencyPhone')">
+                <pdx-input name="emergencyPhone" type="tel" data-test="emergencyPhone"></pdx-input>
+              </pdx-form-field>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tab-panel" data-tab-panel="additional">
+          <fieldset class="group" data-test="group-work">
+            <legend class="group-title">{{ $t('employees.personal.groups.work') }}</legend>
+            <div class="grid two">
+              <pdx-form-field name="skills" :label="$t('employees.personal.fields.skills')">
+                <pdx-tag-input name="skills" :placeholder="$t('employees.personal.fields.skillsHint')" data-test="skills"></pdx-tag-input>
+              </pdx-form-field>
+              <pdx-form-field name="hireChannel" :label="$t('employees.personal.fields.hireChannel')">
+                <pdx-select name="hireChannel" :options="hireChannels" data-test="hireChannel"></pdx-select>
+              </pdx-form-field>
+              <pdx-form-field name="startTime" :label="$t('employees.personal.fields.startTime')">
+                <pdx-time-picker name="startTime" data-test="startTime"></pdx-time-picker>
+              </pdx-form-field>
+              <pdx-form-field name="remote" :label="$t('employees.personal.fields.remote')">
+                <pdx-switch name="remote" data-test="remote"></pdx-switch>
+              </pdx-form-field>
+              <pdx-form-field name="english" :label="$t('employees.personal.fields.english')">
+                <pdx-rating name="english" data-test="english"></pdx-rating>
+              </pdx-form-field>
+              <pdx-form-field class="wide" name="notes" :label="$t('employees.personal.fields.notes')">
+                <pdx-textarea name="notes" rows="3" data-test="notes"></pdx-textarea>
+              </pdx-form-field>
+            </div>
+          </fieldset>
+
+          <fieldset class="group" data-test="group-consents">
+            <legend class="group-title">{{ $t('employees.personal.groups.consents') }}</legend>
+            <div class="consents">
+              <pdx-form-field name="privacy">
+                <pdx-checkbox name="privacy" :label="$t('employees.personal.fields.privacy')" data-test="privacy"></pdx-checkbox>
+              </pdx-form-field>
+              <pdx-form-field name="marketing">
+                <pdx-checkbox name="marketing" :label="$t('employees.personal.fields.marketing')" data-test="marketing"></pdx-checkbox>
+              </pdx-form-field>
+            </div>
+          </fieldset>
+        </div>
+      </pdx-tabs>
+    </pdx-form>
+
+  </section>
+</template>
+
+<script setup>
+@page '/employees/:id/personal' { label: personalLabel };
+@title $t('employees.sectionNames.personal');
+
+// The crumb and the tab title in the page's language: a label read from the dictionary.
+function personalLabel() {
+  return $t('employees.sectionNames.personal');
+}
+
+import { getLocale, getDialogQueue } from '@pdxui/core';
+import { employeeById, employeeTransport, HIRE_CHANNELS } from '../data/employees';
+import { createAutosave } from '../data/autosave';
+import { createRefusedTabs } from '../data/refused-tabs';
+
+@prop id: string = '';
+
+// `getLocale()` hands back the signal; reading it is the second call.
+const localeSignal = getLocale();
+
+// Saved as it changes: each field, after the pause the form gives it. The rules that
+// read more than one field are `validate`'s: on the field they are about, so the message shows in
+// its `<pdx-form-field>` and `errors` knows.
+@form personal: {
+  firstName: string { required },
+  lastName: string { required },
+  birthDate: string,
+  gender: string,
+  taxCode: string,
+  language: string,
+  street: string,
+  city: string,
+  postcode: string,
+  province: string,
+  country: string,
+  birthCity: string,
+  birthPostcode: string,
+  birthProvince: string,
+  birthCountry: string,
+  documentType: string,
+  documentNumber: string,
+  documentIssued: string,
+  documentExpires: string,
+  email: string { email },
+  phone: string,
+  mobile: string,
+  channel: string,
+  emergencyName: string,
+  emergencyPhone: string,
+  skills: string[],
+  hireChannel: string,
+  startTime: string,
+  remote: boolean,
+  english: number,
+  notes: string,
+  privacy: boolean,
+  marketing: boolean
+} {
+  save: onChange;
+  validate: personalRule
+};
+
+/** Every field the form edits: what is loaded into it, and what leaving compares. */
+const FIELDS = Object.keys(personal.getValues());
+
+/** The codice fiscale's shape, as the mask draws it: AAAAAA ## A ## A ### A. */
+const TAX_CODE = /^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/i;
+/** A postcode as the mask draws it: five digits, and a half-typed one is not one. */
+const POSTCODE = /^\d{5}$/;
+
+function personalRule(v) {
+  const errors: Record<string, string> = {};
+  if (v.country === 'IT') {
+    if (!v.taxCode) errors.taxCode = $t('employees.personal.taxCodeRequired');
+    // The mask keeps the wrong CHARACTERS out; it cannot keep a half-typed code out.
+    else if (!TAX_CODE.test(v.taxCode)) errors.taxCode = $t('employees.personal.taxCodeShape');
+  }
+  if (v.postcode && !POSTCODE.test(v.postcode)) errors.postcode = $t('employees.personal.postcodeShape');
+  if (v.birthPostcode && !POSTCODE.test(v.birthPostcode)) errors.birthPostcode = $t('employees.personal.postcodeShape');
+  if (v.documentIssued && v.documentExpires && v.documentExpires <= v.documentIssued) {
+    errors.documentExpires = $t('employees.personal.expiresBeforeIssued');
+  }
+  // A consent, not a preference: the personal data is not kept without it.
+  if (!v.privacy) errors.privacy = $t('employees.personal.privacyRequired');
+  return errors;
+}
+
+const country = $derived(personal.fields.country.value());
+
+const COUNTRIES = ['IT', 'FR', 'DE', 'ES', 'GB'];
+/** Each country in the reader's language, from the platform rather than from a dictionary. */
+const countryNames = $derived(new Intl.DisplayNames([localeSignal()], { type: 'region' }));
+const countries = $derived(COUNTRIES.map(code => ({ value: code, label: countryNames.of(code) })));
+
+const channels = $derived(['email', 'phone', 'sms'].map(c => ({ value: c, label: $t('employees.personal.channels.' + c) })));
+const documentTypes = $derived(['idCard', 'passport', 'licence'].map(d => ({ value: d, label: $t('employees.personal.documentTypes.' + d) })));
+const hireChannels = $derived(HIRE_CHANNELS.map(h => ({ value: h, label: $t('employees.personal.hireChannels.' + h) })));
+/** The cities the address suggests. A list, not a lookup service: the showcase has no backend for it. */
+const cities = ['Bologna', 'Firenze', 'Genova', 'Milano', 'Napoli', 'Palermo', 'Roma', 'Torino', 'Venezia', 'Verona'];
+
+/** The record into the form, when the page opens on it — never after a save, or it would overwrite what is being typed. */
+function load() {
+  const record = employeeById(Number(id));
+  if (!record) return;
+  const values = {};
+  for (const name of FIELDS) values[name] = Array.isArray(record[name]) ? [...record[name]] : record[name];
+  personal.reset(values);
+}
+$watch(id, load, { immediate: true });
+
+// ── Saving (src/data/autosave.ts) ──
+// The queue, the state and the flush are the composable's; what is the employee's own stays here.
+const autosave = createAutosave({
+  form: personal,
+  fields: FIELDS,
+  read: () => employeeById(Number(id)),
+  write: (record) => employeeTransport.update(record),
+  // A tax code outside Italy is not kept: the field is hidden, and a hidden value is not an answer.
+  extra: (name, value) => {
+    if (name !== 'country' || value === 'IT') return {};
+    personal.fields.taxCode.onChange('');
+    return { taxCode: '' };
+  },
+  // Now Italian: the tax code it lacks is asked for on its field, not left for someone to notice.
+  after: (name, value) => { if (name === 'country' && value === 'IT') personal.fields.taxCode.onBlur(); },
+});
+
+const saveState = $derived(autosave.state());
+const statusText = $derived(saveState === 'saving' ? $t('employees.personal.saving')
+  : saveState === 'refused' ? $t('employees.personal.notSaved')
+  : saveState === 'saved' ? $t('employees.personal.saved') : '');
+const savedTitle = $derived(autosave.savedAt()
+  ? $t('employees.personal.savedAt', { time: new Intl.DateTimeFormat(localeSignal(), { timeStyle: 'medium' }).format(autosave.savedAt()) })
+  : null);
+
+// ── A refused value on another tab (src/data/refused-tabs.ts) ──
+let tabsEl = $signal(null);
+const refusedTabs = createRefusedTabs(personal, () => tabsEl);
+onMount(() => refusedTabs.read());
+const refusedIn = $derived(refusedTabs.counts());
+
+/** The tab's accessible name when it holds refused values; otherwise its own text names it. */
+function tabName(key) {
+  const count = refusedIn[key];
+  return count > 0 ? $t('employees.personal.tabWithErrors', { tab: $t('employees.personal.tabs.' + key), count }) : null;
+}
+
+/** «Not saved» leads to the first refused field: its tab opens and the field takes the focus. */
+function goToRefused() { refusedTabs.goToFirst(); }
+
+// ── Leaving ──
+/**
+ * What is still only in the form on the way out — a change inside its pause — is saved, not asked
+ * about. Only a value the rules refused asks: leaving drops it, and the record keeps what it had.
+ * The question is the dialog queue's modal; not the form's `warnUnsaved`, which would
+ * ask about every change, the ones this page saves by itself included.
+ */
+onBeforeLeave(async () => {
+  if (await autosave.flush()) return true;
+  return getDialogQueue().push({
+    type: 'confirm',
+    variant: 'danger',
+    title: $t('employees.personal.leaveTitle'),
+    message: $t('employees.personal.leaveQuestion'),
+    confirmLabel: $t('employees.personal.leaveDiscard'),
+    cancelLabel: $t('employees.personal.leaveStay'),
+  }).then(answer => answer === true);
+});
+</script>
+
+<style scoped>
+  .section { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--pdx-space-md); }
+  .section-head h2 { margin: 0; }
+  .save-status { color: var(--pdx-color-muted); min-height: 1lh; }
+  .save-status[data-state="refused"] { color: var(--pdx-color-danger-ink); }
+  /* A way to the refused field, drawn as the status it replaces: underlined, not a boxed button. */
+  .save-status-link {
+    font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .tab-errors {
+    display: inline-block; margin-inline-start: var(--pdx-space-xs); min-width: 1.5em;
+    padding: 0 var(--pdx-space-2xs); border-radius: 999px; text-align: center;
+    font-size: 0.75em; font-weight: 600; font-variant-numeric: tabular-nums;
+    color: var(--pdx-color-danger-ink); background: var(--pdx-color-danger-soft);
+  }
+
+  .tab-panel { padding-top: var(--pdx-space-lg); }
+
+  /* A group of the form: a titled block, the way the reference sections its collaboratore. A
+     fieldset for what it means (the fields belong together), without the browser's frame. */
+  .group { border: 0; margin: 0 0 var(--pdx-space-xl); padding: 0; min-width: 0; }
+  .group-title {
+    margin: 0 0 var(--pdx-space-md); padding: 0 0 var(--pdx-space-2xs);
+    font-weight: 600; color: var(--pdx-color-primary-ink);
+    border-bottom: 1px solid var(--pdx-color-border); width: 100%;
+  }
+  /* The form's grid: two columns for a person, four for an address — the reference's rhythm. */
+  .grid { display: grid; gap: var(--pdx-space-md) var(--pdx-space-lg); align-items: start; }
+  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid .wide { grid-column: 1 / -1; }
+  .consents { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+
+  /* A phone: one field a row, whatever the group. */
+  @media (max-width: 640px) {
+    .grid.two, .grid.four { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

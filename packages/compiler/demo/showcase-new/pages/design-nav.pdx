@@ -1,0 +1,92 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Navigation</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Vertical navigation, breadcrumb, headings, nested items, and disabled states.
+      <strong>CSS only</strong> — apply classes to <code>&lt;nav&gt;</code> and <code>&lt;a&gt;</code> elements.
+    </p>
+
+    <!-- ═══ Vertical Navigation ═══ -->
+    <pdx-demo-design-nav-vertical class="demo-section"></pdx-demo-design-nav-vertical>
+
+    <!-- ═══ With Headings ═══ -->
+    <pdx-demo-design-nav-headings class="demo-section"></pdx-demo-design-nav-headings>
+
+    <!-- ═══ Nested Navigation ═══ -->
+    <pdx-demo-design-nav-nested class="demo-section"></pdx-demo-design-nav-nested>
+
+    <!-- ═══ Breadcrumb ═══ -->
+    <pdx-demo-design-nav-breadcrumb class="demo-section"></pdx-demo-design-nav-breadcrumb>
+
+    <!-- ═══ Disabled Items ═══ -->
+    <pdx-demo-design-nav-disabled class="demo-section"></pdx-demo-design-nav-disabled>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-nav-composition class="demo-section"></pdx-demo-design-nav-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-nav</code><span>Layout</span><span>Vertical flex container with gap</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-nav-item</code><span>Item</span><span>Nav link with hover + active states</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-nav-item.active</code><span>State</span><span>Primary color + inset background</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-current="page"</code><span>State</span><span>Alternative active state (ARIA)</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-disabled="true"</code><span>State</span><span>50% opacity, not-allowed cursor</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-nav-heading</code><span>Part</span><span>Section label (uppercase, small)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-nav > .pdx-nav</code><span>Nesting</span><span>Indented sub-navigation</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-breadcrumb</code><span>Layout</span><span>Horizontal breadcrumb with / separators</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/nav';
+@title 'Navigation';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .demo-box {
+    margin-top: var(--pdx-space-md);
+    max-width: 280px;
+  }
+
+  /* Source block */
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 200px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

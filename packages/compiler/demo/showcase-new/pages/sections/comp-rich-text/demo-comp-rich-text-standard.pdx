@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Standard Editor</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Full toolbar with formatting, headings, lists, links. Try Markdown shortcuts:
+      <code># </code> for headings, <code>**bold**</code>, <code>*italic*</code>,
+      <code>&#96;code&#96;</code>, <code>- </code> for lists.
+    </p>
+
+    <div class="demo-area">
+      <pdx-rich-text
+        toolbar="full"
+        placeholder="Start writing..."
+        min-height="300px"
+        @pdx-change="onDocChange"
+      ></pdx-rich-text>
+    </div>
+  </section>
+</template>
+
+<script setup>
+function onDocChange(e) {
+  // word count available in e.detail.wordCount
+}
+</script>

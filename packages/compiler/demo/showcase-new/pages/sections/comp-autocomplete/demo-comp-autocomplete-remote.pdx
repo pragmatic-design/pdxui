@@ -1,0 +1,59 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Remote Search — DataSource</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Connect to a DataSource for server-side search. Built-in debounce (300ms).
+      Type at least 2 characters to search.
+    </p>
+    <div class="demo-box">
+      <pdx-autocomplete
+        placeholder="Search countries..."
+        :source="countryDS"
+        labelField="name"
+        valueField="code"
+        :debounce="300"
+        :min-length="2"
+        remote
+        @pdx-change="onCountryChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">Country: {{ countryValue }}</p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-autocomplete
+  placeholder="Search countries..."
+  :source="countryDS"
+  label-field="name"
+  :debounce="300"
+  :min-length="2" /&gt;
+
+const countryDS = createDataSource({
+  data: countries,
+  pageSize: 0,
+});</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createDataSource, delayTransport, arrayTransport } from '@pdxui/core';
+
+// ─── Remote DataSource (simulated) ───
+const allCountries = [
+  { name: 'Afghanistan', code: 'AF' }, { name: 'Albania', code: 'AL' }, { name: 'Algeria', code: 'DZ' },
+  { name: 'Argentina', code: 'AR' }, { name: 'Australia', code: 'AU' }, { name: 'Austria', code: 'AT' },
+  { name: 'Belgium', code: 'BE' }, { name: 'Brazil', code: 'BR' }, { name: 'Canada', code: 'CA' },
+  { name: 'Chile', code: 'CL' }, { name: 'China', code: 'CN' }, { name: 'Colombia', code: 'CO' },
+  { name: 'Czech Republic', code: 'CZ' }, { name: 'Denmark', code: 'DK' }, { name: 'Egypt', code: 'EG' },
+  { name: 'Finland', code: 'FI' }, { name: 'France', code: 'FR' }, { name: 'Germany', code: 'DE' },
+  { name: 'Greece', code: 'GR' }, { name: 'Hungary', code: 'HU' }, { name: 'India', code: 'IN' },
+  { name: 'Indonesia', code: 'ID' }, { name: 'Ireland', code: 'IE' }, { name: 'Israel', code: 'IL' },
+  { name: 'Italy', code: 'IT' }, { name: 'Japan', code: 'JP' }, { name: 'Mexico', code: 'MX' },
+  { name: 'Netherlands', code: 'NL' }, { name: 'New Zealand', code: 'NZ' }, { name: 'Norway', code: 'NO' },
+  { name: 'Poland', code: 'PL' }, { name: 'Portugal', code: 'PT' }, { name: 'Romania', code: 'RO' },
+  { name: 'Russia', code: 'RU' }, { name: 'South Korea', code: 'KR' }, { name: 'Spain', code: 'ES' },
+  { name: 'Sweden', code: 'SE' }, { name: 'Switzerland', code: 'CH' }, { name: 'Turkey', code: 'TR' },
+  { name: 'Ukraine', code: 'UA' }, { name: 'United Kingdom', code: 'GB' }, { name: 'United States', code: 'US' },
+];
+
+const countryDS = createDataSource({ transport: delayTransport({ transport: arrayTransport({ data: allCountries }), readDelay: 600 }), pageSize: 0 });
+let countryValue = $signal('');
+
+function onCountryChange(e) { countryValue = e.detail.value ?? e.detail; }
+</script>

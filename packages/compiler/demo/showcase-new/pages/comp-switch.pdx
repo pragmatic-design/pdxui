@@ -1,0 +1,57 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Switch</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-switch&gt;</code> — toggle switch with label, description, loading state, sizes.
+      Uses <code>role="switch"</code> for proper accessibility semantics.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-switch-basic class="demo-section"></pdx-demo-comp-switch-basic>
+
+    <!-- ═══ With Description ═══ -->
+    <pdx-demo-comp-switch-description class="demo-section"></pdx-demo-comp-switch-description>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-switch-sizes class="demo-section"></pdx-demo-comp-switch-sizes>
+
+    <!-- ═══ Label Position ═══ -->
+    <pdx-demo-comp-switch-label-position class="demo-section"></pdx-demo-comp-switch-label-position>
+
+    <!-- ═══ Loading ═══ -->
+    <pdx-demo-comp-switch-loading class="demo-section"></pdx-demo-comp-switch-loading>
+
+    <!-- ═══ Error ═══ -->
+    <pdx-demo-comp-switch-error class="demo-section"></pdx-demo-comp-switch-error>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-switch-composition class="demo-section"></pdx-demo-comp-switch-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>checked</code><span>boolean</span><span>On/off state</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Label text</span></div>
+        <div class="opt-row"><code>description</code><span>string</span><span>Help text below label</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>labelPosition</code><span>string</span><span>right (default), left</span></div>
+        <div class="opt-row"><code>loading</code><span>boolean</span><span>Spinner in thumb, disabled during load</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Red track color</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Value in event detail</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/switch';
+@title 'Switch Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

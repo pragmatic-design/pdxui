@@ -1,0 +1,44 @@
+<template>
+  <div class="demo">
+    <h2>Focus Management</h2>
+    <p class="desc">Focus trap, focus group (arrow nav + type-ahead), focus restore, tab order.</p>
+
+    <!-- Focus Trap -->
+    <pdx-demo-infra-focus-trap class="demo-section"></pdx-demo-infra-focus-trap>
+
+    <!-- Focus Group Vertical -->
+    <pdx-demo-infra-focus-group-vertical class="demo-section"></pdx-demo-infra-focus-group-vertical>
+
+    <!-- Focus Group Horizontal -->
+    <pdx-demo-infra-focus-group-horizontal class="demo-section"></pdx-demo-infra-focus-group-horizontal>
+
+    <!-- Type-Ahead -->
+    <pdx-demo-infra-focus-typeahead class="demo-section"></pdx-demo-infra-focus-typeahead>
+
+    <!-- Focus Restore -->
+    <pdx-demo-infra-focus-restore class="demo-section"></pdx-demo-infra-focus-restore>
+  </div>
+</template>
+
+<script setup>
+@page '/infra/focus';
+@title 'Focus Management';
+</script>
+
+<style scoped>
+  .demo { display: flex; flex-direction: column; gap: 24px; }
+  h2 { font-size: 1.5rem; font-weight: 700; }
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.875rem; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .group-list { display: flex; flex-direction: column; gap: 4px; }
+  .group-item { padding: 8px 14px; border: 1px solid var(--pdx-color-border); border-radius: 4px; cursor: pointer; font-size: 0.875rem; transition: all 150ms; }
+  .group-item:focus { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); outline: none; border-color: var(--pdx-color-primary); }
+  .group-item[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 32px; }
+  /* Focus restore: visible focus ring on target buttons */
+  [data-test="target-a"]:focus, [data-test="target-b"]:focus, [data-test="target-c"]:focus {
+    outline: 3px solid var(--pdx-color-focus); outline-offset: 2px; box-shadow: 0 0 0 6px color-mix(in srgb, var(--pdx-color-focus) 20%, transparent);
+  }
+</style>

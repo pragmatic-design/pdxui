@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Vertical Layout</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Label on top, value below. Good for long values.</p>
+    <div class="demo-container">
+      <pdx-description-list :items="basicItems" layout="vertical"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-description-list :items="items"
+  layout="vertical"&gt;
+&lt;/pdx-description-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+</script>

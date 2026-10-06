@@ -1,0 +1,61 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Field Group</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-field-group&gt;</code> — scopes the fields inside it to a nested object of the form.
+      Inside <code>&lt;pdx-field-group name="customer"&gt;</code>, a field written <code>name="email"</code> is
+      <code>form.fields['customer.email']</code>, and <code>getValues()</code> returns <code>{ customer: { email } }</code>.
+      Groups nest, and render inline, as a collapsible panel, or behind a dialog.
+    </p>
+
+    <!-- ═══ Nested object ═══ -->
+    <pdx-demo-comp-field-group-nested-object class="demo-section"></pdx-demo-comp-field-group-nested-object>
+
+    <!-- ═══ Nesting ═══ -->
+    <pdx-demo-comp-field-group-groups-inside class="demo-section"></pdx-demo-comp-field-group-groups-inside>
+
+    <!-- ═══ Display modes ═══ -->
+    <pdx-demo-comp-field-group-display-modes class="demo-section"></pdx-demo-comp-field-group-display-modes>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Key of the nested object; prefixes the names of the fields inside</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Legend (inline, panel) or button text (dialog)</span></div>
+        <div class="opt-row"><code>display</code><span>string</span><span>inline (default), panel, dialog</span></div>
+        <div class="opt-row"><code>collapsed</code><span>boolean</span><span>A panel that starts closed</span></div>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted note">
+        In a test or a measurement, select a grouped field by its full path: <code>[name="customer.email"]</code>.
+        The compiler writes that path into the DOM.
+      </p>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/field-group';
+@title 'Field Group Component';
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--pdx-space-lg); align-items: start; margin-top: var(--pdx-space-md); }
+  .form-stack { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .form-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--pdx-space-md); }
+  .values { display: flex; flex-direction: column; gap: var(--pdx-space-xs); margin-top: var(--pdx-space-md); }
+  .values-json {
+    margin: 0; padding: var(--pdx-space-md);
+    background: var(--pdx-color-surface-inset, var(--pdx-color-surface));
+    border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md);
+    font-size: 0.8rem; white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .note { margin-top: var(--pdx-space-md); }
+
+  @media (max-width: 720px) {
+    .demo-split { grid-template-columns: 1fr; }
+  }
+</style>

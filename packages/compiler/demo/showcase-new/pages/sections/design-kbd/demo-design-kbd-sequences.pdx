@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Key Sequences</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Keys pressed in order (not simultaneously) via <code>.pdx-kbd-seq</code>.</p>
+
+    <div class="key-row">
+      <span class="pdx-kbd-seq">
+        <kbd class="pdx-kbd">g</kbd><kbd class="pdx-kbd">i</kbd>
+      </span>
+      <span class="pdx-kbd-seq">
+        <kbd class="pdx-kbd">g</kbd><kbd class="pdx-kbd">p</kbd>
+      </span>
+      <span class="pdx-kbd-seq">
+        <kbd class="pdx-kbd">d</kbd><kbd class="pdx-kbd">d</kbd>
+      </span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-kbd-seq"&gt;
+  &lt;kbd class="pdx-kbd"&gt;g&lt;/kbd&gt;
+  &lt;kbd class="pdx-kbd"&gt;i&lt;/kbd&gt;
+&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>

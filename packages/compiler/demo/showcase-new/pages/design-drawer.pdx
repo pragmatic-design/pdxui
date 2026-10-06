@@ -1,0 +1,188 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Drawer (CSS)</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Slide-in panel appearance with positions, sizes, header/body/footer.
+      <strong>CSS only</strong> — static previews of drawer structure. No JS required.
+    </p>
+
+    <!-- ═══ Drawer Structure ═══ -->
+    <pdx-demo-design-drawer-structure class="demo-section"></pdx-demo-design-drawer-structure>
+
+    <!-- ═══ Positions ═══ -->
+    <pdx-demo-design-drawer-positions class="demo-section"></pdx-demo-design-drawer-positions>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-design-drawer-sizes class="demo-section"></pdx-demo-design-drawer-sizes>
+
+    <!-- ═══ Header, Body, Footer ═══ -->
+    <pdx-demo-design-drawer-regions class="demo-section"></pdx-demo-design-drawer-regions>
+
+    <!-- ═══ Composition: Settings Drawer ═══ -->
+    <pdx-demo-design-drawer-composition class="demo-section"></pdx-demo-design-drawer-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-drawer</code><span>Container</span><span>Drawer panel</span>
+        </div>
+        <div class="opt-row">
+          <code>position="left"</code><span>Position</span><span>Left side (default)</span>
+        </div>
+        <div class="opt-row">
+          <code>position="right"</code><span>Position</span><span>Right side</span>
+        </div>
+        <div class="opt-row">
+          <code>position="top"</code><span>Position</span><span>Top edge</span>
+        </div>
+        <div class="opt-row">
+          <code>position="bottom"</code><span>Position</span><span>Bottom edge</span>
+        </div>
+        <div class="opt-row">
+          <code>size="sm"</code><span>Size</span><span>240px width (side drawers)</span>
+        </div>
+        <div class="opt-row">
+          <code>size="md"</code><span>Size</span><span>320px width (default)</span>
+        </div>
+        <div class="opt-row">
+          <code>size="lg"</code><span>Size</span><span>480px width</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-drawer-header</code><span>Section</span><span>Top section with bottom border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-drawer-body</code><span>Section</span><span>Scrollable content area</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-drawer-footer</code><span>Section</span><span>Bottom actions with top border</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/drawer-css';
+@title 'Drawer (CSS)';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  /* Drawer preview container */
+  .drawer-preview {
+    margin-top: var(--pdx-space-md);
+    display: flex;
+    height: 240px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    overflow: hidden;
+    background: var(--pdx-color-inset);
+  }
+
+  .pdx-drawer {
+    display: flex;
+    flex-direction: column;
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    flex-shrink: 0;
+  }
+  .drawer-left { width: 220px; }
+  .drawer-right {
+    border-right: none;
+    border-left: 1px solid var(--pdx-color-border);
+  }
+
+  .pdx-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .pdx-drawer-header h3 { margin: 0; }
+  .pdx-drawer-body {
+    flex: 1;
+    padding: var(--pdx-space-md);
+    overflow-y: auto;
+  }
+  .pdx-drawer-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    justify-content: flex-end;
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+  }
+
+  .drawer-content-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pdx-color-inset);
+  }
+
+  /* Source block */
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Clearable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Clear button appears on hover when a value is selected.</p>
+    <div class="demo-row">
+      <pdx-select label="Color" :options="colors" clearable :value="'Green'" placeholder="Select a color..." />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="colors" clearable :value="'Green'" /&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan', 'Teal'];
+</script>

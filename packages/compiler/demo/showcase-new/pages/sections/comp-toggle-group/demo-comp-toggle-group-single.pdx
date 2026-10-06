@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Single</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      One pressed at a time. Pressing the pressed one again clears the value.
+    </p>
+    <div class="demo-row">
+      <pdx-toggle-group type="single" label="Text alignment" :value="align" @pdx-change="e => setAlign(e.detail.value)">
+        <pdx-toggle value="left">Left</pdx-toggle>
+        <pdx-toggle value="center">Center</pdx-toggle>
+        <pdx-toggle value="right">Right</pdx-toggle>
+        <pdx-toggle value="justify">Justify</pdx-toggle>
+      </pdx-toggle-group>
+      <span class="pdx-txt-small pdx-ink-muted">value: <code class="live-value">{{ align || '(none)' }}</code></span>
+    </div>
+    <p class="aligned pdx-txt-small" :style="'text-align:' + (align || 'left')">
+      This paragraph follows the group: the quick brown fox jumps over the lazy dog, and then it does it again,
+      so that there are two lines to align.
+    </p>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-toggle-group type="single" label="Text alignment"
+  :value="align" @pdx-change="e =&gt; align = e.detail.value"&gt;
+  &lt;pdx-toggle value="left"&gt;Left&lt;/pdx-toggle&gt;
+  &lt;pdx-toggle value="center"&gt;Center&lt;/pdx-toggle&gt;
+  &lt;pdx-toggle value="right"&gt;Right&lt;/pdx-toggle&gt;
+  &lt;pdx-toggle value="justify"&gt;Justify&lt;/pdx-toggle&gt;
+&lt;/pdx-toggle-group&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useToggleGroupDemo } from './state.pdx';
+
+// The composition section's alignment group shows and sets the same value (state.pdx.ts).
+const toggleGroupDemo = useToggleGroupDemo();
+const align = $derived(toggleGroupDemo.align());
+function setAlign(v) { toggleGroupDemo.setAlign(v); }
+</script>

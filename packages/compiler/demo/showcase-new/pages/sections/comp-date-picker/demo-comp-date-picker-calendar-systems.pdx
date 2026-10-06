@@ -1,0 +1,45 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Calendar Systems (13)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      All powered by <code>Intl.DateTimeFormat</code> — zero translation files. Display only, math stays Gregorian.
+    </p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Gregorian (default)</span>
+        <pdx-date-picker value="2024-06-15" calendar="gregory"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Islamic (Umm al-Qura)</span>
+        <pdx-date-picker value="2024-06-15" calendar="islamic-umalqura" locale="ar"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Hebrew</span>
+        <pdx-date-picker value="2024-06-15" calendar="hebrew" locale="he"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Japanese (Imperial era)</span>
+        <pdx-date-picker value="2024-06-15" calendar="japanese" locale="ja"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Buddhist</span>
+        <pdx-date-picker value="2024-06-15" calendar="buddhist" locale="th"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Persian</span>
+        <pdx-date-picker value="2024-06-15" calendar="persian" locale="fa"></pdx-date-picker>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker value="2024-06-15" calendar="gregory"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" calendar="islamic-umalqura" locale="ar"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" calendar="hebrew" locale="he"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" calendar="japanese" locale="ja"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" calendar="buddhist" locale="th"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" calendar="persian" locale="fa"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

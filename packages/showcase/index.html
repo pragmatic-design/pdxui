@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="pragmatic" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDX Service Desk</title>
+    <meta name="description" content="A service desk written in PDX — the reference for how an application is built, and the bench its production build is measured on." />
+</head>
+<body>
+    <pdx-app></pdx-app>
+    <script type="module">
+        // The design system's FOUNDATION — tokens, layout, surfaces, typography and the @layer
+        // order — plus the ONE theme this app renders. `@pdxui/design` would bring all thirteen
+        // themes and all 114 components' styles; each component's CSS travels with the
+        // component, so this app ships the styles of what it renders.
+        import '@pdxui/design/base';
+        import '@pdxui/design/themes/pragmatic';
+        // Both dictionaries, before the first page renders: the app's own and the library's.
+        // A component mounted before `setLocaleStrings` keeps the English it registered with.
+        import { setupI18n } from './src/i18n';
+        // Fire and forget: the app's own copy is installed synchronously for the default locale,
+        // and a second locale arrives as a chunk that reaches what is already on screen by
+        // itself. <html lang> moves when it lands.
+        void setupI18n();
+        // The shell.
+        import './src/app.pdx';
+        // NO route glob here, and that is the point.
+        //
+        // An eager `import.meta.glob(..., { eager: true })` would put every page in the first
+        // download: the dynamic import the outlet performs would resolve to a module already in the
+        // entry chunk, and Rollup would have nothing to split. The production router carries the
+        // table, compiled from the same @page declarations, and the outlet imports a page the first
+        // time it shows it.
+        //
+        // In dev `routeTable()` is null; what fills the gap is a table the plugin injects, carrying
+        // each page's URL so the outlet still imports one page at a time. Without it every route
+        // answers 404 in `pdx dev`.
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Disabled, loading, and pressed (toggle) states.</p>
+
+    <div class="state-group">
+      <span class="pdx-txt-caption pdx-ink-muted">Disabled</span>
+      <div class="btn-row">
+        <button class="pdx-primary" disabled>Disabled</button>
+        <button class="pdx-secondary" disabled>Disabled</button>
+        <button class="pdx-outline" disabled>Disabled</button>
+        <button class="pdx-ghost" disabled>Disabled</button>
+      </div>
+    </div>
+
+    <div class="state-group">
+      <span class="pdx-txt-caption pdx-ink-muted">Loading</span>
+      <div class="btn-row">
+        <button class="pdx-primary pdx-loading">Saving...</button>
+        <button class="pdx-secondary pdx-loading">Loading</button>
+        <button class="pdx-danger pdx-loading">Deleting</button>
+      </div>
+    </div>
+
+    <div class="state-group">
+      <span class="pdx-txt-caption pdx-ink-muted">Pressed (toggle)</span>
+      <div class="btn-row">
+        <button class="pdx-ghost" aria-pressed="true">Bold</button>
+        <button class="pdx-ghost">Italic</button>
+        <button class="pdx-ghost" aria-pressed="true">Underline</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button class="pdx-primary" disabled&gt;Disabled&lt;/button&gt;
+&lt;button class="pdx-primary pdx-loading"&gt;Saving...&lt;/button&gt;
+&lt;button class="pdx-ghost" aria-pressed="true"&gt;Bold&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .state-group {
+    margin-top: var(--pdx-space-md);
+  }
+</style>

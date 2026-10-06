@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Bordered</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>.pdx-toolbar-bordered</code> for a visible border and background.</p>
+
+    <div class="pdx-toolbar pdx-toolbar-bordered">
+      <button class="pdx-ghost">Cut</button>
+      <button class="pdx-ghost">Copy</button>
+      <button class="pdx-ghost">Paste</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toolbar pdx-toolbar-bordered"&gt;
+  &lt;button class="pdx-ghost"&gt;Cut&lt;/button&gt;
+  &lt;button class="pdx-ghost"&gt;Copy&lt;/button&gt;
+  &lt;button class="pdx-ghost"&gt;Paste&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

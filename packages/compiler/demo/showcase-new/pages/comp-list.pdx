@@ -1,0 +1,74 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">List</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-list&gt;</code> — data-bound list. Supports static arrays, DataSource,
+      custom item templates, loading overlay, empty state, clickable items, dividers.
+    </p>
+
+    <pdx-demo-comp-list-basic class="demo-section"></pdx-demo-comp-list-basic>
+
+    <pdx-demo-comp-list-data-source class="demo-section"></pdx-demo-comp-list-data-source>
+
+    <pdx-demo-comp-list-empty class="demo-section"></pdx-demo-comp-list-empty>
+
+    <pdx-demo-comp-list-slot-template class="demo-section"></pdx-demo-comp-list-slot-template>
+
+    <pdx-demo-comp-list-custom-empty class="demo-section"></pdx-demo-comp-list-custom-empty>
+
+    <pdx-demo-comp-list-rich-item class="demo-section"></pdx-demo-comp-list-rich-item>
+
+    <pdx-demo-comp-list-pagination class="demo-section"></pdx-demo-comp-list-pagination>
+
+    <pdx-demo-comp-list-data-source-wrapper class="demo-section"></pdx-demo-comp-list-data-source-wrapper>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>T[]</td><td>null</td><td>Static data array</td></tr>
+            <tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (priority over items)</td></tr>
+            <tr><td><code>render-item</code></td><td>Function</td><td>null</td><td>(item, index) => HTML string or HTMLElement (escape hatch)</td></tr>
+            <tr><td><code>id-field</code></td><td>String</td><td>'id'</td><td>Unique ID field name</td></tr>
+            <tr><td><code>dividers</code></td><td>Boolean</td><td>false</td><td>Show dividers between items</td></tr>
+            <tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Items are clickable (hover + cursor)</td></tr>
+            <tr><td><code>bordered</code></td><td>Boolean</td><td>true</td><td>Border around list</td></tr>
+            <tr><td><code>empty-title</code></td><td>String</td><td>'No items'</td><td>Empty state title</td></tr>
+            <tr><td><code>empty-description</code></td><td>String</td><td>''</td><td>Empty state description</td></tr>
+            <tr><td><code>empty-icon</code></td><td>String</td><td>'inbox'</td><td>Empty state icon</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>item</code></td><td><code>{ item, index, id }</code></td><td>Custom item template. Priority: slot > render-item > default.</td></tr>
+            <tr><td><code>empty</code></td><td><code>{}</code></td><td>Custom empty state (overrides empty-title/description/icon props).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/list';
+@title 'List — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-container { max-width: 600px; }
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 600px; }
+.slot-user-badge { font-size: var(--pdx-text-xs); padding: 2px 8px; border-radius: 9999px; background: var(--pdx-color-inset); white-space: nowrap; }
+</style>

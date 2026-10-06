@@ -1,0 +1,8 @@
+**/dist/**
+**/node_modules/**
+**/*.d.ts
+pnpm-lock.yaml
+**/tests/**/generated/**
+**/scenarios/generated/**
+.internals/
+.claude/

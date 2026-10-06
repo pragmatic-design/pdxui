@@ -1,0 +1,32 @@
+{
+    "import": {
+        "title": "Import customers",
+        "intro": "Drop a CSV. Nothing is written until you have seen what it would do.",
+        "drop": "Drop a .csv here, or pick one",
+        "inLibrary": "{count} customers in the list",
+        "ignored": "Ignored, because no field claims them: {names}",
+        "willImport": "{good} of {total} rows can be imported",
+        "commit": "Import {count}",
+        "done": "{count} imported · {refused} still to fix",
+        "exportRefused": "Export the refused rows",
+        "expected": "The file's columns",
+        "requiredColumn": "required",
+        "oneOfColumn": "one of: {values}",
+        "template": "Download a template",
+        "columns": {
+            "line": "Line",
+            "problem": "Problem"
+        },
+        "door": {
+            "empty": "That file is empty.",
+            "oneColumn": "That file has one column. A CSV of customers needs at least a name and one more.",
+            "noRows": "That file has a header and no rows.",
+            "noMatch": "None of those columns is a customer field: {names}.",
+            "tooBig": "That file is larger than {max} MB."
+        },
+        "row": {
+            "required": "{field} is empty, and it is required",
+            "oneOf": "{field} is «{value}», which is not one of: {allowed}"
+        }
+    }
+}

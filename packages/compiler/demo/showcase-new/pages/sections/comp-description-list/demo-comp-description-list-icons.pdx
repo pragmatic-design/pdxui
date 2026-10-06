@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Items with icons next to labels.</p>
+    <div class="demo-container">
+      <pdx-description-list :items="iconItems" :bordered="true" label-width="130px"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { label: 'Name', value: 'Jane Smith', icon: 'user' },
+  { label: 'Email', value: 'jane@example.com', icon: 'mail' },
+  { label: 'Phone', value: '+1 555-987-6543', icon: 'phone' },
+];</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const iconItems = [
+  { label: 'Name', value: 'Jane Smith', icon: 'user' },
+  { label: 'Email', value: 'jane.smith@example.com', icon: 'mail' },
+  { label: 'Phone', value: '+1 (555) 987-6543', icon: 'phone' },
+  { label: 'Role', value: 'Editor', icon: 'shield' },
+  { label: 'Joined', value: 'March 3, 2025', icon: 'calendar' },
+];
+</script>

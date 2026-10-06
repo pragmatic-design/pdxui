@@ -1,0 +1,83 @@
+/* Rating — Star rating with precision, hover preview, threshold colors.
+   Sizes: sm, default, lg. States: disabled, readonly, focused.
+*/
+
+.pdx-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    outline: none;
+}
+
+.pdx-rating:focus-visible {
+    box-shadow: var(--pdx-focus-ring);
+    border-radius: var(--pdx-radius-sm);
+}
+
+/* ===== Star ===== */
+
+.pdx-rating-star {
+    position: relative;
+    display: inline-flex;
+    cursor: inherit;
+    color: var(--pdx-color-border);
+    transition: transform var(--pdx-duration-fast) var(--pdx-ease, ease);
+}
+
+.pdx-rating-star:hover {
+    transform: scale(1.15);
+}
+
+.pdx-rating-star-full {
+    color: var(--pdx-color-warning);
+}
+
+.pdx-rating-star-half {
+    color: var(--pdx-color-border);
+}
+
+.pdx-rating-star-half .pdx-rating-fill {
+    position: absolute;
+    inset: 0;
+    color: var(--pdx-color-warning);
+}
+
+/* ===== Icon sizing ===== */
+
+.pdx-rating-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: currentColor;
+    display: block;
+}
+
+/* ===== Sizes ===== */
+
+.pdx-rating-sm .pdx-rating-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.pdx-rating-lg .pdx-rating-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+/* ===== States ===== */
+
+.pdx-rating-readonly {
+    cursor: default;
+}
+
+.pdx-rating-readonly .pdx-rating-star:hover {
+    transform: none;
+}
+
+.pdx-rating-disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+}

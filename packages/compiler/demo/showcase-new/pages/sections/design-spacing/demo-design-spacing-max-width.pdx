@@ -1,0 +1,60 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Max-Width</h2>
+    <p class="pdx-txt-small pdx-ink-muted">6-step max-width scale for <code>&lt;pdx-center&gt;</code> and custom containers.</p>
+
+    <div class="maxw-demo">
+      <div class="maxw-row">
+        <code class="maxw-label">xs</code>
+        <div class="maxw-bar" style="width:min(100%, var(--pdx-max-xs))"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">20rem · 320px</span>
+      </div>
+      <div class="maxw-row">
+        <code class="maxw-label">sm</code>
+        <div class="maxw-bar" style="width:min(100%, var(--pdx-max-sm))"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">30rem · 480px</span>
+      </div>
+      <div class="maxw-row">
+        <code class="maxw-label">md</code>
+        <div class="maxw-bar" style="width:min(100%, var(--pdx-max-md))"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">48rem · 768px</span>
+      </div>
+      <div class="maxw-row">
+        <code class="maxw-label">lg</code>
+        <div class="maxw-bar lg" style="width:min(100%, var(--pdx-max-lg))"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">64rem · 1024px</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>--pdx-max-xs:  20rem;   /* 320px  — mobile */
+--pdx-max-sm:  30rem;   /* 480px  — narrow */
+--pdx-max-md:  48rem;   /* 768px  — reading */
+--pdx-max-lg:  64rem;   /* 1024px — default */
+--pdx-max-xl:  80rem;   /* 1280px — wide */
+--pdx-max-2xl: 96rem;   /* 1536px — ultra */
+
+&lt;pdx-center max="md"&gt;...&lt;/pdx-center&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Max-width */
+  .maxw-demo { margin-top: var(--pdx-space-md); }
+  .maxw-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-xs) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .maxw-label { min-width: 30px; font-size: var(--pdx-text-xs); }
+  .maxw-bar {
+    height: 12px;
+    background: var(--pdx-accent-200);
+    border-radius: var(--pdx-radius-sm);
+    border: 1px solid var(--pdx-accent-400);
+  }
+</style>

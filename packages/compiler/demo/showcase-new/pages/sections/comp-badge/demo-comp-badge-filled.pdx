@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Filled Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">6 semantic color variants. Default style = filled background with contrasting text.</p>
+
+    <div class="demo-row">
+      <pdx-badge variant="primary" value="New"></pdx-badge>
+      <pdx-badge variant="secondary" value="Draft"></pdx-badge>
+      <pdx-badge variant="success" value="Active"></pdx-badge>
+      <pdx-badge variant="danger" value="Error"></pdx-badge>
+      <pdx-badge variant="warning" value="Pending"></pdx-badge>
+      <pdx-badge variant="info" value="Info"></pdx-badge>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-badge variant="primary" value="New"&gt;&lt;/pdx-badge&gt;
+&lt;pdx-badge variant="danger" value="Error"&gt;&lt;/pdx-badge&gt;
+&lt;pdx-badge variant="success" value="Active"&gt;&lt;/pdx-badge&gt;</code></pre>
+    </details>
+  </section>
+</template>

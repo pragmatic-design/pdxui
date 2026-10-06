@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Design System</title>
+    <style>
+        /* Global source block styles — used by @raw content which bypasses scoped CSS */
+        details.source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+        details.source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+        details.source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); line-height: 1.6; }
+        details.source-block code { font-family: var(--pdx-font-mono); background: none; padding: 0; }
+    </style>
+</head>
+<body>
+    <pdx-app></pdx-app>
+    <script type="module">
+        import '@pdxui/design';
+        import './app.pdx';
+        // Auto-import all pages — each registers via @page + component()
+        // TODO: migrate to true lazy loading via router when scanForRoutes() is fixed
+        import.meta.glob('./pages/*.pdx', { eager: true });
+    </script>
+</body>
+</html>

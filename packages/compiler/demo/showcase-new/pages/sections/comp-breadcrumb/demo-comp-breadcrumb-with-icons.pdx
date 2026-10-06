@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icons</h2>
+    <div class="demo-row">
+      <pdx-breadcrumb :items="iconItems"></pdx-breadcrumb>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-breadcrumb :items="items"&gt;&lt;/pdx-breadcrumb&gt;
+
+// { key: 'home', label: 'Home', icon: 'home', href: '#' }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const iconItems = [
+  { key: 'home', label: 'Home', icon: 'home', href: '#' },
+  { key: 'settings', label: 'Settings', icon: 'settings', href: '#' },
+  { key: 'profile', label: 'Profile' },
+];
+</script>

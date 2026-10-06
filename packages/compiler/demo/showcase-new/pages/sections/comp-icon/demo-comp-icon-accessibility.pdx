@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Accessibility</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Without <code>label</code>: decorative (<code>aria-hidden</code>). With <code>label</code>: semantic (<code>role="img"</code>).</p>
+
+    <div class="a11y-demo">
+      <div class="a11y-row">
+        <pdx-icon name="trash" size="lg"></pdx-icon>
+        <code class="pdx-txt-caption">aria-hidden="true" (decorative)</code>
+      </div>
+      <div class="a11y-row">
+        <pdx-icon name="trash" size="lg" label="Delete item"></pdx-icon>
+        <code class="pdx-txt-caption">role="img" aria-label="Delete item"</code>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Decorative (next to text label) --&gt;
+&lt;button class="pdx-danger"&gt;
+  &lt;pdx-icon name="trash"&gt;&lt;/pdx-icon&gt; Delete
+&lt;/button&gt;
+
+&lt;!-- Semantic (icon-only button) --&gt;
+&lt;button class="pdx-ghost"&gt;
+  &lt;pdx-icon name="trash" label="Delete item"&gt;&lt;/pdx-icon&gt;
+&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .a11y-demo { margin-top: var(--pdx-space-md); }
+  .a11y-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+</style>

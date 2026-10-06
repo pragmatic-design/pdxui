@@ -1,0 +1,118 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">NavMenu</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-nav-menu&gt;</code> — vertical navigation menu for sidebars.
+      Supports icons, badges, nested collapsible groups, active state, collapsed icon-only mode.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-nav-menu-basic class="demo-section"></pdx-demo-comp-nav-menu-basic>
+
+    <!-- ═══ With Icons ═══ -->
+    <pdx-demo-comp-nav-menu-icons class="demo-section"></pdx-demo-comp-nav-menu-icons>
+
+    <!-- ═══ Badges ═══ -->
+    <pdx-demo-comp-nav-menu-badges class="demo-section"></pdx-demo-comp-nav-menu-badges>
+
+    <!-- ═══ Nested Groups ═══ -->
+    <pdx-demo-comp-nav-menu-nested-groups class="demo-section"></pdx-demo-comp-nav-menu-nested-groups>
+
+    <!-- ═══ Section Headers ═══ -->
+    <pdx-demo-comp-nav-menu-headers-separators class="demo-section"></pdx-demo-comp-nav-menu-headers-separators>
+
+    <!-- ═══ Collapsed Mode ═══ -->
+    <pdx-demo-comp-nav-menu-collapsed class="demo-section"></pdx-demo-comp-nav-menu-collapsed>
+
+    <!-- ═══ Looks ═══ -->
+    <pdx-demo-comp-nav-menu-compact-bar class="demo-section"></pdx-demo-comp-nav-menu-compact-bar>
+
+    <pdx-demo-comp-nav-menu-row-actions class="demo-section"></pdx-demo-comp-nav-menu-row-actions>
+
+    <pdx-demo-comp-nav-menu-type-per-level class="demo-section"></pdx-demo-comp-nav-menu-type-per-level>
+
+    <!-- ═══ Full Sidebar Example ═══ -->
+    <pdx-demo-comp-nav-menu-full-sidebar class="demo-section"></pdx-demo-comp-nav-menu-full-sidebar>
+
+    <!-- ═══ With the router ═══ -->
+    <pdx-demo-comp-nav-menu-router class="demo-section"></pdx-demo-comp-nav-menu-router>
+
+    <!-- ═══ Events ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-select</code></td><td><code>{ key, item, href }</code></td><td>An entry was chosen. Cancelable: <code>preventDefault()</code> stops the link.</td></tr>
+            <tr><td><code>pdx-toggle</code></td><td><code>{ key, expanded }</code></td><td>A group opened or closed, for the app to keep. Does not bubble.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Slots ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>item</code></td><td><code>{ item, level, expanded, active }</code></td><td>Custom entry content, a group's included — <code>expanded</code> is the group's state. The chevron stays the menu's</td></tr>
+            <tr><td><code>actions</code></td><td><code>{ item, level, active }</code></td><td>Controls beside a leaf entry's link, in a row with it — never inside it</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>NavMenuItem[]</td><td>[]</td><td>Navigation items</td></tr>
+            <tr><td><code>activekey</code></td><td>String</td><td>''</td><td>Currently active item key</td></tr>
+            <tr><td><code>collapsed</code></td><td>Boolean</td><td>false</td><td>Icon-only collapsed mode</td></tr>
+            <tr><td><code>indent</code></td><td>Number</td><td>36</td><td>Indent per nesting level (px)</td></tr>
+            <tr><td><code>size</code></td><td>'md' | 'sm'</td><td>'md'</td><td>A compact menu for a dense sidebar</td></tr>
+            <tr><td><code>indicator</code></td><td>'fill' | 'border'</td><td>'fill'</td><td>How the current entry is marked: a tint, or a tint and a start-edge bar</td></tr>
+            <tr><td><code>chevron</code></td><td>'start' | 'end'</td><td>'start'</td><td>Where a group's chevron sits</td></tr>
+            <tr><td><code>actions</code></td><td>'inline' | 'overlay'</td><td>'inline'</td><td>The <code>actions</code> slot beside the link, or laid over the row's end on hover and focus</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ NavMenuItem Interface ═══ -->
+    <pdx-demo-comp-nav-menu-item-interface class="demo-section"></pdx-demo-comp-nav-menu-item-interface>
+  </div>
+</template>
+
+<script setup>
+@page '/components/nav-menu';
+@title 'NavMenu — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-sidebar {
+  width: 260px;
+  padding: var(--pdx-space-sm);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-surface);
+}
+.demo-sidebar-narrow {
+  width: auto;
+}
+.demo-sidebar-full {
+  width: 280px;
+  padding: 0;
+  overflow: hidden;
+}
+</style>

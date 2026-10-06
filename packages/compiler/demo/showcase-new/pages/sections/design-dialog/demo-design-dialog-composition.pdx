@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Confirmation Dialog</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A realistic confirmation prompt with danger action.</p>
+
+    <div class="dialog-preview-bg">
+      <div class="pdx-dialog" style="max-width: 420px;">
+        <div class="pdx-dialog-header">
+          <h3 class="pdx-txt-subheading">Delete Project</h3>
+          <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="pdx-dialog-body">
+          <p class="pdx-txt-body">Are you sure you want to delete <strong>"My Project"</strong>? This action cannot be undone and all associated data will be permanently removed.</p>
+        </div>
+        <div class="pdx-dialog-footer">
+          <button class="pdx-ghost">Cancel</button>
+          <button class="pdx-danger">Delete Project</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,42 @@
+<!-- Hand-written demo for the net-new pdx-relation-picker (no showcase-new source yet). -->
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Relation Picker</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Pick one or more existing rows for an N-N relation (and optionally create a new one on the fly). Wraps the
+      data-grid with multiple selection + a footer. Emits <code>pdx-pick</code> with the chosen rows and
+      <code>pdx-create</code> when "create" is requested.
+    </p>
+
+    <section>
+      <h2 class="pdx-txt-heading">Multi-select + create</h2>
+      <p class="pdx-txt-small pdx-ink-muted">Select rows, then "Add selected". The result is shown below.</p>
+      <div style="height: 320px; border: 1px solid var(--pdx-color-border); border-radius: 10px; padding: .75rem;">
+        <pdx-relation-picker :source="source" :columns="columns" create-label="New city" @pdx-pick="onPick" @pdx-create="onCreate"></pdx-relation-picker>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted" style="margin-top: .6rem;">{{ result }}</p>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+const rows = [
+  { id: 1, code: 'AMS', name: 'Amsterdam' },
+  { id: 2, code: 'LON', name: 'London' },
+  { id: 3, code: 'PAR', name: 'Paris' },
+  { id: 4, code: 'ROM', name: 'Rome' },
+  { id: 5, code: 'MAD', name: 'Madrid' },
+];
+const source = createDataSource({ data: rows, pageSize: 0 });
+const columns = [
+  // 120, not 100: a header keeps ~60px for its padding, sort and filter icons, and at 100 "Code" shows as "C…".
+  { field: 'code', header: 'Code', width: 120 },
+  { field: 'name', header: 'Name' },
+];
+
+let result = $signal('Nothing picked yet.');
+function onPick(e) { result = 'Picked: ' + e.detail.items.map(i => i.name).join(', '); }
+function onCreate() { result = 'Create requested.'; }
+</script>

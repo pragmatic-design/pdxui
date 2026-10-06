@@ -1,0 +1,51 @@
+<template>
+  <div class="paginated">
+    <h3>LinkedSignal — Pagination</h3>
+    <div class="controls">
+      <label>Category
+        <select @change="onCategory">
+          <option value="Books" :selected="category === 'Books'">Books</option>
+          <option value="Movies" :selected="category === 'Movies'">Movies</option>
+          <option value="Music" :selected="category === 'Music'">Music</option>
+        </select>
+      </label>
+      <div class="page-nav">
+        <button @click="prevPage" :disabled="page() <= 1">←</button>
+        <span class="page-num">Page {{ page() }}</span>
+        <button @click="nextPage">→</button>
+      </div>
+    </div>
+    <div class="info">
+      Category: {{ category }} | Page resets to 1 on category change.
+    </div>
+  </div>
+</template>
+
+<script setup>
+  let category = $signal('Books');
+
+  const page = linkedSignal({
+    source: () => category,
+    computation: (_cat, prev) => {
+      if (prev && prev.source === _cat) return prev.value;
+      return 1;
+    },
+  });
+
+  function onCategory(e) { category = e.target.value; }
+  function prevPage() { if (page() > 1) page.set(page.peek() - 1); }
+  function nextPage() { page.set(page.peek() + 1); }
+</script>
+
+<style scoped>
+  .paginated { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .controls { display: flex; gap: 16px; align-items: center; margin: 8px 0; flex-wrap: wrap; }
+  .controls label { font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 6px; }
+  select { padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; }
+  .page-nav { display: flex; align-items: center; gap: 6px; }
+  .page-num { min-width: 60px; text-align: center; font-weight: bold; }
+  button { padding: 4px 12px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: #f8f9fa; }
+  button:hover { background: #e9ecef; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .info { font-size: 0.85rem; color: #555; margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; }
+</style>

@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Input</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Wrapper pattern: border on wrapper, input inside inherits font/color. Click anywhere in wrapper to focus.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Username" required></pdx-label>
+        <pdx-input placeholder="Enter username..."></pdx-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Email"></pdx-label>
+        <pdx-input type="email" placeholder="you@example.com" inputmode="email"></pdx-input>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-input placeholder="Enter username..." /&gt;
+&lt;pdx-input type="email" placeholder="you@example.com" inputmode="email" /&gt;</code></pre>
+    </details>
+  </section>
+</template>

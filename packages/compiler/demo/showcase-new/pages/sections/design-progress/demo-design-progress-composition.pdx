@@ -1,0 +1,75 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">File upload progress with step indicators.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Uploading Files</h3>
+      <div class="upload-list">
+        <div class="upload-item">
+          <div class="upload-info">
+            <span class="pdx-txt-small">report-2026.pdf</span>
+            <span class="pdx-txt-caption pdx-ink-success">Complete</span>
+          </div>
+          <div class="pdx-progress">
+            <div class="pdx-progress-bar" variant="success" style="width: 100%"></div>
+          </div>
+        </div>
+        <div class="upload-item">
+          <div class="upload-info">
+            <span class="pdx-txt-small">dashboard-screenshot.png</span>
+            <span class="pdx-txt-caption pdx-ink-muted">67%</span>
+          </div>
+          <div class="pdx-progress">
+            <div class="pdx-progress-bar" style="width: 67%"></div>
+          </div>
+        </div>
+        <div class="upload-item">
+          <div class="upload-info">
+            <span class="pdx-txt-small">data-export.csv</span>
+            <span class="pdx-txt-caption pdx-ink-danger">Failed</span>
+          </div>
+          <div class="pdx-progress">
+            <div class="pdx-progress-bar" variant="danger" style="width: 35%"></div>
+          </div>
+        </div>
+        <div class="upload-item">
+          <div class="upload-info">
+            <span class="pdx-txt-small">video-demo.mp4</span>
+            <span class="pdx-txt-caption pdx-ink-muted">Waiting...</span>
+          </div>
+          <div class="pdx-progress pdx-progress-indeterminate">
+            <div class="pdx-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    max-width: 480px;
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-md); }
+  .upload-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+  }
+  .upload-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+  }
+  .upload-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>

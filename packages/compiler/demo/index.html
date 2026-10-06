@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.pdx Compiler Demo — All Features</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; background: #f0f2f5; }
+        h1 { margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        h2 { margin-top: 1rem; font-size: 0.9rem; color: #4a4a6a; margin-bottom: 0.5rem; }
+        .section-label { background: #4a4a6a; color: white; display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <h1>.pdx Compiler Demo</h1>
+    <p class="subtitle">All components compiled from .pdx Single File Components via Vite plugin. Each tests a different framework feature.</p>
+
+    <div class="grid">
+        <!-- Existing demos -->
+        <div>
+            <span class="section-label">Signal + @prop + @if</span>
+            <h2>counter.pdx</h2>
+            <pdx-counter label="Apples" initial="3"></pdx-counter>
+        </div>
+        <div>
+            <span class="section-label">@for + signals</span>
+            <h2>todo-list.pdx</h2>
+            <pdx-todo-list title="Sprint Backlog"></pdx-todo-list>
+        </div>
+
+        <!-- Sprint A.3: Data Layer -->
+        <div>
+            <span class="section-label">@fetch + resource()</span>
+            <h2>user-list.pdx</h2>
+            <pdx-user-list title="Team Members"></pdx-user-list>
+        </div>
+        <div>
+            <span class="section-label">linkedSignal</span>
+            <h2>paginated-list.pdx</h2>
+            <pdx-paginated-list></pdx-paginated-list>
+        </div>
+
+        <!-- Sprint C: Forms + CSS -->
+        <div>
+            <span class="section-label">@form + validation</span>
+            <h2>contact-form.pdx</h2>
+            <pdx-contact-form></pdx-contact-form>
+        </div>
+        <div>
+            <span class="section-label">bind() CSS signals</span>
+            <h2>color-card.pdx</h2>
+            <pdx-color-card emoji="🎨"></pdx-color-card>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import .pdx files — Vite plugin transforms them into JS
+        import './counter.pdx';
+        import './todo-list.pdx';
+        import './user-list.pdx';
+        import './contact-form.pdx';
+        import './color-card.pdx';
+        import './paginated-list.pdx';
+    </script>
+</body>
+</html>

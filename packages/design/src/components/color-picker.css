@@ -1,0 +1,273 @@
+/* Color Picker — swatch trigger, spectrum area, hue/alpha sliders, hex input, presets.
+
+   Usage:
+     <pdx-color-picker></pdx-color-picker>           (popup mode, swatch trigger)
+     <pdx-color-picker inline></pdx-color-picker>     (inline panel, no popup)
+
+   Elements:
+     .pdx-color-swatch        Trigger button showing current color
+     .pdx-color-panel          Panel (popup or inline)
+     .pdx-color-spectrum       2D saturation/value area
+     .pdx-color-spectrum-thumb Crosshair thumb
+     .pdx-color-hue-slider     Hue rainbow bar
+     .pdx-color-alpha-slider   Alpha bar with checkerboard
+     .pdx-color-slider-thumb   Shared thumb for hue/alpha
+     .pdx-color-hex-input      Hex text input
+     .pdx-color-presets        Preset grid
+     .pdx-color-preset         Individual preset swatch
+
+   Sizes: sm, default, lg (swatch only)
+*/
+
+/* ===== Host ===== */
+
+pdx-color-picker {
+    display: inline-block;
+    position: relative;
+}
+
+/* ===== Swatch (trigger) ===== */
+
+/* Checkerboard behind swatch for transparency indication */
+.pdx-color-swatch {
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+    overflow: hidden;
+    background:
+        repeating-conic-gradient(
+            var(--pdx-color-inset) 0% 25%,
+            transparent 0% 50%
+        ) 0 0 / 8px 8px;
+    transition: border-color var(--pdx-transition), box-shadow var(--pdx-transition);
+}
+
+/* Inner color layer sits on top of checkerboard */
+.pdx-color-swatch::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    /* --pdx-cp-current set dynamically via JS */
+    background: var(--pdx-cp-current, var(--pdx-color-surface));
+}
+
+.pdx-color-swatch:hover {
+    border-color: var(--pdx-color-border-strong, var(--pdx-color-border));
+}
+
+.pdx-color-swatch:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: var(--pdx-focus-offset);
+}
+
+/* Sizes */
+.pdx-color-swatch-sm { width: 24px; height: 24px; }
+.pdx-color-swatch-lg { width: 40px; height: 40px; }
+
+/* Disabled */
+.pdx-color-swatch[disabled],
+.pdx-color-swatch.disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ===== Panel ===== */
+
+.pdx-color-panel {
+    width: 240px;
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-md);
+}
+
+/* Inline variant: no popup chrome */
+.pdx-color-panel-inline {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* ===== Spectrum (saturation/value 2D area) ===== */
+
+.pdx-color-spectrum {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    border-radius: var(--pdx-radius-sm);
+    overflow: hidden;
+    cursor: crosshair;
+    /* --pdx-cp-hue set dynamically via JS */
+    background: var(--pdx-cp-hue, hsl(0 100% 50%));
+    user-select: none;
+    touch-action: none;
+}
+
+/* White gradient: left (white) to right (transparent) */
+.pdx-color-spectrum::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #fff, transparent);
+}
+
+/* Black gradient: top (transparent) to bottom (black) */
+.pdx-color-spectrum::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent, #000);
+}
+
+/* ===== Spectrum thumb ===== */
+
+.pdx-color-spectrum-thumb {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    /* Sits above both pseudo-element gradients */
+    z-index: 1;
+}
+
+/* ===== Hue slider ===== */
+
+.pdx-color-hue-slider {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    margin-top: var(--pdx-space-sm);
+    border-radius: 6px;
+    background: linear-gradient(
+        to right,
+        #f00 0%,
+        #ff0 17%,
+        #0f0 33%,
+        #0ff 50%,
+        #00f 67%,
+        #f0f 83%,
+        #f00 100%
+    );
+    cursor: pointer;
+    user-select: none;
+    touch-action: none;
+}
+
+/* ===== Alpha slider ===== */
+
+.pdx-color-alpha-slider {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    margin-top: var(--pdx-space-sm);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    touch-action: none;
+    /* Checkerboard base layer */
+    background:
+        repeating-conic-gradient(
+            var(--pdx-color-inset) 0% 25%,
+            transparent 0% 50%
+        ) 0 0 / 8px 8px;
+}
+
+/* Color gradient overlay (set via --pdx-cp-alpha-gradient in JS) */
+.pdx-color-alpha-slider::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--pdx-cp-alpha-gradient, linear-gradient(to right, transparent, #000));
+}
+
+/* ===== Slider thumb (shared for hue and alpha) ===== */
+
+.pdx-color-slider-thumb {
+    position: absolute;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ===== Hex input ===== */
+
+.pdx-color-hex-input {
+    margin-top: var(--pdx-space-sm);
+}
+
+/* The input carries both classes on the SAME element (it is not a wrapper) → a compound
+   selector, not a descendant one, or width/monospace never apply. */
+.pdx-color-hex-input.pdx-input {
+    width: 100%;
+    font-family: monospace;
+}
+
+/* ===== Presets grid ===== */
+
+.pdx-color-presets {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-top: var(--pdx-space-sm);
+}
+
+.pdx-color-preset {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+    transition: box-shadow var(--pdx-transition);
+    /* Knob: hand-written markup sets --pdx-cp-preset per swatch. <pdx-color-picker> sets an inline
+       `background` instead, which wins over this rule anyway — so without a fallback this whole
+       declaration resolved to `unset` and did nothing at all. */
+    background: var(--pdx-cp-preset, transparent);
+}
+
+.pdx-color-preset:hover {
+    box-shadow: 0 0 0 2px var(--pdx-color-focus);
+}
+
+.pdx-color-preset[aria-selected="true"],
+.pdx-color-preset.active {
+    box-shadow: 0 0 0 2px var(--pdx-color-primary);
+}
+
+/* ===== Mobile / coarse pointer ===== */
+
+@media (pointer: coarse) {
+    .pdx-color-spectrum {
+        height: 200px;
+    }
+
+    .pdx-color-hue-slider,
+    .pdx-color-alpha-slider {
+        height: 20px;
+    }
+
+    .pdx-color-preset {
+        width: 32px;
+        height: 32px;
+    }
+}

@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Virtual Scroll</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>virtual-scroll</code> renders only visible rows + overscan. Scales to 10K+ rows.
+      Set <code>max-height</code> for the scroll container and <code>row-height</code> for fixed row size.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="virtualDS" :columns="virtualColumns" :virtual-scroll="true" :max-height="400" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  virtual-scroll :max-height="400"
+  hover striped&gt;
+&lt;/pdx-data-grid&gt;
+
+// 1000 rows — only visible rows in DOM
+const ds = createDataSource({ data: bigData, pageSize: 0 });</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { categories } from './state.pdx';
+
+var bigData = [];
+for (var j = 0; j < 1000; j++) {
+  bigData.push({ id: j + 1, name: 'Product ' + (j + 1), category: categories[j % 5], price: Math.round(Math.random() * 500 + 10), stock: Math.floor(Math.random() * 200) });
+}
+
+// ─── Virtual scroll ────────────────────────
+const virtualColumns = [
+  { field: 'id', header: 'ID', type: 'number', width: 60 },
+  { field: 'name', header: 'Name', width: 180 },
+  { field: 'category', header: 'Category', width: 120 },
+  { field: 'price', header: 'Price', type: 'currency', width: 120 },
+  { field: 'stock', header: 'Stock', type: 'number', width: 100 },
+];
+
+const virtualDS = createDataSource({ data: bigData, pageSize: 0 });
+</script>

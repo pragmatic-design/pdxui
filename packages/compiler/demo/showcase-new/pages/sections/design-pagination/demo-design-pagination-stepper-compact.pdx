@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact Stepper</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Smaller size with <code>.pdx-stepper-sm</code> for tight spaces.</p>
+
+    <div class="pdx-stepper pdx-stepper-sm">
+      <div class="pdx-step" data-status="done">
+        <span class="pdx-step-number">&#10003;</span>
+        <span class="pdx-step-label">Cart</span>
+      </div>
+      <div class="pdx-step-connector" data-status="done"></div>
+      <div class="pdx-step" data-status="active">
+        <span class="pdx-step-number">2</span>
+        <span class="pdx-step-label">Shipping</span>
+      </div>
+      <div class="pdx-step-connector" data-status="pending"></div>
+      <div class="pdx-step" data-status="pending">
+        <span class="pdx-step-number">3</span>
+        <span class="pdx-step-label">Confirm</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-stepper pdx-stepper-sm"&gt;
+  &lt;div class="pdx-step" data-status="done"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-step-connector" data-status="done"&gt;&lt;/div&gt;
+  &lt;div class="pdx-step" data-status="active"&gt;...&lt;/div&gt;
+  ...
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

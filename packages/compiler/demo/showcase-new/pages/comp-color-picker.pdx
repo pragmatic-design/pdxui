@@ -1,0 +1,121 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Color Picker</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Interactive color selection with swatch trigger, inline panel, alpha channel, preset palettes, and multiple output formats.
+      Supports hex, rgb, and hsl modes.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-color-picker-basic class="demo-section"></pdx-demo-comp-color-picker-basic>
+
+    <!-- ═══ Inline ═══ -->
+    <pdx-demo-comp-color-picker-inline class="demo-section"></pdx-demo-comp-color-picker-inline>
+
+    <!-- ═══ With Alpha ═══ -->
+    <pdx-demo-comp-color-picker-alpha class="demo-section"></pdx-demo-comp-color-picker-alpha>
+
+    <!-- ═══ Presets / Swatches ═══ -->
+    <pdx-demo-comp-color-picker-presets class="demo-section"></pdx-demo-comp-color-picker-presets>
+
+    <!-- ═══ Formats ═══ -->
+    <pdx-demo-comp-color-picker-formats class="demo-section"></pdx-demo-comp-color-picker-formats>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-color-picker-sizes class="demo-section"></pdx-demo-comp-color-picker-sizes>
+
+    <!-- ═══ Disabled & Readonly ═══ -->
+    <pdx-demo-comp-color-picker-disabled class="demo-section"></pdx-demo-comp-color-picker-disabled>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Props Reference</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>value</code></td><td>String</td><td>#000000</td><td>Current color value (hex, rgb, or hsl string).</td></tr>
+            <tr><td><code>format</code></td><td>String</td><td>hex</td><td>Output format: <code>hex</code>, <code>rgb</code>, or <code>hsl</code>.</td></tr>
+            <tr><td><code>show-alpha</code></td><td>Boolean</td><td>false</td><td>Show the alpha/opacity slider.</td></tr>
+            <tr><td><code>inline</code></td><td>Boolean</td><td>false</td><td>Show the panel inline (no popup).</td></tr>
+            <tr><td><code>presets</code></td><td>Array</td><td>[]</td><td>Array of preset color strings for quick selection.</td></tr>
+            <tr><td><code>size</code></td><td>String</td><td>md</td><td>Swatch trigger size: <code>sm</code>, <code>md</code>, or <code>lg</code>.</td></tr>
+            <tr><td><code>disabled</code></td><td>Boolean</td><td>false</td><td>Disable interaction entirely.</td></tr>
+            <tr><td><code>readonly</code></td><td>Boolean</td><td>false</td><td>Display color but prevent editing.</td></tr>
+            <tr><td><code>clearable</code></td><td>Boolean</td><td>false</td><td>Allow clearing the selected color.</td></tr>
+            <tr><td><code>placeholder</code></td><td>String</td><td>—</td><td>Placeholder text for the hex input field.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Events Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Events</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-change</code></td><td><code>{ value, hex, rgb, hsl, alpha }</code></td><td>Fired when the color value changes (final selection).</td></tr>
+            <tr><td><code>pdx-input</code></td><td><code>{ value }</code></td><td>Fired continuously while dragging the color area or sliders.</td></tr>
+            <tr><td><code>pdx-clear</code></td><td>—</td><td>Fired when the color is cleared (if clearable).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</template>
+
+<script setup>
+@page '/components/color-picker';
+@title 'Color Picker — PDX UI';
+
+import '@pdxui/ui/color-picker';
+</script>
+
+<style>
+.demo-box {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  max-width: 480px;
+}
+.result {
+  margin-top: var(--pdx-space-sm);
+}
+.formats-row {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  flex-wrap: wrap;
+  max-width: 600px;
+}
+.format-col {
+  flex: 1;
+  min-width: 140px;
+}
+.sizes-row {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  align-items: flex-end;
+}
+.size-col {
+  text-align: center;
+}
+.states-row {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  align-items: flex-end;
+}
+.state-col {
+  text-align: center;
+}
+
+.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
+.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }
+.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }
+
+details.source { margin-top: var(--pdx-space-sm); }
+details.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }
+details.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }
+</style>

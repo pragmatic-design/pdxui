@@ -1,0 +1,67 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Data Grid — Editing</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      CRUD editing integrated with DataSource. Four edit modes: cell, row, dialog, and batch.
+      Edits go through <code>DataSource.patch()</code> / <code>sync()</code> for persistence.
+    </p>
+
+    <!-- Cell Edit -->
+    <pdx-demo-comp-data-grid-editing-cell-edit class="demo-section"></pdx-demo-comp-data-grid-editing-cell-edit>
+
+    <!-- Row Edit -->
+    <pdx-demo-comp-data-grid-editing-row-edit class="demo-section"></pdx-demo-comp-data-grid-editing-row-edit>
+
+    <!-- Dialog Edit -->
+    <pdx-demo-comp-data-grid-editing-dialog-edit class="demo-section"></pdx-demo-comp-data-grid-editing-dialog-edit>
+
+    <!-- Batch Edit -->
+    <pdx-demo-comp-data-grid-editing-batch-edit class="demo-section"></pdx-demo-comp-data-grid-editing-batch-edit>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Edit Props</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>editable</code><span>boolean</span><span>Enable editing (default false)</span></div>
+        <div class="opt-row"><code>edit-mode</code><span>string</span><span>'cell' | 'row' | 'dialog' | 'batch'</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Column Edit Properties</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>editable</code><span>boolean | fn</span><span>Per-column edit control. Function: (row) => boolean</span></div>
+        <div class="opt-row"><code>validators</code><span>array</span><span>ValidatorSchema[] — required, min, email, etc.</span></div>
+        <div class="opt-row"><code>editorType</code><span>string</span><span>Override editor type (text, number, select, etc.)</span></div>
+        <div class="opt-row"><code>editorProps</code><span>object</span><span>Extra props for the editor component</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Edit Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-cell-edit-start</code><span>{ rowId, field, value }</span></div>
+        <div class="opt-row"><code>pdx-cell-edit-end</code><span>{ rowId, field, oldValue, newValue }</span></div>
+        <div class="opt-row"><code>pdx-row-edit-start</code><span>{ rowId, row }</span></div>
+        <div class="opt-row"><code>pdx-row-edit-end</code><span>{ rowId, values }</span></div>
+        <div class="opt-row"><code>pdx-row-delete</code><span>{ rowId, row }</span></div>
+        <div class="opt-row"><code>pdx-batch-commit</code><span>{ count }</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Edit Slots</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Slot</span><span>Scope</span></div>
+        <div class="opt-row"><code>col-edit:{field}</code><span>{ row, value, col, form } — custom editor for a column</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-grid-editing';
+@title 'Data Grid Editing — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-bg); overflow: hidden; }
+</style>

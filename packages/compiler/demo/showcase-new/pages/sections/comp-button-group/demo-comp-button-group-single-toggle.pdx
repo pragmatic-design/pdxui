@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Single Toggle (Radio)</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>mode="single"</code> — only one button selected at a time. It is a radio group: each button is a radio, and the arrow keys move the selection. Name the group with <code>label</code>.</p>
+
+    <div class="demo-row">
+      <span class="pdx-txt-caption pdx-ink-muted">Alignment:</span>
+      <pdx-button-group mode="single" label="Text alignment" :value="alignment" @pdx-change="onAlignment">
+        <pdx-button variant="outline" value="left">Left</pdx-button>
+        <pdx-button variant="outline" value="center">Center</pdx-button>
+        <pdx-button variant="outline" value="right">Right</pdx-button>
+      </pdx-button-group>
+      <span class="pdx-txt-small pdx-ink-muted">Selected: {{ alignment || 'none' }}</span>
+    </div>
+
+    <div class="demo-row">
+      <span class="pdx-txt-caption pdx-ink-muted">View:</span>
+      <pdx-button-group mode="single" label="View" :value="viewMode" variant="ghost" @pdx-change="onViewMode">
+        <pdx-button value="list" aria-label="List view"><pdx-icon name="list" size="sm"></pdx-icon></pdx-button>
+        <pdx-button value="grid" aria-label="Grid view"><pdx-icon name="grid" size="sm"></pdx-icon></pdx-button>
+        <pdx-button value="kanban" aria-label="Kanban view"><pdx-icon name="columns" size="sm"></pdx-icon></pdx-button>
+      </pdx-button-group>
+      <span class="pdx-txt-small pdx-ink-muted">{{ viewMode || 'none' }}</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button-group mode="single" label="Text alignment" :value="alignment" @pdx-change="onAlignment"&gt;
+  &lt;pdx-button variant="outline" value="left"&gt;Left&lt;/pdx-button&gt;
+  &lt;pdx-button variant="outline" value="center"&gt;Center&lt;/pdx-button&gt;
+  &lt;pdx-button variant="outline" value="right"&gt;Right&lt;/pdx-button&gt;
+&lt;/pdx-button-group&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useButtonGroupDemo } from './state.pdx';
+
+const demo = useButtonGroupDemo();
+const alignment = $derived(demo.alignment());
+const viewMode = $derived(demo.viewMode());
+
+function onAlignment(e) { demo.onAlignment(e); }
+function onViewMode(e) { demo.onViewMode(e); }
+</script>

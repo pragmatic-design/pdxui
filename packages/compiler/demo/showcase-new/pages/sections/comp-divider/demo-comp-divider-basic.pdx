@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <div class="demo-box">
+      <p class="pdx-txt-small">Content above</p>
+      <pdx-divider></pdx-divider>
+      <p class="pdx-txt-small">Content below</p>
+    </div>
+  </section>
+</template>

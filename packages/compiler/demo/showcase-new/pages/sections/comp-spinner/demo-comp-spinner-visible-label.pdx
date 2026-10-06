@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Visible Label</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>showLabel</code> renders the label text below the spinner. Without it, label is aria-only.</p>
+    <div class="demo-row">
+      <pdx-spinner label="Loading..." showLabel></pdx-spinner>
+      <pdx-spinner label="Saving..." showLabel size="lg"></pdx-spinner>
+      <pdx-spinner variant="dots" label="Processing..." showLabel></pdx-spinner>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-spinner label="Loading..." showLabel&gt;&lt;/pdx-spinner&gt;
+&lt;pdx-spinner label="Saving..." showLabel size="lg"&gt;&lt;/pdx-spinner&gt;</code></pre>
+    </details>
+  </section>
+</template>

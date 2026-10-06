@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "Hand-written: the router defines two elements, as classes. tests/custom-elements-manifest.test.ts holds it against the sources. category, order (after @pdxui/ui's last) and summary place them on the site, in the skills and in llms.txt.",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/outlet.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "PdxRouterOutlet",
+          "tagName": "pdx-router-outlet",
+          "category": "Navigation",
+          "order": 1000,
+          "summary": "Where the page the current route matches is rendered.",
+          "description": "Renders the page the current route matches. Without a name it is the main outlet; nested outlets render the nested routes of the page around them.",
+          "attributes": [
+            {
+              "name": "name",
+              "type": { "text": "string" },
+              "description": "A named outlet renders the route component its route assigns to that name (`outlets`), beside the main one."
+            }
+          ],
+          "members": []
+        }
+      ],
+      "exports": [
+        { "kind": "custom-element-definition", "name": "pdx-router-outlet", "declaration": { "name": "PdxRouterOutlet", "module": "src/outlet.ts" } }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/link.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "PdxLink",
+          "tagName": "pdx-link",
+          "category": "Navigation",
+          "order": 1001,
+          "summary": "A link that navigates without a reload and marks itself active.",
+          "description": "A navigation link: renders an <a>, navigates without a reload, marks itself active, and fetches the target route's chunk ahead of the click.",
+          "attributes": [
+            { "name": "to", "type": { "text": "string" }, "description": "The path to navigate to. A route pattern (`/users/:id`) is filled from `params`.", "fieldName": "to" },
+            { "name": "exact", "type": { "text": "boolean" }, "description": "Active only when the current path is exactly `to`, not when it starts with it.", "fieldName": "exact" },
+            { "name": "active-class", "type": { "text": "string" }, "description": "The class added while the link's target is the current route." },
+            { "name": "prefetch", "type": { "text": "'never'" }, "description": "`never` turns off fetching the route's chunk on hover, focus and pointerdown; otherwise the route's own @prefetch decides." },
+            { "name": "params", "type": { "text": "string" }, "description": "JSON object of route params that fill the pattern in `to`." }
+          ],
+          "members": [
+            { "kind": "field", "name": "to", "type": { "text": "string" }, "description": "Reflected to the `to` attribute, so a binding works.", "attribute": "to" },
+            { "kind": "field", "name": "exact", "type": { "text": "boolean" }, "description": "Reflected to the `exact` attribute, so a binding works.", "attribute": "exact" }
+          ],
+          "slots": [
+            { "name": "", "description": "The link's content." }
+          ]
+        }
+      ],
+      "exports": [
+        { "kind": "custom-element-definition", "name": "pdx-link", "declaration": { "name": "PdxLink", "module": "src/link.ts" } }
+      ]
+    }
+  ]
+}

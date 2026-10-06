@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Offset</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Push columns to the right with <code>offset</code>.</p>
+
+    <div class="demo-area">
+      <pdx-row gutter="sm">
+        <pdx-col span="4"><div class="box">span 4</div></pdx-col>
+        <pdx-col span="4" offset="4"><div class="box">span 4, offset 4</div></pdx-col>
+      </pdx-row>
+    </div>
+
+    <div class="demo-area">
+      <pdx-row gutter="sm">
+        <pdx-col span="6" offset="3"><div class="box">span 6, offset 3 (centered)</div></pdx-col>
+      </pdx-row>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-col span="4" offset="4"&gt;...&lt;/pdx-col&gt;
+&lt;pdx-col span="6" offset="3"&gt;Centered column&lt;/pdx-col&gt;</code></pre>
+    </details>
+  </section>
+</template>

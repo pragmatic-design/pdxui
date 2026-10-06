@@ -1,0 +1,622 @@
+<template>
+  <div class="app">
+    <header class="topbar">
+      <button class="menu-btn" @click="toggleMenu"><pdx-icon name="menu" size="18"></pdx-icon></button>
+      <span class="brand"><pdx-icon name="package" size="18"></pdx-icon> PDX</span>
+      <div class="section-switch">
+        <button :class="section === 'design' ? 'section-btn active' : 'section-btn'" @click="goDesign">
+          <span class="section-label">Design System</span>
+          <span class="section-icon"><pdx-icon name="palette" size="16"></pdx-icon></span>
+        </button>
+        <button :class="section !== 'design' ? 'section-btn active' : 'section-btn'" @click="goComponents">
+          <span class="section-label">Components</span>
+          <span class="section-icon"><pdx-icon name="zap" size="16"></pdx-icon></span>
+        </button>
+      </div>
+      <div class="spacer"></div>
+      <pdx-showcase-settings></pdx-showcase-settings>
+    </header>
+
+    <div :class="menuOpen ? 'sidebar open' : 'sidebar'" :ref="sidebarEl">
+      <div class="sidebar-search">
+        <pdx-icon name="search" size="14" class="sidebar-search-icon"></pdx-icon>
+        <input type="text" class="sidebar-search-input" placeholder="Search..." @input="onSearch" id="sidebar-search" />
+        <button class="sidebar-close" @click="toggleMenu"><pdx-icon name="x" size="16"></pdx-icon></button>
+      </div>
+      <pdx-nav-menu :items="filteredItems" :active-key="activeKey" :indent="24" size="sm" indicator="border" @pdx-select="onNavSelect"></pdx-nav-menu>
+    </div>
+
+    <main class="content" id="page-content" :ref="pageContent">
+      <pdx-router-outlet></pdx-router-outlet>
+    </main>
+
+    <aside class="page-toc" id="page-toc" :ref="pageToc">
+      <div class="toc-title">On this page</div>
+      <nav class="toc-nav" id="toc-nav" :ref="tocNavEl"></nav>
+    </aside>
+  </div>
+</template>
+
+<script setup>
+import { currentPath, navigate } from '@pdxui/router';
+import '@pdxui/router/outlet';
+import '@pdxui/router/link';
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+import './showcase-shared.css';
+registerPragmaticIcons();
+
+let menuOpen = $signal(false);
+const path = $derived(currentPath());
+const section = $derived(path.startsWith('/components') || path.startsWith('/infra') ? 'components' : 'design');
+const activeKey = $derived(path);
+const currentItems = $derived(section === 'design' ? designItems : componentItems);
+let searchQuery = $signal('');
+const filteredItems = $derived(_filterNavItems(currentItems, searchQuery));
+
+function toggleMenu() { menuOpen = !menuOpen; }
+
+function onSearch(evt) {
+    searchQuery = evt.target.value;
+}
+
+// Filter nav items by search query — returns flat list when searching
+function _filterNavItems(items, query) {
+    if (!query || !query.trim()) return items;
+    const lowerQ = query.toLowerCase().trim();
+    const results = [];
+    for (const group of items) {
+        if (group.children) {
+            for (const child of group.children) {
+                if (child.label && child.label.toLowerCase().includes(lowerQ)) {
+                    results.push(child);
+                }
+            }
+        }
+        if (group.label && group.label.toLowerCase().includes(lowerQ) && !group.children) {
+            results.push(group);
+        }
+    }
+    return results;
+}
+
+function onNavSelect(e) {
+    navigate(e.detail.key);
+    menuOpen = false;
+}
+function goDesign() { navigate('/design/typography'); }
+function goComponents() { navigate('/components/icon'); }
+
+const designItems = [
+  { key: 'foundation', label: 'Foundation', icon: 'ruler', expanded: true, children: [
+    { key: '/design/typography', label: 'Typography', icon: 'type' },
+    { key: '/design/colors', label: 'Colors & Tokens', icon: 'palette' },
+    { key: '/design/layout', label: 'Layout', icon: 'layout' },
+    { key: '/design/spacing', label: 'Spacing & Sizing', icon: 'space' },
+  ]},
+  { key: 'surfaces', label: 'Surfaces', icon: 'square', expanded: true, children: [
+    { key: '/design/buttons', label: 'Buttons', icon: 'mouse-pointer-click' },
+    { key: '/design/inputs', label: 'Inputs', icon: 'text-cursor-input' },
+    { key: '/design/forms', label: 'Forms', icon: 'file-text' },
+    { key: '/design/tables', label: 'Tables', icon: 'table' },
+    { key: '/design/surfaces', label: 'Surfaces & Cards', icon: 'credit-card' },
+  ]},
+  { key: 'design-comp', label: 'Components', icon: 'component', expanded: true, children: [
+    { key: '/design/chips', label: 'Chips', icon: 'tag' },
+    { key: '/design/feedback', label: 'Badges & Alerts', icon: 'circle-alert' },
+    { key: '/design/kbd', label: 'Kbd', icon: 'keyboard' },
+    { key: '/design/progress', label: 'Progress', icon: 'bar-chart' },
+    { key: '/design/accordion', label: 'Accordion', icon: 'chevrons-up-down' },
+    { key: '/design/tabs', label: 'Tabs', icon: 'folder-kanban' },
+    { key: '/design/menu', label: 'Menu', icon: 'menu' },
+    { key: '/design/pagination', label: 'Pagination', icon: 'hash' },
+    { key: '/design/toolbar', label: 'Toolbar', icon: 'panel-top' },
+    { key: '/design/dialog-css', label: 'Dialog', icon: 'message-square' },
+    { key: '/design/drawer-css', label: 'Drawer', icon: 'panel-left' },
+    { key: '/design/toast-css', label: 'Toast', icon: 'bell-ring' },
+    { key: '/design/popover-css', label: 'Popover', icon: 'info' },
+    { key: '/design/nav', label: 'Navigation', icon: 'compass' },
+    { key: '/design/segmented', label: 'Segmented', icon: 'split' },
+    { key: '/design/banner', label: 'Banners', icon: 'flag' },
+    { key: '/design/animations', label: 'Animations', icon: 'sparkles' },
+  ]},
+];
+
+const componentItems = [
+  // ─── General (11) ───
+  { key: 'general', label: 'General', icon: 'box', expanded: true, children: [
+    { key: '/components/icon', label: 'Icon', icon: 'image' },
+    { key: '/components/button', label: 'Button', icon: 'rectangle-horizontal' },
+    { key: '/components/button-group', label: 'ButtonGroup', icon: 'group' },
+    { key: '/components/badge', label: 'Badge', icon: 'circle-dot' },
+    { key: '/components/chip', label: 'Chip', icon: 'tag' },
+    { key: '/components/avatar', label: 'Avatar', icon: 'circle-user' },
+    { key: '/components/avatar-group', label: 'AvatarGroup', icon: 'users' },
+    { key: '/components/spinner', label: 'Spinner', icon: 'loader' },
+    { key: '/components/skeleton', label: 'Skeleton', icon: 'scan-line' },
+    { key: '/components/divider', label: 'Divider', icon: 'minus' },
+    { key: '/components/kbd', label: 'Kbd', icon: 'keyboard' },
+  ]},
+  // ─── Form Inputs (5 sub-groups) ───
+  { key: 'form-inputs', label: 'Form Inputs', icon: 'text-cursor-input', expanded: true, children: [
+    { key: 'text-inputs', label: 'Text', icon: 'type', children: [
+      { key: '/components/label', label: 'Label' },
+      { key: '/components/input', label: 'Input' },
+      { key: '/components/textarea', label: 'Textarea' },
+      { key: '/components/input-group', label: 'InputGroup' },
+      { key: '/components/password', label: 'Password' },
+      { key: '/components/search', label: 'Search' },
+      { key: '/components/mention', label: 'Mention' },
+    ]},
+    { key: 'number-inputs', label: 'Number & Code', icon: 'hash', children: [
+      { key: '/components/number-input', label: 'NumberInput' },
+      { key: '/components/masked-input', label: 'MaskedInput' },
+      { key: '/components/otp', label: 'OTP' },
+      { key: '/components/pin', label: 'PIN' },
+      { key: '/components/slider', label: 'Slider' },
+      { key: '/components/rating', label: 'Rating' },
+    ]},
+    { key: 'selection-inputs', label: 'Selection', icon: 'check-square', children: [
+      { key: '/components/checkbox', label: 'Checkbox' },
+      { key: '/components/checkbox-group', label: 'Checkbox Group' },
+      { key: '/components/radio', label: 'Radio' },
+      { key: '/components/switch', label: 'Switch' },
+      { key: '/components/toggle', label: 'Toggle' },
+      { key: '/components/toggle-group', label: 'ToggleGroup' },
+      { key: '/components/segmented', label: 'Segmented' },
+    ]},
+    { key: 'pickers', label: 'Pickers', icon: 'list-filter', children: [
+      { key: '/components/select', label: 'Select' },
+      { key: '/components/autocomplete', label: 'Autocomplete' },
+      { key: '/components/date-picker', label: 'DatePicker' },
+      { key: '/components/time-picker', label: 'TimePicker' },
+      { key: '/components/color-picker', label: 'ColorPicker' },
+      { key: '/components/tag-input', label: 'TagInput' },
+      { key: '/components/cascader', label: 'Cascader' },
+      { key: '/components/tree-select', label: 'TreeSelect' },
+      { key: '/components/file-upload', label: 'FileUpload' },
+    ]},
+    { key: 'form-system', label: 'Form System', icon: 'file-text', children: [
+      { key: '/components/form-field', label: 'FormField' },
+      { key: '/components/fieldset', label: 'Fieldset' },
+      { key: '/components/field-group', label: 'FieldGroup' },
+      { key: '/components/field-list', label: 'FieldList' },
+      { key: '/components/form', label: 'Basics' },
+      { key: '/components/form-advanced', label: 'Advanced' },
+      { key: '/components/form-composition', label: 'Composition' },
+      { key: '/components/auto-form', label: 'Auto Form' },
+    ]},
+  ]},
+  // ─── Data (3 sub-groups) ───
+  { key: 'data', label: 'Data', icon: 'database', expanded: true, children: [
+    { key: 'data-display', label: 'Display', icon: 'list', children: [
+      { key: '/components/list', label: 'List' },
+      { key: '/components/tree', label: 'Tree' },
+      { key: '/components/description-list', label: 'DescriptionList' },
+      { key: '/components/statistic', label: 'Statistic' },
+      { key: '/components/empty-state', label: 'EmptyState' },
+      { key: '/components/timeline', label: 'Timeline' },
+      { key: '/components/infinite-scroll', label: 'InfiniteScroll' },
+      { key: '/components/block-ui', label: 'BlockUI' },
+      { key: '/components/progress', label: 'Progress' },
+    ]},
+    { key: '/components/data-source', label: 'DataSource', icon: 'database' },
+    { key: 'data-grid', label: 'DataGrid', icon: 'table', children: [
+      { key: '/components/data-grid', label: 'Overview' },
+      { key: '/components/data-grid-filtering', label: 'Filtering' },
+      { key: '/components/data-grid-selection', label: 'Selection' },
+      { key: '/components/data-grid-grouping', label: 'Grouping' },
+      { key: '/components/data-grid-editing', label: 'Editing' },
+      { key: '/components/data-grid-toolbar', label: 'Advanced' },
+    ]},
+    { key: 'crud', label: 'CRUD', icon: 'pencil', children: [
+      { key: '/components/entity-grid', label: 'EntityGrid' },
+      { key: '/components/edit-drawer', label: 'EditDrawer' },
+      { key: '/components/bulk-actions', label: 'BulkActions' },
+    ]},
+    { key: '/components/filter-builder', label: 'FilterBuilder', icon: 'filter' },
+    { key: 'chart', label: 'Chart', icon: 'bar-chart-2', children: [
+      { key: '/components/chart', label: 'Overview' },
+      { key: '/components/chart-specialized', label: 'Specialized' },
+      { key: '/components/chart-advanced', label: 'Advanced' },
+    ]},
+    { key: '/components/rich-text', label: 'Rich Text', icon: 'text' },
+  ]},
+  // ─── Containers (7) ───
+  { key: 'containers', label: 'Containers', icon: 'square', expanded: true, children: [
+    { key: '/components/card', label: 'Card', icon: 'credit-card' },
+    { key: '/components/tabs', label: 'Tabs', icon: 'folder-kanban' },
+    { key: '/components/accordion', label: 'Accordion', icon: 'chevrons-up-down' },
+    { key: '/components/wizard', label: 'Wizard', icon: 'wand-sparkles' },
+    { key: '/components/inline-edit', label: 'InlineEdit', icon: 'pencil' },
+    { key: '/components/splitter', label: 'Splitter', icon: 'columns' },
+    { key: '/components/transfer', label: 'Transfer', icon: 'arrow-left-right' },
+  ]},
+  // ─── Feedback (9) ───
+  { key: 'feedback', label: 'Feedback', icon: 'bell', expanded: true, children: [
+    { key: '/components/dialog', label: 'Dialog', icon: 'message-square' },
+    { key: '/components/alert-dialog', label: 'AlertDialog', icon: 'alert-triangle' },
+    { key: '/components/drawer', label: 'Drawer', icon: 'panel-right' },
+    { key: '/components/bottom-sheet', label: 'BottomSheet', icon: 'panel-bottom' },
+    { key: '/components/toast', label: 'Toast', icon: 'bell-ring' },
+    { key: '/components/banner', label: 'Banner', icon: 'flag' },
+    { key: '/components/tooltip', label: 'Tooltip', icon: 'message-circle' },
+    { key: '/components/popover', label: 'Popover', icon: 'info' },
+    { key: '/components/overlay-stack', label: 'OverlayStack', icon: 'layers' },
+    { key: '/components/overlay-outlet', label: 'OverlayOutlet', icon: 'layers' },
+  ]},
+  // ─── Navigation (3 sub-groups) ───
+  { key: 'navigation', label: 'Navigation', icon: 'compass', expanded: true, children: [
+    { key: 'nav-menus', label: 'Menu', icon: 'menu', children: [
+      { key: '/components/menu', label: 'Menu' },
+      { key: '/components/dropdown-menu', label: 'DropdownMenu' },
+      { key: '/components/context-menu', label: 'ContextMenu' },
+      { key: '/components/split-button', label: 'SplitButton' },
+      { key: '/components/menubar', label: 'Menubar' },
+      { key: '/components/nav-menu', label: 'NavMenu' },
+    ]},
+    { key: 'nav-app', label: 'App Navigation', icon: 'compass', children: [
+      { key: '/components/navbar', label: 'Navbar' },
+      { key: '/components/sidebar', label: 'Sidebar' },
+      { key: '/components/breadcrumb', label: 'Breadcrumb' },
+      { key: '/components/bottom-nav', label: 'BottomNav' },
+    ]},
+    { key: 'nav-helpers', label: 'Helpers', icon: 'pin', children: [
+      { key: '/components/pagination', label: 'Pagination' },
+      { key: '/components/fab', label: 'FAB' },
+      { key: '/components/affix', label: 'Affix' },
+      { key: '/components/scroll-spy', label: 'ScrollSpy' },
+    ]},
+  ]},
+  // ─── Layout (8) ───
+  { key: 'layout', label: 'Layout', icon: 'layout', expanded: true, children: [
+    { key: '/components/row-col', label: 'Row & Col', icon: 'columns' },
+    { key: '/components/app-layout', label: 'AppLayout', icon: 'layout-dashboard' },
+    { key: '/components/toolbar', label: 'Toolbar', icon: 'grip-horizontal' },
+    { key: '/components/scroll-area', label: 'ScrollArea', icon: 'scroll' },
+    { key: '/components/aspect-ratio', label: 'AspectRatio', icon: 'maximize' },
+    { key: '/components/masonry', label: 'Masonry', icon: 'layout-grid' },
+    { key: '/components/image', label: 'Image', icon: 'image' },
+    { key: '/components/carousel', label: 'Carousel', icon: 'gallery-horizontal' },
+    { key: '/components/relative-time', label: 'RelativeTime', icon: 'clock' },
+  ]},
+  // ─── Utility (2) ───
+  { key: 'utility', label: 'Utility', icon: 'wrench', expanded: true, children: [
+    { key: '/components/error-boundary', label: 'ErrorBoundary', icon: 'shield-check' },
+    { key: '/components/provide', label: 'Provide', icon: 'share-2' },
+  ]},
+  // ─── Infrastructure (7) ───
+  { key: 'infra', label: 'Infrastructure', icon: 'cpu', expanded: true, children: [
+    { key: '/infra/overlay', label: 'Overlay System', icon: 'layers' },
+    { key: '/infra/positioning', label: 'Positioning', icon: 'target' },
+    { key: '/infra/focus', label: 'Focus Management', icon: 'eye' },
+    { key: '/infra/selection', label: 'Selection Model', icon: 'check-square' },
+    { key: '/infra/virtualizer', label: 'Virtualization', icon: 'rows-3' },
+    { key: '/infra/drag', label: 'Drag & Drop', icon: 'grip-vertical' },
+    { key: '/infra/container', label: 'Container Size', icon: 'maximize' },
+  ]},
+];
+
+// The shell's own elements, by :ref (CD-A1): a document query finds them only while the page has one
+// shell, and nothing ties a query to the element it means.
+let sidebarEl = $signal(null);
+let pageContent = $signal(null);
+let pageToc = $signal(null);
+let tocNavEl = $signal(null);
+
+// Scroll content to top on route change, preserve sidebar scroll + rebuild TOC
+$effect(() => {
+    path; // track
+    const content = pageContent;
+    const sidebar = sidebarEl;
+    const sidebarScroll = sidebar ? sidebar.scrollTop : 0;
+    if (content) content.scrollTop = 0;
+    if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
+    // Rebuild right TOC after route change (delay for page render)
+    setTimeout(() => rebuildToc(), 150);
+});
+
+// ─── Right TOC — auto-generated from page headings ───
+let tocObserverRef = null;
+
+function rebuildToc() {
+    const tocNav = tocNavEl;
+    const tocPanel = pageToc;
+    const content = pageContent;
+    if (!tocNav || !content) return;
+
+    const headings = content.querySelectorAll('.page h2');
+    tocNav.innerHTML = '';
+
+    if (headings.length < 2) {
+        // Hide TOC if page has fewer than 2 sections
+        if (tocPanel) tocPanel.classList.add('toc-empty');
+        return;
+    }
+    if (tocPanel) tocPanel.classList.remove('toc-empty');
+
+    // Assign IDs to headings and build TOC links
+    const tocItems = [];
+    headings.forEach((h, i) => {
+        if (!h.id) {
+            h.id = 'sec-' + h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+        const link = document.createElement('a');
+        link.className = 'toc-link';
+        link.href = '#' + h.id;
+        link.textContent = h.textContent.trim();
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Update URL hash without scroll jump
+            history.replaceState(null, '', '#' + h.id);
+        });
+        tocNav.appendChild(link);
+        tocItems.push({ el: h, link });
+    });
+
+    // IntersectionObserver for active section highlighting
+    if (tocObserverRef) tocObserverRef.disconnect();
+    tocObserverRef = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (entry.isIntersecting) {
+                const item = tocItems.find(t => t.el === entry.target);
+                if (item) {
+                    tocNav.querySelectorAll('.toc-link.active').forEach(l => l.classList.remove('active'));
+                    item.link.classList.add('active');
+                }
+            }
+        }
+    }, { root: content, rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+
+    tocItems.forEach(item => tocObserverRef.observe(item.el));
+}
+</script>
+
+<style scoped>
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr 220px;
+    grid-template-rows: 52px 1fr;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--pdx-color-bg);
+    color: var(--pdx-color-text);
+  }
+
+  .topbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .brand { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1rem; letter-spacing: -0.02em; }
+  .spacer { flex: 1; }
+
+  .section-switch {
+    display: flex;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+    padding: 2px;
+    gap: 2px;
+  }
+  .section-btn {
+    display: block;
+    padding: 4px 12px;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    border: none;
+    color: var(--pdx-color-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--pdx-transition);
+  }
+  .section-btn.active {
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    box-shadow: var(--pdx-shadow-sm);
+  }
+  .section-btn:hover { color: var(--pdx-color-text); }
+  .section-icon { display: none; }
+  .section-label { display: inline; }
+
+  /* Theme, density and scheme: their own component, laid out by the topbar like its other items. */
+  .topbar pdx-showcase-settings { display: contents; }
+
+  .sidebar {
+    overflow-y: auto;
+    padding: 0 0 8px;
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar pdx-nav-menu { flex: 1; overflow-y: auto; }
+  /* Search box */
+  .sidebar-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--pdx-color-border);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    background: var(--pdx-color-surface);
+    z-index: 2;
+  }
+  .sidebar-search-icon { flex-shrink: 0; color: var(--pdx-color-muted); display: inline-flex; }
+  .sidebar-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--pdx-color-text);
+    font-size: 0.8rem;
+    outline: none;
+    min-width: 0;
+  }
+  .sidebar-search-input::placeholder { color: var(--pdx-color-muted); }
+  .sidebar-close {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    padding: 2px;
+    border-radius: var(--pdx-radius-sm);
+    flex-shrink: 0;
+  }
+  .sidebar-close:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+  .sidebar-close pdx-icon { display: inline-flex; }
+  /* The sidebar's menu: compact, the current entry marked by a bar (`size`, `indicator`), and a type
+     per level through the menu's documented properties — categories bold, sub-groups
+     muted, the third level smaller and further in. */
+  .sidebar pdx-nav-menu {
+    --pdx-nav-level1-size: 0.82rem;
+    --pdx-nav-level1-indent: 10px;
+    --pdx-nav-level1-group-weight: 600;
+    --pdx-nav-level1-group-color: var(--pdx-color-text);
+    --pdx-nav-level1-group-space: 4px;
+    --pdx-nav-level2-size: 0.76rem;
+    --pdx-nav-level2-group-weight: 400;
+    --pdx-nav-level2-group-space: 2px;
+    --pdx-nav-level3-size: 0.72rem;
+    --pdx-nav-level3-indent: 48px;
+  }
+
+  .content {
+    overflow-y: auto;
+    padding: 32px 40px;
+    max-width: 100%;
+    min-width: 0;
+  }
+  /* Global demo spacing — applies to all pages */
+  .content section { margin-bottom: 3rem; }
+  .content section > h2 { margin-bottom: 0.5rem; }
+  .content section > h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+  .content section > p { margin-bottom: 1rem; }
+
+  /* ─── Right TOC panel ─── */
+  .page-toc {
+    overflow-y: auto;
+    padding: var(--pdx-space-lg) var(--pdx-space-md);
+    border-left: 1px solid var(--pdx-color-border);
+    font-size: 0.75rem;
+    position: sticky;
+    top: 52px;
+    height: calc(100vh - 52px);
+  }
+  .page-toc.toc-empty {
+    visibility: hidden;
+  }
+  .toc-title {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--pdx-space-sm);
+    padding-left: var(--pdx-space-sm);
+  }
+  .toc-nav {
+    display: flex;
+    flex-direction: column;
+  }
+  .toc-link {
+    display: block;
+    padding: 4px var(--pdx-space-sm);
+    color: var(--pdx-color-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    line-height: 1.5;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .toc-link:hover {
+    color: var(--pdx-color-text);
+  }
+  .toc-link.active {
+    color: var(--pdx-color-primary);
+    border-left-color: var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-medium);
+  }
+
+  .menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: var(--pdx-color-text);
+  }
+
+  /* Overlay behind sidebar on mobile */
+  .sidebar::before {
+    content: '';
+    display: none;
+  }
+
+  /* Hide TOC on narrow desktop */
+  @media (max-width: 1200px) {
+    .app {
+      grid-template-columns: 260px 1fr;
+    }
+    .page-toc { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .app {
+      grid-template-columns: 1fr;
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    .page-toc { display: none; }
+    .content { min-width: 0; max-width: 100vw; padding: 20px 16px; }
+    .menu-btn { display: block; }
+    /* Section buttons: show icon, hide label */
+    .section-label { display: none; }
+    .section-icon { display: inline; font-size: 1rem; }
+    .section-btn { padding: 4px 8px; }
+    .sidebar-close { display: flex; }
+
+    .sidebar {
+      position: fixed;
+      top: 52px;
+      left: 0;
+      bottom: 0;
+      width: 280px;
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      box-shadow: none;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+      box-shadow: var(--pdx-shadow-lg);
+    }
+    .sidebar::before {
+      display: block;
+      position: fixed;
+      top: 52px;
+      left: 280px;
+      right: 0;
+      bottom: 0;
+      background: var(--pdx-color-backdrop);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .sidebar.open::before {
+      pointer-events: auto;
+      opacity: 1;
+    }
+  }
+</style>

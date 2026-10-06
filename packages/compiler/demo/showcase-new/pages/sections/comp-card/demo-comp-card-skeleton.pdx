@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Loading Skeleton</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>loading</code> prop — content replaced with animated skeleton placeholders.</p>
+    <div class="demo-grid">
+      <pdx-card loading></pdx-card>
+      <pdx-card loading></pdx-card>
+      <pdx-card loading></pdx-card>
+    </div>
+  </section>
+</template>

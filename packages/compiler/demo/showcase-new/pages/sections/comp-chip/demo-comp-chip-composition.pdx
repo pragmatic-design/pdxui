@@ -1,0 +1,58 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Filter Bar</h3>
+      <p class="pdx-txt-small pdx-ink-muted">Select categories to filter.</p>
+      <div class="pdx-chip-group" style="margin-top:var(--pdx-space-sm)">
+        <pdx-chip selectable variant="primary" selected>All</pdx-chip>
+        <pdx-chip selectable variant="primary">Active</pdx-chip>
+        <pdx-chip selectable variant="primary">Pending</pdx-chip>
+        <pdx-chip selectable variant="primary">Archived</pdx-chip>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Article Tags</h3>
+      <div class="pdx-chip-group" style="margin-top:var(--pdx-space-sm)">
+        <pdx-chip variant="tonal-primary" size="sm"><pdx-icon name="tag" size="sm"></pdx-icon> JavaScript</pdx-chip>
+        <pdx-chip variant="tonal-success" size="sm"><pdx-icon name="tag" size="sm"></pdx-icon> Tutorial</pdx-chip>
+        <pdx-chip variant="tonal-warning" size="sm"><pdx-icon name="tag" size="sm"></pdx-icon> Advanced</pdx-chip>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Team Members</h3>
+      <div class="pdx-chip-group" style="margin-top:var(--pdx-space-sm)">
+        @for (team as member; track member.name) {
+          <pdx-chip :avatar="member.avatar" removable :value="member.name" @pdx-remove="e => team = dropPerson(team, e)">{{ member.name }}</pdx-chip>
+        }
+        @if (team.length === 0) {
+          <button class="pdx-ghost" size="sm" @click="team = startTeam()">Add everyone back</button>
+        }
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useChipConsole } from './state.pdx';
+
+const chipConsole = useChipConsole();
+function dropPerson(list, e) { return chipConsole.dropPerson(list, e); }
+
+function startTeam() {
+    return [
+        { name: 'Jane Doe', avatar: '/avatars/person-1.svg' },
+        { name: 'Alex Smith', avatar: '/avatars/person-2.svg' },
+        { name: 'Mary Kim', avatar: '/avatars/person-3.svg' },
+    ];
+}
+
+let team = $signal(startTeam());
+</script>
+
+<style scoped>
+  .comp-card p { margin: 0; }
+</style>

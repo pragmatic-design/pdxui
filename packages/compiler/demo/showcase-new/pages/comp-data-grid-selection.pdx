@@ -1,0 +1,50 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Data Grid — Selection</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Row selection (single/multiple), checkbox column, Shift+click range select,
+      column resize by dragging, and column reorder via drag-and-drop.
+    </p>
+
+    <!-- Multiple Selection -->
+    <pdx-demo-comp-data-grid-selection-multiple class="demo-section"></pdx-demo-comp-data-grid-selection-multiple>
+
+    <!-- Single Selection -->
+    <pdx-demo-comp-data-grid-selection-single class="demo-section"></pdx-demo-comp-data-grid-selection-single>
+
+    <!-- Column Resize -->
+    <pdx-demo-comp-data-grid-selection-resize class="demo-section"></pdx-demo-comp-data-grid-selection-resize>
+
+    <!-- Column Reorder -->
+    <pdx-demo-comp-data-grid-selection-reorder class="demo-section"></pdx-demo-comp-data-grid-selection-reorder>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Selection Props</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop / Column</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>selection</code><span>string</span><span>'none' | 'single' | 'multiple'</span></div>
+        <div class="opt-row"><code>id-field</code><span>string</span><span>Unique row identifier (default 'id')</span></div>
+        <div class="opt-row"><code>col.resizable</code><span>boolean</span><span>Allow resize (default true)</span></div>
+        <div class="opt-row"><code>col.reorderable</code><span>boolean</span><span>Allow reorder (default true)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-selection-change</code><span>{ selected: id[], count: number }</span></div>
+        <div class="opt-row"><code>pdx-row-click</code><span>{ row, index, id }</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-grid-selection';
+@title 'Data Grid Selection — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-bg); overflow: hidden; }
+</style>

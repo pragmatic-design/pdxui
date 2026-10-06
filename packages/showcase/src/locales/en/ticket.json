@@ -1,0 +1,20 @@
+{
+    "ticket": {
+        "title": "Ticket {id}",
+        "summary": "Its interventions, billing, attachments and history.",
+        "tabs": {
+            "first": "Intervention 2",
+            "second": "Intervention 3",
+            "billing": "Billing",
+            "attachments": "Attachments",
+            "history": "History"
+        },
+        "loadingChart": "Loading the chart…",
+        "sla": "Answer within {hours} h · {service}",
+        "sections": "Sections",
+        "groups": {
+            "work": "Work",
+            "record": "Record"
+        }
+    }
+}

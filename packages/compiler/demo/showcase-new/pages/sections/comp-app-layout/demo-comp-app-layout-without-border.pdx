@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Without Border</h2>
+    <div class="demo-shell">
+      <pdx-app-layout headerheight="44px" navbarwidth="180px" :withBorder="false">
+        <div data-region="header" class="shell-header" style="background:var(--pdx-color-primary);color:var(--pdx-color-primary-text)">
+          <strong>Branded App</strong>
+        </div>
+        <div data-region="navbar" class="shell-nav">
+          <button type="button" class="shell-nav-item" :aria-current="page3 === 'Home' ? 'page' : null" @click="page3 = 'Home'">Home</button>
+          <button type="button" class="shell-nav-item" :aria-current="page3 === 'About' ? 'page' : null" @click="page3 = 'About'">About</button>
+        </div>
+        <div class="shell-main">
+          <p class="pdx-txt-small pdx-ink-muted">No borders between regions.</p>
+        </div>
+      </pdx-app-layout>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let page3 = $signal('Home');
+</script>

@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Locked Field" disabled hint="Contact admin to change">
+        <pdx-input value="Cannot edit" disabled></pdx-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

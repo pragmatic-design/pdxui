@@ -1,0 +1,112 @@
+/* pdx-description-list — Key-value pair display */
+pdx-description-list { display: block; }
+
+.pdx-dl-root { position: relative; }
+
+.pdx-dl {
+    display: grid;
+    grid-template-columns: repeat(var(--pdx-dl-columns, 1), 1fr);
+    gap: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Item (wraps dt + dd) --- */
+.pdx-dl-item {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    min-width: 0;
+}
+
+/* --- Label (dt) --- */
+.pdx-dl-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    flex-shrink: 0;
+    margin: 0;
+}
+
+/* --- Value (dd) --- */
+.pdx-dl-value {
+    color: var(--pdx-color-text);
+    margin: 0;
+    min-width: 0;
+    word-break: break-word;
+}
+
+/* --- Icon inside label --- */
+.pdx-dl-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+/* --- Colon after label --- */
+.pdx-dl-colon .pdx-dl-label::after {
+    content: ':';
+    margin-left: 2px;
+}
+
+/* --- Horizontal layout (label + value side by side) --- */
+.pdx-dl-horizontal .pdx-dl-item {
+    flex-direction: row;
+    align-items: baseline;
+}
+.pdx-dl-horizontal .pdx-dl-label {
+    white-space: nowrap;
+}
+.pdx-dl-horizontal .pdx-dl-value {
+    flex: 1;
+}
+
+/* --- Vertical layout (label on top, value below) --- */
+.pdx-dl-vertical .pdx-dl-item {
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+}
+
+/* --- Bordered --- */
+.pdx-dl-bordered {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+}
+.pdx-dl-bordered .pdx-dl-item {
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+.pdx-dl-bordered .pdx-dl-item:last-child {
+    border-bottom: none;
+}
+
+/* --- Striped --- */
+.pdx-dl-striped .pdx-dl-item:nth-child(even) {
+    background: var(--pdx-color-inset);
+}
+
+/* --- Sizes --- */
+.pdx-dl-sm .pdx-dl-item {
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+}
+.pdx-dl-sm .pdx-dl-label {
+    font-size: var(--pdx-text-xs);
+}
+
+.pdx-dl-md .pdx-dl-item {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    font-size: var(--pdx-text-sm);
+}
+.pdx-dl-md .pdx-dl-label {
+    font-size: var(--pdx-text-sm);
+}
+
+.pdx-dl-lg .pdx-dl-item {
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    font-size: var(--pdx-text-base);
+}
+.pdx-dl-lg .pdx-dl-label {
+    font-size: var(--pdx-text-base);
+}

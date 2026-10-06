@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Submenus &amp; disabled</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>type: 'submenu'</code> with <code>children</code> opens a nested menu on hover or <kbd>→</kbd>;
+      <kbd>←</kbd> closes it and returns to its item. A <code>disabled</code> dropdown cannot be opened.
+    </p>
+    <div class="demo-row">
+      <pdx-dropdown-menu label="Insert" :items="insertItems"></pdx-dropdown-menu>
+      <pdx-dropdown-menu label="Disabled" disabled :items="basicItems"></pdx-dropdown-menu>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>{ key: 'shapes', label: 'Shapes', type: 'submenu', children: [
+  { key: 'rect', label: 'Rectangle' },
+  { key: 'circle', label: 'Circle' },
+] }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './data.pdx';
+
+const insertItems = [
+  { key: 'image', label: 'Image' },
+  { key: 'table', label: 'Table' },
+  { key: 'd1', label: '', type: 'separator' },
+  { key: 'shapes', label: 'Shapes', type: 'submenu', children: [
+    { key: 'rect', label: 'Rectangle' },
+    { key: 'circle', label: 'Circle' },
+    { key: 'triangle', label: 'Triangle' },
+  ] },
+];
+</script>

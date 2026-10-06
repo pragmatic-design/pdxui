@@ -1,0 +1,80 @@
+{
+    "customers": {
+        "title": "Customers",
+        "intro": "Your customers, their sector and their status.",
+        "new": "New customer",
+        "views": { "default": "All customers" },
+        "create": "Create",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "openRecord": "Open {name}",
+        "discardTitle": "Leave without saving?",
+        "discardBody": "This customer has changes that have not been saved.",
+        "discardLeave": "Discard",
+        "discardStay": "Stay",
+        "matching": "{count} matching",
+        "refuseNext": "Make the next archive fail",
+        "archived": "Archived {reference} — it is out of the list, not gone.",
+        "archivedMany": "Archived {count} customers — they are out of the list, not gone.",
+        "undo": "Undo",
+        "unknown": "Customer",
+        "sections": "Sections",
+        "columns": {
+            "categories": "Categories",
+            "reference": "Ref.",
+            "name": "Name",
+            "sector": "Sector",
+            "tier": "Tier",
+            "status": "Status",
+            "since": "Customer since"
+        },
+        "tiers": {
+            "standard": "Standard",
+            "business": "Business",
+            "enterprise": "Enterprise"
+        },
+        "statuses": {
+            "active": "Active",
+            "onboarding": "Onboarding",
+            "closed": "Closed"
+        },
+        "bulk": {
+            "archive": "Archive"
+        },
+        "groups": {
+            "account": "Account"
+        },
+        "sections2": {
+            "profile": "Profile",
+            "contacts": "Contacts",
+            "services": "Services"
+        },
+        "services": {
+            "add": "Add a service",
+            "addShort": "Add",
+            "dialogTitle": "Subscribe to a service",
+            "service": "Service",
+            "since": "Since",
+            "save": "Subscribe",
+            "missing": "Choose a service.",
+            "end": "End",
+            "running": "Since {date}",
+            "ended": "{since} – {until}",
+            "sla": "{hours} h answer",
+            "endedToast": "{service} ended — it no longer counts.",
+            "undo": "Undo",
+            "emptyTitle": "No services yet",
+            "emptyBody": "What this customer pays for, and the answer time each one promises."
+        },
+        "contacts": {
+            "none": "No contact yet.",
+            "add": "Add a contact",
+            "remove": "Remove",
+            "added": "{name} was added.",
+            "removed": "{name} was removed.",
+            "emptyTitle": "No contacts yet",
+            "emptyBody": "The people to reach at this customer are listed here."
+        }
+    }
+}

@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Slot content: combine <code>&lt;pdx-icon&gt;</code> + text. Icon inherits button color.</p>
+
+    <div class="btn-row">
+      <pdx-button variant="primary" @click="log"><pdx-icon name="plus" size="sm"></pdx-icon> New Project</pdx-button>
+      <pdx-button variant="secondary" @click="log"><pdx-icon name="download" size="sm"></pdx-icon> Export</pdx-button>
+      <pdx-button variant="outline" @click="log"><pdx-icon name="filter" size="sm"></pdx-icon> Filter</pdx-button>
+      <pdx-button variant="danger" @click="log"><pdx-icon name="trash" size="sm"></pdx-icon> Delete</pdx-button>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-md)">Icon-only buttons:</p>
+    <div class="btn-row">
+      <pdx-button variant="ghost" aria-label="Settings" @click="log"><pdx-icon name="settings" size="sm"></pdx-icon></pdx-button>
+      <pdx-button variant="ghost" aria-label="Notifications" @click="log"><pdx-icon name="bell" size="sm"></pdx-icon></pdx-button>
+      <pdx-button variant="ghost" aria-label="Search" @click="log"><pdx-icon name="search" size="sm"></pdx-icon></pdx-button>
+      <pdx-button variant="outline" aria-label="More actions" @click="log"><pdx-icon name="more-horizontal" size="sm"></pdx-icon></pdx-button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button variant="primary"&gt;
+  &lt;pdx-icon name="plus" size="sm"&gt;&lt;/pdx-icon&gt; New Project
+&lt;/pdx-button&gt;
+
+&lt;!-- Icon-only: the icon says nothing to a screen reader, aria-label names the button --&gt;
+&lt;pdx-button variant="ghost" aria-label="Settings"&gt;
+  &lt;pdx-icon name="settings" size="sm"&gt;&lt;/pdx-icon&gt;
+&lt;/pdx-button&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useButtonConsole } from './state.pdx';
+
+const buttonConsole = useButtonConsole();
+
+function log(e) {
+    buttonConsole.log(e);
+}
+</script>

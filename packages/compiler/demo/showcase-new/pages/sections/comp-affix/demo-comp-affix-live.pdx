@@ -1,0 +1,78 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Live Demo</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Scroll the box below. The toolbar sticks to the top of the scroll container, and <code>pdx-change</code> says so.</p>
+    <p class="pdx-txt-small affix-state" aria-live="polite">Affixed: <strong>{{ affixed ? 'yes' : 'no' }}</strong></p>
+    <div class="scroll-container" id="affix-container">
+      <div class="scroll-spacer">
+        <p class="pdx-txt-small pdx-ink-muted">Scroll down to see the toolbar become sticky.</p>
+      </div>
+      <pdx-affix :offsetTop="0" target="#affix-container" @pdx-change="e => affixed = e.detail.affixed">
+        <div class="sticky-bar">
+          <pdx-icon name="filter" size="16"></pdx-icon>
+          <strong>Sticky Toolbar</strong>
+          <span class="pdx-ink-muted">— scrolls with content, then sticks</span>
+        </div>
+      </pdx-affix>
+      <div class="scroll-content">
+        <p>This content scrolls normally beneath the sticky toolbar.</p>
+        <p>The <code>pdx-affix</code> component wraps any element and makes it stick to the top (or bottom) of the scroll container when the user scrolls past it.</p>
+        <p>Here, inside a scroll container, it is CSS sticky: it keeps its own place in the flow, so nothing jumps.</p>
+        <p>You can configure the offset from top/bottom and target a specific scroll container.</p>
+        <p class="pdx-ink-muted">Keep scrolling...</p>
+        <p>The state is reported by an IntersectionObserver rooted at the container — no scroll listener in this mode.</p>
+        <p>When the user scrolls back up, the element returns to its normal flow position.</p>
+        <p class="pdx-ink-muted">Almost there...</p>
+        <p>End of scrollable content.</p>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="scroll-container" id="affix-container"&gt;
+  …
+  &lt;pdx-affix :offsetTop="0" target="#affix-container"
+    @pdx-change="e =&gt; affixed = e.detail.affixed"&gt;
+    &lt;div class="sticky-bar"&gt;Sticky Toolbar&lt;/div&gt;
+  &lt;/pdx-affix&gt;
+  …
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let affixed = $signal(false);
+</script>
+
+<style scoped>
+.scroll-container {
+  height: 350px;
+  overflow-y: auto;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  position: relative;
+}
+.affix-state { margin: var(--pdx-space-sm) 0; }
+.scroll-spacer {
+  padding: var(--pdx-space-xl) var(--pdx-space-lg);
+  min-height: 100px;
+}
+.sticky-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-sm) var(--pdx-space-lg);
+  background: var(--pdx-color-surface);
+  border-bottom: 1px solid var(--pdx-color-border);
+  font-size: var(--pdx-text-sm);
+}
+.scroll-content {
+  padding: var(--pdx-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-md);
+  font-size: var(--pdx-text-sm);
+  min-height: 600px;
+}
+</style>

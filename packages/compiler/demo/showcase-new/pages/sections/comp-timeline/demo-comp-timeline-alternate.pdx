@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Alternate Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Odd items left, even items right. Good for project milestones.</p>
+    <div class="demo-container demo-container-wide">
+      <pdx-timeline :items="statusEvents" mode="alternate"></pdx-timeline>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const statusEvents = [
+  { title: 'Code Committed', description: 'feat: add timeline component', date: '10:23 AM', status: 'success', icon: 'check-circle' },
+  { title: 'Build Passed', description: 'All 1934 tests green.', date: '10:25 AM', status: 'success', icon: 'check-circle' },
+  { title: 'Code Review', description: 'Waiting for reviewer approval.', date: '10:30 AM', status: 'warning', icon: 'clock' },
+  { title: 'Deploy to Staging', description: 'Deployed to staging environment.', date: '11:00 AM', status: 'info', icon: 'truck' },
+  { title: 'Production Deploy Failed', description: 'Rollback initiated.', date: '11:15 AM', status: 'error', icon: 'x-circle' },
+];
+</script>

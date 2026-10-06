@@ -1,0 +1,59 @@
+<template>
+  <div class="tabs">
+    <div class="tab-list" role="tablist">
+      @for (tabs as tab; track tab.id) {
+        <button
+          class="tab-button"
+          role="tab"
+          :aria-selected="activeTab === tab.id"
+          @click="selectTab(tab.id)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <div class="tab-panels">
+      @for (tabs as tab; track tab.id) {
+        @if (activeTab === tab.id) {
+          <div class="tab-panel" role="tabpanel">
+            {{ tab.content }}
+          </div>
+        }
+      }
+    </div>
+  </div>
+</template>
+
+<script setup>
+  @prop tabs: object[] = [];
+  @event tabchanged: string;
+
+  let activeTab = $signal(tabs.length > 0 ? tabs[0].id : '');
+
+  function selectTab(id) {
+    activeTab = id;
+    $emit('tabchanged', id);
+  }
+
+  function handleKeydown(e) {
+    const ids = tabs.map(t => t.id);
+    const idx = ids.indexOf(activeTab);
+    if (e.key === 'ArrowRight' && idx < ids.length - 1) selectTab(ids[idx + 1]);
+    if (e.key === 'ArrowLeft' && idx > 0) selectTab(ids[idx - 1]);
+  }
+</script>
+
+<style scoped>
+  .tabs { border: 1px solid var(--pdx-color-border); border-radius: 8px; overflow: hidden; }
+  .tab-list { display: flex; border-bottom: 1px solid var(--pdx-color-border); background: var(--pdx-color-inset); }
+  .tab-button {
+    padding: 0.75rem 1.25rem; border: none; background: transparent;
+    cursor: pointer; font-size: 0.9rem; border-bottom: 2px solid transparent;
+  }
+  .tab-button[aria-selected="true"] {
+    background: var(--pdx-color-surface); border-bottom-color: var(--pdx-color-primary); color: var(--pdx-color-primary-ink); font-weight: 600;
+  }
+  .tab-button:hover:not([aria-selected="true"]) { background: var(--pdx-color-surface); }
+  .tab-panel { padding: 1rem; }
+</style>

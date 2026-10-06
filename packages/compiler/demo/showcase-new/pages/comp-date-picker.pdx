@@ -1,0 +1,117 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Date Picker</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-date-picker&gt;</code> — 9 selection modes, 13 calendar systems, fiscal year/quarter,
+      comparison range, presets, highlighted dates, time picker, mobile-adaptive.
+      Composed of <code>&lt;pdx-calendar&gt;</code> + <code>&lt;pdx-time-picker&gt;</code>.
+    </p>
+
+    <!-- ═══ 1. Basic ═══ -->
+    <pdx-demo-comp-date-picker-basic class="demo-section"></pdx-demo-comp-date-picker-basic>
+
+    <!-- ═══ 2. Selection Modes ═══ -->
+    <pdx-demo-comp-date-picker-selection-modes class="demo-section"></pdx-demo-comp-date-picker-selection-modes>
+
+    <!-- ═══ 3. Calendar Systems ═══ -->
+    <pdx-demo-comp-date-picker-calendar-systems class="demo-section"></pdx-demo-comp-date-picker-calendar-systems>
+
+    <!-- ═══ 4. Constraints ═══ -->
+    <pdx-demo-comp-date-picker-min-max class="demo-section"></pdx-demo-comp-date-picker-min-max>
+
+    <!-- ═══ 4b. Editable ═══ -->
+    <pdx-demo-comp-date-picker-editable class="demo-section"></pdx-demo-comp-date-picker-editable>
+
+    <!-- ═══ 5. Standalone Calendar ═══ -->
+    <pdx-demo-comp-date-picker-standalone-calendar class="demo-section"></pdx-demo-comp-date-picker-standalone-calendar>
+
+    <!-- ═══ 6. Time Picker Standalone ═══ -->
+    <pdx-demo-comp-date-picker-time-picker class="demo-section"></pdx-demo-comp-date-picker-time-picker>
+
+    <!-- ═══ 7. Date Range ═══ -->
+    <pdx-demo-comp-date-picker-date-range class="demo-section"></pdx-demo-comp-date-picker-date-range>
+
+    <!-- ═══ 8. Presets ═══ -->
+    <pdx-demo-comp-date-picker-presets class="demo-section"></pdx-demo-comp-date-picker-presets>
+
+    <!-- ═══ 9. Highlighted Dates ═══ -->
+    <pdx-demo-comp-date-picker-highlighted class="demo-section"></pdx-demo-comp-date-picker-highlighted>
+
+    <!-- ═══ 10. Fiscal Year/Quarter ═══ -->
+    <pdx-demo-comp-date-picker-fiscal class="demo-section"></pdx-demo-comp-date-picker-fiscal>
+
+    <!-- ═══ 9. Inline Calendar ═══ -->
+    <pdx-demo-comp-date-picker-inline class="demo-section"></pdx-demo-comp-date-picker-inline>
+
+    <!-- ═══ 10. Sizes ═══ -->
+    <pdx-demo-comp-date-picker-sizes class="demo-section"></pdx-demo-comp-date-picker-sizes>
+
+    <!-- ═══ 11. Locales ═══ -->
+    <pdx-demo-comp-date-picker-locale class="demo-section"></pdx-demo-comp-date-picker-locale>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Selected ISO date</span></div>
+        <div class="opt-row"><code>mode</code><span>string</span><span>date | datetime | daterange | datetimerange | time | week | month | year | quarter</span></div>
+        <div class="opt-row"><code>locale</code><span>string</span><span>BCP 47 locale tag (en, it, de, ar, ja...)</span></div>
+        <div class="opt-row"><code>calendar</code><span>string</span><span>gregory | islamic-umalqura | hebrew | japanese | buddhist | persian | ...</span></div>
+        <div class="opt-row"><code>numberOfMonths</code><span>number</span><span>1-3 months visible (0 = auto)</span></div>
+        <div class="opt-row"><code>weekNumbers</code><span>boolean</span><span>Show ISO week numbers</span></div>
+        <div class="opt-row"><code>min / max</code><span>string</span><span>Min/max selectable date (ISO)</span></div>
+        <div class="opt-row"><code>disabledDates</code><span>function</span><span>(iso) => boolean</span></div>
+        <div class="opt-row"><code>highlightedDates</code><span>function</span><span>(iso) => string | false</span></div>
+        <div class="opt-row"><code>fiscalStartMonth</code><span>number</span><span>1-12, fiscal year start month</span></div>
+        <div class="opt-row"><code>presets</code><span>array</span><span>[{ label, value }] preset date options</span></div>
+        <div class="opt-row"><code>showCompare</code><span>boolean</span><span>Comparison range toggle</span></div>
+        <div class="opt-row"><code>inline</code><span>boolean</span><span>No popover, always visible</span></div>
+        <div class="opt-row"><code>editable</code><span>boolean</span><span>The date can be typed (date and datetime modes)</span></div>
+        <div class="opt-row"><code>clearable</code><span>boolean</span><span>Show clear button (default: true)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ value, rangeStart, rangeEnd }</span><span>Selection changed</span></div>
+        <div class="opt-row"><code>pdx-open</code><span>—</span><span>Popover opened</span></div>
+        <div class="opt-row"><code>pdx-close</code><span>—</span><span>Popover closed</span></div>
+        <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Value cleared</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard Shortcuts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Action</span><span>Scope</span></div>
+        <div class="opt-row"><code>Arrow Left/Right</code><span>Previous/next day</span><span>Calendar grid</span></div>
+        <div class="opt-row"><code>Arrow Up/Down</code><span>Previous/next week</span><span>Calendar grid</span></div>
+        <div class="opt-row"><code>PageUp/Down</code><span>Previous/next month</span><span>Calendar grid</span></div>
+        <div class="opt-row"><code>Shift+PageUp/Down</code><span>Previous/next year</span><span>Calendar grid</span></div>
+        <div class="opt-row"><code>Home/End</code><span>Start/end of week</span><span>Calendar grid</span></div>
+        <div class="opt-row"><code>Enter/Space</code><span>Select date</span><span>Calendar grid</span></div>
+        <div class="opt-row"><code>Escape</code><span>Close popover</span><span>Date picker</span></div>
+        <div class="opt-row"><code>Enter</code><span>Commit the typed date</span><span>Editable input</span></div>
+        <div class="opt-row"><code>Alt+Arrow Down</code><span>Open the calendar</span><span>Editable input</span></div>
+        <div class="opt-row"><code>Arrow Up/Down</code><span>Increment/decrement</span><span>Time segments</span></div>
+        <div class="opt-row"><code>0-9</code><span>Type digits</span><span>Time segments</span></div>
+        <div class="opt-row"><code>A/P</code><span>Set AM/PM</span><span>Time period</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/date-picker';
+@title 'Date Picker Component';
+</script>
+
+<style scoped>
+  .page { }
+  .demo-labeled {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

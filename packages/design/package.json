@@ -1,0 +1,379 @@
+{
+  "name": "@pdxui/design",
+  "version": "1.0.0-alpha.1",
+  "description": "Context-driven CSS framework. Agent-first, human-friendly.",
+  "license": "MIT",
+  "publishConfig": { "access": "public" },
+  "repository": { "type": "git", "url": "git+https://github.com/pragmatic-design/pdxui.git", "directory": "packages/design" },
+  "homepage": "https://pdxui.com",
+  "bugs": { "url": "https://github.com/pragmatic-design/pdxui/issues" },
+  "type": "module",
+  "main": "src/pragmatic-design.css",
+  "style": "src/pragmatic-design.css",
+  "exports": {
+    ".": {
+      "//": "development FIRST: this repository resolves to source without a prior build. dist/ is what a consumer installing from npm gets, and it is only as fresh as the last `pnpm --filter @pdxui/design build`. Before this entry existed the in-repo save was accidental \u2014 the PDX Vite plugin aliases via the legacy `main` field, which no modern resolver reads, so deleting `main` would have moved the site onto a stylesheet built weeks earlier with nothing to notice.",
+      "development": "./src/pragmatic-design.css",
+      "default": "./dist/pragmatic-design.css"
+    },
+    "./tokens": "./src/tokens.css",
+    "./reset": "./src/reset.css",
+    "./layout": "./src/layout.css",
+    "./typography": "./src/typography.css",
+    "./components": "./src/components/_all.css",
+    "./components/accordion": {
+      "development": "./src/components/layered/accordion.css",
+      "default": "./dist/components/accordion.css"
+    },
+    "./components/app-layout": {
+      "development": "./src/components/layered/app-layout.css",
+      "default": "./dist/components/app-layout.css"
+    },
+    "./components/aspect-ratio": {
+      "development": "./src/components/layered/aspect-ratio.css",
+      "default": "./dist/components/aspect-ratio.css"
+    },
+    "./components/autocomplete": {
+      "development": "./src/components/layered/autocomplete.css",
+      "default": "./dist/components/autocomplete.css"
+    },
+    "./components/avatar-group": {
+      "development": "./src/components/layered/avatar-group.css",
+      "default": "./dist/components/avatar-group.css"
+    },
+    "./components/banner": {
+      "development": "./src/components/layered/banner.css",
+      "default": "./dist/components/banner.css"
+    },
+    "./components/block-ui": {
+      "development": "./src/components/layered/block-ui.css",
+      "default": "./dist/components/block-ui.css"
+    },
+    "./components/bottom-nav": {
+      "development": "./src/components/layered/bottom-nav.css",
+      "default": "./dist/components/bottom-nav.css"
+    },
+    "./components/bottom-sheet": {
+      "development": "./src/components/layered/bottom-sheet.css",
+      "default": "./dist/components/bottom-sheet.css"
+    },
+    "./components/calendar": {
+      "development": "./src/components/layered/calendar.css",
+      "default": "./dist/components/calendar.css"
+    },
+    "./components/carousel": {
+      "development": "./src/components/layered/carousel.css",
+      "default": "./dist/components/carousel.css"
+    },
+    "./components/cascader": {
+      "development": "./src/components/layered/cascader.css",
+      "default": "./dist/components/cascader.css"
+    },
+    "./components/chart": {
+      "development": "./src/components/layered/chart.css",
+      "default": "./dist/components/chart.css"
+    },
+    "./components/chip": {
+      "development": "./src/components/layered/chip.css",
+      "default": "./dist/components/chip.css"
+    },
+    "./components/col": {
+      "development": "./src/components/layered/col.css",
+      "default": "./dist/components/col.css"
+    },
+    "./components/color-picker": {
+      "development": "./src/components/layered/color-picker.css",
+      "default": "./dist/components/color-picker.css"
+    },
+    "./components/command": {
+      "development": "./src/components/layered/command.css",
+      "default": "./dist/components/command.css"
+    },
+    "./components/data-grid": {
+      "development": "./src/components/layered/data-grid.css",
+      "default": "./dist/components/data-grid.css"
+    },
+    "./components/date-picker": {
+      "development": "./src/components/layered/date-picker.css",
+      "default": "./dist/components/date-picker.css"
+    },
+    "./components/description-list": {
+      "development": "./src/components/layered/description-list.css",
+      "default": "./dist/components/description-list.css"
+    },
+    "./components/dialog": {
+      "development": "./src/components/layered/dialog.css",
+      "default": "./dist/components/dialog.css"
+    },
+    "./components/drawer": {
+      "development": "./src/components/layered/drawer.css",
+      "default": "./dist/components/drawer.css"
+    },
+    "./components/empty-state": {
+      "development": "./src/components/layered/empty-state.css",
+      "default": "./dist/components/empty-state.css"
+    },
+    "./components/fab": {
+      "development": "./src/components/layered/fab.css",
+      "default": "./dist/components/fab.css"
+    },
+    "./components/file-upload": {
+      "development": "./src/components/layered/file-upload.css",
+      "default": "./dist/components/file-upload.css"
+    },
+    "./components/filter-builder": {
+      "development": "./src/components/layered/filter-builder.css",
+      "default": "./dist/components/filter-builder.css"
+    },
+    "./components/form": {
+      "development": "./src/components/layered/form.css",
+      "default": "./dist/components/form.css"
+    },
+    "./components/image": {
+      "development": "./src/components/layered/image.css",
+      "default": "./dist/components/image.css"
+    },
+    "./components/infinite-scroll": {
+      "development": "./src/components/layered/infinite-scroll.css",
+      "default": "./dist/components/infinite-scroll.css"
+    },
+    "./components/inline-edit": {
+      "development": "./src/components/layered/inline-edit.css",
+      "default": "./dist/components/inline-edit.css"
+    },
+    "./components/json-editor": {
+      "development": "./src/components/layered/json-editor.css",
+      "default": "./dist/components/json-editor.css"
+    },
+    "./components/kbd": {
+      "development": "./src/components/layered/kbd.css",
+      "default": "./dist/components/kbd.css"
+    },
+    "./components/list": {
+      "development": "./src/components/layered/list.css",
+      "default": "./dist/components/list.css"
+    },
+    "./components/masonry": {
+      "development": "./src/components/layered/masonry.css",
+      "default": "./dist/components/masonry.css"
+    },
+    "./components/mention": {
+      "development": "./src/components/layered/mention.css",
+      "default": "./dist/components/mention.css"
+    },
+    "./components/menu": {
+      "development": "./src/components/layered/menu.css",
+      "default": "./dist/components/menu.css"
+    },
+    "./components/navbar": {
+      "development": "./src/components/layered/navbar.css",
+      "default": "./dist/components/navbar.css"
+    },
+    "./components/page-header": {
+      "development": "./src/components/layered/page-header.css",
+      "default": "./dist/components/page-header.css"
+    },
+    "./components/pagination": {
+      "development": "./src/components/layered/pagination.css",
+      "default": "./dist/components/pagination.css"
+    },
+    "./components/popover": {
+      "development": "./src/components/layered/popover.css",
+      "default": "./dist/components/popover.css"
+    },
+    "./components/progress": {
+      "development": "./src/components/layered/progress.css",
+      "default": "./dist/components/progress.css"
+    },
+    "./components/rating": {
+      "development": "./src/components/layered/rating.css",
+      "default": "./dist/components/rating.css"
+    },
+    "./components/relation-picker": {
+      "development": "./src/components/layered/relation-picker.css",
+      "default": "./dist/components/relation-picker.css"
+    },
+    "./components/relative-time": {
+      "development": "./src/components/layered/relative-time.css",
+      "default": "./dist/components/relative-time.css"
+    },
+    "./components/rich-text": {
+      "development": "./src/components/layered/rich-text.css",
+      "default": "./dist/components/rich-text.css"
+    },
+    "./components/scroll-area": {
+      "development": "./src/components/layered/scroll-area.css",
+      "default": "./dist/components/scroll-area.css"
+    },
+    "./components/segmented": {
+      "development": "./src/components/layered/segmented.css",
+      "default": "./dist/components/segmented.css"
+    },
+    "./components/select": {
+      "development": "./src/components/layered/select.css",
+      "default": "./dist/components/select.css"
+    },
+    "./components/sidebar": {
+      "development": "./src/components/layered/sidebar.css",
+      "default": "./dist/components/sidebar.css"
+    },
+    "./components/sortable-list": {
+      "development": "./src/components/layered/sortable-list.css",
+      "default": "./dist/components/sortable-list.css"
+    },
+    "./components/split-button": {
+      "development": "./src/components/layered/split-button.css",
+      "default": "./dist/components/split-button.css"
+    },
+    "./components/splitter": {
+      "development": "./src/components/layered/splitter.css",
+      "default": "./dist/components/splitter.css"
+    },
+    "./components/statistic": {
+      "development": "./src/components/layered/statistic.css",
+      "default": "./dist/components/statistic.css"
+    },
+    "./components/tabs": {
+      "development": "./src/components/layered/tabs.css",
+      "default": "./dist/components/tabs.css"
+    },
+    "./components/tag-input": {
+      "development": "./src/components/layered/tag-input.css",
+      "default": "./dist/components/tag-input.css"
+    },
+    "./components/time-picker": {
+      "development": "./src/components/layered/time-picker.css",
+      "default": "./dist/components/time-picker.css"
+    },
+    "./components/timeline": {
+      "development": "./src/components/layered/timeline.css",
+      "default": "./dist/components/timeline.css"
+    },
+    "./components/toast": {
+      "development": "./src/components/layered/toast.css",
+      "default": "./dist/components/toast.css"
+    },
+    "./components/toggle": {
+      "development": "./src/components/layered/toggle.css",
+      "default": "./dist/components/toggle.css"
+    },
+    "./components/toolbar": {
+      "development": "./src/components/layered/toolbar.css",
+      "default": "./dist/components/toolbar.css"
+    },
+    "./components/tooltip": {
+      "development": "./src/components/layered/tooltip.css",
+      "default": "./dist/components/tooltip.css"
+    },
+    "./components/transfer": {
+      "development": "./src/components/layered/transfer.css",
+      "default": "./dist/components/transfer.css"
+    },
+    "./components/tree": {
+      "development": "./src/components/layered/tree.css",
+      "default": "./dist/components/tree.css"
+    },
+    "./components/tree-select": {
+      "development": "./src/components/layered/tree-select.css",
+      "default": "./dist/components/tree-select.css"
+    },
+    "./components/wizard": {
+      "development": "./src/components/layered/wizard.css",
+      "default": "./dist/components/wizard.css"
+    },
+    "./surfaces": "./src/surfaces/_all.css",
+    "./adaptive": "./src/adaptive.css",
+    "./base": {
+      "development": "./src/base.css",
+      "default": "./dist/base.css"
+    },
+    "./themes": {
+      "development": "./src/themes-all.css",
+      "default": "./dist/themes-all.css"
+    },
+    "./themes/neutral": {
+      "development": "./src/themes/layered/neutral.css",
+      "default": "./dist/themes/neutral.css"
+    },
+    "./themes/material": {
+      "development": "./src/themes/layered/material.css",
+      "default": "./dist/themes/material.css"
+    },
+    "./themes/fluent": {
+      "development": "./src/themes/layered/fluent.css",
+      "default": "./dist/themes/fluent.css"
+    },
+    "./themes/cupertino": {
+      "development": "./src/themes/layered/cupertino.css",
+      "default": "./dist/themes/cupertino.css"
+    },
+    "./themes/corporate": {
+      "development": "./src/themes/layered/corporate.css",
+      "default": "./dist/themes/corporate.css"
+    },
+    "./themes/playful": {
+      "development": "./src/themes/layered/playful.css",
+      "default": "./dist/themes/playful.css"
+    },
+    "./themes/neumorphic": {
+      "development": "./src/themes/layered/neumorphic.css",
+      "default": "./dist/themes/neumorphic.css"
+    },
+    "./themes/glass": {
+      "development": "./src/themes/layered/glass.css",
+      "default": "./dist/themes/glass.css"
+    },
+    "./themes/cyberpunk": {
+      "development": "./src/themes/layered/cyberpunk.css",
+      "default": "./dist/themes/cyberpunk.css"
+    },
+    "./themes/editorial": {
+      "development": "./src/themes/layered/editorial.css",
+      "default": "./dist/themes/editorial.css"
+    },
+    "./themes/pragmatic": {
+      "development": "./src/themes/layered/pragmatic.css",
+      "default": "./dist/themes/pragmatic.css"
+    },
+    "./themes/pragmatic-gold": {
+      "development": "./src/themes/layered/pragmatic-gold.css",
+      "default": "./dist/themes/pragmatic-gold.css"
+    },
+    "./themes/metro": {
+      "development": "./src/themes/layered/metro.css",
+      "default": "./dist/themes/metro.css"
+    },
+    "./runtime": "./runtime/adaptive.js",
+    "./engine": {
+      "//": "Node refuses TypeScript under node_modules, so a consumer's `pdx theme` could not start if this pointed at src/. Same shape as the other packages: source in this repo, compiled JS for everyone else.",
+      "development": "./src/engine/index.ts",
+      "types": "./dist/engine/index.d.ts",
+      "import": "./dist/engine/index.js"
+    }
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist/",
+    "src/",
+    "runtime/"
+  ],
+  "scripts": {
+    "dev": "npx serve demo -p 3333",
+    "gen:themes": "npx tsx scripts/gen-brand-themes.ts",
+    "gen:reference": "node scripts/gen-theming-reference.mjs",
+    "gen:entries": "node scripts/gen-layered-entries.mjs",
+    "build": "node scripts/gen-layered-entries.mjs && node scripts/build-css.mjs && tsc -p tsconfig.engine.json",
+    "test": "npx playwright test --config tests/playwright.config.ts",
+    "test:ui": "npx playwright test --config tests/playwright.config.ts --ui"
+  },
+  "dependencies": {
+    "@responsivejs/design": "1.0.0-alpha.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@axe-core/playwright": "^4.10.0",
+    "typescript": "^5.8.0"
+  }
+}

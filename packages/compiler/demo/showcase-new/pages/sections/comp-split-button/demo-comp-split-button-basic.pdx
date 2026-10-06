@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click the left side for primary action. Click the arrow for dropdown.</p>
+    <div class="demo-row">
+      <pdx-split-button label="Save" icon="save" :items="saveItems" @pdx-click="onPrimary" @pdx-select="onSelect"></pdx-split-button>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="split-log">{{ splitLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-split-button label="Save" icon="save" :items="items"
+  @pdx-click="onSave" @pdx-select="onSelect"&gt;
+&lt;/pdx-split-button&gt;
+
+// items = [
+//   { key: 'save-as', label: 'Save As...', icon: 'file-text' },
+//   { key: 'save-copy', label: 'Save a Copy', icon: 'copy' },
+//   { key: 'sep', type: 'separator' },
+//   { key: 'export', label: 'Export', icon: 'download' },
+// ]</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const saveItems = [
+  { key: 'save-as', label: 'Save As...', icon: 'file-text' },
+  { key: 'save-copy', label: 'Save a Copy', icon: 'copy' },
+  { key: 'sep', type: 'separator' },
+  { key: 'export', label: 'Export', icon: 'download' },
+];
+
+let splitLog = $signal('Click the button or select from dropdown...');
+
+function onPrimary() {
+  splitLog = 'pdx-click: primary action (Save)';
+}
+
+function onSelect(e) {
+  splitLog = 'pdx-select: ' + e.detail.key + ' — ' + e.detail.item.label;
+}
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+</style>

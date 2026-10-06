@@ -1,0 +1,67 @@
+<template>
+  <section data-test="pos-iframe">
+    <h3>Iframe Positioning</h3>
+    <p class="desc">Floating element in the parent window positioned relative to a reference inside an iframe. Follows on scroll via autoUpdate.</p>
+    <div class="iframe-container">
+      <iframe :ref="iframeRef" srcdoc="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body style='margin:0;padding:20px;font-family:system-ui'&gt;&lt;p style='color:#666;font-size:0.85rem'&gt;I am inside an iframe.&lt;/p&gt;&lt;button id='iframe-ref' style='padding:8px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer'&gt;Reference Element&lt;/button&gt;&lt;/body&gt;&lt;/html&gt;" style="width:100%;height:120px;border:1px solid #e0e0e0;border-radius:8px"></iframe>
+    </div>
+    <div class="log" data-test="iframe-log">{{ iframeLog }}</div>
+  </section>
+</template>
+
+<script setup>
+import { computeFloatingPosition, autoUpdate, offset, shift, onMount, onDestroy } from '@pdxui/core';
+
+let iframeLog = $signal('Click the button inside the iframe');
+let iframeRef = $signal(null);
+
+let iframeFloatEl = null;
+let iframeAutoUpdateDispose = null;
+
+// Iframe positioning with autoUpdate
+onMount(() => {
+    requestAnimationFrame(function() {
+        const iframe = iframeRef;
+        if (!iframe) return;
+        iframe.addEventListener('load', function() {
+            const iframeDoc = iframe.contentDocument;
+            if (!iframeDoc) return;
+            const btn = iframeDoc.getElementById('iframe-ref');
+            if (!btn) return;
+            btn.addEventListener('click', function() {
+                if (!iframeFloatEl) {
+                    iframeFloatEl = document.createElement('div');
+                    iframeFloatEl.style.cssText = 'position:fixed;background:#1d1d2e;color:white;padding:6px 12px;border-radius:6px;font-size:0.8rem;z-index:200;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+                    iframeFloatEl.textContent = 'Positioned from iframe!';
+                    document.body.appendChild(iframeFloatEl);
+                }
+                iframeFloatEl.style.display = 'block';
+
+                function updateIframePos() {
+                    var result = computeFloatingPosition(btn, iframeFloatEl, {
+                        placement: 'top',
+                        middleware: [offset(8), shift({ padding: 8 })],
+                        iframe: iframe,
+                    });
+                    iframeFloatEl.style.left = result.x + 'px';
+                    iframeFloatEl.style.top = result.y + 'px';
+                    iframeLog = 'Positioned at x:' + Math.round(result.x) + ' y:' + Math.round(result.y) + ' — scrolls with page';
+                }
+
+                // autoUpdate: re-position on scroll/resize
+                iframeAutoUpdateDispose?.();
+                iframeAutoUpdateDispose = autoUpdate(iframe, iframeFloatEl, updateIframePos);
+            });
+        });
+    });
+
+    onDestroy(function() {
+        iframeAutoUpdateDispose?.();
+        if (iframeFloatEl) iframeFloatEl.remove();
+    });
+});
+</script>
+
+<style scoped>
+  .iframe-container { margin-top: 8px; }
+</style>

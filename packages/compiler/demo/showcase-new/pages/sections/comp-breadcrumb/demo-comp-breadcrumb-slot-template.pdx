@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use the <code>item</code> slot to customize how each breadcrumb item is rendered.</p>
+    <div class="demo-row">
+      <pdx-breadcrumb :items="slotCrumbs">
+        <slot name="item" let:item let:isLast>
+          <span class="crumb-custom">{{ isLast ? item.label : item.label + ' \u2192' }}</span>
+        </slot>
+      </pdx-breadcrumb>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-breadcrumb :items="items"&gt;
+  &lt;slot name="item" let:item let:isLast&gt;
+    &lt;span class="crumb-custom"&gt;
+      $&lbrace;isLast ? item.label : item.label + ' &amp;rarr;'&rbrace;
+    &lt;/span&gt;
+  &lt;/slot&gt;
+&lt;/pdx-breadcrumb&gt;
+
+.crumb-custom {
+  font-weight: 600;
+  color: var(--pdx-color-primary);
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const slotCrumbs = [
+  { key: 'home', label: 'Home', href: '#' },
+  { key: 'docs', label: 'Docs', href: '#' },
+  { key: 'api', label: 'API Reference' },
+];
+</script>
+
+<style scoped>
+.crumb-custom { font-weight: 600; color: var(--pdx-color-primary); }
+</style>

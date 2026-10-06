@@ -1,0 +1,70 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">{{ themes.length }} themes, one composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The same markup in each card. Nothing below is per-theme CSS — only the
+      <code>pdx-theme</code> attribute differs, which is the whole claim: re-theming is an attribute,
+      not a rebuild.
+    </p>
+
+    <div class="theme-grid" data-test="theme-grid">
+      @for (themes as t; track t) {
+        <div class="theme-card" data-theme-card pdx-scheme="light" :pdx-theme="t">
+          <div class="tc-head">
+            <span class="tc-name">{{ t }}</span>
+          </div>
+          <div class="tc-body">
+            <div class="tc-swatches">
+              <span class="tc-sw" style="background: var(--pdx-color-primary)"></span>
+              <span class="tc-sw" style="background: var(--pdx-color-accent)"></span>
+              <span class="tc-sw" style="background: var(--pdx-color-success)"></span>
+              <span class="tc-sw" style="background: var(--pdx-color-warning)"></span>
+              <span class="tc-sw" style="background: var(--pdx-color-danger)"></span>
+            </div>
+            <button class="pdx-btn pdx-primary tc-btn">Primary</button>
+            <button class="pdx-btn pdx-outline tc-btn">Outline</button>
+            <div class="tc-input-wrap pdx-input-wrap">
+              <input class="pdx-input" placeholder="Input" readonly />
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { THEME_INHERITED } from '@pdxui/design/engine';
+
+// `neutral` IS the base, so it is absent from THEME_INHERITED by construction — a theme that
+// inherits nothing has no row there. Everything else comes from the generated contract, so a theme
+// added to packages/design/src/themes lands here without touching this file.
+const themes = ['neutral', ...Object.keys(THEME_INHERITED)].sort();
+</script>
+
+<style scoped>
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-lg);
+}
+.theme-card {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-bg);
+    color: var(--pdx-color-text);
+    overflow: hidden;
+}
+.tc-head {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+}
+.tc-name { font-family: var(--pdx-font-mono); font-size: 0.78rem; }
+.tc-body { padding: var(--pdx-space-sm); display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+.tc-swatches { display: flex; gap: 4px; margin-bottom: var(--pdx-space-2xs); }
+.tc-sw { width: 22px; height: 22px; border-radius: var(--pdx-radius-sm); }
+.tc-btn { width: 100%; }
+.tc-input-wrap { width: 100%; }
+</style>

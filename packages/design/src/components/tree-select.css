@@ -1,0 +1,188 @@
+/* pdx-tree-select — Select with tree dropdown */
+
+pdx-tree-select {
+    display: inline-block;
+    position: relative;
+}
+
+/* Panel */
+.pdx-tree-select-panel {
+    position: absolute;
+    z-index: var(--pdx-z-popover);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    box-shadow: var(--pdx-shadow-lg);
+    min-width: 240px;
+    max-height: 320px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Search */
+.pdx-tree-select-search {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-tree-select-search input {
+    width: 100%;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-surface);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-text);
+    outline: none;
+}
+
+.pdx-tree-select-search input:focus {
+    border-color: var(--pdx-color-focus);
+}
+
+/* Tree container */
+.pdx-tree-select-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--pdx-space-xs) 0;
+}
+
+/* Tree node */
+.pdx-tree-node {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 2px var(--pdx-space-sm);
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    transition: background 0.1s;
+    user-select: none;
+}
+
+.pdx-tree-node:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-tree-node.selected {
+    background: color-mix(in oklch, var(--pdx-color-primary) 10%, transparent);
+    color: var(--pdx-color-primary-ink);
+    font-weight: var(--pdx-weight-medium);
+}
+
+/* The node the keyboard is on (aria-activedescendant): focus stays on the trigger, so this is the only
+   sign of where the arrows are. A bar as well as the tint, so it shows on a selected node too. */
+.pdx-tree-node.active {
+    background: var(--pdx-color-inset);
+    box-shadow: inset 3px 0 0 var(--pdx-color-primary);
+}
+
+.pdx-tree-node.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Expand toggle */
+.pdx-tree-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    transition: transform 0.15s;
+    padding: 0;
+}
+
+.pdx-tree-toggle.expanded {
+    transform: rotate(90deg);
+}
+
+.pdx-tree-toggle.leaf {
+    visibility: hidden;
+}
+
+/* A branch being fetched by loadChildren: the chevron gives way to the design system's spinner ring
+   (the same one .pdx-loading draws on a button). The row also carries aria-busy for assistive
+   technology, which on its own draws nothing. Themes restyle it through these rules. */
+.pdx-tree-toggle.loading {
+    position: relative;
+    color: transparent;
+    transform: none;
+}
+
+.pdx-tree-toggle.loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 2px solid var(--pdx-color-primary);
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: pdx-spin 0.6s linear infinite;
+}
+
+/* Checkbox for multi-select */
+.pdx-tree-node input[type="checkbox"] {
+    accent-color: var(--pdx-color-primary);
+    flex-shrink: 0;
+}
+
+.pdx-tree-node-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Selected chips (multi mode) */
+.pdx-tree-select-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    align-items: center;
+}
+
+.pdx-tree-select-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 6px;
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-inset);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-text);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pdx-tree-select-chip-remove {
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    font-size: 0.7em;
+    line-height: 1;
+}
+
+.pdx-tree-select-chip-remove:hover {
+    color: var(--pdx-color-text);
+}
+
+/* Empty */
+.pdx-tree-select-empty {
+    padding: var(--pdx-space-md);
+    text-align: center;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+}

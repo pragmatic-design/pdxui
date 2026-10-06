@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Minimum and maximum</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>minItems="1"</code> hides the remove button on the last row; <code>maxItems="3"</code> hides the add
+      button once there are three.
+    </p>
+    <pdx-form :form="contactsForm">
+      <pdx-field-list name="contacts" label="Contacts (1 to 3)" addLabel="+ Add contact" minItems="1" maxItems="3" :itemFields="contactFields" :itemDefault="contactDefault"></pdx-field-list>
+    </pdx-form>
+  </section>
+</template>
+
+<script setup>
+import { createForm } from '@pdxui/core';
+
+const contactFields = [
+  { name: 'name', type: 'text', label: 'Name', placeholder: 'Name' },
+  { name: 'email', type: 'email', label: 'Email', placeholder: 'name@example.com' },
+];
+
+const contactDefault = { name: '', email: '' };
+
+const contactsForm = createForm({
+  initialValues: { contacts: [{ name: 'Ada Lovelace', email: 'ada@example.com' }] },
+});
+</script>

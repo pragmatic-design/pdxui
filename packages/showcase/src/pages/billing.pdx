@@ -1,0 +1,21 @@
+<template>
+  <div class="billing" data-test="billing">
+    <h2 class="pdx-txt-heading">{{ $t('billing.title', { id: id }) }}</h2>
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('billing.body') }}</p>
+  </div>
+</template>
+
+<script setup>
+// A child route the current role may not open. The parent — the ticket, its tabs, its attachments
+// — has to stay on screen behind the refusal: a permission on one tab is not a reason to lose the
+// page the tab belongs to.
+@page '/tickets/:id/billing';
+@title $t('billing.title', { id: id });
+@guard 'tickets.billing';
+
+@prop id: string = '';
+</script>
+
+<style scoped>
+  .billing { border-left: 3px solid var(--pdx-color-accent); padding-left: var(--pdx-space-md); }
+</style>

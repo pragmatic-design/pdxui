@@ -1,0 +1,63 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">With Icons</h2>
+    <pdx-tabs value="profile" label="Account">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="profile">
+          <pdx-icon name="user" size="sm"></pdx-icon>
+          <span>Profile</span>
+        </button>
+        <button class="pdx-tab" data-tab="settings">
+          <pdx-icon name="settings" size="sm"></pdx-icon>
+          <span>Settings</span>
+        </button>
+        <button class="pdx-tab" data-tab="notifications">
+          <pdx-icon name="bell" size="sm"></pdx-icon>
+          <span>Notifications</span>
+        </button>
+        <button class="pdx-tab" data-tab="security" disabled>
+          <pdx-icon name="lock" size="sm"></pdx-icon>
+          <span>Security</span>
+        </button>
+      </div>
+      <div data-tab-panel="profile" style="padding:var(--pdx-space-lg)">
+        <pdx-form-field label="Display Name" size="sm">
+          <pdx-input value="Alessandro" placeholder="Your name"></pdx-input>
+        </pdx-form-field>
+      </div>
+      <div data-tab-panel="settings" style="padding:var(--pdx-space-lg)">
+        <pdx-switch label="Dark mode"></pdx-switch>
+        <pdx-switch label="Compact density" checked></pdx-switch>
+      </div>
+      <div data-tab-panel="notifications" style="padding:var(--pdx-space-lg)">
+        <pdx-switch label="Email notifications" checked></pdx-switch>
+        <pdx-switch label="Push notifications"></pdx-switch>
+      </div>
+      <div data-tab-panel="security" style="padding:var(--pdx-space-lg)">
+        <p class="pdx-txt-small pdx-ink-muted">Locked — requires admin access.</p>
+      </div>
+    </pdx-tabs>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="profile"&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="profile"&gt;
+      &lt;pdx-icon name="user" size="sm"&gt;&lt;/pdx-icon&gt;
+      &lt;span&gt;Profile&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="settings"&gt;
+      &lt;pdx-icon name="settings" size="sm"&gt;&lt;/pdx-icon&gt;
+      &lt;span&gt;Settings&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="security" disabled&gt;
+      &lt;pdx-icon name="lock" size="sm"&gt;&lt;/pdx-icon&gt;
+      &lt;span&gt;Security&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="profile"&gt;Profile content&lt;/div&gt;
+  &lt;div data-tab-panel="settings"&gt;Settings content&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </details>
+  </section>
+</template>

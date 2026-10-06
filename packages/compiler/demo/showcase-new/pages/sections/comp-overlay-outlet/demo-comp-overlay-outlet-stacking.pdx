@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Stacking</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      A dialog opened while another is showing goes on top of it. Escape closes only the top one; the one below
+      gets its focus back.
+    </p>
+    <div class="demo-row">
+      <pdx-button @click="stack">Open two, one over the other</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useOutletAnswer } from './state.pdx';
+
+// Its answer shows in the confirm section (state.pdx.ts).
+const outletAnswer = useOutletAnswer();
+function stack() { outletAnswer.stack(); }
+</script>

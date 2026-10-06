@@ -1,0 +1,39 @@
+<template>
+  <section>
+    <h3>Single Select (replace)</h3>
+    <p class="desc">Click an item. Previous selection is replaced.</p>
+    <div class="two-col">
+      <div class="list">
+        @for (fruits as fruit; track fruit) {
+          <div class="item" :class="singleClass(fruit)" @click="singleSel.select(fruit)">{{ fruit }}</div>
+        }
+      </div>
+      <pre class="log">{{ singleInfo }}</pre>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { createSelection, effect, onMount, onDestroy } from '@pdxui/core';
+
+const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape'];
+
+let singleInfo = $signal('Nothing selected');
+
+// Single
+const singleSel = createSelection({ mode: 'single', behavior: 'replace' });
+
+// Reactive class helpers — read selection signal inside a function so the
+// template effect tracks changes. Direct isSelected() calls on the selection
+// object would be transformed incorrectly by the compiler's callSignals pass
+// (it adds () to ctx.singleSel, treating the object as a signal).
+function singleClass(fruit) { return singleSel.selected().has(fruit) ? 'selected' : ''; }
+
+onMount(() => {
+    const d1 = effect(() => {
+        const sel = singleSel.selected();
+        singleInfo = sel.size > 0 ? 'Selected: ' + [...sel].join(', ') : 'Nothing selected';
+    });
+    onDestroy(() => { d1(); });
+});
+</script>

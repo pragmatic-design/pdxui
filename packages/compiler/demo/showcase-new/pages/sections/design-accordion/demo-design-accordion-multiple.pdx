@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multiple Items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Consecutive accordion items with merged borders. Wrap in <code>.pdx-accordion-group</code>.</p>
+
+    <div class="pdx-accordion-group">
+      <details class="pdx-accordion">
+        <summary>Getting Started</summary>
+        <div class="pdx-accordion-body">
+          Install the framework with <code>npm i @pdxui/framework</code> and create your
+          first component with <code>pdx new my-app</code>. The CLI scaffolds a complete
+          project with routing, state management, and dev server.
+        </div>
+      </details>
+      <details class="pdx-accordion">
+        <summary>Component Model</summary>
+        <div class="pdx-accordion-body">
+          Components are authored as <code>.pdx</code> single-file components with template,
+          script, and style blocks. The compiler transforms decorators like <code>@prop</code>
+          and <code>$signal</code> into optimized runtime code.
+        </div>
+      </details>
+      <details class="pdx-accordion">
+        <summary>Styling</summary>
+        <div class="pdx-accordion-body">
+          Pragmatic CSS provides semantic utility classes with <code>pdx-</code> prefix.
+          Styles are scoped by default. The design system includes tokens for colors,
+          spacing, typography, and responsive breakpoints.
+        </div>
+      </details>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-accordion-group"&gt;
+  &lt;details class="pdx-accordion"&gt;
+    &lt;summary&gt;Getting Started&lt;/summary&gt;
+    &lt;div class="pdx-accordion-body"&gt;...&lt;/div&gt;
+  &lt;/details&gt;
+  &lt;details class="pdx-accordion"&gt;
+    &lt;summary&gt;Component Model&lt;/summary&gt;
+    &lt;div class="pdx-accordion-body"&gt;...&lt;/div&gt;
+  &lt;/details&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

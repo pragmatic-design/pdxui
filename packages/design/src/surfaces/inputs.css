@@ -1,0 +1,790 @@
+/* Input, select, textarea + input wrapper + input group */
+
+/* ── Base input (still works standalone) ── */
+.pdx-input {
+    display: block;
+    width: 100%;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-base);
+    line-height: var(--pdx-line-normal);
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    transition: border-color var(--pdx-transition),
+                box-shadow var(--pdx-transition);
+
+    &::placeholder { color: var(--pdx-color-muted); }
+    /* type="search" inputs (pdx-search-input) render a native clear button — suppress it so the
+       component's own clear control isn't doubled. */
+    &::-webkit-search-cancel-button, &::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+    &:focus-visible { border-color: var(--pdx-color-primary); box-shadow: var(--pdx-focus-ring); outline: none; transition: box-shadow var(--pdx-duration-fast); }
+    &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; background: var(--pdx-color-inset); }
+    &[aria-invalid="true"],
+    &:invalid:not(:placeholder-shown) {
+        border-color: var(--pdx-color-danger);
+    }
+}
+
+/* ── Input wrapper — border on wrapper, not on input ── */
+.pdx-input-wrap {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--pdx-space-xs);
+    padding: 0 var(--pdx-space-sm);
+    background: var(--pdx-color-surface);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    transition: border-color var(--pdx-transition),
+                box-shadow var(--pdx-transition);
+    cursor: text;
+}
+
+/* Inner input: strip all native styling (including .pdx-input class overrides) */
+.pdx-input-wrap > input,
+.pdx-input-wrap > textarea,
+.pdx-input-wrap > input.pdx-input,
+.pdx-input-wrap > textarea.pdx-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: var(--pdx-space-xs) 0;
+    font: inherit;
+    color: inherit;
+    line-height: var(--pdx-line-normal);
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.pdx-input-wrap > input::placeholder,
+.pdx-input-wrap > textarea::placeholder { color: var(--pdx-color-muted); }
+
+/* Focus state — on wrapper when input inside is focused */
+.pdx-input-wrap:focus-within {
+    border-color: var(--pdx-color-primary);
+    box-shadow: var(--pdx-focus-ring);
+    transition: box-shadow var(--pdx-duration-fast);
+}
+
+/* Disabled */
+.pdx-input-wrap.disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+    background: var(--pdx-color-inset);
+}
+.pdx-input-wrap.disabled > input,
+.pdx-input-wrap.disabled > textarea { cursor: not-allowed; }
+
+/* Error state */
+.pdx-input-wrap.error,
+.pdx-input-wrap:has([aria-invalid="true"]) {
+    border-color: var(--pdx-color-danger);
+}
+.pdx-input-wrap.error:focus-within,
+.pdx-input-wrap:has([aria-invalid="true"]):focus-within {
+    box-shadow: 0 0 0 2px oklch(from var(--pdx-color-danger) l c h / 0.15);
+}
+
+/* Success state */
+.pdx-input-wrap.success { border-color: var(--pdx-color-success); }
+.pdx-input-wrap.success:focus-within {
+    box-shadow: 0 0 0 2px oklch(from var(--pdx-color-success) l c h / 0.15);
+}
+
+/* Warning state */
+.pdx-input-wrap.warning { border-color: var(--pdx-color-warning); }
+.pdx-input-wrap.warning:focus-within {
+    box-shadow: 0 0 0 2px oklch(from var(--pdx-color-warning) l c h / 0.15);
+}
+
+/* ── Prefix / Suffix ── */
+.pdx-input-prefix,
+.pdx-input-suffix {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+    pointer-events: none;
+}
+
+/* Allow interactive suffix (clear button, toggle, stepper) */
+.pdx-input-suffix-interactive { pointer-events: auto; }
+
+/* ── Clear button ── */
+.pdx-input-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    font-size: 0.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--pdx-transition), color var(--pdx-transition);
+}
+.pdx-input-clear:hover {
+    background: var(--pdx-color-border);
+    color: var(--pdx-color-text);
+}
+
+/* Desktop: show clear on hover/focus only */
+@media (hover: hover) {
+    .pdx-input-clear { opacity: 0; transition: opacity var(--pdx-transition), background var(--pdx-transition); }
+    .pdx-input-wrap:hover .pdx-input-clear,
+    .pdx-input-wrap:focus-within .pdx-input-clear { opacity: 1; }
+}
+
+/* ── Sizes — exact height to match button [size="*"] ── */
+/* md = default (declared first so sized variants override) */
+.pdx-input, .pdx-input-wrap {
+    height: calc(var(--pdx-input-min-height) * var(--pdx-density-factor, 1));
+    min-height: calc(var(--pdx-input-min-height) * var(--pdx-density-factor, 1));
+}
+
+/* Sizes derived from --pdx-input-min-height with fixed offsets (as buttons.css does): the
+   hierarchy xs<sm<md<lg<xl is guaranteed in EVERY theme, the default unchanged (input-min-height 2.5rem). */
+.pdx-input-xs { font-size: var(--pdx-text-xs); height: calc((var(--pdx-input-min-height) - 0.75rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) - 0.75rem) * var(--pdx-density-factor, 1)); }
+.pdx-input-xs.pdx-input,
+.pdx-input-xs.pdx-input-wrap { padding: 0 var(--pdx-space-xs); }
+
+.pdx-input-sm { font-size: var(--pdx-text-sm); height: calc((var(--pdx-input-min-height) - 0.375rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) - 0.375rem) * var(--pdx-density-factor, 1)); }
+.pdx-input-sm.pdx-input,
+.pdx-input-sm.pdx-input-wrap { padding: 0 var(--pdx-space-xs); }
+
+.pdx-input-lg { font-size: var(--pdx-text-base); height: calc((var(--pdx-input-min-height) + 0.5rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) + 0.5rem) * var(--pdx-density-factor, 1)); }
+.pdx-input-lg.pdx-input,
+.pdx-input-lg.pdx-input-wrap { padding: 0 var(--pdx-space-md); }
+
+.pdx-input-xl { font-size: var(--pdx-text-lg); height: calc((var(--pdx-input-min-height) + 1rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) + 1rem) * var(--pdx-density-factor, 1)); }
+.pdx-input-xl.pdx-input,
+.pdx-input-xl.pdx-input-wrap { padding: 0 var(--pdx-space-md); }
+
+/* ── Mobile: anti-zoom iOS + touch targets ── */
+@media (pointer: coarse) {
+    .pdx-input,
+    .pdx-input-wrap {
+        min-height: var(--pdx-target-min);
+        font-size: max(var(--pdx-text-base), 1rem); /* ≥16px prevents iOS auto-zoom */
+    }
+    .pdx-input-wrap > input,
+    .pdx-input-wrap > textarea {
+        font-size: inherit;
+    }
+    /* Clear button always visible on touch (no hover) */
+    .pdx-input-clear { opacity: 1; }
+    /* A larger drawing on touch; the tap area is --pdx-target-min (adaptive.css). */
+    .pdx-input-clear { width: 1.75rem; height: 1.75rem; font-size: 0.85rem; }
+}
+
+/* ── Readonly (not disabled — still focusable, selectable) ── */
+.pdx-input-wrap.readonly {
+    background: var(--pdx-color-inset);
+}
+.pdx-input-wrap.readonly > input,
+.pdx-input-wrap.readonly > textarea { cursor: default; }
+
+/* ── Select ── */
+select.pdx-input {
+    appearance: none;
+    /* An explicit height, equal to the other inputs/buttons (alignment in a toolbar/input-group).
+       The clipping people fear concerns the OPTIONS in the native popup, which do NOT depend
+       on the height of the closed select; line-height centres the selected text. */
+    height: calc(var(--pdx-input-min-height) * var(--pdx-density-factor, 1));
+    line-height: var(--pdx-line-normal);
+    /* Hardcoded stroke color: %236b7280 = #6b7280, matches --pdx-color-muted.
+       CSS custom properties cannot be used inside SVG data URIs.
+       If the muted color token changes, update this SVG stroke value to match. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--pdx-space-sm) center;
+    padding-right: var(--pdx-space-xl);
+}
+
+/* ── Textarea ── */
+textarea.pdx-input {
+    resize: vertical;
+    min-height: 6rem;
+}
+
+/* Direct child of row: inputs shrink to content width */
+pdx-row > .pdx-input {
+    width: auto;
+}
+
+/* Button/input height alignment is via explicit min-height in buttons.css + inputs.css */
+
+/* ── Input group ──
+   :is() matches both .pdx-input-group (CSS-only) and pdx-input-group (CE tag) */
+:is(.pdx-input-group, pdx-input-group) {
+    display: flex;
+    align-items: stretch;
+}
+
+/* WC children: display contents so inner elements join the flex */
+:is(.pdx-input-group, pdx-input-group) > pdx-input,
+:is(.pdx-input-group, pdx-input-group) > pdx-button {
+    display: contents;
+}
+
+/* Reset ALL radius inside group — then re-apply on first/last.
+   --pdx-group-radius: themes override this to control outer corner radius.
+   --pdx-group-r-*: per-position radius computed from --pdx-group-radius.
+   Children use --pdx-group-r-* which always wins (inherits from parent). */
+:is(.pdx-input-group, pdx-input-group) {
+    --pdx-group-radius: var(--pdx-radius-md);
+    /* Per-position: first gets left, last gets right, middle gets 0 */
+    --pdx-group-r-tl: var(--pdx-group-radius);
+    --pdx-group-r-tr: var(--pdx-group-radius);
+    --pdx-group-r-br: var(--pdx-group-radius);
+    --pdx-group-r-bl: var(--pdx-group-radius);
+}
+
+/* All children: radius via inherited custom props, set per position below */
+:is(.pdx-input-group, pdx-input-group) > * {
+    --_r-tl: 0px; --_r-tr: 0px; --_r-br: 0px; --_r-bl: 0px;
+    border-radius: var(--_r-tl) var(--_r-tr) var(--_r-br) var(--_r-bl);
+}
+:is(.pdx-input-group, pdx-input-group) > pdx-input .pdx-input-wrap {
+    border-radius: var(--_r-tl) var(--_r-tr) var(--_r-br) var(--_r-bl);
+}
+:is(.pdx-input-group, pdx-input-group) > pdx-button button[class] {
+    border-radius: var(--_r-tl) var(--_r-tr) var(--_r-br) var(--_r-bl);
+}
+
+/* First child: left radius */
+:is(.pdx-input-group, pdx-input-group) > :first-child {
+    --_r-tl: var(--pdx-group-r-tl); --_r-bl: var(--pdx-group-r-bl);
+}
+/* Last child: right radius */
+:is(.pdx-input-group, pdx-input-group) > :last-child {
+    --_r-tr: var(--pdx-group-r-tr); --_r-br: var(--pdx-group-r-br);
+}
+/* Only child: all radius */
+:is(.pdx-input-group, pdx-input-group) > :only-child {
+    --_r-tl: var(--pdx-group-r-tl); --_r-tr: var(--pdx-group-r-tr);
+    --_r-br: var(--pdx-group-r-br); --_r-bl: var(--pdx-group-r-bl);
+}
+
+/* Flex: inputs take remaining space */
+:is(.pdx-input-group, pdx-input-group) > .pdx-input,
+:is(.pdx-input-group, pdx-input-group) > .pdx-input-wrap,
+:is(.pdx-input-group, pdx-input-group) > pdx-input .pdx-input-wrap {
+    flex: 1;
+    width: auto;
+}
+
+/* Note: button/input height alignment inside groups depends on themes setting
+   consistent --pdx-button-min-height and --pdx-input-min-height tokens,
+   both scaled by --pdx-density-factor. See individual theme files. */
+
+/* Overlap borders — direct children and WC inner elements */
+:is(.pdx-input-group, pdx-input-group) > :not(:first-child) {
+    margin-left: calc(-1 * var(--pdx-border-width));
+}
+:is(.pdx-input-group, pdx-input-group) > pdx-input:not(:first-child) .pdx-input-wrap,
+:is(.pdx-input-group, pdx-input-group) > pdx-button:not(:first-child) button[class] {
+    margin-left: calc(-1 * var(--pdx-border-width));
+}
+
+/* Focus: raise z-index so focus ring isn't clipped */
+:is(.pdx-input-group, pdx-input-group) > .pdx-input-wrap:focus-within,
+:is(.pdx-input-group, pdx-input-group) > pdx-input .pdx-input-wrap:focus-within,
+:is(.pdx-input-group, pdx-input-group) > button:focus-visible,
+:is(.pdx-input-group, pdx-input-group) > pdx-button button[class]:focus-visible {
+    z-index: 1;
+    position: relative;
+}
+
+.pdx-input-addon {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+    white-space: nowrap;
+}
+
+/* ── Loading spinner (CSS-only, no WC dependency) ── */
+.pdx-input-loading {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    /* Faint primary track so the WHOLE ring reads (in dark the plain border track blends into
+       the bg → only a tiny moving arc is visible, easy to miss as "no animation"). The solid
+       primary arc then rotates against it for an unmistakable spinner. */
+    border: 2px solid color-mix(in oklab, var(--pdx-color-primary) 22%, transparent);
+    border-top-color: var(--pdx-color-primary);
+    border-radius: 50%;
+    animation: pdx-input-spin 0.6s linear infinite;
+}
+
+@keyframes pdx-input-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Textarea wrap — override fixed height, allow flexible ── */
+.pdx-textarea-wrap {
+    height: auto;
+    min-height: auto;
+    align-items: stretch;
+}
+
+.pdx-textarea-wrap > textarea {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: var(--pdx-space-xs) 0;
+    font: inherit;
+    color: inherit;
+    line-height: var(--pdx-line-normal);
+    min-height: 4.5em;
+}
+
+.pdx-textarea-wrap > textarea::placeholder { color: var(--pdx-color-muted); }
+
+.pdx-textarea-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--pdx-space-2xs);
+}
+
+/* ── Password toggle button ── */
+.pdx-password-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color var(--pdx-transition);
+}
+.pdx-password-toggle:hover { color: var(--pdx-color-text); }
+.pdx-password-toggle:disabled { cursor: not-allowed; opacity: var(--pdx-opacity-disabled); }
+
+/* ── Password strength meter ── */
+.pdx-password-strength {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-2xs);
+}
+.pdx-password-strength-track {
+    flex: 1;
+    height: 4px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-full);
+    overflow: hidden;
+}
+.pdx-password-strength-fill {
+    height: 100%;
+    border-radius: var(--pdx-radius-full);
+    transition: width 0.3s, background 0.3s;
+}
+.pdx-password-strength-label {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    min-width: 3rem;
+}
+
+/* ── Number input — uses input-group pattern with addon buttons ── */
+.pdx-number-group {
+    display: flex;
+    align-items: stretch;
+}
+
+/* Inner input wrap fills space, loses radius */
+.pdx-number-group > .pdx-input-wrap {
+    flex: 1;
+    border-radius: 0;
+    min-width: 0;
+}
+/* Center text by default */
+.pdx-number-group > .pdx-input-wrap > input { text-align: center; }
+/* Sign button: absolute overlay, positioned by JS to sit left of centered text */
+.pdx-number-group > .pdx-input-wrap.pdx-has-sign { position: relative; }
+.pdx-number-group > .pdx-input-wrap.pdx-has-sign > .pdx-number-sign { position: absolute; top: 0; bottom: 0; z-index: 1; }
+
+/* Addon stepper buttons — same base as .pdx-input-addon */
+.pdx-number-group > .pdx-input-addon {
+    cursor: pointer;
+    user-select: none;
+    font-size: 1rem;
+}
+.pdx-number-group > .pdx-input-addon:hover { background: var(--pdx-color-border); }
+.pdx-number-group > .pdx-input-addon:active { background: var(--pdx-color-border-strong); }
+.pdx-number-group > button:disabled { cursor: not-allowed; opacity: var(--pdx-opacity-disabled); }
+
+/* Join borders — same custom-property pattern as pdx-input-group */
+.pdx-number-group {
+    --pdx-group-radius: var(--pdx-radius-md);
+    --pdx-group-r-tl: var(--pdx-group-radius);
+    --pdx-group-r-tr: var(--pdx-group-radius);
+    --pdx-group-r-br: var(--pdx-group-radius);
+    --pdx-group-r-bl: var(--pdx-group-radius);
+}
+.pdx-number-group > * {
+    --_r-tl: 0px; --_r-tr: 0px; --_r-br: 0px; --_r-bl: 0px;
+    border-radius: var(--_r-tl) var(--_r-tr) var(--_r-br) var(--_r-bl);
+}
+.pdx-number-group > :not(:first-child) { margin-left: calc(-1 * var(--pdx-border-width)); }
+.pdx-number-group > :first-child { --_r-tl: var(--pdx-group-r-tl); --_r-bl: var(--pdx-group-r-bl); }
+.pdx-number-group > :last-child { --_r-tr: var(--pdx-group-r-tr); --_r-br: var(--pdx-group-r-br); }
+
+/* Focus ring not clipped */
+.pdx-number-group > .pdx-input-wrap:focus-within { z-index: 1; position: relative; }
+
+/* Sign toggle — inside input wrapper, right next to the number */
+.pdx-number-sign {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: auto;
+    padding: 0 2px 0 var(--pdx-space-xs);
+    border: none;
+    background: transparent;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    user-select: none;
+    transition: color var(--pdx-transition);
+}
+.pdx-number-sign.positive { color: var(--pdx-color-success-ink); }
+.pdx-number-sign.positive:hover { color: oklch(from var(--pdx-color-success) calc(l - 0.1) c h); }
+.pdx-number-sign.negative { color: var(--pdx-color-danger-ink); }
+.pdx-number-sign.negative:hover { color: oklch(from var(--pdx-color-danger) calc(l - 0.1) c h); }
+.pdx-number-sign:disabled { cursor: not-allowed; opacity: var(--pdx-opacity-disabled); }
+
+/* Number color by sign — on the wrapper, which the inner input inherits (`color: inherit` above).
+   `.pdx-number-negative > input` would lose to `.pdx-input-wrap > input.pdx-input` (0,1,1 against
+   0,2,1), and the number would stay in the text colour. */
+.pdx-input-wrap.pdx-number-positive { color: var(--pdx-color-success-ink); }
+.pdx-input-wrap.pdx-number-negative { color: var(--pdx-color-danger-ink); }
+
+/* Stacked stepper buttons (controls="right") */
+.pdx-number-btn-stack {
+    display: flex;
+    flex-direction: column;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    margin-left: calc(-1 * var(--pdx-border-width));
+    align-self: stretch;
+}
+.pdx-number-btn-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 1.75rem;
+    padding: 0;
+    border: none;
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    font-size: 0.6rem;
+    cursor: pointer;
+    user-select: none;
+}
+.pdx-number-btn-sm:hover { background: var(--pdx-color-border); color: var(--pdx-color-text); }
+.pdx-number-btn-sm:first-child { border-bottom: var(--pdx-border-width) solid var(--pdx-color-border); }
+
+/* ── OTP / PIN input cells ── */
+.pdx-otp-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+}
+
+.pdx-otp-cell {
+    width: 2.5rem;
+    height: 2.5rem;
+    text-align: center;
+    font-size: var(--pdx-text-lg);
+    font-weight: var(--pdx-weight-semibold);
+    font-family: var(--pdx-font-mono);
+    border: var(--pdx-border-width-focus) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    outline: none;
+    transition: border-color var(--pdx-transition), box-shadow var(--pdx-transition);
+}
+.pdx-otp-cell:focus {
+    border-color: var(--pdx-color-primary);
+    box-shadow: var(--pdx-focus-ring);
+}
+.pdx-otp-cell:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+
+.pdx-otp-wrap.error .pdx-otp-cell { border-color: var(--pdx-color-danger); }
+.pdx-otp-wrap.error .pdx-otp-cell:focus { box-shadow: 0 0 0 2px oklch(from var(--pdx-color-danger) l c h / 0.15); }
+
+/* OTP sizes */
+.pdx-otp-sm .pdx-otp-cell { width: 2rem; height: 2rem; font-size: var(--pdx-text-base); }
+.pdx-otp-lg .pdx-otp-cell { width: 3rem; height: 3rem; font-size: var(--pdx-text-xl); }
+
+.pdx-otp-separator {
+    font-size: var(--pdx-text-lg);
+    color: var(--pdx-color-muted);
+    padding: 0 var(--pdx-space-2xs);
+}
+
+/* ── Character count ── */
+.pdx-input-count {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    text-align: right;
+    margin-top: var(--pdx-space-2xs);
+}
+.pdx-input-count.over { color: var(--pdx-color-danger-ink); }
+
+/* ==========================================================================
+   Input Style Variants — Filled & Underlined
+   Activated by [pdx-input-style="filled|underlined"] on an ancestor
+   (typically <html>) or directly on the element.
+   Default = outlined (no attribute needed, uses base styles above).
+   Themes set --pdx-input-style token for documentation/tooling;
+   the app shell mirrors it as an attribute for CSS to read.
+   ========================================================================== */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FILLED — inset bg, bottom-border only, top-rounded corners
+   Material Design 3, some enterprise UIs
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Wrapper */
+[pdx-input-style="filled"] .pdx-input-wrap {
+    border: none;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border-strong);
+    border-radius: var(--pdx-radius-sm) var(--pdx-radius-sm) 0 0;
+    background: var(--pdx-color-inset);
+}
+
+[pdx-input-style="filled"] .pdx-input-wrap:focus-within {
+    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-width: var(--pdx-border-width-focus);
+    box-shadow: none;
+}
+
+[pdx-input-style="filled"] .pdx-input-wrap.error,
+[pdx-input-style="filled"] .pdx-input-wrap:has([aria-invalid="true"]) {
+    border-bottom-color: var(--pdx-color-danger);
+}
+[pdx-input-style="filled"] .pdx-input-wrap.error:focus-within,
+[pdx-input-style="filled"] .pdx-input-wrap:has([aria-invalid="true"]):focus-within {
+    box-shadow: none;
+}
+
+[pdx-input-style="filled"] .pdx-input-wrap.success { border-bottom-color: var(--pdx-color-success); }
+[pdx-input-style="filled"] .pdx-input-wrap.warning { border-bottom-color: var(--pdx-color-warning); }
+[pdx-input-style="filled"] :is(.pdx-input-wrap.success, .pdx-input-wrap.warning):focus-within { box-shadow: none; }
+
+/* Standalone input (no wrapper) */
+[pdx-input-style="filled"] .pdx-input:not(.pdx-input-wrap > *) {
+    border: none;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border-strong);
+    border-radius: var(--pdx-radius-sm) var(--pdx-radius-sm) 0 0;
+    background: var(--pdx-color-inset);
+}
+[pdx-input-style="filled"] .pdx-input:not(.pdx-input-wrap > *):focus-visible {
+    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-width: var(--pdx-border-width-focus);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Input group */
+[pdx-input-style="filled"] :is(.pdx-input-group, pdx-input-group) {
+    --pdx-group-r-tl: var(--pdx-radius-sm);
+    --pdx-group-r-tr: var(--pdx-radius-sm);
+    --pdx-group-r-br: 0px;
+    --pdx-group-r-bl: 0px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm) var(--pdx-radius-sm) 0 0;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border-strong);
+}
+[pdx-input-style="filled"] :is(.pdx-input-group, pdx-input-group) .pdx-input-wrap,
+[pdx-input-style="filled"] :is(.pdx-input-group, pdx-input-group) > .pdx-input {
+    border: none;
+    background: transparent;
+}
+[pdx-input-style="filled"] .pdx-input-addon {
+    border: none;
+    background: transparent;
+}
+
+/* Number group */
+[pdx-input-style="filled"] .pdx-number-group {
+    --pdx-group-r-tl: var(--pdx-radius-sm);
+    --pdx-group-r-tr: var(--pdx-radius-sm);
+    --pdx-group-r-br: 0px;
+    --pdx-group-r-bl: 0px;
+    background: var(--pdx-color-inset);
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border-strong);
+    border-radius: var(--pdx-radius-sm) var(--pdx-radius-sm) 0 0;
+}
+[pdx-input-style="filled"] .pdx-number-group > * { border-color: transparent; }
+[pdx-input-style="filled"] .pdx-number-group > .pdx-input-wrap {
+    border: none;
+    background: transparent;
+}
+[pdx-input-style="filled"] .pdx-number-group > .pdx-input-addon {
+    border: none;
+    border-left: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+[pdx-input-style="filled"] .pdx-number-group > .pdx-input-addon:first-child {
+    border-left: none;
+    border-right: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+[pdx-input-style="filled"] .pdx-number-group > .pdx-number-btn-stack {
+    border: none;
+    border-left: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+
+/* Select standalone */
+[pdx-input-style="filled"] select.pdx-input {
+    border: none;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border-strong);
+    border-radius: var(--pdx-radius-sm) var(--pdx-radius-sm) 0 0;
+    background-color: var(--pdx-color-inset);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   UNDERLINED — transparent bg, bottom-border only, no radius
+   Editorial, cyberpunk, minimal UIs
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Wrapper */
+[pdx-input-style="underlined"] .pdx-input-wrap {
+    border: none;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+    background: transparent;
+}
+
+[pdx-input-style="underlined"] .pdx-input-wrap:focus-within {
+    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-width: var(--pdx-border-width-focus);
+    box-shadow: none;
+}
+
+[pdx-input-style="underlined"] .pdx-input-wrap.error,
+[pdx-input-style="underlined"] .pdx-input-wrap:has([aria-invalid="true"]) {
+    border-bottom-color: var(--pdx-color-danger);
+}
+[pdx-input-style="underlined"] .pdx-input-wrap.error:focus-within,
+[pdx-input-style="underlined"] .pdx-input-wrap:has([aria-invalid="true"]):focus-within {
+    box-shadow: none;
+}
+
+[pdx-input-style="underlined"] .pdx-input-wrap.success { border-bottom-color: var(--pdx-color-success); }
+[pdx-input-style="underlined"] .pdx-input-wrap.warning { border-bottom-color: var(--pdx-color-warning); }
+[pdx-input-style="underlined"] :is(.pdx-input-wrap.success, .pdx-input-wrap.warning):focus-within { box-shadow: none; }
+
+/* Standalone input (no wrapper) */
+[pdx-input-style="underlined"] .pdx-input:not(.pdx-input-wrap > *) {
+    border: none;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+    background: transparent;
+}
+[pdx-input-style="underlined"] .pdx-input:not(.pdx-input-wrap > *):focus-visible {
+    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-width: var(--pdx-border-width-focus);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Input group */
+[pdx-input-style="underlined"] :is(.pdx-input-group, pdx-input-group) {
+    --pdx-group-r-tl: 0px;
+    --pdx-group-r-tr: 0px;
+    --pdx-group-r-br: 0px;
+    --pdx-group-r-bl: 0px;
+    background: transparent;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border);
+}
+[pdx-input-style="underlined"] :is(.pdx-input-group, pdx-input-group) .pdx-input-wrap,
+[pdx-input-style="underlined"] :is(.pdx-input-group, pdx-input-group) > .pdx-input {
+    border: none;
+    background: transparent;
+}
+[pdx-input-style="underlined"] .pdx-input-addon {
+    border: none;
+    background: transparent;
+}
+
+/* Number group */
+[pdx-input-style="underlined"] .pdx-number-group {
+    --pdx-group-r-tl: 0px;
+    --pdx-group-r-tr: 0px;
+    --pdx-group-r-br: 0px;
+    --pdx-group-r-bl: 0px;
+    background: transparent;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+}
+[pdx-input-style="underlined"] .pdx-number-group > * { border-color: transparent; }
+[pdx-input-style="underlined"] .pdx-number-group > .pdx-input-wrap {
+    border: none;
+    background: transparent;
+}
+[pdx-input-style="underlined"] .pdx-number-group > .pdx-input-addon {
+    border: none;
+    border-left: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+[pdx-input-style="underlined"] .pdx-number-group > .pdx-input-addon:first-child {
+    border-left: none;
+    border-right: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+[pdx-input-style="underlined"] .pdx-number-group > .pdx-number-btn-stack {
+    border: none;
+    border-left: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+
+/* Select standalone */
+[pdx-input-style="underlined"] select.pdx-input {
+    border: none;
+    border-bottom: var(--pdx-input-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+    background-color: transparent;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FOCUS ACCENT — bottom-border emphasis on focus (Fluent style)
+   Works with outlined inputs: keeps full border but accents bottom on focus.
+   Activated by [pdx-input-focus="bottom"] on ancestor.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[pdx-input-focus="bottom"] .pdx-input-wrap:focus-within {
+    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-width: var(--pdx-border-width-focus);
+    box-shadow: none;
+}
+[pdx-input-focus="bottom"] .pdx-input:not(.pdx-input-wrap > *):focus-visible {
+    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-width: var(--pdx-border-width-focus);
+    box-shadow: none;
+    outline: none;
+}

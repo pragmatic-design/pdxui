@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icon</h2>
+    <div class="demo-row">
+      <pdx-chip variant="primary"><pdx-icon name="tag" size="sm"></pdx-icon> Label</pdx-chip>
+      <pdx-chip variant="success"><pdx-icon name="check" size="sm"></pdx-icon> Verified</pdx-chip>
+      <pdx-chip variant="danger"><pdx-icon name="alert-triangle" size="sm"></pdx-icon> Error</pdx-chip>
+      <pdx-chip variant="tonal"><pdx-icon name="clock" size="sm"></pdx-icon> Pending</pdx-chip>
+    </div>
+  </section>
+</template>

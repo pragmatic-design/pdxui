@@ -1,0 +1,51 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Segmented Control</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-segmented&gt;</code> — radio-group style selector with sliding indicator animation.
+      Uses <code>role="radiogroup"</code>.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-segmented-basic class="demo-section"></pdx-demo-comp-segmented-basic>
+
+    <!-- ═══ Object Options ═══ -->
+    <pdx-demo-comp-segmented-object-options class="demo-section"></pdx-demo-comp-segmented-object-options>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-segmented-sizes class="demo-section"></pdx-demo-comp-segmented-sizes>
+
+    <!-- ═══ Full Width ═══ -->
+    <pdx-demo-comp-segmented-full-width class="demo-section"></pdx-demo-comp-segmented-full-width>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-segmented-disabled class="demo-section"></pdx-demo-comp-segmented-disabled>
+
+    <!-- ═══ Form ═══ -->
+    <pdx-demo-comp-segmented-form class="demo-section"></pdx-demo-comp-segmented-form>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Selected value</span></div>
+        <div class="opt-row"><code>options</code><span>string</span><span>JSON array: string[] or {label,value}[]</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>full</code><span>boolean</span><span>Full width (stretch to container)</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal (default), vertical</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/segmented';
+@title 'Segmented Control';
+</script>
+
+<style scoped>
+  .page { }
+</style>

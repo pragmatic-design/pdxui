@@ -1,0 +1,50 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">EmptyState</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-empty-state&gt;</code> — placeholder for empty data views.
+      Icon + title + description + optional action button.
+    </p>
+
+    <pdx-demo-comp-empty-state-basic class="demo-section"></pdx-demo-comp-empty-state-basic>
+
+    <pdx-demo-comp-empty-state-with-action class="demo-section"></pdx-demo-comp-empty-state-with-action>
+
+    <pdx-demo-comp-empty-state-search class="demo-section"></pdx-demo-comp-empty-state-search>
+
+    <pdx-demo-comp-empty-state-error class="demo-section"></pdx-demo-comp-empty-state-error>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>icon</code></td><td>String</td><td>'inbox'</td><td>Icon name</td></tr>
+            <tr><td><code>title</code></td><td>String</td><td>'No data'</td><td>Title text</td></tr>
+            <tr><td><code>description</code></td><td>String</td><td>''</td><td>Description text</td></tr>
+            <tr><td><code>action-label</code></td><td>String</td><td>''</td><td>Action button label (empty = no button)</td></tr>
+            <tr><td><code>icon-size</code></td><td>Number</td><td>48</td><td>Icon size (px)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/empty-state';
+@title 'EmptyState — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-container {
+  max-width: 500px;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+}
+</style>

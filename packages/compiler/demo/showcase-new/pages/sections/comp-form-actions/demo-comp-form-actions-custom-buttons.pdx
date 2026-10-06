@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom buttons (slot)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Project your own buttons to replace the defaults entirely.</p>
+    <div class="demo-container">
+      <pdx-form-actions align="between">
+        <button class="pdx-btn pdx-ghost pdx-danger">Delete</button>
+        <span class="spacer"></span>
+        <button class="pdx-btn pdx-outline">Save draft</button>
+        <button class="pdx-btn pdx-primary">Publish</button>
+      </pdx-form-actions>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.spacer { flex: 1; }
+</style>

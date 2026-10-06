@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Rich Item Template</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Avatar + name + role + badge layout.</p>
+    <div class="demo-container">
+      <pdx-list :items="richItems" :render-item="renderRichItem" dividers></pdx-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>function renderRichItem(user) {
+  const statusColor = user.status === 'Active'
+    ? 'var(--pdx-color-success)' : 'var(--pdx-color-muted)';
+  return '&lt;div class="avatar"&gt;' + user.initials + '&lt;/div&gt;'
+    + '&lt;div&gt;&lt;strong&gt;' + user.name + '&lt;/strong&gt;'
+    + '&lt;div class="role"&gt;' + user.role + '&lt;/div&gt;&lt;/div&gt;'
+    + '&lt;span class="status"&gt;' + user.status + '&lt;/span&gt;';
+}
+
+&lt;pdx-list :items="richItems"
+  :render-item="renderRichItem" dividers&gt;
+&lt;/pdx-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const richItems = [
+  { id: 1, name: 'Alice Johnson', role: 'Frontend', status: 'Active', initials: 'AJ' },
+  { id: 2, name: 'Bob Smith', role: 'Backend', status: 'Active', initials: 'BS' },
+  { id: 3, name: 'Carol White', role: 'Design', status: 'Away', initials: 'CW' },
+  { id: 4, name: 'David Brown', role: 'PM', status: 'Offline', initials: 'DB' },
+];
+
+function renderRichItem(userItem) {
+  const statusColor = userItem.status === 'Active' ? 'var(--pdx-color-success)' : userItem.status === 'Away' ? 'var(--pdx-color-warning)' : 'var(--pdx-color-muted)';
+  return '<div style="width:32px;height:32px;border-radius:50%;background:var(--pdx-color-primary);color:var(--pdx-color-primary-text);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;flex-shrink:0">' + userItem.initials + '</div><div style="flex:1;min-width:0"><div style="font-weight:500">' + userItem.name + '</div><div style="font-size:0.75rem;color:var(--pdx-color-muted)">' + userItem.role + '</div></div><span style="font-size:0.7rem;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:' + statusColor + '"></span>' + userItem.status + '</span>';
+}
+</script>

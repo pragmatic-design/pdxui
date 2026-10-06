@@ -1,0 +1,114 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Banners</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Full-width announcement bars with 4 semantic variants, subtle mode, action links, and dismissable close.
+      <strong>CSS only</strong> — apply classes to <code>&lt;div&gt;</code> elements.
+    </p>
+
+    <!-- ═══ Default Banner ═══ -->
+    <pdx-demo-design-banner-default class="demo-section"></pdx-demo-design-banner-default>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-design-banner-variants class="demo-section"></pdx-demo-design-banner-variants>
+
+    <!-- ═══ Subtle ═══ -->
+    <pdx-demo-design-banner-subtle class="demo-section"></pdx-demo-design-banner-subtle>
+
+    <!-- ═══ With Action ═══ -->
+    <pdx-demo-design-banner-action-link class="demo-section"></pdx-demo-design-banner-action-link>
+
+    <!-- ═══ With Close ═══ -->
+    <pdx-demo-design-banner-close class="demo-section"></pdx-demo-design-banner-close>
+
+    <!-- ═══ Centered ═══ -->
+    <pdx-demo-design-banner-centered class="demo-section"></pdx-demo-design-banner-centered>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-banner-composition class="demo-section"></pdx-demo-design-banner-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner</code><span>Base</span><span>Full-width bar, primary bg</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-info</code><span>Variant</span><span>Primary background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-success</code><span>Variant</span><span>Success (green) background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-warning</code><span>Variant</span><span>Warning (yellow) background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-danger</code><span>Variant</span><span>Danger (red) background</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-subtle</code><span>Variant</span><span>Inset bg + border (low emphasis)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-icon</code><span>Part</span><span>Icon slot (flex-shrink: 0)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-text</code><span>Part</span><span>Main text (flex: 1)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-action</code><span>Part</span><span>Underlined semibold CTA link</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-close</code><span>Part</span><span>Dismiss button</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-banner-centered</code><span>Modifier</span><span>Center-aligned content</span>
+        </div>
+        <div class="opt-row">
+          <code>pdx-sticky</code><span>Attribute</span><span>Sticky top positioning</span>
+        </div>
+        <div class="opt-row">
+          <code>hidden</code><span>Attribute</span><span>Hides the banner (display: none)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/banner';
+@title 'Banners';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .banner-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+
+  /* Source block */
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 200px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

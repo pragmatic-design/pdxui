@@ -1,0 +1,138 @@
+<template>
+  <!-- The rail's SECOND LEVEL: not the rail's entries unfolding, a second panel beside
+       it, with every screen and record the showcase has, grouped, which can be pinned into the rail.
+       A panel over the content, not modal: Escape, a click outside or a choice closes it, and the
+       focus goes back to its opener. The same `pdx-nav-menu` as the rail, so it is walked with the
+       same keys. `:show`, not `@if`: the menu projects its item slot.
+       Its head is a search, as the reference's is: with every entity in one list, finding one by
+       name is the quicker way. Where it sits and how wide it is is the shell's layout;
+       what is inside is this component's. -->
+  <aside
+    id="catalog"
+    class="catalog"
+    role="dialog"
+    aria-modal="false"
+    :aria-label="$t('app.rail.all')"
+    :show="open"
+    :ref="catalogEl"
+    data-test="catalog">
+    <div class="catalog-head">
+      <input
+        class="pdx-input catalog-search"
+        type="search"
+        :value="catalogQuery"
+        :placeholder="$t('app.rail.search')"
+        :aria-label="$t('app.rail.search')"
+        @input="e => catalogQuery = e.target.value"
+        @keydown="onCatalogSearchKey"
+        :ref="catalogSearchEl"
+        data-test="catalog-search" />
+      <button class="catalog-close" type="button" :aria-label="$t('app.rail.closeAll')" @click="dismiss(true)" data-test="catalog-close">×</button>
+    </div>
+    <p class="catalog-empty pdx-txt-small pdx-ink-muted" :show="catalogItems.length === 0" data-test="catalog-empty">{{ $t('app.rail.noMatch', { query: catalogQuery }) }}</p>
+    <pdx-nav-menu
+      class="rail-nav catalog-nav"
+      :items="catalogItems"
+      :active-key="activeCatalogKey"
+      :indent="24"
+      chevron="end"
+      actions="overlay"
+      @pdx-select="onCatalogSelect"
+      data-test="catalog-nav">
+      <slot name="item" let:item>
+        <span class="pdx-nav-icon rail-icon" aria-hidden="true">{{ item.glyph }}</span>
+        <span class="pdx-nav-label rail-label">{{ item.label }}</span>
+      </slot>
+      <!-- The pin, beside the entry's link and not inside it. -->
+      <slot name="actions" let:item>
+        @if (item.href) {
+          <span class="rail-tools catalog-tools">
+            <button
+              class="rail-tool"
+              type="button"
+              :aria-pressed="favourites.isPinned(item.pin) ? 'true' : 'false'"
+              :aria-label="$t('app.rail.pin', { name: item.label })"
+              :data-test="item.data.test + '-pin'"
+              @click.prevent.stop="favourites.togglePin(item.pin)"><svg class="pushpin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pushpin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
+          </span>
+        }
+      </slot>
+    </pdx-nav-menu>
+  </aside>
+</template>
+
+<script setup>
+import { navigate, currentPath } from '@pdxui/router';
+import { CATALOG, fold, activeFor } from './nav-model';
+import type { Favourites } from './favourites';
+
+/** Whether the panel is open: the shell's, which also decides the Escape order with the drawer. */
+@prop open: boolean = false;
+/** The pins, shared with the rail: `createFavourites()` in the shell (CD-S1, one owner). */
+@prop favourites: Favourites | null = null;
+/** Asked to close by its own close button; `true`: give the focus back to the opener. */
+@event dismiss: boolean;
+/** An entry was chosen: the panel has navigated, and the shell puts it away. */
+@event picked: string;
+
+let catalogEl = $signal(null);
+let catalogSearchEl = $signal(null);
+
+/** What the search holds. A new opening starts from the whole list. */
+let catalogQuery = $signal('');
+
+// Opening lands on the search: the reference opens there, and a list of every entity is found by
+// name faster than by arrows.
+$watch(open, (isOpen) => {
+    if (!isOpen) return;
+    catalogQuery = '';
+    requestAnimationFrame(() => catalogSearchEl?.focus());
+});
+
+/** ArrowDown from the search goes into the list, as it does from a combobox's field. */
+function onCatalogSearchKey(e) {
+    if (e.key !== 'ArrowDown') return;
+    const first = catalogEl?.querySelector('.pdx-nav-item');
+    if (!first) return;
+    e.preventDefault();
+    first.focus();
+}
+
+/** A choice navigates, and the shell puts the panel away. */
+function onCatalogSelect(e) {
+    if (!e.detail.href) return;
+    e.preventDefault();
+    navigate(e.detail.href);
+    picked(e.detail.href);
+}
+
+/** Every group of entities. Each entry is named `cat-…` in the panel; it keeps its rail name for
+ *  when it is pinned there. The search keeps the entries whose name has it, and a group with none
+ *  left goes with them. */
+const catalogItems = $derived(CATALOG.map(h => ({
+    type: 'header', key: 'cat-' + h.key, label: h.label(), data: { test: 'cat-' + h.key },
+    children: h.children.map(i => ({
+        ...i, key: 'cat-' + i.key, pin: i.key, nested: false,
+        label: i.label(), data: { test: 'cat-' + i.key },
+    })).filter(i => fold(i.label).includes(fold(catalogQuery.trim()))),
+})).filter(h => h.children.length > 0));
+
+const activeCatalogKey = $derived('cat-' + activeFor(currentPath()));
+</script>
+
+<style scoped>
+  .catalog-head {
+    display: flex; align-items: center; gap: var(--pdx-space-xs);
+    height: var(--app-bar-height); padding: 0 var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+    border-bottom: 1px solid var(--pdx-color-border);
+    box-sizing: border-box;
+  }
+  .catalog-search { flex: 1; min-width: 0; }
+  .catalog-empty { margin: 0; padding: var(--pdx-space-md); }
+  .catalog-close {
+    width: 32px; height: 32px; border: 0; border-radius: var(--pdx-radius-sm);
+    background: transparent; color: var(--pdx-color-muted); font-size: 20px; cursor: pointer;
+  }
+  .catalog-close:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+</style>

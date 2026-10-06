@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Simulated Fetch</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click "Load Data" to block for 2 seconds, then unblock.</p>
+    <div class="demo-actions">
+      <button class="pdx-btn pdx-outline pdx-btn-xs" @click="simulateFetch">Load Data</button>
+    </div>
+    <div class="demo-wrap">
+      <pdx-block-ui :blocked="fetchLoading" id="fetch-block">
+        <div class="demo-panel">
+          <div class="pdx-txt-small" id="fetch-content">{{ fetchContent }}</div>
+        </div>
+      </pdx-block-ui>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let fetchLoading = $signal(false);
+let fetchContent = $signal('Click "Load Data" to simulate a fetch...');
+
+function simulateFetch() {
+  fetchLoading = true;
+  setTimeout(function() {
+    fetchLoading = false;
+    fetchContent = 'Data loaded successfully at ' + new Date().toLocaleTimeString();
+  }, 2000);
+}
+</script>

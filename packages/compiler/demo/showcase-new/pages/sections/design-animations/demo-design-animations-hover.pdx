@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Hover Effects</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Interactive hover states. Hover over each card to see the effect.</p>
+
+    <div class="hover-grid">
+      <div class="hover-card pdx-hover-lift">
+        <span class="pdx-txt-small">Lift</span>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-hover-lift</span>
+      </div>
+      <div class="hover-card pdx-hover-grow">
+        <span class="pdx-txt-small">Grow</span>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-hover-grow</span>
+      </div>
+      <div class="hover-card pdx-hover-glow">
+        <span class="pdx-txt-small">Glow</span>
+        <span class="pdx-txt-caption pdx-ink-muted">.pdx-hover-glow</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-hover-lift"&gt;Lifts on hover&lt;/div&gt;
+&lt;div class="pdx-hover-grow"&gt;Grows on hover&lt;/div&gt;
+&lt;div class="pdx-hover-glow"&gt;Glows on hover (primary ring)&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .hover-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-lg);
+    margin-top: var(--pdx-space-md);
+  }
+  .hover-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-lg);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    cursor: pointer;
+    min-width: 120px;
+  }
+</style>

@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Initial Focus</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Control which element receives focus when the dialog opens via <code>initial-focus</code> selector.</p>
+    <pdx-button variant="outline" size="sm" @click="openFocus">Open (focus on email)</pdx-button>
+    <pdx-dialog :open="focusOpen" title="Login" size="sm" :initialfocus="focusSelector" @pdx-close="closeFocus">
+      <div class="form-fields">
+        <label class="pdx-txt-small pdx-ink-muted">Username</label>
+        <input type="text" class="pdx-input" placeholder="username" />
+        <label class="pdx-txt-small pdx-ink-muted">Email</label>
+        <input type="email" class="pdx-input focus-email" placeholder="email@example.com" />
+      </div>
+      <span slot="footer">
+        <pdx-button variant="ghost" size="sm" @click="closeFocus">Cancel</pdx-button>
+        <pdx-button variant="primary" size="sm" @click="closeFocus">Login</pdx-button>
+      </span>
+    </pdx-dialog>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="focusOpen" title="Login" size="sm"
+  :initialfocus="'.focus-email'" @pdx-close="closeFocus"&gt;
+  &lt;input type="text" class="pdx-input" placeholder="username" /&gt;
+  &lt;input type="email" class="pdx-input focus-email" placeholder="email" /&gt;
+  &lt;span slot="footer"&gt;
+    &lt;pdx-button variant="ghost" @click="closeFocus"&gt;Cancel&lt;/pdx-button&gt;
+    &lt;pdx-button variant="primary" @click="closeFocus"&gt;Login&lt;/pdx-button&gt;
+  &lt;/span&gt;
+&lt;/pdx-dialog&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let focusOpen = $signal(false);
+const focusSelector = '.focus-email';
+
+function openFocus() { focusOpen = true; }
+function closeFocus() { focusOpen = false; }
+</script>

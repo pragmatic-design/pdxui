@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Tonal / Subtle Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Muted background, no border. Use <code>variant="tonal-primary"</code> etc.</p>
+
+    <div class="demo-row">
+      <pdx-chip variant="tonal">Default</pdx-chip>
+      <pdx-chip variant="tonal-primary">Primary</pdx-chip>
+      <pdx-chip variant="tonal-success">Success</pdx-chip>
+      <pdx-chip variant="tonal-danger">Danger</pdx-chip>
+      <pdx-chip variant="tonal-warning">Warning</pdx-chip>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chip variant="tonal-primary"&gt;Primary&lt;/pdx-chip&gt;
+&lt;pdx-chip variant="tonal-danger"&gt;Danger&lt;/pdx-chip&gt;</code></pre>
+    </details>
+  </section>
+</template>

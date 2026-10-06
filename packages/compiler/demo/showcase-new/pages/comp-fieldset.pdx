@@ -1,0 +1,58 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Fieldset</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-fieldset&gt;</code> — semantic form group with native <code>&lt;fieldset&gt;</code> and <code>&lt;legend&gt;</code>.
+      Collapsible, disabled propagation, error state.
+    </p>
+
+    <!-- ═══ Bordered ═══ -->
+    <pdx-demo-comp-fieldset-bordered class="demo-section"></pdx-demo-comp-fieldset-bordered>
+
+    <!-- ═══ Filled ═══ -->
+    <pdx-demo-comp-fieldset-filled class="demo-section"></pdx-demo-comp-fieldset-filled>
+
+    <!-- ═══ Plain ═══ -->
+    <pdx-demo-comp-fieldset-plain class="demo-section"></pdx-demo-comp-fieldset-plain>
+
+    <!-- ═══ Collapsible ═══ -->
+    <pdx-demo-comp-fieldset-collapsible class="demo-section"></pdx-demo-comp-fieldset-collapsible>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-fieldset-disabled class="demo-section"></pdx-demo-comp-fieldset-disabled>
+
+    <!-- ═══ Invalid ═══ -->
+    <pdx-demo-comp-fieldset-invalid class="demo-section"></pdx-demo-comp-fieldset-invalid>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>legend</code><span>string</span><span>Legend text</span></div>
+        <div class="opt-row"><code>description</code><span>string</span><span>Help text below legend</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>bordered, filled, plain</span></div>
+        <div class="opt-row"><code>collapsible</code><span>boolean</span><span>Show collapse toggle</span></div>
+        <div class="opt-row"><code>collapsed</code><span>boolean</span><span>Collapsed state (controlled)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables all children</span></div>
+        <div class="opt-row"><code>invalid</code><span>boolean</span><span>Error border state</span></div>
+        <div class="opt-row"><code>error</code><span>string</span><span>Error message text</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/fieldset';
+@title 'Fieldset';
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-md) 0;
+  }
+</style>

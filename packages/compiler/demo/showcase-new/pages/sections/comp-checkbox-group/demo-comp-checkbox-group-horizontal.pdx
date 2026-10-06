@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal Orientation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>orientation="horizontal"</code> for an inline layout.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Toppings"></pdx-label>
+        <pdx-checkbox-group orientation="horizontal" value="cheese">
+          <pdx-checkbox label="Cheese" value="cheese"></pdx-checkbox>
+          <pdx-checkbox label="Pepperoni" value="pepperoni"></pdx-checkbox>
+          <pdx-checkbox label="Mushrooms" value="mushrooms"></pdx-checkbox>
+          <pdx-checkbox label="Olives" value="olives"></pdx-checkbox>
+        </pdx-checkbox-group>
+      </div>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Mini Mode (Collapsed)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Icons only when collapsed. Set <code>mini</code> + unset <code>open</code>.</p>
+    <div class="demo-layout">
+      <pdx-sidebar mini :width="240" :collapsedWidth="56">
+        <pdx-nav-menu :items="sidebarItems" activekey="dashboard"></pdx-nav-menu>
+      </pdx-sidebar>
+      <div class="demo-content">Content next to mini sidebar</div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-sidebar mini :width="240" :collapsedWidth="56"&gt;
+  &lt;pdx-nav-menu :items="items" activekey="dashboard"&gt;&lt;/pdx-nav-menu&gt;
+&lt;/pdx-sidebar&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const sidebarItems = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'home' },
+  { key: 'analytics', label: 'Analytics', icon: 'trending-up' },
+  { key: 'projects', label: 'Projects', icon: 'folder' },
+  { key: 'team', label: 'Team', icon: 'users' },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'settings', label: 'Settings', icon: 'settings' },
+];
+</script>

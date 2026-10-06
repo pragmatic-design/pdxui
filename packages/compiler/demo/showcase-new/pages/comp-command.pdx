@@ -1,0 +1,63 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Command</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-command&gt;</code> — a command palette (⌘K / Ctrl+K). Fuzzy filter, grouped
+      items, keyboard shortcuts, arrow-key navigation, focus trap and an empty state.
+    </p>
+
+    <pdx-demo-comp-command-basic class="demo-section"></pdx-demo-comp-command-basic>
+
+    <pdx-demo-comp-command-custom class="demo-section"></pdx-demo-comp-command-custom>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>open</code><span>boolean</span><span>Open state (two-way via pdx-open/pdx-close)</span></div>
+        <div class="opt-row"><code>items</code><span>CommandItem[]</span><span>{ id, label, group?, icon?, shortcut?, action?, disabled?, keywords? }</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>Search input placeholder</span></div>
+        <div class="opt-row"><code>empty-text</code><span>string</span><span>Text shown when no item matches</span></div>
+        <div class="opt-row"><code>hotkey</code><span>boolean</span><span>Bind the global ⌘K / Ctrl+K opener (default true)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods (via a ref)</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Method</span><span>What it does</span></div>
+        <div class="opt-row"><code>show()</code><span>Open the palette</span></div>
+        <div class="opt-row"><code>close()</code><span>Close it</span></div>
+        <div class="opt-row"><code>toggle()</code><span>Open or close it</span></div>
+        <div class="opt-row"><code>isOpen</code><span>Read-only: whether it is open</span></div>
+        <div class="opt-row"><code>openPalette() / closePalette()</code><span>Deprecated aliases of show() / close()</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-open</code><span>—</span></div>
+        <div class="opt-row"><code>pdx-close</code><span>—</span></div>
+        <div class="opt-row"><code>pdx-select</code><span>CommandItem</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Keys</span><span>Action</span></div>
+        <div class="opt-row"><code>Ctrl/⌘ + K</code><span>Open the palette</span></div>
+        <div class="opt-row"><code>↑ / ↓</code><span>Move highlight</span></div>
+        <div class="opt-row"><code>Enter</code><span>Run highlighted command</span></div>
+        <div class="opt-row"><code>Esc</code><span>Close</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/command';
+@title 'Command';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+.run-note { white-space: nowrap; }
+</style>

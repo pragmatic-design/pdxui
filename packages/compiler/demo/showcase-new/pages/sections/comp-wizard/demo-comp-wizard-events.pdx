@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Events</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Listen to <code>pdx-change</code> and <code>pdx-complete</code>.</p>
+
+    <div class="demo-box">
+      <pdx-wizard @pdx-change="onStepChange" @pdx-complete="onComplete">
+        <div data-wizard-step data-label="First">
+          <p class="pdx-txt-body">Navigate and watch the event log below.</p>
+        </div>
+        <div data-wizard-step data-label="Second">
+          <p class="pdx-txt-body">Almost there...</p>
+        </div>
+        <div data-wizard-step data-label="Done">
+          <p class="pdx-txt-body">Click Complete to fire the complete event.</p>
+        </div>
+      </pdx-wizard>
+      <div class="event-log pdx-txt-mono pdx-txt-small" id="wizard-event-log">{{ wizardLog }}</div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let wizardLog = $signal('No events yet');
+
+function onStepChange(e) {
+  wizardLog = 'pdx-change: step ' + e.detail.value + ' (from ' + e.detail.previous + ')';
+}
+
+function onComplete(e) {
+  wizardLog = 'pdx-complete: step ' + e.detail.value + ' — Done!';
+}
+</script>
+
+<style scoped>
+.event-log {
+  margin-top: var(--pdx-space-md);
+  padding: var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+}
+</style>

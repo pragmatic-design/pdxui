@@ -1,0 +1,10 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Description</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Extra context below the value.</p>
+    <div class="demo-row">
+      <pdx-statistic title="MRR" prefix="$" value="48250" :precision="0" group-separator="," trend="up" trend-value="+12.5%" description="Monthly Recurring Revenue"></pdx-statistic>
+      <pdx-statistic title="Churn Rate" value="2.4" suffix="%" trend="down" trend-value="-0.8%" description="30-day rolling average"></pdx-statistic>
+    </div>
+  </section>
+</template>

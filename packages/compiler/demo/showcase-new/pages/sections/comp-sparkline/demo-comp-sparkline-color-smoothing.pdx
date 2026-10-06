@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Color &amp; smoothing</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>color</code> takes any CSS color or a design token (<code>--pdx-color-*</code>); it defaults to the
+      theme palette. <code>smooth</code> (default true) toggles bézier vs. straight segments.
+    </p>
+    <div class="demo-container">
+      <div class="spark-grid">
+        <div class="spark-item">
+          <span class="pdx-txt-small pdx-ink-muted">primary</span>
+          <pdx-sparkline data="30,45,38,52,49,61" color="--pdx-color-primary" width="150px" height="40px"></pdx-sparkline>
+        </div>
+        <div class="spark-item">
+          <span class="pdx-txt-small pdx-ink-muted">warning</span>
+          <pdx-sparkline data="30,45,38,52,49,61" color="--pdx-color-warning" width="150px" height="40px"></pdx-sparkline>
+        </div>
+        <div class="spark-item">
+          <span class="pdx-txt-small pdx-ink-muted">smooth = false</span>
+          <pdx-sparkline data="30,45,38,52,49,61,44,58" smooth="false" width="150px" height="40px"></pdx-sparkline>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>

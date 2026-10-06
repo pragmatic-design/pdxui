@@ -1,0 +1,32 @@
+<template>
+  <div class="demo">
+    <h2>Selection Model</h2>
+    <p class="desc">Key-based: single/multiple, toggle/replace, range select (Shift+Click), disabled keys.</p>
+
+    <pdx-demo-infra-selection-single class="demo-section"></pdx-demo-infra-selection-single>
+
+    <pdx-demo-infra-selection-multiple class="demo-section"></pdx-demo-infra-selection-multiple>
+
+    <pdx-demo-infra-selection-grid class="demo-section"></pdx-demo-infra-selection-grid>
+  </div>
+</template>
+
+<script setup>
+@page '/infra/selection';
+@title 'Selection Model';
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+  .list { display: flex; flex-direction: column; gap: 4px; }
+  .item { padding: 8px 12px; border: 1px solid var(--pdx-color-border); border-radius: 4px; cursor: pointer; font-size: 0.85rem; user-select: none; -webkit-user-select: none; transition: all 150ms; }
+  .item:hover { background: var(--pdx-color-inset); }
+  .item.selected { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border-color: var(--pdx-color-primary); }
+  .item.disabled { opacity: 0.4; cursor: not-allowed; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 36px; margin: 8px 0 0; }
+</style>

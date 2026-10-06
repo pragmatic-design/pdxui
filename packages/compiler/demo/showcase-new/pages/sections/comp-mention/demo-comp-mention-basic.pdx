@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic @Mention</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Type <code>@</code> followed by a name to see suggestions.</p>
+
+    <div class="demo-row">
+      <pdx-mention
+        :items="users"
+        label="Comment"
+        placeholder="Type @ to mention a user..."
+        :rows="4"
+      ></pdx-mention>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { users } from './state.pdx';
+</script>

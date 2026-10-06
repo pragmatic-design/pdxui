@@ -1,0 +1,143 @@
+<template>
+  <div class="landing">
+    <section class="hero shell-wrap">
+      <div class="hero-left">
+        <span class="eyebrow">Signal-based · Compiler-first · Agent-native</span>
+        <h1 class="hero-title">
+          <span class="metal-gradient">Declare the intent.</span><br />
+          The compiler writes the wiring.
+        </h1>
+        <p class="hero-sub">
+          <strong>PDX UI</strong> is a
+          signal-based UI framework whose compiler turns <code>.pdx</code> files into standard Web
+          Components. No boilerplate, dual-mode dev/prod — and this page is built with PDX.
+        </p>
+        <p class="hero-status">
+          <strong>Alpha</strong> — the APIs still change between releases.
+          <a href="/docs/licensing" @click="followLink">MIT, every package</a>.
+        </p>
+        <div class="hero-actions">
+          <a href="/docs" @click="followLink"><pdx-button variant="primary" size="lg">Get started</pdx-button></a>
+          <a href="/components" @click="followLink"><pdx-button variant="outline" size="lg">Browse components</pdx-button></a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="glass demo-card">
+          <span class="demo-label">Live · drag the slider</span>
+          <div class="demo-stage">
+            <div class="demo-row">
+              <pdx-slider class="demo-slider" :value="level" min="0" max="100" @pdx-change="setLevel"></pdx-slider>
+              <pdx-badge :value="level" variant="primary"></pdx-badge>
+            </div>
+            <pdx-progress :value="level" max="100" striped></pdx-progress>
+            <div class="demo-mood">{{ mood }}</div>
+          </div>
+          <details class="demo-src">
+            <summary>Source</summary>
+            <pdx-code :code="demoCode"></pdx-code>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="generated shell-wrap">
+      <h2 class="section-title">Declaration <span class="arrow">→</span> generated code</h2>
+      <p class="section-sub">You write the declaration; the compiler produces the wiring. Zero glue code.</p>
+      <div class="gen-grid">
+        <div class="glass gen-card">
+          <span class="gen-tag">You write — .pdx</span>
+          <pdx-code :code="srcCode"></pdx-code>
+        </div>
+        <div class="glass gen-card">
+          <span class="gen-tag">The compiler generates</span>
+          <pdx-code :code="genCode"></pdx-code>
+        </div>
+      </div>
+    </section>
+
+    <pdx-landing-features></pdx-landing-features>
+
+    <section class="cta shell-wrap">
+      <div class="glass cta-card">
+        <h2 class="section-title">Ready to try it?</h2>
+        <pdx-code :code="installCode"></pdx-code>
+        <div class="hero-actions cta-actions">
+          <a href="/docs" @click="followLink"><pdx-button variant="primary">Read the docs</pdx-button></a>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/';
+@title 'PDX UI';
+import { followLink } from '../lib/follow-link';
+
+let level = $signal(64);
+const mood = $derived(level >= 80 ? 'Awesome 🚀' : level >= 50 ? 'Pretty good 👍' : level >= 20 ? 'Getting there 🙂' : 'Warming up ☕');
+
+function setLevel(e) { const v = e.detail && e.detail.value; if (v != null) level = Number(v); }
+
+let demoCode = $signal('<pdx-slider :value="level" @pdx-change="set" />\n<pdx-progress :value="level" striped />\n<p>{{ mood }} — {{ level }}%</p>\n\nlet level = $signal(64);\nconst mood = $derived(\n  level >= 80 ? \'Awesome 🚀\'\n  : level >= 50 ? \'Pretty good 👍\'\n  : \'Getting there 🙂\'\n);');
+let srcCode = $signal('@prop label: string = "Hello";\nlet count = $signal(0);\ncount++;');
+let genCode = $signal('// prop signal + attribute sync + type\n// __count.set(v => v + 1)\n// computed debug name, mutation rewriting');
+let installCode = $signal('pnpm add @pdxui/core @pdxui/compiler\npnpm add -D @pdxui/cli');
+</script>
+
+<style scoped>
+.landing { width: 100%; }
+/* The "Why PDX" section lays out as the page's own. */
+.landing > pdx-landing-features { display: contents; }
+section { padding-top: 5.5rem; }
+
+.hero {
+  display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3.5rem; align-items: center;
+  padding-top: 6rem; text-align: left;
+}
+.eyebrow {
+  display: inline-block; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold); font-weight: 600; padding: 0.35rem 0.9rem; border: 1px solid color-mix(in srgb, var(--gold-display) 25%, transparent);
+  border-radius: 999px; background: color-mix(in srgb, var(--gold-display) 6%, transparent);
+}
+.hero-title { font-size: clamp(2.4rem, 4.4vw, 4rem); line-height: 1.08; font-weight: 800; margin: 1.4rem 0 0; }
+.hero-sub { max-width: 56ch; margin: 1.3rem 0 0; font-size: 1.1rem; line-height: 1.7; color: var(--ink-variant); }
+.hero-sub code { color: var(--gold-fixed); }
+.hero-status { max-width: 56ch; margin: 1rem 0 0; font-size: 0.92rem; line-height: 1.6; color: var(--ink-muted); }
+.hero-status strong { color: var(--gold); }
+.hero-status a { color: var(--ink-variant); }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+
+.demo-card { padding: 1.5rem; border-radius: 18px; box-shadow: var(--glow-gold-lg); }
+.demo-label { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.demo-stage { display: flex; flex-direction: column; gap: 1.1rem; margin-top: 1rem; }
+.demo-row { display: flex; align-items: center; gap: 1rem; }
+.demo-slider { flex: 1; }
+.demo-mood { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--ink); text-align: center; }
+.demo-src { margin-top: 1.2rem; border-top: 1px solid color-mix(in srgb, var(--gold-display) 10%, transparent); padding-top: 0.8rem; }
+.demo-src > summary { font-size: 0.78rem; color: var(--ink-muted); cursor: pointer; list-style: none; }
+.demo-src > summary::before { content: '› '; color: var(--gold); }
+.demo-src[open] > summary::before { content: '⌄ '; }
+
+.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; text-align: center; }
+.arrow { color: var(--gold); }
+.section-sub { text-align: center; color: var(--ink-muted); margin-top: 0.5rem; }
+
+.gen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-top: 2.2rem; }
+.gen-card { padding: 1.2rem; border-radius: 14px; }
+.gen-tag { display: block; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gold); margin-bottom: 0.6rem; }
+
+
+.cta-card { max-width: 680px; margin: 0 auto; padding: 2.6rem; border-radius: 18px; text-align: center; box-shadow: var(--glow-gold); }
+.cta-actions { justify-content: center; margin-top: 1.6rem; }
+/* The card centres its text; a code block of more than one line must not inherit that. */
+.cta-card pdx-code { text-align: left; }
+
+@media (max-width: 880px) {
+  .hero { grid-template-columns: 1fr; text-align: center; }
+  .hero-sub, .hero-status { margin-left: auto; margin-right: auto; }
+  .hero-actions { justify-content: center; }
+  .gen-grid { grid-template-columns: minmax(0, 1fr); } /* bare 1fr grows to min-content */
+}
+</style>

@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Grouping (Declarative)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Pre-configured grouping via <code>group-by</code> prop with aggregates.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="groupDS" :columns="groupColumns" :group-by="groupByCategory" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  :group-by="[{ field: 'category',
+    aggregates: [
+      { field: 'price', aggregate: 'sum' },
+      { field: 'stock', aggregate: 'average' }
+    ]}]" hover&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// ─── Grouping declarative ───────────────────
+const groupColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category' },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+];
+
+const groupDS = createDataSource({
+  data: products.slice(0, 20),
+  pageSize: 0,
+  group: [{ field: 'category', aggregates: [{ field: 'price', aggregate: 'sum' }, { field: 'stock', aggregate: 'average' }] }],
+});
+
+const groupByCategory = [
+  { field: 'category', aggregates: [
+    { field: 'price', aggregate: 'sum' },
+    { field: 'stock', aggregate: 'average' },
+  ]},
+];
+</script>

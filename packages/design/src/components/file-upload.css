@@ -1,0 +1,178 @@
+/* ── pdx-file-upload ── */
+
+/* Host */
+pdx-file-upload { display: block; }
+
+/* Drop zone */
+.pdx-file-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-xs);
+    min-height: 120px;
+    padding: var(--pdx-space-lg);
+    box-sizing: border-box;
+    border: 2px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-inset);
+    cursor: pointer;
+    transition: border-color var(--pdx-transition), background var(--pdx-transition);
+    text-align: center;
+    user-select: none;
+}
+.pdx-file-dropzone:hover {
+    border-color: var(--pdx-color-primary);
+    background: color-mix(in srgb, var(--pdx-color-primary) 5%, transparent);
+}
+.pdx-file-dropzone.dragover {
+    border-color: var(--pdx-color-primary);
+    background: color-mix(in srgb, var(--pdx-color-primary) 10%, transparent);
+    border-style: solid;
+}
+.pdx-file-dropzone:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-primary);
+    outline-offset: var(--pdx-focus-offset);
+}
+.pdx-file-dropzone.disabled {
+    opacity: var(--pdx-opacity-disabled);
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Drop zone text elements */
+.pdx-file-dropzone-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+.pdx-file-dropzone-label {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-text);
+}
+.pdx-file-dropzone-hint {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+/* Size variants */
+.pdx-file-upload-sm .pdx-file-dropzone { min-height: 80px; padding: var(--pdx-space-sm); }
+.pdx-file-upload-sm .pdx-file-dropzone-icon { font-size: 1.5rem; }
+.pdx-file-upload-lg .pdx-file-dropzone { min-height: 180px; padding: var(--pdx-space-xl); }
+
+/* File list */
+.pdx-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    margin-top: var(--pdx-space-sm);
+}
+
+/* File item */
+.pdx-file-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+    font-size: var(--pdx-text-sm);
+    position: relative;
+    overflow: hidden;
+}
+.pdx-file-item.error {
+    border-color: var(--pdx-color-danger);
+}
+.pdx-file-item.success {
+    border-color: var(--pdx-color-success);
+}
+
+/* Thumbnail & Icon */
+.pdx-file-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--pdx-radius-sm);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.pdx-file-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.pdx-file-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+}
+
+/* File info */
+.pdx-file-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.pdx-file-name {
+    font-weight: var(--pdx-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pdx-file-size {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+.pdx-file-error {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-danger-ink);
+}
+
+/* Refused files under the zone, "{name}: {reason}". The container is the status region
+   and is always there, empty and without height until something is refused. */
+.pdx-file-rejections { display: flex; flex-direction: column; gap: 2px; }
+.pdx-file-rejections > .pdx-file-error:first-child { margin-top: var(--pdx-space-xs); }
+
+/* Progress bar */
+.pdx-file-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--pdx-color-inset);
+}
+.pdx-file-progress-bar {
+    height: 100%;
+    background: var(--pdx-color-primary);
+    transition: width 0.2s ease;
+    border-radius: 0 0 var(--pdx-radius-md) var(--pdx-radius-md);
+}
+
+/* Remove button */
+.pdx-file-remove {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    font-size: 1.1em;
+    padding: var(--pdx-space-2xs);
+    line-height: 1;
+    border-radius: var(--pdx-radius-sm);
+}
+.pdx-file-remove:hover { color: var(--pdx-color-danger-ink); }
+
+/* Mobile */
+@media (pointer: coarse) {
+    .pdx-file-dropzone { min-height: 100px; }
+    .pdx-file-item { padding: var(--pdx-space-sm); }
+    .pdx-file-remove { padding: var(--pdx-space-xs); font-size: 1.3em; }
+}

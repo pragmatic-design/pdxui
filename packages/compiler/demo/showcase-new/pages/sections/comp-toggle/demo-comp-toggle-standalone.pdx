@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Standalone Toggle</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to toggle on/off.</p>
+
+    <div class="demo-row">
+      <pdx-toggle :pressed="bold" @pressedchange="onBold" aria-label="Bold"><strong>B</strong></pdx-toggle>
+      <pdx-toggle :pressed="italic" @pressedchange="onItalic" aria-label="Italic"><em>I</em></pdx-toggle>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- aria-label names it by what it does: "B" alone is read as the letter --&gt;
+&lt;pdx-toggle :pressed="bold" @pressedchange="onBold" aria-label="Bold"&gt;&lt;strong&gt;B&lt;/strong&gt;&lt;/pdx-toggle&gt;
+&lt;pdx-toggle :pressed="italic" @pressedchange="onItalic" aria-label="Italic"&gt;&lt;em&gt;I&lt;/em&gt;&lt;/pdx-toggle&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let bold = $signal(false);
+let italic = $signal(false);
+
+function onBold(e) {
+  bold = e.detail.pressed;
+}
+
+function onItalic(e) {
+  italic = e.detail.pressed;
+}
+</script>

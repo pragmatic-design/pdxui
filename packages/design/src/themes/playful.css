@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Playful Theme
+   Vibrant purple/lime, rounded corners, energetic feel.
+   ========================================================================== */
+
+[pdx-theme="playful"] {
+    --pdx-hue-primary: 290;
+    --pdx-hue-accent:  140;
+
+    /* Vibrant grape purple — higher chroma than most themes */
+    --pdx-color-primary:       oklch(0.575 0.22 290);
+    --pdx-color-primary-hover: oklch(0.50 0.24 290);
+    --pdx-color-primary-text:  oklch(0.98 0.01 290);
+    --pdx-color-accent:        oklch(0.68 0.20 140);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.65 0.22 290);
+
+    /* Purple-tinted grays — warmer feel */
+    --pdx-gray-50:  oklch(0.985 0.008 290);
+    --pdx-gray-100: oklch(0.965 0.010 290);
+    --pdx-gray-200: oklch(0.93  0.008 290);
+    --pdx-gray-800: oklch(0.22  0.012 290);
+    --pdx-gray-900: oklch(0.18  0.010 290);
+    --pdx-gray-950: oklch(0.13  0.008 290);
+
+    /* Warm tinted surfaces */
+    --pdx-color-bg:      light-dark(oklch(0.98 0.008 290), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(oklch(0.995 0.004 290), oklch(0.17 0.010 290));
+
+    /* Friendly, bouncy typography */
+    --pdx-font-sans: 'Nunito', 'Inter', system-ui, sans-serif;
+    --pdx-font-heading: 'Fredoka', 'Nunito', system-ui, sans-serif;
+
+    /* Rounded — signature playful shapes */
+    --pdx-radius-sm:  0.5rem;
+    --pdx-radius-md:  0.75rem;
+    --pdx-radius-lg:  1.25rem;
+    --pdx-radius-xl:  1.75rem;
+
+    /* Bolder headings */
+    --pdx-weight-semibold: 700;
+
+    /* Playful semantic colors — vivid, candy-like */
+    --pdx-color-danger:       light-dark(oklch(0.575 0.24 15), oklch(0.575 0.20 15));
+    --pdx-color-danger-hover: light-dark(oklch(0.55 0.26 15), oklch(0.65 0.22 15));
+    --pdx-color-success:      light-dark(oklch(0.515 0.22 150), oklch(0.525 0.18 150));
+    --pdx-color-warning:      light-dark(oklch(0.82 0.20 80), oklch(0.78 0.16 80));
+    --pdx-color-info:         light-dark(oklch(0.53 0.20 240), oklch(0.54 0.16 240));
+
+    /* Colored shadows — purple tint on every elevation */
+    --pdx-shadow-color: oklch(0.55 0.12 290 / 0.15);
+    --pdx-shadow-sm:  0 2px 6px oklch(0.55 0.15 290 / 0.12);
+    --pdx-shadow-md:  0 4px 12px oklch(0.55 0.15 290 / 0.15), 0 1px 3px oklch(0 0 0 / 0.06);
+    --pdx-shadow-lg:  0 8px 24px oklch(0.55 0.15 290 / 0.18), 0 2px 6px oklch(0 0 0 / 0.08);
+    --pdx-shadow-xl:  0 16px 40px oklch(0.55 0.15 290 / 0.22), 0 4px 10px oklch(0 0 0 / 0.08);
+
+    --pdx-focus-ring: 0 0 0 3px oklch(0.58 0.22 290 / 0.35);
+
+    /* Playful transitions — bouncier */
+    --pdx-ease-standard: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Playful behavior tokens */
+    --pdx-button-radius: 9999px;
+    --pdx-input-style: outlined;
+    --pdx-card-style: elevated;
+    --pdx-tab-indicator: pill;
+}
+
+/* Tab: pill variant driven by [pdx-tab-style="pill"] in tabs.css.
+   Playful specifics: larger radius, filled primary on active. */
+[pdx-tab-style="pill"][pdx-theme="playful"] .pdx-tabs:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) { border-radius: var(--pdx-radius-xl); }
+[pdx-tab-style="pill"][pdx-theme="playful"] .pdx-tab:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+    padding: var(--pdx-space-sm) var(--pdx-space-lg);
+}
+[pdx-tab-style="pill"][pdx-theme="playful"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+/* Breadcrumb: arrow emoji */
+[pdx-theme="playful"] .pdx-breadcrumb:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) { --pdx-breadcrumb-separator: '→'; }
+
+/* Table: rounded rows, no uppercase */
+[pdx-theme="playful"] .pdx-table th:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    --pdx-table-header-transform: none;
+    --pdx-table-header-color: var(--pdx-color-primary);
+    --pdx-table-header-border-color: var(--pdx-color-primary);
+}
+[pdx-theme="playful"] .pdx-table td:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    border-bottom-style: dashed;
+}
+
+/* Accordion: playful arrow */
+[pdx-theme="playful"] details.pdx-accordion summary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *))::after {
+    content: '▼';
+    font-size: 0.7em;
+}
+[pdx-theme="playful"] details.pdx-accordion[open] summary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *))::after {
+    transform: rotate(180deg);
+}
+[pdx-theme="playful"] details.pdx-accordion:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    border-radius: var(--pdx-radius-lg);
+}
+[pdx-theme="playful"] details.pdx-accordion:first-of-type:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) { border-radius: var(--pdx-radius-lg) var(--pdx-radius-lg) 0 0; }
+[pdx-theme="playful"] details.pdx-accordion:last-of-type:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) { border-radius: 0 0 var(--pdx-radius-lg) var(--pdx-radius-lg); }
+
+/* Card: elevated variant driven by [pdx-card-style="elevated"] in base.css.
+   Playful uses medium shadow for more pop. */
+[pdx-card-style="elevated"][pdx-theme="playful"] .pdx-surface-card:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    box-shadow: var(--pdx-shadow-md);
+}
+
+/* Buttons: pill shape via --pdx-button-radius token, bouncy active, colored shadows.
+   border-radius removed — flows from token via --_btn-r (groups need to override). */
+[pdx-theme="playful"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    font-weight: var(--pdx-weight-bold);
+}
+[pdx-theme="playful"] .pdx-primary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    --pdx-button-hover-shadow: 0 6px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
+    --pdx-button-hover-transform: translateY(-1px);
+}
+[pdx-theme="playful"] .pdx-danger:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    box-shadow: 0 6px 16px oklch(from var(--pdx-color-danger) l c h / 0.35);
+}
+[pdx-theme="playful"] .pdx-success:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    box-shadow: 0 6px 16px oklch(from var(--pdx-color-success) l c h / 0.35);
+}
+[pdx-theme="playful"] :is(.pdx-primary, .pdx-secondary, .pdx-danger, .pdx-success):active:not(:disabled):not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    transform: scale(0.92);
+}
+[pdx-theme="playful"] .pdx-secondary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    border-color: oklch(from var(--pdx-color-primary) l c h / 0.3);
+}
+[pdx-theme="playful"] .pdx-secondary:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+    border-color: var(--pdx-color-primary);
+    /* was an 8%-alpha primary tint → nearly transparent, leaving the text low-contrast on the page.
+       Darken the secondary's own fill instead (keeps contrast with secondary-text). */
+    filter: brightness(0.96);
+}

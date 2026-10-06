@@ -1,0 +1,51 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Four semantic variants with colored left border and matching icon color.</p>
+
+    <div class="toast-demo-container">
+      <div class="pdx-toast pdx-toast-success" data-open>
+        <div class="pdx-toast-icon">&#10003;</div>
+        <div class="pdx-toast-content">
+          <div class="pdx-toast-title">Success</div>
+          <div class="pdx-toast-message">Changes saved successfully.</div>
+        </div>
+      </div>
+
+      <div class="pdx-toast pdx-toast-error" data-open>
+        <div class="pdx-toast-icon">&#10007;</div>
+        <div class="pdx-toast-content">
+          <div class="pdx-toast-title">Error</div>
+          <div class="pdx-toast-message">Failed to save changes. Please try again.</div>
+        </div>
+      </div>
+
+      <div class="pdx-toast pdx-toast-warning" data-open>
+        <div class="pdx-toast-icon">&#9888;</div>
+        <div class="pdx-toast-content">
+          <div class="pdx-toast-title">Warning</div>
+          <div class="pdx-toast-message">Your session will expire in 5 minutes.</div>
+        </div>
+      </div>
+
+      <div class="pdx-toast pdx-toast-info" data-open>
+        <div class="pdx-toast-icon">&#8505;</div>
+        <div class="pdx-toast-content">
+          <div class="pdx-toast-title">Info</div>
+          <div class="pdx-toast-message">A new version is available.</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toast pdx-toast-success" data-open&gt;
+  &lt;div class="pdx-toast-icon"&gt;&amp;#10003;&lt;/div&gt;
+  &lt;div class="pdx-toast-content"&gt;
+    &lt;div class="pdx-toast-title"&gt;Success&lt;/div&gt;
+    &lt;div class="pdx-toast-message"&gt;Changes saved.&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,71 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slot Template (Declarative)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Scoped slot template — declarative, no render function. The slot receives <code>item</code> and <code>index</code> from the list.</p>
+    <div class="demo-container">
+      <pdx-list :items="slotItems" clickable dividers @pdx-click="onSlotItemClick">
+        <slot name="item" let:item let:index>
+          <div class="slot-user-row">
+            <span class="slot-user-idx">{{ index + 1 }}.</span>
+            <div class="slot-user-info">
+              <strong>{{ item.name }}</strong>
+              <span class="pdx-ink-muted">{{ item.email }}</span>
+            </div>
+            <pdx-chip size="xs">{{ item.dept }}</pdx-chip>
+          </div>
+        </slot>
+      </pdx-list>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="slot-log">{{ slotLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Template: slot receives item + index from the list --&gt;
+&lt;pdx-list :items="users" clickable dividers&gt;
+  &lt;slot name="item" let:item let:index&gt;
+    &lt;div class="user-row"&gt;
+      &lt;span class="idx"&gt;{index + 1}.&lt;/span&gt;
+      &lt;div class="info"&gt;
+        &lt;strong&gt;{item.name}&lt;/strong&gt;
+        &lt;span class="muted"&gt;{item.email}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;span class="badge"&gt;{item.dept}&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/slot&gt;
+&lt;/pdx-list&gt;
+
+&lt;!-- Scoped styles (in &lt;style scoped&gt;) --&gt;
+.user-row { display: flex; align-items: center;
+            gap: var(--pdx-space-sm); width: 100%; }
+.idx      { color: var(--pdx-color-muted);
+            font-size: var(--pdx-text-xs); min-width: 20px; }
+.info     { flex: 1; display: flex; flex-direction: column; }
+.info span { font-size: var(--pdx-text-xs); }
+.badge    { font-size: var(--pdx-text-xs);
+            padding: 2px 8px; border-radius: 9999px;
+            background: var(--pdx-color-inset); }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const slotItems = [
+  { id: 1, name: 'Alice Johnson', email: 'alice@acme.com', dept: 'Engineering' },
+  { id: 2, name: 'Bob Smith', email: 'bob@acme.com', dept: 'Design' },
+  { id: 3, name: 'Carol White', email: 'carol@acme.com', dept: 'Marketing' },
+  { id: 4, name: 'David Brown', email: 'david@acme.com', dept: 'Engineering' },
+  { id: 5, name: 'Eve Davis', email: 'eve@acme.com', dept: 'Design' },
+];
+
+function onSlotItemClick(evt) {
+  slotLog = 'Clicked: ' + evt.detail.item.name + ' (index: ' + evt.detail.index + ')';
+}
+
+let slotLog = $signal('Click a slot item...');
+</script>
+
+<style scoped>
+.slot-user-row { display: flex; align-items: center; gap: var(--pdx-space-sm); width: 100%; padding: var(--pdx-space-sm) var(--pdx-space-md); }
+.slot-user-idx { color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); min-width: 20px; }
+.slot-user-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.slot-user-info span { font-size: var(--pdx-text-xs); }
+</style>

@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Semantic Surfaces</h2>
+    <p class="pdx-txt-small pdx-ink-muted">4 surface tokens. Each resolves automatically in light and dark mode via <code>light-dark()</code>.</p>
+
+    <div class="surface-grid">
+      <div class="surface-card" style="background:var(--pdx-color-bg)">
+        <span class="pdx-txt-label">bg</span>
+        <code>--pdx-color-bg</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Page background</span>
+      </div>
+      <div class="surface-card" style="background:var(--pdx-color-surface)">
+        <span class="pdx-txt-label">surface</span>
+        <code>--pdx-color-surface</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Cards, panels</span>
+      </div>
+      <div class="surface-card" style="background:var(--pdx-color-inset)">
+        <span class="pdx-txt-label">inset</span>
+        <code>--pdx-color-inset</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Recessed areas, inputs</span>
+      </div>
+      <div class="surface-card" style="background:var(--pdx-color-overlay)">
+        <span class="pdx-txt-label">overlay</span>
+        <code>--pdx-color-overlay</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Dialogs, dropdowns</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>--pdx-color-bg:      light-dark(var(--pdx-gray-50),  var(--pdx-gray-950));
+--pdx-color-surface: light-dark(white,               var(--pdx-gray-900));
+--pdx-color-inset:   light-dark(var(--pdx-gray-100), var(--pdx-gray-800));
+--pdx-color-overlay: light-dark(white,               var(--pdx-gray-800));</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Surface grid */
+  .surface-grid {
+    display: grid;
+    /* Four columns on the 760px page, two on a phone: repeat(4, 1fr) overflows at 390px. */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+  }
+  .surface-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    min-height: 100px;
+  }
+</style>

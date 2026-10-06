@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Full Width</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>full</code> prop for block-level buttons.</p>
+
+    <div class="full-demo">
+      <pdx-button variant="primary" full @click="log">Full Width Primary</pdx-button>
+      <pdx-button variant="outline" full @click="log">Full Width Outline</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { useButtonConsole } from './state.pdx';
+
+const buttonConsole = useButtonConsole();
+
+function log(e) {
+    buttonConsole.log(e);
+}
+</script>
+
+<style scoped>
+  .full-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+    max-width: 400px;
+  }
+</style>

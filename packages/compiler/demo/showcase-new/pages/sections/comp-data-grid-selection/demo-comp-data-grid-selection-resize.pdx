@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Column Resize</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Drag column borders to resize. Columns are resizable by default.
+      Set <code>resizable: false</code> on a column to disable.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="resizeDS" :columns="resizeColumns" hover striped></pdx-data-grid>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { data } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+const resizeColumns = [
+  { field: 'name', header: 'Name (resizable)', width: 180 },
+  { field: 'email', header: 'Email (resizable)', width: 220 },
+  { field: 'role', header: 'Role (fixed)', width: 120, resizable: false },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 120 },
+];
+
+const resizeDS = createDataSource({ data: data.slice(), pageSize: 0 });
+</script>

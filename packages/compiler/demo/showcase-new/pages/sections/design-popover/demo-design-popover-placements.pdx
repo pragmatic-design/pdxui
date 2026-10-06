@@ -1,0 +1,62 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Placements</h2>
+    <p class="pdx-txt-small pdx-ink-muted">12 positions: 4 main (top, bottom, left, right) x 3 alignments (start, center, end).</p>
+
+    <div class="placement-list">
+      <div class="placement-row">
+        <code>pdx-popover-top</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Above trigger, centered</span>
+      </div>
+      <div class="placement-row">
+        <code>pdx-popover-top-start</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Above, left-aligned</span>
+      </div>
+      <div class="placement-row">
+        <code>pdx-popover-top-end</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Above, right-aligned</span>
+      </div>
+      <div class="placement-row">
+        <code>pdx-popover-bottom</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Below trigger, centered</span>
+      </div>
+      <div class="placement-row">
+        <code>pdx-popover-bottom-start</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Below, left-aligned</span>
+      </div>
+      <div class="placement-row">
+        <code>pdx-popover-bottom-end</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Below, right-aligned</span>
+      </div>
+      <div class="placement-row">
+        <code>pdx-popover-left</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Left of trigger, centered</span>
+      </div>
+      <div class="placement-row">
+        <code>pdx-popover-right</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Right of trigger, centered</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-popover pdx-popover-top" data-open&gt;...&lt;/div&gt;
+&lt;div class="pdx-popover pdx-popover-bottom-start" data-open&gt;...&lt;/div&gt;
+&lt;div class="pdx-popover pdx-popover-left" data-open&gt;...&lt;/div&gt;
+&lt;div class="pdx-popover pdx-popover-right" data-open&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Placement list */
+  .placement-list { margin-top: var(--pdx-space-md); }
+  .placement-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-xs) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .placement-row code { min-width: 220px; }
+</style>

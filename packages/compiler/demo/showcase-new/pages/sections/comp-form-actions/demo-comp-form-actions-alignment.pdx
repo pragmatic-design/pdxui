@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Alignment</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>align</code>: <code>start</code> · <code>center</code> · <code>end</code> (default) · <code>between</code>.</p>
+    <div class="demo-stack">
+      <div class="demo-container"><pdx-form-actions align="start" submit-label="Save" reset-label="Cancel"></pdx-form-actions></div>
+      <div class="demo-container"><pdx-form-actions align="center" submit-label="Save" reset-label="Cancel"></pdx-form-actions></div>
+      <div class="demo-container"><pdx-form-actions align="between" submit-label="Save" reset-label="Cancel"></pdx-form-actions></div>
+    </div>
+  </section>
+</template>

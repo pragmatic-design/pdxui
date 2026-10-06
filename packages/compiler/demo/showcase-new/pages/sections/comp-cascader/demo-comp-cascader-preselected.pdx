@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Pre-selected Value</h2>
+    <div class="demo-row">
+      <pdx-cascader :options="locations" :value="['europe', 'italy', 'rome']"></pdx-cascader>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { locations } from './state.pdx';
+</script>

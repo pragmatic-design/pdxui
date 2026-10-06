@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Gutter Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Control spacing between columns with the <code>gutter</code> prop on <code>pdx-row</code>.</p>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">gutter="xs"</span>
+        <div class="demo-area">
+          <pdx-row gutter="xs">
+            <pdx-col span="4"><div class="box">4</div></pdx-col>
+            <pdx-col span="4"><div class="box">4</div></pdx-col>
+            <pdx-col span="4"><div class="box">4</div></pdx-col>
+          </pdx-row>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">gutter="lg"</span>
+        <div class="demo-area">
+          <pdx-row gutter="lg">
+            <pdx-col span="4"><div class="box">4</div></pdx-col>
+            <pdx-col span="4"><div class="box">4</div></pdx-col>
+            <pdx-col span="4"><div class="box">4</div></pdx-col>
+          </pdx-row>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>

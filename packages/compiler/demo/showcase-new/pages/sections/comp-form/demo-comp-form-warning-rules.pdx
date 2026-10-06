@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">4. Warning Rules (Non-Blocking)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Warnings are yellow hints that don't block submission. Useful for "are you sure?" patterns.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="warningForm">
+        <pdx-form-field name="price" label="Price" required>
+          <pdx-number-input name="price" placeholder="Enter price"></pdx-number-input>
+        </pdx-form-field>
+        <pdx-form-actions submitLabel="Save" resetLabel=""></pdx-form-actions>
+      </pdx-form>
+      <p class="pdx-txt-small pdx-ink-muted" style="margin-top: var(--pdx-space-sm)">
+        Try entering a price above 1000 — a warning appears but submit still works.
+      </p>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const form = createForm({
+  initialValues: { price: 0 },
+  validators: { price: [required('...'), min(1, '...')] },
+  warnings: {
+    price: [(v) => v > 1000 ? 'Price seems high' : undefined],
+  },
+});
+// Warnings are non-blocking: form.valid() stays true even with warnings</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required, min } from '@pdxui/core';
+
+// ─── 4. Warning Form ───
+const warningForm = createForm({
+  initialValues: { price: 0 },
+  validators: { price: [required('Price is required'), min(1, 'Must be at least 1')] },
+  warnings: { price: [(v) => typeof v === 'number' && v > 1000 ? 'Price seems high — are you sure?' : undefined] },
+});
+</script>

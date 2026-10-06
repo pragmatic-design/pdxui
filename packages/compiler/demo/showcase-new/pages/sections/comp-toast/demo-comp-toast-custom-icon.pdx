@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Custom Icon</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Override the default icon per type, or set <code>icon: null</code> for no icon.</p>
+    <div class="btn-row">
+      <pdx-button variant="outline" size="sm" @click="showCustomIcon">Custom Icon (star)</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="showNoIcon">No Icon</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showCustomIcon() { toast.add({ message: 'Added to favorites!', type: 'success', icon: 'star' }); }
+function showNoIcon() { toast.add({ message: 'A toast without any icon.', type: 'info', icon: null }); }
+</script>

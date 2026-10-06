@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Shapes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">6 preset shapes with pulse animation (default).</p>
+    <div class="demo-col">
+      <div class="shape-row"><div class="pdx-skeleton pdx-skeleton-circle"></div><span class="pdx-txt-caption pdx-ink-muted">Circle (avatar)</span></div>
+      <div class="shape-row"><div class="pdx-skeleton pdx-skeleton-title" style="max-width:300px"></div><span class="pdx-txt-caption pdx-ink-muted">Title</span></div>
+      <div class="shape-row"><div class="pdx-skeleton pdx-skeleton-text" style="max-width:400px"></div><span class="pdx-txt-caption pdx-ink-muted">Text</span></div>
+      <div class="shape-row"><div class="pdx-skeleton pdx-skeleton-button"></div><span class="pdx-txt-caption pdx-ink-muted">Button</span></div>
+      <div class="shape-row"><div class="pdx-skeleton pdx-skeleton-input" style="max-width:300px"></div><span class="pdx-txt-caption pdx-ink-muted">Input</span></div>
+      <div class="shape-row"><div class="pdx-skeleton pdx-skeleton-image" style="max-width:300px"></div><span class="pdx-txt-caption pdx-ink-muted">Image (16:9)</span></div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-skeleton pdx-skeleton-circle"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-title"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-text"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-image"&gt;&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .shape-row { display: flex; gap: var(--pdx-space-md); align-items: center; margin-top: var(--pdx-space-sm); }
+</style>

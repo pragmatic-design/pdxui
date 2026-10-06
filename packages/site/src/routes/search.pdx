@@ -1,0 +1,74 @@
+<template>
+  <div class="search shell-wrap">
+    <h1 class="page-title metal-gradient">Search</h1>
+    <input class="search-input" type="search" placeholder="Search docs and components…" @input="onInput" autofocus />
+    <div class="search-results">
+      @if (q) {
+        <span class="search-meta">{{ count }} results for "{{ q }}"</span>
+      }
+      @for (results as r; track r.href) {
+        <a class="glass search-item" :href="r.href" @click="followLink">
+          <span class="search-label">{{ r.label }}</span>
+          <span class="search-kind">{{ r.kind }}</span>
+        </a>
+      }
+      @if (hasNone) {
+        <p class="search-empty">No results.</p>
+      }
+    </div>
+  </div>
+</template>
+
+<script setup>
+@page '/search';
+@title 'Search — PDX';
+import { allComponents } from '../lib/manifest';
+import { summaries } from '../lib/summaries';
+import designTopics from '../demos/design-index.json';
+import { followLink } from '../lib/follow-link';
+
+function _pretty(t) { return (t || '').replace(/^pdx-/, '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+
+// The frontmatter only (`?meta`): search matches titles and descriptions, and importing the docs
+// themselves would put every page's HTML in the entry chunk.
+const docMetas = import.meta.glob('../../content/docs/**/*.md', { eager: true, query: '?meta', import: 'default' });
+const items = [
+  ...Object.values(docMetas).map(_d => {
+    return { label: _d.frontmatter.title || _d.slug, href: '/docs/' + _d.slug, kind: 'doc', text: (_d.frontmatter.title || '') + ' ' + (_d.frontmatter.description || '') };
+  }),
+  ...allComponents().map(c => ({ label: _pretty(c.tagName), href: '/components/' + c.tagName, kind: 'component', text: c.tagName + ' ' + (summaries[c.tagName] || '') })),
+  ...designTopics.map(t => ({ label: _pretty(t), href: '/design/' + t, kind: 'design', text: 'design css ' + t })),
+];
+
+let q = $signal('');
+const results = $derived(q
+  ? items.filter(i => i.text.toLowerCase().includes(q.toLowerCase()))
+  : items);
+// `{{ results.length }}` in the template reads the computed's arity (0), not the array — use a derived.
+const count = $derived(results.length);
+const hasNone = $derived(!!q && results.length === 0);
+
+function onInput(e) { q = e.target.value; }
+</script>
+
+<style scoped>
+.search { max-width: 760px; padding-top: 3rem; padding-bottom: 4rem; }
+.page-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin: 0; }
+.search-input {
+  width: 100%; margin-top: 1.4rem; padding: 0.8rem 1.1rem; border-radius: 12px;
+  border: 1px solid var(--outline); background: var(--surface-container); color: var(--ink);
+  font-size: 1rem; font-family: var(--font-body);
+}
+.search-input:focus { outline: none; border-color: var(--gold); box-shadow: var(--glow-gold); }
+.search-meta { display: block; color: var(--ink-muted); font-size: 0.82rem; margin: 0 0 0.6rem; }
+.search-results { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 2rem; }
+.search-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: 0.7rem 1rem; border-radius: 12px; text-decoration: none; color: var(--ink);
+  transition: border-color 0.15s, color 0.15s;
+}
+.search-item:hover { border-color: color-mix(in srgb, var(--gold-display) 35%, transparent); color: var(--gold); }
+.search-label { font-family: var(--font-heading); font-weight: 600; font-size: 0.95rem; }
+.search-kind { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); }
+.search-empty { color: var(--ink-muted); margin-top: 1rem; }
+</style>

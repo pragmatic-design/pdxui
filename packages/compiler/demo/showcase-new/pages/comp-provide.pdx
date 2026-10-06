@@ -1,0 +1,94 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Provide — Cascading Values</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Blazor-style <code>CascadingValue</code> for Web Components.
+      <code>&lt;pdx-provide&gt;</code> wraps children and makes values available via hierarchical
+      Context Protocol. Nearest ancestor wins (scoped override).
+    </p>
+
+    <!-- ═══ Single Value ═══ -->
+    <pdx-demo-comp-provide-single class="demo-section"></pdx-demo-comp-provide-single>
+
+    <!-- ═══ Multiple Values ═══ -->
+    <pdx-demo-comp-provide-multiple class="demo-section"></pdx-demo-comp-provide-multiple>
+
+    <!-- ═══ Scoped Override ═══ -->
+    <pdx-demo-comp-provide-scoped class="demo-section"></pdx-demo-comp-provide-scoped>
+
+    <!-- ═══ Future Patterns ═══ -->
+    <pdx-demo-comp-provide-patterns class="demo-section"></pdx-demo-comp-provide-patterns>
+
+    <!-- ═══ API Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">API Reference</h2>
+      <h3 class="pdx-txt-subheading">&lt;pdx-provide&gt; Props</h3>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>String</td><td>''</td><td>Context key (single value mode).</td></tr>
+            <tr><td><code>:value</code></td><td>any</td><td>null</td><td>Value to provide (single value mode).</td></tr>
+            <tr><td><code>:values</code></td><td>Object</td><td>null</td><td>Multiple key→value pairs (takes priority).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="pdx-txt-subheading" style="margin-top: 1.5rem">Consumer API</h3>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>API</th><th>Usage</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>@inject key;</code></td><td>.pdx files</td><td>Compiler rune — generates inject() call.</td></tr>
+            <tr><td><code>useProvided(key)</code></td><td>setup()</td><td>Composable — injects from current element's ancestors.</td></tr>
+            <tr><td><code>inject(key, el)</code></td><td>anywhere</td><td>Manual — walks DOM from el upward.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</template>
+
+<script setup>
+@page '/components/provide';
+@title 'Provide — PDX UI';
+</script>
+
+<style>
+.demo-box {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  max-width: 500px;
+}
+.demo-child {
+  padding: var(--pdx-space-sm);
+  margin-bottom: var(--pdx-space-xs);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+}
+.demo-controls {
+  margin-top: var(--pdx-space-sm);
+}
+.patterns-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-sm);
+}
+.pattern-item {
+  padding: var(--pdx-space-sm) var(--pdx-space-md);
+  border-left: 3px solid var(--pdx-color-primary);
+  background: var(--pdx-color-inset);
+  border-radius: 0 var(--pdx-radius-sm) var(--pdx-radius-sm) 0;
+}
+.pattern-item strong { display: block; margin-bottom: 2px; }
+.pattern-item p { margin: 0; }
+
+.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
+.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }
+.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }
+
+details.source { margin-top: var(--pdx-space-sm); }
+details.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }
+details.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }
+</style>

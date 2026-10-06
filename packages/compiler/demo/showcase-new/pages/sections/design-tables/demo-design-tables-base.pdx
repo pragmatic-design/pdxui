@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Base Table</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Default table with border and padding. Apply <code>.pdx-table</code> to <code>&lt;table&gt;</code>.</p>
+
+    <div class="table-wrap">
+      <table class="pdx-table">
+        <thead>
+          <tr><th>Name</th><th>Role</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alice Martin</td><td>Engineer</td><td>Active</td></tr>
+          <tr><td>Bob Chen</td><td>Designer</td><td>Active</td></tr>
+          <tr><td>Carol Ruiz</td><td>PM</td><td>On leave</td></tr>
+          <tr><td>Dan Kim</td><td>QA Lead</td><td>Active</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;table class="pdx-table"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Role&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;Alice Martin&lt;/td&gt;&lt;td&gt;Engineer&lt;/td&gt;&lt;td&gt;Active&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+    </details>
+  </section>
+</template>

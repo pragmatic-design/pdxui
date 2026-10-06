@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Basic (Click)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click the button to toggle the popover. Click outside or press Escape to close.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm">Click me</pdx-button>
+      <pdx-popover>
+        <p style="margin:0;font-size:var(--pdx-text-sm)">This is a popover with rich content. Click outside to close.</p>
+      </pdx-popover>
+    </div>
+  </section>
+</template>

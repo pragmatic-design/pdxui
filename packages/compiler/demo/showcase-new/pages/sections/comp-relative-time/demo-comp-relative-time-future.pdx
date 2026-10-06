@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Future</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Upcoming times.</p>
+    <div class="demo-container">
+      <div class="demo-stack">
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">In 5 min:</span>
+          <pdx-relative-time :datetime="inFiveMin"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">In 2 hours:</span>
+          <pdx-relative-time :datetime="inTwoHours"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Tomorrow:</span>
+          <pdx-relative-time :datetime="inOneDay"></pdx-relative-time>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const inFiveMin = new Date(Date.now() + 5 * 60000).toISOString();
+const inTwoHours = new Date(Date.now() + 2 * 3600000).toISOString();
+const inOneDay = new Date(Date.now() + 86400000).toISOString();
+</script>

@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Bare Variant</h2>
+    <p class="pdx-txt-small pdx-ink-muted">No padding — for menus and lists that handle their own spacing.</p>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">Menu popover</span>
+        <div class="popover-static bare">
+          <div class="pdx-menu">
+            <button class="pdx-menu-item">Edit</button>
+            <button class="pdx-menu-item">Duplicate</button>
+            <button class="pdx-menu-item">Archive</button>
+            <div class="pdx-menu-separator"></div>
+            <button class="pdx-menu-item pdx-menu-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">List popover</span>
+        <div class="popover-static bare">
+          <div class="pdx-nav">
+            <a class="pdx-nav-item active">Profile</a>
+            <a class="pdx-nav-item">Settings</a>
+            <a class="pdx-nav-item">Log out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-popover pdx-popover-bare pdx-popover-bottom" data-open&gt;
+  &lt;div class="pdx-menu"&gt;
+    &lt;button class="pdx-menu-item"&gt;Edit&lt;/button&gt;
+    &lt;button class="pdx-menu-item pdx-menu-danger"&gt;Delete&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

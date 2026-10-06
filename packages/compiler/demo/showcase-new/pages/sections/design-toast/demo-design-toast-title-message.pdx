@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Title + Message</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Title uses <code>.pdx-toast-title</code> (semibold), message uses <code>.pdx-toast-message</code> (muted, smaller).</p>
+
+    <div class="toast-demo-container">
+      <div class="pdx-toast pdx-toast-info" data-open>
+        <div class="pdx-toast-icon">&#128232;</div>
+        <div class="pdx-toast-content">
+          <div class="pdx-toast-title">New message from Alex</div>
+          <div class="pdx-toast-message">Hey, are you available for a quick call this afternoon?</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toast pdx-toast-info" data-open&gt;
+  &lt;div class="pdx-toast-icon"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-toast-content"&gt;
+    &lt;div class="pdx-toast-title"&gt;New message&lt;/div&gt;
+    &lt;div class="pdx-toast-message"&gt;Details here...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

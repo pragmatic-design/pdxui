@@ -1,0 +1,54 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Sortable List</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-sortable-list&gt;</code> — a list the user can put in another order, by dragging a
+      row's handle or from the keyboard alone. It emits <code>pdx-reorder</code> with the indices and
+      never writes to <code>items</code>: the application applies the move, so the array it owns stays
+      the one source of truth.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-sortable-list-drag class="demo-section"></pdx-demo-comp-sortable-list-drag>
+
+    <!-- ═══ Custom rows ═══ -->
+    <pdx-demo-comp-sortable-list-rows class="demo-section"></pdx-demo-comp-sortable-list-rows>
+
+    <!-- ═══ Horizontal ═══ -->
+    <pdx-demo-comp-sortable-list-horizontal class="demo-section"></pdx-demo-comp-sortable-list-horizontal>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-sortable-list-disabled class="demo-section"></pdx-demo-comp-sortable-list-disabled>
+
+    <!-- ═══ Accessibility ═══ -->
+    <pdx-demo-comp-sortable-list-accessibility class="demo-section"></pdx-demo-comp-sortable-list-accessibility>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>items</code><span>array</span><span>The rows</span></div>
+        <div class="opt-row"><code>idField</code><span>string</span><span>How a row is identified (<code>id</code>); empty uses the index</span></div>
+        <div class="opt-row"><code>labelField</code><span>string</span><span>What a row shows without a slot, and what names its handle</span></div>
+        <div class="opt-row"><code>axis</code><span>string</span><span>vertical (default), horizontal</span></div>
+        <div class="opt-row"><code>handle</code><span>string</span><span>A selector the pointer may grab inside your own row</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Neither pointer nor keyboard reorders</span></div>
+      </div>
+
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-reorder</code><span>{ from, to, id }</span><span>Where the row was and where it landed</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/sortable-list';
+@title 'Sortable List Component';
+</script>
+
+<style scoped>
+  .narrow { max-width: 420px; }
+</style>

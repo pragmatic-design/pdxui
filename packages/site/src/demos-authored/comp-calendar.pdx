@@ -1,0 +1,71 @@
+<!-- Hand-authored site demo (not generated): pdx-calendar had no showcase page to port. -->
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Calendar</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-calendar&gt;</code> — an inline month calendar: single date, range, multi-month,
+      week numbers and min/max bounds. (The popup version is <code>&lt;pdx-date-picker&gt;</code>.)
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Single date</h2>
+      <p class="pdx-txt-small pdx-ink-muted"><code>inline</code> keeps it always visible; <code>value</code> is the selected ISO date.</p>
+      <div class="demo-row">
+        <pdx-calendar inline value="2026-06-15"></pdx-calendar>
+      </div>
+      <details class="source-block">
+        <summary>Source</summary>
+        <pre class="pdx-code"><code>&lt;pdx-calendar inline value="2026-06-15"&gt;&lt;/pdx-calendar&gt;</code></pre>
+      </details>
+    </section>
+
+    <!-- ═══ Range ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Range</h2>
+      <p class="pdx-txt-small pdx-ink-muted"><code>mode="range"</code> with <code>rangeStart</code> / <code>rangeEnd</code>.</p>
+      <div class="demo-row">
+        <pdx-calendar inline mode="range" rangeStart="2026-06-10" rangeEnd="2026-06-18"></pdx-calendar>
+      </div>
+      <details class="source-block">
+        <summary>Source</summary>
+        <pre class="pdx-code"><code>&lt;pdx-calendar inline mode="range" rangeStart="2026-06-10" rangeEnd="2026-06-18"&gt;&lt;/pdx-calendar&gt;</code></pre>
+      </details>
+    </section>
+
+    <!-- ═══ Two months ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Multiple months</h2>
+      <p class="pdx-txt-small pdx-ink-muted"><code>numberOfMonths</code> shows several months side by side — handy for range picking.</p>
+      <div class="demo-row">
+        <pdx-calendar inline mode="range" numberOfMonths="2" rangeStart="2026-06-24" rangeEnd="2026-07-03"></pdx-calendar>
+      </div>
+      <details class="source-block">
+        <summary>Source</summary>
+        <pre class="pdx-code"><code>&lt;pdx-calendar inline mode="range" numberOfMonths="2"&gt;&lt;/pdx-calendar&gt;</code></pre>
+      </details>
+    </section>
+
+    <!-- ═══ Week numbers + bounds ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Week numbers &amp; bounds</h2>
+      <p class="pdx-txt-small pdx-ink-muted"><code>weekNumbers</code> adds the ISO week column; <code>min</code>/<code>max</code> disable out-of-range days.</p>
+      <div class="demo-row">
+        <pdx-calendar inline weekNumbers value="2026-06-15" min="2026-06-08" max="2026-06-26"></pdx-calendar>
+      </div>
+      <details class="source-block">
+        <summary>Source</summary>
+        <pre class="pdx-code"><code>&lt;pdx-calendar inline weekNumbers min="2026-06-08" max="2026-06-26"&gt;&lt;/pdx-calendar&gt;</code></pre>
+      </details>
+    </section>
+  </div>
+</template>
+
+<script setup>
+let _keep = $signal(0);
+</script>
+
+<style scoped>
+  .page { max-width: 760px; }
+  .demo-row { align-items: flex-start; }
+</style>

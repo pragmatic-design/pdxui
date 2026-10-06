@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Drawer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+    <script>
+        // Minimal drawer open/close helpers
+        function pdxOpenDrawer(id) {
+            document.getElementById(id).setAttribute('data-open', '');
+            document.getElementById(id + '-backdrop').setAttribute('data-open', '');
+            document.addEventListener('keydown', function esc(e) {
+                if (e.key === 'Escape') { pdxCloseDrawer(id); document.removeEventListener('keydown', esc); }
+            });
+        }
+        function pdxCloseDrawer(id) {
+            document.getElementById(id).removeAttribute('data-open');
+            document.getElementById(id + '-backdrop').removeAttribute('data-open');
+        }
+    </script>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Drawer</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Drawer</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Slide-in panel from any edge. 4 positions, 3 sizes, push mode. CSS transitions, backdrop blur.</p>
+                    </pdx-stack>
+
+                    <!-- Positions -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Positions</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Open from any edge: left (default), right, top, bottom.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm" wrap>
+                                    <button class="pdx-primary" size="sm" onclick="pdxOpenDrawer('d-left')">Left</button>
+                                    <button class="pdx-primary" size="sm" onclick="pdxOpenDrawer('d-right')">Right</button>
+                                    <button class="pdx-primary" size="sm" onclick="pdxOpenDrawer('d-top')">Top</button>
+                                    <button class="pdx-primary" size="sm" onclick="pdxOpenDrawer('d-bottom')">Bottom</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-drawer" position="right" data-open&gt;
+  &lt;div class="pdx-drawer-header"&gt;Title&lt;/div&gt;
+  &lt;div class="pdx-drawer-body"&gt;Content&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Sizes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sizes</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Three preset sizes. Full-width on mobile (&lt;640px) automatically.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm" wrap>
+                                    <button class="pdx-secondary" size="sm" onclick="pdxOpenDrawer('d-sm')">Small (280px)</button>
+                                    <button class="pdx-secondary" size="sm" onclick="pdxOpenDrawer('d-md')">Medium (380px)</button>
+                                    <button class="pdx-secondary" size="sm" onclick="pdxOpenDrawer('d-lg')">Large (520px)</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-drawer" size="sm"&gt;...&lt;/div&gt;
+&lt;div class="pdx-drawer" size="md"&gt;...&lt;/div&gt;
+&lt;div class="pdx-drawer" size="lg"&gt;...&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Sections -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sections</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Header, scrollable body, and footer with actions.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <button class="pdx-primary" size="sm" onclick="pdxOpenDrawer('d-form')">Open Form Drawer</button>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-drawer" position="right" size="lg"&gt;
+  &lt;div class="pdx-drawer-header"&gt;Edit Profile &lt;button&gt;&amp;times;&lt;/button&gt;&lt;/div&gt;
+  &lt;div class="pdx-drawer-body"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-drawer-footer"&gt;
+    &lt;button class="pdx-ghost"&gt;Cancel&lt;/button&gt;
+    &lt;button class="pdx-primary"&gt;Save&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Bottom Sheet -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Bottom Sheet</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Mobile-friendly action panel. Rounded top corners.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <button class="pdx-secondary" size="sm" onclick="pdxOpenDrawer('d-sheet')">Open Bottom Sheet</button>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-drawer" position="bottom" size="sm"&gt;
+  &lt;div class="pdx-drawer-body"&gt;
+    &lt;nav class="pdx-nav"&gt;...&lt;/nav&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+
+    <!-- ====== Drawer instances ====== -->
+
+    <!-- Backdrops (shared or per-drawer) -->
+    <div id="d-left-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-left')"></div>
+    <div id="d-right-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-right')"></div>
+    <div id="d-top-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-top')"></div>
+    <div id="d-bottom-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-bottom')"></div>
+    <div id="d-sm-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-sm')"></div>
+    <div id="d-md-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-md')"></div>
+    <div id="d-lg-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-lg')"></div>
+    <div id="d-form-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-form')"></div>
+    <div id="d-sheet-backdrop" class="pdx-drawer-backdrop" onclick="pdxCloseDrawer('d-sheet')"></div>
+
+    <!-- Position demos -->
+    <div id="d-left" class="pdx-drawer" position="left">
+        <div class="pdx-drawer-header">Left Drawer <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-left')">&times;</button></div>
+        <div class="pdx-drawer-body"><p>Default position. Great for navigation menus and sidebars.</p></div>
+    </div>
+
+    <div id="d-right" class="pdx-drawer" position="right">
+        <div class="pdx-drawer-header">Right Drawer <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-right')">&times;</button></div>
+        <div class="pdx-drawer-body"><p>Used for detail panels, filters, and property editors.</p></div>
+    </div>
+
+    <div id="d-top" class="pdx-drawer" position="top" size="sm">
+        <div class="pdx-drawer-header">Top Drawer <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-top')">&times;</button></div>
+        <div class="pdx-drawer-body"><p>Useful for notifications, announcements, and search bars.</p></div>
+    </div>
+
+    <div id="d-bottom" class="pdx-drawer" position="bottom" size="sm">
+        <div class="pdx-drawer-header">Bottom Sheet <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-bottom')">&times;</button></div>
+        <div class="pdx-drawer-body"><p>Mobile-first action panel. Touch-friendly.</p></div>
+    </div>
+
+    <!-- Size demos -->
+    <div id="d-sm" class="pdx-drawer" position="right" size="sm">
+        <div class="pdx-drawer-header">Small (280px) <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-sm')">&times;</button></div>
+        <div class="pdx-drawer-body"><p>Compact. Good for simple nav or quick actions.</p></div>
+    </div>
+
+    <div id="d-md" class="pdx-drawer" position="right" size="md">
+        <div class="pdx-drawer-header">Medium (380px) <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-md')">&times;</button></div>
+        <div class="pdx-drawer-body"><p>Default size. Comfortable for forms and content.</p></div>
+    </div>
+
+    <div id="d-lg" class="pdx-drawer" position="right" size="lg">
+        <div class="pdx-drawer-header">Large (520px) <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-lg')">&times;</button></div>
+        <div class="pdx-drawer-body"><p>Spacious. Good for complex forms, tables, and detail views.</p></div>
+    </div>
+
+    <!-- Form drawer -->
+    <div id="d-form" class="pdx-drawer" position="right" size="lg">
+        <div class="pdx-drawer-header">Edit Profile <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-form')">&times;</button></div>
+        <div class="pdx-drawer-body">
+            <pdx-stack gap="md">
+                <div class="pdx-field">
+                    <label class="pdx-field-label pdx-field-required">Name</label>
+                    <input class="pdx-input" value="John Doe">
+                </div>
+                <div class="pdx-field">
+                    <label class="pdx-field-label">Email</label>
+                    <input class="pdx-input" type="email" value="john@example.com">
+                </div>
+                <div class="pdx-field">
+                    <label class="pdx-field-label">Bio</label>
+                    <textarea class="pdx-input" placeholder="Tell us about yourself..."></textarea>
+                </div>
+                <div class="pdx-field">
+                    <label class="pdx-field-label">Role</label>
+                    <select class="pdx-input"><option>Admin</option><option>Editor</option><option>Viewer</option></select>
+                </div>
+            </pdx-stack>
+        </div>
+        <div class="pdx-drawer-footer">
+            <button class="pdx-ghost" size="sm" onclick="pdxCloseDrawer('d-form')">Cancel</button>
+            <button class="pdx-primary" size="sm" onclick="pdxCloseDrawer('d-form')">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- Bottom sheet with nav -->
+    <div id="d-sheet" class="pdx-drawer" position="bottom" size="sm">
+        <div class="pdx-drawer-header">Actions <button class="pdx-dialog-close" onclick="pdxCloseDrawer('d-sheet')">&times;</button></div>
+        <div class="pdx-drawer-body">
+            <nav class="pdx-nav">
+                <a class="pdx-nav-item" href="#" onclick="pdxCloseDrawer('d-sheet')"><i data-lucide="share-2" style="width:16px;height:16px"></i> Share</a>
+                <a class="pdx-nav-item" href="#" onclick="pdxCloseDrawer('d-sheet')"><i data-lucide="bookmark" style="width:16px;height:16px"></i> Save</a>
+                <a class="pdx-nav-item" href="#" onclick="pdxCloseDrawer('d-sheet')"><i data-lucide="link" style="width:16px;height:16px"></i> Copy Link</a>
+                <a class="pdx-nav-item" href="#" onclick="pdxCloseDrawer('d-sheet')"><i data-lucide="flag" style="width:16px;height:16px"></i> Report</a>
+            </nav>
+        </div>
+    </div>
+
+    <script src="docs.js"></script>
+</body>
+</html>

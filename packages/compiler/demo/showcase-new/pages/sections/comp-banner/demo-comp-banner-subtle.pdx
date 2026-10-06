@@ -1,0 +1,9 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Subtle</h2>
+    <div class="demo-stack">
+      <pdx-banner variant="info" subtle>Subtle info — lighter background.</pdx-banner>
+      <pdx-banner variant="warning" subtle closable>Subtle warning with close.</pdx-banner>
+    </div>
+  </section>
+</template>

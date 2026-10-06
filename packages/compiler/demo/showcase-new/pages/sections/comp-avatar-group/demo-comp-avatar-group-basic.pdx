@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">8 team members, max=5 — shows +3 overflow badge.</p>
+    <div class="demo-container">
+      <pdx-avatar-group :items="teamItems" :max="5"></pdx-avatar-group>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-avatar-group :items="teamItems" :max="5"&gt;&lt;/pdx-avatar-group&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { teamItems } from './state.pdx';
+</script>

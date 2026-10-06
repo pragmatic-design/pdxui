@@ -1,0 +1,182 @@
+<template>
+  <section class="section" data-test="documents">
+    <div class="section-head">
+      <h2 class="pdx-txt-heading">{{ $t('employees.sectionNames.documents') }}</h2>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('employees.documents.intro') }}</p>
+
+    <!-- ADD: the ticket's upload, keyed by the employee — the progress, the cancel, the refused
+         types and the server's name behave as they do there, because it is the same component. -->
+    <pdx-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></pdx-attachment-upload>
+
+    <!-- VOID: an invitation, under the drop zone it points at. -->
+    <div :show="loaded && documents.length === 0 && !editing" data-test="documents-empty">
+      <pdx-empty-state
+        icon="file-text"
+        :title="$t('employees.documents.emptyTitle')"
+        :description="$t('employees.documents.emptyBody')"></pdx-empty-state>
+    </div>
+
+    <!-- FILLED: the SERVER's list, re-read after every transfer and every change. -->
+    <div class="documents" :show="documents.length > 0 && !editing" role="list" data-test="doc-list">
+      @for (documents as doc; track doc.id) {
+        <div class="document" role="listitem" :data-name="doc.name" data-test="doc-row">
+          <span class="document-name">
+            <span class="document-label">{{ doc.label || $t('employees.documents.noLabel') }}</span>
+            <span class="pdx-txt-small pdx-ink-muted">{{ doc.name }}</span>
+          </span>
+          <span class="document-expiry">
+            @if (isExpired(doc)) {
+              <span class="pdx-badge pdx-danger" data-test="doc-expired">{{ $t('employees.documents.expired') }}</span>
+            }
+            <span class="pdx-txt-small pdx-ink-muted" :show="doc.expires !== ''">{{ $t('employees.documents.expires', { date: doc.expires }) }}</span>
+          </span>
+          <span class="document-actions">
+            <pdx-button size="sm" variant="ghost" @click="download(doc)" data-test="doc-download">{{ $t('employees.documents.download') }}</pdx-button>
+            <pdx-button size="sm" variant="ghost" @click="startEdit(doc)" data-test="doc-edit">{{ $t('employees.documents.edit') }}</pdx-button>
+            <pdx-button size="sm" variant="outline" @click="withdraw(doc)" data-test="doc-withdraw">{{ $t('employees.documents.withdraw') }}</pdx-button>
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- EDIT, in the page: the label and the expiry. `:show`, not `@if`: the form projects its
+         fields through a slot. -->
+    <div :show="editing">
+      <pdx-form :form="docForm" @pdx-submit="onSave" data-test="doc-form">
+        <p class="pdx-txt-small pdx-ink-muted">{{ editing?.name ?? '' }}</p>
+        <div class="grid">
+          <pdx-form-field name="label" :label="$t('employees.documents.fields.label')">
+            <pdx-input name="label" data-test="label"></pdx-input>
+          </pdx-form-field>
+          <pdx-form-field name="expires" :label="$t('employees.documents.fields.expires')">
+            <pdx-date-picker name="expires" editable data-test="expires"></pdx-date-picker>
+          </pdx-form-field>
+        </div>
+        <div class="actions">
+          <pdx-button type="submit" variant="primary" data-test="doc-save">{{ $t('employees.documents.save') }}</pdx-button>
+          <pdx-button variant="ghost" @click="cancelEdit" data-test="doc-cancel">{{ $t('employees.documents.cancel') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </div>
+
+    <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
+  </section>
+</template>
+
+<script setup>
+@page '/employees/:id/documents' { label: documentsLabel };
+@title $t('employees.sectionNames.documents');
+
+// The crumb and the tab title in the page's language: a label read from the dictionary.
+function documentsLabel() {
+  return $t('employees.sectionNames.documents');
+}
+
+import { downloadFile, saveBlob } from '@pdxui/core';
+// Created from JS, so the compiler cannot auto-import it from a tag.
+import { toast } from '@pdxui/ui/toast';
+
+@prop id: string = '';
+
+// The list is the employee route's, loaded there once (CD-D1): this section reads it and
+// asks the owner to read it again after a change, so the count on the route's menu moves with it.
+@inject employeeDocuments;
+const documents = $derived(employeeDocuments.documents());
+/** False until the first list arrives: the void state is an answer, not the wait for one. */
+const loaded = $derived(employeeDocuments.loaded());
+
+const uploadEndpoint = $derived(employeeDocuments.url());
+
+function reload() {
+  return employeeDocuments.reload();
+}
+
+/** Expired: the expiry is before today. A document with no expiry never expires. */
+function isExpired(doc) {
+  return doc.expires !== '' && doc.expires < new Date().toISOString().slice(0, 10);
+}
+
+/** Saved under the name the SERVER sent, as the ticket's are: the URL ends in `/content`. */
+async function download(doc) {
+  const dl = downloadFile(`/api/attachments/${doc.id}/content`);
+  const blob = await dl.result;
+  saveBlob(blob, dl.filename() ?? doc.name);
+}
+
+/** One document's own fields, written to the server. */
+async function patch(doc, fields) {
+  await fetch(`/api/attachments/${doc.id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(fields),
+  });
+  await reload();
+}
+
+// ── Edit, in the page ──────────────────────────────────────────────────────────────────────
+@form docForm: {
+  label: string,
+  expires: string
+};
+
+let editing = $signal(null);
+
+function startEdit(doc) {
+  docForm.reset({ label: doc.label, expires: doc.expires });
+  editing = doc;
+}
+
+function cancelEdit() {
+  editing = null;
+}
+
+async function onSave(e) {
+  if (!editing) return;
+  const v = e.detail.values;
+  const doc = editing;
+  editing = null;
+  await patch(doc, { label: v.label ?? '', expires: v.expires ?? '' });
+}
+
+// ── Withdraw, and its way back ─────────────────────────────────────────────────────────────
+// Not delete: an employee's documents are a record. It leaves the list and stays on file, and the
+// toast carries the way back (rule 1 of the showcase's README).
+async function withdraw(doc) {
+  await patch(doc, { withdrawn: true });
+  toast.add({
+    type: 'info',
+    message: $t('employees.documents.withdrawn', { name: doc.label || doc.name }),
+    duration: 8000,
+    action: { label: $t('employees.documents.undo'), onClick: () => patch(doc, { withdrawn: false }) },
+  });
+}
+</script>
+
+<style scoped>
+  .section { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-md); }
+  .section-head h2 { margin: 0; }
+  .section > p { margin: 0; }
+
+  .documents { display: flex; flex-direction: column; }
+  /* Fixed tracks, as on the contracts: each row is its own grid. */
+  .document {
+    display: grid; grid-template-columns: minmax(0, 1fr) 11rem 16rem;
+    align-items: center; gap: var(--pdx-space-md);
+    min-height: var(--pdx-section-height);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .document-name { display: flex; flex-direction: column; min-width: 0; }
+  .document-label { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .document-expiry { display: flex; align-items: center; gap: var(--pdx-space-xs); flex-wrap: wrap; }
+  .document-actions { display: flex; gap: var(--pdx-space-xs); justify-content: flex-end; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--pdx-space-md); }
+  .actions { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+
+  @media (max-width: 767px) {
+    .document { grid-template-columns: 1fr; padding-block: var(--pdx-space-xs); }
+    .document-actions { justify-content: flex-start; }
+  }
+</style>

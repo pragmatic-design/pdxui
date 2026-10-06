@@ -1,0 +1,33 @@
+<!-- Hand-written demo for the net-new pdx-page-header (no showcase-new source yet). -->
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Page Header</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Standard page header: breadcrumb + title (+ subtitle) + a right-aligned <code>actions</code> slot. Replaces
+      the hand-assembled "breadcrumb + heading + buttons" row repeated on every list/detail screen.
+      Its title is an <code>h1</code>, the page's own; <code>heading-level</code> lowers it inside a dialog or
+      a section — as here, where each example sits under this page's section headings.
+    </p>
+
+    <section>
+      <h2 class="pdx-txt-heading">Title + breadcrumb + actions</h2>
+      <pdx-page-header title="Patients" subtitle="1,204 records" heading-level="3" :crumbs="crumbs">
+        <pdx-button slot="actions" variant="outline" size="sm">Export</pdx-button>
+        <pdx-button slot="actions" variant="primary" size="sm">New patient</pdx-button>
+      </pdx-page-header>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading">Title only</h2>
+      <pdx-page-header title="Dashboard" heading-level="3"></pdx-page-header>
+    </section>
+  </div>
+</template>
+
+<script setup>
+let crumbs = $signal([
+  { key: 'home', label: 'Home', href: '/' },
+  { key: 'clinic', label: 'Clinic', href: '/clinic' },
+  { key: 'patients', label: 'Patients' },
+]);
+</script>

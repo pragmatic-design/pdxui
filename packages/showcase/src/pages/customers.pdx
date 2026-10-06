@@ -1,0 +1,228 @@
+<template>
+  <section class="page" data-test="customers">
+    <!-- The list's header, the tickets': views of this list's own. -->
+    <pdx-list-header
+      :title="$t('customers.title')"
+      store-key="customers"
+      :default-name="$t('customers.views.default')"
+      :grid="gridEl"
+      :source="source"
+      @switched="list.clearSelection()">
+      <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('customers.matching', { count: total }) }}</span>
+      <pdx-button variant="primary" @click="list.openCreate()" data-test="new">{{ $t('customers.new') }}</pdx-button>
+    </pdx-list-header>
+    <!-- For the reader of the source: the same round-trip as the tickets, on a second
+         entity — written once and repeated, which is what the pattern has to prove. -->
+    <p class="pdx-txt-small pdx-ink-muted">{{ $t('customers.intro') }}</p>
+
+    <!-- The list and the bar that belongs to it, in one box — as wide as the table and anchored to
+         it, as for the first entity. -->
+    <div class="list">
+      <pdx-data-grid
+        :ref="gridEl"
+        :source="source"
+        :columns="columns"
+        :page-sizes="[10, 20, 50]"
+        show-toolbar
+        search
+        selection="multiple"
+        @pdx-selection-change="list.onSelectionChange($event)"
+        row-clickable
+        @pdx-row-click="e => list.openRecord(e.detail.row)"
+        data-test="grid"></pdx-data-grid>
+
+      <pdx-bulk-actions
+        class="bulk"
+        :count="selectedCount"
+        :actions="bulkActions"
+        @pdx-action="onBulkAction"
+        @pdx-clear="list.clearSelection()"
+        data-test="bulk"></pdx-bulk-actions>
+    </div>
+
+
+
+    <!-- CREATE IN A MODAL, a RECORD in the drawer its row opens — the same shapes as the first
+         entity, and the same code: `createListActions`. Not «select, then Edit in the toolbar». -->
+    <pdx-dialog
+      :open="createOpen"
+      size="md"
+      :title="$t('customers.new')"
+      @pdx-close="list.closeCreate()"
+      data-test="create-dialog">
+      <pdx-auto-form
+        :schema="schema"
+        :submit-label="$t('customers.create')"
+        @pdx-submit="onCreate"
+        data-test="create-form"></pdx-auto-form>
+    </pdx-dialog>
+
+    <pdx-edit-drawer
+      :open="editing !== null"
+      :schema="schema"
+      :value="editing"
+      :title="editing ? $t('customers.edit') : ''"
+      :save-label="$t('customers.save')"
+      :cancel-label="$t('customers.cancel')"
+      @pdx-save="onDrawerSave"
+      @pdx-cancel="list.askToClose()"
+      :ref="drawerEl"
+      data-test="record-drawer"></pdx-edit-drawer>
+
+    <!-- Asked only when there is something to lose, as on tickets. -->
+    <pdx-alert-dialog
+      :open="confirmClose"
+      :title="$t('customers.discardTitle')"
+      :message="$t('customers.discardBody')"
+      :confirm-label="$t('customers.discardLeave')"
+      :cancel-label="$t('customers.discardStay')"
+      tone="danger"
+      @pdx-confirm="list.discardAndClose()"
+      @pdx-cancel="list.keepEditing()"
+      data-test="drawer-confirm"></pdx-alert-dialog>
+    <!-- Rule 1's host. On the SCREEN, not in the shell, and that is measured rather
+         than tidy: in `app.pdx` it joins the entry chunk, and the entry is what a visitor waits
+         for before anything is painted — 81 KB against a budget of 78. A toast answers an action
+         that has not happened yet on the first paint, so it travels with the screen that can
+         raise one. The QUEUE is global (`getToastQueue`), so the two screens share one, and only
+         one of them is ever mounted. -->
+    <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
+  </section>
+</template>
+
+<script setup>
+// A dictionary KEY, not a function: this route is an ancestor of pages that do not render it
+// (`/customers/1`, `/customers/import`), so a deep link never loads this module, and a function
+// label here would vanish from their trail. A key travels in the route table.
+@page '/customers' { label: $t('customers.title') };
+@title $t('customers.title');
+@scroll 'preserve';
+
+import { createDataSource, actions, badge } from '@pdxui/core';
+import { customerTransport, refuseNextArchive } from '../data/customers';
+import type { Customer } from '../data/customers';
+// Created from JS, so the compiler cannot auto-import it from a tag; the answers use it.
+import { toast } from '@pdxui/ui/toast';
+import { createAnswer } from '../data/answer';
+import { createListActions } from '../data/list-actions';
+import { categoryLabel, categoryTones, categoryOptions } from '../data/categories';
+import { registerDemo } from '../demo';
+
+// ── The entity, declared ───────────────────────────────────────────────────────────────────
+//
+// Everything above this line is markup that says WHICH components; everything below is what a
+// customer is. The first entity's page is 507 lines and this one is a third of that, and the
+// difference is not cleverness: it is that `live.ts`, the attachments and the inline-edit
+// demonstration belong to the ticket screen, not to the pattern.
+
+const source = createDataSource({ transport: customerTransport, pageSize: 10 });
+
+/** The design system's semantic tone for each status: live, starting, done. */
+const STATUS_TONES = { active: 'success', onboarding: 'info', closed: 'muted' };
+
+const columns = $derived([
+    { field: 'reference', header: $t('customers.columns.reference'), width: 120 },
+    // Searched by name and sector; narrowed by tier and status from their chips.
+    { field: 'name', header: $t('customers.columns.name'), filterable: true, searchable: true },
+    { field: 'sector', groupable: true, header: $t('customers.columns.sector'), width: 180, searchable: true },
+    // Stored as codes, shown as words: the composed key is how the tickets translate
+    // their enums, and the status is a badge toned by the CODE — the grid writes `format`'s label.
+    { field: 'tier', groupable: true, header: $t('customers.columns.tier'), width: 140,
+      format: (v) => $t('customers.tiers.' + String(v)), quickFilter: true,
+      filterOptions: ['standard', 'business', 'enterprise'].map(v => ({ value: v, label: $t('customers.tiers.' + v) })) },
+    { field: 'status', groupable: true, header: $t('customers.columns.status'), width: 140,
+      format: (v) => $t('customers.statuses.' + String(v)), cell: badge({ tones: STATUS_TONES }), quickFilter: true,
+      filterOptions: ['active', 'onboarding', 'closed'].map(v => ({ value: v, label: $t('customers.statuses.' + v) })) },
+    // A coloured badge per category, named in the page's language.
+    { field: 'categories', header: $t('customers.columns.categories'), width: 220, sortable: false,
+      format: (v) => categoryLabel(String(v)), cell: badge({ tones: categoryTones() }),
+      filterOptions: categoryOptions('customers'), quickFilter: true },
+    // The tickets' date format, so the three lists say a date the same way.
+    { field: 'since', header: $t('customers.columns.since'), width: 140,
+      format: (v) => $d(String(v), { dateStyle: 'medium' }) },
+    // The row's own way in, as on tickets. `actions()` keeps the
+    // click from reaching the row, and the label NAMES the customer.
+    { field: 'id', header: '', width: 56, sortable: false,
+      cell: actions([{ icon: 'eye', label: (row) => $t('customers.openRecord', { name: String(row.name) }),
+                       // A cell action hands over the grid's untyped row; this grid's rows are its source's customers.
+                       onClick: (row) => list.openRecord(row as Customer) }]) },
+]);
+
+const schema = $derived({
+    fields: [
+        { name: 'name', label: $t('customers.columns.name'), type: 'text', required: true },
+        { name: 'sector', label: $t('customers.columns.sector'), type: 'text' },
+        {
+            name: 'tier', label: $t('customers.columns.tier'), type: 'select',
+            options: [
+                { value: 'standard', label: $t('customers.tiers.standard') },
+                { value: 'business', label: $t('customers.tiers.business') },
+                { value: 'enterprise', label: $t('customers.tiers.enterprise') },
+            ],
+        },
+        // The active categories for customers, plus any the record carries that has been deactivated.
+        { name: 'categories', type: 'select', multiple: true, label: $t('customers.columns.categories'),
+          options: [
+            ...categoryOptions('customers'),
+            ...(editing?.categories ?? [])
+              .filter(code => !categoryOptions('customers').some(o => o.value === code))
+              .map(code => ({ value: code, label: categoryLabel(code) })),
+          ] },
+    ],
+});
+
+const bulkActions = $derived([
+    { key: 'archive', label: $t('customers.bulk.archive'), icon: 'trash', tone: 'danger' },
+]);
+
+// ── The round-trip, the tickets' own: written once in `createListActions` ────────
+
+/** The grid, for the list header's views and for clearing its checkboxes. A `:ref` binds into a SIGNAL. */
+let gridEl = $signal(null);
+/** The drawer element, for `isDirty()`. A `:ref` binds into a SIGNAL; a plain let stays null. */
+let drawerEl = $signal(null);
+
+const answer = createAnswer(toast);
+const list = createListActions({
+  source, transport: customerTransport, answer,
+  grid: () => gridEl,
+  drawer: () => drawerEl,
+});
+
+const selectedIds = $derived(list.selectedIds());
+const createOpen = $derived(list.createOpen());
+const editing = $derived(list.editing());
+const confirmClose = $derived(list.confirmClose());
+
+const total = $derived(source.total());
+const selectedCount = $derived(selectedIds.length);
+
+function armRefusal() { refuseNextArchive(); }
+
+// The simulated server's knob, in the Demo panel of the service bar.
+onMount(() => onDestroy(registerDemo([
+  { test: 'refuse-next', label: 'customers.refuseNext', run: armRefusal },
+])));
+
+function onCreate(e) { return list.create(e.detail?.values ?? {}); }
+function onDrawerSave(e) { return list.save(e.detail?.values ?? {}); }
+
+/** Archived, not deleted: out of the list, not gone — and the way back travels with the message. */
+function onBulkAction(e) {
+  if (e.detail?.key !== 'archive') return;
+  return list.removeSelected({
+    describe: (rows) => rows.length === 1
+      ? $t('customers.archived', { reference: rows[0].reference })
+      : $t('customers.archivedMany', { count: rows.length }),
+    undoLabel: $t('customers.undo'),
+    recreate: (row) => row,
+  });
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .list { display: flex; flex-direction: column; }
+  .bulk { display: block; width: 100%; }
+  .undo-bar { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+</style>

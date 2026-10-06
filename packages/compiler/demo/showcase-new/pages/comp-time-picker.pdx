@@ -1,0 +1,71 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Time Picker</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-time-picker&gt;</code> — a segmented time input: hour, minute, optional seconds and AM/PM.
+      Each segment has its own up/down arrows and answers the keyboard, the mouse wheel and typed digits.
+      The value is always <code>HH:mm</code> (or <code>HH:mm:ss</code>) on the 24-hour clock, whatever the display.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-time-picker-basic class="demo-section"></pdx-demo-comp-time-picker-basic>
+
+    <!-- ═══ 12h / 24h ═══ -->
+    <pdx-demo-comp-time-picker-clock class="demo-section"></pdx-demo-comp-time-picker-clock>
+
+    <!-- ═══ Seconds and step ═══ -->
+    <pdx-demo-comp-time-picker-seconds class="demo-section"></pdx-demo-comp-time-picker-seconds>
+
+    <!-- ═══ Min / max ═══ -->
+    <pdx-demo-comp-time-picker-min-max class="demo-section"></pdx-demo-comp-time-picker-min-max>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-time-picker-sizes class="demo-section"></pdx-demo-comp-time-picker-sizes>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-time-picker-disabled class="demo-section"></pdx-demo-comp-time-picker-disabled>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-time-picker-composition class="demo-section"></pdx-demo-comp-time-picker-composition>
+
+    <!-- ═══ Keyboard ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Action</span></div>
+        <div class="opt-row"><code>↑ / ↓</code><span>Next / previous value of the focused segment (by <code>step</code> for minutes and seconds)</span></div>
+        <div class="opt-row"><code>0–9</code><span>Type the segment; focus moves on once it is complete</span></div>
+        <div class="opt-row"><code>A / P</code><span>AM / PM, on the period segment</span></div>
+        <div class="opt-row"><code>Tab</code><span>Next segment, then out of the picker</span></div>
+        <div class="opt-row"><code>Wheel</code><span>Same as ↑ / ↓ over a segment</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span><code>HH:mm</code> or <code>HH:mm:ss</code>, 24-hour; empty for no time</span></div>
+        <div class="opt-row"><code>format</code><span>string</span><span>auto (default), 12h, 24h</span></div>
+        <div class="opt-row"><code>showSeconds</code><span>boolean</span><span>Adds the seconds segment</span></div>
+        <div class="opt-row"><code>step</code><span>number</span><span>Minutes (and seconds) per arrow press</span></div>
+        <div class="opt-row"><code>min / max</code><span>string</span><span>Range, <code>HH:mm</code></span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>locale</code><span>string</span><span>Locale for <code>format="auto"</code></span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name (form-associated)</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>event</span><span><code>detail.value</code>: the new value</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/time-picker';
+@title 'Time Picker Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

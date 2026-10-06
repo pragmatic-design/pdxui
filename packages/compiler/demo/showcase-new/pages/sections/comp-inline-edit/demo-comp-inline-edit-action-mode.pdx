@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Action Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Explicit save/cancel buttons instead of blur-to-save.</p>
+    <div class="demo-row">
+      <span class="demo-label">Title:</span>
+      <pdx-inline-edit type="text" saveon="action" :value="'Project Alpha'"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Budget:</span>
+      <pdx-inline-edit type="currency" saveon="action" :value="50000" currency="EUR"></pdx-inline-edit>
+    </div>
+  </section>
+</template>

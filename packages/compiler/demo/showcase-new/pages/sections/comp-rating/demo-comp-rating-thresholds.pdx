@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Threshold Colors</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Colors change based on value. Click to clear.</p>
+
+    <div class="demo-row">
+      <pdx-rating :value="rating4" colors="2:red,3:orange,5:green" @pdx-change="onRating4" clearable></pdx-rating>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let rating4 = $signal(4);
+
+function onRating4(e) {
+  rating4 = e.detail.value;
+}
+</script>

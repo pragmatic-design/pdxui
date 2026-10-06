@@ -1,0 +1,67 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Real-world: Editable Record</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click any value to edit in-place.</p>
+    <div class="record-card">
+      <div class="record-row">
+        <span class="record-label">Name</span>
+        <pdx-inline-edit type="text" label="Name" :value="'Alice Johnson'"></pdx-inline-edit>
+      </div>
+      <div class="record-row">
+        <span class="record-label">Role</span>
+        <pdx-inline-edit type="select" label="Role" :value="'engineer'" :options="roleOptions"></pdx-inline-edit>
+      </div>
+      <div class="record-row">
+        <span class="record-label">Salary</span>
+        <pdx-inline-edit type="currency" label="Salary" :value="85000" currency="EUR"></pdx-inline-edit>
+      </div>
+      <div class="record-row">
+        <span class="record-label">Start date</span>
+        <pdx-inline-edit type="date" label="Start date" :value="'2024-03-15'"></pdx-inline-edit>
+      </div>
+      <div class="record-row">
+        <span class="record-label">Active</span>
+        <pdx-inline-edit type="boolean" :value="true"></pdx-inline-edit>
+      </div>
+      <div class="record-row">
+        <span class="record-label">Rating</span>
+        <pdx-inline-edit type="rating" :value="4"></pdx-inline-edit>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const roleOptions = [
+  { value: 'engineer', label: 'Engineer' },
+  { value: 'designer', label: 'Designer' },
+  { value: 'pm', label: 'Product Manager' },
+  { value: 'lead', label: 'Team Lead' },
+  { value: 'director', label: 'Director' },
+];
+</script>
+
+<style scoped>
+  .record-card {
+    margin-top: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+    padding: var(--pdx-space-sm);
+    max-width: 480px;
+  }
+  .record-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .record-row:last-child { border-bottom: none; }
+  .record-label {
+    min-width: 100px;
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+  }
+</style>

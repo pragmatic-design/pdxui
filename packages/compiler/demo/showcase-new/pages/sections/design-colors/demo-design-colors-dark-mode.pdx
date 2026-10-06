@@ -1,0 +1,52 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Dark Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      All tokens use <code>light-dark()</code> — no separate dark stylesheet needed.
+      Set <code>pdx-scheme="dark"</code> on <code>&lt;html&gt;</code> and everything adapts.
+    </p>
+
+    <div class="darkmode-explain">
+      <div class="dm-row">
+        <code class="pdx-txt-mono">pdx-scheme="light"</code>
+        <span class="pdx-txt-small pdx-ink-muted">Forces light mode. <code>color-scheme: light</code>.</span>
+      </div>
+      <div class="dm-row">
+        <code class="pdx-txt-mono">pdx-scheme="dark"</code>
+        <span class="pdx-txt-small pdx-ink-muted">Forces dark mode. <code>color-scheme: dark</code>.</span>
+      </div>
+      <div class="dm-row">
+        <code class="pdx-txt-mono">pdx-scheme="auto"</code>
+        <span class="pdx-txt-small pdx-ink-muted">Follows OS preference via <code>prefers-color-scheme</code>.</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;html pdx-theme="neutral" pdx-scheme="light"&gt;
+
+/* CSS tokens — one declaration covers both modes: */
+--pdx-color-bg: light-dark(var(--pdx-gray-50), var(--pdx-gray-950));
+
+/* Components use semantic tokens — zero mode-specific code: */
+.my-card {
+  background: var(--pdx-color-surface);
+  color: var(--pdx-color-text);
+  border: 1px solid var(--pdx-color-border);
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Dark mode explanation */
+  .darkmode-explain { margin-top: var(--pdx-space-md); }
+  .dm-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-lg);
+    padding: var(--pdx-space-sm) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .dm-row code { min-width: 200px; }
+</style>

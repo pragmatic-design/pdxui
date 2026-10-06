@@ -1,0 +1,123 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">File Upload</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-file-upload&gt;</code> — drag-and-drop file upload with validation, image preview, size/count limits.
+      Supports accept filters, custom labels, and sizes. Auto-upload requires a server endpoint (not demoed here).
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-file-upload-basic class="demo-section"></pdx-demo-comp-file-upload-basic>
+
+    <!-- ═══ Image Only ═══ -->
+    <pdx-demo-comp-file-upload-image-only class="demo-section"></pdx-demo-comp-file-upload-image-only>
+
+    <!-- ═══ Size Limit ═══ -->
+    <pdx-demo-comp-file-upload-size-limit class="demo-section"></pdx-demo-comp-file-upload-size-limit>
+
+    <!-- ═══ Max Files ═══ -->
+    <pdx-demo-comp-file-upload-max-files class="demo-section"></pdx-demo-comp-file-upload-max-files>
+
+    <!-- ═══ Custom Label ═══ -->
+    <pdx-demo-comp-file-upload-custom-label class="demo-section"></pdx-demo-comp-file-upload-custom-label>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-file-upload-sizes class="demo-section"></pdx-demo-comp-file-upload-sizes>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-file-upload-disabled class="demo-section"></pdx-demo-comp-file-upload-disabled>
+
+    <!-- ═══ Slots ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>file</code></td><td><code>{ file, status, progress }</code></td><td>Custom file item content.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>accept</code><span>string</span><span>Accepted file types (e.g. "image/*", ".pdf,.doc")</span></div>
+        <div class="opt-row"><code>multiple</code><span>boolean</span><span>Allow selecting multiple files</span></div>
+        <div class="opt-row"><code>maxSize</code><span>number</span><span>Max file size in bytes (0 = no limit)</span></div>
+        <div class="opt-row"><code>maxFiles</code><span>number</span><span>Max number of files (0 = no limit)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disable interaction</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Drop zone text (default: "Drop files here or click to browse")</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name for upload (default: "file")</span></div>
+        <div class="opt-row"><code>auto</code><span>boolean</span><span>Auto-upload on select (requires action URL)</span></div>
+        <div class="opt-row"><code>action</code><span>string</span><span>Upload endpoint URL</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>Drop zone size: sm, (default), lg</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Events Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-select</code><span>{ files: File[] }</span><span>Files passed validation and were added</span></div>
+        <div class="opt-row"><code>pdx-error</code><span>{ file, error }</span><span>File rejected (size limit or type mismatch)</span></div>
+        <div class="opt-row"><code>pdx-remove</code><span>{ file, index }</span><span>File removed from the list</span></div>
+        <div class="opt-row"><code>pdx-upload</code><span>{ file }</span><span>Upload started (auto mode)</span></div>
+        <div class="opt-row"><code>pdx-progress</code><span>{ file, percent }</span><span>Upload progress update</span></div>
+        <div class="opt-row"><code>pdx-success</code><span>{ file, response }</span><span>Upload completed successfully</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Exposed Methods</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Method</span><span>Description</span></div>
+        <div class="opt-row-2"><code>addFiles(files)</code><span>Programmatically add files</span></div>
+        <div class="opt-row-2"><code>removeFile(index)</code><span>Remove file at index</span></div>
+        <div class="opt-row-2"><code>uploadAll()</code><span>Trigger upload for all pending files</span></div>
+        <div class="opt-row-2"><code>clear()</code><span>Remove all files and abort uploads</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="shortcut-list">
+        <div><kbd>Enter</kbd> / <kbd>Space</kbd> Open file browser (when drop zone focused)</div>
+        <div><kbd>Delete</kbd> / <kbd>Backspace</kbd> Remove file (when file item focused)</div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Accessibility</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Drop zone has <code>role="button"</code> with <code>tabindex="0"</code> and <code>aria-label</code>
+        matching the label prop. <code>aria-disabled</code> is set when disabled.
+        File list uses <code>role="list"</code> with <code>role="listitem"</code> on each entry.
+        Remove buttons have <code>aria-label="Remove"</code>. Progress bars use <code>role="progressbar"</code>
+        with <code>aria-valuenow</code>.
+      </p>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/file-upload';
+@title 'File Upload — PDX UI';
+
+import '@pdxui/ui/file-upload';
+</script>
+
+<style scoped>
+  .page { }
+
+  .result-box {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+    border: 1px solid var(--pdx-color-border);
+  }
+
+  .opt-row-2 { display: grid; grid-template-columns: 200px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row-2 span { color: var(--pdx-color-muted); }
+
+  .shortcut-list { margin-top: var(--pdx-space-md); display: flex; flex-direction: column; gap: var(--pdx-space-xs); font-size: var(--pdx-text-sm); }
+  .shortcut-list kbd { font-family: var(--pdx-font-mono); font-size: var(--pdx-text-xs); padding: 2px 6px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm); }
+</style>

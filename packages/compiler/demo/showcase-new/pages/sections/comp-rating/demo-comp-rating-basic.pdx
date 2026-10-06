@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to rate. Arrow keys to adjust.</p>
+
+    <div class="demo-row">
+      <pdx-rating :value="rating1" @pdx-change="onRating1"></pdx-rating>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-rating :value="rating1" @pdx-change="onRating1"&gt;&lt;/pdx-rating&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useRatingDemo } from './state.pdx';
+
+// The form-integration rating shows and sets the same value (state.pdx.ts).
+const ratingDemo = useRatingDemo();
+const rating1 = $derived(ratingDemo.rating1());
+function onRating1(e) { ratingDemo.onRating1(e); }
+</script>

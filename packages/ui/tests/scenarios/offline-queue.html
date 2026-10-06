@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Offline queue harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: #fff; color: #111; font-family: system-ui; padding: 24px; }
+        pre { font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<h1>Offline queue</h1>
+<pre id="out" data-test="out"></pre>
+
+<script type="module">
+    // The bench for `offlineMiddleware`, driven by a REAL network drop.
+    //
+    // Its five unit tests run in happy-dom past a getter the test itself writes
+    // (`offline.test.ts:7`), so nothing in them ever fails to reach a server — the middleware is
+    // exercised against a property, not against a network. Here the client sends over TCP to an
+    // endpoint the scenarios dev server provides (`offline-endpoint.ts`), and the spec drives the
+    // connection with `context.setOffline()`. Whether a mutation was replayed is then a question
+    // for the SERVER, which the spec asks out of band.
+    //
+    // Nothing here asserts. The page builds the client and hands the pieces to the spec through
+    // window.__offline.
+    import { createHttpClient, offlineMiddleware, OfflineError } from '@pdxui/core';
+
+    const params = new URLSearchParams(location.search);
+    // Every run gets its own endpoint namespace: certify is fullyParallel and the dev server is
+    // shared, so without this one worker would count another worker's requests.
+    const run = params.get('run') || `run-${Math.random().toString(36).slice(2)}`;
+    const persist = params.get('persist') === '1';
+    // retryMiddleware is ON by default and sits OUTSIDE the caller's middleware, so it can re-enter
+    // the offline middleware. That is something to measure rather than configure away — the spec
+    // does both, and `?retry=0` is the control.
+    const retry = params.get('retry') !== '0';
+
+    const queued = [];
+    const replayed = [];
+    const errors = [];
+    /** Every `online`/`offline` event the page saw — the control for "the drop was real". */
+    const connectivity = [];
+
+    addEventListener('online', () => connectivity.push('online'));
+    addEventListener('offline', () => connectivity.push('offline'));
+
+    const client = createHttpClient({
+        baseUrl: `${location.origin}/__offline/api/${encodeURIComponent(run)}`,
+        retry,
+        // A short deadline: the default is 30s, and a request that hangs because the network is
+        // gone would otherwise outlive the test's own timeout.
+        timeout: 4000,
+        middleware: [
+            offlineMiddleware({
+                persist,
+                onQueued: (request, size) => queued.push({ method: request.method, url: request.url, size }),
+                onReplay: (request, result) => replayed.push({
+                    method: request.method,
+                    url: request.url,
+                    ok: !(result instanceof Error),
+                    error: result instanceof Error ? result.name : null,
+                }),
+            }),
+        ],
+    });
+
+    // The high-level methods, not `client.request()`: only `get`/`post`/`put`/... go through
+    // `buildRequest`, which is what applies `baseUrl`. `request()` takes the URL verbatim.
+    const METHODS = {
+        GET: (path) => client.get(path),
+        POST: (path, body) => client.post(path, body),
+        PUT: (path, body) => client.put(path, body),
+        DELETE: (path) => client.delete(path),
+    };
+
+    /** Send one request. Never rejects: the spec wants the outcome, not an unhandled rejection. */
+    async function send(method, path, body) {
+        try {
+            const data = await METHODS[method](path, body);
+            return { ok: true, data };
+        } catch (err) {
+            const name = err instanceof Error ? err.name : 'unknown';
+            errors.push({ path, method, name });
+            return { ok: false, error: name, offline: err instanceof OfflineError };
+        }
+    }
+
+    /** What `persist: true` actually wrote, read straight out of IndexedDB. */
+    async function readPersisted() {
+        const names = (await indexedDB.databases()).map((d) => d.name);
+        if (!names.includes('pdx-offline')) return null;
+        return new Promise((resolve) => {
+            const open = indexedDB.open('pdx-offline', 1);
+            open.onerror = () => resolve(null);
+            open.onsuccess = () => {
+                const db = open.result;
+                if (!db.objectStoreNames.contains('queue')) { db.close(); resolve([]); return; }
+                const all = db.transaction('queue', 'readonly').objectStore('queue').getAll();
+                all.onerror = () => { db.close(); resolve(null); };
+                all.onsuccess = () => {
+                    const rows = all.result.map((e) => ({
+                        method: e.request?.method, url: e.request?.url, body: e.request?.body,
+                    }));
+                    db.close();
+                    resolve(rows);
+                };
+            };
+        });
+    }
+
+    window.__offline = {
+        run,
+        persist,
+        retry,
+        /** POST — not idempotent, so retryMiddleware passes it straight through. */
+        post: (path, body) => send('POST', path, body),
+        /** PUT — idempotent, so retryMiddleware re-enters the chain when it throws. */
+        put: (path, body) => send('PUT', path, body),
+        get: (path) => send('GET', path, undefined),
+        del: (path) => send('DELETE', path, undefined),
+        onLine: () => navigator.onLine,
+        connectivity: () => connectivity.slice(),
+        queued: () => queued.slice(),
+        replayed: () => replayed.slice(),
+        errors: () => errors.slice(),
+        persisted: () => readPersisted(),
+        /** The databases this origin has — `pdx-offline` missing is how "in memory only" is measured. */
+        databases: async () => (await indexedDB.databases()).map((d) => d.name),
+    };
+
+    document.getElementById('out').textContent = `run=${run} persist=${persist} retry=${retry}`;
+    requestAnimationFrame(() => requestAnimationFrame(() =>
+        document.documentElement.setAttribute('data-pdx-ready', '1')));
+</script>
+</body>
+</html>

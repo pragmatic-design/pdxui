@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple value + title combinations.</p>
+    <div class="demo-row">
+      <pdx-statistic title="Revenue" prefix="$" value="12345" :precision="0" group-separator=","></pdx-statistic>
+      <pdx-statistic title="Active Users" value="8,234"></pdx-statistic>
+      <pdx-statistic title="Orders" value="1,234"></pdx-statistic>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-statistic title="Revenue" prefix="$" value="12345"
+  :precision="0" group-separator=","&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic title="Active Users" value="8,234"&gt;&lt;/pdx-statistic&gt;
+&lt;pdx-statistic title="Orders" value="1,234"&gt;&lt;/pdx-statistic&gt;</code></pre>
+    </details>
+  </section>
+</template>

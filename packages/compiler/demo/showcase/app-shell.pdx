@@ -1,0 +1,122 @@
+<template>
+  @await (appReady) {
+    <div class="app">
+      <nav class="navbar">
+        <span class="brand">TaskMgr</span>
+        <button @click="goTo('/dashboard')" :class="currentPage === '/dashboard' ? 'active' : ''">{{ $t('nav.dashboard') }}</button>
+        <button @click="goTo('/create')" :class="currentPage === '/create' ? 'active' : ''">{{ $t('nav.newTask') }}</button>
+        <button @click="goTo('/settings')" :class="currentPage === '/settings' ? 'active' : ''">{{ $t('nav.settings') }}</button>
+        <button @click="goToUser(1)" :class="currentPage.startsWith('/users') ? 'active' : ''">User #1</button>
+        <button @click="goTo('/admin')" :class="currentPage === '/admin' ? 'active' : ''">🔒 Admin</button>
+        <button @click="goTo('/components')" :class="currentPage === '/components' ? 'active' : ''">🧩 Components</button>
+
+        <div class="locale-switch">
+          <button @click="switchLocale('en')" :class="activeLang === 'en' ? 'lang-active' : ''" class="lang-btn">EN</button>
+          <button @click="switchLocale('it')" :class="activeLang === 'it' ? 'lang-active' : ''" class="lang-btn">IT</button>
+        </div>
+      </nav>
+
+      @if (navigating) {
+        <div class="nav-loading">{{ $t('app.navigating') }}</div>
+      }
+
+      <main class="page-content">
+        <pdx-router-outlet></pdx-router-outlet>
+      </main>
+
+      <footer class="app-footer">
+        <span>{{ $t('footer.brand') }}</span>
+        <span class="stats">{{ $t('common.items', { count: taskCount }) }} | {{ formattedRevenue }}</span>
+        <span class="page-indicator">{{ currentPage }}</span>
+      </footer>
+    </div>
+  } @loading {
+    <div class="splash">
+      <div class="splash-brand">TaskMgr</div>
+      <div class="splash-sub">{{ $t('app.loading') }}</div>
+    </div>
+  }
+</template>
+
+<script setup>
+import { navigate, currentPath, onBeforeNavigate, onAfterNavigate } from '@pdxui/router';
+import { useTasks } from './task-store.pdx';
+import { initI18n, loadTranslations, setLocale, getLocale, setPermissions } from '@pdxui/core';
+import '@pdxui/router/outlet';
+import enMessages from './translations/en.json';
+import itMessages from './translations/it.json';
+
+@meta description: 'TaskMgr — PDX UI showcase: Router v2 features';
+
+// Redirect: / → /dashboard (declared here, auto-registered in __pdx_redirects)
+@redirect '/' -> '/dashboard';
+
+// i18n bootstrap
+initI18n({ locales: ['en', 'it'], default: 'en', detect: true, persist: true });
+loadTranslations('en', enMessages);
+loadTranslations('it', itMessages);
+
+// Permissions — simulates auth response from .NET backend
+// 'admin' permission is NOT set → /admin guard will block
+setPermissions(['users.view', 'tasks.manage']);
+
+// App bootstrap — simulates async init (auth, config, etc.)
+let appReady = $signal(false);
+setTimeout(() => { appReady = true; }, 400);
+
+// Navigation middleware — loading indicator
+let navigating = $signal(false);
+onBeforeNavigate((_from, _to) => {
+  navigating = true;
+  return true;
+});
+onAfterNavigate((_from, _to) => {
+  navigating = false;
+});
+
+const currentPage = $derived(currentPath());
+const store = useTasks();
+const taskCount = $derived(store.stats().total);
+const formattedRevenue = $derived($n(98750.5, { style: 'currency', currency: 'EUR' }));
+
+let activeLang = $signal(getLocale()());
+
+function goTo(target) {
+  navigate(target);
+}
+
+function goToUser(id) {
+  // Navigate with virtual state (not in URL)
+  navigate('/users/:id(number)', { id: String(id) }, { fromList: true, timestamp: Date.now() });
+}
+
+function switchLocale(lang) {
+  setLocale(lang);
+  activeLang = lang;
+}
+</script>
+
+<style scoped>
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+  .navbar { background: #1d1d2e; display: flex; align-items: center; gap: 4px; padding: 8px 20px; flex-wrap: wrap; }
+  .brand { color: white; font-weight: 700; font-size: 1.1rem; margin-right: 20px; }
+  .navbar button { background: transparent; color: rgba(255,255,255,0.7); border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.15s; }
+  .navbar button:hover { background: rgba(255,255,255,0.1); color: white; }
+  .navbar button.active { background: rgba(255,255,255,0.15); color: white; font-weight: 600; }
+
+  .locale-switch { margin-left: auto; display: flex; gap: 3px; }
+  .lang-btn { font-size: 0.72rem !important; padding: 4px 10px !important; border: 1px solid rgba(255,255,255,0.25) !important; border-radius: 4px; font-weight: 600; }
+  .lang-btn:hover { border-color: rgba(255,255,255,0.6) !important; }
+  .lang-active { background: white !important; color: #1d1d2e !important; border-color: white !important; }
+
+  .nav-loading { background: #e3f2fd; color: #1565c0; padding: 6px 20px; font-size: 0.78rem; text-align: center; }
+
+  .page-content { flex: 1; padding: 20px; max-width: 1100px; width: 100%; margin: 0 auto; }
+  .app-footer { background: #f0f0f0; padding: 10px 20px; display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; }
+  .stats { font-family: monospace; }
+  .page-indicator { font-family: monospace; color: #aaa; }
+
+  .splash { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #1d1d2e; }
+  .splash-brand { color: white; font-size: 2.5rem; font-weight: 800; }
+  .splash-sub { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 8px; }
+</style>

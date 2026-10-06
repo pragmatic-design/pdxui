@@ -1,0 +1,312 @@
+<template>
+  <section class="page" data-test="ticket">
+    <!-- The trail, from the routes that matched. -->
+    <pdx-breadcrumb data-test="crumbs"></pdx-breadcrumb>
+    <h1 class="pdx-txt-title">{{ $t('ticket.title', { id: id }) }}</h1>
+    <!-- How many times this page has mounted since the document loaded is what `master-detail` and
+         `production-build` read to prove a child route does not rebuild its parent. It is a test's
+         instrument, not something a reader needs, so it stays in the document, hidden, and the line
+         says what the page is. -->
+    <p class="pdx-txt-small pdx-ink-muted">
+      <span data-test="ticket-mounts" hidden>{{ mountCount }}</span>
+      {{ $t('ticket.summary') }}
+    </p>
+
+    <div class="detail-grid">
+      <!-- ─── The section menu, ON THE LEFT ─────────────────────────────────────
+           260px wide, opening with the entity's face: the reference's detail menu is a portrait
+           and then the sections as rows in groups, and there is no right panel anywhere in its 150
+           screens — that is a rule, not a gap.
+
+           The sections are LINKS where they are routes, so each one is linkable, back-able and
+           deep-linkable, and a button where the section is a part of this page. -->
+      <nav class="detail-menu" :aria-label="$t('ticket.sections')" data-test="detail-menu">
+        <div class="identity" data-test="identity">
+          <span class="portrait" aria-hidden="true">{{ initials }}</span>
+          <p class="pdx-txt-heading identity-name" data-test="identity-name">{{ reference }}</p>
+          <p class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ $t('ticket.title', { id: id }) }}</p>
+          <!-- What it was opened on, a way to its record. Nothing when it names no asset. -->
+          @if (asset) {
+            <p class="pdx-txt-small identity-asset"><pdx-link :to="'/assets/' + asset.id" data-test="ticket-asset">{{ asset.serial }} · {{ asset.name }}</pdx-link></p>
+          }
+          <!-- The answer it is owed: from the customer's subscription that covers the
+               asset, else the customer's shortest. Nothing when the customer subscribes to nothing. -->
+          @if (sla) {
+            <p class="pdx-txt-small identity-sla" data-test="ticket-sla">{{ $t('ticket.sla', { hours: sla.slaHours, service: sla.name }) }}</p>
+          }
+        </div>
+
+        <p class="menu-group pdx-txt-small pdx-ink-muted">{{ $t('ticket.groups.work') }}</p>
+        <!-- Each row is a DIV around the link, and that is measured rather than tidy: `<pdx-link>`
+             computes `display: contents`, so the host has no box and its anchor is what gets laid
+             out — squeezed to 24px, with the click landing on the nav behind it (two 30s timeouts
+             in `master-detail.spec.ts`). The wrapper owns the row, the anchor fills it. -->
+        <nav class="tabs" data-test="tabs">
+          <div class="menu-item"><pdx-link :to="'/tickets/' + id + '/interventions/2'" active-class="here" data-test="tab-i2">{{ $t('ticket.tabs.first') }}</pdx-link></div>
+          <div class="menu-item"><pdx-link :to="'/tickets/' + id + '/interventions/3'" active-class="here" data-test="tab-i3">{{ $t('ticket.tabs.second') }}</pdx-link></div>
+          <div class="menu-item"><pdx-link :to="'/tickets/' + id + '/billing'" active-class="here" data-test="tab-billing">{{ $t('ticket.tabs.billing') }}</pdx-link></div>
+        </nav>
+
+        <p class="menu-group pdx-txt-small pdx-ink-muted">{{ $t('ticket.groups.record') }}</p>
+        <!-- The in-page sections. The menu is the one thing that decides what the body shows: one
+             entry is current, the body shows it and nothing else. Current means no
+             child route is open AND this is the section chosen. -->
+        <button type="button" class="menu-row tab-btn" :aria-current="!onChild && section === 'attachments' ? 'page' : null" @click="choose('attachments')" data-test="tab-attachments">{{ $t('ticket.tabs.attachments') }}</button>
+        <button type="button" class="menu-row tab-btn" :aria-current="!onChild && section === 'history' ? 'page' : null" @click="choose('history')" data-test="tab-history">{{ $t('ticket.tabs.history') }}</button>
+      </nav>
+
+      <div class="detail-body">
+
+    <!-- ─── Attachments ────────────────────────────────────────────────────────
+         The one part of the data layer no page documents: uploadFile, downloadFile and the
+         TransferHandle they return. The upload is `<pdx-attachment-upload>` (src/attachment-upload.pdx),
+         shared with the employee's documents; the list and the download are this
+         page's. -->
+    <section class="attachments" :show="!onChild && section === 'attachments'" data-test="attachments">
+      <h2 class="pdx-txt-heading">{{ $t('attachments.title') }}</h2>
+      <!-- For the reader of the source: upload and download go through `uploadFile` and
+           `downloadFile`, whose TransferHandle carries `progress`, `loaded` and `total` as signals,
+           and `abort()`. -->
+      <p class="pdx-txt-small pdx-ink-muted">{{ $t('attachments.intro') }}</p>
+
+      <pdx-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></pdx-attachment-upload>
+
+      <!-- The list is the SERVER's, re-read after every transfer. An upload that only appends to a
+           local array cannot show that a cancelled one left nothing behind. -->
+      <ul class="files" data-test="files">
+        @for (files as file; track file.id) {
+          <li class="file" :data-name="file.name">
+            <span class="pdx-txt-small">{{ file.name }}</span>
+            <span class="pdx-txt-small pdx-ink-muted">{{ $n(file.size) }}</span>
+            <pdx-button size="sm" variant="ghost" @click="download(file)" data-test="download">{{ $t('attachments.download') }}</pdx-button>
+          </li>
+        } @empty {
+          <li class="pdx-txt-small pdx-ink-muted" data-test="no-files">{{ $t('attachments.none') }}</li>
+        }
+      </ul>
+
+      <!-- What the last download was SAVED as. The server sends it in Content-Disposition and the
+           handle reads it; the URL's last segment is `content`, which is what a page that guessed
+           from the URL would have written to disk. -->
+      <p class="pdx-txt-small pdx-ink-muted" :show="savedAs !== ''" data-test="saved-as">{{ $t('attachments.savedAs', { name: savedAs }) }}</p>
+    </section>
+
+    <!-- The heavy tab, behind a `@defer`: the chart is not in this route's first payload, and the
+         network assertion in the spec is what proves it — its chunk is requested when the tab is
+         opened and not before. -->
+    <section class="history" :show="!onChild && section === 'history'" data-test="history">
+      <!-- `viewport`, not `interaction`: `interaction` listens on the block, and with it the chart
+           is never built at all, because an `interaction` that means what it says cannot fire for
+           a section the pointer has never been inside. The sentinel entering the viewport when the
+           tab opens is what this section actually wants. -->
+      @defer (viewport) {
+        <pdx-chart type="line" :data="historySeries" x-field="month" y-field="hours" height="160" data-test="chart"></pdx-chart>
+      } @placeholder {
+        <div class="skeleton" data-test="chart-placeholder">{{ $t('ticket.loadingChart') }}</div>
+      }
+    </section>
+
+        <!-- The child route renders here, and when one is open it IS the body: the in-page sections
+             above step aside. The number above is how the build test tells a nested render from a
+             flat one: it does not move when only the child changes. -->
+        <pdx-router-outlet></pdx-router-outlet>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+@page '/tickets/:id' { label: ticketLabel };
+@title $t('ticket.title', { id: id });
+
+// The crumb for THIS record, not for this route. A string label such as `'Ticket :id'` reaches the
+// param and no further, and «1» is not what a ticket is called. Only the application
+// can look the record up, so the declaration names a function and the compiler hoists it to module
+// scope: a label is read while the breadcrumb builds, outside any component, so it can reach
+// neither a prop nor a signal. It takes the params and nothing else.
+//
+// The fallback is not decoration: a deep link to an id the store has no row for still draws a
+// trail, and a crumb reading «undefined» is worse than a generic one.
+function ticketLabel(params) {
+    const ticket = ticketById(Number(params.id));
+    return ticket ? `${ticket.reference} · ${ticket.subject}` : $t('ticket.title', { id: params.id });
+}
+// The identity the detail menu opens with: the reference's portrait is a photograph, and a ticket
+// has initials — the reference and the subject are what this record is called.
+const reference = $derived(`T-${String(1000 + Number(id) - 1)}`);
+// The number, not the last two characters of it: `reference.slice(-2)` draws «00» on T-1000, which
+// is a portrait that says nothing. What names a ticket is its number.
+const initials = $derived(reference.replace('T-', ''));
+
+// A ticket opens at its header, always — including on Back, which is the case the default
+// gets wrong: a detail screen restored halfway down is a screen whose subject is off the top
+// of the page. `'top'` is what says so.
+@scroll 'top';
+
+// The upload, and its `uploadFile` and `effect`, are `src/attachment-upload.pdx`'s.
+import { downloadFile, saveBlob } from '@pdxui/core';
+// The store, for the crumb above: the label runs at module scope, so what it reads has to live
+// there too.
+import { ticketById } from '../data/tickets';
+import { assetById } from '../data/assets';
+import { slaFor } from '../data/services';
+import { currentPath, navigate } from '@pdxui/router';
+
+@prop id: string = '';
+
+/** The asset the ticket was opened on, or none. */
+const asset = $derived(assetById(ticketById(Number(id))?.assetId ?? 0) ?? null);
+/** The service whose SLA the ticket is owed, or none. */
+const sla = $derived(slaFor(ticketById(Number(id))?.customerId ?? 0, asset?.kind ?? null));
+
+// On the global on purpose: a signal declared here would be rebuilt with the component, and the
+// question this number answers is whether the component was rebuilt at all. It has to outlive it.
+globalThis.__pdxTicketMounts = (globalThis.__pdxTicketMounts ?? 0) + 1;
+const mountCount = globalThis.__pdxTicketMounts;
+
+// ─── The body's sections ───────────────────────────────────────────────────────
+//
+// Two kinds share one menu: child ROUTES (the interventions, the billing), rendered by the outlet,
+// and sections of THIS page (attachments, history). A child route open means the outlet is the
+// body; otherwise the chosen page section is. They never stack: one section is the body at a time.
+
+/** A child route of this ticket is open: its path goes on past `/tickets/:id`. */
+const onChild = $derived(currentPath().startsWith(`/tickets/${id}/`));
+
+/** The page section the menu has chosen, shown when no child route is open. */
+let section = $signal('attachments');
+
+/** Choose a page section — and leave a child route for it, or the outlet would keep the body. */
+function choose(next) {
+  section = next;
+  if (onChild) navigate(`/tickets/${id}`);
+}
+
+// ─── Attachments ───────────────────────────────────────────────────────────────
+
+const historySeries = [
+  { month: 'Apr', hours: 2 }, { month: 'May', hours: 5 }, { month: 'Jun', hours: 3 },
+  { month: 'Jul', hours: 8 }, { month: 'Aug', hours: 4 }, { month: 'Sep', hours: 6 },
+];
+
+let files = $signal([]);
+let savedAs = $signal('');
+
+/** Where the upload POSTs: this ticket's attachments. */
+const uploadEndpoint = $derived(`/api/attachments?ticket=${encodeURIComponent(id)}`);
+
+async function reload() {
+  const res = await fetch(`/api/attachments?ticket=${encodeURIComponent(id)}`);
+  files = await res.json();
+}
+
+// `$effect` and not `onMount`, and the difference is a bug rather than a style: `onMount` is
+// one-shot and runs while `id` is still the prop's default, so the first request would ask for the
+// attachments of ticket "" — every ticket would get the same list, and nothing would say so. Reading `id`
+// inside an effect subscribes to it, so the list follows the route.
+$effect(() => { void reload(); });
+
+/**
+ * Download, and save under the name the SERVER sent.
+ *
+ * `handle.filename()` is the `Content-Disposition`; the URL ends in `/content`, so a page that
+ * took the last segment would write a file called `content` to the visitor's disk.
+ */
+async function download(file) {
+  const dl = downloadFile(`/api/attachments/${file.id}/content`);
+  const blob = await dl.result;
+  const name = dl.filename() ?? file.name;
+  saveBlob(blob, name);
+  savedAs = name;
+}
+</script>
+
+<style scoped>
+  /* Two columns: the menu at the reference's 260, the body taking the rest. Never a right panel —
+     the owner's rule, and the reference has none in 150 screens. */
+  .detail-grid { display: flex; gap: var(--pdx-gutter); align-items: flex-start; }
+  /* A COLUMN, explicitly: this is a <nav>, and the page gives every nav `display: flex` — as a row
+     it squeezes the section list to zero width. */
+  /* Part of the page, not a card set inside it: a rule beside it sets it
+     apart from the section, and it stays in view while the section scrolls. */
+  .detail-menu {
+    flex: 0 0 260px; width: 260px; display: flex; flex-direction: column; align-items: stretch;
+    position: sticky; top: var(--pdx-space-md);
+    padding-right: var(--pdx-space-sm);
+    border-right: 1px solid var(--pdx-color-border);
+  }
+  .detail-body { flex: 1; min-width: 0; }
+
+  .identity { text-align: center; padding: var(--pdx-space-md); border-bottom: 1px solid var(--pdx-color-border); }
+  /* The reference's 100px round portrait, at the top and centred. */
+  .portrait {
+    width: 100px; height: 100px; margin: 0 auto var(--pdx-space-sm);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink);
+    font-size: 22px; font-weight: 700; letter-spacing: .02em;
+  }
+  .identity-name { margin: 0; }
+  .identity-asset { margin: var(--pdx-space-xs) 0 0; }
+  .identity-asset a { color: var(--pdx-color-primary-ink); }
+  .identity-sla { margin: var(--pdx-space-xs) 0 0; font-weight: 600; }
+
+  /* Inset as the rows are: inside the panel it would otherwise touch its edge. */
+  .menu-group {
+    margin: var(--pdx-space-md) 0 var(--pdx-space-2xs);
+    padding: 0 var(--pdx-space-sm);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  /* A section is a 48px row, which is the rhythm this application states. */
+  /* The box goes on the ANCHOR, not on the `<pdx-link>` host: a host sized taller than the link
+     inside it takes the pointer and the click lands on nothing — measured as a 30s timeout in
+     `master-detail.spec.ts`, twice. The host is a block, the link fills it. */
+  .detail-menu .tabs { display: flex; flex-direction: column; align-items: stretch; gap: 2px; width: 100%; }
+  .menu-item { display: block; width: 100%; }
+
+  .menu-item a,
+  button.menu-row {
+    display: flex; align-items: center; width: 100%;
+    min-height: var(--pdx-section-height);
+    padding: 0 var(--pdx-space-sm);
+    border: 0; border-radius: var(--pdx-radius-sm);
+    background: transparent; color: var(--pdx-color-muted);
+    font: inherit; text-align: left; text-decoration: none; cursor: pointer;
+  }
+  .menu-item a:hover,
+  button.menu-row:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+  /* `<pdx-link>` puts `active-class` on the HOST (`this.classList` in link.ts), not on the anchor
+     inside it — so a rule on the anchor alone leaves the row a visitor is on looking like every
+     other one. */
+  .menu-item pdx-link.here a,
+  button.menu-row[aria-current="page"] { background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink); font-weight: 600; }
+
+  /* Wider than a reading column: this is a detail SCREEN, a 260px menu beside a body, and the
+     reference gives it the whole content area. */
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+
+  .tabs { display: flex; gap: var(--pdx-space-md); align-items: center; }
+  .tabs .here { font-weight: 600; color: var(--pdx-color-primary-ink); }
+  .tab-btn { background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font: inherit; }
+
+  /* A section header inside a detail: the fourth rhythm the shell states. One value
+     for the kind of surface, not a margin per heading. */
+  section > h2 {
+    display: flex;
+    align-items: center;
+    min-height: var(--pdx-section-height);
+    margin: 0;
+  }
+
+  .history { padding: var(--pdx-space-md) 0; }
+  .skeleton { height: 160px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); }
+
+  .attachments {
+    display: flex; flex-direction: column; gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
+
+  .files { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--pdx-space-2xs); }
+
+  .file { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+</style>

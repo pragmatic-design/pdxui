@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5 sizes: xs (12px), sm (16px), md (24px), lg (32px), xl (48px).</p>
+    <div class="demo-row">
+      <div class="demo-item"><pdx-spinner size="xs"></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">xs</span></div>
+      <div class="demo-item"><pdx-spinner size="sm"></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">sm</span></div>
+      <div class="demo-item"><pdx-spinner size="md"></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">md</span></div>
+      <div class="demo-item"><pdx-spinner size="lg"></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">lg</span></div>
+      <div class="demo-item"><pdx-spinner size="xl"></pdx-spinner><span class="pdx-txt-caption pdx-ink-muted">xl</span></div>
+    </div>
+  </section>
+</template>

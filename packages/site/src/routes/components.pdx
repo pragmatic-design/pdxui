@@ -1,0 +1,131 @@
+<template>
+  <div class="comp-index shell-wrap">
+    <!-- Hero -->
+    <header class="ci-hero">
+      <div class="ci-hero-text">
+        <span class="ci-eyebrow">Component library</span>
+        <h1 class="ci-title metal-gradient">{{ total }} components, ready to ship</h1>
+        <p class="ci-sub">Accessible Web Components that work in any framework — or none. Every one
+          themeable across {{ themeCount }} design languages, keyboard-ready, and described by a
+          machine-readable manifest so agents can use them too.</p>
+        <div class="ci-stats">
+          <span class="ci-stat"><strong>{{ total }}</strong> components</span>
+          <span class="ci-stat"><strong>{{ catCount }}</strong> categories</span>
+          <span class="ci-stat"><strong>{{ themeCount }}</strong> themes</span>
+          <span class="ci-stat"><strong>WCAG</strong> contrast-checked</span>
+          <span class="ci-stat"><strong>Agent</strong>-native (CEM)</span>
+        </div>
+      </div>
+
+      <!-- Live taste -->
+      <div class="ci-preview glass">
+        <div class="ci-pv-row">
+          <pdx-button variant="primary">Primary</pdx-button>
+          <pdx-button variant="outline">Outline</pdx-button>
+          <pdx-badge value="9" variant="success"></pdx-badge>
+        </div>
+        <div class="ci-pv-row">
+          <pdx-switch label="Notifications" checked></pdx-switch>
+          <pdx-rating value="4"></pdx-rating>
+        </div>
+        <div class="ci-pv-row">
+          <pdx-segmented value="b" options='[{"label":"Day","value":"a"},{"label":"Week","value":"b"},{"label":"Month","value":"c"}]'></pdx-segmented>
+        </div>
+        <div class="ci-pv-row">
+          <pdx-progress value="68" striped style="flex:1"></pdx-progress>
+          <pdx-avatar name="Ada Lovelace"></pdx-avatar>
+          <pdx-chip variant="primary">Tag</pdx-chip>
+        </div>
+      </div>
+    </header>
+
+    <!-- Categories -->
+    @for (groups as g; track g.category) {
+      <section class="ci-cat">
+        <div class="ci-cat-head">
+          <h2 class="ci-cat-title">{{ g.category }}</h2>
+          <span class="ci-cat-count">{{ g.items.length }}</span>
+        </div>
+        <div class="ci-grid">
+          @for (g.items as c; track c.tagName) {
+            <a class="glass ci-card" :href="'/components/' + c.tagName" @click="followLink">
+              <span class="ci-card-tile" :style="tileStyle(c)">
+                <pdx-icon :name="iconOf(c)" set="pragmatic" size="sm"></pdx-icon>
+              </span>
+              <span class="ci-card-body">
+                <span class="ci-card-name">{{ pretty(c.tagName) }}</span>
+                <code class="ci-card-tag">&lt;{{ c.tagName }}&gt;</code>
+                <span class="ci-card-sum" :style="summaryOf(c) ? '' : 'display:none'">{{ summaryOf(c) }}</span>
+              </span>
+            </a>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</template>
+
+<script setup>
+@page '/components';
+@title 'Components — PDX';
+import { byCategory, allComponents } from '../lib/manifest';
+import { summaries } from '../lib/summaries';
+import { iconFor, hueFor } from '../lib/component-icons';
+import { followLink } from '../lib/follow-link';
+import { onMount } from '@pdxui/core';
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+
+registerPragmaticIcons();
+onMount(() => { import('@pdxui/ui/all'); });
+
+const groups = byCategory();
+const total = allComponents().length;
+const catCount = groups.length;
+const themeCount = 13;
+
+function pretty(t) { return (t || '').replace(/^pdx-/, '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+function summaryOf(c) { const s = c.summary || c.description || summaries[c.tagName] || ''; return s.length > 90 ? s.slice(0, 88) + '…' : s; }
+function iconOf(c) { return iconFor(c.tagName); }
+function tileStyle(c) { const h = hueFor(c.tagName); return 'background: oklch(0.65 0.15 ' + h + ' / 0.16); color: oklch(0.72 0.16 ' + h + ');'; }
+</script>
+
+<style scoped>
+.comp-index { padding-top: 2.5rem; padding-bottom: 5rem; }
+
+/* Hero */
+.ci-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 2.5rem; align-items: center; margin-bottom: 1rem; }
+.ci-eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 700; }
+.ci-title { font-size: clamp(1.9rem, 3.4vw, 2.9rem); font-weight: 800; line-height: 1.08; margin: 0.4rem 0 0; }
+.ci-sub { color: var(--ink-variant); font-size: 1.05rem; line-height: 1.6; margin: 0.9rem 0 0; max-width: 56ch; }
+.ci-stats { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.4rem; }
+.ci-stat { font-size: 0.82rem; color: var(--ink-muted); border: 1px solid var(--outline); border-radius: 999px; padding: 0.3rem 0.8rem; }
+.ci-stat strong { color: var(--ink); font-weight: 700; }
+
+.ci-preview { border-radius: 18px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
+.ci-pv-row { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
+
+/* Categories */
+.ci-cat { margin-top: 2.8rem; }
+.ci-cat-head { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.9rem; }
+.ci-cat-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold); font-weight: 700; margin: 0; }
+.ci-cat-count { font-size: 0.78rem; color: var(--ink-muted); }
+.ci-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.8rem; }
+.ci-card {
+  display: flex; flex-direction: row; gap: 0.85rem; align-items: flex-start; padding: 1rem 1.1rem; border-radius: 14px;
+  text-decoration: none; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.ci-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--gold-display) 40%, transparent); box-shadow: var(--glow-gold); }
+.ci-card-tile {
+  flex-shrink: 0; width: 40px; height: 40px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center; margin-top: 1px;
+}
+.ci-card-tile pdx-icon { width: 20px; height: 20px; }
+.ci-card-body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.ci-card-name { font-family: var(--font-heading); font-weight: 700; font-size: 1rem; color: var(--ink); }
+.ci-card-tag { font-family: var(--font-mono); font-size: 0.74rem; color: var(--gold-fixed); }
+.ci-card-sum { color: var(--ink-muted); font-size: 0.84rem; line-height: 1.4; margin-top: 0.15rem; }
+
+@media (max-width: 920px) {
+  .ci-hero { grid-template-columns: minmax(0, 1fr); gap: 1.6rem; } /* bare 1fr grows to min-content */
+}
+</style>

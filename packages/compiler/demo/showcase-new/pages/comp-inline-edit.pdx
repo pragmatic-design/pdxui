@@ -1,0 +1,81 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">InlineEdit</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-inline-edit&gt;</code> — click to edit any data type in-place.
+      Renders the appropriate editor (input, date picker, select, switch, etc.) based on the <code>type</code> prop.
+    </p>
+
+    <!-- ═══ 1. Text ═══ -->
+    <pdx-demo-comp-inline-edit-text class="demo-section"></pdx-demo-comp-inline-edit-text>
+
+    <!-- ═══ 2. Number & Currency ═══ -->
+    <pdx-demo-comp-inline-edit-number-currency class="demo-section"></pdx-demo-comp-inline-edit-number-currency>
+
+    <!-- ═══ 3. Date & DateTime ═══ -->
+    <pdx-demo-comp-inline-edit-date class="demo-section"></pdx-demo-comp-inline-edit-date>
+
+    <!-- ═══ 4. Boolean ═══ -->
+    <pdx-demo-comp-inline-edit-boolean class="demo-section"></pdx-demo-comp-inline-edit-boolean>
+
+    <!-- ═══ 5. Select & MultiSelect ═══ -->
+    <pdx-demo-comp-inline-edit-select class="demo-section"></pdx-demo-comp-inline-edit-select>
+
+    <!-- ═══ 6. Color & Rating ═══ -->
+    <pdx-demo-comp-inline-edit-color-rating class="demo-section"></pdx-demo-comp-inline-edit-color-rating>
+
+    <!-- ═══ 7. Textarea ═══ -->
+    <pdx-demo-comp-inline-edit-textarea class="demo-section"></pdx-demo-comp-inline-edit-textarea>
+
+    <!-- ═══ 8. Action mode (buttons) ═══ -->
+    <pdx-demo-comp-inline-edit-action-mode class="demo-section"></pdx-demo-comp-inline-edit-action-mode>
+
+    <!-- ═══ 9. Disabled & Readonly ═══ -->
+    <pdx-demo-comp-inline-edit-disabled-readonly class="demo-section"></pdx-demo-comp-inline-edit-disabled-readonly>
+
+    <!-- ═══ 10. Real-world: Editable table row ═══ -->
+    <pdx-demo-comp-inline-edit-editable-record class="demo-section"></pdx-demo-comp-inline-edit-editable-record>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>type</code><span>string</span><span>text | number | currency | date | datetime | boolean | select | multiselect | color | rating | textarea</span></div>
+        <div class="opt-row"><code>value</code><span>any</span><span>Current value</span></div>
+        <div class="opt-row"><code>options</code><span>array</span><span>For select/multiselect: [{ value, label }]</span></div>
+        <div class="opt-row"><code>editOn</code><span>string</span><span>'click' (default) | 'dblclick' | 'icon'</span></div>
+        <div class="opt-row"><code>saveOn</code><span>string</span><span>'blur' (default, auto-save) | 'action' (confirm/cancel buttons)</span></div>
+        <div class="opt-row"><code>currency</code><span>string</span><span>Currency code for type=currency (default: EUR)</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>Text when value is empty</span></div>
+        <div class="opt-row"><code>showIcon</code><span>boolean</span><span>Show edit pencil icon on hover (default: true)</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>The field's name, for the editor's accessible name (default: "Edit {value}")</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>Readonly state</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ value }</span><span>Value confirmed (Enter, blur, or button)</span></div>
+        <div class="opt-row"><code>pdx-cancel</code><span>—</span><span>Edit cancelled (Escape or cancel button)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/inline-edit';
+@title 'InlineEdit Component';
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-label {
+    min-width: 120px;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+    text-align: right;
+  }
+</style>

@@ -1,0 +1,142 @@
+/* Toggle Button & Toggle Group — action state buttons (bold/italic/underline).
+   Distinct from Segmented: toggle = 0..N active, segmented = exactly 1.
+*/
+
+/* ===== Single Toggle ===== */
+
+.pdx-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-xs);
+    padding: 0.375rem 0.75rem;
+    min-height: var(--pdx-button-min-height, 2.25rem);
+    border-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    font-family: inherit;
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    cursor: pointer;
+    transition: all var(--pdx-duration-base) var(--pdx-ease, ease);
+    border: var(--pdx-border-width) solid transparent;
+}
+
+/* Outline variant (default) */
+.pdx-toggle-btn.pdx-outline {
+    background: transparent;
+    border-color: var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+}
+
+.pdx-toggle-btn.pdx-outline:hover {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+}
+
+.pdx-toggle-btn.pdx-outline.pdx-toggle-on {
+    background: var(--pdx-color-inset);
+    border-color: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-ink);
+}
+
+/* Ghost variant */
+.pdx-toggle-btn.pdx-ghost {
+    background: transparent;
+    color: var(--pdx-color-muted);
+}
+
+.pdx-toggle-btn.pdx-ghost:hover {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+}
+
+.pdx-toggle-btn.pdx-ghost.pdx-toggle-on {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-primary-ink);
+}
+
+/* Solid variant */
+.pdx-toggle-btn.pdx-solid {
+    background: transparent;
+    color: var(--pdx-color-muted);
+}
+
+.pdx-toggle-btn.pdx-solid:hover {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+}
+
+.pdx-toggle-btn.pdx-solid.pdx-toggle-on {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+/* Disabled */
+.pdx-toggle-btn:disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Focus */
+.pdx-toggle-btn:focus-visible {
+    box-shadow: var(--pdx-focus-ring);
+    outline: none;
+}
+
+/* ===== Toggle Group ===== */
+
+.pdx-toggle-group {
+    display: inline-flex;
+    gap: 0;
+}
+
+/* CE wrapper transparent to flex layout */
+.pdx-toggle-group > pdx-toggle {
+    display: contents;
+}
+
+/* Joined borders — all buttons in group lose radius */
+.pdx-toggle-group .pdx-toggle-btn {
+    border-radius: 0;
+}
+
+/* First button gets left radius */
+.pdx-toggle-group > pdx-toggle:first-child .pdx-toggle-btn {
+    border-top-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-bottom-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+}
+
+/* Last button gets right radius */
+.pdx-toggle-group > pdx-toggle:last-child .pdx-toggle-btn {
+    border-top-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-bottom-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+}
+
+/* Collapse adjacent borders — skip first */
+.pdx-toggle-group > pdx-toggle:not(:first-child) .pdx-toggle-btn {
+    margin-left: calc(-1 * var(--pdx-border-width));
+}
+
+/* Vertical group */
+.pdx-toggle-group-vertical {
+    flex-direction: column;
+}
+
+.pdx-toggle-group-vertical .pdx-toggle-btn {
+    border-radius: 0;
+}
+
+.pdx-toggle-group-vertical > pdx-toggle:first-child .pdx-toggle-btn {
+    border-top-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-top-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+}
+
+.pdx-toggle-group-vertical > pdx-toggle:last-child .pdx-toggle-btn {
+    border-bottom-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-bottom-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+}
+
+.pdx-toggle-group-vertical > pdx-toggle:not(:first-child) .pdx-toggle-btn {
+    margin-left: 0;
+    margin-top: calc(-1 * var(--pdx-border-width));
+}

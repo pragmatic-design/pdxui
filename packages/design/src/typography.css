@@ -1,0 +1,321 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Typography
+   Text role classes (pdx-txt-*) and ink color classes (pdx-ink-*).
+   ========================================================================== */
+
+/* ==========================================================================
+   Base typography (applied to body)
+   ========================================================================== */
+
+body {
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-base);
+    line-height: var(--pdx-line-normal);
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-bg);
+}
+
+/* A nested theme root takes its own theme's text and font. Set on <body> only, `color` is
+   inherited already resolved: a nested root that is not <body> would keep the outer theme's text
+   colour. Its background is its own business — a card or a preview paints one. */
+[pdx-theme]:not(:root) {
+    font-family: var(--pdx-font-sans);
+    line-height: var(--pdx-line-normal);
+    color: var(--pdx-color-text);
+}
+
+/* ==========================================================================
+   A. Text role classes
+   ========================================================================== */
+
+/* The heading font and the heading WEIGHT travel together: every role that takes
+   --pdx-font-heading also offers --pdx-weight-heading, falling back to the role's own weight. A
+   theme that leaves the token alone renders that weight; editorial (800) and metro (300) declare
+   it. */
+
+.pdx-txt-display {
+    font-family: var(--pdx-font-heading);
+    font-size: var(--pdx-text-display);
+    font-weight: var(--pdx-weight-heading, var(--pdx-weight-bold));
+    line-height: var(--pdx-line-tight);
+    letter-spacing: -0.02em;
+}
+
+/* Between display and title — the 3xl step of the scale, which had no role reading it. Named for
+   the Material 3 vocabulary the type scale already borrows: display > headline > title > body. */
+.pdx-txt-headline {
+    font-family: var(--pdx-font-heading);
+    font-size: var(--pdx-text-3xl);
+    font-weight: var(--pdx-weight-heading, var(--pdx-weight-semibold));
+    line-height: var(--pdx-line-tight);
+    letter-spacing: -0.01em;
+}
+
+.pdx-txt-title {
+    font-family: var(--pdx-font-heading);
+    font-size: var(--pdx-text-2xl);
+    font-weight: var(--pdx-weight-heading, var(--pdx-weight-semibold));
+    line-height: var(--pdx-line-tight);
+}
+
+.pdx-txt-heading {
+    font-family: var(--pdx-font-heading);
+    font-size: var(--pdx-text-xl);
+    font-weight: var(--pdx-weight-heading, var(--pdx-weight-semibold));
+    line-height: var(--pdx-line-tight);
+}
+
+.pdx-txt-subheading {
+    font-family: var(--pdx-font-heading);
+    font-size: var(--pdx-text-lg);
+    font-weight: var(--pdx-weight-heading, var(--pdx-weight-medium));
+    line-height: var(--pdx-line-normal);
+}
+
+.pdx-txt-body {
+    font-size: var(--pdx-text-base);
+    line-height: var(--pdx-line-normal);
+}
+
+.pdx-txt-small {
+    font-size: var(--pdx-text-sm);
+    line-height: var(--pdx-line-normal);
+}
+
+.pdx-txt-caption {
+    font-size: var(--pdx-text-xs);
+    line-height: var(--pdx-line-normal);
+    letter-spacing: 0.01em;
+}
+
+.pdx-txt-label {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.pdx-txt-mono {
+    font-family: var(--pdx-font-mono);
+    font-size: var(--pdx-text-sm);
+}
+
+/* ==========================================================================
+   B. Ink (color) classes
+   ========================================================================== */
+
+.pdx-ink-default { color: var(--pdx-color-text); }
+.pdx-ink-muted   { color: var(--pdx-color-muted); }
+/* An alias of muted: --pdx-color-subtle reads 2.07–2.89:1 on the page, so text in it fails
+   WCAG 1.4.3 in every theme. The class stays so apps that use it keep working. */
+.pdx-ink-subtle  { color: var(--pdx-color-muted); }
+.pdx-ink-primary { color: var(--pdx-color-primary-ink); }
+.pdx-ink-accent  { color: var(--pdx-color-accent-ink); }
+.pdx-ink-secondary { color: var(--pdx-color-secondary); }
+.pdx-ink-danger    { color: var(--pdx-color-danger-ink); }
+.pdx-ink-success   { color: var(--pdx-color-success-ink); }
+.pdx-ink-warning   { color: var(--pdx-color-warning-ink); }
+.pdx-ink-info      { color: var(--pdx-color-info-ink); }
+.pdx-ink-inherit   { color: inherit; }
+
+/* ==========================================================================
+   C. Links
+   ========================================================================== */
+
+.pdx-link {
+    color: var(--pdx-color-primary-ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: color var(--pdx-transition);
+
+    &:hover { color: var(--pdx-color-primary-hover); }
+    &:visited { opacity: 0.85; }
+    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; border-radius: var(--pdx-radius-sm); }
+}
+
+/* ==========================================================================
+   D. Divider / Separator
+   ========================================================================== */
+
+.pdx-divider,
+hr {
+    border: none;
+    border-top: 1px solid var(--pdx-color-border);
+    margin-block: var(--pdx-space-md);
+}
+
+.pdx-divider-vertical {
+    border-top: none;
+    border-left: 1px solid var(--pdx-color-border);
+    align-self: stretch;
+    margin-inline: var(--pdx-space-md);
+}
+
+/* ==========================================================================
+   E. Code blocks
+   ========================================================================== */
+
+code:not(pre code) {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.875em;
+    padding: 0.15em 0.4em;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+}
+
+pre {
+    font-family: var(--pdx-font-mono);
+    font-size: var(--pdx-text-sm);
+    line-height: var(--pdx-line-loose);
+    padding: var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+    overflow-x: auto;
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+}
+
+pre code {
+    padding: 0;
+    background: none;
+    font-size: inherit;
+    border-radius: 0;
+}
+
+/* ==========================================================================
+   F. Blockquote
+   ========================================================================== */
+
+blockquote,
+.pdx-blockquote {
+    border-left: 4px solid var(--pdx-color-border-strong);
+    padding: var(--pdx-space-sm) var(--pdx-space-md) var(--pdx-space-sm) var(--pdx-space-lg);
+    margin: var(--pdx-space-md) 0;
+    font-style: italic;
+    color: var(--pdx-color-muted);
+}
+
+blockquote cite,
+.pdx-blockquote cite {
+    display: block;
+    margin-top: var(--pdx-space-xs);
+    font-size: var(--pdx-text-sm);
+    font-style: normal;
+    /* The attribution is text, and it is the smallest text on the page: muted, not subtle. */
+    color: var(--pdx-color-muted);
+}
+
+/* ==========================================================================
+   G. Icon sizing
+   ========================================================================== */
+
+.pdx-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25em;
+    height: 1.25em;
+    flex-shrink: 0;
+}
+
+.pdx-icon > svg {
+    width: 100%;
+    height: 100%;
+}
+
+.pdx-icon[size="sm"] { width: 1em; height: 1em; }
+.pdx-icon[size="lg"] { width: 1.5em; height: 1.5em; }
+.pdx-icon[size="xl"] { width: 2em; height: 2em; }
+
+/* ==========================================================================
+   H. Truncation
+   ========================================================================== */
+
+.pdx-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pdx-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pdx-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   G. Screen reader only
+   ========================================================================== */
+
+.pdx-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ==========================================================================
+   I. Lists
+   ========================================================================== */
+
+.pdx-list {
+    padding-left: var(--pdx-space-lg);
+    font-size: var(--pdx-text-base);
+    line-height: var(--pdx-line-normal);
+}
+
+ul.pdx-list { list-style: disc; }
+ol.pdx-list { list-style: decimal; }
+
+.pdx-list li {
+    padding-block: var(--pdx-space-2xs);
+}
+
+.pdx-list .pdx-list {
+    margin-top: var(--pdx-space-2xs);
+}
+
+ul.pdx-list ul.pdx-list { list-style: circle; }
+ul.pdx-list ul.pdx-list ul.pdx-list { list-style: square; }
+
+/* Unstyled list (for nav, menus) */
+.pdx-list-none {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* ==========================================================================
+   J. Keyboard shortcut
+   ========================================================================== */
+
+kbd,
+.pdx-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5em;
+    padding: 0.1em 0.4em;
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    line-height: 1;
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--pdx-radius-sm);
+    white-space: nowrap;
+}

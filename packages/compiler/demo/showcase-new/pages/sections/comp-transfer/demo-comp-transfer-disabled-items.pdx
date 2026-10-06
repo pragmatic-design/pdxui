@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled Items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Some items cannot be moved (e.g., locked permissions).</p>
+
+    <div class="demo-row">
+      <pdx-transfer
+        :items="disabledItems"
+        :value="['admin']"
+        sourcetitle="Roles"
+        targettitle="Assigned"
+      ></pdx-transfer>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const disabledItems = [
+  { value: 'viewer', label: 'Viewer' },
+  { value: 'editor', label: 'Editor' },
+  { value: 'admin', label: 'Admin', disabled: true },
+  { value: 'super', label: 'Super Admin', disabled: true },
+  { value: 'moderator', label: 'Moderator' },
+];
+</script>

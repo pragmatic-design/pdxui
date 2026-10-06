@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Single Item (Collapsible)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">An accordion with one item works as a standalone collapsible. Same API, same animation.</p>
+
+    <pdx-accordion>
+      <div data-accordion-item>
+        <button data-accordion-trigger>Show advanced options</button>
+        <div data-accordion-content>
+          <div class="setting-group">
+            <pdx-switch label="Debug mode"></pdx-switch>
+            <pdx-switch label="Verbose logging"></pdx-switch>
+            <pdx-form-field label="Custom endpoint" size="sm">
+              <pdx-input placeholder="https://api.example.com"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </div>
+      </div>
+    </pdx-accordion>
+  </section>
+</template>

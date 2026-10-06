@@ -1,0 +1,50 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">One JSON — Grid + Form + Filter</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The same <code>FieldDefinition[]</code> drives all three components.
+      Filter the grid, then edit the first record in the form below and save: the grid shows the change.
+    </p>
+    <div class="demo-container" style="max-width:100%">
+      <p class="pdx-txt-small pdx-weight-medium">Filter</p>
+      <pdx-filter-builder :fields="triFields" :source="triDS"></pdx-filter-builder>
+      <p class="pdx-txt-small pdx-weight-medium" style="margin-top:var(--pdx-space-md)">Grid</p>
+      <pdx-data-grid :source="triDS" :columns="triColumns" hover striped></pdx-data-grid>
+      <p class="pdx-txt-small pdx-weight-medium" style="margin-top:var(--pdx-space-md)">Form (edit first record)</p>
+      <pdx-auto-form :fields="triFields" :source="triDS" record-id="1" layout="grid" :columns="12"></pdx-auto-form>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// ONE definition → three components
+const fields = [...];
+&lt;pdx-filter-builder :fields="fields" :source="ds" /&gt;
+&lt;pdx-data-grid :source="ds" :columns="toColumnDefs(fields)" /&gt;
+&lt;pdx-auto-form :fields="fields" :source="ds" record-id="1" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource, toColumnDefs } from '@pdxui/core';
+
+const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];
+
+// Tri-component demo: same fields drive filter + grid + form
+const triFields = [
+  { field: 'name', label: 'Name', type: 'text' },
+  { field: 'role', label: 'Role', type: 'enum', options: roles.map(function(r) { return { label: r, value: r }; }) },
+  { field: 'salary', label: 'Salary', type: 'currency' },
+];
+
+const triColumns = toColumnDefs(triFields);
+
+var triData = [
+  { id: 1, name: 'Alice', role: 'Engineer', salary: 95000 },
+  { id: 2, name: 'Bob', role: 'Designer', salary: 82000 },
+  { id: 3, name: 'Carol', role: 'PM', salary: 105000 },
+  { id: 4, name: 'David', role: 'DevOps', salary: 91000 },
+  { id: 5, name: 'Eve', role: 'QA', salary: 78000 },
+];
+
+const triDS = createDataSource({ data: triData, pageSize: 0 });
+</script>

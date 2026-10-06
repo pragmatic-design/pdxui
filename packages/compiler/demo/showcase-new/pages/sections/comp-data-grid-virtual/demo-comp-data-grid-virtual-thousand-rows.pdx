@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">1K Rows</h2>
+    <div class="demo-container">
+      <pdx-data-grid :source="virtualDS" :columns="columns" :virtual-scroll="true" :max-height="500" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  virtual-scroll :max-height="500"
+  hover striped&gt;
+&lt;/pdx-data-grid&gt;
+
+const ds = createDataSource({ data: bigData, pageSize: 0 });
+// 10,000 rows — only visible rows rendered</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+const columns = [
+  { field: 'id', header: 'ID', type: 'number' },
+  { field: 'name', header: 'Name' },
+  { field: 'email', header: 'Email' },
+  { field: 'score', header: 'Score', type: 'number' },
+  { field: 'active', header: 'Active', type: 'boolean' },
+];
+
+// 1000 rows — enough to demonstrate virtual scroll
+var bigData = [];
+for (var j = 0; j < 1000; j++) {
+  bigData.push({
+    id: j + 1,
+    name: 'User ' + (j + 1),
+    email: 'user' + (j + 1) + '@example.com',
+    score: Math.floor(Math.random() * 1000),
+    active: Math.random() > 0.3,
+  });
+}
+const virtualDS = createDataSource({ data: bigData, pageSize: 0 });
+</script>
+
+<style scoped>
+.section-heading { margin-bottom: var(--pdx-space-sm); }
+.demo-container {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  overflow: hidden;
+}
+.source-block { margin-top: var(--pdx-space-sm); }
+.source-block summary { cursor: pointer; font-size: var(--pdx-text-xs); color: var(--pdx-color-muted); }
+.source-block pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); overflow-x: auto; font-size: var(--pdx-text-xs); }
+</style>

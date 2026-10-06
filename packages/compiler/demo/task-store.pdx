@@ -1,0 +1,36 @@
+<template><div></div></template>
+
+<script setup>
+@store tasks { persist: 'local' };
+
+let items = $signal([]);
+let filter = $signal('all');
+
+const filtered = $derived(
+  filter === 'all' ? items
+    : filter === 'done' ? items.filter(t => t.done)
+    : items.filter(t => !t.done)
+);
+
+const stats = $derived({
+  total: items.length,
+  done: items.filter(t => t.done).length,
+  pending: items.filter(t => !t.done).length,
+});
+
+function addTask(text) {
+  items = [...items, { id: Date.now(), text, done: false }];
+}
+
+function toggleTask(id) {
+  items = items.map(t => t.id === id ? { ...t, done: !t.done } : t);
+}
+
+function removeTask(id) {
+  items = items.filter(t => t.id !== id);
+}
+
+function clearDone() {
+  items = items.filter(t => !t.done);
+}
+</script>

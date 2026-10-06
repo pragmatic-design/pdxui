@@ -1,0 +1,259 @@
+<template>
+  <div class="demo">
+    <h2>Positioning Engine</h2>
+    <p class="desc">Middleware chain: offset, flip, shift, arrow, size. Pure math. autoUpdate on scroll/resize.</p>
+
+    <!-- Placement picker -->
+    <section data-test="pos-placement">
+      <h3>Placements + autoUpdate</h3>
+      <p class="desc">Click a placement. Scroll inside the dashed area to move the Reference near the edges — flip swaps side, shift slides to stay visible. autoUpdate keeps the tooltip attached.</p>
+      <div class="placement-grid">
+        @for (placements as p; track p) {
+          @if (p) {
+            <button @click="setPlacement(p)" :class="currentPlacement === p ? 'active' : ''" class="pdx-ghost" data-test="placement-btn">{{ p }}</button>
+          } @else {
+            <span></span>
+          }
+        }
+      </div>
+
+      <div class="arena" data-test="arena" :ref="arenaEl">
+        <div class="arena-scroll" :ref="arenaScrollEl">
+          <div class="arena-content">
+            <div class="spacer"></div>
+            <div class="ref-box" :ref="refBoxRef" data-test="reference">Reference</div>
+            <div class="spacer"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="log" data-test="pos-log">{{ posLog }}</div>
+    </section>
+
+    <!-- Middleware toggles -->
+    <section data-test="pos-middleware">
+      <h3>Middleware Pipeline</h3>
+      <p class="desc">Offset adds distance. Flip swaps side when near viewport edge (scroll down so Reference is near bottom). Shift slides along axis to stay visible.</p>
+      <div class="row">
+        <label><input type="checkbox" checked @change="toggleOffset"> offset(8)</label>
+        <label><input type="checkbox" checked @change="toggleFlip"> flip()</label>
+        <label><input type="checkbox" checked @change="toggleShift"> shift()</label>
+      </div>
+    </section>
+
+    <!-- Iframe positioning -->
+    <section data-test="pos-iframe">
+      <h3>Iframe Positioning</h3>
+      <p class="desc">Floating element in the parent window positioned relative to a reference inside an iframe. Follows on scroll via autoUpdate.</p>
+      <div class="iframe-container">
+        <iframe :ref="iframeRef" srcdoc="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body style='margin:0;padding:20px;font-family:system-ui'&gt;&lt;p style='color:#666;font-size:0.85rem'&gt;I am inside an iframe.&lt;/p&gt;&lt;button id='iframe-ref' style='padding:8px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer'&gt;Reference Element&lt;/button&gt;&lt;/body&gt;&lt;/html&gt;" style="width:100%;height:120px;border:1px solid #e0e0e0;border-radius:8px"></iframe>
+      </div>
+      <div class="log" data-test="iframe-log">{{ iframeLog }}</div>
+    </section>
+
+    <!-- Virtual element -->
+    <section data-test="pos-virtual">
+      <h3>Virtual Element (Cursor)</h3>
+      <p class="desc">Move your mouse over the area below.</p>
+      <div class="cursor-area" @pointermove="onCursorMove" @pointerleave="onCursorLeave" data-test="cursor-area">
+        <span class="hint">Move cursor here</span>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { computeFloatingPosition, autoUpdate, offset, flip, shift, hideMiddleware, onMount, onDestroy } from '@pdxui/core';
+
+const placements = [
+    'top-start', 'top', 'top-end', null,
+    'left-start', null, null, 'right-start',
+    'left', null, null, 'right',
+    'left-end', null, null, 'right-end',
+    null, 'bottom-start', 'bottom', 'bottom-end',
+];
+
+let currentPlacement = $signal('bottom');
+let posLog = $signal('Click a placement');
+let useOffset = $signal(true);
+let useFlip = $signal(true);
+let useShift = $signal(true);
+let iframeLog = $signal('Click the button inside the iframe');
+let iframeRef = $signal(null);
+let refBoxRef = $signal(null);
+let arenaEl = $signal(null);
+let arenaScrollEl = $signal(null);
+
+let floatEl = null;
+let cursorFloatEl = null;
+let iframeFloatEl = null;
+let autoUpdateDispose = null;
+let iframeAutoUpdateDispose = null;
+
+function ensureFloatEl() {
+    if (floatEl) return floatEl;
+    floatEl = document.createElement('div');
+    floatEl.style.cssText = 'position:fixed;background:#1d1d2e;color:white;padding:6px 12px;border-radius:6px;font-size:0.8rem;z-index:100;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+    floatEl.textContent = 'Floating';
+    document.body.appendChild(floatEl);
+    return floatEl;
+}
+
+function setPlacement(p) {
+    currentPlacement = p;
+    startAutoUpdate();
+}
+
+function toggleOffset(e) { useOffset = e.target.checked; updatePosition(); }
+function toggleFlip(e) { useFlip = e.target.checked; updatePosition(); }
+function toggleShift(e) { useShift = e.target.checked; updatePosition(); }
+
+function buildMiddleware() {
+    // Use the arena's visible area as boundary for flip/shift —
+    // same pattern a dropdown would use with its scroll container.
+    // Order: offset → flip → shift → hide (hide checks AFTER flip corrects)
+    const arena = arenaEl;
+    const mw = [];
+    if (useOffset) mw.push(offset(8));
+    if (useFlip) mw.push(flip({ boundary: arena }));
+    if (useShift) mw.push(shift({ padding: 8, boundary: arena }));
+    mw.push(hideMiddleware({ boundary: arena }));
+    return mw;
+}
+
+function updatePosition() {
+    const refEl = refBoxRef;
+    if (!refEl) return;
+    const fl = ensureFloatEl();
+
+    const result = computeFloatingPosition(refEl, fl, {
+        placement: currentPlacement,
+        middleware: buildMiddleware(),
+    });
+
+    // hide middleware sets data.hidden when reference is out of boundary
+    const hidden = result.middlewareData.hide?.hidden;
+    if (hidden) {
+        fl.style.display = 'none';
+        posLog = 'Reference out of bounds — floating hidden';
+        return;
+    }
+
+    fl.style.display = 'block';
+    fl.style.left = result.x + 'px';
+    fl.style.top = result.y + 'px';
+    posLog = 'placement: ' + result.placement + ' | x: ' + Math.round(result.x) + ' | y: ' + Math.round(result.y);
+}
+
+function startAutoUpdate() {
+    autoUpdateDispose?.();
+    const refEl = refBoxRef;
+    if (!refEl) return;
+    const fl = ensureFloatEl();
+    fl.style.display = 'block';
+    // autoUpdate calls updatePosition on scroll/resize
+    autoUpdateDispose = autoUpdate(refEl, fl, updatePosition);
+}
+
+function onCursorMove(e) {
+    if (!cursorFloatEl) {
+        cursorFloatEl = document.createElement('div');
+        cursorFloatEl.style.cssText = 'position:fixed;background:#1d1d2e;color:white;padding:4px 10px;border-radius:4px;font-size:0.75rem;z-index:200;pointer-events:none';
+        cursorFloatEl.textContent = 'Cursor tooltip';
+        document.body.appendChild(cursorFloatEl);
+    }
+    cursorFloatEl.style.display = 'block';
+
+    const virtual = {
+        getBoundingClientRect: function() {
+            return { x: e.clientX, y: e.clientY, width: 0, height: 0, top: e.clientY, left: e.clientX, right: e.clientX, bottom: e.clientY, toJSON: function() { return this; } };
+        },
+    };
+    const result = computeFloatingPosition(virtual, cursorFloatEl, {
+        placement: 'right-start',
+        middleware: [offset(12), shift({ padding: 8 })],
+    });
+    cursorFloatEl.style.left = result.x + 'px';
+    cursorFloatEl.style.top = result.y + 'px';
+}
+
+function onCursorLeave() {
+    if (cursorFloatEl) cursorFloatEl.style.display = 'none';
+}
+
+// Center the arena scroll so Reference is visible on load
+onMount(() => {
+    requestAnimationFrame(function() {
+        var arenaScroll = arenaScrollEl;
+        if (arenaScroll) { arenaScroll.scrollTop = 190; arenaScroll.scrollLeft = 100; }
+    });
+});
+
+// Iframe positioning with autoUpdate
+onMount(() => {
+    requestAnimationFrame(function() {
+        const iframe = iframeRef;
+        if (!iframe) return;
+        iframe.addEventListener('load', function() {
+            const iframeDoc = iframe.contentDocument;
+            if (!iframeDoc) return;
+            const btn = iframeDoc.getElementById('iframe-ref');
+            if (!btn) return;
+            btn.addEventListener('click', function() {
+                if (!iframeFloatEl) {
+                    iframeFloatEl = document.createElement('div');
+                    iframeFloatEl.style.cssText = 'position:fixed;background:#1d1d2e;color:white;padding:6px 12px;border-radius:6px;font-size:0.8rem;z-index:200;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+                    iframeFloatEl.textContent = 'Positioned from iframe!';
+                    document.body.appendChild(iframeFloatEl);
+                }
+                iframeFloatEl.style.display = 'block';
+
+                function updateIframePos() {
+                    var result = computeFloatingPosition(btn, iframeFloatEl, {
+                        placement: 'top',
+                        middleware: [offset(8), shift({ padding: 8 })],
+                        iframe: iframe,
+                    });
+                    iframeFloatEl.style.left = result.x + 'px';
+                    iframeFloatEl.style.top = result.y + 'px';
+                    iframeLog = 'Positioned at x:' + Math.round(result.x) + ' y:' + Math.round(result.y) + ' — scrolls with page';
+                }
+
+                // autoUpdate: re-position on scroll/resize
+                iframeAutoUpdateDispose?.();
+                iframeAutoUpdateDispose = autoUpdate(iframe, iframeFloatEl, updateIframePos);
+            });
+        });
+    });
+
+    onDestroy(function() {
+        autoUpdateDispose?.();
+        iframeAutoUpdateDispose?.();
+        if (floatEl) floatEl.remove();
+        if (cursorFloatEl) cursorFloatEl.remove();
+        if (iframeFloatEl) iframeFloatEl.remove();
+    });
+});
+</script>
+
+<style scoped>
+  .demo { display: flex; flex-direction: column; gap: 24px; }
+  h2 { font-size: 1.5rem; font-weight: 700; }
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .desc { color: #666; font-size: 0.875rem; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row label { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; }
+  .placement-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 12px; }
+  .placement-grid button { font-size: 0.7rem; padding: 4px; }
+  .placement-grid button.active { background: #1d1d2e; color: white; }
+  .arena { width: 400px; height: 220px; border: 2px dashed #e0e0e0; border-radius: 8px; overflow: hidden; }
+  .arena-scroll { height: 100%; overflow: auto; }
+  .arena-content { width: 600px; min-height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .spacer { flex-shrink: 0; height: 250px; width: 100%; }
+  .ref-box { flex-shrink: 0; width: 120px; height: 48px; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+  .iframe-container { margin-top: 8px; }
+  .cursor-area { width: 100%; height: 180px; border: 2px dashed #e0e0e0; border-radius: 8px; cursor: crosshair; position: relative; display: flex; align-items: center; justify-content: center; }
+  .hint { color: #aaa; font-size: 0.85rem; }
+  .log { font-family: monospace; font-size: 0.75rem; background: #f5f5f7; padding: 8px; border-radius: 6px; margin-top: 8px; }
+</style>

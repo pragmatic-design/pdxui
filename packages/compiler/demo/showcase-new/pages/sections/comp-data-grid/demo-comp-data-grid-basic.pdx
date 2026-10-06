@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic (Static Data)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Simple grid from a static array. Columns auto-detected from data keys.</p>
+    <div class="demo-container">
+      <pdx-data-grid :data="basicData" label="Team members" striped hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :data="users" label="Team members" striped hover&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicData } from './state.pdx';
+</script>

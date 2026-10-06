@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Bordered + Striped</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Alternating row colors for easier scanning.</p>
+    <div class="demo-container">
+      <pdx-description-list :items="basicItems" :bordered="true" :striped="true" label-width="120px"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-description-list :items="items"
+  :bordered="true" :striped="true"&gt;
+&lt;/pdx-description-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+</script>

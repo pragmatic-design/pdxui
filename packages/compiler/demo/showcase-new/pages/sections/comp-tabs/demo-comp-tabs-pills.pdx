@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Pills Variant</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Segmented/pill style. No underline indicator. Good for filters and view modes.</p>
+
+    <pdx-tabs value="all" variant="pills" label="Filter">
+      <div class="pdx-tabs" role="tablist">
+        <button class="pdx-tab" data-tab="all">All</button>
+        <button class="pdx-tab" data-tab="active">Active</button>
+        <button class="pdx-tab" data-tab="completed">Completed</button>
+        <button class="pdx-tab" data-tab="archived">Archived</button>
+      </div>
+      <div data-tab-panel="all" style="padding:var(--pdx-space-lg)">
+        <p class="pdx-txt-small pdx-ink-muted">Showing all 42 items.</p>
+      </div>
+      <div data-tab-panel="active" style="padding:var(--pdx-space-lg)">
+        <p class="pdx-txt-small pdx-ink-muted">Showing 28 active items.</p>
+      </div>
+      <div data-tab-panel="completed" style="padding:var(--pdx-space-lg)">
+        <p class="pdx-txt-small pdx-ink-muted">Showing 11 completed items.</p>
+      </div>
+      <div data-tab-panel="archived" style="padding:var(--pdx-space-lg)">
+        <p class="pdx-txt-small pdx-ink-muted">Showing 3 archived items.</p>
+      </div>
+    </pdx-tabs>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="all" variant="pills"&gt;
+  &lt;div class="pdx-tabs" role="tablist"&gt;
+    &lt;button class="pdx-tab" data-tab="all"&gt;All&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="active"&gt;Active&lt;/button&gt;
+    &lt;button class="pdx-tab" data-tab="completed"&gt;Completed&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div data-tab-panel="all"&gt;All items&lt;/div&gt;
+  &lt;div data-tab-panel="active"&gt;Active items&lt;/div&gt;
+&lt;/pdx-tabs&gt;</code></pre>
+    </details>
+  </section>
+</template>

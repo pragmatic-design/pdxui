@@ -1,0 +1,87 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Toast</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Notification toasts with 3 visual variants, title+description, progress bar, pause on hover, action buttons, promise API. 6 screen positions.
+    </p>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-comp-toast-types class="demo-section"></pdx-demo-comp-toast-types>
+
+    <!-- ═══ Visual Variants ═══ -->
+    <pdx-demo-comp-toast-variants class="demo-section"></pdx-demo-comp-toast-variants>
+
+    <!-- ═══ Rich (Title + Description) ═══ -->
+    <pdx-demo-comp-toast-title-description class="demo-section"></pdx-demo-comp-toast-title-description>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-toast-sizes class="demo-section"></pdx-demo-comp-toast-sizes>
+
+    <!-- ═══ With Action ═══ -->
+    <pdx-demo-comp-toast-action class="demo-section"></pdx-demo-comp-toast-action>
+
+    <!-- ═══ Custom Icon ═══ -->
+    <pdx-demo-comp-toast-custom-icon class="demo-section"></pdx-demo-comp-toast-custom-icon>
+
+    <!-- ═══ Promise API ═══ -->
+    <pdx-demo-comp-toast-promise class="demo-section"></pdx-demo-comp-toast-promise>
+
+    <!-- ═══ Persistent + Hover Pause ═══ -->
+    <pdx-demo-comp-toast-persistent class="demo-section"></pdx-demo-comp-toast-persistent>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+
+      <h3 class="pdx-txt-subheading">Toast Options</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Option</span><span>Description</span></div>
+        <div class="opt-row"><code>message</code><span>Toast text (required)</span></div>
+        <div class="opt-row"><code>title</code><span>Bold heading above message</span></div>
+        <div class="opt-row"><code>type</code><span>success, error, warning, info</span></div>
+        <div class="opt-row"><code>variant</code><span>"filled" (default), "bordered", "minimal"</span></div>
+        <div class="opt-row"><code>icon</code><span>Custom icon name, or null for no icon</span></div>
+        <div class="opt-row"><code>size</code><span>"compact", "default", "large"</span></div>
+        <div class="opt-row"><code>duration</code><span>Auto-dismiss ms (0 = persistent, default 4000)</span></div>
+        <div class="opt-row"><code>action</code><span>{ label, onClick } — action button</span></div>
+        <div class="opt-row"><code>dismissible</code><span>Show close button (default true)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Imperative API</h3>
+      <pre class="pdx-txt-mono source-code"><code>import { toast } from '@pdxui/ui/toast';
+
+// Simple
+toast.success('Saved!');
+toast.error('Failed.', { variant: 'bordered' });
+
+// Rich
+toast.info('Update Available', {
+  title: 'New Version',
+  variant: 'filled',
+});
+
+// Promise
+toast.promise(saveData(), {
+  loading: 'Saving...', success: 'Done!', error: 'Failed.',
+});
+
+// Custom icon
+toast.add({ message: 'Starred!', type: 'success', icon: 'star' });</code></pre>
+    </section>
+
+    <pdx-toast position="top-right"></pdx-toast>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+@page '/components/toast';
+@title 'Toast';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
+  .source-code { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; }
+</style>

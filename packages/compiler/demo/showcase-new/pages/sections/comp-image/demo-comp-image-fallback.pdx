@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Fallback</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Broken src triggers fallback icon (image-off). Custom fallback icon also supported.</p>
+    <div class="demo-row">
+      <pdx-image src="/missing-image.jpg" alt="Broken" width="200px" height="150px" :lazy="false"></pdx-image>
+      <pdx-image src="/missing-image.jpg" alt="Custom icon" width="200px" height="150px" fallback-icon="alert-triangle" :lazy="false"></pdx-image>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Default fallback icon --&gt;
+&lt;pdx-image src="/missing-image.jpg" alt="Broken" width="200px" height="150px"&gt;&lt;/pdx-image&gt;
+
+&lt;!-- Custom fallback icon --&gt;
+&lt;pdx-image src="/missing-image.jpg" fallback-icon="alert-triangle"&gt;&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>

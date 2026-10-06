@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled group</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>disabled</code> on the group disables every toggle in it.</p>
+    <div class="demo-row">
+      <pdx-toggle-group type="single" label="Disabled group" value="b" disabled>
+        <pdx-toggle value="a">A</pdx-toggle>
+        <pdx-toggle value="b">B</pdx-toggle>
+        <pdx-toggle value="c">C</pdx-toggle>
+      </pdx-toggle-group>
+    </div>
+  </section>
+</template>

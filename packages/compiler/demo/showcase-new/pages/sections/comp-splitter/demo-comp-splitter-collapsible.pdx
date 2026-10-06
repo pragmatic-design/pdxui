@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Collapsible (Double-Click Handle)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Double-click the handle to collapse/expand the left pane.</p>
+    <div class="demo-split">
+      <pdx-splitter orientation="horizontal" :panes="collapsiblePanes">
+        <div class="pane-content pane-left">
+          <strong>Sidebar</strong>
+          <p class="pdx-txt-small pdx-ink-muted">Double-click handle to collapse</p>
+        </div>
+        <div class="pane-content">
+          <strong>Content</strong>
+        </div>
+      </pdx-splitter>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const collapsiblePanes = [
+  { min: 0, max: 50, defaultSize: 30, collapsible: true, collapsedSize: 0 },
+  { min: 20 },
+];
+</script>

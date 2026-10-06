@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 sizes: sm, default, lg.</p>
+
+    <div class="demo-row">
+      <pdx-badge variant="primary" value="sm" size="sm"></pdx-badge>
+      <pdx-badge variant="primary" value="default"></pdx-badge>
+      <pdx-badge variant="primary" value="lg" size="lg"></pdx-badge>
+    </div>
+    <div class="demo-row">
+      <pdx-badge variant="danger" value="3" size="sm"></pdx-badge>
+      <pdx-badge variant="danger" value="42"></pdx-badge>
+      <pdx-badge variant="danger" value="99+" size="lg"></pdx-badge>
+    </div>
+  </section>
+</template>

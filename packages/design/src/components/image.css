@@ -1,0 +1,149 @@
+/* pdx-image — Rich image component */
+
+/* Root element */
+.pdx-img-root {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    line-height: 0;
+}
+
+/* Wrapper around image — handles aspect ratio and overflow */
+.pdx-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pdx-color-inset);
+}
+
+/* The actual <img> element */
+.pdx-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s ease;
+}
+
+/* Hidden while loading */
+.pdx-img-loading {
+    opacity: 0;
+}
+
+/* Visible once loaded */
+.pdx-img-loaded {
+    opacity: 1;
+}
+
+/* Skeleton placeholder — pulsing gray box */
+.pdx-img-skeleton {
+    position: absolute;
+    inset: 0;
+    background: var(--pdx-gray-200, oklch(0.90 0 0));
+    animation: pdx-img-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pdx-img-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Fallback container — centered icon */
+.pdx-img-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 80px;
+    color: var(--pdx-color-muted, oklch(0.60 0 0));
+    background: var(--pdx-color-inset);
+}
+
+/* Rounded (circular) */
+.pdx-img-rounded {
+    border-radius: 50%;
+}
+
+/* Caption below image */
+.pdx-img-caption {
+    text-align: center;
+    padding-block: var(--pdx-space-xs, 4px);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted, oklch(0.55 0 0));
+    line-height: 1.4;
+}
+
+/* Zoomable cursor */
+.pdx-img-zoomable {
+    cursor: zoom-in;
+}
+
+/* The zoom / lightbox trigger is focusable: it shows where the keyboard is. */
+.pdx-img-wrapper[role="button"]:focus-visible {
+    outline: none;
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* Zoomed state */
+.pdx-img-zoomed {
+    transform: scale(2);
+    cursor: zoom-out;
+    transition: transform 0.3s ease;
+}
+
+/* Lightbox overlay */
+.pdx-img-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--pdx-color-backdrop-strong);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    animation: pdx-img-lightbox-in 0.2s ease;
+}
+
+@keyframes pdx-img-lightbox-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.pdx-img-lightbox img {
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    cursor: default;
+    border-radius: var(--pdx-radius-md, 6px);
+}
+
+/* The lightbox's close button: a way out besides a click anywhere or Escape. */
+.pdx-img-lightbox-close {
+    position: absolute;
+    top: var(--pdx-space-md, 12px);
+    right: var(--pdx-space-md, 12px);
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: var(--pdx-radius-full, 9999px);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.pdx-img-lightbox-close:hover { background: rgba(255, 255, 255, 0.25); }
+.pdx-img-lightbox-close:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+
+.pdx-img-lightbox-caption {
+    color: white;
+    text-align: center;
+    margin-top: var(--pdx-space-md, 12px);
+    font-size: var(--pdx-text-base);
+    max-width: 80vw;
+}

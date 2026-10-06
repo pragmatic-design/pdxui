@@ -1,0 +1,57 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Accordion</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Expandable sections with animated height. Covers single collapsible and multi-item accordion.
+      Keyboard navigation (Arrow keys, Home/End), ARIA, single or multiple expand mode.
+    </p>
+
+    <!-- ═══ Single Mode (default) ═══ -->
+    <pdx-demo-comp-accordion-single class="demo-section"></pdx-demo-comp-accordion-single>
+
+    <!-- ═══ Multiple Mode ═══ -->
+    <pdx-demo-comp-accordion-multiple class="demo-section"></pdx-demo-comp-accordion-multiple>
+
+    <!-- ═══ Single Item (Collapsible) ═══ -->
+    <pdx-demo-comp-accordion-single-item class="demo-section"></pdx-demo-comp-accordion-single-item>
+
+    <!-- ═══ Keyboard ═══ -->
+    <pdx-demo-comp-accordion-keyboard class="demo-section"></pdx-demo-comp-accordion-keyboard>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Description</span></div>
+        <div class="opt-row"><code>mode</code><span>"single" (default) or "multiple"</span></div>
+        <div class="opt-row"><code>disabled</code><span>Disable all items</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Item Structure</h3>
+      <pre class="pdx-txt-mono source-code"><code>&lt;pdx-accordion mode="single"&gt;
+  &lt;div data-accordion-item data-open&gt;
+    &lt;button data-accordion-trigger&gt;Title&lt;/button&gt;
+    &lt;div data-accordion-content&gt;Content&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/pdx-accordion&gt;
+
+&lt;!-- Attributes --&gt;
+data-open         Start expanded
+data-disabled     Disable individual item</code></pre>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+@page '/components/accordion';
+@title 'Accordion';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+  .answer { margin: 0; color: var(--pdx-color-muted); line-height: 1.6; }
+  .setting-group { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .source-code { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; }
+</style>

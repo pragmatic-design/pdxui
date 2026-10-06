@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h3>Nested Overlays</h3>
+    <p class="desc">Opens dialog (modal) then tooltip on top. Escape closes topmost only.</p>
+    <button class="pdx-primary" @click="openNested">Open Nested Demo</button>
+  </section>
+</template>
+
+<script setup>
+import { useOverlayDemo } from './state.pdx';
+
+// It numbers its overlays from the stack section's counter and writes its log (state.pdx.ts).
+const overlayDemo = useOverlayDemo();
+function openNested() { overlayDemo.openNested(); }
+</script>

@@ -1,0 +1,69 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Drawer Structure</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Static preview of a left-anchored drawer with header, body, and footer.</p>
+
+    <div class="drawer-preview">
+      <div class="pdx-drawer drawer-left">
+        <div class="pdx-drawer-header">
+          <h3 class="pdx-txt-subheading">Navigation</h3>
+          <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="pdx-drawer-body">
+          <p class="pdx-txt-small pdx-ink-muted">Drawer body content. Typically navigation links, filters, or settings.</p>
+          <div class="drawer-nav-demo">
+            <button class="pdx-ghost" full>Dashboard</button>
+            <button class="pdx-ghost" full>Projects</button>
+            <button class="pdx-ghost" full>Settings</button>
+          </div>
+        </div>
+        <div class="pdx-drawer-footer">
+          <button class="pdx-ghost" size="sm">Log Out</button>
+        </div>
+      </div>
+      <div class="drawer-content-area">
+        <span class="pdx-txt-small pdx-ink-muted">Main content area</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-drawer"&gt;
+  &lt;div class="pdx-drawer-header"&gt;
+    &lt;h3&gt;Navigation&lt;/h3&gt;
+    &lt;button class="pdx-dialog-close"&gt;&amp;times;&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-drawer-body"&gt;
+    &lt;p&gt;Drawer content...&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-drawer-footer"&gt;
+    &lt;button class="pdx-ghost"&gt;Log Out&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .drawer-nav-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    margin-top: var(--pdx-space-sm);
+  }
+  .pdx-dialog-close {
+    appearance: none;
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    padding: var(--pdx-space-xs);
+    border-radius: var(--pdx-radius-sm);
+  }
+  .pdx-dialog-close:hover {
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+  }
+</style>

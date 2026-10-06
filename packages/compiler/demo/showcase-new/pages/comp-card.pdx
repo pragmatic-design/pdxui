@@ -1,0 +1,39 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Card</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Structured card with header/body/footer/media slots. Loading skeleton, clickable, hoverable, selectable, horizontal layout, elevation control.
+    </p>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-comp-card-variants class="demo-section"></pdx-demo-comp-card-variants>
+
+    <!-- ═══ Elevation ═══ -->
+    <pdx-demo-comp-card-elevation class="demo-section"></pdx-demo-comp-card-elevation>
+
+    <!-- ═══ Product Cards ═══ -->
+    <pdx-demo-comp-card-product class="demo-section"></pdx-demo-comp-card-product>
+
+    <!-- ═══ Horizontal / Article ═══ -->
+    <pdx-demo-comp-card-horizontal class="demo-section"></pdx-demo-comp-card-horizontal>
+
+    <!-- ═══ Interactive States ═══ -->
+    <pdx-demo-comp-card-interactive class="demo-section"></pdx-demo-comp-card-interactive>
+
+    <!-- ═══ Loading Skeleton ═══ -->
+    <pdx-demo-comp-card-skeleton class="demo-section"></pdx-demo-comp-card-skeleton>
+
+    <!-- ═══ Compact Stats ═══ -->
+    <pdx-demo-comp-card-compact class="demo-section"></pdx-demo-comp-card-compact>
+  </div>
+</template>
+
+<script setup>
+@page '/components/card';
+@title 'Card';
+</script>
+
+<style scoped>
+  .page { }
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); }
+</style>

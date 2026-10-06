@@ -1,0 +1,68 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Full Sidebar Example</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Realistic sidebar with all features combined.</p>
+
+    <div class="demo-sidebar demo-sidebar-full">
+      <div class="sidebar-header">
+        <pdx-icon name="package" size="24"></pdx-icon>
+        <span class="sidebar-title pdx-txt-body">Pragmatic App</span>
+      </div>
+      <pdx-nav-menu :items="fullSidebar" activekey="analytics" @pdx-select="onSelect"></pdx-nav-menu>
+      <div class="sidebar-footer pdx-txt-small pdx-ink-muted">v1.0.0</div>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="nav-event-log">{{ navLog }}</div>
+  </section>
+</template>
+
+<script setup>
+const fullSidebar = [
+  { key: 'hdr-main', label: 'Main', type: 'header' },
+  { key: 'dashboard', label: 'Dashboard', icon: 'home' },
+  { key: 'analytics', label: 'Analytics', icon: 'trending-up', badge: 'New', badgeVariant: 'success' },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'hdr-manage', label: 'Manage', type: 'header' },
+  { key: 'projects', label: 'Projects', icon: 'folder', expanded: true, children: [
+    { key: 'active', label: 'Active', badge: '5' },
+    { key: 'archived', label: 'Archived' },
+    { key: 'templates', label: 'Templates' },
+  ]},
+  { key: 'team', label: 'Team', icon: 'users', children: [
+    { key: 'members', label: 'Members', badge: '24' },
+    { key: 'groups', label: 'Groups' },
+    { key: 'invites', label: 'Invitations', badge: '3', badgeVariant: 'primary' },
+  ]},
+  { key: 'sep2', label: '', type: 'separator' },
+  { key: 'hdr-system', label: 'System', type: 'header' },
+  { key: 'settings', label: 'Settings', icon: 'settings' },
+  { key: 'help', label: 'Help & Support', icon: 'help-circle' },
+];
+
+let navLog = $signal('Click an item...');
+
+function onSelect(e) {
+  navLog = 'pdx-select: ' + e.detail.key;
+}
+</script>
+
+<style scoped>
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-md);
+  border-bottom: 1px solid var(--pdx-color-border);
+}
+.sidebar-title { font-weight: var(--pdx-weight-semibold); }
+.sidebar-footer {
+  padding: var(--pdx-space-sm) var(--pdx-space-md);
+  border-top: 1px solid var(--pdx-color-border);
+  text-align: center;
+}
+.event-log {
+  margin-top: var(--pdx-space-md);
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+}
+</style>

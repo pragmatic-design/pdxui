@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Error State</h2>
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-switch label="Accept cookies" error></pdx-switch>
+        <span class="pdx-field-error">You must accept cookies to continue</span>
+      </div>
+    </div>
+  </section>
+</template>

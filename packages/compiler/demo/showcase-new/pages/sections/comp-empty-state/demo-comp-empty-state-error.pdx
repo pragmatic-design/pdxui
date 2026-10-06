@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Error State</h2>
+    <div class="demo-container">
+      <pdx-empty-state icon="alert-triangle" title="Something went wrong" description="We couldn't load the data. Please try again." action-label="Retry" @pdx-action="onRetry"></pdx-empty-state>
+    </div>
+  </section>
+</template>
+
+<script setup>
+function onRetry() {
+  alert('Retrying...');
+}
+</script>

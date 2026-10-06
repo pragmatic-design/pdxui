@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Column Reorder</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Drag column headers to reorder. Also available from the column chooser in the toolbar.
+      Set <code>reorderable: false</code> on a column to pin its position.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="reorderDS" :columns="columns" :show-toolbar="true" hover striped></pdx-data-grid>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { data, columns } from './state.pdx';
+import { createDataSource } from '@pdxui/core';
+
+const reorderDS = createDataSource({ data: data.slice(), pageSize: 0 });
+</script>

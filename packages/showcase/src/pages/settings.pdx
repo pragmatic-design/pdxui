@@ -1,0 +1,74 @@
+<template>
+  <section class="page" data-test="settings">
+    <h1 class="pdx-txt-title">{{ $t('settings.title') }}</h1>
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('settings.intro') }}</p>
+
+    <!-- The reference's settings: tiles in titled groups, each an icon above its name, each a screen
+         that works — no tile opens «coming soon». -->
+    @for (groups as group; track group.key) {
+      <section class="group" :aria-labelledby="'settings-' + group.key">
+        <h2 class="group-title" :id="'settings-' + group.key" data-test="settings-group">{{ $t('settings.groups.' + group.key) }}</h2>
+        <div class="tiles" data-test="tiles">
+          @for (group.tiles as tile; track tile.key) {
+            <a class="tile" :href="tile.href" :data-test="'tile-' + tile.key" @click="followLink($event, tile.href)">
+              <span class="glyph" aria-hidden="true">{{ tile.glyph }}</span>
+              <span class="name">{{ $t('settings.tiles.' + tile.key) }}</span>
+            </a>
+          }
+        </div>
+      </section>
+    }
+  </section>
+</template>
+
+<script setup>
+@page '/settings' { label: settingsLabel };
+@title $t('settings.title');
+
+// A tile is a link: the router takes the click, a middle click still opens a tab.
+import { followLink } from '../data/follow-link';
+
+function settingsLabel() {
+  return $t('settings.title');
+}
+
+/** The reference's two groups. A tile is added here and nowhere else. */
+const groups = [
+  { key: 'system', tiles: [
+    { key: 'lookups', href: '/settings/lookups', glyph: '☰' },
+    { key: 'views', href: '/settings/views', glyph: '◫' },
+  ] },
+  { key: 'access', tiles: [
+    { key: 'users', href: '/settings/users', glyph: '◍' },
+    { key: 'permissions', href: '/settings/permissions', glyph: '⚿' },
+  ] },
+];
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+  .page h1, .page > p { margin: 0; }
+
+  /* A group's name between two rules, as the reference draws it. */
+  .group { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .group-title {
+    display: flex; align-items: center; gap: var(--pdx-space-md); margin: 0;
+    font-size: var(--pdx-text-xs, 0.75rem); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--pdx-color-muted);
+  }
+  .group-title::before, .group-title::after { content: ''; flex: 1; border-top: 1px solid var(--pdx-color-border); }
+
+  /* 120px squares, wrapping, centred; two a row on a phone. */
+  .tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--pdx-space-md); }
+  .tile {
+    width: 120px; height: 120px; box-sizing: border-box;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-sm); text-align: center; text-decoration: none;
+    color: var(--pdx-color-text); background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md);
+  }
+  .tile:hover { border-color: var(--pdx-color-primary); }
+  .tile:focus-visible { outline: 2px solid var(--pdx-color-focus, var(--pdx-color-primary)); outline-offset: 2px; }
+  .glyph { font-size: 28px; line-height: 1; color: var(--pdx-color-primary-ink); }
+  .name { font-size: var(--pdx-text-sm, 0.875rem); }
+</style>

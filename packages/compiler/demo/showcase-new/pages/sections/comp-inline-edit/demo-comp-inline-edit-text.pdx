@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Text</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to edit. Enter saves, Escape cancels, and both put focus back on the value. Tab or a click elsewhere saves too.</p>
+    <div class="demo-row">
+      <span class="demo-label">Name:</span>
+      <pdx-inline-edit type="text" :value="'John Doe'"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Email:</span>
+      <pdx-inline-edit type="text" :value="'john@example.com'"></pdx-inline-edit>
+    </div>
+    <div class="demo-row">
+      <span class="demo-label">Empty:</span>
+      <pdx-inline-edit type="text" placeholder="Click to add name..."></pdx-inline-edit>
+    </div>
+  </section>
+</template>

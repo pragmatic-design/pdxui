@@ -1,0 +1,129 @@
+/* Segmented Control — iOS-style toggle between 2-4 options.
+   Animated slider background follows the active item.
+
+   Usage:
+     <div class="pdx-segmented">
+       <button class="pdx-segmented-item active">Day</button>
+       <button class="pdx-segmented-item">Week</button>
+       <button class="pdx-segmented-item">Month</button>
+     </div>
+
+   Sizes: sm, default, lg
+*/
+
+/* ===== Container ===== */
+
+.pdx-segmented {
+    display: inline-flex;
+    position: relative;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+    padding: 0.15rem;
+    gap: 0.15rem;
+}
+
+/* ===== Sliding Indicator ===== */
+
+.pdx-segmented-indicator {
+    position: absolute;
+    background: var(--pdx-color-surface);
+    border-radius: calc(var(--pdx-radius-md) - 0.1rem);
+    box-shadow: var(--pdx-shadow-sm);
+    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease),
+                width var(--pdx-duration-base) var(--pdx-ease, ease),
+                height var(--pdx-duration-base) var(--pdx-ease, ease);
+    pointer-events: none;
+    z-index: 0;
+    display: none;
+}
+
+/* ===== Item ===== */
+
+.pdx-segmented-item {
+    position: relative;
+    z-index: 1;
+    padding: 0.3rem 0.75rem;
+    border-radius: calc(var(--pdx-radius-md) - 0.1rem);
+    font-family: inherit;
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--pdx-duration-base) var(--pdx-ease, ease);
+    position: relative;
+}
+
+.pdx-segmented-item:hover {
+    color: var(--pdx-color-text);
+}
+
+/* Active state */
+.pdx-segmented-item.active,
+.pdx-segmented-item[aria-selected="true"],
+.pdx-segmented-item[aria-pressed="true"],
+.pdx-segmented-item[aria-checked="true"] {
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    box-shadow: var(--pdx-shadow-sm);
+}
+
+/* ===== Sizes ===== */
+
+.pdx-segmented-sm {
+    padding: 0.1rem;
+    gap: 0.1rem;
+}
+
+.pdx-segmented-sm .pdx-segmented-item {
+    padding: 0.2rem 0.5rem;
+    font-size: var(--pdx-text-xs);
+}
+
+.pdx-segmented-lg {
+    padding: 0.2rem;
+    gap: 0.15rem;
+}
+
+.pdx-segmented-lg .pdx-segmented-item {
+    padding: 0.4rem 1rem;
+    font-size: var(--pdx-text-base);
+}
+
+/* ===== Full width ===== */
+
+.pdx-segmented[full] {
+    display: flex;
+    width: 100%;
+}
+
+.pdx-segmented[full] .pdx-segmented-item {
+    flex: 1;
+    text-align: center;
+}
+
+/* ===== Icon variant ===== */
+
+.pdx-segmented-item > svg,
+.pdx-segmented-item > i {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+}
+
+/* ===== Disabled ===== */
+
+.pdx-segmented-item:disabled,
+.pdx-segmented-item[disabled] {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ===== Vertical ===== */
+
+.pdx-segmented-vertical {
+    flex-direction: column;
+}

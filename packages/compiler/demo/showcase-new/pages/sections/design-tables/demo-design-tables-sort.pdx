@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sort Indicators</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Put <code>aria-sort</code> on the <code>&lt;th&gt;</code> — <code>ascending</code>, <code>descending</code>
+      or <code>none</code>: it draws the indicator and tells assistive technology the order.
+      <code>data-sort="asc|desc|none"</code> still draws the same indicator, but says nothing to a screen reader.
+    </p>
+
+    <div class="table-wrap">
+      <table class="pdx-table pdx-table-hover">
+        <thead>
+          <tr>
+            <th aria-sort="ascending">Name</th>
+            <th aria-sort="descending">Score</th>
+            <th aria-sort="none">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Alice</td><td>98</td><td>A+</td></tr>
+          <tr><td>Bob</td><td>85</td><td>B+</td></tr>
+          <tr><td>Carol</td><td>92</td><td>A</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;th aria-sort="ascending"&gt;Name&lt;/th&gt;
+&lt;th aria-sort="descending"&gt;Score&lt;/th&gt;
+&lt;th aria-sort="none"&gt;Grade&lt;/th&gt;</code></pre>
+    </details>
+  </section>
+</template>

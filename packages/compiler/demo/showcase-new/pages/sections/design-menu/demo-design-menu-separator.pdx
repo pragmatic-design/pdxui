@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Separator and Labels</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Group items with separators and section labels.</p>
+
+    <div class="demo-menu-container">
+      <div class="pdx-menu">
+        <div class="pdx-menu-label">File</div>
+        <button class="pdx-menu-item">New</button>
+        <button class="pdx-menu-item">Open</button>
+        <div class="pdx-menu-separator"></div>
+        <div class="pdx-menu-label">Edit</div>
+        <button class="pdx-menu-item">Undo</button>
+        <button class="pdx-menu-item">Redo</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-menu"&gt;
+  &lt;div class="pdx-menu-label"&gt;File&lt;/div&gt;
+  &lt;button class="pdx-menu-item"&gt;New&lt;/button&gt;
+  &lt;button class="pdx-menu-item"&gt;Open&lt;/button&gt;
+  &lt;div class="pdx-menu-separator"&gt;&lt;/div&gt;
+  &lt;div class="pdx-menu-label"&gt;Edit&lt;/div&gt;
+  &lt;button class="pdx-menu-item"&gt;Undo&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

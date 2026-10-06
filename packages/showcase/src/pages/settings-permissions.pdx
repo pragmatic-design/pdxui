@@ -1,0 +1,188 @@
+<template>
+  <section class="page" data-test="settings-permissions">
+    <header class="head">
+      <div class="head-row">
+        <h1 class="pdx-txt-title">{{ $t('settings.tiles.permissions') }}</h1>
+        @if (canEdit()) {
+          <pdx-button variant="primary" @click="openNewRole" data-test="new-role">{{ $t('settings.permissions.newRole') }}</pdx-button>
+        }
+      </div>
+      <p class="pdx-txt-body pdx-ink-muted">{{ canEdit() ? $t('settings.permissions.introEdit') : $t('settings.permissions.intro') }}</p>
+    </header>
+
+    <!-- The server's words when it refuses a change: a role still held by someone, or nobody left who
+         could change permissions. Where the change was made, and read out. -->
+    <p class="refusal pdx-txt-small" :show="refusal() !== ''" role="alert" data-test="refusal">{{ refusal() }}</p>
+
+    <!-- Role × permission, from the SERVER (`mock-auth.ts`), which checks every action again: the
+         table the guards read, not a copy of it. Editable with `settings.permissions`, read-only
+         otherwise. A div grid (`@for` in a <tbody>, «Bug noti»). -->
+    <div class="matrix" role="table" :aria-label="$t('settings.tiles.permissions')" :style="'--roles: ' + roleList.length">
+      <div class="row head" role="row">
+        <span role="columnheader">{{ $t('settings.permissions.permission') }}</span>
+        <span role="columnheader">{{ $t('settings.permissions.allows') }}</span>
+        @for (roleList as role; track role.key) {
+          <span role="columnheader" class="mark" :data-test="'role-' + role.key" :data-active="String(role.active)">
+            @if (canEdit()) {
+              <pdx-input size="sm" :value="roleName(role.key)" :aria-label="$t('settings.permissions.rename', { name: roleName(role.key) })"
+                @pdx-change="e => rename(role, e.detail.value)" :data-test="'role-name-' + role.key"></pdx-input>
+            } @else {
+              <span class="role">{{ roleName(role.key) }}</span>
+            }
+            <span class="pdx-txt-small pdx-ink-muted">{{ role.active ? $t('settings.permissions.holds', { n: role.permissions.length, total: permissionList.length }) : $t('settings.permissions.inactive') }}</span>
+            @if (canEdit() && role.active) {
+              <pdx-button size="sm" variant="ghost" @click="deactivate(role)" :data-test="'deactivate-' + role.key">{{ $t('settings.permissions.deactivate') }}</pdx-button>
+            }
+          </span>
+        }
+      </div>
+      @for (permissionList as p; track p) {
+        <div class="row" role="row">
+          <code role="rowheader">{{ p }}</code>
+          <span role="cell" class="allows">{{ $t('settings.permissions.descriptions.' + p) }}</span>
+          @for (roleList as role; track role.key) {
+            <span role="cell" class="mark" :data-test="'perm-' + p + '-' + role.key" :data-granted="String(granted(role, p))"
+              :aria-label="canEdit() ? null : (granted(role, p) ? $t('settings.permissions.granted') : $t('settings.permissions.denied'))">
+              @if (canEdit()) {
+                <pdx-checkbox :checked="granted(role, p)" :disabled="!role.active"
+                  @pdx-change="e => toggle(role, p, e.detail.checked, e.currentTarget)"><span class="pdx-sr-only">{{ $t('settings.permissions.grant', { permission: p, role: roleName(role.key) }) }}</span></pdx-checkbox>
+              } @else {
+                {{ granted(role, p) ? '✓' : '—' }}
+              }
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" :show="saved !== ''" role="status" data-test="saved">{{ saved }}</p>
+
+    <!-- A NEW role: a name, and whose permissions it starts from. The key is the name's, made unique. -->
+    <pdx-dialog :open="newOpen" size="md" :title="$t('settings.permissions.newRole')" @pdx-close="newOpen = false" data-test="role-dialog">
+      <pdx-form :form="draft" @pdx-submit="onCreate" data-test="role-form">
+        <pdx-form-field name="name" :label="$t('settings.permissions.roleName')">
+          <pdx-input name="name" data-test="new-role-name"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field name="copyFrom" :label="$t('settings.permissions.copyFrom')">
+          <pdx-select name="copyFrom" :options="copyOptions" data-test="new-role-copy"></pdx-select>
+        </pdx-form-field>
+        <div class="actions">
+          <pdx-button variant="ghost" @click="newOpen = false" data-test="role-cancel">{{ $t('settings.permissions.cancel') }}</pdx-button>
+          <pdx-button type="submit" variant="primary" data-test="role-create">{{ $t('settings.permissions.create') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </pdx-dialog>
+  </section>
+</template>
+
+<script setup>
+@page '/settings/permissions' { label: permissionsLabel };
+@title $t('settings.tiles.permissions');
+
+import { hasPermission } from '@pdxui/core';
+import { roles, roleName } from '../data/grants';
+import { PERMISSIONS } from '../data/roles-seed';
+import { access, refusal, loadAccess, saveRoles } from '../data/access';
+
+function permissionsLabel() {
+  return $t('settings.tiles.permissions');
+}
+
+/** Only a holder of `settings.permissions` edits; everyone else reads the same matrix. */
+const canEdit = hasPermission('settings.permissions');
+
+onMount(() => { void loadAccess(); });
+
+const roleList = $derived(access()?.roles ?? roles());
+const permissionList = $derived(access()?.permissions ?? [...PERMISSIONS]);
+let saved = $signal('');
+
+function granted(role, permission) {
+  return role.permissions.includes(permission);
+}
+
+/** Replace the roles on the server; say so, or put the control back where the server left it. */
+async function commit(next, control?: { checked: boolean }, previous?: boolean) {
+  saved = '';
+  const ok = await saveRoles(next);
+  if (ok) saved = $t('settings.permissions.saved');
+  // The binding cannot put a refused checkbox back: its value did not change, so nothing re-renders.
+  else if (control) control.checked = previous;
+}
+
+function toggle(role, permission, checked, control) {
+  const next = roleList.map(r => r.key !== role.key ? r : {
+    ...r,
+    permissions: checked ? [...r.permissions, permission] : r.permissions.filter(p => p !== permission),
+  });
+  void commit(next, control, !checked);
+}
+
+function rename(role, name) {
+  const clean = String(name ?? '').trim();
+  if (!clean || clean === roleName(role.key)) return;
+  void commit(roleList.map(r => r.key === role.key ? { ...r, name: clean } : r));
+}
+
+function deactivate(role) {
+  void commit(roleList.map(r => r.key === role.key ? { ...r, active: false } : r));
+}
+
+// ── New role ────────────────────────────────────────────────────────────────────────────────
+@form draft: {
+  name: string { required },
+  copyFrom: string
+};
+
+let newOpen = $signal(false);
+const copyOptions = $derived(roleList.filter(r => r.active).map(r => ({ value: r.key, label: roleName(r.key) })));
+
+function openNewRole() {
+  draft.reset({ name: '', copyFrom: '' });
+  newOpen = true;
+}
+
+/** A key from the name: lower-case words joined by «-», made unique against the roles there are. */
+function keyFor(name) {
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'role';
+  let key = base;
+  for (let n = 2; roleList.some(r => r.key === key); n++) key = `${base}-${n}`;
+  return key;
+}
+
+async function onCreate(e) {
+  const v = e.detail.values;
+  const from = roleList.find(r => r.key === v.copyFrom);
+  const role = { key: keyFor(v.name), name: v.name.trim(), active: true, permissions: from ? [...from.permissions] : [] };
+  await commit([...roleList, role]);
+  newOpen = false;
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+  .head { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+  .head-row { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-md); }
+  .head h1, .head p { margin: 0; }
+  .refusal { color: var(--pdx-color-danger-ink); margin: 0; }
+  .matrix { display: flex; flex-direction: column; }
+  .row {
+    display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(14rem, 3fr) repeat(var(--roles), minmax(8rem, 1fr));
+    gap: var(--pdx-space-md); align-items: center;
+    padding: var(--pdx-space-sm) var(--pdx-space-md); border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .row.head { color: var(--pdx-color-muted); font-size: var(--pdx-text-sm, 0.875rem); background: var(--pdx-color-inset); border-bottom: 0; border-radius: var(--pdx-radius-sm); }
+  .mark { text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--pdx-space-2xs); }
+  .mark[data-active="false"] { opacity: 0.6; }
+  .role { color: var(--pdx-color-text); font-weight: 600; }
+  .mark[data-granted="true"] { color: var(--pdx-color-success-ink); font-weight: 600; }
+  .mark[data-granted="false"] { color: var(--pdx-color-muted); }
+  code { font-family: var(--pdx-font-mono, monospace); }
+  .actions { display: flex; justify-content: flex-end; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-lg); }
+
+  /* A phone: the description under the permission, the roles beside it. */
+  @media (max-width: 640px) {
+    .row { grid-template-columns: minmax(0, 1fr) repeat(var(--roles), 5.5rem); }
+    .row > :nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+  }
+</style>

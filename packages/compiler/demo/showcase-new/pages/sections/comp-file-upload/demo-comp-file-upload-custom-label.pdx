@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Label</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Custom drop zone text and restricted file types via <code>accept</code>.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-file-upload label="Drop your documents here" accept=".pdf,.doc,.docx"></pdx-file-upload>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-file-upload label="Drop your documents here"
+  accept=".pdf,.doc,.docx" /&gt;</code></pre>
+    </details>
+  </section>
+</template>

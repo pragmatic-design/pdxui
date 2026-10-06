@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Three sizes: <code>sm</code>, default, and <code>lg</code>.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Small" size="sm"></pdx-label>
+        <pdx-tag-input size="sm" :value="sizeTags" placeholder="Small..."></pdx-tag-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Default"></pdx-label>
+        <pdx-tag-input :value="sizeTags" placeholder="Default..."></pdx-tag-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Large" size="lg"></pdx-label>
+        <pdx-tag-input size="lg" :value="sizeTags" placeholder="Large..."></pdx-tag-input>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+// Sizes
+let sizeTags = $signal(['Tag A', 'Tag B']);
+</script>

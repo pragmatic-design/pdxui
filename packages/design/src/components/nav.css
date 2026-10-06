@@ -1,0 +1,432 @@
+/* Vertical nav + breadcrumb */
+
+.pdx-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-nav-item {
+    display: flex;
+    /* The navigation's rhythm. `auto` by default — the content, each theme with its own type scale
+       (37.59–43.19) — so nothing moves until an app states a number, and then every item of every
+       navigation takes it. */
+    min-height: var(--pdx-nav-item-height);
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-sm);
+    border: none;
+    background: transparent;
+    width: 100%;
+    color: var(--pdx-color-muted);
+    font-family: inherit;
+    font-size: var(--pdx-text-sm);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--pdx-transition);
+}
+
+.pdx-nav-item:hover {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+}
+
+.pdx-nav-item[aria-current="page"],
+.pdx-nav-item.active {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-primary-ink);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.pdx-nav-item:disabled,
+.pdx-nav-item[aria-disabled="true"] {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: not-allowed;
+}
+
+/* An entry with the app's controls beside it (the `actions` slot): the link fills the
+   row, the controls follow it — siblings, never inside the link. Positioned, so an app can overlay
+   them on the row's end instead. */
+.pdx-nav-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.pdx-nav-row > .pdx-nav-item { flex: 1 1 auto; min-width: 0; }
+.pdx-nav-actions { display: flex; align-items: center; gap: 2px; flex: none; }
+/* The row is what the pointer is on when it is on a control: the entry keeps its highlight under it.
+   As strong as an entry's own hover, so the current entry keeps its colour, as it does
+   when hovered directly. */
+:where(.pdx-nav-row:hover) > .pdx-nav-item {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+}
+
+.pdx-nav-heading {
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    /* A section label is text, and at 12px uppercase it is the hardest text here to read: muted,
+       not subtle. */
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--pdx-space-sm) var(--pdx-space-sm) var(--pdx-space-2xs);
+}
+
+.pdx-nav .pdx-nav {
+    padding-left: var(--pdx-space-md);
+}
+
+/* ===== Nav Menu component enhancements ===== */
+
+pdx-nav-menu {
+    display: block;
+}
+
+.pdx-nav-menu-root {
+    width: 100%;
+}
+
+/* Chevron for collapsible groups */
+.pdx-nav-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.pdx-nav-chevron svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.5;
+}
+
+.pdx-nav-chevron.expanded {
+    transform: rotate(90deg);
+}
+
+/* Icon in nav items — fixed size for alignment */
+.pdx-nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* pdx-icon CE inside nav needs display:inline-flex */
+.pdx-nav-item > pdx-icon.pdx-nav-icon {
+    display: inline-flex;
+}
+
+/* Label flex — always left-aligned */
+.pdx-nav-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+}
+
+/* Badge */
+.pdx-nav-badge {
+    font-size: var(--pdx-text-xs);
+    padding: 0.05rem 0.4rem;
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+
+.pdx-nav-badge-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+.pdx-nav-badge-danger { background: var(--pdx-color-danger); color: white; }
+.pdx-nav-badge-success { background: var(--pdx-color-success); color: white; }
+
+/* Group trigger styling */
+.pdx-nav-group-trigger {
+    font-weight: var(--pdx-weight-medium);
+}
+
+/* Collapsible group animation */
+.pdx-nav-group {
+    overflow: hidden;
+}
+
+/* A heading that folds its group: the heading's own look, as a button, with the
+   chevron pointing down when it is open and right when it is folded. */
+.pdx-nav-heading-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.pdx-nav-heading-toggle:hover {
+    color: var(--pdx-color-text);
+}
+
+.pdx-nav-heading-toggle:focus-visible {
+    outline: 2px solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}
+
+.pdx-nav-heading-chevron {
+    transform: rotate(-90deg);
+}
+
+/* A collapsed menu's group, opened BESIDE its icon: a floating surface with the group's
+   name on top and its entries at full width, the way the menus' submenus float. On <body>, so it is
+   not under `.pdx-nav-collapsed` and its entries keep their labels. */
+.pdx-nav-flyout {
+    z-index: 1000;
+    min-width: 12rem;
+    padding: var(--pdx-space-2xs);
+    background: var(--pdx-surface-2, var(--pdx-color-surface));
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-float-radius);
+    box-shadow: var(--pdx-float-shadow);
+}
+
+.pdx-nav-flyout-title {
+    padding-top: var(--pdx-space-xs);
+}
+
+.pdx-nav-heading-chevron.expanded {
+    transform: none;
+}
+
+/* Separator */
+.pdx-nav-separator {
+    border: none;
+    height: 1px;
+    background: var(--pdx-color-border);
+    margin: var(--pdx-space-xs) 0;
+}
+
+/* ===== pdx-nav-menu's looks =====
+   What two app shells reached through the internal classes, as the menu's API: the `size`,
+   `indicator`, `chevron` and `actions` props (one host class each) and a type per level, set as
+   custom properties on the host — levels 1 to 3, the third standing for every deeper one:
+
+     --pdx-nav-level{1,2,3}-size          an entry's font size
+     --pdx-nav-level{1,2,3}-indent        an entry's start padding (default: `indent` × depth + 8px)
+     --pdx-nav-level{1,2,3}-group-weight  a group's entry: weight
+     --pdx-nav-level{1,2,3}-group-color   a group's entry: colour at rest
+     --pdx-nav-level{1,2,3}-group-space   a group's entry: space above it
+
+   The flyout of a collapsed menu builds its entries the same way, on <body>. */
+:where(.pdx-nav-menu-root, .pdx-nav-flyout) .pdx-nav-item[data-level="1"] {
+    padding-left: var(--pdx-nav-level1-indent, var(--pdx-nav-pad, var(--pdx-space-sm)));
+    font-size: var(--pdx-nav-level1-size, var(--pdx-nav-font-size, var(--pdx-text-sm)));
+}
+:where(.pdx-nav-menu-root, .pdx-nav-flyout) .pdx-nav-item[data-level="2"] {
+    padding-left: var(--pdx-nav-level2-indent, var(--pdx-nav-pad, var(--pdx-space-sm)));
+    font-size: var(--pdx-nav-level2-size, var(--pdx-nav-font-size, var(--pdx-text-sm)));
+}
+:where(.pdx-nav-menu-root, .pdx-nav-flyout) .pdx-nav-item[data-level="3"] {
+    padding-left: var(--pdx-nav-level3-indent, var(--pdx-nav-pad, var(--pdx-space-sm)));
+    font-size: var(--pdx-nav-level3-size, var(--pdx-nav-font-size, var(--pdx-text-sm)));
+}
+:where(.pdx-nav-menu-root, .pdx-nav-flyout) .pdx-nav-group-trigger[data-level="1"] {
+    font-weight: var(--pdx-nav-level1-group-weight, var(--pdx-weight-medium));
+    color: var(--pdx-nav-level1-group-color, var(--pdx-color-muted));
+    margin-top: var(--pdx-nav-level1-group-space, 0px);
+}
+:where(.pdx-nav-menu-root, .pdx-nav-flyout) .pdx-nav-group-trigger[data-level="2"] {
+    font-weight: var(--pdx-nav-level2-group-weight, var(--pdx-weight-medium));
+    color: var(--pdx-nav-level2-group-color, var(--pdx-color-muted));
+    margin-top: var(--pdx-nav-level2-group-space, 0px);
+}
+:where(.pdx-nav-menu-root, .pdx-nav-flyout) .pdx-nav-group-trigger[data-level="3"] {
+    font-weight: var(--pdx-nav-level3-group-weight, var(--pdx-weight-medium));
+    color: var(--pdx-nav-level3-group-color, var(--pdx-color-muted));
+    margin-top: var(--pdx-nav-level3-group-space, 0px);
+}
+/* A group's colour at rest is the property's; under the pointer it is every entry's. */
+:where(.pdx-nav-menu-root, .pdx-nav-flyout) .pdx-nav-group-trigger[data-level]:hover {
+    color: var(--pdx-color-text);
+}
+
+/* size="sm": a dense sidebar's menu. */
+.pdx-nav-size-sm {
+    --pdx-nav-font-size: 0.8rem;
+}
+.pdx-nav-size-sm .pdx-nav-item {
+    padding-top: calc(0.3125rem * var(--pdx-density-factor, 1));
+    padding-bottom: calc(0.3125rem * var(--pdx-density-factor, 1));
+    gap: calc(0.375rem * var(--pdx-density-factor, 1));
+}
+.pdx-nav-size-sm .pdx-nav-icon { width: 0.95rem; height: 0.95rem; }
+.pdx-nav-size-sm .pdx-nav-chevron { width: 0.85rem; height: 0.85rem; }
+
+/* indicator="border": the current entry also carries a bar on its start edge; every entry keeps
+   the bar's width, transparent, so the labels do not move when the current one changes. */
+.pdx-nav-indicator-border .pdx-nav-item {
+    border-radius: 0;
+    border-inline-start: 3px solid transparent;
+}
+.pdx-nav-indicator-border .pdx-nav-item:is(.active, [aria-current="page"]) {
+    border-inline-start-color: var(--pdx-color-primary);
+}
+
+/* chevron="end": a group's chevron at the end of its row, its icon in the column of every other. */
+.pdx-nav-chevron-end .pdx-nav-group-trigger > .pdx-nav-chevron {
+    order: 1;
+    margin-inline-start: auto;
+}
+
+/* actions="overlay": an entry's controls laid over the row's end, shown when the row is hovered or
+   holds the focus — at rest they take no width from the label. */
+.pdx-nav-actions-overlay .pdx-nav-actions {
+    position: absolute;
+    inset-inline-end: var(--pdx-space-2xs);
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+.pdx-nav-actions-overlay .pdx-nav-row:is(:hover, :focus-within) > .pdx-nav-actions {
+    opacity: 1;
+}
+
+/* Collapsed mode — icons only */
+.pdx-nav-collapsed .pdx-nav {
+    align-items: center;
+}
+
+.pdx-nav-collapsed .pdx-nav-item {
+    justify-content: center;
+    padding: var(--pdx-space-xs);
+    width: 2.5rem;
+    height: 2.5rem;
+    /* Centred in a folding group's section too, which is not the flex column `.pdx-nav` is. */
+    margin-inline: auto;
+}
+
+/* Collapsed, the headings go: a rule keeps the groups apart. */
+.pdx-nav-collapsed .pdx-nav-section + .pdx-nav-section {
+    margin-top: var(--pdx-space-xs);
+    padding-top: var(--pdx-space-xs);
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+.pdx-nav-collapsed .pdx-nav-chevron,
+.pdx-nav-collapsed .pdx-nav-group,
+.pdx-nav-collapsed .pdx-nav-actions {
+    display: none;
+}
+
+/* An icon-only item's label, on keyboard focus as well as hover: `title` shows it to the mouse only.
+   The colours are pdx-tooltip's. */
+.pdx-nav-collapsed .pdx-nav-item[data-tooltip] {
+    position: relative;
+}
+.pdx-nav-collapsed .pdx-nav-item[data-tooltip]:is(:hover, :focus-visible)::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + var(--pdx-space-xs));
+    top: 50%;
+    transform: translateY(-50%);
+    padding: var(--pdx-space-2xs) var(--pdx-space-xs);
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-text);
+    color: var(--pdx-color-bg);
+    font-size: var(--pdx-text-xs);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Breadcrumb */
+pdx-breadcrumb { display: block; }
+
+.pdx-breadcrumb { font-size: var(--pdx-text-sm); }
+
+/* CSS breadcrumb separator — glyph from the token so every theme (incl. the
+   neutral canvas) gets one; themes add thin ::after overrides for size/color. */
+.pdx-breadcrumb > *:not(:last-child)::after { content: var(--pdx-breadcrumb-separator); }
+
+.pdx-breadcrumb-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pdx-breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+}
+
+/* A crumb is an <a> when it has an href and a <button> when it only emits an event, so this rule has
+   to neutralise the button's chrome — background, border, padding, inherited font — and state the
+   pointer cursor that an <a href> would have brought for free. */
+.pdx-breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    color: var(--pdx-color-muted);
+    text-decoration: none;
+    transition: color var(--pdx-transition);
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+}
+.pdx-breadcrumb-link:hover { color: var(--pdx-color-primary-ink); text-decoration: underline; }
+
+.pdx-breadcrumb-current {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    color: var(--pdx-color-text);
+    font-weight: var(--pdx-weight-medium);
+}
+
+.pdx-breadcrumb-sep {
+    margin: 0 var(--pdx-space-xs);
+    /* A divider, but drawn as a glyph: it is painted with `color`, so it is text on the screen and
+       takes a text colour. A divider that is a border or a background keeps subtle. */
+    color: var(--pdx-color-muted);
+}
+/* WC breadcrumb: when no explicit `separator` prop is set the element is left
+   empty and the glyph comes from the theme token — so WC + CSS stay in sync. */
+.pdx-breadcrumb-sep:empty::before { content: var(--pdx-breadcrumb-separator); }
+
+/* A button, not a clickable span: no native chrome, the crumbs' text. */
+.pdx-breadcrumb-ellipsis {
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    padding: 0 var(--pdx-space-2xs);
+    background: none;
+    border: 0;
+    font: inherit;
+    line-height: inherit;
+    border-radius: var(--pdx-radius-sm);
+}
+.pdx-breadcrumb-ellipsis:hover { color: var(--pdx-color-primary-ink); }
+.pdx-breadcrumb-ellipsis:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: 2px; }

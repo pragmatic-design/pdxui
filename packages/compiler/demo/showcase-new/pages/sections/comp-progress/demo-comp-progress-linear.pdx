@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Linear</h2>
+    <div class="demo-stack">
+      <pdx-form-field label="Default (65%)">
+        <pdx-progress value="65"></pdx-progress>
+      </pdx-form-field>
+      <pdx-form-field label="With label">
+        <pdx-progress value="42" showLabel></pdx-progress>
+      </pdx-form-field>
+      <pdx-form-field label="Custom label">
+        <pdx-progress value="3" max="5" showLabel label="3 of 5 steps"></pdx-progress>
+      </pdx-form-field>
+      <pdx-form-field label="Indeterminate (loading)">
+        <pdx-progress></pdx-progress>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

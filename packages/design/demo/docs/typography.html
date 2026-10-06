@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Typography</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Typography</span></div>
+                        <h1 class="pdx-txt-display">Typography</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">9 text roles, 9 ink colors, links, code, blockquote. Fluid sizing via clamp().</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Text Roles</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="xs">
+                                    <span class="pdx-txt-display">Display — for hero sections</span>
+                                    <span class="pdx-txt-title">Title — for page titles</span>
+                                    <span class="pdx-txt-heading">Heading — for section headings</span>
+                                    <span class="pdx-txt-subheading">Subheading — for subsections</span>
+                                    <span class="pdx-txt-body">Body — for regular content</span>
+                                    <span class="pdx-txt-small">Small — for secondary info</span>
+                                    <span class="pdx-txt-caption">Caption — for fine print</span>
+                                    <span class="pdx-txt-label">Label — for form labels</span>
+                                    <span class="pdx-txt-mono">Mono — for code</span>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;span class="pdx-txt-display"&gt;Display&lt;/span&gt;
+&lt;span class="pdx-txt-title"&gt;Title&lt;/span&gt;
+&lt;span class="pdx-txt-heading"&gt;Heading&lt;/span&gt;
+...</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Ink Colors</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="lg">
+                                    <span class="pdx-ink-default">default</span>
+                                    <span class="pdx-ink-muted">muted</span>
+                                    <span class="pdx-ink-subtle">subtle</span>
+                                    <span class="pdx-ink-primary">primary</span>
+                                    <span class="pdx-ink-accent">accent</span>
+                                    <span class="pdx-ink-danger">danger</span>
+                                    <span class="pdx-ink-success">success</span>
+                                    <span class="pdx-ink-warning">warning</span>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;span class="pdx-ink-primary"&gt;primary&lt;/span&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Links</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <p>Text with a <a class="pdx-link" href="#">link</a> inside a paragraph.</p>
+                            </div>
+                            <div class="doc-source">&lt;a class="pdx-link" href="#"&gt;link&lt;/a&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Code</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <p>Inline <code>code</code> in a sentence.</p>
+                                    <pre><code>function greet(name) {
+    return `Hello, ${name}!`;
+}
+
+console.log(greet("PDX"));</code></pre>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;code&gt;inline code&lt;/code&gt;
+&lt;pre&gt;&lt;code&gt;block code&lt;/code&gt;&lt;/pre&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Blockquote</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <blockquote>
+                                    The screen is a parametric Cartesian plane. Every layout property is a function of viewport width.
+                                    <cite>— Pragmatic Design</cite>
+                                </blockquote>
+                            </div>
+                            <div class="doc-source">&lt;blockquote&gt;
+  Quote text.
+  &lt;cite&gt;— Author&lt;/cite&gt;
+&lt;/blockquote&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Truncation</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <p class="pdx-truncate" style="max-width:20rem">This long text truncates to one line with ellipsis when it exceeds the container width.</p>
+                                    <p class="pdx-clamp-2" style="max-width:20rem">This text is clamped to 2 lines. Any extra content beyond two lines will be cut off with ellipsis. Useful for card descriptions.</p>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;p class="pdx-truncate"&gt;...&lt;/p&gt;
+&lt;p class="pdx-clamp-2"&gt;...&lt;/p&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

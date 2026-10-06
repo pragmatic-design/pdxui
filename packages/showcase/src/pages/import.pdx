@@ -1,0 +1,209 @@
+<template>
+  <section class="page" data-test="import">
+    <pdx-breadcrumb data-test="crumbs"></pdx-breadcrumb>
+    <h1 class="pdx-txt-title">{{ $t('import.title') }}</h1>
+    <p class="pdx-txt-body pdx-ink-muted">{{ $t('import.intro') }}</p>
+
+    <div class="toolbar">
+      <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('import.inLibrary', { count: libraryCount }) }}</span>
+    </div>
+
+    <!-- What the file must look like, BEFORE anything is dropped, not learned
+         from the door's refusals. Listed from the same fields the import maps with, so the
+         page cannot promise a column the parser does not take. -->
+    <div class="expected" data-test="expected">
+      <h2 class="pdx-txt-heading">{{ $t('import.expected') }}</h2>
+      <ul class="expected-list">
+        @for (expectedColumns as c; track c.name) {
+          <li data-test="expected-column">
+            <code>{{ c.name }}</code>
+            <span class="pdx-txt-small pdx-ink-muted">{{ c.note }}</span>
+          </li>
+        }
+      </ul>
+      <pdx-button size="sm" variant="ghost" @click="downloadTemplate" data-test="template">{{ $t('import.template') }}</pdx-button>
+    </div>
+
+    <!-- The door. `<pdx-file-upload>` already reads a drop as well as a pick, so a reader with the
+         file in a folder does not have to go through a dialog to say so. -->
+    <pdx-file-upload
+      accept=".csv,text/csv"
+      :label="$t('import.drop')"
+      @pdx-select="onFile"
+      data-test="dropzone"></pdx-file-upload>
+
+    <!-- Refused at the door, and told which mistake it was. «Invalid file» would be true of all
+         five and useful for none. `role="alert"`: the reader is looking at the drop zone. -->
+    <p class="pdx-txt-small door-error" :show="doorError !== ''" role="alert" data-test="door-error">{{ doorError }}</p>
+
+    <!-- A column nobody claimed. Shown, never dropped in silence: a file with `Tier` spelled
+         `Level` imports every row with no tier and says nothing, which is the worst outcome an
+         import has — it succeeds. -->
+    <p class="pdx-txt-small pdx-ink-muted" :show="ignored !== ''" data-test="ignored">{{ $t('import.ignored', { names: ignored }) }}</p>
+
+    <!-- THE PREVIEW. Nothing is written while this is on screen, and the count says so before the
+         button is there to press. -->
+    <div class="preview-head" :show="plan.length > 0">
+      <span class="pdx-txt-body" data-test="preview-count">{{ $t('import.willImport', { good: goodCount, total: plan.length }) }}</span>
+      <pdx-button variant="primary" :disabled="goodCount === 0" @click="commit" data-test="commit">{{ $t('import.commit', { count: goodCount }) }}</pdx-button>
+    </div>
+
+    <!-- `rowClass` marks the ROW: repeating a
+         `cellClass` on every column marks CELLS, and the gaps between them stay unmarked. The
+         reason is a column because the reader has to READ it — a colour is not a reason. -->
+    <div class="list" :show="plan.length > 0">
+      <pdx-data-grid
+        :data="plan"
+        :columns="previewColumns"
+        :row-class="rowClassOf"
+        data-test="preview"></pdx-data-grid>
+    </div>
+
+    <!-- The «after», in the shape the showcase's README settles: a partly refused action is both a
+         success and a refusal, so the refusal decides the placement — here, next to the rows that
+         are still on screen — and it carries the way forward for the part that did not go through.
+         Not an undo: the refused rows were never written, so what is owed is a way to FIX them. -->
+    <div class="outcome" :show="outcome !== ''" role="status" data-test="outcome">
+      <span class="pdx-txt-small">{{ outcome }}</span>
+      <pdx-button size="sm" variant="ghost" :show="plan.length > 0" @click="exportRefused" data-test="export-refused">{{ $t('import.exportRefused') }}</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+@page '/customers/import' { label: importLabel };
+@title $t('import.title');
+
+// The crumb and the tab title in the page's language: a label read from the dictionary.
+function importLabel() {
+  return $t('import.title');
+}
+
+import { toCsv, saveBlob } from '@pdxui/core';
+import { customerCount, importCustomers, CUSTOMER_IMPORT_FIELDS } from '../data/customers';
+import { parseCsv, planImport, refuseAtTheDoor, MAX_BYTES } from '../data/csv-import';
+
+// What the file would do. Empty until one is dropped, and it stays empty when the door refuses.
+let plan = $signal([]);
+let ignored = $signal('');
+let doorError = $signal('');
+let outcome = $signal('');
+
+// Read from the store rather than kept: the control that nothing is written before the commit is
+// only worth something if this number is re-read at preview time too.
+let libraryCount = $signal(customerCount());
+function refreshCount() { libraryCount = customerCount(); }
+
+const goodCount = $derived(plan.filter(r => r.problem === '').length);
+
+const previewColumns = $derived([
+  { field: 'line', header: $t('import.columns.line'), width: 70 },
+  { field: 'name', header: $t('customers.columns.name') },
+  { field: 'sector', header: $t('customers.columns.sector'), width: 160 },
+  { field: 'tier', header: $t('customers.columns.tier'), width: 140 },
+  // The reason, in the row. A summary at the top is unusable: a reader with 200 lines and «3 rows
+  // are invalid» has to find them by eye.
+  { field: 'problem', header: $t('import.columns.problem') },
+]);
+
+/** Each importable field, and what the reader has to know to fill it. */
+const expectedColumns = $derived(CUSTOMER_IMPORT_FIELDS.map(f => ({
+  name: f.name,
+  note: [
+    f.required ? $t('import.requiredColumn') : '',
+    f.oneOf ? $t('import.oneOfColumn', { values: f.oneOf.join(', ') }) : '',
+  ].filter(Boolean).join(' · '),
+})));
+
+/**
+ * A file the import takes as it is: the fields as the header, and one row that passes every rule,
+ * so the reader edits a shape that works rather than guessing at one.
+ */
+function downloadTemplate() {
+  const example = Object.fromEntries(CUSTOMER_IMPORT_FIELDS.map(f => [f.name, TEMPLATE_EXAMPLE[f.name] ?? '']));
+  const csv = toCsv([example], CUSTOMER_IMPORT_FIELDS.map(f => ({ field: f.name, header: f.name })));
+  saveBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'customers-template.csv');
+}
+const TEMPLATE_EXAMPLE = { name: 'Globex Industrial', sector: 'Manufacturing', tier: 'business' };
+
+function rowClassOf(row) {
+  return row.problem ? 'pdx-dg-row-invalid' : '';
+}
+
+async function onFile(e) {
+  const file = (e.detail?.files ?? [])[0];
+  if (!file) return;
+  reset();
+
+  // The size is the one refusal that does not need the file read: a 10 MB spreadsheet would be
+  // parsed into memory before anyone could say no to it.
+  if (file.size > MAX_BYTES) {
+    doorError = $t('import.door.tooBig', { max: Math.round(MAX_BYTES / 1024 / 1024) });
+    return;
+  }
+
+  const table = parseCsv(await file.text());
+  const refused = refuseAtTheDoor(table, CUSTOMER_IMPORT_FIELDS, $t);
+  if (refused) { doorError = refused; return; }
+
+  const result = planImport(table, CUSTOMER_IMPORT_FIELDS, $t);
+  // The grid wants an id per row and a line number is one: two files dropped in a row must not
+  // leave the grid reconciling row 1 against row 1 of the other file.
+  plan = result.rows.map(r => ({ id: r.line, line: r.line, problem: r.problem, ...r.values }));
+  ignored = result.ignored.join(', ');
+  refreshCount();
+}
+
+/** A new file replaces the last one entirely — including a refusal, so the door does not latch. */
+function reset() {
+  plan = [];
+  ignored = '';
+  doorError = '';
+  outcome = '';
+}
+
+async function commit() {
+  const good = plan.filter(r => r.problem === '');
+  if (good.length === 0) return;
+  const refused = plan.filter(r => r.problem !== '');
+
+  await importCustomers(good.map(r => ({ name: r.name, sector: r.sector, tier: r.tier })));
+
+  // Only the refused rows are left: they are the work that remains, and clearing them would be
+  // throwing away the only copy of what has to be fixed.
+  plan = refused;
+  outcome = $t('import.done', { count: good.length, refused: refused.length });
+  refreshCount();
+}
+
+/** The refused rows, as the file they came from — fix them there and drop them again. */
+function exportRefused() {
+  const refused = plan.filter(r => r.problem !== '');
+  if (refused.length === 0) return;
+  const csv = toCsv(refused, [
+    ...CUSTOMER_IMPORT_FIELDS.map(f => ({ field: f.name, header: f.name })),
+    // The reason travels WITH the row: a file of rejects with no reasons is a puzzle.
+    { field: 'problem', header: 'problem' },
+  ]);
+  saveBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'customers-refused.csv');
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .toolbar { display: flex; align-items: center; gap: var(--pdx-space-md); }
+  .door-error { color: var(--pdx-color-danger-ink); }
+  .expected { display: flex; flex-direction: column; align-items: flex-start; gap: var(--pdx-space-xs); }
+  .expected-list { margin: 0; padding-left: var(--pdx-space-lg); display: flex; flex-direction: column; gap: var(--pdx-space-2xs); }
+  .expected-list li { display: flex; gap: var(--pdx-space-sm); align-items: baseline; flex-wrap: wrap; }
+  .preview-head { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; }
+  .outcome { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; }
+
+  /* A refused row reads as refused across its whole width, which is what a set of marked cells
+     cannot do. Tinted rather than outlined: an outline inside a table is a border nobody can
+     tell from the grid's own. A plain descendant selector, not `.list :global(…)`, which is not
+     CSS: the browser drops that rule. */
+  .list .pdx-dg-row-invalid {
+    background: color-mix(in oklch, var(--pdx-color-danger) 8%, transparent);
+  }
+</style>

@@ -1,0 +1,30 @@
+<template>
+  <section data-test="focus-typeahead">
+    <h3>Type-Ahead Navigation</h3>
+    <p class="desc">Click an item first, then type a letter to jump to matching items. Buffer clears after 500ms.</p>
+    <div class="group-list" :ref="typeaheadRef" data-test="group-typeahead">
+      @for (countries as c; track c) {
+        <div class="group-item" role="option">{{ c }}</div>
+      }
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { focusGroup, onMount } from '@pdxui/core';
+
+const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'Denmark', 'Egypt', 'France'];
+
+let typeaheadRef = $signal(null);
+
+onMount(() => {
+    if (typeaheadRef) {
+        focusGroup(typeaheadRef, {
+            selector: '[role="option"]',
+            orientation: 'vertical',
+            wrap: true,
+            typeAhead: true,
+        });
+    }
+});
+</script>

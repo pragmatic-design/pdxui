@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Three size variants: sm, md (default), lg.</p>
+    <div class="demo-row demo-row-align">
+      <div class="size-card">
+        <span class="pdx-txt-small pdx-ink-muted">sm</span>
+        <pdx-statistic title="Views" value="1,024" size="sm"></pdx-statistic>
+      </div>
+      <div class="size-card">
+        <span class="pdx-txt-small pdx-ink-muted">md</span>
+        <pdx-statistic title="Views" value="1,024" size="md"></pdx-statistic>
+      </div>
+      <div class="size-card">
+        <span class="pdx-txt-small pdx-ink-muted">lg</span>
+        <pdx-statistic title="Views" value="1,024" size="lg"></pdx-statistic>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.demo-row-align {
+  align-items: flex-end;
+}
+.size-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-xs);
+}
+</style>

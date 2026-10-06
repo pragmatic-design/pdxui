@@ -1,0 +1,134 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">AppLayout</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-app-layout&gt;</code> — application shell with header, navbar (left sidebar),
+      aside (right sidebar), main content, and footer. CSS Grid layout, responsive collapse, semantic HTML.
+    </p>
+
+    <pdx-demo-comp-app-layout-full class="demo-section"></pdx-demo-comp-app-layout-full>
+
+    <pdx-demo-comp-app-layout-header-navbar class="demo-section"></pdx-demo-comp-app-layout-header-navbar>
+
+    <pdx-demo-comp-app-layout-without-border class="demo-section"></pdx-demo-comp-app-layout-without-border>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>header-height</code></td><td>String</td><td>'52px'</td><td>Header height (CSS)</td></tr>
+            <tr><td><code>footer-height</code></td><td>String</td><td>''</td><td>Footer height (empty = no footer)</td></tr>
+            <tr><td><code>navbar-width</code></td><td>String</td><td>'260px'</td><td>Navbar width (CSS)</td></tr>
+            <tr><td><code>navbar-collapsed-width</code></td><td>String</td><td>'60px'</td><td>Width when collapsed: an icon rail; '0px' hides the navbar</td></tr>
+            <tr><td><code>navbar-collapsed</code></td><td>Boolean</td><td>false</td><td>Collapsed state; also opens and closes the drawer below the breakpoint</td></tr>
+            <tr><td><code>navbar-breakpoint</code></td><td>Number</td><td>768</td><td>Below this width (px) the navbar is an overlay drawer</td></tr>
+            <tr><td><code>navbar-full-height</code></td><td>Boolean</td><td>false</td><td>The navbar spans header, main and footer; the header sits over main only</td></tr>
+            <tr><td><code>aside-width</code></td><td>String</td><td>''</td><td>Right sidebar width (empty = none)</td></tr>
+            <tr><td><code>with-border</code></td><td>Boolean</td><td>true</td><td>Show borders between regions</td></tr>
+            <tr><td><code>transition-duration</code></td><td>Number</td><td>200</td><td>Collapse animation (ms)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Methods</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Method</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>toggleNavbar()</code></td><td>Collapse or expand the navbar; below the breakpoint, open or close the drawer</td></tr>
+            <tr><td><code>openNavbar()</code></td><td>Expand the navbar (or open the drawer)</td></tr>
+            <tr><td><code>closeNavbar()</code></td><td>Collapse the navbar (or close the drawer)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Regions</h2>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Children are placed by <code>data-region</code>. The layout keeps your elements and gives each region its
+        landmark role; everything without a <code>data-region</code> is wrapped in one <code>&lt;main&gt;</code>.
+      </p>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>data-region</th><th>Landmark</th><th>Position</th></tr></thead>
+          <tbody>
+            <tr><td><code>header</code></td><td><code>role="banner"</code></td><td>Top, full width</td></tr>
+            <tr><td><code>navbar</code></td><td><code>role="navigation"</code>, named</td><td>Left sidebar</td></tr>
+            <tr><td>(none)</td><td><code>&lt;main&gt;</code></td><td>Center content</td></tr>
+            <tr><td><code>aside</code></td><td><code>role="complementary"</code></td><td>Right sidebar</td></tr>
+            <tr><td><code>footer</code></td><td><code>role="contentinfo"</code></td><td>Bottom, full width</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/app-layout';
+@title 'AppLayout — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-shell {
+  height: 350px;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+  min-width: 500px;
+}
+@media (max-width: 600px) {
+  .demo-shell { min-width: auto; height: 300px; overflow-x: auto; }
+}
+.demo-shell pdx-app-layout { height: 100%; }
+.shell-header {
+  display: flex;
+  align-items: center;
+  gap: var(--pdx-space-sm);
+  padding: 0 var(--pdx-space-md);
+  font-size: var(--pdx-text-sm);
+  height: 100%;
+}
+.shell-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pdx-space-sm);
+  font-size: var(--pdx-text-sm);
+}
+.shell-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--pdx-space-xs);
+  width: 100%;
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  border: none;
+  border-radius: var(--pdx-radius-sm);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--pdx-color-muted);
+}
+.shell-nav-item:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+.shell-nav-item:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: -2px; }
+/* Collapsed (mini-rail): the component sets .pdx-app-navbar-collapsed on the navbar →
+   hide the text labels (font-size:0 collapses the text node; the sized pdx-icon stays) and
+   centre the icons so the rail reads as an icon-only nav. */
+.shell-nav.pdx-app-navbar-collapsed .shell-nav-item { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0; }
+.shell-nav-item[aria-current="page"] {
+  background: var(--pdx-color-inset);
+  color: var(--pdx-color-primary);
+  font-weight: var(--pdx-weight-medium);
+}
+.shell-main { padding: var(--pdx-space-lg); }
+</style>

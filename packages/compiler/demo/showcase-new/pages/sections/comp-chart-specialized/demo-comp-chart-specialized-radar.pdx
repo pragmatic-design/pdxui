@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Radar Chart</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Multi-dimensional comparison. Values auto-normalized. Click legend to toggle.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="radar" :data="radarData" :x-field="'skill'" :y-field="'alice,bob'" :series-names="'Alice,Bob'" height="360px"></pdx-chart>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const radarData = [
+  { skill: 'Speed', alice: 85, bob: 70 },
+  { skill: 'Strength', alice: 60, bob: 90 },
+  { skill: 'Defense', alice: 75, bob: 65 },
+  { skill: 'Magic', alice: 95, bob: 40 },
+  { skill: 'Stamina', alice: 70, bob: 80 },
+  { skill: 'Luck', alice: 55, bob: 75 },
+];
+</script>

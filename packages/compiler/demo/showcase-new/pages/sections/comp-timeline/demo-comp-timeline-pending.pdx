@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Pending</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Shows a pulsing dot at the end to indicate an ongoing process.</p>
+    <div class="demo-container">
+      <pdx-timeline :items="pendingEvents" pending pending-label="Awaiting delivery..."></pdx-timeline>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const pendingEvents = [
+  { title: 'Order Placed', date: 'Apr 1, 2026', status: 'success', icon: 'check-circle' },
+  { title: 'Payment Confirmed', date: 'Apr 1, 2026', status: 'success', icon: 'check-circle' },
+  { title: 'Shipped', date: 'Apr 3, 2026', status: 'info', icon: 'truck' },
+];
+</script>

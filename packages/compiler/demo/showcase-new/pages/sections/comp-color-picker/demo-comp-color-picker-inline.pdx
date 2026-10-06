@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Inline — Always Visible</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      With <code>inline</code>, the color panel is always visible — no popup trigger needed.
+    </p>
+    <div class="demo-box">
+      <pdx-color-picker value="#10b981" inline @pdx-change="onInlineChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">Selected: {{ inlineValue }}</p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker
+  value="#10b981"
+  inline
+  @pdx-change="onInlineChange" /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Inline ───
+let inlineValue = $signal('#10b981');
+
+function onInlineChange(e) { inlineValue = e.detail.value ?? e.detail; }
+</script>

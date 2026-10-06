@@ -1,0 +1,81 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Label</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-label&gt;</code> — accessible form label with required/optional indicators, sizing, and description text.
+      Props: <code>for</code>, <code>text</code>, <code>required</code>, <code>optional</code>, <code>disabled</code>, <code>size</code>, <code>hint</code>, <code>description</code>.
+    </p>
+
+    <!-- ═══ Basic Label ═══ -->
+    <pdx-demo-comp-label-basic class="demo-section"></pdx-demo-comp-label-basic>
+
+    <!-- ═══ Required & Optional ═══ -->
+    <pdx-demo-comp-label-required-optional class="demo-section"></pdx-demo-comp-label-required-optional>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-label-sizes class="demo-section"></pdx-demo-comp-label-sizes>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-label-disabled class="demo-section"></pdx-demo-comp-label-disabled>
+
+    <!-- ═══ Hint & Description ═══ -->
+    <pdx-demo-comp-label-hint class="demo-section"></pdx-demo-comp-label-hint>
+
+    <!-- ═══ With pdx-field Wrapper ═══ -->
+    <pdx-demo-comp-label-field-wrapper class="demo-section"></pdx-demo-comp-label-field-wrapper>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-label-composition class="demo-section"></pdx-demo-comp-label-composition>
+
+    <!-- ═══ CSS-only Label ═══ -->
+    <pdx-demo-comp-label-css-only class="demo-section"></pdx-demo-comp-label-css-only>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>text</code><span>string</span><span>Label text (or use default slot)</span></div>
+        <div class="opt-row"><code>for</code><span>string</span><span>ID of associated input (native htmlFor)</span></div>
+        <div class="opt-row"><code>required</code><span>boolean</span><span>Show red asterisk (*) after label</span></div>
+        <div class="opt-row"><code>optional</code><span>boolean</span><span>Show "(optional)" after label</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Muted opacity, not-allowed cursor</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>xs, sm, (default md), lg, xl</span></div>
+        <div class="opt-row"><code>hint</code><span>string</span><span>Helper text below description</span></div>
+        <div class="opt-row"><code>description</code><span>string</span><span>Supplemental text below label</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Accessibility</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Renders semantic <code>&lt;label&gt;</code> with native <code>for</code> attribute.
+        Required indicator uses CSS <code>::after</code> pseudo-element — invisible to screen readers
+        (use <code>aria-required</code> on the input instead). Error state propagation in
+        <code>.pdx-field</code> uses <code>:has([aria-invalid])</code> for label color change.
+      </p>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">CSS Classes</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Class</span><span>Description</span></div>
+        <div class="opt-row"><code>.pdx-field-label</code><span>Base label style (font-size sm, weight medium)</span></div>
+        <div class="opt-row"><code>.pdx-field-required</code><span>Red asterisk via ::after</span></div>
+        <div class="opt-row"><code>.pdx-field-optional</code><span>"(optional)" text via ::after</span></div>
+        <div class="opt-row"><code>.pdx-field-label-disabled</code><span>50% opacity, not-allowed cursor</span></div>
+        <div class="opt-row"><code>.pdx-field-label-{size}</code><span>Size variants: xs, sm, lg, xl</span></div>
+        <div class="opt-row"><code>.pdx-field-hint</code><span>Helper text (muted, xs)</span></div>
+        <div class="opt-row"><code>.pdx-field-description</code><span>Description text (muted, xs)</span></div>
+        <div class="opt-row"><code>.pdx-field-error</code><span>Error message (danger color)</span></div>
+        <div class="opt-row"><code>.pdx-field</code><span>Wrapper: flex column + auto-gap + error propagation</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/label';
+@title 'Label Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

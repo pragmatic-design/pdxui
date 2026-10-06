@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Input + Button</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Input and button joined seamlessly. Borders overlap, radius only on ends.</p>
+
+    <div class="demo-stack">
+      <pdx-input-group>
+        <pdx-input placeholder="Search..."></pdx-input>
+        <pdx-button variant="solid">Search</pdx-button>
+      </pdx-input-group>
+
+      <pdx-input-group>
+        <pdx-input placeholder="Enter email..." type="email"></pdx-input>
+        <pdx-button variant="solid">Subscribe</pdx-button>
+      </pdx-input-group>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-input-group&gt;
+  &lt;pdx-input placeholder="Search..."&gt;&lt;/pdx-input&gt;
+  &lt;pdx-button variant="solid"&gt;Search&lt;/pdx-button&gt;
+&lt;/pdx-input-group&gt;</code></pre>
+    </details>
+  </section>
+</template>

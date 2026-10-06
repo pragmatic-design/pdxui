@@ -1,0 +1,4 @@
+# Derived by scripts/prepare-static.mjs on every build — the manifests stay the only source.
+scenarios/
+public/
+dist/

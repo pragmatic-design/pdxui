@@ -1,0 +1,48 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Masonry</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-masonry&gt;</code> — Pinterest-style masonry grid. Items flow top-to-bottom per column,
+      variable heights. CSS columns for SSR compatibility.
+    </p>
+
+    <pdx-demo-comp-masonry-three-columns class="demo-section"></pdx-demo-comp-masonry-three-columns>
+
+    <pdx-demo-comp-masonry-four-columns class="demo-section"></pdx-demo-comp-masonry-four-columns>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>columns</code></td><td>Number</td><td>3</td><td>Column count (0 = auto from columnWidth)</td></tr>
+            <tr><td><code>column-width</code></td><td>Number</td><td>250</td><td>Min column width for auto mode (px)</td></tr>
+            <tr><td><code>gap</code></td><td>String</td><td>'1rem'</td><td>Gap between items (CSS value)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/masonry';
+@title 'Masonry — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.masonry-card {
+  background: var(--pdx-color-inset);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--pdx-text-lg);
+  font-weight: var(--pdx-weight-semibold);
+  color: var(--pdx-color-muted);
+}
+.masonry-card-sm { font-size: var(--pdx-text-sm); }
+</style>

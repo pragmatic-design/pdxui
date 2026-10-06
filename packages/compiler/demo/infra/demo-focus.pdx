@@ -1,0 +1,190 @@
+<template>
+  <div class="demo">
+    <h2>Focus Management</h2>
+    <p class="desc">Focus trap, focus group (arrow nav + type-ahead), focus restore, tab order.</p>
+
+    <!-- Focus Trap -->
+    <section data-test="focus-trap">
+      <h3>Focus Trap</h3>
+      <p class="desc">Tab cycles within the box. Siblings get aria-hidden.</p>
+      <button class="pdx-primary" @click="activateTrap" data-test="activate-trap">Activate Trap</button>
+      <div class="trap-box" :class="trapActive ? 'active' : ''" data-test="trap-container" :ref="trapContainer">
+        <input class="pdx-input" placeholder="Name" data-test="trap-input-1" />
+        <input class="pdx-input" placeholder="Email" data-test="trap-input-2" />
+        <div class="row">
+          <button class="pdx-ghost" data-test="trap-cancel">Cancel</button>
+          <button class="pdx-primary" @click="deactivateTrap" data-test="trap-save">Save & Deactivate</button>
+        </div>
+      </div>
+      <div class="log" data-test="trap-log">{{ trapLog }}</div>
+    </section>
+
+    <!-- Focus Group Vertical -->
+    <section data-test="focus-group">
+      <h3>Focus Group — Vertical</h3>
+      <p class="desc">Click an item first, then use Arrow Up/Down to navigate, Enter/Space to select. Home/End jump to first/last. Disabled items (Cherry) are skipped.</p>
+      <div class="group-list" :ref="verticalRef" data-test="group-vertical">
+        @for (fruits as fruit; track fruit) {
+          <div class="group-item" role="option" :aria-disabled="fruit === 'Cherry' ? 'true' : null">
+            {{ fruit }}
+          </div>
+        }
+      </div>
+      <div class="log" data-test="group-log">{{ groupLog }}</div>
+    </section>
+
+    <!-- Focus Group Horizontal -->
+    <section data-test="focus-group-h">
+      <h3>Focus Group — Horizontal (Tabs)</h3>
+      <p class="desc">Click a tab first, then use Arrow Left/Right to navigate. Wraps around.</p>
+      <div class="group-row" :ref="horizontalRef" data-test="group-horizontal">
+        @for (tabNames as tab; track tab) {
+          <div class="group-item" role="tab">{{ tab }}</div>
+        }
+      </div>
+    </section>
+
+    <!-- Type-Ahead -->
+    <section data-test="focus-typeahead">
+      <h3>Type-Ahead Navigation</h3>
+      <p class="desc">Click an item first, then type a letter to jump to matching items. Buffer clears after 500ms.</p>
+      <div class="group-list" :ref="typeaheadRef" data-test="group-typeahead">
+        @for (countries as c; track c) {
+          <div class="group-item" role="option">{{ c }}</div>
+        }
+      </div>
+    </section>
+
+    <!-- Focus Restore -->
+    <section data-test="focus-restore">
+      <h3>Focus Restore</h3>
+      <p class="desc">1) Click one of the colored buttons to focus it. 2) "Save Focus" saves which button has focus, then moves focus to the input. 3) "Restore Focus" returns to the saved button.</p>
+      <div class="row">
+        <button class="pdx-primary" data-test="target-a" @click="trackTarget">Button A</button>
+        <button class="pdx-secondary" data-test="target-b" @click="trackTarget">Button B</button>
+        <button class="pdx-ghost" data-test="target-c" @click="trackTarget">Button C</button>
+      </div>
+      <div class="row">
+        <button class="pdx-primary" @click="saveFocus" data-test="save-focus">Save Focus</button>
+        <button class="pdx-secondary" @click="restoreFocus" data-test="restore-focus">Restore Focus</button>
+        <input class="pdx-input" placeholder="Focus moves here after save..." :ref="restoreInputRef" data-test="other-input" />
+      </div>
+      <div class="log" data-test="restore-log">{{ restoreLog }}</div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { focusTrap, focusGroup, focusRestore, manageFocusOrder, onMount } from '@pdxui/core';
+
+const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
+const tabNames = ['Dashboard', 'Users', 'Settings', 'Reports'];
+const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'Denmark', 'Egypt', 'France'];
+
+let trapActive = $signal(false);
+let trapLog = $signal('');
+let groupLog = $signal('');
+let trapDispose = null;
+
+let verticalRef = $signal(null);
+let horizontalRef = $signal(null);
+let typeaheadRef = $signal(null);
+let restoreInputRef = $signal(null);
+let restoreLog = $signal('Click a button, then Save Focus.');
+
+const fr = focusRestore();
+
+let trapContainer = $signal(null);
+
+function activateTrap() {
+    const container = trapContainer;
+    if (!container) return;
+    trapActive = true;
+    trapDispose = focusTrap(container, { initialFocus: 'first', restoreFocus: true });
+    trapLog = 'Trap activated — Tab cycles within the box';
+}
+
+function deactivateTrap() {
+    trapDispose?.();
+    trapDispose = null;
+    trapActive = false;
+    trapLog = trapLog + '\nTrap deactivated — focus restored';
+}
+
+// Track last focused target button so save captures the right element
+let lastTarget = null;
+function trackTarget(e) {
+    lastTarget = e.currentTarget;
+    restoreLog = 'Focused: "' + e.currentTarget.textContent.trim() + '" — now click Save.';
+}
+
+function saveFocus() {
+    if (!lastTarget) { restoreLog = 'Click a colored button first!'; return; }
+    // Temporarily focus the target so fr.save() captures it
+    lastTarget.focus();
+    fr.save();
+    const name = lastTarget.textContent.trim();
+    restoreLog = 'Saved: "' + name + '". Focus moved to input.';
+    const input = restoreInputRef;
+    if (input) input.focus();
+}
+
+function restoreFocus() {
+    fr.restore();
+    const active = document.activeElement;
+    const name = active ? (active.textContent || active.tagName).trim() : 'nothing';
+    restoreLog = restoreLog + '\nRestored to: "' + name + '"';
+}
+
+onMount(() => {
+    // Focus groups — use ref elements, guaranteed to be in the DOM at onMount
+    if (verticalRef) {
+        focusGroup(verticalRef, {
+            selector: '[role="option"]',
+            orientation: 'vertical',
+            wrap: true,
+            skipDisabled: true,
+            onFocus: (el, i) => { groupLog = `Focused: ${el.textContent.trim()} (index ${i})`; },
+            onSelect: (el, i) => { groupLog = `Selected: ${el.textContent.trim()} (index ${i})`; },
+        });
+    }
+
+    if (horizontalRef) {
+        focusGroup(horizontalRef, {
+            selector: '[role="tab"]',
+            orientation: 'horizontal',
+            wrap: true,
+        });
+    }
+
+    if (typeaheadRef) {
+        focusGroup(typeaheadRef, {
+            selector: '[role="option"]',
+            orientation: 'vertical',
+            wrap: true,
+            typeAhead: true,
+        });
+    }
+});
+</script>
+
+<style scoped>
+  .demo { display: flex; flex-direction: column; gap: 24px; }
+  h2 { font-size: 1.5rem; font-weight: 700; }
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .desc { color: #666; font-size: 0.875rem; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .trap-box { border: 2px solid #e0e0e0; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .trap-box.active { border-color: #3b82f6; }
+  .group-list { display: flex; flex-direction: column; gap: 4px; }
+  .group-row { display: flex; gap: 4px; }
+  .group-item { padding: 8px 14px; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; font-size: 0.875rem; transition: all 150ms; }
+  .group-item:focus { background: #3b82f6; color: white; outline: none; border-color: #3b82f6; }
+  .group-item[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
+  .log { font-family: monospace; font-size: 0.75rem; background: #f5f5f7; padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 32px; }
+  /* Focus restore: visible focus ring on target buttons */
+  [data-test="target-a"]:focus, [data-test="target-b"]:focus, [data-test="target-c"]:focus {
+    outline: 3px solid #3b82f6; outline-offset: 2px; box-shadow: 0 0 0 6px rgba(59,130,246,0.2);
+  }
+</style>

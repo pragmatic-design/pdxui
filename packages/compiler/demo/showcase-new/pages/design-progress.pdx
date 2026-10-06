@@ -1,0 +1,125 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Progress</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Determinate and indeterminate progress bars with semantic color variants.
+      <strong>CSS only</strong> — apply classes to <code>&lt;div&gt;</code> elements.
+    </p>
+
+    <!-- ═══ Default ═══ -->
+    <pdx-demo-design-progress-default class="demo-section"></pdx-demo-design-progress-default>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-design-progress-variants class="demo-section"></pdx-demo-design-progress-variants>
+
+    <!-- ═══ Indeterminate ═══ -->
+    <pdx-demo-design-progress-indeterminate class="demo-section"></pdx-demo-design-progress-indeterminate>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-progress-composition class="demo-section"></pdx-demo-design-progress-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Element</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-progress</code><span>div</span><span>Track container (background bar)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-progress-bar</code><span>div</span><span>Fill bar (set width for %)</span>
+        </div>
+        <div class="opt-row">
+          <code>variant="success"</code><span>bar</span><span>Green fill color</span>
+        </div>
+        <div class="opt-row">
+          <code>variant="warning"</code><span>bar</span><span>Amber fill color</span>
+        </div>
+        <div class="opt-row">
+          <code>variant="danger"</code><span>bar</span><span>Red fill color</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-progress-indeterminate</code><span>div</span><span>Animated sliding bar</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/progress';
+@title 'Progress';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .demo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    margin-top: var(--pdx-space-md);
+  }
+
+  .progress-label {
+    margin-top: var(--pdx-space-sm);
+  }
+
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 240px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

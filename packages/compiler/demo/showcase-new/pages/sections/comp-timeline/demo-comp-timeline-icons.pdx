@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icons &amp; Status</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Items with status colors and icons.</p>
+    <div class="demo-container">
+      <pdx-timeline :items="statusEvents"></pdx-timeline>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// status: 'success' | 'warning' | 'error' | 'info'
+// icon: any Pragmatic icon name
+{ title: 'Build Passed', status: 'success', icon: 'check-circle' }
+{ title: 'Review Pending', status: 'warning', icon: 'clock' }
+{ title: 'Deploy Failed', status: 'error', icon: 'x-circle' }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const statusEvents = [
+  { title: 'Code Committed', description: 'feat: add timeline component', date: '10:23 AM', status: 'success', icon: 'check-circle' },
+  { title: 'Build Passed', description: 'All 1934 tests green.', date: '10:25 AM', status: 'success', icon: 'check-circle' },
+  { title: 'Code Review', description: 'Waiting for reviewer approval.', date: '10:30 AM', status: 'warning', icon: 'clock' },
+  { title: 'Deploy to Staging', description: 'Deployed to staging environment.', date: '11:00 AM', status: 'info', icon: 'truck' },
+  { title: 'Production Deploy Failed', description: 'Rollback initiated.', date: '11:15 AM', status: 'error', icon: 'x-circle' },
+];
+</script>

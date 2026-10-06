@@ -1,0 +1,74 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Interactive Toggle</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click the hamburger to toggle between expanded and mini (icon-only) modes.</p>
+    <div class="demo-layout">
+      <pdx-sidebar open :width="240" :collapsedWidth="56" mini id="toggle-sidebar" :ref="sidebarEl">
+        <div class="sidebar-header" :ref="sidebarHeader">
+          <pdx-icon name="package" size="20"></pdx-icon>
+          <strong class="sidebar-title">App</strong>
+          <button class="toggle-btn" @click="toggleSidebar">
+            <pdx-icon name="menu" size="16"></pdx-icon>
+          </button>
+        </div>
+        <pdx-nav-menu :items="sidebarItems" activekey="dashboard"></pdx-nav-menu>
+      </pdx-sidebar>
+      <div class="demo-content">
+        <p class="pdx-ink-muted">Main content area. Toggle the sidebar with the hamburger button.</p>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-sidebar open :width="240" :collapsedWidth="56" mini&gt;
+  &lt;pdx-nav-menu :items="items" activekey="dashboard"&gt;&lt;/pdx-nav-menu&gt;
+&lt;/pdx-sidebar&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const sidebarItems = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'home' },
+  { key: 'analytics', label: 'Analytics', icon: 'trending-up' },
+  { key: 'projects', label: 'Projects', icon: 'folder' },
+  { key: 'team', label: 'Team', icon: 'users' },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'settings', label: 'Settings', icon: 'settings' },
+];
+
+const _state = { open: true };
+let sidebarEl = $signal(null);
+let sidebarHeader = $signal(null);
+
+function toggleSidebar() {
+  _state.open = !_state.open;
+  if (sidebarEl) sidebarEl.open = _state.open;
+  // Update header layout for collapsed state
+  if (sidebarHeader) sidebarHeader.classList.toggle('collapsed', !_state.open);
+}
+</script>
+
+<style scoped>
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-sm) var(--pdx-space-md);
+  border-bottom: 1px solid var(--pdx-color-border);
+  font-size: var(--pdx-text-sm);
+  min-height: 40px;
+}
+.sidebar-title { flex: 1; }
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--pdx-color-muted);
+  padding: 4px;
+  border-radius: var(--pdx-radius-sm);
+}
+.toggle-btn:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+</style>

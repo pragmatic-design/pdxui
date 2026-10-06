@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal Card</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>.pdx-card-horizontal</code> for side-by-side media + body layout.</p>
+
+    <div class="card-demo">
+      <div class="pdx-surface-card pdx-card-horizontal">
+        <div class="pdx-card-media">
+          <div class="media-placeholder">
+            <span class="pdx-txt-caption pdx-ink-muted">Image</span>
+          </div>
+        </div>
+        <div class="pdx-card-body">
+          <h3 class="pdx-txt-subheading" style="margin: 0 0 4px;">Horizontal Layout</h3>
+          <p class="pdx-txt-small pdx-ink-muted" style="margin: 0;">Media takes 40% width, body fills the rest. Great for article previews or product cards.</p>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-surface-card pdx-card-horizontal"&gt;
+  &lt;div class="pdx-card-media"&gt;
+    &lt;img src="..." alt="..." /&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-card-body"&gt;Content&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .media-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 120px;
+    background: var(--pdx-color-inset);
+  }
+</style>

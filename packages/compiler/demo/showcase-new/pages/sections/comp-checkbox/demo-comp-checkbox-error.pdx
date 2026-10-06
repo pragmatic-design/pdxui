@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Error State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Red border to indicate validation error. Pair with error message below.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-checkbox label="I agree to the terms" error required></pdx-checkbox>
+        <span class="pdx-field-error">You must accept the terms to continue</span>
+      </div>
+    </div>
+  </section>
+</template>

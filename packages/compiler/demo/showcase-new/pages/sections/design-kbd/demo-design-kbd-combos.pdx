@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Key Combos</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Multiple keys pressed together, joined with <code>.pdx-kbd-combo</code>.</p>
+
+    <div class="key-row">
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd">Ctrl</kbd><kbd class="pdx-kbd">S</kbd>
+      </span>
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd">Ctrl</kbd><kbd class="pdx-kbd">Shift</kbd><kbd class="pdx-kbd">P</kbd>
+      </span>
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd">Cmd</kbd><kbd class="pdx-kbd">K</kbd>
+      </span>
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd">Alt</kbd><kbd class="pdx-kbd">F4</kbd>
+      </span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-kbd-combo"&gt;
+  &lt;kbd class="pdx-kbd"&gt;Ctrl&lt;/kbd&gt;
+  &lt;kbd class="pdx-kbd"&gt;S&lt;/kbd&gt;
+&lt;/span&gt;
+&lt;span class="pdx-kbd-combo"&gt;
+  &lt;kbd class="pdx-kbd"&gt;Ctrl&lt;/kbd&gt;
+  &lt;kbd class="pdx-kbd"&gt;Shift&lt;/kbd&gt;
+  &lt;kbd class="pdx-kbd"&gt;P&lt;/kbd&gt;
+&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>

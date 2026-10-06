@@ -1,0 +1,296 @@
+{
+    "auto-form": {
+        "submit": "Salva",
+        "reset": "Ripristina"
+    },
+    "bulk-actions": {
+        "label": "Azioni multiple",
+        "clearSelection": "Deseleziona",
+        "selected": "{count} selezionati"
+    },
+    "inline-edit": {
+        "empty": "Clicca per modificare",
+        "save": "Salva",
+        "cancel": "Annulla",
+        "edit": "Modifica {value}"
+    },
+    "file-upload": {
+        "drop": "Trascina i file qui, o clicca per sceglierli",
+        "remove": "Rimuovi {name}",
+        "maxSize": "Massimo {size}",
+        "tooLarge": "File troppo grande (massimo {size})",
+        "notAccepted": "Tipo di file non accettato",
+        "tooMany": "Troppi file (massimo {n})",
+        "uploadFailed": "Caricamento fallito ({status})",
+        "networkError": "Errore di rete",
+        "rejected": "{name}: {reason}"
+    },
+    "pagination": {
+        "label": "Paginazione",
+        "previous": "Pagina precedente",
+        "next": "Pagina successiva",
+        "first": "Prima pagina",
+        "last": "Ultima pagina",
+        "pageSize": "Righe per pagina",
+        "range": "{from}–{to} di {total}",
+        "none": "0 di 0",
+        "page": "Pagina {n}"
+    },
+    "router": {
+        "loading": "Caricamento…",
+        "notFound": "Pagina non trovata",
+        "error": "Errore {code}",
+        "backHome": "← Torna alla home",
+        "loadFailed": "Caricamento della pagina fallito: {message}"
+    },
+    "breadcrumb": {
+        "label": "Percorso di navigazione",
+        "expand": "Mostra il percorso"
+    },
+    "form-template": {
+        "steps": "Passaggi del modulo"
+    },
+    "select": {
+        "clear": "Cancella",
+        "loading": "Caricamento",
+        "search": "Cerca…",
+        "noResults": "Nessun risultato",
+        "optionsAvailable": "{n} opzioni disponibili",
+        "create": "Crea \"{query}\"",
+        "listbox": "Opzioni",
+        "remove": "Rimuovi {label}",
+        "selected": "{n} selezionati"
+    },
+    "input": {
+        "clear": "Cancella",
+        "loading": "Caricamento"
+    },
+    "list": {
+        "empty": "Nessun elemento"
+    },
+    "calendar": {
+        "label": "Calendario",
+        "prevMonth": "Mese precedente",
+        "nextMonth": "Mese successivo",
+        "prevYear": "Anno precedente",
+        "nextYear": "Anno successivo",
+        "prevYears": "Anni precedenti",
+        "nextYears": "Anni successivi",
+        "today": "Oggi",
+        "selectMonth": "Scegli il mese",
+        "selectYear": "Scegli l'anno",
+        "weekNumber": "S"
+    },
+    "field-list": {
+        "add": "+ Aggiungi",
+        "remove": "Rimuovi",
+        "edit": "Modifica",
+        "done": "Fatto",
+        "empty": "Nessun elemento",
+        "editItem": "Modifica elemento",
+        "addItem": "Aggiungi elemento",
+        "editItemN": "Modifica elemento n. {n}",
+        "cellHint": "Clicca per modificare"
+    },
+    "date-picker": {
+        "today": "Oggi",
+        "clear": "Cancella",
+        "close": "Chiudi",
+        "done": "Fatto",
+        "apply": "Applica",
+        "cancel": "Annulla",
+        "prevMonth": "Mese precedente",
+        "nextMonth": "Mese successivo",
+        "selectMonth": "Scegli il mese",
+        "selectYear": "Scegli l'anno",
+        "weekNumber": "S",
+        "startDate": "Data di inizio",
+        "endDate": "Data di fine",
+        "compareToggle": "Confronta",
+        "placeholder": "Scegli una data",
+        "placeholderRange": "Inizio — Fine",
+        "placeholderTime": "Scegli un orario",
+        "choose": "Scegli una data",
+        "chooseTime": "Scegli un orario"
+    },
+    "time-picker": {
+        "hour": "Ora",
+        "minute": "Minuti",
+        "second": "Secondi",
+        "period": "AM/PM",
+        "increment": "Aumenta",
+        "decrement": "Diminuisci",
+        "empty": "Nessun orario",
+        "label": "Orario"
+    },
+    "autocomplete": {
+        "clear": "Cancella",
+        "noResults": "Nessun risultato",
+        "resultsAvailable": "{n} risultati disponibili"
+    },
+    "rating": {
+        "label": "Valutazione"
+    },
+    "switch": {
+        "label": "Interruttore"
+    },
+    "tag-input": {
+        "label": "Etichette",
+        "add": "Aggiungi un’etichetta",
+        "remove": "Rimuovi {tag}",
+        "added": "{tag} aggiunta",
+        "removed": "{tag} rimossa"
+    },
+    "number-input": {
+        "increase": "Aumenta",
+        "decrease": "Diminuisci",
+        "negative": "Negativo",
+        "caretHint": "Le frecce cambiano la cifra prima del cursore"
+    },
+    "field-group": {
+        "edit": "Modifica",
+        "toggle": "Mostra o nascondi la sezione"
+    },
+    "progress": {
+        "label": "Avanzamento"
+    },
+    "spinner": {
+        "loading": "Caricamento"
+    },
+    "relation-picker": {
+        "add": "Aggiungi i selezionati",
+        "selected": "{n} selezionati"
+    },
+    "wizard": {
+        "navigation": "Navigazione della procedura",
+        "steps": "Passaggi della procedura",
+        "stepAnnounce": "Passaggio {current} di {total}: {label}",
+        "back": "Indietro",
+        "next": "Avanti",
+        "complete": "Completa",
+        "stepOf": "Passaggio {current} di {total}"
+    },
+    "chart": {
+        "summary": "Grafico {type}",
+        "points": ", {n} punti dati",
+        "category": "Categoria",
+        "legend": "Legenda",
+        "gauge": "{label}: {value} su {min}–{max}",
+        "gaugeLabel": "Indicatore"
+    },
+    "data-grid": {
+        "filter.contains": "Contiene",
+        "filter.eq": "Uguale a",
+        "filter.neq": "Diverso da",
+        "filter.startswith": "Inizia con",
+        "filter.endswith": "Finisce con",
+        "filter.gt": "Maggiore di",
+        "filter.gte": "Maggiore o uguale a",
+        "filter.lt": "Minore di",
+        "filter.lte": "Minore o uguale a",
+        "filter.after": "Dopo il",
+        "filter.onOrAfter": "Il giorno o dopo",
+        "filter.before": "Prima del",
+        "filter.onOrBefore": "Il giorno o prima",
+        "filter.isnull": "È vuoto",
+        "filter.isnotnull": "Non è vuoto",
+        "filter.forColumn": "Filtra {column}",
+        "filter.remove": "Rimuovi il filtro su {column}",
+        "filter.blanks": "(Vuoti)",
+        "filter.apply": "Applica",
+        "filter.clear": "Cancella",
+        "filter.clearAll": "Azzera tutti i filtri",
+        "filter.addFilter": "+ Aggiungi filtro",
+        "filter.operatorFor": "Filtro su {column}: {operator}",
+        "filter.operatorMenu": "Operatore del filtro su {column}",
+        "filter.addFilterMenu": "Aggiungi un filtro su",
+        "filter.title": "Filtro: {field}",
+        "filter.all": "Tutti",
+        "filter.yes": "Sì",
+        "filter.no": "No",
+        "filter.placeholder": "Filtra…",
+        "filter.valuePlaceholder": "Valore…",
+        "filter.minPlaceholder": "Min…",
+        "filter.datePlaceholder": "Data…",
+        "filter.fromPlaceholder": "Da…",
+        "sort.remove": "Rimuovi l'ordinamento per {column}",
+        "sort.hint": "{column} · Maiusc+clic per aggiungere all'ordinamento",
+        "sort.position": "Ordinamento {n} di {total}, {dir}",
+        "sort.asc": "Crescente",
+        "sort.desc": "Decrescente",
+        "group.remove": "Rimuovi il raggruppamento per {column}",
+        "group.by": "Raggruppa per",
+        "group.none": "Nessuno",
+        "group.chip": "Gruppo: {column}",
+        "group.empty": "(Vuoto)",
+        "group.toggle": "{column}: {value}, {count} righe",
+        "group.toggleOne": "{column}: {value}, {count} riga",
+        "groupBar.dropHere": "Trascina qui le colonne per raggruppare",
+        "logic.and": "E",
+        "logic.or": "O",
+        "selectRow": "Seleziona la riga {n}",
+        "selectAll": "Seleziona tutto",
+        "selection.column": "Selezione",
+        "detail.expand": "Espandi la riga",
+        "detail.collapse": "Comprimi la riga",
+        "detail.column": "Dettagli",
+        "toolbar.reload": "Ricarica",
+        "toolbar.columns": "Colonne",
+        "toolbar.export": "Esporta",
+        "toolbar.exportMenu": "Esporta come",
+        "toolbar.exportCsv": "CSV (.csv)",
+        "toolbar.exportXlsx": "Excel (.xlsx)",
+        "toolbar.search": "Cerca",
+        "toolbar.label": "Strumenti della tabella",
+        "toolbar.sort": "Ordina",
+        "toolbar.filter": "Filtra",
+        "columns.title": "Colonne",
+        "empty.title": "Nessun risultato",
+        "pagination.rows": "{count} righe",
+        "pagination.row": "{count} riga",
+        "edit.save": "Salva",
+        "edit.cancel": "Annulla",
+        "edit.saveAll": "Salva tutto",
+        "edit.revert": "Ripristina",
+        "edit.addRow": "Aggiungi",
+        "edit.delete": "Elimina",
+        "edit.edit": "Modifica",
+        "edit.dialogTitle": "Modifica record"
+    },
+    "sidebar": {
+        "label": "Barra laterale"
+    },
+    "nav-menu": {
+        "label": "Navigazione",
+        "badge": "{label}, {badge} nuovi"
+    },
+    "dialog": {
+        "close": "Chiudi la finestra",
+        "label": "Finestra di dialogo"
+    },
+    "edit-drawer": {
+        "save": "Salva",
+        "cancel": "Annulla",
+        "edit": "Modifica",
+        "new": "Nuovo"
+    },
+    "alert-dialog": {
+        "confirm": "Conferma",
+        "cancel": "Annulla",
+        "title": "Sei sicuro?",
+        "typeToConfirm": "Scrivi {text} per confermare:"
+    },
+    "drawer": {
+        "close": "Chiudi",
+        "label": "Pannello"
+    },
+    "dropdown-menu": {
+        "label": "Menu"
+    },
+    "empty-state": {
+        "title": "Nessun dato"
+    },
+    "toast": {
+        "dismiss": "Chiudi"
+    }
+}

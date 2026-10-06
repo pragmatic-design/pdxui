@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Type to Confirm</h2>
+    <p class="pdx-txt-small pdx-ink-muted">User must type the exact text to enable confirm. GitHub delete-repo pattern.</p>
+    <pdx-button variant="danger" @click="openTypeConfirm">Delete Account</pdx-button>
+
+    <pdx-alert-dialog :open="typeOpen" variant="danger" title="Delete your account?" message="This will permanently delete all your data."
+        confirmLabel="Delete Account" confirmText="DELETE" @pdx-confirm="onTypeConfirm" @pdx-cancel="onTypeCancel"></pdx-alert-dialog>
+  </section>
+</template>
+
+<script setup>
+let typeOpen = $signal(false);
+
+function openTypeConfirm() { typeOpen = true; }
+function onTypeConfirm() { typeOpen = false; }
+function onTypeCancel() { typeOpen = false; }
+</script>

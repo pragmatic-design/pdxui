@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variant & Size Propagation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Set <code>variant</code> and <code>size</code> on the group to apply to all children.</p>
+
+    <div class="demo-col">
+      <div class="demo-row">
+        <span class="pdx-txt-caption pdx-ink-muted" style="min-width:60px">primary:</span>
+        <pdx-button-group variant="primary">
+          <pdx-button>One</pdx-button>
+          <pdx-button>Two</pdx-button>
+          <pdx-button>Three</pdx-button>
+        </pdx-button-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-caption pdx-ink-muted" style="min-width:60px">danger:</span>
+        <pdx-button-group variant="danger">
+          <pdx-button>One</pdx-button>
+          <pdx-button>Two</pdx-button>
+          <pdx-button>Three</pdx-button>
+        </pdx-button-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-caption pdx-ink-muted" style="min-width:60px">sm:</span>
+        <pdx-button-group variant="outline" size="sm">
+          <pdx-button>Small</pdx-button>
+          <pdx-button>Buttons</pdx-button>
+          <pdx-button>Group</pdx-button>
+        </pdx-button-group>
+      </div>
+      <div class="demo-row">
+        <span class="pdx-txt-caption pdx-ink-muted" style="min-width:60px">lg:</span>
+        <pdx-button-group variant="secondary" size="lg">
+          <pdx-button>Large</pdx-button>
+          <pdx-button>Buttons</pdx-button>
+          <pdx-button>Group</pdx-button>
+        </pdx-button-group>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

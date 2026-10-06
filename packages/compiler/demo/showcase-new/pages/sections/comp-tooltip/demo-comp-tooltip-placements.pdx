@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Placements</h2>
+    <p class="pdx-txt-small pdx-ink-muted">12 placement options: top, bottom, left, right + start/end variants.</p>
+    <div class="placement-grid">
+      <div class="row">
+        <span class="trigger" tabindex="0">top-start</span><pdx-tooltip text="top-start" placement="top-start"></pdx-tooltip>
+        <span class="trigger" tabindex="0">top</span><pdx-tooltip text="top" placement="top"></pdx-tooltip>
+        <span class="trigger" tabindex="0">top-end</span><pdx-tooltip text="top-end" placement="top-end"></pdx-tooltip>
+      </div>
+      <div class="row side">
+        <span class="trigger" tabindex="0">left</span><pdx-tooltip text="left" placement="left"></pdx-tooltip>
+        <span class="trigger" tabindex="0">right</span><pdx-tooltip text="right" placement="right"></pdx-tooltip>
+      </div>
+      <div class="row">
+        <span class="trigger" tabindex="0">bottom-start</span><pdx-tooltip text="bottom-start" placement="bottom-start"></pdx-tooltip>
+        <span class="trigger" tabindex="0">bottom</span><pdx-tooltip text="bottom" placement="bottom"></pdx-tooltip>
+        <span class="trigger" tabindex="0">bottom-end</span><pdx-tooltip text="bottom-end" placement="bottom-end"></pdx-tooltip>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .placement-grid { margin-top: var(--pdx-space-md); display: flex; flex-direction: column; gap: var(--pdx-space-md); align-items: center; }
+  .placement-grid .row { display: flex; gap: var(--pdx-space-md); }
+  .placement-grid .row.side { justify-content: space-between; width: 280px; }
+  .trigger { padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); font-size: var(--pdx-text-xs); cursor: default; }
+</style>

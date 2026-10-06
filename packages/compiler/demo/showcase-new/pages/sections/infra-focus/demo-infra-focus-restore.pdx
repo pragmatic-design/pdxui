@@ -1,0 +1,51 @@
+<template>
+  <section data-test="focus-restore">
+    <h3>Focus Restore</h3>
+    <p class="desc">1) Click one of the colored buttons to focus it. 2) "Save Focus" saves which button has focus, then moves focus to the input. 3) "Restore Focus" returns to the saved button.</p>
+    <div class="row">
+      <button class="pdx-primary" data-test="target-a" @click="trackTarget">Button A</button>
+      <button class="pdx-secondary" data-test="target-b" @click="trackTarget">Button B</button>
+      <button class="pdx-ghost" data-test="target-c" @click="trackTarget">Button C</button>
+    </div>
+    <div class="row">
+      <button class="pdx-primary" @click="saveFocus" data-test="save-focus">Save Focus</button>
+      <button class="pdx-secondary" @click="restoreFocus" data-test="restore-focus">Restore Focus</button>
+      <input class="pdx-input" placeholder="Focus moves here after save..." :ref="restoreInputRef" data-test="other-input" />
+    </div>
+    <div class="log" data-test="restore-log">{{ restoreLog }}</div>
+  </section>
+</template>
+
+<script setup>
+import { focusRestore } from '@pdxui/core';
+
+let restoreInputRef = $signal(null);
+let restoreLog = $signal('Click a button, then Save Focus.');
+
+const fr = focusRestore();
+
+// Track last focused target button so save captures the right element
+let lastTarget = null;
+function trackTarget(e) {
+    lastTarget = e.currentTarget;
+    restoreLog = 'Focused: "' + e.currentTarget.textContent.trim() + '" — now click Save.';
+}
+
+function saveFocus() {
+    if (!lastTarget) { restoreLog = 'Click a colored button first!'; return; }
+    // Temporarily focus the target so fr.save() captures it
+    lastTarget.focus();
+    fr.save();
+    const name = lastTarget.textContent.trim();
+    restoreLog = 'Saved: "' + name + '". Focus moved to input.';
+    const input = restoreInputRef;
+    if (input) input.focus();
+}
+
+function restoreFocus() {
+    fr.restore();
+    const active = document.activeElement;
+    const name = active ? (active.textContent || active.tagName).trim() : 'nothing';
+    restoreLog = restoreLog + '\nRestored to: "' + name + '"';
+}
+</script>

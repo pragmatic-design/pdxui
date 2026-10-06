@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Locale Support</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Month/day names, date format, first day of week — all from Intl. Zero translation files.</p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Italian</span>
+        <pdx-date-picker value="2024-06-15" locale="it"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">German</span>
+        <pdx-date-picker value="2024-06-15" locale="de"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Japanese</span>
+        <pdx-date-picker value="2024-06-15" locale="ja"></pdx-date-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Arabic</span>
+        <pdx-date-picker value="2024-06-15" locale="ar"></pdx-date-picker>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker value="2024-06-15" locale="it"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" locale="de"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" locale="ja"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker value="2024-06-15" locale="ar"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

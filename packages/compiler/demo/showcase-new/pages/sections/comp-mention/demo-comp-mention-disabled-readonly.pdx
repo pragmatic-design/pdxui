@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled & Readonly</h2>
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Disabled</span>
+        <pdx-mention disabled value="Hello @Alice, this is disabled" :items="users"></pdx-mention>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Readonly</span>
+        <pdx-mention readonly value="Hello @Bob, this is readonly" :items="users"></pdx-mention>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { users } from './state.pdx';
+</script>
+
+<style scoped>
+  .demo-labeled {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+</style>

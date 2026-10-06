@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Label</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>label</code> prop adds text, or the text inside the tag when <code>label</code> is not set. <code>labelPosition</code>: left, center (default), right.</p>
+    <div class="demo-box">
+      <pdx-divider label="OR"></pdx-divider>
+      <pdx-divider label="Left aligned" labelPosition="left"></pdx-divider>
+      <pdx-divider label="Right aligned" labelPosition="right"></pdx-divider>
+      <pdx-divider>Section 2</pdx-divider>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-divider label="OR"&gt;&lt;/pdx-divider&gt;
+&lt;pdx-divider label="Left" labelPosition="left"&gt;&lt;/pdx-divider&gt;
+&lt;pdx-divider&gt;Section 2&lt;/pdx-divider&gt;</code></pre>
+    </details>
+  </section>
+</template>

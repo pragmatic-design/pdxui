@@ -1,0 +1,68 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">ScrollArea</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-scroll-area&gt;</code> — custom overlay scrollbar container. Replaces native scrollbars
+      with styled, auto-hiding overlay scrollbars. Supports vertical, horizontal, and both axes.
+    </p>
+
+    <pdx-demo-comp-scroll-area-vertical class="demo-section"></pdx-demo-comp-scroll-area-vertical>
+
+    <pdx-demo-comp-scroll-area-always-visible class="demo-section"></pdx-demo-comp-scroll-area-always-visible>
+
+    <pdx-demo-comp-scroll-area-horizontal class="demo-section"></pdx-demo-comp-scroll-area-horizontal>
+
+    <pdx-demo-comp-scroll-area-both-axes class="demo-section"></pdx-demo-comp-scroll-area-both-axes>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>type</code></td><td>String</td><td>'auto'</td><td>auto, always, hover, never</td></tr>
+            <tr><td><code>axis</code></td><td>String</td><td>'vertical'</td><td>vertical, horizontal, both</td></tr>
+            <tr><td><code>scroll-hide-delay</code></td><td>Number</td><td>1200</td><td>Auto-hide delay (ms)</td></tr>
+            <tr><td><code>max-height</code></td><td>String</td><td>''</td><td>CSS max-height on viewport</td></tr>
+            <tr><td><code>height</code></td><td>String</td><td>''</td><td>CSS height on viewport</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Data Attributes</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>data-at-top</code></td><td>Present when scrolled to top</td></tr>
+            <tr><td><code>data-at-bottom</code></td><td>Present when scrolled to bottom</td></tr>
+            <tr><td><code>data-at-left</code></td><td>Present when scrolled to left (H/both)</td></tr>
+            <tr><td><code>data-at-right</code></td><td>Present when scrolled to right (H/both)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/scroll-area';
+@title 'ScrollArea — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.demo-container {
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+}
+.scroll-content {
+  padding: var(--pdx-space-lg);
+  font-size: var(--pdx-text-sm);
+}
+.scroll-content h3 { margin: var(--pdx-space-md) 0 var(--pdx-space-xs); }
+.scroll-content p { color: var(--pdx-color-muted); margin-bottom: var(--pdx-space-sm); }
+</style>

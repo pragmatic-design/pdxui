@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-spacer</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Flexible space filler. Pushes siblings apart in flex containers. Use <code>size</code> for fixed spacing.</p>
+
+    <div class="demo-area">
+      <pdx-row gap="sm" items="center">
+        <div class="box sm">Logo</div>
+        <div class="box sm">Nav</div>
+        <pdx-spacer></pdx-spacer>
+        <div class="box sm">Profile</div>
+      </pdx-row>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">Fixed size spacer:</p>
+    <div class="demo-area">
+      <pdx-stack>
+        <div class="box sm">Section A</div>
+        <pdx-spacer size="xl"></pdx-spacer>
+        <div class="box sm">Section B (xl gap)</div>
+        <pdx-spacer size="xs"></pdx-spacer>
+        <div class="box sm">Section C (xs gap)</div>
+      </pdx-stack>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Flexible: pushes items apart --&gt;
+&lt;pdx-row&gt;
+  &lt;div&gt;Logo&lt;/div&gt;
+  &lt;div&gt;Nav&lt;/div&gt;
+  &lt;pdx-spacer&gt;&lt;/pdx-spacer&gt;
+  &lt;div&gt;Profile&lt;/div&gt;
+&lt;/pdx-row&gt;
+
+&lt;!-- Fixed: explicit size --&gt;
+&lt;pdx-spacer size="xl"&gt;&lt;/pdx-spacer&gt;
+&lt;!-- Sizes: 2xs, xs, sm, md, lg, xl, 2xl --&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Paste Support</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Paste comma-separated values (or custom separator) to add multiple tags at once.
+      Try copying <code>React, Vue, Angular, Svelte</code> and pasting into the input below.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tag-input placeholder="Paste comma-separated values here..." @pdx-change="onPasteChange"></pdx-tag-input>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
+      Pasted tags: <strong>{{ pasteTagsStr() }}</strong>
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Default: comma separator --&gt;
+&lt;pdx-tag-input placeholder="Paste comma-separated values..." /&gt;
+
+&lt;!-- Custom: semicolon separator for paste --&gt;
+&lt;pdx-tag-input separator=";" placeholder="Paste ;-separated values..." /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useTagInputLog } from './state.pdx';
+
+// The page's event console (state.pdx.ts).
+const tagInputLog = useTagInputLog();
+function addLog(text) { tagInputLog.addLog(text); }
+
+// Paste
+let pasteTags = $signal([]);
+
+function onPasteChange(e) {
+    const tags = e.detail ? e.detail.tags : [];
+    pasteTags = tags;
+    addLog('paste change: [' + tags.join(', ') + ']');
+}
+
+function pasteTagsStr() {
+    return pasteTags.length > 0 ? pasteTags.join(', ') : 'none';
+}
+</script>

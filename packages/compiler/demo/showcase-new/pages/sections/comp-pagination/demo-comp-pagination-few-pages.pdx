@@ -1,0 +1,9 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Few Pages (3)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">No ellipsis when all pages fit.</p>
+    <div class="demo-row">
+      <pdx-pagination :total="30" :pageSize="10" :page="2"></pdx-pagination>
+    </div>
+  </section>
+</template>

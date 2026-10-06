@@ -1,0 +1,52 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Text Editor Toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A realistic rich text editor toolbar combining groups, separators, labels, and spacer.</p>
+
+    <div class="comp-card">
+      <div class="pdx-toolbar pdx-toolbar-bordered">
+        <div class="pdx-toolbar-group">
+          <button class="pdx-ghost" aria-pressed="true"><strong>B</strong></button>
+          <button class="pdx-ghost"><em>I</em></button>
+          <button class="pdx-ghost"><u>U</u></button>
+          <button class="pdx-ghost"><s>S</s></button>
+        </div>
+        <div class="pdx-toolbar-sep"></div>
+        <div class="pdx-toolbar-group">
+          <button class="pdx-ghost">&#9776;</button>
+          <button class="pdx-ghost" aria-pressed="true">&#8801;</button>
+          <button class="pdx-ghost">&#8802;</button>
+        </div>
+        <div class="pdx-toolbar-sep"></div>
+        <span class="pdx-toolbar-label">Size:</span>
+        <select class="pdx-select" style="width: 80px; height: 2rem; font-size: var(--pdx-text-sm);">
+          <option>12</option>
+          <option selected>14</option>
+          <option>16</option>
+          <option>18</option>
+          <option>24</option>
+        </select>
+        <div class="pdx-toolbar-spacer"></div>
+        <button class="pdx-ghost pdx-ink-muted" size="sm">Clear</button>
+      </div>
+      <div class="editor-area">
+        <p class="pdx-txt-body">The quick brown fox jumps over the lazy dog. This is a <strong>bold statement</strong> with some <em>italic emphasis</em>.</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    overflow: hidden;
+  }
+  .editor-area {
+    padding: var(--pdx-space-lg);
+    min-height: 80px;
+  }
+  .editor-area p { margin: 0; }
+</style>

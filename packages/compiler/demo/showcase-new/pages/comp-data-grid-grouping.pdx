@@ -1,0 +1,35 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Data Grid — Grouping</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Drag columns to the group bar to group rows. Expand/collapse groups, nested grouping,
+      and programmatic grouping via <code>groupBy</code> prop.
+    </p>
+
+    <!-- Group Bar -->
+    <pdx-demo-comp-data-grid-grouping-group-bar class="demo-section"></pdx-demo-comp-data-grid-grouping-group-bar>
+
+    <!-- Programmatic Grouping -->
+    <pdx-demo-comp-data-grid-grouping-programmatic class="demo-section"></pdx-demo-comp-data-grid-grouping-programmatic>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Grouping Props</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>show-group-bar</code><span>boolean</span><span>Show drag-to-group bar above the grid</span></div>
+        <div class="opt-row"><code>group-by</code><span>array</span><span>Initial grouping: [{ field, dir? }]</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-grid-grouping';
+@title 'Data Grid Grouping — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-bg); overflow: hidden; }
+</style>

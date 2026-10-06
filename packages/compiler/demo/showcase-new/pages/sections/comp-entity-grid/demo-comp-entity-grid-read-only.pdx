@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Read-only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Set <code>readonly</code> (or omit <code>schema</code>) to drop every mutating affordance —
+      no New button, no row actions, no bulk delete.
+    </p>
+    <pdx-entity-grid title="Team (view)" :columns="columns" :data="people" readonly></pdx-entity-grid>
+  </section>
+</template>
+
+<script setup>
+import { columns, people } from './state.pdx';
+</script>

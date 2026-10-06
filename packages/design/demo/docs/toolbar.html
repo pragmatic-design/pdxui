@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Toolbar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Toolbar</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Toolbar</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Horizontal action bar with buttons, separators, groups, spacer. For editors, card headers, form actions.</p>
+                    </pdx-stack>
+
+                    <!-- Basic -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Basic</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Buttons + separator + spacer + primary action.</p>
+                        <div class="pdx-toolbar pdx-toolbar-bordered">
+                            <button class="pdx-ghost" size="sm"><i data-lucide="bold" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="italic" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="underline" style="width:14px;height:14px"></i></button>
+                            <span class="pdx-toolbar-sep"></span>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="align-left" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="align-center" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="align-right" style="width:14px;height:14px"></i></button>
+                            <span class="pdx-toolbar-sep"></span>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="list" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="list-ordered" style="width:14px;height:14px"></i></button>
+                            <span class="pdx-toolbar-spacer"></span>
+                            <button class="pdx-primary" size="sm">Publish</button>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- With groups -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Button Groups</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Fused buttons via <code>pdx-toolbar-group</code>.</p>
+                        <div class="pdx-toolbar pdx-toolbar-bordered">
+                            <div class="pdx-toolbar-group">
+                                <button class="pdx-ghost" size="sm"><i data-lucide="bold" style="width:14px;height:14px"></i></button>
+                                <button class="pdx-ghost" size="sm"><i data-lucide="italic" style="width:14px;height:14px"></i></button>
+                                <button class="pdx-ghost" size="sm"><i data-lucide="underline" style="width:14px;height:14px"></i></button>
+                            </div>
+                            <span class="pdx-toolbar-sep"></span>
+                            <div class="pdx-toolbar-group">
+                                <button class="pdx-ghost" size="sm"><i data-lucide="align-left" style="width:14px;height:14px"></i></button>
+                                <button class="pdx-ghost" size="sm"><i data-lucide="align-center" style="width:14px;height:14px"></i></button>
+                                <button class="pdx-ghost" size="sm"><i data-lucide="align-right" style="width:14px;height:14px"></i></button>
+                            </div>
+                            <span class="pdx-toolbar-spacer"></span>
+                            <span class="pdx-toolbar-label">Draft</span>
+                            <button class="pdx-secondary" size="sm">Save</button>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- With labels -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">With Labels</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Text labels + segmented controls inside toolbar.</p>
+                        <div class="pdx-toolbar pdx-toolbar-bordered">
+                            <span class="pdx-toolbar-label">View:</span>
+                            <div class="pdx-segmented pdx-segmented-sm">
+                                <button class="pdx-segmented-item active">Grid</button>
+                                <button class="pdx-segmented-item">List</button>
+                            </div>
+                            <span class="pdx-toolbar-sep"></span>
+                            <span class="pdx-toolbar-label">Sort:</span>
+                            <select class="pdx-input" style="width:auto;padding:0.15rem 1.5rem 0.15rem 0.4rem;font-size:0.75rem">
+                                <option>Name</option>
+                                <option>Date</option>
+                                <option>Size</option>
+                            </select>
+                            <span class="pdx-toolbar-spacer"></span>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="search" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="filter" style="width:14px;height:14px"></i></button>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- In card context -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">In Card Header</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Toolbar as card header replacement.</p>
+                        <div class="pdx-surface-card" style="padding:0">
+                            <div class="pdx-toolbar" style="padding:0.4rem 0.75rem;border-bottom:1px solid var(--pdx-color-border)">
+                                <strong class="pdx-txt-small">Documents</strong>
+                                <span class="pdx-badge pdx-badge-secondary" style="font-size:0.6rem">24</span>
+                                <span class="pdx-toolbar-spacer"></span>
+                                <button class="pdx-ghost" size="sm"><i data-lucide="plus" style="width:14px;height:14px"></i></button>
+                                <button class="pdx-ghost" size="sm"><i data-lucide="more-horizontal" style="width:14px;height:14px"></i></button>
+                            </div>
+                            <div class="pdx-card-body">
+                                <p class="pdx-txt-small pdx-ink-muted" style="text-align:center;padding:var(--pdx-space-lg)">Content area</p>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Compact -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Compact</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Tighter gaps with <code>pdx-toolbar-compact</code>.</p>
+                        <div class="pdx-toolbar pdx-toolbar-bordered pdx-toolbar-compact">
+                            <button class="pdx-ghost" size="sm"><i data-lucide="undo-2" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="redo-2" style="width:14px;height:14px"></i></button>
+                            <span class="pdx-toolbar-sep"></span>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="scissors" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="copy" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="clipboard" style="width:14px;height:14px"></i></button>
+                            <span class="pdx-toolbar-sep"></span>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="zoom-in" style="width:14px;height:14px"></i></button>
+                            <button class="pdx-ghost" size="sm"><i data-lucide="zoom-out" style="width:14px;height:14px"></i></button>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Form actions -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Form Actions</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Toolbar as form footer with status + actions.</p>
+                        <div class="pdx-toolbar" style="border-top:1px solid var(--pdx-color-border);padding:0.5rem 0">
+                            <span class="pdx-txt-caption pdx-ink-muted">Last saved: 2 min ago</span>
+                            <span class="pdx-toolbar-spacer"></span>
+                            <button class="pdx-ghost" size="sm">Discard</button>
+                            <button class="pdx-secondary" size="sm">Save Draft</button>
+                            <button class="pdx-primary" size="sm">Publish</button>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Formats — hex / rgb / hsl</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use the <code>format</code> prop to control the output string format.
+    </p>
+    <div class="demo-box formats-row">
+      <div class="format-col">
+        <p class="pdx-txt-small"><strong>hex</strong></p>
+        <pdx-color-picker value="#8b5cf6" format="hex" @pdx-change="onHexChange" />
+        <p class="pdx-txt-small pdx-ink-muted result">{{ hexOutput }}</p>
+      </div>
+      <div class="format-col">
+        <p class="pdx-txt-small"><strong>rgb</strong></p>
+        <pdx-color-picker value="#8b5cf6" format="rgb" @pdx-change="onRgbChange" />
+        <p class="pdx-txt-small pdx-ink-muted result">{{ rgbOutput }}</p>
+      </div>
+      <div class="format-col">
+        <p class="pdx-txt-small"><strong>hsl</strong></p>
+        <pdx-color-picker value="#8b5cf6" format="hsl" @pdx-change="onHslChange" />
+        <p class="pdx-txt-small pdx-ink-muted result">{{ hslOutput }}</p>
+      </div>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker value="#8b5cf6" format="hex" /&gt;
+&lt;pdx-color-picker value="#8b5cf6" format="rgb" /&gt;
+&lt;pdx-color-picker value="#8b5cf6" format="hsl" /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Formats ───
+let hexOutput = $signal('#8b5cf6');
+
+let rgbOutput = $signal('#8b5cf6');
+let hslOutput = $signal('#8b5cf6');
+
+function onHexChange(e) { hexOutput = e.detail.value ?? e.detail; }
+function onRgbChange(e) { rgbOutput = e.detail.value ?? e.detail; }
+function onHslChange(e) { hslOutput = e.detail.value ?? e.detail; }
+</script>

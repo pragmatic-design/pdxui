@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Hover Trigger</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>trigger="hover"</code> to open on mouse enter, or when the trigger takes keyboard focus.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm">Hover me</pdx-button>
+      <pdx-popover trigger="hover" placement="bottom">
+        <p class="pop-text">This popover opens on hover.</p>
+      </pdx-popover>
+    </div>
+  </section>
+</template>

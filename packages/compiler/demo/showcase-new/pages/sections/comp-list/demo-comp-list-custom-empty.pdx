@@ -1,0 +1,45 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Empty Slot</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Override the empty state with a custom slot template.</p>
+    <div class="demo-container">
+      <pdx-list :items="emptyItems">
+        <slot name="empty" let:_>
+          <div class="custom-empty">
+            <pdx-icon name="search" size="32"></pdx-icon>
+            <p>Nothing here yet — try adding some items!</p>
+          </div>
+        </slot>
+      </pdx-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Empty slot overrides the default empty state --&gt;
+&lt;!-- Note: let:_ is required (compiler needs at least one let:) --&gt;
+&lt;pdx-list :items="[]"&gt;
+  &lt;slot name="empty" let:_&gt;
+    &lt;div class="custom-empty"&gt;
+      &lt;pdx-icon name="search" size="32"&gt;&lt;/pdx-icon&gt;
+      &lt;p&gt;Nothing here yet — try adding some items!&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/slot&gt;
+&lt;/pdx-list&gt;
+
+.custom-empty {
+  display: flex; flex-direction: column;
+  align-items: center; gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-xl);
+  color: var(--pdx-color-muted);
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const emptyItems = [];
+</script>
+
+<style scoped>
+.custom-empty { display: flex; flex-direction: column; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-xl); color: var(--pdx-color-muted); }
+.custom-empty p { margin: 0; }
+</style>

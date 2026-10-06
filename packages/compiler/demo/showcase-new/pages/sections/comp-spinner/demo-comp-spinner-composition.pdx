@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Loading State</h3>
+      <div class="loading-center">
+        <pdx-spinner size="xl" label="Loading dashboard..." showLabel></pdx-spinner>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Button Loading</h3>
+      <p class="pdx-txt-small pdx-ink-muted">Spinner inside a button for async actions.</p>
+      <div class="demo-row" style="margin-top:var(--pdx-space-sm)">
+        <pdx-button variant="primary" loading>Saving...</pdx-button>
+        <pdx-button variant="outline"><pdx-spinner size="sm"></pdx-spinner> Loading</pdx-button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .loading-center { display: flex; justify-content: center; padding: var(--pdx-space-2xl); }
+</style>

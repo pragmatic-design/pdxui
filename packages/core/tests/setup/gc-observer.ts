@@ -1,0 +1,38 @@
+// Forces a garbage collection one macrotask after every `observe()`, in every unit suite that runs
+// on happy-dom.
+//
+// happy-dom 20.10.2 hands the observed node `callback: new WeakRef((record) => this.report(record))`
+// and nothing else holds that arrow function, so once the collector runs, `deref()` is undefined and
+// every record is dropped in silence — no error, the callback simply never runs again. A test that
+// asserts on something a component does in its MutationObserver callback therefore passes alone and
+// fails at random inside `pnpm test`, under the GC pressure of six packages in parallel: a gate
+// failure nobody can reproduce.
+//
+// With this file the drop happens EVERY time instead of sometimes, so such a test fails at once and
+// always. What to do when it does — two ways:
+//   · read the state synchronously, when the component can be driven without the observer;
+//   · or measure it in Chromium, in a guard spec (see `responsive accordion-late-items.spec.ts`),
+//     leaving a comment in the unit test that says where it went.
+//
+// `--expose-gc` comes from the package's vite config (`test.execArgv`; in Vitest 4 a `poolOptions`
+// nesting reports itself as DEPRECATED and is then ignored). Without it
+// there is no `gc()` to call, and this file says so rather than passing quietly: a detector that
+// silently does nothing is worse than no detector.
+import { setImmediate } from 'node:timers';
+
+const gc = (globalThis as { gc?: () => void }).gc;
+if (typeof gc !== 'function') {
+    throw new Error(
+        'the MutationObserver GC detector needs --expose-gc: add `execArgv: [\'--expose-gc\']` to the '
+        + 'test block of this package\'s vite config',
+    );
+}
+
+const observe = MutationObserver.prototype.observe;
+function observeThenCollect(this: MutationObserver, ...args: Parameters<MutationObserver['observe']>): void {
+    observe.apply(this, args);
+    setImmediate(() => gc!());
+}
+/** Read by each package's `gc-detector.test.ts`: the wrapper is in place, not only the flag. */
+(observeThenCollect as unknown as { pdxGcDetector: boolean }).pdxGcDetector = true;
+MutationObserver.prototype.observe = observeThenCollect;

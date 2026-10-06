@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Select — Creatable Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>pdx-select</code> with <code>creatable</code> prop — type a new value and press Enter or click "Create" to add it.
+      Emits <code>pdx-create</code> event.
+    </p>
+    <div class="demo-box">
+      <pdx-select
+        placeholder="Pick or create a tag..."
+        :options="tags"
+        searchable
+        creatable
+        clearable
+        @pdx-create="onTagCreate"
+        @pdx-change="onTagChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">Tag: {{ tagValue }}</p>
+      @if (createdTags.length > 0) {
+        <p class="pdx-txt-small pdx-ink-muted">Created: {{ createdTags.join(', ') }}</p>
+      }
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-select
+  placeholder="Pick or create a tag..."
+  :options="tags"
+  searchable
+  creatable
+  @pdx-create="onTagCreate"
+  @pdx-change="onTagChange" /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Select creatable (tags) ───
+let tags = $signal(['Bug', 'Feature', 'Enhancement', 'Documentation', 'Help Wanted', 'Good First Issue']);
+
+let tagValue = $signal('');
+let createdTags = $signal([]);
+
+function onTagCreate(e) {
+  const val = e.detail.value ?? e.detail;
+  tags = tags.slice().concat([val]);
+  createdTags = createdTags.slice().concat([val]);
+}
+
+function onTagChange(e) { tagValue = e.detail.value ?? e.detail; }
+</script>

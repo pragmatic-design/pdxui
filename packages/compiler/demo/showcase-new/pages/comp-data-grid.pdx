@@ -1,0 +1,155 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Data Grid</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-data-grid&gt;</code> — Enterprise data grid with sort, pagination,
+      type-aware cell rendering, slot templates for custom cells and headers.
+      Built on <code>useDataGrid()</code> headless composable + <code>DataSource</code>.
+    </p>
+
+    <pdx-demo-comp-data-grid-basic class="demo-section"></pdx-demo-comp-data-grid-basic>
+
+    <pdx-demo-comp-data-grid-typed class="demo-section"></pdx-demo-comp-data-grid-typed>
+
+    <pdx-demo-comp-data-grid-paginated class="demo-section"></pdx-demo-comp-data-grid-paginated>
+
+    <pdx-demo-comp-data-grid-slot-templates class="demo-section"></pdx-demo-comp-data-grid-slot-templates>
+
+    <pdx-demo-comp-data-grid-compact class="demo-section"></pdx-demo-comp-data-grid-compact>
+
+    <pdx-demo-comp-data-grid-empty class="demo-section"></pdx-demo-comp-data-grid-empty>
+
+    <pdx-demo-comp-data-grid-keyboard class="demo-section"></pdx-demo-comp-data-grid-keyboard>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (priority over data)</td></tr>
+            <tr><td><code>data</code></td><td>T[]</td><td>null</td><td>Static data array (auto-wraps in DataSource)</td></tr>
+            <tr><td><code>columns</code></td><td>ColumnDef[]</td><td>null</td><td>Column definitions. Auto-detected from data if omitted.</td></tr>
+            <tr><td><code>label</code></td><td>String</td><td>''</td><td>The grid's accessible name (its <code>aria-label</code>)</td></tr>
+            <tr><td><code>striped</code></td><td>Boolean</td><td>false</td><td>Alternating row backgrounds</td></tr>
+            <tr><td><code>hover</code></td><td>Boolean</td><td>true</td><td>Row hover highlight</td></tr>
+            <tr><td><code>compact</code></td><td>Boolean</td><td>false</td><td>Reduced padding for dense views</td></tr>
+            <tr><td><code>sticky-header</code></td><td>Boolean</td><td>true</td><td>Sticky column headers on scroll</td></tr>
+            <tr><td><code>id-field</code></td><td>String</td><td>'id'</td><td>Unique identifier field</td></tr>
+            <tr><td><code>state-key</code></td><td>String</td><td>''</td><td>LocalStorage key for state persistence</td></tr>
+            <tr><td><code>empty-title</code></td><td>String</td><td>'No data'</td><td>Empty state message</td></tr>
+            <tr><td><code>empty-icon</code></td><td>String</td><td>'inbox'</td><td>Empty state icon name</td></tr>
+            <tr><td><code>show-footer</code></td><td>Boolean</td><td>true</td><td>Show footer with row count and pagination</td></tr>
+            <tr><td><code>filterable</code></td><td>Boolean</td><td>false</td><td>Show inline filter row (shorthand for filter-mode="row")</td></tr>
+            <tr><td><code>filter-mode</code></td><td>String</td><td>'none'</td><td>'none' | 'row' | 'toolbar' — filter display mode</td></tr>
+            <tr><td><code>show-toolbar</code></td><td>Boolean</td><td>false</td><td>Show toolbar (sort chips, reload, columns, slots)</td></tr>
+            <tr><td><code>show-group-bar</code></td><td>Boolean</td><td>false</td><td>Show drag-to-group bar</td></tr>
+            <tr><td><code>pagination-position</code></td><td>String</td><td>'bottom'</td><td>'bottom' | 'top' | 'both'</td></tr>
+            <tr><td><code>page-sizes</code></td><td>Array</td><td>[]</td><td>Rows-per-page choices in the pager, e.g. [10, 20, 50]; empty offers none</td></tr>
+            <tr><td><code>selection</code></td><td>String</td><td>'none'</td><td>'none' | 'single' | 'multiple'</td></tr>
+            <tr><td><code>virtual-scroll</code></td><td>Boolean</td><td>false</td><td>Enable virtual scrolling for large datasets</td></tr>
+            <tr><td><code>row-height</code></td><td>Number</td><td>42</td><td>Row height for virtual scroll (px)</td></tr>
+            <tr><td><code>max-height</code></td><td>Number</td><td>400</td><td>Max height for virtual scroll container (px)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-row-click</code></td><td><code>{ row, index, id }</code></td><td>Emitted when a row is clicked</td></tr>
+            <tr><td><code>pdx-sort</code></td><td><code>{ field, dir }</code></td><td>Emitted when sort changes (future)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>col:{field}</code></td><td><code>{ row, value, index, col }</code></td><td>Custom cell template for a specific column</td></tr>
+            <tr><td><code>header:{field}</code></td><td><code>{ col, field, header }</code></td><td>Custom header template for a specific column</td></tr>
+            <tr><td><code>empty</code></td><td><code>{}</code></td><td>Custom empty state</td></tr>
+            <tr><td><code>filter:{field}</code></td><td><code>{ col, field }</code></td><td>Custom inline filter input for a column</td></tr>
+            <tr><td><code>filter-popover:{field}</code></td><td><code>{ col, apply, clear }</code></td><td>Custom filter popover content for a column</td></tr>
+            <tr><td><code>toolbar-start</code></td><td><code>{ grid }</code></td><td>Custom content at the start of the toolbar</td></tr>
+            <tr><td><code>toolbar-end</code></td><td><code>{ grid }</code></td><td>Custom content at the end of the toolbar</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <pdx-demo-comp-data-grid-column-definition class="demo-section"></pdx-demo-comp-data-grid-column-definition>
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-grid';
+@title 'Data Grid — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--pdx-space-xl) var(--pdx-space-md);
+}
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-sm); }
+.demo-container {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  overflow: hidden;
+}
+.source-block {
+  margin-top: var(--pdx-space-sm);
+}
+.source-block summary {
+  cursor: pointer;
+  font-size: var(--pdx-text-xs);
+  color: var(--pdx-color-muted);
+}
+.source-block pre {
+  margin-top: var(--pdx-space-xs);
+  padding: var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+  overflow-x: auto;
+  font-size: var(--pdx-text-xs);
+}
+.options-table {
+  overflow-x: auto;
+}
+.options-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--pdx-text-sm);
+}
+.options-table th {
+  text-align: left;
+  font-weight: var(--pdx-weight-semibold);
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  border-bottom: 2px solid var(--pdx-color-border);
+  color: var(--pdx-color-muted);
+  font-size: var(--pdx-text-xs);
+  text-transform: uppercase;
+}
+.options-table td {
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  border-bottom: 1px solid var(--pdx-color-border);
+}
+</style>

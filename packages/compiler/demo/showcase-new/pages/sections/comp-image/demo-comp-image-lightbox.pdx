@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Lightbox</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to open fullscreen overlay. Press Escape or click to close.</p>
+    <div class="demo-row">
+      <pdx-image src="/demo-images/mountains.svg" alt="Lightbox" width="250px" height="160px" :lightbox="true" caption="Mountain landscape" :lazy="false"></pdx-image>
+      <pdx-image src="/demo-images/ocean.svg" alt="Lightbox 2" width="250px" height="160px" :lightbox="true" caption="Ocean sunset" :lazy="false"></pdx-image>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-image src="..." :lightbox="true" caption="Mountain landscape"&gt;&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,103 @@
+/* pdx-app-layout — Application shell with grid regions */
+
+pdx-app-layout { display: block; }
+
+.pdx-app-layout {
+    display: grid;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--pdx-color-bg);
+    color: var(--pdx-color-text);
+    grid-template-areas:
+        "header header header"
+        "navbar main aside"
+        "footer footer footer";
+}
+
+/* Header — spans full width */
+.pdx-app-header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--pdx-space-md);
+    background: var(--pdx-color-surface);
+    z-index: 20;
+    min-height: 0;
+}
+
+/* Navbar (left sidebar) */
+.pdx-app-navbar {
+    grid-area: navbar;
+    overflow-y: auto;
+    background: var(--pdx-color-surface);
+    transition: width var(--pdx-app-transition, 200ms) ease;
+    z-index: 30;
+    min-width: 0;
+}
+.pdx-app-navbar-collapsed {
+    overflow: hidden;
+}
+
+/* A navbar collapsed to a zero-width rail is GONE — `navbarCollapsedWidth: '0px'` says so. That is
+   done in JS next to `style.width`, not here: an author's `padding` may be an inline style, which no
+   selector can outrank, and the component already owns this element's geometry. */
+
+/* Navbar overlay drawer on mobile — slides in/out from the left */
+.pdx-app-navbar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    box-shadow: var(--pdx-shadow-xl);
+    z-index: 100;
+    transform: translateX(0);
+    transition: transform var(--pdx-app-transition, 200ms) ease;
+}
+.pdx-app-navbar-overlay.pdx-app-navbar-hidden {
+    transform: translateX(-100%);
+    box-shadow: none;
+}
+
+/* Main content */
+.pdx-app-main {
+    grid-area: main;
+    overflow-y: auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Aside (right sidebar) */
+.pdx-app-aside {
+    grid-area: aside;
+    overflow-y: auto;
+    background: var(--pdx-color-surface);
+    min-width: 0;
+}
+
+/* Footer — spans full width */
+.pdx-app-footer {
+    grid-area: footer;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--pdx-space-md);
+    background: var(--pdx-color-surface);
+    min-height: 0;
+}
+
+/* Borders between regions */
+.pdx-app-with-border .pdx-app-header { border-bottom: 1px solid var(--pdx-color-border); }
+.pdx-app-with-border .pdx-app-navbar { border-right: 1px solid var(--pdx-color-border); }
+.pdx-app-with-border .pdx-app-aside { border-left: 1px solid var(--pdx-color-border); }
+.pdx-app-with-border .pdx-app-footer { border-top: 1px solid var(--pdx-color-border); }
+
+/* Mobile overlay backdrop */
+.pdx-app-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--pdx-color-backdrop);
+    z-index: 99;
+}
+.pdx-app-overlay-visible {
+    display: block;
+}

@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Time Picker Standalone</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>&lt;pdx-time-picker&gt;</code> — segmented input with spinbutton semantics.
+      Up/Down arrows, digit typing, Tab between segments.
+    </p>
+
+    <div class="demo-stack">
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">24h (default)</span>
+        <pdx-time-picker value="14:30" format="24h"></pdx-time-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">12h with AM/PM</span>
+        <pdx-time-picker value="14:30" format="12h"></pdx-time-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">With seconds</span>
+        <pdx-time-picker value="09:15:30" format="24h" showseconds></pdx-time-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">15-minute step</span>
+        <pdx-time-picker value="10:00" format="24h" :step="15"></pdx-time-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Auto (Italian locale → 24h, no AM/PM)</span>
+        <pdx-time-picker value="14:30" format="auto" locale="it"></pdx-time-picker>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-small pdx-ink-muted">Auto (US locale → 12h with AM/PM)</span>
+        <pdx-time-picker value="14:30" format="auto" locale="en-US"></pdx-time-picker>
+      </div>
+    </div>
+
+    <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Sizes</h3>
+    <div class="demo-row">
+      <pdx-time-picker value="10:30" size="sm" format="24h"></pdx-time-picker>
+      <pdx-time-picker value="10:30" format="24h"></pdx-time-picker>
+      <pdx-time-picker value="10:30" size="lg" format="24h"></pdx-time-picker>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-time-picker value="14:30" format="24h"&gt;&lt;/pdx-time-picker&gt;
+&lt;pdx-time-picker value="14:30" format="12h"&gt;&lt;/pdx-time-picker&gt;
+&lt;pdx-time-picker value="09:15:30" format="24h" showseconds&gt;&lt;/pdx-time-picker&gt;
+&lt;pdx-time-picker value="10:00" format="24h" :step="15"&gt;&lt;/pdx-time-picker&gt;
+&lt;pdx-time-picker value="14:30" format="auto" locale="it"&gt;&lt;/pdx-time-picker&gt;
+
+&lt;!-- Sizes --&gt;
+&lt;pdx-time-picker value="10:30" size="sm" format="24h"&gt;&lt;/pdx-time-picker&gt;
+&lt;pdx-time-picker value="10:30" format="24h"&gt;&lt;/pdx-time-picker&gt;
+&lt;pdx-time-picker value="10:30" size="lg" format="24h"&gt;&lt;/pdx-time-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

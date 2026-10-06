@@ -1,0 +1,39 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Banner / Alert</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Inline alert banners with auto icon, closable, auto-dismiss, and action slots.
+    </p>
+
+    <pdx-demo-comp-banner-variants class="demo-section"></pdx-demo-comp-banner-variants>
+
+    <pdx-demo-comp-banner-closable class="demo-section"></pdx-demo-comp-banner-closable>
+
+    <pdx-demo-comp-banner-subtle class="demo-section"></pdx-demo-comp-banner-subtle>
+
+    <pdx-demo-comp-banner-auto-dismiss class="demo-section"></pdx-demo-comp-banner-auto-dismiss>
+
+    <pdx-demo-comp-banner-without-icon class="demo-section"></pdx-demo-comp-banner-without-icon>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Description</span></div>
+        <div class="opt-row"><code>variant</code><span>info, success, warning, danger/error</span></div>
+        <div class="opt-row"><code>closable</code><span>Show × close button</span></div>
+        <div class="opt-row"><code>autoDismiss</code><span>Auto-close after N ms (0 = disabled)</span></div>
+        <div class="opt-row"><code>showIcon</code><span>Show variant-matched icon (default true)</span></div>
+        <div class="opt-row"><code>subtle</code><span>Lighter/muted style</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/banner';
+@title 'Banner / Alert';
+</script>
+
+<style scoped>
+  .page { }
+</style>

@@ -1,0 +1,81 @@
+<template>
+  <div class="task-list">
+    <div class="header">
+      <h2>{{ title }}</h2>
+      <span class="badge">{{ taskCount }} tasks</span>
+    </div>
+
+    <div class="filters">
+      <label>Filter:
+        <select @change="onFilter">
+          <option value="all" :selected="store.filter() === 'all'">All</option>
+          <option value="pending" :selected="store.filter() === 'pending'">Pending</option>
+          <option value="done" :selected="store.filter() === 'done'">Done</option>
+        </select>
+      </label>
+      <span class="page-info">Page {{ page() }}</span>
+      <button @click="prevPage" :disabled="page() <= 1" class="btn-sm">←</button>
+      <button @click="nextPage" class="btn-sm">→</button>
+    </div>
+
+    @if (store.filtered().length === 0) {
+      <div class="empty">No tasks match the filter.</div>
+    }
+
+    @for (store.filtered() as task; track task.id) {
+      <div class="task-row" :class="task.done ? 'done' : ''">
+        <button @click="toggleTask(task.id)" class="btn-toggle">
+          @if (task.done) { ✓ } @else { ○ }
+        </button>
+        <span class="task-text">{{ task.text }}</span>
+        <span class="task-cat">{{ task.category }}</span>
+        <button @click="removeTask(task.id)" class="btn-remove">×</button>
+      </div>
+    }
+  </div>
+</template>
+
+<script setup>
+import { useTasks } from './task-store.pdx';
+
+@prop title: string = 'Tasks';
+
+const store = useTasks();
+
+// linkedSignal: page resets when filter changes
+const page = linkedSignal({
+  source: () => store.filter(),
+  computation: (_f, prev) => {
+    if (prev && prev.source === _f) return prev.value;
+    return 1;
+  },
+});
+
+const taskCount = $derived(store.filtered().length);
+
+function onFilter(e) { store.setFilter(e.target.value); }
+function prevPage() { if (page() > 1) page.set(page.peek() - 1); }
+function nextPage() { page.set(page.peek() + 1); }
+function toggleTask(id) { store.toggleTask(id); }
+function removeTask(id) { store.removeTask(id); }
+</script>
+
+<style scoped>
+  .task-list { background: white; border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+  .header h2 { font-size: 1.2rem; margin: 0; }
+  .badge { background: #e8eaf6; color: #3949ab; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+  .filters { display: flex; gap: 8px; align-items: center; margin-bottom: 0.8rem; font-size: 0.85rem; }
+  .filters select { padding: 3px 8px; border: 1px solid #ddd; border-radius: 4px; }
+  .page-info { margin-left: auto; color: #888; font-size: 0.8rem; }
+  .btn-sm { padding: 2px 8px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: white; }
+  .btn-sm:disabled { opacity: 0.3; }
+  .task-row { display: flex; align-items: center; gap: 8px; padding: 8px 4px; border-bottom: 1px solid #f0f0f0; }
+  .task-row.done .task-text { text-decoration: line-through; color: #aaa; }
+  .task-text { flex: 1; font-size: 0.9rem; }
+  .task-cat { background: #f5f5f5; color: #666; padding: 1px 6px; border-radius: 8px; font-size: 0.7rem; }
+  .btn-toggle { width: 28px; height: 28px; border: 2px solid #4caf50; border-radius: 50%; cursor: pointer; background: white; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
+  .btn-toggle:hover { background: #e8f5e9; }
+  .btn-remove { background: none; border: none; color: #e53935; cursor: pointer; font-size: 1.1rem; padding: 4px; }
+  .empty { color: #888; font-style: italic; text-align: center; padding: 16px; }
+</style>

@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <div class="demo-row">
+      <pdx-date-picker size="sm" placeholder="Small"></pdx-date-picker>
+      <pdx-date-picker placeholder="Medium (default)"></pdx-date-picker>
+      <pdx-date-picker size="lg" placeholder="Large"></pdx-date-picker>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-date-picker size="sm" placeholder="Small"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker placeholder="Medium (default)"&gt;&lt;/pdx-date-picker&gt;
+&lt;pdx-date-picker size="lg" placeholder="Large"&gt;&lt;/pdx-date-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>

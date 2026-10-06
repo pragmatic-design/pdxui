@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Banner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Banner</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Banner / Announcement</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Full-width announcement bars. Semantic variants, dismissable, with action links.</p>
+                    </pdx-stack>
+
+                    <!-- Variants -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Variants</h2>
+                        <pdx-stack gap="sm">
+                            <div class="pdx-banner pdx-banner-info">
+                                <span class="pdx-banner-text">New version 2.0 is available with improved performance.</span>
+                                <a class="pdx-banner-action" href="#">Update now</a>
+                                <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                            </div>
+                            <div class="pdx-banner pdx-banner-success">
+                                <span class="pdx-banner-text">Your account has been verified successfully.</span>
+                                <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                            </div>
+                            <div class="pdx-banner pdx-banner-warning">
+                                <span class="pdx-banner-text">Your trial expires in 3 days.</span>
+                                <a class="pdx-banner-action" href="#">Upgrade</a>
+                                <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                            </div>
+                            <div class="pdx-banner pdx-banner-danger">
+                                <span class="pdx-banner-text">Service outage detected. Some features may be unavailable.</span>
+                                <a class="pdx-banner-action" href="#">Status page</a>
+                                <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                            </div>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Subtle -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Subtle</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Light background variant for less prominent messages.</p>
+                        <div class="pdx-banner pdx-banner-subtle">
+                            <span class="pdx-banner-icon"><i data-lucide="info" style="width:16px;height:16px"></i></span>
+                            <span class="pdx-banner-text">This workspace is in read-only mode during maintenance.</span>
+                            <a class="pdx-banner-action" href="#" style="color:var(--pdx-color-primary)">Learn more</a>
+                            <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Centered -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Centered</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Centered text with <code>pdx-banner-centered</code>.</p>
+                        <div class="pdx-banner pdx-banner-info pdx-banner-centered">
+                            <span class="pdx-banner-text">🎉 We just launched Pragmatic Design v2.0! <a class="pdx-banner-action" href="#">Read the announcement</a></span>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- With icon -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">With Icon</h2>
+                        <pdx-stack gap="sm">
+                            <div class="pdx-banner pdx-banner-info">
+                                <span class="pdx-banner-icon"><i data-lucide="megaphone" style="width:16px;height:16px"></i></span>
+                                <span class="pdx-banner-text">Join our community meetup on March 30th.</span>
+                                <a class="pdx-banner-action" href="#">Register</a>
+                                <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                            </div>
+                            <div class="pdx-banner pdx-banner-warning">
+                                <span class="pdx-banner-icon"><i data-lucide="alert-triangle" style="width:16px;height:16px"></i></span>
+                                <span class="pdx-banner-text">Scheduled maintenance on Sunday 2AM-4AM UTC.</span>
+                                <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                            </div>
+                        </pdx-stack>
+                    </pdx-stack>
+
+                    <!-- Dismissable demo -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Dismissable</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Click X to dismiss. Uses native <code>[hidden]</code> attribute.</p>
+                        <div class="pdx-banner pdx-banner-success">
+                            <span class="pdx-banner-text">Click the X to dismiss this banner.</span>
+                            <button class="pdx-banner-close" onclick="this.closest('.pdx-banner').hidden=true">&times;</button>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

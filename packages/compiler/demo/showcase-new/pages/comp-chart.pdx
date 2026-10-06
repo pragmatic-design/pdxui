@@ -1,0 +1,62 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Chart</h1>
+    <p class="pdx-txt-body pdx-ink-muted">
+      Zero-dependency chart component. Canvas-rendered, design-token native, auto-resize.
+      11 chart types, dual Y-axis, zoom, dark mode, export.
+    </p>
+
+    <!-- ═══ Line Chart ═══ -->
+    <pdx-demo-comp-chart-line class="demo-section"></pdx-demo-comp-chart-line>
+
+    <!-- ═══ Area Chart ═══ -->
+    <pdx-demo-comp-chart-area class="demo-section"></pdx-demo-comp-chart-area>
+
+    <!-- ═══ Bar Chart ═══ -->
+    <pdx-demo-comp-chart-bar class="demo-section"></pdx-demo-comp-chart-bar>
+
+    <!-- ═══ Stacked Bar ═══ -->
+    <pdx-demo-comp-chart-stacked-bar class="demo-section"></pdx-demo-comp-chart-stacked-bar>
+
+    <!-- ═══ Pie Chart ═══ -->
+    <pdx-demo-comp-chart-pie class="demo-section"></pdx-demo-comp-chart-pie>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>type</code><span>string</span><span>"line"</span><span>line, bar, area, pie, doughnut, gauge, radar, candlestick, heatmap, funnel</span></div>
+        <div class="opt-row"><code>data</code><span>array</span><span>[]</span><span>Array of objects</span></div>
+        <div class="opt-row"><code>x-field</code><span>string</span><span>auto</span><span>X-axis field name</span></div>
+        <div class="opt-row"><code>y-field</code><span>string</span><span>auto</span><span>Y-axis field(s), comma-separated</span></div>
+        <div class="opt-row"><code>series-names</code><span>string</span><span>field names</span><span>Display names, comma-separated</span></div>
+        <div class="opt-row"><code>title</code><span>string</span><span>""</span><span>Chart title</span></div>
+        <div class="opt-row"><code>smooth</code><span>boolean</span><span>false</span><span>Smooth line interpolation</span></div>
+        <div class="opt-row"><code>stacked</code><span>boolean</span><span>false</span><span>Stack series</span></div>
+        <div class="opt-row"><code>legend</code><span>boolean</span><span>true</span><span>Show interactive legend</span></div>
+        <div class="opt-row"><code>legend-position</code><span>string</span><span>"top"</span><span>top, bottom, left, right</span></div>
+        <div class="opt-row"><code>height</code><span>string</span><span>16:9</span><span>Chart height (CSS value)</span></div>
+        <div class="opt-row"><code>zoom</code><span>string</span><span>""</span><span>"inside" for mouse wheel + drag</span></div>
+        <div class="opt-row"><code>y-format</code><span>string</span><span>auto</span><span>currency, percent, compact, or template</span></div>
+        <div class="opt-row"><code>source</code><span>DataSource</span><span>null</span><span>Bind to DataSource for auto-update</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/chart';
+@title 'Chart';
+</script>
+
+<style scoped>
+  .page { }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-area { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+  .options-table { margin-top: var(--pdx-space-sm); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 120px 90px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+</style>

@@ -1,0 +1,63 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Shadows & Elevation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">4-step shadow scale. Shadow color adapts to light/dark mode via <code>--pdx-shadow-color</code>. Also available as <code>.pdx-elevation-{0-4}</code> classes.</p>
+
+    <div class="shadow-demo">
+      <div class="shadow-box" style="box-shadow:var(--pdx-shadow-sm)">
+        <code>sm</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Cards</span>
+      </div>
+      <div class="shadow-box" style="box-shadow:var(--pdx-shadow-md)">
+        <code>md</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Hover</span>
+      </div>
+      <div class="shadow-box" style="box-shadow:var(--pdx-shadow-lg)">
+        <code>lg</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Dropdowns</span>
+      </div>
+      <div class="shadow-box" style="box-shadow:var(--pdx-shadow-xl)">
+        <code>xl</code>
+        <span class="pdx-txt-caption pdx-ink-muted">Modals</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>--pdx-shadow-color: light-dark(oklch(0 0 0 / 0.08), oklch(0 0 0 / 0.4));
+--pdx-shadow-sm:  0 1px 2px var(--pdx-shadow-color);
+--pdx-shadow-md:  0 4px 6px -1px ...;
+--pdx-shadow-lg:  0 10px 15px -3px ...;
+--pdx-shadow-xl:  0 20px 25px -5px ...;
+
+/* Utility classes: */
+.pdx-elevation-0  /* none */
+.pdx-elevation-1  /* sm */
+.pdx-elevation-2  /* md */
+.pdx-elevation-3  /* lg */
+.pdx-elevation-4  /* xl */</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Shadows */
+  .shadow-demo {
+    display: flex;
+    gap: var(--pdx-space-xl);
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-xl) var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .shadow-box {
+    width: 120px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-2xs);
+    background: var(--pdx-color-surface);
+    border-radius: var(--pdx-radius-md);
+  }
+</style>

@@ -1,0 +1,43 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Filter Builder</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-filter-builder&gt;</code> — Notion-style chip-based filter bar.
+      Standalone: works with DataSource, DataGrid, or any list. Driven by <code>FieldDefinition[]</code>.
+    </p>
+
+    <!-- Basic -->
+    <pdx-demo-comp-filter-builder-basic class="demo-section"></pdx-demo-comp-filter-builder-basic>
+
+    <!-- Same JSON for Grid + Filter -->
+    <pdx-demo-comp-filter-builder-same-json class="demo-section"></pdx-demo-comp-filter-builder-same-json>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>fields</code><span>array</span><span>FieldDefinition[] or FilterField[]</span></div>
+        <div class="opt-row"><code>source</code><span>DataSource</span><span>Auto-bind: filters applied to DataSource</span></div>
+        <div class="opt-row"><code>value</code><span>array</span><span>Initial FilterDescriptor[]</span></div>
+        <div class="opt-row"><code>logic</code><span>string</span><span>'and' (default) or 'or' between chips</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-filter-change</code><span>{ filters: FilterDescriptor[], logic }</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/filter-builder';
+@title 'Filter Builder';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { display: flex; flex-direction: column; gap: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-bg); }
+</style>

@@ -1,0 +1,109 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Forms</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Checkboxes, radios, toggles, ranges, field wrappers, and fieldsets.
+      <strong>CSS only</strong> — apply classes directly to the <code>&lt;input&gt;</code> element.
+    </p>
+
+    <!-- ═══ Checkbox ═══ -->
+    <pdx-demo-design-forms-checkbox class="demo-section"></pdx-demo-design-forms-checkbox>
+
+    <!-- ═══ Radio ═══ -->
+    <pdx-demo-design-forms-radio class="demo-section"></pdx-demo-design-forms-radio>
+
+    <!-- ═══ Toggle ═══ -->
+    <pdx-demo-design-forms-switch class="demo-section"></pdx-demo-design-forms-switch>
+
+    <!-- ═══ Range ═══ -->
+    <pdx-demo-design-forms-range class="demo-section"></pdx-demo-design-forms-range>
+
+    <!-- ═══ Field Wrapper ═══ -->
+    <pdx-demo-design-forms-field class="demo-section"></pdx-demo-design-forms-field>
+
+    <!-- ═══ Fieldset ═══ -->
+    <pdx-demo-design-forms-fieldset class="demo-section"></pdx-demo-design-forms-fieldset>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-forms-composition class="demo-section"></pdx-demo-design-forms-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class</span><span>Element</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-checkbox</code><span>input</span><span>Custom checkbox (appearance:none + SVG check)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-radio</code><span>input</span><span>Custom radio (appearance:none + inset dot)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toggle</code><span>input</span><span>Switch toggle (::before thumb, 2.75rem track)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-range</code><span>input</span><span>Styled range slider</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-field</code><span>div</span><span>Field wrapper (label + input + message)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-field-label</code><span>label</span><span>Field label text</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-field-hint</code><span>span</span><span>Help text below input</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-field-error</code><span>span</span><span>Error message (danger color)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-field-success</code><span>span</span><span>Success message</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-field-required</code><span>label</span><span>Appends * in danger color</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-fieldset</code><span>fieldset</span><span>Grouped controls with border</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/forms';
+@title 'Forms';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .control-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+  }
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+  }
+
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 200px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

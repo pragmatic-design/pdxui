@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Arrow Up/Down add or remove one <code>step</code>; Shift multiplies by 10. Home/End go to min/max when they are set.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="Basic (step=1, 0-100)">
+        <pdx-number-input value="42" min="0" max="100"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Decimal (step=0.01)" hint="Arrow Up/Down step 0.01">
+        <pdx-number-input value="1234.56" step="0.01" precision="2"></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="With Scroll Wheel" hint="Focus and scroll mouse wheel">
+        <pdx-number-input value="50" min="0" max="1000" allowWheel></pdx-number-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="trim-zeros (precision=3)" hint="29.5 shows as 29.5, not 29.500 — still rounded to 3 decimals">
+        <pdx-number-input value="29.5" step="0.001" precision="3" trim-zeros></pdx-number-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-number-input
+  value="1234.56"
+  step="0.01"
+  precision="2"
+  min="0"
+  max="9999"
+  allowWheel&gt;
+&lt;/pdx-number-input&gt;</code></pre>
+    </details>
+  </section>
+</template>

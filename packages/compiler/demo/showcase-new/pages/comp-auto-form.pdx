@@ -1,0 +1,59 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Auto Form</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-auto-form&gt;</code> — generates a form from <code>FieldDefinition[]</code> or <code>FormSchema</code>.
+      Same JSON that drives a DataGrid can auto-generate an edit form.
+    </p>
+
+    <!-- From FieldDefinition -->
+    <pdx-demo-comp-auto-form-field-definitions class="demo-section"></pdx-demo-comp-auto-form-field-definitions>
+
+    <!-- Server-side lookup -->
+    <pdx-demo-comp-auto-form-server-lookup class="demo-section"></pdx-demo-comp-auto-form-server-lookup>
+
+    <!-- Same JSON for Grid + Form -->
+    <pdx-demo-comp-auto-form-one-json class="demo-section"></pdx-demo-comp-auto-form-one-json>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>fields</code><span>FieldDefinition[]</span><span>Field definitions (converted to FormSchema)</span></div>
+        <div class="opt-row"><code>schema</code><span>FormSchema</span><span>Direct FormSchema JSON (alternative to fields)</span></div>
+        <div class="opt-row"><code>source</code><span>DataSource</span><span>DataSource for auto-load/save</span></div>
+        <div class="opt-row"><code>record-id</code><span>string</span><span>ID of record to load from DataSource</span></div>
+        <div class="opt-row"><code>layout</code><span>string</span><span>'stack' (default) | 'grid' | 'horizontal'</span></div>
+        <div class="opt-row"><code>columns</code><span>number</span><span>Grid columns (default 12)</span></div>
+        <div class="opt-row"><code>show-actions</code><span>boolean</span><span>Show Save/Reset buttons (default true)</span></div>
+        <div class="opt-row"><code>submit-label</code><span>string</span><span>Submit button text (default 'Save')</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span></div>
+        <div class="opt-row"><code>pdx-submit</code><span>{ values, valid }</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Converter Functions</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Function</span><span>Description</span></div>
+        <div class="opt-row"><code>toColumnDefs(fields)</code><span>FieldDefinition[] → ColumnDef[] (for grids)</span></div>
+        <div class="opt-row"><code>toFormFields(fields)</code><span>FieldDefinition[] → FormFieldSchema[] (for forms)</span></div>
+        <div class="opt-row"><code>toFilterFields(fields)</code><span>FieldDefinition[] → FilterField[] (for filter builder)</span></div>
+        <div class="opt-row"><code>createGridFromConfig(config)</code><span>DataGridConfig JSON → { source, columns, props }</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/auto-form';
+@title 'Auto Form';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { max-width: 500px; padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+</style>

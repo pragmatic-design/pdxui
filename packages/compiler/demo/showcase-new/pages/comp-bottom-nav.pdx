@@ -1,0 +1,63 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">BottomNav</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-bottom-nav&gt;</code> — mobile bottom tab bar fixed at the bottom of the screen.
+      3-5 items with icons and optional badges.
+    </p>
+
+    <pdx-demo-comp-bottom-nav-preview class="demo-section"></pdx-demo-comp-bottom-nav-preview>
+
+    <pdx-demo-comp-bottom-nav-with-badges class="demo-section"></pdx-demo-comp-bottom-nav-with-badges>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>BottomNavItem[]</td><td>[]</td><td>Tab items (3-5)</td></tr>
+            <tr><td><code>activekey</code></td><td>String</td><td>''</td><td>Active tab key</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-select</code></td><td>{ key, item }</td><td>Tab clicked</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/bottom-nav';
+@title 'BottomNav — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.phone-frame {
+  width: 375px;
+  max-width: 100%;
+  height: 500px;
+  border: 2px solid var(--pdx-color-border);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  background: var(--pdx-color-bg);
+}
+.phone-frame pdx-bottom-nav { position: absolute; }
+.phone-content { height: calc(100% - 56px); display: flex; align-items: center; justify-content: center; }
+.phone-label { font-size: var(--pdx-text-lg); font-weight: var(--pdx-weight-semibold); }
+</style>

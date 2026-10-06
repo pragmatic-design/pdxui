@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Checkboxes, and the third state</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Checking a branch checks its subtree; checking some of its children leaves the branch
+      <em>mixed</em>. That third state is the reason a tree is not a list with indents — and it
+      is computed from the subtree, never stored, so it cannot go stale.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tree label="Permissions" checkable default-expand-all :nodes="permissions"></pdx-tree>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const permissions = [
+  {
+    id: 'billing', label: 'Billing', children: [
+      { id: 'billing-read', label: 'Read invoices' },
+      { id: 'billing-write', label: 'Issue invoices' },
+      { id: 'billing-refund', label: 'Refund' },
+    ]
+  },
+  {
+    id: 'users', label: 'Users', children: [
+      { id: 'users-read', label: 'See users' },
+      { id: 'users-write', label: 'Edit users' },
+    ]
+  },
+];
+</script>

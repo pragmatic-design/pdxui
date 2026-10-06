@@ -1,0 +1,667 @@
+{
+  "name": "@pdxui/ui",
+  "version": "1.0.0-alpha.1",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pragmatic-design/pdxui.git",
+    "directory": "packages/ui"
+  },
+  "homepage": "https://pdxui.com",
+  "bugs": {
+    "url": "https://github.com/pragmatic-design/pdxui/issues"
+  },
+  "type": "module",
+  "description": "PDX UI Web Components — button, input, dialog, drawer, toast, tabs, popover, tooltip, slider, overlay",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "customElements": "custom-elements.json",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./all": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./manifest": "./custom-elements.json",
+    "./icon/pdx-icon": {
+      "development": "./src/icon/pdx-icon.ts",
+      "types": "./dist/icon/pdx-icon.d.ts",
+      "import": "./dist/icon/pdx-icon.js"
+    },
+    "./icon/pragmatic-icons": {
+      "development": "./src/icon/pragmatic-icons.ts",
+      "types": "./dist/icon/pragmatic-icons.d.ts",
+      "import": "./dist/icon/pragmatic-icons.js"
+    },
+    "./icon/lucide-icons": {
+      "development": "./src/icon/lucide-icons.ts",
+      "types": "./dist/icon/lucide-icons.d.ts",
+      "import": "./dist/icon/lucide-icons.js"
+    },
+    "./button": {
+      "development": "./src/button/pdx-button.ts",
+      "types": "./dist/button/pdx-button.d.ts",
+      "import": "./dist/button/pdx-button.js"
+    },
+    "./button-group": {
+      "development": "./src/button-group/pdx-button-group.ts",
+      "types": "./dist/button-group/pdx-button-group.d.ts",
+      "import": "./dist/button-group/pdx-button-group.js"
+    },
+    "./badge": {
+      "development": "./src/badge/pdx-badge.ts",
+      "types": "./dist/badge/pdx-badge.d.ts",
+      "import": "./dist/badge/pdx-badge.js"
+    },
+    "./chip": {
+      "development": "./src/chip/pdx-chip.ts",
+      "types": "./dist/chip/pdx-chip.d.ts",
+      "import": "./dist/chip/pdx-chip.js"
+    },
+    "./avatar": {
+      "development": "./src/avatar/pdx-avatar.ts",
+      "types": "./dist/avatar/pdx-avatar.d.ts",
+      "import": "./dist/avatar/pdx-avatar.js"
+    },
+    "./avatar-group": {
+      "development": "./src/avatar-group/pdx-avatar-group.ts",
+      "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
+      "import": "./dist/avatar-group/pdx-avatar-group.js"
+    },
+    "./spinner": {
+      "development": "./src/spinner/pdx-spinner.ts",
+      "types": "./dist/spinner/pdx-spinner.d.ts",
+      "import": "./dist/spinner/pdx-spinner.js"
+    },
+    "./divider": {
+      "development": "./src/divider/pdx-divider.ts",
+      "types": "./dist/divider/pdx-divider.d.ts",
+      "import": "./dist/divider/pdx-divider.js"
+    },
+    "./kbd": {
+      "development": "./src/kbd/pdx-kbd.ts",
+      "types": "./dist/kbd/pdx-kbd.d.ts",
+      "import": "./dist/kbd/pdx-kbd.js"
+    },
+    "./label": {
+      "development": "./src/label/pdx-label.ts",
+      "types": "./dist/label/pdx-label.d.ts",
+      "import": "./dist/label/pdx-label.js"
+    },
+    "./input": {
+      "development": "./src/input/pdx-input.ts",
+      "types": "./dist/input/pdx-input.d.ts",
+      "import": "./dist/input/pdx-input.js"
+    },
+    "./textarea": {
+      "development": "./src/textarea/pdx-textarea.ts",
+      "types": "./dist/textarea/pdx-textarea.d.ts",
+      "import": "./dist/textarea/pdx-textarea.js"
+    },
+    "./input-group": {
+      "development": "./src/input-group/pdx-input-group.ts",
+      "types": "./dist/input-group/pdx-input-group.d.ts",
+      "import": "./dist/input-group/pdx-input-group.js"
+    },
+    "./checkbox": {
+      "development": "./src/checkbox/pdx-checkbox.ts",
+      "types": "./dist/checkbox/pdx-checkbox.d.ts",
+      "import": "./dist/checkbox/pdx-checkbox.js"
+    },
+    "./radio": {
+      "development": "./src/radio/pdx-radio.ts",
+      "types": "./dist/radio/pdx-radio.d.ts",
+      "import": "./dist/radio/pdx-radio.js"
+    },
+    "./switch": {
+      "development": "./src/switch-toggle/pdx-switch.ts",
+      "types": "./dist/switch-toggle/pdx-switch.d.ts",
+      "import": "./dist/switch-toggle/pdx-switch.js"
+    },
+    "./radio-group": {
+      "development": "./src/radio-group/pdx-radio-group.ts",
+      "types": "./dist/radio-group/pdx-radio-group.d.ts",
+      "import": "./dist/radio-group/pdx-radio-group.js"
+    },
+    "./checkbox-group": {
+      "development": "./src/checkbox-group/pdx-checkbox-group.ts",
+      "types": "./dist/checkbox-group/pdx-checkbox-group.d.ts",
+      "import": "./dist/checkbox-group/pdx-checkbox-group.js"
+    },
+    "./form": {
+      "development": "./src/form/pdx-form.ts",
+      "types": "./dist/form/pdx-form.d.ts",
+      "import": "./dist/form/pdx-form.js"
+    },
+    "./form-section": {
+      "development": "./src/form-section/pdx-form-section.ts",
+      "types": "./dist/form-section/pdx-form-section.d.ts",
+      "import": "./dist/form-section/pdx-form-section.js"
+    },
+    "./form-template": {
+      "development": "./src/form-template/pdx-form-template.ts",
+      "types": "./dist/form-template/pdx-form-template.d.ts",
+      "import": "./dist/form-template/pdx-form-template.js"
+    },
+    "./form-actions": {
+      "development": "./src/form-actions/pdx-form-actions.ts",
+      "types": "./dist/form-actions/pdx-form-actions.d.ts",
+      "import": "./dist/form-actions/pdx-form-actions.js"
+    },
+    "./form-field": {
+      "development": "./src/form-field/pdx-form-field.ts",
+      "types": "./dist/form-field/pdx-form-field.d.ts",
+      "import": "./dist/form-field/pdx-form-field.js"
+    },
+    "./password-input": {
+      "development": "./src/password-input/pdx-password-input.ts",
+      "types": "./dist/password-input/pdx-password-input.d.ts",
+      "import": "./dist/password-input/pdx-password-input.js"
+    },
+    "./search-input": {
+      "development": "./src/search-input/pdx-search-input.ts",
+      "types": "./dist/search-input/pdx-search-input.d.ts",
+      "import": "./dist/search-input/pdx-search-input.js"
+    },
+    "./number-input": {
+      "development": "./src/number-input/pdx-number-input.ts",
+      "types": "./dist/number-input/pdx-number-input.d.ts",
+      "import": "./dist/number-input/pdx-number-input.js"
+    },
+    "./masked-input": {
+      "development": "./src/masked-input/pdx-masked-input.ts",
+      "types": "./dist/masked-input/pdx-masked-input.d.ts",
+      "import": "./dist/masked-input/pdx-masked-input.js"
+    },
+    "./otp-input": {
+      "development": "./src/otp-input/pdx-otp-input.ts",
+      "types": "./dist/otp-input/pdx-otp-input.d.ts",
+      "import": "./dist/otp-input/pdx-otp-input.js"
+    },
+    "./pin-input": {
+      "development": "./src/pin-input/pdx-pin-input.ts",
+      "types": "./dist/pin-input/pdx-pin-input.d.ts",
+      "import": "./dist/pin-input/pdx-pin-input.js"
+    },
+    "./slider": {
+      "development": "./src/slider/pdx-slider.ts",
+      "types": "./dist/slider/pdx-slider.d.ts",
+      "import": "./dist/slider/pdx-slider.js"
+    },
+    "./rating": {
+      "development": "./src/rating/pdx-rating.ts",
+      "types": "./dist/rating/pdx-rating.d.ts",
+      "import": "./dist/rating/pdx-rating.js"
+    },
+    "./segmented": {
+      "development": "./src/segmented/pdx-segmented.ts",
+      "types": "./dist/segmented/pdx-segmented.d.ts",
+      "import": "./dist/segmented/pdx-segmented.js"
+    },
+    "./toggle": {
+      "development": "./src/toggle/pdx-toggle.ts",
+      "types": "./dist/toggle/pdx-toggle.d.ts",
+      "import": "./dist/toggle/pdx-toggle.js"
+    },
+    "./fieldset": {
+      "development": "./src/fieldset/pdx-fieldset.ts",
+      "types": "./dist/fieldset/pdx-fieldset.d.ts",
+      "import": "./dist/fieldset/pdx-fieldset.js"
+    },
+    "./field-group": {
+      "development": "./src/field-group/pdx-field-group.ts",
+      "types": "./dist/field-group/pdx-field-group.d.ts",
+      "import": "./dist/field-group/pdx-field-group.js"
+    },
+    "./field-list": {
+      "development": "./src/field-list/pdx-field-list.ts",
+      "types": "./dist/field-list/pdx-field-list.d.ts",
+      "import": "./dist/field-list/pdx-field-list.js"
+    },
+    "./progress": {
+      "development": "./src/progress/pdx-progress.ts",
+      "types": "./dist/progress/pdx-progress.d.ts",
+      "import": "./dist/progress/pdx-progress.js"
+    },
+    "./card": {
+      "development": "./src/card/pdx-card.ts",
+      "types": "./dist/card/pdx-card.d.ts",
+      "import": "./dist/card/pdx-card.js"
+    },
+    "./accordion": {
+      "development": "./src/accordion/pdx-accordion.ts",
+      "types": "./dist/accordion/pdx-accordion.d.ts",
+      "import": "./dist/accordion/pdx-accordion.js"
+    },
+    "./banner": {
+      "development": "./src/banner/pdx-banner.ts",
+      "types": "./dist/banner/pdx-banner.d.ts",
+      "import": "./dist/banner/pdx-banner.js"
+    },
+    "./tabs": {
+      "development": "./src/tabs/pdx-tabs.ts",
+      "types": "./dist/tabs/pdx-tabs.d.ts",
+      "import": "./dist/tabs/pdx-tabs.js"
+    },
+    "./dialog": {
+      "development": "./src/dialog/pdx-dialog.ts",
+      "types": "./dist/dialog/pdx-dialog.d.ts",
+      "import": "./dist/dialog/pdx-dialog.js"
+    },
+    "./drawer": {
+      "development": "./src/drawer/pdx-drawer.ts",
+      "types": "./dist/drawer/pdx-drawer.d.ts",
+      "import": "./dist/drawer/pdx-drawer.js"
+    },
+    "./toast": {
+      "development": "./src/toast/pdx-toast.ts",
+      "types": "./dist/toast/pdx-toast.d.ts",
+      "import": "./dist/toast/pdx-toast.js"
+    },
+    "./alert-dialog": {
+      "development": "./src/alert-dialog/pdx-alert-dialog.ts",
+      "types": "./dist/alert-dialog/pdx-alert-dialog.d.ts",
+      "import": "./dist/alert-dialog/pdx-alert-dialog.js"
+    },
+    "./tooltip": {
+      "development": "./src/tooltip/pdx-tooltip.ts",
+      "types": "./dist/tooltip/pdx-tooltip.d.ts",
+      "import": "./dist/tooltip/pdx-tooltip.js"
+    },
+    "./popover": {
+      "development": "./src/popover/pdx-popover.ts",
+      "types": "./dist/popover/pdx-popover.d.ts",
+      "import": "./dist/popover/pdx-popover.js"
+    },
+    "./overlay-outlet": {
+      "development": "./src/overlay/pdx-overlay-outlet.ts",
+      "types": "./dist/overlay/pdx-overlay-outlet.d.ts",
+      "import": "./dist/overlay/pdx-overlay-outlet.js"
+    },
+    "./dialog-service": {
+      "development": "./src/dialog/dialog-service.ts",
+      "types": "./dist/dialog/dialog-service.d.ts",
+      "import": "./dist/dialog/dialog-service.js"
+    },
+    "./bottom-sheet": {
+      "development": "./src/bottom-sheet/pdx-bottom-sheet.ts",
+      "types": "./dist/bottom-sheet/pdx-bottom-sheet.d.ts",
+      "import": "./dist/bottom-sheet/pdx-bottom-sheet.js"
+    },
+    "./select": {
+      "development": "./src/select/pdx-select.ts",
+      "types": "./dist/select/pdx-select.d.ts",
+      "import": "./dist/select/pdx-select.js"
+    },
+    "./autocomplete": {
+      "development": "./src/autocomplete/pdx-autocomplete.ts",
+      "types": "./dist/autocomplete/pdx-autocomplete.d.ts",
+      "import": "./dist/autocomplete/pdx-autocomplete.js"
+    },
+    "./color-picker": {
+      "development": "./src/color-picker/pdx-color-picker.ts",
+      "types": "./dist/color-picker/pdx-color-picker.d.ts",
+      "import": "./dist/color-picker/pdx-color-picker.js"
+    },
+    "./tag-input": {
+      "development": "./src/tag-input/pdx-tag-input.ts",
+      "types": "./dist/tag-input/pdx-tag-input.d.ts",
+      "import": "./dist/tag-input/pdx-tag-input.js"
+    },
+    "./file-upload": {
+      "development": "./src/file-upload/pdx-file-upload.ts",
+      "types": "./dist/file-upload/pdx-file-upload.d.ts",
+      "import": "./dist/file-upload/pdx-file-upload.js"
+    },
+    "./data-source": {
+      "development": "./src/data-source/pdx-data-source.ts",
+      "types": "./dist/data-source/pdx-data-source.d.ts",
+      "import": "./dist/data-source/pdx-data-source.js"
+    },
+    "./error-boundary": {
+      "development": "./src/error-boundary/pdx-error-boundary.ts",
+      "types": "./dist/error-boundary/pdx-error-boundary.d.ts",
+      "import": "./dist/error-boundary/pdx-error-boundary.js"
+    },
+    "./provide": {
+      "development": "./src/provide/pdx-provide.ts",
+      "types": "./dist/provide/pdx-provide.d.ts",
+      "import": "./dist/provide/pdx-provide.js"
+    },
+    "./calendar": {
+      "development": "./src/calendar/pdx-calendar.ts",
+      "types": "./dist/calendar/pdx-calendar.d.ts",
+      "import": "./dist/calendar/pdx-calendar.js"
+    },
+    "./time-picker": {
+      "development": "./src/time-picker/pdx-time-picker.ts",
+      "types": "./dist/time-picker/pdx-time-picker.d.ts",
+      "import": "./dist/time-picker/pdx-time-picker.js"
+    },
+    "./date-picker": {
+      "development": "./src/date-picker/pdx-date-picker.ts",
+      "types": "./dist/date-picker/pdx-date-picker.d.ts",
+      "import": "./dist/date-picker/pdx-date-picker.js"
+    },
+    "./transfer": {
+      "development": "./src/transfer/pdx-transfer.ts",
+      "types": "./dist/transfer/pdx-transfer.d.ts",
+      "import": "./dist/transfer/pdx-transfer.js"
+    },
+    "./mention": {
+      "development": "./src/mention/pdx-mention.ts",
+      "types": "./dist/mention/pdx-mention.d.ts",
+      "import": "./dist/mention/pdx-mention.js"
+    },
+    "./cascader": {
+      "development": "./src/cascader/pdx-cascader.ts",
+      "types": "./dist/cascader/pdx-cascader.d.ts",
+      "import": "./dist/cascader/pdx-cascader.js"
+    },
+    "./tree": {
+      "development": "./src/tree/pdx-tree.ts",
+      "types": "./dist/tree/pdx-tree.d.ts",
+      "import": "./dist/tree/pdx-tree.js"
+    },
+    "./tree-select": {
+      "development": "./src/tree-select/pdx-tree-select.ts",
+      "types": "./dist/tree-select/pdx-tree-select.d.ts",
+      "import": "./dist/tree-select/pdx-tree-select.js"
+    },
+    "./inline-edit": {
+      "development": "./src/inline-edit/pdx-inline-edit.ts",
+      "types": "./dist/inline-edit/pdx-inline-edit.d.ts",
+      "import": "./dist/inline-edit/pdx-inline-edit.js"
+    },
+    "./wizard": {
+      "development": "./src/wizard/pdx-wizard.ts",
+      "types": "./dist/wizard/pdx-wizard.d.ts",
+      "import": "./dist/wizard/pdx-wizard.js"
+    },
+    "./menu": {
+      "development": "./src/menu/pdx-menu.ts",
+      "types": "./dist/menu/pdx-menu.d.ts",
+      "import": "./dist/menu/pdx-menu.js"
+    },
+    "./dropdown-menu": {
+      "development": "./src/dropdown-menu/pdx-dropdown-menu.ts",
+      "types": "./dist/dropdown-menu/pdx-dropdown-menu.d.ts",
+      "import": "./dist/dropdown-menu/pdx-dropdown-menu.js"
+    },
+    "./menubar": {
+      "development": "./src/menubar/pdx-menubar.ts",
+      "types": "./dist/menubar/pdx-menubar.d.ts",
+      "import": "./dist/menubar/pdx-menubar.js"
+    },
+    "./nav-menu": {
+      "development": "./src/nav-menu/pdx-nav-menu.ts",
+      "types": "./dist/nav-menu/pdx-nav-menu.d.ts",
+      "import": "./dist/nav-menu/pdx-nav-menu.js"
+    },
+    "./navbar": {
+      "development": "./src/navbar/pdx-navbar.ts",
+      "types": "./dist/navbar/pdx-navbar.d.ts",
+      "import": "./dist/navbar/pdx-navbar.js"
+    },
+    "./breadcrumb": {
+      "development": "./src/breadcrumb/pdx-breadcrumb.ts",
+      "types": "./dist/breadcrumb/pdx-breadcrumb.d.ts",
+      "import": "./dist/breadcrumb/pdx-breadcrumb.js"
+    },
+    "./toolbar": {
+      "development": "./src/toolbar/pdx-toolbar.ts",
+      "types": "./dist/toolbar/pdx-toolbar.d.ts",
+      "import": "./dist/toolbar/pdx-toolbar.js"
+    },
+    "./sidebar": {
+      "development": "./src/sidebar/pdx-sidebar.ts",
+      "types": "./dist/sidebar/pdx-sidebar.d.ts",
+      "import": "./dist/sidebar/pdx-sidebar.js"
+    },
+    "./bottom-nav": {
+      "development": "./src/bottom-nav/pdx-bottom-nav.ts",
+      "types": "./dist/bottom-nav/pdx-bottom-nav.d.ts",
+      "import": "./dist/bottom-nav/pdx-bottom-nav.js"
+    },
+    "./pagination": {
+      "development": "./src/pagination/pdx-pagination.ts",
+      "types": "./dist/pagination/pdx-pagination.d.ts",
+      "import": "./dist/pagination/pdx-pagination.js"
+    },
+    "./fab": {
+      "development": "./src/fab/pdx-fab.ts",
+      "types": "./dist/fab/pdx-fab.d.ts",
+      "import": "./dist/fab/pdx-fab.js"
+    },
+    "./context-menu": {
+      "development": "./src/context-menu/pdx-context-menu.ts",
+      "types": "./dist/context-menu/pdx-context-menu.d.ts",
+      "import": "./dist/context-menu/pdx-context-menu.js"
+    },
+    "./split-button": {
+      "development": "./src/split-button/pdx-split-button.ts",
+      "types": "./dist/split-button/pdx-split-button.d.ts",
+      "import": "./dist/split-button/pdx-split-button.js"
+    },
+    "./block-ui": {
+      "development": "./src/block-ui/pdx-block-ui.ts",
+      "types": "./dist/block-ui/pdx-block-ui.d.ts",
+      "import": "./dist/block-ui/pdx-block-ui.js"
+    },
+    "./empty-state": {
+      "development": "./src/empty-state/pdx-empty-state.ts",
+      "types": "./dist/empty-state/pdx-empty-state.d.ts",
+      "import": "./dist/empty-state/pdx-empty-state.js"
+    },
+    "./statistic": {
+      "development": "./src/statistic/pdx-statistic.ts",
+      "types": "./dist/statistic/pdx-statistic.d.ts",
+      "import": "./dist/statistic/pdx-statistic.js"
+    },
+    "./description-list": {
+      "development": "./src/description-list/pdx-description-list.ts",
+      "types": "./dist/description-list/pdx-description-list.d.ts",
+      "import": "./dist/description-list/pdx-description-list.js"
+    },
+    "./list": {
+      "development": "./src/list/pdx-list.ts",
+      "types": "./dist/list/pdx-list.d.ts",
+      "import": "./dist/list/pdx-list.js"
+    },
+    "./splitter": {
+      "development": "./src/splitter/pdx-splitter.ts",
+      "types": "./dist/splitter/pdx-splitter.d.ts",
+      "import": "./dist/splitter/pdx-splitter.js"
+    },
+    "./scroll-area": {
+      "development": "./src/scroll-area/pdx-scroll-area.ts",
+      "types": "./dist/scroll-area/pdx-scroll-area.d.ts",
+      "import": "./dist/scroll-area/pdx-scroll-area.js"
+    },
+    "./app-layout": {
+      "development": "./src/app-layout/pdx-app-layout.ts",
+      "types": "./dist/app-layout/pdx-app-layout.d.ts",
+      "import": "./dist/app-layout/pdx-app-layout.js"
+    },
+    "./aspect-ratio": {
+      "development": "./src/aspect-ratio/pdx-aspect-ratio.ts",
+      "types": "./dist/aspect-ratio/pdx-aspect-ratio.d.ts",
+      "import": "./dist/aspect-ratio/pdx-aspect-ratio.js"
+    },
+    "./masonry": {
+      "development": "./src/masonry/pdx-masonry.ts",
+      "types": "./dist/masonry/pdx-masonry.d.ts",
+      "import": "./dist/masonry/pdx-masonry.js"
+    },
+    "./row": {
+      "development": "./src/row/pdx-row.ts",
+      "types": "./dist/row/pdx-row.d.ts",
+      "import": "./dist/row/pdx-row.js"
+    },
+    "./col": {
+      "development": "./src/col/pdx-col.ts",
+      "types": "./dist/col/pdx-col.d.ts",
+      "import": "./dist/col/pdx-col.js"
+    },
+    "./affix": {
+      "development": "./src/affix/pdx-affix.ts",
+      "types": "./dist/affix/pdx-affix.d.ts",
+      "import": "./dist/affix/pdx-affix.js"
+    },
+    "./scroll-spy": {
+      "development": "./src/scroll-spy/pdx-scroll-spy.ts",
+      "types": "./dist/scroll-spy/pdx-scroll-spy.d.ts",
+      "import": "./dist/scroll-spy/pdx-scroll-spy.js"
+    },
+    "./timeline": {
+      "development": "./src/timeline/pdx-timeline.ts",
+      "types": "./dist/timeline/pdx-timeline.d.ts",
+      "import": "./dist/timeline/pdx-timeline.js"
+    },
+    "./infinite-scroll": {
+      "development": "./src/infinite-scroll/pdx-infinite-scroll.ts",
+      "types": "./dist/infinite-scroll/pdx-infinite-scroll.d.ts",
+      "import": "./dist/infinite-scroll/pdx-infinite-scroll.js"
+    },
+    "./image": {
+      "development": "./src/image/pdx-image.ts",
+      "types": "./dist/image/pdx-image.d.ts",
+      "import": "./dist/image/pdx-image.js"
+    },
+    "./carousel": {
+      "development": "./src/carousel/pdx-carousel.ts",
+      "types": "./dist/carousel/pdx-carousel.d.ts",
+      "import": "./dist/carousel/pdx-carousel.js"
+    },
+    "./command": {
+      "development": "./src/command/pdx-command.ts",
+      "types": "./dist/command/pdx-command.d.ts",
+      "import": "./dist/command/pdx-command.js"
+    },
+    "./relative-time": {
+      "development": "./src/relative-time/pdx-relative-time.ts",
+      "types": "./dist/relative-time/pdx-relative-time.d.ts",
+      "import": "./dist/relative-time/pdx-relative-time.js"
+    },
+    "./data-grid": {
+      "development": "./src/data-grid/pdx-data-grid.ts",
+      "types": "./dist/data-grid/pdx-data-grid.d.ts",
+      "import": "./dist/data-grid/pdx-data-grid.js"
+    },
+    "./bulk-actions": {
+      "development": "./src/bulk-actions/pdx-bulk-actions.ts",
+      "types": "./dist/bulk-actions/pdx-bulk-actions.d.ts",
+      "import": "./dist/bulk-actions/pdx-bulk-actions.js"
+    },
+    "./edit-drawer": {
+      "development": "./src/edit-drawer/pdx-edit-drawer.ts",
+      "types": "./dist/edit-drawer/pdx-edit-drawer.d.ts",
+      "import": "./dist/edit-drawer/pdx-edit-drawer.js"
+    },
+    "./entity-grid": {
+      "development": "./src/entity-grid/pdx-entity-grid.ts",
+      "types": "./dist/entity-grid/pdx-entity-grid.d.ts",
+      "import": "./dist/entity-grid/pdx-entity-grid.js"
+    },
+    "./filter-builder": {
+      "development": "./src/filter-builder/pdx-filter-builder.ts",
+      "types": "./dist/filter-builder/pdx-filter-builder.d.ts",
+      "import": "./dist/filter-builder/pdx-filter-builder.js"
+    },
+    "./auto-form": {
+      "development": "./src/auto-form/pdx-auto-form.ts",
+      "types": "./dist/auto-form/pdx-auto-form.d.ts",
+      "import": "./dist/auto-form/pdx-auto-form.js"
+    },
+    "./chart": {
+      "development": "./src/chart/pdx-chart.ts",
+      "types": "./dist/chart/pdx-chart.d.ts",
+      "import": "./dist/chart/pdx-chart.js"
+    },
+    "./sparkline": {
+      "development": "./src/chart/pdx-sparkline.ts",
+      "types": "./dist/chart/pdx-sparkline.d.ts",
+      "import": "./dist/chart/pdx-sparkline.js"
+    },
+    "./rich-text": {
+      "development": "./src/rich-text/pdx-rich-text.ts",
+      "types": "./dist/rich-text/pdx-rich-text.d.ts",
+      "import": "./dist/rich-text/pdx-rich-text.js"
+    },
+    "./shared/column-chooser": {
+      "development": "./src/shared/column-chooser.ts",
+      "types": "./dist/shared/column-chooser.d.ts",
+      "import": "./dist/shared/column-chooser.js"
+    },
+    "./shared/filter-popover": {
+      "development": "./src/shared/filter-popover.ts",
+      "types": "./dist/shared/filter-popover.d.ts",
+      "import": "./dist/shared/filter-popover.js"
+    },
+    "./json-editor": {
+      "development": "./src/json-editor/pdx-json-editor.ts",
+      "types": "./dist/json-editor/pdx-json-editor.d.ts",
+      "import": "./dist/json-editor/pdx-json-editor.js"
+    },
+    "./page-header": {
+      "development": "./src/page-header/pdx-page-header.ts",
+      "types": "./dist/page-header/pdx-page-header.d.ts",
+      "import": "./dist/page-header/pdx-page-header.js"
+    },
+    "./relation-picker": {
+      "development": "./src/relation-picker/pdx-relation-picker.ts",
+      "types": "./dist/relation-picker/pdx-relation-picker.d.ts",
+      "import": "./dist/relation-picker/pdx-relation-picker.js"
+    },
+    "./sortable-list": {
+      "development": "./src/sortable-list/pdx-sortable-list.ts",
+      "types": "./dist/sortable-list/pdx-sortable-list.d.ts",
+      "import": "./dist/sortable-list/pdx-sortable-list.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "dist/index.js",
+    "dist/**/pdx-*.js",
+    "dist/data-grid/grid-i18n.js",
+    "dist/shared/i18n.js",
+    "src/index.ts",
+    "src/**/pdx-*.ts",
+    "src/data-grid/grid-i18n.ts",
+    "src/shared/i18n.ts"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "custom-elements.json"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && tsc --emitDeclarationOnly",
+    "manifest": "node scripts/gen-manifest.mjs",
+    "exports": "node scripts/gen-exports.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "@pdxui/core": "workspace:*",
+    "@pdxui/design": "workspace:*"
+  },
+  "devDependencies": {
+    "@pdxui/core": "workspace:*",
+    "typescript": "^5.8.0",
+    "vite": "^6.4.2",
+    "vitest": "^4.1.0",
+    "happy-dom": "^20.8.9",
+    "@pdxui/design": "workspace:*"
+  }
+}

@@ -1,0 +1,67 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Sidebar</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-sidebar&gt;</code> — collapsible sidebar container. Wraps <code>pdx-nav-menu</code> or any content.
+      Supports expanded, collapsed, and mini (icon-only) modes.
+    </p>
+
+    <pdx-demo-comp-sidebar-interactive class="demo-section"></pdx-demo-comp-sidebar-interactive>
+
+    <pdx-demo-comp-sidebar-mini class="demo-section"></pdx-demo-comp-sidebar-mini>
+
+    <pdx-demo-comp-sidebar-right class="demo-section"></pdx-demo-comp-sidebar-right>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>open</code></td><td>Boolean</td><td>true</td><td>Expanded state</td></tr>
+            <tr><td><code>mini</code></td><td>Boolean</td><td>false</td><td>Show icons when collapsed</td></tr>
+            <tr><td><code>position</code></td><td>String</td><td>'left'</td><td>'left' or 'right'</td></tr>
+            <tr><td><code>width</code></td><td>Number</td><td>260</td><td>Expanded width (px)</td></tr>
+            <tr><td><code>collapsedwidth</code></td><td>Number</td><td>60</td><td>Collapsed width (px)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/sidebar';
+@title 'Sidebar — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-layout {
+  display: flex;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+  height: 320px;
+}
+.demo-content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--pdx-space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pdx-color-muted);
+  background: var(--pdx-color-bg);
+  font-size: var(--pdx-text-sm);
+}
+.sidebar-header.collapsed {
+  flex-direction: column;
+  padding: var(--pdx-space-xs);
+  gap: var(--pdx-space-xs);
+}
+.sidebar-header.collapsed .sidebar-title { display: none; }
+</style>

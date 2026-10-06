@@ -1,0 +1,20 @@
+/* pdx-sidebar — Collapsible sidebar container */
+
+pdx-sidebar { display: block; }
+
+.pdx-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    transition: width 0.2s ease, min-width 0.2s ease;
+    overflow: hidden;
+}
+
+.pdx-sidebar-right {
+    border-right: none;
+    border-left: 1px solid var(--pdx-color-border);
+}
+
+.pdx-sidebar-collapsed:not(.pdx-sidebar-mini) { width: 0 !important; min-width: 0 !important; }

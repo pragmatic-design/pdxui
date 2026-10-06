@@ -1,0 +1,47 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Divider</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-divider&gt;</code> — separator with optional label. Horizontal and vertical orientations.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-divider-basic class="demo-section"></pdx-demo-comp-divider-basic>
+
+    <!-- ═══ With Label ═══ -->
+    <pdx-demo-comp-divider-with-label class="demo-section"></pdx-demo-comp-divider-with-label>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-comp-divider-line-variants class="demo-section"></pdx-demo-comp-divider-line-variants>
+
+    <!-- ═══ Vertical ═══ -->
+    <pdx-demo-comp-divider-vertical class="demo-section"></pdx-demo-comp-divider-vertical>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-divider-composition class="demo-section"></pdx-demo-comp-divider-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal (default), vertical</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Text label; unset, the text inside the tag</span></div>
+        <div class="opt-row"><code>labelPosition</code><span>string</span><span>left, center (default), right</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>solid (default), dashed, dotted</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/divider';
+@title 'Divider Component';
+let _ = $signal(0);
+</script>
+
+<style scoped>
+  .page { }
+
+  .opt-header, .opt-row { grid-template-columns: 120px 80px 1fr; }
+</style>

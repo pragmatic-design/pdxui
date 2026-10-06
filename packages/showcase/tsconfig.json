@@ -1,0 +1,43 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "declaration": false,
+        "declarationMap": false,
+        // @types/node is installed under the compiler and nowhere else in this workspace, and the
+        // same line is in `@pdxui/responsive`'s project for the same reason. This package needs
+        // it: `vite.config.ts` reads `process.env`, and the two mock servers are `node:http`.
+        "typeRoots": ["../compiler/node_modules/@types"],
+        "types": ["node"],
+        // What the `pdx()` plugin resolves for the bundler, told to tsc as well.
+        //
+        // This app has no `@pdxui/*` in its package.json and needs none: the plugin
+        // auto-discovers every workspace package (`discoverPragmaticAliases`) and points each at
+        // its `src/index.ts`, which is what makes `pnpm dev` work with no build step. tsc does not
+        // read Vite's config, so without these two lines every import of core or the router is
+        // `any` — and an `any` import is worse than no type check, because the errors it hides are
+        // reported as "implicitly has an any type" somewhere else.
+        //
+        // Only what the TypeScript here imports. A file that starts importing another package
+        // fails loudly with TS2307, which is the right way to find out.
+        "paths": {
+            "@pdxui/core": ["../core/src/index.ts"],
+            "@pdxui/router": ["../router/src/index.ts"]
+        }
+    },
+    // Everything this package holds in TypeScript: the app's modules, the Playwright suite, and the
+    // root-level files — the Vite config and the two mock servers, which are the backends the suite
+    // measures against. `*.ts` rather than their names, so the next one is covered by arriving.
+    //
+    // ⚠️ `.pdx` files are NOT here and cannot be: they are compiled by @pdxui/compiler, which
+    // emits the `.d.ts` a consumer reads. What `tsc` guards here is the plain TypeScript around
+    // them — which is where `auth.ts`, `api.ts` and the four data sources live.
+    //
+    // `../router/src/pdx-globals.d.ts` is here because the alias above points at the router's
+    // SOURCE, and a source file pulled in as a dependency does not bring its package's ambient
+    // declarations with it. Without it tsc reports two dozen errors inside `outlet.ts` —
+    // `_keepAlive does not exist on HTMLElement`, `PdxNavigateEvent` unknown — which are the
+    // router's own globals, declared in that file and read by its own project. They are errors
+    // about a package this one only imports, and they would drown the ones that are ours.
+    "include": ["src/**/*.ts", "tests/**/*.ts", "*.ts", "../router/src/pdx-globals.d.ts"]
+}

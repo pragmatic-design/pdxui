@@ -1,0 +1,90 @@
+<template>
+  <div class="form-card">
+    <h3>Contact Form</h3>
+    <div class="status-bar">
+      <span class="tag" :class="stateClass">{{ contact.state() }}</span>
+      <span class="tag" :class="contact.valid() ? 'success' : 'error'">valid: {{ contact.valid() }}</span>
+    </div>
+    <form @submit="handleSubmit">
+      <div class="field">
+        <label>Name *</label>
+        <input type="text" :value="contact.fields.name.value()"
+               @input="onNameInput" @blur="onNameBlur"
+               :class="contact.fields.name.error() ? 'input-error' : ''" />
+        @if (contact.fields.name.error()) {
+          <span class="err">{{ contact.fields.name.error() }}</span>
+        }
+      </div>
+      <div class="field">
+        <label>Email *</label>
+        <input type="email" :value="contact.fields.email.value()"
+               @input="onEmailInput" @blur="onEmailBlur"
+               :class="contact.fields.email.error() ? 'input-error' : ''" />
+        @if (contact.fields.email.error()) {
+          <span class="err">{{ contact.fields.email.error() }}</span>
+        }
+      </div>
+      <div class="field">
+        <label>Message</label>
+        <input type="text" :value="contact.fields.message.value()"
+               @input="onMessageInput" />
+      </div>
+      <div class="form-actions">
+        <button type="submit" :disabled="contact.submitting()">
+          @if (contact.submitting()) { Sending... } @else { Submit }
+        </button>
+        <button type="button" @click="resetForm" class="secondary">Reset</button>
+        <span class="meta">dirty:{{ contact.dirty() }} touched:{{ contact.touched() }}</span>
+      </div>
+    </form>
+    @if (contact.state() === 'success') {
+      <div class="success-msg">Form submitted!</div>
+    }
+  </div>
+</template>
+
+<script setup>
+  @form contact: {
+    name: string { required, minLength: 3 },
+    email: string { required, email },
+    message: string,
+  }
+
+  const stateClass = $derived(
+    contact.state() === 'success' ? 'success' : contact.state() === 'error' ? 'error' : 'info'
+  );
+
+  const handleSubmit = contact.handleSubmit(async (values) => {
+    await new Promise(r => setTimeout(r, 800));
+    console.log('Submitted:', values);
+  });
+
+  function onNameInput(e) { contact.fields.name.onChange(e.target.value); }
+  function onNameBlur() { contact.fields.name.onBlur(); }
+  function onEmailInput(e) { contact.fields.email.onChange(e.target.value); }
+  function onEmailBlur() { contact.fields.email.onBlur(); }
+  function onMessageInput(e) { contact.fields.message.onChange(e.target.value); }
+  function resetForm() { contact.reset(); }
+</script>
+
+<style scoped>
+  .form-card { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .status-bar { display: flex; gap: 6px; margin: 8px 0; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; }
+  .tag.success { background: #d4edda; color: #155724; }
+  .tag.error { background: #f8d7da; color: #721c24; }
+  .tag.info { background: #e2e3e5; color: #383d41; }
+  .field { margin-bottom: 10px; }
+  .field label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 2px; }
+  .field input { width: 100%; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
+  .field input:focus { border-color: #007bff; outline: none; }
+  .field .input-error { border-color: #dc3545; }
+  .err { color: #dc3545; font-size: 0.78rem; }
+  .form-actions { display: flex; gap: 6px; align-items: center; margin-top: 10px; }
+  .meta { font-size: 0.75rem; color: #888; margin-left: auto; font-family: monospace; }
+  button { padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; background: #007bff; color: white; }
+  button:hover { background: #0069d9; }
+  button:disabled { background: #ccc; cursor: not-allowed; }
+  button.secondary { background: #6c757d; }
+  .success-msg { margin-top: 8px; padding: 8px; background: #d4edda; color: #155724; border-radius: 4px; }
+</style>

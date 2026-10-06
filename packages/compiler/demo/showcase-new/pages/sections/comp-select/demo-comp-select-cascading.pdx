@@ -1,0 +1,62 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Cascading Selects</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Second select filters options based on the first select's value.
+      Uses <code>$derived</code> to recompute the filtered array reactively.
+    </p>
+    <div class="demo-col" style="max-width: 400px">
+      <div class="field">
+        <pdx-label text="Country"></pdx-label>
+        <pdx-select :options="cascadeCountries" clearable placeholder="Select country..." @pdx-change="onCountryChange" />
+      </div>
+      <div class="field">
+        <pdx-label text="City"></pdx-label>
+        <pdx-select :options="filteredCities" labelField="name" valueField="id" :value="selectedCity" :disabled="!selectedCountry" searchable clearable placeholder="Select city..." @pdx-change="onCityChange" />
+      </div>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>let selectedCountry = $signal('');
+
+const filteredCities = $derived(
+  cities.filter(c => !selectedCountry || c.country === selectedCountry)
+);
+
+function onCountryChange(e) {
+  selectedCountry = e.detail.value;
+}
+
+&lt;pdx-select :options="cascadeCountries" clearable
+  @pdx-change="onCountryChange" placeholder="Select country..." /&gt;
+
+&lt;pdx-select :options="filteredCities" labelField="name" valueField="id"
+  :disabled="!selectedCountry" searchable clearable
+  placeholder="Select city..." /&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// Cascade selects
+let selectedCountry = $signal('');
+
+let selectedCity = $signal(null);
+const cascadeCountries = ['USA', 'UK', 'Italy', 'Japan'];
+const filteredCities = $derived(cities.filter(c => !selectedCountry || c.country === selectedCountry));
+
+function onCountryChange(e) { selectedCountry = e.detail.value ?? e.detail; selectedCity = null; }
+function onCityChange(e) { selectedCity = e.detail.value ?? e.detail; }
+
+const cities = [
+  { id: 1, name: 'New York', country: 'USA' },
+  { id: 2, name: 'Los Angeles', country: 'USA' },
+  { id: 3, name: 'Chicago', country: 'USA' },
+  { id: 4, name: 'London', country: 'UK' },
+  { id: 5, name: 'Manchester', country: 'UK' },
+  { id: 6, name: 'Edinburgh', country: 'UK' },
+  { id: 7, name: 'Rome', country: 'Italy' },
+  { id: 8, name: 'Milan', country: 'Italy' },
+  { id: 9, name: 'Florence', country: 'Italy' },
+  { id: 10, name: 'Tokyo', country: 'Japan' },
+  { id: 11, name: 'Osaka', country: 'Japan' },
+  { id: 12, name: 'Kyoto', country: 'Japan' },
+];
+</script>

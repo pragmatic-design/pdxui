@@ -1,0 +1,79 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Spacing Scale</h2>
+    <p class="pdx-txt-small pdx-ink-muted">7-step scale from 0.25rem to 4rem. All scaled by <code>--pdx-density-factor</code>. Used as <code>gap</code>/<code>pad</code> attributes and in component styles.</p>
+
+    <div class="spacing-demo">
+      <div class="space-row">
+        <code class="space-label">--pdx-space-2xs</code>
+        <div class="space-bar" style="width:var(--pdx-space-2xs)"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">0.25rem · 4px</span>
+      </div>
+      <div class="space-row">
+        <code class="space-label">--pdx-space-xs</code>
+        <div class="space-bar" style="width:var(--pdx-space-xs)"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">0.5rem · 8px</span>
+      </div>
+      <div class="space-row">
+        <code class="space-label">--pdx-space-sm</code>
+        <div class="space-bar" style="width:var(--pdx-space-sm)"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">0.75rem · 12px</span>
+      </div>
+      <div class="space-row">
+        <code class="space-label">--pdx-space-md</code>
+        <div class="space-bar" style="width:var(--pdx-space-md)"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">1rem · 16px</span>
+      </div>
+      <div class="space-row">
+        <code class="space-label">--pdx-space-lg</code>
+        <div class="space-bar" style="width:var(--pdx-space-lg)"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">1.5rem · 24px</span>
+      </div>
+      <div class="space-row">
+        <code class="space-label">--pdx-space-xl</code>
+        <div class="space-bar" style="width:var(--pdx-space-xl)"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">2.5rem · 40px</span>
+      </div>
+      <div class="space-row">
+        <code class="space-label">--pdx-space-2xl</code>
+        <div class="space-bar" style="width:var(--pdx-space-2xl)"></div>
+        <span class="pdx-txt-caption pdx-ink-muted">4rem · 64px</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>--pdx-space-2xs: calc(0.25rem * var(--pdx-density-factor));
+--pdx-space-xs:  calc(0.5rem  * var(--pdx-density-factor));
+--pdx-space-sm:  calc(0.75rem * var(--pdx-density-factor));
+--pdx-space-md:  calc(1rem    * var(--pdx-density-factor));
+--pdx-space-lg:  calc(1.5rem  * var(--pdx-density-factor));
+--pdx-space-xl:  calc(2.5rem  * var(--pdx-density-factor));
+--pdx-space-2xl: calc(4rem    * var(--pdx-density-factor));
+
+/* Usage */
+padding: var(--pdx-space-md);
+gap: var(--pdx-space-sm);
+margin-bottom: var(--pdx-space-xl);</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Spacing bars */
+  .spacing-demo { margin-top: var(--pdx-space-md); }
+  .space-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .space-label { min-width: 160px; font-size: var(--pdx-text-xs); }
+  .space-bar {
+    height: 20px;
+    min-width: 4px;
+    background: var(--pdx-color-primary);
+    border-radius: var(--pdx-radius-sm);
+  }
+</style>

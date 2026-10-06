@@ -1,0 +1,39 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Dialog Structure</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Dialog appearance (static preview) — header, body, and footer sections.</p>
+
+    <div class="dialog-preview-bg">
+      <div class="pdx-dialog">
+        <div class="pdx-dialog-header">
+          <h3 class="pdx-txt-subheading">Dialog Title</h3>
+          <button class="pdx-dialog-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="pdx-dialog-body">
+          <p class="pdx-txt-body">This is the dialog body content. It can contain any HTML elements, forms, or informational text.</p>
+        </div>
+        <div class="pdx-dialog-footer">
+          <button class="pdx-ghost">Cancel</button>
+          <button class="pdx-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-dialog"&gt;
+  &lt;div class="pdx-dialog-header"&gt;
+    &lt;h3&gt;Dialog Title&lt;/h3&gt;
+    &lt;button class="pdx-dialog-close" aria-label="Close"&gt;&amp;times;&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-dialog-body"&gt;
+    &lt;p&gt;Dialog body content...&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-dialog-footer"&gt;
+    &lt;button class="pdx-ghost"&gt;Cancel&lt;/button&gt;
+    &lt;button class="pdx-primary"&gt;Confirm&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

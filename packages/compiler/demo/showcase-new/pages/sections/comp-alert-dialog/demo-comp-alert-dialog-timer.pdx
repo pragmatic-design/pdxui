@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Timer-Gated Confirm</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Confirm button disabled for N seconds to prevent accidental clicks.</p>
+    <pdx-button variant="warning" @click="openTimer">Drop Database</pdx-button>
+
+    <pdx-alert-dialog :open="timerOpen" variant="danger" title="Drop database?" message="All tables and data will be destroyed. This cannot be undone."
+        confirmLabel="Drop" confirmDelay="5" @pdx-confirm="onTimerConfirm" @pdx-cancel="onTimerCancel"></pdx-alert-dialog>
+  </section>
+</template>
+
+<script setup>
+let timerOpen = $signal(false);
+
+function openTimer() { timerOpen = true; }
+function onTimerConfirm() { timerOpen = false; }
+function onTimerCancel() { timerOpen = false; }
+</script>

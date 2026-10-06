@@ -1,0 +1,45 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Product Cards</h2>
+    <div class="demo-grid">
+      <pdx-card hoverable>
+        <div class="pdx-card-media"><img src="/demo-images/desk.svg" alt="Desk setup" /></div>
+        <div class="pdx-card-body">
+          <p class="pdx-txt-small pdx-ink-muted" style="margin-bottom:4px">Furniture</p>
+          <h4 class="pdx-txt-subheading" style="margin-bottom:4px">Standing Desk Pro</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Electric height-adjustable, bamboo top, cable management.</p>
+          <p style="margin-top:8px;font-weight:600;color:var(--pdx-color-primary)">$599.00</p>
+        </div>
+        <div class="pdx-card-footer">
+          <pdx-button variant="primary" size="sm" full>Add to Cart</pdx-button>
+        </div>
+      </pdx-card>
+
+      <pdx-card hoverable>
+        <div class="pdx-card-media"><img src="/demo-images/chair.svg" alt="Chair" /></div>
+        <div class="pdx-card-body">
+          <p class="pdx-txt-small pdx-ink-muted" style="margin-bottom:4px">Furniture</p>
+          <h4 class="pdx-txt-subheading" style="margin-bottom:4px">Ergonomic Chair</h4>
+          <p class="pdx-txt-small pdx-ink-muted">Lumbar support, adjustable armrests, mesh back.</p>
+          <p style="margin-top:8px;font-weight:600;color:var(--pdx-color-primary)">$449.00</p>
+        </div>
+        <div class="pdx-card-footer">
+          <pdx-button variant="primary" size="sm" full>Add to Cart</pdx-button>
+        </div>
+      </pdx-card>
+
+      <pdx-card hoverable>
+        <div class="pdx-card-media"><img src="/demo-images/monitor.svg" alt="Monitor" /></div>
+        <div class="pdx-card-body">
+          <p class="pdx-txt-small pdx-ink-muted" style="margin-bottom:4px">Electronics</p>
+          <h4 class="pdx-txt-subheading" style="margin-bottom:4px">4K Monitor 32"</h4>
+          <p class="pdx-txt-small pdx-ink-muted">IPS panel, USB-C, 100% sRGB, height adjustable.</p>
+          <p style="margin-top:8px;font-weight:600;color:var(--pdx-color-primary)">$349.00</p>
+        </div>
+        <div class="pdx-card-footer">
+          <pdx-button variant="primary" size="sm" full>Add to Cart</pdx-button>
+        </div>
+      </pdx-card>
+    </div>
+  </section>
+</template>

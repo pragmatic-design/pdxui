@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Descriptions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Show extra info (role, email) next to each suggestion.</p>
+
+    <div class="demo-row">
+      <pdx-mention
+        :items="richUsers"
+        descriptionfield="role"
+        label="Assign to"
+        placeholder="Type @ to mention..."
+        :rows="4"
+      ></pdx-mention>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const richUsers = [
+  { value: 'alice', label: 'Alice Johnson', role: 'Engineer' },
+  { value: 'bob', label: 'Bob Smith', role: 'Designer' },
+  { value: 'charlie', label: 'Charlie Brown', role: 'PM' },
+  { value: 'diana', label: 'Diana Prince', role: 'Lead' },
+];
+</script>

@@ -1,0 +1,56 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A realistic settings form combining field wrappers, checkboxes, and toggles.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Account Settings</h3>
+      <div class="comp-form">
+        <div class="pdx-field">
+          <label class="pdx-field-label pdx-field-required">Display Name</label>
+          <input class="pdx-input" type="text" value="Alex Designer" />
+        </div>
+        <div class="pdx-field">
+          <label class="pdx-field-label">Bio</label>
+          <textarea class="pdx-input" placeholder="Tell us about yourself..."></textarea>
+          <span class="pdx-field-hint">Max 160 characters</span>
+        </div>
+        <fieldset class="pdx-fieldset">
+          <legend class="pdx-legend">Privacy</legend>
+          <div class="control-list">
+            <label class="control-row"><input type="checkbox" class="pdx-toggle" checked /><span>Profile visible to public</span></label>
+            <label class="control-row"><input type="checkbox" class="pdx-toggle" /><span>Show email address</span></label>
+            <label class="control-row"><input type="checkbox" class="pdx-checkbox" checked /><span>Allow search engines to index</span></label>
+          </div>
+        </fieldset>
+        <div class="comp-actions">
+          <button class="pdx-ghost">Cancel</button>
+          <button class="pdx-primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    max-width: 480px;
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-md); }
+  .comp-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+  }
+  .comp-actions {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    justify-content: flex-end;
+    margin-top: var(--pdx-space-sm);
+  }
+</style>

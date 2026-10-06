@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A filter selector with selectable chips and a chip input field.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Filter by Category</h3>
+      <div class="pdx-chip-group">
+        <span class="pdx-chip pdx-chip-primary" selected>All</span>
+        <span class="pdx-chip">Frontend</span>
+        <span class="pdx-chip">Backend</span>
+        <span class="pdx-chip">DevOps</span>
+        <span class="pdx-chip">Design</span>
+      </div>
+      <div class="comp-divider"></div>
+      <p class="pdx-txt-small pdx-ink-muted">Applied tags:</p>
+      <div class="pdx-chip-group">
+        <span class="pdx-chip pdx-chip-success">v2.0 <button class="pdx-chip-remove" aria-label="Remove">&times;</button></span>
+        <span class="pdx-chip pdx-chip-warning">needs-review <button class="pdx-chip-remove" aria-label="Remove">&times;</button></span>
+        <span class="pdx-chip pdx-chip-danger">breaking <button class="pdx-chip-remove" aria-label="Remove">&times;</button></span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    max-width: 480px;
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-md); }
+  .comp-divider {
+    height: 1px;
+    background: var(--pdx-color-border);
+    margin: var(--pdx-space-md) 0;
+  }
+</style>

@@ -1,0 +1,119 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Tabs</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Tab navigation with active state, aria support, and panel composition.
+      <strong>CSS only</strong> — apply classes to any container and button elements.
+    </p>
+
+    <!-- ═══ Default Tabs ═══ -->
+    <pdx-demo-design-tabs-default class="demo-section"></pdx-demo-design-tabs-default>
+
+    <!-- ═══ With aria-selected ═══ -->
+    <pdx-demo-design-tabs-aria-selected class="demo-section"></pdx-demo-design-tabs-aria-selected>
+
+    <!-- ═══ Composition: Settings Panel ═══ -->
+    <pdx-demo-design-tabs-composition class="demo-section"></pdx-demo-design-tabs-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-tabs</code><span>Container</span><span>Flex row with bottom border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-tab</code><span>Item</span><span>Button-like tab, 2.75rem min-height</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-tab.active</code><span>State</span><span>Primary color text + bottom border</span>
+        </div>
+        <div class="opt-row">
+          <code>aria-selected="true"</code><span>State</span><span>Same as .active (accessible)</span>
+        </div>
+        <div class="opt-row">
+          <code>disabled</code><span>State</span><span>Muted, no pointer events</span>
+        </div>
+        <div class="opt-row">
+          <code>role="tablist"</code><span>ARIA</span><span>Container role for tab set</span>
+        </div>
+        <div class="opt-row">
+          <code>role="tab"</code><span>ARIA</span><span>Individual tab role</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/tabs';
+@title 'Tabs';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .comp-card .pdx-tabs {
+    padding: 0 var(--pdx-space-md);
+  }
+
+  /* Source block */
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

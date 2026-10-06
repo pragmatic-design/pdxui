@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Programmatic Confirm</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Returns <code>true</code> (Confirm) or <code>false</code> (Cancel / Escape).</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" size="sm" @click="onConfirm">dialog.confirm()</pdx-button>
+      <span class="pdx-txt-small pdx-ink-muted">Result: {{ confirmResult }}</span>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+
+let confirmResult = $signal('(none)');
+
+async function onConfirm() {
+    const result = await dialog.confirm({
+        title: 'Save Changes?',
+        message: 'You have unsaved changes. Do you want to save before leaving?',
+        confirmLabel: 'Save',
+        cancelLabel: 'Discard',
+    });
+    confirmResult = result ? 'true (confirmed)' : 'false (cancelled)';
+}
+</script>

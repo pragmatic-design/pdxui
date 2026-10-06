@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Simple Selection</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to highlight, then use arrow buttons. No checkboxes.</p>
+
+    <div class="demo-row">
+      <pdx-transfer
+        mode="simple"
+        :items="roleItems"
+        sourcetitle="Available"
+        targettitle="Assigned"
+      ></pdx-transfer>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const roleItems = [
+  { value: 'read', label: 'Read' },
+  { value: 'write', label: 'Write' },
+  { value: 'create', label: 'Create' },
+  { value: 'delete', label: 'Delete' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'export', label: 'Export' },
+  { value: 'import', label: 'Import' },
+];
+</script>

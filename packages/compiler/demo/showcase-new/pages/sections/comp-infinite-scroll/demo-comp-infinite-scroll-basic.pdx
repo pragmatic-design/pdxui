@@ -1,0 +1,72 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic (100 items, 10 per page)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Scroll down inside the container to load more. Uses DataSource with <code>loadMore()</code>.</p>
+    <div class="demo-container scroll-box" id="basic-scroll-box">
+      <pdx-infinite-scroll :source="scrollDS" :threshold="200" id="basic-inf-scroll">
+        <div id="basic-items" :ref="basicItems"></div>
+      </pdx-infinite-scroll>
+    </div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="basic-log">{{ basicLog }}</div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const ds = createDataSource({
+  transport: { read: pagedFetch },
+  pageSize: 10,
+  autoLoad: true,
+});
+// ds.loadMore() appends next page
+// ds.hasMore() checks if more pages available
+
+&lt;div style="height:400px;overflow-y:auto"&gt;
+  &lt;pdx-infinite-scroll :source="ds"&gt;
+    &lt;div id="items"&gt;&lt;/div&gt;
+  &lt;/pdx-infinite-scroll&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+
+// --- Basic demo: 100 items, 10 per page ---
+const allItems = [];
+for (let _idx = 1; _idx <= 100; _idx++) {
+    allItems.push({ id: _idx, title: 'Item ' + _idx, description: 'Description for item ' + _idx });
+}
+
+const scrollDS = createDataSource({
+    transport: {
+        read: function(params) {
+            return new Promise(function(resolve) {
+                const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
+                const _result = allItems.slice(_off, _off + (params.pageSize || 10));
+                setTimeout(function() { resolve({ data: _result, total: allItems.length }); }, 500);
+            });
+        },
+    },
+    pageSize: 10,
+    autoLoad: true,
+});
+
+let basicItems = $signal(null);
+let basicLog = $signal('Loaded items: 0');
+
+// Render items into containers when data changes
+$effect(() => {
+    const _data = scrollDS.data();
+    const _container = basicItems;
+    if (_container && _data) {
+        _container.innerHTML = '';
+        for (let _ri = 0; _ri < _data.length; _ri++) {
+            const _item = _data[_ri];
+            const _div = document.createElement('div');
+            _div.className = 'scroll-item';
+            _div.innerHTML = '<strong>' + _item.title + '</strong><span class="pdx-ink-muted" style="font-size:var(--pdx-text-xs)">' + _item.description + '</span>';
+            _container.appendChild(_div);
+        }
+        basicLog = 'Loaded items: ' + _data.length + ' of ' + scrollDS.total();
+    }
+});
+</script>

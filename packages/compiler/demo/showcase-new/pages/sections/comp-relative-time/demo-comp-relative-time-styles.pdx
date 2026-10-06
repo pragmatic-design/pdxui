@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Styles</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Intl.RelativeTimeFormat style: long, short, narrow.</p>
+    <div class="demo-container">
+      <div class="demo-stack">
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Long:</span>
+          <pdx-relative-time :datetime="twoHoursAgo" style="long"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Short:</span>
+          <pdx-relative-time :datetime="twoHoursAgo" style="short"></pdx-relative-time>
+        </div>
+        <div class="demo-row-labeled">
+          <span class="pdx-txt-small pdx-ink-muted label-col">Narrow:</span>
+          <pdx-relative-time :datetime="twoHoursAgo" style="narrow"></pdx-relative-time>
+        </div>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-relative-time :datetime="date" style="short"&gt;&lt;/pdx-relative-time&gt;
+&lt;pdx-relative-time :datetime="date" style="narrow"&gt;&lt;/pdx-relative-time&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const twoHoursAgo = new Date(Date.now() - 2 * 3600000).toISOString();
+</script>

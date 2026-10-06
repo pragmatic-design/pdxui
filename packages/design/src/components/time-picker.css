@@ -1,0 +1,137 @@
+/* pdx-time-picker — Segmented time input with up/down arrow buttons */
+
+.pdx-time-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    background: var(--pdx-color-surface);
+    font-family: var(--pdx-font-mono, var(--pdx-font-sans));
+    font-size: var(--pdx-text-sm);
+}
+
+.pdx-time-picker.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    background: var(--pdx-color-inset);
+}
+
+.pdx-time-picker:focus-within {
+    border-color: var(--pdx-color-focus);
+    box-shadow: 0 0 0 2px oklch(from var(--pdx-color-focus) l c h / 0.2);
+}
+
+/* Column for each segment (up arrow + value + down arrow) */
+.pdx-time-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.pdx-time-period-col {
+    margin-left: 4px;
+}
+
+/* Arrow buttons */
+.pdx-time-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 16px;
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    cursor: pointer;
+    font-size: 8px;
+    color: var(--pdx-color-muted);
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
+    padding: 0;
+}
+
+.pdx-time-arrow:hover {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+}
+
+.pdx-time-arrow:active {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+/* Value display (focusable segment) */
+.pdx-time-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 28px;
+    padding: 2px 4px;
+    border-radius: var(--pdx-radius-sm);
+    cursor: text;
+    color: var(--pdx-color-text);
+    font-weight: var(--pdx-weight-medium);
+    transition: background 0.15s;
+    outline: none;
+    user-select: none;
+}
+
+.pdx-time-value:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-time-value:focus {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+}
+
+.pdx-time-period {
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    min-width: 32px;
+}
+
+.pdx-time-separator {
+    color: var(--pdx-color-muted);
+    font-weight: var(--pdx-weight-bold);
+    pointer-events: none;
+    align-self: center;
+    font-size: var(--pdx-text-base);
+}
+
+/* Size variants */
+.pdx-time-picker-sm {
+    font-size: var(--pdx-text-xs);
+    padding: 2px var(--pdx-space-xs);
+}
+
+.pdx-time-picker-sm .pdx-time-value {
+    min-width: 24px;
+    height: 22px;
+}
+
+.pdx-time-picker-sm .pdx-time-arrow {
+    width: 24px;
+    height: 12px;
+    font-size: 7px;
+}
+
+.pdx-time-picker-lg {
+    font-size: var(--pdx-text-base);
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+}
+
+.pdx-time-picker-lg .pdx-time-value {
+    min-width: 36px;
+    height: 34px;
+}
+
+.pdx-time-picker-lg .pdx-time-arrow {
+    width: 36px;
+    height: 20px;
+    font-size: 10px;
+}

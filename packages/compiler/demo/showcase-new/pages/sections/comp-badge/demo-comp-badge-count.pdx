@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Count Badge</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Numeric <code>value</code> with <code>max</code> overflow (default 99+). <code>hideZero</code> hides at 0.</p>
+
+    <div class="demo-row">
+      <pdx-badge variant="primary" value="3"></pdx-badge>
+      <pdx-badge variant="primary" value="42"></pdx-badge>
+      <pdx-badge variant="danger" value="150"></pdx-badge>
+      <pdx-badge variant="danger" value="150" max="999"></pdx-badge>
+      <pdx-badge variant="primary" value="0"></pdx-badge>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-xs)">
+      3 | 42 | 150 (shows 99+) | 150 with max=999 | 0 (hidden by hideZero)
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-badge variant="danger" value="150"&gt;&lt;/pdx-badge&gt;       &lt;!-- shows 99+ --&gt;
+&lt;pdx-badge variant="danger" value="150" max="999"&gt;&lt;/pdx-badge&gt;  &lt;!-- shows 150 --&gt;
+&lt;pdx-badge variant="primary" value="0"&gt;&lt;/pdx-badge&gt;        &lt;!-- hidden (hideZero) --&gt;</code></pre>
+    </details>
+  </section>
+</template>

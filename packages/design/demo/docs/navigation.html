@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Navigation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Navigation</span></div>
+                        <h1 class="pdx-txt-display">Navigation</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Tabs, breadcrumb, pagination, stepper, vertical nav.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Tabs</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-tabs">
+                                    <button class="pdx-tab active">Overview</button>
+                                    <button class="pdx-tab">Details</button>
+                                    <button class="pdx-tab">Settings</button>
+                                    <button class="pdx-tab">History</button>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-tabs"&gt;
+  &lt;button class="pdx-tab active"&gt;Overview&lt;/button&gt;
+  &lt;button class="pdx-tab"&gt;Details&lt;/button&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Breadcrumb</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-breadcrumb">
+                                    <a class="pdx-link" href="#">Home</a>
+                                    <a class="pdx-link" href="#">Products</a>
+                                    <span>Wireless Headphones</span>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-breadcrumb"&gt;
+  &lt;a class="pdx-link"&gt;Home&lt;/a&gt;
+  &lt;a class="pdx-link"&gt;Products&lt;/a&gt;
+  &lt;span&gt;Current&lt;/span&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Pagination</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-pagination">
+                                    <button class="pdx-page" disabled><i data-lucide="chevron-left" style="width:16px;height:16px"></i></button>
+                                    <button class="pdx-page" aria-current="page">1</button>
+                                    <button class="pdx-page">2</button>
+                                    <button class="pdx-page">3</button>
+                                    <button class="pdx-page">...</button>
+                                    <button class="pdx-page">12</button>
+                                    <button class="pdx-page"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-pagination"&gt;
+  &lt;button class="pdx-page" aria-current="page"&gt;1&lt;/button&gt;
+  &lt;button class="pdx-page"&gt;2&lt;/button&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Stepper</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-stepper">
+                                    <div class="pdx-step" data-status="done"><div class="pdx-step-number"><i data-lucide="check" style="width:14px;height:14px"></i></div><span class="pdx-step-label">Account</span></div>
+                                    <div class="pdx-step-connector"></div>
+                                    <div class="pdx-step" data-status="active"><div class="pdx-step-number">2</div><span class="pdx-step-label">Profile</span></div>
+                                    <div class="pdx-step-connector"></div>
+                                    <div class="pdx-step"><div class="pdx-step-number">3</div><span class="pdx-step-label">Review</span></div>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-stepper"&gt;
+  &lt;div class="pdx-step" data-status="done"&gt;
+    &lt;div class="pdx-step-number"&gt;1&lt;/div&gt;
+    &lt;span class="pdx-step-label"&gt;Account&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="pdx-step-connector"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Vertical Nav</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Sidebar navigation with sections, active state, disabled, and nesting.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div style="max-width:14rem">
+                                    <nav class="pdx-nav">
+                                        <span class="pdx-nav-heading">Account</span>
+                                        <a class="pdx-nav-item active" href="#">Profile</a>
+                                        <a class="pdx-nav-item" href="#">Settings</a>
+                                        <a class="pdx-nav-item" href="#">Notifications</a>
+                                        <span class="pdx-nav-heading">Support</span>
+                                        <a class="pdx-nav-item" href="#">Help Center</a>
+                                        <a class="pdx-nav-item" href="#" aria-disabled="true">Admin</a>
+                                    </nav>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;nav class="pdx-nav"&gt;
+  &lt;span class="pdx-nav-heading"&gt;Section&lt;/span&gt;
+  &lt;a class="pdx-nav-item active"&gt;Active&lt;/a&gt;
+  &lt;a class="pdx-nav-item"&gt;Link&lt;/a&gt;
+&lt;/nav&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<template>
+  <!-- ─── 3 · what step 2 asked for ─────────────────────────────────── -->
+  <div data-wizard-step :data-label="$t('intake.steps.details')">
+  <!-- The step's groups at the page's section gap: without it they sit edge to edge, the add button
+       on the drop zone. A wrapper, because the wizard owns the step's own display. -->
+  <div class="step-groups">
+    <!-- The conditional section: on site, there is an address to go to. The group lives HERE, not
+         around this component on the page: a group in the parent does not prefix a section's
+         controls. -->
+    <pdx-field-group name="address" :label="$t('intake.fields.address')" :show="mode === 'onsite'" data-test="address">
+      <pdx-form-field name="street" :label="$t('intake.fields.street')">
+        <pdx-input name="street" data-test="street"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field name="city" :label="$t('intake.fields.city')">
+        <pdx-input name="city" data-test="city"></pdx-input>
+      </pdx-form-field>
+    </pdx-field-group>
+
+    <p class="pdx-txt-small pdx-ink-muted" :show="mode === 'remote'" data-test="remote-note">{{ $t('intake.remoteNote') }}</p>
+
+    <!-- The one thing the draft cannot hold. A file is not in `localStorage`: not its bytes,
+         and not a pretence that it is still there. What the restored form owes the reader is
+         the NAME of what it lost, which `draft.ts` collects as it strips it. -->
+    <label class="pdx-label">{{ $t('intake.fields.attachment') }}</label>
+    <pdx-file-upload
+      name="attachment"
+      @pdx-select="e => attach((e.detail?.files ?? [])[0] ?? null)"
+      @pdx-remove="detach()"
+      data-test="attachment"></pdx-file-upload>
+
+    <!-- The repeating part. `required` on a row's field is honoured as the row is added —
+         an empty one fails validate() and the wizard does not advance. -->
+    <pdx-field-list
+      name="lines"
+      :form="form"
+      :label="$t('intake.fields.lines')"
+      :item-fields="lineFields"
+      :item-default="{ activity: '', hours: 1 }"
+      :add-label="$t('intake.addLine')"
+      data-test="lines"></pdx-field-list>
+  </div>
+  </div>
+</template>
+
+<script setup>
+// Intake's third step: what the mode asked for, the attachment, and the lines. A section of the
+// `intake` form. The file goes up to the page, which hands it to the draft.
+import { tryUseForm } from '@pdxui/core';
+
+/** On site or remote, as step 2 set it on the page. */
+@prop mode: string = 'onsite';
+/** The `intake` form, which `<pdx-field-list>` keeps its rows on. */
+@prop form: object = null;
+/** A file was attached: the File, or null. */
+@event attach: object;
+/** The attachment was removed. */
+@event detach: void;
+
+tryUseForm();
+
+// `required: true` on a row's field: the schema cannot carry it (a row's path does not exist until
+// the row does, and the compiler says so with PDX_FORM_ARRAY_RULES_IGNORED), so the list registers
+// the validator as each row is added.
+const lineFields = $derived([
+  { name: 'activity', label: $t('intake.fields.activity'), required: true },
+  { name: 'hours', label: $t('intake.fields.hours'), type: 'number' },
+]);
+</script>
+
+<style scoped>
+  /* A step's groups, one section gap apart — the rhythm the Anagrafica keeps between its groups. */
+  .step-groups { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+</style>

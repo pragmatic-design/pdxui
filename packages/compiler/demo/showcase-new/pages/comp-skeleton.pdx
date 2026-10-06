@@ -1,0 +1,63 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Skeleton</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Placeholder loading skeletons. <strong>CSS only</strong> — apply <code>.pdx-skeleton</code> classes. Two animations: pulse (default) and wave.
+    </p>
+
+    <!-- ═══ Shapes ═══ -->
+    <pdx-demo-comp-skeleton-shapes class="demo-section"></pdx-demo-comp-skeleton-shapes>
+
+    <!-- ═══ Animation Types ═══ -->
+    <pdx-demo-comp-skeleton-animation class="demo-section"></pdx-demo-comp-skeleton-animation>
+
+    <!-- ═══ Stagger Timing ═══ -->
+    <pdx-demo-comp-skeleton-stagger class="demo-section"></pdx-demo-comp-skeleton-stagger>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-skeleton-composition class="demo-section"></pdx-demo-comp-skeleton-composition>
+
+    <!-- ═══ Loading Overlay ═══ -->
+    <pdx-demo-comp-skeleton-overlay class="demo-section"></pdx-demo-comp-skeleton-overlay>
+
+    <!-- ═══ Accessibility ═══ -->
+    <pdx-demo-comp-skeleton-accessibility class="demo-section"></pdx-demo-comp-skeleton-accessibility>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Class</span><span>Description</span></div>
+        <div class="opt-row"><code>.pdx-skeleton</code><span>Base — pulse animation, inset background</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-text</code><span>Text line (1em height, 80% width)</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-title</code><span>Title (1.5em height, 50% width)</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-circle</code><span>Circle avatar (2.5rem)</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-image</code><span>Image placeholder (16:9 aspect)</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-button</code><span>Button (2.5rem x 6rem)</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-input</code><span>Input field (2.75rem height)</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-wave</code><span>Wave animation (left-to-right sweep)</span></div>
+        <div class="opt-row"><code>.pdx-skeleton-static</code><span>No animation</span></div>
+        <div class="opt-row"><code>.pdx-loading-overlay</code><span>Frosted overlay with spinner</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">CSS Variables</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Variable</span><span>Description</span></div>
+        <div class="opt-row"><code>--pdx-skeleton-delay</code><span>Animation delay for stagger effect (default 0s)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/skeleton';
+@title 'Skeleton';
+let _ = $signal(0);
+</script>
+
+<style scoped>
+  .page { }
+  .demo-col { display: flex; flex-direction: column; gap: var(--pdx-space-xs); margin-top: var(--pdx-space-md); }
+
+  .opt-header, .opt-row { grid-template-columns: 200px 1fr; }
+</style>

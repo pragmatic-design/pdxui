@@ -1,0 +1,73 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">AvatarGroup</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-avatar-group&gt;</code> — stacked overlapping avatars with an overflow counter badge.
+      Pass an array of items and a max count.
+    </p>
+
+    <pdx-demo-comp-avatar-group-basic class="demo-section"></pdx-demo-comp-avatar-group-basic>
+
+    <pdx-demo-comp-avatar-group-with-images class="demo-section"></pdx-demo-comp-avatar-group-with-images>
+
+    <pdx-demo-comp-avatar-group-sizes class="demo-section"></pdx-demo-comp-avatar-group-sizes>
+
+    <pdx-demo-comp-avatar-group-clickable class="demo-section"></pdx-demo-comp-avatar-group-clickable>
+
+    <pdx-demo-comp-avatar-group-reversed class="demo-section"></pdx-demo-comp-avatar-group-reversed>
+
+    <pdx-demo-comp-avatar-group-custom-max class="demo-section"></pdx-demo-comp-avatar-group-custom-max>
+
+    <pdx-demo-comp-avatar-group-without-border class="demo-section"></pdx-demo-comp-avatar-group-without-border>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>items</code></td><td>Array</td><td>null</td><td>Array of avatar items: { name, src, color }</td></tr>
+            <tr><td><code>max</code></td><td>Number</td><td>5</td><td>Max visible avatars before +N overflow</td></tr>
+            <tr><td><code>size</code></td><td>String</td><td>'md'</td><td>Avatar size: xs, sm, md, lg, xl</td></tr>
+            <tr><td><code>overlap</code></td><td>Number</td><td>-8</td><td>Overlap in px (negative margin)</td></tr>
+            <tr><td><code>direction</code></td><td>String</td><td>'row'</td><td>Flex direction: row, row-reverse</td></tr>
+            <tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Avatars and the +N badge become buttons: click, Enter or Space</td></tr>
+            <tr><td><code>bordered</code></td><td>Boolean</td><td>true</td><td>White ring border around each avatar</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Payload</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-click</code></td><td>{ item, index }</td><td>Fired when a clickable avatar is clicked</td></tr>
+            <tr><td><code>pdx-overflow-click</code></td><td>{ count, items }</td><td>Fired when the +N overflow badge is clicked</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/avatar-group';
+@title 'AvatarGroup — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); }
+.demo-stack { border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); padding: var(--pdx-space-lg); }
+.size-label { min-width: 24px; }
+.options-table { overflow-x: auto; }
+.options-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
+.options-table th, .options-table td { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }
+.options-table th { font-weight: var(--pdx-weight-semibold); background: var(--pdx-color-inset); }
+</style>

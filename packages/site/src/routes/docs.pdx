@@ -1,0 +1,118 @@
+<template>
+  <div class="doc-layout shell-wrap">
+    <nav class="doc-nav">
+      <span class="doc-nav-title">Documentation</span>
+      @for (navItems as item; track item.slug) {
+        <a :class="item.slug === current ? 'doc-nav-link active' : 'doc-nav-link'" :href="'/docs/' + item.slug" @click="followLink">{{ item.title }}</a>
+      }
+    </nav>
+    <!-- On a narrow screen the page list is one closed line above the article: laid out open it is
+         every page, wrapping, above the title, and each new page pushes the title further down. After
+         the desktop nav in the document, so the first link to a page is the one a wide screen shows;
+         `order` puts it on top where it is the one shown. -->
+    <details class="doc-nav-mobile">
+      <summary>Documentation · {{ currentTitle }}</summary>
+      <nav aria-label="Documentation">
+        @for (navItems as item; track item.slug) {
+          <a :class="item.slug === current ? 'doc-nav-link active' : 'doc-nav-link'" :href="'/docs/' + item.slug" @click="followLink">{{ item.title }}</a>
+        }
+      </nav>
+    </details>
+
+    <article class="doc-body" :ref="bodyRef"></article>
+
+    <aside class="doc-toc">
+      @if (headings.length > 0) {
+        <span class="doc-toc-title">On this page</span>
+        @for (headings as h; track h.id) {
+          <a :class="h.depth === 3 ? 'doc-toc-link sub' : 'doc-toc-link'" :href="'#' + h.id">{{ h.text }}</a>
+        }
+      }
+    </aside>
+  </div>
+</template>
+
+<script setup>
+@page '/docs', '/docs/:slug';
+@title 'Docs — PDX';
+import { currentParams } from '@pdxui/router';
+import { followLink } from '../lib/follow-link';
+import { effect } from '@pdxui/core';
+import { enhanceCodeBlocks } from '../lib/markdown/enhance';
+
+
+// Every doc's title, order and slug up front, for the nav (`?meta`: the frontmatter, no HTML).
+// A doc's rendered HTML loads when it is opened: eagerly importing them all would put 848 kB of it
+// in the site's entry chunk, on every page.
+const metaMods = import.meta.glob('../../content/docs/**/*.md', { eager: true, query: '?meta', import: 'default' });
+const docMetas = Object.values(metaMods);
+const docLoaders = import.meta.glob('../../content/docs/**/*.md', { import: 'default' });
+const loaderBySlug = {};
+for (const _k in docLoaders) loaderBySlug[_k.split('/').pop().replace(/\.md$/, '')] = docLoaders[_k];
+
+const navItems = $derived(docMetas
+  .map(d => ({ slug: d.slug, title: d.frontmatter.title || d.slug, order: Number(d.frontmatter.order || 999) }))
+  .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title)));
+
+const current = $derived(currentParams().slug || 'getting-started');
+const currentTitle = $derived((navItems.find(i => i.slug === current) || {}).title || 'Getting started');
+
+let bodyRef = $signal(null);
+let _doc = $signal(null);
+const headings = $derived((_doc && _doc.headings) || []);
+
+// The doc the route names, or getting started. Read from the route, not from `current`: the
+// compiler places this effect before the $derived above, and an effect runs at once — reading
+// `current` here is a TDZ error, and the docs page never sets up.
+function slugOfRoute() {
+  const _p = currentParams().slug || 'getting-started';
+  return loaderBySlug[_p] ? _p : 'getting-started';
+}
+
+// Load the doc the route names; a slow load for a page the reader has already left is dropped.
+effect(() => {
+  const _slug = slugOfRoute();
+  const _load = loaderBySlug[_slug];
+  if (!_load) return;
+  _load().then((_d) => { if (slugOfRoute() === _slug) _doc = _d; });
+});
+
+effect(() => {
+  const _el = bodyRef;
+  if (!_el) return;
+  const _d = _doc;
+  if (_d) { _el.innerHTML = _d.html; enhanceCodeBlocks(_el); }
+});
+</script>
+
+<style scoped>
+.doc-layout {
+  display: grid; grid-template-columns: 220px minmax(0, 1fr) 200px; gap: 3rem;
+  padding-top: 2.5rem; padding-bottom: 4rem; align-items: start;
+}
+.doc-nav { display: flex; flex-direction: column; gap: 0.1rem; position: sticky; top: 80px; }
+.doc-nav-title, .doc-toc-title {
+  display: block; margin-bottom: 0.6rem; font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600;
+}
+.doc-nav-link {
+  color: var(--ink-muted); text-decoration: none; font-size: 0.9rem; padding: 0.3rem 0.7rem;
+  border-radius: 8px; border-left: 2px solid transparent; transition: color 0.15s, background 0.15s;
+}
+.doc-nav-link:hover { color: var(--ink); background: color-mix(in srgb, var(--gold-display) 5%, transparent); }
+.doc-nav-link.active { color: var(--gold); border-left-color: var(--gold); background: color-mix(in srgb, var(--gold-display) 7%, transparent); }
+.doc-toc { display: flex; flex-direction: column; gap: 0.15rem; position: sticky; top: 80px; }
+.doc-toc-link { color: var(--ink-muted); text-decoration: none; font-size: 0.8rem; padding: 2px 0; transition: color 0.15s; }
+.doc-toc-link:hover { color: var(--gold); }
+.doc-toc-link.sub { padding-left: 0.9rem; }
+.doc-nav-mobile { display: none; }
+@media (max-width: 1000px) {
+  /* minmax(0, 1fr): a bare 1fr grows to its widest child's min-content. */
+  .doc-layout { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .doc-nav { display: none; }
+  .doc-toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
+  .doc-nav-mobile { display: block; order: -1; border: 1px solid var(--outline); border-radius: 8px; }
+  .doc-nav-mobile summary { padding: 0.6rem 0.8rem; cursor: pointer; font-size: 0.9rem; color: var(--ink); }
+  .doc-nav-mobile nav { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0 0.5rem 0.6rem; }
+}
+</style>

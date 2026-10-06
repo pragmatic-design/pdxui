@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Employee directory with mixed data types, striped rows, and hover.</p>
+
+    <div class="table-wrap">
+      <table class="pdx-table pdx-table-striped pdx-table-hover">
+        <thead>
+          <tr>
+            <th aria-sort="ascending">Employee</th>
+            <th>Department</th>
+            <th>Start Date</th>
+            <th>Salary</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Maria Garcia</td><td>Engineering</td>
+            <td>2022-03-15</td><td>$125,000</td>
+            <td><span class="pdx-badge-success">Active</span></td>
+          </tr>
+          <tr>
+            <td>James Wilson</td><td>Marketing</td>
+            <td>2021-07-01</td><td>$95,000</td>
+            <td><span class="pdx-badge-success">Active</span></td>
+          </tr>
+          <tr>
+            <td>Yuki Tanaka</td><td>Design</td>
+            <td>2023-01-10</td><td>$110,000</td>
+            <td><span class="pdx-badge-warning">On leave</span></td>
+          </tr>
+          <tr>
+            <td>Liam O'Brien</td><td>Sales</td>
+            <td>2020-11-20</td><td>$88,000</td>
+            <td><span class="pdx-badge-success">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>

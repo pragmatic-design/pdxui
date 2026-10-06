@@ -1,0 +1,107 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Type Scale</h2>
+    <p class="pdx-txt-small pdx-ink-muted">9 semantic roles. Each maps to font-size, weight, line-height, and letter-spacing tokens. Switch theme above to see how the scale adapts.</p>
+
+    <div class="scale-table">
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">display</span>
+          <code>.pdx-txt-display</code>
+        </div>
+        <div class="scale-sample pdx-txt-display">The quick brown fox</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">title</span>
+          <code>.pdx-txt-title</code>
+        </div>
+        <div class="scale-sample pdx-txt-title">The quick brown fox jumps</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">heading</span>
+          <code>.pdx-txt-heading</code>
+        </div>
+        <div class="scale-sample pdx-txt-heading">The quick brown fox jumps over</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">subheading</span>
+          <code>.pdx-txt-subheading</code>
+        </div>
+        <div class="scale-sample pdx-txt-subheading">The quick brown fox jumps over the lazy dog</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">body</span>
+          <code>.pdx-txt-body</code>
+        </div>
+        <div class="scale-sample pdx-txt-body">The quick brown fox jumps over the lazy dog. Default body text for paragraphs.</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">small</span>
+          <code>.pdx-txt-small</code>
+        </div>
+        <div class="scale-sample pdx-txt-small">The quick brown fox jumps over the lazy dog. Secondary information text.</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">caption</span>
+          <code>.pdx-txt-caption</code>
+        </div>
+        <div class="scale-sample pdx-txt-caption">The quick brown fox jumps over the lazy dog. Timestamps, metadata, footnotes.</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">label</span>
+          <code>.pdx-txt-label</code>
+        </div>
+        <div class="scale-sample pdx-txt-label">UPPERCASE LABEL</div>
+      </div>
+
+      <div class="scale-row">
+        <div class="scale-meta">
+          <span class="pdx-txt-label pdx-ink-primary">mono</span>
+          <code>.pdx-txt-mono</code>
+        </div>
+        <div class="scale-sample pdx-txt-mono">const count = signal(0);</div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;p class="pdx-txt-display"&gt;Display text&lt;/p&gt;
+&lt;p class="pdx-txt-title"&gt;Title text&lt;/p&gt;
+&lt;p class="pdx-txt-heading"&gt;Heading text&lt;/p&gt;
+&lt;p class="pdx-txt-body"&gt;Body text&lt;/p&gt;
+&lt;p class="pdx-txt-small"&gt;Small text&lt;/p&gt;
+&lt;span class="pdx-txt-label"&gt;LABEL&lt;/span&gt;
+&lt;code class="pdx-txt-mono"&gt;code&lt;/code&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Scale table */
+  .scale-table { margin-top: var(--pdx-space-md); }
+  .scale-row {
+    padding: var(--pdx-space-md) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .scale-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    margin-bottom: var(--pdx-space-xs);
+  }
+  .scale-sample { margin: 0; }
+</style>

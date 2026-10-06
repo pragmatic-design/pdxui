@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Object Array — Custom Fields</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use <code>label-field</code> and <code>value-field</code> for object arrays. The input shows the label;
+      <code>pdx-change</code> sends the value field as <code>value</code>, with <code>label</code> and the whole <code>item</code>.
+    </p>
+    <div class="demo-box">
+      <pdx-autocomplete
+        placeholder="Search a city..."
+        :suggestions="cities"
+        labelField="name"
+        valueField="code"
+        @pdx-change="onCityChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">City: {{ cityValue }}</p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-autocomplete
+  placeholder="Search a city..."
+  :suggestions="cities"
+  label-field="name"
+  value-field="code"
+  @pdx-change="onSelect" /&gt;
+
+const cities = [
+  { name: 'Rome', code: 'FCO' },
+  { name: 'Milan', code: 'MXP' },
+  ...
+];</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Cities (objects) ───
+const cities = [
+  { name: 'Rome', code: 'FCO' }, { name: 'Milan', code: 'MXP' }, { name: 'Naples', code: 'NAP' },
+  { name: 'Turin', code: 'TRN' }, { name: 'Florence', code: 'FLR' }, { name: 'Venice', code: 'VCE' },
+  { name: 'Bologna', code: 'BLQ' }, { name: 'Genoa', code: 'GOA' }, { name: 'Palermo', code: 'PMO' },
+  { name: 'Bari', code: 'BRI' }, { name: 'Catania', code: 'CTA' }, { name: 'Verona', code: 'VRN' },
+];
+
+let cityValue = $signal('');
+
+function onCityChange(e) { cityValue = e.detail.value ? e.detail.label + ' (value: ' + e.detail.value + ')' : ''; }
+</script>

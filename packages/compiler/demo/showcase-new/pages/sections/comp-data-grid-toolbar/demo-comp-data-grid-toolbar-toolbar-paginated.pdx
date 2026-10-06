@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Toolbar + Paginated</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Toolbar with pagination. Filters are always via chips when toolbar is active.
+      Click "+ Add Filter" to choose a column, set operator and value.
+      No filter icons in headers — all filtering through toolbar.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="toolbarFilterDS" :columns="toolbarFilterColumns" :show-toolbar="true" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  show-toolbar hover&gt;
+&lt;/pdx-data-grid&gt;
+
+// show-toolbar implies filter-mode="toolbar"
+// No inline filter row when toolbar is active</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// ─── Toolbar + filter mode ──────────────────
+const toolbarFilterColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category' },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+];
+
+const toolbarFilterDS = createDataSource({ data: products.slice(0, 30), pageSize: 10 });
+</script>

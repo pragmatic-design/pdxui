@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Accessibility</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The handle is a real button carrying <code>aria-roledescription="draggable"</code> — not
+      <code>aria-grabbed</code>, which WAI-ARIA 1.1 deprecated. Every handle points at one
+      off-screen block of instructions, the list costs a single Tab stop, and each step is announced
+      by <strong>position</strong>: “Position 2 of 4”, never an index.
+    </p>
+
+    <div class="options-table">
+      <div class="opt-header"><span>Keys</span><span>What it does</span></div>
+      <div class="opt-row"><code>Tab</code><span>Into the list — one stop for the whole list</span></div>
+      <div class="opt-row"><code>↑ ↓</code><span>Move between handles, or move the lifted row</span></div>
+      <div class="opt-row"><code>Space / Enter</code><span>Lift the row, then drop it</span></div>
+      <div class="opt-row"><code>Escape</code><span>Put the lifted row back where it started</span></div>
+      <div class="opt-row"><code>Home / End</code><span>First and last handle</span></div>
+    </div>
+  </section>
+</template>

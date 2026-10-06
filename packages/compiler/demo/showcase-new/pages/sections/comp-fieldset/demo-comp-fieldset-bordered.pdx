@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Bordered (default)</h2>
+
+    <div class="demo-block">
+      <pdx-fieldset legend="Personal Information" description="Required fields for registration.">
+        <pdx-form-field label="First Name" required>
+          <pdx-input placeholder="John"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Last Name" required>
+          <pdx-input placeholder="Doe"></pdx-input>
+        </pdx-form-field>
+      </pdx-fieldset>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-fieldset legend="Personal Information" description="Required fields."&gt;
+  &lt;pdx-form-field label="First Name" required&gt;
+    &lt;pdx-input placeholder="John"&gt;&lt;/pdx-input&gt;
+  &lt;/pdx-form-field&gt;
+&lt;/pdx-fieldset&gt;</code></pre>
+    </details>
+  </section>
+</template>

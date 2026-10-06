@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Three Panes</h2>
+    <div class="demo-split">
+      <pdx-splitter orientation="horizontal" :panes="threePanes">
+        <div class="pane-content pane-left">
+          <pdx-icon name="folder" size="20"></pdx-icon>
+          <strong>Explorer</strong>
+        </div>
+        <div class="pane-content">
+          <pdx-icon name="code" size="20"></pdx-icon>
+          <strong>Editor</strong>
+        </div>
+        <div class="pane-content">
+          <pdx-icon name="terminal" size="20"></pdx-icon>
+          <strong>Terminal</strong>
+        </div>
+      </pdx-splitter>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const threePanes = [
+  { min: 10, max: 30, defaultSize: 20 },
+  { min: 30, defaultSize: 55 },
+  { min: 10, max: 35, defaultSize: 25 },
+];
+</script>

@@ -1,0 +1,6 @@
+{
+    "intervention": {
+        "title": "Intervention {n}",
+        "onTicket": "An intervention on ticket {id}."
+    }
+}

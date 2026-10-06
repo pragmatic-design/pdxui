@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Icons</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>data-icon</code> to set an icon on the active step circle.</p>
+
+    <div class="demo-box">
+      <pdx-wizard :linear="false">
+        <div data-wizard-step data-label="Cart" data-icon="🛒">
+          <p class="pdx-txt-body">Your shopping cart items.</p>
+        </div>
+        <div data-wizard-step data-label="Shipping" data-icon="📦">
+          <p class="pdx-txt-body">Shipping address and method.</p>
+        </div>
+        <div data-wizard-step data-label="Payment" data-icon="💳">
+          <p class="pdx-txt-body">Payment information.</p>
+        </div>
+        <div data-wizard-step data-label="Confirm" data-icon="✅">
+          <p class="pdx-txt-body">Order confirmation.</p>
+        </div>
+      </pdx-wizard>
+    </div>
+  </section>
+</template>

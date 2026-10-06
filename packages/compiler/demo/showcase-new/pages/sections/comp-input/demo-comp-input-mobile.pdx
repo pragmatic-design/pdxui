@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Mobile Behavior</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Built-in mobile optimizations (active on touch devices):
+    </p>
+    <ul class="mobile-list">
+      <li><strong>Anti-zoom iOS</strong> — font-size ≥ 16px prevents Safari auto-zoom on focus</li>
+      <li><strong>Touch targets</strong> — min-height 44px (WCAG / Apple HIG)</li>
+      <li><strong>Clear button</strong> — always visible on touch (no hover needed)</li>
+      <li><strong>inputmode</strong> — <code>decimal</code> (with dot), <code>numeric</code> (digits only), <code>email</code>, <code>tel</code>, <code>url</code></li>
+      <li><strong>Larger hit areas</strong> — clear/action buttons 28px on touch vs 20px on desktop</li>
+    </ul>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
+      These apply automatically via <code>@media (pointer: coarse)</code> — no props needed.
+      Test on a real device or Chrome DevTools mobile emulation to see the differences.
+    </p>
+  </section>
+</template>
+
+<style scoped>
+  .mobile-list { margin: var(--pdx-space-md) 0 0 var(--pdx-space-lg); font-size: var(--pdx-text-sm); color: var(--pdx-color-text); }
+  .mobile-list li { margin-bottom: var(--pdx-space-xs); }
+  .mobile-list li strong { color: var(--pdx-color-text); }
+</style>

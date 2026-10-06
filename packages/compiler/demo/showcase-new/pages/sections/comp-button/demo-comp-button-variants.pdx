@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">9 semantic variants via <code>variant</code> prop. Click any button to see events in the console above.</p>
+
+    <div class="btn-row">
+      <pdx-button variant="primary" @click="log">Primary</pdx-button>
+      <pdx-button variant="secondary" @click="log">Secondary</pdx-button>
+      <pdx-button variant="outline" @click="log">Outline</pdx-button>
+      <pdx-button variant="ghost" @click="log">Ghost</pdx-button>
+      <pdx-button variant="link" @click="log">Link</pdx-button>
+      <pdx-button variant="danger" @click="log">Danger</pdx-button>
+      <pdx-button variant="success" @click="log">Success</pdx-button>
+      <pdx-button variant="warning" @click="log">Warning</pdx-button>
+      <pdx-button variant="info" @click="log">Info</pdx-button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button variant="primary"&gt;Primary&lt;/pdx-button&gt;
+&lt;pdx-button variant="secondary"&gt;Secondary&lt;/pdx-button&gt;
+&lt;pdx-button variant="outline"&gt;Outline&lt;/pdx-button&gt;
+&lt;pdx-button variant="ghost"&gt;Ghost&lt;/pdx-button&gt;
+&lt;pdx-button variant="link"&gt;Link&lt;/pdx-button&gt;
+&lt;pdx-button variant="danger"&gt;Danger&lt;/pdx-button&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useButtonConsole } from './state.pdx';
+
+const buttonConsole = useButtonConsole();
+
+function log(e) {
+    buttonConsole.log(e);
+}
+</script>

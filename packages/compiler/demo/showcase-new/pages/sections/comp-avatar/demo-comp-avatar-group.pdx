@@ -1,0 +1,49 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Avatar Group (Stacked)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">CSS overlap stack with <code>+N</code> overflow counter.</p>
+
+    <div class="avatar-stack">
+      <pdx-avatar src="/avatars/person-1.svg" alt="User 1"></pdx-avatar>
+      <pdx-avatar src="/avatars/person-2.svg" alt="User 2"></pdx-avatar>
+      <pdx-avatar src="/avatars/person-3.svg" alt="User 3"></pdx-avatar>
+      <pdx-avatar alt="User 4"></pdx-avatar>
+      <span class="avatar-more" role="img" aria-label="5 more">+5</span>
+    </div>
+
+    <div class="avatar-stack lg" style="margin-top:var(--pdx-space-md)">
+      <pdx-avatar src="/avatars/person-5.svg" alt="Alice" size="lg"></pdx-avatar>
+      <pdx-avatar src="/avatars/person-6.svg" alt="Bob" size="lg"></pdx-avatar>
+      <pdx-avatar alt="Charlie" size="lg"></pdx-avatar>
+      <pdx-avatar alt="Diana" size="lg"></pdx-avatar>
+      <span class="avatar-more lg" role="img" aria-label="12 more">+12</span>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-xs)">
+      "+5" alone does not say what it counts: name it. <code>&lt;pdx-avatar-group&gt;</code> builds the stack and the name for you.
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="avatar-stack"&gt;
+  &lt;pdx-avatar src="..." alt="User 1"&gt;&lt;/pdx-avatar&gt;
+  &lt;pdx-avatar src="..." alt="User 2"&gt;&lt;/pdx-avatar&gt;
+  &lt;span class="avatar-more" role="img" aria-label="5 more"&gt;+5&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .avatar-stack { display: flex; margin-top: var(--pdx-space-md); }
+  .avatar-stack > * { margin-left: -8px; border: 2px solid var(--pdx-color-surface); border-radius: 50%; }
+  .avatar-stack > :first-child { margin-left: 0; }
+  .avatar-stack.lg > * { margin-left: -12px; }
+  .avatar-stack.lg > :first-child { margin-left: 0; }
+  .avatar-more {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--pdx-color-inset); color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-semibold);
+  }
+  .avatar-more.lg { width: 48px; height: 48px; font-size: var(--pdx-text-sm); }
+</style>

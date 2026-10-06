@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sections (collapsible fieldsets)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Group fields with <code>sections</code>; each field points at its section via
+      <code>section</code>. A section can be <code>collapsible</code>.
+    </p>
+    <div class="demo-container">
+      <pdx-form-template :schema="sectionedSchema"></pdx-form-template>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const sectionedSchema = {
+  layout: 'grid', columns: 12,
+  sections: [
+    { name: 'personal', label: 'Personal', columns: 12 },
+    { name: 'work', label: 'Work', collapsible: true },
+  ],
+  fields: [
+    { name: 'first', label: 'First Name', type: 'text', section: 'personal', size: 6 },
+    { name: 'last', label: 'Last Name', type: 'text', section: 'personal', size: 6 },
+    { name: 'company', label: 'Company', type: 'text', section: 'work', size: 6 },
+    { name: 'title', label: 'Job Title', type: 'text', section: 'work', size: 6 },
+  ],
+};
+</script>

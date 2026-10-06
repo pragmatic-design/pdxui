@@ -1,0 +1,31 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">AspectRatio</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-aspect-ratio&gt;</code> — maintains a fixed aspect ratio on its content. Uses native CSS <code>aspect-ratio</code>.
+    </p>
+
+    <pdx-demo-comp-aspect-ratio-common-ratios class="demo-section"></pdx-demo-comp-aspect-ratio-common-ratios>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>ratio</code></td><td>String</td><td>'16/9'</td><td>Aspect ratio as "width/height" (e.g. "16/9", "4/3", "1/1")</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/aspect-ratio';
+@title 'AspectRatio — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+</style>

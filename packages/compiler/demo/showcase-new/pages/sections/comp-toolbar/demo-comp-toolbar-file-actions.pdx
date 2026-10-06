@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">File Actions Toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Actions with labels + icon-only buttons + primary CTA.</p>
+    <pdx-toolbar bordered label="File actions">
+        <button class="pdx-btn pdx-ghost pdx-btn-xs"><pdx-icon name="file-plus" size="14"></pdx-icon> New</button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs"><pdx-icon name="folder-open" size="14"></pdx-icon> Open</button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs"><pdx-icon name="save" size="14"></pdx-icon> Save</button>
+        <span class="pdx-toolbar-sep"></span>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Undo"><pdx-icon name="undo" size="14"></pdx-icon></button>
+        <button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Redo"><pdx-icon name="redo" size="14"></pdx-icon></button>
+        <span class="pdx-toolbar-spacer"></span>
+        <button class="pdx-btn pdx-primary pdx-btn-xs"><pdx-icon name="send" size="14"></pdx-icon> Publish</button>
+      </pdx-toolbar>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-toolbar bordered label="File actions"&gt;
+  &lt;button class="pdx-btn pdx-ghost pdx-btn-xs"&gt;
+    &lt;pdx-icon name="file-plus"&gt;&lt;/pdx-icon&gt; New
+  &lt;/button&gt;
+  &lt;button class="pdx-btn pdx-ghost pdx-btn-xs" aria-label="Undo"&gt;
+    &lt;pdx-icon name="undo"&gt;&lt;/pdx-icon&gt;
+  &lt;/button&gt;
+  &lt;span class="pdx-toolbar-spacer"&gt;&lt;/span&gt;
+  &lt;button class="pdx-btn pdx-primary pdx-btn-xs"&gt;Publish&lt;/button&gt;
+&lt;/pdx-toolbar&gt;</code></pre>
+    </details>
+  </section>
+</template>

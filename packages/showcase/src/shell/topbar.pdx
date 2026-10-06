@@ -1,0 +1,108 @@
+<template>
+  <!-- The topbar, a SERVICE bar. The navigation lives in the rail, so what is left is the right-hand
+       cluster the reference's topbar contains and nothing else: icon buttons at a fixed pitch, a
+       divider, the avatar last. The shell keeps the drawer's state. -->
+  <header class="app-bar">
+    <!-- In a COMPACT window the rail is a modal drawer and this opens it. Always in the
+         document; the stylesheet shows it only below 600px, so the layout is the CSS's decision.
+         Native, like the handle: the shell is the entry chunk. -->
+    <button
+      class="bar-icon bar-menu"
+      type="button"
+      :ref="menuEl"
+      :aria-expanded="menuOpen ? 'true' : 'false'"
+      :aria-label="$t('app.menu')"
+      data-test="menu"
+      @click="openmenu(true)">☰</button>
+    <span class="bar-title pdx-txt-small pdx-ink-muted" data-test="bar-title">{{ $t('app.name') }}</span>
+
+    <div class="bar-cluster" data-test="bar-cluster">
+      <!-- The demo's knobs, out of the screens: the current screen's, in one panel. -->
+      <pdx-demo-panel></pdx-demo-panel>
+      <!-- No guest controls: every route is behind the login, so the bar is only ever
+           drawn for someone signed in. The language and the scheme live in the profile menu's
+           Settings; the sign-in keeps its own language control. -->
+
+      <!-- The application's settings, the reference's gear: its value sets, views, users
+           and roles. Not the profile menu's Settings, which are the reader's own. A link, because it
+           goes somewhere; the router takes the click, as the rail's entries do. Not on a phone: see
+           the compact rule at the foot of the stylesheet. -->
+      <a
+        class="bar-icon bar-settings"
+        href="/settings"
+        :aria-label="$t('app.nav.settings')"
+        :title="$t('app.nav.settings')"
+        :aria-current="currentPath().startsWith('/settings') ? 'page' : null"
+        data-test="to-settings-bar"
+        @click="openSettings">⚙</a>
+
+      <span class="bar-divider" aria-hidden="true"></span>
+
+      <!-- The person and their menu: `profile-menu.pdx`. -->
+      <pdx-profile-menu data-test="session"></pdx-profile-menu>
+    </div>
+  </header>
+</template>
+
+<script setup>
+import { navigate, currentPath } from '@pdxui/router';
+
+/** Whether the rail's drawer is open (a compact window): the shell's. */
+@prop menuOpen: boolean = false;
+/** Asked to open the drawer, from the ☰. */
+@event openmenu: boolean;
+
+let menuEl = $signal(null);
+
+// The drawer this button opened has closed — by Escape, the scrim, a navigation: the focus comes
+// back here, the only place a keyboard reader can carry on from.
+$watch(menuOpen, (open, wasOpen) => {
+    if (wasOpen && !open) menuEl?.focus();
+});
+
+/** The gear: the router's navigation, not a page load. */
+function openSettings(e) {
+    e.preventDefault();
+    navigate('/settings');
+}
+</script>
+
+<style scoped>
+  .app-bar {
+    display: flex; align-items: center; gap: var(--pdx-space-lg);
+    height: var(--app-bar-height);
+    padding: var(--pdx-inset) var(--pdx-gutter);
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+  }
+  /* `nowrap`, or the ellipsis never applies: at 390 the title would break one letter per line. */
+  .bar-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* The cluster the reference's topbar contains, and the only thing in it: controls at a fixed
+     pitch, a divider, the avatar last. */
+  .bar-cluster { display: flex; align-items: center; gap: var(--pdx-space-xs); }
+  .bar-divider { width: 1px; height: 24px; background: var(--pdx-color-border); }
+  /* An icon control in the cluster: square, at the bar's rhythm. */
+  .bar-icon {
+    width: var(--pdx-control-height); height: var(--pdx-control-height); flex: 0 0 auto;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 0; border-radius: var(--pdx-radius-md); background: transparent;
+    color: var(--pdx-color-muted); font-size: 16px; line-height: 1; cursor: pointer;
+  }
+  .bar-icon:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
+  .bar-icon:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: 2px; }
+
+  /* COMPACT, below 600px: the menu button shows, the gear goes (the bar has room for the
+     menu, the knobs and the person, measured in topbar.spec.ts), and every control is 44×44. */
+  .bar-icon.bar-menu { display: none; }
+  @media (max-width: 599px) {
+    .bar-icon.bar-menu { display: inline-flex; }
+    .bar-icon.bar-settings { display: none; }
+    .app-bar { padding-inline: var(--pdx-inset); gap: var(--pdx-space-xs); }
+    .bar-icon { width: 44px; height: 44px; }
+  }
+
+  /* A printed page is the record, not the application around it. */
+  @media print {
+    .app-bar { display: none !important; }
+  }
+</style>

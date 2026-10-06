@@ -1,0 +1,127 @@
+<template>
+  <!-- The person, and what they can do about being signed in: the avatar opens a menu — who, then
+       Profile, Settings and Sign out. The scheme switch is in Settings, with the density, not in the
+       bar. A `<pdx-dropdown-menu>` whose trigger is the avatar (its `trigger` slot): the menu button
+       — opening, the keys, Escape, a click outside, the focus back — is the library's, not
+       hand-built here. -->
+  <span class="session">
+    @if (signedIn()) {
+      <pdx-dropdown-menu
+        :ref="dropdownEl"
+        placement="bottom-end"
+        :items="profileItems"
+        @pdx-select="onProfileSelect"
+        @pdx-check="onProfileCheck"
+        data-test="profile-dropdown">
+        <button slot="trigger" class="profile-trigger" type="button" :aria-label="userName" data-test="profile">
+          <span class="avatar" data-test="avatar" aria-hidden="true">{{ initials }}</span>
+          <span class="pdx-ink-muted bar-user" data-test="session-user">{{ userName }}</span>
+        </button>
+      </pdx-dropdown-menu>
+    }
+  </span>
+</template>
+
+<script setup>
+// The profile menu, as its own component (CD-B1): its state — whether it is open, its
+// items, its trigger — is read by nothing else in the shell, and nothing of the shell's is read here.
+import { getLocale, currentScheme, setScheme } from '@pdxui/core';
+import { navigate } from '@pdxui/router';
+import { switchLocale, localeItems } from '../i18n';
+import { auth, signOut } from '../auth';
+import { density, setDensity } from '../preferences';
+
+// The scheme is core's, not this page's: `setScheme()` persists the choice and applies the
+// precedence — the visitor's choice, then the document's `pdx-scheme`, then the OS. A store of its
+// own here would split that precedence in two.
+//
+// The density lives in `src/preferences.ts`, because the account page sets it too.
+
+// `getLocale()` hands back the signal; reading it is the second call.
+const localeSignal = getLocale();
+const locale = $derived(localeSignal());
+
+/** The dropdown, for the one close this component asks for: after a language is picked. */
+let dropdownEl = $signal(null);
+
+// The entries, with `checked` derived from the scheme and the density as they are now — the account
+// page sets both too. A radio picked here gives the menu a new array, and pdx-menu updates it in
+// place: same elements, same focus, so the menu is not rebuilt under the pointer.
+const scheme = $derived(currentScheme());
+const profileItems = $derived([
+    { key: 'who', type: 'label', label: auth.user()?.name ?? '' },
+    { key: 'email', type: 'label', label: auth.user()?.email ?? '' },
+    { key: 'sep-who', type: 'separator', label: '' },
+    { key: 'profile', label: $t('app.profile.profile') },
+    { key: 'settings', type: 'submenu', label: $t('app.profile.settings'), children: [
+        { key: 'h-locale', type: 'label', label: $t('app.language') },
+        ...localeItems(locale),
+        { key: 'sep-locale', type: 'separator', label: '' },
+        { key: 'h-scheme', type: 'label', label: $t('app.profile.scheme') },
+        { key: 'light', type: 'radio', radioGroup: 'scheme', label: $t('app.profile.light'), checked: scheme !== 'dark' },
+        { key: 'dark', type: 'radio', radioGroup: 'scheme', label: $t('app.profile.dark'), checked: scheme === 'dark' },
+        { key: 'sep-density', type: 'separator', label: '' },
+        { key: 'h-density', type: 'label', label: $t('app.profile.density') },
+        { key: 'compact', type: 'radio', radioGroup: 'density', label: $t('app.profile.compact'), checked: density() === 'compact' },
+        { key: 'normal', type: 'radio', radioGroup: 'density', label: $t('app.profile.normal'), checked: density() === 'normal' },
+        { key: 'comfortable', type: 'radio', radioGroup: 'density', label: $t('app.profile.comfortable'), checked: density() === 'comfortable' },
+    ] },
+    { key: 'sep-out', type: 'separator', label: '' },
+    { key: 'signout', label: $t('app.profile.signOut'), danger: true },
+]);
+
+function onProfileSelect(e) {
+    if (e.detail.key === 'profile') navigate('/account');
+    // The session ending is what sends the visitor to the sign-in, carrying this page (`auth.ts`).
+    if (e.detail.key === 'signout') signOut();
+}
+
+function onProfileCheck(e) {
+    const { key, radioGroup } = e.detail;
+    // A language rewrites every label in the menu: close it, with the focus back on the trigger.
+    if (radioGroup === 'locale') {
+        switchLocale(key);
+        dropdownEl?.close();
+    }
+    if (radioGroup === 'scheme') setScheme(key);
+    if (radioGroup === 'density') setDensity(key);
+}
+
+// `isAuthenticated`, not `user`: the decoded user survives its own token, and a shell that read it
+// would keep greeting someone whose session has lapsed.
+const signedIn = auth.isAuthenticated;
+const userName = $derived(auth.user()?.name ?? '');
+/** The avatar is initials: a face this app does not have, and a name it does. */
+const initials = $derived((auth.user()?.name ?? '?').split(' ').map(p => p[0]).slice(0, 2).join(''));
+</script>
+
+<style scoped>
+  /* A nav item like the others: nowrap, and it scrolls with them when the row runs out. */
+  .session {
+    display: flex; align-items: center; gap: var(--pdx-space-xs); position: relative;
+    white-space: nowrap; font-size: var(--pdx-text-sm);
+  }
+  .avatar {
+    width: 32px; height: 32px; flex: 0 0 auto;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text);
+    font-size: 12px; font-weight: 600;
+  }
+
+  /* The avatar and the name are ONE button: the menu is about the person. */
+  .profile-trigger {
+    display: inline-flex; align-items: center; gap: var(--pdx-space-xs);
+    min-height: var(--pdx-control-height); padding: 0 var(--pdx-space-2xs);
+    border: 0; border-radius: var(--pdx-radius-md); background: transparent;
+    font: inherit; color: inherit; cursor: pointer;
+  }
+  .profile-trigger:hover { background: var(--pdx-color-inset); }
+  .profile-trigger:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: 2px; }
+
+  /* COMPACT, below 600px: the name gives way to the avatar, and the trigger keeps a 44×44
+     hit area. The same breakpoint as the shell's. */
+  @media (max-width: 599px) {
+    .bar-user { display: none; }
+    .profile-trigger { min-height: 44px; min-width: 44px; justify-content: center; }
+  }
+</style>

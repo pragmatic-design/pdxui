@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Horizontal Layout (Fixed Label Width)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Label and value on the same row. Fixed label width for alignment.</p>
+    <div class="demo-container">
+      <pdx-description-list :items="basicItems" layout="horizontal" label-width="120px"></pdx-description-list>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-description-list :items="items"
+  layout="horizontal" label-width="120px"&gt;
+&lt;/pdx-description-list&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+</script>

@@ -1,0 +1,246 @@
+/* pdx-navbar v2 — Compound responsive app header */
+
+pdx-navbar {
+    display: block;
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-navbar-sticky { position: sticky; top: 0; z-index: 100; }
+.pdx-navbar-transparent { background: transparent; border-bottom: none; }
+
+/* ─── Bar layout ─── */
+.pdx-navbar-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    height: 56px;
+    padding: 0 var(--pdx-space-md);
+}
+
+.pdx-navbar-compact .pdx-navbar-bar { height: 48px; }
+
+/* ─── Brand ─── */
+.pdx-navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    flex-shrink: 0;
+    font-weight: var(--pdx-weight-semibold);
+    font-size: var(--pdx-text-base);
+    color: var(--pdx-color-text);
+}
+
+.pdx-navbar-brand pdx-icon {
+    display: inline-flex;
+}
+
+/* ─── Hamburger (mobile) ─── */
+.pdx-navbar-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: none;
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+    color: var(--pdx-color-text);
+    flex-shrink: 0;
+}
+
+.pdx-navbar-hamburger:hover { background: var(--pdx-color-inset); }
+.pdx-navbar-hamburger:focus-visible { outline: var(--pdx-focus-width) solid var(--pdx-color-focus); outline-offset: -1px; }
+
+/* ─── Desktop Nav ─── */
+.pdx-navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-navbar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+}
+
+.pdx-navbar-link:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
+.pdx-navbar-link.active { color: var(--pdx-color-primary-ink); font-weight: var(--pdx-weight-medium); }
+
+/* ─── Spacer ─── */
+.pdx-navbar-spacer { flex: 1; }
+
+/* ─── Actions (right side) ─── */
+.pdx-navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    flex-shrink: 0;
+}
+
+/* Icon buttons in actions */
+.pdx-navbar-actions .pdx-navbar-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: none;
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    position: relative;
+    transition: color 0.15s, background 0.15s;
+}
+
+.pdx-navbar-icon-btn:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
+
+/* Notification badge dot */
+.pdx-navbar-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 0.6rem;
+    line-height: 16px;
+    text-align: center;
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-danger);
+    color: white;
+    font-weight: var(--pdx-weight-semibold);
+}
+
+/* User area */
+.pdx-navbar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 2px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: var(--pdx-radius-full);
+    transition: background 0.15s;
+}
+
+.pdx-navbar-user:hover { background: var(--pdx-color-inset); }
+
+.pdx-navbar-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    flex-shrink: 0;
+}
+
+.pdx-navbar-user-name {
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Search expandable */
+.pdx-navbar-search {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.pdx-navbar-search-input {
+    width: 0;
+    padding: 0;
+    border: none;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    font-size: var(--pdx-text-sm);
+    font-family: inherit;
+    color: var(--pdx-color-text);
+    outline: none;
+    transition: width 0.2s, padding 0.2s;
+}
+
+.pdx-navbar-search.expanded .pdx-navbar-search-input {
+    width: 200px;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: 1px solid var(--pdx-color-border);
+}
+
+/* ─── Mobile Drawer ─── */
+.pdx-navbar-drawer {
+    display: none;
+    flex-direction: column;
+    padding: var(--pdx-space-sm) var(--pdx-space-md) var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+}
+
+.pdx-navbar-drawer .pdx-navbar-link {
+    width: 100%;
+    padding: var(--pdx-space-sm);
+}
+
+/* Drawer open — always works regardless of viewport size */
+.pdx-navbar-drawer-open {
+    display: flex !important;
+}
+
+/* ─── Collapsed ─── */
+/* <pdx-navbar> collapses on its own width: it sets .pdx-navbar-collapsed when its bar overflows, in
+   a column, a sidebar layout or a dialog as on a phone. */
+.pdx-navbar-collapsed .pdx-navbar-hamburger { display: flex; }
+.pdx-navbar-collapsed .pdx-navbar-nav { display: none; }
+/* Hide the user name, keep the avatar */
+.pdx-navbar-collapsed .pdx-navbar-user-name { display: none; }
+.pdx-navbar-collapsed .pdx-navbar-bar { padding: 0 var(--pdx-space-sm); }
+/* Collapsed and still narrower than its actions, the bar gives them the next row, and they wrap
+   there too: on a phone, actions kept on one row run past the edge. On one row the bar keeps its
+   height: `min-height` is the bar's height, and the padding fits inside it. */
+.pdx-navbar-collapsed .pdx-navbar-bar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 56px;
+    row-gap: var(--pdx-space-xs);
+    padding-block: var(--pdx-space-xs);
+}
+.pdx-navbar-collapsed.pdx-navbar-compact .pdx-navbar-bar { min-height: 48px; }
+.pdx-navbar-collapsed .pdx-navbar-actions {
+    flex-wrap: wrap;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-inline-start: auto;
+    justify-content: flex-end;
+}
+
+/* ─── Responsive (real viewport) — the CSS-only .pdx-navbar markup, which has no script to measure
+   its width. The component (.pdx-navbar-fit) uses the rules above instead. ─── */
+@media (max-width: 768px) {
+    .pdx-navbar:not(.pdx-navbar-fit) .pdx-navbar-hamburger { display: flex; }
+    .pdx-navbar:not(.pdx-navbar-fit) .pdx-navbar-nav { display: none; }
+
+    /* Hide user name on mobile, keep avatar */
+    .pdx-navbar:not(.pdx-navbar-fit) .pdx-navbar-user-name { display: none; }
+
+    .pdx-navbar:not(.pdx-navbar-fit) .pdx-navbar-bar { padding: 0 var(--pdx-space-sm); }
+}

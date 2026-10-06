@@ -1,0 +1,86 @@
+<template>
+  <!-- The APP, not its chrome: the rail and the bar are `shell.pdx`, the default layout every route
+       renders in unless it declares its own (`pdx({ defaultLayout: 'shell' })`). A page
+       that must stand alone — the sign-in — says `@layout 'none'`, and nothing of the shell is
+       drawn around it.
+
+       Held until the active locale's strings are in. A PAGE is where the imperative components
+       are — a wizard's stepper, a grid's header — and those write their names once, at mount.
+       Painting them in the wrong language and correcting nothing is worse than one round-trip of
+       nothing, and for the default locale there is no round-trip: `localeReady` is true in a
+       microtask. -->
+  @if (ready) {
+    <pdx-router-outlet></pdx-router-outlet>
+  }
+</template>
+
+<script setup>
+// The side-effect import registers `<pdx-router-outlet>`. It is NOT redundant with the compiler's
+// auto-import: measured by removing it, the router leaves the entry chunk entirely and the outlet
+// is never defined. The compiler's tag scan matches `pdx-*` tags to @pdxui/ui, and the outlet
+// does not live there.
+import '@pdxui/router';
+import { localeReady, stringsReady, ensureSections } from './i18n';
+import { currentPath, onBeforeNavigate, prefetchRoute } from '@pdxui/router';
+// The session: importing it here is what puts `guardFailRedirect` and the user → permissions
+// effect in place before the outlet boots the router and the first guarded route is matched.
+import './auth';
+
+// The app declares no @page, so it is a component and not a route — which is also why the outlet
+// it renders marks no route as a parent.
+
+// The active locale's strings, AND the ones this route reads. Both are gates on the
+// same paint for the same reason: a page is where the imperative components are — a wizard's
+// stepper, a grid's header — and those write their names once, at mount.
+//
+// `stringsReady` is read SYNCHRONOUSLY with the path rather than from a watcher, so a navigation
+// hides the outlet in the same tick it changes the route. A gate that lagged one tick would paint
+// the new screen with the old one's dictionary.
+const ready = $derived(localeReady() && stringsReady(currentPath()));
+
+// The fetch for the COLD load: there is no navigation before the first route, so nothing else
+// would ask, and the gate above is what holds the paint until it lands.
+// The route's chunk starts WITH its strings, not after them: the outlet that would import it is
+// held by the gate above, so without this a cold non-landing route loads strings, then its chunk,
+// then the chunk's dependencies — four waves.
+onMount(() => { prefetchRoute(currentPath()); void ensureSections(currentPath()); });
+
+// Every navigation after that holds until its dictionary is in — the NAVIGATION, not the paint.
+//
+// The outlet is not gated on it: `@if (ready)` going false for one tick UNMOUNTS the whole tree,
+// so a ticket's billing tab would tear down the ticket underneath it and build it again —
+// `master-detail.spec.ts` counts the parent's mounts and wants 1. `onBeforeNavigate` is awaited before the address changes, so the screen the visitor
+// is on stays put while the strings for the next one arrive.
+onBeforeNavigate(async (_from, to) => {
+  prefetchRoute(to);   // the chunk alongside the strings, as at boot
+  await ensureSections(to);
+  return true;
+});
+
+// And on the same gesture the ROUTER prefetches a route's chunk on: a dictionary the screen cannot
+// render without is part of that screen, and fetching it only on the click puts a request between
+// the click and the paint. Measured — `prefetch.spec.ts` asserts the click makes no further
+// request, and it went red until this existed.
+//
+// The app's own listener rather than a hook in the router: `prefetchRoute` decides a POLICY (the
+// route's `@prefetch`, the connection, saveData) and this is a consequence of a decision already
+// taken, not a second one. Passive and capturing, so it costs nothing and sees links inside
+// components too.
+onMount(() => {
+  const warm = (e) => {
+    // BOTH shapes this app navigates by: `<pdx-link to>` (the rail, which is what the router's own
+    // prefetch listens on) and a plain `<a href>` (a row's «open in a new tab», a breadcrumb). The
+    // first version matched only the anchor and missed every rail entry — measured, the click
+    // still fetched a dictionary chunk.
+    const el = e.target?.closest?.('pdx-link[to], a[href^="/"]');
+    const to = el?.getAttribute('to') ?? el?.getAttribute('href');
+    if (to && to.startsWith('/')) void ensureSections(to);
+  };
+  document.addEventListener('pointerover', warm, { capture: true, passive: true });
+  document.addEventListener('focusin', warm, { capture: true, passive: true });
+  onDestroy(() => {
+    document.removeEventListener('pointerover', warm, { capture: true });
+    document.removeEventListener('focusin', warm, { capture: true });
+  });
+});
+</script>

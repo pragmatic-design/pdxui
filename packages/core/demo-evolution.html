@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Model Evolution — E2E Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 960px; margin: 0 auto; background: #f8f9fa; }
+        h1 { margin-bottom: 1rem; font-size: 1.4rem; }
+        h2 { margin: 1.5rem 0 0.5rem; font-size: 1rem; color: #4a4a6a; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
+        .section { background: white; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .pass { color: #155724; } .fail { color: #721c24; }
+        button { padding: 0.3rem 0.75rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white; font-size: 0.85rem; }
+        button:hover { background: #eee; }
+        #results { font-family: monospace; font-size: 0.8rem; background: #1a1a2e; color: #4cc9f0; padding: 1rem; border-radius: 4px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; }
+        .summary { font-size: 1.1rem; font-weight: 600; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <h1>Component Model Evolution — E2E Validation</h1>
+    <div id="test-container" style="display:none;"></div>
+    <div class="section">
+        <button onclick="runAll()">Run All Tests</button>
+        <div id="summary" class="summary"></div>
+    </div>
+    <pre id="results"></pre>
+
+<script type="module">
+import {
+    // Reactivity
+    signal, computed, effect, batch, ref,
+    // Store + Watch
+    store, watch,
+    // Component
+    component, html, when, each, match, show, portal, dynamic,
+    // Lifecycle
+    onMount, onDestroy, onUpdated, onError, useEffect,
+    // Communication
+    createChannel, createCommands, exposeOnElement,
+    // Error Boundary
+    errorBoundary,
+    // Scoped Slot
+    renderSlot,
+    // Animation
+    keyframes, spring,
+    // Style Runtime
+    cssVar, createTheme, applyTheme,
+    // Viewport
+    viewport, screen, adaptive,
+    // Browser
+    useStorage, useOnline, useTitle, useMediaQuery,
+} from './src/index.ts';
+
+const results = [];
+let passed = 0, failed = 0;
+
+function assert(name, condition, detail = '') {
+    if (condition) {
+        results.push(`✅ ${name}`);
+        passed++;
+    } else {
+        results.push(`❌ ${name}${detail ? ' — ' + detail : ''}`);
+        failed++;
+    }
+}
+
+function flush() {
+    const el = document.getElementById('results');
+    el.textContent = results.join('\n');
+    const summary = document.getElementById('summary');
+    summary.innerHTML = `<span class="${failed === 0 ? 'pass' : 'fail'}">${passed} passed, ${failed} failed</span>`;
+}
+
+// ─── 1. Composable Lifecycle ────────────────────────────────────
+
+function testLifecycle() {
+    const log = [];
+    let tagN = 0;
+
+    function useTracker(name) {
+        onMount(() => log.push(`${name}:mount`));
+        onDestroy(() => log.push(`${name}:destroy`));
+    }
+
+    const tag = `demo-lifecycle-${tagN++}`;
+    component(tag, {
+        setup() {
+            useTracker('comp');
+        },
+        render: () => html`<span>lifecycle</span>`,
+    });
+
+    const el = document.createElement(tag);
+    document.getElementById('test-container').appendChild(el);
+    assert('1.1 onMount fires', log.includes('comp:mount'));
+
+    el.remove();
+    assert('1.2 onDestroy fires', log.includes('comp:destroy'));
+}
+
+// ─── 2. Component Expose + Channel ──────────────────────────────
+
+function testCommunication() {
+    // Expose
+    const tag = 'demo-expose-1';
+    const state = signal(false);
+    component(tag, {
+        setup(ctx) {
+            ctx.expose({
+                open: () => state.set(true),
+                isOpen: () => state(),
+            });
+        },
+        render: () => html`<span>expose</span>`,
+    });
+    const el = document.createElement(tag);
+    document.getElementById('test-container').appendChild(el);
+    assert('2.1 expose: methods on element', typeof el.open === 'function');
+    el.open();
+    assert('2.2 expose: method works', el.isOpen() === true);
+    assert('2.3 expose: frozen (not writable)', (() => {
+        try { el.open = () => {}; return false; } catch { return true; }
+    })());
+
+    // Channel
+    const ch = createChannel();
+    const received = [];
+    ch.on('ping', () => received.push('pong'));
+    ch.send('ping');
+    assert('2.4 channel: send/on works', received[0] === 'pong');
+
+    const unsub = ch.on('tick', () => received.push('tick'));
+    ch.send('tick');
+    unsub();
+    ch.send('tick');
+    assert('2.5 channel: unsubscribe works', received.filter(r => r === 'tick').length === 1);
+
+    // Commands
+    const cmds = createCommands();
+    let cmdReceived = false;
+    cmds.on('refresh', () => { cmdReceived = true; });
+    cmds.send('refresh');
+    assert('2.6 commands: send/on works', cmdReceived);
+}
+
+// ─── 3. Deep Reactivity + Watch ─────────────────────────────────
+
+function testStoreWatch() {
+    // Store
+    const state = store({ items: [1, 2, 3], count: 0 });
+    let tracked = 0;
+    effect(() => { tracked = state.count; });
+    assert('3.1 store: reads tracked in effect', tracked === 0);
+
+    state.count = 42;
+    assert('3.2 store: set triggers effect', tracked === 42);
+
+    let arrLen = 0;
+    effect(() => { arrLen = state.items.length; });
+    assert('3.3 store: array length tracked', arrLen === 3);
+
+    state.items.push(4);
+    assert('3.4 store: push triggers update', arrLen === 4);
+    assert('3.5 store: array actually mutated', state.items.length === 4);
+
+    // Watch
+    const count = signal(0);
+    const changes = [];
+    watch(count, (n, o) => changes.push(`${o}→${n}`));
+    count.set(5);
+    count.set(10);
+    assert('3.6 watch: tracks changes', changes.length === 2);
+    assert('3.7 watch: old/new values', changes[0] === '0→5' && changes[1] === '5→10');
+
+    // Watch with immediate
+    const imm = signal('hello');
+    let immCalled = false;
+    watch(imm, () => { immCalled = true; }, { immediate: true });
+    assert('3.8 watch: immediate fires', immCalled);
+}
+
+// ─── 4. Error Boundary ──────────────────────────────────────────
+
+function testErrorBoundary() {
+    // Sync error
+    const frag = errorBoundary(
+        () => { throw new Error('test-boom'); },
+        (err, retry) => {
+            const div = document.createElement('div');
+            div.className = 'error-fb';
+            div.textContent = err.message;
+            return div;
+        }
+    );
+    document.getElementById('test-container').appendChild(frag);
+    const errorEl = document.querySelector('.error-fb');
+    assert('4.1 errorBoundary: catches sync error', errorEl !== null);
+    assert('4.2 errorBoundary: fallback shows error message', errorEl?.textContent === 'test-boom');
+
+    // Retry
+    let shouldFail = true;
+    let retryFn = null;
+    const frag2 = errorBoundary(
+        () => {
+            if (shouldFail) throw new Error('retryable');
+            const ok = document.createElement('div');
+            ok.className = 'retry-ok';
+            ok.textContent = 'recovered';
+            return ok;
+        },
+        (err, retry) => {
+            retryFn = retry;
+            const div = document.createElement('div');
+            div.textContent = 'failed';
+            return div;
+        }
+    );
+    document.getElementById('test-container').appendChild(frag2);
+
+    shouldFail = false;
+    retryFn?.();
+    assert('4.3 errorBoundary: retry recovers', document.querySelector('.retry-ok')?.textContent === 'recovered');
+}
+
+// ─── 5. Scoped Slot ─────────────────────────────────────────────
+
+function testScopedSlot() {
+    const name = signal('Alice');
+    const slots = {
+        greeting: (scope) => {
+            const span = document.createElement('span');
+            span.className = 'slot-result';
+            span.textContent = `Hello ${scope.name}!`;
+            return span;
+        },
+    };
+
+    const frag = renderSlot(
+        slots, 'greeting',
+        () => ({ name: name() }),
+        () => html`<span>default</span>`
+    );
+    document.getElementById('test-container').appendChild(frag);
+
+    assert('5.1 scopedSlot: renders with scope data',
+        document.querySelector('.slot-result')?.textContent === 'Hello Alice!');
+
+    name.set('Bob');
+    assert('5.2 scopedSlot: re-renders on signal change',
+        document.querySelector('.slot-result')?.textContent === 'Hello Bob!');
+
+    // Default slot (no function provided)
+    const frag2 = renderSlot(undefined, 'missing', null, () => {
+        const d = document.createElement('span');
+        d.className = 'default-slot';
+        d.textContent = 'default content';
+        return d;
+    });
+    document.getElementById('test-container').appendChild(frag2);
+    assert('5.3 scopedSlot: default when no slot fn',
+        document.querySelector('.default-slot')?.textContent === 'default content');
+}
+
+// ─── 6. Animation ───────────────────────────────────────────────
+
+function testAnimation() {
+    // Keyframes
+    const bounce = keyframes('bounce', [
+        { offset: 0, transform: 'translateY(0)' },
+        { offset: 0.5, transform: 'translateY(-20px)' },
+        { offset: 1, transform: 'translateY(0)' },
+    ], { duration: 300 });
+    assert('6.1 keyframes: creates config', bounce.name === 'bounce' && bounce.keyframes.length === 3);
+
+    // Spring
+    const ease = spring({ stiffness: 300, damping: 20 });
+    assert('6.2 spring: generates linear() CSS', ease.startsWith('linear('));
+    const values = ease.match(/linear\((.+)\)/)?.[1].split(',').map(Number);
+    assert('6.3 spring: starts at 0, ends at 1', values?.[0] === 0 && values?.[values.length - 1] === 1);
+}
+
+// ─── 7. Dynamic Component ───────────────────────────────────────
+
+function testDynamic() {
+    // Basic dynamic (backward compat)
+    component('demo-dyn-a', { render: () => html`<span class="dyn-a">A</span>` });
+    component('demo-dyn-b', { render: () => html`<span class="dyn-b">B</span>` });
+
+    const current = signal('demo-dyn-a');
+    const frag = dynamic(() => current(), null);
+    document.getElementById('test-container').appendChild(frag);
+
+    assert('7.1 dynamic: renders initial component',
+        document.querySelector('.dyn-a') !== null);
+
+    current.set('demo-dyn-b');
+    assert('7.2 dynamic: swaps component on signal change',
+        document.querySelector('.dyn-b') !== null);
+}
+
+// ─── 8. Reactive Style Runtime ──────────────────────────────────
+
+function testStyleRuntime() {
+    // cssVar
+    const primary = cssVar('--demo-primary', '#ff0000');
+    assert('8.1 cssVar: sets CSS variable',
+        document.documentElement.style.getPropertyValue('--demo-primary') === '#ff0000');
+
+    primary.set('#00ff00');
+    assert('8.2 cssVar: updates on signal change',
+        document.documentElement.style.getPropertyValue('--demo-primary') === '#00ff00');
+
+    // Theme
+    const theme = createTheme({ '--demo-a': 'red', '--demo-b': 'blue' });
+    applyTheme(theme);
+    assert('8.3 applyTheme: sets all variables',
+        document.documentElement.style.getPropertyValue('--demo-a') === 'red' &&
+        document.documentElement.style.getPropertyValue('--demo-b') === 'blue');
+
+    // Viewport signals
+    assert('8.4 viewport.width: returns number', typeof viewport.width() === 'number' && viewport.width() > 0);
+    assert('8.5 viewport.height: returns number', typeof viewport.height() === 'number');
+    assert('8.6 screen.isTouch: returns boolean', typeof screen.isTouch() === 'boolean');
+    assert('8.7 screen.prefersReducedMotion: returns boolean', typeof screen.prefersReducedMotion() === 'boolean');
+
+    // Adaptive
+    const features = adaptive({
+        wide: () => viewport.width() > 500,
+        narrow: () => viewport.width() <= 500,
+    });
+    assert('8.8 adaptive: returns boolean signals', typeof features.wide() === 'boolean');
+    const attr = document.documentElement.getAttribute('pdx-adaptive') ?? '';
+    assert('8.9 adaptive: writes to html attribute', attr.length > 0);
+}
+
+// ─── 9. Browser Composables ─────────────────────────────────────
+
+function testBrowser() {
+    // useStorage
+    localStorage.removeItem('demo-test-key');
+    const stored = useStorage('demo-test-key', 'initial');
+    assert('9.1 useStorage: reads default', stored() === 'initial');
+
+    stored.set('updated');
+    assert('9.2 useStorage: writes to localStorage',
+        JSON.parse(localStorage.getItem('demo-test-key')) === 'updated');
+
+    // useOnline
+    const online = useOnline();
+    assert('9.3 useOnline: returns boolean', typeof online() === 'boolean');
+
+    // useTitle
+    const count = signal(7);
+    useTitle(() => `${count()} items — Demo`);
+    assert('9.4 useTitle: sets document.title', document.title === '7 items — Demo');
+    count.set(12);
+    assert('9.5 useTitle: updates reactively', document.title === '12 items — Demo');
+
+    // useMediaQuery
+    const isDark = useMediaQuery('(prefers-color-scheme: dark)');
+    assert('9.6 useMediaQuery: returns boolean', typeof isDark() === 'boolean');
+}
+
+// ─── Runner ─────────────────────────────────────────────────────
+
+window.runAll = function() {
+    results.length = 0;
+    passed = 0;
+    failed = 0;
+    document.getElementById('test-container').innerHTML = '';
+
+    try { testLifecycle(); } catch(e) { assert('1.x lifecycle CRASH', false, e.message); }
+    try { testCommunication(); } catch(e) { assert('2.x communication CRASH', false, e.message); }
+    try { testStoreWatch(); } catch(e) { assert('3.x store/watch CRASH', false, e.message); }
+    try { testErrorBoundary(); } catch(e) { assert('4.x errorBoundary CRASH', false, e.message); }
+    try { testScopedSlot(); } catch(e) { assert('5.x scopedSlot CRASH', false, e.message); }
+    try { testAnimation(); } catch(e) { assert('6.x animation CRASH', false, e.message); }
+    try { testDynamic(); } catch(e) { assert('7.x dynamic CRASH', false, e.message); }
+    try { testStyleRuntime(); } catch(e) { assert('8.x styleRuntime CRASH', false, e.message); }
+    try { testBrowser(); } catch(e) { assert('9.x browser CRASH', false, e.message); }
+
+    flush();
+};
+
+// Auto-run
+window.runAll();
+</script>
+</body>
+</html>

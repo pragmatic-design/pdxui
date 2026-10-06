@@ -1,0 +1,26 @@
+/* ==========================================================================
+   pdx-col — Responsive column with animated transitions
+   ========================================================================== */
+
+pdx-col {
+    display: block;
+    min-width: 0;
+    /* Smooth transition when span changes dynamically */
+    transition:
+        flex-basis var(--pdx-duration-base, 250ms) var(--pdx-ease, ease),
+        max-width var(--pdx-duration-base, 250ms) var(--pdx-ease, ease),
+        margin-left var(--pdx-duration-base, 250ms) var(--pdx-ease, ease);
+}
+
+/* Row WC — override CSS-only pdx-row defaults when registered as WC */
+pdx-row.pdx-row-wc {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Reduced motion: disable layout animations */
+@media (prefers-reduced-motion: reduce) {
+    pdx-col {
+        transition: none;
+    }
+}

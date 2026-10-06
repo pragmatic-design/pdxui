@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Single Item</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A single collapsible section. Click to toggle.</p>
+
+    <div class="demo-stack">
+      <details class="pdx-accordion">
+        <summary>What is Pragmatic Design?</summary>
+        <div class="pdx-accordion-body">
+          Pragmatic Design is a full-stack framework ecosystem that combines .NET source generators
+          with a modern frontend component system. It emphasizes declarative patterns where the
+          compiler generates the boilerplate.
+        </div>
+      </details>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;details class="pdx-accordion"&gt;
+  &lt;summary&gt;What is Pragmatic Design?&lt;/summary&gt;
+  &lt;div class="pdx-accordion-body"&gt;
+    Content goes here...
+  &lt;/div&gt;
+&lt;/details&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .demo-stack {
+    margin-top: var(--pdx-space-md);
+  }
+</style>

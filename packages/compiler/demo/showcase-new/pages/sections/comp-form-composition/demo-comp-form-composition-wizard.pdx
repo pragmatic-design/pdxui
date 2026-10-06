@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">3. Wizard Layout</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>layout: 'wizard'</code> turns sections into steps with automatic navigation.
+      Each step validates before advancing. Click a completed step to go back.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form-template :schema="wizardSchema"></pdx-form-template>
+    </div>
+  </section>
+</template>
+
+<script setup>
+// ─── 3. Wizard Schema ───
+const wizardSchema = {
+  fields: [
+    { name: 'firstName', type: 'text', label: 'First Name', required: true, size: 6, section: 'personal' },
+    { name: 'lastName', type: 'text', label: 'Last Name', required: true, size: 6, section: 'personal' },
+    { name: 'email', type: 'email', label: 'Email', required: true, section: 'personal', validators: [{ type: 'email' }] },
+    { name: 'company', type: 'text', label: 'Company', section: 'work' },
+    { name: 'role', type: 'text', label: 'Role', section: 'work' },
+    { name: 'plan', type: 'select', label: 'Plan', section: 'preferences', options: ['Free', 'Pro', 'Enterprise'], default: 'Free' },
+    { name: 'newsletter', type: 'checkbox', label: 'Subscribe to newsletter', section: 'preferences', default: true },
+  ],
+  sections: [
+    { name: 'personal', label: 'Personal Info' },
+    { name: 'work', label: 'Work Details' },
+    { name: 'preferences', label: 'Preferences' },
+  ],
+  layout: 'wizard',
+  columns: 12,
+};
+</script>

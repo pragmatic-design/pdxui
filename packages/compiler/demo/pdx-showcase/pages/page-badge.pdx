@@ -1,0 +1,61 @@
+<template>
+  <div class="page">
+    <h2>Badge</h2>
+    <p class="desc">Inline status indicator — count, dot, or capped. Click buttons to change count.</p>
+
+    <section>
+      <h3>Live Counter</h3>
+      <p class="hint">Click + / - to change the badge count.</p>
+      <div class="row">
+        <button class="pdx-secondary" size="sm" @click="decrement">−</button>
+        <span class="pdx-badge pdx-badge-primary">{{ badgeCount }}</span>
+        <button class="pdx-secondary" size="sm" @click="increment">+</button>
+        <span style="margin-left:16px">
+          <span class="pdx-badge pdx-badge-danger">{{ badgeCount > 99 ? '99+' : badgeCount }}</span>
+          (capped)
+        </span>
+      </div>
+    </section>
+
+    <section>
+      <h3>Variants</h3>
+      <div class="row">
+        <span class="pdx-badge pdx-badge-primary">5</span>
+        <span class="pdx-badge pdx-badge-success">12</span>
+        <span class="pdx-badge pdx-badge-danger">3</span>
+        <span class="pdx-badge pdx-badge-warning">7</span>
+        <span class="pdx-badge pdx-badge-secondary">0</span>
+      </div>
+    </section>
+
+    <section>
+      <h3>Status Dots</h3>
+      <div class="row" style="gap:16px">
+        <span>Online <span class="pdx-dot pdx-dot-success pdx-dot-pulse"></span></span>
+        <span>Busy <span class="pdx-dot pdx-dot-danger"></span></span>
+        <span>Away <span class="pdx-dot pdx-dot-warning"></span></span>
+        <span>Offline <span class="pdx-dot pdx-dot-muted"></span></span>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/badge';
+@title 'Badge — PDX Components';
+
+let badgeCount = $signal(5);
+
+function increment() { badgeCount++; }
+function decrement() { if (badgeCount > 0) badgeCount--; }
+</script>
+
+<style scoped>
+  .page { max-width: 680px; }
+  h2 { font-size: 1.3rem; font-weight: 700; margin: 0 0 4px; }
+  h3 { font-size: 0.9rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { font-size: 0.82rem; color: var(--pdx-color-muted, #999); margin: 0 0 20px; }
+  .hint { font-size: 0.75rem; color: var(--pdx-color-muted, #aaa); margin: 0 0 8px; }
+  section { margin-bottom: 24px; padding: 16px; border: 1px solid var(--pdx-color-border, #e0e0e0); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-surface, white); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+</style>

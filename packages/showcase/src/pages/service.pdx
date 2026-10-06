@@ -1,0 +1,169 @@
+<template>
+  <section class="page" data-test="service">
+    <pdx-breadcrumb data-test="crumbs"></pdx-breadcrumb>
+    <h1 class="pdx-txt-title">{{ record?.name ?? $t('services.unknown') }}</h1>
+
+    <!-- The record detail's shell, written once. -->
+    <pdx-record-detail :label="$t('services.sections')">
+      <span slot="identity" class="portrait" aria-hidden="true">{{ record ? record.code.slice(4, 7) : '?' }}</span>
+      <p slot="identity" class="pdx-txt-heading identity-name" data-test="identity-name">{{ record?.code ?? '' }}</p>
+      <p slot="identity" class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ record ? $t('services.hours', { hours: record.slaHours }) + ' · ' + $t('services.states.' + (record.active ? 'active' : 'inactive')) : '' }}</p>
+
+      <p slot="menu" class="menu-group pdx-txt-small pdx-ink-muted">{{ $t('services.groups.service') }}</p>
+      <button slot="menu" type="button" class="menu-row" :aria-pressed="section === 'details' ? 'true' : 'false'"
+        @click="section = 'details'" data-test="section-details">{{ $t('services.sectionNames.details') }}</button>
+      <button slot="menu" type="button" class="menu-row" :aria-pressed="section === 'customers' ? 'true' : 'false'"
+        @click="section = 'customers'" data-test="section-customers">
+        <span>{{ $t('services.sectionNames.customers') }}</span><span class="menu-count" data-test="customers-count">{{ subscribers.length }}</span>
+      </button>
+
+        <!-- Details: the form IS the section, always editable, each field saved after its pause
+             (the employee's personal data's shape). -->
+        <section :show="section === 'details'" data-test="details">
+          <div class="section-head">
+            <h2 class="pdx-txt-heading">{{ $t('services.sectionNames.details') }}</h2>
+            <span class="save-status pdx-txt-small" role="status" aria-live="polite" data-test="save-status"
+              :data-state="saveState" :title="savedTitle">{{ statusText }}</span>
+          </div>
+          <pdx-form :form="details" data-test="details-form">
+            <div class="grid two">
+              <pdx-form-field name="name" :label="$t('services.fields.name')">
+                <pdx-input name="name" data-test="name"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field name="code" :label="$t('services.fields.code')">
+                <pdx-input name="code" data-test="code"></pdx-input>
+              </pdx-form-field>
+              <pdx-form-field class="wide" name="description" :label="$t('services.fields.description')">
+                <pdx-textarea name="description" rows="2" data-test="description"></pdx-textarea>
+              </pdx-form-field>
+              <pdx-form-field name="slaHours" :label="$t('services.fields.slaHours')">
+                <pdx-number-input name="slaHours" min="1" data-test="slaHours"></pdx-number-input>
+              </pdx-form-field>
+              <pdx-form-field name="resolveHours" :label="$t('services.fields.resolveHours')">
+                <pdx-number-input name="resolveHours" min="1" data-test="resolveHours"></pdx-number-input>
+              </pdx-form-field>
+              <pdx-form-field name="price" :label="$t('services.fields.price')">
+                <pdx-number-input name="price" min="0" data-test="price"></pdx-number-input>
+              </pdx-form-field>
+              <pdx-form-field name="active" :label="$t('services.fields.active')">
+                <pdx-switch name="active" data-test="active"></pdx-switch>
+              </pdx-form-field>
+            </div>
+          </pdx-form>
+        </section>
+
+        <!-- Customers: those subscribed to it now, each with the day it started. -->
+        <section :show="section === 'customers'" data-test="service-customers">
+          <h2 class="pdx-txt-heading">{{ $t('services.sectionNames.customers') }}</h2>
+          <ul class="rows">
+            @for (subscribers as s; track s.customer.id) {
+              <li data-test="service-customer">
+                <pdx-link :to="'/customers/' + s.customer.id">{{ s.customer.name }}</pdx-link>
+                <span class="pdx-txt-small pdx-ink-muted">· {{ $t('services.customers.since', { date: $d(s.since, { dateStyle: 'medium' }) }) }}</span>
+              </li>
+            } @empty {
+              <li data-test="no-customers">
+                <pdx-empty-state icon="users" :title="$t('services.customers.emptyTitle')" :description="$t('services.customers.emptyBody')"></pdx-empty-state>
+              </li>
+            }
+          </ul>
+        </section>
+    </pdx-record-detail>
+  </section>
+</template>
+
+<script setup>
+@page '/services/:id' { label: serviceLabel };
+@title record?.name ?? $t('services.unknown');
+
+// The trail names the service, as the asset's names the asset.
+function serviceLabel(params) {
+  return serviceById(Number(params.id))?.name ?? $t('services.unknown');
+}
+
+import { getLocale } from '@pdxui/core';
+import { serviceById, serviceTransport, subscribersOf } from '../data/services';
+import { createAutosave } from '../data/autosave';
+
+@prop id: string = '';
+
+// `getLocale()` hands back the signal; reading it is the second call.
+const localeSignal = getLocale();
+
+const record = $derived(serviceById(Number(id)));
+const subscribers = $derived(subscribersOf(Number(id)));
+
+let section = $signal('details');
+
+// ── Details: saved as they change (the employee's personal data's shape) ──
+@form details: {
+  name: string,
+  code: string,
+  description: string,
+  slaHours: number,
+  resolveHours: number,
+  price: number,
+  active: boolean
+} {
+  save: onChange;
+  validate: detailsRule
+};
+
+const FIELDS = Object.keys(details.getValues());
+
+function detailsRule(v) {
+  const errors: Record<string, string> = {};
+  if (!String(v.name ?? '').trim()) errors.name = $t('services.nameRequired');
+  if (!(Number(v.slaHours) > 0)) errors.slaHours = $t('services.hoursPositive');
+  if (!(Number(v.resolveHours) > 0)) errors.resolveHours = $t('services.hoursPositive');
+  else if (Number(v.resolveHours) < Number(v.slaHours)) errors.resolveHours = $t('services.resolveBeforeAnswer');
+  return errors;
+}
+
+/** The numbers are stored as numbers, whatever the control hands over. */
+const NUMERIC = ['slaHours', 'resolveHours', 'price'];
+
+// ── Saving (src/data/autosave.ts) ──
+// The load, the queue, the state and the flush on leave are the composable's, as on the employee's
+// page.
+const autosave = createAutosave({
+  form: details,
+  fields: FIELDS,
+  read: () => serviceById(Number(id)),
+  write: (record) => serviceTransport.update(record),
+  value: (name, raw) => NUMERIC.includes(name) ? Number(raw) : raw,
+});
+$watch(id, () => autosave.load(), { immediate: true });
+
+const saveState = $derived(autosave.state());
+const statusText = $derived(saveState === 'saving' ? $t('services.saving')
+  : saveState === 'refused' ? $t('services.notSaved')
+  : saveState === 'saved' ? $t('services.saved') : '');
+const savedTitle = $derived(autosave.savedAt()
+  ? $t('services.savedAt', { time: new Intl.DateTimeFormat(localeSignal(), { timeStyle: 'medium' }).format(autosave.savedAt()) })
+  : null);
+
+// A change still inside its pause is saved on the way out, not lost; a refused one stays refused.
+onBeforeLeave(async () => {
+  await autosave.saveChanged();
+  return true;
+});
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  /* The shell — identity, section menu, rows — is <pdx-record-detail>'s. */
+
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--pdx-space-md); }
+  .save-status { color: var(--pdx-color-muted); min-height: 1lh; }
+  .save-status[data-state="refused"] { color: var(--pdx-color-danger-ink); }
+
+  .grid { display: grid; gap: var(--pdx-space-md) var(--pdx-space-lg); align-items: start; }
+  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid .wide { grid-column: 1 / -1; }
+
+  /* A phone: one field a row. */
+  @media (max-width: 640px) {
+    .grid.two { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

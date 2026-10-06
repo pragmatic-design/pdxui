@@ -1,0 +1,48 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">5. Async Validation</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Username availability check with debounce. Simulates an API call (500ms delay).
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="asyncForm">
+        <pdx-form-field name="username" label="Username" required>
+          <pdx-input name="username" placeholder="Try 'admin' or 'root'..."></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field name="email" label="Email" required>
+          <pdx-input name="email" type="email" placeholder="Also async-checked"></pdx-input>
+        </pdx-form-field>
+      </pdx-form>
+      <p class="pdx-txt-small pdx-ink-muted" style="margin-top: var(--pdx-space-sm)">
+        Reserved names: <code>admin</code>, <code>root</code>, <code>test</code>. Try them to see async error.
+      </p>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const form = createForm({
+  initialValues: { username: '', email: '' },
+  validators: {
+    username: [required(...), minLength(3, ...)],
+    email: [required(...), email(...)],
+  },
+  asyncValidators: {
+    username: async (val) =&gt; {
+      await fetch('/api/check-username?q=' + val);
+      // Returns error string or undefined
+      if (taken) return '"' + val + '" is already taken';
+    },
+  },
+  asyncDebounceMs: 500, // debounce async calls
+  validateOn: 'onBlur',
+});</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required, minLength, email } from '@pdxui/core';
+
+// ─── 5. Async Validation ───
+const reservedNames = ['admin', 'root', 'test', 'superuser'];
+
+const asyncForm = createForm({ initialValues: { username: '', email: '' }, validators: { username: [required('Username is required'), minLength(3, 'Min 3 characters')], email: [required('Email is required'), email('Invalid email')] }, asyncValidators: { username: async (val) => { await new Promise(r => setTimeout(r, 500)); if (reservedNames.includes(val.toLowerCase())) return `"${val}" is already taken`; return undefined; } }, validateOn: 'onBlur' });
+</script>

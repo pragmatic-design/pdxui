@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Section Headers & Separators</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Organize items into visual sections.</p>
+
+    <div class="demo-sidebar">
+      <pdx-nav-menu :items="sectionItems" activekey="profile"></pdx-nav-menu>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const sectionItems = [
+  { key: 'hdr1', label: 'Account', type: 'header' },
+  { key: 'profile', label: 'Profile', icon: 'user' },
+  { key: 'security', label: 'Security', icon: 'lock' },
+  { key: 'billing', label: 'Billing', icon: 'tag' },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'hdr2', label: 'Preferences', type: 'header' },
+  { key: 'theme', label: 'Theme', icon: 'sliders' },
+  { key: 'language', label: 'Language', icon: 'globe' },
+  { key: 'notifications', label: 'Notifications', icon: 'bell' },
+];
+</script>

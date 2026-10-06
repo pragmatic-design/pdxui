@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Status Dots</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Tiny color indicators. Add <code>.pdx-dot-pulse</code> for animated pulse.</p>
+
+    <div class="dot-row">
+      <span class="dot-demo"><span class="pdx-dot pdx-dot-success"></span> Online</span>
+      <span class="dot-demo"><span class="pdx-dot pdx-dot-danger"></span> Offline</span>
+      <span class="dot-demo"><span class="pdx-dot pdx-dot-warning"></span> Away</span>
+      <span class="dot-demo"><span class="pdx-dot pdx-dot-muted"></span> Unknown</span>
+      <span class="dot-demo"><span class="pdx-dot pdx-dot-primary"></span> Active</span>
+      <span class="dot-demo"><span class="pdx-dot pdx-dot-success pdx-dot-pulse"></span> Live</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-dot pdx-dot-success"&gt;&lt;/span&gt;
+&lt;span class="pdx-dot pdx-dot-danger"&gt;&lt;/span&gt;
+&lt;span class="pdx-dot pdx-dot-success pdx-dot-pulse"&gt;&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .dot-row {
+    display: flex;
+    gap: var(--pdx-space-lg);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+  }
+  .dot-demo {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    font-size: var(--pdx-text-sm);
+  }
+</style>

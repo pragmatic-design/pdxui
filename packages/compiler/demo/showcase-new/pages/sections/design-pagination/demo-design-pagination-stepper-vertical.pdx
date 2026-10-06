@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Stepper — Vertical</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Vertical layout with <code>.pdx-stepper-vertical</code>.</p>
+
+    <div class="pdx-stepper pdx-stepper-vertical">
+      <div class="pdx-step" data-status="done">
+        <span class="pdx-step-number">&#10003;</span>
+        <span class="pdx-step-label">Order Placed</span>
+      </div>
+      <div class="pdx-step-connector" data-status="done"></div>
+      <div class="pdx-step" data-status="done">
+        <span class="pdx-step-number">&#10003;</span>
+        <span class="pdx-step-label">Processing</span>
+      </div>
+      <div class="pdx-step-connector" data-status="active"></div>
+      <div class="pdx-step" data-status="active">
+        <span class="pdx-step-number">3</span>
+        <span class="pdx-step-label">Shipped</span>
+      </div>
+      <div class="pdx-step-connector" data-status="pending"></div>
+      <div class="pdx-step" data-status="pending">
+        <span class="pdx-step-number">4</span>
+        <span class="pdx-step-label">Delivered</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-stepper pdx-stepper-vertical"&gt;
+  &lt;div class="pdx-step" data-status="done"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-step-connector" data-status="done"&gt;&lt;/div&gt;
+  &lt;div class="pdx-step" data-status="active"&gt;...&lt;/div&gt;
+  ...
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

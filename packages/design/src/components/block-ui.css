@@ -1,0 +1,50 @@
+/* pdx-block-ui — Loading overlay */
+pdx-block-ui { display: block; position: relative; }
+.pdx-block-ui { position: relative; }
+
+.pdx-block-ui-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pdx-color-bg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 10;
+    border-radius: inherit;
+}
+.pdx-block-ui-visible {
+    opacity: 0.7;
+    pointer-events: auto;
+}
+/* `fullscreen`: the viewport, not the element. Fixed, so an ancestor with a
+   `transform` or `contain` would make it that ancestor's box instead — keep a fullscreen block
+   outside such a container. */
+.pdx-block-ui-overlay.pdx-block-ui-fullscreen {
+    position: fixed;
+    z-index: var(--pdx-z-overlay);
+    border-radius: 0;
+}
+/* The spinner group stays in the visible part of the block. Centred on the whole block, a form
+   taller than the window would put its message 1,000px above what the user is looking at.
+   The group is as tall as the block or the viewport, whichever is shorter, and sticky at both
+   edges: on a short block it fills the block (centred); on a tall one it is a
+   viewport-high band that follows the scroll, with the spinner in its middle. */
+.pdx-block-ui-spinner {
+    position: sticky;
+    top: 0;
+    bottom: 0;
+    height: min(100vh, 100%);
+    height: min(100dvh, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-sm);
+}
+.pdx-block-ui-message {
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+}

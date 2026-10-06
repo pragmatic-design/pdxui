@@ -1,0 +1,32 @@
+<script setup>
+@store theme { persist: 'local' };
+
+let currentTheme = $signal('neutral');
+let darkMode = $signal(false);
+let density = $signal('');
+
+function setTheme(name) {
+    currentTheme = name;
+    document.documentElement.setAttribute('pdx-theme', name);
+}
+
+function toggleDark() {
+    darkMode = !darkMode;
+    if (darkMode) {
+        document.documentElement.setAttribute('pdx-dark', '');
+        document.documentElement.setAttribute('pdx-scheme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('pdx-dark');
+        document.documentElement.setAttribute('pdx-scheme', 'light');
+    }
+}
+
+function setDensity(d) {
+    density = d;
+    if (d) {
+        document.documentElement.setAttribute('pdx-density', d);
+    } else {
+        document.documentElement.removeAttribute('pdx-density');
+    }
+}
+</script>

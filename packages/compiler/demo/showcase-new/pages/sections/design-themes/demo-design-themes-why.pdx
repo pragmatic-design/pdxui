@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Why it is built this way</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The decisions behind all of the above, written out — colour space, what happens when two
+      semantic hues collide, why light and dark are one theme rather than two, and an honest account
+      of what the system does <em>not</em> give you.
+    </p>
+    <div class="doc-links">
+      <a class="doc-card" href="/docs/design-theory">
+        <strong>Design theory</strong>
+        <span class="pdx-txt-small pdx-ink-muted">OKLCH · colliding hues · contrast by construction · scales as ratios · the archetype</span>
+      </a>
+      <a class="doc-card" href="/docs/theming">
+        <strong>Theming</strong>
+        <span class="pdx-txt-small pdx-ink-muted">activation · tokens · behaviour tokens · dark mode · density</span>
+      </a>
+      <a class="doc-card" href="/docs/making-a-theme">
+        <strong>Making a theme</strong>
+        <span class="pdx-txt-small pdx-ink-muted">the builder · <code>pdx theme</code> · the engine as an API · what an override costs · DTCG · ship it</span>
+      </a>
+      <a class="doc-card" href="https://themebuilder.pdxui.com/" target="_blank" rel="noreferrer">
+        <strong>Theme Builder ↗</strong>
+        <span class="pdx-txt-small pdx-ink-muted">move a hue, see the verdict, export the theme</span>
+      </a>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.doc-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-lg);
+}
+.doc-card {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    text-decoration: none;
+    color: inherit;
+    background: var(--pdx-color-surface);
+}
+.doc-card:hover { border-color: var(--pdx-color-primary); }
+</style>

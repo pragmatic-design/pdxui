@@ -1,0 +1,69 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Overlay Stack</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Programmatic dialog API: <code>dialog.confirm()</code>, <code>dialog.alert()</code>, <code>dialog.open()</code>.
+      Promise-based, stacking-aware, same pattern as <code>toast.success()</code>.
+    </p>
+
+    <!-- Confirm -->
+    <pdx-demo-comp-overlay-stack-confirm class="demo-section"></pdx-demo-comp-overlay-stack-confirm>
+
+    <!-- Alert -->
+    <pdx-demo-comp-overlay-stack-alert class="demo-section"></pdx-demo-comp-overlay-stack-alert>
+
+    <!-- Danger + Type-to-Confirm -->
+    <pdx-demo-comp-overlay-stack-danger class="demo-section"></pdx-demo-comp-overlay-stack-danger>
+
+    <!-- Timer-Gated -->
+    <pdx-demo-comp-overlay-stack-timer class="demo-section"></pdx-demo-comp-overlay-stack-timer>
+
+    <!-- Dialog + Toast -->
+    <pdx-demo-comp-overlay-stack-toast class="demo-section"></pdx-demo-comp-overlay-stack-toast>
+
+    <!-- Cascade Close -->
+    <pdx-demo-comp-overlay-stack-cascade class="demo-section"></pdx-demo-comp-overlay-stack-cascade>
+
+    <!-- Mix Declarative + Programmatic -->
+    <pdx-demo-comp-overlay-stack-mixed class="demo-section"></pdx-demo-comp-overlay-stack-mixed>
+
+    <!-- Reference -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <h3 class="pdx-txt-subheading">API</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Method</span><span>Returns</span><span>Description</span></div>
+        <div class="opt-row"><code>dialog.confirm(props)</code><span>Promise&lt;boolean&gt;</span><span>Confirm/Cancel dialog</span></div>
+        <div class="opt-row"><code>dialog.alert(props)</code><span>Promise&lt;void&gt;</span><span>Single OK button alert</span></div>
+        <div class="opt-row"><code>dialog.open(props)</code><span>Promise&lt;void&gt;</span><span>Generic dialog with content</span></div>
+        <div class="opt-row"><code>dialog.closeAll()</code><span>void</span><span>Close all programmatic dialogs</span></div>
+      </div>
+      <h3 class="pdx-txt-subheading">Confirm Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>title</code><span>string</span><span>-</span><span>Dialog title (required)</span></div>
+        <div class="opt-row"><code>message</code><span>string</span><span>-</span><span>Body message</span></div>
+        <div class="opt-row"><code>confirmLabel</code><span>string</span><span>'Confirm'</span><span>Confirm button text</span></div>
+        <div class="opt-row"><code>cancelLabel</code><span>string</span><span>'Cancel'</span><span>Cancel button text</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>'default'</span><span>'default' or 'danger'</span></div>
+        <div class="opt-row"><code>confirmText</code><span>string</span><span>-</span><span>Type-to-confirm text</span></div>
+        <div class="opt-row"><code>confirmDelay</code><span>number</span><span>0</span><span>Timer-gated seconds</span></div>
+      </div>
+    </section>
+
+    <pdx-overlay-outlet></pdx-overlay-outlet>
+    <pdx-toast position="top-right"></pdx-toast>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+
+@page '/components/overlay-stack';
+@title 'Overlay Stack';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+</style>

@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Danger Item</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Destructive actions highlighted in danger color.</p>
+
+    <div class="demo-menu-container">
+      <div class="pdx-menu">
+        <button class="pdx-menu-item">Rename</button>
+        <button class="pdx-menu-item">Move to...</button>
+        <div class="pdx-menu-separator"></div>
+        <button class="pdx-menu-item pdx-menu-danger">Delete</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button class="pdx-menu-item pdx-menu-danger"&gt;Delete&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>

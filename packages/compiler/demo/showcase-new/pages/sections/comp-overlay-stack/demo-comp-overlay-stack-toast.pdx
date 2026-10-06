@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Dialog + Toast Coexistence</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Shows confirm + fires toast simultaneously. Both use overlayStack.</p>
+    <div class="demo-row">
+      <pdx-button variant="primary" size="sm" @click="onDialogPlusToast">Confirm + Toast</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+import { toast } from '@pdxui/ui/toast';
+
+async function onDialogPlusToast() {
+    toast.info('A confirm dialog is open...');
+    const result = await dialog.confirm({
+        title: 'Confirm Action',
+        message: 'This demonstrates dialog + toast coexistence.',
+    });
+    if (result) toast.success('Confirmed!');
+    else toast.warning('Cancelled.');
+}
+</script>

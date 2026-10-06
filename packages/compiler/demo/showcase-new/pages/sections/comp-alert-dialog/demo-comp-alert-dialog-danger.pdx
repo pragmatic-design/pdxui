@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Danger Variant</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Red confirm button for destructive actions.</p>
+    <pdx-button variant="danger" @click="openDanger">Delete Repository</pdx-button>
+
+    <pdx-alert-dialog :open="dangerOpen" variant="danger" title="Delete Repository?" message="All data, issues, and pull requests will be permanently deleted."
+        confirmLabel="Delete Forever" @pdx-confirm="onDangerConfirm" @pdx-cancel="onDangerCancel"></pdx-alert-dialog>
+  </section>
+</template>
+
+<script setup>
+let dangerOpen = $signal(false);
+
+function openDanger() { dangerOpen = true; }
+function onDangerConfirm() { dangerOpen = false; }
+function onDangerCancel() { dangerOpen = false; }
+</script>

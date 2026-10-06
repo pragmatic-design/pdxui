@@ -1,0 +1,106 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">1. Order Edit (JSON Schema with Nested DTO)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      100% generated from JSON. Nested objects (<code>type: 'group'</code>), arrays (<code>type: 'list'</code>),
+      sections, custom validators (<code>type: 'custom'</code>), field descriptions — all declarative.
+      Click <strong>Submit</strong> to see validation on Customer name/email and the custom "ORD-" check.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form-template :schema="orderSchema"></pdx-form-template>
+
+      <div class="form-output">
+        <strong>Schema fields:</strong> 3 flat + 2 groups (customer 4 fields, shipping 4 fields) + 1 list (items 3 columns) + notes
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>JSON Schema</summary><pre class="pdx-txt-mono"><code>const orderSchema = {
+  fields: [
+    // Custom validator: must start with ORD-
+    { name: 'orderNumber', type: 'text', label: 'Order #', required: true, size: 4, section: 'order',
+      validators: [{ type: 'custom', validate: v =&gt; !String(v).startsWith('ORD-') ? 'Must start with ORD-' : undefined }] },
+    { name: 'date', type: 'text', label: 'Date', size: 4, section: 'order', default: '2026-04-07' },
+    { name: 'status', type: 'select', label: 'Status', size: 4, section: 'order',
+      options: ['Draft', 'Confirmed', 'Shipped', 'Delivered'] },
+    // Nested object → type: 'group'
+    { name: 'customer', type: 'group', label: 'Customer', section: 'customer', fields: [
+      { name: 'name', type: 'text', label: 'Name', required: true, size: 6 },
+      { name: 'email', type: 'email', label: 'Email', required: true, size: 6, validators: [{ type: 'email' }] },
+      { name: 'phone', type: 'tel', label: 'Phone', size: 6, description: 'Include country code' },
+      { name: 'company', type: 'text', label: 'Company', size: 6 },
+    ]},
+    // Array of objects → type: 'list'
+    { name: 'items', type: 'list', label: 'Line Items', section: 'items',
+      itemFields: [
+        { name: 'product', type: 'text', label: 'Product' },
+        { name: 'qty', type: 'number', label: 'Qty' },
+        { name: 'price', type: 'number', label: 'Unit Price' },
+      ],
+      itemDefault: { product: '', qty: 1, price: 0 },
+      default: [
+        { product: 'Widget Pro', qty: 2, price: 29.99 },
+        { product: 'Gadget X', qty: 1, price: 49.99 },
+      ],
+    },
+    // Another nested object
+    { name: 'shipping', type: 'group', label: 'Shipping Address', section: 'shipping', fields: [
+      { name: 'street', type: 'text', label: 'Street', size: 12 },
+      { name: 'city', type: 'text', label: 'City', size: 4 },
+      { name: 'state', type: 'text', label: 'State', size: 4 },
+      { name: 'zip', type: 'text', label: 'ZIP', size: 4 },
+    ]},
+    { name: 'notes', type: 'textarea', label: 'Order Notes', section: 'shipping', hint: 'Special instructions' },
+  ],
+  sections: [
+    { name: 'order', label: 'Order Details' },
+    { name: 'customer', label: 'Customer' },
+    { name: 'items', label: 'Line Items' },
+    { name: 'shipping', label: 'Shipping', collapsible: true },
+  ],
+  layout: 'grid',
+  columns: 12,
+};</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── 1. Order Schema (JSON-driven) ───
+const orderSchema = {
+  fields: [
+    { name: 'orderNumber', type: 'text', label: 'Order #', required: true, size: 4, section: 'order', default: 'ORD-1001',
+      validators: [{ type: 'custom', validate: (v) => typeof v === 'string' && !v.startsWith('ORD-') ? 'Must start with ORD-' : undefined }] },
+    { name: 'date', type: 'text', label: 'Date', size: 4, section: 'order', default: '2026-04-07' },
+    { name: 'status', type: 'select', label: 'Status', size: 4, section: 'order', options: ['Draft', 'Confirmed', 'Shipped', 'Delivered'], default: 'Draft' },
+    { name: 'customer', type: 'group', label: 'Customer', section: 'customer', fields: [
+      { name: 'name', type: 'text', label: 'Full Name', required: true, size: 6 },
+      { name: 'email', type: 'email', label: 'Email', required: true, size: 6, validators: [{ type: 'email' }] },
+      { name: 'phone', type: 'tel', label: 'Phone', size: 6, placeholder: '+1 (555) 000-0000', description: 'Include country code' },
+      { name: 'company', type: 'text', label: 'Company', size: 6 },
+    ]},
+    { name: 'items', type: 'list', label: 'Line Items', section: 'items', itemFields: [
+      { name: 'product', type: 'text', label: 'Product', required: true },
+      { name: 'qty', type: 'number', label: 'Qty' },
+      { name: 'price', type: 'number', label: 'Unit Price' },
+    ], itemDefault: { product: '', qty: 1, price: 0 }, default: [
+      { product: 'Widget Pro', qty: 2, price: 29.99 },
+      { product: 'Gadget X', qty: 1, price: 49.99 },
+    ]},
+    { name: 'shipping', type: 'group', label: 'Shipping Address', section: 'shipping', fields: [
+      { name: 'street', type: 'text', label: 'Street', size: 12 },
+      { name: 'city', type: 'text', label: 'City', size: 4 },
+      { name: 'state', type: 'text', label: 'State', size: 4 },
+      { name: 'zip', type: 'text', label: 'ZIP', size: 4 },
+    ]},
+    { name: 'notes', type: 'textarea', label: 'Order Notes', section: 'shipping', hint: 'Special delivery instructions' },
+  ],
+  sections: [
+    { name: 'order', label: 'Order Details' },
+    { name: 'customer', label: 'Customer' },
+    { name: 'items', label: 'Line Items' },
+    { name: 'shipping', label: 'Shipping', collapsible: true },
+  ],
+  layout: 'grid',
+  columns: 12,
+};
+</script>

@@ -1,0 +1,85 @@
+/**
+ * The Pragmatic Design identity — the ONE place the wordmark is defined.
+ *
+ * Two surfaces ship under this name: the site (pdxui.com) and the builder
+ * (themebuilder.pdxui.com). They are separate packages with separate Vite roots, so a header
+ * copied from one to the other would be a header that drifts — a gold that is one hex off, a
+ * badge with the wrong tracking, and nobody notices until they are open in adjacent tabs.
+ * Both import this file instead.
+ *
+ * Scope discipline: this file owns the MARK and nothing else. The gold, the heading face, the
+ * logo, the "PDX UI" lockup. It does not style headers, navs, backgrounds or
+ * layout — each surface keeps its own chrome, and the builder deliberately keeps a neutral
+ * working surface so its own theme previews are the only coloured thing on screen.
+ *
+ * The logo is referenced by url() relative to this file, so each build resolves and
+ * fingerprints it independently and there is exactly one binary in the repo.
+ *
+ * Manrope has to be loaded by the host page (both do, from Google Fonts); the stack falls
+ * back to system-ui, which changes the texture but not the layout.
+ */
+
+:root {
+    --pdx-brand-gold: #f2ca50;
+    /* The display gold, which never switches: it is the tint behind badges and rules, where
+       a dark bronze would read as mud. Only the TEXT gold follows the scheme. */
+    --pdx-brand-gold-display: #f2ca50;
+    --pdx-brand-gold-deep: #d4af37;
+    --pdx-brand-gold-bright: #ffe088;
+    --pdx-brand-gold-dim: #b8962a;
+    --pdx-brand-font: 'Manrope', system-ui, sans-serif;
+}
+
+/* On a light surface the display gold is unreadable as text — it drops to a dark bronze.
+   Both surfaces switch on the same attribute, so the swap belongs here rather than in each. */
+:root[pdx-scheme="light"] {
+    --pdx-brand-gold: #8a6512;
+    --pdx-brand-gold-bright: #6e4f0e;
+}
+
+/* ── The lockup ───────────────────────────────────────────────────────────────
+   Class names are the site's own, so its markup and this file share one vocabulary. */
+
+.site-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    /* The lockup sits on whatever surface hosts it and takes that surface's ink. Without
+       this the anchor falls back to the browser's link blue. */
+    color: inherit;
+}
+
+/* A background rather than an <img>: it keeps the asset reference inside this file, which is
+   what makes the file canonical. Sized and labelled by the host markup's role/aria-label. */
+.brand-logo {
+    width: 30px;
+    height: 30px;
+    display: block;
+    flex-shrink: 0;
+    background: url('./pragmatic-logo.png') center / contain no-repeat;
+}
+
+/* The organisation's mark, then the product: "PDX" in the gold of pragmaticdesign.net, "UI" as a badge. */
+.brand-name {
+    font-family: var(--pdx-brand-font);
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    font-size: 1.02rem;
+    white-space: nowrap;
+}
+
+.brand-accent { color: var(--pdx-brand-gold); }
+
+.brand-ui {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    vertical-align: middle;
+    margin-left: 0.15rem;
+    padding: 0.1rem 0.32rem;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--pdx-brand-gold-display) 14%, transparent);
+    color: var(--pdx-brand-gold);
+    border: 1px solid color-mix(in srgb, var(--pdx-brand-gold-display) 25%, transparent);
+}

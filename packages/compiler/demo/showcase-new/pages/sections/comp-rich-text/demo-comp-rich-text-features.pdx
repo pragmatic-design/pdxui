@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Features</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <strong>Markdown Shortcuts</strong>
+        <span class="pdx-txt-small pdx-ink-muted"># H1, ## H2, **, *, ~~, &#96;, >, -, 1.</span>
+      </div>
+      <div class="feature-card">
+        <strong>10 Languages</strong>
+        <span class="pdx-txt-small pdx-ink-muted">JS, TS, Python, Java, C#, Go, Rust, HTML, CSS, SQL</span>
+      </div>
+      <div class="feature-card">
+        <strong>IME First-Class</strong>
+        <span class="pdx-txt-small pdx-ink-muted">CJK input, Android GBoard, Korean Hangul</span>
+      </div>
+      <div class="feature-card">
+        <strong>Paste Sanitizer</strong>
+        <span class="pdx-txt-small pdx-ink-muted">Word, Google Docs, web content — cleaned on paste</span>
+      </div>
+      <div class="feature-card">
+        <strong>CSS Grid Tables</strong>
+        <span class="pdx-txt-small pdx-ink-muted">Resize columns, merge cells, no &lt;table&gt; quirks</span>
+      </div>
+      <div class="feature-card">
+        <strong>Design Tokens</strong>
+        <span class="pdx-txt-small pdx-ink-muted">Auto dark mode, theme-aware, zero config</span>
+      </div>
+      <div class="feature-card">
+        <strong>3 Output Formats</strong>
+        <span class="pdx-txt-small pdx-ink-muted">JSON, HTML, Markdown — serialize anything</span>
+      </div>
+      <div class="feature-card">
+        <strong>Agent API</strong>
+        <span class="pdx-txt-small pdx-ink-muted">Programmatic manipulation, ghost text, streaming</span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); }
+  .feature-card { padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); display: flex; flex-direction: column; gap: var(--pdx-space-2xs); }
+</style>

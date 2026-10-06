@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Presets / Swatches</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Provide a <code>presets</code> array to show a clickable color grid for quick selection.
+    </p>
+    <div class="demo-box">
+      <pdx-color-picker :presets="presetColors" @pdx-change="onPresetChange" />
+      <p class="pdx-txt-small pdx-ink-muted result">Selected: {{ presetValue }}</p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker
+  :presets="presetColors"
+  @pdx-change="onPresetChange" /&gt;
+
+const presetColors = [
+  '#ef4444', '#f97316', '#eab308', '#22c55e',
+  '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4',
+  '#64748b', '#000000', '#ffffff', '#f5f5f4',
+];</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Presets ───
+const presetColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b', '#000000', '#ffffff', '#f5f5f4'];
+
+let presetValue = $signal('');
+
+function onPresetChange(e) { presetValue = e.detail.value ?? e.detail; }
+</script>

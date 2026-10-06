@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Interactive Demo</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to increment/decrement. Badge uses <code>aria-live="polite"</code> — screen readers announce count changes.</p>
+
+    <div class="demo-row">
+      <span class="pdx-badge-anchor">
+        <pdx-button variant="ghost" aria-label="Notifications"><pdx-icon name="bell" size="md"></pdx-icon></pdx-button>
+        <pdx-badge variant="danger" :value="notifStr()"></pdx-badge>
+      </span>
+      <pdx-button variant="outline" size="sm" @click="addNotif">+ Add</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="removeNotif">- Remove</pdx-button>
+      <pdx-button variant="ghost" size="sm" @click="clearNotif">Clear</pdx-button>
+      <span class="pdx-txt-small pdx-ink-muted">Count: {{ notifCount }}</span>
+    </div>
+  </section>
+</template>
+
+<script setup>
+// Interactive demo
+let notifCount = $signal(3);
+
+function notifStr() { return '' + notifCount; }
+
+function addNotif() {
+    notifCount = notifCount + 1;
+}
+
+function removeNotif() {
+    if (notifCount > 0) notifCount = notifCount - 1;
+}
+
+function clearNotif() {
+    notifCount = 0;
+}
+</script>

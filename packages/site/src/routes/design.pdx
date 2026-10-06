@@ -1,0 +1,204 @@
+<template>
+  <div class="design shell-wrap">
+    <nav class="cmp-nav">
+      <span class="cmp-nav-cat">Pragmatic CSS</span>
+      @for (topics as t; track t) {
+        <a :class="t === topic ? 'cmp-nav-link active' : 'cmp-nav-link'" :href="'/design/' + t" @click="followLink">{{ pretty(t) }}</a>
+      }
+    </nav>
+
+    <article class="cmp-body">
+      @if (showIndex) {
+        <header class="ds-hero">
+          <div class="ds-hero-text">
+            <span class="cmp-kicker">Pragmatic CSS</span>
+            <h1 class="cmp-title metal-gradient">The design system, in pure CSS</h1>
+            <p class="cmp-summary">Tokens, typography, color, spacing and the primitives every component
+              is built on — plain classes, zero JavaScript, retuned by {{ themeCount }} themes.</p>
+            <div class="ci-stats">
+              <span class="ci-stat"><strong>{{ topicCount }}</strong> topics</span>
+              <span class="ci-stat"><strong>OKLCH</strong> color</span>
+              <span class="ci-stat"><strong>{{ themeCount }}</strong> themes</span>
+              <span class="ci-stat"><strong>light</strong> / dark</span>
+            </div>
+            <!-- The 26 topics are a REFERENCE: they say what exists, never why. The reasoning lives
+                 in Docs, which reads as the developer's half of the site, so without this line a
+                 designer arriving here meets the catalogue and none of the argument. One click,
+                 from where they land. -->
+            <p class="ds-theory">
+              Why it is built this way —
+              <a class="pdx-link" href="/docs/design-theory" @click="followLink">Design theory</a> ·
+              <a class="pdx-link" href="/docs/theming" @click="followLink">Theming</a> ·
+              <a class="pdx-link" href="/docs/making-a-theme" @click="followLink">Making a theme</a> ·
+              <a class="pdx-link" href="/docs/printing" @click="followLink">Printing an app</a> ·
+              <a class="pdx-link" href="/design/themes" @click="followLink">see it live</a>
+            </p>
+          </div>
+          <div class="ds-taste glass">
+            <div class="ds-swatches">
+              <span class="ds-sw" style="background: var(--pdx-color-primary)"></span>
+              <span class="ds-sw" style="background: var(--pdx-color-accent)"></span>
+              <span class="ds-sw" style="background: var(--pdx-color-success)"></span>
+              <span class="ds-sw" style="background: var(--pdx-color-warning)"></span>
+              <span class="ds-sw" style="background: var(--pdx-color-danger)"></span>
+              <span class="ds-sw" style="background: var(--pdx-color-surface); border:1px solid var(--pdx-color-border)"></span>
+            </div>
+            <div class="ds-type">
+              <span class="pdx-txt-title">Title</span>
+              <span class="pdx-txt-body">Body text — the quick brown fox.</span>
+              <span class="pdx-txt-small pdx-ink-muted">Small muted caption</span>
+            </div>
+            <div class="ds-btns">
+              <button class="pdx-primary">Primary</button>
+              <button class="pdx-outline">Outline</button>
+              <button class="pdx-ghost">Ghost</button>
+            </div>
+          </div>
+        </header>
+        <!-- Themes are the part of this system a designer has to SEE to judge. The builder
+             measures every component under a theme and lets one be authored and exported,
+             so the design pages point at it rather than describing it. -->
+        <a class="ds-builder glass" href="https://themebuilder.pdxui.com/">
+          <span class="ds-builder-kicker">Theme Builder</span>
+          <span class="ds-builder-title">Build a theme, and see it judged ↗</span>
+          <span class="ds-builder-desc">Pick a brand colour and an archetype, override any token,
+            and watch {{ topicCount }} topics' worth of primitives restyle live across every component —
+            with contrast, overflow and touch targets measured on the rendered page. Export CSS or DTCG.</span>
+        </a>
+
+        <div class="design-grid">
+          @for (topics as t; track t) {
+            <a class="design-card glass" :href="'/design/' + t" @click="followLink">
+              <span class="design-card-title">{{ pretty(t) }}</span>
+              <span class="design-card-desc">{{ descOf(t) }}</span>
+            </a>
+          }
+        </div>
+      }
+      @if (showTopic) {
+        <a class="cmp-nav-back" href="/design" @click="followLink">← Design system</a>
+        <div class="design-gallery" :ref="galleryRef"></div>
+      }
+    </article>
+  </div>
+</template>
+
+<script setup>
+@page '/design', '/design/:topic';
+@title 'Design — PDX';
+import { currentParams } from '@pdxui/router';
+import { followLink } from '../lib/follow-link';
+import { onMount, effect } from '@pdxui/core';
+import _topics from '../demos/design-index.json';
+
+// Ported pure-CSS design pages (<pdx-design-NAME>), loaded lazily per topic.
+const _designMods = import.meta.glob('../demos/design-*.pdx');
+// Local const so the template recognises it as a (non-signal) iterable, not a callable signal.
+const topics = _topics;
+
+onMount(() => { import('@pdxui/ui/all'); });
+function pretty(t) { return (t || '').split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+
+const themeCount = 13;
+const topicCount = topics.length;
+const _topicDesc = {
+  accordion: 'Collapsible section styling.', animations: 'Motion tokens, transitions and keyframes.',
+  banner: 'Inline message styles.', buttons: 'Variants, sizes and states.',
+  chips: 'Tag and chip styles.', colors: 'The full OKLCH token palette.',
+  dialog: 'Modal surface styling.', drawer: 'Slide-in panel styles.',
+  feedback: 'Alerts, empty and status states.', forms: 'Field, label and validation styling.',
+  inputs: 'Text, select and control styles.', kbd: 'Keyboard key styling.',
+  layout: 'Grid, stack and container primitives.', menu: 'Menu and dropdown surfaces.',
+  nav: 'Navbar, sidebar and breadcrumb styles.', pagination: 'Pager controls.',
+  popover: 'Floating panel styling.', progress: 'Progress bars and spinners.',
+  segmented: 'Segmented control styling.', spacing: 'The spacing scale (xs → 3xl).',
+  surfaces: 'Cards, insets and elevation.', tables: 'Data table styling.',
+  tabs: 'Tab and panel styles.', toast: 'Notification styling.',
+  toolbar: 'Toolbar and action-row styles.', typography: 'The type scale and text utilities.',
+};
+function descOf(t) { return _topicDesc[t] || ''; }
+
+const topic = $derived(currentParams().topic || '');
+const showIndex = $derived(!currentParams().topic);
+const showTopic = $derived(!!currentParams().topic);
+
+let galleryRef = $signal(null);
+
+effect(() => {
+  const _ref = galleryRef;
+  if (!_ref) return;
+  const _t = currentParams().topic;
+  _ref.innerHTML = '';
+  if (!_t) return;
+  const _key = '../demos/design-' + _t + '.pdx';
+  if (!_designMods[_key]) return;
+  _designMods[_key]().then(() => {
+    if (currentParams().topic !== _t || !galleryRef) return;
+    galleryRef.innerHTML = '';
+    galleryRef.appendChild(document.createElement('pdx-design-' + _t));
+  });
+});
+</script>
+
+<style scoped>
+.design {
+  display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 2.5rem;
+  padding-top: 2.5rem; padding-bottom: 4rem; align-items: start;
+}
+.cmp-nav { display: flex; flex-direction: column; gap: 0.08rem; position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+.cmp-nav-cat { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 700; margin: 0 0 0.4rem; }
+.cmp-nav-link { color: var(--ink-muted); text-decoration: none; font-size: 0.85rem; padding: 0.22rem 0.6rem; border-radius: 7px; border-left: 2px solid transparent; }
+.cmp-nav-link:hover { color: var(--ink); background: color-mix(in srgb, var(--gold-display) 5%, transparent); }
+.cmp-nav-link.active { color: var(--gold); border-left-color: var(--gold); background: color-mix(in srgb, var(--gold-display) 7%, transparent); }
+
+.cmp-head { margin-bottom: 1.5rem; }
+.cmp-kicker { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); font-weight: 600; }
+.cmp-title { font-family: var(--font-heading); font-size: 2rem; margin: 0.2rem 0 0; }
+.cmp-summary { margin-top: 0.5rem; color: var(--ink-variant); font-size: 1.05rem; max-width: 60ch; }
+.cmp-nav-back { display: inline-block; color: var(--ink-muted); text-decoration: none; font-size: 0.82rem; margin-bottom: 1rem; }
+.cmp-nav-back:hover { color: var(--gold); }
+
+/* Hero */
+.ds-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 2.2rem; align-items: center; margin-bottom: 2rem; }
+.ds-theory {
+    margin-top: var(--pdx-space-md);
+    font-size: 0.9rem;
+    color: var(--pdx-color-muted);
+}
+.ds-theory a { white-space: nowrap; }
+
+.ci-stats { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.3rem; }
+.ci-stat { font-size: 0.82rem; color: var(--ink-muted); border: 1px solid var(--outline); border-radius: 999px; padding: 0.3rem 0.8rem; }
+.ci-stat strong { color: var(--ink); font-weight: 700; }
+.ds-taste { border-radius: 18px; padding: 1.4rem; display: flex; flex-direction: column; gap: 1.1rem; }
+.ds-swatches { display: flex; gap: 0.5rem; }
+.ds-sw { width: 100%; height: 34px; border-radius: 8px; }
+.ds-type { display: flex; flex-direction: column; gap: 0.25rem; }
+.ds-btns { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+.design-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.8rem; }
+/* Wider and warmer than a topic card, because it is a different KIND of thing: the topic
+   cards explain the system, this one opens the tool that exercises it. */
+.ds-builder {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  padding: 1.3rem 1.5rem; margin: 0 0 1.4rem; border-radius: 16px;
+  text-decoration: none; border: 1px solid var(--gold);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.ds-builder:hover { transform: translateY(-3px); box-shadow: var(--glow-gold); }
+.ds-builder-kicker { font-family: var(--font-heading); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--gold); }
+.ds-builder-title { font-family: var(--font-heading); font-weight: 800; font-size: 1.18rem; color: var(--ink); }
+.ds-builder-desc { color: var(--ink-muted); font-size: 0.9rem; line-height: 1.5; max-width: 66ch; }
+
+.design-card { display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem 1.1rem; border-radius: 14px; text-decoration: none; border: 1px solid var(--outline); transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; }
+.design-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: var(--glow-gold); }
+.design-card-title { font-family: var(--font-heading); font-weight: 700; color: var(--ink); }
+.design-card-desc { color: var(--ink-muted); font-size: 0.84rem; line-height: 1.4; }
+
+@media (max-width: 1000px) {
+  /* minmax(0, 1fr): a bare 1fr grows to its widest child's min-content. */
+  .design { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .cmp-nav { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; gap: 0.4rem; }
+  .ds-hero { grid-template-columns: minmax(0, 1fr); }
+}
+</style>

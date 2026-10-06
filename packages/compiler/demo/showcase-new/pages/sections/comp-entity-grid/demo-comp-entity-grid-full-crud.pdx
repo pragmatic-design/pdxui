@@ -1,0 +1,64 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Full CRUD</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Click <strong>New</strong> to create, the pencil to edit, the trash to delete — it asks first,
+      and so does the bulk Delete. Select rows (checkboxes) to reveal the bulk bar. Every mutation
+      appends to the event log below.
+    </p>
+
+    <pdx-entity-grid
+      title="Team"
+      :columns="columns"
+      :data="people"
+      :schema="schema"
+      id-field="id"
+      selection="multiple"
+      @pdx-create="onCreate"
+      @pdx-update="onUpdate"
+      @pdx-delete="onDelete"></pdx-entity-grid>
+
+    <div class="event-log">
+      <strong class="pdx-txt-small">Events</strong>
+      <div class="demo-stack" style="gap: 2px; margin-top: 6px;">
+        @for (logLines as line; track line) {
+          <span class="pdx-txt-mono pdx-txt-small pdx-ink-muted">{{ line }}</span>
+        }
+        <span class="pdx-txt-small pdx-ink-muted" :show="logLines.length === 0">No events yet — try creating or deleting a row.</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const schema = { fields: [
+  { name: 'name', type: 'text', label: 'Name', validators: [{ type: 'required' }] },
+  { name: 'role', type: 'text', label: 'Role' },
+] };
+
+&lt;pdx-entity-grid title="Team" :columns="columns" :data="people" :schema="schema"
+  selection="multiple" @pdx-create="onCreate" @pdx-delete="onDelete" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { columns, people } from './state.pdx';
+
+const schema = { fields: [
+  { name: 'name', type: 'text', label: 'Name', validators: [{ type: 'required' }] },
+  { name: 'role', type: 'text', label: 'Role' },
+] };
+
+let logCount = $signal(0);
+let logLines = $signal([]);
+
+function logEvent(name, detail) { logCount = logCount + 1; logLines = [...logLines, '#' + logCount + ' ' + name + ' ' + JSON.stringify(detail)].slice(-6); }
+function onCreate(e) { logEvent('pdx-create', e.detail); }
+function onUpdate(e) { logEvent('pdx-update', e.detail); }
+function onDelete(e) { logEvent('pdx-delete', e.detail); }
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-inset); }
+.source-block { margin-top: var(--pdx-space-md); }
+</style>

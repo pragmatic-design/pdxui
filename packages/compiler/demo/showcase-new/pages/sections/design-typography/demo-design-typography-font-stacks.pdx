@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Font Stacks</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Three font families defined as CSS custom properties. Each theme can override these.</p>
+
+    <div class="font-stack">
+      <div class="font-row">
+        <code>--pdx-font-sans</code>
+        <p style="font-family:var(--pdx-font-sans)">AaBbCc 0123456789 — The quick brown fox jumps over the lazy dog.</p>
+      </div>
+      <div class="font-row">
+        <code>--pdx-font-heading</code>
+        <p style="font-family:var(--pdx-font-heading);font-weight:600">AaBbCc 0123456789 — The quick brown fox jumps over the lazy dog.</p>
+      </div>
+      <div class="font-row">
+        <code>--pdx-font-mono</code>
+        <p style="font-family:var(--pdx-font-mono)">AaBbCc 0123456789 — const fn = (a, b) => a + b;</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  /* Font stacks */
+  .font-stack { margin-top: var(--pdx-space-md); }
+  .font-row {
+    padding: var(--pdx-space-md) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .font-row p { margin: var(--pdx-space-xs) 0 0; font-size: var(--pdx-text-base); }
+</style>

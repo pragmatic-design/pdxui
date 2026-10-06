@@ -1,0 +1,254 @@
+/* Surface classes — base, card, inset, overlay, glass + interactive states + card sections */
+
+.pdx-surface-base {
+    background: var(--pdx-color-bg);
+    color: var(--pdx-color-text);
+}
+
+/* Radius/shadow/border-colour are tokens so a theme — or an engine-generated theme —
+   supplies values without redeclaring the card. Structural card variants (glass blur,
+   bottom-border-only) remain per-theme CSS: those are identity, not values. */
+.pdx-surface-card {
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    border: var(--pdx-border-width) solid var(--pdx-card-border-color);
+    border-radius: var(--pdx-card-radius);
+    padding: var(--pdx-space-lg);
+    box-shadow: var(--pdx-card-shadow);
+}
+
+.pdx-surface-inset {
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-text);
+    border-radius: var(--pdx-radius-md);
+    padding: var(--pdx-space-md);
+}
+
+.pdx-surface-overlay {
+    background: var(--pdx-color-overlay);
+    color: var(--pdx-color-text);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-xl);
+}
+
+.pdx-surface-glass {
+    background: light-dark(
+        oklch(1 0 0 / 0.7),
+        oklch(0.2 0.01 75 / 0.5)
+    );
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--pdx-border-width) solid light-dark(
+        oklch(1 0 0 / 0.3),
+        oklch(1 0 0 / 0.08)
+    );
+    border-radius: var(--pdx-radius-lg);
+    padding: var(--pdx-space-lg);
+}
+
+/* Interactive card states */
+.pdx-surface-card {
+    transition: box-shadow var(--pdx-transition), transform var(--pdx-transition);
+}
+
+.pdx-surface-card[interactive] {
+    cursor: pointer;
+}
+
+.pdx-surface-card[interactive]:hover {
+    box-shadow: var(--pdx-shadow-md);
+    transform: translateY(-1px);
+}
+
+.pdx-surface-card[selected] {
+    border-color: var(--pdx-color-primary);
+    box-shadow: 0 0 0 1px var(--pdx-color-primary);
+}
+
+/* Card sections */
+.pdx-card-header {
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    border-bottom: 1px solid var(--pdx-color-border);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+.pdx-card-body {
+    padding: var(--pdx-space-lg);
+}
+
+.pdx-card-footer {
+    padding: var(--pdx-space-md) var(--pdx-space-lg);
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+.pdx-card-media {
+    overflow: hidden;
+    border-radius: var(--pdx-radius-lg) var(--pdx-radius-lg) 0 0;
+}
+
+.pdx-card-media > img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Sectioned card resets default padding */
+.pdx-surface-card:has(.pdx-card-header),
+.pdx-surface-card:has(.pdx-card-body),
+.pdx-surface-card:has(.pdx-card-media) {
+    padding: 0;
+}
+
+/* ===== Card — Horizontal layout ===== */
+
+.pdx-card-horizontal {
+    display: flex;
+}
+
+.pdx-card-horizontal > .pdx-card-media {
+    border-radius: var(--pdx-radius-lg) 0 0 var(--pdx-radius-lg);
+    width: 40%;
+    flex-shrink: 0;
+}
+
+.pdx-card-horizontal > .pdx-card-media > img {
+    height: 100%;
+    object-fit: cover;
+}
+
+.pdx-card-horizontal > .pdx-card-body {
+    flex: 1;
+}
+
+/* ===== Card — Media overlay (text on image) ===== */
+
+.pdx-card-media-overlay {
+    position: relative;
+}
+
+.pdx-card-media-overlay > .pdx-card-media {
+    border-radius: var(--pdx-radius-lg);
+}
+
+.pdx-card-media-overlay > .pdx-card-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--pdx-space-lg);
+    background: linear-gradient(transparent, oklch(0 0 0 / 0.7));
+    color: white;
+    border-radius: 0 0 var(--pdx-radius-lg) var(--pdx-radius-lg);
+}
+
+/* ===== Card — Compact ===== */
+
+.pdx-card-compact {
+    padding: var(--pdx-space-sm);
+}
+
+.pdx-card-compact .pdx-card-header {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+}
+
+.pdx-card-compact .pdx-card-body {
+    padding: var(--pdx-space-sm);
+}
+
+.pdx-card-compact .pdx-card-footer {
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+}
+
+/* ===== Card — Accent top border ===== */
+
+.pdx-card-accent {
+    border-top: 3px solid var(--pdx-color-primary);
+}
+
+.pdx-card-accent-success { border-top: 3px solid var(--pdx-color-success); }
+.pdx-card-accent-danger  { border-top: 3px solid var(--pdx-color-danger); }
+.pdx-card-accent-warning { border-top: 3px solid var(--pdx-color-warning); }
+
+/* ===== Card — Full clickable link ===== */
+
+a.pdx-surface-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+a.pdx-surface-card:hover {
+    box-shadow: var(--pdx-shadow-md);
+    transform: translateY(-1px);
+}
+
+a.pdx-surface-card:focus-visible {
+    box-shadow: var(--pdx-focus-ring);
+    outline: none;
+}
+
+/* Card — variant modifiers (per-element) */
+.pdx-card-outline { background: transparent; border: 2px solid var(--pdx-color-border); box-shadow: none; }
+.pdx-card-elevated { box-shadow: var(--pdx-shadow-lg); }
+.pdx-card-flat { background: var(--pdx-color-inset); border-color: transparent; box-shadow: none; }
+
+/* Card — theme-driven global variant via [pdx-card-style="elevated|flat"] on ancestor */
+[pdx-card-style="elevated"] .pdx-surface-card {
+    border: none;
+    box-shadow: var(--pdx-shadow-sm);
+}
+[pdx-card-style="elevated"] .pdx-surface-card:hover {
+    box-shadow: var(--pdx-shadow-md);
+}
+[pdx-card-style="flat"] .pdx-surface-card {
+    background: var(--pdx-color-inset);
+    border-color: transparent;
+    box-shadow: none;
+}
+
+/* Card — elevation levels (explicit override — must beat [pdx-card-style] (0,2,0)).
+   Using .pdx-surface-card.pdx-card-elevation-N = (0,2,0) + later in cascade = wins. */
+.pdx-surface-card.pdx-card-elevation-0 { box-shadow: none; }
+.pdx-surface-card.pdx-card-elevation-1 { box-shadow: var(--pdx-shadow-sm); }
+.pdx-surface-card.pdx-card-elevation-2 { box-shadow: var(--pdx-shadow-md); }
+.pdx-surface-card.pdx-card-elevation-3 { box-shadow: var(--pdx-shadow-lg); }
+.pdx-surface-card.pdx-card-elevation-4 { box-shadow: var(--pdx-shadow-xl); }
+
+/* Card — interactive states for WC */
+.pdx-card-hoverable { transition: box-shadow var(--pdx-transition), transform var(--pdx-transition); }
+.pdx-card-hoverable:hover { box-shadow: var(--pdx-shadow-md); transform: translateY(-1px); }
+/* Card with `href` — the link overlay. A real <a> across the card, so middle-click, open in a new
+   tab, copy link address and the status bar all work and the address is in the DOM, none of
+   which a card that navigates from JS has. It is aria-hidden and out of the
+   tab order: the accessible link is the host, which carries role=link and the Enter handling.
+
+   The overlay covers the card, so anything interactive inside has to sit ABOVE it — without
+   this rule a button in a card would stop being clickable, which is the cost the pattern
+   carries and the reason it is handled here rather than left to whoever writes the card.
+
+   Only the interactive elements are raised. Raising every child (`> *`) is wrong: it buries the anchor under the card's own body, so a pointer never reaches it and
+   every affordance the overlay exists for — middle-click, ctrl+click — stops working, while
+   the JS fallback keeps plain clicks looking correct. Text over the overlay is not
+   selectable; that is inherent to a card that IS a link, and the same is true of an <a>
+   wrapped around one. */
+.pdx-card-clickable { cursor: pointer; position: relative; }
+.pdx-card-link { position: absolute; inset: 0; z-index: 0; }
+.pdx-card-clickable a:not(.pdx-card-link), .pdx-card-clickable button,
+.pdx-card-clickable input, .pdx-card-clickable select, .pdx-card-clickable textarea,
+.pdx-card-clickable [role='button'], .pdx-card-clickable pdx-button {
+    position: relative; z-index: 1;
+}
+.pdx-card-clickable:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+.pdx-card-selected { border-color: var(--pdx-color-primary); box-shadow: 0 0 0 2px var(--pdx-color-primary); }
+.pdx-card-disabled { opacity: var(--pdx-opacity-disabled); pointer-events: none; }
+.pdx-card-loading .pdx-skeleton {
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    animation: pdx-skeleton-pulse 1.5s ease-in-out infinite;
+}
+@keyframes pdx-skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}

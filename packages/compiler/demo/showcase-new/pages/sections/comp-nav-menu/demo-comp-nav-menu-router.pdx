@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With the Router</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      An entry with <code>href</code> is a plain link, and followed by the browser it loads the whole page.
+      <code>pdx-select</code> is cancelable: prevent it and navigate with the router, and the menu stops the link.
+      A Ctrl, Cmd or Shift click is left to the browser, so opening in a new tab still works.
+    </p>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-nav-menu :items="items" :active-key="current" @pdx-select="go"&gt;&lt;/pdx-nav-menu&gt;
+
+// navigate and currentPath come from @pdxui/router
+// const current = $derived(keyForPath(currentPath()));
+
+// function go(e) {
+//   if (!e.detail.href) return;
+//   e.preventDefault();       // the menu does not follow the link
+//   navigate(e.detail.href);  // the router does, with no page load
+// }</code></pre>
+    </details>
+  </section>
+</template>

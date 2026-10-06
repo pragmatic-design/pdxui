@@ -1,0 +1,47 @@
+@store tasks { persist: 'local' };
+
+let items = $signal([
+  { id: 1, text: 'Design @form API', category: 'design', done: true },
+  { id: 2, text: 'Implement resource() cache', category: 'dev', done: true },
+  { id: 3, text: 'Write integration tests', category: 'test', done: false },
+  { id: 4, text: 'Fix scoped CSS bug', category: 'dev', done: true },
+  { id: 5, text: 'Create showcase demo', category: 'dev', done: false },
+  { id: 6, text: 'Review form validation', category: 'test', done: false },
+]);
+
+let filter = $signal('all');
+let _nextId = $signal(7);
+
+const filtered = $derived(
+  filter === 'all' ? items
+    : filter === 'done' ? items.filter(t => t.done)
+    : items.filter(t => !t.done)
+);
+
+const stats = $derived({
+  total: items.length,
+  done: items.filter(t => t.done).length,
+  pending: items.filter(t => !t.done).length,
+});
+
+function addTask(text, category) {
+  const id = _nextId;
+  _nextId = _nextId + 1;
+  items = [...items, { id, text, category, done: false }];
+}
+
+function toggleTask(id) {
+  items = items.map(t => t.id === id ? { ...t, done: !t.done } : t);
+}
+
+function removeTask(id) {
+  items = items.filter(t => t.id !== id);
+}
+
+function setFilter(f) {
+  filter = f;
+}
+
+function clearDone() {
+  items = items.filter(t => !t.done);
+}

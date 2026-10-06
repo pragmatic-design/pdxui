@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Shape</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>shape="square"</code> for rounded rectangle.</p>
+
+    <div class="demo-row">
+      <pdx-avatar alt="Circle" size="lg"></pdx-avatar>
+      <pdx-avatar alt="Square" size="lg" shape="square"></pdx-avatar>
+      <pdx-avatar src="/avatars/person-5.svg" alt="Circle Img" size="lg"></pdx-avatar>
+      <pdx-avatar src="/avatars/person-6.svg" alt="Square Img" size="lg" shape="square"></pdx-avatar>
+    </div>
+  </section>
+</template>

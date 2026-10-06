@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">OTP Input</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      N-cell code entry. Auto-advance on type, paste spreads across cells, backspace navigates back.
+      Fires <code>pdx-complete</code> when all cells filled.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="6-digit code" hint="Check your email for the code">
+        <pdx-otp-input length="6"></pdx-otp-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="4-digit code">
+        <pdx-otp-input length="4"></pdx-otp-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="With separator (3-3)">
+        <pdx-otp-input length="6" separator="3"></pdx-otp-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Error state" error="Invalid code. Try again." showError>
+        <pdx-otp-input length="6" error></pdx-otp-input>
+      </pdx-form-field>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-otp-input length="6" separator="3"&gt;&lt;/pdx-otp-input&gt;
+
+&lt;!-- Try pasting: 123456 --&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+</style>

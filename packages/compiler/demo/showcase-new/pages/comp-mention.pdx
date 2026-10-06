@@ -1,0 +1,76 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Mention</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-mention&gt;</code> — textarea with @mention trigger and floating suggestions.
+      Supports multiple triggers, DataSource for remote search, debounce, highlight matching.
+    </p>
+
+    <!-- ═══ 1. Basic ═══ -->
+    <pdx-demo-comp-mention-basic class="demo-section"></pdx-demo-comp-mention-basic>
+
+    <!-- ═══ 2. Multiple triggers ═══ -->
+    <pdx-demo-comp-mention-multiple-triggers class="demo-section"></pdx-demo-comp-mention-multiple-triggers>
+
+    <!-- ═══ 3. With descriptions ═══ -->
+    <pdx-demo-comp-mention-descriptions class="demo-section"></pdx-demo-comp-mention-descriptions>
+
+    <!-- ═══ 4. DataSource (simulated remote) ═══ -->
+    <pdx-demo-comp-mention-data-source class="demo-section"></pdx-demo-comp-mention-data-source>
+
+    <!-- ═══ 5. Disabled / Readonly ═══ -->
+    <pdx-demo-comp-mention-disabled-readonly class="demo-section"></pdx-demo-comp-mention-disabled-readonly>
+
+    <!-- ═══ Slot Template ═══ -->
+    <pdx-demo-comp-mention-slot-template class="demo-section"></pdx-demo-comp-mention-slot-template>
+
+    <!-- ═══ Slots Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Slot</span><span>Scope</span><span>Description</span></div>
+        <div class="opt-row"><code>suggestion</code><span>{ item, index, active }</span><span>Custom suggestion item in dropdown</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>items</code><span>array</span><span>Static suggestions [{ value, label }]</span></div>
+        <div class="opt-row"><code>source</code><span>DataSource | array</span><span>Remote data source with fetch()</span></div>
+        <div class="opt-row"><code>trigger</code><span>string</span><span>Trigger chars, comma-separated (default: '@')</span></div>
+        <div class="opt-row"><code>labelField</code><span>string</span><span>Field for label (default: 'label')</span></div>
+        <div class="opt-row"><code>valueField</code><span>string</span><span>Field for value (default: 'value')</span></div>
+        <div class="opt-row"><code>descriptionField</code><span>string</span><span>Optional field for description</span></div>
+        <div class="opt-row"><code>minLength</code><span>number</span><span>Min chars after trigger before searching</span></div>
+        <div class="opt-row"><code>debounce</code><span>number</span><span>Debounce ms for remote search (default: 300)</span></div>
+        <div class="opt-row"><code>maxItems</code><span>number</span><span>Max suggestions shown (default: 10)</span></div>
+        <div class="opt-row"><code>insertFormat</code><span>string</span><span>'text' = @Name, 'value' = @[id]</span></div>
+        <div class="opt-row"><code>rows</code><span>number</span><span>Textarea rows (default: 3)</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>Readonly state</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-select</code><span>{ item, trigger, query }</span><span>Mention item selected</span></div>
+        <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>Text changed</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ value }</span><span>Value committed</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/mention';
+@title 'Mention Component';
+</script>
+
+<style scoped>
+  .page { max-width: 800px; }
+
+  .opt-header, .opt-row { grid-template-columns: 180px 180px 1fr; }
+</style>

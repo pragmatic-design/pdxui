@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Tooltip</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Hover over the text to see the full absolute date in a tooltip (enabled by default).</p>
+    <div class="demo-container">
+      <div class="demo-row-labeled">
+        <span class="pdx-txt-small pdx-ink-muted label-col">Hover me:</span>
+        <pdx-relative-time :datetime="threeDaysAgo" show-tooltip></pdx-relative-time>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString();
+</script>

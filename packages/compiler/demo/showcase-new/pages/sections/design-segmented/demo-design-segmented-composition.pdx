@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: View Switcher</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A toolbar with segmented control for switching between views.</p>
+
+    <div class="comp-toolbar">
+      <span class="pdx-txt-subheading">Projects</span>
+      <div class="comp-spacer"></div>
+      <div class="pdx-segmented pdx-segmented-sm">
+        <button class="pdx-segmented-item">List</button>
+        <button class="pdx-segmented-item active">Grid</button>
+        <button class="pdx-segmented-item">Table</button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .comp-spacer { flex: 1; }
+</style>

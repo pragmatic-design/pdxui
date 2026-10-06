@@ -1,0 +1,109 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Image</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-image&gt;</code> — rich image component with lazy loading, fallback, zoom, lightbox, and authenticated image loading.
+    </p>
+
+    <!-- Basic -->
+    <pdx-demo-comp-image-basic class="demo-section"></pdx-demo-comp-image-basic>
+
+    <!-- Object Fit -->
+    <pdx-demo-comp-image-object-fit class="demo-section"></pdx-demo-comp-image-object-fit>
+
+    <!-- Aspect Ratio -->
+    <pdx-demo-comp-image-aspect-ratio class="demo-section"></pdx-demo-comp-image-aspect-ratio>
+
+    <!-- Lazy Loading -->
+    <pdx-demo-comp-image-lazy class="demo-section"></pdx-demo-comp-image-lazy>
+
+    <!-- Fallback -->
+    <pdx-demo-comp-image-fallback class="demo-section"></pdx-demo-comp-image-fallback>
+
+    <!-- Rounded -->
+    <pdx-demo-comp-image-rounded class="demo-section"></pdx-demo-comp-image-rounded>
+
+    <!-- Zoomable -->
+    <pdx-demo-comp-image-zoomable class="demo-section"></pdx-demo-comp-image-zoomable>
+
+    <!-- Lightbox -->
+    <pdx-demo-comp-image-lightbox class="demo-section"></pdx-demo-comp-image-lightbox>
+
+    <!-- Caption -->
+    <pdx-demo-comp-image-caption class="demo-section"></pdx-demo-comp-image-caption>
+
+    <!-- Authenticated Image -->
+    <pdx-demo-comp-image-authenticated class="demo-section"></pdx-demo-comp-image-authenticated>
+
+    <!-- Custom Fetch -->
+    <pdx-demo-comp-image-custom-fetch class="demo-section"></pdx-demo-comp-image-custom-fetch>
+
+    <!-- Props Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>src</code></td><td>String</td><td>''</td><td>Image URL</td></tr>
+            <tr><td><code>alt</code></td><td>String</td><td>''</td><td>Alt text for accessibility</td></tr>
+            <tr><td><code>width</code></td><td>String</td><td>'auto'</td><td>CSS width</td></tr>
+            <tr><td><code>height</code></td><td>String</td><td>'auto'</td><td>CSS height</td></tr>
+            <tr><td><code>fit</code></td><td>String</td><td>'cover'</td><td>object-fit: cover | contain | fill | none | scale-down</td></tr>
+            <tr><td><code>lazy</code></td><td>Boolean</td><td>true</td><td>IntersectionObserver lazy loading</td></tr>
+            <tr><td><code>fallback</code></td><td>String</td><td>''</td><td>Fallback image URL on error</td></tr>
+            <tr><td><code>fallback-icon</code></td><td>String</td><td>'image-off'</td><td>Icon name shown on error</td></tr>
+            <tr><td><code>placeholder</code></td><td>String</td><td>'skeleton'</td><td>Placeholder: skeleton | blur | none</td></tr>
+            <tr><td><code>ratio</code></td><td>String</td><td>''</td><td>Aspect ratio (e.g. '16/9', '1/1')</td></tr>
+            <tr><td><code>rounded</code></td><td>Boolean</td><td>false</td><td>Circular border-radius (50%)</td></tr>
+            <tr><td><code>radius</code></td><td>String</td><td>''</td><td>Custom border-radius value</td></tr>
+            <tr><td><code>zoomable</code></td><td>Boolean</td><td>false</td><td>Click to toggle 2x zoom</td></tr>
+            <tr><td><code>lightbox</code></td><td>Boolean</td><td>false</td><td>Click opens fullscreen overlay</td></tr>
+            <tr><td><code>caption</code></td><td>String</td><td>''</td><td>Caption text below image</td></tr>
+            <tr><td><code>auth-src</code></td><td>String</td><td>''</td><td>URL requiring authentication (fetched via fetch + objectURL)</td></tr>
+            <tr><td><code>:auth-provider</code></td><td>Function</td><td>null</td><td>() => Record&lt;string,string&gt; returning HTTP headers</td></tr>
+            <tr><td><code>:fetch-fn</code></td><td>Function</td><td>null</td><td>(url: string) => Promise&lt;Blob&gt; for custom fetching</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Events Reference -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-load</code></td><td>{}</td><td>Emitted when image loads successfully</td></tr>
+            <tr><td><code>pdx-error</code></td><td>{}</td><td>Emitted when image fails to load</td></tr>
+            <tr><td><code>pdx-zoom</code></td><td>{ zoomed: boolean }</td><td>Emitted on zoom toggle</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/image';
+@title 'Image — PDX Components';
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.fit-demos {
+    align-items: flex-start;
+}
+.fit-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+}
+.fit-label {
+    text-align: center;
+    font-weight: 500;
+}
+</style>

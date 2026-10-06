@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">10 pages. Click page numbers or arrows to navigate.</p>
+    <div class="demo-row">
+      <pdx-pagination :total="100" :pageSize="10" :page="1" @pdx-change="onPageChange"></pdx-pagination>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="100" :pageSize="10" :page="1" @pdx-change="onPageChange"&gt;
+&lt;/pdx-pagination&gt;</code></pre>
+    </details>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="page-event-log">{{ pageLog }}</div>
+  </section>
+</template>
+
+<script setup>
+let pageLog = $signal('Click a page...');
+
+function onPageChange(e) {
+  pageLog = 'pdx-change: page ' + e.detail.page + ', pageSize ' + e.detail.pageSize;
+}
+</script>
+
+<style scoped>
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+</style>

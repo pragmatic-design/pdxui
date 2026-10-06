@@ -1,0 +1,48 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Edit Drawer</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-edit-drawer&gt;</code> — a drawer hosting a schema-driven form for creating or
+      editing one entity. Composes <code>pdx-drawer</code> + <code>pdx-form-template</code>. On Save
+      it validates and emits <code>pdx-save</code> with the values; <code>value=null</code> → create.
+    </p>
+
+    <pdx-demo-comp-edit-drawer-create-edit class="demo-section"></pdx-demo-comp-edit-drawer-create-edit>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props &amp; Events</h2>
+      <table class="options-table">
+        <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>open</code></td><td>boolean</td><td>false</td><td>Controlled open state.</td></tr>
+          <tr><td><code>schema</code></td><td>FormSchema</td><td>null</td><td>Field schema for the form.</td></tr>
+          <tr><td><code>value</code></td><td>object</td><td>null</td><td>Entity to edit; null → create.</td></tr>
+          <tr><td><code>position</code></td><td>left|right</td><td>right</td><td>Drawer side.</td></tr>
+          <tr><td><code>size</code></td><td>string</td><td>md</td><td>sm/md/lg preset or a custom width.</td></tr>
+          <tr><td><code>busy</code></td><td>boolean</td><td>false</td><td>Disable the footer buttons while persisting.</td></tr>
+        </tbody>
+      </table>
+      <table class="options-table" style="margin-top: var(--pdx-space-lg);">
+        <thead><tr><th>Event</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td><code>pdx-save</code></td><td>{ values, mode: 'create' | 'edit' }</td></tr>
+          <tr><td><code>pdx-cancel</code></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/edit-drawer';
+@title 'Edit Drawer — PDX Components';
+</script>
+
+<style scoped>
+.page { max-width: 860px; }
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-xs); }
+.options-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.options-table th, .options-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--pdx-color-border); }
+</style>

@@ -1,0 +1,48 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Enum Filter (Server-side autocomplete)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      With <code>filterSearchable</code> + <code>filterOptionsSource</code> the options load on
+      demand from the server as the user types — for large or remote value sets (lookup columns).
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="serverDS" :columns="serverColumns" :filterable="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>function loadCategories(query) {
+  return fetch('/api/categories?q=' + query).then(r =&gt; r.json());
+  // → [{ label, value }, ...]
+}
+
+{ field: 'category', header: 'Category', type: 'enum',
+  filterSearchable: true,
+  filterOptionsSource: loadCategories }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// Server-side autocomplete: options loaded on demand (qui simulato con un delay).
+const allTags = ['Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Garden', 'Toys', 'Beauty', 'Automotive', 'Grocery'];
+
+function loadCategories(query) {
+  return new Promise(function(resolve) {
+    setTimeout(function() {
+      const q = (query || '').toLowerCase();
+      resolve(allTags.filter(function(c) { return c.toLowerCase().includes(q); }).map(function(c) { return { label: c, value: c }; }));
+    }, 250);
+  });
+}
+
+const serverColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category', type: 'enum', filterSearchable: true, filterOptionsSource: loadCategories },
+  { field: 'price', header: 'Price', type: 'currency' },
+];
+
+const serverDS = createDataSource({ data: products.slice(), pageSize: 10 });
+</script>

@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Headings</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Group items with <code>.pdx-nav-heading</code> — uppercase, small, muted label.</p>
+
+    <div class="demo-box">
+      <nav class="pdx-nav">
+        <div class="pdx-nav-heading">General</div>
+        <a href="#" class="pdx-nav-item active">Overview</a>
+        <a href="#" class="pdx-nav-item">Activity</a>
+        <div class="pdx-nav-heading">Management</div>
+        <a href="#" class="pdx-nav-item">Users</a>
+        <a href="#" class="pdx-nav-item">Roles</a>
+        <a href="#" class="pdx-nav-item">Permissions</a>
+        <div class="pdx-nav-heading">System</div>
+        <a href="#" class="pdx-nav-item">Logs</a>
+        <a href="#" class="pdx-nav-item">Health</a>
+      </nav>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;nav class="pdx-nav"&gt;
+  &lt;div class="pdx-nav-heading"&gt;General&lt;/div&gt;
+  &lt;a href="#" class="pdx-nav-item active"&gt;Overview&lt;/a&gt;
+  &lt;a href="#" class="pdx-nav-item"&gt;Activity&lt;/a&gt;
+  &lt;div class="pdx-nav-heading"&gt;Management&lt;/div&gt;
+  &lt;a href="#" class="pdx-nav-item"&gt;Users&lt;/a&gt;
+  &lt;a href="#" class="pdx-nav-item"&gt;Roles&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+    </details>
+  </section>
+</template>

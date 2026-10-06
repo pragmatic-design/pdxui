@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Site Announcement</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A complete banner with icon, text, action, and close button.</p>
+
+    <div class="banner-demo">
+      <div class="pdx-banner pdx-banner-info pdx-banner-centered">
+        <span class="pdx-banner-icon">&#127881;</span>
+        <span class="pdx-banner-text">Version 2.0 is here! Check out the new features and improvements.</span>
+        <a href="#" class="pdx-banner-action">Release notes</a>
+        <button class="pdx-banner-close">&times;</button>
+      </div>
+    </div>
+  </section>
+</template>

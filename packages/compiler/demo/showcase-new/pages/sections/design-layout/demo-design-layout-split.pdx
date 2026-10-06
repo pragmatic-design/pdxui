@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-split</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Two-panel grid. Control ratio with <code>ratio</code> attribute. Auto-stacks below 40rem container width.</p>
+
+    <div class="demo-area">
+      <pdx-split ratio="1:2" gap="md">
+        <div class="box tall">Sidebar (1fr)</div>
+        <div class="box tall">Content (2fr)</div>
+      </pdx-split>
+    </div>
+
+    <div class="demo-row">
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">ratio="1:3"</span>
+        <div class="demo-area">
+          <pdx-split ratio="1:3" gap="sm">
+            <div class="box">Nav</div>
+            <div class="box">Main</div>
+          </pdx-split>
+        </div>
+      </div>
+      <div class="demo-labeled">
+        <span class="pdx-txt-caption pdx-ink-muted">ratio="3:1"</span>
+        <div class="demo-area">
+          <pdx-split ratio="3:1" gap="sm">
+            <div class="box">Main</div>
+            <div class="box">Aside</div>
+          </pdx-split>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-split ratio="1:2" gap="md"&gt;
+  &lt;div&gt;Sidebar (1fr)&lt;/div&gt;
+  &lt;div&gt;Content (2fr)&lt;/div&gt;
+&lt;/pdx-split&gt;
+
+&lt;!-- Ratios: 1:1 1:2 1:3 1:4 2:1 2:3 3:1 3:2 4:1 5:1 1:5 1:6 --&gt;</code></pre>
+    </details>
+  </section>
+</template>

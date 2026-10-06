@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMgr — PDX UI Showcase</title>
+    <script type="module">import '@pdxui/design';</script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f7; color: #1d1d1f; }
+    </style>
+</head>
+<body>
+    <pdx-app-shell></pdx-app-shell>
+
+    <script type="module">
+        // Store
+        import './task-store.pdx';
+
+        // Layout + error pages
+        import './_layout.pdx';
+        import './_404.pdx';
+
+        // Pages
+        import './dashboard-page.pdx';
+        import './task-list.pdx';
+        import './task-form.pdx';
+        import './stats-card.pdx';
+        import './theme-picker.pdx';
+        import './user-detail.pdx';
+        import './admin-page.pdx';
+        import './components-page.pdx';
+
+        // App shell
+        import './app-shell.pdx';
+    </script>
+</body>
+</html>

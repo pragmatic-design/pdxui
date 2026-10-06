@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Image</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>src</code> for image. Falls back to initials on error.</p>
+
+    <div class="demo-row">
+      <pdx-avatar src="/avatars/person-1.svg" alt="Jane Doe"></pdx-avatar>
+      <pdx-avatar src="/avatars/person-2.svg" alt="Alex Smith"></pdx-avatar>
+      <pdx-avatar src="/avatars/person-3.svg" alt="Mary Kim"></pdx-avatar>
+      <pdx-avatar src="/missing-avatar.jpg" alt="Error Fallback"></pdx-avatar>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-xs)">
+      The last one points at a file this site does not have — falls back to initials with auto color.
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-avatar src="/avatars/person-1.svg" alt="Jane Doe"&gt;&lt;/pdx-avatar&gt;
+&lt;pdx-avatar src="/missing-avatar.jpg" alt="Error Fallback"&gt;&lt;/pdx-avatar&gt;  &lt;!-- shows "EF" --&gt;</code></pre>
+    </details>
+  </section>
+</template>

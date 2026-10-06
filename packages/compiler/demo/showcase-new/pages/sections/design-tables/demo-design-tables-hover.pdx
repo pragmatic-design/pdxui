@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Hover</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Row highlight on hover with <code>.pdx-table-hover</code>.</p>
+
+    <div class="table-wrap">
+      <table class="pdx-table pdx-table-hover">
+        <thead>
+          <tr><th>City</th><th>Country</th><th>Population</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tokyo</td><td>Japan</td><td>13.96M</td></tr>
+          <tr><td>London</td><td>UK</td><td>8.98M</td></tr>
+          <tr><td>New York</td><td>USA</td><td>8.34M</td></tr>
+          <tr><td>Paris</td><td>France</td><td>2.16M</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;table class="pdx-table pdx-table-hover"&gt;...&lt;/table&gt;</code></pre>
+    </details>
+  </section>
+</template>

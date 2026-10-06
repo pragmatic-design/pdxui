@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom Slide Template</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>renderSlide</code> for full control over each slide's content.</p>
+    <div class="demo-container">
+      <pdx-carousel :items="testimonialSlides" :render-slide="renderTestimonial"></pdx-carousel>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-carousel :items="testimonials" :render-slide="renderFn"&gt;&lt;/pdx-carousel&gt;
+
+// renderFn = (item, index) =&gt; {
+//   return '&lt;div class="testimonial"&gt;...' + item.content + '&lt;/div&gt;';
+// }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const testimonialSlides = [
+  { content: 'Absolutely fantastic framework. Changed how we build UIs.', alt: 'Alice Johnson' },
+  { content: 'The signal reactivity model is incredibly intuitive.', alt: 'Bob Martinez' },
+  { content: 'Best developer experience I have encountered in years.', alt: 'Carol Lee' },
+];
+
+function renderTestimonial(item, index) {
+    return '<div style="padding: 48px 32px; text-align: center; background: var(--pdx-color-surface-inset, #f5f5f5); min-height: 200px; display: flex; flex-direction: column; justify-content: center;">'
+        + '<p style="font-size: 1.1rem; font-style: italic; color: var(--pdx-color-text); margin: 0 0 16px 0;">"' + item.content + '"</p>'
+        + '<span style="font-weight: 600; color: var(--pdx-color-primary);">' + item.alt + '</span>'
+        + '</div>';
+}
+</script>

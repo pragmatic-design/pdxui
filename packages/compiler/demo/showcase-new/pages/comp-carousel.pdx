@@ -1,0 +1,84 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Carousel</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-carousel&gt;</code> — carousel/slider for images, cards, or any content.
+      Supports slide &amp; fade animation, autoplay, touch/pointer swipe, multiple slides per view.
+    </p>
+
+    <pdx-demo-comp-carousel-basic class="demo-section"></pdx-demo-comp-carousel-basic>
+
+    <pdx-demo-comp-carousel-autoplay class="demo-section"></pdx-demo-comp-carousel-autoplay>
+
+    <pdx-demo-comp-carousel-fade class="demo-section"></pdx-demo-comp-carousel-fade>
+
+    <pdx-demo-comp-carousel-multiple class="demo-section"></pdx-demo-comp-carousel-multiple>
+
+    <pdx-demo-comp-carousel-custom-slide class="demo-section"></pdx-demo-comp-carousel-custom-slide>
+
+    <pdx-demo-comp-carousel-swipe class="demo-section"></pdx-demo-comp-carousel-swipe>
+
+    <pdx-demo-comp-carousel-no-loop class="demo-section"></pdx-demo-comp-carousel-no-loop>
+
+    <pdx-demo-comp-carousel-slot-template class="demo-section"></pdx-demo-comp-carousel-slot-template>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <table class="options-table">
+        <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>slide</code></td><td><code>{ slide, index, isActive }</code></td><td>Custom slide content. Priority: slot &gt; renderSlide &gt; default.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <table class="options-table">
+        <thead>
+          <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>items</code></td><td>Array</td><td>null</td><td>Slide items: <code>{ src?, alt?, content?, caption? }</code></td></tr>
+          <tr><td><code>renderSlide</code></td><td>Function</td><td>null</td><td>Custom render: <code>(item, index) =&gt; HTMLElement | string</code></td></tr>
+          <tr><td><code>autoplay</code></td><td>Boolean</td><td>false</td><td>Auto-advance slides</td></tr>
+          <tr><td><code>interval</code></td><td>Number</td><td>5000</td><td>Autoplay interval in ms</td></tr>
+          <tr><td><code>loop</code></td><td>Boolean</td><td>true</td><td>Wrap around at ends</td></tr>
+          <tr><td><code>showArrows</code></td><td>Boolean</td><td>true</td><td>Show prev/next arrow buttons</td></tr>
+          <tr><td><code>showDots</code></td><td>Boolean</td><td>true</td><td>Show dot indicators</td></tr>
+          <tr><td><code>slidesPerView</code></td><td>Number</td><td>1</td><td>Number of visible slides at once</td></tr>
+          <tr><td><code>gap</code></td><td>Number</td><td>0</td><td>Gap between slides in px</td></tr>
+          <tr><td><code>swipeable</code></td><td>Boolean</td><td>true</td><td>Enable touch/pointer swipe</td></tr>
+          <tr><td><code>pauseOnHover</code></td><td>Boolean</td><td>true</td><td>Pause autoplay on hover</td></tr>
+          <tr><td><code>animation</code></td><td>String</td><td>'slide'</td><td>'slide' or 'fade'</td></tr>
+          <tr><td><code>label</code></td><td>String</td><td>''</td><td>The region's accessible name; empty uses "Carousel"</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <table class="options-table">
+        <thead>
+          <tr><th>Event</th><th>Detail</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>pdx-change</code></td><td><code>{ index, item }</code></td><td>Fired when the active slide changes</td></tr>
+          <tr><td><code>pdx-autoplay-start</code></td><td>—</td><td>Autoplay started</td></tr>
+          <tr><td><code>pdx-autoplay-stop</code></td><td>—</td><td>Autoplay stopped</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/carousel';
+@title 'Carousel';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-bg); margin-bottom: var(--pdx-space-md); }
+.custom-slide-number { font-size: 3rem; font-weight: 700; opacity: 0.3; }
+</style>

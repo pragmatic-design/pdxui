@@ -1,0 +1,270 @@
+<template>
+  <section class="page" data-test="customer">
+    <pdx-breadcrumb data-test="crumbs"></pdx-breadcrumb>
+    <h1 class="pdx-txt-title">{{ record?.name ?? $t('customers.unknown') }}</h1>
+
+    <!-- Identity on top, sections on the LEFT, no right panel — the record detail's
+         shell, written once. -->
+    <pdx-record-detail :label="$t('customers.sections')">
+        <span slot="identity" class="portrait" aria-hidden="true">{{ monogram }}</span>
+        <p slot="identity" class="pdx-txt-heading identity-name" data-test="identity-name">{{ record?.reference ?? '' }}</p>
+        <p slot="identity" class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ record?.sector ?? '' }}</p>
+
+        <p slot="menu" class="menu-group pdx-txt-small pdx-ink-muted">{{ $t('customers.groups.account') }}</p>
+        <button
+          slot="menu"
+          type="button"
+          class="menu-row"
+          :aria-pressed="section === 'profile' ? 'true' : 'false'"
+          @click="section = 'profile'"
+          data-test="section-profile">{{ $t('customers.sections2.profile') }}</button>
+        <button
+          slot="menu"
+          type="button"
+          class="menu-row"
+          :aria-pressed="section === 'contacts' ? 'true' : 'false'"
+          @click="section = 'contacts'"
+          data-test="section-contacts">{{ $t('customers.sections2.contacts') }}</button>
+        <button
+          slot="menu"
+          type="button"
+          class="menu-row"
+          :aria-pressed="section === 'services' ? 'true' : 'false'"
+          @click="section = 'services'"
+          data-test="section-services">{{ $t('customers.sections2.services') }}</button>
+
+        <!-- THE THREE STATES of a section, which is what a reference application is judged on:
+             empty, filled, and the one after the action. -->
+        <section :show="section === 'profile'" data-test="profile">
+          <h2 class="pdx-txt-heading">{{ $t('customers.sections2.profile') }}</h2>
+          <dl class="facts">
+            <!-- Words and a readable date, as the list shows them. -->
+            <dt>{{ $t('customers.columns.tier') }}</dt><dd data-test="fact-tier">{{ record ? $t('customers.tiers.' + record.tier) : '' }}</dd>
+            <dt>{{ $t('customers.columns.status') }}</dt><dd data-test="fact-status">{{ record ? $t('customers.statuses.' + record.status) : '' }}</dd>
+            <dt>{{ $t('customers.columns.since') }}</dt><dd data-test="fact-since">{{ record ? $d(record.since, { dateStyle: 'medium' }) : '' }}</dd>
+          </dl>
+        </section>
+
+        <section :show="section === 'contacts'" data-test="contacts">
+          <h2 class="pdx-txt-heading">{{ $t('customers.sections2.contacts') }}</h2>
+
+          <ul class="contact-list" data-test="contact-list">
+            @for (contacts as person; track person.id) {
+              <li class="pdx-txt-small" :data-name="person.name">
+                {{ person.name }} — {{ person.role }}
+                <pdx-button size="sm" variant="ghost" @click="removeContact(person)" :data-test="'remove-' + person.id">{{ $t('customers.contacts.remove') }}</pdx-button>
+              </li>
+            } @empty {
+              <!-- An INVITATION, not a grey line: what the section is for, and the
+                   action that creates the first one, IN the state rather than somewhere else on
+                   the screen. The reference draws this for every section, always, and it is the
+                   state a harness never has. -->
+              <li data-test="no-contacts">
+                <pdx-empty-state
+                  icon="user"
+                  :title="$t('customers.contacts.emptyTitle')"
+                  :description="$t('customers.contacts.emptyBody')"
+                  :action-label="$t('customers.contacts.add')"
+                  @pdx-action="addContact"></pdx-empty-state>
+              </li>
+            }
+          </ul>
+
+          <div class="contact-add">
+            <pdx-button size="sm" @click="addContact" data-test="add-contact">{{ $t('customers.contacts.add') }}</pdx-button>
+            <!-- The state AFTER the action, which a harness never draws. -->
+            <p class="pdx-txt-small pdx-ink-muted" :show="lastAction !== ''" role="status" data-test="after">{{ lastAction }}</p>
+          </div>
+        </section>
+
+        <!-- Services: what it subscribes to. Ended, never deleted — an ended row stays,
+             with its span, and the toast carries the way back. -->
+        <section :show="section === 'services'" data-test="customer-services">
+          <div class="section-head">
+            <h2 class="pdx-txt-heading">{{ $t('customers.sections2.services') }}</h2>
+            <pdx-button size="sm" :show="subscriptions.length > 0" @click="openSubscribe" data-test="subscription-add">{{ $t('customers.services.addShort') }}</pdx-button>
+          </div>
+          <ul class="subscriptions">
+            @for (subscriptions as s; track s.key) {
+              <li class="subscription" data-test="subscription-row" :data-current="s.current ? 'true' : 'false'">
+                <span class="subscription-name">{{ s.name }}</span>
+                <span class="pdx-txt-small pdx-ink-muted">{{ $t('customers.services.sla', { hours: s.slaHours }) }}</span>
+                <span class="subscription-span pdx-txt-small">{{ s.current ? $t('customers.services.running', { date: $d(s.since, { dateStyle: 'medium' }) }) : $t('customers.services.ended', { since: $d(s.since, { dateStyle: 'medium' }), until: $d(s.until, { dateStyle: 'medium' }) }) }}</span>
+                @if (s.current) {
+                  <pdx-button size="sm" variant="outline" @click="endSubscription(s)" data-test="subscription-end">{{ $t('customers.services.end') }}</pdx-button>
+                }
+              </li>
+            } @empty {
+              <li data-test="no-subscriptions">
+                <pdx-empty-state
+                  icon="layers"
+                  :title="$t('customers.services.emptyTitle')"
+                  :description="$t('customers.services.emptyBody')"
+                  :action-label="$t('customers.services.add')"
+                  @pdx-action="openSubscribe"></pdx-empty-state>
+              </li>
+            }
+          </ul>
+        </section>
+    </pdx-record-detail>
+
+    <!-- ADD, in a modal: an active service the customer does not have now, and the day it starts. -->
+    <pdx-dialog
+      :open="subscribeOpen"
+      size="md"
+      :title="$t('customers.services.dialogTitle')"
+      @pdx-close="subscribeOpen = false"
+      data-test="subscription-dialog">
+      <pdx-form :form="subscribing" @pdx-submit="onSubscribe" data-test="subscription-form">
+        <div class="grid">
+          <pdx-form-field name="serviceId" :label="$t('customers.services.service')">
+            <pdx-select name="serviceId" :options="offered" data-test="new-service"></pdx-select>
+          </pdx-form-field>
+          <pdx-form-field name="since" :label="$t('customers.services.since')">
+            <pdx-date-picker name="since" editable data-test="new-since"></pdx-date-picker>
+          </pdx-form-field>
+        </div>
+        <div class="actions">
+          <pdx-button type="submit" variant="primary" data-test="subscription-save">{{ $t('customers.services.save') }}</pdx-button>
+        </div>
+      </pdx-form>
+    </pdx-dialog>
+
+    <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
+  </section>
+</template>
+
+<script setup>
+@page '/customers/:id' { label: customerLabel };
+@title record?.name ?? $t('customers.unknown');
+
+// The trail names the customer, as the ticket's names the ticket: «Customer 1» would be the
+// route, not the record.
+function customerLabel(params) {
+  return customerById(Number(params.id))?.name ?? $t('customers.unknown');
+}
+
+// Created from JS, so the compiler cannot auto-import it from a tag.
+import { toast } from '@pdxui/ui/toast';
+import { customerById, customerTransport } from '../data/customers';
+import { allServices, serviceById } from '../data/services';
+import { isCurrent } from '../data/service-seed';
+
+// The route's param arrives as a PROP: the outlet writes `<pdx-customer id="1">`, which is the
+// same way the ticket's detail reads its id. Reaching for `currentParams()` instead renders an
+// empty element — the page is there, in the outlet, with nothing in it.
+@prop id: string = '';
+
+const record = $derived(customerById(Number(id)));
+
+/** The identity's face: a customer has a name, so the monogram is what a person would write. */
+const monogram = $derived((record?.name ?? '?').split(' ').map(w => w[0]).slice(0, 2).join(''));
+
+let section = $signal('profile');
+let contacts = $signal([]);
+let lastAction = $signal('');
+let nextContact = 1;
+
+const ROLES = ['Buyer', 'Operations', 'Finance', 'IT'];
+
+function addContact() {
+  const person = { id: nextContact++, name: `Contact ${nextContact - 1}`, role: ROLES[(nextContact - 2) % ROLES.length] };
+  contacts = [...contacts, person];
+  lastAction = $t('customers.contacts.added', { name: person.name });
+}
+
+function removeContact(person) {
+  contacts = contacts.filter(c => c.id !== person.id);
+  lastAction = $t('customers.contacts.removed', { name: person.name });
+}
+
+// ── Services ───────────────────────────────────────────────────────────────────
+const today = () => new Date().toISOString().slice(0, 10);
+
+/** The subscriptions as rows: named, with the service's answer time, current or ended. By position:
+ *  the same service can be ended and taken again, and each is its own row. */
+const subscriptions = $derived((record?.subscriptions ?? []).map((s, index) => {
+  const service = serviceById(s.serviceId);
+  return { ...s, index, key: index + ':' + s.serviceId, name: service?.name ?? '', slaHours: service?.slaHours ?? 0,
+           current: isCurrent(s, today()) };
+}));
+
+/** What the picker offers: a service still sold, that the customer does not have now. */
+const offered = $derived(allServices()
+  .filter(svc => svc.active && !(record?.subscriptions ?? []).some(s => s.serviceId === svc.id && isCurrent(s, today())))
+  .map(svc => ({ value: String(svc.id), label: svc.name })));
+
+@form subscribing: {
+  serviceId: string { required },
+  since: string { required }
+};
+
+let subscribeOpen = $signal(false);
+
+function openSubscribe() {
+  subscribing.reset({ serviceId: '', since: today() });
+  subscribeOpen = true;
+}
+
+/** Every write goes through the record: the subscriptions are the customer's. */
+async function saveSubscriptions(next) {
+  const current = customerById(Number(id));
+  if (!current) return;
+  await customerTransport.update({ ...current, subscriptions: next });
+}
+
+async function onSubscribe(e) {
+  const v = e.detail.values;
+  await saveSubscriptions([...(record?.subscriptions ?? []), { serviceId: Number(v.serviceId), since: v.since, until: '' }]);
+  subscribeOpen = false;
+}
+
+/** Ended today, not removed: the row stays with its span, and Undo makes it current again. */
+async function endSubscription(row) {
+  const list = record?.subscriptions ?? [];
+  await saveSubscriptions(list.map((s, i) => i === row.index ? { ...s, until: today() } : s));
+  toast.add({
+    type: 'info',
+    message: $t('customers.services.endedToast', { service: row.name }),
+    duration: 8000,
+    action: { label: $t('customers.services.undo'), onClick: () => restoreSubscription(row.index) },
+  });
+}
+
+async function restoreSubscription(index) {
+  const current = customerById(Number(id));
+  if (!current) return;
+  await saveSubscriptions(current.subscriptions.map((s, i) => i === index ? { ...s, until: '' } : s));
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  /* The shell — identity, section menu — is <pdx-record-detail>'s. */
+
+  .facts { display: grid; grid-template-columns: auto 1fr; gap: var(--pdx-space-xs) var(--pdx-space-md); }
+  .facts dt { color: var(--pdx-color-muted); }
+  .facts dd { margin: 0; }
+
+  .contact-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+  .contact-add { display: flex; align-items: center; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-md); }
+  .subscriptions { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+  /* Fixed tracks, as the employee's sites: each row its own grid. */
+  .subscription {
+    display: grid; grid-template-columns: minmax(0, 1.2fr) 8rem 14rem 6rem;
+    align-items: center; gap: var(--pdx-space-md);
+    min-height: var(--pdx-section-height);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .subscription[data-current="false"] { color: var(--pdx-color-muted); }
+  .subscription-name { font-weight: 600; }
+  .subscription-span { font-variant-numeric: tabular-nums; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--pdx-space-md); }
+  .actions { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+
+  @media (max-width: 767px) {
+    .subscription { grid-template-columns: 1fr auto; padding-block: var(--pdx-space-xs); }
+  }
+</style>

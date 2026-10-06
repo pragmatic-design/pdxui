@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Skeleton Loading</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Placeholder shapes for loading states. Animated shimmer effect.</p>
+
+    <div class="skeleton-demo">
+      <div class="skeleton-row">
+        <div class="pdx-skeleton pdx-skeleton-circle"></div>
+        <div class="skeleton-lines">
+          <div class="pdx-skeleton pdx-skeleton-title"></div>
+          <div class="pdx-skeleton pdx-skeleton-text"></div>
+          <div class="pdx-skeleton pdx-skeleton-text" style="width: 70%"></div>
+        </div>
+      </div>
+      <div class="skeleton-row-2">
+        <div class="pdx-skeleton pdx-skeleton-image"></div>
+        <div class="pdx-skeleton pdx-skeleton-button"></div>
+        <div class="pdx-skeleton pdx-skeleton-input"></div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-skeleton pdx-skeleton-circle"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-title"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-text"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-image"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-button"&gt;&lt;/div&gt;
+&lt;div class="pdx-skeleton pdx-skeleton-input"&gt;&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .skeleton-demo {
+    margin-top: var(--pdx-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-lg);
+  }
+  .skeleton-row {
+    display: flex;
+    gap: var(--pdx-space-md);
+    align-items: flex-start;
+  }
+  .skeleton-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+  }
+  .skeleton-row-2 {
+    display: flex;
+    gap: var(--pdx-space-md);
+    align-items: center;
+  }
+</style>

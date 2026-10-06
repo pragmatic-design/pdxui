@@ -1,0 +1,60 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Entity Grid</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-entity-grid&gt;</code> — a CRUD surface that composes <code>pdx-data-grid</code> +
+      a "New" toolbar + per-row edit/delete + a bulk-actions bar + <code>pdx-edit-drawer</code>.
+      It keeps a local optimistic copy of the rows and emits
+      <code>pdx-create</code>/<code>pdx-update</code>/<code>pdx-delete</code> so you can persist.
+    </p>
+
+    <!-- ═══ Full CRUD ═══ -->
+    <pdx-demo-comp-entity-grid-full-crud class="demo-section"></pdx-demo-comp-entity-grid-full-crud>
+
+    <!-- ═══ Read-only ═══ -->
+    <pdx-demo-comp-entity-grid-read-only class="demo-section"></pdx-demo-comp-entity-grid-read-only>
+
+    <!-- ═══ Props ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <table class="options-table">
+        <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>columns</code></td><td>ColumnDef[]</td><td>[]</td><td>Grid columns. An edit/delete actions column is appended unless readonly.</td></tr>
+          <tr><td><code>data</code></td><td>object[]</td><td>[]</td><td>Entity rows.</td></tr>
+          <tr><td><code>schema</code></td><td>FormSchema</td><td>null</td><td>Form schema for the create/edit drawer. Omit → no CRUD affordances.</td></tr>
+          <tr><td><code>idField</code></td><td>string</td><td>'id'</td><td>Row identity field.</td></tr>
+          <tr><td><code>selection</code></td><td>none|single|multiple</td><td>multiple</td><td>Row selection mode.</td></tr>
+          <tr><td><code>rowActions</code></td><td>boolean</td><td>true</td><td>Show the per-row edit/delete column.</td></tr>
+          <tr><td><code>bulkActions</code></td><td>BulkAction[]</td><td>[]</td><td>Extra bulk actions (besides Delete).</td></tr>
+          <tr><td><code>readonly</code></td><td>boolean</td><td>false</td><td>Hide all mutating affordances.</td></tr>
+          <tr><td><code>confirmDelete</code></td><td>boolean</td><td>true</td><td>Ask before deleting ("Delete Alice Johnson?", "Delete 2 records?"). <code>false</code> when your <code>pdx-delete</code> handler confirms or offers undo.</td></tr>
+          <tr><td><code>rowLabel</code></td><td>string</td><td>''</td><td>Field that names a row in its Edit/Delete buttons and the confirmation. Empty: the first text column.</td></tr>
+        </tbody>
+      </table>
+      <table class="options-table" style="margin-top: var(--pdx-space-lg);">
+        <thead><tr><th>Event</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td><code>pdx-create</code></td><td>{ values, clientId } — <code>clientId</code> is the optimistic row's local id (use it to reconcile after persisting)</td></tr>
+          <tr><td><code>pdx-update</code></td><td>{ id, values }</td></tr>
+          <tr><td><code>pdx-delete</code></td><td>{ ids, rows? }</td></tr>
+          <tr><td><code>pdx-bulk</code></td><td>{ key, ids } — for custom bulk actions</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/entity-grid';
+@title 'Entity Grid — PDX Components';
+</script>
+
+<style scoped>
+.page { max-width: 1280px; }
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-xs); }
+.options-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.options-table th, .options-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--pdx-color-border); }
+</style>

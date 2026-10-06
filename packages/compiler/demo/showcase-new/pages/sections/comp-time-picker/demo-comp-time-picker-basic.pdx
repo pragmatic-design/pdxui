@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Bound to a signal: the arrows, the wheel and typed digits all emit <code>pdx-change</code> with the new value.
+      An empty picker shows <code>--</code>, the way the native time input does — not midnight.
+    </p>
+    <div class="demo-row">
+      <pdx-time-picker :value="meeting" format="24h" aria-label="Meeting time" @pdx-change="e => meeting = e.detail.value"></pdx-time-picker>
+      <span class="pdx-txt-small pdx-ink-muted">value: <code class="live-value">{{ meeting || '(empty)' }}</code></span>
+    </div>
+    <div class="demo-row">
+      <pdx-time-picker format="24h" aria-label="Unset time"></pdx-time-picker>
+      <span class="pdx-txt-small pdx-ink-muted">No value yet</span>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-time-picker :value="meeting" format="24h" aria-label="Meeting time"
+  @pdx-change="e =&gt; meeting = e.detail.value"&gt;&lt;/pdx-time-picker&gt;
+
+let meeting = $signal('09:30');</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let meeting = $signal('09:30');
+</script>

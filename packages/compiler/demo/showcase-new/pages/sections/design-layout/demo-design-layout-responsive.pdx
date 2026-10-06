@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Responsive Behavior</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Layout primitives auto-adapt via container queries. No media queries needed.</p>
+
+    <div class="options-table">
+      <div class="opt-header">
+        <span>Element</span><span>Trigger</span><span>Behavior</span>
+      </div>
+      <div class="opt-row">
+        <code>pdx-grid</code><span>&lt; 45rem</span><span>Cols 3-6 reduce to 2-3</span>
+      </div>
+      <div class="opt-row">
+        <code>pdx-grid</code><span>&lt; 30rem</span><span>All cols collapse to 1</span>
+      </div>
+      <div class="opt-row">
+        <code>pdx-split</code><span>&lt; 40rem</span><span>Stacks vertically</span>
+      </div>
+      <div class="opt-row">
+        <code>pdx-row[wrap="stack"]</code><span>&lt; 30rem</span><span>Becomes column</span>
+      </div>
+      <div class="opt-row">
+        <code>[pdx-hide="mobile"]</code><span>&lt; 640px</span><span>Hidden on mobile</span>
+      </div>
+      <div class="opt-row">
+        <code>[pdx-hide="desktop"]</code><span>&gt; 640px</span><span>Hidden on desktop</span>
+      </div>
+      <div class="opt-row">
+        <code>span</code><span>&lt; 30rem</span><span>Collapses to full width</span>
+      </div>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">3 Columns</h2>
+    <pdx-masonry :columns="3" gap="1rem">
+      <div class="masonry-card" style="height:120px">1</div>
+      <div class="masonry-card" style="height:180px">2</div>
+      <div class="masonry-card" style="height:100px">3</div>
+      <div class="masonry-card" style="height:200px">4</div>
+      <div class="masonry-card" style="height:140px">5</div>
+      <div class="masonry-card" style="height:160px">6</div>
+      <div class="masonry-card" style="height:110px">7</div>
+      <div class="masonry-card" style="height:190px">8</div>
+      <div class="masonry-card" style="height:130px">9</div>
+    </pdx-masonry>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-masonry :columns="3" gap="1rem"&gt;
+  &lt;div style="height:120px"&gt;1&lt;/div&gt;
+  &lt;div style="height:180px"&gt;2&lt;/div&gt;
+  ...
+&lt;/pdx-masonry&gt;</code></pre>
+    </details>
+  </section>
+</template>

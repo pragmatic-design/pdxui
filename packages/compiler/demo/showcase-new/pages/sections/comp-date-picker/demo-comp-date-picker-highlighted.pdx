@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Highlighted Dates</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Mark specific dates with a dot indicator via <code>highlightedDates</code> callback.
+      The standalone calendar below highlights the 5th, 15th, and 25th of each month.
+    </p>
+
+    <div class="demo-row">
+      <pdx-calendar inline :highlightedDates="highlightFn"></pdx-calendar>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-calendar inline :highlightedDates="highlightFn"&gt;&lt;/pdx-calendar&gt;
+
+// highlightFn = (iso) =&gt; {
+//   const d = parseInt(iso.split('-')[2]);
+//   return d === 5 || d === 15 || d === 25 ? 'event' : false;
+// }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+function highlightFn(iso) {
+  const d = parseInt(iso.split('-')[2]);
+  return d === 5 || d === 15 || d === 25 ? 'event' : false;
+}
+</script>

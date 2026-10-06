@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Buttons in realistic UI contexts.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Delete Account</h3>
+      <p class="pdx-txt-small pdx-ink-muted">This action cannot be undone. All data will be permanently removed.</p>
+      <div class="comp-actions">
+        <button class="pdx-ghost">Cancel</button>
+        <button class="pdx-danger">Delete Account</button>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Unsaved Changes</h3>
+      <p class="pdx-txt-small pdx-ink-muted">You have unsaved changes. What would you like to do?</p>
+      <div class="comp-actions">
+        <button class="pdx-link">Discard</button>
+        <button class="pdx-secondary">Save Draft</button>
+        <button class="pdx-primary">Publish</button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-xs); }
+  .comp-card p { margin: 0 0 var(--pdx-space-md); }
+  .comp-actions {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    justify-content: flex-end;
+  }
+</style>

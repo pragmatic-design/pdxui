@@ -1,0 +1,27 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Data Grid — Virtual Scroll</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      1,000 rows rendered with virtual scroll. Only visible rows + overscan are in the DOM.
+      Smooth scrolling — scales to 10K+ in production builds.
+    </p>
+
+    <pdx-demo-comp-data-grid-virtual-thousand-rows class="demo-section"></pdx-demo-comp-data-grid-virtual-thousand-rows>
+  </div>
+</template>
+
+<script setup>
+@page '/components/data-grid-virtual';
+@title 'Data Grid Virtual Scroll — PDX Components';
+</script>
+
+<style scoped>
+.page {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--pdx-space-xl) var(--pdx-space-md);
+}
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+</style>

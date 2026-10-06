@@ -1,0 +1,100 @@
+<template>
+  <div class="components">
+    <h1>PDX Components</h1>
+    <p class="subtitle">Interactive component showcase. Click buttons to test, type in inputs, open dialogs.</p>
+
+    <section>
+      <h2>Button</h2>
+      <p class="hint">8 variants. Click any button — it shows feedback for 1 second.</p>
+
+      <h3>Primary variants</h3>
+      <div class="row">
+        <button class="pdx-primary" @click="flashBtn">Primary</button>
+        <button class="pdx-secondary" @click="flashBtn">Secondary</button>
+        <button class="pdx-ghost" @click="flashBtn">Ghost</button>
+      </div>
+
+      <h3>Semantic variants</h3>
+      <div class="row">
+        <button class="pdx-danger" @click="flashBtn">Danger</button>
+        <button class="pdx-success" @click="flashBtn">Success</button>
+        <button class="pdx-warning" @click="flashBtn">Warning</button>
+        <button class="pdx-info" @click="flashBtn">Info</button>
+      </div>
+
+      <h3>Sizes</h3>
+      <div class="row">
+        <button class="pdx-primary" size="sm" @click="flashBtn">Small</button>
+        <button class="pdx-primary" @click="flashBtn">Default</button>
+        <button class="pdx-primary" size="lg" @click="flashBtn">Large</button>
+      </div>
+
+      <h3>Loading (click to trigger)</h3>
+      <div class="row">
+        <button class="pdx-primary" :class="loading1 ? 'pdx-loading' : ''" :disabled="loading1" @click="doLoad1">
+          @if (loading1) { Saving... } @else { Save Changes }
+        </button>
+        <button class="pdx-danger" :class="loading2 ? 'pdx-loading' : ''" :disabled="loading2" @click="doLoad2">
+          @if (loading2) { Deleting... } @else { Delete Item }
+        </button>
+      </div>
+
+      <h3>Disabled</h3>
+      <div class="row">
+        <button class="pdx-primary" disabled>Primary</button>
+        <button class="pdx-secondary" disabled>Secondary</button>
+        <button class="pdx-danger" disabled>Danger</button>
+      </div>
+
+      <h3>Button Group</h3>
+      <div class="pdx-btn-group">
+        <button class="pdx-secondary" @click="flashBtn">Left</button>
+        <button class="pdx-secondary" @click="flashBtn">Center</button>
+        <button class="pdx-secondary" @click="flashBtn">Right</button>
+      </div>
+
+      <div class="log">{{ btnLog }}</div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components';
+@title 'Components — PDX Showcase';
+
+let btnLog = $signal('Click a button...');
+let loading1 = $signal(false);
+let loading2 = $signal(false);
+
+function flashBtn(e) {
+    var btn = e.target;
+    var original = btn.textContent;
+    btn.textContent = '✓ Done!';
+    btnLog = 'Clicked: ' + original.trim();
+    setTimeout(function() { btn.textContent = original; }, 1000);
+}
+
+function doLoad1() {
+    loading1 = true;
+    btnLog = 'Saving...';
+    setTimeout(function() { loading1 = false; btnLog = 'Saved successfully!'; }, 1500);
+}
+
+function doLoad2() {
+    loading2 = true;
+    btnLog = 'Deleting...';
+    setTimeout(function() { loading2 = false; btnLog = 'Deleted.'; }, 1500);
+}
+</script>
+
+<style scoped>
+  .components { max-width: 700px; }
+  .components h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .subtitle { font-size: 0.85rem; color: #888; margin: 0 0 24px; }
+  section { background: white; border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+  h2 { font-size: 1.1rem; margin: 0 0 8px; }
+  h3 { font-size: 0.8rem; font-weight: 600; color: #666; margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .hint { font-size: 0.75rem; color: #aaa; margin: 0 0 12px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .log { margin-top: 12px; font-size: 0.8rem; font-family: monospace; padding: 8px 12px; background: #f5f5f7; border-radius: 6px; color: #888; }
+</style>

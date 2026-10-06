@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Pagination</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Numbered page links with current page highlighted via <code>aria-current="page"</code>.</p>
+
+    <nav class="pdx-pagination">
+      <button class="pdx-page" disabled>&laquo;</button>
+      <button class="pdx-page">1</button>
+      <button class="pdx-page">2</button>
+      <button class="pdx-page" aria-current="page">3</button>
+      <button class="pdx-page">4</button>
+      <button class="pdx-page">5</button>
+      <span class="pdx-page" style="pointer-events:none">...</span>
+      <button class="pdx-page">12</button>
+      <button class="pdx-page">&raquo;</button>
+    </nav>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;nav class="pdx-pagination"&gt;
+  &lt;button class="pdx-page" disabled&gt;&amp;laquo;&lt;/button&gt;
+  &lt;button class="pdx-page"&gt;1&lt;/button&gt;
+  &lt;button class="pdx-page"&gt;2&lt;/button&gt;
+  &lt;button class="pdx-page" aria-current="page"&gt;3&lt;/button&gt;
+  &lt;button class="pdx-page"&gt;4&lt;/button&gt;
+  &lt;button class="pdx-page"&gt;5&lt;/button&gt;
+  &lt;span class="pdx-page"&gt;...&lt;/span&gt;
+  &lt;button class="pdx-page"&gt;12&lt;/button&gt;
+  &lt;button class="pdx-page"&gt;&amp;raquo;&lt;/button&gt;
+&lt;/nav&gt;</code></pre>
+    </details>
+  </section>
+</template>

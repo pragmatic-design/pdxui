@@ -1,0 +1,75 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Spinner</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-spinner&gt;</code> — loading indicator with spinner, dots, and bar variants. Customizable speed and thickness via CSS variables.
+    </p>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-comp-spinner-variants class="demo-section"></pdx-demo-comp-spinner-variants>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-spinner-sizes class="demo-section"></pdx-demo-comp-spinner-sizes>
+
+    <!-- ═══ Color Inheritance ═══ -->
+    <pdx-demo-comp-spinner-color-inheritance class="demo-section"></pdx-demo-comp-spinner-color-inheritance>
+
+    <!-- ═══ With Label ═══ -->
+    <pdx-demo-comp-spinner-visible-label class="demo-section"></pdx-demo-comp-spinner-visible-label>
+
+    <!-- ═══ Custom Speed & Thickness ═══ -->
+    <pdx-demo-comp-spinner-speed-thickness class="demo-section"></pdx-demo-comp-spinner-speed-thickness>
+
+    <!-- ═══ Inline ═══ -->
+    <pdx-demo-comp-spinner-inline-text class="demo-section"></pdx-demo-comp-spinner-inline-text>
+
+    <!-- ═══ Loading Overlay (CSS) ═══ -->
+    <pdx-demo-comp-spinner-overlay class="demo-section"></pdx-demo-comp-spinner-overlay>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-spinner-composition class="demo-section"></pdx-demo-comp-spinner-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>variant</code><span>string</span><span>spinner (default), dots, bar</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>xs (12px), sm (16px), md (24px), lg (32px), xl (48px)</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Accessible label (default "Loading")</span></div>
+        <div class="opt-row"><code>showLabel</code><span>boolean</span><span>Render label text visually below spinner</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">CSS Variables</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Variable</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>--pdx-spinner-speed</code><span>1s</span><span>Animation duration</span></div>
+        <div class="opt-row"><code>--pdx-spinner-thickness</code><span>3</span><span>Stroke width</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Accessibility</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Uses <code>role="status"</code> + <code>aria-live="polite"</code> for screen reader announcements.
+        Label is always present as <code>aria-label</code>. <code>showLabel</code> makes it visible.
+      </p>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/spinner';
+@title 'Spinner Component';
+
+let _ = $signal(0);
+</script>
+
+<style scoped>
+  .page { }
+  .demo-row { gap: var(--pdx-space-lg); }
+  .demo-item { display: flex; flex-direction: column; align-items: center; gap: var(--pdx-space-xs); }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-sm); }
+  .comp-card p { margin: 0; }
+
+  .opt-header, .opt-row { grid-template-columns: 200px 100px 1fr; }
+</style>

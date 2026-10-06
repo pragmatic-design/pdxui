@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Surface Types</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Five semantic surfaces with increasing visual prominence.</p>
+
+    <div class="surface-grid">
+      <div class="pdx-surface-base surface-sample">
+        <span class="pdx-txt-small pdx-ink-muted">base</span>
+        <span class="pdx-txt-caption">.pdx-surface-base</span>
+      </div>
+      <div class="pdx-surface-card surface-sample">
+        <span class="pdx-txt-small pdx-ink-muted">card</span>
+        <span class="pdx-txt-caption">.pdx-surface-card</span>
+      </div>
+      <div class="pdx-surface-inset surface-sample">
+        <span class="pdx-txt-small pdx-ink-muted">inset</span>
+        <span class="pdx-txt-caption">.pdx-surface-inset</span>
+      </div>
+      <div class="pdx-surface-overlay surface-sample">
+        <span class="pdx-txt-small pdx-ink-muted">overlay</span>
+        <span class="pdx-txt-caption">.pdx-surface-overlay</span>
+      </div>
+      <div class="pdx-surface-glass surface-sample">
+        <span class="pdx-txt-small pdx-ink-muted">glass</span>
+        <span class="pdx-txt-caption">.pdx-surface-glass</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-surface-base"&gt;Base&lt;/div&gt;
+&lt;div class="pdx-surface-card"&gt;Card&lt;/div&gt;
+&lt;div class="pdx-surface-inset"&gt;Inset&lt;/div&gt;
+&lt;div class="pdx-surface-overlay"&gt;Overlay&lt;/div&gt;
+&lt;div class="pdx-surface-glass"&gt;Glass&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .surface-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+  .surface-sample {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-2xs);
+    min-height: 80px;
+    padding: var(--pdx-space-md);
+    text-align: center;
+  }
+</style>

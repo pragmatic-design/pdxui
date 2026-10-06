@@ -1,0 +1,114 @@
+<template>
+  <section class="page" data-test="settings-users">
+    <header class="head">
+      <h1 class="pdx-txt-title">{{ $t('settings.tiles.users') }}</h1>
+      <p class="pdx-txt-body pdx-ink-muted">{{ $t('settings.users.intro') }}</p>
+    </header>
+
+    <p class="refusal pdx-txt-small" :show="refusal() !== ''" role="alert" data-test="refusal">{{ refusal() }}</p>
+
+    <!-- The identity server's accounts (`mock-auth.ts`), the same list it signs tokens for, each with
+         what its roles let it do. With `settings.permissions` a role is given or taken here; the server
+         checks that again, and signs it into the account's NEXT token. A div grid
+         (`@for` in a <tbody>, a known bug). -->
+    <div class="table" role="table" :aria-label="$t('settings.tiles.users')">
+      <div class="row head" role="row">
+        <span role="columnheader">{{ $t('settings.users.name') }}</span>
+        <span role="columnheader">{{ $t('settings.users.username') }}</span>
+        <span role="columnheader">{{ $t('settings.users.email') }}</span>
+        <span role="columnheader">{{ $t('settings.users.role') }}</span>
+        <span role="columnheader">{{ $t('settings.users.can') }}</span>
+      </div>
+      @for (accounts as a; track a.username) {
+        <div class="row" role="row" data-test="user-row">
+          <span role="cell" class="who">
+            <span class="avatar" aria-hidden="true">{{ initials(a.name) }}</span>
+            <span class="name">{{ a.name }}</span>
+          </span>
+          <code role="cell">{{ a.username }}</code>
+          <span role="cell">{{ a.email }}</span>
+          <span role="cell">
+            @if (canEdit()) {
+              <pdx-select multiple size="sm" :options="roleOptions" :value="a.roles" :aria-label="$t('settings.users.rolesOf', { name: a.name })"
+                @pdx-change="e => saveAccountRoles(a.username, e.detail.values)" :data-test="'roles-' + a.username"></pdx-select>
+            } @else {
+              @for (a.roles as r; track r) {
+                <span class="pdx-badge role">{{ roleName(r) }}</span>
+              }
+            }
+          </span>
+          <span role="cell" class="perms">
+            @for (permissionsOf(a) as p; track p) {
+              <code class="perm">{{ p }}</code>
+            }
+          </span>
+        </div>
+      }
+    </div>
+  </section>
+</template>
+
+<script setup>
+@page '/settings/users' { label: usersLabel };
+@title $t('settings.tiles.users');
+
+import { hasPermission } from '@pdxui/core';
+import { ACCOUNTS } from '../data/users';
+import { grants, roles, roleName } from '../data/grants';
+import { access, refusal, loadAccess, saveAccountRoles } from '../data/access';
+
+function usersLabel() {
+  return $t('settings.tiles.users');
+}
+
+/** Only a holder of `settings.permissions` gives or takes a role. */
+const canEdit = hasPermission('settings.permissions');
+
+onMount(() => { void loadAccess(); });
+
+const accounts = $derived(access()?.accounts ?? ACCOUNTS);
+const roleOptions = $derived(roles().filter(r => r.active).map(r => ({ value: r.key, label: roleName(r.key) })));
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+/** What an account may do: every grant of every role it holds, once. */
+function permissionsOf(account) {
+  const table = grants();
+  return [...new Set(account.roles.flatMap(r => table[r] ?? []))].sort();
+}
+</script>
+
+<style scoped>
+  .page { display: flex; flex-direction: column; gap: var(--pdx-space-lg); }
+  .head { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+  .head h1, .head p { margin: 0; }
+  .refusal { color: var(--pdx-color-danger-ink); margin: 0; }
+  .table { display: flex; flex-direction: column; }
+  .row {
+    display: grid; grid-template-columns: minmax(12rem, 1.4fr) minmax(6rem, 0.8fr) minmax(12rem, 1.4fr) minmax(8rem, 1fr) minmax(12rem, 2fr);
+    gap: var(--pdx-space-md); align-items: center;
+    padding: var(--pdx-space-sm) var(--pdx-space-md); border-bottom: 1px solid var(--pdx-color-border);
+    overflow-wrap: anywhere;
+  }
+  .row.head { color: var(--pdx-color-muted); font-size: var(--pdx-text-sm, 0.875rem); background: var(--pdx-color-inset); border-bottom: 0; border-radius: var(--pdx-radius-sm); }
+  .who { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+  .avatar {
+    width: 32px; height: 32px; flex: 0 0 auto; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;
+    background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink);
+  }
+  .name { font-weight: 600; }
+  .perms { display: flex; flex-wrap: wrap; gap: var(--pdx-space-2xs); }
+  .perm {
+    font-family: var(--pdx-font-mono, monospace); font-size: 12px;
+    padding: 1px var(--pdx-space-xs); border-radius: var(--pdx-radius-sm); background: var(--pdx-color-inset);
+  }
+
+  /* A phone: each account a block, its facts one under the other. */
+  @media (max-width: 640px) {
+    .row { grid-template-columns: minmax(0, 1fr); gap: var(--pdx-space-2xs); }
+    .row.head { display: none; }
+  }
+</style>

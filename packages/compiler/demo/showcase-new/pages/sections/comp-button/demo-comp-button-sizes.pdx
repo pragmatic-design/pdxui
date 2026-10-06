@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">3 sizes via <code>size</code> prop: sm, default, lg.</p>
+
+    <div class="btn-row">
+      <pdx-button variant="primary" size="sm" @click="log">Small</pdx-button>
+      <pdx-button variant="primary" @click="log">Default</pdx-button>
+      <pdx-button variant="primary" size="lg" @click="log">Large</pdx-button>
+    </div>
+
+    <div class="btn-row">
+      <pdx-button variant="outline" size="sm" @click="log">Small</pdx-button>
+      <pdx-button variant="outline" @click="log">Default</pdx-button>
+      <pdx-button variant="outline" size="lg" @click="log">Large</pdx-button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-button variant="primary" size="sm"&gt;Small&lt;/pdx-button&gt;
+&lt;pdx-button variant="primary"&gt;Default&lt;/pdx-button&gt;
+&lt;pdx-button variant="primary" size="lg"&gt;Large&lt;/pdx-button&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useButtonConsole } from './state.pdx';
+
+const buttonConsole = useButtonConsole();
+
+function log(e) {
+    buttonConsole.log(e);
+}
+</script>

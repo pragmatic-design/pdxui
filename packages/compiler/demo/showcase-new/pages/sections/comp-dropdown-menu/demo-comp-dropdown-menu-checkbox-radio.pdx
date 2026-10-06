@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Checkbox &amp; radio items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>type: 'checkbox'</code> renders a checkbox item; <code>type: 'radio'</code> with a shared
+      <code>radioGroup</code> makes a single-choice group. <code>checked</code> is the initial state.
+      Toggling one emits <code>pdx-check</code> with the item and keeps the menu open.
+    </p>
+    <div class="demo-stack">
+      <pdx-dropdown-menu label="View options" :items="optionItems" @pdx-check="onCheck"></pdx-dropdown-menu>
+      <span class="pdx-txt-small pdx-ink-muted">Last toggle: <strong>{{ lastCheck }}</strong></span>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { key: 'grid', label: 'Grid view', type: 'radio', radioGroup: 'view', checked: true },
+  { key: 'list', label: 'List view', type: 'radio', radioGroup: 'view' },
+  { key: 'd1', label: '', type: 'separator' },
+  { key: 'compact', label: 'Compact rows', type: 'checkbox', checked: false },
+  { key: 'lines', label: 'Show grid lines', type: 'checkbox', checked: true },
+];
+
+&lt;pdx-dropdown-menu label="View options" :items="items" @pdx-check="onCheck" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let lastCheck = $signal('—');
+
+const optionItems = [
+  { key: 'grid', label: 'Grid view', type: 'radio', radioGroup: 'view', checked: true },
+  { key: 'list', label: 'List view', type: 'radio', radioGroup: 'view' },
+  { key: 'd1', label: '', type: 'separator' },
+  { key: 'compact', label: 'Compact rows', type: 'checkbox', checked: false },
+  { key: 'lines', label: 'Show grid lines', type: 'checkbox', checked: true },
+];
+
+function onCheck(e) { lastCheck = e.detail ? (e.detail.key + ' → ' + e.detail.checked) : '—'; }
+</script>

@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Frozen Columns</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>frozen: 'left'</code> or <code>'right'</code> on a column definition makes it sticky.
+      Scroll horizontally to see frozen columns stay in place.
+    </p>
+    <div class="demo-container" style="max-width:700px">
+      <pdx-data-grid :source="frozenDS" :columns="frozenColumns" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const columns = [
+  { field: 'id', header: 'ID', width: 60, frozen: 'left' },
+  { field: 'name', header: 'Name', width: 180, frozen: 'left' },
+  { field: 'email', header: 'Email', width: 220 },
+  { field: 'role', header: 'Role', width: 150 },
+  { field: 'salary', header: 'Salary', type: 'currency', width: 130 },
+  { field: 'actions', header: '', width: 80, frozen: 'right', command: true },
+];</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// ─── Frozen columns ────────────────────────
+const frozenColumns = [
+  { field: 'id', header: 'ID', width: 60, type: 'number', frozen: 'left' },
+  { field: 'name', header: 'Name', width: 180, frozen: 'left' },
+  { field: 'category', header: 'Category', width: 150 },
+  { field: 'price', header: 'Price', type: 'currency', width: 130 },
+  { field: 'stock', header: 'Stock', type: 'number', width: 120 },
+  { field: 'inStock', header: 'Available', type: 'boolean', width: 100 },
+];
+
+const frozenDS = createDataSource({ data: products.slice(0, 15), pageSize: 0 });
+</script>

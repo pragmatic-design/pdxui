@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Plain Variant</h2>
+
+    <div class="demo-block">
+      <pdx-fieldset legend="Logical group (no visual box)" variant="plain">
+        <pdx-form-field label="Notes">
+          <pdx-textarea placeholder="Additional notes"></pdx-textarea>
+        </pdx-form-field>
+      </pdx-fieldset>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Bubble Toolbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Select text to see the floating toolbar. Ideal for distraction-free writing.</p>
+
+    <div class="demo-area">
+      <pdx-rich-text
+        :toolbar-mode="'bubble'"
+        :toolbar="false"
+        placeholder="Select text to format..."
+        min-height="200px"
+      ></pdx-rich-text>
+    </div>
+  </section>
+</template>

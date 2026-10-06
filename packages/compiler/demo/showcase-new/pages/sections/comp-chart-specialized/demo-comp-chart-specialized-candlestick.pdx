@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Candlestick (OHLC)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Financial chart. Green = bullish (close > open), red/yellow = bearish.</p>
+
+    <div class="demo-area">
+      <pdx-chart type="candlestick" :data="candleData" :x-field="'date'" height="320px" :legend="false"></pdx-chart>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chart type="candlestick" :data="ohlcData"
+  :x-field="'date'" height="320px" /&gt;
+
+// Data: { date, open, high, low, close }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const candleData = [
+  { date: 'Mon', open: 120, high: 135, low: 118, close: 130 },
+  { date: 'Tue', open: 130, high: 140, low: 125, close: 128 },
+  { date: 'Wed', open: 128, high: 145, low: 126, close: 142 },
+  { date: 'Thu', open: 142, high: 150, low: 138, close: 145 },
+  { date: 'Fri', open: 145, high: 148, low: 130, close: 132 },
+  { date: 'Sat', open: 132, high: 138, low: 128, close: 136 },
+  { date: 'Sun', open: 136, high: 155, low: 134, close: 152 },
+];
+</script>

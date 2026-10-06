@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Data Display</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb"><a class="pdx-link" href="index.html">Docs</a><span>Data Display</span></div>
+                        <h1 class="pdx-txt-display">Data Display</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Tables, timeline, accordion, empty state.</p>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Table</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-table-striped</code>, <code>pdx-table-hover</code>, <code>pdx-table-compact</code>. Wrap in <code>pdx-table-responsive</code> for mobile scroll.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-table-responsive">
+                                    <table class="pdx-table pdx-table-hover pdx-table-striped">
+                                        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>John Doe</td><td>john@example.com</td><td>Admin</td><td><pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-success"></span>Active</pdx-row></td></tr>
+                                            <tr><td>Jane Smith</td><td>jane@example.com</td><td>Editor</td><td><pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-warning"></span>Away</pdx-row></td></tr>
+                                            <tr><td>Bob Wilson</td><td>bob@example.com</td><td>Viewer</td><td><pdx-row gap="xs" items="center" wrap="no"><span class="pdx-dot pdx-dot-muted"></span>Offline</pdx-row></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;table class="pdx-table pdx-table-hover pdx-table-striped"&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;...&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody&gt;&lt;tr&gt;&lt;td&gt;John&lt;/td&gt;...&lt;/tr&gt;&lt;/tbody&gt;
+&lt;/table&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Table Sticky Header &amp; Sort</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-table-sticky</code> for fixed header on scroll. Add <code>data-sort</code> on <code>&lt;th&gt;</code> for sort indicators.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-table-responsive" style="max-height:180px;overflow-y:auto">
+                                    <table class="pdx-table pdx-table-hover pdx-table-sticky">
+                                        <thead><tr><th data-sort="asc">Name</th><th data-sort>Email</th><th data-sort="desc">Score</th><th>Status</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>Alice</td><td>alice@ex.com</td><td>95</td><td><span class="pdx-dot pdx-dot-success"></span> Active</td></tr>
+                                            <tr><td>Bob</td><td>bob@ex.com</td><td>87</td><td><span class="pdx-dot pdx-dot-warning"></span> Away</td></tr>
+                                            <tr><td>Carol</td><td>carol@ex.com</td><td>92</td><td><span class="pdx-dot pdx-dot-success"></span> Active</td></tr>
+                                            <tr><td>David</td><td>david@ex.com</td><td>78</td><td><span class="pdx-dot pdx-dot-danger"></span> Busy</td></tr>
+                                            <tr><td>Eve</td><td>eve@ex.com</td><td>88</td><td><span class="pdx-dot pdx-dot-success"></span> Active</td></tr>
+                                            <tr><td>Frank</td><td>frank@ex.com</td><td>91</td><td><span class="pdx-dot pdx-dot-muted"></span> Offline</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;table class="pdx-table pdx-table-sticky"&gt;
+  &lt;th data-sort="asc"&gt;Name&lt;/th&gt;
+  &lt;th data-sort="desc"&gt;Score&lt;/th&gt;
+  &lt;th data-sort&gt;Unsorted&lt;/th&gt;
+&lt;/table&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Accordion</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <details class="pdx-accordion" open><summary>What is Pragmatic Design?</summary><p class="pdx-txt-small pdx-ink-muted">A context-driven CSS framework that's agent-first and human-friendly.</p></details>
+                                <details class="pdx-accordion"><summary>How does dark mode work?</summary><p class="pdx-txt-small pdx-ink-muted">Uses CSS light-dark(). Set pdx-scheme="dark" on html.</p></details>
+                                <details class="pdx-accordion"><summary>Is JavaScript required?</summary><p class="pdx-txt-small pdx-ink-muted">Only for adaptive behaviors. Layout is pure CSS.</p></details>
+                            </div>
+                            <div class="doc-source">&lt;details class="pdx-accordion" open&gt;
+  &lt;summary&gt;Question?&lt;/summary&gt;
+  &lt;p&gt;Answer.&lt;/p&gt;
+&lt;/details&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Timeline</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-timeline">
+                                    <div class="pdx-timeline-item" data-status="done"><pdx-stack gap="2xs"><span class="pdx-txt-body">Order placed</span><span class="pdx-txt-caption pdx-ink-muted">March 26, 10:00 AM</span></pdx-stack></div>
+                                    <div class="pdx-timeline-item" data-status="active"><pdx-stack gap="2xs"><span class="pdx-txt-body">Processing</span><span class="pdx-txt-caption pdx-ink-muted">March 26, 2:00 PM</span></pdx-stack></div>
+                                    <div class="pdx-timeline-item"><pdx-stack gap="2xs"><span class="pdx-txt-body pdx-ink-muted">Shipped</span><span class="pdx-txt-caption pdx-ink-subtle">Pending</span></pdx-stack></div>
+                                </div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-timeline"&gt;
+  &lt;div class="pdx-timeline-item" data-status="done"&gt;...&lt;/div&gt;
+  &lt;div class="pdx-timeline-item" data-status="active"&gt;...&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Empty State</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-empty"><div class="pdx-empty-title">No results found</div><div class="pdx-empty-description">Try adjusting your search or filter.</div><button class="pdx-secondary" size="sm">Clear filters</button></div>
+                            </div>
+                            <div class="doc-source">&lt;div class="pdx-empty"&gt;
+  &lt;div class="pdx-empty-title"&gt;No results&lt;/div&gt;
+  &lt;div class="pdx-empty-description"&gt;...&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Pagination Position</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>pagination-position</code>: <code>'bottom'</code> (default), <code>'top'</code>, or <code>'both'</code>.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="pagPosDS" :columns="pagColumns" :pagination-position="'both'" hover></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  pagination-position="both" hover&gt;
+&lt;/pdx-data-grid&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource, fakeTransport } from '@pdxui/core';
+import { products } from './state.pdx';
+
+// ─── Pagination position ────────────────────
+const pagColumns = [
+  { field: 'name', header: 'Product' },
+  { field: 'category', header: 'Category' },
+  { field: 'price', header: 'Price', type: 'currency' },
+  { field: 'stock', header: 'Stock', type: 'number' },
+];
+
+const pagPosDS = createDataSource({
+  transport: fakeTransport({ data: products, idField: 'id', latency: 200 }),
+  pageSize: 10,
+});
+</script>

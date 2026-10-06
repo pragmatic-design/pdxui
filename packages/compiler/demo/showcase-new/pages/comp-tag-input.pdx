@@ -1,0 +1,144 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Tag Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-tag-input&gt;</code> — multi-tag input with chip rendering, paste support, keyboard navigation, and duplicate prevention.
+    </p>
+
+    <!-- ═══ Console ═══ -->
+    <div class="console-panel">
+      <div class="console-header">
+        <span class="pdx-txt-caption pdx-ink-muted">Event Console</span>
+        <button class="pdx-ghost" size="sm" @click="clearLog">Clear</button>
+      </div>
+      <div class="console-body pdx-txt-mono">
+        @if (logs.length === 0) {
+          <span class="pdx-ink-muted">Interact with tag inputs below...</span>
+        } @else {
+          @for (logs as entry; track entry.id) {
+            <div class="log-entry">
+              <span class="log-time">{{ entry.time }}</span>
+              <span>{{ entry.text }}</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-tag-input-basic class="demo-section"></pdx-demo-comp-tag-input-basic>
+
+    <!-- ═══ With Initial Values ═══ -->
+    <pdx-demo-comp-tag-input-initial class="demo-section"></pdx-demo-comp-tag-input-initial>
+
+    <!-- ═══ Max Tags ═══ -->
+    <pdx-demo-comp-tag-input-max-tags class="demo-section"></pdx-demo-comp-tag-input-max-tags>
+
+    <!-- ═══ Custom Separator ═══ -->
+    <pdx-demo-comp-tag-input-separator class="demo-section"></pdx-demo-comp-tag-input-separator>
+
+    <!-- ═══ No Duplicates ═══ -->
+    <pdx-demo-comp-tag-input-no-duplicates class="demo-section"></pdx-demo-comp-tag-input-no-duplicates>
+
+    <!-- ═══ Sizes ═══ -->
+    <pdx-demo-comp-tag-input-sizes class="demo-section"></pdx-demo-comp-tag-input-sizes>
+
+    <!-- ═══ States ═══ -->
+    <pdx-demo-comp-tag-input-states class="demo-section"></pdx-demo-comp-tag-input-states>
+
+    <!-- ═══ Paste Support ═══ -->
+    <pdx-demo-comp-tag-input-paste class="demo-section"></pdx-demo-comp-tag-input-paste>
+
+    <!-- ═══ Slot Template ═══ -->
+    <pdx-demo-comp-tag-input-slot class="demo-section"></pdx-demo-comp-tag-input-slot>
+
+    <!-- ═══ Slots Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Slots Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Slot</span><span>Scope</span><span>Description</span></div>
+        <div class="opt-row"><code>tag</code><span>{ tag, index }</span><span>Custom tag chip content</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string[]</span><span>Array of tag strings (one-way binding)</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>Placeholder text when no tags are present</span></div>
+        <div class="opt-row"><code>max-tags</code><span>number</span><span>Maximum number of tags (0 = unlimited)</span></div>
+        <div class="opt-row"><code>max-length</code><span>number</span><span>Maximum character length per tag (0 = unlimited)</span></div>
+        <div class="opt-row"><code>separator</code><span>string</span><span>Separator character for splitting input (default: ",")</span></div>
+        <div class="opt-row"><code>allow-duplicates</code><span>boolean</span><span>Allow duplicate tags (default: false)</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name; the form receives the tags as a JSON array</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Accessible label for the input</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables the entire input</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>Tags visible but not editable</span></div>
+        <div class="opt-row"><code>error</code><span>boolean</span><span>Error state (red border)</span></div>
+        <div class="opt-row"><code>success</code><span>boolean</span><span>Success state (green border)</span></div>
+        <div class="opt-row"><code>warning</code><span>boolean</span><span>Warning state (yellow border)</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ Events Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>When</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ tags: string[] }</span><span>Tag added or removed</span></div>
+        <div class="opt-row"><code>pdx-add</code><span>{ tag, tags }</span><span>Single tag added</span></div>
+        <div class="opt-row"><code>pdx-remove</code><span>{ tag, index, tags }</span><span>Single tag removed</span></div>
+        <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>On every keystroke in the input field</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard Shortcuts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>Action</span></div>
+        <div class="opt-row kbd-row"><kbd>Enter</kbd><span>Add current input as tag</span></div>
+        <div class="opt-row kbd-row"><kbd>Tab</kbd><span>Add current input as tag</span></div>
+        <div class="opt-row kbd-row"><kbd>,</kbd><span>Add tag (or custom separator)</span></div>
+        <div class="opt-row kbd-row"><kbd>Backspace</kbd><span>Remove last tag (when input is empty)</span></div>
+        <div class="opt-row kbd-row"><kbd>Escape</kbd><span>Clear current input text</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Exposed Methods</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Method</span><span>Description</span></div>
+        <div class="opt-row kbd-row"><code>addTag(text)</code><span>Programmatically add a tag</span></div>
+        <div class="opt-row kbd-row"><code>removeTag(index)</code><span>Remove tag at given index</span></div>
+        <div class="opt-row kbd-row"><code>clear()</code><span>Remove all tags and clear input</span></div>
+        <div class="opt-row kbd-row"><code>getTags()</code><span>Returns current tags array</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import '@pdxui/ui/tag-input';
+
+@page '/components/tag-input';
+@title 'Tag Input — PDX UI';
+
+import { useTagInputLog } from './sections/comp-tag-input/state.pdx';
+
+// Console — every section writes to it (sections/comp-tag-input/state.pdx.ts).
+const tagInputLog = useTagInputLog();
+const logs = $derived(tagInputLog.logs());
+function clearLog() { tagInputLog.clearLog(); }
+</script>
+
+<style scoped>
+  .page { }
+
+  .console-panel { margin-bottom: var(--pdx-space-xl); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .console-header { display: flex; align-items: center; justify-content: space-between; padding: var(--pdx-space-xs) var(--pdx-space-md); background: var(--pdx-color-inset); border-bottom: 1px solid var(--pdx-color-border); }
+  .console-body { padding: var(--pdx-space-sm) var(--pdx-space-md); max-height: 120px; overflow-y: auto; font-size: var(--pdx-text-xs); background: var(--pdx-color-surface); }
+  .log-entry { display: flex; gap: var(--pdx-space-sm); padding: 2px 0; line-height: 1.5; }
+  .log-time { color: var(--pdx-color-muted); min-width: 70px; }
+
+  .kbd-row { grid-template-columns: 180px 1fr; }
+  kbd { font-family: var(--pdx-font-mono); font-size: 0.8em; padding: 2px 6px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

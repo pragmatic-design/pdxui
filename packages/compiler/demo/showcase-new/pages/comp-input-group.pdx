@@ -1,0 +1,57 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Input Group</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-input-group&gt;</code> — groups inputs, buttons, and addons with joined borders.
+      Propagates <code>size</code> and <code>disabled</code> to children.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-input-group-basic class="demo-section"></pdx-demo-comp-input-group-basic>
+
+    <!-- ═══ With Addons ═══ -->
+    <pdx-demo-comp-input-group-with-addons class="demo-section"></pdx-demo-comp-input-group-with-addons>
+
+    <!-- ═══ Size Propagation ═══ -->
+    <pdx-demo-comp-input-group-size-propagation class="demo-section"></pdx-demo-comp-input-group-size-propagation>
+
+    <!-- ═══ Multiple Buttons ═══ -->
+    <pdx-demo-comp-input-group-multiple-buttons class="demo-section"></pdx-demo-comp-input-group-multiple-buttons>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-input-group-disabled class="demo-section"></pdx-demo-comp-input-group-disabled>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-input-group-composition class="demo-section"></pdx-demo-comp-input-group-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>Propagates to children: xs, sm, md, lg, xl</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Propagates disabled to all children</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Accepted Children</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Element</span><span>Role</span></div>
+        <div class="opt-row"><code>&lt;pdx-input&gt;</code><span>Input field (flex: 1, fills remaining space)</span></div>
+        <div class="opt-row"><code>&lt;pdx-button&gt;</code><span>Action button (fixed width)</span></div>
+        <div class="opt-row"><code>.pdx-input-addon</code><span>Static text/icon label (non-interactive)</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+
+@page '/components/input-group';
+@title 'Input Group Component';
+</script>
+
+<style scoped>
+  .page { }
+
+  .opt-header, .opt-row { grid-template-columns: 200px 1fr; }
+</style>

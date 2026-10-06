@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Switches in realistic settings contexts.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Privacy Settings</h3>
+      <div class="comp-form-single">
+        <pdx-switch label="Profile visible" description="Allow others to see your profile" checked></pdx-switch>
+        <pdx-switch label="Activity status" description="Show when you're online" checked></pdx-switch>
+        <pdx-switch label="Read receipts" description="Let others know when you've read their messages"></pdx-switch>
+        <pdx-divider></pdx-divider>
+        <pdx-switch label="Two-factor authentication" description="Extra security for your account" checked></pdx-switch>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Feature Flags</h3>
+      <div class="comp-form-single">
+        <pdx-switch label="New dashboard" description="Beta: redesigned dashboard layout" size="sm" checked></pdx-switch>
+        <pdx-switch label="AI suggestions" description="Beta: AI-powered content suggestions" size="sm" loading></pdx-switch>
+        <pdx-switch label="Dark mode" description="Enable dark color scheme" size="sm" checked></pdx-switch>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-form-single { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+</style>

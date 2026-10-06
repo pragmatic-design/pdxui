@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition: Registration Form</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Complete form using FormField wrappers. Simulates a post-submit state with mixed validation.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Create Account</h3>
+      <div class="comp-form">
+        <pdx-form-field label="First Name" required size="sm" showError error="">
+          <pdx-input placeholder="Jane"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Last Name" required size="sm" showError error="">
+          <pdx-input placeholder="Doe"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Email" required size="sm" error="Email is already taken" touched class="full-width">
+          <pdx-input type="email" value="jane@example.com"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Password" required size="sm" hint="Min 8 chars, 1 uppercase, 1 number" class="full-width">
+          <pdx-input type="password" placeholder="Create a password"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field label="Terms" required size="sm" error="You must accept" showError class="full-width">
+          <pdx-checkbox label="I agree to the Terms of Service and Privacy Policy"></pdx-checkbox>
+        </pdx-form-field>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:var(--pdx-space-sm);margin-top:var(--pdx-space-md)">
+        <pdx-button variant="ghost" size="sm">Cancel</pdx-button>
+        <pdx-button variant="solid" size="sm">Create Account</pdx-button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--pdx-space-md); }
+  .full-width { grid-column: 1 / -1; }
+  @media (max-width: 480px) { .comp-form { grid-template-columns: 1fr; } }
+</style>

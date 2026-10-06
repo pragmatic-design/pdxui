@@ -1,0 +1,412 @@
+/* Form system — pdx-form, pdx-form-actions, pdx-form-section, pdx-form-template */
+
+/* ─── pdx-form ──────────────────────────────────────── */
+.pdx-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-lg);
+}
+
+/* ─── pdx-form-actions ──────────────────────────────── */
+.pdx-form-actions {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    padding-top: var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+    margin-top: var(--pdx-space-md);
+}
+
+.pdx-form-actions-start { justify-content: flex-start; }
+.pdx-form-actions-center { justify-content: center; }
+.pdx-form-actions-end { justify-content: flex-end; }
+.pdx-form-actions-between { justify-content: space-between; }
+
+/* ─── pdx-form-section ──────────────────────────────── */
+.pdx-form-section {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    padding: var(--pdx-space-lg);
+}
+
+.pdx-form-section-legend {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-text);
+    padding: 0 var(--pdx-space-xs);
+}
+
+.pdx-form-section-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+}
+
+.pdx-form-section-content[hidden] {
+    display: none;
+}
+
+/* Collapsible sections */
+.pdx-form-section-collapsible > .pdx-form-section-legend::before {
+    content: '▾';
+    display: inline-block;
+    margin-right: var(--pdx-space-xs);
+    transition: transform 0.2s;
+}
+
+.pdx-form-section-collapsible.collapsed > .pdx-form-section-legend::before {
+    transform: rotate(-90deg);
+}
+
+.pdx-form-section-collapsible > .pdx-form-section-legend:hover {
+    color: var(--pdx-color-primary-ink);
+}
+
+/* ─── Warning message (yellow hint) ─────────────────── */
+.pdx-field-warning {
+    display: block;
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-warning-ink);
+    margin-top: var(--pdx-space-xs);
+}
+
+.has-warning .pdx-input-wrap,
+.has-warning .pdx-checkbox,
+.has-warning .pdx-radio-input {
+    border-color: var(--pdx-color-warning);
+}
+
+/* ─── pdx-field-group ──────────────────────────────── */
+.pdx-field-group {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    padding: var(--pdx-space-md) var(--pdx-space-lg) var(--pdx-space-lg);
+    margin: 0;
+}
+
+.pdx-field-group-legend {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-text);
+    padding: 0 var(--pdx-space-xs);
+}
+
+.pdx-field-group-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+}
+
+.pdx-field-group-content[hidden] {
+    display: none;
+}
+
+/* Panel mode — the legend holds a disclosure button, drawn as plain legend text: a keyboard
+   reaches it, and Enter and Space toggle it. */
+.pdx-field-group-toggle {
+    all: unset;
+    cursor: pointer;
+    user-select: none;
+    border-radius: var(--pdx-radius-sm);
+}
+
+.pdx-field-group-toggle:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-primary);
+    outline-offset: 2px;
+}
+
+.pdx-field-group-toggle::before {
+    content: '▾';
+    display: inline-block;
+    margin-right: var(--pdx-space-xs);
+    transition: transform 0.2s;
+}
+
+.pdx-field-group-panel.collapsed > legend > .pdx-field-group-toggle::before {
+    transform: rotate(-90deg);
+}
+
+/* Collapsed, the panel is its legend line and its border. The content is hidden, and the block
+   padding that keeps it apart from the border would leave ~40px of empty frame under the legend. */
+.pdx-field-group-panel.collapsed {
+    padding-block: 0;
+}
+
+.pdx-field-group-toggle:hover {
+    color: var(--pdx-color-primary-ink);
+}
+
+/* Dialog mode — trigger button */
+.pdx-field-group-dialog {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pdx-field-group-trigger {
+    cursor: pointer;
+}
+
+/* ─── pdx-field-list ───────────────────────────────── */
+.pdx-field-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.pdx-field-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--pdx-space-sm);
+}
+
+.pdx-field-list-label {
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+.pdx-field-list-columns {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) 0;
+    border-bottom: 2px solid var(--pdx-color-border);
+    margin-bottom: var(--pdx-space-xs);
+}
+
+.pdx-field-list-col-header {
+    flex: 1;
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pdx-field-list-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    align-items: center;
+    padding: var(--pdx-space-xs) 0;
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-field-list-cell {
+    flex: 1;
+    min-width: 0;
+}
+
+/* The actions column and its cells, after the rules above (same specificity): the buttons in a row,
+   as wide as they are. The header's copy of them is hidden (pdx-field-list.ts), so both are the same
+   width in every theme. As a block, the cell would stack ✎ and × in display="dialog". */
+.pdx-field-list-col-actions,
+.pdx-field-list-cell-actions {
+    flex: 0 0 auto;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-2xs);
+}
+.pdx-field-list-col-actions > * { visibility: hidden; }
+
+.pdx-field-list-empty {
+    padding: var(--pdx-space-lg);
+    text-align: center;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+}
+
+.pdx-field-list-footer {
+    margin-top: var(--pdx-space-sm);
+}
+
+/* Field-list dialog mode */
+.pdx-field-list-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--pdx-color-backdrop);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdx-field-list-dialog {
+    background: var(--pdx-color-surface);
+    border-radius: var(--pdx-radius-lg);
+    box-shadow: var(--pdx-shadow-xl);
+    padding: var(--pdx-space-lg);
+    min-width: 360px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.pdx-field-list-dialog-title {
+    font-size: var(--pdx-text-lg);
+    font-weight: var(--pdx-weight-semibold);
+    margin-bottom: var(--pdx-space-md);
+}
+
+.pdx-field-list-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+}
+
+.pdx-field-list-dialog-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+}
+
+.pdx-field-list-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-lg);
+    padding-top: var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+/* ─── Form Template grid ────────────────────────────── */
+.pdx-form-template-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-lg);
+}
+
+.pdx-form-template-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+}
+
+/* Grid layout for form-template */
+.pdx-form-template-fields[style*="grid"] {
+    align-items: start;
+}
+
+/* ─── Wizard layout ───────────────────────────────────── */
+.pdx-wizard-stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: var(--pdx-space-xl);
+    padding: 0 var(--pdx-space-sm);
+}
+
+.pdx-wizard-step {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-sm);
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.pdx-wizard-step:hover {
+    color: var(--pdx-color-text);
+}
+
+.pdx-wizard-step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+
+.pdx-wizard-step-active .pdx-wizard-step-number {
+    background: var(--pdx-color-primary);
+    color: white;
+}
+
+.pdx-wizard-step-active .pdx-wizard-step-label {
+    color: var(--pdx-color-text);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+.pdx-wizard-step-completed .pdx-wizard-step-number {
+    background: var(--pdx-color-success);
+    color: white;
+}
+
+.pdx-wizard-step-completed {
+    color: var(--pdx-color-text);
+}
+
+.pdx-wizard-connector {
+    flex: 1;
+    height: 2px;
+    background: var(--pdx-color-border);
+    min-width: 24px;
+    transition: background 0.2s;
+}
+
+.pdx-wizard-connector-completed {
+    background: var(--pdx-color-success);
+}
+
+.pdx-wizard-step-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+    min-height: 200px;
+}
+
+.pdx-wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--pdx-space-lg);
+    padding-top: var(--pdx-space-md);
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+/* ─── Status badges for demo ────────────────────────── */
+.form-status {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    flex-wrap: wrap;
+    margin-top: var(--pdx-space-sm);
+}
+
+.form-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    padding: 2px var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-full);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+}
+
+.form-status-badge.active {
+    background: var(--pdx-color-primary);
+    color: white;
+}
+
+.form-status-badge.error {
+    background: var(--pdx-color-danger);
+    color: white;
+}
+
+.form-status-badge.success {
+    background: var(--pdx-color-success);
+    color: white;
+}

@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Weight</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Override stroke weight. Thin (1px), light (1.5), regular (2), bold (2.5).</p>
+
+    <div class="size-row">
+      <div class="size-demo">
+        <pdx-icon name="heart" size="xl" weight="thin"></pdx-icon>
+        <span class="pdx-txt-caption">thin</span>
+      </div>
+      <div class="size-demo">
+        <pdx-icon name="heart" size="xl" weight="light"></pdx-icon>
+        <span class="pdx-txt-caption">light</span>
+      </div>
+      <div class="size-demo">
+        <pdx-icon name="heart" size="xl" weight="regular"></pdx-icon>
+        <span class="pdx-txt-caption">regular</span>
+      </div>
+      <div class="size-demo">
+        <pdx-icon name="heart" size="xl" weight="bold"></pdx-icon>
+        <span class="pdx-txt-caption">bold</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-icon name="heart" weight="thin"&gt;&lt;/pdx-icon&gt;
+&lt;pdx-icon name="heart" weight="bold"&gt;&lt;/pdx-icon&gt;</code></pre>
+    </details>
+  </section>
+</template>

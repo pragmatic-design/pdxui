@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Still readable, and out of the tab order.</p>
+
+    <div class="demo-stack">
+      <pdx-tree label="Read-only tree" disabled default-expand-all :nodes="docs"></pdx-tree>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { docs } from './state.pdx';
+</script>

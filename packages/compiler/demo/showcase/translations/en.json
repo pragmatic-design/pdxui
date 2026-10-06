@@ -1,0 +1,49 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "newTask": "New Task",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "visitors": "{count, plural, one {# visitor} other {# visitors}} today"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme Colors",
+    "primary": "Primary",
+    "accent": "Accent"
+  },
+  "tasks": {
+    "title": "Sprint Backlog",
+    "addPlaceholder": "Add a new task...",
+    "add": "Add",
+    "empty": "No tasks yet. Add one above!",
+    "stats": "Task Stats",
+    "total": "Total",
+    "done": "Done",
+    "progress": "Progress"
+  },
+  "create": {
+    "title": "Create Task",
+    "name": "Task name",
+    "namePlaceholder": "Enter task name...",
+    "priority": "Priority",
+    "submit": "Create Task"
+  },
+  "footer": {
+    "brand": "PDX UI — .pdx Showcase"
+  },
+  "common": {
+    "items": "{count, plural, zero {No items} one {# item} other {# items}}"
+  },
+  "app": {
+    "loading": "Loading TaskMgr...",
+    "navigating": "Loading page..."
+  },
+  "error": {
+    "notFound": "Page not found",
+    "backHome": "Back to home"
+  }
+}

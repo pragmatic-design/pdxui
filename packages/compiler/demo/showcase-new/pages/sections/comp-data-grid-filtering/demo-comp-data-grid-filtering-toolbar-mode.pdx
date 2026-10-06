@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Toolbar Filter Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      With <code>show-toolbar</code>, filters appear as chips. Click "+" to add a filter, select field,
+      set operator and value. Chips show active filters — click to edit, "x" to remove.
+    </p>
+    <div class="demo-container">
+      <pdx-data-grid :source="toolbarFilterDS" :columns="filterColumns" :show-toolbar="true" hover striped></pdx-data-grid>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-data-grid :source="ds" :columns="columns"
+  show-toolbar hover striped&gt;
+&lt;/pdx-data-grid&gt;
+// Toolbar implies filter-mode="toolbar"</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createDataSource } from '@pdxui/core';
+import { products, filterColumns } from './state.pdx';
+
+const toolbarFilterDS = createDataSource({ data: products.slice(), pageSize: 10 });
+</script>

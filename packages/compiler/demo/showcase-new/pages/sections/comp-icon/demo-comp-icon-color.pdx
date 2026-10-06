@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Color Inheritance</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Icons use <code>currentColor</code> — wrap in an ink class or set color on parent.</p>
+
+    <div class="color-row">
+      <span class="pdx-ink-primary"><pdx-icon name="check-circle" size="lg"></pdx-icon></span>
+      <span class="pdx-ink-danger"><pdx-icon name="alert-circle" size="lg"></pdx-icon></span>
+      <span class="pdx-ink-success"><pdx-icon name="shield-check" size="lg"></pdx-icon></span>
+      <span class="pdx-ink-warning"><pdx-icon name="alert-triangle" size="lg"></pdx-icon></span>
+      <span class="pdx-ink-info"><pdx-icon name="info" size="lg"></pdx-icon></span>
+      <span class="pdx-ink-muted"><pdx-icon name="help-circle" size="lg"></pdx-icon></span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-ink-primary"&gt;
+  &lt;pdx-icon name="check-circle" size="lg"&gt;&lt;/pdx-icon&gt;
+&lt;/span&gt;
+&lt;span class="pdx-ink-danger"&gt;
+  &lt;pdx-icon name="alert-circle" size="lg"&gt;&lt;/pdx-icon&gt;
+&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .color-row {
+    display: flex;
+    gap: var(--pdx-space-lg);
+    margin-top: var(--pdx-space-md);
+    align-items: center;
+  }
+</style>

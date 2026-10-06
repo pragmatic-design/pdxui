@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled Item</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>disabled</code> attribute on individual items for 50% opacity.</p>
+
+    <div class="demo-row">
+      <div class="pdx-segmented">
+        <button class="pdx-segmented-item active">Free</button>
+        <button class="pdx-segmented-item">Pro</button>
+        <button class="pdx-segmented-item" disabled>Enterprise</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button class="pdx-segmented-item" disabled&gt;Enterprise&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>

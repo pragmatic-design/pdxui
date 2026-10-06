@@ -1,0 +1,65 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">User Profile Card</h3>
+      <div class="profile-card">
+        <pdx-avatar src="/avatars/person-1.svg" alt="Jane Doe" size="xl"></pdx-avatar>
+        <div>
+          <span class="pdx-txt-subheading">Jane Doe</span>
+          <span class="pdx-txt-small pdx-ink-muted">Product Designer</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Team Members</h3>
+      <div class="team-list">
+        <div class="team-row">
+          <span class="pdx-badge-anchor">
+            <pdx-avatar alt="Jane Doe" size="sm"></pdx-avatar>
+            <pdx-badge label="Online" dot variant="success"></pdx-badge>
+          </span>
+          <div style="flex:1">
+            <span class="pdx-txt-small">Jane Doe</span>
+            <span class="pdx-txt-caption pdx-ink-muted">Designer</span>
+          </div>
+          <pdx-badge variant="success" value="Online" size="sm"></pdx-badge>
+        </div>
+        <div class="team-row">
+          <span class="pdx-badge-anchor">
+            <pdx-avatar alt="Alex Smith" size="sm"></pdx-avatar>
+            <pdx-badge label="Away" dot variant="warning"></pdx-badge>
+          </span>
+          <div style="flex:1">
+            <span class="pdx-txt-small">Alex Smith</span>
+            <span class="pdx-txt-caption pdx-ink-muted">Developer</span>
+          </div>
+          <pdx-badge variant="warning" value="Away" size="sm"></pdx-badge>
+        </div>
+        <div class="team-row">
+          <span class="pdx-badge-anchor">
+            <pdx-avatar alt="Mary Kim" size="sm"></pdx-avatar>
+            <pdx-badge label="Offline" dot variant="muted"></pdx-badge>
+          </span>
+          <div style="flex:1">
+            <span class="pdx-txt-small">Mary Kim</span>
+            <span class="pdx-txt-caption pdx-ink-muted">Manager</span>
+          </div>
+          <pdx-badge variant="outline" value="Offline" size="sm"></pdx-badge>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .profile-card { display: flex; align-items: center; gap: var(--pdx-space-md); }
+  .profile-card div { display: flex; flex-direction: column; gap: 2px; }
+  .team-list { display: flex; flex-direction: column; }
+  .team-row { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) 0; border-bottom: 1px solid var(--pdx-color-border); }
+  .team-row:last-child { border-bottom: none; }
+  .team-row div { display: flex; flex-direction: column; gap: 2px; }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-sm); }
+</style>

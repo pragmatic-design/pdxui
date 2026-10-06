@@ -1,0 +1,205 @@
+<template>
+  <div class="demo">
+    <h2>DataSource CRUD</h2>
+    <p class="desc">Signal-based data manager with pluggable transport. Server sort/filter/page + change tracking.</p>
+
+    <section>
+      <h3>Server-side Pagination + Sort</h3>
+      <p class="desc">Mock transport simulates server. Click headers to sort. Use page buttons.</p>
+      <div class="controls">
+        <input type="text" class="input" placeholder="Filter by name..." @input="onFilter" />
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="col col-id" @click="sortById">ID {{ sortIcon('id') }}</span>
+          <span class="col col-name" @click="sortByName">Name {{ sortIcon('name') }}</span>
+          <span class="col col-email">Email</span>
+        </div>
+        @for (rows as row; track row.id) {
+          <div class="table-row">
+            <span class="col col-id">{{ row.id }}</span>
+            <span class="col col-name">{{ row.name }}</span>
+            <span class="col col-email">{{ row.email }}</span>
+          </div>
+        }
+      </div>
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage <= 1">← Prev</button>
+        <span>Page {{ currentPage }} / {{ totalPages }} ({{ totalItems }} items)</span>
+        <button @click="nextPage" :disabled="currentPage >= totalPages">Next →</button>
+      </div>
+      <div class="log">Loading: <strong>{{ loading }}</strong> | Sort: <strong>{{ sortDesc }}</strong> | Filter: <strong>{{ filterDesc }}</strong></div>
+    </section>
+
+    <section>
+      <h3>Change Tracking</h3>
+      <p class="desc">Add/update/remove items locally. Sync pushes to server. Cancel discards.</p>
+      <div class="row">
+        <button class="pdx-primary" @click="addItem">+ Add User</button>
+        <button @click="syncChanges" :disabled="!dirty" style="background:#22c55e;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Sync</button>
+        <button @click="cancelAll" :disabled="!dirty" style="background:#666;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Cancel</button>
+      </div>
+      <div class="log">
+        Changes: <strong>added={{ addedCount }}, updated={{ updatedCount }}, removed={{ removedCount }}</strong>
+        | Dirty: <strong>{{ dirty }}</strong>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { createDataSource, effect, onMount, onDestroy } from '@pdxui/core';
+
+// ─── Mock transport (simulates server) ────────────────────────
+var mockDb = [];
+for (var i = 1; i <= 53; i++) {
+    mockDb.push({ id: i, name: 'User ' + i, email: 'user' + i + '@test.com' });
+}
+
+var mockTransport = {
+    read: function(req) {
+        return new Promise(function(resolve) {
+            setTimeout(function() {
+                var filtered = mockDb;
+                // Filter
+                if (req.filter && req.filter.length > 0) {
+                    var f = req.filter[0];
+                    if (f.operator === 'contains' && f.field === 'name') {
+                        var term = String(f.value).toLowerCase();
+                        filtered = filtered.filter(function(u) { return u.name.toLowerCase().indexOf(term) >= 0; });
+                    }
+                }
+                // Sort
+                if (req.sort && req.sort.length > 0) {
+                    var s = req.sort[0];
+                    filtered = filtered.slice().sort(function(a, b) {
+                        var va = a[s.field], vb = b[s.field];
+                        if (va < vb) return s.dir === 'asc' ? -1 : 1;
+                        if (va > vb) return s.dir === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+                // Paginate
+                var start = (req.page - 1) * req.pageSize;
+                var page = filtered.slice(start, start + req.pageSize);
+                resolve({ data: page, total: filtered.length });
+            }, 150); // simulate network delay
+        });
+    },
+    create: function(item) {
+        return new Promise(function(resolve) {
+            var newItem = { id: mockDb.length + 1, name: item.name, email: item.email };
+            mockDb.push(newItem);
+            resolve(newItem);
+        });
+    },
+    destroy: function(item) {
+        return new Promise(function(resolve) {
+            mockDb = mockDb.filter(function(u) { return u.id !== item.id; });
+            resolve();
+        });
+    },
+};
+
+// ─── DataSource ───────────────────────────────────────────────
+var ds = createDataSource({
+    transport: mockTransport,
+    pageSize: 10,
+    autoLoad: true,
+});
+
+let rows = $signal([]);
+let currentPage = $signal(1);
+let totalPages = $signal(1);
+let totalItems = $signal(0);
+let loading = $signal(false);
+let sortDesc = $signal('none');
+let filterDesc = $signal('none');
+let dirty = $signal(false);
+let addedCount = $signal(0);
+let updatedCount = $signal(0);
+let removedCount = $signal(0);
+
+var currentSortField = '';
+var currentSortDir = 'asc';
+
+function sortIcon(field) {
+    if (currentSortField !== field) return '';
+    return currentSortDir === 'asc' ? '↑' : '↓';
+}
+
+function toggleSort(field) {
+    if (currentSortField === field) {
+        currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortField = field;
+        currentSortDir = 'asc';
+    }
+    ds.setSort([{ field: field, dir: currentSortDir }]);
+    sortDesc = field + ' ' + currentSortDir;
+}
+
+function sortById() { toggleSort('id'); }
+function sortByName() { toggleSort('name'); }
+
+function onFilter(e) {
+    var val = e.target.value;
+    if (val) {
+        ds.setFilter([{ field: 'name', operator: 'contains', value: val }]);
+        filterDesc = 'name contains "' + val + '"';
+    } else {
+        ds.setFilter([]);
+        filterDesc = 'none';
+    }
+}
+
+function prevPage() { ds.setPage(currentPage - 1); }
+function nextPage() { ds.setPage(currentPage + 1); }
+
+var addN = 100;
+function addItem() {
+    addN++;
+    ds.add({ id: addN, name: 'New User ' + addN, email: 'new' + addN + '@test.com' });
+}
+function syncChanges() { ds.sync(); }
+function cancelAll() { ds.cancelChanges(); }
+
+onMount(() => {
+    var d1 = effect(() => {
+        rows = ds.data();
+        currentPage = ds.page();
+        totalPages = ds.totalPages();
+        totalItems = ds.total();
+        loading = ds.isLoading();
+        dirty = ds.hasChanges();
+    });
+    var d2 = effect(() => {
+        var ch = ds.changes();
+        addedCount = ch.added.length;
+        updatedCount = ch.updated.length;
+        removedCount = ch.removed.length;
+    });
+    onDestroy(() => { d1(); d2(); ds.dispose(); });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 700px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .controls { margin-bottom: 8px; }
+  .input { padding: 6px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; width: 250px; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .table-wrap { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+  .table-header { display: grid; grid-template-columns: 60px 1fr 1fr; background: #f5f5f7; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; color: #666; }
+  .table-header .col { cursor: pointer; }
+  .table-header .col:hover { color: #3b82f6; }
+  .table-row { display: grid; grid-template-columns: 60px 1fr 1fr; border-top: 1px solid #f0f0f0; }
+  .col { padding: 8px 12px; font-size: 0.85rem; }
+  .pagination { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 0.85rem; }
+  .pagination button { padding: 4px 12px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; cursor: pointer; }
+  .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .log { font-size: 0.8rem; margin-top: 8px; font-family: monospace; }
+</style>

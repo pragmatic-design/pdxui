@@ -1,0 +1,33 @@
+/* pdx-page-header — breadcrumb + title row + actions. Token-only (theme/dark safe). */
+.pdx-page-header-root { display: block; }
+.pdx-page-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    margin-bottom: var(--pdx-space-md);
+}
+.pdx-page-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--pdx-space-md);
+}
+.pdx-page-header-titles { min-width: 0; }
+.pdx-page-header-title {
+    margin: 0;
+    font-size: var(--pdx-text-2xl);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--pdx-color-text);
+}
+.pdx-page-header-subtitle {
+    margin: var(--pdx-space-2xs) 0 0;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+}
+.pdx-page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    flex: 0 0 auto;
+}

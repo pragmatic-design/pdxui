@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Inline SVG & URL</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>svg</code> prop for inline markup or <code>src</code> for external URL. No icon set needed.</p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Inline SVG --&gt;
+&lt;pdx-icon svg="&lt;svg viewBox='0 0 24 24'&gt;...&lt;/svg&gt;"&gt;&lt;/pdx-icon&gt;
+
+&lt;!-- External URL --&gt;
+&lt;pdx-icon src="/icons/custom.svg"&gt;&lt;/pdx-icon&gt;
+
+&lt;!-- Third-party set (e.g., Lucide) --&gt;
+registerIconSet('lucide', (name) =&gt; lucideIcons[name]);</code></pre>
+    </details>
+  </section>
+</template>

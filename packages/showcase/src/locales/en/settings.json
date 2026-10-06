@@ -1,0 +1,98 @@
+{
+    "settings": {
+        "title": "Settings",
+        "intro": "The application's own: the values its lists are made of, the views people saved, and who may do what.",
+        "groups": {
+            "system": "System",
+            "access": "Access and authorisations"
+        },
+        "tiles": {
+            "lookups": "Lookups",
+            "views": "Saved views",
+            "users": "Users",
+            "permissions": "Permissions"
+        },
+        "lookups": {
+            "intro": "The closed sets of values a record can take. The code is what is stored; the label is what a reader sees, in their language.",
+            "setsLabel": "Value sets",
+            "code": "Code",
+            "label": "Label",
+            "inUse": "Records",
+            "field": "Stored in the field {field}",
+            "owner": { "tickets": "Tickets", "customers": "Customers", "assets": "Assets", "all": "Tickets, customers, assets" },
+            "sets": {
+                "ticketStatus": "Ticket status",
+                "ticketPriority": "Ticket priority",
+                "customerTier": "Customer tier",
+                "customerStatus": "Customer status",
+                "categories": "Categories"
+            }
+        },
+        "categories": {
+            "add": "Add category",
+            "en": "English",
+            "it": "Italian",
+            "color": "Colour",
+            "appliesTo": "Applies to",
+            "usageHint": "Tickets · customers · assets",
+            "deactivate": "Deactivate",
+            "reactivate": "Reactivate",
+            "nameRequired": "A category needs an English name.",
+            "tones": { "primary": "Primary", "success": "Green", "warning": "Amber", "danger": "Red", "info": "Blue", "muted": "Grey" }
+        },
+        "views": {
+            "intro": "The arrangements of the tickets list you saved under a name. Each one opens from the list's view picker.",
+            "name": "Name",
+            "filter": "Filter",
+            "sort": "Sort",
+            "pageSize": "Rows per page",
+            "actions": "Actions",
+            "rename": "Rename",
+            "delete": "Delete",
+            "save": "Save",
+            "cancel": "Cancel",
+            "deleteTitle": "Delete this view?",
+            "deleteBody": "“{name}” is no longer offered by the tickets list. The tickets themselves do not change.",
+            "keep": "Keep it",
+            "emptyTitle": "No saved view",
+            "emptyBody": "Arrange the tickets list — a filter, a sort — and save it under a name from its view picker."
+        },
+        "users": {
+            "intro": "The accounts that can sign in, and the roles each holds. A role given or taken here applies from that account's next sign-in.",
+            "name": "Name",
+            "username": "Username",
+            "email": "Email",
+            "role": "Role",
+            "can": "May",
+            "rolesOf": "Roles of {name}"
+        },
+        "permissions": {
+            "intro": "What each role may do: the table the application's guards read.",
+            "introEdit": "What each role may do: the table the application's guards read. A change applies at once, and the server checks every action again.",
+            "permission": "Permission",
+            "allows": "What it opens",
+            "holds": "{n} of {total}",
+            "inactive": "Inactive",
+            "descriptions": {
+                "account": { "read": "The account page: who is signed in, their role, their preferences." },
+                "billing": {
+                    "read": "The billing figures on the account page.",
+                    "write": "Closing the month. The server checks it again, whatever the page shows."
+                },
+                "tickets": { "billing": "The Billing tab of an intervention." },
+                "settings": { "permissions": "This screen and Users: changing what a role may do, and who holds which role." }
+            },
+            "granted": "Granted",
+            "denied": "Not granted",
+            "grant": "{permission} for {role}",
+            "rename": "Name of the role {name}",
+            "deactivate": "Deactivate",
+            "newRole": "New role",
+            "roleName": "Name",
+            "copyFrom": "Start from the permissions of",
+            "create": "Create",
+            "cancel": "Cancel",
+            "saved": "Saved."
+        }
+    }
+}

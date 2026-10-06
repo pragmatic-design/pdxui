@@ -1,0 +1,123 @@
+<template>
+  <section>
+    <h3>Drop Zones</h3>
+    <p class="desc">Drag cards between Zone A and Zone B. Cards move to the drop zone on release. Zone highlights when hovered.</p>
+    <div class="zones">
+      <div>
+        <span class="zone-label">Zone A</span>
+        <div class="drop-zone" :ref="zoneARef" data-zone="A">
+          <div class="card" data-id="c1" :ref="c1Ref">Task 1: Design review</div>
+          <div class="card" data-id="c2" :ref="c2Ref">Task 2: Code cleanup</div>
+          <div class="card" data-id="c3" :ref="c3Ref">Task 3: Write tests</div>
+        </div>
+      </div>
+      <div>
+        <span class="zone-label">Zone B</span>
+        <div class="drop-zone" :ref="zoneBRef" data-zone="B">
+          <div class="card" data-id="c4" :ref="c4Ref">Task 4: Deploy</div>
+        </div>
+      </div>
+    </div>
+    <pre class="log">{{ dropLog }}</pre>
+  </section>
+</template>
+
+<script setup>
+import { useDrag, useDropZone, effect, onMount, onDestroy } from '@pdxui/core';
+
+let dropLog = $signal('Drag cards between zones...');
+
+let zoneARef = $signal(null);
+let zoneBRef = $signal(null);
+let c1Ref = $signal(null);
+let c2Ref = $signal(null);
+let c3Ref = $signal(null);
+let c4Ref = $signal(null);
+
+// Card drags — each card sends its data-id as payload
+const c1Drag = useDrag(() => c1Ref, { data: function() { return 'c1'; } });
+const c2Drag = useDrag(() => c2Ref, { data: function() { return 'c2'; } });
+const c3Drag = useDrag(() => c3Ref, { data: function() { return 'c3'; } });
+const c4Drag = useDrag(() => c4Ref, { data: function() { return 'c4'; } });
+
+// Move card element to target zone on drop
+function moveCard(cardId, targetZone) {
+    const card = ({ c1: c1Ref, c2: c2Ref, c3: c3Ref, c4: c4Ref })[cardId];
+    if (card && targetZone) {
+        card.style.transform = '';
+        card.style.zIndex = '';
+        card.style.opacity = '';
+        card.style.boxShadow = '';
+        targetZone.appendChild(card);
+    }
+}
+
+// Drop zones — actual card movement on drop
+const dropA = useDropZone(() => zoneARef, {
+    onDrop: function(data) {
+        moveCard(data, zoneARef);
+        dropLog = dropLog + '> Moved ' + data + ' → Zone A\n';
+    },
+    onEnter: function() { },
+    onLeave: function() { },
+});
+const dropB = useDropZone(() => zoneBRef, {
+    onDrop: function(data) {
+        moveCard(data, zoneBRef);
+        dropLog = dropLog + '> Moved ' + data + ' → Zone B\n';
+    },
+});
+
+onMount(() => {
+    // Drop zone highlight
+    const d4 = effect(() => {
+        const el = zoneARef;
+        if (el) el.classList.toggle('over', dropA.isOver());
+    });
+    const d5 = effect(() => {
+        const el = zoneBRef;
+        if (el) el.classList.toggle('over', dropB.isOver());
+    });
+
+    // Card drag visual feedback
+    function cardEffect(drag, getRef) {
+        return effect(() => {
+            const el = getRef;
+            if (!el) return;
+            const pos = drag.position();
+            const dragging = drag.isDragging();
+            if (dragging) {
+                el.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
+                el.style.zIndex = '100';
+                el.style.opacity = '0.85';
+                el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+            } else {
+                el.style.transform = '';
+                el.style.zIndex = '';
+                el.style.opacity = '';
+                el.style.boxShadow = '';
+            }
+        });
+    }
+    const d6 = cardEffect(c1Drag, c1Ref);
+    const d7 = cardEffect(c2Drag, c2Ref);
+    const d8 = cardEffect(c3Drag, c3Ref);
+    const d9 = cardEffect(c4Drag, c4Ref);
+
+    onDestroy(() => {
+        d4(); d5(); d6(); d7(); d8(); d9();
+        c1Drag.dispose(); c2Drag.dispose(); c3Drag.dispose(); c4Drag.dispose();
+        dropA.dispose(); dropB.dispose();
+    });
+});
+</script>
+
+<style scoped>
+  .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0; }
+  .zone-label { font-size: 0.75rem; color: var(--pdx-color-muted); font-weight: 600; }
+  .drop-zone { min-height: 140px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; transition: all 200ms; margin-top: 4px; }
+  .drop-zone.over { border-color: var(--pdx-color-primary); background: var(--pdx-color-primary-soft); }
+  .card { padding: 10px 14px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: 6px; cursor: grab; user-select: none; touch-action: none; font-size: 0.85rem; }
+  .card:active { cursor: grabbing; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; max-height: 100px; overflow-y: auto; white-space: pre-wrap; min-height: 30px; margin: 0; }
+</style>

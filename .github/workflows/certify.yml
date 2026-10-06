@@ -1,0 +1,85 @@
+name: Component Certification
+
+# Certifies the UI components on 5 dimensions (contract math, axe, isolation, keyboard, visual).
+# Dimensions 1-4 run directly; 5 (visual) uses the pinned Docker image for deterministic
+# screenshots (the same -docker-linux baselines as locally).
+
+on:
+  pull_request:
+    paths:
+      - 'packages/ui/**'
+      - 'packages/design/**'
+      - 'packages/responsive/tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Dimensions 1-4: deterministic, fast, no screenshots → no Docker needed.
+  contracts:
+    name: contracts (dim 1-4)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Sharded, to parallelise as the components grow
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.8.1 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
+      - name: Generate scenarios + registry
+        run: pnpm --filter @pdxui/responsive test:gen
+      # The whole certification folder, as `test:certify` runs it: no file filter. A list of named
+      # specs here would leave every other regression guard in the folder running on a developer's
+      # machine and never in CI. skill-claims rides along — a check that never runs lets the skill
+      # drift from the code.
+      - name: Certification folder (dim 1-4, skill claims, regression guards)
+        run: >
+          pnpm --filter @pdxui/responsive exec playwright test
+          --config tests/playwright-ui.config.ts
+          --shard=${{ matrix.shard }}/2
+      # The component-coherence behavior suite, which `test:certify` runs after the folder.
+      # 37 tests, ~15 s: once, in the first shard.
+      - name: Behavior suite
+        if: matrix.shard == 1
+        run: pnpm --filter @pdxui/responsive exec playwright test --config tests/playwright-behavior.config.ts
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: contracts-report-${{ matrix.shard }}
+          path: packages/responsive/test-results
+
+  # Dimension 5: visual regression in the pinned Docker image (bit-for-bit determinism).
+  visual:
+    name: visual (dim 5, docker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true } # the PNG baselines are in Git LFS
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # Through run.mjs, NOT a docker command spelled out here.
+      #
+      # A docker command spelled out here, ending in
+      # `playwright test --config tests/playwright-docker.config.ts visual-runner`, would select
+      # visual-runner.spec.ts alone — the positional is a regex over the file path; measured with
+      # --list: "Total: 1586 tests in 1 file" — and exclude fonts.spec.ts, the guard against a
+      # font resolving to a CJK face so that every heading of every baseline renders in Chinese
+      # with the whole suite green. A screenshot suite cannot catch that.
+      #
+      # So one place decides what runs in the container. run.mjs owns that, its default is
+      # asserted in core's certification-gate test, and core's ci-certification test asserts
+      # that this job goes through it — so the two cannot drift apart.
+      - name: Visual regression + font guard (compare with the baselines, no update)
+        run: node packages/responsive/tests/docker/run.mjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-diffs
+          path: packages/responsive/test-results

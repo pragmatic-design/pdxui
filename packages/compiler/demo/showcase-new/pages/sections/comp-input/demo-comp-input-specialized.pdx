@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Specialized inputs</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Each of these ships today and has its own page — all of them are built on this
+      <code>&lt;pdx-input&gt;</code> wrapper foundation:
+    </p>
+    <div class="roadmap-list">
+      <div class="roadmap-item">
+        <strong>pdx-number-input</strong>
+        <span>Figma-style: cursor-position-aware step (arrow on hundreds → step=100), Shift×10, scroll wheel, Intl.NumberFormat, min/max/precision</span>
+      </div>
+      <div class="roadmap-item">
+        <strong>pdx-password-input</strong>
+        <span>Toggle visibility, strength meter</span>
+      </div>
+      <div class="roadmap-item">
+        <strong>pdx-search-input</strong>
+        <span>Search icon prefix, auto-clearable, debounce, Ctrl+K shortcut</span>
+      </div>
+      <div class="roadmap-item">
+        <strong>pdx-masked-input</strong>
+        <span>Phone, credit card, custom masks</span>
+      </div>
+      <div class="roadmap-item">
+        <strong>pdx-otp-input</strong>
+        <span>N-cell code entry, paste handling, auto-advance</span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .roadmap-list { display: flex; flex-direction: column; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+  .roadmap-item { display: flex; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-sm); align-items: baseline; }
+  .roadmap-item strong { flex-shrink: 0; min-width: 160px; font-family: var(--pdx-font-mono); font-size: var(--pdx-text-xs); color: var(--pdx-color-primary); }
+  .roadmap-item span { color: var(--pdx-color-muted); }
+</style>

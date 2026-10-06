@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Custom Template — Scoped Slot</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Alternative to function props: use <code>&lt;slot let:var&gt;</code> to define
+      templates inline with data from the child. HTML-native syntax.
+    </p>
+    <div class="demo-row">
+      <pdx-select label="Team member" :options="teamMembers" labelField="name" valueField="id" clearable placeholder="Select team member...">
+        <slot name="item" let:label let:raw>
+          <div class="team-option">
+            <span class="team-avatar">{{ raw.initials }}</span>
+            <div class="team-info">
+              <span class="team-name">{{ label }}</span>
+              <span class="team-role">{{ raw.role }}</span>
+            </div>
+          </div>
+        </slot>
+        <slot name="selected" let:label let:raw>
+          <span class="team-selected">
+            <span class="team-avatar-sm">{{ raw.initials }}</span> {{ label }}
+          </span>
+        </slot>
+      </pdx-select>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="teamMembers"
+  labelField="name" valueField="id"
+  clearable placeholder="Select team member..."&gt;
+
+  &lt;slot name="item" let:label let:raw&gt;
+    &lt;div class="team-option"&gt;
+      &lt;span class="team-avatar"&gt;{{ raw.initials }}&lt;/span&gt;
+      &lt;div class="team-info"&gt;
+        &lt;span class="team-name"&gt;{{ label }}&lt;/span&gt;
+        &lt;span class="team-role"&gt;{{ raw.role }}&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/slot&gt;
+
+  &lt;slot name="selected" let:label let:raw&gt;
+    &lt;span class="team-selected"&gt;
+      &lt;span class="team-avatar-sm"&gt;{{ raw.initials }}&lt;/span&gt; {{ label }}
+    &lt;/span&gt;
+  &lt;/slot&gt;
+
+&lt;/pdx-select&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+const teamMembers = [
+  { id: 1, name: 'Alice Johnson', role: 'Lead', initials: 'AJ' },
+  { id: 2, name: 'Bob Smith', role: 'Developer', initials: 'BS' },
+  { id: 3, name: 'Charlie Brown', role: 'Designer', initials: 'CB' },
+  { id: 4, name: 'Diana Prince', role: 'PM', initials: 'DP' },
+];
+</script>

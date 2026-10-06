@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Label Position</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Label on right (default) or left.</p>
+
+    <div class="demo-stack">
+      <pdx-checkbox label="Label on right (default)"></pdx-checkbox>
+      <pdx-checkbox label="Label on left" labelPosition="left"></pdx-checkbox>
+    </div>
+  </section>
+</template>

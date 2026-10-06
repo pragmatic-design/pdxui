@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Use the <code>suggestion</code> slot to customize suggestion items in the dropdown (e.g., avatars, badges).
+      The slot receives scope data for each suggestion.
+    </p>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-mention :items="users"&gt;
+  &lt;slot name="suggestion" let:item let:index let:active&gt;
+    &lt;div class="mention-custom"&gt;
+      &lt;span class="avatar"&gt;$&lbrace;item.label.charAt(0)&rbrace;&lt;/span&gt;
+      &lt;span&gt;$&lbrace;item.label&rbrace;&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/slot&gt;
+&lt;/pdx-mention&gt;
+
+.mention-custom {
+  display: flex; align-items: center; gap: 8px;
+}
+.mention-custom .avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--pdx-color-primary);
+  color: #fff; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { users } from './state.pdx';
+</script>

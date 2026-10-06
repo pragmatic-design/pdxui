@@ -1,0 +1,60 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Navbar</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-navbar&gt;</code> — compound responsive app header with brand, nav links,
+      search, notifications, user avatar + dropdown. All interactions are live.
+    </p>
+
+    <!-- ═══ 1. Enterprise Header — fully interactive ═══ -->
+    <pdx-demo-comp-navbar-enterprise class="demo-section"></pdx-demo-comp-navbar-enterprise>
+
+    <!-- ═══ 2. Basic (no actions) ═══ -->
+    <pdx-demo-comp-navbar-basic class="demo-section"></pdx-demo-comp-navbar-basic>
+
+    <!-- ═══ 3. With Dropdown Nav Item ═══ -->
+    <pdx-demo-comp-navbar-dropdown class="demo-section"></pdx-demo-comp-navbar-dropdown>
+
+    <!-- ═══ 4. Compact ═══ -->
+    <pdx-demo-comp-navbar-compact class="demo-section"></pdx-demo-comp-navbar-compact>
+
+    <!-- ═══ 5. Responsive Preview ═══ -->
+    <pdx-demo-comp-navbar-responsive class="demo-section"></pdx-demo-comp-navbar-responsive>
+
+    <!-- ═══ Props ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>brand</code></td><td>String</td><td>''</td><td>Brand/logo text</td></tr>
+            <tr><td><code>brandicon</code></td><td>String</td><td>''</td><td>Brand icon name</td></tr>
+            <tr><td><code>items</code></td><td>NavbarItem[]</td><td>[]</td><td>Navigation links</td></tr>
+            <tr><td><code>sticky</code></td><td>Boolean</td><td>false</td><td>Sticky at top</td></tr>
+            <tr><td><code>compact</code></td><td>Boolean</td><td>false</td><td>48px height</td></tr>
+            <tr><td><code>label</code></td><td>String</td><td>'Main navigation'</td><td>The navigation landmark's name; give each navbar on a page its own</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/navbar';
+@title 'Navbar — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.intro { max-width: 800px; }
+.demo-full {
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+}
+</style>

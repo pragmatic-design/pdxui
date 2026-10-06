@@ -1,0 +1,10 @@
+#!/bin/sh
+# Refuses a commit message the public history does not accept (scripts/commit-message-check.mjs).
+# `pnpm install` enables .githooks for the clone.
+#
+# A private working copy whose history is never published sets `git config pdxui.lab true` to turn
+# the check off there; the setting is local to that clone and travels nowhere.
+if [ "$(git config --get pdxui.lab)" = "true" ]; then
+    exit 0
+fi
+exec node scripts/commit-message-check.mjs "$1"

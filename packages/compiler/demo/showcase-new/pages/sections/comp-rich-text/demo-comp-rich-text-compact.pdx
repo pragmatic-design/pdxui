@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Compact (Comments)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Minimal toolbar for comment fields, chat input, etc.</p>
+
+    <div class="demo-area">
+      <pdx-rich-text
+        toolbar="compact"
+        :preset="'minimal'"
+        placeholder="Write a comment..."
+        min-height="80px"
+        max-height="200px"
+      ></pdx-rich-text>
+    </div>
+  </section>
+</template>

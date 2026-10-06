@@ -1,0 +1,54 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Rows from itemFields</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>itemFields</code> describes a row's columns, <code>itemDefault</code> fills a new one. The initial rows come
+      from the form's <code>initialValues</code>. Add a line, edit it, remove one, then submit.
+    </p>
+    <pdx-form :form="orderForm" @pdx-submit="submitOrder">
+      <div class="form-stack">
+        <pdx-field-list name="lines" label="Order lines" addLabel="+ Add line" :itemFields="lineFields" :itemDefault="lineDefault"></pdx-field-list>
+        <pdx-form-actions submitLabel="Submit order"></pdx-form-actions>
+      </div>
+    </pdx-form>
+    <pre class="pdx-txt-mono values-json" :hidden="!orderValues">{{ orderValues }}</pre>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-form :form="orderForm" @pdx-submit="submitOrder"&gt;
+  &lt;pdx-field-list name="lines" label="Order lines" addLabel="+ Add line"
+    :itemFields="lineFields" :itemDefault="lineDefault"&gt;&lt;/pdx-field-list&gt;
+  &lt;pdx-form-actions submitLabel="Submit order"&gt;&lt;/pdx-form-actions&gt;
+&lt;/pdx-form&gt;
+
+const lineFields = [
+  { name: 'product', type: 'text', label: 'Product' },
+  { name: 'qty', type: 'number', label: 'Qty' },
+  { name: 'gift', type: 'checkbox', label: 'Gift wrap' },
+];
+const lineDefault = { product: '', qty: 1, gift: false };
+const orderForm = createForm({
+  initialValues: { lines: [{ product: 'Notebook', qty: 2, gift: false }, { product: 'Pen', qty: 10, gift: true }] },
+});</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { createForm } from '@pdxui/core';
+
+const lineFields = [
+  { name: 'product', type: 'text', label: 'Product', placeholder: 'Product' },
+  { name: 'qty', type: 'number', label: 'Qty' },
+  { name: 'gift', type: 'checkbox', label: 'Gift wrap' },
+];
+
+const lineDefault = { product: '', qty: 1, gift: false };
+
+const orderForm = createForm({
+  initialValues: { lines: [{ product: 'Notebook', qty: 2, gift: false }, { product: 'Pen', qty: 10, gift: true }] },
+});
+
+let orderValues = $signal('');
+
+function submitOrder(e) { orderValues = JSON.stringify(e.detail.values, null, 2); }
+</script>

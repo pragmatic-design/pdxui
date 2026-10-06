@@ -1,0 +1,335 @@
+/* pdx-calendar — Calendar grid, cells, range, states */
+
+/* `flex`, not `inline-flex`: an inline-flex box sizes to its content and ignores the width its host
+   offers, so a calendar in a 420px card would sit at its intrinsic 290px, flush left, with 78px of
+   empty space beside it. An author who sizes the container is asking for a calendar that size.
+   `min-width` keeps it legible where the container is narrower than the seven columns. */
+.pdx-calendar {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    user-select: none;
+    font-family: var(--pdx-font-sans);
+    font-size: var(--pdx-text-sm);
+    min-width: 280px;
+}
+
+.pdx-calendar.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.pdx-calendar-inline {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-surface);
+}
+
+/* Navigation */
+.pdx-cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--pdx-space-xs) 0;
+    gap: var(--pdx-space-xs);
+}
+
+.pdx-cal-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--pdx-text-lg);
+    color: var(--pdx-color-text);
+    transition: background 0.15s;
+}
+
+.pdx-cal-nav-btn:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-cal-nav-btn:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}
+
+.pdx-cal-title {
+    flex: 1;
+    text-align: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: var(--pdx-weight-semibold);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    border-radius: var(--pdx-radius-sm);
+    transition: background 0.15s;
+}
+
+.pdx-cal-title:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-cal-title-static {
+    cursor: default;
+}
+
+.pdx-cal-title-static:hover {
+    background: transparent;
+}
+
+/* Multi-month grids. Narrower than its months side by side (260px each), the calendar puts the next
+   month below: on a phone the second would run past the edge, cut off by the page's sideways clip. */
+.pdx-cal-grids {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-md);
+}
+
+/* One block per month, its title above its grid: as siblings in the row of `.pdx-cal-grids`, a
+   multi-month calendar would put every title beside its grid. */
+.pdx-cal-month {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.pdx-cal-grids-2 .pdx-cal-month,
+.pdx-cal-grids-3 .pdx-cal-month {
+    min-width: 260px;
+}
+
+.pdx-cal-sub-header {
+    text-align: center;
+    font-weight: var(--pdx-weight-medium);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    padding: var(--pdx-space-xs) 0;
+}
+
+/* Grid */
+/* `flex: 1` so a single month takes the width the calendar was given. Without it the month box keeps
+   its content width inside the flex row of `.pdx-cal-grids`, and widening the calendar only moves the
+   empty space from the right edge to beside the month. */
+.pdx-cal-grid {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pdx-cal-header-row,
+.pdx-cal-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+/* Week number column */
+.pdx-cal-header-row:has(.pdx-cal-wk-header),
+.pdx-cal-row:has(.pdx-cal-wk-num) {
+    grid-template-columns: 32px repeat(7, 1fr);
+}
+
+.pdx-cal-wk-header,
+.pdx-cal-wk-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    width: 32px;
+}
+
+.pdx-cal-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+}
+
+/* Day cells */
+.pdx-cal-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* `min-width`, not `width`: the row is `repeat(7, 1fr)`, so a fixed cell width would make the
+       columns grow while the cells stay 36px — the empty space moving from the right edge into the
+       gaps instead of going away. 36px stays the floor, which is also the touch-target minimum here. */
+    min-width: 36px;
+    width: 100%;
+    height: 36px;
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+}
+
+.pdx-cal-cell:hover:not(.pdx-cal-disabled) {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-cal-cell:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -2px;
+    z-index: 1;
+}
+
+/* Outside month */
+.pdx-cal-outside {
+    color: var(--pdx-color-muted);
+    opacity: 0.4;
+}
+
+/* Today */
+.pdx-cal-today {
+    font-weight: var(--pdx-weight-bold);
+    color: var(--pdx-color-primary-ink);
+}
+
+.pdx-cal-today::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--pdx-color-primary);
+}
+
+/* Selected */
+.pdx-cal-selected {
+    background: var(--pdx-color-primary) !important;
+    color: var(--pdx-color-primary-text) !important;
+    font-weight: var(--pdx-weight-semibold);
+}
+
+/* Disabled */
+.pdx-cal-disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Range */
+.pdx-cal-in-range {
+    background: color-mix(in oklch, var(--pdx-color-primary) 15%, transparent);
+    border-radius: 0;
+}
+
+.pdx-cal-range-start {
+    background: var(--pdx-color-primary) !important;
+    color: var(--pdx-color-primary-text) !important;
+    border-radius: var(--pdx-radius-sm) 0 0 var(--pdx-radius-sm);
+}
+
+.pdx-cal-range-end {
+    background: var(--pdx-color-primary) !important;
+    color: var(--pdx-color-primary-text) !important;
+    border-radius: 0 var(--pdx-radius-sm) var(--pdx-radius-sm) 0;
+}
+
+.pdx-cal-range-start.pdx-cal-range-end {
+    border-radius: var(--pdx-radius-sm);
+}
+
+/* Range preview (hover while building) */
+.pdx-cal-range-preview {
+    background: color-mix(in oklch, var(--pdx-color-primary) 8%, transparent);
+    border-radius: 0;
+}
+
+/* Compare range overlay */
+.pdx-cal-compare {
+    box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--pdx-color-secondary, var(--pdx-color-primary)) 40%, transparent);
+}
+
+.pdx-cal-compare.pdx-cal-compare-start {
+    box-shadow: inset 2px 0 0 0 var(--pdx-color-secondary, var(--pdx-color-primary)),
+                inset 0 2px 0 0 var(--pdx-color-secondary, var(--pdx-color-primary)),
+                inset 0 -2px 0 0 var(--pdx-color-secondary, var(--pdx-color-primary));
+}
+
+.pdx-cal-compare.pdx-cal-compare-end {
+    box-shadow: inset -2px 0 0 0 var(--pdx-color-secondary, var(--pdx-color-primary)),
+                inset 0 2px 0 0 var(--pdx-color-secondary, var(--pdx-color-primary)),
+                inset 0 -2px 0 0 var(--pdx-color-secondary, var(--pdx-color-primary));
+}
+
+/* Highlighted dates */
+.pdx-cal-highlighted::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--pdx-color-warning);
+}
+
+/* Focused cell (keyboard navigation) */
+.pdx-cal-focused {
+    box-shadow: inset 0 0 0 2px var(--pdx-color-focus);
+}
+
+/* Month/Year picker grids */
+.pdx-cal-month-grid,
+.pdx-cal-year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--pdx-space-xs);
+    padding: var(--pdx-space-sm) 0;
+}
+
+.pdx-cal-month-cell,
+.pdx-cal-year-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    transition: background 0.15s;
+}
+
+.pdx-cal-month-cell:hover,
+.pdx-cal-year-cell:hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-cal-month-cell.pdx-cal-selected,
+.pdx-cal-year-cell.pdx-cal-selected {
+    background: var(--pdx-color-primary);
+    color: var(--pdx-color-primary-text);
+    font-weight: var(--pdx-weight-semibold);
+}
+
+.pdx-cal-month-cell:focus-visible,
+.pdx-cal-year-cell:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: -2px;
+}

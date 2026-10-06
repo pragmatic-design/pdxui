@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Change on Select (Non-leaf)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Allow selecting intermediate nodes, not just leaves.</p>
+
+    <div class="demo-row">
+      <pdx-cascader :options="locations" changeonselect placeholder="Select any level"></pdx-cascader>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { locations } from './state.pdx';
+</script>

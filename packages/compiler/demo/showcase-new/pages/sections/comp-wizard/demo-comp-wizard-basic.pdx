@@ -1,0 +1,62 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Wizard</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Linear navigation: must complete steps in order. Click Next to advance.</p>
+
+    <div class="demo-box">
+      <pdx-wizard>
+        <div data-wizard-step data-label="Account">
+          <h3 class="pdx-txt-body" style="margin-bottom: var(--pdx-space-md)">Account Information</h3>
+          <div class="form-fields">
+            <label class="pdx-label">Username</label>
+            <div class="pdx-input-wrap"><input class="pdx-input" placeholder="Enter username" /></div>
+            <label class="pdx-label">Email</label>
+            <div class="pdx-input-wrap"><input class="pdx-input" type="email" placeholder="you@example.com" /></div>
+          </div>
+        </div>
+        <div data-wizard-step data-label="Profile" data-description="Personal details">
+          <h3 class="pdx-txt-body" style="margin-bottom: var(--pdx-space-md)">Profile Details</h3>
+          <div class="form-fields">
+            <label class="pdx-label">Full Name</label>
+            <div class="pdx-input-wrap"><input class="pdx-input" placeholder="John Doe" /></div>
+            <label class="pdx-label">Bio</label>
+            <div class="pdx-input-wrap"><textarea class="pdx-input" rows="3" placeholder="Tell us about yourself..."></textarea></div>
+          </div>
+        </div>
+        <div data-wizard-step data-label="Review">
+          <h3 class="pdx-txt-body" style="margin-bottom: var(--pdx-space-md)">Review & Submit</h3>
+          <p class="pdx-txt-body pdx-ink-muted">Review your information before submitting.</p>
+          <div class="review-card">
+            <div class="review-row"><span class="pdx-ink-muted">Username:</span> <span>johndoe</span></div>
+            <div class="review-row"><span class="pdx-ink-muted">Email:</span> <span>john@example.com</span></div>
+            <div class="review-row"><span class="pdx-ink-muted">Name:</span> <span>John Doe</span></div>
+          </div>
+        </div>
+      </pdx-wizard>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-wizard&gt;
+  &lt;div data-wizard-step data-label="Account"&gt;...&lt;/div&gt;
+  &lt;div data-wizard-step data-label="Profile" data-description="Personal details"&gt;...&lt;/div&gt;
+  &lt;div data-wizard-step data-label="Review"&gt;...&lt;/div&gt;
+&lt;/pdx-wizard&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+.review-card {
+  padding: var(--pdx-space-md);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-xs);
+}
+.review-row {
+  display: flex;
+  gap: var(--pdx-space-sm);
+}
+</style>

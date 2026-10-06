@@ -1,0 +1,73 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Icons in realistic UI contexts.</p>
+
+    <div class="comp-demos">
+      <div class="comp-row">
+        <button class="pdx-primary"><pdx-icon name="plus" size="sm"></pdx-icon> New Project</button>
+        <button class="pdx-secondary"><pdx-icon name="download" size="sm"></pdx-icon> Export</button>
+        <button class="pdx-danger"><pdx-icon name="trash" size="sm"></pdx-icon> Delete</button>
+        <button class="pdx-ghost"><pdx-icon name="settings" size="sm"></pdx-icon></button>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-card-row">
+          <span class="pdx-ink-success"><pdx-icon name="check-circle" size="md"></pdx-icon></span>
+          <div>
+            <span class="pdx-txt-small">Deployment successful</span>
+            <span class="pdx-txt-caption pdx-ink-muted">Production v2.4.1 · 2 min ago</span>
+          </div>
+        </div>
+        <div class="comp-card-row">
+          <span class="pdx-ink-warning"><pdx-icon name="alert-triangle" size="md"></pdx-icon></span>
+          <div>
+            <span class="pdx-txt-small">High memory usage</span>
+            <span class="pdx-txt-caption pdx-ink-muted">Server node-3 · 89% used</span>
+          </div>
+        </div>
+        <div class="comp-card-row">
+          <span class="pdx-ink-danger"><pdx-icon name="x-circle" size="md"></pdx-icon></span>
+          <div>
+            <span class="pdx-txt-small">Build failed</span>
+            <span class="pdx-txt-caption pdx-ink-muted">Branch feature/auth · 5 min ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-demos {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-lg);
+    margin-top: var(--pdx-space-md);
+  }
+  .comp-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .comp-card {
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    overflow: hidden;
+  }
+  .comp-card-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    align-items: flex-start;
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .comp-card-row:last-child { border-bottom: none; }
+  .comp-card-row div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+</style>

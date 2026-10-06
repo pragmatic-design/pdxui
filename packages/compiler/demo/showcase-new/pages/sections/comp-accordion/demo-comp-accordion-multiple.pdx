@@ -1,0 +1,61 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Multiple Mode</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Any number of sections can be open simultaneously.</p>
+
+    <pdx-accordion mode="multiple">
+      <div data-accordion-item data-open>
+        <button data-accordion-trigger>
+          <pdx-icon name="user" size="sm"></pdx-icon>
+          <span>Profile Settings</span>
+        </button>
+        <div data-accordion-content>
+          <div class="setting-group">
+            <pdx-form-field label="Display Name" size="sm">
+              <pdx-input placeholder="Your name" value="Alessandro"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field label="Email" size="sm">
+              <pdx-input type="email" value="alex@pragmatic.dev"></pdx-input>
+            </pdx-form-field>
+          </div>
+        </div>
+      </div>
+      <div data-accordion-item>
+        <button data-accordion-trigger>
+          <pdx-icon name="bell" size="sm"></pdx-icon>
+          <span>Notifications</span>
+        </button>
+        <div data-accordion-content>
+          <div class="setting-group">
+            <pdx-switch label="Email notifications"></pdx-switch>
+            <pdx-switch label="Push notifications" checked></pdx-switch>
+            <pdx-switch label="Weekly digest"></pdx-switch>
+          </div>
+        </div>
+      </div>
+      <div data-accordion-item>
+        <button data-accordion-trigger>
+          <pdx-icon name="shield" size="sm"></pdx-icon>
+          <span>Security</span>
+        </button>
+        <div data-accordion-content>
+          <div class="setting-group">
+            <pdx-switch label="Two-factor authentication" checked></pdx-switch>
+            <pdx-form-field label="Session timeout (minutes)" size="sm">
+              <pdx-slider value="30" min="5" max="120" step="5" showLabel></pdx-slider>
+            </pdx-form-field>
+          </div>
+        </div>
+      </div>
+      <div data-accordion-item data-disabled>
+        <button data-accordion-trigger>
+          <pdx-icon name="lock" size="sm"></pdx-icon>
+          <span>Admin (requires permissions)</span>
+        </button>
+        <div data-accordion-content>
+          <p class="answer">You need admin privileges to access this section.</p>
+        </div>
+      </div>
+    </pdx-accordion>
+  </section>
+</template>

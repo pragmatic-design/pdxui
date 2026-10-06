@@ -1,0 +1,146 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Network Fetch — Retry with Countdown</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Simulates a network request that fails. Click "Load Users" to start.
+      Auto-retries up to 3 times with a live countdown, then succeeds or gives up.
+    </p>
+    <div class="demo-box">
+      @if (netState === 'idle') {
+        <div class="demo-widget">
+          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="startNetworkDemo">Load Users</button>
+        </div>
+      }
+      @if (netState === 'loading') {
+        <div class="demo-widget state-loading" role="status">
+          <div class="pdx-spinner-inline"></div>
+          <span class="pdx-txt-small pdx-ink-muted">Fetching /api/users...</span>
+        </div>
+      }
+      @if (netState === 'error') {
+        <div class="pdx-error-fallback" role="alert">
+          <div class="pdx-error-icon">&#128268;</div>
+          <div class="pdx-error-msg">Failed to load user data</div>
+          <div class="pdx-error-detail">{{ netError }}</div>
+          @if (netRetry < 3) {
+            <div class="pdx-error-meta">Retry {{ netRetry }} of 3 — next attempt in {{ netCountdown }}s</div>
+            <button class="pdx-btn pdx-btn-sm pdx-btn-error retry-btn" disabled>Retrying...</button>
+          } @else {
+            <div class="pdx-error-meta">Failed after 3 attempts.</div>
+            <button class="pdx-btn pdx-btn-sm pdx-btn-outline retry-btn" @click="resetNetworkDemo">Start Over</button>
+          }
+        </div>
+      }
+      @if (netState === 'success') {
+        <div class="demo-widget success-widget" role="status">
+          <div class="pdx-txt-small" style="color: var(--pdx-color-success); font-weight: 600">&#10003; Data loaded successfully</div>
+          <div class="pdx-txt-small pdx-ink-muted">Loaded 3 users after {{ netRetry }} failed attempts.</div>
+          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" style="margin-top: var(--pdx-space-xs)" @click="resetNetworkDemo">Reset</button>
+        </div>
+      }
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>@@try {
+  &lt;pdx-user-list /&gt;
+} @@catch (err) {
+  &lt;div role="alert"&gt;
+    {{ err.message }}
+    &lt;button @@click="retry"&gt;Retry&lt;/button&gt;
+  &lt;/div&gt;
+}
+
+// Or with onGlobalError:
+onGlobalError((error, ctx) =&gt; {
+  if (ctx.source === 'async') {
+    showToast(error.message);
+    return true; // handled
+  }
+});</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Network Fetch Simulation ───────────────────────────
+
+let netState = $signal('idle');
+let netError = $signal('');
+let netRetry = $signal(0);
+let netCountdown = $signal(0);
+
+// Non-signal: timer IDs don't need reactivity
+const timers = { id: 0 };
+
+function startNetworkDemo() {
+  netState = 'loading';
+  netRetry = 0;
+  simulateFetch();
+}
+
+function simulateFetch() {
+  setTimeout(() => {
+    netRetry = netRetry + 1;
+    netError = 'NetworkError: fetch /api/users failed (ERR_CONNECTION_REFUSED)';
+    netState = 'error';
+
+    if (netRetry < 3) {
+      startCountdown(3, () => {
+        netState = 'loading';
+        setTimeout(() => {
+          if (netRetry >= 2) {
+            netState = 'success';
+          } else {
+            simulateFetch();
+          }
+        }, 800);
+      });
+    }
+  }, 1000);
+}
+
+function startCountdown(seconds, onDone) {
+  netCountdown = seconds;
+  timers.id = setInterval(() => {
+    netCountdown = netCountdown - 1;
+    if (netCountdown <= 0) {
+      clearInterval(timers.id);
+      onDone();
+    }
+  }, 1000);
+}
+
+function resetNetworkDemo() {
+  clearInterval(timers.id);
+  timers.id = 0;
+  netState = 'idle';
+  netError = '';
+  netRetry = 0;
+  netCountdown = 0;
+}
+</script>
+
+<style>
+/* Global: the spinner is async-action's too. */
+.pdx-error-meta {
+  font-size: var(--pdx-text-xs);
+  color: var(--pdx-color-muted);
+  margin-bottom: var(--pdx-space-sm);
+}
+
+.pdx-btn-error {
+  background: var(--pdx-color-danger);
+  color: var(--pdx-color-danger-text);
+  border: none;
+  cursor: pointer;
+}
+.pdx-btn-error:hover { opacity: 0.85; }
+.pdx-btn-error:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.pdx-spinner-inline {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--pdx-color-border);
+  border-top-color: var(--pdx-color-primary);
+  border-radius: 50%;
+  animation: pdx-spin 0.6s linear infinite;
+}
+@keyframes pdx-spin { to { transform: rotate(360deg); } }
+</style>

@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Custom slide content via scoped slot. Receives <code>slide</code>, <code>index</code>, and <code>isActive</code>.</p>
+    <div class="demo-container">
+      <pdx-carousel :items="slotSlides">
+        <slot name="slide" let:slide let:index>
+          <div class="custom-slide">
+            <pdx-badge variant="outline" class="slide-step">Step {{ index + 1 }}</pdx-badge>
+            <h3>{{ slide.title }}</h3>
+            <p>{{ slide.desc }}</p>
+          </div>
+        </slot>
+      </pdx-carousel>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- Compose PDX components inside carousel slides --&gt;
+&lt;pdx-carousel :items="slides"&gt;
+  &lt;slot name="slide" let:slide let:index&gt;
+    &lt;div class="slide"&gt;
+      &lt;pdx-badge variant="outline"&gt;Step {index + 1}&lt;/pdx-badge&gt;
+      &lt;h3&gt;{slide.title}&lt;/h3&gt;
+      &lt;p&gt;{slide.desc}&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/slot&gt;
+&lt;/pdx-carousel&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const slotSlides = [
+  { title: 'Welcome', desc: 'Get started with our platform in minutes.' },
+  { title: 'Features', desc: 'Explore powerful tools built for your team.' },
+  { title: 'Pricing', desc: 'Simple, transparent plans for every size.' },
+];
+</script>
+
+<style scoped>
+.custom-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; background: linear-gradient(135deg, var(--pdx-color-primary), var(--pdx-color-accent, var(--pdx-color-primary))); color: var(--pdx-color-primary-text); text-align: center; padding: var(--pdx-space-xl); }
+.custom-slide h3 { margin: var(--pdx-space-sm) 0 var(--pdx-space-xs); font-size: 1.5rem; }
+.custom-slide p { margin: 0; opacity: 0.85; }
+</style>

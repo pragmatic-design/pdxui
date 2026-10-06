@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">4 sizes: <code>xs</code>, <code>sm</code>, default (<code>md</code>), <code>lg</code>, <code>xl</code>.</p>
+
+    <div class="demo-stack">
+      <pdx-label text="Extra Small (xs)" size="xs"></pdx-label>
+      <pdx-label text="Small (sm)" size="sm"></pdx-label>
+      <pdx-label text="Default (md)"></pdx-label>
+      <pdx-label text="Large (lg)" size="lg"></pdx-label>
+      <pdx-label text="Extra Large (xl)" size="xl"></pdx-label>
+    </div>
+  </section>
+</template>

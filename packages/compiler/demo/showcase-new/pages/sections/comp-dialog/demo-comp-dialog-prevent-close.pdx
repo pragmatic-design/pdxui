@@ -1,0 +1,68 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Prevent Close</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>prevent-close</code> to intercept close attempts. Useful for unsaved changes confirmation.</p>
+    <pdx-button variant="warning" size="sm" @click="openPrevent">Edit with Unsaved Warning</pdx-button>
+    <pdx-dialog :open="preventOpen" title="Edit Document" size="md" prevent-close @pdx-before-close="onBeforeClose" @pdx-close="closePrevent">
+      <p>Try closing this dialog — you'll be asked in the page first, because <code>prevent-close</code> is enabled.</p>
+      <div style="margin-top: var(--pdx-space-md)">
+        <label class="pdx-txt-small pdx-ink-muted">Document Title</label>
+        <input type="text" class="pdx-input" value="My Important Document" />
+      </div>
+      <span slot="footer">
+        <pdx-button variant="ghost" size="sm" @click="closePrevent">Discard</pdx-button>
+        <pdx-button variant="primary" size="sm" @click="closePrevent">Save &amp; Close</pdx-button>
+      </span>
+    </pdx-dialog>
+    <!-- Draws the dialog.confirm() question. An app mounts one, once, in its shell. -->
+    <pdx-overlay-outlet></pdx-overlay-outlet>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="preventOpen" title="Edit Document" size="md"
+  prevent-close @pdx-before-close="onBeforeClose" @pdx-close="closePrevent"&gt;
+  &lt;p&gt;Try closing — you'll be asked in the page first.&lt;/p&gt;
+  &lt;span slot="footer"&gt;
+    &lt;pdx-button variant="ghost" @click="closePrevent"&gt;Discard&lt;/pdx-button&gt;
+    &lt;pdx-button variant="primary" @click="closePrevent"&gt;Save &amp;amp; Close&lt;/pdx-button&gt;
+  &lt;/span&gt;
+&lt;/pdx-dialog&gt;
+&lt;!-- once, in the app shell: it draws dialog.confirm() --&gt;
+&lt;pdx-overlay-outlet&gt;&lt;/pdx-overlay-outlet&gt;
+
+import { dialog } from '@pdxui/ui/dialog';
+
+// prevent-close blocks Escape, the backdrop and ✕; this hears the attempt.
+async function onBeforeClose() {
+  const leave = await dialog.confirm({
+    title: 'Discard changes?', message: 'Leave without saving them?',
+    confirmLabel: 'Leave', cancelLabel: 'Stay', variant: 'danger',
+  });
+  if (leave) preventOpen = false;
+}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { dialog } from '@pdxui/ui/dialog';
+
+let preventOpen = $signal(false);
+
+function openPrevent() { preventOpen = true; }
+function closePrevent() { preventOpen = false; }
+
+// prevent-close already blocks Escape, the backdrop and the close button; the event says a close
+// was attempted. Ask in the page, never with window.confirm: the browser's modal stops automated
+// browsers and cannot be translated or themed.
+async function onBeforeClose() {
+  const leave = await dialog.confirm({
+    title: 'Discard changes?',
+    message: 'You have unsaved changes. Leave without saving them?',
+    confirmLabel: 'Leave',
+    cancelLabel: 'Stay',
+    variant: 'danger',
+  });
+  if (leave) preventOpen = false;
+}
+</script>

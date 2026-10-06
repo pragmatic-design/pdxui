@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Multi Select</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Check multiple nodes with checkboxes.</p>
+    <div class="demo-row">
+      <pdx-tree-select label="Departments" multiple :options="departments" placeholder="Select departments"></pdx-tree-select>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { departments } from './state.pdx';
+</script>

@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Title + Description</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>title</code> for a bold heading above the message.</p>
+    <div class="btn-row">
+      <pdx-button variant="primary" size="sm" @click="showRichSuccess">Rich Success</pdx-button>
+      <pdx-button variant="danger" size="sm" @click="showRichError">Rich Error</pdx-button>
+      <pdx-button variant="outline" size="sm" @click="showRichBordered">Rich Bordered</pdx-button>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { toast } from '@pdxui/ui/toast';
+
+function showRichSuccess() { toast.success('Your changes have been saved to the database.', { title: 'Saved Successfully' }); }
+function showRichError() { toast.error('The server returned a 500 error. Please try again later.', { title: 'Connection Failed' }); }
+function showRichBordered() { toast.info('Click "Update" to install the latest version.', { title: 'Update Available', variant: 'bordered' }); }
+</script>

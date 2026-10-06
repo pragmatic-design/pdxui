@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Seconds and step</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>showSeconds</code> adds a seconds segment. <code>step</code> is how far one arrow press moves
+      the minutes (and seconds): <code>15</code> gives quarter hours.
+    </p>
+    <div class="demo-grid">
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">show-seconds</span>
+        <pdx-time-picker value="08:15:30" format="24h" show-seconds aria-label="With seconds"></pdx-time-picker>
+      </div>
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">step 15 — press ↑ on the minutes</span>
+        <pdx-time-picker :value="quarter" format="24h" step="15" aria-label="Quarter hours" @pdx-change="e => quarter = e.detail.value"></pdx-time-picker>
+        <span class="pdx-txt-small pdx-ink-muted">value: <code>{{ quarter }}</code></span>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-time-picker value="08:15:30" format="24h" show-seconds&gt;&lt;/pdx-time-picker&gt;
+&lt;pdx-time-picker :value="quarter" format="24h" step="15"&gt;&lt;/pdx-time-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let quarter = $signal('10:00');
+</script>

@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled Items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>aria-disabled="true"</code> for reduced opacity and <code>cursor: not-allowed</code>.</p>
+
+    <div class="demo-box">
+      <nav class="pdx-nav">
+        <a href="#" class="pdx-nav-item active">Dashboard</a>
+        <a href="#" class="pdx-nav-item">Projects</a>
+        <a href="#" class="pdx-nav-item" aria-disabled="true">Analytics (coming soon)</a>
+        <a href="#" class="pdx-nav-item" aria-disabled="true">Reports (coming soon)</a>
+        <a href="#" class="pdx-nav-item">Settings</a>
+      </nav>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;a class="pdx-nav-item" aria-disabled="true"&gt;Analytics (coming soon)&lt;/a&gt;</code></pre>
+    </details>
+  </section>
+</template>

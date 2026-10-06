@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Visually muted, not-allowed cursor. Pairs with disabled inputs.</p>
+
+    <div class="demo-stack">
+      <pdx-label text="Disabled Field" disabled></pdx-label>
+      <input class="pdx-input" placeholder="Can't edit" disabled />
+    </div>
+  </section>
+</template>

@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Total Info</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Shows "X–Y of Z" before the page buttons.</p>
+    <div class="demo-row">
+      <pdx-pagination :total="247" :pageSize="20" :page="2" showtotal></pdx-pagination>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="247" :pageSize="20" :page="2" showtotal&gt;&lt;/pdx-pagination&gt;</code></pre>
+    </details>
+  </section>
+</template>

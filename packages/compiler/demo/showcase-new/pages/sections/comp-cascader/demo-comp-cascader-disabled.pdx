@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled Items</h2>
+    <div class="demo-row">
+      <pdx-cascader :options="disabledLocations" placeholder="Some items disabled"></pdx-cascader>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const disabledLocations = [
+  {
+    value: 'europe', label: 'Europe', children: [
+      { value: 'italy', label: 'Italy', children: [
+        { value: 'rome', label: 'Rome' },
+        { value: 'milan', label: 'Milan', disabled: true },
+      ]},
+      { value: 'france', label: 'France', disabled: true, children: [
+        { value: 'paris', label: 'Paris' },
+      ]},
+    ]
+  },
+  {
+    value: 'asia', label: 'Asia', children: [
+      { value: 'japan', label: 'Japan', children: [
+        { value: 'tokyo', label: 'Tokyo' },
+      ]},
+    ]
+  },
+];
+</script>

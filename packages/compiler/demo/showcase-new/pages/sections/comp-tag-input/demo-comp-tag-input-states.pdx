@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Disabled, readonly, error, success, and warning states.</p>
+
+    <div class="demo-stack">
+      <div class="pdx-field">
+        <pdx-label text="Disabled" disabled></pdx-label>
+        <pdx-tag-input disabled :value="stateTags"></pdx-tag-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Readonly"></pdx-label>
+        <pdx-tag-input readonly :value="stateTags"></pdx-tag-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Error" required></pdx-label>
+        <pdx-tag-input error :value="stateTags" placeholder="Add tags..."></pdx-tag-input>
+        <span class="pdx-field-error">At least 3 tags are required</span>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Success"></pdx-label>
+        <pdx-tag-input success :value="stateTags" placeholder="Add tags..."></pdx-tag-input>
+        <span class="pdx-field-success">Tags are valid</span>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Warning"></pdx-label>
+        <pdx-tag-input warning :value="stateTags" placeholder="Add tags..."></pdx-tag-input>
+        <span class="pdx-field-hint" style="color:var(--pdx-color-warning)">Some tags may be deprecated</span>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+// States
+let stateTags = $signal(['React', 'Vue']);
+</script>

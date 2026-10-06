@@ -1,0 +1,174 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Cyberpunk Theme
+   Neon magenta/cyan, sharp edges, dense layout, glowing shadows.
+   ========================================================================== */
+
+[pdx-theme="cyberpunk"] {
+    --pdx-hue-primary: 330;
+    --pdx-hue-accent:  190;
+
+    --pdx-color-primary:       oklch(0.585 0.25 330);
+    --pdx-color-primary-hover: oklch(0.58 0.27 330);
+    --pdx-color-primary-text:  oklch(0.98 0.01 330);
+    --pdx-color-accent:        oklch(0.75 0.20 190);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.65 0.25 330);
+
+    /* Very dark, magenta-tinted grays */
+    --pdx-gray-50:  oklch(0.96  0.005 330);
+    --pdx-gray-100: oklch(0.93  0.008 330);
+    --pdx-gray-200: oklch(0.88  0.008 330);
+    --pdx-gray-800: oklch(0.15  0.012 330);
+    --pdx-gray-900: oklch(0.10  0.010 330);
+    --pdx-gray-950: oklch(0.06  0.008 330);
+
+    --pdx-font-sans:    'Exo 2', system-ui, sans-serif;
+    --pdx-font-heading: 'Rajdhani', 'Share Tech', system-ui, sans-serif;
+    --pdx-font-mono:    'JetBrains Mono', monospace;
+
+    /* Sharp, almost no rounding */
+    --pdx-radius-sm:  0;
+    --pdx-radius-md:  0.125rem;
+    --pdx-radius-lg:  0.25rem;
+    --pdx-radius-xl:  0.375rem;
+
+    --pdx-density-factor: 0.85;
+
+    /* The rendered height is `min-height × --pdx-density-factor`, and this theme declares no
+       control height of its own: the inherited 2.5rem default would render at 34px. Dividing the
+       factor out gives the 40px the default means. The rule across the design system is that
+       the factor governs SPACING, not control height — a theme that wants different controls
+       declares them. */
+    --pdx-button-min-height: calc(2.5rem / 0.85);   /* 40px at this theme's density */
+    --pdx-input-min-height:  calc(2.5rem / 0.85);   /* the same, so a row of both aligns */
+    --pdx-weight-semibold: 700;
+
+    /* Multi-layer neon glow focus — 3 shadow layers for authentic neon feel */
+    --pdx-focus-ring:   0 0 4px oklch(0.65 0.25 330 / 0.6),
+                        0 0 12px oklch(0.65 0.25 330 / 0.3),
+                        0 0 24px oklch(0.65 0.25 330 / 0.1);
+    --pdx-shadow-color: oklch(0.65 0.25 330 / 0.15);
+
+    /* Neon shadows for cards/overlays — magenta-tinted */
+    --pdx-shadow-sm:  0 0 4px oklch(0.65 0.20 330 / 0.15);
+    --pdx-shadow-md:  0 0 8px oklch(0.65 0.20 330 / 0.2), 0 2px 4px oklch(0 0 0 / 0.3);
+    --pdx-shadow-lg:  0 0 16px oklch(0.65 0.20 330 / 0.2), 0 4px 8px oklch(0 0 0 / 0.3);
+    --pdx-shadow-xl:  0 0 24px oklch(0.65 0.20 330 / 0.25), 0 8px 16px oklch(0 0 0 / 0.3);
+
+    /* Cyberpunk behavior tokens */
+    --pdx-button-radius: 0;
+    --pdx-input-style: underlined;
+    --pdx-card-style: bordered;
+    --pdx-tab-indicator: underline;
+    --pdx-tab-indicator-size: 3px;
+    --pdx-border-width: 2px;
+}
+
+/* Tab: neon underline glow */
+[pdx-theme="cyberpunk"] .pdx-tab.active:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)),
+[pdx-theme="cyberpunk"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-bottom-width: 2px;
+    border-bottom-color: var(--pdx-color-primary);
+    text-shadow: 0 0 6px oklch(from var(--pdx-color-primary) l c h / 0.5);
+    box-shadow: 0 2px 6px oklch(from var(--pdx-color-primary) l c h / 0.4);
+}
+
+/* Breadcrumb: double arrow */
+[pdx-theme="cyberpunk"] .pdx-breadcrumb:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) { --pdx-breadcrumb-separator: '>>'; }
+[pdx-theme="cyberpunk"] .pdx-breadcrumb > *:not(:last-child):not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *))::after {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.8em;
+    color: var(--pdx-color-primary-ink);
+}
+
+/* Table: neon header line, mono font */
+[pdx-theme="cyberpunk"] .pdx-table th:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    --pdx-table-header-font: var(--pdx-font-mono);
+    --pdx-table-header-transform: uppercase;
+    --pdx-table-header-letter-spacing: 0.08em;
+    --pdx-table-header-size: var(--pdx-text-xs);
+    --pdx-table-header-border-color: var(--pdx-color-primary);
+    --pdx-table-header-color: var(--pdx-color-primary);
+}
+[pdx-theme="cyberpunk"] .pdx-table td:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-bottom-color: light-dark(var(--pdx-color-border), oklch(0.2 0.01 330));
+}
+
+/* Accordion: sharp, neon border */
+[pdx-theme="cyberpunk"] details.pdx-accordion:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-color: light-dark(var(--pdx-color-border), oklch(0.25 0.02 330));
+}
+[pdx-theme="cyberpunk"] details.pdx-accordion summary:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *))::after {
+    content: '▶';
+    font-size: 0.65em;
+    color: var(--pdx-color-primary-ink);
+}
+[pdx-theme="cyberpunk"] details.pdx-accordion[open] summary:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *))::after {
+    transform: rotate(90deg);
+}
+
+/* Card: neon border glow */
+[pdx-theme="cyberpunk"] .pdx-surface-card:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    --pdx-card-border-color: light-dark(var(--pdx-color-border), oklch(0.3 0.05 330));
+}
+[pdx-theme="cyberpunk"] .pdx-surface-card[interactive]:hover:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)),
+[pdx-theme="cyberpunk"] .pdx-card-hoverable:hover:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-color: var(--pdx-color-primary);
+    box-shadow: 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.3),
+                0 0 20px oklch(from var(--pdx-color-primary) l c h / 0.15);
+}
+
+/* Input: underlined variant driven by [pdx-input-style="underlined"] in inputs.css.
+   Neon glow on focus is cyberpunk-specific. */
+[pdx-input-style="underlined"][pdx-theme="cyberpunk"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    box-shadow: 0 1px 0 0 var(--pdx-color-primary), 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.2);
+}
+[pdx-input-style="underlined"][pdx-theme="cyberpunk"] .pdx-input:not(.pdx-input-wrap > *):focus-visible:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    box-shadow: 0 1px 0 0 var(--pdx-color-primary), 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.2);
+}
+
+/* ── Button: triple-layer neon glow hover ── */
+[pdx-theme="cyberpunk"] .pdx-primary:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    --pdx-button-hover-shadow: 0 0 6px oklch(from var(--pdx-color-primary) l c h / 0.5),
+                0 0 16px oklch(from var(--pdx-color-primary) l c h / 0.3),
+                0 0 32px oklch(from var(--pdx-color-primary) l c h / 0.1);
+}
+[pdx-theme="cyberpunk"] .pdx-primary:hover:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    text-shadow: 0 0 6px oklch(from var(--pdx-color-primary) l c h / 0.6);
+}
+[pdx-theme="cyberpunk"] .pdx-secondary:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-color: light-dark(var(--pdx-color-border), oklch(0.3 0.08 330));
+}
+[pdx-theme="cyberpunk"] .pdx-secondary:hover:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-color: var(--pdx-color-primary);
+    box-shadow: 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.3);
+}
+
+/* ── App shell: the magenta edge the rest of the theme already has ──
+ *
+ * Without these rules the shell falls through to the base's neutral treatment and renders black on
+ * black: header, navbar and main separated only by hairlines that are invisible on this ground.
+ * Its own table and card do not, because the theme has rules for them — which is why the four
+ * surface tokens cyberpunk inherits are deliberate. Setting them would tint every surface in every
+ * component at once and still not give the shell an edge. What the shell needs is a rule, and this
+ * is it.
+ *
+ * Same vocabulary as the table header (`.pdx-table th`) and the active tab: a 2px primary edge with
+ * a low-alpha glow, and a ground lifted just off the page so the navbar reads as a panel.
+ */
+[pdx-theme="cyberpunk"] .pdx-app-header:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-bottom: var(--pdx-border-width) solid var(--pdx-color-primary);
+    box-shadow: 0 2px 8px oklch(from var(--pdx-color-primary) l c h / 0.25);
+}
+[pdx-theme="cyberpunk"] .pdx-app-navbar:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)),
+[pdx-theme="cyberpunk"] .pdx-sidebar:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    background: light-dark(var(--pdx-color-surface), oklch(0.16 0.02 330));
+    border-right: var(--pdx-border-width) solid oklch(from var(--pdx-color-primary) l c h / 0.4);
+}
+[pdx-theme="cyberpunk"] .pdx-app-aside:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    background: light-dark(var(--pdx-color-surface), oklch(0.16 0.02 330));
+    border-left: var(--pdx-border-width) solid oklch(from var(--pdx-color-primary) l c h / 0.4);
+}
+[pdx-theme="cyberpunk"] .pdx-app-footer:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+    border-top: var(--pdx-border-width) solid oklch(from var(--pdx-color-primary) l c h / 0.4);
+}

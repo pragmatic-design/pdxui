@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Types</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>type</code>: <code>line</code> (default) · <code>area</code> · <code>bar</code>.</p>
+    <div class="demo-container">
+      <div class="spark-grid">
+        <div class="spark-item">
+          <span class="pdx-txt-small pdx-ink-muted">line</span>
+          <pdx-sparkline data="12,18,15,24,21,32,29,35,28,38,41,48" type="line" width="160px" height="40px"></pdx-sparkline>
+        </div>
+        <div class="spark-item">
+          <span class="pdx-txt-small pdx-ink-muted">area</span>
+          <pdx-sparkline data="42,51,48,62,59,71,68,74,65,78,82,91" type="area" width="160px" height="40px"></pdx-sparkline>
+        </div>
+        <div class="spark-item">
+          <span class="pdx-txt-small pdx-ink-muted">bar</span>
+          <pdx-sparkline data="80,65,90,70,85,60,95,75,88" type="bar" width="160px" height="40px"></pdx-sparkline>
+        </div>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-sparkline data="12,18,15,24,21,32" type="line" width="160px" height="40px" /&gt;
+&lt;pdx-sparkline data="42,51,48,62,59,71" type="area" width="160px" height="40px" /&gt;
+&lt;pdx-sparkline data="80,65,90,70,85,60" type="bar"  width="160px" height="40px" /&gt;</code></pre>
+    </details>
+  </section>
+</template>

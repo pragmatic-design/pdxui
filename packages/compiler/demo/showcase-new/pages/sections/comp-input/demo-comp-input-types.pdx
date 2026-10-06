@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Input Types & Mobile Keyboards</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>type</code> and <code>inputmode</code> control native keyboard on mobile.
+      Use <code>inputmode</code> for fine control (e.g. <code>decimal</code> shows dot key on iOS).
+    </p>
+
+    <div class="demo-fields">
+      <div class="pdx-field">
+        <pdx-label text="Email" size="sm"></pdx-label>
+        <pdx-input type="email" inputmode="email" placeholder="name@example.com"></pdx-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Phone" size="sm"></pdx-label>
+        <pdx-input type="tel" inputmode="tel" placeholder="+1 (555) 000-0000"></pdx-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="URL" size="sm"></pdx-label>
+        <pdx-input type="url" inputmode="url" placeholder="https://example.com"></pdx-input>
+      </div>
+      <div class="pdx-field">
+        <pdx-label text="Number (decimal)" size="sm"></pdx-label>
+        <pdx-input inputmode="decimal" placeholder="0.00"></pdx-input>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+  }
+</style>

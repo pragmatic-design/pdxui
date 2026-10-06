@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Autocomplete vs Select</h2>
+    <div class="comparison">
+      <div class="comparison-col">
+        <h3 class="pdx-txt-subheading">pdx-autocomplete</h3>
+        <ul class="pdx-txt-small">
+          <li>Value is <strong>free text</strong></li>
+          <li>Suggestions are optional hints</li>
+          <li>User can type anything</li>
+          <li>Use for: search, address, mentions</li>
+        </ul>
+      </div>
+      <div class="comparison-col">
+        <h3 class="pdx-txt-subheading">pdx-select</h3>
+        <ul class="pdx-txt-small">
+          <li>Value is from a <strong>fixed list</strong></li>
+          <li>Options are the only choices</li>
+          <li>With <code>creatable</code>: user can add new options</li>
+          <li>Use for: dropdowns, pickers, filters</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</template>

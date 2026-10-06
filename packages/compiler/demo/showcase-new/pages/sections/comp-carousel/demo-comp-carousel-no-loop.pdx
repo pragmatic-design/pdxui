@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">No Loop</h2>
+    <p class="pdx-txt-small pdx-ink-muted">When <code>loop</code> is false, the carousel stops at the first and last slide, and the arrow that cannot move is disabled.</p>
+    <div class="demo-container">
+      <pdx-carousel :items="basicSlides" :loop="false"></pdx-carousel>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { basicSlides } from './state.pdx';
+</script>

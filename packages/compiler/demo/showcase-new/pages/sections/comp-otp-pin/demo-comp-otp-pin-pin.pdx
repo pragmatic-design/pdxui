@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">PIN Input</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Masked code entry — shows dots instead of digits. Same behavior as OTP but for passwords/PINs.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-form-field label="4-digit PIN">
+        <pdx-pin-input length="4"></pdx-pin-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="6-digit PIN">
+        <pdx-pin-input length="6"></pdx-pin-input>
+      </pdx-form-field>
+
+      <pdx-form-field label="Error" error="Wrong PIN" showError>
+        <pdx-pin-input length="4" error></pdx-pin-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>

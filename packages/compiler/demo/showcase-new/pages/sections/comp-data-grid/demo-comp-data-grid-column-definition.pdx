@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Column Definition</h2>
+    <div class="options-table">
+      <table>
+        <thead><tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>field</code></td><td>string</td><td>—</td><td>Data field path (supports 'address.city')</td></tr>
+          <tr><td><code>header</code></td><td>string</td><td>auto</td><td>Display name (auto-humanized from field)</td></tr>
+          <tr><td><code>type</code></td><td>ColumnType</td><td>'text'</td><td>'text'|'number'|'date'|'boolean'|'currency'|'email'|'enum'</td></tr>
+          <tr><td><code>width</code></td><td>number</td><td>150</td><td>Column width in px</td></tr>
+          <tr><td><code>minWidth</code></td><td>number</td><td>50</td><td>Minimum width in px</td></tr>
+          <tr><td><code>sortable</code></td><td>boolean</td><td>true</td><td>Allow sorting</td></tr>
+          <tr><td><code>align</code></td><td>string</td><td>auto</td><td>'left'|'center'|'right' (auto by type)</td></tr>
+          <tr><td><code>format</code></td><td>string | fn</td><td>—</td><td>Value formatter function</td></tr>
+          <tr><td><code>hidden</code></td><td>boolean</td><td>false</td><td>Hidden but available in column chooser</td></tr>
+          <tr><td><code>frozen</code></td><td>string</td><td>—</td><td>'left' or 'right' for sticky columns</td></tr>
+          <tr><td><code>compute</code></td><td>fn</td><td>—</td><td>Client-side computed column: (row) => value</td></tr>
+          <tr><td><code>filterable</code></td><td>boolean</td><td>true</td><td>Allow filtering on this column</td></tr>
+          <tr><td><code>filterOperators</code></td><td>string[]</td><td>auto</td><td>Limit operators: ['contains', 'eq', 'neq', ...]</td></tr>
+          <tr><td><code>filterOptions</code></td><td>{ label, value }[]</td><td>—</td><td>Predefined values for enum filter (checkbox list)</td></tr>
+          <tr><td><code>resizable</code></td><td>boolean</td><td>true</td><td>Allow column resize by dragging</td></tr>
+          <tr><td><code>reorderable</code></td><td>boolean</td><td>true</td><td>Allow column reorder by drag/drop</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>

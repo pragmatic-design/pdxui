@@ -1,0 +1,55 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Field Wrapper</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Structured label + input + hint/error/success via <code>.pdx-field</code>.</p>
+
+    <div class="fields-demo">
+      <div class="pdx-field">
+        <label class="pdx-field-label">Username</label>
+        <input class="pdx-input" type="text" placeholder="Enter username" />
+        <span class="pdx-field-hint">Must be 3-20 characters</span>
+      </div>
+
+      <div class="pdx-field">
+        <label class="pdx-field-label pdx-field-required">Email</label>
+        <input class="pdx-input" type="email" placeholder="user@example.com" />
+      </div>
+
+      <div class="pdx-field">
+        <label class="pdx-field-label">Password</label>
+        <input class="pdx-input" type="password" aria-invalid="true" value="123" />
+        <span class="pdx-field-error">Password must be at least 8 characters</span>
+      </div>
+
+      <div class="pdx-field">
+        <label class="pdx-field-label">Display Name</label>
+        <input class="pdx-input" type="text" value="Alessandro" />
+        <span class="pdx-field-success">Looks good!</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-field"&gt;
+  &lt;label class="pdx-field-label"&gt;Username&lt;/label&gt;
+  &lt;input class="pdx-input" placeholder="..." /&gt;
+  &lt;span class="pdx-field-hint"&gt;Must be 3-20 characters&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="pdx-field"&gt;
+  &lt;label class="pdx-field-label"&gt;Password&lt;/label&gt;
+  &lt;input class="pdx-input" aria-invalid="true" /&gt;
+  &lt;span class="pdx-field-error"&gt;Too short&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .fields-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-lg);
+    margin-top: var(--pdx-space-md);
+    max-width: 400px;
+  }
+</style>

@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Compact — Dashboard Stats</h2>
+    <div class="demo-grid-sm">
+      <pdx-card compact hoverable elevation="1">
+        <div class="pdx-card-body"><strong>Revenue</strong><br /><span style="font-size:1.5rem;font-weight:700">$12,450</span><br /><span class="pdx-txt-small pdx-ink-muted">+12% from last month</span></div>
+      </pdx-card>
+      <pdx-card compact hoverable elevation="1">
+        <div class="pdx-card-body"><strong>Users</strong><br /><span style="font-size:1.5rem;font-weight:700">1,234</span><br /><span class="pdx-txt-small pdx-ink-muted">+5% from last week</span></div>
+      </pdx-card>
+      <pdx-card compact hoverable elevation="1">
+        <div class="pdx-card-body"><strong>Orders</strong><br /><span style="font-size:1.5rem;font-weight:700">89</span><br /><span class="pdx-txt-small pdx-ink-muted">3 pending</span></div>
+      </pdx-card>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-grid-sm { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--pdx-space-md); margin-top: var(--pdx-space-lg); }
+</style>

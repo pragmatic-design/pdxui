@@ -1,0 +1,77 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Transfer</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-transfer&gt;</code> — dual-list shuttle. Move items between source (left) and target (right) panels.
+      Supports search, select-all, disabled items, form integration.
+    </p>
+
+    <!-- ═══ 1. Basic ═══ -->
+    <pdx-demo-comp-transfer-basic class="demo-section"></pdx-demo-comp-transfer-basic>
+
+    <!-- ═══ 2. Searchable ═══ -->
+    <pdx-demo-comp-transfer-searchable class="demo-section"></pdx-demo-comp-transfer-searchable>
+
+    <!-- ═══ 3. With titles & move-all ═══ -->
+    <pdx-demo-comp-transfer-custom-titles class="demo-section"></pdx-demo-comp-transfer-custom-titles>
+
+    <!-- ═══ 4. Disabled items ═══ -->
+    <pdx-demo-comp-transfer-disabled-items class="demo-section"></pdx-demo-comp-transfer-disabled-items>
+
+    <!-- ═══ 5. Direct mode (click to move) ═══ -->
+    <pdx-demo-comp-transfer-direct class="demo-section"></pdx-demo-comp-transfer-direct>
+
+    <!-- ═══ 6. Simple selection (no checkboxes) ═══ -->
+    <pdx-demo-comp-transfer-simple class="demo-section"></pdx-demo-comp-transfer-simple>
+
+    <!-- ═══ 7. Drag and Drop ═══ -->
+    <pdx-demo-comp-transfer-drag class="demo-section"></pdx-demo-comp-transfer-drag>
+
+    <!-- ═══ 8. Disabled state ═══ -->
+    <pdx-demo-comp-transfer-disabled class="demo-section"></pdx-demo-comp-transfer-disabled>
+
+    <!-- ═══ 6. DataSource mode (assignedField) ═══ -->
+    <pdx-demo-comp-transfer-datasource class="demo-section"></pdx-demo-comp-transfer-datasource>
+
+    <!-- ═══ 7. DataSource mode (assignedValue) ═══ -->
+    <pdx-demo-comp-transfer-assigned-value class="demo-section"></pdx-demo-comp-transfer-assigned-value>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>items</code><span>array</span><span>Simple mode: [{ value, label, disabled? }]</span></div>
+        <div class="opt-row"><code>value</code><span>string[]</span><span>Simple mode: values in target panel</span></div>
+        <div class="opt-row"><code>source</code><span>array | DataSource</span><span>DataSource mode: single dataset</span></div>
+        <div class="opt-row"><code>labelField</code><span>string</span><span>DataSource: field for display label (default: 'label')</span></div>
+        <div class="opt-row"><code>valueField</code><span>string</span><span>DataSource: field for item id (default: 'value')</span></div>
+        <div class="opt-row"><code>assignedField</code><span>string</span><span>DataSource: boolean field determining panel assignment</span></div>
+        <div class="opt-row"><code>assignedValue</code><span>string</span><span>DataSource: match value for assignedField (non-boolean mode)</span></div>
+        <div class="opt-row"><code>searchable</code><span>boolean</span><span>Show search input in panels</span></div>
+        <div class="opt-row"><code>sourceTitle</code><span>string</span><span>Left panel title</span></div>
+        <div class="opt-row"><code>targetTitle</code><span>string</span><span>Right panel title</span></div>
+        <div class="opt-row"><code>mode</code><span>string</span><span>'checkbox' | 'simple' | 'direct' (default: checkbox)</span></div>
+        <div class="opt-row"><code>showAllButtons</code><span>boolean</span><span>Show move-all buttons (» «)</span></div>
+        <div class="opt-row"><code>draggable</code><span>boolean</span><span>Enable drag and drop between panels</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>pdx-change</code><span>{ value: string[] }</span><span>Target values changed</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/transfer';
+@title 'Transfer Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

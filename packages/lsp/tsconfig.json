@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "//": "`*.ts` is the package root, vite.config.ts.",
+  "include": ["src", "tests", "*.ts"],
+  "exclude": ["dist"]
+}

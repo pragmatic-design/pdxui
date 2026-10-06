@@ -1,0 +1,160 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">ErrorBoundary</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Catches render errors and effect failures from children. Shows fallback UI with retry.
+      Provides <code>errorContext</code> to descendants via Context Protocol.
+    </p>
+
+    <!-- ═══ Render Error Caught ═══ -->
+    <pdx-demo-comp-error-boundary-render-error class="demo-section"></pdx-demo-comp-error-boundary-render-error>
+
+    <!-- ═══ Healthy Content ═══ -->
+    <pdx-demo-comp-error-boundary-healthy class="demo-section"></pdx-demo-comp-error-boundary-healthy>
+
+    <!-- ═══ pdx-error-boundary Component ═══ -->
+    <pdx-demo-comp-error-boundary-wrapper class="demo-section"></pdx-demo-comp-error-boundary-wrapper>
+
+    <!-- ═══ Network Fetch Simulation ═══ -->
+    <pdx-demo-comp-error-boundary-network-fetch class="demo-section"></pdx-demo-comp-error-boundary-network-fetch>
+
+    <!-- ═══ Async Action Simulation ═══ -->
+    <pdx-demo-comp-error-boundary-async-action class="demo-section"></pdx-demo-comp-error-boundary-async-action>
+
+    <!-- ═══ Global Error Interceptor ═══ -->
+    <pdx-demo-comp-error-boundary-global-error class="demo-section"></pdx-demo-comp-error-boundary-global-error>
+
+    <!-- ═══ Known Limitation ═══ -->
+    <pdx-demo-comp-error-boundary-scope class="demo-section"></pdx-demo-comp-error-boundary-scope>
+
+    <!-- ═══ Props Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Props Reference</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>max-retries</code></td><td>Number</td><td>3</td><td>Max retries before permanent fallback.</td></tr>
+            <tr><td><code>auto-retry</code></td><td>Boolean</td><td>false</td><td>Auto-retry on error without user action.</td></tr>
+            <tr><td><code>retry-delay</code></td><td>Number</td><td>1000</td><td>Delay between auto-retries (ms).</td></tr>
+            <tr><td><code>fallback-message</code></td><td>String</td><td>Something went wrong.</td><td>Message shown in fallback UI.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Events Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Events</h2>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-error</code></td><td><code>{ error, retryCount }</code></td><td>Fired on every caught error. Use for logging/telemetry.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Context Protocol ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Context Protocol — errorContext</h2>
+      <p class="pdx-txt-small pdx-ink-muted">
+        Provides <code>errorContext</code> to all descendants via hierarchical provide/inject.
+        Children can <code>@inject errorContext;</code> to read error state, retry count, and trigger retries.
+      </p>
+      @raw {<details class="source"><summary>Source</summary><pre><code>// In a child component:
+@inject errorContext;
+
+// errorContext.error()    → Error | null
+// errorContext.retryCount() → number
+// errorContext.canRetry()  → boolean
+// errorContext.retry()     → trigger retry</code></pre></details>}
+    </section>
+
+  </div>
+</template>
+
+<script setup>
+@page '/components/error-boundary';
+@title 'ErrorBoundary — PDX UI';
+
+import '@pdxui/ui/error-boundary';
+</script>
+
+<style>
+.demo-box {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  max-width: 500px;
+}
+
+.demo-controls {
+  margin-top: var(--pdx-space-sm);
+}
+
+.retry-btn {
+  margin-top: var(--pdx-space-xs);
+}
+
+.demo-widget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-sm);
+  align-items: flex-start;
+}
+
+.success-widget {
+  padding: var(--pdx-space-sm);
+  background: color-mix(in oklch, var(--pdx-color-success) 8%, transparent);
+  border: 1px solid var(--pdx-color-success);
+  border-radius: var(--pdx-radius-md);
+}
+
+.state-loading {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-sm);
+}
+
+.error-log {
+  margin-top: var(--pdx-space-sm);
+  padding: var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+  max-height: 160px;
+  overflow-y: auto;
+}
+.log-entry {
+  display: flex;
+  gap: var(--pdx-space-sm);
+  font-size: var(--pdx-text-xs);
+  padding: 2px 0;
+  border-bottom: 1px solid var(--pdx-color-border);
+  font-family: monospace;
+}
+.log-entry:last-child { border-bottom: none; }
+.log-source {
+  color: var(--pdx-color-danger-ink);
+  font-weight: 600;
+  min-width: 50px;
+}
+.log-msg {
+  flex: 1;
+  color: var(--pdx-color-text);
+}
+.log-time {
+  color: var(--pdx-color-muted);
+  white-space: nowrap;
+}
+
+.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
+.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }
+.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }
+
+details.source { margin-top: var(--pdx-space-sm); }
+details.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }
+details.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }
+</style>

@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Object Data</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Custom labelField and valueField for object arrays.</p>
+    <div class="demo-row">
+      <pdx-select label="User" :options="users" labelField="name" valueField="id" searchable clearable placeholder="Select user..." />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="users" labelField="name" valueField="id"
+  searchable clearable placeholder="Select user..." /&gt;
+
+const users = [
+  { id: 1, name: 'Alice Johnson' },
+  { id: 2, name: 'Bob Smith' },
+  { id: 3, name: 'Charlie Brown' },
+];</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const users = [
+  { id: 1, name: 'Alice Johnson' },
+  { id: 2, name: 'Bob Smith' },
+  { id: 3, name: 'Charlie Brown' },
+  { id: 4, name: 'Diana Prince' },
+  { id: 5, name: 'Edward Norton' },
+];
+</script>

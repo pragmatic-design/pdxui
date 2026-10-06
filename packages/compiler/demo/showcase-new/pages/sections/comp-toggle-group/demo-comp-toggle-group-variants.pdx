@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants and sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>variant</code> and <code>size</code> on the group reach every toggle.</p>
+    <div class="demo-grid">
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">outline (default)</span>
+        <pdx-toggle-group type="single" label="Outline" value="a" variant="outline">
+          <pdx-toggle value="a">One</pdx-toggle><pdx-toggle value="b">Two</pdx-toggle><pdx-toggle value="c">Three</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">ghost</span>
+        <pdx-toggle-group type="single" label="Ghost" value="a" variant="ghost">
+          <pdx-toggle value="a">One</pdx-toggle><pdx-toggle value="b">Two</pdx-toggle><pdx-toggle value="c">Three</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">size sm</span>
+        <pdx-toggle-group type="single" label="Small" value="a" size="sm">
+          <pdx-toggle value="a">One</pdx-toggle><pdx-toggle value="b">Two</pdx-toggle><pdx-toggle value="c">Three</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+      <div class="demo-stack">
+        <span class="pdx-txt-small pdx-weight-semibold">size lg</span>
+        <pdx-toggle-group type="single" label="Large" value="a" size="lg">
+          <pdx-toggle value="a">One</pdx-toggle><pdx-toggle value="b">Two</pdx-toggle><pdx-toggle value="c">Three</pdx-toggle>
+        </pdx-toggle-group>
+      </div>
+    </div>
+  </section>
+</template>

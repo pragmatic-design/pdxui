@@ -1,0 +1,16 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Textarea</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Resizable vertically. Min-height 6rem.</p>
+
+    <div class="demo-stack narrow">
+      <textarea class="pdx-input" placeholder="Write your message..."></textarea>
+      <textarea class="pdx-input" disabled>Disabled textarea</textarea>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;textarea class="pdx-input" placeholder="Message..."&gt;&lt;/textarea&gt;</code></pre>
+    </details>
+  </section>
+</template>

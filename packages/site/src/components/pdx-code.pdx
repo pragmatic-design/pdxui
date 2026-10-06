@@ -1,0 +1,49 @@
+<template>
+  <div class="pdx-code">
+    <button class="pdx-code-copy" type="button" @click="copy">{{ copied ? 'Copied' : 'Copy' }}</button>
+    <pre class="pdx-code-pre" :ref="preRef"></pre>
+  </div>
+</template>
+
+<script setup>
+@prop code: string = '';
+import { effect } from '@pdxui/core';
+import { highlightPdx } from '../lib/highlight';
+
+let copied = $signal(false);
+let preRef = $signal(null);
+
+function copy() {
+  navigator.clipboard.writeText(code).then(() => {
+    copied = true;
+    setTimeout(() => { copied = false; }, 1500);
+  });
+}
+
+// Render highlighted HTML into the <pre> (injected → token colors are global in site.css).
+effect(() => {
+  const _el = preRef;
+  if (!_el) return;
+  _el.innerHTML = highlightPdx(code);
+});
+</script>
+
+<style scoped>
+.pdx-code { position: relative; }
+.pdx-code-pre {
+  margin: 0; padding: 0.9rem 1rem;
+  background: var(--code-bg); border: 1px solid var(--outline);
+  border-radius: 10px; overflow-x: auto;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.82rem; line-height: 1.6;
+  white-space: pre; tab-size: 2; color: var(--code-ink);   /* panel is always dark → fixed light base */
+}
+.pdx-code-copy {
+  position: absolute; top: var(--pdx-space-xs); right: var(--pdx-space-xs);
+  font-size: var(--pdx-text-xs); padding: 2px 8px;
+  border: 1px solid var(--outline); border-radius: 6px;
+  background: var(--surface-high); color: var(--ink-muted); cursor: pointer;
+  opacity: 0; transition: opacity 0.12s, color 0.12s;
+}
+.pdx-code:hover .pdx-code-copy { opacity: 1; }
+.pdx-code-copy:hover { color: var(--gold); }
+</style>

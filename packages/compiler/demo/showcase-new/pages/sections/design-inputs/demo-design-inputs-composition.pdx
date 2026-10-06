@@ -1,0 +1,47 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Composition</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Inputs in a realistic form context.</p>
+
+    <div class="comp-card">
+      <h3 class="pdx-txt-subheading">Sign Up</h3>
+      <div class="comp-form">
+        <div class="comp-field">
+          <label class="pdx-txt-small">Full Name</label>
+          <input class="pdx-input" type="text" placeholder="John Doe" />
+        </div>
+        <div class="comp-field">
+          <label class="pdx-txt-small">Email</label>
+          <input class="pdx-input" type="email" placeholder="john@example.com" />
+        </div>
+        <div class="comp-field">
+          <label class="pdx-txt-small">Password</label>
+          <input class="pdx-input" type="password" placeholder="Min 8 characters" />
+        </div>
+        <button class="pdx-primary" full>Create Account</button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .comp-card {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+    max-width: 400px;
+  }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-md); }
+  .comp-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-md);
+  }
+  .comp-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+  }
+</style>

@@ -1,0 +1,35 @@
+/* pdx-infinite-scroll — Infinite scroll container */
+
+.pdx-infinite-scroll-root {
+  position: relative;
+  display: block;
+}
+
+/* Invisible sentinel that triggers IntersectionObserver */
+.pdx-infinite-scroll-sentinel {
+  height: 1px;
+  pointer-events: none;
+}
+
+/* Loading indicator */
+.pdx-infinite-scroll-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pdx-space-sm);
+  padding: var(--pdx-space-md) var(--pdx-space-sm);
+}
+
+.pdx-infinite-scroll-text {
+  color: var(--pdx-color-muted);
+  font-size: var(--pdx-text-sm);
+}
+
+/* End of data message */
+.pdx-infinite-scroll-end {
+  text-align: center;
+  padding: var(--pdx-space-md) var(--pdx-space-sm);
+  color: var(--pdx-color-muted);
+  font-size: var(--pdx-text-sm);
+  border-top: 1px dashed var(--pdx-color-border);
+}

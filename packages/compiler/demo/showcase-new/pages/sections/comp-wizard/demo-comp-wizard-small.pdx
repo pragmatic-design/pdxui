@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Small Size</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Compact stepper with <code>size="sm"</code>.</p>
+
+    <div class="demo-box">
+      <pdx-wizard size="sm" :linear="false">
+        <div data-wizard-step data-label="Step 1">
+          <p class="pdx-txt-body">Small wizard step 1 content.</p>
+        </div>
+        <div data-wizard-step data-label="Step 2">
+          <p class="pdx-txt-body">Small wizard step 2 content.</p>
+        </div>
+        <div data-wizard-step data-label="Step 3">
+          <p class="pdx-txt-body">Small wizard step 3 content.</p>
+        </div>
+      </pdx-wizard>
+    </div>
+  </section>
+</template>

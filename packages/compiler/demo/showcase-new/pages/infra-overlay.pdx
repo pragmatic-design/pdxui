@@ -1,0 +1,30 @@
+<template>
+  <div class="demo">
+    <h2>Overlay System</h2>
+    <p class="desc">Z-stack LIFO, portal, backdrop, Escape dismiss, body scroll lock.</p>
+
+    <pdx-demo-infra-overlay-stack class="demo-section"></pdx-demo-infra-overlay-stack>
+
+    <pdx-demo-infra-overlay-portal class="demo-section"></pdx-demo-infra-overlay-portal>
+
+    <pdx-demo-infra-overlay-backdrop class="demo-section"></pdx-demo-infra-overlay-backdrop>
+
+    <pdx-demo-infra-overlay-bottom-sheet class="demo-section"></pdx-demo-infra-overlay-bottom-sheet>
+
+    <pdx-demo-infra-overlay-nested class="demo-section"></pdx-demo-infra-overlay-nested>
+  </div>
+</template>
+
+<script setup>
+@page '/infra/overlay';
+@title 'Overlay System';
+</script>
+
+<style scoped>
+  .demo { max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+</style>

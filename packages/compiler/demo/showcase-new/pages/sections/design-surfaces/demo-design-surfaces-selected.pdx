@@ -1,0 +1,41 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Selected Card</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Add <code>selected</code> attribute for primary border ring.</p>
+
+    <div class="select-row">
+      <div class="pdx-surface-card" interactive>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small">Basic Plan</span>
+        </div>
+      </div>
+      <div class="pdx-surface-card" interactive selected>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small">Pro Plan</span>
+        </div>
+      </div>
+      <div class="pdx-surface-card" interactive>
+        <div class="pdx-card-body">
+          <span class="pdx-txt-small">Enterprise</span>
+        </div>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-surface-card" interactive selected&gt;
+  &lt;div class="pdx-card-body"&gt;Pro Plan&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .select-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    max-width: 500px;
+  }
+</style>

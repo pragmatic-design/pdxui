@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Buttons</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Buttons</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Buttons</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">7 variants, 3 sizes, loading state. Works on <code>&lt;button&gt;</code>, <code>&lt;a&gt;</code>, and <code>[role="button"]</code>.</p>
+                    </pdx-stack>
+
+                    <!-- Variants -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Variants</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Use semantic classes to communicate intent.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm">
+                                    <button class="pdx-primary">Primary</button>
+                                    <button class="pdx-secondary">Secondary</button>
+                                    <button class="pdx-ghost">Ghost</button>
+                                    <button class="pdx-danger">Danger</button>
+                                    <button class="pdx-success">Success</button>
+                                    <button class="pdx-warning">Warning</button>
+                                    <button class="pdx-info">Info</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;button class="pdx-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="pdx-secondary"&gt;Secondary&lt;/button&gt;
+&lt;button class="pdx-ghost"&gt;Ghost&lt;/button&gt;
+&lt;button class="pdx-danger"&gt;Danger&lt;/button&gt;
+&lt;button class="pdx-success"&gt;Success&lt;/button&gt;
+&lt;button class="pdx-warning"&gt;Warning&lt;/button&gt;
+&lt;button class="pdx-info"&gt;Info&lt;/button&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Sizes -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Sizes</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>size="sm"</code> or <code>size="lg"</code>. Default is medium.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm" items="center">
+                                    <button class="pdx-primary" size="sm">Small</button>
+                                    <button class="pdx-primary">Medium</button>
+                                    <button class="pdx-primary" size="lg">Large</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;button class="pdx-primary" size="sm"&gt;Small&lt;/button&gt;
+&lt;button class="pdx-primary"&gt;Medium&lt;/button&gt;
+&lt;button class="pdx-primary" size="lg"&gt;Large&lt;/button&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Disabled -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Disabled</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm">
+                                    <button class="pdx-primary" disabled>Disabled</button>
+                                    <button class="pdx-secondary" disabled>Disabled</button>
+                                    <button class="pdx-ghost" disabled>Disabled</button>
+                                    <button class="pdx-danger" disabled>Disabled</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;button class="pdx-primary" disabled&gt;Disabled&lt;/button&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Loading -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Loading</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>pdx-loading</code> class. Text becomes invisible, spinner appears.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm">
+                                    <button class="pdx-primary pdx-loading">Saving</button>
+                                    <button class="pdx-secondary pdx-loading">Loading</button>
+                                    <button class="pdx-danger pdx-loading">Deleting</button>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;button class="pdx-primary pdx-loading"&gt;Saving&lt;/button&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Full Width -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Full Width</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Add <code>[full]</code> attribute for 100% width.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-stack gap="sm">
+                                    <button class="pdx-primary" full>Full Width Primary</button>
+                                    <button class="pdx-secondary" full>Full Width Secondary</button>
+                                </pdx-stack>
+                            </div>
+                            <div class="doc-source">&lt;button class="pdx-primary" full&gt;Full Width&lt;/button&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- Link as button -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Link as Button</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Works on <code>&lt;a&gt;</code> with <code>role="button"</code>.</p>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <pdx-row gap="sm">
+                                    <a href="#" class="pdx-primary" role="button">Link Primary</a>
+                                    <a href="#" class="pdx-secondary" role="button">Link Secondary</a>
+                                    <a href="#" class="pdx-ghost" role="button">Link Ghost</a>
+                                </pdx-row>
+                            </div>
+                            <div class="doc-source">&lt;a href="#" class="pdx-primary" role="button"&gt;Link&lt;/a&gt;</div>
+                        </div>
+                    </pdx-stack>
+
+                    <!-- All combinations -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">All Combinations</h2>
+                        <div class="doc-example">
+                            <div class="doc-preview">
+                                <div class="pdx-table-responsive">
+                                    <table class="pdx-table">
+                                        <thead>
+                                            <tr><th>Variant</th><th>Default</th><th>Small</th><th>Large</th><th>Disabled</th><th>Loading</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Primary</td>
+                                                <td><button class="pdx-primary">Click</button></td>
+                                                <td><button class="pdx-primary" size="sm">Click</button></td>
+                                                <td><button class="pdx-primary" size="lg">Click</button></td>
+                                                <td><button class="pdx-primary" disabled>Click</button></td>
+                                                <td><button class="pdx-primary pdx-loading">Click</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Secondary</td>
+                                                <td><button class="pdx-secondary">Click</button></td>
+                                                <td><button class="pdx-secondary" size="sm">Click</button></td>
+                                                <td><button class="pdx-secondary" size="lg">Click</button></td>
+                                                <td><button class="pdx-secondary" disabled>Click</button></td>
+                                                <td><button class="pdx-secondary pdx-loading">Click</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Ghost</td>
+                                                <td><button class="pdx-ghost">Click</button></td>
+                                                <td><button class="pdx-ghost" size="sm">Click</button></td>
+                                                <td><button class="pdx-ghost" size="lg">Click</button></td>
+                                                <td><button class="pdx-ghost" disabled>Click</button></td>
+                                                <td><button class="pdx-ghost pdx-loading">Click</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Danger</td>
+                                                <td><button class="pdx-danger">Click</button></td>
+                                                <td><button class="pdx-danger" size="sm">Click</button></td>
+                                                <td><button class="pdx-danger" size="lg">Click</button></td>
+                                                <td><button class="pdx-danger" disabled>Click</button></td>
+                                                <td><button class="pdx-danger pdx-loading">Click</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Success</td>
+                                                <td><button class="pdx-success">Click</button></td>
+                                                <td><button class="pdx-success" size="sm">Click</button></td>
+                                                <td><button class="pdx-success" size="lg">Click</button></td>
+                                                <td><button class="pdx-success" disabled>Click</button></td>
+                                                <td><button class="pdx-success pdx-loading">Click</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Warning</td>
+                                                <td><button class="pdx-warning">Click</button></td>
+                                                <td><button class="pdx-warning" size="sm">Click</button></td>
+                                                <td><button class="pdx-warning" size="lg">Click</button></td>
+                                                <td><button class="pdx-warning" disabled>Click</button></td>
+                                                <td><button class="pdx-warning pdx-loading">Click</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Info</td>
+                                                <td><button class="pdx-info">Click</button></td>
+                                                <td><button class="pdx-info" size="sm">Click</button></td>
+                                                <td><button class="pdx-info" size="lg">Click</button></td>
+                                                <td><button class="pdx-info" disabled>Click</button></td>
+                                                <td><button class="pdx-info pdx-loading">Click</button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

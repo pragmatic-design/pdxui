@@ -1,0 +1,94 @@
+{
+  "name": "@pdxui/core",
+  "version": "1.0.0-alpha.1",
+  "license": "MIT",
+  "publishConfig": { "access": "public" },
+  "repository": { "type": "git", "url": "git+https://github.com/pragmatic-design/pdxui.git", "directory": "packages/core" },
+  "homepage": "https://pdxui.com",
+  "bugs": { "url": "https://github.com/pragmatic-design/pdxui/issues" },
+  "type": "module",
+  "description": "Reactive core for PDX UI — signals, renderer, Web Component base",
+  "main": "dist/pragmatic-core.cjs",
+  "module": "dist/pragmatic-core.es.js",
+  "types": "dist/index.d.ts",
+  "unpkg": "dist/pragmatic-core.iife.js",
+  "exports": {
+    ".": {
+"development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/pragmatic-core.es.js",
+      "require": "./dist/pragmatic-core.cjs"
+    },
+    "./reactivity": {
+"development": "./src/reactivity/index.ts",
+      "types": "./dist/reactivity/index.d.ts",
+      "import": "./dist/pragmatic-core.es.js",
+      "require": "./dist/pragmatic-core.cjs"
+    },
+    "./renderer": {
+"development": "./src/renderer/index.ts",
+      "types": "./dist/renderer/index.d.ts",
+      "import": "./dist/pragmatic-core.es.js",
+      "require": "./dist/pragmatic-core.cjs"
+    },
+    "./component": {
+"development": "./src/component/index.ts",
+      "types": "./dist/component/index.d.ts",
+      "import": "./dist/pragmatic-core.es.js",
+      "require": "./dist/pragmatic-core.cjs"
+    },
+    "./devtools": {
+"development": "./src/devtools/overlay.ts",
+      "types": "./dist/devtools/overlay.d.ts",
+      "import": "./dist/devtools.es.js",
+      "require": "./dist/devtools.cjs"
+    },
+    "./testing": {
+"development": "./src/testing/index.ts",
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/pragmatic-core.es.js",
+      "require": "./dist/pragmatic-core.cjs"
+    },
+    "./i18n": {
+"development": "./src/i18n/index.ts",
+      "types": "./dist/i18n/index.d.ts",
+      "import": "./dist/pragmatic-core.es.js",
+      "require": "./dist/pragmatic-core.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": [
+      "src/browser/online.ts",
+      "src/browser/splash.ts",
+      "src/component/adaptive.ts",
+      "src/component/context.ts",
+      "src/component/overlay-stack.ts",
+      "src/component/style.ts",
+      "src/component/viewport.ts",
+      "src/debug/inspector.ts",
+      "src/debug/devtools-api.ts",
+      "src/form/form-registry.ts",
+      "src/i18n/rtl.ts",
+      "dist/pragmatic-core.es.js",
+      "dist/pragmatic-core.cjs",
+      "dist/pragmatic-core.iife.js"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && vite build --config vite.config.iife.ts && tsc --emitDeclarationOnly",
+    "test": "vitest run",
+    "test:perf": "vitest run --config vitest.perf.config.ts",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "happy-dom": "^20.8.9",
+    "typescript": "^5.8.0",
+    "vite": "^6.4.2",
+    "vitest": "^4.1.0"
+  }
+}

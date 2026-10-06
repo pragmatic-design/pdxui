@@ -1,0 +1,76 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Enterprise Header</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Search, a notification bell with its unread count, and a user menu. The navbar collapses on its own
+      width: narrow the window, or put it in a narrow column, and the links move behind the menu button.
+      Escape closes that menu.
+    </p>
+    <div class="demo-full">
+      <pdx-navbar brand="Enterprise" brandicon="zap" :items="appNavItems" @pdx-select="onNav">
+        <!-- Search: expanded text input -->
+        <div class="pdx-input-wrap" style="max-width: 220px">
+          <pdx-icon name="search" size="16" style="opacity: 0.5; margin-right: 4px"></pdx-icon>
+          <input class="pdx-input" type="text" placeholder="Search..." aria-label="Search" style="border: none; background: none; padding: 4px 0" />
+        </div>
+        <!-- Notifications: the navbar's icon button, its badge over the bell -->
+        <button class="pdx-navbar-icon-btn" type="button" aria-label="Notifications, 3 unread">
+          <pdx-icon name="bell" size="18"></pdx-icon>
+          <span class="pdx-navbar-badge" aria-hidden="true">3</span>
+        </button>
+        <!-- User menu -->
+        <pdx-dropdown-menu :items="userMenuItems" variant="ghost" size="sm" icon="user" label="John Doe">
+        </pdx-dropdown-menu>
+      </pdx-navbar>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-navbar brand="Enterprise" brandicon="zap" :items="appNavItems" @pdx-select="onNav"&gt;
+  &lt;div class="pdx-input-wrap"&gt;
+    &lt;pdx-icon name="search" size="16"&gt;&lt;/pdx-icon&gt;
+    &lt;input class="pdx-input" type="text" placeholder="Search..." aria-label="Search" /&gt;
+  &lt;/div&gt;
+  &lt;button class="pdx-navbar-icon-btn" aria-label="Notifications, 3 unread"&gt;
+    &lt;pdx-icon name="bell" size="18"&gt;&lt;/pdx-icon&gt;
+    &lt;span class="pdx-navbar-badge" aria-hidden="true"&gt;3&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;pdx-dropdown-menu :items="userMenuItems" variant="ghost" size="sm" icon="user" label="John Doe"&gt;
+  &lt;/pdx-dropdown-menu&gt;
+&lt;/pdx-navbar&gt;</code></pre>
+    </details>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="navbar-log">{{ navbarLog }}</div>
+  </section>
+</template>
+
+<script setup>
+import { useNavbarEvents } from './state.pdx';
+
+// The basic section's navbar writes this line too (state.pdx.ts).
+const navbarEvents = useNavbarEvents();
+const navbarLog = $derived(navbarEvents.navbarLog());
+function onNav(e) { navbarEvents.onNav(e); }
+
+const appNavItems = [
+  { key: 'dashboard', label: 'Dashboard', active: true },
+  { key: 'projects', label: 'Projects' },
+  { key: 'reports', label: 'Reports' },
+  { key: 'team', label: 'Team' },
+];
+
+const userMenuItems = [
+  { key: 'profile', label: 'Profile', icon: 'user' },
+  { key: 'settings', label: 'Settings', icon: 'settings' },
+  { key: 'billing', label: 'Billing', icon: 'tag' },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'logout', label: 'Sign Out', icon: 'log-out', danger: true },
+];
+</script>
+
+<style scoped>
+.event-log {
+  margin-top: var(--pdx-space-sm);
+  padding: var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+}
+</style>

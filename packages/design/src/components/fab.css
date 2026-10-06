@@ -1,0 +1,181 @@
+/* pdx-fab — Floating Action Button + Speed Dial
+   Supports: direction (up/down/left/right), type (linear/circle/semi-circle/quarter-circle),
+   tooltip labels, mask overlay, variants, sizes */
+
+/* ===== Container =====
+   `--pdx-fab-position` contains the FAB in a positioned box instead of the viewport: set it to
+   `absolute` on the box. The mask follows it, so an open speed dial dims the box, not the page. */
+.pdx-fab-container {
+    position: var(--pdx-fab-position, fixed);
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+}
+
+/* Position */
+.pdx-fab-bottom-right { bottom: var(--pdx-space-lg); right: var(--pdx-space-lg); }
+.pdx-fab-bottom-left { bottom: var(--pdx-space-lg); left: var(--pdx-space-lg); }
+.pdx-fab-top-right { top: var(--pdx-space-lg); right: var(--pdx-space-lg); }
+.pdx-fab-top-left { top: var(--pdx-space-lg); left: var(--pdx-space-lg); }
+
+/* Direction — DOM order: [dial] [fab-button]. Flex reverses so FAB is at the edge.
+   up: FAB at bottom, dial above → column (dial on top, fab below)
+   down: FAB at top, dial below → column-reverse (fab on top, dial below)
+   left: FAB at right, dial left → row (dial left, fab right)
+   right: FAB at left, dial right → row-reverse (fab left, dial right) */
+.pdx-fab-dir-up { flex-direction: column; }
+.pdx-fab-dir-down { flex-direction: column-reverse; }
+.pdx-fab-dir-left { flex-direction: row; }
+.pdx-fab-dir-right { flex-direction: row-reverse; }
+
+/* ===== Main FAB button ===== */
+.pdx-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--pdx-radius-full);
+    cursor: pointer;
+    box-shadow: var(--pdx-shadow-lg);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    flex-shrink: 0;
+}
+.pdx-fab:hover { transform: scale(1.05); box-shadow: var(--pdx-shadow-xl); }
+.pdx-fab:active { transform: scale(0.95); }
+.pdx-fab:focus-visible { outline: var(--pdx-focus-width) solid var(--pdx-color-primary); outline-offset: var(--pdx-focus-offset); }
+
+/* Icon centering */
+.pdx-fab pdx-icon, .pdx-fab-action pdx-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Sizes */
+.pdx-fab-sm { width: 40px; height: 40px; }
+.pdx-fab-md { width: 56px; height: 56px; }
+.pdx-fab-lg { width: 72px; height: 72px; }
+
+/* Variants */
+.pdx-fab-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+.pdx-fab-secondary { background: var(--pdx-color-surface); color: var(--pdx-color-text); border: 1px solid var(--pdx-color-border); }
+.pdx-fab-danger { background: var(--pdx-color-danger); color: white; }
+
+/* Open state — icon rotates */
+.pdx-fab-open .pdx-fab-icon { transform: rotate(45deg); }
+.pdx-fab .pdx-fab-icon { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* ===== Speed Dial — Linear ===== */
+.pdx-fab-dial {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    pointer-events: none;
+}
+
+/* Direction inherits from container flex-direction */
+.pdx-fab-dir-up .pdx-fab-dial, .pdx-fab-dir-down .pdx-fab-dial { flex-direction: column; }
+.pdx-fab-dir-left .pdx-fab-dial, .pdx-fab-dir-right .pdx-fab-dial { flex-direction: row; }
+
+/* Action wrap — each action + tooltip */
+.pdx-fab-action-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    opacity: 0;
+    transform: scale(0.3);
+    transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+.pdx-fab-dial-open .pdx-fab-action-wrap {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+/* Tooltip direction */
+.pdx-fab-dir-up .pdx-fab-tooltip,
+.pdx-fab-dir-down .pdx-fab-tooltip { /* tooltip to the left */ }
+.pdx-fab-dir-left .pdx-fab-tooltip,
+.pdx-fab-dir-right .pdx-fab-tooltip { /* tooltip above */ }
+
+/* ===== Action button ===== */
+.pdx-fab-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: var(--pdx-radius-full);
+    background: var(--pdx-color-surface);
+    color: var(--pdx-color-text);
+    box-shadow: var(--pdx-shadow-md);
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+}
+.pdx-fab-action:hover {
+    background: var(--pdx-color-inset);
+    transform: scale(1.1);
+    box-shadow: var(--pdx-shadow-lg);
+}
+.pdx-fab-action:focus-visible { outline: var(--pdx-focus-width) solid var(--pdx-color-primary); outline-offset: var(--pdx-focus-offset); }
+
+/* ===== Tooltip ===== */
+.pdx-fab-tooltip {
+    white-space: nowrap;
+    font-size: var(--pdx-text-xs);
+    padding: 4px 8px;
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-text);
+    color: var(--pdx-color-bg);
+    box-shadow: var(--pdx-shadow-sm);
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+/* ===== Mask overlay ===== */
+.pdx-fab-mask {
+    position: var(--pdx-fab-position, fixed);
+    inset: 0;
+    /* A modal scrim: visible, it takes the clicks while the dial is open. */
+    background: var(--pdx-color-backdrop);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: -1;
+}
+.pdx-fab-mask-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ===== Circular layouts ===== */
+/* Dial overlays the entire container; actions positioned absolutely from FAB center */
+.pdx-fab-dial-circle,
+.pdx-fab-dial-semi-circle,
+.pdx-fab-dial-quarter-circle {
+    position: absolute !important;
+    inset: 0;
+    gap: 0;
+    display: block !important;
+    pointer-events: none;
+}
+.pdx-fab-dial-circle .pdx-fab-action-wrap,
+.pdx-fab-dial-semi-circle .pdx-fab-action-wrap,
+.pdx-fab-dial-quarter-circle .pdx-fab-action-wrap {
+    position: absolute;
+}
+.pdx-fab-dial-circle .pdx-fab-tooltip,
+.pdx-fab-dial-semi-circle .pdx-fab-tooltip,
+.pdx-fab-dial-quarter-circle .pdx-fab-tooltip {
+    display: none;
+}
+/* When open, enable pointer events on action wraps */
+.pdx-fab-dial-open.pdx-fab-dial-circle .pdx-fab-action-wrap,
+.pdx-fab-dial-open.pdx-fab-dial-semi-circle .pdx-fab-action-wrap,
+.pdx-fab-dial-open.pdx-fab-dial-quarter-circle .pdx-fab-action-wrap {
+    pointer-events: auto;
+}

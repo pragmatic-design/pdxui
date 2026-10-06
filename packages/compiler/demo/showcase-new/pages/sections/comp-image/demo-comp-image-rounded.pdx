@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Rounded</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Circular avatar-like image with <code>rounded</code> prop.</p>
+    <div class="demo-row">
+      <pdx-image src="/avatars/person-1.svg" alt="Avatar" width="80px" height="80px" :rounded="true" ratio="1/1" :lazy="false"></pdx-image>
+      <pdx-image src="/avatars/person-2.svg" alt="Avatar" width="120px" height="120px" :rounded="true" ratio="1/1" :lazy="false"></pdx-image>
+      <pdx-image src="/avatars/person-3.svg" alt="Avatar" width="64px" height="64px" :rounded="true" ratio="1/1" :lazy="false"></pdx-image>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-image src="..." width="80px" height="80px" :rounded="true" ratio="1/1"&gt;&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>

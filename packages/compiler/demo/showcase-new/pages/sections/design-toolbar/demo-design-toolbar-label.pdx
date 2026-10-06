@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Label</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Inline label for context inside the toolbar.</p>
+
+    <div class="pdx-toolbar pdx-toolbar-bordered">
+      <span class="pdx-toolbar-label">Font:</span>
+      <button class="pdx-ghost">Sans</button>
+      <button class="pdx-ghost" aria-pressed="true">Mono</button>
+      <button class="pdx-ghost">Serif</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-toolbar pdx-toolbar-bordered"&gt;
+  &lt;span class="pdx-toolbar-label"&gt;Font:&lt;/span&gt;
+  &lt;button class="pdx-ghost"&gt;Sans&lt;/button&gt;
+  &lt;button class="pdx-ghost" aria-pressed="true"&gt;Mono&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

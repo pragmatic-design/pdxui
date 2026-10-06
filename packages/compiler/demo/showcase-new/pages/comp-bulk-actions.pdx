@@ -1,0 +1,47 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Bulk Actions</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-bulk-actions&gt;</code> — a contextual action bar for a multi-selection. Visible
+      while <code>count &gt; 0</code>; renders "{count} selected" + a button per action + a clear
+      button. Event-driven: feed <code>count</code>/<code>actions</code>, react to
+      <code>pdx-action</code>/<code>pdx-clear</code>. (Used internally by <code>pdx-entity-grid</code>.)
+    </p>
+
+    <pdx-demo-comp-bulk-actions-standalone class="demo-section"></pdx-demo-comp-bulk-actions-standalone>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props &amp; Events</h2>
+      <table class="options-table">
+        <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>count</code></td><td>number</td><td>0</td><td>Selected count — drives visibility and the label.</td></tr>
+          <tr><td><code>actions</code></td><td>BulkAction[]</td><td>[]</td><td>{ key, label, icon?, tone?, disabled?, disabledReason? }</td></tr>
+          <tr><td><code>label</code></td><td>string</td><td>'{count} selected'</td><td>Label template; <code>{count}</code> is substituted.</td></tr>
+          <tr><td><code>clearable</code></td><td>boolean</td><td>true</td><td>Show the trailing clear (✕) button.</td></tr>
+        </tbody>
+      </table>
+      <table class="options-table" style="margin-top: var(--pdx-space-lg);">
+        <thead><tr><th>Event</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td><code>pdx-action</code></td><td>{ key, action }</td></tr>
+          <tr><td><code>pdx-clear</code></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/bulk-actions';
+@title 'Bulk Actions — PDX Components';
+</script>
+
+<style scoped>
+.page { max-width: 1280px; }
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-xs); }
+.options-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.options-table th, .options-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--pdx-color-border); }
+</style>

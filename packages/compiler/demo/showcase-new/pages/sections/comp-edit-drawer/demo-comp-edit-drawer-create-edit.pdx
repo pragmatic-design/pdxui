@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Create &amp; Edit</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      "New" opens an empty form; "Edit" preloads an entity. Save validates (Name is required) and
+      emits the values.
+    </p>
+
+    <div class="demo-row">
+      <button class="pdx-primary" @click="openNew"><pdx-icon name="plus" size="16"></pdx-icon> New</button>
+      <button class="pdx-secondary" @click="openEdit">Edit Alice</button>
+    </div>
+
+    <div class="event-log" :show="lastSaved !== ''">
+      <strong class="pdx-txt-small">Last saved</strong>
+      <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;">{{ lastSaved }}</div>
+    </div>
+
+    <pdx-edit-drawer
+      :open="drawerOpen"
+      :schema="schema"
+      :value="editing"
+      @pdx-save="onSave"
+      @pdx-cancel="onCancel"></pdx-edit-drawer>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-edit-drawer :open="drawerOpen" :schema="schema" :value="editing"
+  @pdx-save="onSave" @pdx-cancel="onCancel" /&gt;
+
+// value = null → create; value = entity → edit
+function onSave(e) { persist(e.detail.values); drawerOpen = false; }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const schema = { fields: [
+  { name: 'name', type: 'text', label: 'Name', validators: [{ type: 'required' }] },
+  { name: 'role', type: 'text', label: 'Role' },
+] };
+
+let drawerOpen = $signal(false);
+let editing = $signal(null);
+let lastSaved = $signal('');
+
+function openNew() { editing = null; drawerOpen = true; }
+function openEdit() { editing = { id: 1, name: 'Alice Johnson', role: 'Engineer' }; drawerOpen = true; }
+function onSave(e) { lastSaved = e.detail.mode + ': ' + JSON.stringify(e.detail.values); drawerOpen = false; }
+function onCancel() { drawerOpen = false; }
+</script>
+
+<style scoped>
+.demo-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; }
+.event-log { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-inset); }
+.source-block { margin-top: var(--pdx-space-md); }
+</style>

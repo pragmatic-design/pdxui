@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Navbar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Brand + navigation links only. No actions area.</p>
+    <div class="demo-full">
+      <pdx-navbar brand="Pragmatic" brandicon="package" label="Site" :items="navItems" @pdx-select="onNav"></pdx-navbar>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-navbar brand="Pragmatic" brandicon="package" :items="navItems" @pdx-select="onNav"&gt;
+&lt;/pdx-navbar&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useNavbarEvents } from './state.pdx';
+
+// The enterprise section shows what this navbar selects (state.pdx.ts).
+const navbarEvents = useNavbarEvents();
+function onNav(e) { navbarEvents.onNav(e); }
+
+const navItems = [
+  { key: 'home', label: 'Home', icon: 'home', active: true },
+  { key: 'products', label: 'Products' },
+  { key: 'pricing', label: 'Pricing' },
+  { key: 'docs', label: 'Documentation' },
+  { key: 'contact', label: 'Contact' },
+];
+</script>

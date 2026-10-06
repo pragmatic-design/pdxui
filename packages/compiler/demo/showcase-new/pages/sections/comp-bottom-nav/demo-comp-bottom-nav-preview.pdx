@@ -1,0 +1,43 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Preview</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click the tabs to switch. Active tab is highlighted.</p>
+    <div class="phone-frame">
+      <div class="phone-content">
+        <p class="pdx-ink-muted pdx-txt-small phone-label" id="nav-label">{{ navLabel }}</p>
+      </div>
+      <pdx-bottom-nav :items="navItems" activekey="home" @pdx-select="onNavSelect"></pdx-bottom-nav>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-bottom-nav :items="navItems" activekey="home" @pdx-select="onSelect"&gt;
+&lt;/pdx-bottom-nav&gt;
+
+// items = [
+//   { key: 'home', label: 'Home', icon: 'home' },
+//   { key: 'search', label: 'Search', icon: 'search' },
+//   { key: 'add', label: 'Create', icon: 'plus-circle' },
+//   { key: 'messages', label: 'Messages', icon: 'message-circle' },
+//   { key: 'profile', label: 'Profile', icon: 'user' },
+// ]</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const navItems = [
+  { key: 'home', label: 'Home', icon: 'home' },
+  { key: 'search', label: 'Search', icon: 'search' },
+  { key: 'add', label: 'Create', icon: 'plus-circle' },
+  { key: 'messages', label: 'Messages', icon: 'message-circle' },
+  { key: 'profile', label: 'Profile', icon: 'user' },
+];
+
+let navLabel = $signal('Home');
+
+function onNavSelect(e) {
+  const nav = e.target;
+  if (nav) nav.setAttribute('activekey', e.detail.key);
+  navLabel = e.detail.item.label;
+}
+</script>

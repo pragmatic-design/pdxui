@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Three sizes: sm, default, and lg.</p>
+
+    <div class="key-row">
+      <kbd class="pdx-kbd pdx-kbd-sm">Ctrl</kbd>
+      <kbd class="pdx-kbd">Ctrl</kbd>
+      <kbd class="pdx-kbd pdx-kbd-lg">Ctrl</kbd>
+    </div>
+
+    <div class="key-row">
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd pdx-kbd-sm">Cmd</kbd><kbd class="pdx-kbd pdx-kbd-sm">K</kbd>
+      </span>
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd">Cmd</kbd><kbd class="pdx-kbd">K</kbd>
+      </span>
+      <span class="pdx-kbd-combo">
+        <kbd class="pdx-kbd pdx-kbd-lg">Cmd</kbd><kbd class="pdx-kbd pdx-kbd-lg">K</kbd>
+      </span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;kbd class="pdx-kbd pdx-kbd-sm"&gt;Ctrl&lt;/kbd&gt;
+&lt;kbd class="pdx-kbd"&gt;Ctrl&lt;/kbd&gt;
+&lt;kbd class="pdx-kbd pdx-kbd-lg"&gt;Ctrl&lt;/kbd&gt;</code></pre>
+    </details>
+  </section>
+</template>

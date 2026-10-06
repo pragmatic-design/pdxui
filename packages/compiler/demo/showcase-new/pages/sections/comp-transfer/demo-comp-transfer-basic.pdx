@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic Transfer</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Check items, click arrow buttons to move between panels.</p>
+
+    <div class="demo-row">
+      <pdx-transfer
+        :items="basicItems"
+        :value="basicValue"
+      ></pdx-transfer>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { basicItems } from './state.pdx';
+
+const basicValue = ['fish', 'rabbit'];
+</script>

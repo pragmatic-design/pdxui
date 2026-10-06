@@ -1,0 +1,65 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Standalone bar</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Adjust the selection count to show/hide the bar; click an action or clear.
+    </p>
+
+    <div class="demo-row">
+      <button class="pdx-outline" @click="dec">−</button>
+      <span class="pdx-txt-body" style="min-width: 7ch; text-align: center;">{{ count }} selected</span>
+      <button class="pdx-outline" @click="inc">+</button>
+    </div>
+
+    <div style="margin-top: var(--pdx-space-md);">
+      <pdx-bulk-actions :count="count" :actions="actions" @pdx-action="onAction" @pdx-clear="onClear"></pdx-bulk-actions>
+    </div>
+
+    <div class="event-log" :show="last !== ''">
+      <strong class="pdx-txt-small">Last action</strong>
+      <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;">{{ last }}</div>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top: var(--pdx-space-md);">
+      <strong>Export</strong> is an action this role may not perform. It is offered and refused
+      rather than withheld: an action that merely vanishes is indistinguishable from one nobody
+      wrote. The button is <code>aria-disabled</code> — not <code>disabled</code>, so it stays in
+      the tab order and a screen reader can reach the reason, which is read as its description.
+    </p>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const actions = [
+  { key: 'archive', label: 'Archive', icon: 'archive' },
+  { key: 'export', label: 'Export', icon: 'download',
+    disabled: true, disabledReason: 'Your role cannot export' },
+  { key: 'delete', label: 'Delete', icon: 'trash', tone: 'danger' },
+];
+
+&lt;pdx-bulk-actions :count="count" :actions="actions"
+  @pdx-action="onAction" @pdx-clear="onClear" /&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const actions = [
+  { key: 'archive', label: 'Archive', icon: 'archive' },
+  { key: 'export', label: 'Export', icon: 'download', disabled: true, disabledReason: 'Your role cannot export' },
+  { key: 'delete', label: 'Delete', icon: 'trash', tone: 'danger' },
+];
+
+let count = $signal(3);
+let last = $signal('');
+
+function inc() { count = count + 1; }
+function dec() { count = count > 0 ? count - 1 : 0; }
+function onAction(e) { last = 'pdx-action: ' + e.detail.key; }
+function onClear() { count = 0; last = 'pdx-clear'; }
+</script>
+
+<style scoped>
+.demo-row { display: flex; gap: var(--pdx-space-sm); align-items: center; }
+.event-log { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-inset); }
+.source-block { margin-top: var(--pdx-space-md); }
+</style>

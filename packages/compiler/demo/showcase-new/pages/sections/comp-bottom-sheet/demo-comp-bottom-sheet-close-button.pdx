@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Close Button</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Optional close button in the header, useful when the handle is hidden.</p>
+    <pdx-button variant="outline" @click="openClose">Open with Close Button</pdx-button>
+
+    <pdx-bottom-sheet :open="closeOpen" showClose label="Sheet with close button" @pdx-close="closeCloseSheet">
+      <span slot="header"><strong>With Close Button</strong></span>
+      <p>This sheet has both a drag handle and a close button.</p>
+      <p>The close button provides an explicit close affordance for mouse/keyboard users.</p>
+    </pdx-bottom-sheet>
+  </section>
+</template>
+
+<script setup>
+// Close button
+let closeOpen = $signal(false);
+
+function openClose() { closeOpen = true; }
+function closeCloseSheet() { closeOpen = false; }
+</script>

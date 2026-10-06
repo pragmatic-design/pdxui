@@ -1,0 +1,8 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Disabled</h2>
+    <div class="demo-row">
+      <pdx-time-picker value="12:30" format="24h" disabled aria-label="Disabled"></pdx-time-picker>
+    </div>
+  </section>
+</template>

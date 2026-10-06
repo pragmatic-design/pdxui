@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Custom Template — Function Prop</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Use <code>:item-template</code> and <code>:selected-template</code> for rich rendering with avatars, descriptions, icons.</p>
+    <div class="demo-row">
+      <pdx-select label="Team member" :options="teamMembers" labelField="name" valueField="id" :item-template="renderTeamItem" :selected-template="renderTeamSelected" clearable placeholder="Select team member..." />
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="teamMembers"
+  labelField="name" valueField="id"
+  :item-template="renderTeamItem"
+  :selected-template="renderTeamSelected"
+  clearable placeholder="Select team member..." /&gt;
+
+function renderTeamItem(item) {
+  const r = item.raw;
+  return html`&lt;div class="team-option"&gt;
+    &lt;span class="team-avatar"&gt;${r.initials}&lt;/span&gt;
+    &lt;div class="team-info"&gt;
+      &lt;span class="team-name"&gt;${item.label}&lt;/span&gt;
+      &lt;span class="team-role"&gt;${r.role}&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;`;
+}</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+const teamMembers = [
+  { id: 1, name: 'Alice Johnson', role: 'Lead', initials: 'AJ' },
+  { id: 2, name: 'Bob Smith', role: 'Developer', initials: 'BS' },
+  { id: 3, name: 'Charlie Brown', role: 'Designer', initials: 'CB' },
+  { id: 4, name: 'Diana Prince', role: 'PM', initials: 'DP' },
+];
+
+function renderTeamItem(item) {
+  if (!item || !item.raw) return '';
+  const r = item.raw;
+  return html`<div class="team-option"><span class="team-avatar">${r.initials}</span><div class="team-info"><span class="team-name">${item.label}</span><span class="team-role">${r.role}</span></div></div>`;
+}
+
+function renderTeamSelected(item) {
+  if (!item || !item.raw) return '';
+  const r = item.raw;
+  return html`<span class="team-selected"><span class="team-avatar-sm">${r.initials}</span> ${item.label}</span>`;
+}
+</script>

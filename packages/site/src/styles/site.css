@@ -1,0 +1,299 @@
+/* Site chrome — the visual language of pragmaticdesign.net (gold/dark).
+   The components use the --pdx-* tokens; this file defines the site's own "chrome". */
+
+:root {
+  /* The identity comes from brand/brand.css, shared with the builder. These stay as the
+     site's own names for it, so nothing downstream depends on brand.css's names. */
+  --gold: var(--pdx-brand-gold);
+  --gold-container: var(--pdx-brand-gold-deep);
+  --gold-fixed: var(--pdx-brand-gold-bright);
+  --gold-dim: var(--pdx-brand-gold-dim);
+  /* The gold behind tints and rules: it never switches with the scheme (brand.css). */
+  --gold-display: var(--pdx-brand-gold-display);
+  --surface: #131313;
+  --surface-container: #201f1f;
+  --surface-high: #2a2a2a;
+  --surface-bright: #393939;
+  --ink: #e5e2e1;
+  --ink-variant: #d0c5af;
+  --ink-muted: #99907c;
+  --outline: #4a4640;
+  --font-heading: var(--pdx-brand-font);
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  --glow-gold: 0 0 24px rgba(242, 202, 80, 0.18);
+  --glow-gold-lg: 0 0 48px rgba(242, 202, 80, 0.28);
+  /* Roles the pages name instead of writing a colour. A code panel is always dark,
+     so its two stay in the light scheme; the statuses sit on the page, and switch below. */
+  --code-bg: #0d0d0d;
+  --code-ink: #cfc9ba;
+  --status-ok: #a8d4a0;
+  --status-err: #e89b9b;
+  /* What an embedded page is painted on before it paints itself. */
+  --frame-bg: #fff;
+  /* Single shell width for header/footer/docs/component pages so the header never looks
+     narrower than the body. The component gallery (.cmp) already sits at this width. */
+  --content-w: 1760px;
+}
+
+/* ── Light scheme (the header toggle flips pdx-scheme on <html>) ────
+   High contrast: dark ink, white cards on a warm bg, dark-bronze gold accents
+   (bright gold is illegible on light), titles go dark instead of gold. */
+:root[pdx-scheme="light"] {
+  --surface: #f3efe6;
+  --surface-container: #ffffff;
+  --surface-high: #ece7db;
+  --surface-bright: #e2dccd;
+  --ink: #1d1a14;
+  --ink-variant: #3a352c;
+  --ink-muted: #6f6757;
+  --outline: #d6cfbe;
+  /* The playground's statuses on a light page: the pale green and red read at 1.45:1 here.
+     The design system's text colours for them hold AA. */
+  --status-ok: var(--pdx-color-success-ink);
+  --status-err: var(--pdx-color-danger-ink);
+  /* --gold / --gold-fixed switch in brand/brand.css, on the same attribute. */
+}
+:root[pdx-scheme="light"] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184, 134, 42, 0.08) 0%, transparent 60%),
+    var(--surface);
+}
+:root[pdx-scheme="light"] .glass {
+  background: #ffffff;
+  border: 1px solid var(--outline);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+:root[pdx-scheme="light"] .site-header {
+  background: rgba(255,255,255,0.85);
+  border-bottom: 1px solid var(--outline);
+}
+/* Titles: bright gold gradient is unreadable on light → dark bronze gradient. */
+:root[pdx-scheme="light"] .metal-gradient {
+  background: linear-gradient(135deg, #7a5512 0%, #4a3209 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+/* No tint in light: the bronze text reads 4.24:1 on the 0.10 tint and 4.46 on 0.04. The border keeps the pill. */
+:root[pdx-scheme="light"] .eyebrow { background: transparent; border-color: rgba(184,134,42,0.35); }
+:root[pdx-scheme="light"] .doc-body h1 { background: linear-gradient(135deg, #7a5512, #4a3209); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+:root[pdx-scheme="light"] .doc-body h2 { border-top-color: rgba(184,134,42,0.18); }
+:root[pdx-scheme="light"] .glow-fix, :root[pdx-scheme="light"] .demo-card,
+:root[pdx-scheme="light"] .cta-card, :root[pdx-scheme="light"] .feature-card:hover { box-shadow: 0 6px 20px rgba(120,90,20,0.10); }
+
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+
+/* Prevent the browser's back/forward gesture on horizontal overscroll: selecting
+   text by dragging can trigger "back" at random.
+   overflow-x: clip removes every horizontal scroll (e.g. a ribbon that
+   sticks out 22px), so auto-scrolling during a fast selection cannot overscroll
+   horizontally. clip (not hidden) creates no scroll container →
+   the sidebar's position: sticky stays intact. */
+html, body { margin: 0; padding: 0; overscroll-behavior-x: none; overflow-x: clip; }
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(242, 202, 80, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 55%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 15% 85%, rgba(184, 150, 42, 0.04) 0%, transparent 50%),
+    var(--surface);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-heading); letter-spacing: -0.01em; }
+code, pre { font-family: var(--font-mono); }
+/* Code shows the characters to type. JetBrains Mono draws programming ligatures by default, and in a
+   sample `<!--` becomes an arrow a reader copying by eye would type. Every code element —
+   galleries, pdx-code, docs — including the ones whose font is set elsewhere, so it holds whichever
+   font of the stack is picked. */
+code, pre, kbd, samp {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+/* The site's links are gold; a link the design system styles is not the site's. This rule is not in a
+   layer, so it beats every layered component rule whatever its specificity: unscoped, a banner's
+   action link comes out gold on the gold banner, 1.29:1. */
+a:not([class*="pdx-"]) { color: var(--gold); }
+
+::selection { background: rgba(242, 202, 80, 0.3); color: #fff; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-bright); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--outline); }
+
+/* ── Chrome utilities ────────────────────────────────────────────── */
+.metal-gradient {
+  background: linear-gradient(135deg, #f2ca50 0%, #d4af37 50%, #ffe088 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.glass {
+  background: linear-gradient(135deg, rgba(53,53,52,0.45) 0%, rgba(40,40,39,0.22) 100%);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(242, 202, 80, 0.10);
+}
+.shell-wrap { width: 100%; max-width: var(--content-w); margin: 0 auto; padding-left: 2rem; padding-right: 2rem; }
+
+/* ── Token colors for inline code (pdx-code → injected, so global) ── */
+.tok-com { color: #8a857a; font-style: italic; }
+.tok-str { color: #a8d4a0; }
+.tok-rune { color: #f2ca50; }
+.tok-kw { color: #c678dd; }
+.tok-lit { color: #d19a66; }
+.tok-tag { color: #e5c07b; }
+.tok-num { color: #d19a66; }
+
+/* ── Markdown body (.doc-body) — injected through innerHTML, global styles ── */
+.doc-body { line-height: 1.75; font-size: 1rem; color: var(--ink); min-width: 0; }
+.doc-body h1 { font-size: 2.2rem; line-height: 1.15; margin: 0 0 1rem; background: linear-gradient(135deg,#f2ca50,#ffe088); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.doc-body h2 { font-size: 1.5rem; margin: 2.6rem 0 0.8rem; padding-top: 0.4rem; scroll-margin-top: 84px; border-top: 1px solid rgba(242,202,80,0.08); padding-top: 1.4rem; }
+.doc-body h3 { font-size: 1.15rem; margin: 1.8rem 0 0.4rem; scroll-margin-top: 84px; color: var(--ink-variant); }
+.doc-body p, .doc-body ul, .doc-body ol { margin: 0.8rem 0; color: var(--ink-variant); }
+.doc-body strong { color: var(--ink); }
+.doc-body a { color: var(--gold); text-underline-offset: 3px; }
+.doc-body :not(pre) > code {
+  font-size: 0.86em; background: var(--surface-high); color: var(--gold-fixed);
+  padding: 0.12em 0.4em; border-radius: 6px; border: 1px solid rgba(242,202,80,0.12);
+  /* A long identifier is one unbreakable word: 388px of it runs off a phone screen. */
+  overflow-wrap: anywhere;
+}
+.doc-body pre {
+  margin: 1.1rem 0; padding: 1rem 1.1rem; border-radius: 12px; overflow-x: auto;
+  border: 1px solid var(--outline); font-size: 0.86rem; line-height: 1.6;
+  background: #0d0d0d !important;
+}
+.doc-body pre.shiki { background: #0d0d0d !important; }
+.doc-body blockquote {
+  margin: 1.1rem 0; padding: 0.6rem 1rem; border-left: 3px solid var(--gold);
+  background: rgba(242,202,80,0.05); border-radius: 0 8px 8px 0; color: var(--ink-variant);
+}
+.doc-body table { border-collapse: collapse; width: 100%; margin: 1.1rem 0; font-size: 0.9rem; }
+.doc-body th, .doc-body td { border: 1px solid var(--outline); padding: 0.5rem 0.7rem; text-align: left; }
+.doc-body th { background: var(--surface-container); color: var(--gold-fixed); }
+
+/* Copy button on the markdown's <pre> blocks (enhance.ts) */
+.doc-body pre.has-copy { position: relative; }
+.doc-body pre .md-copy {
+  position: absolute; top: 8px; right: 8px; font-size: 0.72rem; padding: 3px 9px;
+  border: 1px solid var(--outline); border-radius: 6px; background: var(--surface-high);
+  color: var(--ink-muted); cursor: pointer; opacity: 0; transition: opacity 0.15s, color 0.15s;
+}
+.doc-body pre:hover .md-copy { opacity: 1; }
+.doc-body pre .md-copy:hover { color: var(--gold); border-color: var(--gold); }
+
+/* ── Ported showcase galleries (light-DOM, injected) ───────────────────────
+   The showcase app provided a global `section { margin-bottom }`; restore that
+   rhythm here so ported demos aren't cramped, and tidy headings/source spacing. */
+/* Preview the components on the active THEME's own canvas (its --pdx-color-bg), not the site's brand
+   background — otherwise theme-tuned surfaces/borders (e.g. default's light-grey divider) vanish
+   against the brand bg ("same colour, no border"). A themed card gives every component the right
+   contrast. */
+.cmp-gallery {
+  background: var(--pdx-color-bg);
+  color: var(--pdx-color-text);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: 16px;
+  padding: 1.9rem 2.1rem;
+}
+.cmp-gallery .page > h1 { display: none; } /* the site page header already shows the name */
+.cmp-gallery .intro { margin: 0 0 1.6rem; max-width: 70ch; }
+.cmp-gallery section { margin-bottom: 2.75rem; scroll-margin-top: 80px; }
+/* A section composed as a component is the only child of its `.demo-section` element, so
+   it is always its :last-child: the last one is the section whose element is the last. */
+.cmp-gallery section:last-child:not(.demo-section > section),
+.cmp-gallery .demo-section:last-child > section { margin-bottom: 0; }
+.cmp-gallery .section-heading { margin: 0 0 0.5rem; }
+/* The section description gets room: without it, it sits right on top of the demo. */
+.cmp-gallery section > p { margin: 0 0 1.25rem; }
+.cmp-gallery .source-block { margin-top: 1rem; }
+
+/* The demo scaffolding — `.demo-row`, `.demo-stack`, the Reference tables, `.demo-grid`, `.comp-card`,
+   and the form-field spacing rule — comes from the showcase's showcase-shared.css,
+   imported before this file. What follows is where the site deliberately differs. */
+/* A tighter gap than the showcase's, on the narrower gallery column. */
+.cmp-gallery .demo-row, .design-gallery .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.85rem; }
+/* stretch (not flex-start) so full-width controls — textarea, input, select, form fields — fill
+   the column instead of collapsing to their min content width (~216px, too narrow);
+   capped at a comfortable form width so they don't run edge-to-edge on the wide gallery. */
+.cmp-gallery .demo-stack, .design-gallery .demo-stack { display: flex; flex-direction: column; align-items: stretch; gap: 0.85rem; max-width: 760px; }
+.cmp-gallery .demo-row + .demo-row, .cmp-gallery .demo-stack + .demo-stack,
+.cmp-gallery .demo-row + .demo-stack, .cmp-gallery .demo-stack + .demo-row,
+.cmp-gallery .demo-row + .source-block, .cmp-gallery .demo-stack + .source-block,
+.design-gallery .demo-row + .demo-row, .design-gallery .demo-stack + .demo-stack { margin-top: 1.1rem; }
+/* Cards in a grid: grid cells already stretch to the tallest in the row, but a card only fills its
+   cell if it's height:100% — otherwise sibling cards end up uneven. Make demo-grid cards match. */
+.cmp-gallery .demo-grid > pdx-card, .cmp-gallery .demo-grid > .pdx-surface-card,
+.cmp-gallery .demo-grid > pdx-card > .pdx-surface-card { height: 100%; }
+
+/* Wide demo content scrolls inside its own box, never the page: html/body clip overflow-x, so what
+   runs past the edge is not scrollable — it is simply gone. The props tables are grids of
+   fixed columns in every ported page; on a phone they are the widest thing in it. */
+.cmp-gallery .options-table, .design-gallery .options-table,
+.cmp-gallery .props-table, .design-gallery .props-table,
+.cmp-gallery pre, .design-gallery pre { overflow-x: auto; }
+@media (max-width: 640px) {
+  /* 2.1rem of side padding leaves 257px of a 390px screen to the demos. */
+  .cmp-gallery { padding: 1.2rem 1rem; }
+  /* Some pages write the props table as a real <table>, and a table ignores overflow: as a block
+     it scrolls. Phones only — on a wide screen the block would stop the table filling the row. */
+  .cmp-gallery table.options-table, .design-gallery table.options-table { display: block; }
+}
+
+/* ── Ported CSS/design pages (light-DOM, injected) — keep their own <h1>/intro ───────────── */
+.design-gallery .page > h1 { font-family: var(--font-heading); font-size: 1.9rem; margin: 0 0 0.3rem; }
+.design-gallery .intro { margin: 0 0 1.8rem; max-width: 72ch; }
+.design-gallery section { margin-bottom: 2.75rem; scroll-margin-top: 80px; }
+.design-gallery section:last-child:not(.demo-section > section),
+.design-gallery .demo-section:last-child > section { margin-bottom: 0; }
+.design-gallery .section-heading { margin: 0 0 0.6rem; }
+
+/* ── Diagonal "Alpha" corner ribbon (top-right) — PDX is an alpha release ────────────────────── */
+.preview-ribbon {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  pointer-events: none;        /* decorative — never intercepts clicks */
+  /* Above the sticky header (50) but BELOW overlays/toasts (300/500): the decorative corner
+     never covers toasts and dialogs. */
+  z-index: 60;
+}
+.preview-ribbon span {
+  position: absolute;
+  top: 30px;
+  right: -40px;
+  width: 200px;
+  transform: rotate(45deg);
+  text-align: center;
+  padding: 7px 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1a1400;
+  background: linear-gradient(135deg, var(--gold-fixed), var(--gold-container));
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+/* Light scheme: keep the gold readable against a bright page. */
+:root[pdx-scheme="light"] .preview-ribbon span {
+  color: #fff;
+  background: linear-gradient(135deg, #b8862a, #8a6512);
+}
+@media (max-width: 640px) {
+  .preview-ribbon { width: 116px; height: 116px; }
+  .preview-ribbon span { top: 22px; right: -46px; font-size: 0.62rem; padding: 5px 0; }
+}
+
+/* ── Tabs: the enclosed "folder tab" as the showcase default ──────────────────────────────
+   The Pragmatic family themes ship --pdx-tab-indicator: pill, which @pdxui/core mirrors
+   onto <html pdx-tab-style="pill"> → every tablist renders as pills (even the Bordered/Card
+   demos). This site wants the enclosed folder-tab look as the default and pills only as the
+   explicit .pdx-tabs-pills variant. Neutralise the token for the Pragmatic themes (site-only;
+   the design-system theme is untouched). */
+:root[pdx-theme="pragmatic"], :root[pdx-theme="pragmatic-gold"] { --pdx-tab-indicator: line; }

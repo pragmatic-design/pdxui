@@ -1,0 +1,46 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Submenus</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Hover or press Arrow Right to open a nested menu. Arrow Left or Escape goes back to its item.</p>
+
+    <div class="demo-row">
+      <div class="menu-demo">
+        <button class="pdx-outline" size="sm" :aria-expanded="shown === 'insert' ? 'true' : 'false'" @click="show('insert')">Insert</button>
+        <pdx-menu :open="shown === 'insert'" :items="insertItems" @pdx-select="onSelect" @pdx-close="hide"></pdx-menu>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>// { key: 'shapes', label: 'Shapes', type: 'submenu', children: [
+//   { key: 'rect', label: 'Rectangle' },
+//   { key: 'circle', label: 'Circle' },
+// ]}</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useMenuDemo } from './state.pdx';
+
+// One menu open at a time across the sections (state.pdx.ts).
+const menuDemo = useMenuDemo();
+const shown = $derived(menuDemo.shown());
+function show(key) { menuDemo.show(key); }
+function hide(e) { menuDemo.hide(e); }
+function onSelect(e) { menuDemo.onSelect(e); }
+
+const insertItems = [
+  { key: 'image', label: 'Image' },
+  { key: 'table', label: 'Table' },
+  { key: 'sep1', label: '', type: 'separator' },
+  { key: 'shapes', label: 'Shapes', type: 'submenu', children: [
+    { key: 'rect', label: 'Rectangle' },
+    { key: 'circle', label: 'Circle' },
+    { key: 'triangle', label: 'Triangle' },
+  ]},
+  { key: 'charts', label: 'Charts', type: 'submenu', children: [
+    { key: 'bar', label: 'Bar Chart' },
+    { key: 'line', label: 'Line Chart' },
+  ]},
+];
+</script>

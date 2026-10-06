@@ -1,0 +1,47 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Popover</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Floating content panel anchored to a trigger. Click, hover, or manual trigger. Click-outside and Escape to close. 12 placements.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-popover-basic class="demo-section"></pdx-demo-comp-popover-basic>
+
+    <!-- ═══ Placements ═══ -->
+    <pdx-demo-comp-popover-placements class="demo-section"></pdx-demo-comp-popover-placements>
+
+    <!-- ═══ Hover Trigger ═══ -->
+    <pdx-demo-comp-popover-hover class="demo-section"></pdx-demo-comp-popover-hover>
+
+    <!-- ═══ Rich Content ═══ -->
+    <pdx-demo-comp-popover-rich-content class="demo-section"></pdx-demo-comp-popover-rich-content>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <h3 class="pdx-txt-subheading">Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>trigger</code><span>string</span><span>'click'</span><span>click, hover, or manual</span></div>
+        <div class="opt-row"><code>placement</code><span>string</span><span>'bottom'</span><span>12 placement options</span></div>
+        <div class="opt-row"><code>open</code><span>boolean</span><span>false</span><span>Manual control (trigger="manual")</span></div>
+        <div class="opt-row"><code>close-on-outside</code><span>boolean</span><span>true</span><span>Close on click outside</span></div>
+        <div class="opt-row"><code>close-on-escape</code><span>boolean</span><span>true</span><span>Close on Escape key</span></div>
+        <div class="opt-row"><code>offset-px</code><span>number</span><span>8</span><span>Distance from trigger in px</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+@page '/components/popover';
+@title 'Popover';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+  .pop-text { margin: 0; font-size: var(--pdx-text-sm); }
+</style>

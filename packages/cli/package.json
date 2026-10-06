@@ -1,0 +1,59 @@
+{
+  "name": "@pdxui/cli",
+  "version": "1.0.0-alpha.1",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pragmatic-design/pdxui.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://pdxui.com",
+  "bugs": {
+    "url": "https://github.com/pragmatic-design/pdxui/issues"
+  },
+  "type": "module",
+  "description": "The pdx CLI for PDX UI — build, check, analyze, scaffold .pdx components",
+  "bin": {
+    "pdx": "./dist/index.mjs"
+  },
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.0",
+    "@pdxui/compiler": "workspace:*",
+    "@pdxui/core": "workspace:*",
+    "@pdxui/design": "workspace:*",
+    "@pdxui/lsp": "workspace:*",
+    "citty": "^0.1.6",
+    "consola": "^3.4.0",
+    "fast-glob": "^3.3.0",
+    "jiti": "^2.4.0",
+    "pathe": "^2.0.0"
+  },
+  "peerDependencies": {
+    "vite": "^6.4.2"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "unbuild": "^3.5.0",
+    "vite": "^6.4.2",
+    "vitest": "^4.1.0"
+  }
+}

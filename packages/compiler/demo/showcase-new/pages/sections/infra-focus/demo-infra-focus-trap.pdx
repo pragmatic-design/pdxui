@@ -1,0 +1,46 @@
+<template>
+  <section data-test="focus-trap">
+    <h3>Focus Trap</h3>
+    <p class="desc">Tab cycles within the box. Siblings get aria-hidden.</p>
+    <button class="pdx-primary" @click="activateTrap" data-test="activate-trap">Activate Trap</button>
+    <div class="trap-box" :class="trapActive ? 'active' : ''" data-test="trap-container" :ref="trapContainer">
+      <input class="pdx-input" placeholder="Name" data-test="trap-input-1" />
+      <input class="pdx-input" placeholder="Email" data-test="trap-input-2" />
+      <div class="row">
+        <button class="pdx-ghost" data-test="trap-cancel">Cancel</button>
+        <button class="pdx-primary" @click="deactivateTrap" data-test="trap-save">Save & Deactivate</button>
+      </div>
+    </div>
+    <div class="log" data-test="trap-log">{{ trapLog }}</div>
+  </section>
+</template>
+
+<script setup>
+import { focusTrap } from '@pdxui/core';
+
+let trapActive = $signal(false);
+let trapLog = $signal('');
+let trapDispose = null;
+
+let trapContainer = $signal(null);
+
+function activateTrap() {
+    const container = trapContainer;
+    if (!container) return;
+    trapActive = true;
+    trapDispose = focusTrap(container, { initialFocus: 'first', restoreFocus: true });
+    trapLog = 'Trap activated — Tab cycles within the box';
+}
+
+function deactivateTrap() {
+    trapDispose?.();
+    trapDispose = null;
+    trapActive = false;
+    trapLog = trapLog + '\nTrap deactivated — focus restored';
+}
+</script>
+
+<style scoped>
+  .trap-box { border: 2px solid var(--pdx-color-border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .trap-box.active { border-color: var(--pdx-color-primary); }
+</style>

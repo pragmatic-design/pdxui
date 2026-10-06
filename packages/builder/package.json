@@ -1,0 +1,27 @@
+{
+    "name": "@pdxui/builder",
+    "version": "1.0.0-alpha.0",
+    "description": "PDX Builder — component tester + theme builder on one shell.",
+    "license": "MIT",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "node scripts/prepare-static.mjs && vite build",
+        "preview": "vite preview",
+        "test": "npm run test:e2e && npm run test:static",
+    "test:e2e": "playwright test --config tests/playwright.config.ts",
+        "test:static": "playwright test --config tests/playwright.static.config.ts",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@pdxui/core": "workspace:*",
+        "@pdxui/design": "workspace:*",
+        "@pdxui/ui": "workspace:*"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.50.0",
+        "vite": "^6.4.2",
+        "@responsivejs/design": "1.0.0-alpha.0"
+    }
+}

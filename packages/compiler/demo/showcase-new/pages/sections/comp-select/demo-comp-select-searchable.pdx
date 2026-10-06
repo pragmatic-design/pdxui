@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Searchable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Type to filter. The search field is the combobox; without <code>searchable</code>, the trigger is, and typing a letter jumps to the next option that starts with it.</p>
+    <div class="demo-row">
+      <pdx-select label="Fruit" :options="fruits" searchable clearable placeholder="Search fruit..." />
+    </div>
+    <details class="source"><summary>Source</summary><pre><code>&lt;pdx-select :options="fruits" searchable clearable placeholder="Search fruit..." /&gt;</code></pre></details>
+  </section>
+</template>
+
+<script setup>
+const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew', 'Kiwi', 'Lemon', 'Mango', 'Nectarine', 'Orange', 'Papaya', 'Quince'];
+</script>

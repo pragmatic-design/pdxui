@@ -1,0 +1,30 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">pdx-cluster</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Wrapping flow for tags, badges, chips. Like row but always wraps.</p>
+
+    <div class="demo-area">
+      <pdx-cluster gap="xs">
+        <span class="tag">JavaScript</span>
+        <span class="tag">TypeScript</span>
+        <span class="tag">Rust</span>
+        <span class="tag">Go</span>
+        <span class="tag">Python</span>
+        <span class="tag">C#</span>
+        <span class="tag">Kotlin</span>
+        <span class="tag">Swift</span>
+        <span class="tag">Elixir</span>
+        <span class="tag">Zig</span>
+      </pdx-cluster>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-cluster gap="xs"&gt;
+  &lt;span class="tag"&gt;JavaScript&lt;/span&gt;
+  &lt;span class="tag"&gt;TypeScript&lt;/span&gt;
+  ...
+&lt;/pdx-cluster&gt;</code></pre>
+    </details>
+  </section>
+</template>

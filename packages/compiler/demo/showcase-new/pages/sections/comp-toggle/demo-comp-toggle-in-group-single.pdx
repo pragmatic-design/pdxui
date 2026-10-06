@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Toggle Group — Single</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Only one can be active (exclusive).</p>
+
+    <div class="demo-row">
+      <pdx-toggle-group type="single" :value="align" @valuechange="onAlign" label="Alignment">
+        <pdx-toggle value="left">Left</pdx-toggle>
+        <pdx-toggle value="center">Center</pdx-toggle>
+        <pdx-toggle value="right">Right</pdx-toggle>
+        <pdx-toggle value="justify">Justify</pdx-toggle>
+      </pdx-toggle-group>
+    </div>
+  </section>
+</template>
+
+<script setup>
+let align = $signal('left');
+
+function onAlign(e) {
+  align = e.detail.value;
+}
+</script>

@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Open on arrival</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>default-expand-all</code> shows the whole hierarchy at once — right for a small tree
+      the user is meant to read rather than explore.
+    </p>
+
+    <div class="demo-stack">
+      <pdx-tree label="Documentation" default-expand-all :nodes="docs"></pdx-tree>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { docs } from './state.pdx';
+</script>

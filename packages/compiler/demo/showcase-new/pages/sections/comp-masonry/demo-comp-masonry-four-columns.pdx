@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">4 Columns, Tighter Gap</h2>
+    <pdx-masonry :columns="4" gap="0.5rem">
+      <div class="masonry-card masonry-card-sm" style="height:80px">A</div>
+      <div class="masonry-card masonry-card-sm" style="height:130px">B</div>
+      <div class="masonry-card masonry-card-sm" style="height:90px">C</div>
+      <div class="masonry-card masonry-card-sm" style="height:150px">D</div>
+      <div class="masonry-card masonry-card-sm" style="height:100px">E</div>
+      <div class="masonry-card masonry-card-sm" style="height:170px">F</div>
+      <div class="masonry-card masonry-card-sm" style="height:110px">G</div>
+      <div class="masonry-card masonry-card-sm" style="height:140px">H</div>
+      <div class="masonry-card masonry-card-sm" style="height:120px">I</div>
+      <div class="masonry-card masonry-card-sm" style="height:160px">J</div>
+      <div class="masonry-card masonry-card-sm" style="height:85px">K</div>
+      <div class="masonry-card masonry-card-sm" style="height:145px">L</div>
+    </pdx-masonry>
+  </section>
+</template>

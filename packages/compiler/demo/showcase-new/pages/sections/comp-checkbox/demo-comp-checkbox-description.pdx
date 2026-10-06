@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Description</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Supplemental text below the label for additional context.</p>
+
+    <div class="demo-stack">
+      <pdx-checkbox label="Marketing emails" description="Receive product updates and promotional offers"></pdx-checkbox>
+      <pdx-checkbox label="Security alerts" description="Get notified about suspicious activity on your account" checked></pdx-checkbox>
+      <pdx-checkbox label="Beta features" description="Try experimental features before they're released (may be unstable)"></pdx-checkbox>
+    </div>
+  </section>
+</template>

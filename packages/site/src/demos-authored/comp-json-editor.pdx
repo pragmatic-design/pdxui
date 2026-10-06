@@ -1,0 +1,37 @@
+<!-- Hand-written demo for the net-new pdx-json-editor (no showcase-new source yet). -->
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">JSON Editor</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Schema-driven form editor for nested JSON — objects, lists-of-objects (repeater), and scalars. Complex
+      branches open a sub-modal so the UI stays uncluttered. Emits <code>pdx-change</code> with the edited value.
+    </p>
+
+    <section>
+      <h2 class="pdx-txt-heading">Object with a nested list</h2>
+      <p class="pdx-txt-small pdx-ink-muted">Edit the fields; the "Contacts" branch (a list of objects) opens a sub-modal. The live value is shown below.</p>
+      <pdx-json-editor :schema="schema" :value="value" @pdx-change="onChange"></pdx-json-editor>
+      <pre class="pdx-txt-small" style="background: var(--pdx-color-bg); padding: .75rem; border-radius: 8px; overflow: auto;">{{ output }}</pre>
+    </section>
+  </div>
+</template>
+
+<script setup>
+let value = $signal({ name: 'Acme', active: true, tags: ['vip', 'eu'], contacts: [{ label: 'Email', value: 'a@b.com' }] });
+let output = $signal('{\n  "name": "Acme",\n  "active": true,\n  "tags": ["vip", "eu"],\n  "contacts": [{ "label": "Email", "value": "a@b.com" }]\n}');
+
+const schema = {
+  label: 'Config',
+  fields: [
+    { k: 'name', label: 'Name', type: 'text', req: true },
+    { k: 'active', label: 'Active', type: 'bool' },
+    { k: 'tags', label: 'Tags', type: 'taglist' },
+    { k: 'contacts', label: 'Contacts', type: 'objectList', fields: [
+      { k: 'label', label: 'Label', type: 'text' },
+      { k: 'value', label: 'Value', type: 'text' },
+    ] },
+  ],
+};
+
+function onChange(e) { output = JSON.stringify(e.detail.value, null, 2); }
+</script>

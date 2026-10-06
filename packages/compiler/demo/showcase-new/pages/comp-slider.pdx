@@ -1,0 +1,41 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Slider</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Range slider with keyboard nav, marks, value labels, and dual-thumb range mode. Sizes, colors, vertical orientation.
+    </p>
+
+    <!-- ═══ Slider ═══ -->
+    <pdx-demo-comp-slider-slider class="demo-section"></pdx-demo-comp-slider-slider>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>Current value (number or "min,max" for range)</span></div>
+        <div class="opt-row"><code>min / max</code><span>Range bounds (default 0-100)</span></div>
+        <div class="opt-row"><code>step</code><span>Step granularity (default 1)</span></div>
+        <div class="opt-row"><code>range</code><span>Enable dual-thumb mode</span></div>
+        <div class="opt-row"><code>minGap</code><span>Minimum distance between thumbs in range mode</span></div>
+        <div class="opt-row"><code>marks</code><span>Comma-separated values or "step" for all steps</span></div>
+        <div class="opt-row"><code>showLabel</code><span>Show value label on drag</span></div>
+        <div class="opt-row"><code>labelAlways</code><span>Always show value label</span></div>
+        <div class="opt-row"><code>orientation</code><span>"horizontal" (default) or "vertical"</span></div>
+        <div class="opt-row"><code>color</code><span>"success", "warning" — fill/thumb color</span></div>
+        <div class="opt-row"><code>size</code><span>"sm", "lg"</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/slider';
+@title 'Slider';
+</script>
+
+<style scoped>
+  .page { }
+
+  .opt-header, .opt-row { grid-template-columns: 180px 1fr; }
+</style>

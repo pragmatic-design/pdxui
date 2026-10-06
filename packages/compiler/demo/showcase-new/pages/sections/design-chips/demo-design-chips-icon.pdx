@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">With Icon</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Prefix with <code>.pdx-chip-icon</code> for a leading visual indicator.</p>
+
+    <div class="chip-row">
+      <span class="pdx-chip"><span class="pdx-chip-icon">&#9679;</span> Online</span>
+      <span class="pdx-chip pdx-chip-danger"><span class="pdx-chip-icon">&#9679;</span> Offline</span>
+      <span class="pdx-chip pdx-chip-warning"><span class="pdx-chip-icon">&#9888;</span> Warning</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;span class="pdx-chip"&gt;
+  &lt;span class="pdx-chip-icon"&gt;&amp;#9679;&lt;/span&gt; Online
+&lt;/span&gt;</code></pre>
+    </details>
+  </section>
+</template>

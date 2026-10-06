@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading">Cascading — &lt;pdx-data-source&gt; Wrapper</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Wrap with <code>&lt;pdx-data-source&gt;</code> — the autocomplete discovers the DataSource
+      automatically via Context Protocol. No <code>:source</code> prop needed.
+    </p>
+    <div class="demo-box">
+      <pdx-data-source :data="programmingLangs" auto-load>
+        <pdx-autocomplete
+          placeholder="Search language..."
+          highlight
+          @pdx-change="onLangChange" />
+      </pdx-data-source>
+      <p class="pdx-txt-small pdx-ink-muted result">Language: {{ langValue }}</p>
+    </div>
+    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;!-- Zero prop wiring — autocomplete discovers DataSource via Context Protocol --&gt;
+&lt;pdx-data-source :data="languages" auto-load&gt;
+  &lt;pdx-autocomplete placeholder="Search..." highlight /&gt;
+&lt;/pdx-data-source&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+// ─── Declarative DataSource ───
+const programmingLangs = ['JavaScript', 'TypeScript', 'Python', 'Rust', 'Go', 'Java', 'C#', 'C++', 'Ruby', 'Swift', 'Kotlin', 'Dart', 'PHP', 'Scala', 'Elixir', 'Haskell', 'Clojure', 'F#', 'Erlang', 'Lua', 'R', 'Julia', 'Zig', 'Nim', 'Crystal', 'OCaml', 'Perl', 'COBOL', 'Fortran', 'Assembly'];
+
+let langValue = $signal('');
+
+function onLangChange(e) { langValue = e.detail.value ?? e.detail; }
+</script>

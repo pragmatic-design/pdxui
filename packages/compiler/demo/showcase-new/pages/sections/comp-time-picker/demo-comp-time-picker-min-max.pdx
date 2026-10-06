@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Min and max</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Office hours, 09:00 to 18:00: arrows, the wheel and typed digits are all pulled back inside the range.
+      An empty picker starts from <code>min</code> on the first arrow press.
+    </p>
+    <div class="demo-row">
+      <pdx-time-picker :value="office" format="24h" min="09:00" max="18:00" step="30" aria-label="Office hours" @pdx-change="e => office = e.detail.value"></pdx-time-picker>
+      <span class="pdx-txt-small pdx-ink-muted">value: <code>{{ office || '(empty)' }}</code> · range 09:00–18:00</span>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-time-picker :value="office" format="24h" min="09:00" max="18:00" step="30"&gt;&lt;/pdx-time-picker&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+let office = $signal('');
+</script>

@@ -1,0 +1,85 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">6. DataSource Integration (SessionStorage)</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Form bound to a DataSource that persists to <code>sessionStorage</code>.
+      Changes are saved on submit and survive page refresh.
+    </p>
+
+    <div class="demo-block">
+      <pdx-form :form="dsForm" @pdx-submit="saveDsForm">
+        <pdx-form-field name="companyName" label="Company Name" required>
+          <pdx-input name="companyName" placeholder="Acme Inc."></pdx-input>
+        </pdx-form-field>
+
+        <pdx-form-field name="industry" label="Industry">
+          <pdx-select name="industry" :options="industryOptions" placeholder="Select industry"></pdx-select>
+        </pdx-form-field>
+
+        <pdx-form-field name="website" label="Website">
+          <pdx-input name="website" type="url" placeholder="https://example.com"></pdx-input>
+        </pdx-form-field>
+
+        <pdx-form-field name="active" label="">
+          <pdx-switch name="active" label="Active account"></pdx-switch>
+        </pdx-form-field>
+
+        <pdx-form-actions submitLabel="Save to Storage" resetLabel="Reset"></pdx-form-actions>
+      </pdx-form>
+
+      <div class="form-status">
+        <span class="form-status-badge active">Storage: sessionStorage</span>
+        <span :class="dsDirtyClass()" :textContent="dsDirtyText()"></span>
+        <span class="form-status-badge" :textContent="dsMessageText()"></span>
+      </div>
+    </div>
+
+    @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>const dsForm = createForm({
+  initialValues: loadFromStorage(), // load from sessionStorage
+  validators: { companyName: [required('...')] },
+});
+
+&lt;pdx-form :form="dsForm" @pdx-submit="saveDsForm"&gt;
+  &lt;pdx-form-field name="companyName" label="Company Name" required&gt;
+    &lt;pdx-input name="companyName"&gt;&lt;/pdx-input&gt;
+  &lt;/pdx-form-field&gt;
+  &lt;pdx-form-actions submitLabel="Save to Storage" /&gt;
+&lt;/pdx-form&gt;</code></pre></details>}
+  </section>
+</template>
+
+<script setup>
+import { createForm, required } from '@pdxui/core';
+
+// ─── 5. DataSource Form (SessionStorage) ───
+const industryOptions = ['Technology', 'Healthcare', 'Finance', 'Education', 'Manufacturing', 'Retail'];
+
+// Load initial values from sessionStorage
+function loadFromStorage() {
+  try {
+    const raw = sessionStorage.getItem('pdx-demo-company');
+    return raw ? JSON.parse(raw) : { companyName: '', industry: '', website: '', active: false };
+  } catch { return { companyName: '', industry: '', website: '', active: false }; }
+}
+
+const dsForm = createForm({
+  initialValues: loadFromStorage(),
+  validators: { companyName: [required('Company name is required')] },
+  validateOn: 'onBlur',
+});
+
+let dsFormMessage = $signal('Ready');
+
+function saveDsForm() {
+  dsForm.validate().then(valid => {
+    if (!valid) { dsFormMessage = 'Validation failed'; return; }
+    sessionStorage.setItem('pdx-demo-company', JSON.stringify(dsForm.getValues()));
+    dsFormMessage = 'Saved at ' + new Date().toLocaleTimeString();
+    dsForm.reset(dsForm.getValues());
+  });
+}
+
+function dsDirtyText() { return 'Dirty: ' + (dsForm.dirty() ? 'Yes' : 'No'); }
+function dsDirtyClass() { return 'form-status-badge' + (dsForm.dirty() ? ' active' : ''); }
+function dsMessageText() { return dsFormMessage; }
+</script>

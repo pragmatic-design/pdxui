@@ -1,0 +1,59 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Removable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>removable</code> adds a close button — the chip's one tab stop, named "Remove React". The remove event carries
+      <code>value</code> + <code>label</code>. The chip does not remove itself, and the app owns focus afterwards: here it moves to
+      the next chip's ×, else the previous one, else Reset.
+    </p>
+
+    <div class="demo-row" :ref="tagRow">
+      @for (tags as tag; track tag) {
+        <pdx-chip removable :value="tag" @pdx-remove="removeTag">{{ tag }}</pdx-chip>
+      }
+      @if (tags.length === 0) {
+        <span class="pdx-txt-small pdx-ink-muted">All removed!</span>
+      }
+      <button class="pdx-ghost reset-tags" size="sm" @click="resetTags">Reset</button>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chip removable value="react" @pdx-remove="onRemove"&gt;React&lt;/pdx-chip&gt;
+// event.detail = { value: "react", label: "React" }</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+import { useChipConsole } from './state.pdx';
+
+const chipConsole = useChipConsole();
+function addLog(text) { chipConsole.addLog(text); }
+
+// Removable. The chip does not remove itself, and the app owns focus afterwards: without this, a
+// keyboard removal left focus on <body>.
+let tags = $signal(['React', 'Vue', 'Angular', 'Svelte', 'Solid']);
+
+let tagRow = $signal(null);
+
+function removeTag(e) {
+    const val = e.detail ? e.detail.value : '';
+    if (!val) return;
+    const at = tags.indexOf(val);
+    tags = tags.filter(t => t !== val);
+    addLog('removed: ' + val);
+    requestAnimationFrame(() => {
+        const row = tagRow;
+        if (!row) return;
+        const xs = row.querySelectorAll('.pdx-chip-remove');
+        const next = xs[Math.min(at, xs.length - 1)] || row.querySelector('.reset-tags');
+        if (next) next.focus();
+    });
+}
+
+function resetTags() {
+    tags = ['React', 'Vue', 'Angular', 'Svelte', 'Solid'];
+    addLog('tags reset');
+}
+</script>

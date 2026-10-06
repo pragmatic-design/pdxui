@@ -1,0 +1,62 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Border Radius</h2>
+    <p class="pdx-txt-small pdx-ink-muted">5-step radius scale. Themes can override these for sharper or rounder aesthetics.</p>
+
+    <div class="radius-demo">
+      <div class="radius-box" style="border-radius:var(--pdx-radius-sm)">
+        <code>sm</code>
+        <span class="pdx-txt-caption pdx-ink-muted">0.25rem</span>
+      </div>
+      <div class="radius-box" style="border-radius:var(--pdx-radius-md)">
+        <code>md</code>
+        <span class="pdx-txt-caption pdx-ink-muted">0.5rem</span>
+      </div>
+      <div class="radius-box" style="border-radius:var(--pdx-radius-lg)">
+        <code>lg</code>
+        <span class="pdx-txt-caption pdx-ink-muted">0.75rem</span>
+      </div>
+      <div class="radius-box" style="border-radius:var(--pdx-radius-xl)">
+        <code>xl</code>
+        <span class="pdx-txt-caption pdx-ink-muted">1rem</span>
+      </div>
+      <div class="radius-box pill" style="border-radius:var(--pdx-radius-full)">
+        <code>full</code>
+        <span class="pdx-txt-caption pdx-ink-muted">pill</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>--pdx-radius-sm:   0.25rem;
+--pdx-radius-md:   0.5rem;
+--pdx-radius-lg:   0.75rem;
+--pdx-radius-xl:   1rem;
+--pdx-radius-full: 9999px;
+
+border-radius: var(--pdx-radius-md);</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  /* Radius */
+  .radius-demo {
+    display: flex;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .radius-box {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-2xs);
+    border: 2px solid var(--pdx-color-primary);
+    background: var(--pdx-primary-50);
+  }
+  .radius-box.pill { width: 140px; height: 60px; }
+</style>

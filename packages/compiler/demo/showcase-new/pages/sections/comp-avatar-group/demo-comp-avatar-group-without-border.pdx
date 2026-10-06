@@ -1,0 +1,12 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Without Border</h2>
+    <div class="demo-container">
+      <pdx-avatar-group :items="teamItems" :max="5" :bordered="false"></pdx-avatar-group>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { teamItems } from './state.pdx';
+</script>

@@ -1,0 +1,27 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Checkable Items</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Toggle items with <code>aria-checked</code> for check state.</p>
+
+    <div class="demo-menu-container">
+      <div class="pdx-menu">
+        <button class="pdx-menu-item pdx-menu-check" role="menuitemcheckbox" aria-checked="true">Show Toolbar</button>
+        <button class="pdx-menu-item pdx-menu-check" role="menuitemcheckbox" aria-checked="true">Show Sidebar</button>
+        <button class="pdx-menu-item pdx-menu-check" role="menuitemcheckbox" aria-checked="false">Show Minimap</button>
+        <button class="pdx-menu-item pdx-menu-check" role="menuitemcheckbox" aria-checked="false">Word Wrap</button>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;button class="pdx-menu-item pdx-menu-check"
+  role="menuitemcheckbox" aria-checked="true"&gt;
+  Show Toolbar
+&lt;/button&gt;
+&lt;button class="pdx-menu-item pdx-menu-check"
+  role="menuitemcheckbox" aria-checked="false"&gt;
+  Show Minimap
+&lt;/button&gt;</code></pre>
+    </details>
+  </section>
+</template>

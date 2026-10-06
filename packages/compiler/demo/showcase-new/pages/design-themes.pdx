@@ -1,0 +1,52 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Themes & Tokens</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      A theme here is not a stylesheet you override — it is a set of <strong>token</strong> values the
+      whole library reads. This page shows the consequences rather than describing them: every shipped
+      theme rendering the same composition, the contrast rule computed live on this page, and the
+      DTCG export a design tool can import.
+    </p>
+
+    <!-- ═══ Every theme, at once ═══ -->
+    <pdx-demo-design-themes-themes class="demo-section"></pdx-demo-design-themes-themes>
+
+    <!-- ═══ Contrast, computed here ═══ -->
+    <pdx-demo-design-themes-contrast class="demo-section"></pdx-demo-design-themes-contrast>
+
+    <!-- ═══ DTCG ═══ -->
+    <pdx-demo-design-themes-dtcg class="demo-section"></pdx-demo-design-themes-dtcg>
+
+    <!-- ═══ Where the reasoning lives ═══ -->
+    <pdx-demo-design-themes-why class="demo-section"></pdx-demo-design-themes-why>
+  </div>
+</template>
+
+<script setup>
+@page '/design/themes';
+@title 'Themes & Tokens — PDX UI';
+import { onMount } from '@pdxui/core';
+import { useThemeMeasure } from './sections/design-themes/state.pdx';
+
+// The contrast and DTCG sections show what this measures (sections/design-themes/state.pdx.ts).
+const themeMeasure = useThemeMeasure();
+function measure() { themeMeasure.measure(); }
+
+onMount(() => {
+    measure();
+    // The header's theme picker rewrites `pdx-theme` on <html>; re-measure when it does, or the
+    // figures would describe the theme the page was opened with rather than the one on screen.
+    const obs = new MutationObserver(measure);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['pdx-theme', 'pdx-scheme'] });
+});
+</script>
+
+<style scoped>
+.page { max-width: 960px; }
+.intro { margin-bottom: var(--pdx-space-xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-sm); }
+.ct-verdict { font-size: 0.75rem; font-weight: 600; }
+.ct-verdict.ok { color: var(--pdx-color-success); }
+.ct-verdict.bad { color: var(--pdx-color-danger); }
+</style>

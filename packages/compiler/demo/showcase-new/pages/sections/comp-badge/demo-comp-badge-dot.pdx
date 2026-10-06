@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Dot Indicator</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>dot</code> prop renders a small status dot. <code>pulse</code> adds animation.</p>
+
+    <div class="demo-row">
+      <span class="status-item"><pdx-badge label="Online" dot variant="success"></pdx-badge> Online</span>
+      <span class="status-item"><pdx-badge label="Offline" dot variant="danger"></pdx-badge> Offline</span>
+      <span class="status-item"><pdx-badge label="Away" dot variant="warning"></pdx-badge> Away</span>
+      <span class="status-item"><pdx-badge label="Unknown" dot variant="muted"></pdx-badge> Unknown</span>
+      <span class="status-item"><pdx-badge label="Active" dot variant="primary"></pdx-badge> Active</span>
+    </div>
+
+    <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-md)">With pulse animation:</p>
+    <div class="demo-row">
+      <span class="status-item"><pdx-badge label="Live" dot variant="success" pulse></pdx-badge> Live</span>
+      <span class="status-item"><pdx-badge label="Recording" dot variant="danger" pulse></pdx-badge> Recording</span>
+      <span class="status-item"><pdx-badge label="Syncing" dot variant="primary" pulse></pdx-badge> Syncing</span>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;!-- label: what the dot means. Without it a dot is read as its colour ("success indicator") --&gt;
+&lt;pdx-badge dot variant="success" label="Online"&gt;&lt;/pdx-badge&gt; Online
+&lt;pdx-badge dot variant="danger" pulse label="Recording"&gt;&lt;/pdx-badge&gt; Recording</code></pre>
+    </details>
+  </section>
+</template>
+
+<style scoped>
+  .status-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    font-size: var(--pdx-text-sm);
+  }
+</style>

@@ -1,0 +1,137 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Toast (CSS)</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Screen-edge notifications with stacking, 4 semantic variants, progress bar, and 6 container positions.
+      <strong>CSS only</strong> — apply classes to standard <code>&lt;div&gt;</code> elements.
+    </p>
+
+    <!-- ═══ Variants ═══ -->
+    <pdx-demo-design-toast-variants class="demo-section"></pdx-demo-design-toast-variants>
+
+    <!-- ═══ Title + Message ═══ -->
+    <pdx-demo-design-toast-title-message class="demo-section"></pdx-demo-design-toast-title-message>
+
+    <!-- ═══ Progress Bar ═══ -->
+    <pdx-demo-design-toast-progress class="demo-section"></pdx-demo-design-toast-progress>
+
+    <!-- ═══ Close Button ═══ -->
+    <pdx-demo-design-toast-close class="demo-section"></pdx-demo-design-toast-close>
+
+    <!-- ═══ Container Positions ═══ -->
+    <pdx-demo-design-toast-positions class="demo-section"></pdx-demo-design-toast-positions>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Attribute</span><span>Type</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-container</code><span>Layout</span><span>Fixed container for stacking toasts</span>
+        </div>
+        <div class="opt-row">
+          <code>position="top-right"</code><span>Position</span><span>Top-right corner (default)</span>
+        </div>
+        <div class="opt-row">
+          <code>position="top-left"</code><span>Position</span><span>Top-left corner</span>
+        </div>
+        <div class="opt-row">
+          <code>position="top-center"</code><span>Position</span><span>Top center</span>
+        </div>
+        <div class="opt-row">
+          <code>position="bottom-right"</code><span>Position</span><span>Bottom-right corner</span>
+        </div>
+        <div class="opt-row">
+          <code>position="bottom-left"</code><span>Position</span><span>Bottom-left corner</span>
+        </div>
+        <div class="opt-row">
+          <code>position="bottom-center"</code><span>Position</span><span>Bottom center</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast</code><span>Base</span><span>Toast item (hidden by default)</span>
+        </div>
+        <div class="opt-row">
+          <code>data-open</code><span>State</span><span>Shows the toast (opacity 1, translateX 0)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-success</code><span>Variant</span><span>Green left border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-error</code><span>Variant</span><span>Red left border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-warning</code><span>Variant</span><span>Yellow left border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-info</code><span>Variant</span><span>Primary left border</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-icon</code><span>Part</span><span>Icon slot (color matches variant)</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-content</code><span>Part</span><span>Flex container for title + message</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-title</code><span>Part</span><span>Semibold title text</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-message</code><span>Part</span><span>Muted description text</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-close</code><span>Part</span><span>Dismiss button</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-toast-progress</code><span>Part</span><span>Animated timer bar (5s)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/toast-css';
+@title 'Toast (CSS)';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  /* Override toast positioning for inline static preview */
+  .toast-demo-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: var(--pdx-space-md);
+    max-width: 24rem;
+  }
+
+  .toast-demo-container .pdx-toast {
+    position: relative;
+    transform: none;
+    opacity: 1;
+  }
+
+  .toast-demo-container .pdx-toast[data-open] {
+    transform: none;
+  }
+
+  /* Source block */
+  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
+  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
+  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
+
+  /* Options table */
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row { display: grid; grid-template-columns: 200px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
+  .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

@@ -1,0 +1,50 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">RelativeTime</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-relative-time&gt;</code> — displays relative time ("3 hours ago", "in 2 days")
+      with auto-update. Uses <code>Intl.RelativeTimeFormat</code> for locale-aware output.
+    </p>
+
+    <pdx-demo-comp-relative-time-past class="demo-section"></pdx-demo-comp-relative-time-past>
+
+    <pdx-demo-comp-relative-time-future class="demo-section"></pdx-demo-comp-relative-time-future>
+
+    <pdx-demo-comp-relative-time-styles class="demo-section"></pdx-demo-comp-relative-time-styles>
+
+    <pdx-demo-comp-relative-time-auto-update class="demo-section"></pdx-demo-comp-relative-time-auto-update>
+
+    <pdx-demo-comp-relative-time-locales class="demo-section"></pdx-demo-comp-relative-time-locales>
+
+    <pdx-demo-comp-relative-time-tooltip class="demo-section"></pdx-demo-comp-relative-time-tooltip>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <table class="options-table">
+        <thead>
+          <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>datetime</code></td><td>String</td><td>''</td><td>ISO date string or timestamp</td></tr>
+          <tr><td><code>locale</code></td><td>String</td><td>'' (auto)</td><td>Locale for Intl.RelativeTimeFormat</td></tr>
+          <tr><td><code>style</code></td><td>String</td><td>'long'</td><td>'long', 'short', or 'narrow'</td></tr>
+          <tr><td><code>numeric</code></td><td>String</td><td>'auto'</td><td>'always' or 'auto' (e.g. "yesterday" vs "1 day ago")</td></tr>
+          <tr><td><code>updateInterval</code></td><td>Number</td><td>60000</td><td>Auto-update interval in ms (0 = disabled)</td></tr>
+          <tr><td><code>showTooltip</code></td><td>Boolean</td><td>true</td><td>Show absolute date on hover</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/relative-time';
+@title 'RelativeTime';
+</script>
+
+<style scoped>
+.page { }
+.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-bg); margin-bottom: var(--pdx-space-md); }
+.demo-row-labeled { display: flex; align-items: baseline; gap: var(--pdx-space-md); }
+.label-col { min-width: 100px; text-align: right; }
+</style>

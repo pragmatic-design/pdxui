@@ -1,0 +1,60 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Semantic Ink Applied</h2>
+    <p class="pdx-txt-small pdx-ink-muted">All <code>.pdx-ink-*</code> classes applied to text. These adapt to every theme + dark mode.</p>
+
+    <div class="ink-grid">
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-primary">Primary ink</span>
+        <code>.pdx-ink-primary</code>
+      </div>
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-secondary">Secondary ink</span>
+        <code>.pdx-ink-secondary</code>
+      </div>
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-accent">Accent ink</span>
+        <code>.pdx-ink-accent</code>
+      </div>
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-danger">Danger ink</span>
+        <code>.pdx-ink-danger</code>
+      </div>
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-success">Success ink</span>
+        <code>.pdx-ink-success</code>
+      </div>
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-warning">Warning ink</span>
+        <code>.pdx-ink-warning</code>
+      </div>
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-info">Info ink</span>
+        <code>.pdx-ink-info</code>
+      </div>
+      <div class="ink-card">
+        <span class="pdx-txt-body pdx-ink-inherit">Inherit ink</span>
+        <code>.pdx-ink-inherit</code>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  /* Ink grid */
+  .ink-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+  }
+  .ink-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+  }
+</style>

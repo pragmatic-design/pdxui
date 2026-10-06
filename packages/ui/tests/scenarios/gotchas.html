@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Gotchas Harness</title>
+    <style>
+        html, body { margin: 0; height: 100%; }
+        body { background: var(--pdx-color-bg, #fff); color: var(--pdx-color-text, #111); font-family: var(--pdx-font-sans, system-ui); }
+        section[hidden] { display: none !important; }
+        .pad { padding: 24px; }
+        /* The layout case needs real height for the drawer to be measured against the chrome. */
+        #case-drawer-in-layout, #case-who-scrolls { height: 100vh; }
+        /* Scoped to the drawer case: `display: block` cancels the shell own grid, and with it the
+           row that constrains main — which is the whole subject of the who-scrolls case. */
+        #case-drawer-in-layout pdx-app-layout { height: 100%; display: block; }
+        #case-who-scrolls pdx-app-layout { height: 100%; }
+        .fake-topbar { background: #123; color: #fff; padding: 12px; font-weight: 600; }
+    </style>
+    <script type="module">
+        // Every trap that `gotchas.md` teaches, set up so Playwright can decide whether it is still
+        // true: an entry that describes a fixed defect makes an agent reading it write the
+        // workaround anyway.
+        //
+        // One case per `?case=`, each self-contained. Nothing here asserts: the page only builds the
+        // situation and hands the pieces to the test through window.__gotcha.
+        import '@pdxui/design';
+        // Not the barrel: a load of this page builds ONE case, and registers that case's components
+        // (the barrel is 414 requests a load, ~400 loads a certify run).
+        import { loadTags, tagsIn } from './generated/component-loaders.js';
+        import { createDataSource, component, html, signal, saveScrollPosition, restoreScrollPosition, useScroll } from '@pdxui/core';
+
+        const p = new URLSearchParams(location.search);
+        const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+        const which = p.get('case') ?? '';
+
+        const api = {};
+        window.__gotcha = api;
+        // For a spec that builds its own markup (form-value-once): register its tags BEFORE inserting
+        // it, as the page does for a case.
+        api.load = (markup) => loadTags(tagsIn(markup));
+
+        const ROWS = [
+            { id: 1, name: 'Ada', role: 'engineer' },
+            { id: 2, name: 'Grace', role: 'admiral' },
+            { id: 3, name: 'Katherine', role: 'mathematician' },
+        ];
+        const OPTIONS = [
+            { value: 'a', label: 'Alpha' },
+            { value: 'b', label: 'Beta' },
+            { value: 'c', label: 'Gamma' },
+        ];
+        const COLUMNS = [
+            { field: 'name', header: 'Name' },
+            { field: 'role', header: 'Role' },
+        ];
+
+        // Reveal one case and REMOVE every other section. Merely hiding them leaves their elements in
+        // the document, and a drawer's panel is found with a document-wide selector (it may portal to
+        // <body>): with the others still there, `document.querySelector('.pdx-drawer')` returns the
+        // FIRST one in document order — a drawer belonging to a case that was never opened. Four of
+        // the first eight measurements were wrong for exactly this reason.
+        function show(id) {
+            for (const sec of document.querySelectorAll('section')) {
+                if (sec.id !== id) sec.remove();
+            }
+            const s = document.getElementById(id);
+            if (s) s.hidden = false;
+            return s;
+        }
+
+        const cases = {
+            // gotchas.md:27 — "pdx-select does NOT reflect the choice onto .value"
+            'select-value': () => {
+                const s = show('case-select-value');
+                const el = s.querySelector('pdx-select');
+                el.options = OPTIONS;
+                api.read = () => ({ value: el.value, detail: api._detail ?? null });
+                el.addEventListener('pdx-change', e => { api._detail = e.detail?.value ?? null; });
+            },
+
+            // gotchas.md:95 — "a static createDataSource({data}) does NOT render the rows"
+            'grid-static-source': () => {
+                const s = show('case-grid-static-source');
+                const grid = s.querySelector('pdx-data-grid');
+                grid.columns = COLUMNS;
+                grid.source = createDataSource({ data: ROWS, pageSize: 0 });
+                api.read = () => ({ rows: s.querySelectorAll('[role="row"] [role="gridcell"]').length });
+            },
+
+            // gotchas.md:54 — "the grid's selection is NOT the DataSource's"
+            'grid-selection': () => {
+                const s = show('case-grid-selection');
+                const grid = s.querySelector('pdx-data-grid');
+                const ds = createDataSource({ data: ROWS, pageSize: 0 });
+                grid.columns = COLUMNS;
+                grid.source = ds;
+                grid.selection = 'multiple';   // the prop is `selection: String`, not `selectable`
+                api._events = [];
+                grid.addEventListener('pdx-selection-change', e => api._events.push(e.detail));
+                api.read = () => ({
+                    fromEvent: api._events.at(-1) ?? null,
+                    dsCount: typeof ds.selectedCount === 'function' ? ds.selectedCount() : ds.selectedCount,
+                    gridApi: !!grid.__dataGrid?.getSelectedIds,
+                });
+            },
+
+            // The same grid over a source that DID opt into keeping a selection.
+            'grid-selection-bound': () => {
+                const s = show('case-grid-selection-bound');
+                const grid = s.querySelector('pdx-data-grid');
+                const ds = createDataSource({ data: ROWS, pageSize: 0, selection: { mode: 'multiple' } });
+                grid.columns = COLUMNS;
+                grid.source = ds;
+                grid.selection = 'multiple';
+                api._events = [];
+                grid.addEventListener('pdx-selection-change', e => api._events.push(e.detail));
+                api.read = () => ({
+                    fromEvent: api._events.at(-1) ?? null,
+                    dsCount: ds.selectedCount(),
+                    dsIds: [...ds.selected()],
+                    dsNames: ds.selectedItems().map(r => r.name),
+                    enabled: ds.selectionEnabled,
+                });
+            },
+
+            // gotchas.md:98 — "'No data' is not vertically centred"
+            'grid-empty': () => {
+                const s = show('case-grid-empty');
+                const grid = s.querySelector('pdx-data-grid');
+                grid.columns = COLUMNS;
+                grid.source = createDataSource({ data: [], pageSize: 0 });
+                api.read = () => {
+                    const host = grid.getBoundingClientRect();
+                    const empty = s.querySelector('.pdx-dg-empty');
+                    if (!empty) return { found: false };
+                    const r = empty.getBoundingClientRect();
+                    return {
+                        found: true,
+                        // How far the empty block's centre sits from the host's centre, as a
+                        // fraction of the host height. Centred → near 0; pushed to the bottom → large.
+                        offset: ((r.top + r.height / 2) - (host.top + host.height / 2)) / host.height,
+                        hostHeight: host.height,
+                    };
+                };
+            },
+
+            // gotchas.md:77 — "a pdx-drawer does NOT open when you set .open = true from JS"
+            'drawer-open': () => {
+                const s = show('case-drawer-open');
+                const el = s.querySelector('pdx-drawer');
+                api.openIt = () => { el.open = true; };
+                api.read = () => {
+                    const panel = document.querySelector('.pdx-drawer');
+                    if (!panel) return { panel: false };
+                    const r = panel.getBoundingClientRect();
+                    return {
+                        panel: true,
+                        dataOpen: panel.hasAttribute('data-open'),
+                        // On screen means: it has width and its left edge is inside the viewport.
+                        onScreen: r.width > 50 && r.left < window.innerWidth - 10 && r.right > 0,
+                        left: r.left, right: r.right, width: r.width,
+                        viewport: window.innerWidth,
+                    };
+                };
+            },
+
+            // A dialog the user must not be able to dismiss.
+            'dialog-prevent-close': () => {
+                const sec = show('case-dialog-prevent-close');
+                const dlg = sec.querySelector('pdx-dialog');
+                api._before = 0;
+                dlg.addEventListener('pdx-before-close', () => { api._before++; });
+                api.openDialog = () => { dlg.open = true; };
+                api.pressEscape = () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+                api.clickX = () => {
+                    const x = document.querySelector('.pdx-dialog-close');
+                    if (x) x.click();
+                };
+                api.clickBackdrop = () => {
+                    const b = document.querySelector('.pdx-dialog-backdrop');
+                    if (b) b.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                };
+                api.callClose = () => dlg.close?.();
+                api.read = () => ({
+                    open: !!dlg.open,
+                    panelPresent: !!document.querySelector('.pdx-dialog-backdrop[data-open]'),
+                    beforeCloseCount: api._before,
+                });
+            },
+
+            // A crumb with no href has to be reachable from the keyboard.
+            'breadcrumb-no-href': () => {
+                const sec = show('case-breadcrumb-no-href');
+                const bc = sec.querySelector('pdx-breadcrumb');
+                bc.items = [{ key: 'home', label: 'Home' }, { key: 'plan', label: 'Plan' }, { key: 'now', label: 'Now' }];
+                api._selected = [];
+                bc.addEventListener('pdx-select', e => api._selected.push(e.detail?.key ?? null));
+                api.pressFirst = () => {
+                    const el = sec.querySelector('.pdx-breadcrumb-link');
+                    el.focus();
+                    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+                    el.click();  // Enter on a button fires click natively; here we drive both.
+                };
+                api.read = () => {
+                    const links = [...sec.querySelectorAll('.pdx-breadcrumb-link')];
+                    const first = links[0];
+                    let focusable = false;
+                    if (first) { first.focus(); focusable = document.activeElement === first; }
+                    return {
+                        count: links.length,
+                        tags: links.map(l => l.tagName.toLowerCase()),
+                        focusable,
+                        cursor: first ? getComputedStyle(first).cursor : null,
+                        selected: api._selected,
+                    };
+                };
+            },
+
+            // A select's dropdown, opened from inside a dialog.
+            'select-in-dialog': () => {
+                const sec = show('case-select-in-dialog');
+                const dlg = sec.querySelector('pdx-dialog');
+                const sel = sec.querySelector('pdx-select');
+                sel.options = OPTIONS;
+                api.openDialog = () => { dlg.open = true; };
+                api.openSelect = () => {
+                    const trig = document.querySelector('.pdx-dialog-panel .pdx-select-trigger');
+                    if (trig) trig.click();
+                };
+                api.read = () => {
+                    const panel = document.querySelector('.pdx-dialog-panel');
+                    // Scope to the panel: a document-wide query finds the first select in the page.
+                    const dd = panel && panel.querySelector('.pdx-select-dropdown');
+                    const trig = panel && panel.querySelector('.pdx-select-trigger');
+                    if (!panel || !dd || !trig) return { ready: false };
+                    const p = panel.getBoundingClientRect();
+                    const d = dd.getBoundingClientRect();
+                    const t = trig.getBoundingClientRect();
+                    return {
+                        ready: true,
+                        panelTransform: getComputedStyle(panel).transform,
+                        dropdownOpen: getComputedStyle(dd).display !== 'none',
+                        // How far the dropdown's left edge is from the trigger's. Zero is the goal
+                        // (placement is bottom-START); hundreds means a different containing block.
+                        dx: Math.round(d.x - t.x),
+                        // And it should hang just under the trigger.
+                        dyFromTriggerBottom: Math.round(d.y - t.bottom),
+                        panelRect: { x: Math.round(p.x), y: Math.round(p.y), h: Math.round(p.height) },
+                    };
+                };
+            },
+
+            // Three popups opened inside a box that scrolls, and is shorter than they are.
+            'popup-in-scroll-box': () => {
+                const sec = show('case-popup-in-scroll-box');
+                const many = (n, p) => Array.from({ length: n }, (_, i) => ({ value: `${p}${i}`, label: `${p.toUpperCase()} option ${i}` }));
+                sec.querySelector('pdx-select').options = many(8, 's');
+                sec.querySelector('pdx-tree-select').options = many(8, 't').map((o) => ({ ...o, children: many(3, o.value + '-') }));
+                sec.querySelector('pdx-cascader').options = many(8, 'c').map((o) => ({ ...o, children: many(3, o.value + '-') }));
+                // pdx-mention's menu opens at the text caret, not under a trigger.
+                sec.querySelector('pdx-mention').items = many(8, 'm');
+                const host = (kind) => sec.querySelector(`[data-test="${kind}"]`);
+                // `prefix` (mention only) is typed before the '@', to put the caret further right.
+                api.open = (kind, prefix = '') => {
+                    const h = host(kind);
+                    if (kind === 'mention') {
+                        const ta = h && h.querySelector('textarea');
+                        if (!ta) return;
+                        ta.focus();
+                        ta.value = prefix + '@';
+                        ta.setSelectionRange(ta.value.length, ta.value.length);
+                        ta.dispatchEvent(new Event('input', { bubbles: true }));
+                        return;
+                    }
+                    const trig = h && (h.querySelector('.pdx-select-trigger') ?? h.querySelector('[role=combobox]'));
+                    if (trig) trig.click();
+                };
+                // Where the caret at the end of a one-line textarea is, measured without the
+                // component's own code: the content box's top-left, plus the width of the text in the
+                // textarea's font. (If the text wrapped, the menu would sit a line lower than this.)
+                const caretOf = (ta) => {
+                    const r = ta.getBoundingClientRect();
+                    const s = getComputedStyle(ta);
+                    const probe = document.createElement('span');
+                    probe.style.cssText = `position:absolute;visibility:hidden;white-space:pre;font:${s.font}`;
+                    probe.textContent = ta.value;
+                    document.body.appendChild(probe);
+                    const w = probe.getBoundingClientRect().width;
+                    probe.remove();
+                    const left = r.left + parseFloat(s.borderLeftWidth) + parseFloat(s.paddingLeft) + w;
+                    const top = r.top + parseFloat(s.borderTopWidth) + parseFloat(s.paddingTop);
+                    const lh = parseFloat(s.lineHeight) || parseFloat(s.fontSize) * 1.2;
+                    return { left, bottom: top + lh };
+                };
+                api.read = (kind) => {
+                    const h = host(kind);
+                    const box = h && h.closest('.scroll-box');
+                    const panel = h && h.querySelector('.pdx-select-dropdown, .pdx-tree-select-panel, .pdx-cascader-panel, .pdx-mention-dropdown');
+                    if (!h || !box || !panel || getComputedStyle(panel).display === 'none') return { ready: false };
+                    const p = panel.getBoundingClientRect();
+                    const b = box.getBoundingClientRect();
+                    // A point that belongs to the panel and lies BELOW the scrolling box: if the box
+                    // clips the panel, what is found there is whatever is under it, not the panel.
+                    const x = Math.round(p.left + 12), y = Math.round(b.bottom + 24);
+                    const hit = document.elementFromPoint(x, y);
+                    // For the mention, "its trigger" is the caret it opens at.
+                    const t = kind === 'mention'
+                        ? caretOf(h.querySelector('textarea'))
+                        : (h.querySelector('.pdx-select-trigger') ?? h.querySelector('[role=combobox]')).getBoundingClientRect();
+                    return {
+                        ready: true,
+                        position: getComputedStyle(panel).position,
+                        // Escaping the box is only half: a fixed panel in the wrong place escapes too.
+                        dx: Math.round(p.left - t.left),
+                        dyFromTriggerBottom: Math.round(p.top - t.bottom),
+                        extendsBelowBox: Math.round(p.bottom - b.bottom),
+                        hitIsPanel: !!hit && panel.contains(hit),
+                        // How far right of the box's left edge the trigger (for mention: the caret) is.
+                        triggerFromBoxLeft: Math.round(t.left - b.left),
+                    };
+                };
+            },
+
+            // A lazily loaded branch, held pending until the test lets it resolve.
+            'tree-loading-branch': () => {
+                const sec = show('case-tree-loading-branch');
+                const tree = sec.querySelector('pdx-tree-select');
+                let settle = null;
+                tree.options = [{ value: 'fruits', label: 'Fruits' }, { value: 'grain', label: 'Grain' }];
+                tree.loadChildren = () => new Promise((r) => { settle = r; });
+                const row = () => [...sec.querySelectorAll('.pdx-tree-node')]
+                    .find((n) => n.querySelector('.pdx-tree-node-label')?.textContent === 'Fruits');
+                api.open = () => sec.querySelector('.pdx-cascader-trigger').click();
+                api.expand = () => row().querySelector('.pdx-tree-toggle').click();
+                api.resolve = () => settle && settle([{ value: 'apple', label: 'Apple' }]);
+                api.read = () => {
+                    const r = row();
+                    if (!r) return { ready: false };
+                    const toggle = r.querySelector('.pdx-tree-toggle');
+                    const box = toggle.getBoundingClientRect();
+                    const ring = getComputedStyle(toggle, '::after');
+                    return {
+                        ready: true,
+                        busy: r.getAttribute('aria-busy') === 'true',
+                        toggle: { width: box.width, height: box.height, visibility: getComputedStyle(toggle).visibility },
+                        // The indicator is a pseudo-element: `content: none` means there is none.
+                        ring: {
+                            content: ring.content,
+                            width: parseFloat(ring.width) || 0,
+                            height: parseFloat(ring.height) || 0,
+                            visibility: ring.visibility,
+                            animation: ring.animationName,
+                        },
+                        children: [...sec.querySelectorAll('.pdx-tree-node-label')].map((n) => n.textContent),
+                    };
+                };
+            },
+
+            // The cascader's counterpart: a lazily loaded branch held pending. Its next
+            // column has to show a spinner and the loading text, not only turn the arrow into «⋯».
+            'cascader-loading-branch': () => {
+                const sec = show('case-cascader-loading-branch');
+                const cas = sec.querySelector('pdx-cascader');
+                let settle = null;
+                cas.options = [{ value: 'mammals', label: 'Mammals', isLeaf: false }, { value: 'birds', label: 'Birds', isLeaf: false }];
+                cas.loadChildren = () => new Promise((r) => { settle = r; });
+                const item = () => [...sec.querySelectorAll('.pdx-cascader-item')]
+                    .find((n) => n.querySelector('.pdx-cascader-item-label')?.textContent === 'Mammals');
+                api.open = () => sec.querySelector('.pdx-cascader-trigger').click();
+                api.expand = () => item().click();
+                api.resolve = () => settle && settle([{ value: 'cat', label: 'Cat' }]);
+                api.read = () => {
+                    const it = item();
+                    if (!it) return { ready: false };
+                    const status = sec.querySelector('.pdx-cascader-panel [role="status"]');
+                    const spinner = status?.querySelector('.pdx-cascader-spinner');
+                    const sBox = spinner?.getBoundingClientRect();
+                    const tBox = status?.getBoundingClientRect();
+                    const sCs = spinner ? getComputedStyle(spinner) : null;
+                    return {
+                        ready: true,
+                        busy: it.getAttribute('aria-busy') === 'true',
+                        status: status ? {
+                            // innerText, not textContent: what is rendered, not what is in the DOM.
+                            text: status.innerText.trim(),
+                            width: tBox.width,
+                            height: tBox.height,
+                            visibility: getComputedStyle(status).visibility,
+                        } : null,
+                        spinner: spinner ? {
+                            width: sBox.width,
+                            height: sBox.height,
+                            visibility: sCs.visibility,
+                            animation: sCs.animationName,
+                        } : null,
+                        children: [...sec.querySelectorAll('.pdx-cascader-column')].slice(1)
+                            .flatMap((c) => [...c.querySelectorAll('.pdx-cascader-item-label')].map((n) => n.textContent)),
+                    };
+                };
+            },
+
+            // A disabled or loading pdx-button must not deliver a click to a listener on
+            // its host, which is where an app's @click sits. Counts per button; the spec clicks.
+            'disabled-host-click': () => {
+                const sec = show('case-disabled-host-click');
+                const counts = { disabled: 0, loading: 0, enabled: 0, 'toggle-disabled': 0, 'toggle-enabled': 0 };
+                for (const k of Object.keys(counts)) {
+                    sec.querySelector(`[data-test="${k}"]`).addEventListener('click', () => { counts[k]++; });
+                }
+                api.read = () => ({ ...counts });
+            },
+
+            // Does the calendar take the width its container offers?
+            'calendar-fills': () => {
+                const sec = show('case-calendar-fills');
+                api.read = () => {
+                    const box = sec.querySelector('[data-test="box"]').getBoundingClientRect();
+                    const host = sec.querySelector('[data-test="cal"]').getBoundingClientRect();
+                    const inner = sec.querySelector('.pdx-calendar').getBoundingClientRect();
+                    const cells = [...sec.querySelectorAll('.pdx-cal-cell')].map(c => c.getBoundingClientRect());
+                    return {
+                        boxW: Math.round(box.width),
+                        innerW: Math.round(inner.width),
+                        gapRight: Math.round(box.right - inner.right),
+                        cellCount: cells.length,
+                        rowSpan: cells.length ? Math.round(Math.max(...cells.map(c => c.right)) - Math.min(...cells.map(c => c.left))) : 0,
+                    };
+                };
+            },
+
+            // The navbar driven by its documented property. `setCollapsed` writes the
+            // property, exactly as a `:navbar-collapsed="…"` binding does; nothing here calls the
+            // imperative API, because the point is whether the declarative surface works at all.
+            'navbar-collapsed-prop': () => {
+                const s = show('case-navbar-collapsed-prop');
+                const layout = s.querySelector('pdx-app-layout');
+                api.setCollapsed = (v) => { layout.navbarCollapsed = v; };
+                api.read = () => {
+                    const nav = document.querySelector('[data-test="navbar"]');
+                    const r = nav.getBoundingClientRect();
+                    // Off screen is not hidden: a closed overlay navbar that keeps its tab order
+                    // means Tab walks into an invisible menu.
+                    const first = nav.querySelector('button');
+                    let reachable = false;
+                    if (first) { first.focus(); reachable = document.activeElement === first; first.blur(); }
+                    return {
+                        x: Math.round(r.x), width: Math.round(r.width),
+                        hidden: nav.classList.contains('pdx-app-navbar-hidden'),
+                        overlay: nav.classList.contains('pdx-app-navbar-overlay'),
+                        prop: layout.navbarCollapsed,
+                        inert: nav.hasAttribute('inert'),
+                        focusReachable: reachable,
+                        viewport: window.innerWidth,
+                    };
+                };
+            },
+
+            // "Set to '0px' explicitly for a fully-hidden navbar", per the prop's own
+            // documentation. Measures the ELEMENT, not the grid column: the column can be 0px
+            // while the element keeps 25px and paints clipped labels.
+            'navbar-rail-zero': () => {
+                const s = show('case-navbar-rail-zero');
+                const layout = s.querySelector('pdx-app-layout');
+                api.read = () => {
+                    const nav = document.querySelector('[data-test="navbar"]');
+                    const r = nav.getBoundingClientRect();
+                    // The element's own width is the measurement that discriminates. Hit-testing —
+                    // of the children or of the layout's left edge — was tried and stayed green
+                    // with the defect present: see the note in app-layout-navbar.spec.ts.
+                    return {
+                        width: Math.round(r.width),
+                        column: getComputedStyle(layout).gridTemplateColumns.split(' ')[0],
+                        childCount: nav.querySelectorAll('button').length,
+                        viewport: window.innerWidth,
+                    };
+                };
+            },
+
+            // gotchas.md:81 — "inside pdx-app-layout's content region the drawer stays UNDER the chrome"
+            // Who scrolls in an app with pdx-app-layout: the shell hides its overflow and
+            // main scrolls, so the window never does. Everything that watches a scroll — affix,
+            // scroll-spy, any sticky, and a test that scrolls `window` — depends on this.
+            // A card with `href` is a real link: the overlay anchor carries the address, a
+            // programmatic click on the HOST navigates, and a button inside the card still gets its
+            // own click instead of the anchor swallowing it.
+            'card-link': () => {
+                const s = show('case-card-link');
+                const card = s.querySelector('pdx-card');
+                const button = s.querySelector('[data-test="inside"]');
+                let buttonClicks = 0;
+                button.addEventListener('click', () => { buttonClicks++; });
+                api.read = () => ({
+                    href: card.querySelector('a.pdx-card-link')?.getAttribute('href') ?? null,
+                    hash: location.hash,
+                    buttonClicks,
+                });
+                api.clickHost = () => { card.click(); };
+                // Every click that reaches the real-link card, as the browser delivers it.
+                const log = [];
+                const real = s.querySelector('[data-test="real-link"]');
+                real.addEventListener('click', (e) => {
+                    const t = e.target;
+                    log.push({ button: e.button, ctrl: e.ctrlKey, meta: e.metaKey,
+                        target: t.tagName + '.' + (t.className || ''), prevented: e.defaultPrevented });
+                }, true);
+                real.addEventListener('auxclick', (e) => {
+                    log.push({ aux: true, button: e.button, target: e.target.tagName });
+                }, true);
+                api.clicks = () => log;
+                api.topAtRealTitle = () => {
+                    const r = s.querySelector('[data-test="real-title"]').getBoundingClientRect();
+                    const el = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                    return el ? el.tagName + '.' + (el.className || '') : 'nothing';
+                };
+                api.topAtButton = () => {
+                    const r = button.getBoundingClientRect();
+                    const el = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                    return el === button ? 'button' : el?.className || el?.tagName || 'nothing';
+                };
+            },
+
+            'who-scrolls': () => {
+                const s = show('case-who-scrolls');
+                const tall = s.querySelector('#tall');
+                tall.style.height = '4000px';
+                api.read = () => {
+                    const doc = document.scrollingElement;
+                    const main = document.querySelector('main.pdx-app-main');
+                    const shell = document.querySelector('pdx-app-layout');
+                    const scrolls = (el) => !!el && el.scrollHeight > el.clientHeight + 1;
+                    return {
+                        pageScrolls: scrolls(doc),
+                        mainExists: !!main,
+                        mainScrolls: scrolls(main),
+                        mainOverflowY: main ? getComputedStyle(main).overflowY : null,
+                        shellOverflow: shell ? getComputedStyle(shell).overflow : null,
+                        mainTop: main ? main.scrollTop : null,
+                    };
+                };
+                api.scrollWindow = () => { window.scrollTo(0, 500); };
+                api.scrollMain = () => { document.querySelector('main.pdx-app-main').scrollTop = 500; };
+
+                // And the composable, on the same shell: one state for the window, one for the
+                // region that actually scrolls, passed as the argument.
+                let page = null, region = null;
+                api.watch = () => {
+                    page = useScroll();
+                    region = useScroll(document.querySelector('main.pdx-app-main'));
+                };
+                // The direction settles back to 'idle' 150 ms after the last event, so it is read in
+                // the frame the event arrives in — a round trip to the test would miss it.
+                api.scrollAndCapture = (top) => new Promise((resolve) => {
+                    const main = document.querySelector('main.pdx-app-main');
+                    main.addEventListener('scroll', () => requestAnimationFrame(() => resolve({
+                        regionY: region.y(), regionDirection: region.direction(),
+                        pageY: page.y(), pageDirection: page.direction(),
+                    })), { once: true });
+                    main.scrollTop = top;
+                });
+            },
+
+            'drawer-in-layout': () => {
+                const s = show('case-drawer-in-layout');
+                const el = s.querySelector('pdx-drawer');
+                api.openIt = () => { el.open = true; };
+                api.read = () => {
+                    const panel = document.querySelector('.pdx-drawer');
+                    if (!panel) return { panel: false };
+                    const r = panel.getBoundingClientRect();
+                    // Hit-test the panel's own middle: if the chrome paints over it, the topmost
+                    // element at that point is not the panel or one of its descendants.
+                    const x = Math.min(r.left + r.width / 2, window.innerWidth - 2);
+                    const top = document.elementFromPoint(x, r.top + 20);
+                    return {
+                        panel: true,
+                        parentIsBody: panel.parentElement === document.body,
+                        coveredBy: top ? (panel.contains(top) ? null : top.className || top.tagName) : 'nothing',
+                    };
+                };
+            },
+
+            // gotchas.md:84 — "a transform on the panel makes it a containing block" → a select
+            // dropdown inside the drawer lands off screen.
+            'drawer-select-inside': () => {
+                const s = show('case-drawer-select-inside');
+                const el = s.querySelector('pdx-drawer');
+                const sel = s.querySelector('pdx-select');
+                sel.options = OPTIONS;
+                api.openIt = () => { el.open = true; };
+                api.read = () => {
+                    const panel = document.querySelector('.pdx-drawer');
+                    const cs = panel ? getComputedStyle(panel) : null;
+                    const menu = document.querySelector('.pdx-select-dropdown, .pdx-select-menu, [role="listbox"]');
+                    const r = menu?.getBoundingClientRect();
+                    return {
+                        transform: cs?.transform ?? null,
+                        menu: !!menu,
+                        menuOnScreen: r ? (r.left >= -1 && r.right <= window.innerWidth + 1 && r.width > 0) : null,
+                        menuLeft: r?.left ?? null, menuRight: r?.right ?? null, viewport: window.innerWidth,
+                    };
+                };
+            },
+
+            // gotchas.md:87 — "the drawer's own X emits pdx-close but does not close it"
+            'drawer-close-x': () => {
+                const s = show('case-drawer-close-x');
+                const el = s.querySelector('pdx-drawer');
+                api._closes = 0;
+                el.addEventListener('pdx-close', () => { api._closes++; });
+                api.openIt = () => { el.open = true; };
+                api.read = () => {
+                    const panel = document.querySelector('.pdx-drawer');
+                    return {
+                        closeEvents: api._closes,
+                        openProp: el.open,
+                        dataOpen: panel ? panel.hasAttribute('data-open') : null,
+                    };
+                };
+            },
+        };
+
+        // When does a SLOTTED child mount? Not a gotchas.md entry: a browser-only order that
+        // happy-dom cannot show (it connects children before parents), so the only place to measure it
+        // is a real browser. The components are defined here, and only when this case runs.
+        cases['slotted-mount'] = () => {
+            const log = [];
+            component('gotcha-slot-parent', {
+                setup: () => { log.push({ who: 'parent setup' }); return {}; },
+                render: () => html`<div class="wrap"><slot></slot></div>`,
+            });
+            component('gotcha-slot-kid', {
+                setup: (ctx) => {
+                    log.push({ who: 'kid setup', connected: ctx.el.isConnected, insideParentTemplate: !!ctx.el.closest('.wrap') });
+                    return {};
+                },
+                render: () => html`<i class="kid">kid</i>`,
+            });
+            component('gotcha-slot-fails', {
+                setup: () => { throw new Error('config missing'); },
+                render: () => html`<span>never</span>`,
+            });
+            api.mountSlotted = () => {
+                const host = document.createElement('div');
+                host.innerHTML = '<gotcha-slot-parent><gotcha-slot-kid></gotcha-slot-kid></gotcha-slot-parent>';
+                document.body.appendChild(host);
+                return { log, kidRendered: !!host.querySelector('.wrap gotcha-slot-kid .kid') };
+            };
+            api.mountInBoundary = () => {
+                const host = document.createElement('div');
+                host.innerHTML = '<pdx-error-boundary><gotcha-slot-fails></gotcha-slot-fails></pdx-error-boundary>';
+                document.body.appendChild(host);
+                return new Promise((resolve) => requestAnimationFrame(() => resolve({
+                    alert: !!host.querySelector('[role="alert"]'),
+                    detail: host.querySelector('.pdx-error-boundary-detail')?.textContent ?? null,
+                    inlineSpan: host.textContent.includes('Error in <'),
+                })));
+            };
+        };
+
+        // pdx-data-grid's maxHeight caps a plain grid, not only a virtual one. happy-dom has
+        // no layout, so whether the body really scrolls under the cap is measured here. Two grids of 20
+        // rows: one capped at 200, one with no maxHeight (the control: as tall as its rows).
+        cases['grid-max-height'] = () => {
+            const rows = Array.from({ length: 20 }, (_, i) => ({ id: i + 1, name: 'Row ' + (i + 1), role: 'role' }));
+            const mount = (maxHeight) => {
+                const el = document.createElement('pdx-data-grid');
+                el.columns = COLUMNS;
+                el.data = rows.map(r => ({ ...r }));
+                if (maxHeight) el.maxHeight = maxHeight;
+                document.body.appendChild(el);
+                return el;
+            };
+            const capped = mount(200);
+            const free = mount(0);
+            const measure = (el) => {
+                const s = el.querySelector('.pdx-dg-scroll');
+                if (!s || el.querySelectorAll('.pdx-dg-row').length < 20) return null;
+                return {
+                    height: s.getBoundingClientRect().height,
+                    scrollHeight: s.scrollHeight,
+                    clientHeight: s.clientHeight,
+                    overflowY: getComputedStyle(s).overflowY,
+                };
+            };
+            api.read = () => ({ capped: measure(capped), free: measure(free) });
+            api.scrollCapped = (y) => {
+                const s = capped.querySelector('.pdx-dg-scroll');
+                s.scrollTop = y;
+                const header = capped.querySelector('.pdx-dg-header');
+                return { scrollTop: s.scrollTop, headerFromTop: header.getBoundingClientRect().top - s.getBoundingClientRect().top };
+            };
+        };
+
+        // A component inside pdx-scroll-area must build itself once, not once per move: a pdx-mention
+        // built three times has three wraps, three textareas, and a menu that never opens. The scroll
+        // area moves its children into a viewport one frame after it mounts. The same component in a plain
+        // div is the control. `pair(tag)` mounts both and reports how many elements each one holds.
+        cases['in-scroll-area'] = () => {
+            const frames = (n) => new Promise((r) => {
+                const step = () => (n-- <= 0 ? r() : requestAnimationFrame(step));
+                requestAnimationFrame(step);
+            });
+            // `container` is the component that holds the tag: pdx-scroll-area, or pdx-app-layout, which
+            // moves its children into its regions the same way.
+            api.pair = async (tag, container = 'pdx-scroll-area') => {
+                await loadTags([tag, container]);
+                const inDiv = document.createElement('div');
+                inDiv.innerHTML = `<${tag}></${tag}>`;
+                const inArea = document.createElement(container);
+                if (container === 'pdx-scroll-area') inArea.setAttribute('max-height', '200px');
+                inArea.innerHTML = container === 'pdx-app-layout'
+                    ? `<header data-region="header">h</header><div class="page"><${tag}></${tag}></div>`
+                    : `<${tag}></${tag}>`;
+                document.body.append(inDiv, inArea);
+                await frames(6);
+                const count = (host) => {
+                    const el = host.querySelector(tag);
+                    return el ? el.querySelectorAll('*').length : -1;
+                };
+                const result = { tag, div: count(inDiv), area: count(inArea) };
+                inDiv.remove();
+                inArea.remove();
+                return result;
+            };
+            api.mentionInArea = async () => {
+                const inArea = document.createElement('pdx-scroll-area');
+                inArea.setAttribute('max-height', '200px');
+                inArea.innerHTML = '<pdx-mention></pdx-mention>';
+                document.body.append(inArea);
+                await frames(6);
+                const m = inArea.querySelector('pdx-mention');
+                m.items = [{ value: 1, label: 'Mario Rossi' }, { value: 2, label: 'Marta Bianchi' }];
+                return {
+                    wraps: inArea.querySelectorAll('.pdx-mention-wrap').length,
+                    textareas: inArea.querySelectorAll('textarea').length,
+                };
+            };
+        };
+
+        // Attributes bound on SVG elements through `html`. In a browser `width`, `x`, `href` and
+        // `className` are read-only SVGAnimated* views on an SVG element, so assigning them throws
+        // "which has only a getter"; happy-dom does not model them, so only a browser shows it. The
+        // <input :value> is the control: an HTML element keeps the property path.
+        cases['svg-bound-attributes'] = () => {
+            const w = signal(40);
+            const x = signal(5);
+            const cls = signal('hot');
+            const groupCls = signal('grp');
+            // textContent is a property SVG can assign: it must keep the property path. Written
+            // kebab, as the compiler emits it: the HTML parser lowercases attribute names.
+            const label = signal('first');
+            api.mount = () => {
+                let frag;
+                try {
+                    frag = html`<div id="svg-case"><svg viewBox="0 0 100 100" width="100" height="100">
+                        <rect :width=${() => w()} :x=${() => x()} y="0" height="10"></rect>
+                        <a :href=${'#t'}><text x="0" y="50">t</text></a>
+                        <circle class="base" :class=${() => cls()} cx="50" cy="50" r="5"></circle>
+                        <g class=${() => groupCls()}><line x1="0" y1="0" x2="10" y2="10"></line></g>
+                        <text id="label" x="0" y="90" :text-content=${() => label()}></text>
+                    </svg></div>`;
+                } catch (e) {
+                    return { error: String(e) };
+                }
+                document.body.appendChild(frag);
+                return { error: null };
+            };
+            // Its own template, so the control does not fall with the SVG one.
+            api.mountInput = () => {
+                document.body.appendChild(html`<div id="input-case"><input :value=${'typed'} /></div>`);
+                const input = document.querySelector('#input-case input');
+                return { value: input.value, valueAttr: input.getAttribute('value') };
+            };
+            api.set = (nw, nx, nc, ng, nl) => { w.set(nw); x.set(nx); cls.set(nc); groupCls.set(ng); label.set(nl); };
+            api.read = () => {
+                const root = document.getElementById('svg-case');
+                if (!root) return null;
+                const rect = root.querySelector('rect');
+                return {
+                    width: rect.getAttribute('width'),
+                    x: rect.getAttribute('x'),
+                    href: root.querySelector('a').getAttribute('href'),
+                    circleClass: root.querySelector('circle').getAttribute('class'),
+                    groupClass: root.querySelector('g').getAttribute('class'),
+                    labelText: root.querySelector('#label').textContent,
+                    labelAttrs: root.querySelector('#label').getAttributeNames(),
+                };
+            };
+        };
+
+        // `:class` and `:class.x` on one element. A `:class` write that rewrites the whole attribute
+        // drops what `:class.x` has turned on. An HTML element and an SVG one.
+        cases['class-and-toggle'] = () => {
+            const variant = signal('primary');
+            const on = signal(true);
+            api.mount = () => {
+                document.body.appendChild(html`<div id="class-case">
+                    <div id="html-el" class="btn" :class=${() => variant()} :class.active=${() => on()}>x</div>
+                    <svg width="10" height="10"><circle id="svg-el" class="dot" :class=${() => variant()} :class.active=${() => on()} cx="5" cy="5" r="2"></circle></svg>
+                </div>`);
+            };
+            api.set = (v, o) => { variant.set(v); on.set(o); };
+            api.read = () => ({
+                html: document.getElementById('html-el').getAttribute('class'),
+                svg: document.getElementById('svg-el').getAttribute('class'),
+            });
+        };
+
+        // A component moved by APP code, with no moveMounted: a plain appendChild into
+        // another parent. The move is a disconnect and a connect, so the component is set up again;
+        // what must not happen is its content twice. `when` is 'before' (moved in the task that mounted
+        // it, before its frames ran) or 'after' (moved once it has built). The same component left in
+        // place is the reference count.
+        cases['plain-move'] = () => {
+            const frames = (n) => new Promise((r) => {
+                const step = () => (n-- <= 0 ? r() : requestAnimationFrame(step));
+                requestAnimationFrame(step);
+            });
+            // `props`: set on both copies before they connect, for a component that renders nothing
+            // bare (pdx-menu without items, pdx-json-editor without a schema).
+            api.plainMove = async (tag, when, props = {}) => {
+                await loadTags([tag]);
+                const still = document.createElement('div');
+                still.innerHTML = `<${tag}></${tag}>`;
+                const moved = document.createElement('div');
+                moved.innerHTML = `<${tag}></${tag}>`;
+                for (const host of [still, moved]) Object.assign(host.firstElementChild, props);
+                const target = document.createElement('section');
+                document.body.append(still, moved, target);
+                if (when === 'after') await frames(6);
+                target.appendChild(moved);
+                await frames(6);
+                const count = (host) => {
+                    const el = host.querySelector(tag);
+                    return el ? el.querySelectorAll('*').length : -1;
+                };
+                const result = { tag, when, still: count(still), moved: count(target) };
+                still.remove();
+                target.remove();
+                return result;
+            };
+        };
+
+        // Back restores the scroll one frame after the route resolves, and the page renders
+        // after that. A 300px scroll container holds an outlet; the "list" is 2000px tall, the page
+        // left for is 400px, and `render()` puts the list back after the restore, as a lazy page does.
+        // The clamping is the browser's: happy-dom cannot show it.
+        cases['scroll-restore-late-content'] = () => {
+            const scroller = document.createElement('div');
+            scroller.style.cssText = 'height:300px;overflow-y:auto';
+            const outlet = document.createElement('div');
+            scroller.appendChild(outlet);
+            document.body.appendChild(scroller);
+            const page = (height) => {
+                const block = document.createElement('div');
+                block.style.height = height + 'px';
+                outlet.replaceChildren(block);
+            };
+            page(2000);
+            api.save = () => { scroller.scrollTop = 600; saveScrollPosition('/list', outlet); return scroller.scrollTop; };
+            api.leave = () => { page(400); restoreScrollPosition('/detail', false, outlet); };
+            api.back = () => restoreScrollPosition('/list', true, outlet);
+            api.forward = () => restoreScrollPosition('/other', false, outlet);
+            api.render = () => page(2000);
+            api.userScroll = (top) => {
+                scroller.dispatchEvent(new WheelEvent('wheel', { bubbles: true, deltaY: -40 }));
+                scroller.scrollTop = top;
+            };
+            api.frames = (n) => new Promise((r) => {
+                const step = () => (n-- <= 0 ? r() : requestAnimationFrame(step));
+                requestAnimationFrame(step);
+            });
+            api.read = () => ({ top: scroller.scrollTop, max: scroller.scrollHeight - scroller.clientHeight });
+        };
+
+        // What the case builds: the tags in its own source and in the markup of every section it
+        // show()s. Registered BEFORE the case runs, so a property it sets lands on an upgraded element.
+        const caseSource = String(cases[which] ?? '');
+        const shownMarkup = [...caseSource.matchAll(/show\('([^']+)'\)/g)]
+            .map((m) => document.getElementById(m[1])?.outerHTML ?? '').join('');
+        await loadTags(tagsIn(caseSource + shownMarkup));
+        (cases[which] ?? (() => {}))();
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+            document.documentElement.setAttribute('data-pdx-ready', '1')));
+    </script>
+</head>
+<body>
+    <section id="case-select-value" class="pad" hidden>
+        <pdx-select data-test="select" placeholder="pick one"></pdx-select>
+    </section>
+
+    <section id="case-grid-static-source" class="pad" hidden>
+        <pdx-data-grid data-test="grid"></pdx-data-grid>
+    </section>
+
+    <section id="case-grid-selection" class="pad" hidden>
+        <pdx-data-grid data-test="grid"></pdx-data-grid>
+    </section>
+
+    <section id="case-grid-selection-bound" class="pad" hidden>
+        <pdx-data-grid data-test="grid"></pdx-data-grid>
+    </section>
+
+    <section id="case-grid-empty" class="pad" hidden>
+        <div style="height: 420px">
+            <pdx-data-grid data-test="grid" style="height: 100%"></pdx-data-grid>
+        </div>
+    </section>
+
+    <section id="case-drawer-open" class="pad" hidden>
+        <pdx-drawer data-test="drawer" position="right" size="md" label="Edit">
+            <p data-test="drawer-body">panel content</p>
+        </pdx-drawer>
+    </section>
+
+    <section id="case-card-link" class="pad" hidden>
+        <!-- Two cards: the first links to a FRAGMENT, so a test can watch the navigation without
+             leaving the page; the second to a real URL, which is what a middle-click or a
+             ctrl+click needs in order to open a tab at all. -->
+        <pdx-card data-test="linked" href="#linked" style="max-width:320px">
+            <div class="pdx-card-body">
+                <h3>A property</h3>
+                <button type="button" data-test="inside">Save</button>
+            </div>
+        </pdx-card>
+        <pdx-card data-test="real-link" href="/gotchas.html?case=card-link&amp;opened=1" style="max-width:320px">
+            <div class="pdx-card-body"><h3 data-test="real-title">Another property</h3></div>
+        </pdx-card>
+    </section>
+
+    <section id="case-who-scrolls" hidden>
+        <pdx-app-layout>
+            <div data-region="header" class="fake-topbar">the chrome</div>
+            <!-- The main region is the child with NO data-region: "content" is not one, and
+                 pdx-app-layout warns about it. -->
+            <div class="pad">
+                <p id="tall">tall content</p>
+                <p data-test="bottom">the last line</p>
+            </div>
+        </pdx-app-layout>
+    </section>
+
+    <section id="case-drawer-in-layout" hidden>
+        <pdx-app-layout>
+            <div data-region="header" class="fake-topbar">the chrome</div>
+            <div data-region="content" class="pad">
+                <pdx-drawer data-test="drawer" position="right" size="md" label="Edit">
+                    <p>panel content</p>
+                </pdx-drawer>
+            </div>
+        </pdx-app-layout>
+    </section>
+
+    <section id="case-drawer-select-inside" class="pad" hidden>
+        <pdx-drawer data-test="drawer" position="right" size="md" label="Edit">
+            <pdx-select data-test="select" placeholder="pick one"></pdx-select>
+        </pdx-drawer>
+    </section>
+
+    <section id="case-drawer-close-x" class="pad" hidden>
+        <pdx-drawer data-test="drawer" position="right" size="md" label="Edit" show-close>
+            <p>panel content</p>
+        </pdx-drawer>
+    </section>
+
+    <!-- prevent-close: a dialog the user must not be able to dismiss. -->
+    <section id="case-dialog-prevent-close" class="pad" hidden>
+        <pdx-dialog data-test="dlg" title="Start of shift" size="md" prevent-close>
+            <p>declare before you go on</p>
+        </pdx-dialog>
+    </section>
+
+    <!-- Crumbs driven by the event, with no href — the route the skill note recommends. -->
+    <section id="case-breadcrumb-no-href" class="pad" hidden>
+        <pdx-breadcrumb data-test="bc"></pdx-breadcrumb>
+    </section>
+
+    <!-- A select inside a dialog: the same containing-block trap as on the drawer. -->
+    <section id="case-select-in-dialog" class="pad" hidden>
+        <pdx-dialog data-test="dlg" title="Assign" size="md">
+            <pdx-select data-test="sel" placeholder="choose"></pdx-select>
+        </pdx-dialog>
+    </section>
+
+    <!-- Each popup lives in a box that scrolls and is much shorter than the popup: a table that
+         scrolls sideways, a scroll area, a card. `pdx-select` is the control — it positions its
+         menu `fixed` and escapes any box; a menu positioned `absolute` would not. -->
+    <section id="case-popup-in-scroll-box" class="pad" hidden>
+        <!-- wrap: four 300px boxes do not fit in 1280px, and a menu opened at the viewport's right
+             edge is shifted back inside it — correct, but then it is not "at its trigger". -->
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding-bottom: 400px;">
+            <div class="scroll-box" style="width: 300px; height: 90px; overflow: auto; border: 1px solid #888;">
+                <pdx-select data-test="select" placeholder="select"></pdx-select>
+            </div>
+            <div class="scroll-box" style="width: 300px; height: 90px; overflow: auto; border: 1px solid #888;">
+                <pdx-tree-select data-test="tree" placeholder="tree"></pdx-tree-select>
+            </div>
+            <div class="scroll-box" style="width: 300px; height: 90px; overflow: auto; border: 1px solid #888;">
+                <pdx-cascader data-test="cascader" placeholder="cascader"></pdx-cascader>
+            </div>
+            <!-- The mention's menu opens at the caret of its textarea. -->
+            <div class="scroll-box" style="width: 300px; height: 90px; overflow: auto; border: 1px solid #888;">
+                <pdx-mention data-test="mention" placeholder="mention" rows="2"></pdx-mention>
+            </div>
+        </div>
+    </section>
+
+    <!-- A tree whose "Fruits" branch is fetched by loadChildren and held pending: the row
+         has to SHOW that it is loading, not only carry aria-busy. -->
+    <section id="case-tree-loading-branch" class="pad" hidden>
+        <div style="padding-bottom: 300px;">
+            <pdx-tree-select data-test="lazy" placeholder="lazy"></pdx-tree-select>
+        </div>
+    </section>
+
+    <!-- A cascader whose "Mammals" branch is fetched by loadChildren and held pending: the
+         next column has to SHOW that it is loading, in words and with a spinner. -->
+    <section id="case-cascader-loading-branch" class="pad" hidden>
+        <div style="padding-bottom: 320px;">
+            <pdx-cascader data-test="lazy" placeholder="lazy"></pdx-cascader>
+        </div>
+    </section>
+
+    <!-- Three buttons, each with a click listener on its HOST (what `@click` on
+         <pdx-button> compiles to): disabled, loading, and the enabled control. -->
+    <section id="case-disabled-host-click" class="pad" hidden>
+        <div style="display: flex; gap: 24px;">
+            <pdx-button data-test="disabled" disabled>Next</pdx-button>
+            <pdx-button data-test="loading" loading>Save</pdx-button>
+            <pdx-button data-test="enabled">Go</pdx-button>
+            <pdx-toggle data-test="toggle-disabled" disabled>Bold</pdx-toggle>
+            <pdx-toggle data-test="toggle-enabled">Italic</pdx-toggle>
+        </div>
+    </section>
+
+    <!-- A calendar in a container WIDER than its intrinsic size (290px). The host is 420px, which
+         is what an author writing a card gets, and the calendar must not sit flush left. -->
+    <section id="case-calendar-fills" class="pad" hidden>
+        <div data-test="box" style="width: 420px; border: 1px solid #888;">
+            <pdx-calendar data-test="cal"></pdx-calendar>
+        </div>
+    </section>
+
+    <!-- The layout's own navbar, driven the declarative way: the `collapsed`
+         property, which is what the props table documents. Both cases use a breakpoint of 900 so a
+         390px viewport is "mobile" and a 1440px one is not. -->
+    <section id="case-navbar-collapsed-prop" hidden>
+        <pdx-app-layout data-test="layout" navbar-width="224px" navbar-breakpoint="900" navbar-collapsed>
+            <div data-region="header" class="fake-topbar">the chrome</div>
+            <!-- The padding is the point, not decoration: with border-box it is the floor under
+                 `width: 0`, and it is what turned a "fully-hidden" navbar into a 25px sliver in the
+                 lab app. A scenario without it measures a milder defect than the real one. -->
+            <nav data-region="navbar" data-test="navbar" style="padding: 12px"><button>one</button><button>two</button></nav>
+            <div class="pad">page</div>
+        </pdx-app-layout>
+    </section>
+
+    <section id="case-navbar-rail-zero" hidden>
+        <pdx-app-layout data-test="layout" navbar-width="224px" navbar-collapsed-width="0px"
+                        navbar-breakpoint="900" navbar-collapsed>
+            <div data-region="header" class="fake-topbar">the chrome</div>
+            <!-- The padding is the point, not decoration: with border-box it is the floor under
+                 `width: 0`, and it is what turned a "fully-hidden" navbar into a 25px sliver in the
+                 lab app. A scenario without it measures a milder defect than the real one. -->
+            <nav data-region="navbar" data-test="navbar" style="padding: 12px"><button>one</button><button>two</button></nav>
+            <div class="pad">page</div>
+        </pdx-app-layout>
+    </section>
+</body>
+</html>

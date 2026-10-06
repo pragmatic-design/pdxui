@@ -1,0 +1,137 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Inputs</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Text inputs, selects, textareas, and input groups.
+      <strong>CSS only</strong> — apply <code>.pdx-input</code> to native form elements.
+    </p>
+
+    <!-- ═══ Text Input ═══ -->
+    <pdx-demo-design-inputs-text class="demo-section"></pdx-demo-design-inputs-text>
+
+    <!-- ═══ Input Types ═══ -->
+    <pdx-demo-design-inputs-types class="demo-section"></pdx-demo-design-inputs-types>
+
+    <!-- ═══ Select ═══ -->
+    <pdx-demo-design-inputs-select class="demo-section"></pdx-demo-design-inputs-select>
+
+    <!-- ═══ Textarea ═══ -->
+    <pdx-demo-design-inputs-textarea class="demo-section"></pdx-demo-design-inputs-textarea>
+
+    <!-- ═══ Input Groups ═══ -->
+    <pdx-demo-design-inputs-groups class="demo-section"></pdx-demo-design-inputs-groups>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-design-inputs-composition class="demo-section"></pdx-demo-design-inputs-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Class / Selector</span><span>Element</span><span>Effect</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-input</code><span>input</span><span>Styled text input with focus ring</span>
+        </div>
+        <div class="opt-row">
+          <code>select.pdx-input</code><span>select</span><span>Custom chevron, no native appearance</span>
+        </div>
+        <div class="opt-row">
+          <code>textarea.pdx-input</code><span>textarea</span><span>Vertical resize, min-height 6rem</span>
+        </div>
+        <div class="opt-row">
+          <code>::placeholder</code><span>state</span><span>Muted color</span>
+        </div>
+        <div class="opt-row">
+          <code>:focus-visible</code><span>state</span><span>Primary border + focus ring</span>
+        </div>
+        <div class="opt-row">
+          <code>:disabled</code><span>state</span><span>50% opacity, inset background</span>
+        </div>
+        <div class="opt-row">
+          <code>[aria-invalid="true"]</code><span>state</span><span>Danger border color</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-input-group</code><span>wrapper</span><span>Joined input + addons/buttons</span>
+        </div>
+        <div class="opt-row">
+          <code>.pdx-input-addon</code><span>span</span><span>Inset bg, muted text, border</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/design/inputs';
+@title 'Inputs';
+</script>
+
+<style scoped>
+  .page { }
+  .intro { margin-bottom: var(--pdx-space-xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+
+  .demo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+  }
+  .demo-stack.narrow { max-width: 400px; }
+
+  .source-block {
+    margin-top: var(--pdx-space-md);
+    margin-bottom: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .source-block summary {
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    background: var(--pdx-color-inset);
+    user-select: none;
+  }
+  .source-block pre {
+    margin: 0;
+    padding: var(--pdx-space-md);
+    font-size: var(--pdx-text-xs);
+    overflow-x: auto;
+    background: var(--pdx-color-surface);
+  }
+
+  .options-table { margin-top: var(--pdx-space-md); }
+  .opt-header, .opt-row {
+    display: grid;
+    grid-template-columns: 200px 80px 1fr;
+    gap: var(--pdx-space-sm);
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    align-items: center;
+  }
+  .opt-header {
+    font-weight: var(--pdx-weight-semibold);
+    border-bottom: 2px solid var(--pdx-color-border);
+    color: var(--pdx-color-muted);
+    font-size: var(--pdx-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
+  .opt-row span { color: var(--pdx-color-muted); }
+
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

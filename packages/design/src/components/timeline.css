@@ -1,0 +1,181 @@
+/* Timeline — single continuous line with dots overlaid.
+   Modes: left (default), right, alternate, horizontal. */
+
+.pdx-tl-root { display: block; }
+
+.pdx-tl {
+    display: flex;
+    flex-direction: column;
+    /* An <ol>: none of the list's own markers, margins or indent. */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== Item: track + content side by side ===== */
+.pdx-tl-item {
+    display: flex;
+    gap: var(--pdx-space-md);
+    position: relative;
+    min-height: 3rem;
+}
+
+/* ===== Track column: continuous line + dot ===== */
+.pdx-tl-track {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 24px;
+    flex-shrink: 0;
+}
+
+/* Continuous vertical line — full height of item */
+.pdx-tl-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background: var(--pdx-color-border);
+}
+.pdx-tl-item-last .pdx-tl-line,
+.pdx-tl-line-last {
+    bottom: auto;
+    height: 12px; /* stop at dot center */
+}
+/* First item: line starts from dot */
+.pdx-tl-item:first-child .pdx-tl-line {
+    top: 12px;
+}
+/* First AND last (single item): no line */
+.pdx-tl-item:first-child.pdx-tl-item-last .pdx-tl-line {
+    display: none;
+}
+
+/* Dashed/dotted connector variants */
+.pdx-tl-conn-dashed .pdx-tl-line { background: none; border-left: 2px dashed var(--pdx-color-border); width: 0; }
+.pdx-tl-conn-dotted .pdx-tl-line { background: none; border-left: 2px dotted var(--pdx-color-border); width: 0; }
+
+/* ===== Dot ===== */
+.pdx-tl-dot {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--pdx-color-border);
+    background: var(--pdx-color-bg);
+    z-index: 1;
+    margin-top: 4px; /* align with first line of title */
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* Dot with icon — larger */
+.pdx-tl-dot-icon {
+    width: 24px;
+    height: 24px;
+    margin-top: 0;
+    border-color: var(--pdx-color-primary);
+    background: var(--pdx-color-primary);
+    /* The glyph is a label on this fill: inheriting the page's text colour, whatever the fill, gives
+       a near-white glyph on warning's amber in dark. Each fill below brings its label. */
+    color: var(--pdx-color-primary-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pdx-tl-dot-icon pdx-icon { display: flex; }
+
+/* Pending pulse */
+.pdx-tl-dot-pending {
+    border-color: var(--pdx-color-primary);
+    background: var(--pdx-color-primary);
+    animation: pdx-tl-pulse 1.5s ease-in-out infinite;
+}
+@keyframes pdx-tl-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* ===== Content ===== */
+.pdx-tl-content {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: var(--pdx-space-lg);
+    padding-top: 1px; /* align baseline with dot */
+}
+.pdx-tl-title { font-weight: var(--pdx-weight-semibold); font-size: var(--pdx-text-sm); color: var(--pdx-color-text); line-height: 1.4; }
+.pdx-tl-desc { font-size: var(--pdx-text-xs); color: var(--pdx-color-muted); margin-top: var(--pdx-space-2xs); line-height: 1.4; }
+.pdx-tl-date { font-size: var(--pdx-text-xs); color: var(--pdx-color-muted); margin-top: var(--pdx-space-2xs); }
+
+/* ===== Dot vertical alignment ===== */
+.pdx-tl-dot-center .pdx-tl-track { justify-content: center; }
+.pdx-tl-dot-center .pdx-tl-dot { margin-top: 0; }
+.pdx-tl-dot-center .pdx-tl-item:first-child .pdx-tl-line { top: 50%; }
+.pdx-tl-dot-center .pdx-tl-item-last .pdx-tl-line { bottom: 50%; height: auto; }
+
+.pdx-tl-dot-end .pdx-tl-track { justify-content: flex-end; }
+.pdx-tl-dot-end .pdx-tl-dot { margin-top: 0; margin-bottom: 4px; }
+.pdx-tl-dot-end .pdx-tl-item:first-child .pdx-tl-line { top: calc(100% - 12px); }
+.pdx-tl-dot-end .pdx-tl-item-last .pdx-tl-line { bottom: auto; height: 12px; }
+
+/* ===== Status colors ===== */
+.pdx-tl-success .pdx-tl-dot { border-color: var(--pdx-color-success); background: var(--pdx-color-success); }
+.pdx-tl-success .pdx-tl-dot-icon { background: var(--pdx-color-success); color: var(--pdx-color-success-text); }
+.pdx-tl-warning .pdx-tl-dot { border-color: var(--pdx-color-warning); background: var(--pdx-color-warning); }
+.pdx-tl-warning .pdx-tl-dot-icon { background: var(--pdx-color-warning); color: var(--pdx-color-warning-text); }
+.pdx-tl-error .pdx-tl-dot { border-color: var(--pdx-color-danger); background: var(--pdx-color-danger); }
+.pdx-tl-error .pdx-tl-dot-icon { background: var(--pdx-color-danger); color: var(--pdx-color-danger-text); }
+.pdx-tl-info .pdx-tl-dot { border-color: var(--pdx-color-info); background: var(--pdx-color-info); }
+.pdx-tl-info .pdx-tl-dot-icon { background: var(--pdx-color-info); color: var(--pdx-color-info-text); }
+
+/* ===== Clickable ===== */
+.pdx-tl-clickable { cursor: pointer; border-radius: var(--pdx-radius-sm); transition: background 150ms ease; }
+.pdx-tl-clickable:hover { background: var(--pdx-color-inset); }
+.pdx-tl-clickable:focus-visible { outline: var(--pdx-focus-width) solid var(--pdx-color-primary); outline-offset: var(--pdx-focus-offset); }
+
+/* ===== Right mode ===== */
+.pdx-tl-right .pdx-tl-item { flex-direction: row-reverse; }
+.pdx-tl-right .pdx-tl-content { text-align: right; }
+
+/* ===== Alternate mode ===== */
+.pdx-tl-alternate .pdx-tl-item { width: 100%; position: relative; }
+.pdx-tl-alternate .pdx-tl-track { position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; }
+.pdx-tl-alternate .pdx-tl-content { width: calc(50% - 24px); }
+.pdx-tl-alternate .pdx-tl-item { min-height: 5rem; /* more spacing in alternate */ }
+.pdx-tl-alternate .pdx-tl-left { justify-content: flex-start; }
+.pdx-tl-alternate .pdx-tl-left .pdx-tl-content { text-align: right; margin-right: calc(50% + 20px); }
+.pdx-tl-alternate .pdx-tl-right-item { justify-content: flex-end; }
+.pdx-tl-alternate .pdx-tl-right-item .pdx-tl-content { text-align: left; margin-left: calc(50% + 20px); }
+
+/* ===== Horizontal mode ===== */
+.pdx-tl-horizontal { flex-direction: row; overflow-x: auto; }
+.pdx-tl-horizontal .pdx-tl-item {
+    flex-direction: column;
+    align-items: center;
+    min-width: 8rem;
+    flex-shrink: 0;
+    gap: var(--pdx-space-sm);
+}
+.pdx-tl-horizontal .pdx-tl-track {
+    flex-direction: row;
+    width: 100%;
+    height: 24px;
+}
+.pdx-tl-horizontal .pdx-tl-line {
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 2px;
+    transform: translateY(-50%);
+}
+.pdx-tl-horizontal .pdx-tl-item-last .pdx-tl-line { right: 50%; height: 2px; bottom: auto; }
+.pdx-tl-horizontal .pdx-tl-item:first-child .pdx-tl-line { left: 50%; top: 50%; }
+.pdx-tl-horizontal .pdx-tl-content { text-align: center; padding-bottom: 0; padding-inline: var(--pdx-space-xs); }
+.pdx-tl-horizontal .pdx-tl-dot { margin-top: 0; }
+.pdx-tl-horizontal.pdx-tl-conn-dashed .pdx-tl-line { background: none; border-left: none; border-top: 2px dashed var(--pdx-color-border); width: auto; }
+.pdx-tl-horizontal.pdx-tl-conn-dotted .pdx-tl-line { background: none; border-left: none; border-top: 2px dotted var(--pdx-color-border); width: auto; }

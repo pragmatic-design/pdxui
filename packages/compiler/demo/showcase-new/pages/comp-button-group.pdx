@@ -1,0 +1,150 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">ButtonGroup</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-button-group&gt;</code> — groups buttons visually (action) or with toggle selection (single/multiple).
+      Propagates <code>variant</code>, <code>size</code>, <code>disabled</code> to children.
+    </p>
+
+    <!-- ═══ Event Console ═══ -->
+    <div class="console-panel">
+      <div class="console-header">
+        <span class="pdx-txt-caption pdx-ink-muted">Event Console</span>
+        <button class="pdx-ghost" size="sm" @click="clearLog">Clear</button>
+      </div>
+      <div class="console-body pdx-txt-mono">
+        @if (logs.length === 0) {
+          <span class="pdx-ink-muted">Interact with toggle groups below...</span>
+        } @else {
+          @for (logs as entry; track entry.id) {
+            <div class="log-entry">
+              <span class="log-time">{{ entry.time }}</span>
+              <span class="log-label">{{ entry.label }}</span>
+              <span>{{ entry.text }}</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- ═══ Action Group ═══ -->
+    <pdx-demo-comp-button-group-action class="demo-section"></pdx-demo-comp-button-group-action>
+
+    <!-- ═══ Single Toggle ═══ -->
+    <pdx-demo-comp-button-group-single-toggle class="demo-section"></pdx-demo-comp-button-group-single-toggle>
+
+    <!-- ═══ Multiple Toggle ═══ -->
+    <pdx-demo-comp-button-group-multiple-toggle class="demo-section"></pdx-demo-comp-button-group-multiple-toggle>
+
+    <!-- ═══ Orientation ═══ -->
+    <pdx-demo-comp-button-group-orientation class="demo-section"></pdx-demo-comp-button-group-orientation>
+
+    <!-- ═══ Variant & Size Propagation ═══ -->
+    <pdx-demo-comp-button-group-propagation class="demo-section"></pdx-demo-comp-button-group-propagation>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-button-group-disabled class="demo-section"></pdx-demo-comp-button-group-disabled>
+
+    <!-- ═══ Composition ═══ -->
+    <pdx-demo-comp-button-group-composition class="demo-section"></pdx-demo-comp-button-group-composition>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Prop</span><span>Type</span><span>Description</span>
+        </div>
+        <div class="opt-row">
+          <code>mode</code><span>string</span><span>none (action group), single (radio group: radios, arrows select), multiple (toggle buttons, aria-pressed)</span>
+        </div>
+        <div class="opt-row">
+          <code>orientation</code><span>string</span><span>horizontal (default), vertical</span>
+        </div>
+        <div class="opt-row">
+          <code>variant</code><span>string</span><span>Propagated to all child buttons</span>
+        </div>
+        <div class="opt-row">
+          <code>size</code><span>string</span><span>Propagated: sm, (default), lg</span>
+        </div>
+        <div class="opt-row">
+          <code>value</code><span>string</span><span>Selected value(s). Comma-separated for multiple: "bold,italic".</span>
+        </div>
+        <div class="opt-row">
+          <code>label</code><span>string</span><span>The group's accessible name, set as aria-label on the group</span>
+        </div>
+        <div class="opt-row">
+          <code>disabled</code><span>boolean</span><span>Disables all buttons in group</span>
+        </div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header">
+          <span>Event</span><span>Detail</span><span>When</span>
+        </div>
+        <div class="opt-row">
+          <code>pdx-change</code><span>string</span><span>Selection changes (single: value, multiple: comma-separated)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+import { useButtonGroupDemo } from './sections/comp-button-group/state.pdx';
+
+@page '/components/button-group';
+@title 'ButtonGroup Component';
+
+registerPragmaticIcons();
+
+// Event console: the toggle sections write to it, the page shows it (sections/comp-button-group/state.pdx.ts).
+const demo = useButtonGroupDemo();
+const logs = $derived(demo.logs());
+
+function clearLog() {
+    demo.clearLog();
+}
+</script>
+
+<style scoped>
+  .page { }
+
+  .demo-row { gap: var(--pdx-space-sm); }
+  .demo-row.align-start { align-items: flex-start; }
+
+  /* Console */
+  .console-panel {
+    margin-bottom: var(--pdx-space-xl);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .console-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--pdx-space-xs) var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-bottom: 1px solid var(--pdx-color-border);
+  }
+  .console-body {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    max-height: 140px;
+    overflow-y: auto;
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-surface);
+  }
+  .log-entry {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    padding: 2px 0;
+    line-height: 1.5;
+  }
+  .log-time { color: var(--pdx-color-muted); min-width: 90px; }
+  .log-label { color: var(--pdx-color-primary); min-width: 80px; font-weight: var(--pdx-weight-medium); }
+
+  .opt-header, .opt-row { grid-template-columns: 120px 120px 1fr; }
+</style>

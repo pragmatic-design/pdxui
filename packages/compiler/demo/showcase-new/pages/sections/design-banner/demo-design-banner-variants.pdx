@@ -1,0 +1,40 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Variants</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Four semantic variants: info (primary), success, warning, danger.</p>
+
+    <div class="banner-demo">
+      <div class="pdx-banner pdx-banner-info">
+        <span class="pdx-banner-icon">&#8505;</span>
+        <span class="pdx-banner-text">System maintenance scheduled for tonight at 11 PM.</span>
+      </div>
+
+      <div class="pdx-banner pdx-banner-success">
+        <span class="pdx-banner-icon">&#10003;</span>
+        <span class="pdx-banner-text">Your account has been verified successfully.</span>
+      </div>
+
+      <div class="pdx-banner pdx-banner-warning">
+        <span class="pdx-banner-icon">&#9888;</span>
+        <span class="pdx-banner-text">Your trial expires in 3 days. Upgrade to continue.</span>
+      </div>
+
+      <div class="pdx-banner pdx-banner-danger">
+        <span class="pdx-banner-icon">&#10007;</span>
+        <span class="pdx-banner-text">Service outage detected. Our team is investigating.</span>
+      </div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-banner pdx-banner-info"&gt;
+  &lt;span class="pdx-banner-icon"&gt;...&lt;/span&gt;
+  &lt;span class="pdx-banner-text"&gt;Message here.&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;div class="pdx-banner pdx-banner-success"&gt;...&lt;/div&gt;
+&lt;div class="pdx-banner pdx-banner-warning"&gt;...&lt;/div&gt;
+&lt;div class="pdx-banner pdx-banner-danger"&gt;...&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>

@@ -1,0 +1,65 @@
+/* What a drop target looks like while something is held over it.
+ *
+ * `useDropZone` writes the state and this paints it:
+ *
+ *   data-pdx-drop="over"        a droppable item is over this area and it will land here
+ *   data-pdx-drop="rejected"    it is over this area and this area will not take it
+ *   data-pdx-drop-edge="top|bottom|left|right|center"
+ *                               where it would insert — only on a zone that asked for the line
+ *
+ * Attributes rather than classes because they carry a VALUE: one name would be needed per state
+ * and per edge otherwise. And here rather than in the application, because a drop indicator that
+ * every app re-invents is the one part of a themed system that does not follow the theme.
+ *
+ * The two questions are answered differently on purpose, and this is the only normative rule
+ * anybody in this space has written down (Atlassian's): the BACKGROUND says "it will land inside
+ * here", the LINE says "it will land before or after this", and a line must not be shown where no
+ * relative placement exists. So `line` is opt-in on the zone and the highlight is not.
+ */
+
+[data-pdx-drop] {
+    /* The zone is the positioning context for its own line. Stated, because a zone that is
+       `position: static` would hang the line off whatever ancestor happens to be positioned. */
+    position: relative;
+}
+
+/* The mark is an OUTLINE and an inset shadow, not a background, and that was measured rather than
+   preferred: the showcase's own kanban column sets `background: var(--pdx-color-inset)` in its
+   `<style scoped>`, which is UNLAYERED and therefore beats every layer here. A highlight painted
+   with `background` is a highlight any application silently cancels — and `background-image` does
+   not survive it either, because the shorthand resets it.
+
+   `outline` and `box-shadow` are properties an application does not usually set on a container,
+   and neither of them affects layout, so nothing moves when the mark appears. */
+[data-pdx-drop="over"] {
+    outline: 2px solid var(--pdx-color-primary);
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 100vmax var(--pdx-color-primary-soft);
+}
+
+/* A refusal is said out loud. react-beautiful-dnd never tells a disabled droppable that it is
+   being dragged over (issue #1712) and Atlassian handles it by omission — "only colour when a drop
+   is possible" — which leaves the user to infer a rule from the absence of a colour. */
+[data-pdx-drop="rejected"] {
+    outline: 2px dashed var(--pdx-color-danger);
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 100vmax var(--pdx-color-danger-soft);
+    cursor: not-allowed;
+}
+
+/* The insertion line. `::after` and not an element, so nothing has to be rendered into the zone
+   and no layout moves — a line that takes space is a line that shifts what it is pointing at. */
+[data-pdx-drop-edge]::after {
+    content: '';
+    position: absolute;
+    background: var(--pdx-color-primary);
+    border-radius: var(--pdx-radius-full, 999px);
+    pointer-events: none;
+}
+
+[data-pdx-drop-edge="top"]::after    { inset: -1px 0 auto 0; height: 2px; }
+[data-pdx-drop-edge="bottom"]::after { inset: auto 0 -1px 0; height: 2px; }
+[data-pdx-drop-edge="left"]::after   { inset: 0 auto 0 -1px; width: 2px; }
+[data-pdx-drop-edge="right"]::after  { inset: 0 -1px 0 auto; width: 2px; }
+/* `center` means "inside, not between" — the highlight already says that, so no line. */
+[data-pdx-drop-edge="center"]::after { content: none; }

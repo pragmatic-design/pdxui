@@ -1,0 +1,38 @@
+<template>
+  <!-- ─── 2 · the window, and the rule that reads TWO fields ────────── -->
+  <div data-wizard-step :data-label="$t('intake.steps.window')">
+    <!-- The cross-field rule is the `intake` form's (`windowRule`, on the page): its message IS the
+         `ends` field's error, and shows in that field's `<pdx-form-field>`. -->
+    <pdx-form-field name="starts" :label="$t('intake.fields.starts')">
+      <pdx-date-picker name="starts" editable data-test="starts"></pdx-date-picker>
+    </pdx-form-field>
+    <pdx-form-field name="ends" :label="$t('intake.fields.ends')">
+      <pdx-date-picker name="ends" editable data-test="ends"></pdx-date-picker>
+    </pdx-form-field>
+
+    <!-- A PDX select, not the browser's: a native <select class="pdx-input"> takes the input's
+         padding and cuts its value. No `name`: the mode is the page's value, not a field
+         of the form, so it goes up as an event. -->
+    <pdx-form-field :label="$t('intake.fields.mode')">
+      <pdx-select :options="modes" :value="mode" @pdx-change="e => modechange(e.detail.value)" data-test="mode"></pdx-select>
+    </pdx-form-field>
+  </div>
+</template>
+
+<script setup>
+// Intake's second step: the window, and whether the visit is on site or remote. A section of the
+// `intake` form; the mode is the page's, which step 3 reads too.
+import { tryUseForm } from '@pdxui/core';
+
+/** On site or remote: the page's value. */
+@prop mode: string = 'onsite';
+/** The mode was changed: its new value. */
+@event modechange: string;
+
+tryUseForm();
+
+const modes = $derived([
+  { value: 'onsite', label: $t('intake.modes.onsite') },
+  { value: 'remote', label: $t('intake.modes.remote') },
+]);
+</script>

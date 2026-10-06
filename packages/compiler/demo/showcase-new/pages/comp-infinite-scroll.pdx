@@ -1,0 +1,63 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">InfiniteScroll</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-infinite-scroll&gt;</code> — loads more data as the user scrolls to the bottom.
+      Uses IntersectionObserver for efficient detection. Auto-pages a DataSource or fires
+      <code>pdx-load-more</code> events for manual control.
+    </p>
+
+    <pdx-demo-comp-infinite-scroll-basic class="demo-section"></pdx-demo-comp-infinite-scroll-basic>
+
+    <pdx-demo-comp-infinite-scroll-end-message class="demo-section"></pdx-demo-comp-infinite-scroll-end-message>
+
+    <pdx-demo-comp-infinite-scroll-manual class="demo-section"></pdx-demo-comp-infinite-scroll-manual>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (auto-increments page)</td></tr>
+            <tr><td><code>threshold</code></td><td>Number</td><td>200</td><td>Pixels from bottom to trigger load</td></tr>
+            <tr><td><code>disabled</code></td><td>Boolean</td><td>false</td><td>Disable automatic loading</td></tr>
+            <tr><td><code>loading</code></td><td>Boolean</td><td>false</td><td>External loading state override</td></tr>
+            <tr><td><code>end-message</code></td><td>String</td><td>'No more data'</td><td>Message when all data loaded</td></tr>
+            <tr><td><code>loading-message</code></td><td>String</td><td>'Loading...'</td><td>Loading indicator text</td></tr>
+            <tr><td><code>show-end-message</code></td><td>Boolean</td><td>true</td><td>Show end message when complete</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Events</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-load-more</code></td><td><code>{}</code></td><td>Fired when scroll threshold is reached (and not disabled/loading/at-end)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/infinite-scroll';
+@title 'InfiniteScroll — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-container { max-width: 600px; }
+.scroll-box { height: 400px; overflow-y: auto; border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm); }
+.scroll-item { padding: var(--pdx-space-sm) var(--pdx-space-md); border-bottom: 1px solid var(--pdx-color-border); display: flex; align-items: center; gap: var(--pdx-space-sm); }
+.scroll-item:last-child { border-bottom: none; }
+.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 600px; }
+</style>

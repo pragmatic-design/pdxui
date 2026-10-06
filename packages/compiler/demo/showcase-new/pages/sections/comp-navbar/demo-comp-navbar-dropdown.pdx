@@ -1,0 +1,64 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Nav with Dropdown</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A nav item can trigger a dropdown for sub-pages.</p>
+    <div class="demo-full">
+      <div class="pdx-navbar">
+        <div class="pdx-navbar-bar">
+          <div class="pdx-navbar-brand">
+            <pdx-icon name="globe" size="22"></pdx-icon>
+            <strong>SaaS App</strong>
+          </div>
+          <nav class="pdx-navbar-nav" role="navigation">
+            <a class="pdx-navbar-link active" href="#">Home</a>
+            <pdx-dropdown-menu label="Products" :items="productSubmenu" variant="ghost" size="sm"></pdx-dropdown-menu>
+            <a class="pdx-navbar-link" href="#">Pricing</a>
+            <pdx-dropdown-menu label="Resources" :items="resourceSubmenu" variant="ghost" size="sm"></pdx-dropdown-menu>
+          </nav>
+          <div class="pdx-navbar-spacer"></div>
+          <div class="pdx-navbar-actions">
+            <a class="pdx-navbar-link" href="#">Sign In</a>
+            <button class="pdx-btn pdx-primary pdx-btn-sm">Get Started</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;div class="pdx-navbar"&gt;
+  &lt;div class="pdx-navbar-bar"&gt;
+    &lt;div class="pdx-navbar-brand"&gt;
+      &lt;pdx-icon name="globe" size="22"&gt;&lt;/pdx-icon&gt;
+      &lt;strong&gt;SaaS App&lt;/strong&gt;
+    &lt;/div&gt;
+    &lt;nav class="pdx-navbar-nav"&gt;
+      &lt;a class="pdx-navbar-link active" href="#"&gt;Home&lt;/a&gt;
+      &lt;pdx-dropdown-menu label="Products" :items="productSubmenu" variant="ghost" size="sm"&gt;&lt;/pdx-dropdown-menu&gt;
+      &lt;a class="pdx-navbar-link" href="#"&gt;Pricing&lt;/a&gt;
+    &lt;/nav&gt;
+    &lt;div class="pdx-navbar-spacer"&gt;&lt;/div&gt;
+    &lt;div class="pdx-navbar-actions"&gt;
+      &lt;button class="pdx-btn pdx-primary pdx-btn-sm"&gt;Get Started&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script setup>
+const productSubmenu = [
+  { key: 'analytics', label: 'Analytics', icon: 'trending-up' },
+  { key: 'automation', label: 'Automation', icon: 'zap' },
+  { key: 'integrations', label: 'Integrations', icon: 'link' },
+  { key: 'sep', label: '', type: 'separator' },
+  { key: 'enterprise', label: 'Enterprise', icon: 'shield' },
+];
+
+const resourceSubmenu = [
+  { key: 'docs', label: 'Documentation', icon: 'file-text' },
+  { key: 'blog', label: 'Blog', icon: 'edit' },
+  { key: 'community', label: 'Community', icon: 'users' },
+  { key: 'changelog', label: 'Changelog', icon: 'list' },
+];
+</script>

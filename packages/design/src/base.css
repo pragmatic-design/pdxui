@@ -1,0 +1,60 @@
+/* ==========================================================================
+   Pragmatic Design CSS — the base, without the themes.
+
+   Everything `pragmatic-design.css` is, minus the thirteen theme files. It exists so an app that
+   uses ONE theme can ship one: importing all of them costs 10.5 KB gzipped — 20% of the stylesheet
+   — for rules the application cannot reach, and it is render-blocking CSS.
+
+       import '@pdxui/design/base';
+       import '@pdxui/design/themes/pragmatic';
+
+   `pragmatic-design.css` imports THIS plus the themes, so nothing that imports `@pdxui/design` has
+   to know this file exists.
+
+   ⚠️ THE @layer DECLARATION LIVES HERE, and it is the reason this file is not just a shorter list.
+   The order below is the cascade: a consumer's own unlayered CSS beats every layer, so overriding
+   the design system needs no `!important`. A stylesheet that arrives OUTSIDE these layers takes
+   that promise away — which is exactly what importing a raw theme file would do, because a theme
+   file carries no layer of its own and gets one from the `layer(...)` on the import here.
+   `themes/*.css` are wrappers, each declaring this same order before importing its theme into
+   `pdx.themes`, so a single theme lands in the right layer whether or not this file came first.
+   ========================================================================== */
+
+@layer pdx.reset, pdx.tokens, pdx.layout, pdx.surfaces, pdx.typography, pdx.media, pdx.components, pdx.adaptive, pdx.themes, pdx.composition, pdx.print;
+
+@import "./reset.css"      layer(pdx.reset);
+@import "./tokens.css"     layer(pdx.tokens);
+@import "./layout.css"     layer(pdx.layout);
+@import "./surfaces/_all.css"   layer(pdx.surfaces);
+@import "./typography.css"  layer(pdx.typography);
+@import "./media.css"       layer(pdx.media);
+/* The component styles do NOT live here. Each component's stylesheet travels with the component
+   that owns it — `@pdxui/ui/data-grid` imports `@pdxui/design/components/data-grid` — so an
+   app ships the styles of the components it renders and no others. On the showcase that is 28.8 KB
+   gzipped, more than its entire JavaScript bundle.
+
+   What stays is the CSS-ONLY tier: the `.pdx-table`, `.pdx-nav`, `.pdx-code` and alert/badge
+   classes a developer applies to plain HTML. They belong to no component, so nothing would carry
+   them.
+
+   `@pdxui/design/components` still imports all of them, for an app that would rather not think
+   about it. */
+@import "./components/table.css"     layer(pdx.components);
+@import "./components/nav.css"       layer(pdx.components);
+@import "./components/code.css"      layer(pdx.components);
+@import "./components/feedback.css"  layer(pdx.components);
+/* The drop target's own feedback. Here and not with a component, because
+   `useDropZone` is a composable any element can use — there is no `<pdx-drop-zone>` to carry it. */
+@import "./components/drop-zone.css" layer(pdx.components);
+@import "./adaptive.css"    layer(pdx.adaptive);
+
+/* Composition — enforces group constraints after theme overrides.
+   It is in `pdx.composition`, the LAST layer, so it wins over a theme whichever order the theme
+   arrived in. That is why it belongs here and not after the theme imports. */
+@import "./composition.css"         layer(pdx.composition);
+
+/* Print — the LAST layer, and that is the whole reason it is a layer of its own. In `adaptive.css`,
+   which sits BEFORE `pdx.themes`, the print block would lose: a later layer wins whatever the
+   specificity, so every theme's card shadow would override it and the print rules would never
+   apply. */
+@import "./print.css"               layer(pdx.print);

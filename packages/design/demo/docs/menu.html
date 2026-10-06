@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" pdx-scheme="auto" pdx-theme="neutral" pdx-density="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDX Docs — Dropdown Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/pragmatic-design.css?v=3">
+    <link rel="stylesheet" href="docs.css">
+    <script>
+        function pdxTogglePopover(id) {
+            const el = document.getElementById(id);
+            if (el.hasAttribute('data-open')) { el.removeAttribute('data-open'); }
+            else { document.querySelectorAll('.pdx-popover[data-open]').forEach(p => p.removeAttribute('data-open')); el.setAttribute('data-open', ''); }
+        }
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.pdx-popover-trigger')) document.querySelectorAll('.pdx-popover[data-open]').forEach(p => p.removeAttribute('data-open'));
+        });
+        function pdxToggleCheck(btn) {
+            const checked = btn.getAttribute('aria-checked') === 'true';
+            btn.setAttribute('aria-checked', checked ? 'false' : 'true');
+        }
+    </script>
+</head>
+<body>
+    <pdx-split ratio="1:6">
+        <nav class="doc-sidebar" pdx-sticky id="sidebar"></nav>
+        <main>
+            <div class="doc-topbar" pdx-sticky id="topbar"></div>
+            <pdx-center max="xl" pad="lg">
+                <pdx-stack gap="2xl">
+
+                    <pdx-stack gap="xs">
+                        <div class="pdx-breadcrumb">
+                            <a class="pdx-link" href="index.html">Docs</a>
+                            <span>Dropdown Menu</span>
+                        </div>
+                        <h1 class="pdx-txt-display">Dropdown Menu</h1>
+                        <p class="pdx-txt-body pdx-ink-muted">Contextual action list. Icons, shortcuts, separators, danger items, checkbox items, groups. Built on popover.</p>
+                    </pdx-stack>
+
+                    <!-- Basic -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Basic Menu</h2>
+                        <pdx-row gap="lg">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-secondary" size="sm" onclick="pdxTogglePopover('menu-basic')">Actions &#9662;</button>
+                                <div id="menu-basic" class="pdx-popover pdx-popover-bare pdx-popover-bottom-start">
+                                    <div class="pdx-menu">
+                                        <button class="pdx-menu-item"><i data-lucide="user" class="pdx-menu-icon"></i> Profile</button>
+                                        <button class="pdx-menu-item"><i data-lucide="settings" class="pdx-menu-icon"></i> Settings</button>
+                                        <button class="pdx-menu-item"><i data-lucide="credit-card" class="pdx-menu-icon"></i> Billing</button>
+                                        <hr class="pdx-menu-separator">
+                                        <button class="pdx-menu-item pdx-menu-danger"><i data-lucide="log-out" class="pdx-menu-icon"></i> Logout</button>
+                                    </div>
+                                </div>
+                            </span>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- With shortcuts -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Shortcuts</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Keyboard shortcut labels aligned right.</p>
+                        <pdx-row gap="lg">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-secondary" size="sm" onclick="pdxTogglePopover('menu-shortcuts')">Edit &#9662;</button>
+                                <div id="menu-shortcuts" class="pdx-popover pdx-popover-bare pdx-popover-bottom-start">
+                                    <div class="pdx-menu">
+                                        <button class="pdx-menu-item">Undo <span class="pdx-menu-shortcut">Ctrl+Z</span></button>
+                                        <button class="pdx-menu-item">Redo <span class="pdx-menu-shortcut">Ctrl+Y</span></button>
+                                        <hr class="pdx-menu-separator">
+                                        <button class="pdx-menu-item">Cut <span class="pdx-menu-shortcut">Ctrl+X</span></button>
+                                        <button class="pdx-menu-item">Copy <span class="pdx-menu-shortcut">Ctrl+C</span></button>
+                                        <button class="pdx-menu-item">Paste <span class="pdx-menu-shortcut">Ctrl+V</span></button>
+                                        <hr class="pdx-menu-separator">
+                                        <button class="pdx-menu-item">Select All <span class="pdx-menu-shortcut">Ctrl+A</span></button>
+                                    </div>
+                                </div>
+                            </span>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Groups -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Groups</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Section labels with <code>pdx-menu-label</code>.</p>
+                        <pdx-row gap="lg">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-secondary" size="sm" onclick="pdxTogglePopover('menu-groups')">View &#9662;</button>
+                                <div id="menu-groups" class="pdx-popover pdx-popover-bare pdx-popover-bottom-start">
+                                    <div class="pdx-menu">
+                                        <span class="pdx-menu-label">Layout</span>
+                                        <button class="pdx-menu-item active">Grid</button>
+                                        <button class="pdx-menu-item">List</button>
+                                        <button class="pdx-menu-item">Board</button>
+                                        <hr class="pdx-menu-separator">
+                                        <span class="pdx-menu-label">Density</span>
+                                        <button class="pdx-menu-item">Compact</button>
+                                        <button class="pdx-menu-item active">Normal</button>
+                                        <button class="pdx-menu-item">Spacious</button>
+                                    </div>
+                                </div>
+                            </span>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Checkbox items -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Checkbox Items</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Toggle items with checkmark indicator.</p>
+                        <pdx-row gap="lg">
+                            <span class="pdx-popover-trigger">
+                                <button class="pdx-secondary" size="sm" onclick="pdxTogglePopover('menu-check')">Columns &#9662;</button>
+                                <div id="menu-check" class="pdx-popover pdx-popover-bare pdx-popover-bottom-start">
+                                    <div class="pdx-menu">
+                                        <button class="pdx-menu-item" aria-checked="true" onclick="pdxToggleCheck(this)"><span class="pdx-menu-check"></span> Name</button>
+                                        <button class="pdx-menu-item" aria-checked="true" onclick="pdxToggleCheck(this)"><span class="pdx-menu-check"></span> Email</button>
+                                        <button class="pdx-menu-item" aria-checked="false" onclick="pdxToggleCheck(this)"><span class="pdx-menu-check"></span> Phone</button>
+                                        <button class="pdx-menu-item" aria-checked="true" onclick="pdxToggleCheck(this)"><span class="pdx-menu-check"></span> Status</button>
+                                        <button class="pdx-menu-item" aria-checked="false" onclick="pdxToggleCheck(this)"><span class="pdx-menu-check"></span> Created</button>
+                                    </div>
+                                </div>
+                            </span>
+                        </pdx-row>
+                    </pdx-stack>
+
+                    <!-- Standalone (not floating) -->
+                    <pdx-stack gap="md">
+                        <h2 class="pdx-txt-title">Standalone</h2>
+                        <p class="pdx-txt-small pdx-ink-muted">Menu inside a card, not floating. Works as a settings list.</p>
+                        <div class="pdx-surface-card" style="max-width:16rem;padding:0">
+                            <div class="pdx-menu">
+                                <span class="pdx-menu-label">Account</span>
+                                <button class="pdx-menu-item"><i data-lucide="user" class="pdx-menu-icon"></i> Profile</button>
+                                <button class="pdx-menu-item active"><i data-lucide="settings" class="pdx-menu-icon"></i> Settings</button>
+                                <button class="pdx-menu-item"><i data-lucide="bell" class="pdx-menu-icon"></i> Notifications</button>
+                                <hr class="pdx-menu-separator">
+                                <span class="pdx-menu-label">Support</span>
+                                <button class="pdx-menu-item"><i data-lucide="help-circle" class="pdx-menu-icon"></i> Help</button>
+                                <button class="pdx-menu-item" disabled><i data-lucide="shield" class="pdx-menu-icon"></i> Admin</button>
+                                <hr class="pdx-menu-separator">
+                                <button class="pdx-menu-item pdx-menu-danger"><i data-lucide="log-out" class="pdx-menu-icon"></i> Logout</button>
+                            </div>
+                        </div>
+                    </pdx-stack>
+
+                </pdx-stack>
+            </pdx-center>
+        </main>
+    </pdx-split>
+    <script src="docs.js"></script>
+</body>
+</html>

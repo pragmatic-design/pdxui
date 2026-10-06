@@ -1,0 +1,202 @@
+<template>
+  <div class="demo">
+    <h2>Tier 0C — Component Infrastructure</h2>
+    <p class="desc">Compound, Slots, Adaptive, Form Engine, Skeleton, Scroll Animation.</p>
+
+    <!-- Form Engine -->
+    <section>
+      <h3>Form Engine</h3>
+      <p class="desc">Cross-field validation, dirty tracking, field-level errors.</p>
+      <div class="form">
+        <div class="field">
+          <label>Name (required)</label>
+          <input type="text" :ref="nameRef" @input="onNameInput" @blur="onNameBlur" class="input" />
+          <span class="error">{{ nameError }}</span>
+        </div>
+        <div class="field">
+          <label>Email (must contain @)</label>
+          <input type="email" :ref="emailRef" @input="onEmailInput" @blur="onEmailBlur" class="input" />
+          <span class="error">{{ emailError }}</span>
+        </div>
+        <div class="row">
+          <button class="pdx-primary" @click="submitForm">Submit</button>
+          <button @click="resetForm" style="background:#666;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Reset</button>
+        </div>
+        <div class="log">
+          Dirty: <strong>{{ formDirty }}</strong> |
+          Valid: <strong>{{ formValid }}</strong> |
+          Submitted: <strong>{{ formSubmitted }}</strong> |
+          Result: <strong>{{ submitResult }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Adaptive -->
+    <section>
+      <h3>Adaptive Component</h3>
+      <p class="desc">Resize the browser. Below 768px it switches to mobile mode.</p>
+      <div class="adaptive-box">
+        <div class="mode-badge">{{ adaptiveMode }} ({{ adaptiveWidth }}px)</div>
+        @if (adaptiveMobile) {
+          <div class="mobile-view">📱 Mobile layout — would show BottomSheet</div>
+        } @else {
+          <div class="desktop-view">🖥️ Desktop layout — would show Popover</div>
+        }
+      </div>
+    </section>
+
+    <!-- Auto-Skeleton -->
+    <section>
+      <h3>Auto-Skeleton</h3>
+      <p class="desc">Click to toggle skeleton loading state on the card below.</p>
+      <button class="pdx-primary" @click="toggleSkeleton">Toggle Skeleton</button>
+      <div class="card-demo" :ref="cardRef">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' fill='%23ddd'%3E%3Crect width='200' height='120'/%3E%3C/svg%3E" width="200" height="120" />
+        <h4>Card Title</h4>
+        <p>Some description text that spans multiple lines to demonstrate text skeleton generation.</p>
+        <button>Action</button>
+      </div>
+    </section>
+
+    <!-- Scroll Animation -->
+    <section>
+      <h3>Scroll Animation</h3>
+      <p class="desc">Scroll down to see elements animate in. Uses IntersectionObserver.</p>
+      <div style="height: 150px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px;" :ref="scrollBoxRef">
+        <div style="height: 100px;"></div>
+        <div class="scroll-target" :ref="scrollTarget1">First element — appears on scroll</div>
+        <div style="height: 60px;"></div>
+        <div class="scroll-target" :ref="scrollTarget2">Second element — also appears on scroll</div>
+        <div style="height: 60px;"></div>
+        <div class="scroll-target" :ref="scrollTarget3">Third element</div>
+        <div style="height: 100px;"></div>
+      </div>
+      <div class="log">In view: <strong>{{ scrollInView }}</strong></div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { createFormEngine, useAdaptive, showSkeleton, hideSkeleton, useScrollAnimation, effect, onMount, onDestroy } from '@pdxui/core';
+
+// ─── Form Engine ──────────────────────────────────────────────
+let nameError = $signal('');
+let emailError = $signal('');
+let formDirty = $signal(false);
+let formValid = $signal(true);
+let formSubmitted = $signal(false);
+let submitResult = $signal('');
+let nameRef = $signal(null);
+let emailRef = $signal(null);
+
+var form = createFormEngine();
+var nameField = form.field('name', {
+    initialValue: '',
+    rules: [function(v) { return v ? null : 'Name is required'; }],
+});
+var emailField = form.field('email', {
+    initialValue: '',
+    rules: [
+        function(v) { return v ? null : 'Email is required'; },
+        function(v) { return String(v).includes('@') ? null : 'Must contain @'; },
+    ],
+});
+
+function onNameInput(e) { nameField.set(e.target.value); }
+function onNameBlur() { nameField.touch(); }
+function onEmailInput(e) { emailField.set(e.target.value); }
+function onEmailBlur() { emailField.touch(); }
+
+function submitForm() {
+    form.submit(function(values) {
+        submitResult = 'OK: ' + JSON.stringify(values);
+    });
+}
+function resetForm() {
+    form.reset();
+    submitResult = '';
+    if (nameRef) nameRef.value = '';
+    if (emailRef) emailRef.value = '';
+}
+
+// ─── Adaptive ─────────────────────────────────────────────────
+let adaptiveMode = $signal('desktop');
+let adaptiveMobile = $signal(false);
+let adaptiveWidth = $signal(0);
+
+var adaptive = useAdaptive({ breakpoint: 768 });
+
+// ─── Skeleton ─────────────────────────────────────────────────
+let cardRef = $signal(null);
+var skeletonDispose = null;
+var skeletonOn = false;
+
+function toggleSkeleton() {
+    if (skeletonOn && skeletonDispose) {
+        skeletonDispose();
+        skeletonDispose = null;
+        skeletonOn = false;
+    } else if (cardRef) {
+        skeletonDispose = showSkeleton(cardRef, { animation: 'wave' });
+        skeletonOn = true;
+    }
+}
+
+// ─── Scroll Animation ─────────────────────────────────────────
+let scrollTarget1 = $signal(null);
+let scrollTarget2 = $signal(null);
+let scrollTarget3 = $signal(null);
+let scrollBoxRef = $signal(null);
+
+var sa1 = useScrollAnimation(() => scrollTarget1, { threshold: 0.5 });
+var sa2 = useScrollAnimation(() => scrollTarget2, { threshold: 0.5 });
+var sa3 = useScrollAnimation(() => scrollTarget3, { threshold: 0.5 });
+/** How many of the three are in view: computed from their signals, not counted by an effect (CD-D2). */
+const scrollInView = $derived([sa1, sa2, sa3].filter(sa => sa.isInView()).length);
+
+onMount(() => {
+    var d1 = effect(() => {
+        nameError = nameField.errors().join(', ');
+        emailError = emailField.errors().join(', ');
+        formDirty = form.state.dirty();
+        formValid = form.state.valid();
+        formSubmitted = form.state.submitted();
+    });
+    var d2 = effect(() => {
+        adaptiveMode = adaptive.mode();
+        adaptiveMobile = adaptive.isMobile();
+        adaptiveWidth = adaptive.width();
+    });
+    onDestroy(() => {
+        d1(); d2();
+        sa1.dispose(); sa2.dispose(); sa3.dispose();
+        if (skeletonDispose) skeletonDispose();
+    });
+});
+</script>
+
+<style scoped>
+  .demo { max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: #666; font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .form { display: flex; flex-direction: column; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 0.8rem; font-weight: 600; color: #555; }
+  .input { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; }
+  .error { color: #ef4444; font-size: 0.75rem; min-height: 16px; }
+  .log { font-size: 0.8rem; margin-top: 8px; font-family: monospace; }
+  .adaptive-box { padding: 16px; border: 2px dashed #e0e0e0; border-radius: 8px; margin-top: 8px; }
+  .mode-badge { font-size: 0.75rem; color: #666; margin-bottom: 8px; }
+  .mobile-view { padding: 12px; background: #fef3c7; border-radius: 6px; }
+  .desktop-view { padding: 12px; background: #dbeafe; border-radius: 6px; }
+  .card-demo { margin-top: 8px; padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; }
+  .card-demo img { border-radius: 6px; display: block; margin-bottom: 8px; }
+  .card-demo h4 { margin: 0 0 4px; }
+  .card-demo p { margin: 0 0 8px; font-size: 0.85rem; color: #666; }
+  .card-demo button { padding: 6px 14px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; cursor: pointer; }
+  .scroll-target { padding: 16px; background: #f0f0f0; border-radius: 8px; text-align: center; font-size: 0.9rem; transition: all 500ms ease; opacity: 0; transform: translateY(20px); }
+  .scroll-target.pdx-in-view { opacity: 1; transform: translateY(0); }
+</style>

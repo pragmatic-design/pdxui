@@ -1,0 +1,13 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Zoomable</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Click to zoom in (2x), click again to zoom out.</p>
+    <div class="demo-row">
+      <pdx-image src="/demo-images/mountains.svg" alt="Zoomable" width="300px" height="200px" :zoomable="true" :lazy="false"></pdx-image>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-image src="..." :zoomable="true" width="300px" height="200px"&gt;&lt;/pdx-image&gt;</code></pre>
+    </details>
+  </section>
+</template>

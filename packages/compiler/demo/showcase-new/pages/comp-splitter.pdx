@@ -1,0 +1,79 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Splitter</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-splitter&gt;</code> — resizable split pane layout. Drag handles between panes,
+      keyboard resize, collapsible, persistence, nested.
+    </p>
+
+    <pdx-demo-comp-splitter-horizontal class="demo-section"></pdx-demo-comp-splitter-horizontal>
+
+    <pdx-demo-comp-splitter-vertical class="demo-section"></pdx-demo-comp-splitter-vertical>
+
+    <pdx-demo-comp-splitter-three-panes class="demo-section"></pdx-demo-comp-splitter-three-panes>
+
+    <pdx-demo-comp-splitter-collapsible class="demo-section"></pdx-demo-comp-splitter-collapsible>
+
+    <pdx-demo-comp-splitter-nested class="demo-section"></pdx-demo-comp-splitter-nested>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>orientation</code></td><td>String</td><td>'horizontal'</td><td>horizontal or vertical</td></tr>
+            <tr><td><code>panes</code></td><td>SplitterPane[]</td><td>[]</td><td>Per-pane config: min, max, defaultSize, collapsible, collapsedSize</td></tr>
+            <tr><td><code>gutter-size</code></td><td>Number</td><td>6</td><td>Handle thickness (px)</td></tr>
+            <tr><td><code>auto-save-id</code></td><td>String</td><td>''</td><td>localStorage key for persistence</td></tr>
+            <tr><td><code>keyboard-step</code></td><td>Number</td><td>2</td><td>% step for arrow key resize</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Keyboard</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Key</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Arrow Left/Right (H) or Up/Down (V)</td><td>Resize by step</td></tr>
+            <tr><td>Home</td><td>Maximize left/top pane</td></tr>
+            <tr><td>End</td><td>Minimize left/top pane</td></tr>
+            <tr><td>Double-click handle</td><td>Collapse/expand (if collapsible)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+@page '/components/splitter';
+@title 'Splitter — PDX Components';
+
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+.page { }
+.demo-split {
+  height: 280px;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+}
+.demo-split-tall { height: 400px; }
+.pane-content {
+  padding: var(--pdx-space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-xs);
+  font-size: var(--pdx-text-sm);
+  height: 100%;
+  box-sizing: border-box;
+}
+.pane-left { background: var(--pdx-color-inset); }
+</style>

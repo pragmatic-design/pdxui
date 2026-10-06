@@ -1,0 +1,9 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Closable</h2>
+    <div class="demo-stack">
+      <pdx-banner variant="info" closable>Click the × to dismiss this banner.</pdx-banner>
+      <pdx-banner variant="success" closable>You can close this success message.</pdx-banner>
+    </div>
+  </section>
+</template>

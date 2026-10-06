@@ -1,0 +1,53 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Tooltip</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      Positioned tooltip with 12 placements, show/hide delay, arrow, overflow-only mode. Hover or focus the trigger.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <pdx-demo-comp-tooltip-basic class="demo-section"></pdx-demo-comp-tooltip-basic>
+
+    <!-- ═══ Placements ═══ -->
+    <pdx-demo-comp-tooltip-placements class="demo-section"></pdx-demo-comp-tooltip-placements>
+
+    <!-- ═══ With Arrow ═══ -->
+    <pdx-demo-comp-tooltip-arrow class="demo-section"></pdx-demo-comp-tooltip-arrow>
+
+    <!-- ═══ Delay ═══ -->
+    <pdx-demo-comp-tooltip-delay class="demo-section"></pdx-demo-comp-tooltip-delay>
+
+    <!-- ═══ Overflow Only ═══ -->
+    <pdx-demo-comp-tooltip-overflow class="demo-section"></pdx-demo-comp-tooltip-overflow>
+
+    <!-- ═══ Disabled ═══ -->
+    <pdx-demo-comp-tooltip-disabled class="demo-section"></pdx-demo-comp-tooltip-disabled>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">Reference</h2>
+      <h3 class="pdx-txt-subheading">Props</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
+        <div class="opt-row"><code>text</code><span>string</span><span>''</span><span>Tooltip text content</span></div>
+        <div class="opt-row"><code>placement</code><span>string</span><span>'top'</span><span>12 options: top, bottom, left, right + -start/-end</span></div>
+        <div class="opt-row"><code>delay</code><span>number</span><span>200</span><span>Show delay in ms</span></div>
+        <div class="opt-row"><code>hide-delay</code><span>number</span><span>0</span><span>Hide delay in ms</span></div>
+        <div class="opt-row"><code>arrow</code><span>boolean</span><span>false</span><span>Show directional arrow</span></div>
+        <div class="opt-row"><code>disabled</code><span>boolean</span><span>false</span><span>Disable tooltip</span></div>
+        <div class="opt-row"><code>overflow-only</code><span>boolean</span><span>false</span><span>Only show when trigger text is truncated</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
+@page '/components/tooltip';
+@title 'Tooltip';
+registerPragmaticIcons();
+</script>
+
+<style scoped>
+  .page { }
+</style>
