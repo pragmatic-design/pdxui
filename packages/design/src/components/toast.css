@@ -278,6 +278,11 @@
 
 .pdx-toast-close {
     flex-shrink: 0;
+    /* A square of the glyph's size, the × centred in it: left to the glyph, the width was the
+       font's to decide — 11px on Windows, 8.5 in the Linux image, 13.4 on the GitHub runner. */
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1em;
     background: none;
     border: none;
     color: var(--pdx-color-muted);
