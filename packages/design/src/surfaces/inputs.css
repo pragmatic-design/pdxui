@@ -277,12 +277,15 @@ pdx-row > .pdx-input {
     --_r-br: var(--pdx-group-r-br); --_r-bl: var(--pdx-group-r-bl);
 }
 
-/* Flex: inputs take remaining space */
+/* Flex: inputs take remaining space — and give it back. min-width:0, because a text input's
+   automatic minimum is about twenty characters of the font: a narrow group pushed its addons and
+   buttons past the edge instead of shrinking the field. */
 :is(.pdx-input-group, pdx-input-group) > .pdx-input,
 :is(.pdx-input-group, pdx-input-group) > .pdx-input-wrap,
 :is(.pdx-input-group, pdx-input-group) > pdx-input .pdx-input-wrap {
     flex: 1;
     width: auto;
+    min-width: 0;
 }
 
 /* Note: button/input height alignment inside groups depends on themes setting

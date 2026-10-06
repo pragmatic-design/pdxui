@@ -66,3 +66,24 @@ test('a CSS-only stepper narrower than its steps shrinks them, and every step st
     expect(new Set(numbers.map((n) => n.top)).size, 'the steps keep one row').toBe(1);
     for (const n of numbers) expect(n.width, 'a step number keeps its size').toBeGreaterThanOrEqual(20);
 });
+
+// The input is what gives: a text input's intrinsic width is about twenty characters of the font,
+// so with the default min-width it never shrank below that, and the addons and the button were
+// pushed past the edge — 6px and 17px past it at 390px on the GitHub runner, whose fonts are wider.
+test('a CSS-only input group narrower than its parts shrinks the input, and every part stays in the box', async ({ page }) => {
+    await mount(page, `
+        <div class="pdx-input-group">
+            <span class="pdx-input-addon">@</span>
+            <input class="pdx-input" type="text" placeholder="username" />
+        </div>
+        <div class="pdx-input-group">
+            <input class="pdx-input" type="text" placeholder="Search..." />
+            <button class="pdx-primary">Go</button>
+        </div>
+        <div class="pdx-input-group">
+            <span class="pdx-input-addon">https://</span>
+            <input class="pdx-input" type="text" placeholder="example.com" />
+            <span class="pdx-input-addon">/path</span>
+        </div>`);
+    expect((await pastTheEdge(page)).past).toEqual([]);
+});
