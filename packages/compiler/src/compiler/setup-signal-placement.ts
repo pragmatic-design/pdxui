@@ -22,7 +22,18 @@ interface LateSignal {
     unplaced?: 'end' | 'start';
 }
 
-const reads = (expr: string, name: string): boolean => new RegExp(`(?<![\\w$.])${name.replace(/\$/g, '\\$')}(?![\\w$])`).test(expr);
+// Match: an identifier-like run not preceded by an identifier character nor by `.` (a property
+// access). An expression reads a name when one of its runs IS that name.
+const NAME_RUN = /(?<![\p{ID_Continue}$.])[\p{ID_Continue}$]+/gu;
+
+/**
+ * The names of `candidates` that `expr` reads, looked up from the runs of `expr`. Testing every
+ * candidate against every expression — with a regex built per pair — made placement O(n²) in the
+ * number of declarations: a 500-declaration component took half a second to compile.
+ */
+function namesRead(expr: string, candidates: { has(name: string): boolean }): string[] {
+    return [...new Set(expr.match(NAME_RUN))].filter((n) => candidates.has(n));
+}
 
 /**
  * The signals that must wait for the body: those reading a body-local, and — transitively — those
@@ -31,13 +42,13 @@ const reads = (expr: string, name: string): boolean => new RegExp(`(?<![\\w$.])$
  */
 export function lateSignals<S extends LateSignal>(signals: S[], bodyLocals: Set<string>): Set<string> {
     const late = new Set<string>();
-    for (const s of signals) if ([...bodyLocals].some((n) => reads(s.initialExpr, n))) late.add(s.name);
+    for (const s of signals) if (namesRead(s.initialExpr, bodyLocals).length > 0) late.add(s.name);
     let grew = true;
     while (grew) {
         grew = false;
         for (const s of signals) {
             if (late.has(s.name)) continue;
-            if ([...late].some((n) => reads(s.initialExpr, n))) { late.add(s.name); grew = true; }
+            if (namesRead(s.initialExpr, late).length > 0) { late.add(s.name); grew = true; }
         }
     }
     return late;
@@ -70,8 +81,8 @@ export function lateSignalOffsets(body: string, signals: LateSignal[]): Map<stri
     const offsets = new Map<string, number>();
     for (const s of signals) {
         let at = -1;
-        for (const [n, end] of declaredAt) if (reads(s.initialExpr, n)) at = Math.max(at, end);
-        for (const [n, end] of offsets) if (reads(s.initialExpr, n)) at = Math.max(at, end);
+        for (const n of namesRead(s.initialExpr, declaredAt)) at = Math.max(at, declaredAt.get(n)!);
+        for (const n of namesRead(s.initialExpr, offsets)) at = Math.max(at, offsets.get(n)!);
         offsets.set(s.name, at !== -1 ? at : s.unplaced === 'start' ? 0 : body.length);
     }
     return offsets;
