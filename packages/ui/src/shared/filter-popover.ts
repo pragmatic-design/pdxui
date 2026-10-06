@@ -582,8 +582,12 @@ function buildEnumContent(
 
 let _activePopover: HTMLElement | null = null;
 
+/** Takes the open popover's outside-click and scroll listeners away, attached or still pending. */
+let _detach: (() => void) | null = null;
+
 export function closeFilterPopover(): void {
     if (_activePopover) { _activePopover.remove(); _activePopover = null; }
+    if (_detach) { _detach(); _detach = null; }
 }
 
 /** Open a filter popover anchored to an element. */
@@ -602,12 +606,12 @@ export function openFilterPopoverFor(
 
     const opener: FilterPopoverOpener = options.opener !== undefined ? options.opener
         : anchorEl instanceof HTMLElement ? anchorEl : (document.activeElement as HTMLElement | null);
-    const dismiss = () => dialog.closing(() => { closeFilterPopover(); cleanup(); callbacks.onClose(); });
+    const dismiss = () => dialog.closing(() => { closeFilterPopover(); callbacks.onClose(); });
     const dialog = makeFilterDialog(popover, field.label, opener, dismiss);
 
     buildFilterPopoverContent(popover, field, state, {
-        onApply: (s) => dialog.closing(() => { callbacks.onApply(s); closeFilterPopover(); cleanup(); }),
-        onClear: () => dialog.closing(() => { callbacks.onClear(); closeFilterPopover(); cleanup(); }),
+        onApply: (s) => dialog.closing(() => { callbacks.onApply(s); closeFilterPopover(); }),
+        onClear: () => dialog.closing(() => { callbacks.onClear(); closeFilterPopover(); }),
         onClose: dismiss,
     });
 
@@ -639,31 +643,34 @@ export function openFilterPopoverFor(
     // in a rAF registered BEFORE this one, and focus does not land in a hidden subtree.
     requestAnimationFrame(() => { if (popover.isConnected) place(); });
 
-    // Close on outside click
-    function cleanup() {
-        document.removeEventListener('pointerdown', onClickOutside, true);
-        window.removeEventListener('scroll', onScroll, true);
-    }
-
+    // Close on outside click or scroll. Attached a tick later, so the click that opened the popover
+    // does not close it; every close — these two, Apply, Clear, Escape, a reopen, the grid's own —
+    // goes through closeFilterPopover, which detaches them.
     // A click outside puts focus where it clicked, so it is not sent back to the opener.
     const onClickOutside = (e: MouseEvent) => {
         if (!popover.contains(e.target as Node)) {
             closeFilterPopover();
-            cleanup();
             callbacks.onClose();
         }
     };
     const onScroll = (e: Event) => {
         if (popover.contains(e.target as Node)) return;
         closeFilterPopover();
-        cleanup();
         callbacks.onClose();
     };
 
-    setTimeout(() => {
+    let attached = false;
+    const attach = setTimeout(() => {
+        attached = true;
         document.addEventListener('pointerdown', onClickOutside, true);
         window.addEventListener('scroll', onScroll, true);
     }, 0);
+    _detach = () => {
+        clearTimeout(attach);
+        if (!attached) return;
+        document.removeEventListener('pointerdown', onClickOutside, true);
+        window.removeEventListener('scroll', onScroll, true);
+    };
 }
 
 // ─── Convert state to FilterDescriptor/CompositeFilter ─────

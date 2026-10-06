@@ -21,10 +21,13 @@ export interface ColumnChooserCallbacks {
 let _activeMenu: HTMLElement | null = null;
 /** The element that opened the menu: its aria-expanded says whether the menu is open. */
 let _activeAnchor: HTMLElement | null = null;
+/** Takes the open menu's outside-click and scroll listeners away, attached or still pending. */
+let _detach: (() => void) | null = null;
 
 export function closeColumnChooser(): void {
     if (_activeMenu) { _activeMenu.remove(); _activeMenu = null; }
     if (_activeAnchor) { _activeAnchor.setAttribute('aria-expanded', 'false'); _activeAnchor = null; }
+    if (_detach) { _detach(); _detach = null; }
 }
 
 /** Open a column chooser dropdown anchored to an element. */
@@ -145,24 +148,28 @@ export function openColumnChooser(
 
     document.body.appendChild(menu);
 
-    // Close on outside click or scroll
-    function cleanup() {
-        closeColumnChooser();
-        document.removeEventListener('pointerdown', onClickOutside, true);
-        window.removeEventListener('scroll', onScroll, true);
-    }
-
+    // Close on outside click or scroll. Attached a tick later, so the click that opened the menu
+    // does not close it; every close — these two, a reopen, the grid's own — goes through
+    // closeColumnChooser, which detaches them.
     const onClickOutside = (e: MouseEvent) => {
-        if (!menu.contains(e.target as Node) && e.target !== anchorEl) cleanup();
+        if (!menu.contains(e.target as Node) && e.target !== anchorEl) closeColumnChooser();
     };
 
     const onScroll = (e: Event) => {
         if (menu.contains(e.target as Node)) return;
-        cleanup();
+        closeColumnChooser();
     };
 
-    setTimeout(() => {
+    let attached = false;
+    const attach = setTimeout(() => {
+        attached = true;
         document.addEventListener('pointerdown', onClickOutside, true);
         window.addEventListener('scroll', onScroll, true);
     }, 0);
+    _detach = () => {
+        clearTimeout(attach);
+        if (!attached) return;
+        document.removeEventListener('pointerdown', onClickOutside, true);
+        window.removeEventListener('scroll', onScroll, true);
+    };
 }
