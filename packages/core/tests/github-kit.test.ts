@@ -43,6 +43,18 @@ describe('the GitHub kit', () => {
         expect(t).toMatch(/package-ecosystem: github-actions\n\s+directory: \/\n/);
     });
 
+    it('Quality builds before it typechecks: the meta-package checks against its siblings\' dist', () => {
+        // packages/framework typechecks against what core, ui and router PUBLISH (its tsconfig empties
+        // the development condition), so on a fresh runner a typecheck before the build cannot
+        // resolve them.
+        const t = read('workflows', 'quality.yml');
+        const build = t.indexOf('run: pnpm build');
+        const typecheck = t.indexOf('run: pnpm typecheck');
+        expect(build, 'quality.yml has no `pnpm build` step').toBeGreaterThan(-1);
+        expect(typecheck, 'quality.yml has no `pnpm typecheck` step').toBeGreaterThan(-1);
+        expect(build, 'the build must run before the typecheck').toBeLessThan(typecheck);
+    });
+
     it('CodeQL analyses the sources and the workflows', () => {
         expect(read('workflows', 'codeql.yml')).toMatch(/language: \[javascript-typescript, actions\]/);
     });
