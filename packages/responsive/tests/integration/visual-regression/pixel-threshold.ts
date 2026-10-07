@@ -19,3 +19,28 @@
 //
 // One value, for the config's floor and for the runner's two calls.
 export const PIXEL_THRESHOLD = 0;
+
+// How many pixels may differ at all — not by how much, which stays 0 above.
+//
+// The baselines are made in the Docker image on a developer's machine and compared on GitHub's
+// runners, and the same image and the same Chromium do not rasterise every edge alike on every CPU:
+// Skia picks its SIMD path from the processor. Measured on the runner: slider-basic [neutral] 6
+// pixels off and split-open [neumorphic] 3, identical in every run on any commit (deterministic,
+// not noise), and tabs-bordered [neutral] 3 once, on one runner. All of it antialiasing at an edge
+// or a rounded corner.
+//
+// 10 lets that through and nothing a design change makes: a tint, a shadow or a backdrop moves
+// thousands of pixels, and a focus ring a pixel wider a few hundred. What it gives up is a change
+// of ten pixels or fewer.
+export const MAX_DIFF_PIXELS = 10;
+
+/**
+ * The pixel tolerance of one screenshot: MAX_DIFF_PIXELS, or the ratio a manifest declares for a
+ * scenario that carries state or movement. One or the other, never both — Playwright takes the
+ * SMALLER of the two, so a ratio of 0 next to a count would leave nothing.
+ */
+export function pixelTolerance(ratio?: number): { maxDiffPixels?: number; maxDiffPixelRatio?: number } {
+    return ratio === undefined
+        ? { maxDiffPixels: MAX_DIFF_PIXELS, maxDiffPixelRatio: undefined }
+        : { maxDiffPixels: undefined, maxDiffPixelRatio: ratio };
+}

@@ -13,7 +13,7 @@ import { goToScenario, applyTheme } from '../ui-components/contracts/measure';
 import { freezeAnimations } from '../ui-components/contracts/assertions';
 import { manifests, scenarioPage } from '../ui-components/contracts/generated/manifests';
 import { THEMES, schemeFor } from '../../manifests/_themes';
-import { PIXEL_THRESHOLD } from './pixel-threshold';
+import { PIXEL_THRESHOLD, pixelTolerance } from './pixel-threshold';
 
 for (const m of manifests) {
     if (!m.visual) continue;
@@ -61,7 +61,8 @@ for (const m of manifests) {
                     // hundred thousand — about 0.2%, comfortably under the 1% the resting baselines
                     // allow. Measured: at 0.01 the whole suite stays green with --pdx-focus-width
                     // moved from 3px to 4px, which is the exact change this screenshot exists to catch.
-                    maxDiffPixelRatio: 0,
+                    // So a count, not a ratio: the few pixels a CPU rasterises differently, and no more.
+                    ...pixelTolerance(),
                     threshold: PIXEL_THRESHOLD,
                     mask: (m.visual!.mask ?? []).map((s) => page.locator(s)),
                     animations: 'disabled',
@@ -86,16 +87,16 @@ for (const m of manifests) {
             // which .first() would otherwise capture.
             const target = page.locator('section[data-scenario]:not([hidden])').first();
             return expect(target).toHaveScreenshot(`${scenarioId}-${theme}.png`, {
-                // 0 by default, and that is a measurement rather than a preference. At 0 the whole visual
-                // dimension has 25 failures of 1591, and they are NOT spread across the suite: they come
-                // from four scenarios carrying state or movement, each of which declares its own
-                // tolerance and says why. Everything else is exact.
+                // A few pixels by default (pixel-threshold.ts: what a CPU rasterises differently), and
+                // that is a measurement rather than a preference. Exact, the whole visual dimension had
+                // 25 failures of 1591, NOT spread across the suite: they came from four scenarios
+                // carrying state or movement, each of which declares its own ratio and says why.
                 //
-                // A default of 0.01 sounds strict and is not: a 2px border on a wide section is about
-                // 0.34% of its pixels, so every border, rule, divider, tab indicator and focus ring
+                // A default RATIO of 0.01 sounds strict and is not: a 2px border on a wide section is
+                // about 0.34% of its pixels, so every border, rule, divider, tab indicator and focus ring
                 // would be invisible to this dimension — a magenta shell edge passes with no change
-                // reported.
-                maxDiffPixelRatio: m.visual!.maxDiffPixelRatio ?? 0,
+                // reported. A count of ten does not hide any of them.
+                ...pixelTolerance(m.visual!.maxDiffPixelRatio),
                 // How far one pixel's colour may move — pixel-threshold.ts, measured.
                 threshold: PIXEL_THRESHOLD,
                 mask: (m.visual!.mask ?? []).map((s) => page.locator(s)),
