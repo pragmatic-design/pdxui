@@ -391,6 +391,11 @@ applyDensity(storedDensity());
        list in between scrolls inside it (`.rail-nav`), so the foot is in the window at any height. */
     position: sticky;
     top: 0;
+    /* The document scrolls in whole pixels and the shell's height need not be one: scrolled to the
+       end of a 931.5px page, the shell's bottom is half a pixel above the window's, and a sticky
+       rail held inside it went up with it (-0.5 on the GitHub runner). A sticky box is held by its
+       MARGIN box, so a pixel of negative margin lets it overhang the shell by that fraction. */
+    margin-bottom: -1px;
     align-self: flex-start;
     height: 100vh;
     height: 100dvh;
