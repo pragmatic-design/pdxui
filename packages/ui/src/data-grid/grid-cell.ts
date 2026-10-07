@@ -95,6 +95,8 @@ function renderCellContent(value: unknown, col: AnyColumn, row: Record<string, u
                 const list = document.createElement('span');
                 list.className = 'pdx-dg-badges';
                 for (const item of value) list.appendChild(one(item));
+                // The list stays on one line and is cut where the cell ends: the title names them all.
+                if (value.length > 0) list.title = [...list.children].map((b) => b.textContent).join(', ');
                 return list;
             }
             case 'status': {
