@@ -374,5 +374,6 @@ library included, free for everyone, at any scale, with no threshold and no paid
 the compiler emits into your project is yours.
 
 "Pragmatic" and "PDX UI", their names and logos, are trademarks and are not covered by the license: a
-fork is welcome, under a name of its own. The project is funded through GitHub Sponsors; the details
-are in **[docs/LICENSING.md](docs/LICENSING.md)**.
+fork is welcome, under a name of its own. The project is funded by its sponsors, through
+**[GitHub Sponsors](https://github.com/sponsors/pragmatic-design)**; the details are in
+**[docs/LICENSING.md](docs/LICENSING.md)**.
