@@ -11,12 +11,26 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Two kept out of the weekly group, each in a pull request of its own: tests here depend on
+    # behaviour measured on a given happy-dom (its MutationObserver, its mount order), and citty is
+    # the CLI's parser on 0.x, where a minor may change the API.
     groups:
+      happy-dom:
+        patterns: ["happy-dom"]
+      citty:
+        patterns: ["citty"]
       npm:
         patterns: ["*"]
+        exclude-patterns: ["happy-dom", "citty"]
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Not at all: every Playwright release brings its own Chromium, and the certification image
+      # (packages/responsive/tests/docker/Dockerfile) and its 1708 visual baselines are pinned to
+      # one. Playwright moves on purpose, with the image and the baselines, in one change.
+      - dependency-name: "@playwright/test"
+      - dependency-name: "playwright"
+      - dependency-name: "playwright-core"
 
   - package-ecosystem: github-actions
     directory: /
