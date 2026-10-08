@@ -38,7 +38,7 @@
     "vite": "^6.4.2"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.6.4",
     "vite": "^6.4.2",
     "vitest": "^4.1.0"
   }
