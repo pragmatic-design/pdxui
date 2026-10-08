@@ -43,6 +43,19 @@ describe('the GitHub kit', () => {
         expect(t).toMatch(/package-ecosystem: github-actions\n\s+directory: \/\n/);
     });
 
+    it('dependabot leaves Playwright alone, and gives happy-dom and citty a pull request each', () => {
+        // Every Playwright release brings its own Chromium, and the certification image and its
+        // visual baselines are pinned to one: bumped in the weekly group it would turn the visual
+        // dimension red with nothing to fix but the image.
+        const t = read('dependabot.yml');
+        for (const name of ['@playwright/test', 'playwright', 'playwright-core']) {
+            expect(t, `${name} is not ignored`).toMatch(new RegExp(`- dependency-name: "${name}"\\s*\\n`));
+        }
+        expect(t).toMatch(/happy-dom:\n\s+patterns: \["happy-dom"\]/);
+        expect(t).toMatch(/citty:\n\s+patterns: \["citty"\]/);
+        expect(t).toMatch(/exclude-patterns: \["happy-dom", "citty"\]/);
+    });
+
     it('Quality builds before it typechecks: the meta-package checks against its siblings\' dist', () => {
         // packages/framework typechecks against what core, ui and router PUBLISH (its tsconfig empties
         // the development condition), so on a fresh runner a typecheck before the build cannot
