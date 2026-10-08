@@ -60,8 +60,8 @@
     "vscode-languageclient": "^9.0.1"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
-    "esbuild": "^0.28.1",
+    "@types/vscode": "^1.140.0",
+    "esbuild": "^0.28.2",
     "typescript": "^5.8.0"
   }
 }
