@@ -28,10 +28,10 @@ jobs:
     name: build · typecheck · lint · test · coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with: { version: 10.8.1 }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
 
@@ -59,7 +59,7 @@ jobs:
       - name: Coverage thresholds (core · compiler · router · lsp)
         run: pnpm coverage
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: coverage-report
@@ -84,10 +84,10 @@ jobs:
     name: builder · e2e + static build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with: { version: 10.8.1 }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @pdxui/builder exec playwright install --with-deps chromium
@@ -100,7 +100,7 @@ jobs:
       - name: Builder static build
         run: pnpm --filter @pdxui/builder run test:static
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: builder-report
