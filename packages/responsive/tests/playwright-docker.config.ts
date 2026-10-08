@@ -16,7 +16,7 @@
  * too, when you actually want that.
  */
 import { defineConfig } from '@playwright/test';
-import { PIXEL_THRESHOLD } from './integration/visual-regression/pixel-threshold';
+import { PIXEL_THRESHOLD, pixelTolerance } from './integration/visual-regression/pixel-threshold';
 
 export default defineConfig({
     testDir: './integration',
@@ -69,7 +69,7 @@ export default defineConfig({
         toHaveScreenshot: {
             // The visual runner passes this per test and so decides it in practice; this is the
             // floor for anything else that screenshots through this config.
-            maxDiffPixelRatio: 0,
+            ...pixelTolerance(),
             // And how far a pixel's colour may move: measured, see pixel-threshold.ts.
             threshold: PIXEL_THRESHOLD,
             animations: 'disabled',

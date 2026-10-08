@@ -66,3 +66,48 @@ test('a CSS-only stepper narrower than its steps shrinks them, and every step st
     expect(new Set(numbers.map((n) => n.top)).size, 'the steps keep one row').toBe(1);
     for (const n of numbers) expect(n.width, 'a step number keeps its size').toBeGreaterThanOrEqual(20);
 });
+
+// A grid row has one height — the rhythm an application states — so the badges of one cell stay on
+// one line and what does not fit is cut, with an ellipsis where the cut is. Wrapping inside the cell
+// made the row a line taller: 49 to 72 on the GitHub runner, whose fonts are wider, where Windows
+// fitted «Hardware» and «On site» side by side with a few pixels to spare.
+test('a list of badges narrower than its cell stays on one line, and the cut is marked', async ({ page }) => {
+    await mount(page, `
+        <span class="pdx-dg-badges" style="max-width: 120px">
+            <span class="pdx-dg-badge pdx-dg-badge-primary">Hardware</span><span class="pdx-dg-badge pdx-dg-badge-info">On site</span><span class="pdx-dg-badge pdx-dg-badge-muted">Network</span>
+        </span>`);
+    const m = await page.evaluate(() => {
+        const list = document.querySelector('#narrow-box .pdx-dg-badges') as HTMLElement;
+        const badge = list.querySelector('.pdx-dg-badge') as HTMLElement;
+        return {
+            list: list.getBoundingClientRect().height, badge: badge.getBoundingClientRect().height,
+            width: list.getBoundingClientRect().width, clips: list.scrollWidth > list.clientWidth,
+            ellipsis: getComputedStyle(list).textOverflow,
+        };
+    });
+    expect(m.list, 'the badges took more than one line').toBeLessThanOrEqual(m.badge + 1);
+    expect(m.width, 'the list ran past the width it was given').toBeLessThanOrEqual(120.5);
+    expect(m.clips, 'control — the three badges do not fit, or this proves nothing').toBe(true);
+    expect(m.ellipsis, 'the cut is not marked').toBe('ellipsis');
+});
+
+// The input is what gives: a text input's intrinsic width is about twenty characters of the font,
+// so with the default min-width it never shrank below that, and the addons and the button were
+// pushed past the edge — 6px and 17px past it at 390px on the GitHub runner, whose fonts are wider.
+test('a CSS-only input group narrower than its parts shrinks the input, and every part stays in the box', async ({ page }) => {
+    await mount(page, `
+        <div class="pdx-input-group">
+            <span class="pdx-input-addon">@</span>
+            <input class="pdx-input" type="text" placeholder="username" />
+        </div>
+        <div class="pdx-input-group">
+            <input class="pdx-input" type="text" placeholder="Search..." />
+            <button class="pdx-primary">Go</button>
+        </div>
+        <div class="pdx-input-group">
+            <span class="pdx-input-addon">https://</span>
+            <input class="pdx-input" type="text" placeholder="example.com" />
+            <span class="pdx-input-addon">/path</span>
+        </div>`);
+    expect((await pastTheEdge(page)).past).toEqual([]);
+});

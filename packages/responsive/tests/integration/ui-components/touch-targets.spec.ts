@@ -104,7 +104,9 @@ const DESKTOP_BOX: Record<string, Record<string, { w?: number; h: number }>> = {
     },
     'inline-edit': { '.pdx-inline-edit-save': { w: 26, h: 26 }, '.pdx-inline-edit-cancel': { w: 26, h: 26 } },
     input: { 'pdx-input .pdx-input-clear': { w: 20, h: 20 } },
-    toast: { '.pdx-toast-close': { w: 11, h: 16 } },
+    // A declared 1em square: the × alone measured 11 on Windows, 8.5 in the Linux image, 13.4 on the
+    // GitHub runner.
+    toast: { '.pdx-toast-close': { w: 16, h: 16 } },
     'otp-input': { 'pdx-otp-input .pdx-otp-cell': { w: 40, h: 40 } },
     'data-grid': { 'pdx-data-grid .pdx-dg-row': { h: 44 } },
     'data-grid-virtual': { 'pdx-data-grid .pdx-dg-row': { h: 42 } },

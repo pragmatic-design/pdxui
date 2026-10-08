@@ -33,8 +33,20 @@ pdx-data-grid {
 .pdx-dg-badge-danger  { color: var(--pdx-color-danger-ink);  background: var(--pdx-color-danger-soft); }
 .pdx-dg-badge-primary { color: var(--pdx-color-primary-ink); background: var(--pdx-color-primary-soft); }
 .pdx-dg-badge-muted   { color: var(--pdx-color-muted);   background: color-mix(in oklab, var(--pdx-color-muted) 14%, transparent); }
-/* A badge per value of a list: in a row, wrapping inside the cell rather than past it. */
-.pdx-dg-badges { display: inline-flex; flex-wrap: wrap; gap: .25rem; min-width: 0; }
+/* A badge per value of a list, on ONE line: a grid row has one height, the rhythm the application
+   states, and wrapping made it a line taller wherever the font was wider. What does not fit is cut,
+   and the ellipsis marks the cut; the list's title names every value. */
+.pdx-dg-badges {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    /* The line is exactly as tall as a badge (.78rem at 1.5, plus .15rem above and below), as the
+       flex row was: taller and the strut adds to the row, 0 and the ellipsis sits above the badges. */
+    line-height: calc(.78rem * 1.5 + .3rem);
+}
+.pdx-dg-badges > .pdx-dg-badge { vertical-align: top; }
+.pdx-dg-badges > .pdx-dg-badge + .pdx-dg-badge { margin-inline-start: .25rem; }
 
 /* Typed cell: status — text with a leading colour dot (no pill). */
 .pdx-dg-status { display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap; }

@@ -1,8 +1,8 @@
 name: Quality (every package with a suite)
 
 # The gate that runs the tests. Complements certify.yml (UI components, 5 dimensions):
-# this enforces typecheck, lint (0 explicit-any), THE SUITES, coverage thresholds on the
-# four packages that carry them, and a successful build.
+# this enforces a successful build, typecheck, lint (0 explicit-any), THE SUITES, and coverage
+# thresholds on the four packages that carry them.
 #
 # `pnpm coverage` filters to four packages, so it cannot stand in for running the suites: on
 # its own it would leave ui, cli, design and the builder's e2e/static tests to no gate at all.
@@ -55,7 +55,7 @@ permissions:
 
 jobs:
   quality:
-    name: typecheck · lint · test · coverage · build
+    name: build · typecheck · lint · test · coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +64,11 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
+
+      # First, because the typecheck needs it: packages/framework checks against what core, ui and
+      # router publish (dist/*.d.ts), not their sources, and a fresh runner has no dist.
+      - name: Build (every package)
+        run: pnpm build
 
       - name: Typecheck
         run: pnpm typecheck
@@ -83,9 +88,6 @@ jobs:
 
       - name: Coverage thresholds (core · compiler · router · lsp)
         run: pnpm coverage
-
-      - name: Build
-        run: pnpm --filter @pdxui/core --filter @pdxui/compiler --filter @pdxui/router --filter @pdxui/lsp run build
 
       - uses: actions/upload-artifact@v4
         if: failure()

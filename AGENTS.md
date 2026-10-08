@@ -18,6 +18,7 @@ has a bug, and the fix is a declaration the compiler turns into that wiring.
 
 ```bash
 pnpm install                    # also points git at .githooks/
+pnpm build                      # once on a fresh clone: framework typechecks against its siblings' dist/
 pnpm test                       # every package: the vitest suites, then the browser suites one at a time
 pnpm typecheck
 pnpm lint                       # 0 errors; the warning count is a ratchet and must not rise

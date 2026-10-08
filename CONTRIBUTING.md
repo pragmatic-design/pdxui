@@ -14,6 +14,9 @@ belongs in Discussions: [SUPPORT.md](SUPPORT.md) says where each kind of request
 - **Node 22** (the version CI runs) and **pnpm 10** (`packageManager` in `package.json` pins it).
 - `pnpm install` at the root. The install also points git at `.githooks/`, whose `pre-push` hook
   runs the gate described below.
+- `pnpm build` once after the install, and again after changing a package another one depends on:
+  `@pdxui/framework` typechecks against what core, ui and router publish (`dist/`), so on a fresh
+  clone `pnpm typecheck` — and the pre-push — fail until they are built.
 - Browser suites need Chromium: `pnpm --filter @pdxui/design exec playwright install chromium`.
 - `pnpm certify:visual` needs Docker. It is skipped automatically when the daemon does not answer.
 

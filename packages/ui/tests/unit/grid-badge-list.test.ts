@@ -38,6 +38,11 @@ describe('pdx-data-grid badge over a list', () => {
         expect(badges[1].classList.contains('pdx-dg-badge-info')).toBe(true);
     });
 
+    it('names every value in its title, since a list wider than its cell is cut on one line', async () => {
+        const el = await mountGrid([{ id: 1, name: 'A', categories: ['hardware', 'network'] }]);
+        expect(cell(el).querySelector('.pdx-dg-badges')!.getAttribute('title')).toBe('Hardware, Network');
+    });
+
     it('an empty list draws no badge, not an empty grey one', async () => {
         const el = await mountGrid([{ id: 1, name: 'A', categories: [] }]);
         expect(cell(el).querySelectorAll('.pdx-dg-badge')).toHaveLength(0);

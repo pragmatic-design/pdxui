@@ -456,6 +456,25 @@ test('with a long page scrolled to its end, the rail\'s foot is still in the win
     expect(at.head.top, 'the rail scrolled away: its head left the window').toBe(0);
 });
 
+test('a page whose height ends in a fraction of a pixel scrolls to its end without moving the rail', async ({ page }) => {
+    // The document's scroll extent is whole pixels and the content's height need not be: a page of
+    // 931.5px scrolls to 32, half a pixel past the shell's bottom. A rail held by the shell — sticky
+    // inside it — was pushed up by that half (-0.5 on the GitHub runner, whose fonts give such
+    // heights). Held by the window instead, it does not move.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await open(page, '/customers');
+    await expect(page.locator('[data-test="customers"] [role="gridcell"]').first()).toBeVisible();
+    await page.evaluate(() => {
+        const half = document.createElement('div');
+        half.style.height = '0.5px';
+        document.querySelector('main')!.appendChild(half);
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+    const at = await railInWindow(page);
+    expect(at.scrolled, 'the premise: the page is longer than the window and scrolled').toBeGreaterThan(0);
+    expect(at.head.top, 'the rail moved with the page').toBe(0);
+});
+
 test('in a window shorter than the rail\'s list, the list scrolls inside the rail and the foot stays', async ({ page }) => {
     // A rail of every entity pinned: the first-visit rail is four entries and fits any window.
     await page.addInitScript(() => localStorage.setItem('showcase.pins', JSON.stringify(

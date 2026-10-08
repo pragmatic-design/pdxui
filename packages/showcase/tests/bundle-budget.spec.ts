@@ -120,7 +120,9 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
  * behind `DEV`, and the branch goes with its string. `diagnostics.spec.ts` asserts WHICH strings left and which stayed, because
  * a number falling says nothing about what fell.
  */
-const BUDGET_KB = { entry: 34, js: 362, css: 58, blocking: 83 };
+// css 58 → 59: a grid cell's badges keep one line and mark the cut with an ellipsis (they wrapped,
+// and made the row a line taller wherever the font was wider) — 58.1 KB measured.
+const BUDGET_KB = { entry: 34, js: 362, css: 59, blocking: 83 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

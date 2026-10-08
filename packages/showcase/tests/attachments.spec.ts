@@ -64,6 +64,15 @@ test('the panel loads, and the list it shows is the one the server sent', async 
 
 test('progress is observed BETWEEN 0 and 100, which is the whole claim', async ({ page }) => {
     await openTicket(page, 102);
+    // The browser's own upload, held to 1 MB/s. The slow reader in the mock is not enough by itself:
+    // the loopback's socket buffers take the file whole before the server reads a byte — 2 MB fits
+    // in them on the GitHub runner, where the bar went 0 -> 100 — and the panel accepts no more
+    // than 8 MB. Held in the browser, the bytes leave at the pace the bar reports, on any machine.
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Network.enable');
+    await cdp.send('Network.emulateNetworkConditions', {
+        offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: 1024 * 1024,
+    });
 
     // Sample while the transfer runs. `progress-value` is the signal's own number, rendered.
     const seen = new Set<number>();

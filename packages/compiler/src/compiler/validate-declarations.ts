@@ -17,22 +17,35 @@ const RUNES = new Set(['$signal', '$derived', '$store']);
 
 interface Declaration { name: string; kind: string; line: number }
 
-/** 1-based line of an absolute offset into the file. */
-function lineAt(source: string, offset: number): number {
-    return source.slice(0, offset).split('\n').length;
+/**
+ * The 1-based line of an absolute offset into `source`. The line starts are found once: splitting
+ * the text up to each offset made a component's declarations O(n²) to locate.
+ */
+function lineIndex(source: string): (offset: number) => number {
+    const lineStarts = [0];
+    for (let i = 0; i < source.length; i++) if (source[i] === '\n') lineStarts.push(i + 1);
+    return (offset) => {
+        let lo = 0, hi = lineStarts.length - 1;
+        while (lo < hi) {
+            const mid = (lo + hi + 1) >> 1;
+            if (lineStarts[mid] <= offset) lo = mid; else hi = mid - 1;
+        }
+        return lo + 1;
+    };
 }
 
 /** The names the script declares at its top level, in source order, with the line of each. */
 function declarations(descriptor: SFCDescriptor, source: string): Declaration[] {
     const script = descriptor.script;
     if (!script || !script.content.trim()) return [];
+    const lineAt = lineIndex(source);
     const found: Declaration[] = [];
     // Match: a `@prop name` line. Groups: [1]=the name
     for (const m of script.content.matchAll(/^[ \t]*@prop\s+([A-Za-z_$][\w$]*)/gm)) {
-        found.push({ name: m[1], kind: '@prop', line: lineAt(source, script.start + m.index!) });
+        found.push({ name: m[1], kind: '@prop', line: lineAt(script.start + m.index!) });
     }
     const sf = parseableScript(script.content);
-    const at = (node: ts.Node) => lineAt(source, script.start + node.getStart(sf));
+    const at = (node: ts.Node) => lineAt(script.start + node.getStart(sf));
     for (const st of sf.statements) {
         // A function, a class: plain declarations of the setup's scope. Next to a rune of the same
         // name the clash vanishes from the module (the signal is `__name`), and the auto-return's
