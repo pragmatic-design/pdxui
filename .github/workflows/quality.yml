@@ -9,45 +9,15 @@ name: Quality (every package with a suite)
 # Coverage on four packages and running the suites are different goals; both are here, neither
 # substitutes for the other.
 #
-# The path filters list every package that has tests. A step that runs `pnpm test` is worth
-# nothing on a change the workflow does not react to.
+# No path filter, on purpose. This is a REQUIRED check on `main`, and a required check that a
+# path filter skips never reports: the pull request waits on "Expected" forever. It runs on every
+# change — and so on every package with a suite, including one added later
+# (gate-coverage.test.ts holds that).
 
 on:
   pull_request:
-    paths:
-      - 'packages/core/**'
-      - 'packages/compiler/**'
-      - 'packages/router/**'
-      - 'packages/lsp/**'
-      - 'packages/vscode-pdx/**'
-      - 'packages/ui/**'
-      - 'packages/cli/**'
-      - 'packages/design/**'
-      - 'packages/responsive/**'
-      - 'packages/builder/**'
-      - 'packages/site/**'
-      - 'packages/showcase/**'
-      - '.github/workflows/quality.yml'
-      - 'eslint.config.mjs'
-      - '.prettierrc.json'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
   push:
     branches: [main]
-    paths:
-      - 'packages/core/**'
-      - 'packages/compiler/**'
-      - 'packages/router/**'
-      - 'packages/lsp/**'
-      - 'packages/vscode-pdx/**'
-      - 'packages/ui/**'
-      - 'packages/cli/**'
-      - 'packages/design/**'
-      - 'packages/responsive/**'
-      - 'packages/builder/**'
-      - 'packages/site/**'
-      - 'packages/showcase/**'
-      - '.github/workflows/quality.yml'
   workflow_dispatch:
 
 permissions:
