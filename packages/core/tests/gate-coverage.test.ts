@@ -219,14 +219,16 @@ describe('a failing package cannot hide behind another', () => {
     });
 });
 
-describe('the gate is triggered by the packages it covers', () => {
-    // A step that runs `pnpm test` is worth nothing on a change the workflow does not react to.
-    it('watches every package that has a suite', () => {
-        const unwatched = packages
-            .filter(p => p.testScripts.length > 0)
-            .filter(p => !quality.includes(`packages/${p.dir}/**`))
-            .map(p => p.dir);
-        expect(unwatched, 'these carry tests and no path filter mentions them').toEqual([]);
+describe('the gate is triggered by every change', () => {
+    // A step that runs `pnpm test` is worth nothing on a change the workflow does not react to, and
+    // Quality is a REQUIRED check on `main`: a required check that a path filter skips never reports,
+    // and the pull request waits on "Expected" forever. So no path filter, on a pull request or on a
+    // push — which also covers every package with a suite, including one added tomorrow.
+    it('has no path filter on pull_request or push', () => {
+        const triggers = quality.slice(quality.indexOf('\non:'), quality.indexOf('\npermissions:'));
+        expect(triggers, 'quality.yml has no `on:` block before `permissions:`').toContain('pull_request');
+        expect(triggers, 'a path filter skips the required check on the changes it does not name')
+            .not.toMatch(/^\s+paths(-ignore)?:/m);
     });
 });
 
