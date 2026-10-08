@@ -26,10 +26,10 @@ jobs:
         # Sharded, to parallelise as the components grow
         shard: [1, 2]
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with: { version: 10.8.1 }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
@@ -49,7 +49,7 @@ jobs:
       - name: Behavior suite
         if: matrix.shard == 1
         run: pnpm --filter @pdxui/responsive exec playwright test --config tests/playwright-behavior.config.ts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: contracts-report-${{ matrix.shard }}
@@ -60,9 +60,9 @@ jobs:
     name: visual (dim 5, docker)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { lfs: true } # the PNG baselines are in Git LFS
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with: { node-version: 22 }
       # Through run.mjs, NOT a docker command spelled out here.
       #
@@ -78,7 +78,7 @@ jobs:
       # that this job goes through it — so the two cannot drift apart.
       - name: Visual regression + font guard (compare with the baselines, no update)
         run: node packages/responsive/tests/docker/run.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: visual-diffs
