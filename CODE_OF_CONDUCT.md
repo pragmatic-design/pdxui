@@ -6,7 +6,8 @@ and wherever someone represents the project.
 
 ## Reporting
 
-TODO(owner): the address that receives conduct reports.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project
+maintainers at **info@pragmaticdesign.net**.
 
 Every report is reviewed and investigated promptly and fairly. The maintainers keep the reporter's
 identity confidential, and act according to the enforcement guidelines of the Covenant.
