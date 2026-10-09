@@ -22,6 +22,9 @@ declaration is not recognised, and an unrecognised declaration is **dropped**: n
 every read of `users` below finds nothing. You get `PDX_FETCH_INVALID` for it, which is the
 diagnostic to look for when a page that reads `users.data` renders nothing at all.
 
+`@fetch` **reads**, so the method is `GET`: a `POST` or a `DELETE` here is the error
+`PDX_FETCH_METHOD`. A write is a `mutation()` (below).
+
 From this one line the compiler generates a typed `resource()` with three states you use directly in
 the template:
 
@@ -40,12 +43,12 @@ Often the URL depends on some state (the selected id, a query). Put it in with `
 
 ```pdx
 @prop id: string = '';
-@fetch user: 'GET /api/users/${id}' : User;
+@fetch user: 'GET /api/users/${id}' as User;
 ```
 
 When `id` changes, the resource **re-runs itself** with the new value — same principle as signals:
-you declared the dependency by writing it, not by managing it. The trailing `: User` is the result
-type.
+you declared the dependency by writing it, not by managing it. The trailing `as User` is the result
+type; written `: User` it is the error `PDX_FETCH_TYPE_COLON`, whose fix rewrites it.
 
 ## Cache: don't repeat the same call
 
@@ -56,7 +59,10 @@ can control how long data stays "fresh" and group it with tags for invalidation:
 @fetch users: 'GET /api/users' { staleTime: 60000, tags: ['users'] };
 ```
 
-`staleTime` avoids needless refetches within the window; the `tags` serve the next step.
+`staleTime` avoids needless refetches within the window; the `tags` serve the next step. The block
+takes `resource()`'s options — `key`, `staleTime`, `retry`, `tags`, `enabled`, `transform`,
+`onSuccess`, `onError`, `cache` — and any other key is the error `PDX_FETCH_UNKNOWN_OPTION`: a
+misspelled option would otherwise do nothing.
 
 ## Mutations: write and keep everything consistent
 

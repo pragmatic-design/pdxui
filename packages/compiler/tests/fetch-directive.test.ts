@@ -101,12 +101,13 @@ describe('@fetch parsing', () => {
         expect(a.usedFeatures.has('resource')).toBe(true);
     });
 
-    it('handles POST method', () => {
+    it('reads the method as written, POST included — which is then an error (fetch-strict.test.ts)', () => {
         const a = analyzeScript(`
             @fetch result: 'POST /api/search' as SearchResult[];
         `, 'search.pdx');
 
         expect(a.fetches[0].method).toBe('POST');
+        expect(a.warnings.map((w) => w.code)).toContain('PDX_FETCH_METHOD');
     });
 
     it('handles double-quoted URL', () => {

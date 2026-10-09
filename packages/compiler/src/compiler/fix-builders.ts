@@ -146,3 +146,21 @@ export function eventNameFix(source: string, w: ValidationWarning): FixProposal 
     }
     return edits.length ? { title: `Rename the event ${name} to ${w.suggestion}`, edits } : undefined;
 }
+
+/** PDX_FETCH_TYPE_COLON. `@fetch user: 'GET /u' : User` → `@fetch user: 'GET /u' as User`. */
+export function fetchTypeColonFix(source: string, w: ValidationWarning): FixProposal | undefined {
+    const start = at(source, w);
+    if (start === undefined) return undefined;
+    // Match: `@fetch name: '` up to the opening quote of the spec.   Groups: [1]=the quote
+    const head = /^@fetch\s+[\w$]+\s*:\s*(['"`])/.exec(source.slice(start));
+    if (!head) return undefined;
+    const close = source.indexOf(head[1], start + head[0].length);
+    if (close < 0) return undefined;
+    // Match: the `:` after the spec's closing quote, with the space around it.
+    const colon = /^\s*:\s*/.exec(source.slice(close + 1));
+    if (!colon) return undefined;
+    return {
+        title: 'Write the type with `as`',
+        edits: [{ start: close + 1, end: close + 1 + colon[0].length, newText: ' as ' }],
+    };
+}

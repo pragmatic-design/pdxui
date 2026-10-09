@@ -12,7 +12,7 @@ import type {
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
     parseInlineFormSchema, parseFormOptions, parsePageOptions, parseSearchParams, normalizeStatementsWithOrigins,
-    extractTypeAnnotation, parseFetchDecl, extractSearchBlock, parseHeadBlock,
+    extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, extractSearchBlock, parseHeadBlock,
     parseRouteBlock, parseRouteParams, parseObjectLiteralToJson, splitAtTopLevelCommas,
 } from './script-analyzer-helpers';
 import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
@@ -518,6 +518,34 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                 });
                 if (!fetchResult.name.startsWith('_')) exports.push({ name: fetchResult.name, kind: 'const' });
                 usedFeatures.add('resource');
+                // `@fetch` reads. A write written here compiled to a GET of the same URL, in silence.
+                if (fetchResult.method !== 'GET') {
+                    warnings.push({
+                        code: 'PDX_FETCH_METHOD',
+                        severity: 'error' as const,
+                        message: `@fetch '${fetchResult.name}' declares ${fetchResult.method}: @fetch reads, and only GET is fetched.`,
+                        hint: `A write is a mutation(): const save = mutation((dto) => client.post('${fetchResult.url}', dto)). For a read, write 'GET ${fetchResult.url}'.`,
+                    });
+                }
+                if (fetchResult.typeAfterColon) {
+                    warnings.push({
+                        code: 'PDX_FETCH_TYPE_COLON',
+                        severity: 'error' as const,
+                        message: `@fetch '${fetchResult.name}' writes its type after ':', which @fetch does not read: the type is written with 'as'.`,
+                        hint: `@fetch ${fetchResult.name}: '${fetchResult.method} ${fetchResult.url}' as ${fetchResult.type ?? 'Type'};`,
+                    });
+                }
+                if (fetchResult.options) {
+                    const unknown = fetchOptionKeys(fetchResult.options).filter((k) => !FETCH_OPTION_KEYS.includes(k));
+                    if (unknown.length > 0) {
+                        warnings.push({
+                            code: 'PDX_FETCH_UNKNOWN_OPTION',
+                            severity: 'error' as const,
+                            message: `@fetch '${fetchResult.name}' passes ${unknown.map((k) => `\`${k}\``).join(', ')}, which resource() does not take: it would do nothing.`,
+                            hint: `The options are: ${FETCH_OPTION_KEYS.join(', ')}.`,
+                        });
+                    }
+                }
                 continue;
             }
             // Recognized @fetch decorator but unparseable. Don't fall through

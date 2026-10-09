@@ -123,6 +123,9 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             // Match: `@expose a, close` — the line that lists the name.
             return name ? find(source, script, new RegExp(`@expose\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;
         case 'PDX_FETCH_NO_ERROR_UI':
+        case 'PDX_FETCH_METHOD':
+        case 'PDX_FETCH_TYPE_COLON':
+        case 'PDX_FETCH_UNKNOWN_OPTION':
             return name ? find(source, script, new RegExp(`@fetch\\s+${escape(name)}\\b`)) : undefined;
         case 'PDX_FORM_NO_SUBMIT':
         case 'PDX_FORM_ARRAY_RULES_IGNORED': {

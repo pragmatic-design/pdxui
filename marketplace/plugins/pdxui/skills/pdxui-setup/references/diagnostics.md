@@ -2,7 +2,7 @@
 
 # Diagnostics
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 61 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 64 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -188,6 +188,14 @@ The resource cannot be generated; dropping it silently would break the component
 
 **Fix.** `@fetch users: 'GET /api/users' as User[];`
 
+### PDX_FETCH_METHOD
+
+*error* — `@fetch` with a method other than GET.
+
+`@fetch` reads. A POST, PUT or DELETE written here used to compile to a GET of the same URL, and nothing said so.
+
+**Fix.** For a read, `'GET /url'`. For a write, a `mutation()`.
+
 ### PDX_FETCH_NO_ERROR_UI
 
 *info* — An `@fetch` whose error state the template never shows.
@@ -217,6 +225,22 @@ write:
 @fetch users: 'GET /api/users' as string[];
 </script>
 ```
+
+### PDX_FETCH_TYPE_COLON
+
+*error* — `@fetch` with its type written after `:`.
+
+The type is written with `as`. Written with `:` it was dropped, and the options block after it with it.
+
+**Fix.** `@fetch users: 'GET /api/users' as User[];`
+
+### PDX_FETCH_UNKNOWN_OPTION
+
+*error* — `@fetch` with an option `resource()` does not take.
+
+The options block is handed to `resource()`, which ignores a key it does not know: a misspelled `stalTime` does nothing.
+
+**Fix.** Use one of `resource()`'s options: key, staleTime, retry, tags, enabled, transform, onSuccess, onError, cache, stale.
 
 ### PDX_FORM_ARRAY_RULES_IGNORED
 
