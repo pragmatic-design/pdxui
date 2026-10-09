@@ -8,7 +8,7 @@
  * The two surfaces stay DIFFERENT, and the last test here is what holds them apart: a row's menu
  * is not a copy of the bulk bar with one row selected.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const dataRows = (page: Page) => page.locator('[data-test="grid"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') });
 // The ROW's menu: signed in, the bar's profile menu is a `[role="menu"]` on the page too.

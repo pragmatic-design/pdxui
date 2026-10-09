@@ -11,7 +11,7 @@
  * screen, and it is the half a reader notices. So the assertion is a PAIR, in one test: asserting
  * only the app's copy would pass on exactly the failure this is here to catch.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 
 async function open(page: Page, path: string): Promise<void> {

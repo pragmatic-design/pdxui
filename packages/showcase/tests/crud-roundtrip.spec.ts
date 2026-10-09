@@ -7,7 +7,7 @@
 //
 // The numbers are the reference's, read from the `.sketch`: a 1760×64 bulk bar under a 1760-wide
 // list, a 260px detail menu, a 100px round portrait, sections as 48px rows.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const box = (page: Page, selector: string) =>
     page.locator(selector).evaluate((el) => {

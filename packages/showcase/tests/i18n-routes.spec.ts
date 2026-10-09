@@ -9,7 +9,7 @@
  * The first test here is the one that keeps it honest as the app grows: it reads the pages and the
  * map, and fails naming the section a page uses and its route does not declare.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { pickLocale } from './locale';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

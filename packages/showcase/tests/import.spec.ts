@@ -7,7 +7,7 @@
  *
  * The control that runs through the whole file: NOTHING is written before the commit.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const rows = (page: Page) => page.locator('[data-test="preview"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') });
 const cell = (page: Page, row: number, field: string) =>

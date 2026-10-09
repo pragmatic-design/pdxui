@@ -6,7 +6,7 @@
  * and state are theirs: on the build's server a revoked grant would race every other spec that
  * reads it. Serial, and each row puts back what it takes.
  */
-import { expect, test, type Browser, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Browser, type Page, type TestInfo } from './fixture';
 import { GUEST } from './session';
 
 test.describe.configure({ mode: 'serial' });

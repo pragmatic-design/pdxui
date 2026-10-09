@@ -13,7 +13,7 @@
 // Two measurements, and they fail for different reasons: the HTML one says the links are there, the
 // wave one says they did something. A preload that names the wrong file passes the first and not
 // the second.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';

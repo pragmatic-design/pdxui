@@ -8,7 +8,7 @@
  * permanent one — and the twelfth, a new hire, with none: 22. Elena Ricci's permanent contract ends
  * twelve days from today, so «Ending this month» has exactly one row whatever day the suite runs.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { clearAllButSession } from './session';
 
 const rows = (page: Page) => page.locator('[data-test="grid"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') });

@@ -4,7 +4,7 @@
 // making the second one a copy of the first. So these are deliberately the same assertions as
 // `crud-roundtrip.spec.ts`, pointed at customers: if the pattern repeats, the only thing that had
 // to be written is what a customer IS.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 
 const box = (page: Page, selector: string) =>

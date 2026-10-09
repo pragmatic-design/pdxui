@@ -18,7 +18,7 @@
  *     panel shows for the half-second before the first fetch returns, so asserting on it right
  *     after the page loads passes on any behaviour at all. `listFor()` reads the response body.
  */
-import { test, expect, type Page, type Response } from '@playwright/test';
+import { test, expect, type Page, type Response } from './fixture';
 
 /** Big enough that the throttled endpoint takes about a second: 64 KB chunks, 25 ms apart. */
 const BIG = 2 * 1024 * 1024;

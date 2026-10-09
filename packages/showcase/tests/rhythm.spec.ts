@@ -12,7 +12,7 @@
 // It is here rather than in a manifest because a manifest measures a component in isolation, on a
 // scenario page with no application around it — and what is under test is exactly the application's
 // declaration reaching the component.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** What the shell declares, and what every surface of that kind must then be. */
 const STATED = { row: 49, navItem: 40, gutter: 24, inset: 16 };

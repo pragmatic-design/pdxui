@@ -14,7 +14,7 @@
  * no `sourceMappingURL` comment is added, so the bytes the budget weighs are the bytes an app
  * ships — the JS total is the same either way.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';

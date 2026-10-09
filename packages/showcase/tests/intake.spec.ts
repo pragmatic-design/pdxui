@@ -9,7 +9,7 @@
  * Filled as a person would fill it, against the production build, and the submit is asserted on
  * the WHOLE payload the server received rather than on a field of it.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 import { pickLocale } from './locale';
 

@@ -13,7 +13,7 @@
  * certification manifests' `contrast` rule runs, so the showcase and the components are held to one
  * number by one function.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { measureTextContrast } from '../../responsive/tests/integration/ui-components/contracts/measure';
 
 const scheme = (page: Page) => page.evaluate(() => document.documentElement.getAttribute('pdx-scheme'));

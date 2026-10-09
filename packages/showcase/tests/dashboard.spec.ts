@@ -8,7 +8,7 @@
 // assignee cycling nobody / three agents, shifted by one every fourth ticket. The open ones with
 // nobody on them are ids 1, 8 and 17 (T-1000, T-1007, T-1016), opened on the 1st, 8th and 17th:
 // three, in that order.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 
 const tile = (page: Page, key: string) => page.locator(`[data-test="kpi-${key}"]`);

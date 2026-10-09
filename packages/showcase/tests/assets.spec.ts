@@ -12,7 +12,7 @@
  *   a laptop»), so its laptop, asset 23, has exactly those two;
  * - «Shared mailbox is read-only» names no kind, and T-1003 carries it: no asset.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { clearAllButSession } from './session';
 
 const rows = (page: Page) => page.locator('[data-test="grid"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') });

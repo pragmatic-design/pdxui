@@ -36,7 +36,7 @@
  * beside the other two. What lives here is the browser half — the ordering that makes the above
  * true, and the layout stability that a deferral would break.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** Slow 4G, the profile Lighthouse throttles to: 1.6 Mbps down, 150 ms RTT. */
 const SLOW_4G = {
@@ -122,6 +122,20 @@ async function load(page: Page): Promise<Timings> {
     // page that has not drawn anything yet, which is zero for the wrong reason.
     await expect(page.locator('.pdx-app-layout, pdx-app > *').first()).toBeVisible();
     await page.waitForTimeout(800);
+
+    // A cold load or nothing: an entry served from the HTTP cache measures a returning visitor, and
+    // every number below would be the wrong one. The fixture reuses a context per worker (#32), so
+    // this is what says whether it also reused its cache.
+    // Downloaded means more bytes on the wire than the body: headers on top of it. A 304 moves only
+    // headers, and the memory cache moves nothing.
+    const entry = await page.evaluate(() => {
+        const r = (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
+            .find((e) => /\/assets\/index-[^/]*\.js$/.test(e.name));
+        return r ? { wire: r.transferSize, body: r.encodedBodySize } : null;
+    });
+    expect(entry, 'the entry module was not fetched at all').not.toBeNull();
+    expect(entry!.wire, `the entry module came from the HTTP cache (${entry!.wire} bytes on the wire for a `
+        + `${entry!.body}-byte body): this is not a cold load`).toBeGreaterThan(entry!.body);
 
     return page.evaluate(() => {
         const end = (match: RegExp): number => {

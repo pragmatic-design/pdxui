@@ -14,7 +14,7 @@
  * A setInterval feed would make every assertion below a race, and a race dressed as a test is worse
  * than no test.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 
 const dataRows = (page: Page) =>

@@ -8,7 +8,7 @@
  * The assertions are the server's: `__pdxLastMove` is what the mock backend was told, read whole.
  * A board that only ever moves cards on screen would pass a test that reads the screen.
  */
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page, type Locator } from './fixture';
 import { demo } from './demo';
 
 async function openBoard(page: Page): Promise<void> {

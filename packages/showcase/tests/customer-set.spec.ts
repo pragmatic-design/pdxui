@@ -5,7 +5,7 @@
  * of its own each, a ticket cannot reach its customer's record, and an asset is matched to a
  * customer by a piece of its name. Read from the seeds themselves: a guard, not a page.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { ticketSeed } from '../src/data/seed';
 import { CUSTOMER_NAMES } from '../src/data/customer-seed';
 

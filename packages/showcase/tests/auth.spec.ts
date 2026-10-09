@@ -13,7 +13,7 @@
  * difference has to be visible twice over, as a button that is absent and as a call that is
  * refused. A showcase that only hides the button teaches the half of the job that is not security.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 import { GUEST } from './session';
 

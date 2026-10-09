@@ -7,7 +7,7 @@
  *
  * Driven with dispatched pointer events, for the reason `board.spec.ts` gives.
  */
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page, type Locator } from './fixture';
 
 /** Press on a card and walk the pointer to the centre of a target, button still down. */
 async function holdOver(page: Page, card: Locator, target: Locator): Promise<void> {

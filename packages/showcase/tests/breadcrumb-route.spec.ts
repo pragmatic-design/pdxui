@@ -14,7 +14,7 @@
  * the one a hand-written array cannot pass: nothing in `app.pdx` or in the three pages mentions a
  * crumb, so a renamed route renames the breadcrumb by itself.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const crumbs = (page: Page) => page.locator('[data-test="crumbs"] .pdx-breadcrumb-item');
 

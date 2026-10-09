@@ -14,7 +14,7 @@
  * list, each list with views of its own. No browser dialog and no native control: the rule, and
  * the guard at the foot of this file.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';

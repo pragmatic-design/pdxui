@@ -7,7 +7,7 @@
  *
  * These rows are a GUEST's: the suite signs every other spec in (`tests/session.ts`).
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { GUEST } from './session';
 
 /** The shell's CATALOG, every entry (`src/shell.pdx`), and the dashboard. */

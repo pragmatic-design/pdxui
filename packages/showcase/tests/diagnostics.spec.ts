@@ -16,7 +16,7 @@
 //   · it reports a FAILURE at runtime  → it stays. A loader that did not answer, a guard that
 //     threw, an unhandled error: that is the app talking about itself, and silencing it in
 //     production is how an incident becomes unreadable.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';

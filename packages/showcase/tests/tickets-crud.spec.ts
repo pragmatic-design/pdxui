@@ -14,7 +14,7 @@
  * the `[role="dialog"]` inside it. Written the other way, both fail for a reason that has nothing
  * to do with the screen.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { ticketSeed } from '../src/data/seed';
 import { demo } from './demo';
 

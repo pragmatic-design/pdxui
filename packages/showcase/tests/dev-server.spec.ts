@@ -10,7 +10,7 @@
  * The framework's own rule is that development requires no build, so this is not a small defect in
  * a demo: an app that takes the documented shape has to run in development.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 

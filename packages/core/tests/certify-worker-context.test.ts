@@ -23,10 +23,13 @@ function importsPlaywrightTest(source: string): boolean {
     return false;
 }
 
-/** Whether `source` takes `test` from the fixture. */
-function importsFixtureTest(source: string): boolean {
-    return /^import\s+\{[^}]*\btest\b[^}]*\}\s+from\s+'\.\/contracts\/fixture'/m.test(source);
+/** Whether `source` takes `test` from the fixture, at `path` relative to the spec. */
+function importsFixtureTest(source: string, path = './contracts/fixture'): boolean {
+    const escaped = path.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+    return new RegExp(`^import\\s+\\{[^}]*\\btest\\b[^}]*\\}\\s+from\\s+'${escaped}'`, 'm').test(source);
 }
+
+const SHOWCASE_SPECS = join(__dirname, '..', '..', 'showcase', 'tests');
 
 describe('the reader can fail', () => {
     it('sees a value import of test, and not a type-only one', () => {
@@ -51,5 +54,24 @@ describe('every certify spec reuses the worker context', () => {
             return importsPlaywrightTest(src) || !importsFixtureTest(src);
         });
         expect(wrong, "import { test } from './contracts/fixture'").toEqual([]);
+    });
+});
+
+describe('every showcase spec reuses the worker context', () => {
+    // The showcase's build suite left 3,298 sockets in TIME_WAIT on its port, and `page.goto` was
+    // refused there inside the full gate on Windows (#32). It takes the same fixture, through
+    // `tests/fixture.ts`.
+    const specs = readdirSync(SHOWCASE_SPECS).filter((f) => f.endsWith('.spec.ts'));
+
+    it('found the specs', () => {
+        expect(specs.length).toBeGreaterThan(40);
+    });
+
+    it('none takes test from @playwright/test; each takes it from ./fixture', () => {
+        const wrong = specs.filter((f) => {
+            const src = readFileSync(join(SHOWCASE_SPECS, f), 'utf8');
+            return importsPlaywrightTest(src) || !importsFixtureTest(src, './fixture');
+        });
+        expect(wrong, "import { test } from './fixture'").toEqual([]);
     });
 });

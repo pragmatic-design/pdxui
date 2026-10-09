@@ -7,7 +7,7 @@
 //
 // What the auth story asserts is still asserted, in `auth.spec.ts`, through the new page and —
 // for the call that is meant to be refused — through the Demo panel.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 
 const fill = (page: Page, field: string, value: string) =>

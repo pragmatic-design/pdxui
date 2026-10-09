@@ -17,7 +17,7 @@
  *  3. **`history.scrollRestoration = 'manual'`** — Chromium restores the offset on a traversal by
  *     itself, so a green test would say nothing about this framework.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pinInRail } from './rail';
 
 /**

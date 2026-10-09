@@ -6,7 +6,7 @@
  *
  * Every step stays inside the app: the stores are in memory, and a page load starts them again.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 import { clearAllButSession } from './session';
 

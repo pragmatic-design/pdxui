@@ -12,7 +12,7 @@
  *   (2 h, covers the network). T-1008 is opened on its scanner: the covering subscription answers,
  *   12 h. T-1003 names no asset: the customer's shortest answers, 2 h.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 import { CUSTOMER_NAMES } from '../src/data/customer-seed';
 import { clearAllButSession } from './session';

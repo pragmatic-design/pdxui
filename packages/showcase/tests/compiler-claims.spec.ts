@@ -12,7 +12,7 @@
  * Each row below is one of three things and says which: a passing assertion, an assertion of what
  * is ACTUALLY true where the claim was wrong, or a stated gap with an issue.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';

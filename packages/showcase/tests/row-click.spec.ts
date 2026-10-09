@@ -7,7 +7,7 @@
  * The two controls are the point of this file as much as the first row: a row click that fires for
  * EVERY click in the row would pass it, and would also open a drawer on top of a selection or a menu.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const dataRows = (page: Page) => page.locator('[data-test="grid"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') });
 const drawer = (page: Page) => page.getByRole('dialog', { name: 'Edit' });
