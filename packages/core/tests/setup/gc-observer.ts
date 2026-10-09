@@ -1,15 +1,17 @@
 // Forces a garbage collection one macrotask after every `observe()`, in every unit suite that runs
 // on happy-dom.
 //
-// happy-dom 20.10.2 hands the observed node `callback: new WeakRef((record) => this.report(record))`
-// and nothing else holds that arrow function, so once the collector runs, `deref()` is undefined and
-// every record is dropped in silence — no error, the callback simply never runs again. A test that
-// asserts on something a component does in its MutationObserver callback therefore passes alone and
-// fails at random inside `pnpm test`, under the GC pressure of six packages in parallel: a gate
-// failure nobody can reproduce.
+// happy-dom 20.10.2 handed the observed node `callback: new WeakRef((record) => this.report(record))`
+// and nothing else held that arrow function, so once the collector ran, `deref()` was undefined and
+// every record was dropped in silence — no error, the callback simply never ran again. A test that
+// asserts on something a component does in its MutationObserver callback therefore passed alone and
+// failed at random inside `pnpm test`, under the GC pressure of six packages in parallel: a gate
+// failure nobody could reproduce.
 //
-// With this file the drop happens EVERY time instead of sometimes, so such a test fails at once and
-// always. What to do when it does — two ways:
+// From 20.14 the listener keeps the arrow in a field, and the observer survives a collection; core's
+// `gc-detector.test.ts` asserts that it does. The detector stays because the defect was silent: if it
+// comes back, the drop happens EVERY time instead of sometimes, and a test that depends on a delivery
+// fails at once and always. What to do when it does — two ways:
 //   · read the state synchronously, when the component can be driven without the observer;
 //   · or measure it in Chromium, in a guard spec (see `responsive accordion-late-items.spec.ts`),
 //     leaving a comment in the unit test that says where it went.
