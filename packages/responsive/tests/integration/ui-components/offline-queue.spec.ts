@@ -139,8 +139,11 @@ test.describe('offlineMiddleware, against a real network drop', () => {
         await expect.poll(async () => trace(await received(request, run)), { timeout: 10_000 })
             .toEqual(['POST /tickets {"title":"queued"}']);
 
+        // The server records the request before its response reaches the page, and `onReplay` runs on
+        // that response: read at once, `replayed()` can still be empty (it was, once in CI). Waited for.
+        await expect.poll(() => page.evaluate(() => window.__offline.replayed().length), { timeout: 5_000 })
+            .toBe(1);
         const replayed = await page.evaluate(() => window.__offline.replayed());
-        expect(replayed).toHaveLength(1);
         expect(replayed[0].ok, 'onReplay reported a failure for a request the server accepted').toBe(true);
     });
 
