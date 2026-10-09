@@ -43,7 +43,7 @@
     "pathe": "^2.0.0"
   },
   "peerDependencies": {
-    "vite": "^6.4.4"
+    "vite": "^6.4.3"
   },
   "peerDependenciesMeta": {
     "vite": {

@@ -56,6 +56,15 @@ describe('the GitHub kit', () => {
         expect(t).toMatch(/exclude-patterns: \["happy-dom", "citty"\]/);
     });
 
+    it('dependabot leaves @types/vscode to the engine, and moves a range only when it must', () => {
+        // The extension's types follow `engines.vscode` (vscode-types-engine.test.ts); and a range in
+        // a published package's peerDependencies is a promise to its users, not a pointer to the
+        // latest patch.
+        const t = read('dependabot.yml');
+        expect(t, '@types/vscode is not ignored').toMatch(/- dependency-name: "@types\/vscode"\s*\n/);
+        expect(t).toMatch(/^\s+versioning-strategy: increase-if-necessary$/m);
+    });
+
     it('Quality builds before it typechecks: the meta-package checks against its siblings\' dist', () => {
         // packages/framework typechecks against what core, ui and router PUBLISH (its tsconfig empties
         // the development condition), so on a fresh runner a typecheck before the build cannot
