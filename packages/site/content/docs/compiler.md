@@ -118,11 +118,13 @@ no build, and the template path is what HMR reloads.
 
 ## The first screen, in one round-trip less
 
-A built `index.html` names the landing route's chunk, and the chunks that chunk imports statically:
+A built `index.html` names the landing route's chunk, the chunks that chunk imports statically, and
+the stylesheets they import:
 
 ```html
 <link rel="modulepreload" crossorigin href="/assets/dashboard-CMcP70OD.js">
 <link rel="modulepreload" crossorigin href="/assets/pdx-icon-CXs78fgR.js">
+<link rel="preload" as="style" crossorigin href="/assets/dashboard-BJbnitW9.css">
 ```
 
 Vite emits those for what it can SEE — and a route is a dynamic import the generated router
@@ -132,6 +134,13 @@ which is the same table the production router compiles in.
 Measured on the showcase: without the preload, a cold first screen fetches its JavaScript in **three
 waves** — the entry, then the route's chunk once the browser has run the entry and learnt of it, then
 what that chunk imports. With it, **two**, and the round-trip saved is paid by every first-time visitor.
+
+The stylesheets matter as much as the scripts: Vite's loader waits for a chunk's CSS before the
+import resolves, so the page cannot mount until it is in. Found only once the entry has run, the
+route's stylesheets were the last wave of a cold load; announced, they download beside the entry.
+On the showcase, under slow 4G, that took the first page from ~1180 ms to ~885 ms. `as="style"`
+downloads them without blocking the first paint, and the link Vite inserts later finds them in the
+cache.
 
 `/` by default, because that is the URL an app is usually entered at. For an app that lands
 somewhere else, or to turn it off:

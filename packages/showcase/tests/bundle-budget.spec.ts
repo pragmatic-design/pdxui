@@ -60,9 +60,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
  * extracted into a `.css` beside its chunk rather than a string its JS has to parse.
  *
  * `blocking` — what `index.html` asks for before the app can paint: the entry module, the entry
- * stylesheet, and the landing route's chunk and its static imports named in
+ * stylesheet, the landing route's chunk and its static imports named in
  * `<link rel="modulepreload">` (a route is a dynamic import Vite cannot see, and without the
- * preload the browser discovers it one round trip after the entry). The ratchet is on the SUM and
+ * preload the browser discovers it one round trip after the entry), and the stylesheets those
+ * chunks import, named in `<link rel="preload" as="style">` (Vite's loader waits for them before
+ * the page mounts). The ratchet is on the SUM and
  * not on the stylesheet: both resources are on the same wire, and moving a kilobyte from one to the
  * other buys nothing. `first-paint.spec.ts` holds the ordering that makes this true, and
  * `first-paint-waves.spec.ts` the wave count, so a preload that names the wrong file cannot pass by
@@ -122,7 +124,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
  */
 // css 58 → 59: a grid cell's badges keep one line and mark the cut with an ellipsis (they wrapped,
 // and made the row a line taller wherever the font was wider) — 58.1 KB measured.
-const BUDGET_KB = { entry: 34, js: 362, css: 59, blocking: 83 };
+// blocking 83 → 88: no byte more on the wire. The landing route's stylesheets (dashboard, shell,
+// dropdown menu, progress: ~5 KB) were always needed before the first page mounts, but they were
+// requested a wave after the entry and this sum, read off index.html, did not see them. index.html
+// now announces them, which took the first page from ~1180 to ~885 ms on slow 4G
+// (first-paint.spec.ts, #31) — and the sum counts them. 87.7 KB measured.
+const BUDGET_KB = { entry: 34, js: 362, css: 59, blocking: 88 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -57,15 +57,19 @@ const SLOW_4G = {
  * median:
  *
  *                                   app ready median     splash FCP median
- *   as shipped (entry 33.4 KB)       1059–1097 ms           740–752 ms      (10 medians, 4 workers)
- *   entry padded to 67.8 KB          1225–1267 ms           740–748 ms      (2 medians; runs 1214–1288)
+ *   as shipped (entry 34.6 KB)        884–889 ms            720–732 ms      (6 medians, 4 workers)
+ *   entry padded by 34.2 KB          1046–1047 ms           728–732 ms      (2 medians; runs 1030–1065)
  *
- * A doubled entry costs ~170 ms of ~1080, not twice the time: the entry is one download among the
- * first page's. So the ceiling sits between the two rows — ~100 ms over the shipped medians, 25 under
- * the lower padded one, and the padded build was measured red against it. It sits close to the
- * shipped figure: another machine's numbers will differ, and this is where it will say so first.
+ * Re-measured 2026-10-09 (#31). The first page had drifted to 1157–1182 ms against a table that
+ * said 1059–1097: its route stylesheets were found only after the entry ran, and Vite's loader waits
+ * for them before the page mounts — a whole extra wave. The HTML now announces them
+ * (`routePreloadFiles`, and `first-paint-waves.spec.ts` checks they start with the entry), which took
+ * ~290 ms off. With the page that much faster a doubled entry stayed under the old 1200 ms ceiling,
+ * so the alarm had gone blind; it is placed again between the two rows: ~111 ms over the shipped
+ * medians, 46 under the padded ones, which are red against it. Another machine's numbers will
+ * differ, and this is where it will say so first.
  */
-const APP_READY_CEILING_MS = 1_200;
+const APP_READY_CEILING_MS = 1_000;
 
 async function throttle(page: Page): Promise<void> {
     const cdp = await page.context().newCDPSession(page);

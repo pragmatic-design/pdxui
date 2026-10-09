@@ -292,6 +292,8 @@ export interface BundleChunk {
     moduleIds?: string[];
     /** The chunks it imports STATICALLY: fetched in the wave after it, unless they are announced. */
     imports?: string[];
+    /** Vite's record of the CSS files the chunk imports, which its loader waits for. */
+    viteMetadata?: { importedCss?: Set<string> };
 }
 
 /**
@@ -310,7 +312,13 @@ export interface BundleChunk {
  *   · the route's chunk and its STATIC imports, no deeper. A static import is fetched in the wave
  *     after the chunk that names it; a dynamic one is a thing the visitor may never reach.
  *
- * Returns file names relative to the bundle root, in the order the browser should have them.
+ * And the CSS those chunks import. Vite's dynamic-import helper waits for a chunk's stylesheets
+ * before the import resolves, so the page cannot mount until they are in: found only once the entry
+ * has run, they were the last wave of a cold load, and on slow 4G the first page was ready when
+ * they arrived (`packages/showcase/tests/first-paint-waves.spec.ts`).
+ *
+ * Returns file names relative to the bundle root, in the order the browser should have them: the
+ * scripts, then the stylesheets.
  */
 export function routePreloadFiles(
     bundle: Record<string, BundleChunk>,
@@ -319,6 +327,7 @@ export function routePreloadFiles(
 ): string[] {
     const chunks = Object.values(bundle).filter((c) => c.type === 'chunk' && c.fileName);
     const files: string[] = [];
+    const styles: string[] = [];
 
     for (const path of paths) {
         const route = routes.find((r) => r.path === path);
@@ -333,11 +342,16 @@ export function routePreloadFiles(
         if (!own || own.fileName === undefined) continue;
 
         for (const file of [own.fileName, ...(own.imports ?? [])]) {
-            // An import may name the entry, which is already in the page.
-            if (!files.includes(file) && !isEntry(bundle, file)) files.push(file);
+            // An import may name the entry, which is already in the page — its CSS too.
+            if (files.includes(file) || isEntry(bundle, file)) continue;
+            files.push(file);
+            const chunk = chunks.find((c) => c.fileName === file);
+            for (const css of chunk?.viteMetadata?.importedCss ?? []) {
+                if (!styles.includes(css)) styles.push(css);
+            }
         }
     }
-    return files;
+    return [...files, ...styles];
 }
 
 /** True when the file is the bundle's own entry chunk, which `index.html` already loads. */
@@ -351,11 +365,15 @@ function isEntry(bundle: Record<string, BundleChunk>, fileName: string): boolean
  *
  * `crossorigin` because the module scripts Vite emits carry it, and a preload whose CORS mode does
  * not match the request it is meant to serve is fetched TWICE — which would turn a saved
- * round-trip into an extra download.
+ * round-trip into an extra download. A stylesheet is a `preload` `as="style"`, not a
+ * `rel="stylesheet"`: it downloads without blocking the splash's paint, and the `<link>` Vite's
+ * loader inserts later (also `crossorigin`) finds it in the cache.
  */
 export function preloadTags(files: string[], base: string): string {
     const prefix = base.endsWith('/') ? base : `${base}/`;
-    return files.map((f) => `<link rel="modulepreload" crossorigin href="${prefix}${f}">`).join('\n');
+    return files.map((f) => f.endsWith('.css')
+        ? `<link rel="preload" as="style" crossorigin href="${prefix}${f}">`
+        : `<link rel="modulepreload" crossorigin href="${prefix}${f}">`).join('\n');
 }
 
 /**

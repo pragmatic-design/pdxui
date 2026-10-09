@@ -197,6 +197,32 @@ test('a cold first screen fetches its JavaScript in two waves, not three', async
         .toBeLessThanOrEqual(2);
 });
 
+test('the landing route\'s stylesheets start with the entry, not after it', async ({ page }) => {
+    // Vite's dynamic-import helper waits for a chunk's CSS before the import resolves, so the first
+    // page cannot mount until its stylesheets are in. Found only once the entry has run, they start a
+    // round trip after it — and on slow 4G the first page was ready only when they arrived
+    // (`first-paint.spec.ts`). Announced in the HTML, they start beside the entry.
+    await page.route(/\.(js|css)(\?|$)/, async (route) => {
+        await new Promise((r) => setTimeout(r, LATENCY_MS));
+        await route.fallback();
+    });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    const timing = await page.evaluate(() =>
+        (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
+            .map((e) => ({ file: e.name.split('/').pop()!, start: e.startTime, end: e.responseEnd })));
+    const entry = timing.find((t) => /^index-[^.]+\.js$/.test(t.file));
+    expect(entry, 'the entry module was not fetched: nothing is being measured').toBeDefined();
+    const routeCss = timing.filter((t) => /^(dashboard|shell)-[^.]+\.css$/.test(t.file));
+    expect(routeCss.length, 'the landing route\'s stylesheets were not fetched: nothing is being measured')
+        .toBeGreaterThan(0);
+    const late = routeCss.filter((t) => t.start >= entry!.end).map((t) => t.file);
+    expect(late, 'these stylesheets of the first page started only after the entry arrived').toEqual([]);
+    // Each fetched once: a preload in another CORS mode than Vite's own `<link>` is downloaded twice.
+    for (const css of routeCss) {
+        expect(timing.filter((t) => t.file === css.file), `${css.file} was fetched more than once`).toHaveLength(1);
+    }
+});
+
 test('a cold load of a route that is not the landing one fetches in two waves, not three', async ({ page }) => {
     // The first thing a link someone was sent lands on. The shell holds the outlet for the route's
     // strings, and the outlet is what imports the route: the strings, THEN the chunk, would be a
