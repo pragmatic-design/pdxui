@@ -16,7 +16,7 @@
  *   - a ceiling left far above the measurement stops being a ratchet and becomes decoration, so
  *     there is a SLACK cap: too much headroom fails too, and the fix is to lower the ceiling.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';

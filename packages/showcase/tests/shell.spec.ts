@@ -10,7 +10,7 @@
 // What the rail carries is the reference's too: entries in groups over a rule, the counter ON the
 // item rather than in a bell, the pin and the open-in-new an expanded entry offers, and the
 // environment badge with the version at the foot.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 
 /** The two, and the width each one is. «All entities» is a panel beside the rail,

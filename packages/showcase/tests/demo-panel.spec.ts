@@ -4,7 +4,7 @@
 // tell the product's action from the demo's. The owner's decision: one Demo panel in the service
 // bar, holding the current screen's knobs and nothing else. Whether each knob still DOES what it
 // did is asserted where it always was — the specs that press them reach them through `demo()`.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { pickLocale } from './locale';
 
 const SCREENS = [

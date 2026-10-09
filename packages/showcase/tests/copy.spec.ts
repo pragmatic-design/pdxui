@@ -3,7 +3,7 @@
 // A line that explains the implementation — «the grid is over a data source, not an array», «a
 // four-step wizard: two forms, one Save…» — is true, and addressed to whoever reads the source, so
 // it belongs in a comment beside the page's template. On screen, one line a user would read.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { pickLocale } from './locale';
 
 /**

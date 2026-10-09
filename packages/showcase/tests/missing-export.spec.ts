@@ -10,7 +10,7 @@
 // entries are .js: a .ts entry would have its unused import erased by esbuild before Rollup saw it,
 // and the test would pass with or without the rule.
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { build } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';

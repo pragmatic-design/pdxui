@@ -9,7 +9,7 @@
  * someone submits last week's answers without noticing, so the page says a draft exists, says when,
  * and waits. The control for every row below is that the fields are EMPTY before the choice.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 import { clearAllButSession } from './session';
 

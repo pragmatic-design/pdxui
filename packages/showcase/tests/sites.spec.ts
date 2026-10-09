@@ -5,7 +5,7 @@
  * their own. A site is closed, never
  * deleted; its detail says who works there now and which tickets were opened there.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { clearAllButSession } from './session';
 
 const rows = (page: Page) => page.locator('[data-test="grid"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') });

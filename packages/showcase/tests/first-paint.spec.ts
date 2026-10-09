@@ -36,7 +36,7 @@
  * beside the other two. What lives here is the browser half — the ordering that makes the above
  * true, and the layout stability that a deferral would break.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** Slow 4G, the profile Lighthouse throttles to: 1.6 Mbps down, 150 ms RTT. */
 const SLOW_4G = {

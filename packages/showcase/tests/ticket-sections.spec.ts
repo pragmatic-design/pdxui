@@ -8,7 +8,7 @@
  * The rule, the one the customer and employee details keep: exactly one entry is current,
  * and the body shows that entry and nothing else.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const menu = (page: Page) => page.locator('[data-test="detail-menu"]');
 /** Every entry the menu marks as the one the visitor is on. */

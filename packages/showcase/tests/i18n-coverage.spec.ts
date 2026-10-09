@@ -20,7 +20,7 @@
  * It keeps working: a page that starts using `<pdx-toast>` fails here until the toast is
  * translated, which is the difference between a guard and a one-off.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';

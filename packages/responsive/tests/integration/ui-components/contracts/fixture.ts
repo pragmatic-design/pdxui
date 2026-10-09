@@ -15,13 +15,41 @@
 //
 // Everything else of '@playwright/test' is re-exported, so a spec changes only where it imports from;
 // `packages/core/tests/certify-worker-context.test.ts` fails on a spec that does not.
+//
+// The showcase uses it too (`packages/showcase/tests/fixture.ts`): its build suite alone left 3,298
+// sockets in TIME_WAIT on its port, and inside the full gate `page.goto` was refused there as well.
+// It signs every context in through a `storageState`, which the reset would wipe with the origin's
+// storage, so the state is laid down again on each test's first navigation (`seedStorageState`).
 
-import { test as base, type Browser, type BrowserContext, type BrowserContextOptions } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { test as base, type Browser, type BrowserContext, type BrowserContextOptions, type Page } from '@playwright/test';
 
 export * from '@playwright/test';
 
 type ContextOptionFixtures = Pick<BrowserContextOptions,
-    'viewport' | 'hasTouch' | 'isMobile' | 'colorScheme' | 'locale' | 'deviceScaleFactor' | 'baseURL'>;
+    'viewport' | 'hasTouch' | 'isMobile' | 'colorScheme' | 'locale' | 'deviceScaleFactor' | 'baseURL' | 'storageState'>;
+
+type StorageState = { cookies?: Parameters<BrowserContext['addCookies']>[0]; origins?: { origin: string; localStorage: { name: string; value: string }[] }[] };
+
+/**
+ * Put back what a fresh context would have started with: the `storageState`'s cookies, and its
+ * localStorage on the first navigation of this page to that origin. Once per page — a test that signs
+ * out and reloads must stay signed out, as it would in a new context — which is what the
+ * sessionStorage mark is for: it belongs to this tab and dies with it.
+ */
+async function seedStorageState(page: Page, state: string | StorageState | undefined): Promise<void> {
+    if (!state) return;
+    const parsed: StorageState = typeof state === 'string' ? JSON.parse(readFileSync(state, 'utf8')) as StorageState : state;
+    if (parsed.cookies?.length) await page.context().addCookies(parsed.cookies);
+    for (const { origin, localStorage: items } of parsed.origins ?? []) {
+        if (!items.length) continue;
+        await page.addInitScript(({ origin, items }) => {
+            if (location.origin !== origin || sessionStorage.getItem('__pdx_storage_state')) return;
+            sessionStorage.setItem('__pdx_storage_state', '1');
+            for (const { name, value } of items) localStorage.setItem(name, value);
+        }, { origin: new URL(origin).origin, items });
+    }
+}
 
 /** The context options a test resolved to, without the unset ones: the key of its worker context. */
 function contextOptions(o: ContextOptionFixtures): BrowserContextOptions {
@@ -49,16 +77,17 @@ export const test = base.extend<{}, { contextPool: Map<string, BrowserContext>; 
         await context.close();
     }, { scope: 'worker' }],
 
-    contextPool: [async ({ browser }: { browser: Browser }, use) => {
+    contextPool: [async ({}, use) => {
         const pool = new Map<string, BrowserContext>();
         await use(pool);
         await Promise.all([...pool.values()].map((c) => c.close()));
     }, { scope: 'worker' }],
 
     context: async ({ browser, contextPool, contextOptions: rest, viewport, hasTouch, isMobile,
-        colorScheme, locale, deviceScaleFactor, baseURL }, use) => {
+        colorScheme, locale, deviceScaleFactor, baseURL, storageState }, use) => {
         // `contextOptions` carries what has no fixture of its own (reducedMotion, forcedColors, …).
-        const options = { ...rest, ...contextOptions({ viewport, hasTouch, isMobile, colorScheme, locale, deviceScaleFactor, baseURL }) };
+        // `storageState` is part of the key: a guest's context is never a signed-in one reset.
+        const options = { ...rest, ...contextOptions({ viewport, hasTouch, isMobile, colorScheme, locale, deviceScaleFactor, baseURL, storageState }) };
         const key = JSON.stringify(options);
         let context = contextPool.get(key);
         if (!context) {
@@ -69,7 +98,7 @@ export const test = base.extend<{}, { contextPool: Map<string, BrowserContext>; 
         await resetContext(context);
     },
 
-    page: async ({ context, baseURL }, use) => {
+    page: async ({ context, baseURL, storageState }, use) => {
         const page = await context.newPage();
         if (baseURL) {
             // localStorage, sessionStorage, IndexedDB, cookies, service workers: what the last test on
@@ -78,6 +107,7 @@ export const test = base.extend<{}, { contextPool: Map<string, BrowserContext>; 
             await cdp.send('Storage.clearDataForOrigin', { origin: new URL(baseURL).origin, storageTypes: 'all' });
             await cdp.detach();
         }
+        await seedStorageState(page, storageState as string | StorageState | undefined);
         await use(page);
     },
 });

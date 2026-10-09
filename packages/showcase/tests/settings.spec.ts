@@ -7,7 +7,7 @@
  * Not the profile menu's Settings: that submenu is the reader's own preferences (language, scheme,
  * density). This is the application's: its closed value sets, its saved views, its users and roles.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 
 const TILES: [string, string, string][] = [

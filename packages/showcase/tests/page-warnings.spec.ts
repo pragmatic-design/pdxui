@@ -13,7 +13,7 @@
  * Node-side, no browser: it compiles the sources as the build does — `compile()` with the UI
  * manifest's props and enum values.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { basename, join } from 'node:path';

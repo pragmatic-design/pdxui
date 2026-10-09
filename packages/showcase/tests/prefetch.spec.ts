@@ -10,7 +10,7 @@
  * So the subject here is the NETWORK, on the real build: which files the browser asked for, and
  * when. Counting is the only way to tell a prefetch that happened from one that was declared.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /**
  * The JavaScript files the browser asked for, in order, as file NAMES.

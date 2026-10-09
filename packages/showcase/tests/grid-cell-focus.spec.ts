@@ -10,7 +10,7 @@
  * or a customers row opens the record's drawer, and the drawer takes the
  * focus.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const firstRow = (page: Page) => page.locator('[data-test="preview"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') }).first();
 const focused = (page: Page) => page.evaluate(() => {

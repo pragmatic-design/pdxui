@@ -16,7 +16,7 @@
  *
  * And all three reach a screen reader exactly once, which is the part no visual rule covers.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 
 const rows = (page: Page) => page.locator('[data-test="grid"] .pdx-dg-row');

@@ -10,7 +10,7 @@
  * (`ticket.pdx`), which is what makes "the parent was not rebuilt" a measurement rather than an
  * impression.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** Sign in through the form, as a person does — the same steps as `auth.spec.ts`. */
 async function signIn(page: Page, username: string): Promise<void> {

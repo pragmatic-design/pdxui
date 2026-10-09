@@ -5,7 +5,7 @@
 // bar beside the language.
 //
 // Its own file rather than rows in `shell.spec.ts`, which is the rail's and is 300 lines already.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { GUEST } from './session';
 
 const trigger = (page: Page) => page.locator('[data-test="profile"]');

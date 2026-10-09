@@ -6,7 +6,7 @@
  * of the same scoped CSS, a fix (the section gap, the phone layout) copied by hand into one misses
  * another: at 390 a body becomes a sliver beside a 260px menu.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';

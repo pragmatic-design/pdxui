@@ -17,7 +17,7 @@
  * overflow are measured on the bar, because that is where a select lives and a select is what
  * causes all of it; the labels are measured in the rail, which is where a long word has to fit.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 
 const WIDTHS = [1440, 1024, 768, 390] as const;

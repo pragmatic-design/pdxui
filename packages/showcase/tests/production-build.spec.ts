@@ -8,7 +8,7 @@
  *
  * This is also where `vite build` output is executed, rather than the dev path.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { demo } from './demo';
 
 /** Wait for the app to have mounted, not merely for the document to have loaded. */

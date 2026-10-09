@@ -7,7 +7,7 @@
  * `requestAnimationFrame` loop started before any of the app's code — and each one must be the splash
  * covering the viewport, or the app with its page in it.
  */
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './fixture';
 import { GUEST } from './session';
 
 interface Sample { t: number; parsed: boolean; reduced: boolean; splash: boolean; leaving: boolean; page: boolean; placeholder: boolean }

@@ -9,7 +9,7 @@
  * This file holds the entity, its list, its detail and its sections: Anagrafica, Contratti, Sedi
  * and Documenti.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pinInRail } from './rail';
 
 /** The question on leaving with a refused value: the dialog queue's modal, by its role and its name. */

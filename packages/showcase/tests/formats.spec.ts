@@ -3,7 +3,7 @@
 // No «standard», «active», «onboarding» or «IT» where a word belongs, no ISO date beside the
 // tickets' «1 set 2026», and no «1 schede» on the board. Every row here is read in Italian, where a
 // raw code and an English word are both visible for what they are.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { pickLocale } from './locale';
 
 async function openInItalian(page: Page, path: string, ready: string): Promise<void> {
