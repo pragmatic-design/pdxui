@@ -123,6 +123,20 @@ async function load(page: Page): Promise<Timings> {
     await expect(page.locator('.pdx-app-layout, pdx-app > *').first()).toBeVisible();
     await page.waitForTimeout(800);
 
+    // A cold load or nothing: an entry served from the HTTP cache measures a returning visitor, and
+    // every number below would be the wrong one. The fixture reuses a context per worker (#32), so
+    // this is what says whether it also reused its cache.
+    // Downloaded means more bytes on the wire than the body: headers on top of it. A 304 moves only
+    // headers, and the memory cache moves nothing.
+    const entry = await page.evaluate(() => {
+        const r = (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
+            .find((e) => /\/assets\/index-[^/]*\.js$/.test(e.name));
+        return r ? { wire: r.transferSize, body: r.encodedBodySize } : null;
+    });
+    expect(entry, 'the entry module was not fetched at all').not.toBeNull();
+    expect(entry!.wire, `the entry module came from the HTTP cache (${entry!.wire} bytes on the wire for a `
+        + `${entry!.body}-byte body): this is not a cold load`).toBeGreaterThan(entry!.body);
+
     return page.evaluate(() => {
         const end = (match: RegExp): number => {
             // `PerformanceResourceTiming`, not `PerformanceEntry`: `responseEnd` is on the

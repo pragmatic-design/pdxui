@@ -64,7 +64,18 @@ async function resetContext(context: BrowserContext): Promise<void> {
     await context.clearPermissions();
 }
 
-export const test = base.extend<{}, { contextPool: Map<string, BrowserContext>; sharedContext: BrowserContext }>({
+/**
+ * What a reused context does with its HTTP cache between tests. `keep` is certify's: the scenario
+ * pages load the same assets hundreds of times, and the cache is the point. `clear` is for a suite
+ * whose tests measure a cold load — the showcase's first paint and waves — where an entry answered by a
+ * 304 measures a returning visitor (300 bytes on the wire for a 34 KB body, #32). The connections
+ * are reused either way; that is what the loopback needed.
+ */
+export type HttpCache = 'keep' | 'clear';
+
+export const test = base.extend<{ httpCache: HttpCache }, { contextPool: Map<string, BrowserContext>; sharedContext: BrowserContext }>({
+    httpCache: ['keep', { option: true }],
+
     /**
      * The context of a group that shares one page across its tests, the manifest and axe runners:
      * opened once per worker, never reset, closed with the worker. A group closes only its own page.
@@ -98,13 +109,14 @@ export const test = base.extend<{}, { contextPool: Map<string, BrowserContext>; 
         await resetContext(context);
     },
 
-    page: async ({ context, baseURL, storageState }, use) => {
+    page: async ({ context, baseURL, storageState, httpCache }, use) => {
         const page = await context.newPage();
-        if (baseURL) {
-            // localStorage, sessionStorage, IndexedDB, cookies, service workers: what the last test on
-            // this context left on the scenario origin. The HTTP cache stays, and is the point.
+        if (baseURL || httpCache === 'clear') {
             const cdp = await context.newCDPSession(page);
-            await cdp.send('Storage.clearDataForOrigin', { origin: new URL(baseURL).origin, storageTypes: 'all' });
+            // localStorage, sessionStorage, IndexedDB, cookies, service workers: what the last test on
+            // this context left on the scenario origin. The HTTP cache stays unless asked (`httpCache`).
+            if (baseURL) await cdp.send('Storage.clearDataForOrigin', { origin: new URL(baseURL).origin, storageTypes: 'all' });
+            if (httpCache === 'clear') await cdp.send('Network.clearBrowserCache');
             await cdp.detach();
         }
         await seedStorageState(page, storageState as string | StorageState | undefined);

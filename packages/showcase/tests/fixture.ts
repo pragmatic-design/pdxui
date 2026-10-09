@@ -5,4 +5,11 @@
 // alone left 3,298 sockets in TIME_WAIT on its port, and inside the full pre-push gate on Windows a
 // `page.goto` was refused (#32). Everything of '@playwright/test' is re-exported, so a spec changes only
 // where it imports from; `packages/core/tests/certify-worker-context.test.ts` fails on a spec that does not.
+//
+// The HTTP cache is cleared before every test: these specs were written against a new context, and
+// some measure a cold load (`first-paint.spec.ts` says so when a resource comes from the cache).
+import { test as base } from '../../responsive/tests/integration/ui-components/contracts/fixture';
+
 export * from '../../responsive/tests/integration/ui-components/contracts/fixture';
+
+export const test = base.extend({ httpCache: 'clear' });
