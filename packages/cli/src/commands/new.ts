@@ -104,7 +104,7 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
         type: 'module',
         scripts: { dev: 'pdx dev', build: 'pdx build', check: 'pdx check' },
         dependencies: { '@pdxui/framework': range },
-        devDependencies: { '@pdxui/cli': range, '@pdxui/compiler': range, 'vite': cli?.vite ?? '^6.4.2' },
+        devDependencies: { '@pdxui/cli': range, '@pdxui/compiler': range, 'vite': cli?.vite ?? '^6.4.3' },
     }, null, 2));
 
     // The design system once, through the package the project depends on; then the app, placed: the
