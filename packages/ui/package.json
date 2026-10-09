@@ -659,8 +659,8 @@
   "devDependencies": {
     "@pdxui/core": "workspace:*",
     "typescript": "^5.8.0",
-    "vite": "^6.4.2",
-    "vitest": "^4.1.0",
+    "vite": "^6.4.4",
+    "vitest": "^4.1.11",
     "happy-dom": "^20.14.5",
     "@pdxui/design": "workspace:*"
   }

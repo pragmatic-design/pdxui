@@ -11,6 +11,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # A range in a package.json says what the package supports, and the lockfile what the gate ran.
+    # A range moves only when the new version falls outside it, or on purpose: a published package's
+    # peerDependencies rise to a security fix (vite ^6.4.3), not to whatever patch came out last.
+    versioning-strategy: increase-if-necessary
     # Two kept out of the weekly group, each in a pull request of its own: tests here depend on
     # behaviour measured on a given happy-dom (its MutationObserver, its mount order), and citty is
     # the CLI's parser on 0.x, where a minor may change the API.
@@ -31,6 +35,10 @@ updates:
       - dependency-name: "@playwright/test"
       - dependency-name: "playwright"
       - dependency-name: "playwright-core"
+      # Not at all: the extension's types follow its `engines.vscode`, the oldest VS Code it runs on.
+      # Newer types let the code call an API that VS Code lacks, and `vsce package` refuses them;
+      # core's vscode-types-engine.test.ts holds the rule. They move with the engine, on purpose.
+      - dependency-name: "@types/vscode"
 
   - package-ecosystem: github-actions
     directory: /
