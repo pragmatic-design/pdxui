@@ -232,9 +232,11 @@ test('the catalogue opens on its search, and the search narrows it', async ({ pa
     const all = await entries.count();
 
     await search.fill('empl');
-    // «Employees»: every entry whose name has it, and nothing else.
+    // «Employees»: every entry whose name has it, and nothing else. pdx-nav-menu rebuilds its
+    // entries in the frame after the change, so the narrowed list is waited for, not read at once:
+    // read before that frame it is still the whole list (12 of 12, once in CI).
+    await expect.poll(() => entries.count(), { message: 'nothing was filtered' }).toBeLessThan(all);
     const names = await entries.allInnerTexts();
-    expect(names.length, 'nothing was filtered').toBeLessThan(all);
     expect(names.every((n) => /empl/i.test(n)), `left: ${names.join(' | ')}`).toBe(true);
     await expect(catalog(page).locator('[data-test="catalog-empty"]')).toBeHidden();
 
