@@ -6,8 +6,8 @@
 // `pnpm --filter @pdxui/compiler test` hangs, and the caller has no way to tell "still running"
 // from "waiting for a keystroke".
 //
-// It matters because /start-jira-loop tells whoever works a story that `pnpm test` is the signal
-// that closes it. Reached per-package — which is what you do while iterating — it never answers.
+// It matters because CONTRIBUTING.md makes `pnpm test` the signal that a change is ready. Reached
+// per-package — which is what you do while iterating — it never answers.
 
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
