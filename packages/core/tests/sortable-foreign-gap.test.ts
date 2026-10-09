@@ -40,15 +40,17 @@ function pointer(type: string, target: EventTarget, clientX: number, clientY: nu
     target.dispatchEvent(e);
 }
 
-/** Every value written to `el.style.transform`, in order. */
+/** Every value written to `el.style.transform`, in order. happy-dom's style is a Proxy that turns
+ *  `style.transform = v` into `setProperty('transform', v)` and refuses `defineProperty` on a CSS
+ *  property, so the writes are recorded where they land. */
 function recordTransforms(el: HTMLElement): string[] {
     const writes: string[] = [];
-    let current = '';
-    Object.defineProperty(el.style, 'transform', {
-        configurable: true,
-        get: () => current,
-        set: (v: string) => { current = v; writes.push(v); },
-    });
+    const style = el.style;
+    const setProperty = style.setProperty.bind(style);
+    style.setProperty = (property: string, value: string | null, priority?: string) => {
+        if (property === 'transform') writes.push(value ?? '');
+        setProperty(property, value, priority);
+    };
     return writes;
 }
 

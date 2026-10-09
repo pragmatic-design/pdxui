@@ -19,22 +19,23 @@ describe('the GC detector', () => {
         expect((MutationObserver.prototype.observe as unknown as { pdxGcDetector?: boolean }).pdxGcDetector).toBe(true);
     });
 
-    it('an observer whose records arrive after its first task is silenced — what it detects', async () => {
+    it('an observer whose records arrive after a forced collection still delivers them', async () => {
         const host = document.createElement('div');
         document.body.appendChild(host);
         let delivered = 0;
         const observer = new MutationObserver(() => { delivered++; });
         observer.observe(host, { childList: true });
 
-        // The detector's forced collection is one macrotask after observe(); after these, happy-dom's
-        // WeakRef to the delivery callback is gone.
+        // The detector's forced collection is one macrotask after observe(). Up to 20.10.2 happy-dom
+        // held the delivery callback only through a WeakRef, and this observer went silent here; it
+        // must not go silent again.
         await turn();
         await turn();
         host.appendChild(document.createElement('span'));
         await turn();
         await turn();
 
-        expect(delivered, 'the observer still delivered: the detector is not doing its job').toBe(0);
+        expect(delivered, 'the collection silenced the observer: happy-dom drops MutationObserver records again').toBe(1);
         observer.disconnect();
         host.remove();
     });
