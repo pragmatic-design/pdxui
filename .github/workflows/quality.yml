@@ -29,6 +29,15 @@ on:
 permissions:
   contents: read
 
+# The values Chromium writes itself at startup, set before it starts (#63). Chromium sets both with
+# setenv on two threads while others run; for a variable that is not there yet glibc reallocates the
+# environment array and can free it under a thread reading it — on a runner with no D-Bus socket,
+# libdbus, and the headless shell dies with signal 11 at launch. Already set, both calls replace a
+# value in place and nothing is freed. core's ci-browser-env test holds every browser job to it.
+env:
+  FC_FONTATIONS: '1'
+  DBUS_SESSION_BUS_ADDRESS: 'disabled:'
+
 jobs:
   # Build first, because the typecheck needs it: packages/framework checks against what core, ui
   # and router publish (dist/*.d.ts), not their sources, and a fresh runner has no dist.

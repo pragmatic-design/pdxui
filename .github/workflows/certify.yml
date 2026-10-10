@@ -14,6 +14,12 @@ on:
 permissions:
   contents: read
 
+# The values Chromium writes itself at startup, set before it starts (#63): see quality.yml. The
+# visual job runs in a container, which does not inherit these; the Dockerfile sets them there.
+env:
+  FC_FONTATIONS: '1'
+  DBUS_SESSION_BUS_ADDRESS: 'disabled:'
+
 jobs:
   # Dimensions 1-4: deterministic, fast, no screenshots → no Docker needed.
   contracts:
