@@ -949,7 +949,10 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         detectCoreApis(stripLineComment(trimmed), usedFeatures);
 
         // ─── const/let declarations ───
-        const constMatch = trimmed.match(/^(const|let)\s+(\w+)\s*=/);
+        // Match: `const NAME =` or `const NAME: Type =` — the name, then its initialiser or its type
+        // annotation. Groups: [1]=keyword [2]=name. Without the `:` a typed declaration was never
+        // returned: undefined in the template, and a throw on the inline path (#44).
+        const constMatch = trimmed.match(/^(const|let)\s+(\w+)\s*[=:]/);
         if (constMatch) {
             const [, keyword, name] = constMatch;
             // Only top-level (depth 0) declarations are auto-exported — a nested const/let (inside

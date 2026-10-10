@@ -29,14 +29,14 @@ function parses(code: string): void {
 }
 
 /**
- * A plain element's property write: `read` taken once into `__v`, null handed to core's
- * `clearBoundProperty` with the bound attribute `attr` and the property `prop`, anything else
- * assigned to `prop`.
+ * A plain element's property write: `read` taken once into `__b` (the value the binding last wrote
+ * is kept beside it, #44), null handed to core's `clearBoundProperty` with the bound attribute
+ * `attr` and the property `prop`, anything else assigned to `prop`.
  */
 function writesProperty(code: string, attr: string, prop: string, read: string): void {
     const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     expect(code).toMatch(new RegExp(
-        `const __v = ${esc(read)}; if \\(__v == null\\) clearBoundProperty\\(__el\\d+, "${attr}", "${prop}"\\); else __el\\d+\\["${prop}"\\] = __v;`,
+        `const __b = ${esc(read)}; .*?const __v = __b; if \\(__v == null\\) clearBoundProperty\\(__el\\d+, "${attr}", "${prop}"\\); else __el\\d+\\["${prop}"\\] = __v;`,
     ));
 }
 

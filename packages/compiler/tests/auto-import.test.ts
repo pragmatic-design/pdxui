@@ -285,15 +285,29 @@ function go(file) { const h = uploadFile('/u', file); effect(() => { ready = h.p
 // chunk the code lands in, and a chart behind a tab most visitors never open would cost the
 // route's chunk its full size (15 KB on the showcase's ticket route).
 describe('a component only used inside @defer', () => {
-    const compileDeferred = (template: string): string => {
+    const compileDeferred = (template: string, inline = false): string => {
         const source = `<template>${template}</template>\n<script setup>\nlet ready = $signal(true);\n</script>`;
         const resolver = new ComponentResolver();
         resolver.registerUiManifest();
         const { code } = compile(source, 'page.pdx', undefined, undefined, {
             importPathOf: (tag) => resolver.resolve(tag)?.importPath ?? null,
+            ...(inline ? { production: true, inlineBindings: true } : {}),
         });
         return injectComponentImports(code, 'page.pdx', source, resolver);
     };
+
+    it('on the inline path too — the production default — the defer loads what it renders (#44)', () => {
+        // The inline path passed `null` as the loader. The static import was dropped all the same,
+        // so the deferred component was imported by nobody: the trigger fired, `<pdx-chart>` was
+        // created, and it stayed an unknown element — the showcase's dashboard charts never drew.
+        const out = compileDeferred(`
+  @defer (interaction) {
+    <pdx-chart type="line"></pdx-chart>
+  }
+`, true);
+        expect(out, 'the inline path rendered the defer without loading its component')
+            .toMatch(/import\(\s*['"]@pdxui\/ui\/chart['"]\s*\)/);
+    });
 
     it('is imported DYNAMICALLY, inside the defer, not statically at the top', () => {
         const out = compileDeferred(`

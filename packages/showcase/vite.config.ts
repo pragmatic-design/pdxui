@@ -15,9 +15,9 @@ import { mockAuth } from './mock-auth';
  * No `minify` override and no `target` beyond es2022: the numbers this app produces are meant to be
  * the numbers an application gets from `pdx build` with nothing tuned.
  *
- * `PDX_INLINE_BINDINGS=1` builds the same app through the inline render path instead, which is how
- * the two are measured against each other. It is an env switch and not a second config
- * on purpose: the two builds must differ in exactly one option.
+ * No `inlineBindings` override either: a production build takes the inline render path by default,
+ * and so does every app built with `pdx build` — the mode this bench has to measure
+ * (`tests/render-path.spec.ts` reads it off the built chunk).
  */
 export default defineConfig({
     // `mockAttachments` serves `/api/attachments` in dev AND in preview, slowly on purpose: a
@@ -27,7 +27,7 @@ export default defineConfig({
     plugins: [
         // `defaultLayout`: the rail and the bar (`src/shell.pdx`) around every page that declares no
         // layout, and none around the sign-in, which says `@layout 'none'`.
-        pdx({ devtools: false, inlineBindings: process.env.PDX_INLINE_BINDINGS === '1', defaultLayout: 'shell' }),
+        pdx({ devtools: false, defaultLayout: 'shell' }),
         mockAttachments(), mockAuth(),
     ],
     server: { port: 5310 },
