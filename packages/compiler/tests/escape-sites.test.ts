@@ -34,6 +34,22 @@ describe('@raw keeps its text as written', () => {
     }
 });
 
+describe('@raw inside a loop binds nothing', () => {
+    // The parser's `\${` used to hide an unquoted `attr=${…}` from both render paths. Kept as written,
+    // the inline path read it as a value the compiler had pre-rewritten — a live binding to `item`.
+    const src = `<template>\n@for (items as item; track item) { @raw {<span title=\${item}>x</span>} }\n</template>\n<script setup>\nlet items = $signal([1]);\n</script>\n`;
+
+    it('inline path: the attribute is the text', () => {
+        const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: true, inlineBindings: true });
+        expect(code).toContain('.setAttribute("title", "${item}")');
+    });
+
+    it('template path: the markup carries the text', () => {
+        const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: false });
+        expect(templateText(code)).toContain('<span title=${item}>');
+    });
+});
+
 describe('a single-quoted string in an object literal read as JSON', () => {
     it('keeps an escaped double quote inside it', () => {
         expect(parseObjectLiteralToJson(`{ title: 'say \\"hi\\"' }`)).toEqual({ title: 'say "hi"' });
