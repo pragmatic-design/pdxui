@@ -20,7 +20,8 @@ export function offsetToPosition(source: string, offset: number): Position {
     return Position.create(line, col);
 }
 
-function escapeRegex(s: string): string {
+/** `s` as a regex that matches it literally: every metacharacter escaped. */
+export function escapeRegex(s: string): string {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 

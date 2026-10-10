@@ -59,6 +59,11 @@ export interface HtmlNode {
      * each, the source is one character further on.
      */
     shifts?: number[];
+    /**
+     * An `@raw { … }` block: text as written, which no pass reads for bindings, interpolations or
+     * directives. Each render path only escapes it for where it puts it.
+     */
+    raw?: true;
 }
 
 export interface InterpolationNode {
@@ -1064,13 +1069,13 @@ function parseRaw(ctx: ParseContext, loc: SourceLoc): HtmlNode {
         );
     }
 
-    let content = ctx.source.slice(blockStart, end);
+    const content = ctx.source.slice(blockStart, end);
     advanceTo(ctx, end + 1); // past closing }
 
-    // Escape backticks and ${} so they survive inside html`` template literal
-    content = content.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-
-    return { type: 'html', content, loc };
+    // The text as written, marked raw. Escaping it here for the html`` literal — backticks and `${`,
+    // not the backslash — was escaped a second time downstream: the page showed `a\`b` (#71). Each
+    // render path escapes it for where it puts it, and `raw` keeps every other pass away from it.
+    return { type: 'html', content, loc, raw: true };
 }
 
 // ─── <slot let:> (parent-side, HTML-native syntax) ────────────────
