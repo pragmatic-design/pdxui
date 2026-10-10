@@ -20,19 +20,25 @@ declares it once.
 The **method is part of the string** — `'GET /api/users'`, not `'/api/users'`. Without it the
 declaration is not recognised, and an unrecognised declaration is **dropped**: no `resource`, and
 every read of `users` below finds nothing. You get `PDX_FETCH_INVALID` for it, which is the
-diagnostic to look for when a page that reads `users.data` renders nothing at all.
+diagnostic to look for when a page that reads `users.data()` renders nothing at all.
 
 `@fetch` **reads**, so the method is `GET`: a `POST` or a `DELETE` here is the error
 `PDX_FETCH_METHOD`. A write is a `mutation()` (below).
 
 From this one line the compiler generates a typed `resource()` with three states you use directly in
-the template:
+the template. Each is a signal, so it is read with a call — `users.loading()`, not `users.loading`,
+which is the function itself and always true:
 
 ```pdx
-@if (users.loading) { <pdx-spinner /> }
-@if (users.error)   { <p class="err">{{ users.error.message }}</p> }
-@for (users.data as u; track u.id) { <li>{{ u.name }}</li> }
+@if (users.loading()) { <pdx-spinner /> }
+@if (users.error())   { <p class="err">{{ String(users.error()) }}</p> }
+@for (users.data() ?? [] as u; track u.id) { <li>{{ u.name }}</li> }
 ```
+
+In the editor and in `pdx check --types`, `users` is that resource with the type after `as`:
+`@fetch users: 'GET /api/users' as User[]` makes `users.data()` a `User[] | undefined`, and a
+misspelt field is an error. Without `as`, the data is `unknown`. The error is always `unknown` —
+anything can be thrown — so it is shown through `String()`, or narrowed before reading a field.
 
 You didn't write a `useState`/`useEffect`, didn't hand-manage `try/catch`, don't have an `isLoading`
 flag to remember to turn off. You declared *which data you want*, and the state is modeled for you.
@@ -617,7 +623,7 @@ Two more you will meet rarely and should know exist:
 
 ## In practice
 
-- **Read data** → `@fetch name: 'GET /url'` and use `name.loading/error/data`.
+- **Read data** → `@fetch name: 'GET /url' as Type` and read `name.loading()`, `name.error()`, `name.data()`.
 - **Feed a grid or a select** → `createDataSource(rows)` or `createDataSource({ transport })`.
 - **Depends on state** → put `${signal}` in the URL: it re-runs itself.
 - **Avoid duplicate requests** → `staleTime` + `tags`.

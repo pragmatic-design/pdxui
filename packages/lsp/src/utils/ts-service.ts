@@ -4,55 +4,11 @@
 // out PRESERVING the offsets → the .pdx ↔ TS position mapping is 1:1 (offset-scriptStart).
 
 import ts from 'typescript';
-import { DECORATOR_RUNES } from '@pdxui/compiler';
+import { DECORATOR_RUNES, parseFetchDecl } from '@pdxui/compiler';
 import { existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-
-const GLOBALS_FILE = '__pdx_globals__.d.ts';
-const GLOBALS_DTS = `
-export {};
-declare global {
-  // In .pdx source, signals are USED as values (the compiler rewrites reads and writes):
-  // so, for IntelliSense and diagnostics, the type is the VALUE, not a callable.
-  function $signal<T>(v: T): T;
-  // The VALUE form, the one the compiler takes: \`$derived(a > b)\` is a boolean.
-  function $derived<T>(value: T): T;
-  function $store<T extends object>(v: T): T;
-  function $effect(fn: () => unknown): void;
-  function $watch<T>(src: T | (() => T), cb: (v: T, prev: T) => void, opts?: { immediate?: boolean }): void;
-  function $t(key: string, params?: Record<string, unknown>): string;
-  function $n(v: number, opts?: Intl.NumberFormatOptions): string;
-  function $d(v: Date | number | string, opts?: Intl.DateTimeFormatOptions): string;
-  function $r(v: number, unit: Intl.RelativeTimeFormatUnit): string;
-  // A handler's event: \`any\`, so \`$event.target.value\` reads as it runs. The template projection
-  // narrows it where the event's payload type is known.
-  const $event: any;
-  const $el: HTMLElement;
-  const $refs: Record<string, HTMLElement>;
-  // The @pdxui/core helpers the compiler auto-imports (used with no import in the .pdx).
-  const html: (strings: TemplateStringsArray, ...values: any[]) => unknown;
-  function signal<T>(v: T): { (): T; set(v: T | ((p: T) => T)): void };
-  function computed<T>(fn: () => T): () => T;
-  // effect() and watch() hand back the function that stops them, as core's do.
-  function effect(fn: () => unknown): () => void;
-  function batch(fn: () => void): void;
-  function untrack<T>(fn: () => T): T;
-  function watch(src: unknown, cb: (v: any, p: any) => void, opts?: { immediate?: boolean }): () => void;
-  // An async callback too, as core's own signature allows.
-  function onMount(fn: () => void | (() => void) | Promise<unknown>): void;
-  function onDestroy(fn: () => void): void;
-  function onUpdated(fn: () => void): void;
-  function onError(fn: (e: unknown) => void): void;
-  function onShow(fn: () => void): void;
-  function onHide(fn: () => void): void;
-  function onPropsChange(fn: (...a: any[]) => void): void;
-  function onBeforeLeave(fn: (...a: any[]) => unknown): void;
-  function onRouteChange(fn: (...a: any[]) => void): void;
-  function onVisible(fn: (...a: any[]) => void): void;
-  function onResize(fn: (...a: any[]) => void): void;
-}
-`;
+import { GLOBALS_FILE, GLOBALS_DTS } from './pdx-globals';
 
 // Statement-leading runes. We recognise them ONLY at the start of a line (indent aside):
 // an `@form`/`@store` inside a comment ("(via @form rune)", for one) is not a rune.
@@ -84,7 +40,8 @@ function atLineStart(s: string, idx: number): boolean {
 export function projectScript(scriptContent: string): string {
     const s = scriptContent;
     const out = s.split('');
-    const names = new Set<string>();
+    // Each name a rune introduces → the type it is declared with at the end.
+    const names = new Map<string, string>();
     // `@event name: T` → the script's `name(detail)`, declared typed by its payload.
     const emitters: string[] = [];
     RUNE_KW.lastIndex = 0;
@@ -99,12 +56,12 @@ export function projectScript(scriptContent: string): string {
         }
         if (NAME_INTRO.has(kw)) {
             const after = /^\s+([A-Za-z_$][\w$]*)/.exec(s.slice(m.index + 1 + kw.length));
-            if (after) names.add(after[1]);
+            if (after) names.set(after[1], 'any');
         }
         if (kw === 'inject' || kw === 'mixin') {
             // Match: @inject key;  @inject key as alias;  @mixin useThing as thing;   Groups: [1]=key [2]=alias
             const inj = /^\s+([A-Za-z_$][\w$]*)(?:\s+as\s+([A-Za-z_$][\w$]*))?/.exec(s.slice(m.index + 1 + kw.length));
-            if (inj) names.add(inj[2] ?? inj[1]);
+            if (inj) names.set(inj[2] ?? inj[1], 'any');
         }
         if (kw === 'event') {
             // Match: @event name: PayloadType;   Groups: [1]=name [2]=payload type (optional)
@@ -131,13 +88,20 @@ export function projectScript(scriptContent: string): string {
             else if (c === ';' && depth === 0) { j++; ended = true; break; }
         }
         if (!ended) { j = s.indexOf('\n', m.index); if (j < 0) j = s.length; }
+        if (kw === 'fetch') {
+            // `as User` → `PdxResource<User>`, read by the compiler's own parser so the two cannot
+            // disagree; `unknown` with no type. A line the compiler rejects stays `any`: it is
+            // already an error, and a second one on every read of the name would bury it.
+            const decl = parseFetchDecl(s.slice(m.index, j).replace(/\s+/g, ' ').trim());
+            if (decl) names.set(decl.name, `PdxResource<${decl.type || 'unknown'}>`);
+        }
         for (let k = m.index; k < j; k++) if (out[k] !== '\n') out[k] = ' ';
         RUNE_KW.lastIndex = j;
     }
     let res = out.join('');
     res = res.replace(RUNE_DECL, (_all, indent: string, kw: string, rest: string) => `${indent}${kw === 'let' ? 'var' : 'var  '}${rest}`);
     // `var`: declared after the code that reads them, as the compiler makes them available before it.
-    const decls = [...[...names].map(n => `var ${n}: any;`), ...emitters].join(' ');
+    const decls = [...[...names].map(([n, type]) => `var ${n}: ${type};`), ...emitters].join(' ');
     return decls ? `${res}\n;${decls}` : res;
 }
 
