@@ -12,7 +12,7 @@ import type {
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
     parseInlineFormSchema, parseFormOptions, parsePageOptions, parseSearchParams, normalizeStatementsWithOrigins,
-    extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, extractSearchBlock, parseHeadBlock,
+    extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, PREFETCH_POLICIES, extractSearchBlock, parseHeadBlock,
     parseRouteBlock, parseRouteParams, parseObjectLiteralToJson, splitAtTopLevelCommas,
 } from './script-analyzer-helpers';
 import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
@@ -984,6 +984,17 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     detectCoreApis(maskNonCode([...bodyLines, ...effects, ...onMountBodies, ...onDestroyBodies, ...inlineBlocks].join('\n')), usedFeatures);
 
     dropLocallyDeclared(usedFeatures, lines, setupDepthAt);
+
+    // A prefetch policy the router does not have: it normalised it to `hover`, in silence. Checked
+    // here, once, because it arrives from `@prefetch '…'` and from `@page '…' { prefetch: … }` alike.
+    if (route.prefetch !== undefined && !PREFETCH_POLICIES.includes(route.prefetch)) {
+        warnings.push({
+            code: 'PDX_PREFETCH_POLICY',
+            severity: 'error' as const,
+            message: `@prefetch '${route.prefetch}' is not a policy the router has: it would behave as 'hover'.`,
+            hint: `Use one of: ${PREFETCH_POLICIES.map((p) => `'${p}'`).join(', ')}.`,
+        });
+    }
 
     const analysis: ScriptAnalysis = {
         mode: isNewMode ? 'new' : 'legacy',

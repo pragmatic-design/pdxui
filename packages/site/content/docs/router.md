@@ -361,9 +361,16 @@ the module is already in the cache.
 You write nothing for the common case. What you can write is the exception:
 
 ```pdx
-@page '/reports' { prefetch: 'eager' };   <!-- fetch it as soon as a link to it is on screen -->
-@page '/admin'   { prefetch: 'never' };   <!-- never speculatively -->
+@page '/reports' { prefetch: 'eager' };     <!-- fetch it as soon as a link to it is on the page -->
+@page '/assets/:id' { prefetch: 'viewport' }; <!-- fetch it once a link to it scrolls into view -->
+@page '/admin'   { prefetch: 'never' };     <!-- never speculatively -->
 ```
+
+`viewport` sits between the two: a link far down a long page costs nothing until the visitor
+scrolls to it, and then its chunk is on its way before any hover. One `IntersectionObserver` watches
+every such link, and a link stops being watched once its route is fetched. Hover, focus and press
+still fetch it earlier if they come first. A name that is none of the four is a compile error,
+[`PDX_PREFETCH_POLICY`](/docs/diagnostics).
 
 `never` is the one worth knowing. A route behind a permission the visitor does not have should not
 be fetched to find that out, and a page nobody is expected to open is bytes spent on nothing. A
@@ -495,14 +502,13 @@ so does an HMR pass that re-creates the router. It is idempotent.
 @alias '/people';                <!-- alternative path for the same page -->
 @outlet 'sidebar' -> 'pdx-nav';  <!-- named outlet -->
 @params { id: number };          <!-- param types: parsed, not implemented -->
-@prefetch 'hover';               <!-- 'hover' (the default), 'eager', or 'never' -->
+@prefetch 'hover';               <!-- 'hover' (the default), 'eager', 'viewport', or 'never' -->
 ```
 
 `@prefetch` is the policy for fetching the page's chunk before the click — see
 [Before the click](#before-the-click-prefetching) above, which is where it is explained.
 
-> Two things `@prefetch` does not do: **`'viewport'`** is not a policy the router
-> knows (it is accepted by the parser and then behaves as `hover`), and nothing emits the browser's
+> One thing `@prefetch` does not do: nothing emits the browser's
 > **Speculation Rules** — `GeneratedRouter.speculationRules` is a type with no producer. Prefetching
 > is done by `<pdx-link>` calling the route's own `import()`, which is a different mechanism and
 > the one that works in a single-page app.

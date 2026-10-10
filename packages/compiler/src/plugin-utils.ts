@@ -163,7 +163,7 @@ export interface ScannedRoute {
      * page's language. The router translates it with the route's params.
      */
     labelKey?: string;
-    /** `@prefetch 'hover' | 'viewport' | 'eager'` — when to fetch the chunk. */
+    /** `@prefetch 'hover' | 'eager' | 'viewport' | 'never'` — when to fetch the chunk. */
     prefetch?: string;
     /** `@transition 'fade'` — the enter/exit animation between this page and the previous one. */
     transition?: string;

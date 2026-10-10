@@ -221,6 +221,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Write `<script setup>`, which hands the template every name it declares — or add the name to the returned object.',
         reproducedIn: `${T}legacy-template-names.test.ts`,
     },
+    PDX_PREFETCH_POLICY: {
+        severity: 'error', category: 'defect',
+        summary: 'A route\'s `@prefetch` names a policy the router does not have.',
+        explanation: 'The router treats a policy it does not know as `hover`: the route would prefetch on a hover whatever was written, and nothing would say so.',
+        fix: "One of `'hover'` (the default), `'eager'`, `'viewport'`, `'never'`.",
+        reproducedIn: `${T}prefetch-policy.test.ts`,
+    },
     PDX_FETCH_METHOD: {
         severity: 'error', category: 'defect',
         summary: '`@fetch` with a method other than GET.',

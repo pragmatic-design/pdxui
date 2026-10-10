@@ -146,6 +146,9 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const tag = /^<([\w-]+)>/.exec(w.message)?.[1];
             return tag ? find(source, template, new RegExp(`<${escape(tag)}(?![\\w-])`)) : undefined;
         }
+        case 'PDX_PREFETCH_POLICY':
+            // Match: `@prefetch 'x'` or `prefetch: 'x'` in a @page block — the policy the message names.
+            return name ? find(source, script, new RegExp(`prefetch\\s*:?\\s*['"]${escape(name)}['"]`)) : undefined;
         case 'PDX_UNDECLARED_REF':
         case 'PDX_TEMPLATE_NAME_NOT_PROVIDED':
             return name ? findTemplateRead(source, template, name) : undefined;

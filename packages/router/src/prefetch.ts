@@ -14,8 +14,15 @@
 
 import { routeTable, pageModule } from './active';
 
-/** What a route says about being fetched ahead of time. */
-export type PrefetchPolicy = 'hover' | 'eager' | 'never';
+/**
+ * What a route says about being fetched ahead of time: on a hover, focus or press of a link to it
+ * (`hover`, the default); as soon as a link to it is on the page (`eager`); as soon as a link to it
+ * scrolls into view (`viewport`); or never.
+ */
+export type PrefetchPolicy = 'hover' | 'eager' | 'viewport' | 'never';
+
+/** The policies a route may declare; the compiler reports any other (`PDX_PREFETCH_POLICY`). */
+export const PREFETCH_POLICIES: readonly PrefetchPolicy[] = ['hover', 'eager', 'viewport', 'never'];
 
 /** The shape this module reads out of the route table; the rest of an entry is not its business. */
 interface PrefetchableRoute {
@@ -83,7 +90,38 @@ export function routeFor(url: string): PrefetchableRoute | undefined {
 /** What the route says, normalised; `hover` when it says nothing. */
 export function policyFor(url: string): PrefetchPolicy {
     const declared = routeFor(url)?.prefetch;
-    return declared === 'never' || declared === 'eager' ? declared : 'hover';
+    return declared === 'never' || declared === 'eager' || declared === 'viewport' ? declared : 'hover';
+}
+
+/**
+ * ONE observer for every link waiting to be seen, not one each: a list page renders a link per row,
+ * and an observer per link is that many observers for one question.
+ */
+let viewportObserver: IntersectionObserver | null = null;
+const onSeen = new WeakMap<Element, () => void>();
+
+/**
+ * Call `seen` the first time `el` intersects the viewport, then stop watching it. Returns the way
+ * to stop watching it earlier — a link that leaves the page before it was seen.
+ *
+ * Without `IntersectionObserver` (a test environment, an old browser) nothing is watched, and the
+ * link still prefetches on hover, focus and press.
+ */
+export function whenInView(el: Element, seen: () => void): () => void {
+    if (typeof IntersectionObserver === 'undefined') return () => {};
+    viewportObserver ??= new IntersectionObserver((entries, observer) => {
+        for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            observer.unobserve(entry.target);
+            const cb = onSeen.get(entry.target);
+            onSeen.delete(entry.target);
+            cb?.();
+        }
+    });
+    onSeen.set(el, seen);
+    viewportObserver.observe(el);
+    const observer = viewportObserver;
+    return () => { onSeen.delete(el); observer.unobserve(el); };
 }
 
 /**

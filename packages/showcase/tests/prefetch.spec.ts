@@ -30,6 +30,14 @@ function watchChunks(page: Page): string[] {
 /** Was a chunk built from `<name>.pdx` among them? */
 const has = (files: string[], chunk: string): boolean => files.some(f => f.startsWith(chunk + '-'));
 
+/**
+ * Was the chunk of PAGE `<name>` among them: `<name>-` and Vite's 8-character hash, nothing else.
+ * Not `has`: a data module can share the prefix — `asset-seed-….js` is imported by the ticket page
+ * itself, and read as the asset page it made a test pass with no prefetch at all.
+ */
+const hasPage = (files: string[], page: string): boolean =>
+    files.some(f => new RegExp(`^${page}-[A-Za-z0-9_-]{8}\\.js$`).test(f));
+
 async function open(page: Page, path: string): Promise<void> {
     // The links hovered below are the rail's Customers and Board, favourites on a first visit. The
     // menu lists no single record: a record is reached from its list.
@@ -77,6 +85,27 @@ test.describe('hovering a link to a split route', () => {
         await expect(page.locator('.app main [data-test="customers"]')).toBeVisible();
         expect(has(onClick, 'customers'), 'the chunk was already in the entry — this app does not measure prefetching')
             .toBe(true);
+    });
+});
+
+test.describe("a route that says @prefetch 'viewport'", () => {
+    // `/assets/:id` declares it, and a ticket shows its asset as a link at the top of the page. The
+    // policy used to be documented and treated as `hover` by the router (#42).
+    test('is fetched when its link is in view, with no hover, focus or press', async ({ page }) => {
+        const chunks = watchChunks(page);
+        await page.goto('/tickets/5');
+        await expect(page.locator('[data-test="ticket-asset"]')).toBeVisible();
+        await expect.poll(() => hasPage(chunks, 'asset'), { message: 'the asset link was in view and its page chunk was not fetched' })
+            .toBe(true);
+    });
+
+    test('control — a hover route linked from the same page is not fetched until hovered', async ({ page }) => {
+        // The board is a `hover` route the rail links on every page: in view, and not fetched — which
+        // is what tells the test above apart from a page that fetches every route it links.
+        const chunks = watchChunks(page);
+        await page.goto('/tickets/5');
+        await expect.poll(() => hasPage(chunks, 'asset')).toBe(true);
+        expect(hasPage(chunks, 'board'), 'a hover route was fetched with no hover').toBe(false);
     });
 });
 
