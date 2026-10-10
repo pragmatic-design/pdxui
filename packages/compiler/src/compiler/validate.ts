@@ -8,6 +8,7 @@ import type { ScriptAnalysis } from './script-analyzer';
 import { findComponentTags, selfDefinedTags } from './resolve';
 import { onlyNear } from './edit-distance';
 import { checkUndeclaredRefs } from './validate-refs';
+import { validateLegacy } from './validate-legacy';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
 import { skipNonCode, findClosing } from './tokenizer';
@@ -194,7 +195,8 @@ export function validate(
     _filename: string,
     options?: ValidateOptions
 ): ValidationWarning[] {
-    if (analysis.mode !== 'new') return [];
+    // The legacy mode has one check of its own: a template read its script does not hand over.
+    if (analysis.mode !== 'new') return validateLegacy(analysis, ast);
     // @store files are store modules — no template usage checks apply
     if (analysis.globalStore) return [];
 

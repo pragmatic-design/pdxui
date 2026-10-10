@@ -155,7 +155,16 @@ export const FETCH_OPTION_KEYS: readonly string[] = [
  * skipped: what it carries cannot be known here.
  */
 export function fetchOptionKeys(block: string): string[] {
+    return objectKeys(block).keys;
+}
+
+/**
+ * The top-level keys of an object literal `{ … }`, written as `key: value` or as a shorthand, and
+ * whether it spreads another object in — whose keys cannot be listed from the text.
+ */
+export function objectKeys(block: string): { keys: string[]; spread: boolean } {
     const keys: string[] = [];
+    let spread = false;
     let depth = 0;
     let expectKey = false;
     for (let i = 0; i < block.length; i++) {
@@ -177,10 +186,11 @@ export function fetchOptionKeys(block: string): string[] {
             i += m[0].length - 1;
             expectKey = false;
         } else if (expectKey && ch === '.') {
-            expectKey = false; // a spread
+            expectKey = false;
+            spread = true;
         }
     }
-    return keys;
+    return { keys, spread };
 }
 
 /**

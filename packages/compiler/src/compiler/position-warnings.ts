@@ -147,6 +147,7 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return tag ? find(source, template, new RegExp(`<${escape(tag)}(?![\\w-])`)) : undefined;
         }
         case 'PDX_UNDECLARED_REF':
+        case 'PDX_TEMPLATE_NAME_NOT_PROVIDED':
             return name ? findTemplateRead(source, template, name) : undefined;
         case 'PDX_INVALID_ENUM_VALUE': {
             // Match: `<pdx-button> size="huge"` — the tag, the attribute and the value.

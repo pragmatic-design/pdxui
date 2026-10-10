@@ -48,6 +48,7 @@ const ROWS: Record<string, Row> = {
     PDX_AWAIT_NO_LOADING: { src: pdx('@await (ready) { <p>ok</p> }', 'let ready = $signal(Promise.resolve());'), at: '@await (ready)' },
     PDX_FETCH_INVALID: { src: pdx('<p>x</p>', "let a = $signal(1);\n@fetch users: 'nomethod';"), at: '@fetch users' },
     PDX_FETCH_NO_ERROR_UI: { src: pdx('<p>{{ users.value() }}</p>', "@fetch users: 'GET /api/users' as string[];"), at: '@fetch users' },
+    PDX_TEMPLATE_NAME_NOT_PROVIDED: { src: '<template>\n  <h1>{{ title }}</h1>\n</template>\n<script>\nconst title = 1;\n</script>\n', at: '{{ title }}' },
     PDX_FETCH_METHOD: { src: pdx('<p>{{ hits }}</p>', "let a = $signal(1);\n@fetch hits: 'POST /api/search';"), at: '@fetch hits' },
     PDX_FETCH_TYPE_COLON: { src: pdx('<p>{{ user }}</p>', "let a = $signal(1);\n@fetch user: 'GET /api/user' : User;"), at: '@fetch user' },
     PDX_FETCH_UNKNOWN_OPTION: { src: pdx('<p>{{ users }}</p>', "let a = $signal(1);\n@fetch users: 'GET /api/users' { stalTime: 1 };"), at: '@fetch users' },
