@@ -138,6 +138,13 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const marker = /carries (\w+)/.exec(w.message)?.[1];
             return marker ? find(source, script, new RegExp(`\\b${escape(marker)}\\b`)) : undefined;
         }
+        case 'PDX_ROUTE_FIELD_INVALID': {
+            // Match: the field's name inside its own `@search {` / `@params {` block, at the name.
+            const rune = /^@(search|params)\b/.exec(w.message)?.[1];
+            return name && rune
+                ? find(source, script, new RegExp(`(?<=@${rune}\\s*\\{[^}]*)\\b${escape(name)}\\s*(?:\\?\\s*)?:`))
+                : undefined;
+        }
         case 'PDX_PAGE_INVALID_PATH':
         case 'PDX_PAGE_INVALID_CONSTRAINT':
         case 'PDX_PAGE_EMPTY_CONSTRAINT':

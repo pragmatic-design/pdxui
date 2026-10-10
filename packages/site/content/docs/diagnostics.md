@@ -6,7 +6,7 @@ order: 25
 
 # Diagnostics
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 66 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 67 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -603,6 +603,38 @@ let n = $signal(1);
 The fragment is kept as written, so a signal read inside it is not called and is not reactive.
 
 **Fix.** Fix the syntax, or move the fragment out of the setup body.
+
+### PDX_ROUTE_FIELD_INVALID
+
+*error* — A `@params` or `@search` field its parser cannot read, such as a type in quotes.
+
+The field is dropped: the param is undefined in the page. `@search` reads string, number and boolean; `@params` a bare type name.
+
+**Fix.** `@params { id: number }`, `@search { q?: string, page: number = 1 }` — the type without quotes. `pdx check --fix` and the editor apply it.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ id }}</p>
+</template>
+<script setup>
+@page '/users/:id';
+@params { id: 'number' };
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ id }}</p>
+</template>
+<script setup>
+@page '/users/:id';
+@params { id: number };
+</script>
+```
 
 ### PDX_SCRIPT_SYNTAX_ERROR
 

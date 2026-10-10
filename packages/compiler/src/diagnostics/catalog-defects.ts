@@ -308,6 +308,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: '`:id(number)`, or remove the parentheses.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_ROUTE_FIELD_INVALID: {
+        severity: 'error', category: 'defect', fixable: true,
+        summary: 'A `@params` or `@search` field its parser cannot read, such as a type in quotes.',
+        explanation: 'The field is dropped: the param is undefined in the page. `@search` reads string, number and boolean; `@params` a bare type name.',
+        fix: '`@params { id: number }`, `@search { q?: string, page: number = 1 }` — the type without quotes.',
+        example: {
+            bad: pdx('<p>{{ id }}</p>', "@page '/users/:id';\n@params { id: 'number' };"),
+            good: pdx('<p>{{ id }}</p>', "@page '/users/:id';\n@params { id: number };"),
+        },
+    },
     PDX_LOADER_NOT_FOUND: {
         severity: 'warn', category: 'defect',
         summary: '`@loader` names a function the script does not declare.',

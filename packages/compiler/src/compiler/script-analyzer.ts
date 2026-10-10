@@ -13,7 +13,7 @@ import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
     parseInlineFormSchema, parseFormOptions, parsePageOptions, parseSearchParams, normalizeStatementsWithOrigins,
     extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, PREFETCH_POLICIES, extractSearchBlock, parseHeadBlock,
-    parseRouteBlock, parseRouteParams, parseObjectLiteralToJson, splitAtTopLevelCommas,
+    parseRouteBlock, parseRouteParams, parseObjectLiteralToJson, splitAtTopLevelCommas, invalidRouteFields,
 } from './script-analyzer-helpers';
 import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
 import { importedLocalNames } from './import-names';
@@ -65,6 +65,23 @@ function isMalformedTsType(type: string): boolean {
 const DECLARATION_SHAPES: Record<string, string> = Object.fromEntries(
     [...DECORATOR_RUNES.values()].map(r => [r.name, r.shape]),
 );
+
+/**
+ * PDX_ROUTE_FIELD_INVALID for each field of a `@params` / `@search` block its parser would skip.
+ * The message quotes the field's name first, which is how position-warnings finds it; the hint is the
+ * form the parser reads, when there is one.
+ */
+function routeFieldWarnings(block: string, kind: 'params' | 'search'): ValidationWarning[] {
+    const types = kind === 'search' ? 'string, number or boolean' : 'a bare type name such as number or string';
+    return invalidRouteFields(block, kind).map((f) => ({
+        code: 'PDX_ROUTE_FIELD_INVALID',
+        severity: 'error' as const,
+        message: f.unquoted
+            ? `@${kind} field '${f.name}' writes its type in quotes, which @${kind} does not read: the field is dropped. Write "${f.unquoted}".`
+            : `@${kind} field ${f.name ? `'${f.name}'` : `"${f.text}"`} is not \`name: type\` with ${types}: the field is dropped.`,
+        hint: f.unquoted ?? `@${kind} { ${kind === 'search' ? 'q?: string, page: number = 1' : 'id: number'} }`,
+    }));
+}
 
 // ─── Analyzer ──────────────────────────────────────────────────────
 
@@ -639,12 +656,16 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         const loaderMatch = trimmed.match(/^@loader\s+(\w+)\s*;?\s*$/);
         if (loaderMatch) { route.loader = loaderMatch[1]; continue; }
 
-        // @search { ... } — tokenizer-based brace matching for nested objects
+        // @search { ... } — tokenizer-based brace matching for nested objects, read up to its closing
+        // brace across lines (#105)
         if (trimmed.startsWith('@search ') && trimmed.includes('{')) {
-            const searchBlock = extractSearchBlock(trimmed);
+            const block = extractBlock(lines, i);
+            const searchBlock = extractSearchBlock(block.content.trim());
             if (searchBlock) {
                 route.search = searchBlock;
                 route.searchParams = parseSearchParams(searchBlock);
+                warnings.push(...routeFieldWarnings(searchBlock, 'search'));
+                i = block.endLine;
                 continue;
             }
         }
@@ -701,9 +722,12 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         // ─── @params { id: number, slug: string }; — typed route param schema ───
         // Match: @params { id: number }; — same syntax as @search
         if (trimmed.startsWith('@params') && trimmed.includes('{')) {
-            const paramsBlock = extractSearchBlock(trimmed.replace('@params', '@search'));
+            const block = extractBlock(lines, i);
+            const paramsBlock = extractSearchBlock(block.content.trim());
             if (paramsBlock) {
                 route.params = parseRouteParams(paramsBlock);
+                warnings.push(...routeFieldWarnings(paramsBlock, 'params'));
+                i = block.endLine;
                 continue;
             }
         }
