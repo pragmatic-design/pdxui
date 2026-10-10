@@ -129,7 +129,9 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // requested a wave after the entry and this sum, read off index.html, did not see them. index.html
 // now announces them, which took the first page from ~1180 to ~885 ms on slow 4G
 // (first-paint.spec.ts, #31) — and the sum counts them. 87.7 KB measured.
-const BUDGET_KB = { entry: 34, js: 362, css: 59, blocking: 88 };
+// entry 34 → 35: `@prefetch 'viewport'` is a policy the router now has (#42) — one shared
+// IntersectionObserver in `<pdx-link>`, which every page's links need. 34.1 KB measured.
+const BUDGET_KB = { entry: 35, js: 362, css: 59, blocking: 88 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
