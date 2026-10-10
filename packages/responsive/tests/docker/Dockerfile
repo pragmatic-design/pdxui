@@ -5,6 +5,11 @@ FROM mcr.microsoft.com/playwright:v1.58.2-noble
 
 WORKDIR /work
 
+# The values Chromium writes itself at startup, set before it starts (#63, see quality.yml): with
+# both already present its two setenv calls never reallocate the environment under another thread.
+# `docker run` does not inherit the runner's environment, so the workflow's `env:` stops here.
+ENV FC_FONTATIONS=1 DBUS_SESSION_BUS_ADDRESS=disabled:
+
 # Deterministic fonts for the themes + fontconfig with fixed hinting/antialiasing.
 #
 # MANROPE IS REQUIRED, not decorative: --pdx-font-heading is
