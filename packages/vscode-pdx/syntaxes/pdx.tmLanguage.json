@@ -244,7 +244,7 @@
     "pdx-decorators": {
       "patterns": [
         {
-          "match": "^\\s*@(prop|event|slot|expose|form|fetch|store|page|guard|loader|layout|title|meta|scroll|head|provide|inject|tag|route|params|redirect|alias|outlet|search|prefetch|snippet|i18n|mixin|transition)\\b",
+          "match": "^\\s*@(prop|event|slot|expose|form|fetch|store|page|guard|loader|layout|title|meta|scroll|head|provide|inject|tag|route|params|redirect|alias|outlet|search|prefetch|snippet|i18n|mixin|use|raw|transition)\\b",
           "name": "keyword.other.decorator.pdx"
         }
       ]
