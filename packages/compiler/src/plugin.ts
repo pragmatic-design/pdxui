@@ -24,7 +24,7 @@ import { collectOrigins, mapFromOrigins, insertMapLines } from './compiler/sourc
 import type { SourceMapJSON } from './compiler/sourcemap';
 import { PluginRunner } from './plugin-system';
 import type { CompilerPlugin } from './plugin-system';
-import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, generateOptimizedRouter, generateDevRouteTable, routePreloadFiles, preloadTags, type BundleChunk } from './plugin-utils';
+import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, generateOptimizedRouter, generateDevRouteTable, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
 import { FormControlRegistry } from './compiler/codegen-form-binding';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
@@ -58,14 +58,6 @@ const RESOLVED_ROUTES_DEV_ID = '\0virtual:pdx-routes-dev';
 // module also drops the inline `<script>` that a strict CSP rejects.
 const VIRTUAL_DEVTOOLS_ID = 'virtual:pdx-devtools';
 const RESOLVED_DEVTOOLS_ID = '\0virtual:pdx-devtools';
-/**
- * The one file `@pdxui/router` routes every internal import of a router through — the dev/prod
- * seam. Anchored to the package directory so a file merely named `active.ts` in the app is not it,
- * and written for both layouts the package ships in: the monorepo sibling `packages/router/src` and
- * an install under `node_modules/@pdxui/router/src`. Backslashes are accepted because a Windows
- * id can still reach `load` unnormalised.
- */
-const ROUTER_SEAM = /(?:^|[/\\])(?:packages|@pdxui)[/\\]router[/\\]src[/\\]active\.tsx?(?:\?.*)?$/;
 
 export interface PdxPluginOptions {
     /** File extensions to process. Default: ['.pdx'] */
@@ -359,7 +351,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             // Matched on the path rather than on a bare specifier because by the time `load` runs
             // Vite has already resolved it to a file, and the package ships the same layout whether
             // it is the monorepo sibling or an install under node_modules.
-            if (!isDevMode && ROUTER_SEAM.test(id)) {
+            if (!isDevMode && isRouterSeam(id)) {
                 return generateOptimizedRouter(scannedRoutes);
             }
         },
@@ -406,7 +398,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 // as it is created. Injected before </body> they would run after the app has built every
                 // signal, and the Signals tab would be empty.
                 const tag = `<script type="module" src="${url}"></script>`;
-                return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => `${m}\n${tag}`) : tag + html;
+                return injectAfterHeadOpen(html, tag);
             }
             return html;
         },
@@ -517,10 +509,9 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     const tag = tagMatch[1];
                     const existingFile = tagRegistry.get(tag);
                     if (existingFile && existingFile !== id) {
-                        const short = (f: string) => f.replace(/.*[/\\]packages[/\\]/, '').replace(/.*[/\\]src[/\\]/, 'src/');
                         throw new Error(
-                            `PDX_TAG_COLLISION: "${tag}" is already registered by "${short(existingFile)}".\n` +
-                            `  Conflicting file: ${short(id)}\n` +
+                            `PDX_TAG_COLLISION: "${tag}" is already registered by "${shortPath(existingFile)}".\n` +
+                            `  Conflicting file: ${shortPath(id)}\n` +
                             `  Fix: add @tag 'pdx-unique-name'; in one of the files to disambiguate.`
                         );
                     }

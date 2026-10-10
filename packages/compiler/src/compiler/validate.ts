@@ -12,6 +12,7 @@ import { validateLegacy } from './validate-legacy';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
 import { skipNonCode, findClosing } from './tokenizer';
+import { openingTagTexts, routeParams } from '../text-scan';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -666,24 +667,22 @@ function validateRoutePath(path: string): ValidationWarning[] {
         });
     }
     // Check param constraints
-    const paramPattern = /:(\w+)(?:\(([^)]*)\))?/g;
-    let pm: RegExpExecArray | null;
     const validConstraints = new Set(['string', 'number', 'uuid', 'slug']);
-    while ((pm = paramPattern.exec(path)) !== null) {
-        if (pm[2] !== undefined && !validConstraints.has(pm[2])) {
+    for (const { name, constraint } of routeParams(path)) {
+        if (constraint !== undefined && !validConstraints.has(constraint)) {
             warnings.push({
                 code: 'PDX_PAGE_INVALID_CONSTRAINT',
                 severity: 'warn',
-                message: `Param constraint '${pm[2]}' on ':${pm[1]}' is not a known type.`,
+                message: `Param constraint '${constraint}' on ':${name}' is not a known type.`,
                 hint: `Valid constraints: ${[...validConstraints].join(', ')}.`,
             });
         }
-        if (pm[2] === '') {
+        if (constraint === '') {
             warnings.push({
                 code: 'PDX_PAGE_EMPTY_CONSTRAINT',
                 severity: 'error',
-                message: `Empty param constraint on ':${pm[1]}()' — did you forget the type?`,
-                hint: `Use: :${pm[1]}(number) or remove the parentheses.`,
+                message: `Empty param constraint on ':${name}()' — did you forget the type?`,
+                hint: `Use: :${name}(number) or remove the parentheses.`,
             });
         }
     }
@@ -947,10 +946,10 @@ function extractHtmlBindingIds(html: string, ids: Set<string>): void {
     const bindingRegex = /(?<=\s)(?:::|[:@])[\w.-]*=(?:"([^"]*?)"|'([^']*?)')/g;
     // Only inside a real opening tag. Code shown on a page is escaped — `&lt;pdx-x :items="items"&gt;`
     // is text — and its `:items="items"` binds nothing.
-    // Match: `<tag …>` with its quoted values, which may hold `>` (`e => …`).
-    for (const tag of html.matchAll(/<[A-Za-z][\w-]*(?:[^>"']|"[^"]*"|'[^']*')*>/g)) {
+    // Each `<tag …>` with its quoted values, which may hold `>` (`e => …`). Scanned, not matched (#70).
+    for (const tag of openingTagTexts(html)) {
         let match;
-        while ((match = bindingRegex.exec(tag[0])) !== null) {
+        while ((match = bindingRegex.exec(tag)) !== null) {
             const expr = match[1] ?? match[2];
             if (expr) extractIdentifiers(expr, ids);
         }
