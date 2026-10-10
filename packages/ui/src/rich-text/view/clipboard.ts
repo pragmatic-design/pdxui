@@ -220,6 +220,33 @@ function domToNodes(element: Element, schema: Schema): DocNode[] {
   return nodes;
 }
 
+/** Elements that sit on their own line: whitespace beside them is the source's layout. */
+const BLOCK_TAGS = new Set([
+  'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'ol', 'li', 'hr',
+  'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th', 'figure', 'figcaption', 'section', 'article',
+  'header', 'footer', 'aside', 'nav', 'main', 'dl', 'dt', 'dd', 'address', 'details', 'summary',
+]);
+
+/** The nearest sibling element in one direction, skipping text and comments. */
+function siblingElement(node: Node, next: boolean): Element | null {
+  let s = next ? node.nextSibling : node.previousSibling;
+  while (s && s.nodeType !== Node.ELEMENT_NODE) s = next ? s.nextSibling : s.previousSibling;
+  return s as Element | null;
+}
+
+/**
+ * Whitespace between blocks, or between a block and the edge of its container: what a source's
+ * indentation leaves, `<p>a</p>\n  <p>b</p>`. Between two inline elements it is a real space, and
+ * stays (`<b>a</b> <i>b</i>`).
+ */
+function isBetweenBlocks(text: Node): boolean {
+  const before = siblingElement(text, false);
+  const after = siblingElement(text, true);
+  const isBlock = (el: Element | null) => el !== null && BLOCK_TAGS.has(el.tagName.toLowerCase());
+  if (!isBlock(before) && !isBlock(after)) return false;
+  return (before === null || isBlock(before)) && (after === null || isBlock(after));
+}
+
 function domNodeToModel(
   dom: Node, schema: Schema, inheritedMarks: readonly Mark[],
 ): DocNode[] | null {
@@ -227,6 +254,7 @@ function domNodeToModel(
   if (dom.nodeType === Node.TEXT_NODE) {
     const text = dom.textContent ?? '';
     if (!text.trim() && !text.includes(' ')) return null; // skip empty whitespace
+    if (!text.trim() && isBetweenBlocks(dom)) return null; // layout between blocks, not content (#74)
     const normalizedText = text.replace(/\s+/g, ' ');
     if (!normalizedText) return null;
     return [createText(normalizedText, inheritedMarks)];

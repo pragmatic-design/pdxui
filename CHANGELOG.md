@@ -39,3 +39,6 @@ semver.
   variable that does not exist. (#101)
 - A subscriber or an error handler that throws during a write no longer stops every later effect in
   the page. (#102)
+- Pasting HTML into `pdx-rich-text` no longer leaves a stray space node between two blocks: the
+  whitespace a source puts between `<p>`s is layout, and is dropped. A space between inline nodes is
+  kept. (#74)
