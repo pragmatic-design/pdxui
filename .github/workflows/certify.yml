@@ -4,12 +4,11 @@ name: Component Certification
 # Dimensions 1-4 run directly; 5 (visual) uses the pinned Docker image for deterministic
 # screenshots (the same -docker-linux baselines as locally).
 
+# Every change, with no path filter. It used to run only on ui, design and the harness, and a
+# change to core or the compiler — which every component is built on — was certified only by the
+# pre-push. The pre-push no longer runs certification (#60), so CI is where every change gets it.
 on:
   pull_request:
-    paths:
-      - 'packages/ui/**'
-      - 'packages/design/**'
-      - 'packages/responsive/tests/**'
   workflow_dispatch:
 
 permissions:
@@ -23,8 +22,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Sharded, to parallelise as the components grow
-        shard: [1, 2]
+        # Sharded, to parallelise as the components grow. Playwright splits by test COUNT, not by
+        # duration: with two shards one took 16.5 min and the other 5.5 (#60).
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -43,7 +43,7 @@ jobs:
         run: >
           pnpm --filter @pdxui/responsive exec playwright test
           --config tests/playwright-ui.config.ts
-          --shard=${{ matrix.shard }}/2
+          --shard=${{ matrix.shard }}/4
       # The component-coherence behavior suite, which `test:certify` runs after the folder.
       # 37 tests, ~15 s: once, in the first shard.
       - name: Behavior suite

@@ -27,7 +27,9 @@ pnpm certify:visual             # an appearance change: visual regression in Doc
 ```
 
 While you work, run what you touch: `pnpm --filter @pdxui/core exec vitest run tests/signal.test.ts`.
-The `pre-push` hook runs the whole gate, certification included; do not bypass it.
+The `pre-push` hook runs typecheck, lint, `pnpm test` and the benchmarks; do not bypass it.
+Certification runs in CI on every pull request; `PDX_CERTIFY=1 git push` runs it locally first,
+which is worth it for a component change.
 
 ## The things most likely to be got wrong
 

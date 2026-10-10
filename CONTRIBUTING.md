@@ -166,6 +166,11 @@ pnpm certify          # Playwright: contract geometry, axe, hostile-CSS isolatio
 pnpm certify:visual   # Docker: visual regression against the committed baselines
 ```
 
+The `pre-push` hook runs `pnpm typecheck`, `pnpm lint`, `pnpm test` and the compiler benchmarks.
+Certification runs in CI on every pull request, all five dimensions. To run it before the push as
+well, push with `PDX_CERTIFY=1`: for a change to a component's look or geometry, a red seen before
+the push saves a round trip.
+
 **Certification is declared, not scripted.** Each component has one hand-written manifest,
 `packages/responsive/tests/manifests/{name}.manifest.ts`. The manifest holds isolated scenarios
 with `data-test` hooks on every measurable element, and the rules to measure: universal ones,
