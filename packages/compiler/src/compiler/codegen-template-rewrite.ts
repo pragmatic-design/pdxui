@@ -10,6 +10,7 @@ import { boundPropName } from './codegen-prop-names';
 import { VOID_ELEMENTS } from './codegen-template-inline';
 import { attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
+import { jsQuote } from './js-literal';
 
 // ─── Event handler building ──────────────────────────────────────
 //
@@ -228,12 +229,12 @@ function rewriteDynamicComponent(tag: string, ctx: CompileContext): string {
 
     const transMatch = tag.match(/@transition\s*\(\s*['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"])?\s*\)/);
     if (transMatch) {
-        optionParts.push(`transition: { enter: '${transMatch[1]}', exit: '${transMatch[2] ?? transMatch[1]}' }`);
+        optionParts.push(`transition: { enter: ${jsQuote(transMatch[1])}, exit: ${jsQuote(transMatch[2] ?? transMatch[1])} }`);
     }
 
     const modeMatch = tag.match(/@mode\s*\(\s*['"]([^'"]+)['"]\s*\)/);
     if (modeMatch) {
-        optionParts.push(`mode: '${modeMatch[1]}'`);
+        optionParts.push(`mode: ${jsQuote(modeMatch[1])}`);
     }
 
     const optionsArg = optionParts.length > 0
@@ -286,7 +287,7 @@ function rewriteScopedSlot(
         }
     }
 
-    const code = `\${renderSlot(ctx.__slots, '${slotName}', ${scopeArg}, ${defaultContent || '() => html``'})}`;
+    const code = `\${renderSlot(ctx.__slots, ${jsQuote(slotName)}, ${scopeArg}, ${defaultContent || '() => html``'})}`;
     return { code, nextIndex };
 }
 
@@ -315,7 +316,7 @@ function rewriteTagAttributes(tag: string, ctx: CompileContext,
         const wrappedMatch = expr.match(/^\$\{(.+)\}$/);
         if (wrappedMatch) expr = wrappedMatch[1];
         const evName = event.split('.')[0];
-        return `@${event}=\${${m('@' + event)}safeHandler(${buildEventHandler(expr, ctx)}, ctx.el?.tagName?.toLowerCase(), '${evName}')}`;
+        return `@${event}=\${${m('@' + event)}safeHandler(${buildEventHandler(expr, ctx)}, ctx.el?.tagName?.toLowerCase(), ${jsQuote(evName)})}`;
     });
 
     // 2. ::prop(.mod)="signal" → ::prop.mod=${ctx.signal}
@@ -433,7 +434,9 @@ function escapeRawInterpolationInAttrs(tag: string, ctx: CompileContext): string
             i = end + 1;
             continue;
         }
-        // Quoted attribute value — escape any raw ${ inside it (unless it binds a scope var).
+        // Quoted attribute value — escape any raw ${ inside it (unless it binds a scope var), and the
+        // backslash and backtick: the value is the text of a template literal, where a backtick
+        // ends it and a backslash starts an escape (`\b` would be a backspace).
         if (ch === '"' || ch === "'") {
             const q = ch;
             out += q;
@@ -451,7 +454,7 @@ function escapeRawInterpolationInAttrs(tag: string, ctx: CompileContext): string
                     i = end + 1;
                     continue;
                 }
-                out += tag[i];
+                out += tag[i] === '\\' || tag[i] === '`' ? '\\' + tag[i] : tag[i];
                 i++;
             }
             if (i < tag.length) { out += q; i++; }
@@ -478,7 +481,7 @@ function rewriteGestureAttributes(tag: string, ctx: CompileContext): string {
             const handler = expr.includes('(')
                 ? `() => ${callSignals(prefixCtx(expr, ctx), ctx)}`
                 : prefixCtx(expr, ctx);
-            return `@__swipe=\${['${dir}', ${handler}]}`;
+            return `@__swipe=\${[${jsQuote(dir)}, ${handler}]}`;
         },
     );
 

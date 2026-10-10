@@ -10,6 +10,7 @@ import { applyFormBindings } from './codegen-form-binding';
 import { indent, extractTag, sourceFileOption } from './codegen-shared';
 import { originMark } from './sourcemap';
 import { coreRuntimeNames } from './core-import-names';
+import { jsQuote } from './js-literal';
 
 /** Compile using legacy defineProps + explicit return syntax. */
 export function compileLegacyMode(descriptor: SFCDescriptor, ast: TemplateNode[], filename: string, _runner: PluginRunner | null | undefined, ctx: CompileContext): string {
@@ -50,7 +51,7 @@ export function compileLegacyMode(descriptor: SFCDescriptor, ast: TemplateNode[]
     if (topLevelImports) code += topLevelImports + '\n';
     code += '\n';
     code += generateStyles(descriptor, filename, production);
-    code += `component('${tag}', {\n`;
+    code += `component(${jsQuote(tag)}, {\n`;
     code += `  props: ${propsCode},\n`;
     code += sourceFileOption(ctx.sourceFile);
     if (descriptor.template?.shadow) code += `  shadow: true,\n`;

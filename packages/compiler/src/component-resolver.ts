@@ -12,6 +12,7 @@ import { moduleDir } from './module-dir';
 import { scanNoImportTags } from './no-import-tags';
 import { componentPackages, type ComponentPackage } from './component-packages';
 import type { ValidationWarning } from './compiler/validate';
+import { jsQuote } from './compiler/js-literal';
 
 /** Resolved component: tag name → import path */
 export interface ComponentEntry {
@@ -318,9 +319,9 @@ export class ComponentResolver {
                 const fromDir = dirname(currentFile);
                 let rel = relative(fromDir, entry.importPath).replace(/\\/g, '/');
                 if (!rel.startsWith('.')) rel = './' + rel;
-                imports.push(`import '${rel}';`);
+                imports.push(`import ${jsQuote(rel)};`);
             } else {
-                imports.push(`import '${entry.importPath}';`);
+                imports.push(`import ${jsQuote(entry.importPath)};`);
             }
         }
 

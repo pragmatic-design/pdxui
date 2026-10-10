@@ -13,6 +13,7 @@ import type { CompileContext } from './compile-context';
 import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg } from './codegen-prefix';
 import { rewriteHtmlBindings, isSimpleAccess } from './codegen-template-rewrite';
 import { templateMark, htmlOriginOf } from './codegen-origins';
+import { jsQuote, jsString } from './js-literal';
 
 /** `${…}` with an origin mark just inside its `${`, where it is part of the expression, not the HTML. */
 function markInterpolation(code: string, mark: string): string {
@@ -275,7 +276,7 @@ function generateSwitch(node: SwitchNode, imports: Set<string>, ctx: CompileCont
     const expr = callSignals(prefixCtx(node.expr, ctx), ctx);
     const caseParts = node.cases.map(c => {
         const bodyCode = generateNodes(c.body, imports, ctx);
-        return `    ${JSON.stringify(c.value)}: () => ${bodyCode}`;
+        return `    ${jsString(c.value)}: () => ${bodyCode}`;
     });
     if (node.defaultBody) {
         caseParts.push(`    _: () => ${generateNodes(node.defaultBody, imports, ctx)}`);
@@ -287,7 +288,7 @@ function generateRequire(node: RequireNode, imports: Set<string>, ctx: CompileCo
     imports.add('requirePermission');
     const bodyCode = generateNodes(node.body, imports, ctx);
     const elseCode = node.elseBody ? `() => ${generateNodes(node.elseBody, imports, ctx)}` : 'null';
-    return `\${requirePermission('${node.permission}', () => ${bodyCode}, ${elseCode})}`;
+    return `\${requirePermission(${jsQuote(node.permission)}, () => ${bodyCode}, ${elseCode})}`;
 }
 
 function generateShow(node: ShowNode, imports: Set<string>, ctx: CompileContext): string {
@@ -305,7 +306,7 @@ function generateShow(node: ShowNode, imports: Set<string>, ctx: CompileContext)
 function generatePortal(node: PortalNode, imports: Set<string>, ctx: CompileContext): string {
     imports.add('portal');
     const bodyCode = generateNodes(node.body, imports, ctx);
-    return `\${portal(() => ${bodyCode}, '${node.target}')}`;
+    return `\${portal(() => ${bodyCode}, ${jsQuote(node.target)})}`;
 }
 
 /**
@@ -324,7 +325,7 @@ function deferredTags(bodyCode: string): string[] {
 function generateDefer(node: DeferNode, imports: Set<string>, ctx: CompileContext): string {
     imports.add('defer');
     const bodyCode = generateNodes(node.body, imports, ctx);
-    const optionParts: string[] = [`trigger: '${node.trigger}'`];
+    const optionParts: string[] = [`trigger: ${jsQuote(node.trigger)}`];
     if (node.placeholder) optionParts.push(`placeholder: () => ${generateNodes(node.placeholder, imports, ctx)}`);
     if (node.loading) optionParts.push(`loading: () => ${generateNodes(node.loading, imports, ctx)}`);
     if (node.error) optionParts.push(`error: () => ${generateNodes(node.error, imports, ctx)}`);
@@ -341,7 +342,7 @@ function generateDefer(node: DeferNode, imports: Set<string>, ctx: CompileContex
         ? deferredTags(bodyCode).map(tag => ctx.importPathOf!(tag)).filter((p): p is string => !!p)
         : [];
     const loadFn = paths.length > 0
-        ? `() => Promise.all([${paths.map(p => `import('${p}')`).join(', ')}])`
+        ? `() => Promise.all([${paths.map(p => `import(${jsQuote(p)})`).join(', ')}])`
         : 'null';
 
     return `\${defer({ ${optionParts.join(', ')} }, ${loadFn}, () => ${bodyCode})}`;
@@ -438,18 +439,18 @@ export function hoistSlotTemplate(node: SlotTemplateNode, imports: Set<string>, 
 
     ctx.hoistedSlots.push([varName, fnCode]);
 
-    return `slotCarrier('${node.name}', ${varName})`;
+    return `slotCarrier(${jsQuote(node.name)}, ${varName})`;
 }
 
 function generateTransition(config?: TransitionConfig): string {
     if (!config) return '';
     const parts: string[] = [];
-    if (config.enter) parts.push(`enter: '${config.enter}'`);
-    if (config.exit) parts.push(`exit: '${config.exit}'`);
+    if (config.enter) parts.push(`enter: ${jsQuote(config.enter)}`);
+    if (config.exit) parts.push(`exit: ${jsQuote(config.exit)}`);
     if (config.stagger) parts.push(`stagger: ${config.stagger}`);
-    if (config.mode) parts.push(`mode: '${config.mode}'`);
+    if (config.mode) parts.push(`mode: ${jsQuote(config.mode)}`);
     // The reconciler reads this to record positions before the mutation and play the FLIP after
     // (renderer/list.ts:172 and :299).
-    if (config.move) parts.push(`move: '${config.move}'`);
+    if (config.move) parts.push(`move: ${jsQuote(config.move)}`);
     return `, { ${parts.join(', ')} }`;
 }

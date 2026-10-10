@@ -2,6 +2,7 @@
 // Extracted from codegen.ts for maintainability.
 
 import type { SFCDescriptor, SFCStyle } from '../parser/sfc';
+import { jsQuote, jsString } from './js-literal';
 
 // ─── Public ────────────────────────────────────────────────────────
 
@@ -37,7 +38,7 @@ export function generateStyles(descriptor: SFCDescriptor, filename: string, prod
     // Dev keeps the injection, deliberately: it is what makes HMR of a `<style scoped>` block
     // instant, and dev has no bundle to extract into.
     if (production) {
-        return blocks.map((_, index) => `import '${styleModuleId(filename, index)}';\n`).join('') + '\n';
+        return blocks.map((_, index) => `import ${jsQuote(styleModuleId(filename, index))};\n`).join('') + '\n';
     }
 
     return blocks.map((block, index) => {
@@ -116,7 +117,7 @@ export function generateShadowStyles(descriptor: SFCDescriptor, filename: string
     let css = blocks.map(b => transformCssFunctions(b.content.replace(/\r\n/g, '\n'), `data-pdx-${hash(filename)}`)).join('\n').trim();
     if (!css) return '';
     if (production) css = minifyCSS(css);
-    return `    __adoptStyles(ctx.el.shadowRoot, ${JSON.stringify(css)}, ${JSON.stringify(hash(filename))});`;
+    return `    __adoptStyles(ctx.el.shadowRoot, ${jsString(css)}, ${jsString(hash(filename))});`;
 }
 
 /**
@@ -127,9 +128,9 @@ export function generateShadowStyles(descriptor: SFCDescriptor, filename: string
 function styleInjection(css: string, id: string): string {
     const styleId = `pdx-s-${id}`;
     return `{\n` +
-        `  let __pdx_style = document.getElementById(${JSON.stringify(styleId)});\n` +
-        `  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = ${JSON.stringify(styleId)}; document.head.appendChild(__pdx_style); }\n` +
-        `  __pdx_style.textContent = ${JSON.stringify(css)};\n` +
+        `  let __pdx_style = document.getElementById(${jsString(styleId)});\n` +
+        `  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = ${jsString(styleId)}; document.head.appendChild(__pdx_style); }\n` +
+        `  __pdx_style.textContent = ${jsString(css)};\n` +
         `}\n\n`;
 }
 

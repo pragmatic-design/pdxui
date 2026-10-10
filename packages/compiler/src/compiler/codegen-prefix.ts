@@ -5,6 +5,7 @@
 import ts from 'typescript';
 import { skipNonCode, findClosing } from './tokenizer';
 import type { CompileContext } from './compile-context';
+import { jsQuote } from './js-literal';
 
 // ─── Signal call insertion ──────────────────────────────────────
 
@@ -57,7 +58,7 @@ export function bindingNames(binding: string): string[] {
 export function trackKeyArg(node: { item: string; index?: string; track: string }, ctx: CompileContext): string {
     if (isRowBinding(node)) {
         const field = node.track.match(new RegExp(`^${node.item}\\.(\\w+)$`));
-        if (field) return `'${field[1]}'`;
+        if (field) return jsQuote(field[1]);
     }
     const params = node.index ? `${node.item}, ${node.index}` : node.item;
     // The key function receives values, not row getters: in scope as plain locals.

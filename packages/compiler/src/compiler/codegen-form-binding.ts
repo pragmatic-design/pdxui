@@ -12,6 +12,7 @@
 //   4. The form variable name is extracted from the :form binding
 
 import type { TemplateNode, HtmlNode } from '../parser/template';
+import { jsQuote } from './js-literal';
 
 // ─── Known Form Controls ──────────────────────────────────────
 
@@ -182,7 +183,8 @@ function collectHtml(nodes: TemplateNode[]): string {
 
 /** `form.fields.x`, as a binding reaches it: the setup's form, or the injected one. */
 function fieldRef(formVar: string, fieldPath: string): string {
-    const field = fieldPath.includes('.') ? `fields['${fieldPath}']` : `fields.${fieldPath}`;
+    // A name that is not an identifier — a dotted path, or one with a hyphen — is a quoted key.
+    const field = /^[A-Za-z_$][\w$]*$/.test(fieldPath) ? `fields.${fieldPath}` : `fields[${jsQuote(fieldPath)}]`;
     return formVar === INJECTED ? `${INJECTED_REF}?.${field}` : `ctx.${formVar}.${field}`;
 }
 

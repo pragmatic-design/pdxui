@@ -19,6 +19,7 @@ function declaresFormSection(script: string): boolean {
     return /(?<![\w$.])(?:useForm|tryUseForm)\s*\(/.test(maskNonCode(script));
 }
 import { assembleModule, detectDeadSignals, deduplicateBindings, extractTag, renderReturnIndex } from './codegen-shared';
+import { jsQuote } from './js-literal';
 
 /** Compile using decorator+rune syntax. Auto-return, auto-import, signal mutation rewriting. */
 export function compileNewMode(
@@ -289,7 +290,7 @@ export function compileStoreMode(
 
     // Build options
     const optParts: string[] = [];
-    if (store.persist) optParts.push(`persist: '${store.persist}'`);
+    if (store.persist) optParts.push(`persist: ${jsQuote(store.persist)}`);
     const optsStr = optParts.length > 0 ? `, { ${optParts.join(', ')} }` : '';
 
     // Capitalize store name for useXxx hook
@@ -300,7 +301,7 @@ export function compileStoreMode(
     if (analysis.userImports.length > 0) code += analysis.userImports.join('\n') + '\n';
     code += '\n';
     if (lifted.statements.length > 0) code += lifted.statements.join('\n') + '\n\n';
-    code += `const __store_${store.name} = createGlobalStore('${store.name}', () => {\n`;
+    code += `const __store_${store.name} = createGlobalStore(${jsQuote(store.name)}, () => {\n`;
     code += factoryBody + '\n';
     code += `}${optsStr});\n`;
     code += '\n';

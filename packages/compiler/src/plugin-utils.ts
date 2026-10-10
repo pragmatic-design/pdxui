@@ -8,6 +8,7 @@ import { layoutChain, routeLayout } from './compiler/codegen-shared';
 import { analyzeScript } from './compiler/script-analyzer';
 import { parseSFC } from './parser/sfc';
 import { moduleDir } from './module-dir';
+import { jsQuote, jsString } from './compiler/js-literal';
 
 /**
  * Auto-discover @pdxui/* packages in the workspace.
@@ -412,10 +413,10 @@ export function generateDevRouteTable(routes: ScannedRoute[], root: string): str
             'transition', 'scroll', 'label', 'labelKey', 'outlets', 'hasOutlet', 'layouts'] as const) {
             if (r[key] !== undefined) serialisable[key] = r[key];
         }
-        const json = JSON.stringify(serialisable);
+        const json = jsString(serialisable);
         // The loader bridge, written per entry so it closes over its own URL and path.
         return r.loader
-            ? `{ ...${json}, loader: () => __load(${JSON.stringify(urlOf(r.file))}, ${JSON.stringify(r.path)}) }`
+            ? `{ ...${json}, loader: () => __load(${jsString(urlOf(r.file))}, ${jsString(r.path)}) }`
             : json;
     });
 
@@ -442,7 +443,7 @@ for (const route of seeded) {
   if (!table.some(existing => existing.path === route.path)) table.push(route);
 }
 ${redirects.length > 0 ? `const redirects = (globalThis.__pdx_redirects ??= []);
-for (const pair of ${JSON.stringify(redirects)}) {
+for (const pair of ${jsString(redirects)}) {
   if (!redirects.some(existing => existing.from === pair.from)) redirects.push(pair);
 }` : ''}
 `;
@@ -500,7 +501,7 @@ export function injectStoreImports(
     }
 
     const importLines = Array.from(neededImports.entries()).map(
-        ([hook, path]) => `import { ${hook} } from '${path}';`
+        ([hook, path]) => `import { ${hook} } from ${jsQuote(path)};`
     );
 
     if (lastImportIdx >= 0) {
@@ -687,7 +688,7 @@ export function generateOptimizedRouter(routes: ScannedRoute[]): string {
                 ? '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
                 : constraint;
         const name = `_c${constraintDecls.length}`;
-        constraintDecls.push(`const ${name} = new RegExp(${JSON.stringify(`^(?:${source})$`)});`);
+        constraintDecls.push(`const ${name} = new RegExp(${jsString(`^(?:${source})$`)});`);
         return `${name}.test(s[${segIdx}])`;
     }
 
@@ -702,7 +703,7 @@ export function generateOptimizedRouter(routes: ScannedRoute[]): string {
 
         if (isStatic) {
             // Static route: exact match
-            return `    case ${JSON.stringify(r.path)}: return { idx: ${i}, params: {} };`;
+            return `    case ${jsString(r.path)}: return { idx: ${i}, params: {} };`;
         } else if (wildcardIdx !== -1) {
             // A wildcard is not a param with a different sigil: `(.+)` spans slashes, so the match
             // cannot be decided from `s.length` the way every other case is — it needs "at least
@@ -711,7 +712,7 @@ export function generateOptimizedRouter(routes: ScannedRoute[]): string {
             // requiring at least one segment after the prefix.
             const conditions = [`s.length > ${wildcardIdx}`];
             for (let j = 0; j < wildcardIdx; j++) {
-                conditions.push(`s[${j}] === ${JSON.stringify(segments[j])}`);
+                conditions.push(`s[${j}] === ${jsString(segments[j])}`);
             }
             // Decoded AFTER the join, like the runtime's single `(.+)` capture: decoding each
             // segment first would turn an encoded %2F into a separator and change the shape.
@@ -735,10 +736,10 @@ export function generateOptimizedRouter(routes: ScannedRoute[]): string {
                     // Quote the param name so a segment that isn't a valid JS identifier is still a
                     // legal object key in the generated code. Decode percent-encoding so route
                     // params arrive as their literal values.
-                    params.push(`${JSON.stringify(paramName)}: decodeURIComponent(s[${j}])`);
+                    params.push(`${jsString(paramName)}: decodeURIComponent(s[${j}])`);
                 } else {
-                    // JSON.stringify escapes ', \, etc. → no broken/injectable generated string.
-                    conditions.push(`s[${j}] === ${JSON.stringify(segments[j])}`);
+                    // jsString escapes ', \, etc. → no broken/injectable generated string.
+                    conditions.push(`s[${j}] === ${jsString(segments[j])}`);
                 }
             }
             return `    // ${r.path}\n    if (${conditions.join(' && ')}) return { idx: ${i}, params: { ${params.join(', ')} } };`;
@@ -770,24 +771,24 @@ export function generateOptimizedRouter(routes: ScannedRoute[]): string {
     }).join(', ');
 
     const routeEntries = routes.map((r) =>
-        `  { path: ${JSON.stringify(r.path)}, tag: ${JSON.stringify(r.tag)}`
-        + `${r.guard ? `, guard: ${JSON.stringify(r.guard)}` : ''}`
-        + `${r.redirect ? `, redirect: ${JSON.stringify(r.redirect)}` : ''}`
-        + `${r.loader ? `, loader: ${JSON.stringify(r.loader)}` : ''}`
-        + `${r.meta ? `, meta: ${JSON.stringify(r.meta)}` : ''}`
+        `  { path: ${jsString(r.path)}, tag: ${jsString(r.tag)}`
+        + `${r.guard ? `, guard: ${jsString(r.guard)}` : ''}`
+        + `${r.redirect ? `, redirect: ${jsString(r.redirect)}` : ''}`
+        + `${r.loader ? `, loader: ${jsString(r.loader)}` : ''}`
+        + `${r.meta ? `, meta: ${jsString(r.meta)}` : ''}`
         + `${r.hasOutlet ? `, hasOutlet: true` : ''}`
         // What the OUTLET needs to render the page, so it does not have to wait for the page
         // module to import itself and announce it.
-        + `${r.keepAlive !== undefined ? `, keepAlive: ${JSON.stringify(r.keepAlive)}` : ''}`
+        + `${r.keepAlive !== undefined ? `, keepAlive: ${jsString(r.keepAlive)}` : ''}`
         + `${r.preload ? `, preload: true` : ''}`
-        + `${r.prefetch ? `, prefetch: ${JSON.stringify(r.prefetch)}` : ''}`
-        + `${r.transition ? `, transition: ${JSON.stringify(r.transition)}` : ''}`
-        + `${r.scroll ? `, scroll: ${JSON.stringify(r.scroll)}` : ''}`
-        + `${r.label ? `, label: ${JSON.stringify(r.label)}` : ''}`
-        + `${r.labelKey ? `, labelKey: ${JSON.stringify(r.labelKey)}` : ''}`
-        + `${r.outlets && r.outlets.length > 0 ? `, outlets: ${JSON.stringify(r.outlets)}` : ''}`
-        + `${r.layouts && r.layouts.length > 0 ? `, layouts: ${JSON.stringify(r.layouts)}` : ''}`
-        + `${r.lazy ? `, lazy: true, file: ${JSON.stringify(r.file)}` : ''} }`
+        + `${r.prefetch ? `, prefetch: ${jsString(r.prefetch)}` : ''}`
+        + `${r.transition ? `, transition: ${jsString(r.transition)}` : ''}`
+        + `${r.scroll ? `, scroll: ${jsString(r.scroll)}` : ''}`
+        + `${r.label ? `, label: ${jsString(r.label)}` : ''}`
+        + `${r.labelKey ? `, labelKey: ${jsString(r.labelKey)}` : ''}`
+        + `${r.outlets && r.outlets.length > 0 ? `, outlets: ${jsString(r.outlets)}` : ''}`
+        + `${r.layouts && r.layouts.length > 0 ? `, layouts: ${jsString(r.layouts)}` : ''}`
+        + `${r.lazy ? `, lazy: true, file: ${jsString(r.file)}` : ''} }`
     ).join(',\n');
 
     // One `import()` with a LITERAL specifier per route that declares a loader, keyed by path. A
@@ -796,7 +797,7 @@ export function generateOptimizedRouter(routes: ScannedRoute[]): string {
     // Only the module is imported here — the function comes from the registration it performs.
     const loaderModules = routes
         .filter(r => r.loader && r.file)
-        .map(r => `  ${JSON.stringify(r.path)}: () => import(${JSON.stringify(r.file)})`)
+        .map(r => `  ${jsString(r.path)}: () => import(${jsString(r.file)})`)
         .join(',\n');
 
     // The same, for the PAGE itself.
@@ -809,14 +810,14 @@ export function generateOptimizedRouter(routes: ScannedRoute[]): string {
     // outlet has the path in hand when it is about to render.
     const pageModules = routes
         .filter(r => r.lazy && r.file && !r.redirect)
-        .map(r => `  ${JSON.stringify(r.path)}: () => import(${JSON.stringify(r.file)})`)
+        .map(r => `  ${jsString(r.path)}: () => import(${jsString(r.file)})`)
         .join(',\n');
 
     // `@redirect '/from' -> '/to'` is a table entry, and a file declares it wherever it likes, so
     // the entries are merged across every scanned route. First declaration wins, which is what a
     // Map built in source order gives.
     const redirectPairs = routes.flatMap(r => r.redirects ?? [])
-        .map(p => `[${JSON.stringify(p.from)}, ${JSON.stringify(p.to)}]`);
+        .map(p => `[${jsString(p.from)}, ${jsString(p.to)}]`);
 
     return `// Generated by @pdxui/compiler — optimized switch-based router
 // ${routes.length} routes, switch-based matching, zero loop${constraintDecls.length === 0 ? ', zero regex' : `, ${constraintDecls.length} param constraint(s)`}

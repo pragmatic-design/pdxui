@@ -16,6 +16,7 @@ import { buildEventHandler } from './codegen-template-rewrite';
 import { hoistSlotTemplate } from './codegen-template';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
+import { jsQuote, jsString } from './js-literal';
 
 // ─── Constants ────────────────────────────────────────────────────
 
@@ -229,7 +230,7 @@ class InlineGen {
                 // nothing would make two inline siblings run together in a build.
                 if (text) {
                     const data = /^\s+$/.test(text) ? ' ' : decodeEntities(text);
-                    this.out(`${this.parent()}.appendChild(document.createTextNode(${JSON.stringify(data)}));`);
+                    this.out(`${this.parent()}.appendChild(document.createTextNode(${jsString(data)}));`);
                 }
                 i = next === -1 ? content.length : next;
                 continue;
@@ -282,8 +283,8 @@ class InlineGen {
 
         const el = this.v();
         this.out(svg
-            ? `const ${el} = document.createElementNS(${JSON.stringify(SVG_NS)}, '${name}');`
-            : `const ${el} = document.createElement('${name}');`);
+            ? `const ${el} = document.createElementNS(${jsString(SVG_NS)}, ${jsQuote(name)});`
+            : `const ${el} = document.createElement(${jsQuote(name)});`);
         this.attrs(tag, el, kind, at ? attributeOrigins(tag, at) : null);
         this.out(`${this.parent()}.appendChild(${el});`);
         if (!isVoid) {
@@ -313,7 +314,7 @@ class InlineGen {
         // Match: ` class="a b"` (not `:class`, not `data-class`)  Groups: [1]/[2]=the value
         const staticClass = /\sclass=(?:"([^"]*)"|'([^']*)')/.exec(s);
         const staticClassValue = staticClass ? (staticClass[1] ?? staticClass[2]) : '';
-        if (staticClass) this.out(`${el}.setAttribute("class", ${JSON.stringify(staticClassValue)});`);
+        if (staticClass) this.out(`${el}.setAttribute("class", ${jsString(staticClassValue)});`);
         let m;
         while ((m = re.exec(s)) !== null) {
             const n = m[1];
@@ -339,8 +340,8 @@ class InlineGen {
             else if (n.startsWith(':'))       this.propBind(el, n.slice(1), val, kind, preRewritten);
             else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten);
             else if (n === 'class')           continue; // written first, above
-            else if (val)                     this.out(`${el}.setAttribute(${JSON.stringify(n)}, ${JSON.stringify(decodeEntities(val))});`);
-            else                              this.out(`${el}.setAttribute(${JSON.stringify(n)}, '');`);
+            else if (val)                     this.out(`${el}.setAttribute(${jsString(n)}, ${jsString(decodeEntities(val))});`);
+            else                              this.out(`${el}.setAttribute(${jsString(n)}, '');`);
             this.pending = '';
         }
     }
@@ -380,7 +381,7 @@ class InlineGen {
     private classBind(el: string, expr: string, staticClass: string, preRewritten: boolean): void {
         this.imports.add('effect');
         const value = preRewritten ? `(${expr})()` : this.read(expr);
-        const statics = JSON.stringify(staticClass.split(/\s+/).filter(Boolean));
+        const statics = jsString(staticClass.split(/\s+/).filter(Boolean));
         this.out(`{ const __s = new Set(${statics}); let __w = []; effect(() => { `
             + `const __n = String(${value} ?? '').split(/\\s+/).filter(Boolean); `
             + `for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) ${el}.classList.remove(__t); `
@@ -398,7 +399,7 @@ class InlineGen {
         const url = URL_BINDINGS.has(prop.toLowerCase());
         if (url) this.imports.add('sanitizeBoundUrl');
         if (isAttributeBinding(prop, kind)) return this.attributeWrite(el, prop, value, url);
-        const p = JSON.stringify(propName(prop, kind));
+        const p = jsString(propName(prop, kind));
         const property = url
             ? `const __safeUrl = sanitizeBoundUrl(${el}, ${p}, ${value}); `
                 + `if (__safeUrl == null) ${el}.removeAttribute(${p}); else ${el}[${p}] = __safeUrl;`
@@ -423,13 +424,13 @@ class InlineGen {
         if (!url) this.imports.add('clearBoundProperty');
         const plainProperty = url
             ? property
-            : `const __v = ${value}; if (__v == null) clearBoundProperty(${el}, ${JSON.stringify(prop)}, ${p}); else ${el}[${p}] = __v;`;
+            : `const __v = ${value}; if (__v == null) clearBoundProperty(${el}, ${jsString(prop)}, ${p}); else ${el}[${p}] = __v;`;
         return `if (${p} in ${el}) { ${plainProperty} } else { ${this.attributeWrite(el, prop, value, url)} }`;
     }
 
     /** Write `value` as the attribute `prop`: null or false removes it, as core's attribute branch does. */
     private attributeWrite(el: string, prop: string, value: string, url: boolean): string {
-        const a = JSON.stringify(prop);
+        const a = jsString(prop);
         const set = url
             ? `const __safeUrl = sanitizeBoundUrl(${el}, ${a}, __v); if (__safeUrl == null) ${el}.removeAttribute(${a}); else ${el}.setAttribute(${a}, __safeUrl);`
             : `${el}.setAttribute(${a}, __v === true ? '' : String(__v));`;
@@ -447,7 +448,7 @@ class InlineGen {
         const rawHandler = preRewritten ? expr : buildEventHandler(expr, this.ctx);
         // Wrap with safeHandler for global error interception
         this.imports.add('safeHandler');
-        const handler = `safeHandler(${rawHandler}, ctx.el?.tagName?.toLowerCase(), '${ev}')`;
+        const handler = `safeHandler(${rawHandler}, ctx.el?.tagName?.toLowerCase(), ${jsQuote(ev)})`;
 
         const optP: string[] = [];
         if (mods.has('once')) optP.push('once:true');
@@ -459,43 +460,43 @@ class InlineGen {
         rt.delete('once'); rt.delete('capture'); rt.delete('passive');
 
         if (rt.size === 0) {
-            this.out(`${el}.addEventListener('${ev}', ${handler}${opts});`);
+            this.out(`${el}.addEventListener(${jsQuote(ev)}, ${handler}${opts});`);
         } else {
             const w: string[] = [];
             if (rt.has('self')) w.push('if(e.target!==e.currentTarget)return;');
             for (const [mod, keys] of Object.entries(KEY_MAP)) {
                 if (rt.has(mod)) {
                     const a = Array.isArray(keys) ? keys : [keys];
-                    w.push(`if(!${JSON.stringify(a)}.includes(e.key))return;`);
+                    w.push(`if(!${jsString(a)}.includes(e.key))return;`);
                 }
             }
             if (rt.has('prevent')) w.push('e.preventDefault();');
             if (rt.has('stop')) w.push('e.stopPropagation();');
             w.push(`(${handler})(e);`);
-            this.out(`${el}.addEventListener('${ev}',(e)=>{${w.join('')}}${opts});`);
+            this.out(`${el}.addEventListener(${jsQuote(ev)},(e)=>{${w.join('')}}${opts});`);
         }
     }
 
     private twoWay(el: string, desc: string, expr: string, kind: ElementKind): void {
         this.imports.add('effect');
         const parts = desc.split('.'), prop = this.boundName(parts[0], kind), mods = new Set(parts.slice(1));
-        const sig = prefixCtx(expr, this.ctx), p = JSON.stringify(propName(prop, kind));
+        const sig = prefixCtx(expr, this.ctx), p = jsString(propName(prop, kind));
         this.out(`effect(() => { ${this.assign(el, prop, `${sig}()`, kind)} });`);
         const ev = mods.has('lazy') ? 'change' : 'input';
         let val = `${el}[${p}]`;
         if (mods.has('trim')) val = `(typeof ${val}==='string'?${val}.trim():${val})`;
         if (mods.has('number')) val = `(Number(${val})||0)`;
-        this.out(`${el}.addEventListener('${ev}',()=>{${sig}.set(${val});});`);
+        this.out(`${el}.addEventListener(${jsQuote(ev)},()=>{${sig}.set(${val});});`);
     }
 
     private classToggle(el: string, cls: string, expr: string): void {
         this.imports.add('effect');
-        this.out(`effect(()=>{${el}.classList.toggle(${JSON.stringify(cls)},!!(${callSignals(prefixCtx(expr, this.ctx), this.ctx)}));});`);
+        this.out(`effect(()=>{${el}.classList.toggle(${jsString(cls)},!!(${callSignals(prefixCtx(expr, this.ctx), this.ctx)}));});`);
     }
 
     private styleProp(el: string, prop: string, expr: string): void {
         this.imports.add('effect');
-        this.out(`effect(()=>{${el}.style.setProperty(${JSON.stringify(prop)},String(${callSignals(prefixCtx(expr, this.ctx), this.ctx)}??''));});`);
+        this.out(`effect(()=>{${el}.style.setProperty(${jsString(prop)},String(${callSignals(prefixCtx(expr, this.ctx), this.ctx)}??''));});`);
     }
 
     private showBind(el: string, expr: string): void {
@@ -627,7 +628,7 @@ class InlineGen {
     switchN(node: SwitchNode): void {
         this.imports.add('match');
         const expr = callSignals(prefixCtx(node.expr, this.ctx), this.ctx);
-        const cases = node.cases.map(c => `${JSON.stringify(c.value)}:()=>{${this.sub(c.body)}}`);
+        const cases = node.cases.map(c => `${jsString(c.value)}:()=>{${this.sub(c.body)}}`);
         if (node.defaultBody) cases.push(`_:()=>{${this.sub(node.defaultBody)}}`);
         const cf = this.v('cf');
         this.out(`const ${cf}=match(()=>${expr},{${cases.join(',')}});`);
@@ -639,7 +640,7 @@ class InlineGen {
         const body = this.sub(node.body);
         const els = node.elseBody ? `()=>{${this.sub(node.elseBody)}}` : 'null';
         const cf = this.v('cf');
-        this.out(`const ${cf}=requirePermission('${node.permission}',()=>{${body}},${els});`);
+        this.out(`const ${cf}=requirePermission(${jsQuote(node.permission)},()=>{${body}},${els});`);
         this.out(`${this.parent()}.appendChild(${cf});`);
     }
 
@@ -656,14 +657,14 @@ class InlineGen {
         this.imports.add('portal');
         const body = this.sub(node.body);
         const cf = this.v('cf');
-        this.out(`const ${cf}=portal(()=>(()=>{${body}})(),'${node.target}');`);
+        this.out(`const ${cf}=portal(()=>(()=>{${body}})(),${jsQuote(node.target)});`);
         this.out(`${this.parent()}.appendChild(${cf});`);
     }
 
     deferN(node: DeferNode): void {
         this.imports.add('defer');
         const body = this.sub(node.body);
-        const opts: string[] = [`trigger:'${node.trigger}'`];
+        const opts: string[] = [`trigger:${jsQuote(node.trigger)}`];
         if (node.placeholder) opts.push(`placeholder:()=>{${this.sub(node.placeholder)}}`);
         if (node.loading) opts.push(`loading:()=>{${this.sub(node.loading)}}`);
         if (node.error) opts.push(`error:()=>{${this.sub(node.error)}}`);
