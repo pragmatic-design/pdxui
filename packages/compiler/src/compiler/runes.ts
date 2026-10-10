@@ -55,6 +55,8 @@ export const RUNES: readonly RuneInfo[] = [
     d('snippet', 'Declare a reusable template fragment.', '@snippet name(arg) { <div>…</div> }', '@snippet ${1:name}(${2:arg}) {\n  $3\n}'),
     d('i18n', 'Configure internationalization for the app.', "@i18n { locales: ['en', 'it'], default: 'en' }", "@i18n {\n  locales: ['${1:en}', '${2:it}'],\n  default: '${3:en}',\n  translations: '${4:./translations}',\n}"),
     d('mixin', "Run another .pdx file's setup here, under a name.", "@mixin './use-thing.pdx' as thing;", "@mixin '${1:./use-thing.pdx}' as ${2:thing};"),
+    d('use', 'Use a Web Component from another package: imports the package that registers the tag.', "@use 'sl-button' from '@shoelace-style/shoelace';", "@use '${1:tag-name}' from '${2:package}';"),
+    d('raw', 'Kept as written. In the script, no signal is rewritten inside the block; in the template, no binding, interpolation or directive is read inside it.', '@raw { … }', '@raw {\n  $1\n}'),
     d('transition', 'The page transition animation.', "@transition 'fade';", "@transition '${1|fade,slide-left,slide-right,slide-up,slide-down,scale|}';"),
 
     f('signal', 'A reactive value; `count++` and `count = x` are rewritten into updates.', 'let count = $signal(0);', '\\$signal(${1:initial})'),
