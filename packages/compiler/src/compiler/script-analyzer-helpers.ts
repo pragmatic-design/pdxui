@@ -862,6 +862,44 @@ export function parseObjectLiteralToJson(src: string): unknown {
     }
 }
 
+/** A field of a `@params` / `@search` block its parser cannot read. */
+export interface InvalidRouteField {
+    /** The field as written. */
+    text: string;
+    /** Its name, when it starts with one. */
+    name?: string;
+    /** The form the parser reads, when the field only quoted a type it knows. */
+    unquoted?: string;
+}
+
+/** The field shape each parser reads — what `parseRouteParams` and `parseSearchParams` match. */
+const ROUTE_FIELD: Record<'params' | 'search', RegExp> = {
+    // Match: `id: number`
+    params: /^\w+\s*:\s*\w+$/,
+    // Match: `page?: number = 1` — the types @search coerces.
+    search: /^\w+\??\s*:\s*(?:string|number|boolean)(?:\s*=\s*.+)?$/,
+};
+
+/**
+ * The fields of a `@params` or `@search` block that its parser would skip (#105). A quoted type the
+ * parser knows comes back with the form it reads instead.
+ */
+export function invalidRouteFields(block: string, kind: 'params' | 'search'): InvalidRouteField[] {
+    const inner = block.trim().replace(/^\{/, '').replace(/\}$/, '');
+    const out: InvalidRouteField[] = [];
+    for (const raw of splitAtTopLevelCommas(inner)) {
+        const text = raw.trim();
+        if (!text || ROUTE_FIELD[kind].test(text)) continue;
+        const name = /^(\w+)/.exec(text)?.[1];
+        // Match: `name?: 'type' = default` with a quoted type the parser knows.
+        // Groups: [1]=name and `?` [2]=type [3]=the rest (a default)
+        const quoted = /^(\w+\??)\s*:\s*(['"])(string|number|boolean)\2(.*)$/.exec(text);
+        const unquoted = quoted ? `${quoted[1]}: ${quoted[3]}${quoted[4]}` : undefined;
+        out.push({ text, name, unquoted: unquoted && ROUTE_FIELD[kind].test(unquoted) ? unquoted : undefined });
+    }
+    return out;
+}
+
 /**
  * Parse a route params block into typed param declarations.
  * Input: '{ id: number, slug: string }'

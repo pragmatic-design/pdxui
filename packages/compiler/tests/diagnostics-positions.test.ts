@@ -61,6 +61,7 @@ const ROWS: Record<string, Row> = {
     PDX_PAGE_INVALID_PATH: { src: pdx('<p>x</p>', "@page 'users';"), at: "@page 'users'" },
     PDX_PAGE_INVALID_CONSTRAINT: { src: pdx('<p>x</p>', "@page '/u/:id(foo)';"), at: "@page '/u/:id(foo)'" },
     PDX_PAGE_EMPTY_CONSTRAINT: { src: pdx('<p>x</p>', "@page '/u/:id()';"), at: "@page '/u/:id()'" },
+    PDX_ROUTE_FIELD_INVALID: { src: pdx('<p>x</p>', "@page '/u';\n@search {\n  page: number = 1,\n  q: 'string'\n};"), at: "q: 'string'" },
     PDX_LOADER_NOT_FOUND: { src: pdx('<p>x</p>', "@page '/u';\n@loader loadMissing;"), at: '@loader loadMissing' },
     PDX_LABEL_NOT_FOUND: { src: pdx('<p>x</p>', "@page '/u/:id' { label: missingLabel };"), at: 'missingLabel' },
     PDX_GLOBAL_SELECTOR: { src: pdx('<p class="y">x</p>', 'let a = $signal(1);', ':global(.x) .y { margin: 0; }'), at: ':global(.x)' },

@@ -147,6 +147,20 @@ export function eventNameFix(source: string, w: ValidationWarning): FixProposal 
     return edits.length ? { title: `Rename the event ${name} to ${w.suggestion}`, edits } : undefined;
 }
 
+/** PDX_ROUTE_FIELD_INVALID with a quoted known type. `id: 'number'` → `id: number`, in its block. */
+export function routeFieldQuotedFix(source: string, w: ValidationWarning): FixProposal | undefined {
+    const start = at(source, w);
+    if (start === undefined) return undefined;
+    // Match: `name?: 'type'` at the field.   Groups: [1]=up to the quote [2]=the quote [3]=the type
+    const m = /^(\w+\s*\??\s*:\s*)(['"])(string|number|boolean)\2/.exec(source.slice(start));
+    if (!m) return undefined;
+    const quoteAt = start + m[1].length;
+    return {
+        title: `Write the type without quotes: ${m[3]}`,
+        edits: [{ start: quoteAt, end: quoteAt + m[3].length + 2, newText: m[3] }],
+    };
+}
+
 /** PDX_FETCH_TYPE_COLON. `@fetch user: 'GET /u' : User` → `@fetch user: 'GET /u' as User`. */
 export function fetchTypeColonFix(source: string, w: ValidationWarning): FixProposal | undefined {
     const start = at(source, w);
