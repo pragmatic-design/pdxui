@@ -3,7 +3,7 @@
 // Eliminates: innerHTML parsing, placeholder regex, bindAttribute dispatch, DOM walking.
 // Gated behind: production: true + inlineBindings: true
 
-import { extractLoopInvariants } from './codegen-template';
+import { extractLoopInvariants, generateTransition } from './codegen-template';
 import type {
     TemplateNode, IfNode, ForNode, SwitchNode, RequireNode,
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
@@ -554,7 +554,7 @@ class InlineGen {
         const els = node.elseBody ? `()=>{${this.sub(node.elseBody)}}` : 'null';
         const cf = this.v('cf');
         this.pending = templateMark(this.ctx, node.exprOffset);
-        this.out(`const ${cf}=when(()=>${cond},()=>{${then}},${els});`);
+        this.out(`const ${cf}=when(()=>${cond},()=>{${then}},${els}${generateTransition(node.transition)});`);
         this.out(`${this.parent()}.appendChild(${cf});`);
     }
 
@@ -567,6 +567,7 @@ class InlineGen {
         const keyArg = trackKeyArg(node, this.ctx);
         let body = withLoopScope(node, rows, this.ctx, () => this.sub(node.body));
         const params = node.index ? `${node.item},${node.index}` : node.item;
+        const transition = generateTransition(node.transition);
         const cf = this.v('cf');
 
         // A read that does not depend on the row is lifted into ONE computed, outside the loop —
@@ -597,12 +598,12 @@ class InlineGen {
             const emptyBody = this.sub(node.emptyBody);
             const wf = this.v('wf');
             this.pending = templateMark(this.ctx, node.exprOffset);
-            this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}});`);
+            this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}}${transition});`);
             this.out(`const ${wf}=when(()=>${items}?.length>0,()=>{const f=document.createDocumentFragment();f.appendChild(${cf});return f;},()=>{${emptyBody}});`);
             this.out(`${this.parent()}.appendChild(${wf});`);
         } else {
             this.pending = templateMark(this.ctx, node.exprOffset);
-            this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}});`);
+            this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}}${transition});`);
             this.out(`${this.parent()}.appendChild(${cf});`);
         }
     }
