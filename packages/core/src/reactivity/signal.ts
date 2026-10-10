@@ -586,10 +586,17 @@ function notifySet(subscribers: Set<Subscriber>): void {
     if (batchDepth > 0) {
         for (const sub of subscribers) scheduleSubscriber(sub);
     } else {
+        // try/finally, as batch(): a subscriber that runs here may throw (a computed with `equals`
+        // recomputes to compare). The error still reaches the writer, but the depth comes back
+        // down and what was scheduled still flushes; left raised, no effect would ever run again
+        // (#102).
         batchDepth++;
-        for (const sub of subscribers) scheduleSubscriber(sub);
-        batchDepth--;
-        flush();
+        try {
+            for (const sub of subscribers) scheduleSubscriber(sub);
+        } finally {
+            batchDepth--;
+            if (batchDepth === 0) flush();
+        }
     }
 }
 
@@ -628,34 +635,39 @@ function flush(): void {
         pendingLen = 0;
         pendingSeen.clear();
 
+        // Raised while this round runs, and lowered whatever escapes it: an effect's error is
+        // caught below, but the handler it is routed to can itself throw (#102).
         batchDepth++;
-        for (let i = 0; i < len; i++) {
-            const effectName = (arr[i] as { __pdx_name?: string }).__pdx_name ?? 'anonymous';
-            try {
-                effectRunTrace(effectName);
-                arr[i]();
-            } catch (err) {
-                trackError(effectName, err);
-                // Prefer the route captured at THIS effect's creation (correct owner) — a
-                // boundary, or the boundary enclosing its component NOW; fall back to the
-                // current stack, then the global handler.
-                const route = (arr[i] as { __pdx_errh?: ErrorRoute }).__pdx_errh;
-                // Listed for the devtools whichever handler takes it.
-                if (DEV) {
-                    const owner = ownerContext(route);
-                    devRecordError(err, 'effect', owner.component, owner.file);
-                }
-                const owned = resolveRoute(route);
-                const handler = owned ?? getTopErrorHandler();
-                if (handler) {
-                    handler(err);
-                } else {
-                    // An effect a component created names it: its route is that element.
-                    dispatchGlobalError(err, { source: 'effect', ...ownerContext(route) });
+        try {
+            for (let i = 0; i < len; i++) {
+                const effectName = (arr[i] as { __pdx_name?: string }).__pdx_name ?? 'anonymous';
+                try {
+                    effectRunTrace(effectName);
+                    arr[i]();
+                } catch (err) {
+                    trackError(effectName, err);
+                    // Prefer the route captured at THIS effect's creation (correct owner) — a
+                    // boundary, or the boundary enclosing its component NOW; fall back to the
+                    // current stack, then the global handler.
+                    const route = (arr[i] as { __pdx_errh?: ErrorRoute }).__pdx_errh;
+                    // Listed for the devtools whichever handler takes it.
+                    if (DEV) {
+                        const owner = ownerContext(route);
+                        devRecordError(err, 'effect', owner.component, owner.file);
+                    }
+                    const owned = resolveRoute(route);
+                    const handler = owned ?? getTopErrorHandler();
+                    if (handler) {
+                        handler(err);
+                    } else {
+                        // An effect a component created names it: its route is that element.
+                        dispatchGlobalError(err, { source: 'effect', ...ownerContext(route) });
+                    }
                 }
             }
+        } finally {
+            batchDepth--;
         }
-        batchDepth--;
         // Return array to pool for reuse (clear refs, cap pool size)
         arr.length = 0;
         if (flushPool.length < 4) flushPool.push(arr);
