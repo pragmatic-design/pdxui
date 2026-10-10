@@ -131,75 +131,80 @@ export function parsePlainText(text: string): DocNode[] {
 }
 
 // ── HTML Sanitizer ────────────────────────────────────────────
+//
+// The cleanup for Word and Google Docs works on the parsed tree, not on the string: a regex over
+// markup misses `</script >`, a tag whose attributes come in another order, and its own order of
+// passes — the mso- styles were stripped before Word's list paragraphs were recognised by them, so
+// a pasted list never became one (#64). Parsing with DOMParser runs nothing: no script executes, no
+// image loads.
+
+/** Elements whose whole subtree is dropped: not content. */
+const DROPPED_TAGS = new Set(['style', 'script', 'meta', 'link', 'title', 'noscript', 'template']);
+/** Office XML namespaces whose tags are unwrapped, their content kept. */
+const OFFICE_PREFIX = /^(o|w|m|st1|v):/;
 
 function sanitizeHTML(html: string): string {
-  let cleaned = html;
-
-  // Remove <style>, <script>, <meta>, HTML comments
-  cleaned = cleaned.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-  cleaned = cleaned.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
-  cleaned = cleaned.replace(/<meta[^>]*\/?>/gi, '');
-  cleaned = cleaned.replace(/<!--[\s\S]*?-->/g, '');
-
-  // ── Word-specific cleanup ──
-
-  // Strip Word XML namespaces and tags
-  cleaned = cleaned.replace(/<\/?o:[^>]*>/gi, '');
-  cleaned = cleaned.replace(/<\/?w:[^>]*>/gi, '');
-  cleaned = cleaned.replace(/<\/?m:[^>]*>/gi, '');
-  cleaned = cleaned.replace(/<\/?st1:[^>]*>/gi, '');
-
-  // Strip mso-* CSS properties
-  cleaned = cleaned.replace(/mso-[^;:"']+:[^;:"']+;?/gi, '');
-
-  // Strip class="Mso*" (Word paragraph styles)
-  cleaned = cleaned.replace(/\s*class="Mso[^"]*"/gi, '');
-
-  // Convert Word's faked lists to real lists
-  cleaned = convertWordLists(cleaned);
-
-  // ── Google Docs-specific cleanup ──
-
-  // Google Docs wraps everything in <b style="font-weight:normal"> — strip these
-  cleaned = cleaned.replace(/<b\s+style="font-weight:\s*normal[^"]*">/gi, '');
-  cleaned = cleaned.replace(/<\/b>/gi, (_match, _offset) => {
-    // Only remove </b> that matches a stripped <b>
-    return '</b>';
-  });
-
-  // Strip Google Docs IDs
-  cleaned = cleaned.replace(/\s*id="docs-internal-guid-[^"]*"/gi, '');
-
-  // ── General cleanup ──
-
-  // Remove empty spans
-  cleaned = cleaned.replace(/<span[^>]*>\s*<\/span>/gi, '');
-
-  // Strip data-* attributes (except ours)
-  cleaned = cleaned.replace(/\s*data-(?!pdx)[a-z-]+="[^"]*"/gi, '');
-
-  // Normalize whitespace — BUT <pre> blocks must be preserved: the global
-  // collapse would destroy the indentation and the newlines of pasted code.
-  const preBlocks: string[] = [];
-  cleaned = cleaned.replace(/<pre[\s\S]*?<\/pre>/gi, (m) => {
-    preBlocks.push(m);
-    return `@@PDX_PRE_${preBlocks.length - 1}@@`;
-  });
-  cleaned = cleaned.replace(/\s+/g, ' ');
-  cleaned = cleaned.replace(/@@PDX_PRE_(\d+)@@/g, (_, i) => preBlocks[Number(i)]);
-
-  return cleaned;
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  cleanPastedTree(doc.body);
+  // Text split by a dropped comment or tag is one text again: `a<!-- x -->b` is "ab".
+  doc.body.normalize();
+  return doc.body.innerHTML;
 }
 
-/** Convert Word's paragraph-based "lists" to real <ul>/<ol> */
-function convertWordLists(html: string): string {
-  // Word uses <p style="mso-list: l0 level1 lfo1"> for list items
-  // This is a simplified converter — full fidelity would need more work
-  // For now, detect the pattern and wrap in list tags
-  return html.replace(
-    /<p[^>]*style="[^"]*mso-list[^"]*"[^>]*>([\s\S]*?)<\/p>/gi,
-    '<li>$1</li>',
-  );
+/** Clean `root`'s subtree in place: drop what is not content, unwrap what only wraps it. */
+function cleanPastedTree(root: Element): void {
+  for (const node of Array.from(root.childNodes)) {
+    if (node.nodeType === Node.COMMENT_NODE) { node.remove(); continue; }
+    if (node.nodeType !== Node.ELEMENT_NODE) continue;
+    let el = node as HTMLElement;
+    const tag = el.tagName.toLowerCase();
+    if (DROPPED_TAGS.has(tag)) { el.remove(); continue; }
+
+    // Word's list items are paragraphs marked by an mso-list style: read it BEFORE the mso- styles go.
+    if (tag === 'p' && /mso-list/i.test(el.getAttribute('style') ?? '')) el = renameElement(el, 'li');
+
+    cleanPastedTree(el);
+
+    if (OFFICE_PREFIX.test(tag) || isGoogleDocsWrapper(el)) { unwrap(el); continue; }
+    cleanPastedAttributes(el);
+    if (tag === 'span' && el.attributes.length === 0 && !el.textContent?.trim() && el.children.length === 0) el.remove();
+  }
+}
+
+/** Google Docs wraps a whole paste in a `<b>` whose font-weight is normal: a wrapper, not bold. */
+function isGoogleDocsWrapper(el: HTMLElement): boolean {
+  if (el.tagName.toLowerCase() !== 'b') return false;
+  return /font-weight\s*:\s*(normal|400)\b/i.test(el.getAttribute('style') ?? '');
+}
+
+/** Word's mso- styles and Mso classes, Google Docs' guid ids, foreign data-* attributes. */
+function cleanPastedAttributes(el: HTMLElement): void {
+  const style = el.getAttribute('style');
+  if (style !== null) {
+    const kept = style.split(';').map(d => d.trim()).filter(d => d && !/^mso-/i.test(d));
+    if (kept.length > 0) el.setAttribute('style', kept.join('; '));
+    else el.removeAttribute('style');
+  }
+  if (/^Mso/.test(el.getAttribute('class') ?? '')) el.removeAttribute('class');
+  if ((el.getAttribute('id') ?? '').startsWith('docs-internal-guid-')) el.removeAttribute('id');
+  for (const attr of Array.from(el.attributes)) {
+    if (attr.name.startsWith('data-') && !attr.name.startsWith('data-pdx')) el.removeAttribute(attr.name);
+  }
+}
+
+/** Replace `el` by its children. */
+function unwrap(el: Element): void {
+  while (el.firstChild) el.before(el.firstChild);
+  el.remove();
+}
+
+/** Replace `el` by an element named `tag` holding the same children and attributes. */
+function renameElement(el: HTMLElement, tag: string): HTMLElement {
+  const next = el.ownerDocument.createElement(tag);
+  for (const attr of Array.from(el.attributes)) next.setAttribute(attr.name, attr.value);
+  while (el.firstChild) next.appendChild(el.firstChild);
+  el.replaceWith(next);
+  return next;
 }
 
 // ── DOM → Model Conversion ────────────────────────────────────
@@ -425,6 +430,7 @@ function escapeHTML(str: string): string {
     .replace(/"/g, '&quot;');
 }
 
+/** `&` FIRST: escaped after the quote, it turned every `&quot;` into `&amp;quot;` (#64). */
 function escapeAttr(str: string): string {
-  return str.replace(/"/g, '&quot;').replace(/&/g, '&amp;');
+  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
