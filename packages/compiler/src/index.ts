@@ -19,9 +19,9 @@ export type {
 export { compileSFC } from './compiler/codegen';
 /** The filename → custom element tag rule. The one rule: the CLI and the LSP call it. */
 export { deriveTag } from './compiler/codegen-shared';
-export { analyzeScript } from './compiler/script-analyzer';
+export { analyzeScript, inlineFormFields } from './compiler/script-analyzer';
 export type {
-    ScriptAnalysis, PropInfo, EventInfo, SlotInfo,
+    ScriptAnalysis, PropInfo, EventInfo, SlotInfo, FormFieldDecl,
     SignalDecl, DerivedDecl, StoreDecl, WatchDecl, ExportDecl,
     RouteInfo,
 } from './compiler/script-analyzer';

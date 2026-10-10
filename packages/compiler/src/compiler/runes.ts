@@ -31,7 +31,9 @@ export const RUNES: readonly RuneInfo[] = [
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),
     d('form', 'Declare a form with its fields and validation.', '@form name: { field: string { required } };   // the colon is not optional', '@form ${1:name}: { ${2:field}: ${3:string} };'),
     d('fetch', 'Declare a data fetch, a reactive resource().', "@fetch name: 'GET /api/path' as Type;   // the method is part of the string", "@fetch ${1:data}: 'GET ${2:/api/path}' as ${3:Type[]};"),
-    d('store', 'Declare a global reactive store module.', '@store name = { count: 0 };', '@store ${1:name} = { $2 };'),
+    // The file IS the store: `@store name;` names it, `$store({…})` holds its state. `@store name = {…}`
+    // is not a form the compiler reads — it is PDX_UNKNOWN_DECLARATION — and completion offered it (#58).
+    d('store', 'Make this file a global reactive store module, its state in $store({ … }).', "@store name;   // or @store name { persist: 'local' };", '@store ${1:name};'),
     d('page', 'Register the component as a route page, lazy-loaded.', "@page '/users/:id';", "@page '${1:/path}';"),
     d('guard', 'Require a permission for the route.', "@guard 'users.read';", "@guard '${1:permission}';"),
     d('loader', 'Name the function that loads the route data before the page renders.', '@loader loadUsers;', '@loader ${1:load};'),
@@ -47,12 +49,12 @@ export const RUNES: readonly RuneInfo[] = [
     d('params', 'Declare and type the route params.', "@params { id: 'number' }", "@params { ${1:id}: '${2:number}' }"),
     d('redirect', 'Redirect another path to this page.', "@redirect '/new-path';", "@redirect '${1:/path}';"),
     d('alias', 'Another path that renders this page.', "@alias '/old-path';", "@alias '${1:/path}';"),
-    d('outlet', 'Render the page into a named outlet.', "@outlet 'sidebar';", "@outlet '${1:name}';"),
+    d('outlet', 'Render a component into a named outlet beside this page.', "@outlet 'sidebar' -> 'pdx-nav';", "@outlet '${1:name}' -> '${2:pdx-component}';"),
     d('search', 'Declare and type the query-string params.', "@search { q: 'string' }", "@search { ${1:q}: '${2:string}' }"),
     d('prefetch', 'When the page\'s chunk is fetched ahead of a click.', "@prefetch 'hover';", "@prefetch '${1|hover,eager,viewport,never|}';"),
     d('snippet', 'Declare a reusable template fragment.', '@snippet name(arg) { <div>…</div> }', '@snippet ${1:name}(${2:arg}) {\n  $3\n}'),
     d('i18n', 'Configure internationalization for the app.', "@i18n { locales: ['en', 'it'], default: 'en' }", "@i18n {\n  locales: ['${1:en}', '${2:it}'],\n  default: '${3:en}',\n  translations: '${4:./translations}',\n}"),
-    d('mixin', 'Use a composable under a name.', '@mixin useThing as thing;', '@mixin ${1:useThing} as ${2:thing};'),
+    d('mixin', "Run another .pdx file's setup here, under a name.", "@mixin './use-thing.pdx' as thing;", "@mixin '${1:./use-thing.pdx}' as ${2:thing};"),
     d('transition', 'The page transition animation.', "@transition 'fade';", "@transition '${1|fade,slide-left,slide-right,slide-up,slide-down,scale|}';"),
 
     f('signal', 'A reactive value; `count++` and `count = x` are rewritten into updates.', 'let count = $signal(0);', '\\$signal(${1:initial})'),

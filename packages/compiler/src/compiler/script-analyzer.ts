@@ -6,7 +6,7 @@
 import type { ValidationWarning } from './validate';
 import type {
     PropInfo, EventInfo, SlotInfo, SignalDecl, DerivedDecl, ExportDecl,
-    StoreDecl, WatchDecl, FetchDecl, FormDecl, RouteInfo,
+    StoreDecl, WatchDecl, FetchDecl, FormDecl, FormFieldDecl, RouteInfo,
     GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis,
 } from './script-analyzer-types';
 import {
@@ -1352,6 +1352,15 @@ function parseI18nBlock(content: string): I18nInfo {
  * of the fields into the options. Both blocks would come back as one, and `validate: rule` would be
  * parsed as a field.
  */
+/**
+ * The fields an inline `@form` declaration declares, read as `analyzeScript` reads them — the
+ * fields block split from any options block, then parsed. The language server types the form
+ * from this, so the editor and the compiler cannot read a declaration two ways.
+ */
+export function inlineFormFields(declaration: string): FormFieldDecl[] {
+    return parseInlineFormSchema(splitInlineFormBlock(declaration).fields);
+}
+
 function splitInlineFormBlock(content: string): { fields: string; options: string | null } {
     let depth = 0;
     let started = false;
