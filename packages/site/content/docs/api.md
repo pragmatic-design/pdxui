@@ -3695,6 +3695,12 @@ Provide a value on a specific element (DOM-scoped).
 Descendants can inject it via context-request event.
 If no element is specified, provides globally (app-wide).
 
+It answers the Web Components context protocol's `context-request`, from any library: the
+request's `context` is compared with `key` by identity. A request with `subscribe: true` is
+answered with the current value of a provided signal, and again on each change until it calls
+the `unsubscribe` it was given, or the host component is destroyed; a plain value is answered
+once, which the protocol allows. A request without `subscribe` gets the value as provided.
+
 ### `provideFieldGroupPath`
 
 ```ts
