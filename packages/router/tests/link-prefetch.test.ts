@@ -19,7 +19,7 @@ vi.mock('../src/active', async () => {
         ...actual,
         routeTable: () => (globalThis as { __pdx_table?: unknown[] }).__pdx_table ?? null,
         pageModule: (path: string) => {
-            if (!['/dest', '/eagerly', '/admin'].includes(path)) return undefined;
+            if (!['/dest', '/eagerly', '/admin', '/below'].includes(path)) return undefined;
             return () => { loaded.push(path); return Promise.resolve({}); };
         },
     };
@@ -33,7 +33,42 @@ const TABLE = [
     { path: '/dest', tag: 'pdx-dest' },
     { path: '/eagerly', tag: 'pdx-eager', prefetch: 'eager' },
     { path: '/admin', tag: 'pdx-admin', prefetch: 'never' },
+    { path: '/below', tag: 'pdx-below', prefetch: 'viewport' },
 ];
+
+/**
+ * An IntersectionObserver the test drives: happy-dom lays nothing out, so «in view» is said here.
+ * Every instance is recorded, with the elements it watches.
+ */
+const observers: { cb: IntersectionObserverCallback; watched: Set<Element>; self: unknown }[] = [];
+class FakeIntersectionObserver {
+    private readonly entry: { cb: IntersectionObserverCallback; watched: Set<Element>; self: unknown };
+    constructor(cb: IntersectionObserverCallback) {
+        this.entry = { cb, watched: new Set(), self: this };
+        observers.push(this.entry);
+    }
+    observe(el: Element) { this.entry.watched.add(el); }
+    unobserve(el: Element) { this.entry.watched.delete(el); }
+    disconnect() { this.entry.watched.clear(); }
+}
+(globalThis as { IntersectionObserver?: unknown }).IntersectionObserver = FakeIntersectionObserver;
+
+/**
+ * Tell the observers that the link's ANCHOR entered (or left) the viewport.
+ *
+ * The anchor, not the `<pdx-link>`: the host is `display: contents`, has no box, and a real
+ * IntersectionObserver never reports it as intersecting — measured in Chromium (#42).
+ */
+function scrollInto(el: Element, isIntersecting = true): void {
+    const target = el.querySelector('a')!;
+    for (const o of observers) {
+        if (!o.watched.has(target)) continue;
+        o.cb([{ target, isIntersecting } as unknown as IntersectionObserverEntry], o.self as IntersectionObserver);
+    }
+}
+
+/** How many elements are being watched across every observer. */
+const watchedCount = (): number => observers.reduce((n, o) => n + o.watched.size, 0);
 
 function link(attrs: Record<string, string>): HTMLElement {
     const el = document.createElement('pdx-link');
@@ -48,6 +83,7 @@ beforeEach(() => {
     document.body.innerHTML = '';
     loaded.length = 0;
     resetPrefetch();
+    for (const o of observers) o.watched.clear();
 });
 
 afterEach(() => {
@@ -95,6 +131,69 @@ describe('what the route says', () => {
         el.dispatchEvent(new Event('pointerenter'));
         el.dispatchEvent(new Event('focusin', { bubbles: true }));
         expect(loaded).toEqual([]);
+    });
+
+    it("`@prefetch 'viewport'` fetches when the link scrolls into view, and not before", () => {
+        const el = link({ to: '/below' });
+        expect(loaded, 'a viewport route was fetched before its link was seen').toEqual([]);
+        scrollInto(el);
+        expect(loaded, 'the link came into view and nothing was fetched').toEqual(['/below']);
+    });
+
+    it("`@prefetch 'viewport'` watches the anchor, which has a box, not the `display: contents` host", () => {
+        const el = link({ to: '/below' });
+        const watched = observers.flatMap((o) => [...o.watched]);
+        expect(watched, 'the host was watched: an element with no box never intersects').toEqual([el.querySelector('a')]);
+    });
+
+    it("`@prefetch 'viewport'` is fetched once, and the link is no longer watched", () => {
+        const el = link({ to: '/below' });
+        scrollInto(el);
+        scrollInto(el, false);
+        scrollInto(el);
+        expect(loaded).toEqual(['/below']);
+        expect(watchedCount(), 'the link is still observed after its fetch').toBe(0);
+    });
+
+    it("`@prefetch 'viewport'` still fetches on hover, before it was seen", () => {
+        const el = link({ to: '/below' });
+        el.dispatchEvent(new Event('pointerenter'));
+        expect(loaded).toEqual(['/below']);
+    });
+
+    it("a link whose `to` is bound — written after it connects — is watched too", () => {
+        // `:to="'/assets/' + id"` sets the property once the element is in the page: the policy read
+        // at connect time saw no `to` and was `hover`, so a bound viewport link was never watched.
+        const el = link({});
+        (el as unknown as { to: string }).to = '/below';
+        expect(watchedCount(), 'the bound link was not watched').toBe(1);
+        scrollInto(el);
+        expect(loaded).toEqual(['/below']);
+    });
+
+    it("and an `eager` route behind a bound `to` is fetched once `to` arrives", () => {
+        const el = link({});
+        expect(loaded).toEqual([]);
+        (el as unknown as { to: string }).to = '/eagerly';
+        expect(loaded, 'an eager route behind a bound link waited for a hover').toEqual(['/eagerly']);
+    });
+
+    it('control — a hover route is not watched at all', () => {
+        link({ to: '/dest' });
+        expect(watchedCount(), 'a hover route was observed for the viewport').toBe(0);
+    });
+
+    it('one observer serves every viewport link, not one each', () => {
+        link({ to: '/below' });
+        link({ to: '/below' });
+        link({ to: '/below' });
+        expect(observers.filter((o) => o.watched.size > 0).length).toBe(1);
+    });
+
+    it('a removed viewport link is no longer watched', () => {
+        const el = link({ to: '/below' });
+        el.remove();
+        expect(watchedCount()).toBe(0);
     });
 
     it('and a link can opt out locally', () => {

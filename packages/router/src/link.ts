@@ -8,16 +8,18 @@
 // Features:
 //   - Calls navigate() on click (SPA navigation, no full reload)
 //   - `active-class` applied when currentPath matches `to`
-//   - Fetches the target route's chunk on hover, focus or pointerdown — see ./prefetch. The
-//     ROUTE's `@prefetch` decides the policy; `prefetch="never"` here is a local override.
+//   - Fetches the target route's chunk on hover, focus or pointerdown — see ./prefetch — and,
+//     for a `viewport` route, when the link scrolls into view. The ROUTE's `@prefetch` decides
+//     the policy; `prefetch="never"` here is a local override.
 //   - Renders as <a> for accessibility + SEO (right-click → open in new tab)
 
 import { effect, sanitizeUrl } from '@pdxui/core';
 import { navigate, currentPath } from './active';
-import { prefetchRoute, policyFor } from './prefetch';
+import { prefetchRoute, policyFor, whenInView } from './prefetch';
 
 class PdxLink extends HTMLElement {
     private _dispose: (() => void) | null = null;
+    private _unwatch: (() => void) | null = null;
     private _prefetchDone = false;
 
     static get observedAttributes() { return ['to', 'active-class', 'exact']; }
@@ -87,10 +89,7 @@ class PdxLink extends HTMLElement {
             this.addEventListener('pointerenter', this._onPrefetchSignal);
             this.addEventListener('focusin', this._onPrefetchSignal);
             this.addEventListener('pointerdown', this._onPrefetchSignal);
-            // `eager` means "with the route that links to it": fetch now, not on a signal.
-            if (policyFor(sanitizeUrl(this.getAttribute('to')) ?? '') === 'eager') {
-                this._onPrefetchSignal();
-            }
+            this._applyPrefetchPolicy();
         }
 
         // Active class tracking. The effect follows the PATH; `attributeChangedCallback` follows
@@ -109,8 +108,29 @@ class PdxLink extends HTMLElement {
         this.removeEventListener('pointerenter', this._onPrefetchSignal);
         this.removeEventListener('focusin', this._onPrefetchSignal);
         this.removeEventListener('pointerdown', this._onPrefetchSignal);
+        this._unwatch?.();
+        this._unwatch = null;
         this._dispose?.();
         this._dispose = null;
+    }
+
+    /**
+     * What the target route's `@prefetch` asks of this link beyond hover, focus and press.
+     *
+     * `eager` means "with the route that links to it": fetch now, not on a signal. `viewport`
+     * means "once this link is seen": a link far down a long page costs nothing until the visitor
+     * scrolls to it. Run at connect time AND when `to` changes: a bound `:to` is written after the
+     * element connects, and read only at connect time the policy was always `hover`.
+     */
+    private _applyPrefetchPolicy(): void {
+        this._unwatch?.();
+        this._unwatch = null;
+        if (!this.isConnected || this._prefetchDone || this.getAttribute('prefetch') === 'never') return;
+        const policy = policyFor(sanitizeUrl(this.getAttribute('to')) ?? '');
+        if (policy === 'eager') this._onPrefetchSignal();
+        // The anchor, not this element: the host is `display: contents`, has no box, and an
+        // IntersectionObserver never reports it as intersecting.
+        else if (policy === 'viewport') this._unwatch = whenInView(this.querySelector('a') ?? this, this._onPrefetchSignal);
     }
 
     /**
@@ -146,6 +166,8 @@ class PdxLink extends HTMLElement {
             // a navigation, and a link told where it points AFTER it is connected — every `:to`
             // binding — sees no navigation on the page it was rendered into.
             this._applyActiveClass();
+            // And the prefetch policy, for the same reason: the route is known only now.
+            this._applyPrefetchPolicy();
         }
     }
 

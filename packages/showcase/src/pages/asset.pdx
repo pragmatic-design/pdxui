@@ -75,6 +75,9 @@
 
 <script setup>
 @page '/assets/:id' { label: assetLabel };
+// A ticket shows its asset as a link at the top of the page: seen there, it is likely to be followed,
+// so the chunk is fetched once the link is in view rather than on the hover (`prefetch.spec.ts`).
+@prefetch 'viewport';
 @title record?.name ?? $t('assets.unknown');
 
 // The trail names the asset, as the customer's names the customer.

@@ -6,7 +6,7 @@ order: 25
 
 # Diagnostics
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 65 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 66 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -465,6 +465,14 @@ write:
 @page '/users';
 </script>
 ```
+
+### PDX_PREFETCH_POLICY
+
+*error* — A route's `@prefetch` names a policy the router does not have.
+
+The router treats a policy it does not know as `hover`: the route would prefetch on a hover whatever was written, and nothing would say so.
+
+**Fix.** One of `'hover'` (the default), `'eager'`, `'viewport'`, `'never'`.
 
 ### PDX_PROP_INVALID_TYPE
 

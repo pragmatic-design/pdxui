@@ -141,6 +141,13 @@ export function parseFetchDecl(trimmed: string): {
 }
 
 /**
+ * The prefetch policies the router has (`PREFETCH_POLICIES` in router/src/prefetch.ts). Written
+ * here because the compiler imports no runtime package; `tests/prefetch-policy.test.ts` reads the
+ * router's list and fails when the two differ.
+ */
+export const PREFETCH_POLICIES: readonly string[] = ['hover', 'eager', 'viewport', 'never'];
+
+/**
  * The options `resource()` takes, as `ResourceOptions` in core declares them. The compiler does not
  * import core, so the list is written here; `tests/fetch-strict.test.ts` reads the interface and
  * fails when the two differ.

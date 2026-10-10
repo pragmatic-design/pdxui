@@ -49,7 +49,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('alias', 'Another path that renders this page.', "@alias '/old-path';", "@alias '${1:/path}';"),
     d('outlet', 'Render the page into a named outlet.', "@outlet 'sidebar';", "@outlet '${1:name}';"),
     d('search', 'Declare and type the query-string params.', "@search { q: 'string' }", "@search { ${1:q}: '${2:string}' }"),
-    d('prefetch', 'When the page\'s chunk is fetched ahead of a click.', "@prefetch 'hover';", "@prefetch '${1|hover,eager,never|}';"),
+    d('prefetch', 'When the page\'s chunk is fetched ahead of a click.', "@prefetch 'hover';", "@prefetch '${1|hover,eager,viewport,never|}';"),
     d('snippet', 'Declare a reusable template fragment.', '@snippet name(arg) { <div>…</div> }', '@snippet ${1:name}(${2:arg}) {\n  $3\n}'),
     d('i18n', 'Configure internationalization for the app.', "@i18n { locales: ['en', 'it'], default: 'en' }", "@i18n {\n  locales: ['${1:en}', '${2:it}'],\n  default: '${3:en}',\n  translations: '${4:./translations}',\n}"),
     d('mixin', 'Use a composable under a name.', '@mixin useThing as thing;', '@mixin ${1:useThing} as ${2:thing};'),
