@@ -152,7 +152,8 @@ export function routeFieldQuotedFix(source: string, w: ValidationWarning): FixPr
     const start = at(source, w);
     if (start === undefined) return undefined;
     // Match: `name?: 'type'` at the field.   Groups: [1]=up to the quote [2]=the quote [3]=the type
-    const m = /^(\w+\s*\??\s*:\s*)(['"])(string|number|boolean)\2/.exec(source.slice(start));
+    // The space after `?` is in the `?` group, so no two `\s*` meet: a run of spaces has one split.
+    const m = /^(\w+\s*(?:\?\s*)?:\s*)(['"])(string|number|boolean)\2/.exec(source.slice(start));
     if (!m) return undefined;
     const quoteAt = start + m[1].length;
     return {

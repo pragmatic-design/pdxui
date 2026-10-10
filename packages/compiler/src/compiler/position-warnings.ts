@@ -142,7 +142,7 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             // Match: the field's name inside its own `@search {` / `@params {` block, at the name.
             const rune = /^@(search|params)\b/.exec(w.message)?.[1];
             return name && rune
-                ? find(source, script, new RegExp(`(?<=@${rune}\\s*\\{[^}]*)\\b${escape(name)}\\s*\\??\\s*:`))
+                ? find(source, script, new RegExp(`(?<=@${rune}\\s*\\{[^}]*)\\b${escape(name)}\\s*(?:\\?\\s*)?:`))
                 : undefined;
         }
         case 'PDX_PAGE_INVALID_PATH':

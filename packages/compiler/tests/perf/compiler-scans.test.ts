@@ -12,6 +12,7 @@ import { injectSplash } from '../../src/splash';
 import { stripHtmlComments, isRouterSeam, injectAfterHeadOpen, shortPath } from '../../src/plugin-utils';
 import { extractLegacyScript } from '../../src/compiler/codegen-legacy';
 import { elementContent } from '../../src/text-scan';
+import { routeFieldQuotedFix } from '../../src/compiler/fix-builders';
 
 /** How long `fn` takes, and how it ended: a malformed input may be refused, and refusing it is timed too. */
 function elapsed(fn: () => void): { ms: number; outcome: string } {
@@ -56,6 +57,8 @@ const cases: [string, () => void][] = [
     ['router seam: the seam path repeated (alert #19)', () => isRouterSeam('@pdxui/router/src/active.ts?' + '/@pdxui/router/src/active.ts?'.repeat(N / 30) + '\n')],
     ['index.html: <head repeated (alerts #20, #21)', () => injectAfterHeadOpen('<head'.repeat(N / 5), '<script></script>')],
     ['tag collision message: a run of a (alerts #22, #23)', () => shortPath('a'.repeat(N))],
+    ['route field fix: a name and a run of tabs (alert #154)', () => routeFieldQuotedFix('0' + '\t'.repeat(N),
+        { code: 'PDX_ROUTE_FIELD_INVALID', severity: 'error', message: '', line: 1, column: 1 })],
 ];
 
 describe('linear scans in the compiler', () => {
