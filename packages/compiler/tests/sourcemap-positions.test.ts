@@ -198,7 +198,7 @@ function save() { throw new Error('nope'); }
         const { code, map } = compile(TEMPLATE, 'tpl.pdx', [], undefined, { production: true, inlineBindings: true });
         expect(probe(TEMPLATE, code, map, [
             ['@click="save"', "__el1.addEventListener('click'"],
-            [':value="name"', 'effect(() => { if ("value" in __el2)'],
+            [':value="name"', 'let __el2w_value = {}; effect('],
             ['label }}', 'effect(()=>{__t4.data'],
             ['items as item', 'const __cf7=eachRow('],
             ['item }}</li>', 'effect(()=>{__t6.data'],

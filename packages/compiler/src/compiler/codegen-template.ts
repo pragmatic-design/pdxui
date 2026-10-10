@@ -337,22 +337,27 @@ function generateDefer(node: DeferNode, imports: Set<string>, ctx: CompileContex
     if (node.loading) optionParts.push(`loading: () => ${generateNodes(node.loading, imports, ctx)}`);
     if (node.error) optionParts.push(`error: () => ${generateNodes(node.error, imports, ctx)}`);
 
-    // The block loads what it renders, through `defer`'s second argument, a `loadFn`. Passing `null`
-    // would leave the components to the tag scan's STATIC import at the top of the module — which
-    // is what decides the chunk, so the payload would not be deferred at all, only the render.
-    //
-    // Emitted for every tag in the body, not only the ones used exclusively here: a component
-    // rendered elsewhere too keeps its static import, and `import()` on an already-loaded module
-    // resolves from the module cache. The static import is the one that is dropped, and only when
-    // the tag appears nowhere outside a defer — see `injectComponentImports`.
+    return `\${defer({ ${optionParts.join(', ')} }, ${deferLoadFn(deferredTags(bodyCode), ctx)}, () => ${bodyCode})}`;
+}
+
+/**
+ * `defer`'s second argument, a `loadFn`: the block loads what it renders. Passing `null` would
+ * leave the components to the tag scan's STATIC import at the top of the module — which is what
+ * decides the chunk, so the payload would not be deferred at all, only the render. And the static
+ * import of a tag used only inside a defer is dropped (`injectComponentImports`), so with `null`
+ * nothing would import it at all: shared with the inline path for that reason (#44).
+ *
+ * Emitted for every tag in the body, not only the ones used exclusively here: a component
+ * rendered elsewhere too keeps its static import, and `import()` on an already-loaded module
+ * resolves from the module cache.
+ */
+export function deferLoadFn(tags: string[], ctx: CompileContext): string {
     const paths = ctx.importPathOf
-        ? deferredTags(bodyCode).map(tag => ctx.importPathOf!(tag)).filter((p): p is string => !!p)
+        ? tags.map(tag => ctx.importPathOf!(tag)).filter((p): p is string => !!p)
         : [];
-    const loadFn = paths.length > 0
+    return paths.length > 0
         ? `() => Promise.all([${paths.map(p => `import(${jsQuote(p)})`).join(', ')}])`
         : 'null';
-
-    return `\${defer({ ${optionParts.join(', ')} }, ${loadFn}, () => ${bodyCode})}`;
 }
 
 function generateTry(node: TryNode, imports: Set<string>, ctx: CompileContext): string {

@@ -39,6 +39,14 @@ semver.
   variable that does not exist. (#101)
 - A subscriber or an error handler that throws during a write no longer stops every later effect in
   the page. (#102)
+- A top-level `const` or `let` with a type annotation (`const SORT: Sort[] = […]`) reaches the
+  template. It was left out of the setup's return: `undefined` in dev, and in a production build
+  the component threw at mount and rendered nothing. (#44)
+- A production build loads a component used only inside `@defer`: the trigger used to fire and
+  leave an unknown, empty element. (#98)
+- In a production build, a binding writes a property only when its value changes. It wrote again
+  whenever the row it read from was replaced, so a field being typed in took back the saved value
+  when another field's save landed. (#44)
 - Pasting HTML into `pdx-rich-text` no longer leaves a stray space node between two blocks: the
   whitespace a source puts between `<p>`s is layout, and is dropped. A space between inline nodes is
   kept. (#74)

@@ -40,7 +40,8 @@ describe('inlineBindings: bound names with - or :', () => {
     it(':xlink:href on an SVG link is sanitised and set as the attribute', () => {
         const code = inline('<svg><a :xlink:href="url"><text>t</text></a></svg>');
         parses(code);
-        expect(code).toMatch(/const __v = ctx\.url\(\);/);
+        expect(code).toMatch(/const __b = ctx\.url\(\);/);
+        expect(code).toMatch(/const __v = __b;/);
         expect(code).toMatch(/sanitizeBoundUrl\(\w+, "xlink:href", __v\)/);
         expect(code).toMatch(/setAttribute\("xlink:href", __safeUrl\)/);
         expect(code, 'the name was cut at the colon').not.toMatch(/\["xlink"\]/);
@@ -63,7 +64,7 @@ describe('inlineBindings: bound names with - or :', () => {
         const code = inline('<pdx-list :item-height="id"></pdx-list>');
         parses(code);
         // Assigned through core's assignBoundProperty, which a component's props go through.
-        expect(code).toMatch(/assignBoundProperty\(__el\d+, "itemHeight", ctx\.id\(\)\)/);
+        expect(code).toMatch(/const __b = ctx\.id\(\);.*assignBoundProperty\(__el\d+, "itemHeight", __b\)/);
     });
 });
 
@@ -107,14 +108,15 @@ describe('the controls', () => {
     it(':disabled and :value still assign the property', () => {
         const code = inline('<input :disabled="id" :value="label" />');
         parses(code);
-        expect(code).toMatch(/if \("disabled" in (\w+)\) \{ const __v = ctx\.id\(\); if \(__v == null\) clearBoundProperty\(\1, "disabled", "disabled"\); else \1\["disabled"\] = __v; \}/);
-        expect(code).toMatch(/if \("value" in (\w+)\) \{ const __v = ctx\.label\(\); if \(__v == null\) clearBoundProperty\(\1, "value", "value"\); else \1\["value"\] = __v; \}/);
+        // The value is read once into __b, beside the value the binding last wrote (#44).
+        expect(code).toMatch(/const __b = ctx\.id\(\); [^\n]*if \("disabled" in (\w+)\) \{ const __v = __b; if \(__v == null\) clearBoundProperty\(\1, "disabled", "disabled"\); else \1\["disabled"\] = __v; \}/);
+        expect(code).toMatch(/const __b = ctx\.label\(\); [^\n]*if \("value" in (\w+)\) \{ const __v = __b; if \(__v == null\) clearBoundProperty\(\1, "value", "value"\); else \1\["value"\] = __v; \}/);
     });
 
     it('a camelCase DOM property keeps the property path, on HTML and on SVG: :textContent', () => {
         const code = inline('<p :textContent="label"></p><svg><text :textContent="label"></text></svg>');
         parses(code);
-        expect(code.match(/if \("textContent" in (\w+)\) \{ const __v = ctx\.label\(\); if \(__v == null\) clearBoundProperty\(\1, "textContent", "textContent"\); else \1\["textContent"\] = __v; \}/g)).toHaveLength(2);
+        expect(code.match(/const __b = ctx\.label\(\); [^\n]*if \("textContent" in (\w+)\) \{ const __v = __b; if \(__v == null\) clearBoundProperty\(\1, "textContent", "textContent"\); else \1\["textContent"\] = __v; \}/g)).toHaveLength(2);
     });
 
     it('an HTML element is still created with createElement', () => {

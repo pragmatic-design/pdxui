@@ -3,7 +3,7 @@
 // Eliminates: innerHTML parsing, placeholder regex, bindAttribute dispatch, DOM walking.
 // Gated behind: production: true + inlineBindings: true
 
-import { extractLoopInvariants, generateTransition } from './codegen-template';
+import { deferLoadFn, extractLoopInvariants, generateTransition } from './codegen-template';
 import type {
     TemplateNode, IfNode, ForNode, SwitchNode, RequireNode,
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
@@ -367,7 +367,13 @@ class InlineGen {
         this.imports.add('effect');
         // Pre-rewritten values are already final JS (often a `() => …` getter from form-binding).
         const value = preRewritten ? `(${expr})()` : this.read(expr);
-        this.out(`effect(() => { ${this.assign(el, this.boundName(prop, kind), value, kind)} });`);
+        // The value this binding wrote last, as core's binding keeps it (`template.ts`): the effect
+        // re-runs when anything it READ changes — the row object a field comes from, replaced after
+        // another field's save — and writing the same value again would put it back over what the
+        // component holds since, a field being typed in (#44). It starts as an object no value is.
+        // Named after the element and the prop (one binding each), on the binding's own line.
+        const written = `${el}w_${prop.replace(/\W/g, '_')}`;
+        this.out(`let ${written} = {}; effect(() => { const __b = ${value}; if (Object.is(__b, ${written})) return; ${written} = __b; ${this.assign(el, this.boundName(prop, kind), '__b', kind)} });`);
     }
 
     /**
@@ -676,8 +682,13 @@ class InlineGen {
         if (node.placeholder) opts.push(`placeholder:()=>{${this.sub(node.placeholder)}}`);
         if (node.loading) opts.push(`loading:()=>{${this.sub(node.loading)}}`);
         if (node.error) opts.push(`error:()=>{${this.sub(node.error)}}`);
+        // The tags the body creates, read off its `createElement` calls as the template path reads
+        // them off its markup: the block loads its components, or nothing does (#44).
+        // Match: createElement('pdx-x') or createElementNS(ns, 'pdx-x'). Groups: [1]=tag
+        const tags = [...new Set([...body.matchAll(/createElement(?:NS)?\((?:[^,()]*,\s*)?['"](pdx-[\w-]+)['"]/g)]
+            .map(m => m[1].toLowerCase()))];
         const cf = this.v('cf');
-        this.out(`const ${cf}=defer({${opts.join(',')}},null,()=>{${body}});`);
+        this.out(`const ${cf}=defer({${opts.join(',')}},${deferLoadFn(tags, this.ctx)},()=>{${body}});`);
         this.out(`${this.parent()}.appendChild(${cf});`);
     }
 

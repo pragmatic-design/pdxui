@@ -21,15 +21,16 @@ function inline(template: string, script = "let url = $signal('/');"): string {
 describe('inlineBindings: a URL binding is sanitised', () => {
     it(':href goes through sanitizeBoundUrl, never straight into the element', () => {
         const code = inline('<a :href="url">Go</a>');
-        expect(code).toMatch(/sanitizeBoundUrl\(\w+, "href", ctx\.url\(\)\)/);
-        expect(code, 'the raw value must not be assigned').not.toMatch(/\["href"\] = ctx\./);
+        // The value is read once into __b, beside the value the binding last wrote (#44).
+        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "href", __b\)/);
+        expect(code, 'the raw value must not be assigned').not.toMatch(/\["href"\] = (ctx\.|__b)/);
         expect(code).toMatch(/import \{[^}]*\bsanitizeBoundUrl\b[^}]*\} from '@pdxui\/core'/);
         expect(() => new Function(code.replace(/^import .*$/gm, '')), 'the emitted module must parse').not.toThrow();
     });
 
     it(':src on an image too, and a refused value removes the attribute', () => {
         const code = inline('<img :src="url" />');
-        expect(code).toMatch(/sanitizeBoundUrl\(\w+, "src", ctx\.url\(\)\)/);
+        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "src", __b\)/);
         expect(code).toMatch(/removeAttribute\("src"\)/);
     });
 
@@ -42,9 +43,9 @@ describe('inlineBindings: a URL binding is sanitised', () => {
 describe('the controls', () => {
     it(':title and :value still compile to a direct assignment, with no sanitiser', () => {
         const code = inline('<input :title="url" :value="url" />');
-        // The value read once into __v: null goes to core's clearBoundProperty, as core does.
-        expect(code).toMatch(/const __v = ctx\.url\(\); if \(__v == null\) clearBoundProperty\(\w+, "title", "title"\); else \w+\["title"\] = __v;/);
-        expect(code).toMatch(/const __v = ctx\.url\(\); if \(__v == null\) clearBoundProperty\(\w+, "value", "value"\); else \w+\["value"\] = __v;/);
+        // The value read once into __b, then __v: null goes to core's clearBoundProperty, as core does.
+        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*const __v = __b; if \(__v == null\) clearBoundProperty\(\w+, "title", "title"\); else \w+\["title"\] = __v;/);
+        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*const __v = __b; if \(__v == null\) clearBoundProperty\(\w+, "value", "value"\); else \w+\["value"\] = __v;/);
         expect(code).not.toContain('sanitizeBoundUrl');
     });
 

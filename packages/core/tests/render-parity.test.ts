@@ -204,8 +204,20 @@ const ROWS: Row[] = [
         name: '@defer loads a component used only inside it',
         template: '@defer (immediate) { <pdx-deferred-probe></pdx-deferred-probe> }',
         read: (h) => lazyLoads.some((u) => u.endsWith(`?for=${mountName(h)}`)),
-        // Inline: defer() gets no loader, so the component is never asked for.
-        owner: 98,
+    },
+    {
+        // A row replaced by a new object whose field kept its value — another field's save landing.
+        // The binding writes when ITS value changes, so what the component holds since (a field being
+        // typed in) stays. Inline wrote again on every re-run: the showcase's category labels took
+        // back the saved name over the one being typed (#44).
+        name: ':prop is not written again with the value it already wrote',
+        template: '@for (rows as r; track r.id) { <x-probe :value="r.v"></x-probe> }<button @click="rows = [{ id: 1, v: \'saved\', other: 2 }]">save</button>',
+        script: "let rows = $signal([{ id: 1, v: 'saved', other: 1 }]);",
+        act: (h) => {
+            (h.querySelector('x-probe') as unknown as { value: unknown }).value = 'typed';
+            click('button')(h);
+        },
+        read: (h) => (h.querySelector('x-probe') as unknown as { value: unknown }).value,
     },
     { name: '@try / @catch', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
     // Both paths pass the transition options to when()/each() since #85: the enter classes match.

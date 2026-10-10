@@ -92,15 +92,18 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 /**
  * `inlineBindings`, measured.
  *
- * The flag swaps `html``` for imperative DOM construction; `PDX_INLINE_BINDINGS=1 vite build` is
- * how this app is built the other way. Both numbers, same machine, same commit:
+ * The flag swaps `html``` for imperative DOM construction, and it is the default of a production
+ * build, so it is how this app is built and what these ceilings measure (#44;
+ * `render-path.spec.ts` reads it off the chunk). Both paths, same machine, same commit, the
+ * template path with `inlineBindings: false` set for the measurement:
  *
- *                     entry      JS total     CSS
- *   template          20.5 KB    30.4 KB      18.9 KB
- *   inlineBindings    20.6 KB    30.8 KB      18.9 KB
+ *                     entry      JS total     CSS        blocking
+ *   template          34.4 KB    360.6 KB     58.1 KB    88.3 KB
+ *   inlineBindings    34.0 KB    378.4 KB     58.1 KB    87.9 KB
  *
- * So it is **slightly bigger on the wire** — imperative DOM code is more instructions than a
- * template string. It is not the interesting number.
+ * So the first download is slightly SMALLER and the total is 5% bigger: imperative DOM code is more
+ * instructions than a template string, and the pages carry the difference. It is not the
+ * interesting number.
  *
  * The interesting number is the render, which this app cannot show: its first paint is dominated by
  * fetching and parsing the bundle. Measured instead on a 1500-row list, mounted thirty times per
@@ -112,8 +115,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
  * median either way, inside one of Chromium's paint-timing ticks. Stated so the 3.5× is read with
  * its condition: it is the cost of RENDERING, and it only shows where rendering is the cost.
  *
- * The flag is off in this app's build, and the reason is not the size: with it on, a `<slot>`
- * inside a component's tag is dropped from the emitted module.
+ * The flag used to be off in this app's build, because a `<slot>` inside a component's tag was
+ * dropped on the inline path. That was fixed (`compiler/tests/inline-slots.test.ts`) and the
+ * override outlived it; turning it back on found three inline-path bugs no suite here ran, now
+ * fixed in the compiler: a typed `const` read as a signal, `@defer` loading nothing, and a binding
+ * writing its value again over a field being typed.
  */
 /**
  * Diagnostics do not ship. They sit behind `DEV`, a const (`core/src/utils/env.ts`) and not a
@@ -134,7 +140,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // blocking 88 → 89: html``'s self-closing expansion and the router's route-pattern compiler are
 // scans now, not one-line regexes that ran in polynomial time and, in the router, escaped only the
 // slashes of a path (#67). A few hundred bytes of code before the first paint. 88.1 KB measured.
-const BUDGET_KB = { entry: 35, js: 362, css: 59, blocking: 89 };
+// js 362 → 379: the app is built the production default way now, through the inline render path
+// (#44). Same commit, 360.6 KB on the template path and 378.4 KB on the inline one: imperative DOM
+// code is longer than a template string, page by page. The entry and the blocking bytes went DOWN
+// (34.4 → 34.0, 88.3 → 87.9). 378.4 KB measured.
+const BUDGET_KB = { entry: 35, js: 379, css: 59, blocking: 89 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
