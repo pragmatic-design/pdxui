@@ -40,6 +40,11 @@ async function openFilter(page: Page): Promise<Measured> {
     await page.hover('[data-probe-th="cell"]');
     await page.click('[data-probe="filter"]');
     await page.waitForSelector('.pdx-dg-filter-popover');
+    // The popover is placed twice: at append, and again on the next frame, once its editors have
+    // filled in and its width settled (filter-popover.ts, `place()` and its requestAnimationFrame).
+    // Measured between the two, on a busy runner, it read 24px off the funnel (#81). So: the frame
+    // the second placement runs in, and one more for its layout, then the measurement.
+    await page.evaluate(() => new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
     return page.evaluate(() => {
         const box = (el: Element): Box => {
             const r = el.getBoundingClientRect();
