@@ -27,10 +27,16 @@ count = 5;      // → __count.set(5)
 template, a component to keep), don't use `set` — you'd accidentally use the updater — but **`setRaw(fn)`**,
 which stores the function as-is.
 
-```pdx
-const onClick = $signal();
+```ts
+import { signal } from '@pdxui/core';
+
+const onClick = signal<(() => void) | null>(null);
 onClick.setRaw(() => doThing());   // stores the function, doesn't invoke it as an updater
 ```
+
+This is the `signal()` of `@pdxui/core`, in a `.ts` file. In a `.pdx` script a `$signal`'s name reads
+its value, so `onClick.setRaw(…)` would call `setRaw` on the value: a `$signal` cannot hold a
+function yet.
 
 `peek()` reads the value **without** creating a subscription (useful inside an effect when you want to
 read but not depend on that signal).
@@ -38,6 +44,7 @@ read but not depend on that signal).
 ## $derived
 
 ```pdx
+let count = $signal(0);
 const doubled = $derived(count * 2);
 ```
 
@@ -50,6 +57,7 @@ const doubled = $derived(count * 2);
 ## effect
 
 ```pdx
+let count = $signal(0);
 const dispose = effect(() => {
   console.log(count);             // reading here = subscribing
   return () => {/* cleanup */};   // runs before every re-run and on dispose
@@ -78,6 +86,7 @@ batch(() => {
 When you want to react to a source's change with access to old and new values:
 
 ```pdx
+let query = $signal('');
 $watch(query, (next, prev) => {
   console.log('from', prev, 'to', next);
 });

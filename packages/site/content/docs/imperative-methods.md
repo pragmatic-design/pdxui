@@ -104,7 +104,7 @@ In a `.pdx` SFC, declare them with `@expose`:
 
 ```pdx
 <script setup>
-@prop open: boolean = false;
+let open = $signal(false);   // the component's own state: a @prop belongs to the parent
 
 function showModal() { open = true; }
 function close() { open = false; }

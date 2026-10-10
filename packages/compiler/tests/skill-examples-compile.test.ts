@@ -9,66 +9,22 @@
 // A block that is deliberately partial says so in its fence (```html partial) and is skipped — and
 // counted, so the skip list cannot grow in silence. The number compiled is asserted exactly: an
 // extractor that finds nothing cannot pass, and a new example has to be counted in on purpose.
+//
+// An example that compiles with a warning is not clean either (#39): each is compiled with its
+// diagnostics read. The extraction is tests/support/published-examples.ts, shared with the type
+// check in packages/lsp.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
 import { compile } from '../src/plugin';
-
-const PLUGINS = join(__dirname, '..', '..', '..', 'marketplace', 'plugins');
-
-/** A .pdx construct: a block directive, or an SFC block. */
-const PDX_CONSTRUCT = /@for\b|@if\b|@try\b|@await\b|@switch\b|@defer\b|<script setup>|<template[\s>]/;
-
-interface Example { where: string; lang: string; partial: boolean; code: string }
-
-function skillFiles(dir: string, out: string[] = []): string[] {
-    for (const name of readdirSync(dir)) {
-        const p = join(dir, name);
-        if (statSync(p).isDirectory()) skillFiles(p, out);
-        else if (p.endsWith('.md') && /[\\/]skills[\\/]/.test(p)) out.push(p);
-    }
-    return out;
-}
-
-function examples(): Example[] {
-    const found: Example[] = [];
-    // Match: a fence at column 0, its info string, the body, the closing fence.
-    // Groups: [1]=info string (lang + meta) [2]=body
-    const FENCE = /^```([^\n]*)\n([\s\S]*?)^```[ \t]*$/gm;
-    for (const file of skillFiles(PLUGINS)) {
-        const text = readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
-        // A topic skill's copy of a site docs page: its fences are compiled at the
-        // source, by docs-examples-compile.test.ts, which knows how a docs fragment is assembled.
-        if (text.startsWith('<!-- Copied from packages/site/content/docs/')) continue;
-        for (const m of text.matchAll(FENCE)) {
-            const [lang = '', ...meta] = m[1].trim().split(/\s+/);
-            if (lang !== 'html' && lang !== 'pdx') continue;
-            if (!PDX_CONSTRUCT.test(m[2])) continue;
-            const line = text.slice(0, m.index).split('\n').length;
-            found.push({ where: `${relative(PLUGINS, file).replace(/\\/g, '/')}:${line}`, lang, partial: meta.includes('partial'), code: m[2] });
-        }
-    }
-    return found;
-}
+import { skillExamples, resolveStub } from './support/published-examples';
 
 /**
- * The `src=` example names files that do not exist: stand in for them by extension, so what is
- * compiled is the example's own shape (three self-closing blocks) with minimal real contents.
+ * Examples that are there to show a diagnostic, with the code each must raise. The exception is
+ * written down and checked — the example has to keep raising it — instead of silenced.
  */
-const resolveFile = (src: string): string =>
-    src.endsWith('.html') ? '<p class="n">{{ n }}</p>'
-        : src.endsWith('.css') ? 'p { margin: 0; }'
-            : 'let n = $signal(0);';
+const SHOWS_A_WARNING: Record<string, string[]> = {};
 
-/** A full SFC compiles as is; a template fragment is wrapped in one. */
-function asSfc(code: string): string {
-    if (/<template[\s>]/i.test(code) || /<script[\s>]/i.test(code)) return code;
-    return `<template>\n${code}\n</template>`;
-}
-
-const ALL = examples();
-const COMPILED = ALL.filter(e => !e.partial);
+const ALL = skillExamples();const COMPILED = ALL.filter(e => !e.partial);
 const SKIPPED = ALL.filter(e => e.partial);
 
 describe('the .pdx examples in the skills', () => {
@@ -94,11 +50,15 @@ describe('the .pdx examples in the skills', () => {
         expect(SKIPPED.map(e => e.where)).toEqual([]);
     });
 
-    for (const [i, ex] of COMPILED.entries()) {
-        it(`compiles and produces valid JS — ${ex.where}`, () => {
-            let code = '';
-            expect(() => { code = compile(asSfc(ex.code), `skill-example-${i}.pdx`, [], resolveFile).code; }, `${ex.where} does not compile`).not.toThrow();
-            const body = code.replace(/^import .*$/gm, '');
+    for (const ex of COMPILED) {
+        it(`compiles clean and produces valid JS — ${ex.where}`, () => {
+            let result: ReturnType<typeof compile> | undefined;
+            expect(() => { result = compile(ex.source, ex.filename, [], resolveStub); }, `${ex.where} does not compile`).not.toThrow();
+            const expected = SHOWS_A_WARNING[ex.where] ?? [];
+            const raised = result!.warnings.filter(w => w.severity === 'warn' || w.severity === 'error');
+            expect(raised.filter(w => !expected.includes(w.code)).map(w => `${w.code} — ${w.message}`), `${ex.where} raises diagnostics`).toEqual([]);
+            expect(expected.filter(c => !raised.some(w => w.code === c)), `${ex.where} no longer raises what it is listed to show`).toEqual([]);
+            const body = result!.code.replace(/^import .*$/gm, '');
             expect(() => new Function(body), `${ex.where} compiles to invalid JS:\n${body}`).not.toThrow();
         });
     }

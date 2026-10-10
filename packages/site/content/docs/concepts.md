@@ -38,6 +38,7 @@ any value:
 And you update it like any variable:
 
 ```pdx
+let count = $signal(0);
 function inc() { count++; }
 ```
 
@@ -80,6 +81,7 @@ changes: write to `localStorage`, log, kick off a request, touch the DOM by hand
 ```pdx
 import { effect } from '@pdxui/core';
 
+let count = $signal(0);
 effect(() => {
   console.log('count changed:', count);
 });
@@ -92,6 +94,7 @@ If the effect creates something to clean up (a timer, a listener), return a clea
 runs before every re-run and on teardown.
 
 ```pdx
+let count = $signal(0);
 effect(() => {
   const id = setInterval(() => count++, 1000);
   return () => clearInterval(id);   // automatic cleanup
@@ -130,6 +133,9 @@ Let's put the three building blocks into something real: a list filtered as you 
 searches. Three responsibilities, three different tools.
 
 ```pdx
+import { analytics } from './analytics';   // your app's tracking module
+interface Product { id: number; name: string }
+
 @prop products: Product[] = [];
 
 let query = $signal('');                 // 1. state the user changes

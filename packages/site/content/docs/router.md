@@ -222,6 +222,10 @@ the child loads one intervention, and moving between interventions refetches the
 <!-- ticket.pdx -->
 @page '/tickets/:id';
 @loader loadTicket;
+
+async function loadTicket() {
+    return (await fetch('/api/tickets/7')).json();
+}
 ```
 
 ```pdx
@@ -230,6 +234,10 @@ the child loads one intervention, and moving between interventions refetches the
 @loader loadIntervention;
 
 import { currentLoaderData, loaderData } from '@pdxui/router';
+
+async function loadIntervention() {
+    return (await fetch('/api/tickets/7/interventions/2')).json();
+}
 
 const intervention = $derived(currentLoaderData());        // this level's
 const ticket = $derived(loaderData('/tickets/:id'));       // the parent's, by its pattern
@@ -363,9 +371,9 @@ the module is already in the cache.
 You write nothing for the common case. What you can write is the exception:
 
 ```pdx
-@page '/reports' { prefetch: 'eager' };     <!-- fetch it as soon as a link to it is on the page -->
-@page '/assets/:id' { prefetch: 'viewport' }; <!-- fetch it once a link to it scrolls into view -->
-@page '/admin'   { prefetch: 'never' };     <!-- never speculatively -->
+@page '/reports' { prefetch: 'eager' };     // fetch it as soon as a link to it is on the page
+@page '/assets/:id' { prefetch: 'viewport' }; // fetch it once a link to it scrolls into view
+@page '/admin'   { prefetch: 'never' };     // never speculatively
 ```
 
 `viewport` sits between the two: a link far down a long page costs nothing until the visitor
@@ -500,11 +508,11 @@ so does an HMR pass that re-creates the router. It is idempotent.
 ## Other route declarations
 
 ```pdx
-@redirect '/old' -> '/new';      <!-- redirect -->
-@alias '/people';                <!-- alternative path for the same page -->
-@outlet 'sidebar' -> 'pdx-nav';  <!-- named outlet -->
-@params { id: number };          <!-- param types: parsed, not implemented -->
-@prefetch 'hover';               <!-- 'hover' (the default), 'eager', 'viewport', or 'never' -->
+@redirect '/old' -> '/new';      // redirect
+@alias '/people';                // alternative path for the same page
+@outlet 'sidebar' -> 'pdx-nav';  // named outlet
+@params { id: number };          // param types: parsed, not implemented
+@prefetch 'hover';               // 'hover' (the default), 'eager', 'viewport', or 'never'
 ```
 
 `@prefetch` is the policy for fetching the page's chunk before the click — see
