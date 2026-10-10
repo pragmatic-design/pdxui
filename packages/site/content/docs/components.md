@@ -14,8 +14,9 @@ A file has three blocks:
 
 ```pdx
 <template>  <!-- what you see -->        </template>
-<script setup>  <!-- state and logic --> </script>
-<style scoped>  <!-- isolated styles --> </style>
+<script setup>  // state and logic
+</script>
+<style scoped>  /* isolated styles */ </style>
 ```
 
 The file name determines the tag: `user-card.pdx` → `<pdx-user-card>`. To force a different tag use
@@ -214,7 +215,7 @@ You declare it with `@event`:
 ```pdx
 @event selected: { id: string };
 
-function pick() { selected({ id: currentId }); }
+function pick(id: string) { selected({ id }); }
 ```
 
 The compiler generates the `selected(payload)` function and the dispatch of a typed `CustomEvent`.
@@ -273,6 +274,7 @@ opening a dialog, focusing. For those you expose methods on the element with `@e
 ```pdx
 @expose open, close;
 
+let isOpen = $signal(false);
 function open() { isOpen = true; }
 function close() { isOpen = false; }
 ```

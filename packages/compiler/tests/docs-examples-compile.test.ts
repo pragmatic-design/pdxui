@@ -1,4 +1,4 @@
-// Every `pdx` example the site publishes compiles.
+// Every `pdx` example the site publishes compiles, and compiles clean.
 //
 // A declaration the analyzer does not accept fails the way this compiler fails such a line: in
 // silence. `@form user {` needs a colon — `@form user: {` — and `@fetch users: '/api/users'` needs
@@ -8,61 +8,27 @@
 // A reader copies these. So they are compiled here, as a reader would use them.
 //
 // A fence is a FRAGMENT: sometimes a script block, sometimes markup, sometimes both. It is assembled
-// into the smallest file that carries it, and a failure names the page and the fence. What this
-// cannot check is whether the RESULT is right — `user.values` compiles and does not exist (the
-// members are asserted separately). This is the floor: it does not compile, nobody can use it.
+// into the smallest file that carries it (tests/support/published-examples.ts), and a failure names
+// the page and the fence. Compiling is the floor, and a compile that succeeds with a warning is not a
+// clean example: `@fetch user: 'GET /u' : User` compiles and drops the type and its options (#39).
+// Whether the result type-checks and its imports resolve is packages/lsp's
+// published-examples-types.test.ts, which runs the editor's type check on the same examples.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { compile } from '../src/plugin';
-
-const DOCS = join(__dirname, '..', '..', 'site', 'content', 'docs');
-
-interface Fence { page: string; index: number; body: string }
-
-/** Every ```pdx fence of every page, in order, with where it came from. */
-function fences(): Fence[] {
-    const out: Fence[] = [];
-    for (const file of readdirSync(DOCS).filter(f => f.endsWith('.md') && f !== 'api.md')) {
-        const text = readFileSync(join(DOCS, file), 'utf-8').replace(/\r\n/g, '\n');
-        const re = /```pdx\n([\s\S]*?)```/g;
-        let m: RegExpExecArray | null;
-        let index = 0;
-        while ((m = re.exec(text)) !== null) out.push({ page: file, index: ++index, body: m[1] });
-    }
-    return out;
-}
+import { DOCS, docsExamples, resolveStub } from './support/published-examples';
 
 /**
- * The smallest .pdx that carries a fragment. A fence with a `<script` is a file already, give or
- * take a template; a bare block of declarations is a script; anything else is markup.
+ * Examples that are there to show a diagnostic, with the code each must raise. The exception is
+ * written down and checked — the example has to keep raising it — instead of silenced.
  */
-function asFile(body: string): string {
-    const hasScript = /<script/.test(body);
-    const hasTemplate = /<template/.test(body);
-    if (hasScript && hasTemplate) return body;
-    if (hasScript) {
-        const markup = body.slice(0, body.indexOf('<script')).trim();
-        const script = body.slice(body.indexOf('<script'));
-        return `<template>\n${markup || '<div></div>'}\n</template>\n${script}`;
-    }
-    const isDeclarations = /^\s*@(form|fetch|store|page|guard|prop|event|title|meta|scroll|slot|loader)\b/m.test(body)
-        && !/^\s*</m.test(body.trim());
-    if (isDeclarations) return `<template><div></div></template>\n<script setup>\n${body}\n</script>`;
-    return `<template>\n${body}\n</template>`;
-}
-
-/**
- * `src="./x.ts"` on a block is resolved by the Vite plugin against the file system. The pages teach
- * it, so their fences have to compile — with a stand-in, since the file a doc names does not exist.
- * What the fence is proving is the syntax, not the contents of a file nobody ships.
- */
-const resolveStub = (srcPath: string): string =>
-    srcPath.endsWith('.css') ? '.stub { color: red; }' : 'let __stub = $signal(0);';
+const SHOWS_A_WARNING: Record<string, string[]> = {};
 
 describe('the pdx examples the site publishes', () => {
-    const all = fences();
+    const all = docsExamples();
+    const compileOf = (f: { source: string; filename: string }) => compile(f.source, `C:/docs/${f.filename}`, [], resolveStub);
 
     it('found them', () => {
         expect(all.length, 'no pdx fence found in the docs at all').toBeGreaterThan(30);
@@ -72,12 +38,30 @@ describe('the pdx examples the site publishes', () => {
         const broken: string[] = [];
         for (const f of all) {
             try {
-                compile(asFile(f.body), `C:/docs/${f.page.replace('.md', '')}-${f.index}.pdx`, [], resolveStub);
+                compileOf(f);
             } catch (e) {
-                broken.push(`${f.page} fence ${f.index}: ${String(e).split('\n')[0].slice(0, 90)}`);
+                broken.push(`${f.where}: ${String(e).split('\n')[0].slice(0, 90)}`);
             }
         }
         expect(broken, 'these published examples do not compile').toEqual([]);
+    });
+
+    it('every one compiles without a warning or an error, unless it is there to show one', () => {
+        const found: string[] = [];
+        for (const f of all) {
+            let warnings;
+            try {
+                warnings = compileOf(f).warnings;
+            } catch {
+                continue; // the compile failure is reported above
+            }
+            const raised = warnings.filter(w => w.severity === 'warn' || w.severity === 'error').map(w => w.code);
+            const expected = SHOWS_A_WARNING[f.where] ?? [];
+            const unexpected = warnings.filter(w => (w.severity === 'warn' || w.severity === 'error') && !expected.includes(w.code));
+            for (const w of unexpected) found.push(`${f.where}: ${w.code} — ${w.message.slice(0, 100)}`);
+            for (const code of expected) if (!raised.includes(code)) found.push(`${f.where}: no longer raises ${code}, which it is listed to show`);
+        }
+        expect(found, 'these published examples raise diagnostics').toEqual([]);
     });
 
     // Compiling is a weaker claim than it sounds: `compile()` never parses what it emits. A
@@ -90,9 +74,9 @@ describe('the pdx examples the site publishes', () => {
         for (const f of all) {
             let code: string;
             try {
-                code = compile(asFile(f.body), `C:/docs/${f.page.replace('.md', '')}-${f.index}.pdx`, [], resolveStub).code;
+                code = compileOf(f).code;
             } catch {
-                continue; // the compile failure is reported by the test above
+                continue; // the compile failure is reported above
             }
             // Strip the module syntax `new Function` cannot take. The compiler emits one import per
             // line, so this is exact, not a guess.
@@ -100,7 +84,7 @@ describe('the pdx examples the site publishes', () => {
             try {
                 new Function(body);
             } catch (e) {
-                broken.push(`${f.page} fence ${f.index}: ${(e as Error).message}`);
+                broken.push(`${f.where}: ${(e as Error).message}`);
             }
         }
         expect(broken, 'these published examples compile to a module that does not parse').toEqual([]);
@@ -111,19 +95,15 @@ describe('the pdx examples the site publishes', () => {
         // Compiling is therefore not enough — for these two declarations, the page's
         // example has to actually produce the call it promises.
         // A DECLARATION starts its line: `@fetch` inside a comment is a mention, not a promise.
-        const forms = all.filter(f => f.page === 'forms.md' && /^\s*@form\s/m.test(f.body));
+        const forms = all.filter(f => f.where.startsWith('forms.md ') && /^\s*@form\s/m.test(f.source));
         expect(forms.length, 'forms.md declares no form any more').toBeGreaterThan(0);
         for (const f of forms) {
-            const code = compile(asFile(f.body), `C:/docs/forms-${f.index}.pdx`, [], resolveStub).code;
-            expect(code, `forms.md fence ${f.index} declares a form that emits no createForm`)
-                .toMatch(/createForm\(/);
+            expect(compileOf(f).code, `${f.where} declares a form that emits no createForm`).toMatch(/createForm\(/);
         }
-        const fetches = all.filter(f => f.page === 'data.md' && /^\s*@fetch\s/m.test(f.body));
+        const fetches = all.filter(f => f.where.startsWith('data.md ') && /^\s*@fetch\s/m.test(f.source));
         expect(fetches.length, 'data.md declares no fetch any more').toBeGreaterThan(0);
         for (const f of fetches) {
-            const code = compile(asFile(f.body), `C:/docs/data-${f.index}.pdx`, [], resolveStub).code;
-            expect(code, `data.md fence ${f.index} declares a fetch that emits no resource`)
-                .toMatch(/resource\(/);
+            expect(compileOf(f).code, `${f.where} declares a fetch that emits no resource`).toMatch(/resource\(/);
         }
     });
 });

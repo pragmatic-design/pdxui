@@ -69,8 +69,8 @@ reading the store.
 Often you want state to survive a refresh. One declaration does it:
 
 ```pdx
-@store cart { persist: 'local' };     <!-- localStorage -->
-@store ui   { persist: 'session' };   <!-- sessionStorage -->
+@store cart { persist: 'local' };     // localStorage
+@store ui   { persist: 'session' };   // sessionStorage
 ```
 
 The store is serialized on every change and restored on startup. The user finds their cart after

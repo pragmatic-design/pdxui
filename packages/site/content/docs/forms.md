@@ -68,6 +68,12 @@ touched and warning from the same place — you write no `:value`, no `@input`:
 </pdx-form>
 
 <script setup>
+@form user: {
+  name: string { required, minLength: 3 },
+  email: string { required, email },
+  age: number
+}
+
 function save(values) { /* already validated */ }
 </script>
 ```

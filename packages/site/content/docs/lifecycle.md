@@ -21,6 +21,9 @@ almost always, what you start needs stopping: `onDestroy` (or the cleanup return
 ```pdx
 import { onMount, onDestroy } from '@pdxui/core';
 
+let seconds = $signal(0);
+function tick() { seconds++; }
+
 onMount(() => {
   const id = setInterval(tick, 1000);
   onDestroy(() => clearInterval(id));   // stop what you started

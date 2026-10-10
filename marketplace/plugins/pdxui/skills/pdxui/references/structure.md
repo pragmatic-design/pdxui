@@ -46,7 +46,7 @@ keep the state in the route. This is what you want most of the time.
 <template>
   <div class="job-row" @click="open()">
     <strong>{{ customer }}</strong>
-    <pdx-badge :tone="tone()">{{ status }}</pdx-badge>
+    <pdx-badge :tone="tone">{{ status }}</pdx-badge>
   </div>
 </template>
 

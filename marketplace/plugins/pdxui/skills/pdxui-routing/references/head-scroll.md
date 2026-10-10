@@ -79,7 +79,7 @@ import { useScroll, scrollTo } from '@pdxui/core';
 
 const { x, y, direction, isScrolling } = useScroll();
 
-const atTop = $derived(y < 8);
+const atTop = $derived(y() < 8);   // useScroll returns signals: read them with a call
 </script>
 ```
 
@@ -166,7 +166,7 @@ Two pages want something other than the default, and they declare it:
 ```pdx
 <script setup>
 @page '/checkout';
-@scroll 'top';        <!-- always enter at the top, even on Back -->
+@scroll 'top';        // always enter at the top, even on Back
 </script>
 ```
 

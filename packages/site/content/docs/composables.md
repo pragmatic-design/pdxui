@@ -73,6 +73,7 @@ for an inactivity timeout in its first review.
 import { useIdle, createAuthStore } from '@pdxui/core';
 
 const auth = createAuthStore();
+let showStayLoggedIn = $signal(false);
 const idle = useIdle({
   after: 15 * 60_000,
   warnBefore: 60_000,
