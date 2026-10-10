@@ -179,6 +179,30 @@ pages from the manifests, and `pnpm certify` runs it first. Never edit anything 
 `generated/` folder; change its generator instead. A new rule must be able to fail: change its
 value once and watch it go red.
 
+### Comparing with other frameworks
+
+`pnpm bench:jfb` runs the public
+[js-framework-benchmark](https://github.com/krausest/js-framework-benchmark) with PDX and the
+reference frameworks, and prints a table of medians with each one's ratio to vanillajs: total and
+script time, memory, bundle size.
+
+```bash
+pnpm bench:jfb                                # PDX against vanillajs, svelte, solid, lit and vue
+pnpm bench:jfb --with vanillajs --only 01_,07_ # fewer frameworks, fewer benchmarks
+pnpm bench:jfb --runs 3                       # three whole runs, the median of their medians
+```
+
+Run it before and after a change to rendering, reactivity or the runtime's size, and compare the two
+tables. **Compare only within one run.** Totals move between runs on the same machine, so
+frameworks are measured together, and a "before" is a run made the same day, on the same machine,
+with nothing else working.
+
+It is not part of `pnpm test`. It needs Chrome, opens a browser window, and takes several minutes
+per framework. The benchmark is cloned at a pinned commit into the OS temp directory, with its own
+dependencies; the next run reuses it. PDX is built from your checkout: core, compiler, then the app
+in `scripts/bench-jfb/`. A PDX build that is not keyed stops the run before anything is measured.
+`node --test scripts/bench-jfb/summarize.test.mjs` tests the table.
+
 ## Commits and pull requests
 
 - One logical change per commit, in the imperative, with a scope.

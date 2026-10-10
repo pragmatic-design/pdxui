@@ -10,6 +10,7 @@
     "test:unit:uncovered": "pnpm -r --workspace-concurrency=4 --filter=!@pdxui/design --filter=!@pdxui/builder --filter=!@pdxui/site --filter=!@pdxui/showcase --filter=!@pdxui/core --filter=!@pdxui/compiler --filter=!@pdxui/router --filter=!@pdxui/lsp run test",
     "test:browser": "pnpm -r --workspace-concurrency=1 --filter @pdxui/design --filter @pdxui/builder --filter @pdxui/site --filter @pdxui/showcase run test",
     "test:perf": "pnpm --filter @pdxui/compiler --filter @pdxui/core run test:perf",
+    "bench:jfb": "node scripts/bench-jfb/run.mjs",
     "clean": "pnpm -r exec rm -rf dist",
     "lint": "eslint packages/core/src packages/compiler/src packages/router/src packages/lsp/src packages/vscode-pdx/src packages/cli/src && node packages/design/scripts/lint-tokens.mjs",
     "lint:fix": "eslint packages/core/src packages/compiler/src packages/router/src packages/lsp/src packages/vscode-pdx/src packages/cli/src --fix",
