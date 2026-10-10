@@ -1096,23 +1096,54 @@ async function handleNavigation(path: string, isBack = false, depth = 0, commit?
  *   /items/:id([a-z]+)   → /^\/items\/([a-z]+)$/
  */
 function pathToRegex(path: string): { regex: RegExp; paramNames: string[] } {
+    // One left-to-right scan, not three regex passes (#67). The passes ran in polynomial time on a
+    // pattern of repeated `:0((`, escaped the slashes and nothing else — so a `.` in `/feed.xml`
+    // matched any character — named the wildcard before the params whatever their order, and
+    // rewrote a `*` inside a param's own constraint.
     const paramNames: string[] = [];
-
-    const regexStr = path
-        // Catch-all wildcard: * → (.+)
-        .replace(/\*/g, () => {
+    let source = '';
+    let i = 0;
+    while (i < path.length) {
+        const ch = path[i];
+        if (ch === '*') {
             paramNames.push('$rest');
-            return '(.+)';
-        })
-        // Param with constraint: :name(constraint) → type-specific regex
-        .replace(/:(\w+)(?:\(([^)]+)\))?/g, (_, name, constraint) => {
+            source += '(.+)';
+            i++;
+            continue;
+        }
+        if (ch === ':' && isWordChar(path[i + 1])) {
+            let end = i + 1;
+            while (end < path.length && isWordChar(path[end])) end++;
+            const name = path.slice(i + 1, end);
+            let constraint = '';
+            if (path[end] === '(') {
+                const close = path.indexOf(')', end + 1);
+                if (close > end + 1) {
+                    constraint = path.slice(end + 1, close);
+                    end = close + 1;
+                }
+            }
             paramNames.push(name);
-            if (constraint === 'number') return '([0-9]+)';
-            if (constraint === 'uuid') return '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})';
-            if (constraint) return `(${constraint})`; // custom regex
-            return '([^/]+)'; // default: any non-slash
-        })
-        .replace(/\//g, '\\/');
+            source += constraint === 'number' ? '([0-9]+)'
+                : constraint === 'uuid' ? '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})'
+                : constraint ? `(${constraint})` // custom regex, the developer's own
+                : '([^/]+)'; // default: any non-slash
+            i = end;
+            continue;
+        }
+        // Literal text matches itself: every regex metacharacter escaped, not only `/`.
+        source += REGEX_SPECIAL.has(ch) ? `\\${ch}` : ch;
+        i++;
+    }
+    return { regex: new RegExp(`^${source}$`), paramNames };
+}
 
-    return { regex: new RegExp(`^${regexStr}$`), paramNames };
+/** The characters a regex reads as syntax. */
+const REGEX_SPECIAL = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}', '/']);
+
+/** `\w`, one character at a time: a letter, a digit or `_`. */
+function isWordChar(ch: string | undefined): boolean {
+    if (ch === undefined) return false;
+    const c = ch.charCodeAt(0);
+    return (c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c === 95;
 }

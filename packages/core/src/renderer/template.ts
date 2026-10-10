@@ -118,19 +118,53 @@ const VOID_ELEMENTS = new Set([
     'link', 'meta', 'param', 'source', 'track', 'wbr',
 ]);
 
-// Match: an opening tag ended by `/>`, its quoted attribute values skipped whole (so a `/>` or `>`
-// inside one is not the end). Groups: [1]=element name [2]=attributes
-const SELF_CLOSING_TAG = /<([A-Za-z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)\s*\/>/g;
-
 /**
  * `<x … />` of a non-void element → `<x …></x>`, as the compiler does for .pdx templates. The HTML
  * parser does not honour `/>` there: it opens the element, and what follows becomes its child — a
  * component then renders its own content and the child is gone. Run once per template: the parsed
  * template is cached.
+ *
+ * One left-to-right scan, each character read once: quoted attribute values are skipped whole, so a
+ * `/>` or `>` inside one is not the end of the tag. It was a regex whose attribute part and trailing
+ * whitespace competed for the same characters, and which re-scanned to the end from every `<` after
+ * an unclosed quote — seconds on a 100 KB template (#67).
  */
 function expandSelfClosingTags(markup: string): string {
-    return markup.replace(SELF_CLOSING_TAG, (tag: string, name: string, attrs: string) =>
-        VOID_ELEMENTS.has(name.toLowerCase()) ? tag : `<${name}${attrs}></${name}>`);
+    let out = '';
+    let copied = 0;
+    let i = markup.indexOf('<');
+    while (i !== -1) {
+        let end = i + 1;
+        if (!isAsciiLetter(markup.charCodeAt(end))) { i = markup.indexOf('<', end); continue; }
+        while (end < markup.length && isTagNameChar(markup.charCodeAt(end))) end++;
+        const name = markup.slice(i + 1, end);
+        // To the `>` that closes the tag, a quoted value read as one unit.
+        let quote = '';
+        let close = end;
+        for (; close < markup.length; close++) {
+            const c = markup[close];
+            if (quote) { if (c === quote) quote = ''; }
+            else if (c === '"' || c === "'") quote = c;
+            else if (c === '>') break;
+        }
+        if (close >= markup.length) break; // an unterminated tag: the rest is left as it is
+        if (markup[close - 1] === '/' && close - 1 >= end && !VOID_ELEMENTS.has(name.toLowerCase())) {
+            out += markup.slice(copied, i) + `<${name}${markup.slice(end, close - 1).trimEnd()}></${name}>`;
+            copied = close + 1;
+        }
+        i = markup.indexOf('<', close + 1);
+    }
+    return out + markup.slice(copied);
+}
+
+/** `[A-Za-z]`, by character code. */
+function isAsciiLetter(c: number): boolean {
+    return (c >= 65 && c <= 90) || (c >= 97 && c <= 122);
+}
+
+/** `[\w-]`, by character code: what may follow the first letter of a tag name. */
+function isTagNameChar(c: number): boolean {
+    return isAsciiLetter(c) || (c >= 48 && c <= 57) || c === 95 || c === 45;
 }
 
 /** Walk all elements, find attributes with placeholders, bind values. */

@@ -116,8 +116,10 @@ function splitTop(text: string, isSep: (c: string) => boolean): string[] {
 
 function guardSelectorList(list: string, guard: string): string {
     // Keep the whitespace around the list (the source's indentation and the space before `{`).
-    const lead = list.match(/^\s*/)![0];
-    const trail = list.match(/\s*$/)![0];
+    // Measured with trimStart/trimEnd: `/\s*$/` tried from every position of a long run of
+    // whitespace, quadratic (#67).
+    const lead = list.slice(0, list.length - list.trimStart().length);
+    const trail = list.slice(list.trimEnd().length);
     const body = list.slice(lead.length, list.length - trail.length);
     const selectors = splitTop(body, (c) => c === ',').map((s) => guardSelector(s, guard));
     return lead + selectors.join(',') + trail;

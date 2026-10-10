@@ -307,11 +307,29 @@ const PATTERN_MAX_INPUT = 2000;
 /** Tighter cap when the pattern source looks vulnerable to backtracking. */
 const PATTERN_RISKY_MAX_INPUT = 100;
 
-/** Detect nested-quantifier shapes that enable catastrophic backtracking. */
-function isRiskyPattern(source: string): boolean {
-    // Group whose body ends in a quantifier, followed by another quantifier:
-    // (…+)+  (…*)*  (…+)*  (…*)+  etc. Conservative heuristic, false positives ok.
-    return /\([^)]*[+*][^)]*\)[+*]/.test(source);
+/**
+ * Detect nested-quantifier shapes that enable catastrophic backtracking: a group with a quantifier
+ * inside, quantified itself — (…+)+  (…*)*  (…+)*  (…*)+. Conservative heuristic, false positives ok.
+ *
+ * One scan, each character read once. It was itself a regex, `\([^)]*[+*][^)]*\)[+*]`, and the
+ * source it reads comes from an untrusted schema: on `((((…` it ran in quadratic time (#67). Exported
+ * for its test only; the package entry does not re-export it.
+ */
+export function isRiskyPattern(source: string): boolean {
+    let open = false;        // a `(` since the last `)`
+    let quantified = false;  // and a `+` or `*` after it
+    for (let i = 0; i < source.length; i++) {
+        const c = source[i];
+        if (c === '(') open = true;
+        else if ((c === '+' || c === '*') && open) quantified = true;
+        else if (c === ')') {
+            const next = source[i + 1];
+            if (quantified && (next === '+' || next === '*')) return true;
+            open = false;
+            quantified = false;
+        }
+    }
+    return false;
 }
 
 /**
