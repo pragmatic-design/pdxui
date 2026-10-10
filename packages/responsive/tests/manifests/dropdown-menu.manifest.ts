@@ -317,7 +317,7 @@ export const dropdownMenu: ComponentManifest = {
     isolation: {
         scenario: 'dd-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="dd"] button[aria-haspopup="menu"]', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="dd"] button[aria-haspopup="menu"]', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['letterSpacing'], themes: ['neutral'] }] },
         ],
     },
 

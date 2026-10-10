@@ -220,6 +220,7 @@ export const fieldset: ComponentManifest = {
                 selector: 'section:not([hidden]) [data-test="fieldset"] fieldset.pdx-fieldset',
                 tolerancePx: 10,
                 skipHeight: true,
+                leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }],
             },
         ],
     },

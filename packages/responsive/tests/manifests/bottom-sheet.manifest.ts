@@ -131,7 +131,7 @@ export const bottomSheet: ComponentManifest = {
         scenario: 'bottom-sheet-open',
         targets: [
             // The panel: a JS-driven height + max-width 640 → a generous overlay tolerance.
-            { selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet', tolerancePx: 12 },
+            { selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet', tolerancePx: 12, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

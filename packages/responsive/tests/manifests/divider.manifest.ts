@@ -195,7 +195,7 @@ export const divider: ComponentManifest = {
         targets: [
             // The horizontal divider must stay a thin line under hostile CSS.
             // An 8px tolerance (a pilot, to be refined).
-            { selector: 'pdx-divider[data-test="div-h"] > hr', tolerancePx: 8 },
+            { selector: 'pdx-divider[data-test="div-h"] > hr', tolerancePx: 8, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

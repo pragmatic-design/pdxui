@@ -322,7 +322,7 @@ export const navMenu: ComponentManifest = {
     isolation: {
         scenario: 'nav-menu-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="nav-menu"] .pdx-nav-item.active', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="nav-menu"] .pdx-nav-item.active', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['letterSpacing'] }] },
         ],
     },
 

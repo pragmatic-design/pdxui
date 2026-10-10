@@ -124,7 +124,7 @@ export const statistic: ComponentManifest = {
         scenario: 'statistic-basic',
         targets: [
             // A content-driven container: skip the height (= the content), assert the radius. A container tolerance.
-            { selector: 'section:not([hidden]) [data-test="stat"]', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="stat"]', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

@@ -157,7 +157,7 @@ export const avatar: ComponentManifest = {
         targets: [
             // The avatar is sized through an inline width and height: it must keep its square box
             // even under hostile global CSS. An 8px tolerance (a first pass, to be tightened).
-            { selector: 'pdx-avatar[data-test="av-md"] > span', tolerancePx: 8 },
+            { selector: 'pdx-avatar[data-test="av-md"] > span', tolerancePx: 8, leaks: [{ issue: 170, properties: ['fontFamily', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

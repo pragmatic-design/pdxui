@@ -162,7 +162,7 @@ export const buttonGroup: ComponentManifest = {
         targets: [
             // The first button must keep its height (the design system's min-height)
             // even under hostile global CSS. A 10px tolerance.
-            { selector: 'pdx-button-group[data-test="bg"] [data-test="bg-first"] button', tolerancePx: 10 },
+            { selector: 'pdx-button-group[data-test="bg"] [data-test="bg-first"] button', tolerancePx: 10, leaks: [{ issue: 170, properties: ['letterSpacing'], themes: ['neutral'] }] },
         ],
     },
 

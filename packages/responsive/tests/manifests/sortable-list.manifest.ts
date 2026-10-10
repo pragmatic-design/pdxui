@@ -176,7 +176,7 @@ export const sortableList: ComponentManifest = {
     isolation: {
         scenario: 'sortable-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="sortable"] .pdx-sortable-list', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="sortable"] .pdx-sortable-list', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

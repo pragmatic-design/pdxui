@@ -315,7 +315,7 @@ export const toolbar: ComponentManifest = {
     isolation: {
         scenario: 'toolbar-bordered',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="toolbar-bordered"]', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="toolbar-bordered"]', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

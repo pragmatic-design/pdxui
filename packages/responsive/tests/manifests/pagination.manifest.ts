@@ -169,7 +169,7 @@ export const pagination: ComponentManifest = {
         scenario: 'pagination-basic',
         targets: [
             // The page button keeps its min-height even under hostile global CSS.
-            { selector: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-current="page"]', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-current="page"]', tolerancePx: 10, leaks: [{ issue: 170, properties: ['letterSpacing'] }] },
         ],
     },
 

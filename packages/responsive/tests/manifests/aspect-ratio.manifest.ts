@@ -136,7 +136,7 @@ export const aspectRatio: ComponentManifest = {
         targets: [
             // Height = derived from the aspect-ratio + width (content/parent-driven): skip height;
             // the invariant is the ratio (checked in the contract), not an absolute height.
-            { selector: 'section:not([hidden]) [data-test="ar-16-9"]', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="ar-16-9"]', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

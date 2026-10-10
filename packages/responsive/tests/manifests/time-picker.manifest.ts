@@ -152,7 +152,7 @@ export const timePicker: ComponentManifest = {
     isolation: {
         scenario: 'time-picker-default',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-picker', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-picker', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

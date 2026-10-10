@@ -175,6 +175,21 @@ app with a theme picker wants. The base goes in once either way. Both halves are
 where the `@layer` declaration lives, and that declaration is what makes **your** unlayered CSS beat
 everything the design system ships, with no `!important` anywhere.
 
+That is also why a global stylesheet you did not write for PDX — a CMS theme, an old reset, a
+`button { … }` meant for the rest of the page — restyles the components: unlayered, it wins. To keep
+it away from them, put it in a layer declared **before** the design system's:
+
+```css
+@layer host, pdx;                        /* first, before @pdxui/design is loaded */
+@import url('legacy.css') layer(host);
+```
+
+Then nothing the design system declares can be overridden by it. The certification measures this
+contract on every component (style isolation, on `neutral` and `material`). One gap remains today:
+text properties a component inherits from `<body>` instead of declaring them (colour, font, line
+height, letter spacing) are still reached by a bare element rule in that layer. Each manifest lists
+those leaks, and they are being closed.
+
 **The component styles are not in `base`.** Each component imports its own — `@pdxui/ui/data-grid`
 brings `@pdxui/design/components/data-grid` with it — so an app ships the styles of what it
 renders. You write nothing: the compiler already auto-imports the components your templates use, and

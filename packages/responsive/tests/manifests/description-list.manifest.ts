@@ -176,7 +176,7 @@ export const descriptionList: ComponentManifest = {
         scenario: 'description-list-basic',
         targets: [
             // A content-driven container (key-value rows): skip height, assert radius/width/border.
-            { selector: 'section:not([hidden]) [data-test="dl"] .pdx-dl', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="dl"] .pdx-dl', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

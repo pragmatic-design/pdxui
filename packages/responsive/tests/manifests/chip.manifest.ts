@@ -168,7 +168,7 @@ export const chip: ComponentManifest = {
         scenario: 'chip-variants',
         targets: [
             // A box-sizing defence in chip.css; the residue comes from a pathological host on a tiny atom.
-            { selector: '[data-test="default"] .pdx-chip', tolerancePx: 14 },
+            { selector: '[data-test="default"] .pdx-chip', tolerancePx: 14, leaks: [{ issue: 170, properties: ['fontFamily', 'letterSpacing'] }] },
         ],
     },
 

@@ -234,7 +234,7 @@ export const autocomplete: ComponentManifest = {
     isolation: {
         scenario: 'autocomplete-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="ac"] .pdx-autocomplete', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="ac"] .pdx-autocomplete', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

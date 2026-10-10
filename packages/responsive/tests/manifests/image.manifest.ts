@@ -246,7 +246,7 @@ export const image: ComponentManifest = {
             // The height is derived from the aspect-ratio + width (content/parent-driven): skipHeight;
             // the invariant is the ratio (checked in the contract), not an absolute height.
             // The wrapper is the stable visual box; a wide tolerance for the drift across operating systems.
-            { selector: 'section:not([hidden]) [data-test="image"] .pdx-img-wrapper', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="image"] .pdx-img-wrapper', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

@@ -225,6 +225,7 @@ export const toast: ComponentManifest = {
                 selector: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1)',
                 tolerancePx: 2,
                 skipHeight: true,
+                leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }],
             },
         ],
     },

@@ -190,7 +190,7 @@ export const tooltip: ComponentManifest = {
     isolation: {
         scenario: 'tooltip-top',
         targets: [
-            { selector: '[data-test="trigger"]', tolerancePx: 6 },
+            { selector: '[data-test="trigger"]', tolerancePx: 6, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

@@ -151,7 +151,7 @@ export const segmented: ComponentManifest = {
     isolation: {
         scenario: 'segmented-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor', 'height'] }] },
         ],
     },
 

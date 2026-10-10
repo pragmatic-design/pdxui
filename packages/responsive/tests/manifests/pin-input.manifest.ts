@@ -181,7 +181,7 @@ export const pinInput: ComponentManifest = {
     isolation: {
         scenario: 'pin-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="pin"] .pdx-otp-cell:first-of-type', tolerancePx: 6 },
+            { selector: 'section:not([hidden]) [data-test="pin"] .pdx-otp-cell:first-of-type', tolerancePx: 6, leaks: [{ issue: 170, properties: ['lineHeight', 'letterSpacing'] }] },
         ],
     },
 

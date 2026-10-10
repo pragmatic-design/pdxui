@@ -198,6 +198,7 @@ export const autoForm: ComponentManifest = {
                 selector: 'section:not([hidden]) [data-test="af"] .pdx-auto-form',
                 tolerancePx: 10,
                 skipHeight: true,
+                leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }],
             },
         ],
     },

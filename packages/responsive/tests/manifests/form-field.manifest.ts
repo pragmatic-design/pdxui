@@ -290,7 +290,7 @@ export const formField: ComponentManifest = {
             // the host's font and line-height poisoned by the hostile CSS → skipHeight (as for card and dialog).
             // The wrapper has no radius or border of its own (.pdx-form-field has none): it asserts only
             // the width's integrity, which the runner checks by default.
-            { selector: 'section:not([hidden]) [data-test="field"] .pdx-form-field', skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="field"] .pdx-form-field', skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

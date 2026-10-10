@@ -146,7 +146,7 @@ export const searchInput: ComponentManifest = {
     isolation: {
         scenario: 'search-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="search"] .pdx-input-wrap', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="search"] .pdx-input-wrap', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

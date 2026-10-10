@@ -179,7 +179,7 @@ export const dialog: ComponentManifest = {
         targets: [
             // A modal panel: it has transform:scale() (so getBoundingClientRect is scaled) and it is
             // content-driven → the height is NOT a clean invariant (skipHeight). The radius stays asserted (it is stable).
-            { selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel', tolerancePx: 2, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel', tolerancePx: 2, skipHeight: true, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

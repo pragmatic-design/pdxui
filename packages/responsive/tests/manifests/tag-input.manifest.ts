@@ -145,7 +145,7 @@ export const tagInput: ComponentManifest = {
     isolation: {
         scenario: 'tag-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

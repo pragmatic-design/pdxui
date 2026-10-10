@@ -134,7 +134,7 @@ export const banner: ComponentManifest = {
         targets: [
             // Defences for box-sizing+line-height+border in banner.css; a ~11px residue from a
             // pathological host (`div{line-height:2.2}`) on a flex container. Tolerance 14.
-            { selector: 'section:not([hidden]) [data-test="banner-info"] .pdx-banner', tolerancePx: 14 },
+            { selector: 'section:not([hidden]) [data-test="banner-info"] .pdx-banner', tolerancePx: 14, leaks: [{ issue: 170, properties: ['fontFamily', 'letterSpacing'] }] },
         ],
     },
 

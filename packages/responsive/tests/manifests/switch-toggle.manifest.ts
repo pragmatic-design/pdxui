@@ -239,7 +239,7 @@ export const switchToggle: ComponentManifest = {
     isolation: {
         scenario: 'switch-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="switch-on"] .pdx-toggle', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="switch-on"] .pdx-toggle', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

@@ -173,7 +173,7 @@ export const fieldList: ComponentManifest = {
             // host values poisoned by the hostile CSS) → skipHeight (as for list, form-field and card). The wrapper has
             // no radius or border of its own (.pdx-field-list is only a flex column): what stays asserted is the
             // width's integrity, which the runner checks by default.
-            { selector: 'section:not([hidden]) [data-test="field-list"] .pdx-field-list', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="field-list"] .pdx-field-list', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

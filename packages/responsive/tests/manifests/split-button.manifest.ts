@@ -261,7 +261,7 @@ export const splitButton: ComponentManifest = {
     isolation: {
         scenario: 'split-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-primary', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-primary', tolerancePx: 10, leaks: [{ issue: 170, properties: ['letterSpacing'], themes: ['neutral'] }] },
         ],
     },
 

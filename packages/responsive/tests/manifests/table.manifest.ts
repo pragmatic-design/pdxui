@@ -127,7 +127,7 @@ export const table: ComponentManifest = {
     isolation: {
         scenario: 'table-basic',
         targets: [
-            { selector: '[data-test="table"]', tolerancePx: 6 },
+            { selector: '[data-test="table"]', tolerancePx: 6, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'letterSpacing'] }] },
         ],
     },
 

@@ -163,7 +163,7 @@ export const badge: ComponentManifest = {
         targets: [
             // The box-sizing and border defences in feedback.css keep the drift to 11px. What is left
             // comes from a pathological host (`span{line-height:2.2}`) on a tiny atom: tolerance 14.
-            { selector: '[data-test="primary"] .pdx-badge', tolerancePx: 14 },
+            { selector: '[data-test="primary"] .pdx-badge', tolerancePx: 14, leaks: [{ issue: 170, properties: ['fontFamily', 'letterSpacing'] }] },
         ],
     },
 

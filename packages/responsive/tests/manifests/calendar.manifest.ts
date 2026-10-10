@@ -323,7 +323,7 @@ export const calendar: ComponentManifest = {
     isolation: {
         scenario: 'calendar-month',
         targets: [
-            { selector: `${ROOT} .pdx-calendar`, tolerancePx: 10, skipHeight: true },
+            { selector: `${ROOT} .pdx-calendar`, tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

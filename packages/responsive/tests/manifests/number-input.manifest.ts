@@ -164,7 +164,7 @@ export const numberInput: ComponentManifest = {
     isolation: {
         scenario: 'number-input-both',
         targets: [
-            { selector: '[data-test="number-both"] .pdx-input-wrap', tolerancePx: 6 },
+            { selector: '[data-test="number-both"] .pdx-input-wrap', tolerancePx: 6, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

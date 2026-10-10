@@ -193,7 +193,7 @@ export const tab: ComponentManifest = {
             // A 10px tolerance: the tab is a CSS-only <button> (flex). The defensive fix
             // (line-height + box-sizing in tabs.css) brought the drift under hostile CSS
             // down from ~44px to ~8px; the smaller remainder, from aggressive host resets, is acceptable.
-            { selector: '[data-test="tab-active"]', tolerancePx: 10 },
+            { selector: '[data-test="tab-active"]', tolerancePx: 10, leaks: [{ issue: 170, properties: ['fontFamily', 'letterSpacing'] }] },
         ],
     },
 

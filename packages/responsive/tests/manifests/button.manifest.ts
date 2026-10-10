@@ -316,7 +316,7 @@ export const button: ComponentManifest = {
         targets: [
             // The button must keep its height (the design system's min-height)
             // even under hostile global CSS. A generous tolerance for the pilot: to be tightened.
-            { selector: '[data-test="primary"] button', tolerancePx: 6 },
+            { selector: '[data-test="primary"] button', tolerancePx: 6, leaks: [{ issue: 170, properties: ['letterSpacing'], themes: ['neutral'] }] },
         ],
     },
 

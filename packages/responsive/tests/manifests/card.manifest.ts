@@ -261,7 +261,7 @@ export const card: ComponentManifest = {
             // reflows and the height follows (which is legitimate, not a containment failure). The height drift
             // is stronger on Linux/Docker (~19px) than on Windows. Skip the height; the radius and the border stay
             // asserted as the real immunity guarantee (as for dialog and alert-dialog).
-            { selector: 'section:not([hidden]) [data-test="card"] .pdx-surface-card', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="card"] .pdx-surface-card', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

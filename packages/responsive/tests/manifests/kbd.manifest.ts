@@ -120,7 +120,7 @@ export const kbd: ComponentManifest = {
     isolation: {
         scenario: 'kbd-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="kbd-single"] .pdx-kbd', tolerancePx: 8 },
+            { selector: 'section:not([hidden]) [data-test="kbd-single"] .pdx-kbd', tolerancePx: 8, leaks: [{ issue: 170, properties: ['fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

@@ -173,7 +173,7 @@ export const list: ComponentManifest = {
         scenario: 'list-basic',
         targets: [
             // A content-driven container (items): skip height, assert width/radius/border (host).
-            { selector: 'section:not([hidden]) [data-test="list"]', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="list"]', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 
