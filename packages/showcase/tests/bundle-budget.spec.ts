@@ -131,7 +131,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // (first-paint.spec.ts, #31) — and the sum counts them. 87.7 KB measured.
 // entry 34 → 35: `@prefetch 'viewport'` is a policy the router now has (#42) — one shared
 // IntersectionObserver in `<pdx-link>`, which every page's links need. 34.1 KB measured.
-const BUDGET_KB = { entry: 35, js: 362, css: 59, blocking: 88 };
+// blocking 88 → 89: html``'s self-closing expansion and the router's route-pattern compiler are
+// scans now, not one-line regexes that ran in polynomial time and, in the router, escaped only the
+// slashes of a path (#67). A few hundred bytes of code before the first paint. 88.1 KB measured.
+const BUDGET_KB = { entry: 35, js: 362, css: 59, blocking: 89 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
