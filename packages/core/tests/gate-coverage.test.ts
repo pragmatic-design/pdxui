@@ -106,29 +106,114 @@ describe('the suites exist and are reachable in one command', () => {
     });
 });
 
-describe('a gate runs them', () => {
-    it('CI runs `pnpm test`, not only `pnpm coverage`', () => {
-        expect(quality, 'no workflow step runs the suites').toMatch(/run:\s*pnpm test\b/);
+/** The packages a `pnpm -r … --filter …` script names, as `include` and `exclude` lists. */
+function filtersOf(script: string): { include: string[]; exclude: string[] } {
+    return {
+        include: [...script.matchAll(/--filter[= ](?!!)(\S+)/g)].map(m => m[1]),
+        exclude: [...script.matchAll(/--filter=!(\S+)/g)].map(m => m[1]),
+    };
+}
+
+/** The ids of the jobs under `jobs:` in a workflow — two-space indented keys. */
+function jobIds(workflow: string): string[] {
+    const jobs = workflow.slice(workflow.indexOf('\njobs:'));
+    return [...jobs.matchAll(/^ {2}([\w-]+):\s*$/gm)].map(m => m[1]);
+}
+
+/** A job's body, from its key to the next job, comment lines dropped: what CI executes. */
+function jobBody(workflow: string, id: string): string {
+    const start = workflow.indexOf(`\n  ${id}:`);
+    expect(start, `no job \`${id}\``).toBeGreaterThan(-1);
+    const rest = workflow.slice(start + 1);
+    const next = rest.slice(1).search(/\n {2}[\w-]+:\s*\n/);
+    return (next === -1 ? rest : rest.slice(0, next + 1))
+        .split('\n').filter(l => !l.trim().startsWith('#')).join('\n');
+}
+
+// CI runs `pnpm test`'s suites as parallel jobs (#60): one job ran them one after another for 35
+// minutes. What must not come undone is the property — every suite `pnpm test` runs, CI runs —
+// so it is asserted package by package, not as the presence of one command.
+describe('CI runs every suite `pnpm test` runs', () => {
+    const unit = filtersOf(rootPkg.scripts['test:unit']);
+    const uncovered = filtersOf(rootPkg.scripts['test:unit:uncovered'] ?? '');
+    const covered = filtersOf(rootPkg.scripts.coverage).include;
+    const browser = filtersOf(rootPkg.scripts['test:browser']).include;
+    const executed = jobIds(quality).map(id => jobBody(quality, id)).join('\n');
+
+    it('the unit half: `coverage` runs four packages, `test:unit:uncovered` everything else', () => {
+        expect(covered.length, 'coverage names no package').toBeGreaterThan(0);
+        expect(uncovered.include, 'the uncovered half names packages to INCLUDE, so a new one joins no gate').toEqual([]);
+        // Exactly what test:unit excludes, plus exactly what coverage runs: nothing in neither.
+        expect([...uncovered.exclude].sort()).toEqual([...unit.exclude, ...covered].sort());
+        expect(executed, 'no job runs the coverage packages').toMatch(/run:\s*pnpm coverage\b/);
+        expect(executed, 'no job runs the rest of the unit half').toMatch(/run:\s*pnpm test:unit:uncovered\b/);
     });
 
-    it('the pre-push hook runs them too, and before the slower certify', () => {
+    it('the browser half: every package of `test:browser` is run by a job', () => {
+        expect(browser.length, 'test:browser names no package').toBeGreaterThan(0);
+        const missing = browser.filter(name => !executed.includes(`--filter ${name} `));
+        expect(missing, 'these browser suites run in `pnpm test` and in no CI job').toEqual([]);
+    });
+
+    it('a sharded suite runs every shard', () => {
+        // A matrix that lists 1/3 and 3/3 and forgets 2/3 runs a third of the suite fewer, green.
+        for (const m of executed.matchAll(/--filter (\S+) exec playwright test (.*?)--shard=(\d+)\/(\d+)/g)) {
+            const [, pkg, config, , total] = m;
+            const seen = [...executed.matchAll(new RegExp(`--filter ${pkg} exec playwright test ${config.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}--shard=(\\d+)/${total}`, 'g'))]
+                .map(s => Number(s[1])).sort((a, b) => a - b);
+            expect(seen, `${pkg} is split in ${total} and runs shards ${seen.join(', ')}`)
+                .toEqual(Array.from({ length: Number(total) }, (_, i) => i + 1));
+        }
+    });
+
+    it('the builder job runs both its suites', () => {
+        const builder = jobBody(quality, 'builder');
+        expect(builder).toContain('test:e2e');
+        expect(builder).toContain('test:static');
+    });
+
+    // The ruleset requires the check by NAME. Split into jobs, the gate is only as good as the one
+    // carrying that name: it must wait for every other job and fail when any did not succeed.
+    it('the required check waits for every job and fails on any', () => {
+        const ids = jobIds(quality);
+        const gate = ids.find(id => jobBody(quality, id).includes('name: build · typecheck · lint · test · coverage'));
+        expect(gate, 'no job carries the name the ruleset requires').toBeDefined();
+        const body = jobBody(quality, gate!);
+        const needs = /needs:\s*\[([^\]]*)\]/.exec(body)?.[1].split(',').map(s => s.trim()) ?? [];
+        expect([...needs].sort(), 'jobs the required check does not wait for')
+            .toEqual(ids.filter(id => id !== gate).sort());
+        expect(body, 'a failed job would SKIP the required check, and a skipped check reads as passed')
+            .toMatch(/if:\s*always\(\)/);
+        expect(body, 'the required check does not read the results of the jobs it waits for')
+            .toContain('needs.*.result');
+    });
+});
+
+describe('the pre-push', () => {
+    it('runs the suites, before anything slower', () => {
         expect(prePush).toContain('pnpm test');
-        expect(
-            prePush.indexOf('pnpm test'),
-            'certify takes minutes; the cheaper gate must fail first',
-        ).toBeLessThan(prePush.indexOf('pnpm certify'));
+        expect(prePush.indexOf('pnpm test'), 'the cheaper gate must fail first')
+            .toBeLessThan(prePush.indexOf('pnpm certify'));
     });
 
-    // Dim 5 in CI only, and in no local gate, lets a change move dozens of screenshots with no red
-    // seen. It runs before a push when Docker answers, and says so and carries on when it does
-    // not — a machine without Docker still pushes.
-    it('the pre-push runs the visual certification, last and only with Docker', () => {
-        expect(prePush, 'the visual dimension is in no local gate').toContain('pnpm certify:visual');
-        const certify = prePush.search(/^\s*pnpm certify\s*$/m);
-        expect(certify, 'no line runs `pnpm certify` on its own').toBeGreaterThan(-1);
-        expect(prePush.indexOf('pnpm certify:visual'), 'the slowest phase runs last').toBeGreaterThan(certify);
-        expect(prePush, 'no way to skip a Docker phase').toContain('PDX_SKIP_VISUAL');
+    // Certification left the default pre-push (#60): 25 minutes a push that CI spent again. It is
+    // still one variable away, and certify.yml must then run on every change — otherwise a change
+    // to core, which every component is built on, would be certified nowhere.
+    it('certifies only when asked, and then visual last and only with Docker', () => {
+        expect(prePush, 'no way to certify before a push').toContain('PDX_CERTIFY');
+        expect(prePush.indexOf('PDX_CERTIFY'), 'certify runs before the opt-in is read')
+            .toBeLessThan(prePush.search(/^\s*pnpm certify\s*$/m));
+        expect(prePush.indexOf('pnpm certify:visual'), 'the slowest phase runs last')
+            .toBeGreaterThan(prePush.search(/^\s*pnpm certify\s*$/m));
         expect(prePush, 'nothing asks whether Docker answers').toMatch(/docker info/);
+    });
+
+    it('…because CI certifies every change', () => {
+        const certifyYml = readFileSync(join(workflows, 'certify.yml'), 'utf-8');
+        const triggers = certifyYml.slice(certifyYml.indexOf('\non:'), certifyYml.indexOf('\npermissions:'));
+        expect(triggers, 'certify.yml no longer runs on pull requests').toContain('pull_request');
+        expect(triggers, 'a path filter leaves core and compiler changes uncertified')
+            .not.toMatch(/^\s+paths(-ignore)?:/m);
     });
 });
 

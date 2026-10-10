@@ -269,9 +269,9 @@ on.
 ## How we know it works
 
 A framework that writes your wiring has to be more reliable than the wiring it replaces. Every push
-runs the whole gate on the machine it comes from; CI runs the suites again on every pull request, and
-the certification on every pull request that touches the components, the design system or the
-certification itself. The last full run was **21,901 tests**:
+runs the type check, the lint and every suite on the machine it comes from; CI runs the suites again
+on every pull request, and the component certification on every pull request too. The last full run
+was **21,901 tests**:
 
 - **11,833 unit tests** across the compiler, the runtime, the router, the language server, the
   components and the CLI, and **23 benchmarks**, among them one that keeps compile time linear in the

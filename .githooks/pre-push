@@ -1,20 +1,27 @@
 #!/bin/sh
-# Pre-push gate. Four phases, fastest to slowest (fail-fast):
+# Pre-push gate. Fastest to slowest (fail-fast):
 #   1) Quality outside the UI: typecheck + lint (core·compiler·router·ui·lsp·cli·design engine)  (seconds)
-#   2) The suites: pnpm test, every package                          (~1 minute)
-#   3) UI component certification (Dim 1-4) + the behavior suite     (minutes)
-#   4) Visual regression (Dim 5) in the container, if Docker answers  (~2 minutes)
+#   2) The suites: pnpm test, every package                          (minutes)
+#   2b) The compiler benchmarks, alone                               (seconds)
+#   3) Only with PDX_CERTIFY=1: component certification (Dim 1-4) and, when Docker answers, the
+#      visual regression (Dim 5)
 #
-# Phase 2 is the only gate that runs every package's suite: `pnpm coverage` filters on four
-# packages, so without it ui, cli and design would be covered by no gate at all. It is cheaper
-# than certify and runs first.
+# Phase 2 is the only local gate that runs every package's suite: `pnpm coverage` filters on four
+# packages, so without it ui, cli and design would be covered by no gate at all.
+#
+# Certification is CI's, by default. It ran here too, and with it a push took about 25 minutes
+# that CI then spent again (#60). certify.yml runs Dim 1-5 on every pull request, with no path
+# filter, so every change is certified before it can be merged. Set PDX_CERTIFY=1 to run it here
+# first — worth it for a change to a component's look or geometry, where a red seen before the
+# push saves a round trip.
 #
 # Skipping:
 #   - Skip everything once:          git push --no-verify
 #   - Skip quality only (env):       PDX_SKIP_QUALITY=1
 #   - Skip the suites only (env):    PDX_SKIP_TESTS=1
-#   - Skip certify only (env):       PDX_SKIP_CERTIFY=1
-#   - Skip the visual only (env):    PDX_SKIP_VISUAL=1
+#   - Skip the benchmarks (env):     PDX_SKIP_PERF=1
+# Adding:
+#   - Certify before the push (env): PDX_CERTIFY=1   (and PDX_SKIP_VISUAL=1 to leave out Dim 5)
 
 # ── Phase 1: quality (typecheck + lint) on core·compiler·router·ui·lsp·cli·vscode·design engine ──
 if [ "$PDX_SKIP_QUALITY" = "1" ]; then
@@ -49,25 +56,23 @@ else
     echo "[pre-push] OK: benchmarks."
 fi
 
-# ── Phase 3: component certification (Dim 1-4 + the behavior suite) ──
-if [ "$PDX_SKIP_CERTIFY" = "1" ]; then
-    echo "[pre-push] PDX_SKIP_CERTIFY=1 -> certification skipped"
-else
-    echo "[pre-push] Component certification: pnpm certify  (skip with: PDX_SKIP_CERTIFY=1)"
-    pnpm certify
-    status=$?
-    if [ $status -ne 0 ]; then
-        echo "[pre-push] FAILED: a component regression. Push blocked. (override: git push --no-verify)"
-        exit $status
-    fi
-    echo "[pre-push] OK: components certified."
+# ── Phase 3: certification, only when asked ──
+if [ "$PDX_CERTIFY" != "1" ]; then
+    echo "[pre-push] Certification is left to CI (certify.yml, every pull request). PDX_CERTIFY=1 runs it here first."
+    exit 0
 fi
 
-# ── Phase 4: visual regression (Dim 5, Docker) ──
-#
-# A visual check that runs only in CI lets screenshots change without a red anyone sees, so it
-# runs before the push when Docker answers; when the daemon is not there it says so and carries
-# on, so a machine without Docker can still push.
+echo "[pre-push] Component certification: pnpm certify"
+pnpm certify
+status=$?
+if [ $status -ne 0 ]; then
+    echo "[pre-push] FAILED: a component regression. Push blocked. (override: git push --no-verify)"
+    exit $status
+fi
+echo "[pre-push] OK: components certified."
+
+# Dim 5 needs the container: when the daemon is not there it says so and carries on, so a machine
+# without Docker can still push with PDX_CERTIFY=1.
 if [ "$PDX_SKIP_VISUAL" = "1" ]; then
     echo "[pre-push] PDX_SKIP_VISUAL=1 -> visual regression skipped"
     exit 0
