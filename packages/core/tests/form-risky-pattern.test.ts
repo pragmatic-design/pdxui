@@ -22,8 +22,12 @@ describe('isRiskyPattern', () => {
     }
 
     it('agrees with the regex it replaced on a spread of shapes', () => {
-        const old = (s: string) => /\([^)]*[+*][^)]*\)[+*]/.test(s);
-        const shapes = ['(a+)+', '(a)(b+)+', '((a+)b)+', '(a+)(b)+', 'x(y*)*z', '(*)+', '(+)', 'a)+', '((+)', '(a+))+'];
-        for (const s of shapes) expect(isRiskyPattern(s), s).toBe(old(s));
+        // Its answers, computed once from it — not a copy of the polynomial regex, which code
+        // scanning would report here as well.
+        const oldAnswers: [string, boolean][] = [
+            ['(a+)+', true], ['(a)(b+)+', true], ['((a+)b)+', false], ['(a+)(b)+', false], ['x(y*)*z', true],
+            ['(*)+', true], ['(+)', false], ['a)+', false], ['((+)', false], ['(a+))+', false],
+        ];
+        for (const [s, old] of oldAnswers) expect(isRiskyPattern(s), s).toBe(old);
     });
 });

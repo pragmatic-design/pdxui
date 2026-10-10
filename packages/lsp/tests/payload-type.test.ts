@@ -6,7 +6,14 @@
 import { describe, it, expect } from 'vitest';
 import { isSelfContainedType } from '../src/utils/payload-type';
 
-const OLD = /^(?:[\s{}[\]:;,|?'"]|string|number|boolean|null|undefined|'[^']*'|"[^"]*"|\d+|[a-z_$][\w$]*(?=\??\s*:))*$/;
+/**
+ * What the replaced regex answered on these shapes, computed once from it. Its answers, not a copy
+ * of it: a copy kept here is the same exponential regex, and CodeQL reports it here too (#150).
+ */
+const OLD_ANSWERS: [string, boolean][] = [
+    ['{ a: 1, b: "x" }', true], ['{ a: b }', false], ['{a:{b:{c:number}}}', true], ["'x'|'y'|null", true],
+    ['string[]', true], ['{ id : number }', true], ['x', false], ['undefined | string', true], ['1234567890', true],
+];
 
 describe('isSelfContainedType', () => {
     for (const type of ['number', '{ id: number }', "'a' | 'b'", '{ id?: string; tags: string[] }', '42', 'null', '{ "x": 1 }', '[number, string]']) {
@@ -17,13 +24,11 @@ describe('isSelfContainedType', () => {
     }
 
     it('agrees with the regex it replaced, on its accepted and refused shapes', () => {
-        const shapes = ['{ a: 1, b: "x" }', '{ a: b }', '{a:{b:{c:number}}}', "'x'|'y'|null", 'string[]', '{ id : number }', 'x', 'undefined | string', '1234567890'];
-        for (const s of shapes) expect(isSelfContainedType(s), s).toBe(OLD.test(s));
+        for (const [s, old] of OLD_ANSWERS) expect(isSelfContainedType(s), s).toBe(old);
     });
 
     it('control — an unterminated quote is refused, where the regex let a lone quote through', () => {
         // The one place the two differ, on purpose: `'` alone matched the regex's character class.
-        expect(OLD.test("'")).toBe(true);
         expect(isSelfContainedType("'")).toBe(false);
     });
 });
