@@ -173,6 +173,13 @@ The codegen's sub-modules each own one responsibility:
 - **codegen-styles.ts**: applies CSS scoping with `[data-pdx-HASH]` and handles `bind()` → `var()`
 - **codegen-template-inline.ts**: an alternative production mode that emits imperative DOM instead of `html\`\``
 
+Every value the codegen writes into the generated JavaScript as a string goes through
+`compiler/js-literal.ts`: `jsString` for a JSON value, `jsQuote` where the code has always been
+single-quoted. Both escape the quotes, the backslash, line breaks, `<`, `>` and U+2028/U+2029, so a
+`'` in a `@require` permission or a `</script>` in an attribute stays text. A value pasted between
+quotes by hand can leave its string; what is written without either helper is code by intent, such
+as a template expression or a name the compiler made itself.
+
 ### Stage 6 — DTS generation
 
 **File**: `compiler/dts-generator.ts` (114 lines)

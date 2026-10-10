@@ -12,6 +12,7 @@ import { extractBlock } from './script-analyzer-helpers';
 import type { analyzeScript } from './script-analyzer';
 import type { ValidationWarning } from './validate';
 import { originMark, ORIGIN_PREFIX } from './sourcemap';
+import { jsQuote, jsString } from './js-literal';
 
 // ─── Template-literal escaping ─────────────────────────────────────
 
@@ -129,7 +130,7 @@ export function routeLayout(declared: string | undefined, fallback: string | und
  * nothing. The caller passes a file in development builds only.
  */
 export function sourceFileOption(sourceFile: string | null | undefined): string {
-    return sourceFile ? `  file: ${JSON.stringify(sourceFile)},\n` : '';
+    return sourceFile ? `  file: ${jsString(sourceFile)},\n` : '';
 }
 
 // ─── Route loaders ─────────────────────────────────────────────────
@@ -281,11 +282,11 @@ export function assembleModule(
     const coreImports = Array.from(imports).sort().join(', ');
     let code = `import { ${coreImports} } from '@pdxui/core';\n`;
     if (userImports.length > 0) code += userImports.join('\n') + '\n';
-    for (const path of layoutImports) code += `import '${path}';\n`;
+    for (const path of layoutImports) code += `import ${jsQuote(path)};\n`;
     code += '\n';
     code += generateStyles(descriptor, filename, production);
     code += hoistedLoader;
-    code += `component('${tag}', {\n`;
+    code += `component(${jsQuote(tag)}, {\n`;
     code += `  props: ${propsCode},\n`;
     code += sourceFileOption(sourceFile);
     // Shadow DOM opt-in via <template shadow>
@@ -309,21 +310,21 @@ export function assembleModule(
 
     // Auto-register route from @page declaration — zero manual createRouter() needed
     if (route?.page) {
-        const routeParts: string[] = [`path:${JSON.stringify(route.page)}`, `tag:${JSON.stringify(tag)}`];
-        if (route.guard) routeParts.push(`guard:${JSON.stringify(route.guard)}`);
-        if (route.scroll) routeParts.push(`scroll:${JSON.stringify(route.scroll)}`);
+        const routeParts: string[] = [`path:${jsString(route.page)}`, `tag:${jsString(tag)}`];
+        if (route.guard) routeParts.push(`guard:${jsString(route.guard)}`);
+        if (route.scroll) routeParts.push(`scroll:${jsString(route.scroll)}`);
         if (route.keepAlive !== undefined) routeParts.push(`keepAlive:${route.keepAlive}`);
         if (route.preload) routeParts.push(`preload:true`);
         // The REFERENCE, not the name: the router calls this. The string would make
         // `config.loader()` a call on a string and the whole feature unreachable.
         if (loaderRef) routeParts.push(`loader:${loaderRef}`);
-        if (route.prefetch) routeParts.push(`prefetch:${JSON.stringify(route.prefetch)}`);
-        if (route.transition) routeParts.push(`transition:${JSON.stringify(route.transition)}`);
+        if (route.prefetch) routeParts.push(`prefetch:${jsString(route.prefetch)}`);
+        if (route.transition) routeParts.push(`transition:${jsString(route.transition)}`);
         // The RESOLVED chain, not the name: the outlet diffs the chain, and nothing reads the
         // unresolved name.
         const chain = route.layouts && route.layouts.length > 0 ? route.layouts : layoutTags;
         if (chain.length > 0) {
-            routeParts.push(`layouts:[${chain.map(l => JSON.stringify(l)).join(',')}]`);
+            routeParts.push(`layouts:[${chain.map(l => jsString(l)).join(',')}]`);
         }
         // Nested routes: this page is a PARENT only if it renders a child outlet.
         //
@@ -348,25 +349,25 @@ export function assembleModule(
         // The REFERENCE for a function label, the string for a written one — never the function's
         // NAME as a string, which no runtime can call.
         if (labelRef) routeParts.push(`label:${labelRef}`);
-        else if (route.label) routeParts.push(`label:${JSON.stringify(route.label)}`);
+        else if (route.label) routeParts.push(`label:${jsString(route.label)}`);
         // A dictionary key: data, like the scanned table's, so the two agree.
-        if (route.labelKey) routeParts.push(`labelKey:${JSON.stringify(route.labelKey)}`);
-        if (route.redirectTo) routeParts.push(`redirect:${JSON.stringify(route.redirectTo)}`);
-        if (route.meta) routeParts.push(`meta:${JSON.stringify(route.meta)}`);
+        if (route.labelKey) routeParts.push(`labelKey:${jsString(route.labelKey)}`);
+        if (route.redirectTo) routeParts.push(`redirect:${jsString(route.redirectTo)}`);
+        if (route.meta) routeParts.push(`meta:${jsString(route.meta)}`);
         if (route.outlets && route.outlets.length > 0) {
-            routeParts.push(`outlets:[${route.outlets.map((o: { name: string; tag: string }) => `{name:${JSON.stringify(o.name)},tag:${JSON.stringify(o.tag)}}`).join(',')}]`);
+            routeParts.push(`outlets:[${route.outlets.map((o: { name: string; tag: string }) => `{name:${jsString(o.name)},tag:${jsString(o.tag)}}`).join(',')}]`);
         }
         // Param constraints extracted from path: :id(number) → { id: 'number' }
         const constraintParts: string[] = [];
         const constraintRegex = /:(\w+)\(([^)]+)\)/g;
         let cm: RegExpExecArray | null;
         while ((cm = constraintRegex.exec(route.page!)) !== null) {
-            constraintParts.push(`${cm[1]}:${JSON.stringify(cm[2])}`);
+            constraintParts.push(`${cm[1]}:${jsString(cm[2])}`);
         }
         if (constraintParts.length > 0) routeParts.push(`paramConstraints:{${constraintParts.join(',')}}`);
         // @params { id: number } — typed route params for coercion
         if (route.params && route.params.length > 0) {
-            const typeParts = route.params.map((p: { name: string; type: string }) => `${p.name}:${JSON.stringify(p.type)}`);
+            const typeParts = route.params.map((p: { name: string; type: string }) => `${p.name}:${jsString(p.type)}`);
             routeParts.push(`paramTypes:{${typeParts.join(',')}}`);
         }
         // Lazy loading: include file path for dynamic import()
@@ -376,7 +377,7 @@ export function assembleModule(
             const basename = filename.replace(/\\/g, '/').split('/').pop() ?? filename;
             routeParts.push(`file:'./${basename}'`);
         }
-        code += `\n// Auto-route: @page '${route.page}'\n`;
+        code += `\n// Auto-route: @page ${jsQuote(route.page)}\n`;
         code += `if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];\n`;
         // HMR-safe push: replace any existing route for the same path instead of
         // appending a duplicate on module re-execution.
@@ -389,7 +390,7 @@ export function assembleModule(
         // Aliases: register same component under additional paths
         if (route.aliases) {
             for (const alias of route.aliases) {
-                code += `__pdx_pushRoute({path:${JSON.stringify(alias)},tag:${JSON.stringify(tag)}${route.guard ? `,guard:${JSON.stringify(route.guard)}` : ''}});\n`;
+                code += `__pdx_pushRoute({path:${jsString(alias)},tag:${jsString(tag)}${route.guard ? `,guard:${jsString(route.guard)}` : ''}});\n`;
             }
         }
 
@@ -397,7 +398,7 @@ export function assembleModule(
         if (route.redirects) {
             code += `if(!globalThis.__pdx_redirects)globalThis.__pdx_redirects=[];\n`;
             for (const r of route.redirects) {
-                code += `globalThis.__pdx_redirects.push({from:${JSON.stringify(r.from)},to:${JSON.stringify(r.to)}});\n`;
+                code += `globalThis.__pdx_redirects.push({from:${jsString(r.from)},to:${jsString(r.to)}});\n`;
             }
         }
     }
@@ -414,7 +415,7 @@ export function assembleModule(
         const errorCode = errorCodeMatch[1] || '404';
         code += `\n// Auto-error: ${errorCode}\n`;
         code += `if(!globalThis.__pdx_error_pages)globalThis.__pdx_error_pages={};\n`;
-        code += `if(!globalThis.__pdx_error_pages['${errorCode}'])globalThis.__pdx_error_pages['${errorCode}']='${tag}';\n`;
+        code += `if(!globalThis.__pdx_error_pages[${jsQuote(errorCode)}])globalThis.__pdx_error_pages[${jsQuote(errorCode)}]=${jsQuote(tag)};\n`;
     }
 
     return code;

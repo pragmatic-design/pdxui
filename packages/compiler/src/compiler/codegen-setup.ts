@@ -13,6 +13,7 @@ import { emitWatchSource } from './watch-source';
 import { lateSignals, lateSignalOffsets, insertLateSignalMarkers, replaceLateSignalMarkers } from './setup-signal-placement';
 import { originMark } from './sourcemap';
 import { maskNonCode } from './tokenizer';
+import { jsQuote, jsString } from './js-literal';
 
 // ─── Public API ────────────────────────────────────────────────────
 
@@ -46,14 +47,14 @@ export function buildSetupBody(
     // i18n initialization (before props — runs once in app root)
     if (analysis.i18n) {
         const cfg = analysis.i18n;
-        const localesStr = cfg.locales.map(l => JSON.stringify(l)).join(', ');
-        const opts: string[] = [`locales: [${localesStr}]`, `default: ${JSON.stringify(cfg.default)}`];
+        const localesStr = cfg.locales.map(l => jsString(l)).join(', ');
+        const opts: string[] = [`locales: [${localesStr}]`, `default: ${jsString(cfg.default)}`];
         if (cfg.detect !== undefined) opts.push(`detect: ${cfg.detect}`);
         if (cfg.persist !== undefined) {
-            opts.push(`persist: ${typeof cfg.persist === 'string' ? JSON.stringify(cfg.persist) : cfg.persist}`);
+            opts.push(`persist: ${typeof cfg.persist === 'string' ? jsString(cfg.persist) : cfg.persist}`);
         }
         parts.push(`    initI18n({ ${opts.join(', ')} });`);
-        parts.push(`    const __i18nLoader = createI18nLoader({ mode: 'static', basePath: '${cfg.translationsPath}' });`);
+        parts.push(`    const __i18nLoader = createI18nLoader({ mode: 'static', basePath: ${jsQuote(cfg.translationsPath)} });`);
     }
 
     // Prop accessors — only generate if prop is actually referenced in body/lifecycle/effects/watches.
@@ -76,7 +77,7 @@ export function buildSetupBody(
     // The lookup needs nothing the body declares — a key and the host element.
     for (const inj of analysis.injects) {
         const localName = inj.alias ?? inj.key;
-        parts.push(`    const ${localName} = inject('${inj.key}', ctx.el);`);
+        parts.push(`    const ${localName} = inject(${jsQuote(inj.key)}, ctx.el);`);
     }
 
     // TDZ-safe ordering. Signals normally emit BEFORE the body, but a signal may
@@ -88,7 +89,7 @@ export function buildSetupBody(
     // everything else, so the body can call it at setup time. An author who declares the name
     // themselves keeps their own function. `$emit(event, detail)` is the untyped form of the same.
     const emitterNames = analysis.events.map(e => e.name).filter(n => !bodyLocalNames.has(n));
-    for (const n of emitterNames) parts.push(`    const ${n} = (detail) => ctx.emit('${n}', detail);`);
+    for (const n of emitterNames) parts.push(`    const ${n} = (detail) => ctx.emit(${jsQuote(n)}, detail);`);
     const usesEmit = /\$emit\s*\(/.test(bodyText) || /\$emit\s*\(/.test(descriptor?.template?.content ?? '');
     if (usesEmit) parts.push(`    const $emit = (event, detail) => ctx.emit(event, detail);`);
 
@@ -125,14 +126,14 @@ export function buildSetupBody(
         parts.push(`    const __httpClient = getDefaultClient();`);
         for (const f of analysis.fetches) {
             // Escape the URL so a backtick in it cannot close the generated literal and turn the
-            // rest into an executed expression. Static URLs go through JSON.stringify, which
+            // rest into an executed expression. Static URLs go through jsString, which
             // cannot be escaped out of. Reactive URLs must keep their `${...}` interpolations —
             // that is the feature — so they get the sibling escape that leaves `${` alone.
             const safeUrl = escapeForReactiveTemplate(f.url);
             const cacheKey = f.hasReactiveParams
                 ? `() => \`${f.method}:${safeUrl}\``
-                : JSON.stringify(`${f.method}:${f.url}`);
-            const fetchUrl = f.hasReactiveParams ? `\`${safeUrl}\`` : JSON.stringify(f.url);
+                : jsString(`${f.method}:${f.url}`);
+            const fetchUrl = f.hasReactiveParams ? `\`${safeUrl}\`` : jsString(f.url);
             const optsEntries: string[] = [`key: ${cacheKey}`];
             if (f.options) {
                 optsEntries.push(f.options.slice(1, -1).trim());
@@ -147,18 +148,18 @@ export function buildSetupBody(
         // Extended-option tail shared by inline + external forms. `warnUnsaved` goes to createForm,
         // which installs the leave guard itself: the in-app confirm, not window.confirm.
         const optionParts: string[] = [];
-        if (f.saveMode) optionParts.push(`saveMode: '${f.saveMode}'`);
+        if (f.saveMode) optionParts.push(`saveMode: ${jsQuote(f.saveMode)}`);
         if (f.warnUnsaved) optionParts.push('warnUnsaved: true');
         if (f.source) optionParts.push(`source: ${f.source}`);
         if (f.parent) optionParts.push(`parent: ${f.parent}`);
         // The cross-field rule, emitted as the expression it was written as.
         if (f.validate) optionParts.push(`validate: ${f.validate}`);
         // name lets a parent coordinator + DataSource identify this form.
-        if (f.source || f.parent) optionParts.push(`name: '${f.name}'`);
+        if (f.source || f.parent) optionParts.push(`name: ${jsQuote(f.name)}`);
         if (f.fieldConfig && Object.keys(f.fieldConfig).length > 0) {
             const entries = Object.entries(f.fieldConfig).map(([k, v]) => {
                 const opts: string[] = [];
-                if (v.saveMode) opts.push(`saveMode: '${v.saveMode}'`);
+                if (v.saveMode) opts.push(`saveMode: ${jsQuote(v.saveMode)}`);
                 if (v.saveDebounce) opts.push(`saveDebounce: ${v.saveDebounce}`);
                 return `${k}: { ${opts.join(', ')} }`;
             });
@@ -376,7 +377,7 @@ export function buildSetupBody(
     // as it names a $signal: what the inspector's effects(), trace and subscribers report.
     const pdxFile = filename.replace(/\\/g, '/').split('/').pop() ?? '';
     const runeName = (line: number | null | undefined): string | null =>
-        production || line == null ? null : JSON.stringify(`${pdxFile}:${line}`);
+        production || line == null ? null : jsString(`${pdxFile}:${line}`);
     analysis.watches.forEach((w, k) => {
         // The options are an expression too: `{ immediate: eager }` reads a prop.
         const name = runeName(analysis.runeLines?.watches[k]);
@@ -444,7 +445,7 @@ export function buildSetupBody(
 
     // @provide — declarative context provider (DOM-scoped on host element)
     for (const p of analysis.provides) {
-        parts.push(`    provide('${p.key}', ${rewriteAll(p.expr)}, ctx.el);`);
+        parts.push(`    provide(${jsQuote(p.key)}, ${rewriteAll(p.expr)}, ctx.el);`);
     }
 
     // keepAlive pages need onShow for resume lifecycle (title refresh, state reconciliation)
@@ -458,7 +459,7 @@ export function buildSetupBody(
         if (analysis.head.title.isDynamic) {
             parts.push(`    ctx.track(() => { document.title = ${rewriteAll(titleValue)}; });`);
         } else {
-            parts.push(`    useHead({ title: ${JSON.stringify(titleValue)} });`);
+            parts.push(`    useHead({ title: ${jsString(titleValue)} });`);
         }
         // Keep-alive pages: refresh title on show (resume from freeze)
         if (analysis.route.keepAlive) {
@@ -466,7 +467,7 @@ export function buildSetupBody(
             if (analysis.head.title.isDynamic) {
                 parts.push(`    onShow(() => { document.title = ${rewriteAll(titleValue)}; });`);
             } else {
-                parts.push(`    onShow(() => { document.title = ${JSON.stringify(titleValue)}; });`);
+                parts.push(`    onShow(() => { document.title = ${jsString(titleValue)}; });`);
             }
         }
     }
@@ -475,9 +476,9 @@ export function buildSetupBody(
     if (analysis.head.meta.length > 0) {
         const metaEntries = analysis.head.meta.map(m => {
             const entries: string[] = [];
-            if (m.name) entries.push(`name: ${JSON.stringify(m.name)}`);
-            if (m.property) entries.push(`property: ${JSON.stringify(m.property)}`);
-            entries.push(`content: ${JSON.stringify(m.content)}`);
+            if (m.name) entries.push(`name: ${jsString(m.name)}`);
+            if (m.property) entries.push(`property: ${jsString(m.property)}`);
+            entries.push(`content: ${jsString(m.content)}`);
             return `{ ${entries.join(', ')} }`;
         });
         parts.push(`    useHead({ meta: [${metaEntries.join(', ')}] });`);
@@ -494,7 +495,7 @@ export function buildSetupBody(
         parts.push(shadowStyles);
     } else if (cssBlocks.some(b => b.scoped)) {
         const scopeAttr = `data-pdx-${hash(filename)}`;
-        parts.push(`    ctx.el.setAttribute('${scopeAttr}', '');`);
+        parts.push(`    ctx.el.setAttribute(${jsQuote(scopeAttr)}, '');`);
     }
 
     // bind() CSS — generate effect that sets CSS custom properties on host element
@@ -518,25 +519,25 @@ export function buildSetupBody(
             const fieldLines = analysis.route.searchParams.map(p => {
                 if (p.type === 'number') {
                     const def = p.default ?? '0';
-                    return `        const __v_${p.name} = Number(__sp.get('${p.name}') ?? ${def});\n` +
+                    return `        const __v_${p.name} = Number(__sp.get(${jsQuote(p.name)}) ?? ${def});\n` +
                            `        if (isNaN(__v_${p.name})) console.warn('[pdx] Invalid search param: ${p.name} must be a number');`;
                 }
                 return null;
             }).filter(Boolean);
             const returnFields = analysis.route.searchParams.map(p => {
                 if (p.type === 'number') return `${p.name}: isNaN(__v_${p.name}) ? ${p.default ?? '0'} : __v_${p.name}`;
-                if (p.type === 'boolean') return `${p.name}: __sp.get('${p.name}') === 'true'`;
-                const def = p.default ? ` ?? ${JSON.stringify(p.default)}` : p.optional ? '' : " ?? ''";
-                return `${p.name}: __sp.get('${p.name}')${def}`;
+                if (p.type === 'boolean') return `${p.name}: __sp.get(${jsQuote(p.name)}) === 'true'`;
+                const def = p.default ? ` ?? ${jsString(p.default)}` : p.optional ? '' : " ?? ''";
+                return `${p.name}: __sp.get(${jsQuote(p.name)})${def}`;
             });
             parts.push(`    const searchParams = computed(() => {\n      const __sp = new URLSearchParams(currentSearch());\n${fieldLines.join('\n')}\n      return { ${returnFields.join(', ')} };\n    });`);
         } else {
             // Simple form: no validation
             const returnFields = analysis.route.searchParams.map(p => {
-                if (p.type === 'number') return `${p.name}: Number(__sp.get('${p.name}') ?? ${p.default ?? '0'})`;
-                if (p.type === 'boolean') return `${p.name}: __sp.get('${p.name}') === 'true'`;
-                const def = p.default ? ` ?? ${JSON.stringify(p.default)}` : p.optional ? '' : " ?? ''";
-                return `${p.name}: __sp.get('${p.name}')${def}`;
+                if (p.type === 'number') return `${p.name}: Number(__sp.get(${jsQuote(p.name)}) ?? ${p.default ?? '0'})`;
+                if (p.type === 'boolean') return `${p.name}: __sp.get(${jsQuote(p.name)}) === 'true'`;
+                const def = p.default ? ` ?? ${jsString(p.default)}` : p.optional ? '' : " ?? ''";
+                return `${p.name}: __sp.get(${jsQuote(p.name)})${def}`;
             });
             parts.push(`    const searchParams = computed(() => {\n      const __sp = new URLSearchParams(currentSearch());\n      return { ${returnFields.join(', ')} };\n    });`);
         }

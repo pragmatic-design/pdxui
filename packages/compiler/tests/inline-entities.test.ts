@@ -13,6 +13,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { jsString } from '../src/compiler/js-literal';
 
 const emitted = (template: string, inlineBindings: boolean): string =>
     compile(`<template>${template}</template>\n<script setup>\nlet _x = $signal(0);\n</script>`,
@@ -29,10 +30,10 @@ describe('text a reader sees', () => {
         // `&amp;lt;` must come out as the TEXT `&lt;`, not as `<`: decoding `&amp;` first and then
         // rescanning would turn an escaped entity into a tag, which is the classic double-decode.
         const code = emitted('<p>&lt;div&gt; &amp; &quot;q&quot; &#39;a&#39; &amp;lt;</p>', true);
-        // JSON.stringify, because the module carries the text as a JS string literal and its quotes
-        // are escaped there. Comparing the bare form matched nothing and reported the decoding as
-        // broken when it was not.
-        expect(code).toContain(JSON.stringify('<div> & "q" \'a\' &lt;'));
+        // jsString, because the module carries the text as a JS string literal written by it: its
+        // quotes are escaped there, and so are `<` and `>` (#69). Comparing the bare form matched
+        // nothing and reported the decoding as broken when it was not.
+        expect(code).toContain(jsString('<div> & "q" \'a\' &lt;'));
     });
 
     it('and a lone ampersand is left alone', () => {

@@ -31,6 +31,7 @@ import { ComponentResolver } from './component-resolver';
 import { injectSplash, type SplashOptions } from './splash';
 import type { PropsLookup } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
+import { jsQuote } from './compiler/js-literal';
 const VIRTUAL_ROUTER_ID = 'virtual:pdx-router';
 const RESOLVED_VIRTUAL_ID = '\0virtual:pdx-router';
 /**
@@ -1008,10 +1009,10 @@ function injectHMR(code: string, tag: string): string {
 if (import.meta.hot) {
   import.meta.hot.accept(() => {
     import('@pdxui/core').then(({ __pdx_hmr_save, __pdx_hmr_swap, __pdx_hmr_rerender, __pdx_hmr_restore }) => {
-      __pdx_hmr_save('${tag}');
-      __pdx_hmr_swap('${tag}');
-      __pdx_hmr_rerender('${tag}');
-      __pdx_hmr_restore('${tag}');
+      __pdx_hmr_save(${jsQuote(tag)});
+      __pdx_hmr_swap(${jsQuote(tag)});
+      __pdx_hmr_rerender(${jsQuote(tag)});
+      __pdx_hmr_restore(${jsQuote(tag)});
     });
   });
 }
