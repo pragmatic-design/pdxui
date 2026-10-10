@@ -196,14 +196,21 @@ test('the tiles are two per row at 390, and centred on one row at 1440', async (
     expect(narrow[2], `second pair not on one row: ${narrow}`).toBe(narrow[3]);
 
     await page.setViewportSize({ width: 1440, height: 900 });
+    // The shell turns its rail from collapsed (80 px) to expanded (300 px) by script after the
+    // resize, and animates the width. Measured at once, on a busy runner the group was read before
+    // the switch and the tiles after it: «638 left, 418 right», 220 px apart — the rail's two widths,
+    // and the trace of that run shows data-side changing between the two reads (#78). So: the
+    // desktop state first, then the three boxes read together until the row has settled.
+    await expect(page.locator('.app')).toHaveAttribute('data-side', 'expanded');
     const group = page.locator('[data-test="tiles"]').first();
-    const g = (await group.boundingBox())!;
-    const first = (await tiles(page).nth(0).boundingBox())!;
-    const second = (await tiles(page).nth(1).boundingBox())!;
-    const left = first.x - g.x;
-    const right = g.x + g.width - (second.x + second.width);
-    expect(Math.abs(left - right), `not centred: ${left} left, ${right} right`).toBeLessThanOrEqual(2);
-    expect(Math.round(first.width)).toBe(120);
+    const offCentre = async () => {
+        const g = (await group.boundingBox())!;
+        const first = (await tiles(page).nth(0).boundingBox())!;
+        const second = (await tiles(page).nth(1).boundingBox())!;
+        return Math.abs((first.x - g.x) - (g.x + g.width - (second.x + second.width)));
+    };
+    await expect.poll(offCentre, { message: 'the first row of tiles never settled centred' }).toBeLessThanOrEqual(2);
+    expect(Math.round((await tiles(page).nth(0).boundingBox())!.width)).toBe(120);
 });
 
 // ─── Categories: the one lookup that is managed here ──────────────────────────
