@@ -172,16 +172,12 @@ const ROWS: Row[] = [
         script: "let s = $signal('a');",
         act: (h) => { const s = h.querySelector('select')!; s.value = 'b'; s.dispatchEvent(new Event('change', { bubbles: true })); },
         read: (h) => h.querySelector('select')!.value,
-        // Inline: listens to `input`, and a <select> reports a choice with `change`.
-        owner: 97,
     },
     {
         name: '::value on a component that emits pdx-change',
         template: '<x-field ::value="v"></x-field><p>{{ v }}</p>',
         script: "let v = $signal('a');",
         act: (h) => { (h.querySelector('x-field') as unknown as { change(v: string): void }).change('b'); },
-        // Inline: the component's pdx-change never reaches the signal.
-        owner: 97,
     },
     { name: '@if / @else', template: '@if (on) { <p>yes</p> } @else { <p>no</p> }<button @click="on = !on">t</button>', script: 'let on = $signal(true);', act: click('button') },
     { name: '@for with track', template: '<ul>@for (items as it; track it.id) { <li>{{ it.label }}</li> }</ul>', script: "let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);" },

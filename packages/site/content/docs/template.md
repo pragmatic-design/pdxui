@@ -50,7 +50,14 @@ Handy binding variants:
 ```
 
 `::value` is the shorthand for controlled fields: it binds the value *and* updates the signal as the
-user types, without writing the `@input` handler.
+user types, without writing the `@input` handler. It listens where the value changes: `input` on a
+text field, `change` on a `<select>` and on `::checked`, and a component's `pdx-input` and
+`pdx-change`, reading the value from their `detail` — so `<pdx-select ::value="country">` works as
+`<input ::value="name">` does. `.lazy` waits for the committed change, `.trim` and `.number` shape
+the value on its way back.
+
+The wiring is core's `bindTwoWay(el, 'value', signal)`, the call a compiled template makes in dev
+and in a build alike. A hand-written TypeScript component can call it the same way.
 
 ## React to the user: `@event`
 

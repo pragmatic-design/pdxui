@@ -652,8 +652,15 @@ function bindStyleProp(el: HTMLElement, prop: string, value: TemplateValue): voi
 
 // ─── Two-Way Binding (::attr) ──────────────────────────────────────
 
-/** Two-way binding with optional modifiers (.trim, .number, .lazy). */
-function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void {
+/**
+ * Two-way binding with optional modifiers (.trim, .number, .lazy): `::value`, `::checked`.
+ *
+ * The inline build calls this too, so the two builds listen the same way: a component through its
+ * `pdx-input`/`pdx-change` and their `detail`, a `<select>` and a checkbox through `change`. The
+ * inline path had its own copy that listened to `input` on everything, and `::value` was one-way
+ * on a component in a production build (#97).
+ */
+export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void {
     const sig = value as Signal<unknown>;
     if (typeof sig !== 'function' || typeof sig.set !== 'function') {
         bindProperty(el, descriptor.split('.')[0], value);
@@ -666,9 +673,13 @@ function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void
     const prop = kebabToCamel(parts[0]);
     const mods = new Set(parts.slice(1));
 
-    // Forward: signal → DOM property
+    // Forward: signal → DOM property. A URL name is written as the one-way binding writes it,
+    // through the sanitiser and as the attribute: `formaction` is not the `formAction` property, and
+    // a `javascript:` value must not reach the element whichever way it is bound.
+    const urlName = URL_PROPS.has(parts[0].toLowerCase());
     effect(() => {
-        (el as unknown as Record<string, unknown>)[prop] = sig();
+        if (urlName) setUrlAttribute(el, parts[0], sig());
+        else (el as unknown as Record<string, unknown>)[prop] = sig();
     });
 
     const applyValue = (raw: unknown): void => {
