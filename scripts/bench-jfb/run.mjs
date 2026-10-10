@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // pnpm bench:jfb [--with vanillajs svelte …] [--runs N] [--only 01_,07_] [--port 8080]
+//                [--chrome <path>] [--headless]
 //
 // Runs js-framework-benchmark with PDX and the reference frameworks in ONE run, and prints a markdown
 // table of the medians with their ratio to vanillajs. Totals vary between runs on the same machine, so
@@ -29,7 +30,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..', '..');
 
 function parseArgs(argv) {
-    const options = { with: DEFAULT_WITH, runs: 1, only: [], port: 8080 };
+    const options = { with: DEFAULT_WITH, runs: 1, only: [], port: 8080, chrome: null, headless: false };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
         if (arg === '--with') {
@@ -42,6 +43,10 @@ function parseArgs(argv) {
             options.only = (argv[++i] ?? '').split(',').filter(Boolean);
         } else if (arg === '--port') {
             options.port = Number(argv[++i]);
+        } else if (arg === '--chrome') {
+            options.chrome = argv[++i];
+        } else if (arg === '--headless') {
+            options.headless = true;
         } else {
             throw new Error(`unknown argument ${arg}`);
         }
@@ -59,14 +64,25 @@ function step(message) {
     console.log(`\n[bench:jfb] ${message}`);
 }
 
+let playwrightBrowsers = null;
+
 /**
- * The environment of a command run in the clone. `pnpm bench:jfb` exports pnpm's own settings as
- * `npm_config_*` (`dir`, `verify-deps-before-run`, …); npm would read them as its own. The user's
- * `.npmrc` still applies: npm reads it itself.
+ * The environment of a command run in the clone.
+ * - `pnpm bench:jfb` exports pnpm's own settings as `npm_config_*` (`dir`, `verify-deps-before-run`,
+ *   …); npm would read them as its own. The user's `.npmrc` still applies: npm reads it itself.
+ * - The benchmark brings its own Playwright, and a Playwright removes from the shared browser cache
+ *   the browsers no installed Playwright refers to: in a container it deleted the image's Chromium.
+ *   The clone gets a browser folder of its own, beside it, and downloads nothing: the benchmark drives
+ *   the Chrome given with --chrome, or the system one.
  */
 function cloneEnv(extra = {}) {
     const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^npm_config_/i.test(k)));
-    return { ...env, ...extra };
+    return {
+        ...env,
+        PLAYWRIGHT_BROWSERS_PATH: playwrightBrowsers,
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
+        ...extra,
+    };
 }
 
 /**
@@ -87,8 +103,8 @@ function run(command, args, cwd, env = {}) {
  * The benchmark's own check. Its exit code is not enough: it exits 0 when no framework matched, and
  * when it fails before the check starts. The verdict is the line it prints for the framework.
  */
-function checkKeyed(webdriver, env) {
-    const result = spawnSync(process.execPath, ['dist/isKeyed.js', '--framework', 'keyed/pdx'], {
+function checkKeyed(webdriver, env, browserArgs) {
+    const result = spawnSync(process.execPath, ['dist/isKeyed.js', '--framework', 'keyed/pdx', ...browserArgs], {
         cwd: webdriver, encoding: 'utf8', env: cloneEnv(env),
     });
     process.stdout.write(result.stdout ?? '');
@@ -210,9 +226,16 @@ async function waitClosed(port) {
 async function main() {
     const options = parseArgs(process.argv.slice(2));
     const jfb = join(tmpdir(), 'pdx-jfb', JFB_COMMIT.slice(0, 12));
+    playwrightBrowsers = join(tmpdir(), 'pdx-jfb', 'playwright-browsers');
     const webdriver = join(jfb, 'webdriver-ts');
     const frameworks = ['pdx', ...options.with];
     const env = { LANG: 'en_US.UTF-8', PORT: String(options.port) };
+    // The benchmark looks for Chrome in one place per platform (on Linux, /snap/bin/chromium) and
+    // opens a window; a machine without either passes --chrome and --headless.
+    const browserArgs = [
+        ...(options.chrome ? ['--chromeBinary', options.chrome] : []),
+        ...(options.headless ? ['--headless'] : []),
+    ];
 
     step(`benchmark at ${JFB_COMMIT.slice(0, 12)} in ${jfb}`);
     clone(jfb);
@@ -229,12 +252,12 @@ async function main() {
     const runs = [];
     try {
         step('checking that the PDX implementation is keyed');
-        checkKeyed(webdriver, env);
+        checkKeyed(webdriver, env, browserArgs);
         for (let i = 1; i <= options.runs; i++) {
             step(`run ${i} of ${options.runs}: ${frameworks.join(', ')}`);
             const results = join(webdriver, 'results');
             rmSync(results, { recursive: true, force: true });
-            const args = ['dist/benchmarkRunner.js', '--framework', ...frameworks.map(f => `keyed/${f}`)];
+            const args = ['dist/benchmarkRunner.js', ...browserArgs, '--framework', ...frameworks.map(f => `keyed/${f}`)];
             if (options.only.length) args.push('--benchmark', ...options.only);
             run(process.execPath, args, webdriver, env);
             const measured = readRun(results);

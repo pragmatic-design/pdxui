@@ -203,6 +203,13 @@ dependencies; the next run reuses it. PDX is built from your checkout: core, com
 in `scripts/bench-jfb/`. A PDX build that is not keyed stops the run before anything is measured.
 `node --test scripts/bench-jfb/summarize.test.mjs` tests the table.
 
+The benchmark looks for Chrome in one place per platform, and on Linux that is `/snap/bin/chromium`.
+On a machine where Chrome is elsewhere, or with no display, pass `--chrome <path>` and `--headless`.
+A headless run is fine for a before-and-after on the same machine. It is not comparable with the
+benchmark's published, windowed results. In a Docker container, run as a user other than root and
+with `--security-opt seccomp=unconfined`: Chrome needs that to build its sandbox, and the benchmark
+does not start it without one.
+
 ## Commits and pull requests
 
 - One logical change per commit, in the imperative, with a scope.
