@@ -47,7 +47,10 @@ describe('pdx build --sourcemap', () => {
     afterEach(() => {
         process.chdir(prevCwd);
         exitSpy.mockRestore();
-        rmSync(root, { recursive: true, force: true });
+        // maxRetries: on Windows, under the load of the gate, something still holds a freshly built file
+        // when this runs and rmdir fails with EBUSY (#165). Node's option for exactly that case retries;
+        // the build's assertions above are untouched.
+        rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     });
 
     describe('standalone', () => {
