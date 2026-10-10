@@ -71,6 +71,8 @@ export function extractBraceBlock(text: string, bracePos: number): string | null
 export function parseFetchDecl(trimmed: string): {
     name: string; method: string; url: string;
     type?: string; options?: string;
+    /** The type was written `: Type`, which is not the syntax: read anyway, so the error can name it. */
+    typeAfterColon?: boolean;
 } | null {
     // Match: @fetch name :
     const prefixMatch = trimmed.match(/^@fetch\s+(\w+)\s*:\s*/);
@@ -95,12 +97,14 @@ export function parseFetchDecl(trimmed: string): {
     pos = quoteEnd + 1;
     let rest = trimmed.slice(pos).trim();
 
-    // Optional: as TypeAnnotation
+    // Optional: as TypeAnnotation — or `: Type`, the form TypeScript would suggest, which is read the
+    // same way so that neither the type nor the options after it are dropped (the caller reports it).
     // Can't use findAtDepthZero for `{` since it's also a depth opener.
     // Scan manually: type ends at `{` or `;` at bracket depth 0.
     let type: string | undefined;
-    if (rest.startsWith('as ')) {
-        rest = rest.slice(3);
+    const typeAfterColon = rest.startsWith(':');
+    if (rest.startsWith('as ') || typeAfterColon) {
+        rest = rest.slice(typeAfterColon ? 1 : 3).trimStart();
         let typeEnd = -1;
         let depth = 0;
         for (let i = 0; i < rest.length; i++) {
@@ -133,7 +137,50 @@ export function parseFetchDecl(trimmed: string): {
         if (block) options = block;
     }
 
-    return { name, method, url, type: type || undefined, options };
+    return { name, method, url, type: type || undefined, options, typeAfterColon: typeAfterColon || undefined };
+}
+
+/**
+ * The options `resource()` takes, as `ResourceOptions` in core declares them. The compiler does not
+ * import core, so the list is written here; `tests/fetch-strict.test.ts` reads the interface and
+ * fails when the two differ.
+ */
+export const FETCH_OPTION_KEYS: readonly string[] = [
+    'key', 'staleTime', 'retry', 'tags', 'enabled', 'transform', 'onSuccess', 'onError', 'cache', 'stale',
+];
+
+/**
+ * The top-level keys of an `@fetch` options block — `{ staleTime: 1, cache: { ttl: 5 } }` gives
+ * `staleTime` and `cache` — including a shorthand (`{ staleTime }`). A spread names no key and is
+ * skipped: what it carries cannot be known here.
+ */
+export function fetchOptionKeys(block: string): string[] {
+    const keys: string[] = [];
+    let depth = 0;
+    let expectKey = false;
+    for (let i = 0; i < block.length; i++) {
+        const skip = skipNonCode(block, i);
+        if (skip !== null) { i = skip - 1; continue; }
+        const ch = block[i];
+        if (ch === '{' || ch === '(' || ch === '[') {
+            depth++;
+            if (depth === 1) expectKey = true;
+            continue;
+        }
+        if (ch === '}' || ch === ')' || ch === ']') { depth--; continue; }
+        if (depth !== 1) continue;
+        if (ch === ',') { expectKey = true; continue; }
+        if (expectKey && /[A-Za-z_$]/.test(ch)) {
+            // Match: an identifier at the start of a member — `staleTime` in `staleTime: 1` or `{ staleTime }`.
+            const m = /^[A-Za-z_$][\w$]*/.exec(block.slice(i))!;
+            keys.push(m[0]);
+            i += m[0].length - 1;
+            expectKey = false;
+        } else if (expectKey && ch === '.') {
+            expectKey = false; // a spread
+        }
+    }
+    return keys;
 }
 
 /**

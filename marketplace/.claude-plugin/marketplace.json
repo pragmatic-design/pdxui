@@ -9,7 +9,7 @@
       "name": "pdxui",
       "source": "./plugins/pdxui",
       "description": "Skills for building web app UIs with PDX (@pdxui) — the .pdx language compiled to Web Components, its pdx-* components one page each, screen composition, theming, and the data layer, forms, routing, i18n, setup and testing.",
-      "version": "1.0.0-alpha.4"
+      "version": "1.0.0-alpha.5"
     }
   ]
 }

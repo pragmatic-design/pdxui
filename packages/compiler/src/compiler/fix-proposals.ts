@@ -8,7 +8,7 @@
 import type { ValidationWarning, FixProposal } from './validate';
 import {
     offsetOf, rawInterpolationFix, interpolationInBindingFix, boundNameFix, eventNameFix, tagRenameFix,
-    undeclaredRefFix,
+    undeclaredRefFix, fetchTypeColonFix,
 } from './fix-builders';
 
 /**
@@ -68,6 +68,7 @@ const BUILDERS: Record<string, (source: string, w: ValidationWarning) => FixProp
     PDX_EVENT_NAME_CASE: eventNameFix,
     PDX_UNRESOLVED_COMPONENT: tagRenameFix,
     PDX_UNDECLARED_REF: undeclaredRefFix,
+    PDX_FETCH_TYPE_COLON: fetchTypeColonFix,
 };
 
 /**

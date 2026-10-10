@@ -214,6 +214,27 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: "`@fetch users: 'GET /api/users' as User[];`",
         reproducedIn: `${T}fetch-directive-diagnostics.test.ts`,
     },
+    PDX_FETCH_METHOD: {
+        severity: 'error', category: 'defect',
+        summary: '`@fetch` with a method other than GET.',
+        explanation: '`@fetch` reads. A POST, PUT or DELETE written here used to compile to a GET of the same URL, and nothing said so.',
+        fix: "For a read, `'GET /url'`. For a write, a `mutation()`.",
+        reproducedIn: `${T}fetch-strict.test.ts`,
+    },
+    PDX_FETCH_TYPE_COLON: {
+        severity: 'error', category: 'defect',
+        summary: '`@fetch` with its type written after `:`.',
+        explanation: 'The type is written with `as`. Written with `:` it was dropped, and the options block after it with it.',
+        fix: "`@fetch users: 'GET /api/users' as User[];`",
+        reproducedIn: `${T}fetch-strict.test.ts`,
+    },
+    PDX_FETCH_UNKNOWN_OPTION: {
+        severity: 'error', category: 'defect',
+        summary: '`@fetch` with an option `resource()` does not take.',
+        explanation: 'The options block is handed to `resource()`, which ignores a key it does not know: a misspelled `stalTime` does nothing.',
+        fix: 'Use one of `resource()`\'s options: key, staleTime, retry, tags, enabled, transform, onSuccess, onError, cache, stale.',
+        reproducedIn: `${T}fetch-strict.test.ts`,
+    },
     PDX_FETCH_NO_ERROR_UI: {
         severity: 'info', category: 'defect',
         summary: 'An `@fetch` whose error state the template never shows.',
