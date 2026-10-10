@@ -16,6 +16,9 @@ import { uiString, format } from '../shared/i18n';
 // and no more.
 import '@pdxui/design/components/command';
 
+/** Counts palettes: the id is also the palette's key in the overlay stack, so it never repeats (#68). */
+let _cmdCounter = 0;
+
 export interface CommandItem {
     id: string;
     label: string;
@@ -53,7 +56,7 @@ component('pdx-command', {
         const _activeIndex = signal(0);
 
         let _trapDispose: Dispose | null = null;
-        const _uid = 'pdx-cmd-' + Math.random().toString(36).slice(2, 8);
+        const _uid = 'pdx-cmd-' + (++_cmdCounter);
 
         // Filtered items — simple case-insensitive substring match. A disabled command is listed
         // (aria-disabled) and skipped by the arrows and Enter, not dropped.

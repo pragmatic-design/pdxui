@@ -17,6 +17,9 @@ import { component, html, useFormAssociated, untracked } from '@pdxui/core';
 import { interceptChildEvent } from '../shared/child-event';
 import { nameGroup, authoredName } from '../shared/group-name';
 
+/** Counts unnamed groups: two sharing a radio `name` would be one radio group to the browser (#68). */
+let _rgCounter = 0;
+
 /**
  * Single selection across the `<pdx-radio>` elements it holds, with one tab stop and arrow keys that
  * move and check, and the chosen value takes part in a form.
@@ -34,7 +37,7 @@ component('pdx-radio-group', {
         label: { type: String, default: '' },
     },
     setup(ctx) {
-        const _fallbackName = 'pdx-rg-' + Math.random().toString(36).slice(2, 8);
+        const _fallbackName = 'pdx-rg-' + (++_rgCounter);
 
         function getRadios(): HTMLElement[] {
             return Array.from(ctx.el.querySelectorAll('pdx-radio'));
