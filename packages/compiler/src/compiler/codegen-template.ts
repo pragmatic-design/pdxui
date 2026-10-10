@@ -449,7 +449,12 @@ export function hoistSlotTemplate(node: SlotTemplateNode, imports: Set<string>, 
     return `slotCarrier(${jsQuote(node.name)}, ${varName})`;
 }
 
-function generateTransition(config?: TransitionConfig): string {
+/**
+ * The options a `when` / `each` / `eachRow` call takes for `@transition`, `@stagger`, `@mode` and
+ * `@move`, as `, { … }` to append after its last argument, or '' for a block without them. Both
+ * render paths call it, so they cannot disagree about what a block animates (#85).
+ */
+export function generateTransition(config?: TransitionConfig): string {
     if (!config) return '';
     const parts: string[] = [];
     if (config.enter) parts.push(`enter: ${jsQuote(config.enter)}`);

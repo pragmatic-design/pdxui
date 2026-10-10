@@ -208,9 +208,9 @@ const ROWS: Row[] = [
         owner: 98,
     },
     { name: '@try / @catch', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
-    // Inline: no transition options reach when()/each(), so no enter classes.
-    { name: '@if with @transition', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);', owner: 85 },
-    { name: '@for with @transition', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);", owner: 85 },
+    // Both paths pass the transition options to when()/each() since #85: the enter classes match.
+    { name: '@if with @transition', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
+    { name: '@for with @transition', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },
     // Inline: reads the @let name as a signal and throws.
     { name: '@let', template: '@let total = a + b; <p>{{ total }}</p>', script: 'let a = $signal(1); let b = $signal(2);', owner: 162 },
     { name: 'an interpolated Node', template: '<div>{{ node }}</div>', script: "const node = document.createElement('em'); node.textContent = 'n';" },
