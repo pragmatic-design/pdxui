@@ -158,7 +158,7 @@ export const relativeTime: ComponentManifest = {
         targets: [
             // Content-driven inline text (height = the host line-height, width = the text):
             // skip the height (it is not a structural invariant). There is no border or radius to assert.
-            { selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-root', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-root', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

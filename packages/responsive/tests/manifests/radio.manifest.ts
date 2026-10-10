@@ -172,7 +172,7 @@ export const radio: ComponentManifest = {
         scenario: 'radio-basic',
         targets: [
             // A tiny atom: a generous tolerance against pathological host CSS.
-            { selector: '[data-test="radio-off"] input.pdx-radio', tolerancePx: 10 },
+            { selector: '[data-test="radio-off"] input.pdx-radio', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

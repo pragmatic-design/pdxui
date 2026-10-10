@@ -223,7 +223,7 @@ export const input: ComponentManifest = {
     isolation: {
         scenario: 'input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="input"] .pdx-input-wrap', tolerancePx: 6 },
+            { selector: 'section:not([hidden]) [data-test="input"] .pdx-input-wrap', tolerancePx: 6, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

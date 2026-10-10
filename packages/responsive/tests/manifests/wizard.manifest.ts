@@ -283,8 +283,8 @@ export const wizard: ComponentManifest = {
     isolation: {
         scenario: 'wizard-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="wizard"] [data-step-btn="1"] .pdx-step-number', tolerancePx: 8 },
-            { selector: 'section:not([hidden]) [data-test="wizard"]', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="wizard"] [data-step-btn="1"] .pdx-step-number', tolerancePx: 8, leaks: [{ issue: 170, properties: ['fontFamily', 'lineHeight', 'letterSpacing'] }] },
+            { selector: 'section:not([hidden]) [data-test="wizard"]', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

@@ -40,7 +40,8 @@ describe('API reference', () => {
 
     it('the committed page is what the generator produces now', () => {
         expect(existsSync(API_MD), 'run `pnpm --filter @pdxui/site run api`').toBe(true);
-        expect(readFileSync(API_MD, 'utf8'), 'api.md is stale — regenerate it').toBe(render());
+        // Line endings normalised, as the skill's copy below: with core.autocrlf a checkout writes CRLF.
+        expect(readFileSync(API_MD, 'utf8').replace(/\r\n/g, '\n'), 'api.md is stale — regenerate it').toBe(render());
     });
 
     it('the skill carries the same page, generated, not edited', () => {

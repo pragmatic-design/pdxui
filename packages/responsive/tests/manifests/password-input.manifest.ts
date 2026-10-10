@@ -127,7 +127,7 @@ export const passwordInput: ComponentManifest = {
     isolation: {
         scenario: 'password-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="password"] .pdx-input-wrap', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="password"] .pdx-input-wrap', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

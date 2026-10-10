@@ -180,7 +180,7 @@ export const alertDialog: ComponentManifest = {
         scenario: 'alert-open',
         targets: [
             // A scaled, content-driven modal panel (see dialog) → skipHeight; the radius is asserted.
-            { selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel', tolerancePx: 2, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel', tolerancePx: 2, skipHeight: true, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

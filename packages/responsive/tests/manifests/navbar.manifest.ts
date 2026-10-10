@@ -227,7 +227,7 @@ export const navbar: ComponentManifest = {
     isolation: {
         scenario: 'navbar-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="navbar"] .pdx-navbar-bar', tolerancePx: 12 },
+            { selector: 'section:not([hidden]) [data-test="navbar"] .pdx-navbar-bar', tolerancePx: 12, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

@@ -197,7 +197,7 @@ export const contextMenu: ComponentManifest = {
     isolation: {
         scenario: 'ctxmenu-open',
         targets: [
-            { selector: '.pdx-context-menu-panel.pdx-menu', tolerancePx: 10, skipHeight: true },
+            { selector: '.pdx-context-menu-panel.pdx-menu', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

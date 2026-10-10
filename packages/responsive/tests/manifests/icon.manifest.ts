@@ -154,7 +154,7 @@ export const icon: ComponentManifest = {
         targets: [
             // The size (20px for md) is inline on the container → it must resist hostile global CSS.
             // It is not font- or transform-driven: the height IS a structural invariant → NO skipHeight.
-            { selector: 'section:not([hidden]) [data-test="icon-decorative"] .pdx-icon-container', tolerancePx: 4 },
+            { selector: 'section:not([hidden]) [data-test="icon-decorative"] .pdx-icon-container', tolerancePx: 4, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

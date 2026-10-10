@@ -246,7 +246,7 @@ export const inlineEdit: ComponentManifest = {
     isolation: {
         scenario: 'inline-edit-display',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

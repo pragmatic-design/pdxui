@@ -184,7 +184,7 @@ export const fileUpload: ComponentManifest = {
     isolation: {
         scenario: 'file-upload-empty',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

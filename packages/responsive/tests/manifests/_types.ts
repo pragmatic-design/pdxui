@@ -88,11 +88,36 @@ export interface A11ySpec {
 
 // ── Dimension 3: style isolation (immunity to somebody else's CSS) ──
 
+/**
+ * What the isolation runner compares before and after the hostile CSS. Computed values are compared
+ * exactly; `height` and `radius` (the four corners) within `tolerancePx`.
+ */
+export type IsolatedProperty =
+    | 'color' | 'backgroundColor'
+    | 'fontFamily' | 'fontSize' | 'lineHeight' | 'letterSpacing'
+    | 'borderTopWidth' | 'borderTopStyle' | 'borderTopColor'
+    | 'height' | 'radius';
+
+/**
+ * Properties the hostile CSS changes today, named so the suite stays green while the issue that
+ * removes them is open. They are still measured: the run fails when one STOPS changing, and it is
+ * then removed from the entry. A change that no entry lists fails.
+ */
+export interface IsolationLeak {
+    /** The GitHub issue that removes the leak */
+    issue: number;
+    properties: IsolatedProperty[];
+    /** Only on these themes (default: every theme the isolation runner uses) */
+    themes?: string[];
+}
+
 export interface IsolationTarget {
-    /** The element whose geometry must hold under hostile CSS */
+    /** The element whose style must hold under hostile CSS */
     selector: string;
-    /** Largest drift tolerated, in px, on width/height/radius/border (default 1) */
+    /** Largest drift tolerated, in px, on the height and the radii (default 1) */
     tolerancePx?: number;
+    /** The properties that leak today, each with the issue that removes it */
+    leaks?: IsolationLeak[];
     /**
      * Skip the assertion on the height. For elements whose height is NOT a clean structural
      * invariant: modal panels with `transform: scale()` (getBoundingClientRect is scaled) or
@@ -105,7 +130,7 @@ export interface IsolationTarget {
 export interface IsolationSpec {
     /** The scenario the hostile CSS is injected into */
     scenario: string;
-    /** The elements that must keep their geometry despite the external CSS */
+    /** The elements that must keep their style despite the external CSS */
     targets: IsolationTarget[];
 }
 

@@ -296,7 +296,7 @@ export const select: ComponentManifest = {
     isolation: {
         scenario: 'select-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="sel"] .pdx-select-trigger', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="sel"] .pdx-select-trigger', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

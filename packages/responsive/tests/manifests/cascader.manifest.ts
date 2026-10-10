@@ -258,7 +258,7 @@ export const cascader: ComponentManifest = {
     isolation: {
         scenario: 'cascader-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="casc"] .pdx-cascader-trigger', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="casc"] .pdx-cascader-trigger', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

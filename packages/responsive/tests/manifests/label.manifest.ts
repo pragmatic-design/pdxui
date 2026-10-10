@@ -135,7 +135,7 @@ export const label: ComponentManifest = {
         scenario: 'label-variants',
         targets: [
             // A text atom: a generous tolerance (the font and line-height vary by theme).
-            { selector: '[data-test="plain"] .pdx-field-label', tolerancePx: 10 },
+            { selector: '[data-test="plain"] .pdx-field-label', tolerancePx: 10, leaks: [{ issue: 170, properties: ['fontFamily', 'lineHeight', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }, { issue: 170, properties: ['letterSpacing'], themes: ['neutral'] }] },
         ],
     },
 

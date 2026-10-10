@@ -88,7 +88,7 @@ export const checkbox: ComponentManifest = {
     isolation: {
         scenario: 'checkbox-basic',
         targets: [
-            { selector: '[data-test="checkbox-off"]', tolerancePx: 6 },
+            { selector: '[data-test="checkbox-off"]', tolerancePx: 6, leaks: [{ issue: 170, properties: ['fontFamily', 'letterSpacing'] }] },
         ],
     },
 

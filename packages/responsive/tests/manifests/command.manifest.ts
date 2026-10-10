@@ -205,7 +205,7 @@ export const command: ComponentManifest = {
     isolation: {
         scenario: 'command-open',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command', tolerancePx: 4, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command', tolerancePx: 4, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

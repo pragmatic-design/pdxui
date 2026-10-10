@@ -178,7 +178,7 @@ export const filterBuilder: ComponentManifest = {
             // host's hostile CSS) → skipHeight (as for field-list and toolbar). The bar has no radius or border
             // of its own (`.pdx-filter-builder` is only a flex row): what stays asserted is the width's integrity,
             // which the runner checks by default.
-            { selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-filter-builder', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-filter-builder', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

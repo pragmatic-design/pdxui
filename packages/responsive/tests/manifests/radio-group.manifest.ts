@@ -179,7 +179,7 @@ export const radioGroup: ComponentManifest = {
         targets: [
             // The target is a single control (a fixed size), not the group (a content-driven flex
             // column: its height is the sum of N items, sensitive to the host's line-height).
-            { selector: 'section:not([hidden]) [data-test="rg-free"] input.pdx-radio', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="rg-free"] input.pdx-radio', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

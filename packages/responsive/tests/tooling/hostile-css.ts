@@ -1,14 +1,18 @@
 /**
  * HOSTILE CSS for the style-isolation tests (Dimension 3).
  *
- * It simulates a "sloppy" or aggressive host app injecting global rules able to
- * break badly isolated components. Pragmatic's components use the Light DOM (no Shadow
- * DOM): their defence is the specificity of the .pdx-* classes + the @layer ordering.
+ * It simulates a "sloppy" host app with global rules able to break badly isolated components.
+ * Pragmatic's components use the Light DOM (no Shadow DOM), and the design system lives in
+ * `@layer pdx.*`.
  *
- * The test measures an element BEFORE and AFTER the injection: if the critical geometry
- * (height/width/radius/border) stays within tolerance, the component is immune.
- * A failure is NOT a bug in the test: it is a real vulnerability of the design system,
- * to be hardened (defensive specificity on the critical geometry).
+ * WHAT IS PROMISED, AND WHAT IS NOT. A rule outside any layer wins over every layered rule,
+ * whatever its specificity: that is the cascade-layers spec, and the design system chose it on
+ * purpose (`pragmatic-design.css`: "Consumer's unlayered CSS always wins"). So an unlayered
+ * `button { color: lime }` restyles every button, by design, and the certification does not test it.
+ * The contract is the other half: a host that puts its global CSS in a layer declared BEFORE the
+ * design system's (`@layer host, pdx;`) cannot change anything the design system declares.
+ * `HOSTILE_STYLESHEET` is that host. What still changes under it is an element the design system
+ * leaves unstyled, so the host's bare `span { … }` reaches it: a real leak of that component.
  *
  * NB: we deliberately do NOT use `* { all: revert }` (it would zero everything out and make the
  * test trivial). We use rules a messy third-party app would realistically have.
@@ -48,6 +52,17 @@ button, input, a, label, p, span, div {
 .third-party-btn, .third-party-card {
     padding: 30px;
     background: repeating-linear-gradient(45deg, red, blue 10px);
+}
+`;
+
+/**
+ * The hostile rules as a well-behaved host loads them: in its own layer, declared before the design
+ * system's. Must be the FIRST stylesheet of the document: layer order is the order in which the names
+ * first appear, so a sheet added after the design system would put `host` above `pdx`.
+ */
+export const HOSTILE_STYLESHEET = `@layer host, pdx;
+@layer host {
+${HOSTILE_CSS}
 }
 `;
 

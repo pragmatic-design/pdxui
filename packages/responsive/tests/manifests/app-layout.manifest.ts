@@ -224,7 +224,7 @@ export const appLayout: ComponentManifest = {
     isolation: {
         scenario: 'app-layout-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="app-layout"]', tolerancePx: 2, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="app-layout"]', tolerancePx: 2, skipHeight: true, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

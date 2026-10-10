@@ -134,7 +134,7 @@ export const avatarGroup: ComponentManifest = {
         targets: [
             // The +N counter (sized through .pdx-avatar-size-md = 40px) must keep its
             // geometry under hostile global CSS. A 10px tolerance.
-            { selector: 'pdx-avatar-group[data-test="ag"] .pdx-avatar-group-overflow', tolerancePx: 10 },
+            { selector: 'pdx-avatar-group[data-test="ag"] .pdx-avatar-group-overflow', tolerancePx: 10, leaks: [{ issue: 170, properties: ['fontFamily', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

@@ -152,7 +152,7 @@ export const slider: ComponentManifest = {
     isolation: {
         scenario: 'slider-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-track', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-track', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

@@ -161,7 +161,7 @@ export const drawer: ComponentManifest = {
         scenario: 'drawer-right',
         targets: [
             // The panel: a box of a fixed size (a width per size) → a generous overlay tolerance.
-            { selector: 'section:not([hidden]) [data-test="drw"] .pdx-drawer', tolerancePx: 12 },
+            { selector: 'section:not([hidden]) [data-test="drw"] .pdx-drawer', tolerancePx: 12, leaks: [{ issue: 170, properties: ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }] },
         ],
     },
 

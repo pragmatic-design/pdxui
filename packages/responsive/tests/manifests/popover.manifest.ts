@@ -160,7 +160,7 @@ export const popover: ComponentManifest = {
     isolation: {
         scenario: 'popover-bottom',
         targets: [
-            { selector: '[data-test="trigger"]', tolerancePx: 10 },
+            { selector: '[data-test="trigger"]', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

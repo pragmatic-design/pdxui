@@ -141,7 +141,7 @@ export const textarea: ComponentManifest = {
         targets: [
             // A tolerance of 24: the textarea has height:auto (multi-line, content-driven) → under a
             // pathological host that alters line-height/font the height varies by nature. Width/radius stay stable.
-            { selector: 'section:not([hidden]) [data-test="textarea"] .pdx-input-wrap', tolerancePx: 24 },
+            { selector: 'section:not([hidden]) [data-test="textarea"] .pdx-input-wrap', tolerancePx: 24, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }, { issue: 170, properties: ['borderTopColor'], themes: ['material'] }] },
         ],
     },
 

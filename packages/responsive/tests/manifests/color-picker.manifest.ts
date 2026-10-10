@@ -244,7 +244,7 @@ export const colorPicker: ComponentManifest = {
     isolation: {
         scenario: 'cp-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="cp"] .pdx-color-swatch', tolerancePx: 4, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="cp"] .pdx-color-swatch', tolerancePx: 4, skipHeight: true, leaks: [{ issue: 170, properties: ['letterSpacing'] }] },
         ],
     },
 

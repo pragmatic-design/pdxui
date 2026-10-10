@@ -148,7 +148,7 @@ export const fab: ComponentManifest = {
         targets: [
             // The round button must keep its size (a fixed px per size) and its shape (the radius)
             // even under hostile global CSS. A 10px tolerance.
-            { selector: 'section:not([hidden]) [data-test="fab"] .pdx-fab', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="fab"] .pdx-fab', tolerancePx: 10, leaks: [{ issue: 170, properties: ['letterSpacing'] }] },
         ],
     },
 

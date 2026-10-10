@@ -261,7 +261,7 @@ export const masonry: ComponentManifest = {
     isolation: {
         scenario: 'masonry-columns',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="masonry"]', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="masonry"]', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

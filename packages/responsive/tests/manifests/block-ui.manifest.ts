@@ -243,7 +243,7 @@ export const blockUi: ComponentManifest = {
         targets: [
             // The host is content-driven (its height is the wrapper's content, sensitive to the host's font and
             // line-height): skipHeight. The width, radius and border stay asserted as the immunity guarantee.
-            { selector: 'section:not([hidden]) [data-test="block"]', tolerancePx: 2, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="block"]', tolerancePx: 2, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

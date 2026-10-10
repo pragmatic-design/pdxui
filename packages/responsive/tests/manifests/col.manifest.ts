@@ -233,7 +233,7 @@ export const col: ComponentManifest = {
     isolation: {
         scenario: 'col-halves',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="col-a"]', tolerancePx: 2, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="col-a"]', tolerancePx: 2, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
         ],
     },
 

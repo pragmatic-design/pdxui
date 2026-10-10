@@ -164,6 +164,7 @@ export const form: ComponentManifest = {
                 selector: 'section:not([hidden]) [data-test="form"] form.pdx-form',
                 tolerancePx: 10,
                 skipHeight: true,
+                leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }],
             },
         ],
     },

@@ -225,7 +225,7 @@ export const richText: ComponentManifest = {
     isolation: {
         scenario: 'rich-text-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

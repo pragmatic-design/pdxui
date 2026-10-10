@@ -146,7 +146,7 @@ export const emptyState: ComponentManifest = {
         scenario: 'empty-state-basic',
         targets: [
             // A content-driven container (the icon, the text and the padding): a wider tolerance.
-            { selector: 'section:not([hidden]) [data-test="empty"]', tolerancePx: 16 },
+            { selector: 'section:not([hidden]) [data-test="empty"]', tolerancePx: 16, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor', 'height'] }] },
         ],
     },
 

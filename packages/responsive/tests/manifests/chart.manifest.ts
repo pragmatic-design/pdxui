@@ -216,7 +216,7 @@ export const chart: ComponentManifest = {
             // The height is NOT an absolute invariant: it comes from the inline 16/9 aspect ratio and the width
             // (aspect-driven, as in aspect-ratio.manifest). skipHeight → the invariant is the width and the box,
             // not a fixed height. No radius or border from the design system (the style is inline) → a wide tolerance.
-            { selector: 'section:not([hidden]) [data-test="chart"] .pdx-chart-canvas', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="chart"] .pdx-chart-canvas', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 

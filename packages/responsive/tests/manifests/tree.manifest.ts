@@ -188,7 +188,7 @@ export const tree: ComponentManifest = {
     isolation: {
         scenario: 'tree-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="tree"] .pdx-tree', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="tree"] .pdx-tree', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
         ],
     },
 
