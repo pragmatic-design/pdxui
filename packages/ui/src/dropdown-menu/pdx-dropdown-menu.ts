@@ -61,6 +61,8 @@ component('pdx-dropdown-menu', {
         let _menuEl: MenuHost | null = null;
         let _scrollHandler: (() => void) | null = null;
         let _outsideHandler: ((e: MouseEvent) => void) | null = null;
+        /** The pending timer that adds `_outsideHandler`: close() cancels it, or it adds the listener after the close (#163). */
+        let _outsideTimer: ReturnType<typeof setTimeout> | null = null;
         let _escHandler: ((e: KeyboardEvent) => void) | null = null;
 
         // ─── The menu ────────────────────────────────────────
@@ -139,7 +141,8 @@ component('pdx-dropdown-menu', {
             }));
 
             // Click-outside
-            setTimeout(() => {
+            _outsideTimer = setTimeout(() => {
+                _outsideTimer = null;
                 _outsideHandler = (e: MouseEvent) => {
                     const t = e.target as Node;
                     if (_triggerEl?.contains(t) || _menuEl?.contains(t)) return;
@@ -166,6 +169,7 @@ component('pdx-dropdown-menu', {
 
             if (_triggerEl) { _triggerEl.setAttribute('aria-expanded', 'false'); _triggerEl.removeAttribute('aria-controls'); }
             if (_menuEl) { _menuEl.closeSubmenu?.(); _menuEl.remove(); _menuEl = null; }
+            if (_outsideTimer) { clearTimeout(_outsideTimer); _outsideTimer = null; }
             if (_outsideHandler) { document.removeEventListener('mousedown', _outsideHandler); _outsideHandler = null; }
             if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
             if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }

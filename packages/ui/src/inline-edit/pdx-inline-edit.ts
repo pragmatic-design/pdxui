@@ -85,6 +85,8 @@ component('pdx-inline-edit', {
         let _hiddenEl: HTMLInputElement | null = null;
         let _rootEl: HTMLElement | null = null;
         let _outsideHandler: ((e: MouseEvent) => void) | null = null;
+        /** The pending timer that adds `_outsideHandler`: removeOutsideHandler() cancels it too (#163). */
+        let _outsideTimer: ReturnType<typeof setTimeout> | null = null;
 
         function getType(): string {
             return (ctx.type() as string) || 'text';
@@ -184,7 +186,8 @@ component('pdx-inline-edit', {
             _editing.set(true);
             // Click outside → auto-confirm (unless action mode)
             if ((ctx.saveOn() as string) !== 'action') {
-                setTimeout(() => {
+                _outsideTimer = setTimeout(() => {
+                    _outsideTimer = null;
                     _outsideHandler = (e: MouseEvent) => {
                         if (!ctx.el.contains(e.target as Node)) confirmEdit();
                     };
@@ -194,6 +197,7 @@ component('pdx-inline-edit', {
         }
 
         function removeOutsideHandler(): void {
+            if (_outsideTimer) { clearTimeout(_outsideTimer); _outsideTimer = null; }
             if (_outsideHandler) {
                 document.removeEventListener('mousedown', _outsideHandler);
                 _outsideHandler = null;

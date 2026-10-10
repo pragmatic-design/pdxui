@@ -55,6 +55,8 @@ component('pdx-menubar', {
         let _focusDispose: Dispose | null = null;
         let _panelFocusDispose: Dispose | null = null;
         let _outsideHandler: ((e: MouseEvent) => void) | null = null;
+        /** The pending timer that adds `_outsideHandler`: closeMenu() cancels it, or it adds the listener after the close (#163). */
+        let _outsideTimer: ReturnType<typeof setTimeout> | null = null;
         let _escHandler: ((e: KeyboardEvent) => void) | null = null;
         // _hasOpened tracking removed (was declared but never read)
         let _activeSubmenuKey = '';
@@ -153,7 +155,8 @@ component('pdx-menubar', {
             requestAnimationFrame(() => focusPanelEntry(focus));
 
             // Click-outside
-            setTimeout(() => {
+            _outsideTimer = setTimeout(() => {
+                _outsideTimer = null;
                 _outsideHandler = (e: MouseEvent) => {
                     const t = e.target as Node;
                     if (_barEl?.contains(t) || _panelEl?.contains(t)) return;
@@ -207,6 +210,7 @@ component('pdx-menubar', {
             }
             if (_panelEl) { _panelEl.remove(); _panelEl = null; }
             if (_panelFocusDispose) { _panelFocusDispose(); _panelFocusDispose = null; }
+            if (_outsideTimer) { clearTimeout(_outsideTimer); _outsideTimer = null; }
             if (_outsideHandler) { document.removeEventListener('mousedown', _outsideHandler); _outsideHandler = null; }
             if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
             if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
