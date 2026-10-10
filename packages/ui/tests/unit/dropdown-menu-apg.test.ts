@@ -29,7 +29,8 @@ const panel = () => document.querySelector('.pdx-dropdown-menu-panel') as HTMLEl
 describe('menu items with the wrong shape warn in dev', () => {
     let warn: Mock<typeof console.warn>;
     beforeEach(() => { cleanup(); warn = vi.spyOn(console, 'warn').mockImplementation(() => {}); });
-    afterEach(() => warn.mockRestore());
+    // Torn down after each test too: an open menu's click-outside timer must not outlive the file (#177).
+    afterEach(() => { cleanup(); warn.mockRestore(); });
 
     const messages = () => warn.mock.calls.map(c => String(c[0]));
 
@@ -97,6 +98,7 @@ describe('menu items with the wrong shape warn in dev', () => {
 
 describe('pdx-dropdown-menu — APG menu button keys', () => {
     beforeEach(cleanup);
+    afterEach(cleanup);
 
     const items = [
         { key: 'new', label: 'New' },

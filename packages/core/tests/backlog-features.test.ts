@@ -148,14 +148,13 @@ describe('W3C Context Protocol', () => {
         installContextProtocol();
         provide('shared-theme', { dark: true });
 
-        // Simulate a Lit element requesting context
+        // Simulate a Lit element requesting context: the protocol's `context` is the key itself (#103).
         const litEl = document.createElement('lit-element');
         document.body.appendChild(litEl);
 
         let received: unknown = null;
-        const event = new CustomEvent('context-request', { bubbles: true, composed: true });
-        (event as any).context = { name: 'shared-theme' };
-        (event as any).callback = (v: unknown) => { received = v; };
+        const event = new Event('context-request', { bubbles: true, composed: true });
+        Object.assign(event, { context: 'shared-theme', callback: (v: unknown) => { received = v; } });
         litEl.dispatchEvent(event);
 
         expect(received).toEqual({ dark: true });

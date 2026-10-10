@@ -26,7 +26,9 @@ describe('pdx-dropdown-menu shows its menu only once it is placed', () => {
         cleanup();
         frames = [];
     });
-    afterEach(() => vi.restoreAllMocks());
+    // Torn down after each test, not only before the next: the last test ends with the menu open, and
+    // its 10 ms click-outside timer would fire after the environment is gone (#177).
+    afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
     async function open(): Promise<HTMLElement> {
         const el = document.createElement('pdx-dropdown-menu');
