@@ -119,7 +119,10 @@ function emitsFor(tag) {
   return [...found].sort();
 }
 
-const esc = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ').trim();
+// The backslash first: a `\|` in the text would otherwise end the table cell at its pipe (#72).
+const esc = (s) => String(s ?? '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\n/g, ' ').trim();
+/** `s` with `re` removed until nothing more is: one pass can join two halves into a new match (#72). */
+const removeAll = (s, re) => { let prev; do { prev = s; s = s.replace(re, ''); } while (s !== prev); return s; };
 
 /** The names of the built-in icon set: the keys of `icons` in pragmatic-icons.ts, in file order. */
 function builtInIconNames() {
@@ -283,7 +286,7 @@ const unescapeHtml = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replac
   .replace(/&#39;/g, "'").replace(/&#123;/g, '{').replace(/&#125;/g, '}').replace(/&amp;/g, '&').replace(/@@/g, '@');
 // A tag named in a heading becomes code, `<code>` or not: `<pdx-error-boundary>` bare is read as a tag
 // by Markdown. The escaped `&lt;x&gt;` outside a code span is what the demos write for it.
-const plainText = (s) => unescapeHtml(s.replace(/<code>([\s\S]*?)<\/code>/g, '`$1`').replace(/<[^>]+>/g, '')
+const plainText = (s) => unescapeHtml(removeAll(s.replace(/<code>([\s\S]*?)<\/code>/g, '`$1`'), /<[^>]+>/g)
   .replace(/(`[^`]*`)|&lt;(\/?[a-z][\w-]*)&gt;/g, (m, code, tag) => code ?? `\`<${tag}>\``)).replace(/\s+/g, ' ').trim();
 /** A line that starts script rather than markup: where a Source block's JS part begins. */
 const SCRIPT_START = /^(import |export |const |let |var |function |async |await |class |\/\/|\/\*|[A-Za-z_$][\w$.]*\s*(=|\())/;
@@ -360,9 +363,9 @@ function demoSections(file) {
     // A section with no transcription gives its live markup: the code that actually runs, less the
     // heading, the description and the section's own closing tag.
     if (!blocks.length) {
-      const markup = sec.replace(/^[^>]*>/, '').replace(/<h2[^>]*>[\s\S]*?<\/h2>/, '')
-        .replace(/<p class="pdx-txt-small[^"]*"[^>]*>[\s\S]*?<\/p>/, '').replace(/<\/section>[\s\S]*$/, '')
-        .replace(/<!--[\s\S]*?-->/g, '').replace(/^\s*\n/gm, '').trimEnd();
+      const markup = removeAll(sec.replace(/^[^>]*>/, '').replace(/<h2[^>]*>[\s\S]*?<\/h2>/, '')
+        .replace(/<p class="pdx-txt-small[^"]*"[^>]*>[\s\S]*?<\/p>/, '').replace(/<\/section>[\s\S]*$/, ''),
+        /<!--[\s\S]*?-->/g).replace(/^\s*\n/gm, '').trimEnd();
       if (/<pdx-/.test(markup)) {
         const indent = Math.min(...markup.split('\n').filter(l => l.trim()).map(l => l.match(/^ */)[0].length));
         blocks = [{ lang: 'html', code: markup.split('\n').map(l => l.slice(indent)).join('\n').trim() }];
@@ -390,7 +393,7 @@ function examplesByTag() {
     .sort((a, b) => a.replace(/^.*[\\/]/, '').localeCompare(b.replace(/^.*[\\/]/, '')));
   const ownerOf = (name) => shorts.includes(name) ? name : (shorts.find(x => name.startsWith(`${x}-`)) ?? null);
   const withPage = new Set(files.map(f => ownerOf(f.replace(/^.*[\\/]comp-/, '').replace(/\.pdx$/, ''))).filter(Boolean).map(s => `pdx-${s}`));
-  const uses = (s, t) => s.blocks.some(b => b.lang === 'html' && new RegExp(`<${t}[\\s/>]`).test(b.code));
+  const uses = (s, t) => s.blocks.some(b => b.lang === 'html' && new RegExp(`<${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s/>]`).test(b.code));
   for (const f of files) {
     const name = f.replace(/^.*[\\/]comp-/, '').replace(/\.pdx$/, '');
     const owner = ownerOf(name);
@@ -534,7 +537,7 @@ function componentStrings() {
 }
 
 const strings = componentStrings();
-const cell = (s) => '`' + s.replace(/\|/g, '\\|') + '`';
+const cell = (s) => '`' + s.replace(/\\/g, '\\\\').replace(/\|/g, '\\|') + '`';
 const stringsDoc = [
   '# Component strings — every key, its English default, where it is declared', '',
   `> Generated from the sources. ${strings.length} keys in ${new Set(strings.map(r => r.component)).size} components.`, '',

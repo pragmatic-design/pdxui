@@ -68,7 +68,7 @@ describe('the component-design rules are in the skill', () => {
             .flatMap((m) => m[1].split(',').map((s) => s.trim().split(/\s+as\s+/)[0]).filter(Boolean));
         for (const name of imports) {
             expect(exported, `the page imports ${name}, which @pdxui/core does not export`)
-                .toMatch(new RegExp(`\\b${name.replace(/\$/g, '\\$')}\\b`));
+                .toMatch(new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`));
         }
     });
 });

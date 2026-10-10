@@ -125,7 +125,8 @@ describe('the contract pages import what they render, not the library', () => {
         // A tag missing from the map makes loadTags() throw on the page that needs it — loud, but
         // only on that page. Here it fails for every tag, before any page is opened.
         const loaders = readFileSync(join(GENERATED, 'component-loaders.js'), 'utf-8');
-        const missing = [...owner.keys()].filter((tag) => !loaders.includes(`'${tag}': () => import('@pdxui/ui/${owner.get(tag)!.subpath.slice(2)}')`));
+        // A Map entry since #72: `['pdx-x', () => import('…')]`.
+        const missing = [...owner.keys()].filter((tag) => !loaders.includes(`['${tag}', () => import('@pdxui/ui/${owner.get(tag)!.subpath.slice(2)}')]`));
         expect(missing, 'these tags have no loader: run `pnpm certify:gen`').toEqual([]);
     });
 

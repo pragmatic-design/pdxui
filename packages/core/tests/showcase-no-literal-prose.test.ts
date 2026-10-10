@@ -14,6 +14,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { removeHtmlComments } from '../../compiler/src/text-scan';
 
 const SHOWCASE_SRC = join(__dirname, '../../showcase/src');
 
@@ -30,7 +31,7 @@ function pdxFiles(dir: string): string[] {
 /** The `<template>` block, with comments removed. */
 function templateOf(source: string): string {
     const m = /<template[^>]*>([\s\S]*?)<\/template>\s*(?:<script|<style|$)/.exec(source);
-    return (m?.[1] ?? '').replace(/<!--[\s\S]*?-->/g, '');
+    return removeHtmlComments(m?.[1] ?? '');
 }
 
 /**

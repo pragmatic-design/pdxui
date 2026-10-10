@@ -66,6 +66,52 @@ export function elementContent(source: string, name: string): string | null {
     return close === -1 ? null : source.slice(open.end, close);
 }
 
+/**
+ * Every `<name …>…</name>` element in `source`, as [start of the opening tag, start of the body, end of
+ * the body, end of the closing tag]. The closing tag is matched in any case and may have whitespace
+ * before its `>` (`</script >`), as a browser reads it; an element that never closes is not listed.
+ */
+function elementSpans(source: string, name: string): [number, number, number, number][] {
+    const lower = source.toLowerCase();
+    const closer = `</${name.toLowerCase()}`;
+    const out: [number, number, number, number][] = [];
+    let from = 0;
+    // One pass over the opening tags; one inside an element already taken (a `<script>` named in a
+    // script's own text) is that element's content, not a new one.
+    for (const open of openTags(source, name)) {
+        if (open.start < from) continue;
+        let close = lower.indexOf(closer, open.end);
+        let end = -1;
+        while (close !== -1) {
+            let k = close + closer.length;
+            while (isSpace(source[k])) k++;
+            if (source[k] === '>') { end = k + 1; break; }
+            close = lower.indexOf(closer, close + 1);
+        }
+        // Not closed: no later one can close either.
+        if (end === -1) break;
+        out.push([open.start, open.end, close, end]);
+        from = end;
+    }
+    return out;
+}
+
+/** `source` without its `<name>` elements, each removed with its content: a `<script>` or `<style>` block. */
+export function removeElements(source: string, name: string): string {
+    let out = '';
+    let at = 0;
+    for (const [start, , , end] of elementSpans(source, name)) {
+        out += source.slice(at, start);
+        at = end;
+    }
+    return out + source.slice(at);
+}
+
+/** The content of every `<name>` element in `source`, in order. */
+export function elementBodies(source: string, name: string): string[] {
+    return elementSpans(source, name).map(([, bodyStart, bodyEnd]) => source.slice(bodyStart, bodyEnd));
+}
+
 /** `source` without its `<!-- … -->` comments. An opened comment that never closes stays, as before. */
 export function removeHtmlComments(source: string): string {
     let out = '';

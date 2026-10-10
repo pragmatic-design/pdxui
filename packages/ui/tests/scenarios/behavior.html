@@ -22,12 +22,20 @@
         if (theme) document.documentElement.setAttribute('pdx-theme', theme);
         if (scheme) document.documentElement.setAttribute('pdx-scheme', scheme);
 
+        // The tag and the attributes come from the URL (#72): only a library tag the loaders know, and no
+        // event-handler attribute — `?a:onclick=…` would be script the page runs.
         const tag = p.get('tag');
+        if (tag && !/^pdx-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(tag)) throw new Error('not a library tag: ' + tag);
         if (tag) {
             await loadTags([tag]);
             const el = document.createElement(tag);
             el.setAttribute('data-test', 'subject');
-            for (const [k, v] of p) { if (k.startsWith('a:')) el.setAttribute(k.slice(2), v); }
+            for (const [k, v] of p) {
+                if (!k.startsWith('a:')) continue;
+                const name = k.slice(2);
+                if (/^on/i.test(name)) throw new Error('an event-handler attribute is not a scenario attribute: ' + name);
+                el.setAttribute(name, v);
+            }
             const text = p.get('text'); if (text) el.textContent = text;
             document.getElementById('root').appendChild(el);
             window.__el = el;
