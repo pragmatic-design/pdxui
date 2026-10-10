@@ -9,6 +9,9 @@ import { uiString, format, uiAttr} from '../shared/i18n';
 import { createNavKeys, NAV_ENTRY } from './nav-keys';
 import { createNavFlyout } from './nav-flyout';
 
+/** Counts menus: a group's id is the menu's id and the item's key, so two menus never share one (#68). */
+let _navCounter = 0;
+
 export interface NavMenuItem {
     /** Unique key */
     key: string;
@@ -83,7 +86,7 @@ component('pdx-nav-menu', {
     },
     setup(ctx) {
         /** Prefix of this menu's group ids, which the toggles' aria-controls point at. */
-        const _uid = 'pdx-nav-' + Math.random().toString(36).slice(2, 8);
+        const _uid = 'pdx-nav-' + (++_navCounter);
         const _expandedKeys = signal<Set<string>>(new Set());
         let _navEl: HTMLElement | null = null;
         let _built = false;
