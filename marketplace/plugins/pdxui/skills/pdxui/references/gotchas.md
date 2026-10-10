@@ -9,9 +9,7 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
 > read before every `.pdx` anyone writes.
 
 ## Template reactivity
-- **A signal appears in the template only inside an expression or a wrapper function**, never as a bare identifier:
-  `@if (open())` and `:class="x > 0 ? 'a' : 'b'"` are fine; `{{ signalBare }}` or `@if (signalBare)` → a ReferenceError.
-  **An import is not on `ctx`**: a signal imported and used in the template makes the component throw at mount
+- **An import is not on `ctx`**: a signal imported and used in the template makes the component throw at mount
   (`ctx.X is not a function`); a function imported and used in `@click` throws the same when clicked, and nothing
   happens. Bring it into the `<script setup>`: a **function** as `const goTo = go` or a wrapper function; a **shared
   signal** as `const user = $derived(shared())`, then `{{ user.name }}` follows it. Not `const user = shared()` —

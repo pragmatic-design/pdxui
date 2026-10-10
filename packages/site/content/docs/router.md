@@ -170,13 +170,15 @@ Put a `<pdx-router-outlet>` in a page and every route below its path renders **i
 ```pdx
 <!-- ticket.pdx -->
 <template>
-  <h1>Ticket {{ $params.id }}</h1>
+  <h1>Ticket {{ id }}</h1>
   <nav>…tabs…</nav>
   <pdx-router-outlet />          <!-- the child renders here -->
 </template>
 
 <script setup>
 @page '/tickets/:id';
+import { currentParams } from '@pdxui/router';
+const id = $derived(currentParams().id);
 </script>
 ```
 

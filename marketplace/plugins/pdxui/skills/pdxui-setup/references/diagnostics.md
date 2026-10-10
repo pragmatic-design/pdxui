@@ -208,7 +208,7 @@ Instead of:
 
 ```html
 <template>
-  <p>{{ users.value() }}</p>
+  <p>{{ users.data() }}</p>
 </template>
 <script setup>
 @fetch users: 'GET /api/users' as string[];
@@ -219,7 +219,7 @@ write:
 
 ```html
 <template>
-  @if (users.state() === 'error') { <p>Could not load</p> } <p>{{ users.value() }}</p>
+  @if (users.state() === 'error') { <p>Could not load</p> } <p>{{ users.data() }}</p>
 </template>
 <script setup>
 @fetch users: 'GET /api/users' as string[];

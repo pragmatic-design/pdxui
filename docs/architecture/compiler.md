@@ -90,8 +90,8 @@ const doubled = $derived(count * 2);  // recomputed when count changes
 
 **Data** — declarative data loading:
 ```javascript
-@fetch users: '/api/users';           // a reactive GET
-@fetch user: '/api/users/${id}';      // with a reactive parameter
+@fetch users: 'GET /api/users';           // a reactive GET
+@fetch user: 'GET /api/users/${id}';      // with a reactive parameter
 ```
 
 **Form** — a form with validation:

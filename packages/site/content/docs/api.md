@@ -470,9 +470,8 @@ function batch(fn: () => void): void
 
 Group writes so subscribers run once, after all of them.
 
-Mostly unnecessary: synchronous writes are batched automatically, so this is for the cases the
-automatic batching cannot see — writes spread across an `await`, or inside a callback the runtime
-did not schedule. Wrapping ordinary code in it changes nothing.
+Outside it each write flushes at once, so two writes in a row run their subscribers twice, and the
+first run sees the second value not yet written. Use it when several writes are one change.
 
 Nested calls flush once, at the outermost exit.
 
@@ -3237,7 +3236,7 @@ Concurrent executions are refused, not queued: calling `execute` while one is in
 with "Mutation already in progress". That is the double-submit guard — a user double-clicking
 Save must not create two records — and it is why this is not just an async function.
 
-`invalidates` names the cache tags to drop on success, which is how a list refreshes itself after
+`invalidate` names the cache tags to drop on success, which is how a list refreshes itself after
 an item is created without the caller wiring the two together.
 
 ### `OfflineError`
@@ -4051,7 +4050,7 @@ flickering the old value back in.
 `tags` are what {@link invalidate} matches on after a {@link mutation}. `staleTime` (30s by
 default) is how long a cached value is served without a refetch.
 
-In a `.pdx` file `@fetch users: '/api/users'` compiles to this.
+In a `.pdx` file `@fetch users: 'GET /api/users'` compiles to this.
 
 ### `resourceWhen`
 
@@ -4672,9 +4671,9 @@ Reading is calling it: `count()`. Writing is `count.set(next)` or `count.set(v =
 {@link effect} or `computed` that read it during its last run re-runs when it changes; nothing
 else does, so there is no diffing and no dependency array to keep correct.
 
-Writes are auto-batched: several mutations in the same synchronous turn produce ONE flush, so a
-subscriber never observes a half-updated state. {@link batch} is for the cases where you need to
-say so explicitly.
+Each write outside {@link batch} flushes at once: its subscribers run before `set` returns. Writes
+that must be seen together — two fields of one state — go inside `batch()`, so a subscriber never
+observes the state half-updated.
 
 In a `.pdx` file you rarely call this — `let count = $signal(0)` compiles to it, and `count++`
 compiles to the `.set`.
