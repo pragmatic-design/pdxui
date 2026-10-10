@@ -27,7 +27,8 @@ describe('pdx-dropdown-menu keeps a focus the reader moved', () => {
         cleanup();
         frames = [];
     });
-    afterEach(() => vi.restoreAllMocks());
+    // Torn down after each test too: an open menu's click-outside timer must not outlive the file (#177).
+    afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
     async function open(): Promise<void> {
         const el = document.createElement('pdx-dropdown-menu');

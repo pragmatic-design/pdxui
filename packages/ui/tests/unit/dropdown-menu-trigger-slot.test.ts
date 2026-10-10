@@ -4,7 +4,7 @@
 // `size`), and a menu opened by an avatar would rebuild opening, closing, the keys, the outside click
 // and the focus return by hand around a pdx-menu. With the slot, the component does that for whatever
 // it is given, and without it the button is the component's own.
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/dropdown-menu/pdx-dropdown-menu';
 import '../../src/menu/pdx-menu';
@@ -34,6 +34,8 @@ const key = (target: HTMLElement, k: string) => {
 
 describe('pdx-dropdown-menu — a slotted trigger', () => {
     beforeEach(cleanup);
+    // Torn down after each test too: an open menu's click-outside timer must not outlive the file (#177).
+    afterEach(cleanup);
 
     it('the slotted element is the trigger, and no button of the component is built beside it', async () => {
         const { el, trigger } = await mountSlotted('<button slot="trigger" class="avatar">AS</button>');
@@ -139,6 +141,7 @@ describe('pdx-dropdown-menu — a slotted trigger', () => {
 
 describe('pdx-dropdown-menu — control: without the slot, the button is the component\'s', () => {
     beforeEach(cleanup);
+    afterEach(cleanup);
 
     it('builds its own button, with its label and chevron, and opens on click', async () => {
         const el = document.createElement('pdx-dropdown-menu');
