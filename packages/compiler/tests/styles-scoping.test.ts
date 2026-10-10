@@ -62,6 +62,8 @@ describe('scoping a selector', () => {
         expect(out).toContain('@container (min-width: 600px)');
         expect(out).toMatch(/\[data-pdx-[a-z0-9]+\] \.title/);
         expect(out).not.toMatch(/@container[^{]*\[data-pdx-/);
+        // No bare `.title` rule left beside the scoped one (from #166, by @jay23606).
+        expect(out).not.toMatch(/(^|[;{}])\s*\.title \{ *font-size/);
     });
 
     it('recurses into @starting-style the same way (#104)', () => {

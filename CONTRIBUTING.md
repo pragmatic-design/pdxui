@@ -212,6 +212,10 @@ does not start it without one.
 
 ## Commits and pull requests
 
+- **Before you start on an issue, comment on it and ask to be assigned.** The maintainers work
+  through the open issues continuously, so an issue nobody is assigned to may be picked up at any
+  time; one that someone asked for is left to them. If you can no longer work on an issue you were
+  assigned, say so on it, so that it can go to someone else.
 - One logical change per commit, in the imperative, with a scope.
 - The body says what was wrong, how you know it is fixed, and which test proves it.
 - A change an application can notice gets a [CHANGELOG](CHANGELOG.md) entry under *Unreleased*.
