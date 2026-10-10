@@ -13,6 +13,7 @@ import { findLocalOccurrences, findAttributeOccurrences, findTagUses } from '../
 import { collectDeclaredNames } from './references';
 import { tagFromUri, type ComponentInfo } from '../utils/component-index';
 import type { WorkspaceFile } from './references';
+import { escapeRegex } from '../utils/positions';
 
 /** Valid JS identifier (for symbol rename). */
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
@@ -166,8 +167,9 @@ function renameTag(ctx: RenameEditContext): WorkspaceEdit | null {
 
 /** Edit that rewrites the `@tag 'old'` / `@tag "old"` literal to the new tag. */
 function tagLiteralEdit(content: string, oldTag: string, newTag: string): TextEdit | null {
-    // Match: @tag 'old' or @tag "old". Group 1 = quote, group 2 = old tag.
-    const re = new RegExp(`@tag\\s+(["'])(${oldTag.replace(/[-]/g, '\\$&')})\\1`);
+    // Match: @tag 'old' or @tag "old". Group 1 = quote, group 2 = old tag — escaped whole: a tag
+    // may hold a `.`, which unescaped matched any character (#71).
+    const re = new RegExp(`@tag\\s+(["'])(${escapeRegex(oldTag)})\\1`);
     const m = re.exec(content);
     if (!m) return null;
     const nameStart = m.index + m[0].indexOf(oldTag, 4);

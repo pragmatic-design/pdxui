@@ -8,6 +8,7 @@
 import type { ScriptAnalysis } from './script-analyzer';
 import type { ValidationWarning } from './validate';
 import { onlyNear } from './edit-distance';
+import { escapeForRegExp } from './regexp-escape';
 
 /** JS words and browser globals an expression may name without the component declaring them. */
 const AMBIENT = new Set([
@@ -49,7 +50,7 @@ export function checkUndeclaredRefs(analysis: ScriptAnalysis, templateIds: Reado
         ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy, ...analysis.effects].join('\n');
     for (const id of templateIds) {
         if (declared.has(id) || AMBIENT.has(id) || id.startsWith('$')) continue;
-        if (new RegExp(`(?<![\\w$])${id.replace(/\$/g, '\\$')}(?![\\w$])`).test(script)) continue;
+        if (new RegExp(`(?<![\\w$])${escapeForRegExp(id)}(?![\\w$])`).test(script)) continue;
         const meant = onlyNear(id, declared, 2);
         warnings.push({
             code: 'PDX_UNDECLARED_REF',

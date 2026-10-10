@@ -175,7 +175,7 @@ class InlineGen {
     walk(nodes: TemplateNode[]): void {
         for (const node of nodes) {
             switch (node.type) {
-                case 'html': this.html(node.content, htmlOriginOf(this.ctx, node)); break;
+                case 'html': this.html(node.content, htmlOriginOf(this.ctx, node), node.raw === true); break;
                 case 'interpolation': this.interp(node); break;
                 case 'if': this.ifN(node); break;
                 case 'for': this.forN(node); break;
@@ -220,7 +220,8 @@ class InlineGen {
 
     // ─── HTML Fragment Parsing ────────────────────────────────
 
-    html(content: string, at: ((k: number) => number | null) | null = null): void {
+    /** `raw`: an @raw block, whose unquoted `${…}` is text, not a value the compiler wrote. */
+    html(content: string, at: ((k: number) => number | null) | null = null, raw = false): void {
         let i = 0;
         while (i < content.length) {
             if (content[i] !== '<') {
@@ -245,7 +246,7 @@ class InlineGen {
             } else {
                 const tagEnd = this.tagEnd(content, i);
                 const tagStart = i;
-                this.openTag(content.slice(i, tagEnd + 1), at ? (k) => at(tagStart + k) : null);
+                this.openTag(content.slice(i, tagEnd + 1), at ? (k) => at(tagStart + k) : null, raw);
                 i = tagEnd + 1;
             }
         }
@@ -271,7 +272,7 @@ class InlineGen {
         return s.length - 1;
     }
 
-    private openTag(tag: string, at: ((k: number) => number | null) | null = null): void {
+    private openTag(tag: string, at: ((k: number) => number | null) | null = null, raw = false): void {
         const nm = tag.match(/^<([\w-]+)/);
         if (!nm) return;
         const name = nm[1];
@@ -285,7 +286,7 @@ class InlineGen {
         this.out(svg
             ? `const ${el} = document.createElementNS(${jsString(SVG_NS)}, ${jsQuote(name)});`
             : `const ${el} = document.createElement(${jsQuote(name)});`);
-        this.attrs(tag, el, kind, at ? attributeOrigins(tag, at) : null);
+        this.attrs(tag, el, kind, at ? attributeOrigins(tag, at) : null, raw);
         this.out(`${this.parent()}.appendChild(${el});`);
         if (!isVoid) {
             this.stack.push(el);
@@ -295,7 +296,7 @@ class InlineGen {
 
     // ─── Attribute Processing ─────────────────────────────────
 
-    private attrs(tag: string, el: string, kind: ElementKind, origins: Map<string, number> | null = null): void {
+    private attrs(tag: string, el: string, kind: ElementKind, origins: Map<string, number> | null = null, raw = false): void {
         const sp = tag.indexOf(' ');
         if (sp === -1) return;
         const s = tag.slice(sp, tag.endsWith('/>') ? -2 : -1);
@@ -324,9 +325,15 @@ class InlineGen {
             if (m[4]) {
                 const open = m.index + m[0].length - 2; // position of `${`
                 const close = this.matchBrace(s, open + 1);
+                re.lastIndex = close + 1;
+                if (raw) {
+                    // In @raw it is what the author wrote, and the browser reads it as a plain value:
+                    // the template path's markup shows `${x}`, and so does this (#71).
+                    this.out(`${el}.setAttribute(${jsString(n)}, ${jsString(s.slice(open, close + 1))});`);
+                    continue;
+                }
                 val = s.slice(open + 2, close);
                 preRewritten = true;
-                re.lastIndex = close + 1;
             }
             // The statement this attribute becomes points at it.
             const origin = origins?.get(n);

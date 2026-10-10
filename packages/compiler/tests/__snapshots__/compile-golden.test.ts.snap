@@ -31034,7 +31034,7 @@ component('pdx-demo-comp-form-basic', {
   notifications: boolean
 }
 
-// Validates, moves \\\\\\\`state\\\\\\\` through submitting → success, and rebases the form.
+// Validates, moves \\\`state\\\` through submitting → success, and rebases the form.
 const saveBasic = basicForm.handleSubmit(async (values) =&gt; { await api.saveProfile(values); });
 
 &lt;pdx-form :form="basicForm" @pdx-submit="saveBasic"&gt;
@@ -42453,13 +42453,13 @@ const teamMembers = [
 
 function renderTeamItem(item) {
   const r = item.raw;
-  return html\\\\\\\`&lt;div class="team-option"&gt;
-    &lt;span class="team-avatar"&gt;\\\\\\\${r.initials}&lt;/span&gt;
+  return html\\\`&lt;div class="team-option"&gt;
+    &lt;span class="team-avatar"&gt;\\\${r.initials}&lt;/span&gt;
     &lt;div class="team-info"&gt;
-      &lt;span class="team-name"&gt;\\\\\\\${item.label}&lt;/span&gt;
-      &lt;span class="team-role"&gt;\\\\\\\${r.role}&lt;/span&gt;
+      &lt;span class="team-name"&gt;\\\${item.label}&lt;/span&gt;
+      &lt;span class="team-role"&gt;\\\${r.role}&lt;/span&gt;
     &lt;/div&gt;
-  &lt;/div&gt;\\\\\\\`;
+  &lt;/div&gt;\\\`;
 }</code></pre></details>
   </section>
 \`,

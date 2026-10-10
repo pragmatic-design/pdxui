@@ -13,6 +13,7 @@ import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
 import { skipNonCode, findClosing } from './tokenizer';
 import { openingTagTexts, routeParams } from '../text-scan';
+import { escapeForRegExp } from './regexp-escape';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -508,11 +509,6 @@ function checkEmptyLoops(ast: TemplateNode[], warnings: ValidationWarning[]): vo
     }
 }
 
-/** A name as a regular-expression literal: a form is named by the author and could hold anything. */
-function escapeForRegExp(text: string): string {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 /**
  * Every piece of raw markup in the template, concatenated.
  *
@@ -736,10 +732,11 @@ function checkRawInterpolation(nodes: TemplateNode[], warnings: ValidationWarnin
     const seen = new Set<string>();
     const walk = (list: TemplateNode[]): void => {
         for (const node of list) {
-            if (node.type === 'html') {
+            // An @raw block is text as written: a `${` in it is shown, not interpolated.
+            if (node.type === 'html' && !node.raw) {
                 const bound = checkBoundValues(node.content, node.loc, warnings);
                 // Match ${ ... } occurrences (template-literal interpolation leaking into markup).
-                // Negative lookbehind for `\` — @raw blocks escape `${` to `\${`, which is intentional.
+                // Negative lookbehind for `\` — an author's `\${` is escaped on purpose.
                 const re = /(?<!\\)\$\{[^}]*\}/g;
                 let m: RegExpExecArray | null;
                 while ((m = re.exec(node.content)) !== null) {

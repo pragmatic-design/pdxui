@@ -14,6 +14,7 @@ import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg } from
 import { rewriteHtmlBindings, isSimpleAccess } from './codegen-template-rewrite';
 import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
+import { escapeForTemplateLiteral } from './codegen-shared';
 
 /** `${…}` with an origin mark just inside its `${`, where it is part of the expression, not the HTML. */
 function markInterpolation(code: string, mark: string): string {
@@ -51,6 +52,12 @@ export function generateNodes(nodes: TemplateNode[], imports: Set<string>, ctx: 
     for (const node of nodes) {
         switch (node.type) {
             case 'html':
+                if (node.raw) {
+                    // @raw: escaped for the html`` literal and nothing else — no binding rewrite.
+                    flushHtml();
+                    parts.push(escapeForTemplateLiteral(node.content));
+                    break;
+                }
                 segments.push({ start: htmlBuf.length, at: htmlOriginOf(ctx, node) });
                 htmlBuf += node.content;
                 break;

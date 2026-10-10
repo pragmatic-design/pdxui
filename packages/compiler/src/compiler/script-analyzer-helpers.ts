@@ -787,6 +787,37 @@ export function parseRouteBlock(blockContent: string, route: RouteInfo): void {
  * Quotes ONLY identifier keys (in key position, not inside strings/values) so that
  * `:` inside URLs/values (e.g. `url: 'https://x'`) is preserved. Returns undefined on parse failure.
  */
+const SIMPLE_ESCAPES: Record<string, string> = { n: '\n', t: '\t', r: '\r', b: '\b', f: '\f', v: '\v', 0: '\0' };
+
+/** The value of a single-quoted JavaScript string literal's body: its escapes read, as the language reads them. */
+function decodeSingleQuoted(body: string): string {
+    let out = '';
+    for (let i = 0; i < body.length; i++) {
+        if (body[i] !== '\\') { out += body[i]; continue; }
+        const ch = body[++i];
+        if (ch === undefined) break;
+        if (ch in SIMPLE_ESCAPES && !(ch === '0' && /\d/.test(body[i + 1] ?? ''))) {
+            out += SIMPLE_ESCAPES[ch];
+        } else if (ch === 'x') {
+            out += String.fromCharCode(parseInt(body.slice(i + 1, i + 3), 16));
+            i += 2;
+        } else if (ch === 'u' && body[i + 1] === '{') {
+            const close = body.indexOf('}', i + 2);
+            out += String.fromCodePoint(parseInt(body.slice(i + 2, close), 16));
+            i = close;
+        } else if (ch === 'u') {
+            out += String.fromCharCode(parseInt(body.slice(i + 1, i + 5), 16));
+            i += 4;
+        } else if (ch === '\r' || ch === '\n') {
+            // A line continuation adds nothing; `\r\n` is one.
+            if (ch === '\r' && body[i + 1] === '\n') i++;
+        } else {
+            out += ch; // `\'`, `\"`, `\\` and every other identity escape
+        }
+    }
+    return out;
+}
+
 export function parseObjectLiteralToJson(src: string): unknown {
     let out = '';
     for (let i = 0; i < src.length; i++) {
@@ -795,9 +826,9 @@ export function parseObjectLiteralToJson(src: string): unknown {
         if (skip !== null && skip > i) {
             const tok = src.slice(i, skip);
             if (tok[0] === "'") {
-                // single-quoted → JSON double-quoted (escape inner ", unescape \')
-                const body = tok.slice(1, -1).replace(/\\'/g, "'").replace(/"/g, '\\"');
-                out += `"${body}"`;
+                // single-quoted → JSON: read the string as JavaScript reads it, then write it as JSON.
+                // Swapping the quotes by hand turned `\"` into `\\"`, which ends the JSON string (#71).
+                out += JSON.stringify(decodeSingleQuoted(tok.slice(1, -1)));
             } else {
                 out += tok;
             }
