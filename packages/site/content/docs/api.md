@@ -1518,6 +1518,10 @@ function define(tag: string, ctor: PdxElementConstructor): void
 
 Register a Custom Element. If already defined, swaps prototype for HMR.
 
+Where there is no custom element registry (Node: a build tool, a test, static generation) it
+registers nothing. Every compiled `.pdx` and every `@pdxui/ui` module calls `component()` when it is
+imported, so throwing here would make the whole module graph unimportable.
+
 ### `delayTransport`
 
 ```ts
@@ -2613,7 +2617,9 @@ import { html } from '@pdxui/core';
 function html(strings: TemplateStringsArray, ...values: TemplateValue[]): DocumentFragment
 ```
 
-Tagged template literal that produces reactive DOM. SSR-safe: returns empty fragment.
+Tagged template literal that produces reactive DOM. It needs a DOM: where there is none it throws,
+naming the call, instead of returning something that is not a fragment. Module evaluation never
+calls it, so a module that uses it still imports.
 
 ### `HttpError`
 

@@ -23,11 +23,12 @@ export interface EmitOptions {
     cancelable?: boolean;
 }
 
-// SSR-safe base: in a non-DOM environment (Node tooling, tests without happy-dom, future
-// SSR) `HTMLElement` is undefined and `class extends HTMLElement` would throw AT IMPORT
-// TIME, making the whole bundle unimportable. Fall back to an empty stub — it is
-// never instantiated outside the browser (customElements.define is DOM-guarded), so the
-// class definition just needs *a* constructor to extend.
+// Importable without a DOM, which is not the same as rendering without one. In Node (a build tool,
+// a test, static generation) `HTMLElement` is undefined and `class extends HTMLElement` would throw
+// AT IMPORT TIME, making the whole bundle unimportable. Fall back to an empty stub: it is never
+// instantiated there, because `define()` registers nothing without a custom element registry, so
+// the class definition just needs *a* constructor to extend. tests/node-import.test.ts imports core,
+// a compiled component and a library component in plain Node.
 const HTMLElementBase: typeof HTMLElement = (typeof HTMLElement !== 'undefined'
     ? HTMLElement
     : (class {} as unknown as typeof HTMLElement));

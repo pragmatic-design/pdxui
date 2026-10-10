@@ -30,11 +30,16 @@ if (typeof gc !== 'function') {
     );
 }
 
-const observe = MutationObserver.prototype.observe;
-function observeThenCollect(this: MutationObserver, ...args: Parameters<MutationObserver['observe']>): void {
-    observe.apply(this, args);
-    setImmediate(() => gc!());
+// A file that declares `@vitest-environment node` has no MutationObserver, and so nothing to detect
+// (node-import.test.ts, which asserts that core imports where there is no DOM). Every happy-dom file
+// has one, and `gc-detector.test.ts` asserts the wrapper is in place there.
+if (typeof MutationObserver !== 'undefined') {
+    const observe = MutationObserver.prototype.observe;
+    const observeThenCollect = function (this: MutationObserver, ...args: Parameters<MutationObserver['observe']>): void {
+        observe.apply(this, args);
+        setImmediate(() => gc!());
+    };
+    /** Read by each package's `gc-detector.test.ts`: the wrapper is in place, not only the flag. */
+    (observeThenCollect as unknown as { pdxGcDetector: boolean }).pdxGcDetector = true;
+    MutationObserver.prototype.observe = observeThenCollect;
 }
-/** Read by each package's `gc-detector.test.ts`: the wrapper is in place, not only the flag. */
-(observeThenCollect as unknown as { pdxGcDetector: boolean }).pdxGcDetector = true;
-MutationObserver.prototype.observe = observeThenCollect;
