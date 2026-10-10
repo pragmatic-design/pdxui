@@ -11,6 +11,7 @@ import { indent, extractTag, sourceFileOption } from './codegen-shared';
 import { originMark } from './sourcemap';
 import { coreRuntimeNames } from './core-import-names';
 import { jsQuote } from './js-literal';
+import { isSpace } from '../text-scan';
 
 /** Compile using legacy defineProps + explicit return syntax. */
 export function compileLegacyMode(descriptor: SFCDescriptor, ast: TemplateNode[], filename: string, _runner: PluginRunner | null | undefined, ctx: CompileContext): string {
@@ -91,11 +92,91 @@ interface LegacyScriptParts {
     body: string;
 }
 
+/** A `defineProps(…)` / `defineEmits(…)` call found in a legacy script, with its `const x =` if it has one. */
+interface LegacyCall {
+    start: number;
+    end: number;
+    argument: string;
+    binding?: string;
+}
+
+/** Reads a call's arguments from just after its name: what they are and where the call ends, or null. */
+type ArgumentReader = (text: string, from: number) => { argument: string; end: number } | null | 'never';
+
+const skipSpace = (text: string, i: number): number => {
+    while (isSpace(text[i])) i++;
+    return i;
+};
+
+/**
+ * The first call to `name` whose arguments `read` accepts, with the `const x =` before it. A scan in
+ * place of the patterns that took quadratic time on a script repeating `defineProps({{` or
+ * `defineEmits<` (#70): a reader answers 'never' when no later call can be complete either.
+ */
+function findLegacyCall(text: string, name: string, read: ArgumentReader): LegacyCall | null {
+    for (let i = text.indexOf(name); i !== -1; i = text.indexOf(name, i + 1)) {
+        const args = read(text, i + name.length);
+        if (args === 'never') return null;
+        if (!args) continue;
+        // `const x = ` immediately before: spaces, `=`, spaces, a name, spaces, `const`.
+        let j = i - 1;
+        while (j >= 0 && isSpace(text[j])) j--;
+        if (text[j] === '=') {
+            j--;
+            while (j >= 0 && isSpace(text[j])) j--;
+            const nameEnd = j + 1;
+            while (j >= 0 && /\w/.test(text[j])) j--;
+            const binding = text.slice(j + 1, nameEnd);
+            const spaceEnd = j;
+            while (j >= 0 && isSpace(text[j])) j--;
+            if (binding && j < spaceEnd && j >= 4 && text.slice(j - 4, j + 1) === 'const') {
+                return { start: j - 4, end: args.end, argument: args.argument, binding };
+            }
+        }
+        return { start: i, end: args.end, argument: args.argument };
+    }
+    return null;
+}
+
+/** `( { … } )`: the object up to the first `}` that a `)` follows, as `\(\s*(\{[\s\S]*?\})\s*\)` read it. */
+function propsArgument(text: string, from: number): { argument: string; end: number } | null | 'never' {
+    let i = skipSpace(text, from);
+    if (text[i] !== '(') return null;
+    i = skipSpace(text, i + 1);
+    if (text[i] !== '{') return null;
+    for (let close = text.indexOf('}', i + 1); close !== -1; close = text.indexOf('}', close + 1)) {
+        const paren = skipSpace(text, close + 1);
+        if (text[paren] === ')') return { argument: text.slice(i, close + 1), end: paren + 1 };
+    }
+    // No `}` followed by `)` after this point, so none after any later call either.
+    return 'never';
+}
+
+/**
+ * A reader of `[<…>] ( )`, as `\s*(?:<[^>]*>)?\s*\(\s*\)` read it. It remembers where a `>` was last
+ * looked for and not found: a later `defineEmits<` cannot find one either, but a later plain
+ * `defineEmits()` still can, so it is not the end of the search.
+ */
+function emitsArgument(): ArgumentReader {
+    let noGtFrom = Infinity;
+    return (text, from) => {
+        let i = skipSpace(text, from);
+        if (text[i] === '<') {
+            const gt = i + 1 >= noGtFrom ? -1 : text.indexOf('>', i + 1);
+            if (gt === -1) { noGtFrom = Math.min(noGtFrom, i + 1); return null; }
+            i = skipSpace(text, gt + 1);
+        }
+        if (text[i] !== '(') return null;
+        i = skipSpace(text, i + 1);
+        return text[i] === ')' ? { argument: '', end: i + 1 } : null;
+    };
+}
+
 /**
  * Extract defineProps, defineEmits, imports, and remaining body from legacy-mode script.
  * Used only for backward compatibility with the old defineProps/return syntax.
  */
-function extractLegacyScript(script: string): LegacyScriptParts {
+export function extractLegacyScript(script: string): LegacyScriptParts {
     const lines = script.split('\n');
     const importLines: string[] = [];
     const bodyLines: string[] = [];
@@ -115,23 +196,21 @@ function extractLegacyScript(script: string): LegacyScriptParts {
 
     const body = bodyLines.join('\n').trim();
 
-    // Match: defineProps({ ... })
-    const propsRegex = /(?:const\s+\w+\s*=\s*)?defineProps\s*\(\s*(\{[\s\S]*?\})\s*\)/;
-    const propsMatch = propsRegex.exec(body);
+    // `[const x =] defineProps({ ... })`, the object up to the first `}` that a `)` follows.
+    const propsMatch = findLegacyCall(body, 'defineProps', propsArgument);
     let props: string | null = null;
     let cleanBody = body;
     if (propsMatch) {
-        props = propsMatch[1].trim();
-        cleanBody = body.slice(0, propsMatch.index) + body.slice(propsMatch.index + propsMatch[0].length);
+        props = propsMatch.argument.trim();
+        cleanBody = body.slice(0, propsMatch.start) + body.slice(propsMatch.end);
         cleanBody = cleanBody.replace(/^\s*;\s*$/gm, '').trim();
     }
 
-    // Match: defineEmits() → replace with ctx.emit wrapper
-    const emitsRegex = /(?:const\s+(\w+)\s*=\s*)?defineEmits\s*(?:<[^>]*>)?\s*\(\s*\)/;
-    const emitsMatch = emitsRegex.exec(cleanBody);
+    // `[const emit =] defineEmits[<…>]()` → replaced with a ctx.emit wrapper
+    const emitsMatch = findLegacyCall(cleanBody, 'defineEmits', emitsArgument());
     if (emitsMatch) {
-        const emitVar = emitsMatch[1] || 'emit';
-        cleanBody = cleanBody.slice(0, emitsMatch.index) + cleanBody.slice(emitsMatch.index + emitsMatch[0].length);
+        const emitVar = emitsMatch.binding || 'emit';
+        cleanBody = cleanBody.slice(0, emitsMatch.start) + cleanBody.slice(emitsMatch.end);
         cleanBody = cleanBody.replace(/^\s*;\s*$/gm, '').trim();
         cleanBody = `const ${emitVar} = (event, detail) => ctx.emit(event, detail);\n${cleanBody}`;
     }

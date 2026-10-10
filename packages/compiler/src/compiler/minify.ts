@@ -20,13 +20,55 @@
  * Whitespace inside text is content: `a {{ x }} b` is three pieces the author typed. Collapsing a RUN
  * of it is fine; removing the single space that separates two words is not.
  */
+/**
+ * `html` with every `<pre …>…</pre>` and `<code …>…</code>` replaced by a placeholder, the blocks
+ * pushed to `preserved` in order: what `/<(pre|code)[^>]*>[\s\S]*?<\/\1>/gi` replaced. Scanned, not
+ * matched — that pattern took quadratic time on `<pre` repeated without its `>` or its `</pre>` (#70).
+ */
+function preserveBlocks(html: string, preserved: string[]): string {
+    const lower = html.toLowerCase();
+    // Per name, the position after which its closing tag does not occur.
+    const noClose: Record<string, number> = {};
+    // Per name, the next opener found at or after `at`, kept until `at` passes it: searching again
+    // from every block would read the file once per block.
+    const next: Record<string, number> = { pre: -2, code: -2 };
+    const nextOpener = (name: string, at: number): number => {
+        if (at >= (noClose[name] ?? Infinity)) return -1;
+        if (next[name] === -1 || next[name] >= at) return next[name];
+        return (next[name] = lower.indexOf('<' + name, at));
+    };
+    let out = '';
+    let from = 0;
+    let at = 0;
+    for (;;) {
+        const candidates = ['pre', 'code']
+            .map((name) => ({ name, i: nextOpener(name, at) }))
+            .filter((c) => c.i !== -1)
+            .sort((a, b) => a.i - b.i);
+        if (candidates.length === 0) break;
+        const { name, i } = candidates[0];
+        const gt = html.indexOf('>', i + name.length + 1);
+        // No `>` after this opener, so no later opener can end either.
+        if (gt === -1) break;
+        const closeTag = `</${name}>`;
+        const close = lower.indexOf(closeTag, gt + 1);
+        if (close === -1) {
+            noClose[name] = i;
+            at = i + 1;
+            continue;
+        }
+        const end = close + closeTag.length;
+        preserved.push(html.slice(i, end));
+        out += html.slice(from, i) + `__PDX_PRESERVE_${preserved.length - 1}__`;
+        from = at = end;
+    }
+    return out + html.slice(from);
+}
+
 export function minifyHTML(html: string): string {
     // Protect <pre> and <code> blocks
     const preserved: string[] = [];
-    let result = html.replace(/<(pre|code)[^>]*>[\s\S]*?<\/\1>/gi, (match) => {
-        preserved.push(match);
-        return `__PDX_PRESERVE_${preserved.length - 1}__`;
-    });
+    let result = preserveBlocks(html, preserved);
 
     // Collapse whitespace between tags to ONE space, not to none. Dev renders through the browser's
     // parser, which keeps it; between two inline elements it is text the reader sees, and dropping it

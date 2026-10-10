@@ -29,17 +29,53 @@ export interface Ignore {
     scope: 'file' | 'next-line';
 }
 
-// Match: a `pdx-ignore` / `pdx-ignore-file` comment in any of the three forms.
-// Groups: [1]=`-file` or nothing [2]=the code [3]=the reason, up to the comment's end.
-const IGNORE = /(?:<!--|\/\*|\/\/)\s*pdx-ignore(-file)?\s+(PDX_[A-Z0-9_]+)\s*(?::\s*(.*?))?\s*(?:-->|\*\/|$)/;
+/**
+ * A `pdx-ignore` / `pdx-ignore-file` comment on one line, in any of the three forms — `<!--`, `/*`,
+ * `//` — then the code, then optionally `: reason` up to the comment's end or the line's.
+ *
+ * Read by hand, not by a pattern: `\s*(?::\s*(.*?))?\s*(?:-->|\*\/|$)` took quadratic time on a run of
+ * whitespace that ends in neither (#70). Same rules: the first opener that starts a valid comment wins;
+ * after the code comes `:`, or the comment's end, or the line's.
+ */
+function readIgnore(text: string): { file: boolean; code: string; reason: string; index: number } | null {
+    const isSp = (ch: string | undefined) => ch === ' ' || ch === '\t' || ch === '\r' || ch === '\f' || ch === '\v';
+    const skip = (i: number) => { while (isSp(text[i])) i++; return i; };
+    for (let at = 0; at < text.length; at++) {
+        const opener = text.startsWith('<!--', at) ? 4 : text.startsWith('/*', at) || text.startsWith('//', at) ? 2 : 0;
+        if (!opener) continue;
+        let i = skip(at + opener);
+        if (!text.startsWith('pdx-ignore', i)) continue;
+        i += 'pdx-ignore'.length;
+        const file = text.startsWith('-file', i) && isSp(text[i + 5]);
+        if (file) i += 5;
+        if (!isSp(text[i])) continue;
+        i = skip(i);
+        if (!text.startsWith('PDX_', i)) continue;
+        let j = i + 4;
+        while (/[A-Z0-9_]/.test(text[j] ?? '')) j++;
+        if (j === i + 4) continue;
+        const code = text.slice(i, j);
+        const k = skip(j);
+        if (text[k] === ':') {
+            // The reason runs to the first `-->` or `*/`, or to the end of the line.
+            const ends = [text.indexOf('-->', k + 1), text.indexOf('*/', k + 1)].filter((e) => e !== -1);
+            const end = ends.length > 0 ? Math.min(...ends) : text.length;
+            return { file, code, reason: text.slice(k + 1, end).trim(), index: at };
+        }
+        if (k === text.length || text.startsWith('-->', k) || text.startsWith('*/', k)) {
+            return { file, code, reason: '', index: at };
+        }
+    }
+    return null;
+}
 
 /** The exemptions a file declares, in order. */
 export function parseIgnores(source: string): Ignore[] {
     const out: Ignore[] = [];
     source.split('\n').forEach((text, i) => {
-        const m = IGNORE.exec(text);
+        const m = readIgnore(text);
         if (!m) return;
-        out.push({ code: m[2], reason: (m[3] ?? '').trim(), line: i + 1, column: m.index + 1, scope: m[1] ? 'file' : 'next-line' });
+        out.push({ code: m.code, reason: m.reason, line: i + 1, column: m.index + 1, scope: m.file ? 'file' : 'next-line' });
     });
     return out;
 }

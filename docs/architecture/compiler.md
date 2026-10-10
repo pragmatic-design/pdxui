@@ -242,6 +242,7 @@ To find your way around the compiler's source:
 | | `component-resolver.ts` | 180 | The tag→import map, from package.json and .pdx files |
 | | `plugin-utils.ts` | 380 | Alias discovery, store/route scanning, auto-import injection |
 | | `plugin-system.ts` | 60 | The hook interface for external plugins |
+| | `text-scan.ts` | 180 | Linear scans of markup and route paths: opening tags, comments, `:params` — in place of patterns that took quadratic time on a malformed file |
 | **Parser** | `parser/sfc.ts` | 187 | Splits a .pdx into template/script/style |
 | | `parser/template.ts` | 991 | Template HTML → an AST with directives |
 | **Analysis** | `compiler/script-analyzer.ts` | 853 | Extracts @prop, $signal, @page, and the rest |

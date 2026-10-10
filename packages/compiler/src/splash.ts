@@ -5,6 +5,8 @@
 // of the app root (inside it, mounting would clear it). `@pdxui/core`'s `browser/splash.ts` takes
 // it away once the app says it is ready; the router says so for the first page it shows.
 
+import { findOpenTag } from './text-scan';
+
 /** What `pdx({ splash })` accepts. */
 export interface SplashOptions {
     /** The name shown. Default: the page's `<title>`. */
@@ -29,8 +31,12 @@ const SPLASH_STYLE = `<style id="${SPLASH_ID}-style">
 
 /** The text of a `<title>`, or ''. */
 function pageTitle(html: string): string {
-    // Match: <title …>text</title> — Groups: [1]=text
-    return /<title[^>]*>([^<]*)<\/title>/i.exec(html)?.[1]?.trim() ?? '';
+    // `<title …>text</title>`, with no markup in the text. Scanned, not matched (#70).
+    const open = findOpenTag(html, 'title');
+    if (!open) return '';
+    const lt = html.indexOf('<', open.end);
+    if (lt === -1 || html.slice(lt, lt + 8).toLowerCase() !== '</title>') return '';
+    return html.slice(open.end, lt).trim();
 }
 
 function escapeHtml(text: string): string {
@@ -44,16 +50,15 @@ function escapeHtml(text: string): string {
  */
 export function injectSplash(html: string, options: SplashOptions = {}): string {
     if (html.includes(`id="${SPLASH_ID}"`)) return html;
-    // Match: <body …> — Groups: [1]=its attributes
-    const body = /<body([^>]*)>/i.exec(html);
+    const body = findOpenTag(html, 'body');
     if (!body) return html;
 
     const title = escapeHtml(options.title ?? pageTitle(html));
     const logo = options.logo ? `<img src="${escapeHtml(options.logo)}" alt="">` : '';
     const min = options.minDuration && options.minDuration > 0 ? ` data-min-duration="${Math.round(options.minDuration)}"` : '';
     const element = `<div id="${SPLASH_ID}" aria-hidden="true"${min}>${logo}<span>${title}</span></div>`;
-    const attrs = /\baria-busy\s*=/.test(body[1]) ? body[1] : `${body[1]} aria-busy="true"`;
+    const attrs = /\baria-busy\s*=/.test(body.attrs) ? body.attrs : `${body.attrs} aria-busy="true"`;
 
-    html = html.replace(body[0], `<body${attrs}>\n${element}`);
+    html = html.slice(0, body.start) + `<body${attrs}>\n${element}` + html.slice(body.end);
     return html.includes('</head>') ? html.replace('</head>', `${SPLASH_STYLE}\n</head>`) : SPLASH_STYLE + html;
 }

@@ -13,6 +13,7 @@
 
 import type { TemplateNode, HtmlNode } from '../parser/template';
 import { jsQuote } from './js-literal';
+import { isSpace, openTags, type OpenTag } from '../text-scan';
 
 // ─── Known Form Controls ──────────────────────────────────────
 
@@ -259,23 +260,52 @@ function processHtmlContent(content: string, ctx: FormCtx): string {
     return result;
 }
 
+/**
+ * The value of the last `name="…"` (or `'…'`, or a backquoted value) in an opening tag whose name is
+ * followed by whitespace, as `<tag\s[^>]*name=(?:"([^"]+)"|…)[^>]*>` found it: the greedy `[^>]*`
+ * made it the last one, and the name may end a longer one (`data-name=`). Undefined when there is none.
+ */
+function lastAttributeValue(tag: OpenTag, name: string): string | undefined {
+    const attrs = tag.attrs;
+    if (!isSpace(attrs[0])) return undefined;
+    const needle = name + '=';
+    // Per quote, the position after which it does not close again.
+    const noClose: Record<string, number> = {};
+    let value: string | undefined;
+    for (let p = attrs.indexOf(needle); p !== -1; p = attrs.indexOf(needle, p + 1)) {
+        const q = attrs[p + needle.length];
+        if (q !== '"' && q !== "'" && q !== '`') continue;
+        const open = p + needle.length + 1;
+        if (open >= (noClose[q] ?? Infinity)) continue;
+        const close = attrs.indexOf(q, open);
+        if (close === -1) { noClose[q] = open; continue; }
+        if (close > open) value = attrs.slice(open, close);
+    }
+    return value;
+}
+
 function getFormState(content: string, formVar: string | null, depth: number, groupPath: string[], base?: FormCtx['base']): FormCtx {
     // Re-scan to track pdx-form and pdx-field-group open/close across HtmlNode boundaries
     let fv = formVar;
     let d = depth;
     const baseDepth = base?.depth ?? 0;
     const gp = [...groupPath];
-    const openRegex = /<pdx-form\s[^>]*:form=(?:"([^"]+)"|'([^']+)'|`([^`]+)`)[^>]*>/g;
     const closeRegex = /<\/pdx-form>/g;
-    const groupOpenRegex = /<pdx-field-group\s[^>]*name=(?:"([^"]+)"|'([^']+)'|`([^`]+)`)[^>]*>/g;
     const groupCloseRegex = /<\/pdx-field-group>/g;
-    let m;
-    while ((m = openRegex.exec(content)) !== null) { fv = m[1] ?? m[2] ?? m[3]; d++; }
+    // The tags are scanned, and the attribute read inside each one: a pattern spanning the whole tag
+    // took quadratic time on `<pdx-form` repeated without its `>` (#70).
+    for (const tag of openTags(content, 'pdx-form')) {
+        const value = lastAttributeValue(tag, ':form');
+        if (value !== undefined) { fv = value; d++; }
+    }
     while (closeRegex.exec(content) !== null) {
         d = Math.max(baseDepth, d - 1);
         if (d === baseDepth) { fv = base?.formVar ?? null; gp.length = 0; }
     }
-    while ((m = groupOpenRegex.exec(content)) !== null) { if (fv) gp.push(m[1] ?? m[2] ?? m[3]); }
+    for (const tag of openTags(content, 'pdx-field-group')) {
+        const value = lastAttributeValue(tag, 'name');
+        if (value !== undefined && fv) gp.push(value);
+    }
     while (groupCloseRegex.exec(content) !== null) { if (gp.length > 0) gp.pop(); }
     return { formVar: fv, depth: d, groupPath: gp, base };
 }

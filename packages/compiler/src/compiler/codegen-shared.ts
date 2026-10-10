@@ -13,6 +13,7 @@ import type { analyzeScript } from './script-analyzer';
 import type { ValidationWarning } from './validate';
 import { originMark, ORIGIN_PREFIX } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
+import { routeParams } from '../text-scan';
 
 // ─── Template-literal escaping ─────────────────────────────────────
 
@@ -359,10 +360,8 @@ export function assembleModule(
         }
         // Param constraints extracted from path: :id(number) → { id: 'number' }
         const constraintParts: string[] = [];
-        const constraintRegex = /:(\w+)\(([^)]+)\)/g;
-        let cm: RegExpExecArray | null;
-        while ((cm = constraintRegex.exec(route.page!)) !== null) {
-            constraintParts.push(`${cm[1]}:${jsString(cm[2])}`);
+        for (const param of routeParams(route.page!)) {
+            if (param.constraint) constraintParts.push(`${param.name}:${jsString(param.constraint)}`);
         }
         if (constraintParts.length > 0) routeParts.push(`paramConstraints:{${constraintParts.join(',')}}`);
         // @params { id: number } — typed route params for coercion

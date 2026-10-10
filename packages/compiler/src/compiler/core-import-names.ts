@@ -11,7 +11,14 @@
 export function coreRuntimeNames(flatImport: string): string[] {
     // Match: `import type {` — the whole statement imports types only.
     if (/^import\s+type\s*\{/.test(flatImport.trim())) return [];
-    const match = flatImport.match(/\{([^}]+)\}/);
-    if (!match) return [];
-    return match[1].split(',').map(n => n.trim()).filter(n => n && !/^type\s/.test(n));
+    // The first `{…}` with something inside, as `\{([^}]+)\}` found it — scanned, not matched: that
+    // pattern took quadratic time on `{{|` repeated (#70).
+    let names: string | null = null;
+    for (let open = flatImport.indexOf('{'); open !== -1; open = flatImport.indexOf('{', open + 1)) {
+        const close = flatImport.indexOf('}', open + 1);
+        if (close === -1) break;
+        if (close > open + 1) { names = flatImport.slice(open + 1, close); break; }
+    }
+    if (names === null) return [];
+    return names.split(',').map(n => n.trim()).filter(n => n && !/^type\s/.test(n));
 }

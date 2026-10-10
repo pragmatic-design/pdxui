@@ -6,6 +6,7 @@
 
 import type { TemplateNode } from '../parser/template';
 import type { ValidationWarning } from './validate';
+import { removeHtmlComments } from '../text-scan';
 
 /** The allowed values of an enum prop on a component, or null when it is not one. */
 export type EnumLookup = (tag: string, prop: string) => readonly string[] | null;
@@ -41,7 +42,7 @@ function markupOf(nodes: TemplateNode[]): string {
  */
 export function checkEnumValues(ast: TemplateNode[], enumValues: EnumLookup, warnings: ValidationWarning[]): void {
     // A commented-out tag is not rendered: a finding about it is about code that does not run.
-    const markup = markupOf(ast).replace(/<!--[\s\S]*?-->/g, '');
+    const markup = removeHtmlComments(markupOf(ast));
     // Match: an opening `<pdx-tag …>` (also self-closing). Groups: [1]=tag [2]=the attributes.
     for (const tm of markup.matchAll(/<(pdx-[\w-]+)\b([^>]*?)\/?>/gis)) {
         const tag = tm[1].toLowerCase();

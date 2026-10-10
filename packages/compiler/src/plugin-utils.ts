@@ -9,6 +9,7 @@ import { analyzeScript } from './compiler/script-analyzer';
 import { parseSFC } from './parser/sfc';
 import { moduleDir } from './module-dir';
 import { jsQuote, jsString } from './compiler/js-literal';
+import { elementContent, findOpenTag, removeHtmlComments } from './text-scan';
 
 /**
  * Auto-discover @pdxui/* packages in the workspace.
@@ -515,6 +516,49 @@ export function injectStoreImports(
 }
 
 /**
+ * The one file `@pdxui/router` routes every internal import of a router through — the dev/prod
+ * seam. Anchored to the package directory so a file merely named `active.ts` in the app is not it,
+ * and written for both layouts the package ships in: the monorepo sibling `packages/router/src` and
+ * an install under `node_modules/@pdxui/router/src`. Backslashes are accepted because a Windows
+ * id can still reach `load` unnormalised.
+ */
+export function isRouterSeam(id: string): boolean {
+    // The query goes first, then the path is compared by its ending: no pattern retried from every
+    // position (#70).
+    const query = id.indexOf('?');
+    const path = (query === -1 ? id : id.slice(0, query)).replace(/\\/g, '/');
+    return ['packages', '@pdxui'].some((root) =>
+        ['ts', 'tsx'].some((ext) => {
+            const tail = `${root}/router/src/active.${ext}`;
+            return path === tail || path.endsWith('/' + tail);
+        }));
+}
+
+/** `html` with `tag` just inside its `<head>`, or before everything when it has none. */
+export function injectAfterHeadOpen(html: string, tag: string): string {
+    const head = findOpenTag(html, 'head');
+    return head ? `${html.slice(0, head.end)}\n${tag}${html.slice(head.end)}` : tag + html;
+}
+
+/** A file path as a message shows it: from the package, or from its `src/`. */
+export function shortPath(file: string): string {
+    // After the LAST `/packages/`, then after the last `/src/` — what the greedy `.*` patterns took.
+    const after = (path: string, segment: string): number => {
+        let found = -1;
+        for (let i = path.indexOf(segment.slice(1, -1)); i !== -1; i = path.indexOf(segment.slice(1, -1), i + 1)) {
+            const before = path[i - 1];
+            const next = path[i + segment.length - 2];
+            if ((before === '/' || before === '\\') && (next === '/' || next === '\\')) found = i + segment.length - 1;
+        }
+        return found;
+    };
+    const p = after(file, '/packages/');
+    const rest = p === -1 ? file : file.slice(p);
+    const s = after(rest, '/src/');
+    return s === -1 ? rest : 'src/' + rest.slice(s);
+}
+
+/**
  * A template with its HTML comments taken out, for the passes that ask "which components does this
  * file USE".
  *
@@ -530,7 +574,7 @@ export function injectStoreImports(
  * in any HTML document.
  */
 export function stripHtmlComments(template: string): string {
-    return template.replace(/<!--[\s\S]*?-->/g, '');
+    return removeHtmlComments(template);
 }
 
 /**
@@ -584,9 +628,9 @@ export function injectComponentImports(
     if (resolvedTemplate) {
         templateContent = resolvedTemplate;
     } else {
-        const templateMatch = originalSource.match(/<template[^>]*>([\s\S]*?)<\/template>/);
-        if (!templateMatch) return compiledCode;
-        templateContent = templateMatch[1];
+        const content = elementContent(originalSource, 'template');
+        if (content === null) return compiledCode;
+        templateContent = content;
     }
     // A tag named in a comment is not a tag used.
     templateContent = stripHtmlComments(templateContent);
@@ -612,7 +656,7 @@ export function injectComponentImports(
     // warnUnsaved (in @form or in a createForm written in script) asks through the in-app dialog,
     // which <pdx-overlay-outlet> draws. No template names it, and without it registered the
     // question cannot be shown.
-    const scriptContent = originalSource.match(/<script[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? '';
+    const scriptContent = elementContent(originalSource, 'script') ?? '';
     if (/\bwarnUnsaved\b/.test(scriptContent)) usedTags.add('pdx-overlay-outlet');
 
     if (usedTags.size === 0) return compiledCode;

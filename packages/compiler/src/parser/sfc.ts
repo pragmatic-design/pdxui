@@ -10,6 +10,7 @@
 //   <style scoped> ... </style>                     ← inline
 
 import { skipNonCode } from '../compiler/tokenizer';
+import { findOpenTag, isSpace } from '../text-scan';
 
 export interface SFCBlock {
     content: string;
@@ -147,21 +148,31 @@ function findCloseTag(source: string, contentStart: number, closeTag: string, is
 
 // ─── Block Extractors ──────────────────────────────────────────────
 
+/**
+ * The first `<tag …>` of a block: where it starts, its text, and its attributes — the text after the
+ * name when it begins with whitespace, '' otherwise. A scan, not a pattern: `<script` followed by a
+ * long run of whitespace and no `>` took quadratic time to reject (#70).
+ */
+function openBlockTag(source: string, tag: string): { index: number; text: string; attrs: string } | null {
+    const open = findOpenTag(source, tag);
+    if (!open) return null;
+    return { index: open.start, text: open.text, attrs: isSpace(open.attrs[0]) ? open.attrs : '' };
+}
+
 function extractBlock(source: string, tag: string, errors?: string[]): SFCBlock | null {
-    const openRegex = new RegExp(`<${tag}(\\s[^>]*)?>`, 'i');
-    const openMatch = openRegex.exec(source);
+    const openMatch = openBlockTag(source, tag);
     if (!openMatch) return null;
 
-    const attrs = openMatch[1] || '';
+    const attrs = openMatch.attrs;
     const src = extractSrc(attrs);
 
     // Self-closing with src: <template src="./template.html" />
-    if (src && isSelfClosing(openMatch[0])) {
-        return { content: '', start: openMatch.index, end: openMatch.index + openMatch[0].length, src };
+    if (src && isSelfClosing(openMatch.text)) {
+        return { content: '', start: openMatch.index, end: openMatch.index + openMatch.text.length, src };
     }
 
     const closeTag = `</${tag}>`;
-    const contentStart = openMatch.index + openMatch[0].length;
+    const contentStart = openMatch.index + openMatch.text.length;
     const closeIndex = findCloseTag(source, contentStart, closeTag, false);
     if (closeIndex === -1) {
         // Open tag present but never closed — surface it instead of degrading to a fallback.
@@ -178,23 +189,22 @@ function extractBlock(source: string, tag: string, errors?: string[]): SFCBlock 
 }
 
 function extractScriptBlock(source: string, errors?: string[]): SFCScript | null {
-    const openRegex = /<script(\s[^>]*)?\s*\/?>/i;
-    const openMatch = openRegex.exec(source);
+    const openMatch = openBlockTag(source, 'script');
     if (!openMatch) return null;
 
-    const attrs = openMatch[1] || '';
+    const attrs = openMatch.attrs;
     const setup = /\bsetup\b/.test(attrs);
     const lang = extractLang(attrs) ?? 'ts'; // Default: TypeScript
     const src = extractSrc(attrs);
 
     // Self-closing: <script setup src="./counter.ts" />
-    if (isSelfClosing(openMatch[0])) {
-        if (src) return { content: '', setup, lang, start: openMatch.index, end: openMatch.index + openMatch[0].length, src };
+    if (isSelfClosing(openMatch.text)) {
+        if (src) return { content: '', setup, lang, start: openMatch.index, end: openMatch.index + openMatch.text.length, src };
         // Self-closing <script /> with no src carries no code — nothing to extract.
         return null;
     }
 
-    const contentStart = openMatch.index + openMatch[0].length;
+    const contentStart = openMatch.index + openMatch.text.length;
     const closeIndex = findCloseTag(source, contentStart, '</script>', true);
     if (closeIndex === -1) {
         errors?.push(`<script> block opened at line ${lineAt(source, openMatch.index)} is never closed (missing </script>).`);
@@ -236,22 +246,21 @@ function extractStyleBlocks(source: string, errors?: string[]): SFCStyle[] {
 }
 
 function extractStyleBlock(source: string, errors?: string[], offset = 0): SFCStyle | null {
-    const openRegex = /<style(\s[^>]*)?\s*\/?>/i;
-    const openMatch = openRegex.exec(source);
+    const openMatch = openBlockTag(source, 'style');
     if (!openMatch) return null;
 
-    const attrs = openMatch[1] || '';
+    const attrs = openMatch.attrs;
     const scoped = /\bscoped\b/.test(attrs);
     const lang = extractLang(attrs) ?? 'css';
     const src = extractSrc(attrs);
 
     // Self-closing: <style scoped src="./counter.css" />
-    if (isSelfClosing(openMatch[0])) {
-        if (src) return { content: '', scoped, lang, start: offset + openMatch.index, end: offset + openMatch.index + openMatch[0].length, src };
+    if (isSelfClosing(openMatch.text)) {
+        if (src) return { content: '', scoped, lang, start: offset + openMatch.index, end: offset + openMatch.index + openMatch.text.length, src };
         return null; // self-closing <style /> with no src carries no CSS
     }
 
-    const contentStart = openMatch.index + openMatch[0].length;
+    const contentStart = openMatch.index + openMatch.text.length;
     // CSS can contain </style> in strings too (e.g. content: '</style>')
     const closeIndex = findCloseTag(source, contentStart, '</style>', true);
     if (closeIndex === -1) {
