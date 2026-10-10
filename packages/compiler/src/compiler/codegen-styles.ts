@@ -259,10 +259,11 @@ function transformResponsiveCSS(css: string): string {
 
 /**
  * Process a CSS block recursively. Handles:
- * - Regular rules: .btn { ... } → .btn[scope] { ... }
- * - @media/@supports/@layer: recurse into inner selectors
+ * - Regular rules: .btn { ... } → [scope] .btn { ... }
+ * - @media/@supports/@layer/@container/@starting-style: recurse into inner selectors
  * - @keyframes/@font-face: pass through WITHOUT scoping (names aren't selectors)
- * - Pseudo-selectors: insert scope BEFORE pseudo (.btn:hover → .btn[scope]:hover)
+ * - @scope: pass through unchanged; an author's own @scope defines its own boundary
+ * - Pseudo-selectors: the ancestor prefix goes before the whole selector (.btn:hover → [scope] .btn:hover)
  */
 function scopeBlock(css: string, scopeId: string): string {
     let result = '';
@@ -282,7 +283,10 @@ function scopeBlock(css: string, scopeId: string): string {
 
             if (atRule.startsWith('@keyframes') || atRule.startsWith('@font-face')) {
                 result += atRule + ' {' + blockContent + '}';
-            } else if (atRule.startsWith('@media') || atRule.startsWith('@supports') || atRule.startsWith('@layer')) {
+            } else if (
+                atRule.startsWith('@media') || atRule.startsWith('@supports') || atRule.startsWith('@layer') ||
+                atRule.startsWith('@container') || atRule.startsWith('@starting-style')
+            ) {
                 result += atRule + ' {' + scopeBlock(blockContent, scopeId) + '}';
             } else {
                 result += atRule + ' {' + blockContent + '}';

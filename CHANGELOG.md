@@ -12,3 +12,7 @@ semver.
 ### Features
 
 - Initial public release.
+
+### Fixes
+
+- Scoped `<style scoped>` rules inside `@container` and `@starting-style` now apply only to the component. Before, they were emitted unscoped and applied to every matching element on the page.
