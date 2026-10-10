@@ -584,7 +584,7 @@ describe('the theming page states the scheme rule the themes follow', () => {
 
     /** Whether a theme declares a token as a `light-dark()` pair. */
     const varies = (css: string, token: string): boolean =>
-        [...css.matchAll(new RegExp(`--pdx-color-${token}:\s*([^;]+);`, 'g'))]
+        [...css.matchAll(new RegExp(`--pdx-color-${token}:\\s*([^;]+);`, 'g'))]
             .some(m => m[1].includes('light-dark('));
 
     it('the premise: a fill and its label move together, or neither moves', () => {

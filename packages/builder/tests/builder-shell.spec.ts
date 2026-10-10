@@ -68,7 +68,8 @@ test('the identity bar carries the shared brand, and every link leaves for the s
     // Nothing in the bar keeps the user inside the tool.
     const hrefs = await page.locator('.topbar-nav a').evaluateAll(els => els.map(e => e.getAttribute('href')));
     expect(hrefs.length).toBeGreaterThan(0);
-    expect(hrefs.every(h => h?.startsWith('https://pdxui.com'))).toBe(true);
+    // The host parsed, not the prefix: `https://pdxui.com.evil.example` starts with it too (#72).
+    expect(hrefs.every(h => { try { const u = new URL(h ?? ''); return u.protocol === 'https:' && u.hostname === 'pdxui.com'; } catch { return false; } })).toBe(true);
 });
 
 /** Collect console errors and uncaught exceptions from the page AND its iframes. */

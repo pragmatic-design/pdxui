@@ -53,7 +53,7 @@ describe('every API the recipe names is exported', () => {
             // ⚠️ No leading `\b` for the `$…` names: `$` is not a word character, so between a space
             // and a `$` there is no boundary and `\b\$t\b` never matches. The first version of this
             // test failed on all four dollar-prefixed exports, which are exported on line 395.
-            const name = api.replace('$', '\\$');
+            const name = api.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const pattern = api.startsWith('$') ? `${name}\\b` : `\\b${name}\\b`;
             expect(exported, `${api} is in the recipe and not exported from core`)
                 .toMatch(new RegExp(pattern));

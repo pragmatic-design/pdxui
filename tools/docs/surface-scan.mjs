@@ -73,7 +73,7 @@ export function scan() {
         // before the `$`, so every one of them was reported unnamed while `i18n.md` teaches them on
         // its first page. Lookarounds over the identifier alphabet instead — which also keeps
         // `resource` from being satisfied by `resourceWhen`.
-        const boundary = new RegExp(`(?<![A-Za-z0-9_$])${name.replace(/\$/g, '\\$')}(?![A-Za-z0-9_$])`);
+        const boundary = new RegExp(`(?<![A-Za-z0-9_$])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9_$])`);
         if (boundary.test(text)) taught.push(name);
         else missing.push(name);
     }

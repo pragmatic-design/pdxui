@@ -22,6 +22,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { pdx } from '../src/plugin';
+import { elementBodies } from '../src/text-scan';
 
 interface HtmlPlugin {
     transformIndexHtml(html: string): string | undefined;
@@ -60,7 +61,7 @@ describe('the injected devtools script is loadable', () => {
         // The rule: an inline module script is not rewritten, so every
         // specifier inside one must already be loadable by the browser.
         const out = devPlugin().transformIndexHtml(HTML) ?? '';
-        const inlineScripts = [...out.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+        const inlineScripts = elementBodies(out, 'script');
         for (const body of inlineScripts) {
             const imports = [...body.matchAll(/\bfrom\s+['"]([^'"]+)['"]/g)].map(m => m[1]);
             for (const spec of imports) {

@@ -18,6 +18,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { removeElements } from '../../compiler/src/text-scan';
 
 const ROOT = join(__dirname, '..', '..');
 const PAGES = join(ROOT, 'compiler', 'demo', 'showcase-new', 'pages');
@@ -38,7 +39,8 @@ const read = (f: string) => {
 
 /** The page's markup, without its <script> and <style> blocks. */
 function template(f: string): string {
-    return read(f).replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '');
+    // Scanned, in any case and with `</script >` too: not two patterns that miss both (#72).
+    return removeElements(removeElements(read(f), 'script'), 'style');
 }
 
 describe('the showcase galleries say only what is true and ours', () => {

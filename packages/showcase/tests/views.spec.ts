@@ -18,6 +18,7 @@ import { test, expect, type Page } from './fixture';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { removeHtmlComments } from '../../compiler/src/text-scan';
 import { clearAllButSession } from './session';
 
 const dataRows = (page: Page) => page.locator('[data-test="grid"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') });
@@ -433,7 +434,7 @@ test('no page calls a browser dialog or renders a native <select>', () => {
         const code = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
         for (const m of code.matchAll(/\b(?:window|globalThis)\.(prompt|confirm|alert)\s*\(/g)) found.push(`${where}: ${m[0]}`);
         // The markup's controls, with its comments taken out for the same reason.
-        const template = text.match(/<template>([\s\S]*)<\/template>/)?.[1]?.replace(/<!--[\s\S]*?-->/g, '') ?? '';
+        const template = removeHtmlComments(text.match(/<template>([\s\S]*)<\/template>/)?.[1] ?? '');
         if (/<select[\s>]/.test(template)) found.push(`${where}: <select>`);
     }
     expect(found, 'a browser dialog or a native select in the app').toEqual([]);

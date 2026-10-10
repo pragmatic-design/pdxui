@@ -25,6 +25,7 @@ import { pickLocale } from './locale';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { removeHtmlComments } from '../../compiler/src/text-scan';
 
 import itComponents from '../src/locales/it.components.json' with { type: 'json' };
 
@@ -116,7 +117,7 @@ function tagsWrittenInSources(): Set<string> {
             const full = join(dir, entry.name);
             if (entry.isDirectory()) walk(full);
             else if (entry.name.endsWith('.pdx')) {
-                const src = readFileSync(full, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+                const src = removeHtmlComments(readFileSync(full, 'utf8'));
                 for (const m of src.matchAll(/<pdx-([a-z0-9-]+)/g)) out.add(m[1]);
             }
         }

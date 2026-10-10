@@ -3,7 +3,7 @@
 // patterns, which code scanning would flag again wherever they were pasted.
 
 import { describe, it, expect } from 'vitest';
-import { openTags, findOpenTag, elementContent, removeHtmlComments, routeParams, openingTagTexts } from '../src/text-scan';
+import { openTags, findOpenTag, elementContent, removeHtmlComments, routeParams, openingTagTexts, removeElements, elementBodies } from '../src/text-scan';
 import { isRouterSeam, injectAfterHeadOpen, shortPath, stripHtmlComments } from '../src/plugin-utils';
 import { extractLegacyScript } from '../src/compiler/codegen-legacy';
 import { coreRuntimeNames } from '../src/compiler/core-import-names';
@@ -30,6 +30,18 @@ describe('opening tags', () => {
     it('elementContent: the first element\'s content, or null when it never closes', () => {
         expect(elementContent('<template lang="x"><p>a</p></template><template>b</template>', 'template')).toBe('<p>a</p>');
         expect(elementContent('<template><p>a</p>', 'template')).toBeNull();
+    });
+});
+
+describe('whole elements', () => {
+    it('removes each <script> and its content, in any case and with a space before the closing >', () => {
+        expect(removeElements('a<script>x</script>b<SCRIPT type="m">y</SCRIPT >c<script>never', 'script'))
+            .toBe('abc<script>never');
+    });
+
+    it('lists each body, and a <script> named inside a script is its text', () => {
+        expect(elementBodies('<script>let s = "<script>";</script><p></p><script src="a"></script>', 'script'))
+            .toEqual(['let s = "<script>";', '']);
     });
 });
 

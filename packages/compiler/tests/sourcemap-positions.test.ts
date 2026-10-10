@@ -72,8 +72,10 @@ function probe(source: string, code: string, map: SourceMapJSON, pairs: [string,
     const wrong: string[] = [];
     for (const [src, genWithCursor] of pairs) {
         const want = at(source, src);
-        const cursor = Math.max(0, genWithCursor.indexOf('|'));
-        const gen = genWithCursor.replace('|', '');
+        // The marker is the FIRST `|`; a `||` in the code after it stays code.
+        const mark = genWithCursor.indexOf('|');
+        const cursor = Math.max(0, mark);
+        const gen = mark === -1 ? genWithCursor : genWithCursor.slice(0, mark) + genWithCursor.slice(mark + 1);
         const start = at(code, gen);
         const g = { line: start.line, column: start.column + cursor };
         const got = original(map, g.line, g.column);

@@ -875,11 +875,13 @@
 
         // What the case builds: the tags in its own source and in the markup of every section it
         // show()s. Registered BEFORE the case runs, so a property it sets lands on an upgraded element.
-        const caseSource = String(cases[which] ?? '');
+        // `which` comes from the URL: only the table's own cases, never `constructor` or `toString` (#72).
+        const run = which && Object.hasOwn(cases, which) ? cases[which] : null;
+        const caseSource = String(run ?? '');
         const shownMarkup = [...caseSource.matchAll(/show\('([^']+)'\)/g)]
             .map((m) => document.getElementById(m[1])?.outerHTML ?? '').join('');
         await loadTags(tagsIn(caseSource + shownMarkup));
-        (cases[which] ?? (() => {}))();
+        if (typeof run === 'function') run();
         requestAnimationFrame(() => requestAnimationFrame(() =>
             document.documentElement.setAttribute('data-pdx-ready', '1')));
     </script>

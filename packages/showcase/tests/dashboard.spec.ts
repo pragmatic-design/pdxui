@@ -37,7 +37,8 @@ for (const [key, query, matching] of [
     test(`the «${key}» count is the way into the list it counts`, async ({ page }) => {
         await openDashboard(page);
         await tile(page, key).click();
-        await expect(page).toHaveURL(new RegExp(`/tickets\\${query.replace(/&/g, '&')}$`));
+        // The query matched literally: its `?` is a metacharacter, and so would be any `.` or `+` (#72).
+        await expect(page).toHaveURL(new RegExp(`/tickets${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`));
         // The same number on both sides: a tile that says 3 and a list that shows 36 is a lie.
         await expect(page.locator('[data-test="total"]')).toHaveText(matching);
     });

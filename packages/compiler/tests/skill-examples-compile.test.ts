@@ -63,7 +63,7 @@ const resolveFile = (src: string): string =>
 
 /** A full SFC compiles as is; a template fragment is wrapped in one. */
 function asSfc(code: string): string {
-    if (/<template[\s>]/.test(code) || /<script[\s>]/.test(code)) return code;
+    if (/<template[\s>]/i.test(code) || /<script[\s>]/i.test(code)) return code;
     return `<template>\n${code}\n</template>`;
 }
 
