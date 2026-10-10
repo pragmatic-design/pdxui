@@ -47,6 +47,13 @@ createForm({
 `user.reset()`, `user.array(name)`. They are **signals** — `user.valid()` with parentheses, and
 `user.errors()` gives the whole record.
 
+In the editor and in `pdx check --types`, `user` has that type with the fields you declared:
+`user.fields.age.value()` is a `number`, and `user.fields.nmae` or `user.values` is an error.
+Fields are keyed the way the form keys them. A nested object's fields are dotted:
+`user.fields['address.street']`. A row's fields carry their index: `user.fields['lines.0.qty']`.
+`user.getValues()` gives the nested object back. A form on an external schema (`@form user: UserSchema`)
+is a form whose fields the editor does not know.
+
 ## Binding the fields
 
 Wrap the fields in `<pdx-form :form>` and give each control the field's `name`. The compiler wires

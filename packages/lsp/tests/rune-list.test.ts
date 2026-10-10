@@ -53,4 +53,14 @@ describe('the rune list, as the editor reads it', () => {
             .map(d => `${d.code} ${d.message.split('\n')[0]}`);
         expect(found).toEqual([]);
     });
+
+    it('@mixin declares its name in the form the compiler reads — a quoted path', () => {
+        // The shape used to read `@mixin useThing as thing`, which the compiler rejects; the form it
+        // reads quotes the file, and the projection only knew the unquoted one (#58).
+        const script = "@mixin './use-thing.pdx' as thing;\nthing;\n";
+        const root = join(__dirname, '..', '..', '..');
+        const found = getTsDiagnostics(new PdxTsService(root), pathToFileURL(join(root, 'mixin.pdx')).href, buildVirtualFile(script, 0, [], '', -1), script)
+            .map(d => d.message.split('\n')[0]);
+        expect(found).toEqual([]);
+    });
 });

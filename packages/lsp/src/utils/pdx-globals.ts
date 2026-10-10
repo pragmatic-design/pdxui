@@ -47,21 +47,77 @@ declare global {
   // What \`@fetch name: 'GET /url' as T\` gives the script and the template: core's Resource<T>, whose
   // reads are signals — \`name.data()\`, not \`name.data\`. tests/fetch-types.test.ts fails when a
   // member of Resource is missing here.
+  // Core's ReadonlySignal: a read and a peek of the SAME type. Written once, so the two cannot
+  // drift — a peek typed apart made a form unassignable to core's Form in four showcase pages (#58).
+  type PdxReadonly<T> = { (): T; peek(): T };
   interface PdxResource<T> {
-    readonly data: { (): T | undefined; peek(): T | undefined };
-    readonly error: { (): unknown; peek(): unknown };
-    readonly loading: { (): boolean; peek(): boolean };
-    readonly isPending: { (): boolean; peek(): boolean };
-    readonly state: { (): 'idle' | 'loading' | 'reloading' | 'success' | 'stale' | 'error' | 'local'; peek(): string };
-    readonly status: {
-      (): { readonly isLoading: boolean; readonly isError: boolean; readonly isSuccess: boolean;
-            readonly isStale: boolean; readonly hasData: boolean; readonly isIdle: boolean };
-      peek(): unknown;
-    };
+    readonly data: PdxReadonly<T | undefined>;
+    readonly error: PdxReadonly<unknown>;
+    readonly loading: PdxReadonly<boolean>;
+    readonly isPending: PdxReadonly<boolean>;
+    readonly state: PdxReadonly<'idle' | 'loading' | 'reloading' | 'success' | 'stale' | 'error' | 'local'>;
+    readonly status: PdxReadonly<{
+      readonly isLoading: boolean; readonly isError: boolean; readonly isSuccess: boolean;
+      readonly isStale: boolean; readonly hasData: boolean; readonly isIdle: boolean;
+    }>;
     readonly key: string;
     refetch(): Promise<void>;
     mutate(value: T): void;
     abort(): void;
+    dispose(): void;
+  }
+  // What \`@form\` gives: core's FormField, FieldArray and Form. A form is typed by two parameters
+  // the projection writes out (./form-types): V, the values as getValues() returns them, nested; and
+  // F, the fields, keyed as createForm flattens them — \`address.street\`, \`lines.0.product\`.
+  // tests/form-store-types.test.ts fails when a member of the three is missing here.
+  interface PdxFormField<T> {
+    readonly value: PdxReadonly<T> & { set(v: T | ((prev: T) => T)): void; setRaw(v: T): void };
+    readonly error: PdxReadonly<string | undefined>;
+    readonly warning: PdxReadonly<string | undefined>;
+    readonly touched: PdxReadonly<boolean>;
+    readonly dirty: PdxReadonly<boolean>;
+    onChange(value: T): void;
+    onBlur(): void;
+    reset(): void;
+  }
+  interface PdxFieldArray<T> {
+    readonly items: PdxReadonly<{ readonly __id: number; readonly value: T }[]>;
+    readonly length: PdxReadonly<number>;
+    append(value: T): void;
+    prepend(value: T): void;
+    insert(index: number, value: T): void;
+    remove(index: number): void;
+    move(from: number, to: number): void;
+    swap(a: number, b: number): void;
+    update(index: number, value: T): void;
+    replace(values: T[]): void;
+    reset(): void;
+    getValues(): T[];
+    dispose(): void;
+  }
+  interface PdxForm<V, F> {
+    readonly fields: F;
+    readonly valid: PdxReadonly<boolean>;
+    readonly dirty: PdxReadonly<boolean>;
+    readonly touched: PdxReadonly<boolean>;
+    readonly submitting: PdxReadonly<boolean>;
+    readonly submitted: PdxReadonly<boolean>;
+    readonly errors: PdxReadonly<Partial<Record<string, string>>>;
+    readonly warnings: PdxReadonly<Partial<Record<string, string>>>;
+    readonly saveMode: 'onSubmit' | 'onChange' | 'onBlur' | 'immediate';
+    readonly validateOn: 'onChange' | 'onBlur' | 'onSubmit';
+    readonly state: PdxReadonly<'idle' | 'validating' | 'submitting' | 'success' | 'error'>;
+    readonly submitError: PdxReadonly<unknown>;
+    handleSubmit(fn: (values: V) => Promise<void> | void): (e: Event) => void;
+    reset(newValues?: Partial<V>): void;
+    setValues(values: Partial<V>): void;
+    validate(): Promise<boolean>;
+    // One generic signature, not core's two overloads: a page that hands the form to a helper typed
+    // \`Form<Values>\` (four in the showcase) needs this to be assignable to core's Form, and
+    // TypeScript cannot relate core's conditional return across two different value types.
+    array<U = unknown>(name: string): PdxFieldArray<U>;
+    getValues(): V;
+    onFieldSave(callback: (fieldName: string, value: unknown) => void): void;
     dispose(): void;
   }
 }

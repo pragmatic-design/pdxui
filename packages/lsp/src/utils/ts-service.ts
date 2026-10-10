@@ -9,6 +9,7 @@ import { existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { GLOBALS_FILE, GLOBALS_DTS } from './pdx-globals';
+import { formTypeOf } from './form-types';
 
 // Statement-leading runes. We recognise them ONLY at the start of a line (indent aside):
 // an `@form`/`@store` inside a comment ("(via @form rune)", for one) is not a rune.
@@ -16,7 +17,9 @@ import { GLOBALS_FILE, GLOBALS_DTS } from './pdx-globals';
 // in the projected code as text, and `@inject employeeDocuments;` would become a name TypeScript
 // cannot find.
 const RUNE_KW = new RegExp(`@(${[...DECORATOR_RUNES.keys()].join('|')})\\b`, 'g');
-const NAME_INTRO = new Set(['fetch', 'form', 'store']);
+// Not `store`: `@store cart;` names a store MODULE and makes no `cart` variable — the module exports
+// `useCart()`. Declared, a script reading `cart` type-checked and threw a ReferenceError (#58).
+const NAME_INTRO = new Set(['fetch', 'form']);
 
 // Match: let x = $signal(   const y = $derived(   — a rune declaration.  Groups: [1]=let|const
 // The compiler places these where every use can see them, so TypeScript must not report
@@ -34,8 +37,8 @@ function atLineStart(s: string, idx: number): boolean {
 /** Projects the .pdx script into valid TS, with the length and the offsets unchanged.
  *  - `@prop name: T = d` → `let  name…` (a TYPED prop; `@prop`=5 → `let  `=5).
  *  - the other @… runes → blanked out (from the keyword to a `;` at depth 0, or to the
- *    balanced `{…}`), preserving the newlines. The names of @fetch/@form/@store are
- *    declared at the end (their lines are blanked) → the references resolve.
+ *    balanced `{…}`), preserving the newlines. The names of @fetch/@form are declared at
+ *    the end, typed (their lines are blanked) → the references resolve.
  *  - the `$…` runes stay (they are declared ambient). */
 export function projectScript(scriptContent: string): string {
     const s = scriptContent;
@@ -59,9 +62,11 @@ export function projectScript(scriptContent: string): string {
             if (after) names.set(after[1], 'any');
         }
         if (kw === 'inject' || kw === 'mixin') {
-            // Match: @inject key;  @inject key as alias;  @mixin useThing as thing;   Groups: [1]=key [2]=alias
-            const inj = /^\s+([A-Za-z_$][\w$]*)(?:\s+as\s+([A-Za-z_$][\w$]*))?/.exec(s.slice(m.index + 1 + kw.length));
-            if (inj) names.set(inj[2] ?? inj[1], 'any');
+            // Match: @inject key;  @inject key as alias;  @mixin './use-thing.pdx' as thing;
+            // Groups: [1]=key (absent for a quoted mixin path) [2]=alias
+            const inj = /^\s+(?:'[^'\n]*'|"[^"\n]*"|([A-Za-z_$][\w$]*))(?:\s+as\s+([A-Za-z_$][\w$]*))?/.exec(s.slice(m.index + 1 + kw.length));
+            const declared = inj && (inj[2] ?? inj[1]);
+            if (declared) names.set(declared, 'any');
         }
         if (kw === 'event') {
             // Match: @event name: PayloadType;   Groups: [1]=name [2]=payload type (optional)
@@ -94,6 +99,13 @@ export function projectScript(scriptContent: string): string {
             // already an error, and a second one on every read of the name would bury it.
             const decl = parseFetchDecl(s.slice(m.index, j).replace(/\s+/g, ' ').trim());
             if (decl) names.set(decl.name, `PdxResource<${decl.type || 'unknown'}>`);
+        }
+        if (kw === 'form') {
+            // The form createForm builds from this declaration (./form-types); `any` only for one
+            // the compiler does not understand, which it reports itself.
+            const name = /^@form\s+([A-Za-z_$][\w$]*)/.exec(s.slice(m.index, j));
+            const type = name && formTypeOf(s.slice(m.index, j));
+            if (name && type) names.set(name[1], type);
         }
         for (let k = m.index; k < j; k++) if (out[k] !== '\n') out[k] = ' ';
         RUNE_KW.lastIndex = j;

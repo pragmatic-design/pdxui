@@ -21,13 +21,14 @@ describe('projectScript', () => {
         expect(out).toContain('$signal(0)');
     });
 
-    it('blanks out the non-prop runes and declares the names of @form/@fetch/@store', () => {
+    it('blanks out the non-prop runes and declares the names of @form/@fetch, typed', () => {
         const src = '@event changed: number;\n@form myForm: { a: string { required } }\nfunction f() { return myForm.valid(); }';
         const out = projectScript(src);
         expect(out).not.toContain('@event');
         expect(out).not.toContain('@form');
         expect(out).not.toContain('required'); // the schema block emptied
-        expect(out).toContain('var myForm: any;'); // declared at the end, with `var`
+        // Declared at the end, with `var`, as core's Form of the declared fields (#58).
+        expect(out).toContain('var myForm: import("@pdxui/core").Form<{ "a": string }>;');
     });
 
     it('does not treat a rune inside a comment as one', () => {
