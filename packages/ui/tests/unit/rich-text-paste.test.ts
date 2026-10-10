@@ -62,6 +62,19 @@ describe('paste of whitespace', () => {
     it('a space inside a paragraph is kept', () => {
         expect(shape(paste('<p><b>a</b> <i>b</i></p>'))).toBe('paragraph("a"[bold], " ", "b"[italic])');
     });
+
+    it('whitespace between two blocks is layout, not a node (#74)', () => {
+        expect(shape(paste('<p>a</p>\n  \n<p>b</p>'))).toBe('paragraph("a"), paragraph("b")');
+    });
+
+    it('whitespace between blocks inside a container is dropped too (#74)', () => {
+        expect(shape(paste('<blockquote>\n  <p>a</p>\n  <p>b</p>\n</blockquote>'))).toBe('blockquote(paragraph("a"), paragraph("b"))');
+        expect(shape(paste('<div>\n<p>a</p> <h2>b</h2>\n</div>'))).toBe('paragraph("a"), heading("b")');
+    });
+
+    it('control — a space between two inline nodes at the top level is kept', () => {
+        expect(shape(paste('<b>a</b> <i>b</i>'))).toBe('"a"[bold], " ", "b"[italic]');
+    });
 });
 
 describe('paste of code', () => {
