@@ -2,7 +2,7 @@
 
 # Diagnostics
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 64 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 65 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -623,6 +623,14 @@ A custom element can be defined once; the second definition would throw in the b
 Only one of the two is registered by auto-import, and which one depends on scan order.
 
 **Fix.** Rename one of the files, or give one an explicit `@tag 'pdx-other-name';`.
+
+### PDX_TEMPLATE_NAME_NOT_PROVIDED
+
+*error* — A legacy-mode template reads a name its script does not provide.
+
+In the legacy mode the template sees what `defineProps` declares and what the top-level `return { … }` returns. A `const` the script declares and does not return reads as undefined — and a plain `<script>` with no rune is the legacy mode.
+
+**Fix.** Write `<script setup>`, which hands the template every name it declares — or add the name to the returned object.
 
 ### PDX_TS
 

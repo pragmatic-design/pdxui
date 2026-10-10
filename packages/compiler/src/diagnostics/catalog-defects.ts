@@ -214,6 +214,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: "`@fetch users: 'GET /api/users' as User[];`",
         reproducedIn: `${T}fetch-directive-diagnostics.test.ts`,
     },
+    PDX_TEMPLATE_NAME_NOT_PROVIDED: {
+        severity: 'error', category: 'defect',
+        summary: 'A legacy-mode template reads a name its script does not provide.',
+        explanation: 'In the legacy mode the template sees what `defineProps` declares and what the top-level `return { … }` returns. A `const` the script declares and does not return reads as undefined — and a plain `<script>` with no rune is the legacy mode.',
+        fix: 'Write `<script setup>`, which hands the template every name it declares — or add the name to the returned object.',
+        reproducedIn: `${T}legacy-template-names.test.ts`,
+    },
     PDX_FETCH_METHOD: {
         severity: 'error', category: 'defect',
         summary: '`@fetch` with a method other than GET.',

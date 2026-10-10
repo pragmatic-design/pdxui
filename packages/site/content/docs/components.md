@@ -73,6 +73,12 @@ The compiler says so, as `PDX_LEGACY_IN_SETUP`, naming the marker and which side
 declared with `@prop` don't arrive, that warning is the first place to look — after a stray `return`
 at the top level of the script, which is the marker nobody recognises as one.
 
+The other side of «not a switch»: a plain `<script>` **with no rune** is the legacy mode too, and the
+legacy mode hands the template only what `defineProps` declares and what the top-level `return { … }`
+returns. `const title = 'Hi'` there, read as `{{ title }}`, is undefined — and the compiler reports it
+as `PDX_TEMPLATE_NAME_NOT_PROVIDED`. `<script setup>` returns what it declares, which is why writing
+it is the convention.
+
 The script is **TypeScript**: annotations, `as`, generics (`$signal<User | null>(null)`), `import type`,
 `interface` and `type` are checked by the editor and erased by the compiler, which replaces them with
 spaces so every line and column of the module stays where you wrote it. TypeScript that does something
