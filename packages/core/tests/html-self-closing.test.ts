@@ -34,6 +34,14 @@ describe('html`` and self-closing tags', () => {
         expect(sec.querySelector('em')!.getAttribute('title')).toBe('a/>b');
     });
 
+    // The time the expansion takes on the inputs CodeQL names is measured in tests/perf/runtime-scans.test.ts.
+    it('an unterminated tag is left as it is, and the tags before it are still expanded', () => {
+        const markup = '<div><x-probe /><p>a</p><em title="open';
+        const strings = Object.assign([markup], { raw: [markup] }) as unknown as TemplateStringsArray;
+        const div = html(strings).firstElementChild!;
+        expect(tags(div).slice(0, 2)).toEqual(['x-probe', 'p']);
+    });
+
     it('void elements are left as they are', () => {
         const frag = html`<p><input type="text" /><br/>after</p>`;
         const p = frag.firstElementChild!;

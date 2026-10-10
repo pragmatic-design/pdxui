@@ -13,17 +13,13 @@ import { scanWorkspace, scanTagHostFiles, type TranslationKeys } from './utils/p
 import { analyzeDocument } from './utils/compiler-bridge';
 import { ProjectRegistries, type ProjectRegistry } from './utils/project-registry';
 import { pathToUri } from './utils/uri';
+import { isSelfContainedType } from './utils/payload-type';
 import type { WorkspaceFile } from './capabilities/references';
 
 // The prop types that are "safe" to type-check in literal bindings: primitives and unions
 // of string literals. Complex types (objects, functions, generics) → null: they cannot be
 // parsed as an annotation, and they are a source of false positives.
 const SAFE_PROP_TYPE = /^(string|number|boolean|(?:'[^']*'(?:\s*\|\s*'[^']*')*))$/;
-
-// A payload type that names nothing the virtual file would have to import: primitives, literals,
-// object and array shapes of them. `{ id: number }` is one; `Ticket` is not — it would be an unknown
-// name in the projected file, which is a false error.
-const SELF_CONTAINED_TYPE = /^(?:[\s{}[\]:;,|?'"]|string|number|boolean|null|undefined|'[^']*'|"[^"]*"|\d+|[a-z_$][\w$]*(?=\??\s*:))*$/;
 
 /**
  * The safe TS type of an attribute-prop of a component, or null. For `@name`, the type of that
@@ -38,7 +34,7 @@ function resolvePropType(registry: ProjectRegistry, tag: string, attr: string): 
         const payload = ev?.type?.trim();
         if (!payload || payload === 'void' || payload === 'CustomEvent') return null;
         const inner = /^CustomEvent<([\s\S]*)>$/.exec(payload)?.[1] ?? payload;
-        return SELF_CONTAINED_TYPE.test(inner) ? `CustomEvent<${inner}>` : null;
+        return isSelfContainedType(inner) ? `CustomEvent<${inner}>` : null;
     }
     // Attributes in the template are kebab-case; in the manifest they may be
     // camelCase or kebab — compare both forms.

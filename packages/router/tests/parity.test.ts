@@ -152,6 +152,8 @@ const ROUTES: ParityRoute[] = [
     // Two DYNAMIC routes that both match `/pages/12`: among dynamic routes the declared order holds.
     { path: '/pages/:slug', file: 'page.pdx', tag: 'pdx-page' },
     { path: '/pages/:n(number)', file: 'page-n.pdx', tag: 'pdx-page-n' },
+    // A static path with a regex metacharacter in it: the dot is a dot.
+    { path: '/feed.xml', file: 'feed.pdx', tag: 'pdx-feed' },
 ];
 
 /**
@@ -465,6 +467,24 @@ const PARITY: Row[] = [
             r.navigate('/about/');
             await settle();
             expect(r.matched()).toBe('/about');
+        },
+    },
+    {
+        // pathToRegex escaped only the slashes of a pattern's literal text, so `.` stayed a regex
+        // wildcard: `/feed.xml` matched `/feedXxml` in dev and nothing in a build (#67).
+        name: 'a dot in a route path is a dot, not any character',
+        run: async (r) => {
+            r.navigate('/feedXxml');
+            await settle();
+            expect(r.matched(), 'the dot matched another character').toBeNull();
+        },
+    },
+    {
+        name: 'control — the path with its dot still matches',
+        run: async (r) => {
+            r.navigate('/feed.xml');
+            await settle();
+            expect(r.matched()).toBe('/feed.xml');
         },
     },
     {

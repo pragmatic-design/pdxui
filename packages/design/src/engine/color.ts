@@ -396,8 +396,41 @@ export function compositeOver(top: OKLCH, bottom: OKLCH): OKLCH {
     return oklabToOklch(L, A, B);
 }
 
-/** `var(--name)` / `var(--name, fallback)`, innermost first. */
-const VAR_REF = /var\(\s*(--[a-z0-9-]+)\s*(?:,\s*([^()]*(?:\([^()]*\))?[^()]*))?\)/i;
+/** One `var(--name)` or `var(--name, fallback)` in a value: where it is, and what it names. */
+interface VarRef { start: number; end: number; ref: string; fallback?: string }
+
+/**
+ * The first `var(…)` of `value` that reads as one, its fallback taken to the matching parenthesis.
+ *
+ * A scan, not a regex: the regex this replaced let `\s*` and `[^()]*` compete for the same
+ * whitespace in the fallback, and ran in quadratic time on a long one (#67). It also read at most one
+ * level of parentheses in a fallback; the scan reads any depth.
+ */
+function findVarRef(value: string): VarRef | null {
+    const lower = value.toLowerCase();
+    for (let start = lower.indexOf('var('); start !== -1; start = lower.indexOf('var(', start + 1)) {
+        let i = start + 4;
+        while (i < value.length && /\s/.test(value[i])) i++;
+        if (value[i] !== '-' || value[i + 1] !== '-') continue;
+        let nameEnd = i + 2;
+        while (nameEnd < value.length && /[a-z0-9-]/i.test(value[nameEnd])) nameEnd++;
+        const ref = value.slice(i, nameEnd);
+        let j = nameEnd;
+        while (j < value.length && /\s/.test(value[j])) j++;
+        if (value[j] === ')') return { start, end: j + 1, ref };
+        if (value[j] !== ',') continue;
+        // The fallback runs to the parenthesis that closes this var(, nested ones counted.
+        let depth = 0;
+        for (let k = j + 1; k < value.length; k++) {
+            if (value[k] === '(') depth++;
+            else if (value[k] === ')') {
+                if (depth === 0) return { start, end: k + 1, ref, fallback: value.slice(j + 1, k) };
+                depth--;
+            }
+        }
+    }
+    return null;
+}
 
 /**
  * Read token `name` from a token map as a colour for `scheme`, following every `var()` in it —
@@ -412,16 +445,14 @@ export function resolveColorToken(
 ): OKLCH | null {
     const get = (k: string) => (tokens instanceof Map ? tokens.get(k) : (tokens as Record<string, string>)[k]);
     let value = get(name);
-    for (let hop = 0; hop < 32 && value && VAR_REF.test(value); hop++) {
-        let missing = false;
-        value = value.replace(VAR_REF, (_m: string, ref: string, fallback?: string) => {
-            const v = get(ref) ?? fallback?.trim();
-            if (v === undefined) missing = true;
-            return v ?? '';
-        });
-        if (missing) return null;
+    for (let hop = 0; hop < 32 && value; hop++) {
+        const found = findVarRef(value);
+        if (!found) break;
+        const v = get(found.ref) ?? found.fallback?.trim();
+        if (v === undefined) return null;
+        value = value.slice(0, found.start) + v + value.slice(found.end);
     }
-    return value && !VAR_REF.test(value) ? parseColorToken(value, scheme) : null;
+    return value && !findVarRef(value) ? parseColorToken(value, scheme) : null;
 }
 
 /** Generate danger/success/warning/info colors, each with an auto-contrast label. */
