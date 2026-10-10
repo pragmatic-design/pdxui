@@ -60,9 +60,11 @@ export function buildSetupBody(
     // Prop accessors — only generate if prop is actually referenced in body/lifecycle/effects/watches.
     // The watches count too: a prop read only in a `$watch` is rewritten to a call of the
     // accessor, and without the accessor declared, setup throws.
+    // A reactive `@fetch` URL counts as well: `${userId}` is rewritten to a call of the accessor (#101).
     const bodyText = analysis.body + analysis.effects.join(' ') +
         analysis.lifecycle.onMount.join(' ') + analysis.lifecycle.onDestroy.join(' ') +
-        analysis.watches.map(w => `${w.source} ${w.callback} ${w.options ?? ''}`).join(' ');
+        analysis.watches.map(w => `${w.source} ${w.callback} ${w.options ?? ''}`).join(' ') +
+        analysis.fetches.filter(f => f.hasReactiveParams).map(f => f.url).join(' ');
     for (const p of analysis.props) {
         // Always generate accessor if prop is used in body, signals, deriveds, or is a common pattern
         const namePattern = new RegExp(`\\b${p.name}\\b`);
@@ -120,6 +122,23 @@ export function buildSetupBody(
         parts.push(markFirst(`    const ${s.name} = store(${storeExpr});`, s.origin));
     }
 
+    // Callable names: props + derived + route params — need () appended in body/effect/lifecycle
+    const signalNames = new Set(analysis.signals.map(s => s.name));
+    const callableNames = new Set<string>();
+    for (const p of analysis.props) callableNames.add(p.name);
+    for (const d of analysis.deriveds) callableNames.add(d.name);
+    // @params: typed route params are generated as computed() → need () reads
+    if (analysis.route.params) {
+        for (const rp of analysis.route.params) callableNames.add(rp.name);
+    }
+
+    // Helper: rewrite signals (__name / .set) and callables (name()) in one AST pass. Declared
+    // before the first statement that uses it: the sets above are consts, and a call ahead of them
+    // would be in their temporal dead zone.
+    function rewriteAll(code: string): string {
+        return rewriteAst(code, signalNames, callableNames, filename, undefined, sink);
+    }
+
     // @fetch declarations → resource() calls with HttpClient
     // (BEFORE derived — derived may reference fetch results)
     if (analysis.fetches.length > 0) {
@@ -128,12 +147,14 @@ export function buildSetupBody(
             // Escape the URL so a backtick in it cannot close the generated literal and turn the
             // rest into an executed expression. Static URLs go through jsString, which
             // cannot be escaped out of. Reactive URLs must keep their `${...}` interpolations —
-            // that is the feature — so they get the sibling escape that leaves `${` alone.
+            // that is the feature — so they get the sibling escape that leaves `${` alone, and
+            // then the setup's own rewrite: `${page}` reads the signal (`${__page()}`) and `${userId}`
+            // the prop (`${userId()}`), inside the getter resource() tracks (#101).
             const safeUrl = escapeForReactiveTemplate(f.url);
             const cacheKey = f.hasReactiveParams
-                ? `() => \`${f.method}:${safeUrl}\``
+                ? `() => ${rewriteAll(`\`${f.method}:${safeUrl}\``)}`
                 : jsString(`${f.method}:${f.url}`);
-            const fetchUrl = f.hasReactiveParams ? `\`${safeUrl}\`` : jsString(f.url);
+            const fetchUrl = f.hasReactiveParams ? rewriteAll(`\`${safeUrl}\``) : jsString(f.url);
             const optsEntries: string[] = [`key: ${cacheKey}`];
             if (f.options) {
                 optsEntries.push(f.options.slice(1, -1).trim());
@@ -228,21 +249,6 @@ export function buildSetupBody(
             formCode += `${tail} });`;
             parts.push(formCode);
         }
-    }
-
-    // Callable names: props + derived + route params — need () appended in body/effect/lifecycle
-    const signalNames = new Set(analysis.signals.map(s => s.name));
-    const callableNames = new Set<string>();
-    for (const p of analysis.props) callableNames.add(p.name);
-    for (const d of analysis.deriveds) callableNames.add(d.name);
-    // @params: typed route params are generated as computed() → need () reads
-    if (analysis.route.params) {
-        for (const rp of analysis.route.params) callableNames.add(rp.name);
-    }
-
-    // Helper: rewrite signals (__name / .set) and callables (name()) in one AST pass.
-    function rewriteAll(code: string): string {
-        return rewriteAst(code, signalNames, callableNames, filename, undefined, sink);
     }
 
     // Partition deriveds: any derived referenced by the EAGERLY-executing body must
