@@ -63,8 +63,9 @@ Two equivalent ways to clean up, pick for readability:
 
 ## batch
 
-Synchronous mutations are already **auto-batched**: several `set`s in a row produce a single flush.
-`batch` is for when you want to explicitly group a block so subscribers run only once at the end:
+Each write outside `batch` flushes at once: three `set`s in a row run their readers three times, and
+the first run sees the other two values not yet written. `batch` groups a block so subscribers run
+only once, at the end:
 
 ```pdx
 batch(() => {

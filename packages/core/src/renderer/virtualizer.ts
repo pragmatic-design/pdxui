@@ -1,6 +1,6 @@
 // Virtualizer — efficient rendering of large lists/grids.
 // Only renders visible items + overscan. Binary search for scroll position.
-// Used by: DataGrid, VirtualList, Tree, Combobox dropdown.
+// Used by: pdx-select.
 
 import { signal, computed, effect } from '../reactivity/signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';

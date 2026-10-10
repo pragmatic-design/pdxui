@@ -44,8 +44,9 @@ input.value = 'hello';    // set a value
 grid.data = rows;         // feed data
 ```
 
-This is the preferred way to *control* a component (dialog/drawer `open`, inputs `value`, etc.) — it's
-reactive and survives re-renders.
+From script, this is how to set state on an element you hold a ref to. In a template, prefer the
+declarative binding — `<pdx-dialog :open="showDialog">` — which keeps the state in one signal; a ref
+is for what a prop cannot express, such as `focus()` or `scrollTo()`.
 
 ## 2. Call exposed methods
 

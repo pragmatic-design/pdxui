@@ -4,7 +4,7 @@
 // 1. Array-based subscribers (no Set hash overhead for typical <10 subscribers)
 // 2. Pre-allocated flush array (no spread [...pendingEffects] per cycle)
 // 3. Minimal branching on hot path (read/set)
-// 4. Glitch-free auto-batch with error boundary
+// 4. Glitch-free flush, once per write or per batch(), with error boundary
 // 5. Effect dep tracking via array (not Set) for fast unsubscribe
 
 import { DEV } from '../utils/env';
@@ -174,9 +174,9 @@ export function untracked<T>(fn: () => T): T {
  * {@link effect} or `computed` that read it during its last run re-runs when it changes; nothing
  * else does, so there is no diffing and no dependency array to keep correct.
  *
- * Writes are auto-batched: several mutations in the same synchronous turn produce ONE flush, so a
- * subscriber never observes a half-updated state. {@link batch} is for the cases where you need to
- * say so explicitly.
+ * Each write outside {@link batch} flushes at once: its subscribers run before `set` returns. Writes
+ * that must be seen together — two fields of one state — go inside `batch()`, so a subscriber never
+ * observes the state half-updated.
  *
  * In a `.pdx` file you rarely call this — `let count = $signal(0)` compiles to it, and `count++`
  * compiles to the `.set`.
@@ -540,9 +540,8 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
 /**
  * Group writes so subscribers run once, after all of them.
  *
- * Mostly unnecessary: synchronous writes are batched automatically, so this is for the cases the
- * automatic batching cannot see — writes spread across an `await`, or inside a callback the runtime
- * did not schedule. Wrapping ordinary code in it changes nothing.
+ * Outside it each write flushes at once, so two writes in a row run their subscribers twice, and the
+ * first run sees the second value not yet written. Use it when several writes are one change.
  *
  * Nested calls flush once, at the outermost exit.
  */

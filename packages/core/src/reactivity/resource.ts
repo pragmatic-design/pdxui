@@ -116,7 +116,7 @@ let resourceCounter = 0;
  * `tags` are what {@link invalidate} matches on after a {@link mutation}. `staleTime` (30s by
  * default) is how long a cached value is served without a refetch.
  *
- * In a `.pdx` file `@fetch users: '/api/users'` compiles to this.
+ * In a `.pdx` file `@fetch users: 'GET /api/users'` compiles to this.
  */
 export function resource<T>(
     fetcher: () => Promise<T>,

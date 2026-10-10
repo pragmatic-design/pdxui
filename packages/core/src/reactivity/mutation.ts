@@ -66,7 +66,7 @@ export interface Mutation<TData, TInput> {
  * with "Mutation already in progress". That is the double-submit guard — a user double-clicking
  * Save must not create two records — and it is why this is not just an async function.
  *
- * `invalidates` names the cache tags to drop on success, which is how a list refreshes itself after
+ * `invalidate` names the cache tags to drop on success, which is how a list refreshes itself after
  * an item is created without the caller wiring the two together.
  */
 export function mutation<TData, TInput = void>(

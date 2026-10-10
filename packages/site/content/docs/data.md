@@ -75,11 +75,16 @@ misspelled option would otherwise do nothing.
 After a POST/PUT/DELETE, the lists that showed that data are stale. Instead of updating them by hand
 one by one, a mutation **invalidates tags** and the linked resources refetch:
 
-```pdx
-async function addUser(dto) {
-  await mutate('/api/users', { method: 'POST', body: dto, invalidates: ['users'] });
-  // every @fetch tagged 'users' refreshes itself
-}
+```ts
+import { mutation, getDefaultClient } from '@pdxui/core';
+
+const http = getDefaultClient();
+const addUser = mutation({
+  fn: (dto) => http.post('/api/users', dto),
+  invalidate: ['users'],   // every @fetch tagged 'users' refreshes itself
+});
+
+await addUser.execute(dto);
 ```
 
 The mental model is the same as reactivity: you declare the relationships (this resource has these
@@ -92,12 +97,14 @@ click. An **optimistic** write puts the new value in the cache immediately and u
 server refuses.
 
 ```ts
-import { mutation } from '@pdxui/core';
+import { mutation, getDefaultClient } from '@pdxui/core';
 
+const http = getDefaultClient();
 const rename = mutation({
     fn: (input) => http.put(`/api/users/${input.id}`, input),
     optimistic: {
-        key: '/api/users',
+        // The key @fetch users: 'GET /api/users' caches under: the method, a colon, the URL.
+        key: 'GET:/api/users',
         update: (current, input) => (current as User[]).map(u => u.id === input.id ? { ...u, ...input } : u),
     },
     invalidate: ['users'],
@@ -133,14 +140,20 @@ pending state and wait: guessing produces a number that changes under the reader
 
 Three ways, in the order you should reach for them.
 
-**When the window comes back.** On by default:
+**When the window comes back.** This is `useQuery`'s, and on by default there:
 
-```pdx
-@fetch users: 'GET /api/users';   // refetchOnFocus and refetchOnReconnect are true
+```ts
+import { useQuery, getDefaultClient } from '@pdxui/core';
+
+const http = getDefaultClient();
+const users = useQuery(() => http.get('/api/users'));   // refetchOnFocus and refetchOnReconnect: on
 ```
 
 A user who alt-tabs away for ten minutes gets fresh data on return, and an app that was offline
 refetches when the network comes back. This is the one that costs nothing.
+
+`@fetch` does **not** do it: it compiles to `resource()`, which has no focus or reconnect listener.
+A screen that must refresh on return uses `useQuery`, or refetches its resource itself.
 
 **Polling**, when the data changes without you and there is no push:
 
@@ -627,4 +640,4 @@ Two more you will meet rarely and should know exist:
 - **Feed a grid or a select** → `createDataSource(rows)` or `createDataSource({ transport })`.
 - **Depends on state** → put `${signal}` in the URL: it re-runs itself.
 - **Avoid duplicate requests** → `staleTime` + `tags`.
-- **After a write** → `mutate(..., { invalidates: [...] })`: the lists refresh.
+- **After a write** → `mutation({ fn, invalidate: [...] })`: the lists refresh.

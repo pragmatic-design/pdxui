@@ -255,8 +255,8 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         explanation: 'A failed request leaves the screen as it was, with nothing telling the user.',
         fix: "Show it: `@if (users.state() === 'error') { … }`.",
         example: {
-            bad: pdx('<p>{{ users.value() }}</p>', "@fetch users: 'GET /api/users' as string[];"),
-            good: pdx("@if (users.state() === 'error') { <p>Could not load</p> } <p>{{ users.value() }}</p>", "@fetch users: 'GET /api/users' as string[];"),
+            bad: pdx('<p>{{ users.data() }}</p>', "@fetch users: 'GET /api/users' as string[];"),
+            good: pdx("@if (users.state() === 'error') { <p>Could not load</p> } <p>{{ users.data() }}</p>", "@fetch users: 'GET /api/users' as string[];"),
         },
     },
     PDX_FORM_NO_SUBMIT: {

@@ -17,20 +17,26 @@ A file with `@store` becomes a store module. Inside, `$store({...})` creates the
 
 ```pdx
 <!-- cart.pdx -->
+<script setup>
 @store cart;
 
 let items = $store({ products: [], total: 0 });
 
-export function add(p) {
+function add(p) {
   items.products = [...items.products, p];
   items.total += p.price;
 }
 
-export function clear() {
+function clear() {
   items.products = [];
   items.total = 0;
 }
+</script>
 ```
+
+The actions are plain functions **inside** the store, not exports: the module compiles to a single
+hook, `useCart()`, that returns the store's state and functions. An `export` that reads the store's
+names would sit outside it, where they do not exist — the compiler reports it as `PDX_STORE_EXPORT`.
 
 `$store({...})` returns a **reactive Proxy**: you mutate its properties like a normal object
 (`items.total += p.price`) and every component reading that property updates. It's the same
@@ -39,18 +45,19 @@ signals, so it doesn't rewrite them.)
 
 ## Using it from a component
 
-You import the store and read/write its properties: updates propagate to **all** consumers, wherever
-they are in the tree.
+You import the store's hook and read/write through what it returns: updates propagate to **all**
+consumers, wherever they are in the tree.
 
 ```pdx
 <template>
-  <span>Cart: {{ cart.products.length }} ({{ cart.total }}€)</span>
-  <pdx-button @click="checkout">Pay</pdx-button>
+  <span>Cart: {{ cart.items.products.length }} ({{ cart.items.total }}€)</span>
+  <pdx-button @click="cart.clear()">Empty</pdx-button>
 </template>
 
 <script setup>
-import { add, clear } from './cart';   // actions
-// reactive reads of cart.* happen through the imported store
+import { useCart } from './cart.pdx';
+
+const cart = useCart();   // the same instance in every component
 </script>
 ```
 
