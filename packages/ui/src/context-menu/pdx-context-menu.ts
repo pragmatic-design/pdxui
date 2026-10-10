@@ -39,6 +39,8 @@ component('pdx-context-menu', {
         }
         let _panelEl: HTMLElement | null = null;
         let _outsideHandler: ((e: MouseEvent) => void) | null = null;
+        /** The pending timer that adds `_outsideHandler`: close() cancels it, or it adds the listener after the close (#163). */
+        let _outsideTimer: ReturnType<typeof setTimeout> | null = null;
         let _escHandler: ((e: KeyboardEvent) => void) | null = null;
         let _focusDispose: Dispose | null = null;
         let _scrollHandler: (() => void) | null = null;
@@ -191,7 +193,8 @@ component('pdx-context-menu', {
             });
 
             // Click outside → close
-            setTimeout(() => {
+            _outsideTimer = setTimeout(() => {
+                _outsideTimer = null;
                 _outsideHandler = (ev: MouseEvent) => {
                     if (_panelEl && !_panelEl.contains(ev.target as Node)) close();
                 };
@@ -219,6 +222,7 @@ component('pdx-context-menu', {
             if (_panelEl) _panelEl.style.display = 'none';
             if (hadFocus && _opener?.isConnected) _opener.focus();
             _opener = null;
+            if (_outsideTimer) { clearTimeout(_outsideTimer); _outsideTimer = null; }
             if (_outsideHandler) { document.removeEventListener('mousedown', _outsideHandler); _outsideHandler = null; }
             if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
             if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
