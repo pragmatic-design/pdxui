@@ -13,7 +13,7 @@ read is `pdx-data-source`'s page in `pdxui-data`, which lists every component th
 
 | You want… | Use | Read |
 | --- | --- | --- |
-| data from a URL, in a page | `@fetch name: 'GET /url'` → `name.loading/error/data` | [data](references/data.md) |
+| data from a URL, in a page | `@fetch name: 'GET /url' as Type` → `name.loading()`, `name.error()`, `name.data()` — signals, read with a call | [data](references/data.md) |
 | it to re-run when state changes | put the signal in the URL: `` `GET /users/${id}` `` | [data](references/data.md) § Reactive params |
 | no duplicate requests | `staleTime` + `tags` | [data](references/data.md) § Cache |
 | lists to refresh after a write | `mutate(…, { invalidates: [...] })` | [data](references/data.md) § Mutations |
