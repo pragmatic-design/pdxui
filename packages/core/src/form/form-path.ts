@@ -13,6 +13,10 @@ function isPlainObject(val: unknown): val is Record<string, unknown> {
 
 // Prototype-pollution guard: dotted paths can come from server-driven form schemas
 // or external values → never walk/write __proto__/constructor/prototype segments.
+//
+// Written out as comparisons at each key, where the key is read or written — not as a callback
+// handed to `.some()`: the protection was the same, but CodeQL could not see it (#66), and a
+// guard nobody can check reads exactly like a missing one.
 const UNSAFE_KEY = (k: string): boolean => k === '__proto__' || k === 'constructor' || k === 'prototype';
 
 /**
@@ -24,6 +28,9 @@ const UNSAFE_KEY = (k: string): boolean => k === '__proto__' || k === 'construct
 export function flattenValues(obj: Record<string, unknown>, prefix = ''): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     for (const [key, val] of Object.entries(obj)) {
+        // An own `__proto__` key — what JSON.parse makes — assigned below would re-point the
+        // result's prototype.
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
         const path = prefix ? `${prefix}.${key}` : key;
         if (isPlainObject(val)) {
             Object.assign(result, flattenValues(val, path));
@@ -80,10 +87,12 @@ export function getNestedValue(obj: unknown, path: string): unknown {
 /** Set a value in a nested object by dotted path, creating intermediate objects/arrays as needed. */
 export function setNestedValue(obj: Record<string, unknown>, path: string, value: unknown): void {
     const parts = path.split('.');
-    if (parts.some(UNSAFE_KEY)) return; // prototype-pollution guard
+    // The whole path first, so a refused one writes nothing at all, not its first segments.
+    if (parts.some(UNSAFE_KEY)) return;
     let current: Record<string, unknown> = obj;
     for (let i = 0; i < parts.length - 1; i++) {
         const key = parts[i];
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') return;
         const nextKey = parts[i + 1];
         const isNextIndex = /^\d+$/.test(nextKey);
         if (current[key] === undefined || current[key] === null) {
@@ -92,6 +101,7 @@ export function setNestedValue(obj: Record<string, unknown>, path: string, value
         current = current[key] as Record<string, unknown>;
     }
     const lastKey = parts[parts.length - 1];
+    if (lastKey === '__proto__' || lastKey === 'constructor' || lastKey === 'prototype') return;
     current[lastKey] = value;
 }
 
