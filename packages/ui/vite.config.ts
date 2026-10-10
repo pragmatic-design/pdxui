@@ -13,6 +13,10 @@ import { unitTestWorkers } from '../../build/unit-test-workers';
 //   • "./button"   → dist/button/pdx-button.js    (granular, tree-shakeable subpath import)
 // @pdxui/core stays external so a consuming app shares a single core instance
 // (the customElements.define guard in core makes repeated registration idempotent).
+// @pdxui/design stays external too, sub-paths included: each component imports its own stylesheet
+// (`import '@pdxui/design/components/accordion'`), and that import has to reach the published
+// module for the consumer's bundler to resolve. Inlined, it became `/* empty css */` and every
+// component's CSS went into one `ui.css` nothing loaded (#45; tests/unit/dist-css-imports.test.ts).
 //
 // Entry points are DERIVED from package.json "exports": every ./src/*.ts target becomes a
 // rollup input, so standalone entries not reachable from the barrel (dialog-service,
@@ -43,7 +47,7 @@ export default defineConfig({
             formats: ['es'],
         },
         rollupOptions: {
-            external: ['@pdxui/core'],
+            external: ['@pdxui/core', /^@pdxui\/design(\/|$)/],
             output: {
                 preserveModules: true,
                 preserveModulesRoot: 'src',
