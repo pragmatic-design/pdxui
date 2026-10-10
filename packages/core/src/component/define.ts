@@ -11,8 +11,15 @@ const latestCtorMap = new Map<string, PdxElementConstructor>();
 /** Map of tag → set of live instances, for HMR re-render. */
 const instanceRegistry = new Map<string, Set<PdxElement>>();
 
-/** Register a Custom Element. If already defined, swaps prototype for HMR. */
+/**
+ * Register a Custom Element. If already defined, swaps prototype for HMR.
+ *
+ * Where there is no custom element registry (Node: a build tool, a test, static generation) it
+ * registers nothing. Every compiled `.pdx` and every `@pdxui/ui` module calls `component()` when it is
+ * imported, so throwing here would make the whole module graph unimportable.
+ */
 export function define(tag: string, ctor: PdxElementConstructor): void {
+    if (typeof customElements === 'undefined') return;
     latestCtorMap.set(tag, ctor);
 
     if (!customElements.get(tag)) {

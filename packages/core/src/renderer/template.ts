@@ -1,7 +1,7 @@
 // Tagged template literal html`` → DOM with reactive bindings.
 // Supports: text interpolation, @event(.mod), :prop, ::twoWay.
 // Template caching: same template strings → reuse parsed HTMLTemplateElement.
-// SSR-safe: returns empty fragment when document is unavailable.
+// Importable without a DOM; calling html`` needs one (#93).
 
 import { effect } from '../reactivity/signal';
 import { setProp } from './dom';
@@ -35,9 +35,15 @@ const PH_REGEX = new RegExp(`(${escapeRegex(PLACEHOLDER)}\\d+\u200B)`, 'g');
 const PH_EXTRACT = new RegExp(`${escapeRegex(PLACEHOLDER)}(\\d+)\u200B`);
 const COMMENT_PH_RE = new RegExp(`^${COMMENT_PH_PREFIX}(\\d+)$`);
 
-/** Tagged template literal that produces reactive DOM. SSR-safe: returns empty fragment. */
+/**
+ * Tagged template literal that produces reactive DOM. It needs a DOM: where there is none it throws,
+ * naming the call, instead of returning something that is not a fragment. Module evaluation never
+ * calls it, so a module that uses it still imports.
+ */
 export function html(strings: TemplateStringsArray, ...values: TemplateValue[]): DocumentFragment {
-    if (!isBrowser) return new DocumentFragment();
+    if (!isBrowser) {
+        throw new Error('html`` needs a DOM; it was called in an environment without one (Node, a build tool)');
+    }
 
     let tpl = templateCache.get(strings);
     if (!tpl) {
