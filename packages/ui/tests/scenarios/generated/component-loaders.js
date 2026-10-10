@@ -130,5 +130,9 @@ export function tagsIn(text) {
 export async function loadTags(tags) {
     const unknown = tags.filter((t) => !LOADERS.has(t));
     if (unknown.length > 0) throw new Error('no @pdxui/ui module registers ' + unknown.join(', '));
-    await Promise.all(tags.map((t) => LOADERS.get(t)()));
+    await Promise.all(tags.map((t) => {
+        const load = LOADERS.get(t);
+        if (typeof load !== 'function') throw new Error('no @pdxui/ui module registers ' + t);
+        return load();
+    }));
 }
