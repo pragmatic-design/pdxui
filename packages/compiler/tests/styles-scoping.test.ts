@@ -56,6 +56,26 @@ describe('scoping a selector', () => {
         expect(out).not.toMatch(/@supports[^{]*\[data-pdx-/);
     });
 
+    it('recurses into @container — its rules are style rules too (#104)', () => {
+        // Copied as is, `.title` grew in every matching container of the page.
+        const out = css('@container (min-width: 600px) { .title { font-size: 2rem; } }');
+        expect(out).toContain('@container (min-width: 600px)');
+        expect(out).toMatch(/\[data-pdx-[a-z0-9]+\] \.title/);
+        expect(out).not.toMatch(/@container[^{]*\[data-pdx-/);
+    });
+
+    it('recurses into @starting-style the same way (#104)', () => {
+        const out = css('@starting-style { .a { opacity: 0; } }');
+        expect(out).toContain('@starting-style');
+        expect(out).toMatch(/\[data-pdx-[a-z0-9]+\] \.a/);
+    });
+
+    it('leaves an author\'s @scope as written — it sets its own boundary (#104)', () => {
+        const out = css('@scope (.card) to (.content) { img { border: 1px solid; } }');
+        expect(out).toContain('@scope (.card) to (.content)');
+        expect(out).not.toMatch(/\[data-pdx-[a-z0-9]+\] img/);
+    });
+
     it('leaves @keyframes alone — a keyframe name is not a selector', () => {
         // Scoping `from`/`to` would break the animation with no error anywhere.
         const out = css('@keyframes spin { from { opacity: 0; } to { opacity: 1; } }');
