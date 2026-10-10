@@ -88,8 +88,9 @@ describe('author text stays text in the generated module', () => {
     it('a clean reactive URL still interpolates — the fix must not kill the feature', () => {
         const code = compile(`@fetch users: 'GET /api/users/\${id}';`);
         const line = code.split('\n').find(l => l.includes('resource(')) ?? '';
-        // The ${id} interpolation is the whole point of a reactive URL: it must survive.
-        expect(line).toContain('${id}');
+        // The ${id} interpolation is the whole point of a reactive URL: it must survive, as a read
+        // of the signal (#101) — the bare `${id}` named a variable that does not exist.
+        expect(line).toContain('${__id()}');
         expect(line).toContain('/api/users/');
     });
 });
