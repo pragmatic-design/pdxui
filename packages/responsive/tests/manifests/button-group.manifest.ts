@@ -4,7 +4,7 @@
  * Contracts DERIVED by inspecting the source and the CSS (they are NOT in universal.ts):
  *   - Source: packages/ui/src/button-group/pdx-button-group.ts
  *       · the styled class is on the HOST <pdx-button-group>, set in ctx.track:
- *         `el.className = 'pdx-btn-group'` (or 'pdx-btn-group-vertical' when orientation=vertical).
+ *         `el.classList.toggle('pdx-btn-group', …)` (or 'pdx-btn-group-vertical' when orientation=vertical).
  *       · render() = <slot></slot>: the <pdx-button> elements are projected as direct children of the host.
  *       · An action group (mode="none", the default): visual grouping only, role="group".
  *   - CSS: packages/design/src/surfaces/buttons.css
