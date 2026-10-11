@@ -313,6 +313,7 @@
 <script setup>
 import { onMount } from '@pdxui/core';
 import { CATALOG_URL, THEMES, VIEWPORTS, CAN_SAVE, scenarioUrl, compositionUrl, COMPOSITION_NAME } from './config';
+import { readPreference, writePreference } from '../../../brand/preference';
 import { runOracle, injectCss, clearCss } from './oracle';
 import { inheritedFromBase } from '@pdxui/design/engine';
 import { TOKEN_GROUPS, ALL_EDITABLE_TOKENS, resolveTokens } from './tokens';
@@ -338,8 +339,13 @@ let loadError = $signal('');
 let query = $signal('');
 let component = $signal(params.get('component') ?? '');
 let scenario = $signal(params.get('scenario') ?? '');
-let theme = $signal(params.get('theme') ?? 'neutral');
-let scheme = $signal(params.get('scheme') ?? 'light');
+// The visitor's choice on pdxui.com (brand/preference.ts) when the URL names nothing: a URL that
+// names a theme or a scheme still wins, so a shared link shows what was shared.
+const preference = readPreference();
+let theme = $signal(params.get('theme') ?? (preference.theme && THEMES.includes(preference.theme) ? preference.theme : 'neutral'));
+let scheme = $signal(params.get('scheme') ?? preference.scheme ?? 'light');
+// One scheme for the chrome and the preview: the builder's own surface follows the choice too.
+document.documentElement.setAttribute('pdx-scheme', scheme);
 let width = $signal(Number(params.get('w') ?? 0));
 let report = $signal(null);
 let measuring = $signal(false);
@@ -565,12 +571,15 @@ function onFilter(e) {
 function onTheme(e) {
     frameReady = false;
     theme = e.target.value;
+    writePreference({ theme });
     syncUrl();
 }
 
 function toggleScheme() {
     frameReady = false;
     scheme = scheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('pdx-scheme', scheme);
+    writePreference({ scheme });
     syncUrl();
 }
 
