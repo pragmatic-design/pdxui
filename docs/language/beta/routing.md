@@ -43,7 +43,7 @@ Grammars in [grammar.md](grammar.md).
 ### Removed: @route, @alias, @prefetch, the script @transition
 
 Each restated a field `@page` already has, or used a keyword that means something else in the
-template. Under `language: 'alpha'` they are accepted with `PDX_ALPHA_FORM`; `pdx migrate` rewrites
+template. Each is `PDX_REMOVED_FORM`; `pdx migrate` rewrites
 them mechanically — `@route { … }` into the separate declarations and `@page` options,
 `@alias 'p'` into a further `@page` path, `@prefetch 'x'` and `@transition 'x'` into `@page`'s
 `prefetch` and `transition` options (migration.md).

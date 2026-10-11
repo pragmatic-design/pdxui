@@ -147,7 +147,7 @@ field, the control also receives the field's error, `aria-invalid` and `required
 
 - `::x` on a component prop that is not a model: `PDX_TWO_WAY_NOT_MODEL` (error).
 - A modifier not in the list: `PDX_BINDING_MODIFIER` (error).
-- `.number` writing `0` for an empty or invalid entry is the alpha behaviour, kept under `'alpha'`.
+- `.number` writing `0` for an empty or invalid entry was the alpha behaviour; it is gone.
 
 #### Examples
 
@@ -371,7 +371,8 @@ resolved value, typed (`Resource<T>` → `T`, `Promise<T>` → `T`):
 - otherwise the body, with `data()` bound — including a refresh in flight and a refresh that failed
   over kept data (below).
 
-A boolean is still a condition. The `@error` names are typed by the strict projection (#122): the
+An operand written as a boolean expression (`@await (ready)`) is still a condition; a **source** that
+resolved `false` is data, and renders the body (data.md, E5). The `@error` names are typed by the strict projection (#122): the
 error is `unknown`, so the body narrows it before reading a member.
 
 Whether the body renders is decided by `state()`, never by the value's truthiness: a source that
@@ -393,9 +394,8 @@ promise, a new key); they stop when the block is removed. Alpha starts them once
 them (`helpers.ts:185,191`). A minimum display time — keeping a spinner up for at least N ms once
 shown — is not part of the beta (decisions.md 26).
 
-**Rules.** `maxMs` not greater than `minMs` is `PDX_AWAIT_TIMING` (error). Under `language: 'alpha'`,
-an `@await` with `maxMs` is `PDX_AWAIT_MAXMS_CHANGED` (warning): in the beta it times out to `@error`
-instead of rendering the body.
+**Rules.** `maxMs` not greater than `minMs` is `PDX_AWAIT_TIMING` (error). `pdx migrate` flags every
+`@await` with `maxMs`, whose meaning changes.
 
 Acceptance cases: a promise still pending at `maxMs` → `@error` with `AwaitTimeoutError`, the body not
 rendered, and the body rendered when it resolves later; the same without `@error` → `@loading`
@@ -449,7 +449,8 @@ component in a `@defer` body is no longer lazy — a dependency of #136.
 *render* mounts the body. The triggers before `;` start the render — and the load, if it has not
 happened yet; the triggers after `prefetch` start only the load. `@defer (interaction; prefetch idle)`
 fetches the chart's code when the browser is idle and mounts it on the first pointer or focus entry
-into the block (`interaction` is the alpha `hover`: `pointerenter`/`focusin`, `defer.ts:184-185`).
+into the block (`pointerenter`/`focusin`, `defer.ts:184-185`; the alpha spelling `hover` is removed —
+decisions.md 37).
 Without `prefetch`, the two phases start together, as in alpha. **`when (expr)`** — the expression in
 its own parentheses, since `|` and `;` separate triggers — fires the first time the expression is
 truthy and does not un-fire: a deferred block is never removed by its trigger; `@if` around it does

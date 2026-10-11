@@ -2,7 +2,8 @@
 
 This is the **target** specification of the `.pdx` language at the `beta` level: the whole language
 as it will be once the beta issues land, in one place. It replaces `docs/language/` when the beta
-becomes the default (#159); until then it lives in `docs/language/beta/`, and the reference in
+issues land — the beta replaces the alpha outright, with no compatibility level (decisions.md 36); until
+then it lives in `docs/language/beta/`, and the reference in
 `docs/language/` keeps describing what the compiler accepts today. Issues cite its sections.
 
 | | `docs/language/` | this specification |
@@ -20,7 +21,7 @@ disagreement with an issue is a defect of this specification, to fix here.
 | Page | What it defines |
 |---|---|
 | [grammar.md](grammar.md) | **Every production** of the beta language, in one EBNF — the formal core |
-| [file.md](file.md) | The file and its blocks, the tag, language levels and browser targets, the render model |
+| [file.md](file.md) | The file and its blocks, the tag, one language with no levels, browser targets, the render model |
 | [script.md](script.md) | Script declarations and `$` runes |
 | [components.md](components.md) | The component contract: props, models, events, slots, states, parts, host, refs, context — in `.pdx` and in the TypeScript descriptor |
 | [template.md](template.md) | Interpolation, bindings, attachments, block directives |
@@ -28,6 +29,7 @@ disagreement with an issue is a defect of this specification, to fix here.
 | [routing.md](routing.md) | Pages, loaders, navigation, typed routes, static generation |
 | [data.md](data.md) | The async vocabulary and its execution contract, `@fetch`, `@action` and its concurrency, `@form` and async validation, `@store`, `$store` |
 | [lifecycle.md](lifecycle.md) | What effects, requests, timers, attachments, refs and snippets do when a block is removed, hidden, frozen, resumed or destroyed |
+| [library.md](library.md) | What the beta asks of each `@pdxui/ui` component: contract, forms, states, parts, tokens, accessibility for people and agents, and when one is done |
 | [agents.md](agents.md) | How an agent reads and operates an app: accessibility the framework guarantees, the description API, capabilities offered to agents |
 | [performance.md](performance.md) | Guarantees with their measurements: the compiler, the compiled output, loading and deferred code, the first render, virtual lists, bounded memory, requests, heavy work, bundle budgets |
 | [server.md](server.md) | Rendering outside the browser: Node-safe imports, static generation (render and replace), and the separate roadmap to hydration, per-request rendering and streaming |
@@ -69,7 +71,7 @@ These come from the repository's own rules and from the decisions of 2026-10-10/
 section below was checked against them:
 
 1. **One way per common thing.** A beta form replaces its alpha alternatives; it does not sit beside
-   them. The alpha form survives only behind `language: 'alpha'` (file.md).
+   them: a removed alpha form is an error, `PDX_REMOVED_FORM`, and `pdx migrate` rewrites it (file.md).
 2. **A declaration, not wiring.** If a developer writes the same wiring twice, the language lacks a
    declaration.
 3. **Explicit and greppable.** No implicit context, no type-based template selection, no name

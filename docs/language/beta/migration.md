@@ -2,10 +2,10 @@
 
 Every alpha form that the beta changes or removes.
 
-- A **language change** compiles under `language: 'alpha'` with `PDX_ALPHA_FORM` and is an error
-  under `'beta'`.
-- A **fix** changes behaviour at every level, because the alpha behaviour was a defect (#187).
-- A **target change** depends on `pdx({ target })`, not on the language level (#152, #156).
+- A **language change** is an error, `PDX_REMOVED_FORM`, naming the beta form; there is no alpha
+  level to keep it compiling (decisions.md 36).
+- A **fix** changes behaviour, because the alpha behaviour was a defect (#187).
+- A **target change** depends on `pdx({ target })` (#152, #156).
 
 «Mechanical» means `pdx migrate` rewrites it; «flagged» means it reports the location and the beta
 form and a person rewrites it; «behaviour» means the source stays valid but its meaning changes.
@@ -50,7 +50,7 @@ proposals the implementing issue may change.
 | `::x` on a component prop that is not two-way | `@model x` in the child | flagged (the child is another file, maybe another package) | #124 (flagging †) |
 | `@await (x as T)`, where `as T` was a TypeScript assertion (alpha has no `as` binding) | `@await ((x as T))`: in the beta a trailing `as Name` binds the value | mechanical: parenthesises every `@await` whose expression ends in `as <Identifier>` | † (decision 18) |
 | `:style.color="c"`, `:style.--accent="c"` | `:style="{ color: c, '--accent': c }"` | mechanical (merged into an existing object) | † (decision 5) |
-| `{{ price \| money }}` (a single pipe) | still valid; `PDX_PIPE_SINGLE` (info, at both levels) suggests `{{ money(price) }}`; chains of two or more stay | mechanical, optional | † (decision 4) |
+| `{{ price \| money }}` (a single pipe) | still valid; `PDX_PIPE_SINGLE` (info) suggests `{{ money(price) }}`; chains of two or more stay | mechanical, optional | † (decision 4) |
 | `@pdx-change="…"` on a library value component | `@<model>-change="…"` — `@checked-change` on `pdx-checkbox` and `pdx-switch`, `@pressed-change` on `pdx-toggle`, `@value-change` on the others — **with the payload converted**: each `$event.detail.<field>` / `e.detail.<field>` read is rewritten through the component's mapping in the manifest (on `pdx-checkbox`: `detail.checked` → `detail.value`; `detail.value`, the choice identifier → `$event.currentTarget.value`; `detail.indeterminate` → `$event.currentTarget.indeterminate`) | mechanical only when the handler is written inline and every `detail` read in it has a mapping; **flagged** when the handler is a reference to a script function, passes `detail` or the event on, or reads a field with no mapping | #125 (payload conversion †) |
 | `@change`, `@valuechange`, `@pressedchange`, `@pdx-pressed-change` on a library value component | the model's change event | flagged | #125 |
 | `::value.number` writes `0` for empty or invalid | writes `null` for empty; leaves the value and marks invalid otherwise | behaviour: flagged on every `.number` binding | #126 (flagging †) |
@@ -62,7 +62,7 @@ proposals the implementing issue may change.
 | parent `<slot name="row" let:item>…</slot>` / `@slot(row, { item }) { … }` | `@snippet row(item) { … }` inside the tag | mechanical | #131 |
 | template props (`:item-template="fn"`) on library components | `@snippet item(o) { … }` | flagged | #131 (flagging †) |
 | `component(tag, { props: { x: { type: String } } })` (TypeScript) | the typed descriptor | manual (library work) | #123 |
-| `@await (…) { maxMs: n }` renders the body when `n` passes | `@error` with an `AwaitTimeoutError` when `n` passes; the body only with a result | behaviour: flagged on every `maxMs` (`PDX_AWAIT_MAXMS_CHANGED`) | † (decision 26) |
+| `@await (…) { maxMs: n }` renders the body when `n` passes | `@error` with an `AwaitTimeoutError` when `n` passes; the body only with a result | behaviour: flagged on every `maxMs` | † (decision 26) |
 | `@defer (anything)` — an unknown trigger fires at once | `PDX_DEFER_UNKNOWN_TRIGGER` | flagged; `immediate` suggested when that is what it did | † (decision 27) |
 
 ## Data and routing
@@ -74,6 +74,7 @@ proposals the implementing issue may change.
 | `@head { title, meta: [...] }` | `@title` and `@meta` lines | mechanical | † (decision 3) |
 | `@transition 'fade';` in the script | `@page '/x' { transition: 'fade' }` | mechanical | † (decision 7) |
 | `@meta { requiresAuth: true }` (route data) | `@page '/x' { meta: { requiresAuth: true } }` | mechanical | † (decision 8) |
+| `@defer (hover)` | `@defer (interaction)` — the same trigger | mechanical | † (decision 37) |
 | `@prefetch 'hover';` | `@page '/x' { prefetch: 'hover' }` | mechanical | † (decision 19) |
 | a form field named like a form member (`valid`, `reset`, …) | another name | `PDX_FORM_FIELD_RESERVED`; flagged | † (decision 13) |
 | `x.isPending()` | `x.pending()` | mechanical | #141 |
@@ -89,7 +90,7 @@ proposals the implementing issue may change.
 | `@store x { persist: 'other' }` | `'local'` or `'session'` | flagged | † (decision 14) |
 
 **Runtime behaviour that changes with the execution contract** (data.md E1–E9, F1–F7). These are
-runtime fixes, not syntax: they apply at both language levels when they land, and `pdx migrate`
+runtime fixes, not syntax: they apply when they land, and `pdx migrate`
 has nothing to rewrite. They are listed because code may rely on the old behaviour.
 
 | Before | After | Who notices | Source |

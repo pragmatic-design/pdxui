@@ -46,7 +46,7 @@ resource; `execute(arg)`, `cancel()` on an action.
 
 - The alpha names — `loading`, `isPending`, `status`, `isLoading`, the extra `state` values
   (`loading`, `reloading`, `stale`, `local`), `currentLoaderState()` — are language changes: kept as
-  deprecated aliases under `'alpha'` (a one-time warning in development), removed in `'beta'`.
+  removed (decisions.md 36).
   `pdx migrate` rewrites the mechanical ones (`x.isPending()` → `x.pending()`) and flags the others
   (`x.loading()` is `x.state() === 'pending' && !x.data()`, #141).
 

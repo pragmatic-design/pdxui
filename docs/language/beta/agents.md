@@ -31,7 +31,7 @@ rules first; agents benefit because they read the same tree. Each is measured in
 | A3 | `aria-rowcount` / `aria-setsize` with the source's total when a list shows a part of it | the data source, the pager | present on `pdx-data-grid` (`aria-rowcount` counts header rows, as ARIA defines); missing on the dashboard's three-item lists |
 | A4 | `aria-busy="true"` on the region whose source is pending; a `status` with text only while it is | the async vocabulary | to check: the showcase dashboard (Italian locale) shows a 'Loading' status beside a loaded list |
 | A5 | `aria-sort` on a sortable column header; the header's name is its label alone | the grid's column state | `aria-sort` present; a header's accessible name includes its sort and filter buttons' labels (column «X» is announced as «X Filter X») |
-| A6 | the current step and the count of a multi-step flow (`aria-current="step"`, «step 1 of 4») | `pdx-wizard` | present as visible text («step 1 of 4»), not as `aria-current="step"` |
+| A6 | the current step and the count of a multi-step flow (`aria-current="step"`, «step 1 of 4») | `pdx-wizard` | `aria-current="step"` is set (`ui/src/wizard/pdx-wizard.ts`); the snapshot did not show it — to measure with a browser test |
 
 ## The description API (development and test)
 

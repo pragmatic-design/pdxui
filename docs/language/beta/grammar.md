@@ -1,6 +1,6 @@
 # The beta grammar
 
-The productions of the `.pdx` language at the `beta` level, in the W3C EBNF notation of
+The productions of the `.pdx` language in its beta form, in the W3C EBNF notation of
 `docs/language/overview.md`. The other pages give each construct its semantics and rules; this page
 is the grammar they share. A few productions local to one construct live on its page
 (`ScopedStyle` and `ComponentToken` in styles.md, `StoreRune` in data.md, `DerivedDecl` in
@@ -280,7 +280,7 @@ PortalBlock    ::= "@portal" S? "(" ( StringLiteral | [^)]+ ) ")" Block
 DeferBlock     ::= "@defer" S? "(" Triggers ( S? ";" S? "prefetch" S Triggers )? ")" Block                 (proposed: "; prefetch" — decisions.md 27)
                    ( S? ( "@placeholder" Block | "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*     (proposed: ErrorNames — decisions.md 10)
 Triggers       ::= Trigger ( S? "|" S? Trigger )*
-Trigger        ::= "viewport" | "idle" ( "(" Digits ")" )? | "hover" | "interaction" | "timer(" Digits ")" | "immediate"   /* hover = interaction: still open, decisions.md */
+Trigger        ::= "viewport" | "idle" ( "(" Digits ")" )? | "interaction" | "timer(" Digits ")" | "immediate"   /* † `hover` removed — decisions.md 37 */
                  | "when" S? "(" S? Expression S? ")"                                                      (proposed — decisions.md 27)
 AwaitBlock     ::= "@await" S? "(" S? Expression ( S "as" S Identifier )? S? ")" S? AwaitTiming? Block       (β #145: `as`; disambiguation proposed — decisions.md 18)
                    ( S? ( "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*
@@ -314,8 +314,7 @@ ThemeBlock     ::= "@pdx-theme" S KebabName S? "{" CssText "}"                  
 
 ```ebnf
 PdxOptions     ::= "pdx(" "{" ( PdxOption ( "," PdxOption )* )? "}" ")"
-PdxOption      ::= "language" ":" ( "'alpha'" | "'beta'" )                                              (β #121)
-                 | "target" ":" ( "'baseline-2026'" | "'baseline-2024'" )                               (β #121)
+PdxOption      ::= "target" ":" ( "'baseline-2026'" | "'baseline-2024'" )                               (β #121)
                  | "prefix" ":" StringLiteral                                                           (β #136)
                  | /* the alpha options, minus inlineBindings (β #107) */
 ```

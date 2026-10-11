@@ -1,4 +1,4 @@
-# The file, levels, targets and the render model
+# The file, targets and the render model
 
 ## The file
 
@@ -24,8 +24,8 @@ use runes), unchanged.
 ### Rules
 
 - `<script setup>` is accepted and `setup` ignored: `PDX_SETUP_REDUNDANT` (info).
-- A legacy marker — `defineProps`, `defineEmits`, a top-level `return { … }` — is `PDX_ALPHA_FORM`
-  under `language: 'alpha'` and an error under `'beta'`; `pdx migrate` converts it (migration.md).
+- A legacy marker — `defineProps`, `defineEmits`, a top-level `return { … }` — is `PDX_REMOVED_FORM`;
+  `pdx migrate` converts it (migration.md).
 - A second `<template>` or `<script>` is `PDX_DUPLICATE_TEMPLATE` / `PDX_DUPLICATE_SCRIPT`, as in alpha.
 - **One reading rule for declarations** (decisions.md 11 — proposed): any declaration may span lines
   when it opens a balanced `{ … }` or `( … )` on its first line; it ends at its `;` or at the end of
@@ -48,9 +48,8 @@ The prefix `pdx-` is reserved for the `@pdxui/*` packages.
 
 - An application tag that starts with `pdx-` (derived or written with `@tag`) is `PDX_TAG_RESERVED`.
 - Two files that derive one tag are `PDX_TAG_COLLISION`, as in alpha.
-- Under `language: 'alpha'` the derived prefix stays `pdx-`; `pdx migrate` renames the application's
-  tags in its templates, its CSS selectors and its `@tag` lines, and reports a tag it finds inside a
-  string.
+- `pdx migrate` renames an existing application's `pdx-` tags in its templates, its CSS selectors and
+  its `@tag` lines, and reports a tag it finds inside a string.
 
 ### Examples
 
@@ -69,34 +68,29 @@ let me = $signal<User>({ id: 1, name: 'Ada' });
 
 alpha → beta (#136)
 
-## Language levels
-
-### Syntax
-
-```ebnf
-PdxOption ::= "language" ":" ( "'alpha'" | "'beta'" ) | "target" ":" ( "'baseline-2026'" | "'baseline-2024'" )
-```
+## One language, no levels
 
 ### Semantics
 
-`pdx({ language })` selects the forms the compiler accepts (#121). Each form the beta removes is a
-**language change**, registered once in the compiler with how to detect it, the message, and the
-mechanical fix when there is one:
-
-| Level | A removed form | A beta form |
-|---|---|---|
-| `'alpha'` | compiles as before, `PDX_ALPHA_FORM` (warning) naming the beta form and `pdx migrate` | compiles |
-| `'beta'` | error, same message | compiles |
-
-The default is `'alpha'` until #159 makes it `'beta'`; after that `'alpha'` stays selectable for the
-support period the release notes state.
+The beta **replaces** the alpha: there is no `language` option and no period in which both are
+accepted (owner decision, 2026-10-11 — decisions.md 36; the alpha has no users to protect). Each form
+the beta removes is registered once in the compiler with how to detect it, its message and the
+mechanical fix when there is one, and is an error, `PDX_REMOVED_FORM`, whose message names the beta
+form and `pdx migrate`.
 
 `pdx migrate [paths] [--dry]` applies every mechanical fix, writes the files, and reports the changes
-it could only flag. It is idempotent. The full list is migration.md.
+it could only flag. It is idempotent. It exists to move code written in alpha — the repository's own
+showcase, site, examples and skills first — and the full list is migration.md.
+
+### Rules
+
+- A removed form is `PDX_REMOVED_FORM` (error), never a warning and never accepted silently.
+- A removed export of `@pdxui/*` is removed from the package; the release notes list each one with
+  its replacement.
 
 ### Since
 
-beta (#121, #159)
+beta (#121)
 
 ## Browser targets
 
@@ -111,7 +105,7 @@ is Baseline widely available (September 2028); #121 carries the details (decisio
 | Output | `baseline-2026` | `baseline-2024` |
 |---|---|---|
 | Scoped style | `@scope (…) to (…)` donut (#152) | ancestor selector `[data-pdx-H] …` (alpha) |
-| `:scope` in a scoped block (the host) | native, inside `@scope` | rewritten to the host, `[data-pdx-H]` (proposed — decisions.md) |
+| `:scope` in a scoped block (the host) | native, inside `@scope` | rewritten to the host, `[data-pdx-H]` (proposed — decisions.md 20) |
 | Theme behaviours | custom properties read with style queries (#156) | attributes on `<html>` synced by `setTheme` (alpha) |
 | Custom states | `:state(name)` (#132) | `:state(name)` plus a mirrored `data-state-name` attribute |
 | Variants | `:scope[variant="x"]` inside the `@scope` block (#153) | `[data-pdx-H][variant="x"]` |

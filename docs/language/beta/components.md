@@ -45,8 +45,8 @@ Descriptor: `prop.required<T>()`, `prop<T>(default)`, `prop.optional<T>()`.
 
 - A parent template that uses the component without a required prop (no attribute, no binding) is
   `PDX_PROP_REQUIRED` (error), for `.pdx` components and, through the manifest, library components.
-- Under `language: 'alpha'`, `@prop id: string;` keeps its alpha meaning (optional) with
-  `PDX_ALPHA_FORM`; `pdx migrate` adds `?` to every `@prop` without a default, which preserves meaning.
+- `pdx migrate` adds `?` to every alpha `@prop` without a default, which preserves its meaning
+  (optional).
 - The alpha rules stay (`PDX_PROP_NO_TYPE`, `PDX_PROP_INVALID_TYPE`, `PDX_PROP_TYPE_MISMATCH`,
   `PDX_DUP_PROP`, `PDX_PROP_WRITE`).
 
@@ -94,7 +94,7 @@ lifecycle callbacks (`formResetCallback` restores the initial value, `formDisabl
 
 Every value component of `@pdxui/ui` declares its value as a model and emits exactly one change event
 per model (#125); the alias events of alpha (`pdx-change`, `change`, `valuechange`, `pressedchange`,
-`pdx-pressed-change`) are emitted under `language: 'alpha'` only, **with their alpha payload**.
+`pdx-pressed-change`) are removed; `pdx migrate` rewrites listeners and their payload reads (migration.md).
 
 The model event's payload is always `{ value: T }`, where `value` is the **model's** value. That is
 not the alpha payload: `pdx-checkbox`'s `pdx-change` carries `{ checked, value }` or
@@ -106,7 +106,7 @@ beta event is `checked-change` with `{ value: boolean }`, and the identifier sta
 ### Rules
 
 - `::x` on a component prop that is not a `@model` is `PDX_TWO_WAY_NOT_MODEL` (error), hint «declare
-  `@model x` in the child». Under `'alpha'`, `PDX_ALPHA_FORM` and the alpha listening.
+  `@model x` in the child».
 
 ### Examples
 
@@ -469,7 +469,7 @@ injects.
   `pdx migrate` generates a `contexts.ts` with one token per key and rewrites both sides
   (`@inject me from User`).
 - `useProvided`, `tryUseProvided`, `tryInject`, `requestContext`, `provideWritable`, `useWritable`,
-  `tryUseWritable` leave the public exports (#139, #144).
+  `tryUseWritable` leave the public exports (#139; the bus and channel APIs leave with #144).
 
 ### Examples
 
@@ -500,7 +500,7 @@ import { CurrentUser } from './contexts';
 
 ### Since
 
-alpha → beta (#139, #144)
+alpha → beta (#139)
 
 ## The TypeScript descriptor
 

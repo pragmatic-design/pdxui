@@ -28,7 +28,7 @@ held to the benchmark (`pnpm bench:jfb`):
 | O2 | An expression that reads no signal creates **no effect**; a `track` key is not reactive (#110) | memory per 1 000 rows ≤ 3.5 MB (4.8 MB measured) |
 | O3 | Whitespace HTML ignores is not emitted (`table`, `tr`, between cells), except where it renders | node count of the benchmark table |
 | O4 | `:class` compiles to the cheapest DOM write its shape allows (`className`, `classList.toggle`) | select benchmark |
-| O5 | Events inside an `@for` are **delegated**: one listener per type at the list's root | memory, create |
+| O5 | Events inside an `@for` are **delegated**: one listener per type on the component's host (#113) | memory, create |
 | O6 | `item === selected` in an `@for` updates two rows, not N | select with 10 000 rows |
 | O7 | Clearing and appending a list take their fast paths (#118) | clear, append |
 | O8 | A handler's writes flush once (`batch()` in compiled handlers, #114 — **landed**); an unchanged computed does not rerun what reads it (#115 — **landed**); tracking allocates nothing per run (#116 — **landed**) | the reactivity probes |
@@ -42,7 +42,7 @@ held to the benchmark (`pnpm bench:jfb`):
 | L1 | Each route is its own chunk, loaded when first shown, not at boot | `showcase/tests/dev-server.spec.ts` («a page is loaded when it is first shown») | **landed** |
 | L2 | A cold load fetches its JavaScript in **at most two waves**: the landing route's chunk and its static imports are named in `modulepreload` | `showcase/tests/first-paint-waves.spec.ts` | **landed** |
 | L3 | A route's stylesheets start with the entry, not after it | `first-paint-waves.spec.ts` | **landed** |
-| L4 | **A navigation with data costs two waves, not three**: a route's `@loader` starts in parallel with its chunk, not after it | `first-paint-waves.spec.ts`, extended to count the data request | proposed (#119; #146 makes the loader a module-level declaration, which is what allows it) |
+| L4 | **A navigation with data costs two waves, not three**: a route's `@loader` starts in parallel with its chunk, not after it | `first-paint-waves.spec.ts`, extended to count the data request | proposed (#119) |
 | L5 | A component used only inside a `@defer` body ships in that body's chunk (#98 — **landed**); `; prefetch` loads it before the render trigger (template.md); prefetches go through one bounded queue (below) | bundle inspection, request timing | partly proposed |
 | L6 | The entry carries only the components the shell renders, and only the active locale | `showcase/tests/entry-attribution.spec.ts:95,126` | **landed** for the showcase |
 | L7 | A route's chunk is fetched on hover, focus or when its link is in view, by policy, so the click needs no further request; off under Save-Data and 2G | `showcase/tests/prefetch.spec.ts`; `router/src/prefetch.ts:134-139` | **landed** |

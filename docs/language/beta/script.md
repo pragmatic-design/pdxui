@@ -78,7 +78,7 @@ Rune         ::= "$signal" | "$derived" | "$store"          /* only $signal may 
 Unchanged from alpha, except the assignment rule above: a `$signal` may hold any value, a function
 included, and `x = v` stores `v`. `$signal()` with no argument starts at `undefined` (#186, landed).
 The assignment rule is a fix of a defect (#187 was a bug: a function could not be stored), so it
-applies at every language level, not only under `'beta'`.
+applies as soon as it lands.
 
 #### Rules
 
@@ -145,8 +145,8 @@ Unchanged from alpha (`docs/language/script.md`).
 ### $emit — removed
 
 `$emit(name, detail)` is not part of the beta (#138). An event is declared with `@event`
-([components.md](components.md)) and dispatched by the function the declaration creates. Under
-`language: 'alpha'` it compiles with `PDX_ALPHA_FORM`; `pdx migrate` rewrites `$emit('saved', x)` to
+([components.md](components.md)) and dispatched by the function the declaration creates. `$emit` is
+`PDX_REMOVED_FORM`; `pdx migrate` rewrites `$emit('saved', x)` to
 `saved(x)` and adds `@event saved: unknown;` when the declaration is missing.
 
 ## Module declarations
@@ -174,7 +174,7 @@ single rune list the editor reads (#106 — landed).
 `@mixin './x.ts' as name` ran a module's `setup(ctx)`; an imported function called in the script does
 the same with no keyword (`const clock = useClock();`), and core's lifecycle functions (`onMount`,
 `onDestroy`, `effect`) work inside it. The beta removes `@mixin` (decisions.md 6 — proposed);
-no `.pdx` file in the repository uses it. Under `'alpha'` it stays, with `PDX_ALPHA_FORM`.
+no `.pdx` file in the repository uses it. It is `PDX_REMOVED_FORM`.
 
 ### @snippet (in the script)
 

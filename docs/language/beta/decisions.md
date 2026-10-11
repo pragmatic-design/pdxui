@@ -33,7 +33,7 @@ issue implements it. Each line names where the rule lives.
 | 12 | A `$` rune outside the position the compiler reads it in is `PDX_RUNE_POSITION` (error), the hint naming the core function for that place | script.md |
 | 13 | A form field named like a form member (`valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array`) is `PDX_FORM_FIELD_RESERVED` (error) | [data.md](data.md) |
 | 14 | A `persist` value other than `'local'` or `'session'` is `PDX_UNKNOWN_DECLARATION` | data.md |
-| 15 | Assignment storing the value (#187) is a **fix at every language level**; `pdx migrate` flags each arrow function assigned to a `$signal` whose type is not a function type, and the release notes state it | script.md, migration.md |
+| 15 | Assignment storing the value (#187) is a **fix**; `pdx migrate` flags each arrow function assigned to a `$signal` whose type is not a function type, and the release notes state it | script.md, migration.md |
 | 16 | The `baseline-2024` target is maintained frozen — fixes only, a reduced certification run, retired when `@scope` is Baseline widely available (September 2028); the details go into #121 | file.md |
 | 17 | A `$signal` in callee position is read, then called: `onSave()` is `__onSave()()` | script.md |
 | 18 | In `@await (x as name)`, the binding is the last top-level `as` followed by a bare identifier and `)`; a type assertion inside is parenthesised | template.md |
@@ -58,6 +58,20 @@ issue implements it. Each line names where the rule lives.
 | 33 | Static generation runs a listed route's `@loader` at build time, as a second step after render-and-replace | [server.md](server.md) |
 | 35 | Edit-to-screen and project-wide time budgets; the compiler micro-benchmark asserts what its comment states | performance.md |
 
+## Decisions of the backlog reconciliation (2026-10-11)
+
+| # | Decision | Where |
+|---|---|---|
+| 36 | **No language levels.** The beta replaces the alpha outright: no `language` option, no deprecated aliases; a removed form is `PDX_REMOVED_FORM` (error) and a removed export leaves the package. `pdx migrate` stays, to move code written in alpha. The browser target `baseline-2024` stays | file.md, migration.md |
+| 37 | `@defer`'s `hover` trigger is removed: `interaction` is the same trigger (mechanical) | template.md, grammar.md |
+| 38 | #170 option B is declined: a component's text follows its container, like a native element | — |
+| 39 | `PDX_DEFER_UNKNOWN_TRIGGER` is an error as soon as it lands: a misspelt trigger must never fire silently | template.md |
+| 40 | A field required by the `@form` schema shows the required marker in its label by default; the marker can be turned off or customised. `aria-required` is always set | [agents.md](agents.md) A1, [library.md](library.md) |
+| 41 | The behavioural agent test is a local script run on demand, outside CI; its result goes in the pull request | agents.md |
+| 42 | The golden compile corpus is regenerated in bulk for #107, accepted only when the parity table and the browser suites are green and a script shows that each entry changed in its render function only; entries that change anything else are read line by line | performance.md |
+| 43 | Benchmark thresholds (`pnpm bench:jfb`) fail in a nightly CI job, not in the pre-push gate | performance.md |
+| 44 | The component library is brought to the beta contract in the same refactoring, component by component, with the accessibility and agent rules | [library.md](library.md) |
+
 ## Still open
 
 - **The separate server roadmap** (adoption, islands, per-request scope, streaming): decided when the
@@ -66,12 +80,6 @@ issue implements it. Each line names where the rule lives.
 - **Starting data with a built-in `@defer` trigger** (`viewport`): needs the trigger to be readable
   as a signal; deferred.
 - **The WebMCP adapter**: revisited at the end of Chrome's origin trial.
-- **`hover` and `interaction` as `@defer` triggers**: in alpha they are the same trigger
-  (`pointerenter`/`focusin`), two spellings of one thing. Recommendation: keep `interaction`, remove
-  `hover` (mechanical); a syntax removal, so the owner's call.
-- **#170, option B** — whether a component's root takes its text style from the tokens instead of its
-  container. It decides what «a component's internals are its own» means for text, and so what the
-  style-isolation certification promises.
 
 ## Names this specification chose
 

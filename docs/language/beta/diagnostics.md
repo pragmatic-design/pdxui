@@ -8,7 +8,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 
 | Code | Severity | Meaning | Construct | Named by |
 |---|---|---|---|---|
-| `PDX_ALPHA_FORM` | warn (alpha) / error (beta) | A form the beta removes; the message names the beta form and `pdx migrate`. | every language change, [migration.md](migration.md) | #121 |
+| `PDX_REMOVED_FORM` | error | A form the beta removes; the message names the beta form and `pdx migrate`. | every language change, [migration.md](migration.md) | #121 (decisions.md 36) |
 | `PDX_SETUP_REDUNDANT` | info | `<script setup>`: `setup` has no meaning in the beta. | the file | #158 |
 | `PDX_TAG_RESERVED` | error | An application tag that starts with `pdx-`. | the tag | #136 |
 | `PDX_INLINE_BINDINGS_IGNORED` | warn | `pdx({ inlineBindings })` no longer selects a render path. | configuration | #107 |
@@ -38,7 +38,6 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_AGENT_ACTION_UNBOUND` | error | An `@action` with `agent` that no control in the template runs: a capability only an agent would have. | `@action`, [agents.md](agents.md) | this specification (proposed, decisions.md 31) |
 | `PDX_AWAIT_TIMING` | error | `maxMs` not greater than `minMs`. | `@await` | this specification (proposed, decisions.md 26) |
 | `PDX_VIRTUAL_TRANSITION` | error | `@virtual` together with `@move` or `@stagger`. | `@for` | this specification (proposed, decisions.md 29) |
-| `PDX_AWAIT_MAXMS_CHANGED` | warn (alpha) | An `@await` with `maxMs`: in the beta it times out to `@error` instead of rendering the body. | `@await` | this specification (proposed, decisions.md 26) |
 
 ## Changed
 
@@ -48,9 +47,9 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_FETCH_NO_ERROR_UI` | Its example and fix use the async vocabulary (`users.state() === 'error'`, `users.error()`). | #141 |
 | `PDX_TS` | Raised by the strict template projection: slot contexts, `@catch`/`@error` names and `$event` are typed, not `any`. | #122 |
 
-## Retired at the beta level
+## Retired
 
-These remain under `language: 'alpha'` and cannot occur under `'beta'`:
+These belong to forms the beta removes, and no longer occur:
 
 | Code | Why |
 |---|---|
