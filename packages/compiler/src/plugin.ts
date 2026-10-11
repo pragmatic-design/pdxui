@@ -13,6 +13,7 @@ import { diagnosticUrl, DIAGNOSTICS } from './diagnostics/catalog';
 import { validateStyles } from './compiler/validate-styles';
 import { validateDesign } from './compiler/validate-design';
 import { validateDeclarations } from './compiler/validate-declarations';
+import { validateSignalMutation } from './compiler/validate-signal-mutation';
 import { routeLayout } from './compiler/codegen-shared';
 import { minifyHTML } from './compiler/minify';
 import { locateBoundName } from './compiler/codegen-prop-names';
@@ -791,6 +792,8 @@ export function compile(
     allWarnings.push(...validateDesign(descriptor, cachedAnalysis, source));
     // A name declared twice by runes or @prop: the output would keep one of them in silence.
     allWarnings.push(...validateDeclarations(descriptor, source));
+    // A $signal's value changed in place: the signal is never set, and nothing updates.
+    allWarnings.push(...validateSignalMutation(descriptor, cachedAnalysis, source));
 
     // A `${` inside a bound value would be written into the module as it is, and the module would not
     // parse: the build would die in rollup, far from the line at fault. Stop here, at the line.

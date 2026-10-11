@@ -24,6 +24,12 @@ count++;        // → __count.set(v => v + 1)
 count = 5;      // → __count.set(5)
 ```
 
+A signal notifies when it is **set**. Changing the array or object it holds in place sets nothing, so
+nothing that reads it updates: `items.push(x)` leaves the list on screen as it was. Assign a new value
+instead — `items = [...items, x]`, `user = { ...user, name: v }`. The compiler reports the in-place
+form as `PDX_SIGNAL_MUTATED_IN_PLACE`, with that fix for a push and a field. A value meant to be
+changed in place is a [`$store`](/docs/store); a `:ref` target, which holds an element, is not reported.
+
 `set` has a behavior worth knowing: if you pass a **function**, it treats it as an *updater*
 (`s.set(prev => prev + 1)`). So if the value you want to store *is itself* a function (a handler, a
 template, a component to keep), don't use `set` — you'd accidentally use the updater — but **`setRaw(fn)`**,

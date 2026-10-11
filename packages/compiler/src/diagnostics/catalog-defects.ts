@@ -30,6 +30,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it with `$signal`: `let count = $signal(0);`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_SIGNAL_MUTATED_IN_PLACE: {
+        severity: 'warn', category: 'defect', fixable: true,
+        summary: "A `$signal`'s value changed in place: a mutating method (`push`, `splice`, `set`, `add`…) or a write to a member (`user.name = …`, `items[0] = …`).",
+        explanation: 'A signal notifies when it is set, and `set` compares with `Object.is`. Changing the array or object it already holds calls no `set` at all, so nothing that reads the signal updates: the list on screen does not grow. A `$store` is a proxy, where in-place mutation is the point, and is not reported.',
+        fix: 'Assign a new value: `items = [...items, x]` for a push, `user = { ...user, name: v }` for a field. The fix rewrites those two; the other forms get the hint. A value meant to be changed in place is a `$store`.',
+        example: {
+            bad: pdx('<p>{{ items.length }}</p>', 'let items = $signal<number[]>([]);\nfunction add(x: number) {\n  items.push(x);\n}'),
+            good: pdx('<p>{{ items.length }}</p>', 'let items = $signal<number[]>([]);\nfunction add(x: number) {\n  items = [...items, x];\n}'),
+        },
+    },
     PDX_SCRIPT_SYNTAX_ERROR: {
         severity: 'error', category: 'defect',
         summary: 'The `<script setup>` does not parse.',

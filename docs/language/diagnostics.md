@@ -44,6 +44,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_DERIVED_WRITE` | warn | Code that writes into the object a `$derived` returned (CD-S2). | `$derived`, [script.md](script.md) |
 | `PDX_EFFECT_STATE` | warn | State written by an effect from what the effect reads (CD-D2, a heuristic). *(design)* | `$effect`, [script.md](script.md) |
 | `PDX_NON_REACTIVE` | warn | A plain `let` the template reads and the script changes. | `$signal`, [script.md](script.md) |
+| `PDX_SIGNAL_MUTATED_IN_PLACE` | warn | A `$signal`'s value changed in place: a mutating method (`push`, `splice`, `set`, `add`…) or a write to a member (`user.name = …`, `items[0] = …`). | `$signal`, [script.md](script.md) |
 | `PDX_REWRITE_FALLBACK` | warn | A fragment of the setup the signal rewriter could not parse. | the signal rewrite, [script.md](script.md) |
 | `PDX_DOCUMENT_QUERY` | warn | `document.querySelector` (or a sibling) in a component (CD-A1). | [script.md](script.md) |
 | `PDX_LISTENER_LEAK` | warn | An `addEventListener` on a global target with no matching removal (CD-D3). | [script.md](script.md) |

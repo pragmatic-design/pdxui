@@ -15,6 +15,11 @@ semver.
 - `@params` and `@search` report a field they cannot read with `PDX_ROUTE_FIELD_INVALID`, an error,
   instead of dropping it; a quoted type (`id: 'number'`) carries the fix to `id: number`. Both
   blocks may span several lines. (#105)
+- `PDX_SIGNAL_MUTATED_IN_PLACE` (warning): a `$signal`'s value changed in place — `items.push(x)`,
+  `splice`, `sort`, a `Map`/`Set` `set`/`add`/`delete`/`clear`, `user.name = v`, `items[0] = v` —
+  sets nothing, so nothing that reads it updates. Reported where it is written, with a fix for a push
+  (`items = [...items, x]`) and a field (`user = { ...user, name: v }`). A `$store` and a `:ref`
+  target are not reported. (#151)
 - `<pdx-button :action="save" :action-arg="dto">` runs a write: a click calls `save.execute(dto)`,
   and while `save.pending()` the button is busy and refuses clicks, so a double click sends one
   write. A refusal stays on `save.error()` and is announced as `pdx-action-error`. Any object with
