@@ -10,7 +10,7 @@ import type {
     SlotTemplateNode,
 } from '../parser/template';
 import type { CompileContext } from './compile-context';
-import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg, pipeChain } from './codegen-prefix';
+import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope, trackKeyArg, pipeChain } from './codegen-prefix';
 import { rewriteHtmlBindings, isSimpleAccess } from './codegen-template-rewrite';
 import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
@@ -359,7 +359,7 @@ export function deferLoadFn(tags: string[], ctx: CompileContext): string {
 function generateTry(node: TryNode, imports: Set<string>, ctx: CompileContext): string {
     imports.add('errorBoundary');
     const bodyCode = generateNodes(node.body, imports, ctx);
-    const catchCode = generateNodes(node.catchBody, imports, ctx);
+    const catchCode = withBoundaryScope(node.errorVar, node.retryVar, ctx, () => generateNodes(node.catchBody, imports, ctx));
     return `\${errorBoundary(() => ${bodyCode}, (${node.errorVar}, ${node.retryVar}) => ${catchCode})}`;
 }
 
@@ -388,11 +388,11 @@ function generateAwait(node: AwaitNode, imports: Set<string>, ctx: CompileContex
     if (node.errorBody) {
         imports.add('errorBoundary');
         const errorVar = node.errorVar || 'err';
-        ctx.scopeVars.add(errorVar);
-        const errorCode = generateNodes(node.errorBody, imports, ctx);
-        ctx.scopeVars.delete(errorVar);
+        const retryVar = node.retryVar ?? 'retry';
+        const errorBody = node.errorBody;
+        const errorCode = withBoundaryScope(errorVar, retryVar, ctx, () => generateNodes(errorBody, imports, ctx));
         // resetOn: a new promise in the awaited expression leaves @error and awaits it.
-        return `\${errorBoundary(() => html\`\${${whenExpr}}\`, (${errorVar}, ${node.retryVar ?? 'retry'}) => ${errorCode}, { resetOn: () => ${awaited} })}`;
+        return `\${errorBoundary(() => html\`\${${whenExpr}}\`, (${errorVar}, ${retryVar}) => ${errorCode}, { resetOn: () => ${awaited} })}`;
     }
 
     return `\${${whenExpr}}`;

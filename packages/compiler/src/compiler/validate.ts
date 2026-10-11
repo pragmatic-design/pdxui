@@ -14,6 +14,7 @@ import type { TemplateNode, SourceLoc } from '../parser/template';
 import { skipNonCode, findClosing } from './tokenizer';
 import { openingTagTexts, routeParams } from '../text-scan';
 import { escapeForRegExp } from './regexp-escape';
+import { bindingNames } from './codegen-prefix';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -815,7 +816,8 @@ function walkNodes(
                 break;
             case 'for':
                 extractIdentifiers(node.items, ids);
-                loopVars.add(node.item);
+                // Each name of a destructuring pattern, not the pattern's text as one name (#201).
+                for (const n of bindingNames(node.item)) loopVars.add(n);
                 // The index of `@for (items as item, i; …)` is the loop's too, and `@empty` is
                 // template like the body.
                 if (node.index) loopVars.add(node.index);

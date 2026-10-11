@@ -59,6 +59,11 @@ semver.
 
 ### Fixes
 
+- The names a block binds are in its scope whatever they are called: `@catch (problem, again)` and
+  `@await … @error (fail, again)` read `problem`, `fail` and `again` instead of `ctx.problem`, which
+  threw when the error rendered — only `err`, `retry` and a few other names worked. A destructured
+  `@for (pairs as { key, value }; …)` no longer reports `key` and `value` as `PDX_UNDECLARED_REF`.
+  (#201)
 - A production build compiles `<component :is="view" @keepAlive>` and the shorthand `<input :value>`
   to a module that parses — both were a `SyntaxError` that stopped the page loading — and a scoped
   slot outlet `<slot :row="row">` to the same `renderSlot` call as in dev, not a literal `<slot>`

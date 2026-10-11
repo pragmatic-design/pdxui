@@ -112,6 +112,15 @@ export function withLoopScope<T>(
     }
 }
 
+/**
+ * Generate an error-boundary body — `@catch (error, retry)`, `@await … @error (error, retry)` — with
+ * its two names in scope as plain locals. Without them, any name the compiler does not already leave
+ * unprefixed compiled to `ctx.<name>`: `@catch (problem)` read `ctx.problem()` (#201).
+ */
+export function withBoundaryScope<T>(errorVar: string, retryVar: string, ctx: CompileContext, generate: () => T): T {
+    return withLoopScope({ item: errorVar, index: retryVar }, false, ctx, generate);
+}
+
 // ─── ctx. prefix logic ──────────────────────────────────────────
 
 /**
