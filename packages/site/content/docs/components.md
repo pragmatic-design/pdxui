@@ -228,7 +228,9 @@ The consumer listens like any DOM event:
 ```
 
 Convention: library-component events use the `pdx-` prefix (e.g. `pdx-change`). For your own app
-components, pick meaningful names.
+components, pick meaningful names. An `@event` name is a JavaScript identifier, since it is also the
+function that emits it: `@event pdx-change` is an error. To dispatch a hyphenated name, call
+`$emit('pdx-change', value)`.
 
 ## Slots — content decided by the parent
 

@@ -127,12 +127,12 @@ host with `detail`, `bubbles: true` and `composed: true`. Without a type the pay
 
 #### Rules
 
-- A line `@event …` that is not this form raises `PDX_MALFORMED_EVENT`.
+- A line `@event …` that is not this form raises `PDX_MALFORMED_EVENT`. That includes a name that is
+  not an `Identifier`: `@event pdx-change: T` is an error, since the name is the emitter function too.
+  A hyphenated event is dispatched with `$emit('pdx-change', value)`.
 - Two `@event` of one name raise `PDX_DUP_EVENT`.
 - A name with an uppercase letter raises `PDX_EVENT_NAME_CASE`: HTML lowercases the parent's listener
   attribute, which then never matches.
-- The name is an `Identifier`: `@event pdx-change: T` declares an event named `pdx` (#202) — not checked
-  today.
 - A function the script declares under the same name replaces the generated one.
 
 #### Examples
@@ -652,9 +652,9 @@ reads when it reads a body variable.
 - `$derived` values that read each other in a cycle raise `PDX_CIRCULAR_DERIVED`.
 - Writing into the object a `$derived` returned raises `PDX_DERIVED_WRITE`.
 - A `$derived` nothing reads raises `PDX_UNUSED_REACTIVE` (info).
-- A trailing comma, `$derived(a * 2,)`, is not rewritten (#202): the module carries `computed(() => a * 2,, …)`,
-  which does not parse; `PDX_REWRITE_FALLBACK` is printed to the console but not returned as a
-  finding.
+- A trailing comma, `$derived(a * 2,)`, is JavaScript's and is dropped, as in `$signal` and `$store`.
+- An expression the compiler cannot parse is left as written and raises `PDX_REWRITE_FALLBACK`
+  (warning): the signals it names are not rewritten, so it does not update.
 - The expression should only compute: a side effect is an `$effect` — not checked today.
 
 #### Examples

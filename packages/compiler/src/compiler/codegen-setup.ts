@@ -108,7 +108,7 @@ export function buildSetupBody(
     const declareSignal = (sig: (typeof analysis.signals)[number]) =>
         markFirst(generateSignalDeclarations([sig], filename, propNames, production), sig.origin);
     const declareDerived = (d: (typeof analysis.deriveds)[number]) =>
-        markFirst(generateDerivedDeclarations([d], signalNames, allCallableInDerived, filename, production), d.origin);
+        markFirst(generateDerivedDeclarations([d], signalNames, allCallableInDerived, filename, production, sink), d.origin);
 
     // Signal declarations with debug names (independent ones — emit before body)
     if (signalsBeforeBody.length > 0) {
@@ -119,7 +119,8 @@ export function buildSetupBody(
     // (string/object-key-aware so keys and string contents aren't touched).
     for (const s of analysis.stores) {
         const storeExpr = rewritePropPeeks(s.initialExpr, propNames);
-        parts.push(markFirst(`    const ${s.name} = store(${storeExpr});`, s.origin));
+        // The keyword as written: `let state = $store(…)` emitted as `const` threw on `state = …` (#202).
+        parts.push(markFirst(`    ${s.keyword ?? 'const'} ${s.name} = store(${storeExpr});`, s.origin));
     }
 
     // @params — typed route params with coercion: the outlet's routeParams signal, and one computed

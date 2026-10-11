@@ -7,7 +7,7 @@
 import ts from 'typescript';
 import type { SignalDecl } from './script-analyzer';
 import { skipNonCode } from './tokenizer';
-import { rewriteAst } from './signal-rewrite-ast';
+import { rewriteAst, type WarningSink } from './signal-rewrite-ast';
 
 /**
  * Is this fragment, as a whole, an arrow function? The question `$derived(…)` has to answer before
@@ -100,6 +100,8 @@ export function generateDerivedDeclarations(
     derivedNames?: Set<string>,
     filename = '',
     production = false,
+    /** Where a PDX_REWRITE_FALLBACK goes: without it the finding reached only the console (#202). */
+    sink?: WarningSink,
 ): string {
     // The same debug name a `$signal` gets, for the same reason: without it a computed is an
     // anonymous function in every reading `__pdx_debug` gives, so «what does this depend on» and
@@ -117,7 +119,7 @@ export function generateDerivedDeclarations(
         // otherwise parse as a block); strip the wrapper back off afterwards.
         const callables = new Set(derivedNames ?? []);
         callables.delete(d.name); // a derived never reads itself
-        const wrapped = rewriteAst(`(${d.expr})`, signalNames, callables, '__derived.ts');
+        const wrapped = rewriteAst(`(${d.expr})`, signalNames, callables, '__derived.ts', undefined, sink);
         const expr = wrapped.startsWith('(') && wrapped.endsWith(')')
             ? wrapped.slice(1, -1)
             : d.expr;

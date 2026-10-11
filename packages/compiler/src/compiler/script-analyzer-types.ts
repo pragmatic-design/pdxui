@@ -45,6 +45,8 @@ export interface ExportDecl {
 export interface StoreDecl {
     name: string;
     initialExpr: string;
+    /** The keyword that declared it: a `let` store may be assigned again (#202). */
+    keyword?: 'let' | 'const' | 'var';
     /** Where the declaration was written in the .pdx, when a source map was asked for. */
     origin?: number;
 }

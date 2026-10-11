@@ -345,8 +345,9 @@ not follow the prop afterwards.
 - `$store` is read only as the initialiser of a `let`, `const` or `var` declarator at the top of the
   script. Anywhere else (`wrap($store({}))`) it is left as written, and `$store` does not exist at run
   time. Not checked today.
-- The variable is emitted as `const` whatever keyword declared it (#202): assigning it again
-  (`state = { … }`) throws at run time. Write its properties instead. Not checked today.
+- The variable keeps the keyword that declared it. Assigning a `let` store again (`state = { … }`)
+  changes the script's variable only: the template keeps the store it was handed when the component
+  was set up. Write its properties to update the page. Not checked today.
 - A name declared twice at the top of the script is `PDX_DUP_DECLARATION`.
 - A name that starts with `_` is not handed to the template.
 
