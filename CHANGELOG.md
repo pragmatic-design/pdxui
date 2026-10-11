@@ -59,6 +59,8 @@ semver.
 
 ### Fixes
 
+- `$signal()` with no initial value compiles to a signal that starts at `undefined`. It compiled to
+  `signal(, { name })`, a module that did not parse wherever it was imported. (#186)
 - `@params { id: number }` declares `id` for the page: the template reads `{{ id }}` and the script
   `id`, coerced to the declared type, and it follows a navigation that changes the param without a
   remount. The compiler emitted the value under another name, so the template raised
