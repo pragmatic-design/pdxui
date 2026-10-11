@@ -90,7 +90,8 @@ hand-written function that happens to reject empty values.
 
 The marker is presentation and is set in CSS, with one inherited custom property: on a `<pdx-form>`
 for the whole form, on a `<pdx-form-field>` for one field, or in a theme. `aria-required` stays
-whatever the marker is.
+whatever the marker is, and the marker is kept out of the field's accessible name: the field is
+«Name», announced as required, not «Name star».
 
 ```css
 pdx-form.compact { --pdx-field-required-marker: ' (required)'; }

@@ -392,9 +392,11 @@ pdx-form-field:last-child {
 /* The required marker. Changed or removed with one custom property, inherited: set it on a
    <pdx-form> for the whole form, on a <pdx-form-field> for one field, or in a theme;
    `--pdx-field-required-marker: none` turns it off. The control's aria-required carries the
-   meaning whatever the marker is. */
+   meaning whatever the marker is, so the marker is for the eye only: the empty alternative text
+   after the slash keeps it out of the label's accessible name, which would otherwise be read as
+   «Name star». */
 .pdx-field-required::after {
-    content: var(--pdx-field-required-marker, ' *');
+    content: var(--pdx-field-required-marker, ' *') / '';
     color: var(--pdx-color-danger-ink);
 }
 
