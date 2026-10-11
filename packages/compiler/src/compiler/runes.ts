@@ -47,7 +47,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('tag', 'Register the component under another tag than its file name.', "@tag 'pdx-other-name';", "@tag '${1:pdx-name}';"),
     d('route', 'Route options for the page.', "@route { path: '/users', keepAlive: true }", "@route { path: '${1:/path}' }"),
     d('params', 'Declare and type the route params.', '@params { id: number }', '@params { ${1:id}: ${2:number} }'),
-    d('redirect', 'Redirect another path to this page.', "@redirect '/new-path';", "@redirect '${1:/path}';"),
+    d('redirect', "Send this page's route to another path; `'/from' -> '/to'` redirects any path.", "@redirect '/new-path';", "@redirect '${1:/path}';"),
     d('alias', 'Another path that renders this page.', "@alias '/old-path';", "@alias '${1:/path}';"),
     d('outlet', 'Render a component into a named outlet beside this page.', "@outlet 'sidebar' -> 'pdx-nav';", "@outlet '${1:name}' -> '${2:pdx-component}';"),
     d('search', 'Declare and type the query-string params.', '@search { q?: string, page: number = 1 }', '@search { ${1:q}?: ${2:string} }'),

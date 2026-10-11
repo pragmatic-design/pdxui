@@ -486,7 +486,8 @@ export function validate(
     // ─── Check 12: @page path validation ────────────────────────
 
     if (analysis.route.page) {
-        const pathIssues = validateRoutePath(analysis.route.page);
+        // Every path the page answers to — a second path and an @alias are registered as routes too (#204).
+        const pathIssues = [analysis.route.page, ...(analysis.route.aliases ?? [])].flatMap(validateRoutePath);
         for (const issue of pathIssues) {
             warnings.push(issue);
         }

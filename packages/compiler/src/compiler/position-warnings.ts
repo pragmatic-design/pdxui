@@ -147,10 +147,11 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return marker ? find(source, script, new RegExp(`\\b${escape(marker)}\\b`)) : undefined;
         }
         case 'PDX_ROUTE_FIELD_INVALID': {
-            // Match: the field's name inside its own `@search {` / `@params {` block, at the name.
+            // Match: the field's name inside its own `@search {` / `@params {` block — or `search: {` /
+            // `params: {` in an `@route` block — at the name.
             const rune = /^@(search|params)\b/.exec(w.message)?.[1];
             return name && rune
-                ? find(source, script, new RegExp(`(?<=@${rune}\\s*\\{[^}]*)\\b${escape(name)}\\s*(?:\\?\\s*)?:`))
+                ? find(source, script, new RegExp(`(?<=(?:@${rune}|\\b${rune}\\s*:)\\s*\\{[^}]*)\\b${escape(name)}\\s*(?:\\?\\s*)?:`))
                 : undefined;
         }
         case 'PDX_PAGE_INVALID_PATH':

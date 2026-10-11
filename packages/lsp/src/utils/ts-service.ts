@@ -4,7 +4,8 @@
 // out PRESERVING the offsets → the .pdx ↔ TS position mapping is 1:1 (offset-scriptStart).
 
 import ts from 'typescript';
-import { DECORATOR_RUNES, parseFetchDecl, parseRouteParams } from '@pdxui/compiler';
+import { DECORATOR_RUNES, parseFetchDecl } from '@pdxui/compiler';
+import { routeNameTypes } from './route-name-types';
 import { existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -100,17 +101,9 @@ export function projectScript(scriptContent: string): string {
             const decl = parseFetchDecl(s.slice(m.index, j).replace(/\s+/g, ' ').trim());
             if (decl) names.set(decl.name, `PdxResource<${decl.type || 'unknown'}>`);
         }
-        if (kw === 'params') {
-            // Each param is a name the page reads, as the compiler declares it (#185): `number`,
-            // `boolean`, or the string any other type is.
-            const block = s.slice(m.index, j);
-            const open = block.indexOf('{');
-            const close = block.lastIndexOf('}');
-            if (open >= 0 && close > open) {
-                for (const p of parseRouteParams(block.slice(open, close + 1))) {
-                    names.set(p.name, p.type === 'number' || p.type === 'boolean' ? p.type : 'string');
-                }
-            }
+        if (kw === 'params' || kw === 'search') {
+            // Each param, and `searchParams`, under the type the compiler gives it (./route-name-types).
+            for (const [name, type] of routeNameTypes(kw, s.slice(m.index, j))) names.set(name, type);
         }
         if (kw === 'form') {
             // The form createForm builds from this declaration (./form-types); `any` only for one

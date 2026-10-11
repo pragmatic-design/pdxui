@@ -83,6 +83,18 @@ function routeFieldWarnings(block: string, kind: 'params' | 'search'): Validatio
     }));
 }
 
+/**
+ * The names a route's `@params` and `@search` hand to the template and the script, as exports of kind
+ * `derived`: each param is a computed under its own name (#185), and `@search` declares `searchParams`,
+ * a computed of the whole query (#204). Without the export the template's read was PDX_UNDECLARED_REF.
+ */
+function declareRouteNames(route: RouteInfo, exports: ExportDecl[]): void {
+    const names = [...(route.params ?? []).map(p => p.name), ...(route.searchParams?.length ? ['searchParams'] : [])];
+    for (const name of names) {
+        if (!name.startsWith('_') && !exports.some(e => e.name === name)) exports.push({ name, kind: 'derived' });
+    }
+}
+
 // ─── Analyzer ──────────────────────────────────────────────────────
 
 /**
@@ -630,7 +642,12 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         // Cannot coexist with individual @page/@guard/@prefetch etc.
         if (trimmed.startsWith('@route') && trimmed.includes('{') && !trimmed.match(/^@route\s+['"]/)) {
             const block = extractBlock(lines, i);
-            parseRouteBlock(block.content, route);
+            const read = parseRouteBlock(block.content, route);
+            // Its `search` and `params` are checked as `@search`'s and `@params`'s are, and declare the
+            // same names (#204).
+            if (read.search) warnings.push(...routeFieldWarnings(read.search, 'search'));
+            if (read.params) warnings.push(...routeFieldWarnings(read.params, 'params'));
+            declareRouteNames(route, exports);
             i = block.endLine;
             continue;
         }
@@ -639,7 +656,11 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         // Match: @page '/path'; or @page "/path"; or @page '/path' { options };
         // Groups: [1]=path [2]=options block (optional, without braces)
         // Support: @page '/users'; OR @page '/users', '/people'; OR @page '/path' { options };
-        const pageMatch = trimmed.match(/^@page\s+(.+?)\s*;?\s*$/);
+        // The whole declaration: an options block may go on to the next lines, which were otherwise
+        // left to the setup as code (#204).
+        const pageDecl = trimmed.startsWith('@page') ? collectDeclarationStatement(lines, i) : null;
+        const pageMatch = pageDecl ? pageDecl.text.replace(/\s*\n\s*/g, ' ').trim().match(/^@page\s+(.+?)\s*;?\s*$/) : null;
+        if (pageMatch && pageDecl) i = pageDecl.endLine;
         if (pageMatch) {
             const raw = pageMatch[1];
             // Extract options block if present: { keepAlive, preload }
@@ -675,6 +696,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                 route.search = searchBlock;
                 route.searchParams = parseSearchParams(searchBlock);
                 warnings.push(...routeFieldWarnings(searchBlock, 'search'));
+                declareRouteNames(route, exports);
                 i = block.endLine;
                 continue;
             }
@@ -739,9 +761,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                 warnings.push(...routeFieldWarnings(paramsBlock, 'params'));
                 // Each param is a name the template and the script read, a computed like a
                 // $derived: without this it was emitted and reachable by nobody (#185).
-                for (const p of route.params) {
-                    if (!p.name.startsWith('_') && !exports.some(e => e.name === p.name)) exports.push({ name: p.name, kind: 'derived' });
-                }
+                declareRouteNames(route, exports);
                 i = block.endLine;
                 continue;
             }
@@ -749,12 +769,18 @@ export function analyzeScript(script: string, _filename: string, options: { setu
 
         // Match: @meta { key: value, ... }; — route meta (block with braces, not HTML meta)
         // Parsed as JSON5-like (no new Function — avoids code execution at build time)
-        if (trimmed.startsWith('@meta') && trimmed.includes('{') && !trimmed.includes('name:') && !trimmed.includes('property:')) {
-            const metaBlock = trimmed.match(/^@meta\s+(\{[\s\S]+\})\s*;?\s*$/);
+        if (trimmed.startsWith('@meta') && trimmed.includes('{')) {
+            // The whole block, which may span lines (#204); a block naming `name:` or `property:` is
+            // the head form, read further down.
+            const metaDecl = collectDeclarationStatement(lines, i);
+            const metaText = metaDecl.text.trim();
+            const metaBlock = !metaText.includes('name:') && !metaText.includes('property:')
+                ? metaText.match(/^@meta\s+(\{[\s\S]+\})\s*;?\s*$/) : null;
             if (metaBlock) {
                 // Quote only KEYS — preserves `:` inside URLs/values (e.g. og:url).
                 const parsed = parseObjectLiteralToJson(metaBlock[1]);
                 if (parsed !== undefined) route.meta = parsed as Record<string, unknown>;
+                i = metaDecl.endLine;
                 continue;
             }
         }

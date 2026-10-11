@@ -358,12 +358,17 @@ export function assembleModule(
         if (route.outlets && route.outlets.length > 0) {
             routeParts.push(`outlets:[${route.outlets.map((o: { name: string; tag: string }) => `{name:${jsString(o.name)},tag:${jsString(o.tag)}}`).join(',')}]`);
         }
-        // Param constraints extracted from path: :id(number) → { id: 'number' }
-        const constraintParts: string[] = [];
-        for (const param of routeParams(route.page!)) {
-            if (param.constraint) constraintParts.push(`${param.name}:${jsString(param.constraint)}`);
-        }
-        if (constraintParts.length > 0) routeParts.push(`paramConstraints:{${constraintParts.join(',')}}`);
+        // Param constraints extracted from path: :id(number) → { id: 'number' }. Per path: a second
+        // path or an alias has its own params.
+        const constraintsOf = (path: string): string | null => {
+            const constraintParts: string[] = [];
+            for (const param of routeParams(path)) {
+                if (param.constraint) constraintParts.push(`${param.name}:${jsString(param.constraint)}`);
+            }
+            return constraintParts.length > 0 ? `paramConstraints:{${constraintParts.join(',')}}` : null;
+        };
+        const pageConstraints = constraintsOf(route.page!);
+        if (pageConstraints) routeParts.push(pageConstraints);
         // @params { id: number } — typed route params for coercion
         if (route.params && route.params.length > 0) {
             const typeParts = route.params.map((p: { name: string; type: string }) => `${p.name}:${jsString(p.type)}`);
@@ -386,10 +391,14 @@ export function assembleModule(
         code += `const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};\n`;
         code += `__pdx_pushRoute({${routeParts.join(',')}});\n`;
 
-        // Aliases: register same component under additional paths
+        // Aliases: the same component under additional paths, with every field of the first — as the
+        // scanned table gives them. With path, tag and guard only, a second path lost its keep-alive,
+        // its label, its transition and its lazy file the moment the page module loaded (#204).
         if (route.aliases) {
+            const shared = routeParts.filter(p => !p.startsWith('path:') && !p.startsWith('paramConstraints:'));
             for (const alias of route.aliases) {
-                code += `__pdx_pushRoute({path:${jsString(alias)},tag:${jsString(tag)}${route.guard ? `,guard:${jsString(route.guard)}` : ''}});\n`;
+                const constraints = constraintsOf(alias);
+                code += `__pdx_pushRoute({${[`path:${jsString(alias)}`, ...shared, ...(constraints ? [constraints] : [])].join(',')}});\n`;
             }
         }
 
