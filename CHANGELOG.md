@@ -59,6 +59,10 @@ semver.
 
 ### Fixes
 
+- A scoped slot outlet, `<slot name="cell" :row="r">`, renders the parent's `@slot(cell, { row })`
+  fill with its scope: the child collected the fills only after rendering, so the default was always
+  shown. A self-closing outlet with no fill no longer fails the mount with `defaultFn is not a
+  function`. (#221)
 - `@stagger` and `@mode` on an `@for` animate the list: the n-th row that arrives waits n × stagger
   ms, `@mode('out-in')` holds arriving rows until the leaving ones are gone, and `@mode('in-out')`
   keeps leaving rows until the arriving ones have entered. The list reconciler read only `enter`,

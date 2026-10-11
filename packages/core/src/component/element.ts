@@ -191,6 +191,10 @@ export abstract class PdxElement extends HTMLElementBase {
             if (DEV) devInstanceId(this);
             this._projectedChildren = Array.from(this.childNodes);
             this._lightChildren = this._projectedChildren.slice();
+            // The parent's scoped slot functions, BEFORE the render: a compiled `<slot :row>` outlet
+            // reads `ctx.__slots` while it renders, and collected after, every fill was missed and the
+            // outlet rendered its default for good (#221).
+            this._collectSlotFunctions();
             const target = this._renderTarget;
             // Light DOM: remove children for slot projection.
             // Mark ALL descendant PdxElements as keepAlive to prevent their
@@ -424,20 +428,19 @@ export abstract class PdxElement extends HTMLElementBase {
      */
     private _lightChildren: Node[] = [];
 
-    /** Replace <slot> placeholders with projected children.
-     *  Also extracts scoped slot functions from children with __pdxSlot property. */
-    private _projectSlots(): void {
-        if (this._projectedChildren.length === 0) return;
-
-        // Extract scoped slot functions (set by compiled parent code)
+    /** The scoped slot functions the parent's compiled code set on carrier children (`__pdxSlot`). */
+    private _collectSlotFunctions(): void {
         for (const child of this._projectedChildren) {
             const carrier = child as { __pdxSlot?: (scope: Record<string, unknown>) => Node | DocumentFragment; __pdxSlotName?: string };
             if (child instanceof Element && carrier.__pdxSlot) {
-                const name = carrier.__pdxSlotName as string;
-                this._slotFunctions[name] = carrier.__pdxSlot;
-                // Don't project this element — it's a slot function carrier
+                this._slotFunctions[carrier.__pdxSlotName as string] = carrier.__pdxSlot;
             }
         }
+    }
+
+    /** Replace <slot> placeholders with projected children. A slot function carrier is not projected. */
+    private _projectSlots(): void {
+        if (this._projectedChildren.length === 0) return;
 
         // Only the slots OUR template rendered (captured from body() before it was inserted — see
         // connectedCallback). `querySelectorAll` does not stop at component boundaries: an empty

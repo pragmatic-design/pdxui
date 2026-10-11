@@ -619,8 +619,9 @@ gives none. `name` defaults to `default`. Declare what a slot passes with `@slot
 #### Rules
 
 - Both render paths compile it to the same `renderSlot(…)` call.
-- **The parent's fill does not reach it today: the default is always rendered.** `renderSlot` reads
-  the parent's slot functions while the child renders, and the child collects them only after (#221).
+- The child collects the parent's fills before it renders, so a fill the parent writes is the one
+  rendered. A fill added later, after the child has mounted, is not read.
+- With nothing between the tags, or self-closing, the default renders nothing.
 - A bound name is `[A-Za-z0-9_]+`: no `-`. Not checked today.
 
 #### Examples
