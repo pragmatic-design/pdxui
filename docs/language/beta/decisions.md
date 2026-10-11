@@ -53,7 +53,7 @@ issue implements it. Each line names where the rule lives.
 | 28 | The lifecycle matrix; a frozen page costs no CPU; kept-alive pages and instances have a maximum of 10 by default, set on the container | [lifecycle.md](lifecycle.md) |
 | 29 | Performance guarantees; order of work: bounded caches and dedupe, the prefetch queue, `@virtual` | [performance.md](performance.md) |
 | 30 | Accessibility rules A1–A6; A1 is a defect today | [agents.md](agents.md) |
-| 31 | `with { agent, consequential }`, `@form { agent }` and `PDX_AGENT_ACTION_UNBOUND` are specified now; the WebMCP adapter waits for the API to settle | agents.md |
+| 31 | `with { agent, consequential }` and `PDX_AGENT_ACTION_UNBOUND` are specified now; the WebMCP adapter waits for the API to settle (`@form { agent }` went with it — decision 54) | agents.md |
 | 32 | `__PDX_DEVTOOLS__` v2, starting with `page()` and `outline()`, then a behavioural test with an agent before any other agent work | agents.md |
 | 33 | Static generation runs a listed route's `@loader` at build time, as a second step after render-and-replace | [server.md](server.md) |
 | 35 | Edit-to-screen and project-wide time budgets; the compiler micro-benchmark asserts what its comment states | performance.md |
@@ -79,6 +79,7 @@ issue implements it. Each line names where the rule lives.
 | 51 | `pdx-button-group`'s selection modes (`mode="single"`, `mode="multiple"`) are removed: selecting among buttons is `pdx-toggle-group`; `pdx-button-group` only groups action buttons visually (mechanical) | library.md, migration.md |
 | 52 | `pdx-otp-input mask` takes the PIN defaults: `autocomplete="off"` and the accessible name «PIN» | library.md |
 | 53 | A `pdx-button toggle` migrated to `pdx-toggle` gets `variant="solid"`, the closest to its filled look | migration.md |
+| 54 | `@form { agent }` is not part of the beta: without the WebMCP adapter it would be an option accepted and ignored. It returns with the adapter (Still open) | agents.md |
 | 50 | One rule across the library: a prop the component writes itself is a `@model`, one only the parent writes is a `@prop`, a read-only output emits `<name>-change`; overlays emit `open-change`; overlays share `show()`/`close()`/`toggle()`, navigation `next()`/`prev()`/`goTo(n)` | library.md |
 
 ## Still open
@@ -88,7 +89,8 @@ issue implements it. Each line names where the rule lives.
   built so that adoption can reuse its walk. (Point 34.)
 - **Starting data with a built-in `@defer` trigger** (`viewport`): needs the trigger to be readable
   as a signal; deferred.
-- **The WebMCP adapter**: revisited at the end of Chrome's origin trial.
+- **The WebMCP adapter**: revisited at the end of Chrome's origin trial — and with it `@form { agent }`
+  (decision 54).
 - **Four questions the examples raised**, for the next revision: whether a `data-part` may sit inside
   a `@for`; how `@part` and `@state` names relate to the script's other names; whether the callee rule
   (decision 17) covers `onSave?.()`; whether `execute()` rejects when the action fails, or only on
