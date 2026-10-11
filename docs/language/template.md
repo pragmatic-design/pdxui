@@ -77,8 +77,8 @@ text, anything else as `String(value)` — `interpolationText` in core, used by 
 - `{{ }}` inside an attribute value — `title="{{ n }}"` — is not a binding form. The template path
   emits `title="${ctx.n}"`; the inline path sets the attribute to `''` and spills the rest of the tag
   into the text. Bind with `:title="n"`. Not checked today.
-- An array value renders its items on the template path and `String(array)` (`a,b`) on the inline
-  path (#100).
+- A Node, a fragment or an array value is put in as nodes — an array's items one after the other —
+  on both render paths (`bindInterpolation`).
 - An unclosed `{{` stops the compile: `Unclosed interpolation`.
 
 #### Examples
@@ -398,8 +398,7 @@ filters (`.delete` is `Delete` or `Backspace`, the arrows are `ArrowUp` …), th
 - Only a bare signal name is rewritten into `.set`. `user.name = x` assigns a field of the signal's
   current value, which notifies nothing. Not checked today.
 - A modifier that is not in the list — `.ctrl`, `.meta` — is ignored. Not checked today.
-- A key filter applies to keyboard events only on the template path; on the inline path it applies
-  to every event, so `@click.enter` never fires (#100).
+- A key filter applies to keyboard events only, on both render paths: `@click.enter` fires on a click.
 - A component's events: the parent listens with the name the child dispatches, lowercase — HTML
   lowercases attribute names. The child's declaration is checked (`PDX_EVENT_NAME_CASE`, see
   [script.md](script.md)); the listener is not.

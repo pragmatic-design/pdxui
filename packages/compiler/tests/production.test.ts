@@ -567,8 +567,8 @@ let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'inline-text.pdx', [], undefined, { production: true, inlineBindings: true });
         expect(code).toContain('createTextNode');
-        expect(code).toContain('effect(');
-        expect(code).toContain('.data');
+        // core's bindInterpolation follows the signal, as the template path's interpolation does (#100).
+        expect(code).toContain('bindInterpolation(__t1,()=>ctx.count())');
     });
 
     it('handles @if with when() helper', () => {
@@ -610,8 +610,8 @@ let items = $signal([]);
 </script>`;
         const { code } = compile(source, 'inline-for-scope.pdx', [], undefined, { production: true, inlineBindings: true });
         // The item is a row getter; its PROPERTY is still never called.
-        // The text goes through core's rule, not a bare String().
-        expect(code).toContain('interpolationText(item().name)');
+        // The value goes through core's bindInterpolation, not a bare String().
+        expect(code).toContain('()=>item().name)');
         expect(code).not.toContain('item.name()');
         expect(code).not.toContain('item().name()');
     });
@@ -751,9 +751,10 @@ let first = $signal('John');
 let last = $signal('Doe');
 </script>`;
         const { code } = compile(source, 'inline-multi-interp.pdx', [], undefined, { production: true, inlineBindings: true });
-        // Two text nodes with effects
-        const effectCount = (code.match(/effect\(/g) || []).length;
-        expect(effectCount).toBeGreaterThanOrEqual(2);
+        // Two text nodes, each following its own signal
+        expect(code).toContain('()=>ctx.first())');
+        expect(code).toContain('()=>ctx.last())');
+        expect((code.match(/bindInterpolation\(/g) || []).length).toBe(2);
     });
 
     it('handles @switch control flow', () => {
