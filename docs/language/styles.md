@@ -48,9 +48,11 @@ itself.
 - The selector list is split at every comma (#205), including a comma inside `:is()`, `:where()`, `:not()`
   or `:has()`: `:is(.a, .b) > span` becomes `[data-pdx-HASH] :is(.a, [data-pdx-HASH] .b) > span`,
   which no longer means what was written. Not checked today.
-- A statement at-rule — `@import`, `@charset`, `@namespace`, `@layer a, b;` — has no block of its
-  own, so the scoper takes the next rule's block as its body and copies both as written: the rule
-  after it is left unscoped. Not checked today.
+- A statement at-rule — `@import`, `@charset`, `@namespace`, `@layer a, b;` — ends at its `;` (one
+  inside parentheses or quotes does not end it). It is copied as written, and the rule after it is
+  scoped as usual.
+- At-rule names are matched as whole names, in any case: `@MEDIA` is scoped like `@media`, and
+  `@media-x` is not `@media`.
 - `:root`, `html`, `body` and the host's own tag become descendants of the host and match nothing;
   style the host from a plain `<style>` block. Not checked today.
 - `@keyframes` names are global: two components that both define `@keyframes fade` collide. Not

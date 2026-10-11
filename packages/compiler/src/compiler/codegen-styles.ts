@@ -267,7 +267,31 @@ function transformResponsiveCSS(css: string): string {
  * - @scope, and any other at-rule: copied as written. An author's own @scope sets its own boundary,
  *   and wrapping its selectors would change what it means.
  */
-const SCOPED_AT_RULES = ['@media', '@supports', '@layer', '@container', '@starting-style'];
+const SCOPED_AT_RULES = new Set(['media', 'supports', 'layer', 'container', 'starting-style']);
+
+/**
+ * Where an at-rule's prelude ends: the first `;` (a statement at-rule — `@layer a, b;`, `@import …;`,
+ * `@charset …;`) or `{` (a block at-rule) outside strings and parentheses. -1 when neither comes.
+ * Read up to the next `{` alone, a statement took the following rule's selector as its prelude and
+ * left that rule unscoped (#180).
+ */
+function atRulePreludeEnd(css: string, from: number): number {
+    let depth = 0;
+    let quote = '';
+    for (let i = from; i < css.length; i++) {
+        const ch = css[i];
+        if (quote) {
+            if (ch === '\\') i++;
+            else if (ch === quote) quote = '';
+            continue;
+        }
+        if (ch === '"' || ch === "'") quote = ch;
+        else if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        else if (depth <= 0 && (ch === ';' || ch === '{')) return i;
+    }
+    return -1;
+}
 
 function scopeBlock(css: string, scopeId: string): string {
     let result = '';
@@ -278,18 +302,27 @@ function scopeBlock(css: string, scopeId: string): string {
         if (pos >= css.length) break;
 
         if (css[pos] === '@') {
-            const atEnd = css.indexOf('{', pos);
+            const atEnd = atRulePreludeEnd(css, pos);
             if (atEnd === -1) { result += css.slice(pos); break; }
+            // A statement at-rule is copied as written, and the scan goes on to the next rule.
+            if (css[atEnd] === ';') {
+                result += css.slice(pos, atEnd + 1);
+                pos = atEnd + 1;
+                continue;
+            }
 
             const atRule = css.slice(pos, atEnd).trim();
+            // The whole name, in lower case: CSS at-rule names are ASCII case-insensitive, and
+            // `@media-x` is not `@media`. Match: `@` and the name. Groups: [1]=name
+            const name = (/^@([\w-]+)/.exec(atRule)?.[1] ?? '').toLowerCase();
             const blockEnd = findCSSBlockEnd(css, atEnd);
             const blockContent = css.slice(atEnd + 1, blockEnd);
 
-            if (atRule.startsWith('@keyframes') || atRule.startsWith('@font-face')) {
-                result += atRule + ' {' + blockContent + '}';
-            } else if (SCOPED_AT_RULES.some(name => atRule.startsWith(name))) {
+            if (SCOPED_AT_RULES.has(name)) {
                 result += atRule + ' {' + scopeBlock(blockContent, scopeId) + '}';
             } else {
+                // @keyframes and @font-face hold no selectors; @scope and any other at-rule are
+                // copied as written (see above).
                 result += atRule + ' {' + blockContent + '}';
             }
             pos = blockEnd + 1;

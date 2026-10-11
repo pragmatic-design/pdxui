@@ -12,6 +12,13 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { minifyCSS, extractCSSBindings, hash } from '../src/compiler/codegen-styles';
 
+/** The CSS a compiled module writes into its `<style>`, as text rather than as a JS string literal. */
+function emittedCss(module: string): string {
+    const literal = /textContent = ("(?:[^"\\]|\\.)*");/.exec(module)?.[1];
+    if (!literal) throw new Error('no style textContent in the module');
+    return JSON.parse(literal) as string;
+}
+
 /** Compile a scoped style block and return the generated module. */
 function css(style: string, production = false): string {
     const source = `<template><div class="a">x</div></template>\n<style scoped>\n${style}\n</style>\n<script setup>\n  let n = $signal(1);\n</script>`;
@@ -76,6 +83,39 @@ describe('scoping a selector', () => {
         const out = css('@scope (.card) to (.content) { img { border: 1px solid; } }');
         expect(out).toContain('@scope (.card) to (.content)');
         expect(out).not.toMatch(/\[data-pdx-[a-z0-9]+\] img/);
+    });
+
+    // #180: the prelude was read up to the next `{`, so a statement at-rule — which ends at `;` —
+    // swallowed the next rule's selector and copied it unscoped; and names were compared with a
+    // case-sensitive startsWith, with no end of name.
+    for (const statement of ['@layer base, overrides;', '@import url(x.css);', '@charset "utf-8";']) {
+        it(`scopes the rule after a statement at-rule, ${statement.split(' ')[0]}`, () => {
+            const out = emittedCss(css(`${statement}\n.btn { color: red; }`));
+            expect(out).toContain(statement);
+            expect(out).toMatch(/\[data-pdx-[a-z0-9]+\] \.btn \{/);
+            expect(out, 'the rule after the statement came out unscoped').not.toMatch(/(^|[;{}])\s*\.btn \{/);
+        });
+    }
+
+    it('reads a `;` inside the prelude\'s parentheses or quotes as part of it', () => {
+        const out = emittedCss(css('@import url("a;b.css") screen;\n.btn { color: red; }'));
+        expect(out).toContain('@import url("a;b.css") screen;');
+        expect(out).toMatch(/\[data-pdx-[a-z0-9]+\] \.btn \{/);
+    });
+
+    it('matches at-rule names in any case, as CSS does', () => {
+        for (const rule of ['@CONTAINER (min-width: 600px) { .title { color: red; } }', '@Media (min-width: 600px) { .title { color: red; } }']) {
+            const out = emittedCss(css(rule));
+            expect(out, rule).toMatch(/\[data-pdx-[a-z0-9]+\] \.title/);
+            expect(out, rule).not.toMatch(/(^|[;{}])\s*\.title \{/);
+        }
+        const kf = emittedCss(css('@KEYFRAMES spin { from { opacity: 0; } to { opacity: 1; } }'));
+        expect(kf).not.toMatch(SCOPE.source + ' from');
+    });
+
+    it('matches a whole at-rule name, not a prefix of a longer one', () => {
+        const out = emittedCss(css('@media-x { .a { color: red; } }'));
+        expect(out).toContain('@media-x { .a { color: red; } }');
     });
 
     it('leaves @keyframes alone — a keyframe name is not a selector', () => {
