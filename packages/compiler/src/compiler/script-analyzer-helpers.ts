@@ -450,7 +450,10 @@ export function parsePageOptions(optionsStr: string, route: RouteInfo): void {
             // Strip quotes for string values
             const val = rawVal.replace(/^['"]|['"]$/g, '');
             if (key === 'keepAlive') {
-                route.keepAlive = Number(val);
+                // `true` / `false` are booleans, a number a TTL in ms. `Number('true')` was NaN (#204).
+                if (val === 'true') route.keepAlive = true;
+                else if (val === 'false') route.keepAlive = undefined;
+                else if (/^\d+$/.test(val)) route.keepAlive = Number(val);
             } else if (key === 'preload') {
                 route.preload = val === 'true';
             } else if (key === 'prefetch') {
@@ -703,8 +706,8 @@ export function parseHeadBlock(blockContent: string, head: HeadInfo): void {
 }
 
 /**
- * Parse an @route { ... } aggregate block into RouteInfo.
- * Maps keys to the same properties as individual route runes.
+ * Parse an @route { ... } aggregate block into RouteInfo, and return its raw `search` and `params`
+ * blocks. Maps keys to the same properties as individual route runes.
  *
  * Supported keys: path, guard, loader, prefetch, transition, layout, scroll,
  * keepAlive, preload, search (as { ... } object), meta (as { ... } object).
@@ -720,10 +723,10 @@ export function parseHeadBlock(blockContent: string, head: HeadInfo): void {
  *     search: { id: number };
  *   }
  */
-export function parseRouteBlock(blockContent: string, route: RouteInfo): void {
+export function parseRouteBlock(blockContent: string, route: RouteInfo): { search?: string; params?: string } {
     const braceStart = blockContent.indexOf('{');
     const braceEnd = blockContent.lastIndexOf('}');
-    if (braceStart === -1 || braceEnd === -1) return;
+    if (braceStart === -1 || braceEnd === -1) return {};
     const inner = blockContent.slice(braceStart + 1, braceEnd);
 
     // Helper: extract a quoted string value for a key
@@ -762,24 +765,39 @@ export function parseRouteBlock(blockContent: string, route: RouteInfo): void {
     if (keepAliveNum) route.keepAlive = parseInt(keepAliveNum[1], 10);
 
     // search: { ... } — extract raw block for parseSearchParams
-    const searchMatch = inner.match(/search\s*:\s*(\{[^}]+\})/);
-    if (searchMatch) {
-        route.search = searchMatch[1];
-        route.searchParams = parseSearchParams(searchMatch[1]);
+    const searchBlock = objectAfterKey(inner, 'search');
+    if (searchBlock) {
+        route.search = searchBlock;
+        route.searchParams = parseSearchParams(searchBlock);
     }
 
     // params: { ... } — typed route params
-    const paramsMatch = inner.match(/params\s*:\s*(\{[^}]+\})/);
-    if (paramsMatch) {
-        route.params = parseRouteParams(paramsMatch[1]);
+    const paramsBlock = objectAfterKey(inner, 'params');
+    if (paramsBlock) {
+        route.params = parseRouteParams(paramsBlock);
     }
 
     // meta: { ... } — route metadata
-    const metaMatch = inner.match(/meta\s*:\s*(\{[^}]+\})/);
-    if (metaMatch) {
-        const parsed = parseObjectLiteralToJson(metaMatch[1]);
+    const metaBlock = objectAfterKey(inner, 'meta');
+    if (metaBlock) {
+        const parsed = parseObjectLiteralToJson(metaBlock);
         if (parsed && typeof parsed === 'object') route.meta = parsed as Record<string, unknown>;
     }
+    // The raw blocks, for the caller to check their fields.
+    return { search: searchBlock, params: paramsBlock };
+}
+
+/**
+ * The `{ … }` written after `key:` in a route block, braces balanced: a nested object ends it at its
+ * own closing brace, not at the first `}` (#204). Undefined when the key has no object.
+ */
+function objectAfterKey(inner: string, key: string): string | undefined {
+    // Match: the key as a whole word, then `:` and the opening brace.
+    const m = new RegExp(`(?<![\\w$.])${key}\\s*:\\s*\\{`).exec(inner);
+    if (!m) return undefined;
+    const open = m.index + m[0].length - 1;
+    const close = findClosing(inner, open);
+    return close === -1 ? undefined : inner.slice(open, close + 1);
 }
 
 /**

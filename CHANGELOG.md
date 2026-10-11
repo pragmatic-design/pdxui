@@ -59,6 +59,12 @@ semver.
 
 ### Fixes
 
+- Page declarations compile to the route they describe. `@page '/x' { keepAlive: true }` registers
+  `keepAlive: true`, not `NaN`. `@search`'s `searchParams` is read as a `$derived` in the script too —
+  `searchParams.page + 1` was `NaN` — and is declared for `pdx check` and the editor. A `@page`
+  options block or a route `@meta` may span lines. A page's second path and an `@alias` carry every
+  field of its route and are checked like the first. `@route`'s `search`, `params` and `meta` are read
+  to their own closing brace, and their fields are checked with `PDX_ROUTE_FIELD_INVALID`. (#204)
 - `@fetch` options read signals and props like the rest of the script: `enabled: () => ready`
   threw `ReferenceError: ready is not defined`, and `ready` was reported unused. A declaration whose
   options block goes on to the next lines keeps it. `@form` imports from `@pdxui/core` only core's

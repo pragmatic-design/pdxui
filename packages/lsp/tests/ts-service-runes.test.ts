@@ -71,6 +71,13 @@ describe('projectScript', () => {
         expect(diagnose(src + 'const wrong: string = id;\n').join('\n'), 'a number param must be a number')
             .toContain("Type 'number' is not assignable to type 'string'");
     });
+
+    it('declares @search\'s searchParams with its fields\' types, as the compiler does (#204)', () => {
+        const src = "@page '/list';\n@search { page: number = 1, q?: string, open: boolean }\nconst next = $derived(searchParams.page + 1);\n";
+        expect(diagnose(src, '<p>{{ next }} {{ searchParams.q ?? \'\' }} {{ searchParams.open ? 1 : 0 }}</p>')).toEqual([]);
+        expect(diagnose(src + 'const wrong: string = searchParams.page;\n').join('\n'), 'a number field must be a number')
+            .toContain("Type 'number' is not assignable to type 'string'");
+    });
 });
 
 describe('$event narrowed to the event a component declares', () => {

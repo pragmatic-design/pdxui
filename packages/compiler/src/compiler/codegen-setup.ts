@@ -138,6 +138,41 @@ export function buildSetupBody(
         }
     }
 
+    // @search — `searchParams`, a computed of the typed query. Declared here, before the deriveds and
+    // the body, like @params: the analyzer exports it as a derived, so both read `searchParams.page`
+    // as `searchParams().page` (#204).
+    if (analysis.route.searchParams && analysis.route.searchParams.length > 0) {
+        // Simple form vs validation form
+        const hasValidation = analysis.route.searchParams.some(p => p.type === 'number' && !p.optional);
+        if (hasValidation) {
+            // Complex form with per-field validation
+            const fieldLines = analysis.route.searchParams.map(p => {
+                if (p.type === 'number') {
+                    const def = p.default ?? '0';
+                    return `        const __v_${p.name} = Number(__sp.get(${jsQuote(p.name)}) ?? ${def});\n` +
+                           `        if (isNaN(__v_${p.name})) console.warn('[pdx] Invalid search param: ${p.name} must be a number');`;
+                }
+                return null;
+            }).filter(Boolean);
+            const returnFields = analysis.route.searchParams.map(p => {
+                if (p.type === 'number') return `${p.name}: isNaN(__v_${p.name}) ? ${p.default ?? '0'} : __v_${p.name}`;
+                if (p.type === 'boolean') return `${p.name}: __sp.get(${jsQuote(p.name)}) === 'true'`;
+                const def = p.default ? ` ?? ${jsString(p.default)}` : p.optional ? '' : " ?? ''";
+                return `${p.name}: __sp.get(${jsQuote(p.name)})${def}`;
+            });
+            parts.push(`    const searchParams = computed(() => {\n      const __sp = new URLSearchParams(currentSearch());\n${fieldLines.join('\n')}\n      return { ${returnFields.join(', ')} };\n    });`);
+        } else {
+            // Simple form: no validation
+            const returnFields = analysis.route.searchParams.map(p => {
+                if (p.type === 'number') return `${p.name}: Number(__sp.get(${jsQuote(p.name)}) ?? ${p.default ?? '0'})`;
+                if (p.type === 'boolean') return `${p.name}: __sp.get(${jsQuote(p.name)}) === 'true'`;
+                const def = p.default ? ` ?? ${jsString(p.default)}` : p.optional ? '' : " ?? ''";
+                return `${p.name}: __sp.get(${jsQuote(p.name)})${def}`;
+            });
+            parts.push(`    const searchParams = computed(() => {\n      const __sp = new URLSearchParams(currentSearch());\n      return { ${returnFields.join(', ')} };\n    });`);
+        }
+    }
+
     // Callable names: props + derived + route params — need () appended in body/effect/lifecycle
     const signalNames = new Set(analysis.signals.map(s => s.name));
     const callableNames = new Set<string>();
@@ -147,6 +182,8 @@ export function buildSetupBody(
     if (analysis.route.params) {
         for (const rp of analysis.route.params) callableNames.add(rp.name);
     }
+    // @search: searchParams is a computed too (#204)
+    if (analysis.route.searchParams && analysis.route.searchParams.length > 0) callableNames.add('searchParams');
 
     // Helper: rewrite signals (__name / .set) and callables (name()) in one AST pass. Declared
     // before the first statement that uses it: the sets above are consts, and a call ahead of them
@@ -290,7 +327,8 @@ export function buildSetupBody(
     // is fine, but a top-level body statement reading it would TDZ).
     const derivedNames = new Set(analysis.deriveds.map(d => d.name));
     // Route params are computeds too, read as `id()` inside a $derived (#185).
-    const allCallableInDerived = new Set([...derivedNames, ...propNames, ...(analysis.route.params ?? []).map(p => p.name)]);
+    const allCallableInDerived = new Set([...derivedNames, ...propNames, ...(analysis.route.params ?? []).map(p => p.name),
+        ...(analysis.route.searchParams?.length ? ['searchParams'] : [])]);
     const bodyForDerived = analysis.body || '';
     // Deriveds reference EARLIER deriveds (source order = dependency order). computed() is lazy, so
     // a dependency need not be declared before its dependent, and the partition below is
@@ -539,43 +577,6 @@ export function buildSetupBody(
                 `      ctx.el.style.setProperty('--pdx-${scopeHash}-${name}', String(ctx.${name}()));`
             ).join('\n');
             parts.push(`    ctx.track(() => {\n${setProps}\n    });`);
-        }
-    }
-
-    // @search: generate typed searchParams computed from URLSearchParams
-    if (analysis.route.searchParams && analysis.route.searchParams.length > 0) {
-        // Simple form vs validation form
-        const hasValidation = analysis.route.searchParams.some(p => p.type === 'number' && !p.optional);
-        if (hasValidation) {
-            // Complex form with per-field validation
-            const fieldLines = analysis.route.searchParams.map(p => {
-                if (p.type === 'number') {
-                    const def = p.default ?? '0';
-                    return `        const __v_${p.name} = Number(__sp.get(${jsQuote(p.name)}) ?? ${def});\n` +
-                           `        if (isNaN(__v_${p.name})) console.warn('[pdx] Invalid search param: ${p.name} must be a number');`;
-                }
-                return null;
-            }).filter(Boolean);
-            const returnFields = analysis.route.searchParams.map(p => {
-                if (p.type === 'number') return `${p.name}: isNaN(__v_${p.name}) ? ${p.default ?? '0'} : __v_${p.name}`;
-                if (p.type === 'boolean') return `${p.name}: __sp.get(${jsQuote(p.name)}) === 'true'`;
-                const def = p.default ? ` ?? ${jsString(p.default)}` : p.optional ? '' : " ?? ''";
-                return `${p.name}: __sp.get(${jsQuote(p.name)})${def}`;
-            });
-            parts.push(`    const searchParams = computed(() => {\n      const __sp = new URLSearchParams(currentSearch());\n${fieldLines.join('\n')}\n      return { ${returnFields.join(', ')} };\n    });`);
-        } else {
-            // Simple form: no validation
-            const returnFields = analysis.route.searchParams.map(p => {
-                if (p.type === 'number') return `${p.name}: Number(__sp.get(${jsQuote(p.name)}) ?? ${p.default ?? '0'})`;
-                if (p.type === 'boolean') return `${p.name}: __sp.get(${jsQuote(p.name)}) === 'true'`;
-                const def = p.default ? ` ?? ${jsString(p.default)}` : p.optional ? '' : " ?? ''";
-                return `${p.name}: __sp.get(${jsQuote(p.name)})${def}`;
-            });
-            parts.push(`    const searchParams = computed(() => {\n      const __sp = new URLSearchParams(currentSearch());\n      return { ${returnFields.join(', ')} };\n    });`);
-        }
-        // Add searchParams to exports so it's in auto-return
-        if (!analysis.exports.some(e => e.name === 'searchParams')) {
-            analysis.exports.push({ name: 'searchParams', kind: 'const' });
         }
     }
 

@@ -31,13 +31,13 @@ with a constraint `c`, one of `string`, `number`, `uuid`, `slug`.
 ```ebnf
 PageDecl     ::= "@page" S StringLiteral ( S? "," S? StringLiteral )* ( S? PageOptions )? S? ";"?
 PageOptions  ::= "{" S? PageOption ( S? "," S? PageOption )* S? "}"
-PageOption   ::= "keepAlive" ( S? ":" S? Digits )?
+PageOption   ::= "keepAlive" ( S? ":" S? ( "true" | "false" | Digits ) )?
                | "preload" ( S? ":" S? ( "true" | "false" ) )?
                | "prefetch" S? ":" S? StringLiteral
                | "label" S? ":" S? ( StringLiteral | Identifier | "$t(" S? StringLiteral S? ")" )
 ```
 
-The analyzer's form: `@page '/users/:id';`. The whole declaration, options included, is one line.
+The analyzer's form: `@page '/users/:id';`. The options block may span lines.
 
 #### Semantics
 
@@ -46,7 +46,7 @@ The analyzer's form: `@page '/users/:id';`. The whole declaration, options inclu
 entry with the same path), with the fields the other declarations of this page add. A page is its own
 chunk: the route carries `lazy:true` and `file:'./name.pdx'`, and the outlet imports it the first
 time the route is shown. Every path after the first is registered as a further route to the same tag,
-carrying `path`, `tag` and `guard`. A page whose template renders a `<pdx-router-outlet>` element
+with every field of the first and the param constraints of its own path. A page whose template renders a `<pdx-router-outlet>` element
 gets `hasOutlet:true`: the routes below its path render inside it. The options block:
 
 - `keepAlive` freezes the page when it is left instead of destroying it; `keepAlive: 60000` destroys
@@ -62,18 +62,17 @@ gets `hasOutlet:true`: the routes below its path render inside it. The options b
 
 #### Rules
 
-- A path that does not start with `/` raises `PDX_PAGE_INVALID_PATH`. Only the first path is checked.
+- A path that does not start with `/` raises `PDX_PAGE_INVALID_PATH`. Every path is checked, an
+  `@alias`'s too.
 - A param constraint that is not `string`, `number`, `uuid` or `slug` raises
   `PDX_PAGE_INVALID_CONSTRAINT` (a warning: the constraint is not applied); empty parentheses,
   `:id()`, raise `PDX_PAGE_EMPTY_CONSTRAINT`.
 - A `label` that names a function the script does not declare raises `PDX_LABEL_NOT_FOUND`; the
   route is registered without a label.
 - `prefetch` follows the rules of `@prefetch` (`PDX_PREFETCH_POLICY`).
-- An options block written over several lines is not read (#204): the lines after the first reach the
-  setup as code, which then does not parse (`PDX_SCRIPT_SYNTAX_ERROR`).
 - An option key other than the four above is ignored, and two `@page` lines leave the last one's
   paths in place: not checked today.
-- `keepAlive: true` is not in the grammar: the value is read as a number. Not checked today (#204).
+- A `keepAlive` value other than `true`, `false` or digits is ignored. Not checked today.
 
 #### Examples
 
@@ -118,7 +117,7 @@ RouteField  ::= ( "path" | "guard" | "prefetch" | "transition" | "layout" | "scr
               | "loader" S? ":" S? Identifier
               | "keepAlive" S? ":" S? ( "true" | Digits )
               | "preload" S? ":" S? "true"
-              | ( "search" | "params" | "meta" ) S? ":" S? "{" [^}]* "}"
+              | ( "search" | "params" | "meta" ) S? ":" S? ObjectLiteral
 ```
 
 The analyzer's form: `@route { path: '/users', keepAlive: true }`. The block may span lines.
@@ -135,10 +134,9 @@ registration is the one `@page` emits.
 - The path is checked as `@page`'s is (`PDX_PAGE_INVALID_PATH`, `PDX_PAGE_INVALID_CONSTRAINT`,
   `PDX_PAGE_EMPTY_CONSTRAINT`); `prefetch` as `@prefetch`'s (`PDX_PREFETCH_POLICY`); `loader` as
   `@loader`'s (`PDX_LOADER_NOT_FOUND`).
-- The fields of `search` and `params` are not checked as `@search`'s and `@params`'s are: a field the
-  parser cannot read is dropped without `PDX_ROUTE_FIELD_INVALID`.
-- `search`, `params` and `meta` are read up to their first `}` (#204): a nested object ends them. Not
-  checked today.
+- The fields of `search` and `params` are checked as `@search`'s and `@params`'s are
+  (`PDX_ROUTE_FIELD_INVALID`), and declare the same names: each param, and `searchParams`.
+- `search`, `params` and `meta` are read to their own closing brace: a nested object is part of them.
 - A key other than those above is ignored — `label`, `alias`, `redirect` and `outlet` have no key —
   and a field declared both here and by its own declaration takes the last one read. Not checked
   today.
@@ -547,7 +545,7 @@ The analyzer's form: `@redirect '/new-path';`.
 The two forms do different things. `@redirect '/from' -> '/to'` adds an entry to the redirect table,
 `globalThis.__pdx_redirects.push({from, to})`: a navigation to `/from` is replaced by one to `/to`
 before any route is matched. `@redirect '/target'` registers `redirect:'/target'` on this page's own
-route: when the route matches, the router writes `/target` to the address bar and navigates there
+route, each of its paths: when the route matches, the router writes `/target` to the address bar and navigates there
 instead of rendering the page. A redirect to a target outside the origin is refused at run time.
 
 #### Rules
@@ -652,27 +650,28 @@ with `currentSearch` imported from `@pdxui/router`, returning one value per fiel
 `Number(…)` of the value or of the default (`0` without one), a `boolean` is `=== 'true'`, a
 `string` is the value, else the default, else `''` — or `null` for an optional field with no
 default. When a required `number` field reads as `NaN`, it logs a warning and takes its default.
-`searchParams` is a computed: the script reads it as `searchParams()`.
+`searchParams` is declared before the script's own statements and read as a `$derived` is, in the
+template and in the script alike: `searchParams.page` is `searchParams().page`. The editor types it
+as the object of the fields.
 
 #### Rules
 
 - A field that is not `name: type` with `string`, `number` or `boolean` — a type in quotes, a type
   the block does not coerce — raises `PDX_ROUTE_FIELD_INVALID` and is dropped.
-- The template does not see `searchParams`: reading it there raises `PDX_UNDECLARED_REF` (#204). The
-  script can read it — `const page = $derived(searchParams().page);` compiles — but the editor's type
-  projection does not declare it, so that script does not type-check today.
 - A default is read up to the next comma, and a string default loses its quotes. Not checked today.
 
 #### Examples
 
 ```pdx
 <template>
-  <p>Results</p>
+  <p>Results for {{ searchParams.q ?? 'everything' }}, page {{ searchParams.page }}</p>
+  <a :href="'?page=' + next">Next page</a>
 </template>
 
 <script setup>
 @page '/search';
 @search { q?: string, page: number = 1, archived: boolean };
+const next = $derived(searchParams.page + 1);
 </script>
 ```
 
@@ -758,8 +757,8 @@ document.
 
 #### Rules
 
-- A route `@meta` is one line. Over several lines it is not read (#204) and raises
-  `PDX_UNKNOWN_DECLARATION`, as does a block whose text contains `name:` or `property:`.
+- A route `@meta` may span lines. A block whose text contains `name:` or `property:` is not read as
+  one and raises `PDX_UNKNOWN_DECLARATION`.
 - A route `@meta` that is not a JSON value once its keys are quoted — a function, a variable — is
   dropped without a diagnostic. Not checked today.
 - A head `@meta` content is a static string. Not checked today.
