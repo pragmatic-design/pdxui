@@ -23,6 +23,14 @@
 # Adding:
 #   - Certify before the push (env): PDX_CERTIFY=1   (and PDX_SKIP_VISUAL=1 to leave out Dim 5)
 
+# The gate runs in a clean git environment. Git exports GIT_DIR to a hook — in a linked worktree it
+# points at .git/worktrees/<name> — and the suites call git themselves: `git ls-files` from a
+# subfolder then lists paths from the repository root (docs-language.test.ts reads files that do not
+# exist), `git status` per package returns the whole tree (publish-local.test.ts overflows its
+# buffer), and a fixture's `git init` + `git config` in a temporary folder writes into the real
+# repository's config instead. Each git call must find its repository from its own folder.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_PREFIX GIT_OBJECT_DIRECTORY
+
 # ── Phase 1: quality (typecheck + lint) on core·compiler·router·ui·lsp·cli·vscode·design engine ──
 if [ "$PDX_SKIP_QUALITY" = "1" ]; then
     echo "[pre-push] PDX_SKIP_QUALITY=1 -> quality skipped"
