@@ -84,9 +84,10 @@ behaves as follows; the options and the build check above hold from now:
 
 - The adapter registers the tool while `when` is true and unregisters it when the component is
   disposed (the registration's `AbortSignal` is the scope's; lifecycle.md).
-- A form with a schema gets the declarative attributes (`toolname`, `tooldescription`,
-  `toolparamdescription`) only when its `@form` says `agent: '…'`; field errors return through the
-  submit's response.
+- A form with a schema would get the declarative attributes (`toolname`, `tooldescription`,
+  `toolparamdescription`) through an `@form { agent: '…' }` option that arrives **with** the adapter,
+  not before it: without the adapter it would be an option accepted and ignored (decisions.md 54).
+  Field errors return through the submit's response.
 - A read-only `describe_page` tool returns the card; `navigate` takes a route and its typed params.
 - The adapter is a separate, opt-in module; its target API is WebMCP as Chrome ships it
   (`document.modelContext.registerTool`), which is an origin trial and still changing. Nothing is

@@ -37,6 +37,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_DEFER_UNKNOWN_TRIGGER` | error | A `@defer` trigger outside the grammar (alpha fires it at once). | `@defer` | this specification (proposed, decisions.md 27) |
 | `PDX_AGENT_ACTION_UNBOUND` | error | An `@action` with `agent` that no control in the template runs: a capability only an agent would have. | `@action`, [agents.md](agents.md) | this specification (proposed, decisions.md 31) |
 | `PDX_AWAIT_TIMING` | error | `maxMs` not greater than `minMs`. | `@await` | this specification (proposed, decisions.md 26) |
+| `PDX_VIRTUAL_SHAPE` | error | `@virtual` on a `@for` that is not its parent's only content, or whose body has more than one root. | `@for` | this specification (proposed, decisions.md 45) |
 | `PDX_VIRTUAL_TRANSITION` | error | `@virtual` together with `@move` or `@stagger`. | `@for` | this specification (proposed, decisions.md 29) |
 
 ## Changed

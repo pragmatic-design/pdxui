@@ -176,7 +176,6 @@ Rules          ::= "{" S? Rule ( S? "," S? Rule )* S? "}"
 Rule           ::= "required" | Word ( S? ":" S? [^,}]+ )?
 FormOptions    ::= "{" S? FormOption ( S? ( ";" | "\n" ) S? FormOption )* S? ";"? S? "}"
 FormOption     ::= ( "save" | "saveMode" ) S? ":" S? StringLiteral
-                 | "agent" S? ":" S? StringLiteral                                                     (proposed — decisions.md 31)
                  | "warnUnsaved" ( S? ":" S? ( "true" | "false" ) )?
                  | ( "validate" | "source" | "parent" ) S? ":" S? Expression
                  | "fields" S? ":" S? "{" ( Word S? ":" S? "{" FieldSave ( "," FieldSave )* "}" ","? )* "}"

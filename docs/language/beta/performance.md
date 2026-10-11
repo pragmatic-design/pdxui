@@ -57,7 +57,7 @@ held to the benchmark (`pnpm bench:jfb`):
 | R4 | The bytes before first paint are budgeted (entry 35 KB, blocking 89 KB gzip) | `showcase/tests/bundle-budget.spec.ts:149` | **landed** |
 | R5 | **LCP** has its own budget, separate from «app ready»: a page whose largest element is a list or an image is not ready when the shell is | Playwright `largest-contentful-paint` on three showcase routes | proposed |
 | R6 | A route rendered at build time paints its content **before any script runs** (server.md) | the SSG build's HTML and `first-paint.spec.ts` on it | proposed (#160) |
-| R7 | A long list that is not virtualized gets `content-visibility: auto` from the design CSS, so off-screen rows cost no layout on the first render | layout time of `/customers` with 200 rows | proposed |
+| R7 | A long list that is not virtualized skips its off-screen rows with `content-visibility: auto` and `contain-intrinsic-size: auto <h>` — per component, on div-based rows only (not table rows), after reading what each component draws outside a row (decisions.md 46; #285) | layout time of a real 2 000-row list (not `/customers`, which pages by 10) | proposed |
 
 ## Virtualized lists
 
@@ -75,8 +75,13 @@ the compiler cannot see the layout.
 
 ### Semantics
 
-`@for (rows as r; track r.id) @virtual(48) { … }` renders only the items in view plus an overscan,
-inside a scroll container the compiler wraps around them, through the runtime's
+`@for (rows as r; track r.id) @virtual(48) { … }` renders only the items in view plus an overscan
+(#283). **The scroll container is the parent the template writes** — the `<ul>`, the `<tbody>`, the
+element with `overflow` — never an element the compiler adds, so lists and tables stay valid HTML
+(decisions.md 45). The runtime puts two spacers of the body root's tag before and after the window,
+`aria-hidden`, sized to the offsets (a third splits around a focused item scrolled away, #284). So the
+`@for` must be its parent's only content and its body must have one root element, or the template is
+`PDX_VIRTUAL_SHAPE` (error). It goes through the runtime's
 `createVirtualizer` (`core/src/renderer/virtualizer.ts`, today called by hand, e.g. from
 `pdx-select`). The template is the same as a plain `@for`: making a list virtual is one word.
 
