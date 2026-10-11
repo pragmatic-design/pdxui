@@ -45,12 +45,15 @@ const item = 1;
 function save(x) {} function a() {} function b() {} function onClick() {} function onFrameLoad(e) {}
 </script>`;
 
-/** The handler expression each path hands to `safeHandler`. */
+/**
+ * The handler expression each path hands to `safeHandler`, inside the `batchHandler(…)` every
+ * compiled handler is wrapped in (#114) — required here, so a path that stopped batching fails.
+ */
 function handlerOf(handler: string, inlineBindings: boolean): string {
     const { code } = compile(SOURCE(handler), 'p.pdx', [], undefined, { production: true, inlineBindings });
     const re = inlineBindings
-        ? /addEventListener\('click', safeHandler\(([\s\S]*?), ctx\.el/
-        : /@click=\$\{safeHandler\(([\s\S]*?), ctx\.el/;
+        ? /addEventListener\('click', safeHandler\(batchHandler\(([\s\S]*?)\), ctx\.el/
+        : /@click=\$\{safeHandler\(batchHandler\(([\s\S]*?)\), ctx\.el/;
     const m = re.exec(code);
     if (!m) throw new Error(`no click handler found in the ${inlineBindings ? 'inline' : 'template'} output for ${handler}`);
     return m[1];

@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-435 value exports.
+436 value exports.
 
 ### `__adoptStyles`
 
@@ -472,8 +472,23 @@ Group writes so subscribers run once, after all of them.
 
 Outside it each write flushes at once, so two writes in a row run their subscribers twice, and the
 first run sees the second value not yet written. Use it when several writes are one change.
+A compiled template's event handlers already run inside it (`batchHandler`); code anywhere
+else — a hand-written listener, a timer, a promise callback — flushes per write.
 
 Nested calls flush once, at the outermost exit.
+
+### `batchHandler`
+
+```ts
+import { batchHandler } from '@pdxui/core';
+
+function batchHandler(handler: (...args: A) => R): (...args: A) => R
+```
+
+`handler`, run inside `batch()` on every call: what a compiled template does with each of its
+`@event` handlers (#114), so a handler writing three signals runs an effect reading them once,
+on the finished state. The call keeps its `this` and returns what the handler returns — the
+promise of an async handler, which is batched up to its first `await`.
 
 ### `bindTwoWay`
 

@@ -185,7 +185,7 @@ function save() { throw new Error('nope'); }
     it('the template path: a handler, a binding, interpolations, @for and @if', () => {
         const { code, map } = compile(TEMPLATE, 'tpl.pdx');
         expect(probe(TEMPLATE, code, map, [
-            ['@click="save"', '@click=${|safeHandler(ctx.save'],
+            ['@click="save"', '@click=${|safeHandler(batchHandler(ctx.save'],
             [':value="name"', ':value=${|ctx.name}'],
             ['label }}', '<p>${|ctx.label}'],
             ['items as item', '${|eachRow('],

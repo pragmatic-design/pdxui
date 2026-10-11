@@ -131,6 +131,8 @@ export function generateNodes(nodes: TemplateNode[], imports: Set<string>, ctx: 
     if (result.includes('dynamic(')) imports.add('dynamic');
     if (result.includes('errorBoundary(')) imports.add('errorBoundary');
     if (result.includes('safeHandler(')) imports.add('safeHandler');
+    // Every compiled handler runs inside batch() (#114, buildEventHandler).
+    if (result.includes('batchHandler(')) imports.add('batchHandler');
     return result;
 }
 

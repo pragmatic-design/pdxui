@@ -71,9 +71,14 @@ Two equivalent ways to clean up, pick for readability:
 
 ## batch
 
-Each write outside `batch` flushes at once: three `set`s in a row run their readers three times, and
-the first run sees the other two values not yet written. `batch` groups a block so subscribers run
-only once, at the end:
+**A template event handler is already batched.** `@click="a = 1; b = 1; c = 1"` — or a function it
+calls — runs inside `batch`: the compiler wraps every handler in `batchHandler`, so an effect reading
+all three runs once, on the finished state. An `async` handler is batched up to its first `await`.
+
+Everywhere else — a listener you add by hand, a timer, a promise callback, the code after an
+`await` — each write flushes at once: three `set`s in a row run their readers three times, and the
+first run sees the other two values not yet written. `batch` groups a block so subscribers run only
+once, at the end:
 
 ```pdx
 batch(() => {

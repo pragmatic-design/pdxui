@@ -22,6 +22,10 @@ semver.
 
 ### Changed
 
+- A template event handler runs inside `batch()`: `@click="a = 1; b = 1; c = 1"` runs an effect
+  reading the three once, on the finished state, instead of three times on states half written. An
+  `async` handler is batched up to its first `await`; code outside a template handler still flushes
+  per write. `batchHandler(fn)`, which the compiler emits, is exported from `@pdxui/core`. (#114)
 - A `mutation()` called while it is pending queues the call instead of rejecting with "Mutation
   already in progress": calls run one at a time, in call order, each with its own result, and a
   failed one does not stop the next. `pending()` stays true until the queue is empty. The

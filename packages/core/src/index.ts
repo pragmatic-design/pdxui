@@ -10,7 +10,7 @@
 //     → distinctOp is the pipe-compatible version of distinct (alias to avoid name collision)
 
 // Reactivity
-export { signal, computed, effect, batch, onCleanup, onDispose, collectDisposers, ref, untracked, enableDevMode, pushErrorHandler, popErrorHandler } from './reactivity/signal';
+export { signal, computed, effect, batch, batchHandler, onCleanup, onDispose, collectDisposers, ref, untracked, enableDevMode, pushErrorHandler, popErrorHandler } from './reactivity/signal';
 export type { ComputedOptions, EffectOptions } from './reactivity/signal';
 
 // Deep Reactive Store
