@@ -9,7 +9,7 @@
 // The two producers differ in ONE thing, how a page's module is named: a build imports the file,
 // the dev server asks for the URL it serves. `buildSpecifier` and `devSpecifier`.
 
-import { relative } from 'node:path';
+import { relative } from 'path';
 import { jsString } from './compiler/js-literal';
 import type { ScannedRoute } from './plugin-utils';
 
