@@ -94,7 +94,7 @@ describe('pipe arguments — {{ x | pipe(arg) }}', () => {
   let price = $signal(42);
   function currency(val, code) { return code + ' ' + val; }
 </script>`);
-        expect(code).toContain('pipe(');
+        expect(code).toContain('templatePipe(');
         expect(code).toContain("(v) => ctx.currency(v, 'EUR')");
     });
 

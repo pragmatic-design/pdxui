@@ -17,6 +17,24 @@ export function callSignals(expr: string, ctx: CompileContext): string {
     });
 }
 
+/**
+ * `{{ value | upper | money('EUR') }}` as core's value chain, `templatePipe(value, …)`, shared by both
+ * render paths (#199). A pipe is a function the script declares (`ctx.upper`) or imports (`upper`, as
+ * written); one with arguments is called with the value first, `(v) => ctx.money(v, 'EUR')`, its
+ * arguments read like any template expression. `value` is already read (signals called).
+ */
+export function pipeChain(value: string, pipes: string[], ctx: CompileContext): string {
+    const fns = pipes.map((pipe) => {
+        // Match: a pipe name, and its argument list when it has one. Groups: [1]=name [2]=arguments
+        const m = /^([A-Za-z_$][\w$]*)\s*(?:\(([\s\S]*)\))?$/.exec(pipe.trim());
+        if (!m) return `ctx.${pipe.trim()}`;
+        const fn = ctx.importedNames?.has(m[1]) && !ctx.declaredNames?.has(m[1]) ? m[1] : `ctx.${m[1]}`;
+        if (m[2] === undefined) return fn;
+        return `(v) => ${fn}(v, ${callSignals(prefixCtx(m[2], ctx), ctx)})`;
+    });
+    return `templatePipe(${value}, ${fns.join(', ')})`;
+}
+
 // ─── @for scope ─────────────────────────────────────────────────
 
 /** True when a @for binds a plain identifier — not a destructuring — so it can be a row getter. */

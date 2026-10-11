@@ -36,8 +36,9 @@ describe('compile (end-to-end)', () => {
 </template>`;
 
         const { code } = compile(source, 'price.pdx');
-        expect(code).toContain('pipe');
-        expect(code).toContain('pipe(ctx.price(), ctx.currency)');
+        // core's value chain, `templatePipe` — `pipe` is its signal operator (#199).
+        expect(code).toMatch(/import \{[^}]*\btemplatePipe\b[^}]*\} from '@pdxui\/core'/);
+        expect(code).toContain('templatePipe(ctx.price(), ctx.currency)');
     });
 
     it('compiles @if/@else', () => {

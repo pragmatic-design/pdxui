@@ -59,6 +59,11 @@ semver.
 
 ### Fixes
 
+- A template pipe renders its value: `{{ name | upper }}`, a chain, and `{{ price | money('EUR') }}`
+  (the value first, then the arguments), in dev and in a build, following the signal it reads. The
+  compiled module called core's signal operator `pipe` instead of the value chain `templatePipe`, so
+  the page showed a function's source; a pipe the script imports is now called by its own name.
+  (#199)
 - `pdx build` and `pdx dev` on a project whose `vite.config` registers `pdx()` — as the one
   `pdx new project` writes does — use that plugin and add no second one. With two, every module was
   compiled twice and a production build rendered nothing (`component is not defined`). (#197)
