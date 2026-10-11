@@ -830,6 +830,10 @@ function computed(fn: () => T, options?: ComputedOptions<T>): ReadonlySignal<T>
 
 Derived signal — lazy recomputation with dirty flag + optional equality.
 
+A source change makes it dirty and tells its readers «maybe»: an effect that read it is checked
+before it runs, and runs only if this computed — recomputed then — gives another value
+(`Object.is`). With `equals` it recomputes at once and tells its readers only of a change.
+
 ### `computeDiff`
 
 ```ts

@@ -51,6 +51,9 @@ const doubled = $derived(count * 2);
 - **Lazy**: doesn't compute until someone reads it.
 - **Glitch-free**: within a single update it's never computed twice and never exposes inconsistent
   intermediate state.
+- **Only a new value moves its readers**: when a source changes and the derived recomputes to the
+  same value (`Object.is`), an effect reading it does not run. `$derived(n % 2)` and three writes of
+  `n` that keep it at 1 run nothing.
 - **Pure**: the body should only *compute and return*, with no side effects. If you need a side
   effect, it's an `effect`, not a derived.
 

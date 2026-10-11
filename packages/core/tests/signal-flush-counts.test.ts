@@ -23,8 +23,9 @@ const EXPECTED: Record<string, Record<Strategy, number>> = {
     // again. One torn run that `batch()` does not remove (measured, not predicted: 1000 was).
     '(c) @for of 1000 rows, select + relabel': { sync: 1001, batched: 1001 },
     '(d) 3 signals, computed chain 10 deep': { sync: 3, batched: 1 },
-    // Today the effect re-runs although the computed it reads kept its value; #115 brings both to 0.
-    '(e) 3 writes, computed value unchanged': { sync: 3, batched: 1 },
+    // The computed kept its value, so its readers have nothing to see: a computed's notification is a
+    // «maybe», checked before the effect runs (#115). Before #115: 3 and 1.
+    '(e) 3 writes, computed value unchanged': { sync: 0, batched: 0 },
     // Compiled handlers are batched by the compiler (#114): one run under either strategy. Without
     // the compiler's batch the sync column reads 3, one per write the effect reads (measured).
     '(f) a compiled template handler, 3 signals': { sync: 1, batched: 1 },

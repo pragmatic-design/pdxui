@@ -83,6 +83,21 @@ export function getTopErrorHandler(): ErrorHandler | null {
     return errorHandlerStack.length > 0 ? resolveRoute(errorHandlerStack[errorHandlerStack.length - 1]) : null;
 }
 
+// --- «Maybe dirty» (#115) ---
+// A computed without `equals` notifies its readers before it knows whether its value changed: the
+// notification is a MAYBE. An effect queued only that way is checked before it runs — the computeds
+// it read last time are brought up to date and compared — and does not run when none changed. An
+// effect queued by a signal it reads directly is DEFINITE, and runs.
+/** True while a computed is notifying its readers: what it schedules is a «maybe». */
+let notifyingMaybe = false;
+/**
+ * An effect queued by a direct write since it last ran (or was skipped) carries this flag, and
+ * runs. A property rather than a Set: it is set and read once per queued effect, on the hot path.
+ */
+type Flagged = Subscriber & { __pdx_definite?: boolean };
+/** The computeds the running effect reads, with the value each gave it. Null outside an effect. */
+let currentComputedReads: [() => unknown, unknown][] | null = null;
+
 // --- Pending effects: array-based for zero-alloc flush ---
 let pendingArr: Subscriber[] = [];
 let pendingLen = 0;
@@ -319,7 +334,13 @@ export interface ComputedOptions<T> {
     name?: string;
 }
 
-/** Derived signal — lazy recomputation with dirty flag + optional equality. */
+/**
+ * Derived signal — lazy recomputation with dirty flag + optional equality.
+ *
+ * A source change makes it dirty and tells its readers «maybe»: an effect that read it is checked
+ * before it runs, and runs only if this computed — recomputed then — gives another value
+ * (`Object.is`). With `equals` it recomputes at once and tells its readers only of a change.
+ */
 export function computed<T>(fn: () => T, options?: ComputedOptions<T>): ReadonlySignal<T> {
     let cached: T;
     let dirty = true;
@@ -349,13 +370,19 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
         const prev = currentEffect;
         const prevDeps = currentDeps;
         const prevInsideComputed = _insideComputed;
+        // What this computed reads is its own dependency, not the effect's that read it.
+        const prevComputedReads = currentComputedReads;
         // Once disposed, it recomputes WITHOUT re-subscribing to the sources — a late
         // read must not bring the computed back to life.
         currentEffect = disposed ? null : markDirty;
         currentDeps = disposed ? null : nextDeps;
+        currentComputedReads = null;
         _insideComputed = true;
         try { cached = fn(); dirty = false; initialized = true; }
-        finally { currentEffect = prev; currentDeps = prevDeps; _insideComputed = prevInsideComputed; }
+        finally {
+            currentEffect = prev; currentDeps = prevDeps; _insideComputed = prevInsideComputed;
+            currentComputedReads = prevComputedReads;
+        }
 
         // Deps read only conditionally last time must stop notifying this computed.
         for (let i = 0; i < prevTracked.length; i++) {
@@ -377,8 +404,16 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
                 const oldCached = cached;
                 recompute();
                 if (equals(oldCached, cached)) return; // same value — don't propagate
+                // It did change, and it knows: what it schedules runs.
+                const prevMaybe = notifyingMaybe;
+                notifyingMaybe = false;
+                try { notifySet(subscribers); } finally { notifyingMaybe = prevMaybe; }
+                return;
             }
-            notifySet(subscribers);
+            // Not recomputed yet: its readers MAY see a new value. Each is checked before it runs.
+            const prevMaybe = notifyingMaybe;
+            notifyingMaybe = true;
+            try { notifySet(subscribers); } finally { notifyingMaybe = prevMaybe; }
         }
     };
     // The inspector's two readings: what this computed last READ, and — through
@@ -402,6 +437,8 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
             if (currentDeps) currentDeps.push(subscribers);
         }
         if (dirty) recompute();
+        // The running effect remembers the value it was given, to tell a «maybe» from a change.
+        if (currentEffect && currentComputedReads) currentComputedReads.push([read.peek, cached]);
         return cached;
     };
 
@@ -476,6 +513,8 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
     let cleanups: (() => void)[] = [];
     let disposed = false;
     let deps: Set<Subscriber>[] = [];
+    /** The computeds the last run read, with their values: what a «maybe» is checked against. */
+    const computedReads: [() => unknown, unknown][] = [];
 
     // Capture the error route active WHEN THIS EFFECT IS CREATED. Async errors (thrown
     // during a later flush) must route to the boundary that wraps this effect's subtree, not
@@ -498,9 +537,13 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
         const prevEffect = currentEffect;
         const prevCleanups = currentCleanups;
         const prevDeps = currentDeps;
+        const prevComputedReads = currentComputedReads;
+        // Reused, not reallocated: an effect re-runs on the hot path.
+        computedReads.length = 0;
         currentEffect = run;
         currentCleanups = cleanups;
         currentDeps = deps;
+        currentComputedReads = computedReads;
         try {
             const result = fn();
             if (typeof result === 'function') cleanups.push(result);
@@ -508,8 +551,25 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
             currentEffect = prevEffect;
             currentCleanups = prevCleanups;
             currentDeps = prevDeps;
+            currentComputedReads = prevComputedReads;
             if (inspected) noteEffectDeps(inspected.record, deps);
         }
+    };
+
+    /**
+     * Whether a «maybe» is a change: true when a computed the last run read now gives another value.
+     * Reading it brings it up to date. With nothing recorded there is nothing to compare, and it runs.
+     */
+    // Declared here, with the check, so the function keeps one shape: the flag added later, on the
+    // first write, would change it on the hot path.
+    (run as Flagged).__pdx_definite = false;
+    (run as { __pdx_check?: () => boolean }).__pdx_check = () => {
+        if (computedReads.length === 0) return true;
+        for (let i = 0; i < computedReads.length; i++) {
+            const [peek, seen] = computedReads[i];
+            if (!Object.is(peek(), seen)) return true;
+        }
+        return false;
     };
 
     if (boundaryHandler) (run as { __pdx_errh?: ErrorRoute }).__pdx_errh = boundaryHandler;
@@ -583,7 +643,26 @@ export function batchHandler<A extends unknown[], R>(handler: (...args: A) => R)
  */
 function scheduleSubscriber(sub: Subscriber): void {
     if ((sub as { __pdx_mark?: boolean }).__pdx_mark) sub();
-    else enqueuePending(sub);
+    else {
+        // Queued by a direct write, not by a computed's «maybe»: it runs, unchecked.
+        if (!notifyingMaybe) (sub as Flagged).__pdx_definite = true;
+        enqueuePending(sub);
+    }
+}
+
+/**
+ * Whether a queued effect is to run. Definite: yes. A «maybe»: only if a computed it read changed.
+ * A check that throws — a computed whose recompute throws — runs the effect, which reads the same
+ * computed and throws where the error is routed to its boundary.
+ */
+function shouldRun(sub: Subscriber): boolean {
+    if ((sub as Flagged).__pdx_definite) {
+        (sub as Flagged).__pdx_definite = false;
+        return true;
+    }
+    const check = (sub as { __pdx_check?: () => boolean }).__pdx_check;
+    if (!check) return true;
+    try { return check(); } catch { return true; }
 }
 
 /**
@@ -636,6 +715,8 @@ function flush(): void {
                 `[pdx] Infinite reactive loop detected (${MAX_FLUSH_ITERATIONS} flush cycles). ` +
                 'This usually means an effect writes to a signal it reads. Breaking cycle.'
             );
+            // The dropped effects lose their «definite» flag with their place in the queue.
+            for (let i = 0; i < pendingLen; i++) (pendingArr[i] as Flagged).__pdx_definite = false;
             pendingLen = 0;
             pendingSeen.clear();
             // The readers just dropped were the ones every dirty computed was waiting for.
@@ -655,6 +736,8 @@ function flush(): void {
         batchDepth++;
         try {
             for (let i = 0; i < len; i++) {
+                // A «maybe» whose computeds all kept their value has nothing new to see (#115).
+                if (!shouldRun(arr[i])) continue;
                 const effectName = (arr[i] as { __pdx_name?: string }).__pdx_name ?? 'anonymous';
                 try {
                     effectRunTrace(effectName);
