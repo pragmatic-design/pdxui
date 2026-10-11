@@ -19,6 +19,11 @@ export interface AuthStore<TUser> {
     readonly isAuthenticated: ReadonlySignal<boolean>;
     /** Current access token (null if none). */
     getToken(): string | null;
+    /**
+     * Current refresh token (null if none): what the app sends to its token endpoint to get a new
+     * access token, then hands back through `setTokens()`.
+     */
+    getRefreshToken(): string | null;
     /** Store tokens (persists if configured) and refresh the user signal. */
     setTokens(tokens: AuthTokens): void;
     /** Clear tokens + user (sign out). */
@@ -142,6 +147,7 @@ export function createAuthStore<TUser = Record<string, unknown>>(
             return _user() !== null && !expired(access);
         }),
         getToken: () => access,
+        getRefreshToken: () => refresh,
         setTokens(tokens) {
             access = tokens.access;
             refresh = tokens.refresh ?? null;

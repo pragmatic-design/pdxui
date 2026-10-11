@@ -15,6 +15,9 @@ semver.
 - `@params` and `@search` report a field they cannot read with `PDX_ROUTE_FIELD_INVALID`, an error,
   instead of dropping it; a quoted type (`id: 'number'`) carries the fix to `id: number`. Both
   blocks may span several lines. (#105)
+- `createAuthStore()` returns `getRefreshToken()`: the refresh token `setTokens` stored (and
+  persisted with `storageKey`), or `null`. The store kept it and gave no way to read it, so an app
+  that refreshes a session had to store it a second time. (#43)
 - `PDX_SIGNAL_MUTATED_IN_PLACE` (warning): a `$signal`'s value changed in place — `items.push(x)`,
   `splice`, `sort`, a `Map`/`Set` `set`/`add`/`delete`/`clear`, `user.name = v`, `items[0] = v` —
   sets nothing, so nothing that reads it updates. Reported where it is written, with a fix for a push
