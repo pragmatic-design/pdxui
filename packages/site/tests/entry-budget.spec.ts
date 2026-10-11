@@ -16,12 +16,14 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 
 /**
- * gzip kB the entry chunk may weigh. Measured at 859 kB, 198 kB gzip — the
- * runtime, the router, the shell and routes, and the UI manifest (custom-elements.json, ~420 kB
- * unminified, read by the nav and the component pages). The budget leaves ~25% for growth and is
- * still well below either regression it guards: TypeScript back in the entry is ~900 kB gzip more.
+ * gzip kB the entry chunk may weigh. Measured at 782 kB, 182.5 kB gzip — the runtime, the router
+ * and its route table, the shell, and the UI manifest (custom-elements.json, ~420 kB unminified,
+ * read by the nav and the component pages). No route: each is its own chunk (#303; with the
+ * routes imported eagerly it was 1008 kB, 240 kB gzip). The budget leaves ~25% for growth and is
+ * still well below either regression it guards: the routes back in the entry are ~58 kB gzip more,
+ * TypeScript ~900 kB.
  */
-const ENTRY_BUDGET_KB = 250;
+const ENTRY_BUDGET_KB = 228;
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 
@@ -57,6 +59,25 @@ test('no docs page is a chunk over the budget', () => {
     }
     expect(found, 'no docs chunk found: the naming this test reads has changed').toBeGreaterThan(10);
     expect(sizes, 'docs chunks over the budget').toEqual([]);
+});
+
+test('no route is in the entry chunk — the route table loads each one', () => {
+    // A route in the entry is a component registered there: `component("pdx-docs", { … })`, which
+    // minifies to `("pdx-docs",{props:` or `{setup:`. The route TABLE names every route too, as
+    // `tag:"pdx-docs"`, and that is meant to be in the entry: it is how the router knows a route
+    // it has not loaded. An eager `import.meta.glob` of the routes in index.html put all eight in
+    // the entry, the lazy `import()`s of the table bought nothing, and Vite said so in a warning.
+    const routes = readdirSync(fileURLToPath(new URL('../src/routes/', import.meta.url)))
+        .filter(f => f.endsWith('.pdx')).map(f => `pdx-${f.replace(/\.pdx$/, '')}`);
+    expect(routes.length, 'no routes found: the folder this test reads has moved').toBeGreaterThan(5);
+    const html = readFileSync(join(dist, 'index.html'), 'utf8');
+    const src = html.match(/<script[^>]+type="module"[^>]+src="\/?([^"]+\.js)"/)![1];
+    const code = readFileSync(join(dist, src), 'utf8');
+    const inEntry = routes.filter(tag => new RegExp(`\\(["']${tag}["'],\\{(props|setup|render|styles)\\b`).test(code));
+    expect(inEntry, 'routes registered in the entry chunk').toEqual([]);
+    // Control: the table is there, naming them — so the assertion above is not passing on an entry
+    // that lost the router altogether.
+    expect(routes.filter(tag => !code.includes(`tag:"${tag}"`)), 'routes the entry\'s route table does not name').toEqual([]);
 });
 
 test('the compiler and TypeScript are not in the entry chunk', () => {
