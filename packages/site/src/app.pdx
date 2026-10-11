@@ -61,6 +61,7 @@
 <script setup>
 import { onMount } from '@pdxui/core';
 import { followLink } from './lib/follow-link';
+import { readPreference, writePreference } from '../../../brand/preference';
 import '@pdxui/router/outlet';
 
 const themeItems = [
@@ -88,8 +89,15 @@ function _applyBehaviorAttrs(t) {
   _set('pdx-card-style', _cardStyleMap);
 }
 
-let theme = $signal(localStorage.getItem('pdx-theme') || document.documentElement.getAttribute('pdx-theme') || 'pragmatic-gold');
-let scheme = $signal(document.documentElement.getAttribute('pdx-scheme') || 'dark');
+// The visitor's choice lives in a cookie shared with themebuilder.pdxui.com (brand/preference.ts).
+// localStorage is read only as the older place a returning visitor's theme was kept.
+const _pref = readPreference();
+const _knownTheme = (t) => themeItems.some((i) => i.key === t) ? t : null;
+let theme = $signal(_knownTheme(_pref.theme) || localStorage.getItem('pdx-theme') || document.documentElement.getAttribute('pdx-theme') || 'pragmatic-gold');
+let scheme = $signal(_pref.scheme || document.documentElement.getAttribute('pdx-scheme') || 'dark');
+// Applied at once: the scheme depends on nothing below, and waiting for mount would paint the
+// page in the static one first.
+document.documentElement.setAttribute('pdx-scheme', scheme);
 
 // Restore + apply behavior attrs after setup (avoids TDZ on the const maps above).
 onMount(() => {
@@ -101,13 +109,14 @@ function onTheme(e) {
   const t = e.target.value;
   theme = t;
   document.documentElement.setAttribute('pdx-theme', t);
-  localStorage.setItem('pdx-theme', t);
+  writePreference({ theme: t });
   _applyBehaviorAttrs(t);
 }
 
 function toggleScheme() {
   scheme = scheme === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('pdx-scheme', scheme);
+  writePreference({ scheme });
 }
 
 // The phone menu (under 720px): closed by a choice or by Escape, which gives focus back to its button.

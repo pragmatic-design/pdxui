@@ -1,0 +1,5 @@
+{
+  "//": "Not a package: it says the .ts files here are ES modules, so a test runner that loads them outside Vite (the builder's Playwright suite) reads their exports.",
+  "private": true,
+  "type": "module"
+}
