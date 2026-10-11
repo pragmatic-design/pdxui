@@ -50,7 +50,7 @@ component('pdx-counter', {
   setup(ctx) {
     const changed = (detail) => ctx.emit('changed', detail);   // @event → the emit function
     const __count = signal(0, { name: 'counter:count' });      // $signal → signal + debug name
-    const prefs = store({ theme: 'dark' });                    // $store → reactive proxy, keys
+    let prefs = store({ theme: 'dark' });                      // $store → reactive proxy, keys
                                                                //          are not signals
     function bump() { __count.set(__v => __v + 1); changed(__count()); }
                                     // count++ became .set(), and `count` as an argument became a read

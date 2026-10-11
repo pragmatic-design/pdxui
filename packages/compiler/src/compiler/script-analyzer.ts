@@ -401,7 +401,10 @@ export function analyzeScript(script: string, _filename: string, options: { setu
 
         // ─── @event name: PayloadType ───
         // Tokenizer-based for complex types like { old: T, new: T }
-        const eventPrefix = trimmed.match(/^@event\s+(\w+)\s*(?::\s*)?/);
+        // Match: `@event name`, then `:`, `;` or the end — the whole name, an identifier. Without the
+        // lookahead `@event pdx-change: number;` declared an event named `pdx` (#202).
+        // Groups: [1]=name
+        const eventPrefix = trimmed.match(/^@event\s+(\w+)\s*(?=:|;|$)(?::\s*)?/);
         if (eventPrefix && trimmed.startsWith('@event ')) {
             const name = eventPrefix[1];
             const hasType = trimmed.indexOf(':') > trimmed.indexOf(name);
@@ -421,7 +424,10 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                 code: 'PDX_MALFORMED_EVENT',
                 severity: 'error' as const,
                 message: `Invalid @event declaration: "${trimmed}".`,
-                hint: `Use: @event eventName: PayloadType;`,
+                hint: /^@event\s+[\w-]+-/.test(trimmed)
+                    ? 'The name is an identifier, and it is both the emitter and the event: @event change: number; '
+                        + 'dispatches `change`. For a hyphenated event name, call $emit(\'pdx-change\', value).'
+                    : `Use: @event eventName: PayloadType;`,
             });
             continue;
         }
@@ -845,7 +851,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                         handledAny = true;
                     } else if (stoM) {
                         const name = stoM[1];
-                        stores.push({ name, initialExpr: extractRuneArg(d, stoM[0].length - 1), origin: originOf(i) ?? undefined });
+                        stores.push({ name, initialExpr: extractRuneArg(d, stoM[0].length - 1), keyword: runeDeclStart[1] as 'let' | 'const' | 'var', origin: originOf(i) ?? undefined });
                         if (!name.startsWith('_')) exports.push({ name, kind: 'const' });
                         usedFeatures.add('store');
                         handledAny = true;
@@ -1230,11 +1236,15 @@ function continuesOnNextLine(line: string, next: string | undefined): boolean {
 /**
  * Extract the balanced argument of a rune call given the index of its opening `(`.
  * Returns the trimmed content between the parens (string/comment-aware).
+ *
+ * A trailing comma, `$derived(a * 2,)`, is JavaScript's and is dropped: an expression never ends in
+ * one, and kept it was pasted into `computed(() => a * 2,, …)`, a module that does not parse (#202).
  */
 function extractRuneArg(decl: string, openParenIdx: number): string {
     const close = findClosing(decl, openParenIdx);
     const end = close === -1 ? decl.length : close;
-    return decl.slice(openParenIdx + 1, end).trim();
+    const arg = decl.slice(openParenIdx + 1, end).trim();
+    return arg.endsWith(',') ? arg.slice(0, -1).trimEnd() : arg;
 }
 
 /** Strip comments AND string contents from a line for safe feature detection.

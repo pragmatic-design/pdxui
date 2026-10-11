@@ -59,6 +59,12 @@ semver.
 
 ### Fixes
 
+- Three script forms compile as written. `$derived(a * 2,)` — a trailing comma, also in `$signal`
+  and `$store` — no longer emits a module that does not parse, and a `$derived` the compiler cannot
+  read reports `PDX_REWRITE_FALLBACK` as a warning instead of only on the console.
+  `@event pdx-change: number;` is `PDX_MALFORMED_EVENT` (error) instead of declaring an event named
+  `pdx`; `$emit('pdx-change', value)` dispatches a hyphenated name. `let state = $store(…)` keeps
+  `let`, so assigning it again no longer throws. (#202)
 - The names a block binds are in its scope whatever they are called: `@catch (problem, again)` and
   `@await … @error (fail, again)` read `problem`, `fail` and `again` instead of `ctx.problem`, which
   threw when the error rendered — only `err`, `retry` and a few other names worked. A destructured
