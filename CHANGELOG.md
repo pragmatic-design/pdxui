@@ -22,6 +22,10 @@ semver.
 
 ### Changed
 
+- Dependency tracking keeps an effect's or a computed's subscriptions between runs and updates them
+  in place: a source read twice in one run is recorded once, and a re-run that reads the same
+  sources touches no subscription. Measured on the flush benchmark, 1.2× to 4× the updates per
+  second depending on the case. Nothing a run sees changes. (#116)
 - An effect reading a computed runs only when the computed's value changed. A source change used
   to re-run it even when the computed recomputed to the same value: `computed(() => n() % 2)` and
   three writes of `n` that keep it at 1 ran an effect on it three times, now none. (#115)

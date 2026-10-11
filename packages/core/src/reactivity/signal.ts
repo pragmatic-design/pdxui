@@ -114,8 +114,83 @@ function enqueuePending(sub: Subscriber): void {
 // --- Scope ---
 let currentCleanups: (() => void)[] | null = null;
 
-// --- Effect dep tracking: sets of subscriber Sets for cleanup on dispose ---
-let currentDeps: Set<Subscriber>[] | null = null;
+// --- Dependency tracking (#116) ---
+// A reader — an effect's run, a computed's markDirty — keeps its dependency list BETWEEN runs and
+// updates it in place: a source read again at the same position costs nothing, a source read twice
+// in one run is recorded once, and only a source that stopped being read is unsubscribed. Before, a
+// run detached from every source and re-attached as it read, and every read pushed an entry.
+
+/** One reader's dependencies: the list, and where this run is in it. */
+interface Tracker {
+    readonly sub: Subscriber;
+    /**
+     * The sources, in the order the last run read them. Kept, and rewritten in place: during a run
+     * `deps[0..cursor)` is what this run has read, without repeats.
+     */
+    readonly deps: Set<Subscriber>[];
+    /** How far into `deps` this run has read. */
+    cursor: number;
+    /** Sources a read moved out of their place, checked at the end of the run. */
+    readonly displaced: Set<Subscriber>[];
+    /** True while the run is in progress. */
+    active: boolean;
+}
+
+function newTracker(sub: Subscriber): Tracker {
+    return { sub, deps: [], cursor: 0, displaced: [], active: false };
+}
+
+/** The tracker of the reader running now, or null: what a read records itself into. */
+let currentTracker: Tracker | null = null;
+
+/** Whether this run has read `source` already: it is in `deps[0..cursor)`. */
+function readThisRun(t: Tracker, source: Set<Subscriber>): boolean {
+    for (let i = 0; i < t.cursor; i++) if (t.deps[i] === source) return true;
+    return false;
+}
+
+/** A run begins: the list is kept, the run's own bookkeeping is reset. */
+function beginTracking(t: Tracker): void {
+    t.cursor = 0;
+    // Written only when it changes: a store to `length` takes V8's slow path even with the same
+    // value, and it was over half of a computed chain's recompute (measured with --cpu-prof).
+    if (t.displaced.length !== 0) t.displaced.length = 0;
+    t.active = true;
+}
+
+/**
+ * `source` was read by the run `t` is tracking. The common case — the same source in the same
+ * place as last run — is one comparison. Only a read that changes the list looks back through what
+ * this run read, to record a repeated source once: an array scan, which for the few sources a
+ * reader has costs less than a Set (measured: a Set per run cost a chain of computeds ~40%).
+ */
+function track(t: Tracker, source: Set<Subscriber>): void {
+    // In the same place as last run: already subscribed, nothing to do.
+    if (t.deps[t.cursor] === source) { t.cursor++; return; }
+    if (readThisRun(t, source)) return;
+    if (t.cursor < t.deps.length) t.displaced.push(t.deps[t.cursor]);
+    t.deps[t.cursor++] = source;
+    // Set.add on a member does not move it: an unchanged subscription keeps its place in the
+    // source's live Set, which notifySet iterates (see its INVARIANT).
+    source.add(t.sub);
+}
+
+/** A run ends: whatever it did not read again stops notifying it. */
+function endTracking(t: Tracker): void {
+    t.active = false;
+    // The common case: the same sources, nothing moved — nothing to do (and no `length` store).
+    if (t.cursor === t.deps.length && t.displaced.length === 0) return;
+    for (let i = t.cursor; i < t.deps.length; i++) t.displaced.push(t.deps[i]);
+    t.deps.length = t.cursor;
+    for (let i = 0; i < t.displaced.length; i++) {
+        const source = t.displaced[i];
+        if (!readThisRun(t, source)) source.delete(t.sub);
+    }
+    t.displaced.length = 0;
+}
+
+/** An effect's run carries its tracker, for the self-scheduling rule in {@link scheduleSubscriber}. */
+type Tracked = Subscriber & { __pdx_tracker?: Tracker };
 
 /** Register a cleanup function for the current effect. */
 export function onCleanup(fn: () => void): void {
@@ -175,9 +250,11 @@ export function collectDisposers<T>(fn: () => T): [T, Dispose] {
  */
 export function untracked<T>(fn: () => T): T {
     const prev = currentEffect;
+    const prevTracker = currentTracker;
     currentEffect = null;
+    currentTracker = null;
     try { return fn(); }
-    finally { currentEffect = prev; }
+    finally { currentEffect = prev; currentTracker = prevTracker; }
 }
 
 // --- Signal ---
@@ -222,9 +299,12 @@ function createSignal<T>(initial: T, debugName?: string, equals?: (prev: T, next
     if (name) registerSignal(name, () => value, () => subscribers.size);
 
     const read = () => {
-        if (currentEffect) {
-            subscribers.add(currentEffect);
-            if (currentDeps) currentDeps.push(subscribers);
+        const t = currentTracker;
+        if (t) {
+            // The common case inline — the same source where the last run read it — and the rest
+            // in track().
+            if (t.deps[t.cursor] === subscribers) t.cursor++;
+            else track(t, subscribers);
         } else if (DEV && _devMode && name && !_warnedReads.has(name)) {
             // Dev guardrail: signal read outside reactive tracking
             _warnedReads.add(name);
@@ -350,46 +430,35 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
     let dirtyEpoch = 0;
     const subscribers = new Set<Subscriber>();
     const equals = options?.equals;
-    // Source signal subscriber-Sets that markDirty is registered with.
-    // Pruned before each recompute so deps read only conditionally last time
-    // don't keep this computed subscribed (mirrors effect's dep cleanup).
-    let deps: Set<Subscriber>[] = [];
+    // The source Sets markDirty is registered with, kept between recomputes and updated in place
+    // (#116): an unchanged dependency is never deleted and re-added. That matters beyond the cost —
+    // a delete then re-add moves the entry to the END of that source's subscriber Set; notifySet
+    // iterates the LIVE Set and JS visits entries appended during iteration, so markDirty would run
+    // again, find `dirty` reset by this very recompute, re-enter and loop forever (with `equals`,
+    // which recomputes INSIDE the notification pass, that hangs the process).
+    // `tracker` is declared after markDirty below, the subscriber it tracks for; recompute only
+    // runs once it exists.
 
     function recompute(): void {
-        // Track into a FRESH list, then prune only the deps that were not re-tracked.
-        //
-        // Pruning up-front (delete markDirty from every dep, then let fn() re-add it) looks
-        // equivalent but is not: an unchanged dep gets deleted and re-added, which moves the
-        // entry to the END of that source's subscriber Set. notifySet iterates the LIVE Set,
-        // and JS visits entries appended during iteration — so markDirty would run again, find
-        // `dirty` already reset by this very recompute, re-enter, and loop forever.
-        // With `equals` (which recomputes INSIDE the notification pass) that hangs the process.
-        const prevTracked = deps;
-        const nextDeps: Set<Subscriber>[] = [];
-
         const prev = currentEffect;
-        const prevDeps = currentDeps;
+        const prevTracker = currentTracker;
         const prevInsideComputed = _insideComputed;
         // What this computed reads is its own dependency, not the effect's that read it.
         const prevComputedReads = currentComputedReads;
         // Once disposed, it recomputes WITHOUT re-subscribing to the sources — a late
         // read must not bring the computed back to life.
         currentEffect = disposed ? null : markDirty;
-        currentDeps = disposed ? null : nextDeps;
+        currentTracker = disposed ? null : tracker;
+        if (!disposed) beginTracking(tracker);
         currentComputedReads = null;
         _insideComputed = true;
         try { cached = fn(); dirty = false; initialized = true; }
         finally {
-            currentEffect = prev; currentDeps = prevDeps; _insideComputed = prevInsideComputed;
+            currentEffect = prev; currentTracker = prevTracker; _insideComputed = prevInsideComputed;
             currentComputedReads = prevComputedReads;
+            // Deps read only conditionally last time stop notifying this computed.
+            if (!disposed) endTracking(tracker);
         }
-
-        // Deps read only conditionally last time must stop notifying this computed.
-        for (let i = 0; i < prevTracked.length; i++) {
-            const dep = prevTracked[i];
-            if (!nextDeps.includes(dep)) dep.delete(markDirty);
-        }
-        deps = nextDeps;
     }
 
     const markDirty = () => {
@@ -424,6 +493,7 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
 
     // Tag so notifySet propagates this synchronously instead of queuing it as an effect.
     (markDirty as { __pdx_mark?: boolean }).__pdx_mark = true;
+    const tracker = newTracker(markDirty);
 
     // Lazy: nothing is computed until the first read (`dirty` starts true). Computing eagerly here,
     // at creation, would make a `$derived` declared before what its expression reads throw a TDZ
@@ -432,9 +502,10 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
     // are collected on the first read, by the same tracking as recompute.
 
     const read = () => {
-        if (currentEffect) {
-            subscribers.add(currentEffect);
-            if (currentDeps) currentDeps.push(subscribers);
+        const t = currentTracker;
+        if (t) {
+            if (t.deps[t.cursor] === subscribers) t.cursor++;
+            else track(t, subscribers);
         }
         if (dirty) recompute();
         // The running effect remembers the value it was given, to tell a «maybe» from a change.
@@ -457,14 +528,14 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
     read.dispose = () => {
         if (disposed) return;
         disposed = true;
-        for (let i = 0; i < deps.length; i++) deps[i].delete(markDirty);
-        deps = [];
+        for (let i = 0; i < tracker.deps.length; i++) tracker.deps[i].delete(markDirty);
+        tracker.deps.length = 0;
         subscribers.clear();
     };
 
     // The inspector, both ways: `deps` is a GETTER over the live list, so the answer
     // is always the last run's, and the subscriber Set makes this computed answerable too.
-    registerReactiveNode(read, debugName || '(anonymous computed)', subscribers, () => deps, () => dirty);
+    registerReactiveNode(read, debugName || '(anonymous computed)', subscribers, () => tracker.deps, () => dirty);
     if (DEV && debugName) devOwnedNode('derived', debugName, read);
 
     // An ownership scope: without a disposer, a computed created in a subtree that is
@@ -475,8 +546,8 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
         currentOwner.push(() => {
             if (disposed) return;
             disposed = true;
-            for (let i = 0; i < deps.length; i++) deps[i].delete(markDirty);
-            deps = [];
+            for (let i = 0; i < tracker.deps.length; i++) tracker.deps[i].delete(markDirty);
+            tracker.deps.length = 0;
             subscribers.clear();
         });
     }
@@ -512,7 +583,7 @@ export interface EffectOptions {
 export function effect(fn: () => void | (() => void), options?: EffectOptions): Dispose {
     let cleanups: (() => void)[] = [];
     let disposed = false;
-    let deps: Set<Subscriber>[] = [];
+    // The sources this effect reads, kept between runs (#116): `tracker`, declared once `run` exists.
     /** The computeds the last run read, with their values: what a «maybe» is checked against. */
     const computedReads: [() => unknown, unknown][] = [];
 
@@ -530,19 +601,20 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
         for (let i = 0; i < cleanups.length; i++) cleanups[i]();
         cleanups = [];
 
-        // Unsubscribe from all tracked subscriber sets
-        for (let i = 0; i < deps.length; i++) deps[i].delete(run);
-        deps = [];
-
+        // Its subscriptions are kept and updated as it reads, not dropped and re-taken (#116).
+        // While it runs, a source it has not read yet in this run does not schedule it — as when
+        // it detached from everything first (scheduleSubscriber).
         const prevEffect = currentEffect;
         const prevCleanups = currentCleanups;
-        const prevDeps = currentDeps;
+        const prevTracker = currentTracker;
         const prevComputedReads = currentComputedReads;
-        // Reused, not reallocated: an effect re-runs on the hot path.
-        computedReads.length = 0;
+        // Reused, not reallocated: an effect re-runs on the hot path. And `length` written only when
+        // it changes — the store is slow even with the same value (see beginTracking).
+        if (computedReads.length !== 0) computedReads.length = 0;
+        beginTracking(tracker);
         currentEffect = run;
         currentCleanups = cleanups;
-        currentDeps = deps;
+        currentTracker = tracker;
         currentComputedReads = computedReads;
         try {
             const result = fn();
@@ -550,11 +622,14 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
         } finally {
             currentEffect = prevEffect;
             currentCleanups = prevCleanups;
-            currentDeps = prevDeps;
+            currentTracker = prevTracker;
             currentComputedReads = prevComputedReads;
-            if (inspected) noteEffectDeps(inspected.record, deps);
+            endTracking(tracker);
+            if (inspected) noteEffectDeps(inspected.record, tracker.deps);
         }
     };
+    const tracker = newTracker(run);
+    (run as Tracked).__pdx_tracker = tracker;
 
     /**
      * Whether a «maybe» is a change: true when a computed the last run read now gives another value.
@@ -586,8 +661,8 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
         if (inspected) unregisterEffect(inspected.id);
         for (let i = 0; i < cleanups.length; i++) cleanups[i]();
         cleanups = [];
-        for (let i = 0; i < deps.length; i++) deps[i].delete(run);
-        deps = [];
+        for (let i = 0; i < tracker.deps.length; i++) tracker.deps[i].delete(run);
+        tracker.deps.length = 0;
     };
     // Register with the enclosing ownership scope so removed subtrees dispose
     // their effects (idempotent — safe even if also disposed explicitly).
@@ -640,10 +715,16 @@ export function batchHandler<A extends unknown[], R>(handler: (...args: A) => R)
  * effect reading both a signal and a signal-derived computed would run twice per set (and could
  * read a stale computed if it ran before the mark). Only effects (leaf subscribers) are
  * queued, each once; effects always recompute the computed lazily on read → glitch-free.
+ *
+ * An effect that is running keeps its subscriptions from the last run (#116), but it is scheduled
+ * only by a `source` it has read in THIS run: written before it is read again, the source does not
+ * schedule it — what happened when a run first detached from every source.
  */
-function scheduleSubscriber(sub: Subscriber): void {
+function scheduleSubscriber(sub: Subscriber, source: Set<Subscriber>): void {
     if ((sub as { __pdx_mark?: boolean }).__pdx_mark) sub();
     else {
+        const t = (sub as Tracked).__pdx_tracker;
+        if (t !== undefined && t.active && !readThisRun(t, source)) return;
         // Queued by a direct write, not by a computed's «maybe»: it runs, unchecked.
         if (!notifyingMaybe) (sub as Flagged).__pdx_definite = true;
         enqueuePending(sub);
@@ -678,7 +759,7 @@ function shouldRun(sub: Subscriber): boolean {
  */
 function notifySet(subscribers: Set<Subscriber>): void {
     if (batchDepth > 0) {
-        for (const sub of subscribers) scheduleSubscriber(sub);
+        for (const sub of subscribers) scheduleSubscriber(sub, subscribers);
     } else {
         // try/finally, as batch(): a subscriber that runs here may throw (a computed with `equals`
         // recomputes to compare). The error still reaches the writer, but the depth comes back
@@ -686,7 +767,7 @@ function notifySet(subscribers: Set<Subscriber>): void {
         // (#102).
         batchDepth++;
         try {
-            for (const sub of subscribers) scheduleSubscriber(sub);
+            for (const sub of subscribers) scheduleSubscriber(sub, subscribers);
         } finally {
             batchDepth--;
             if (batchDepth === 0) flush();
