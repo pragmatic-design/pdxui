@@ -75,9 +75,44 @@ function extractHeadings(content: string): DocHeading[] {
     return out;
 }
 
+/** markdown-it with Shiki highlighting and heading ids: built once per plugin. */
+async function createRenderer(): Promise<MarkdownIt> {
+    const pdxGrammar = loadPdxGrammar();
+    const langs = pdxGrammar ? [...LANGS, pdxGrammar] : LANGS;
+    const highlighter: Highlighter = await createHighlighter({ themes: [THEME], langs });
+    const hasPdx = !!pdxGrammar;
+    const md = new MarkdownIt({
+        html: true,
+        linkify: true,
+        highlight: (code, lang) => {
+            // .pdx with its own grammar where there is one, otherwise fall back to 'ts'.
+            let l = lang || 'text';
+            if (lang === 'pdx') l = hasPdx ? 'pdx' : 'ts';
+            else if (!LANGS.includes(l)) l = 'text';
+            try {
+                return highlighter.codeToHtml(code, { lang: l, theme: THEME });
+            } catch {
+                return ''; // markdown-it falls back to escaped <pre><code>
+            }
+        },
+    });
+    // Inject id on h2/h3 so TOC anchors resolve.
+    md.renderer.rules.heading_open = (tokens, idx, options, _env, self) => {
+        const level = Number(tokens[idx].tag.slice(1));
+        if (level === 2 || level === 3) {
+            const inline = tokens[idx + 1];
+            if (inline && inline.type === 'inline') tokens[idx].attrSet('id', slugify(inline.content));
+        }
+        return self.renderToken(tokens, idx, options);
+    };
+    return md;
+}
+
 export function markdownPlugin(): Plugin {
-    let md: MarkdownIt | null = null;
-    let highlighter: Highlighter | null = null;
+    // The PROMISE is kept, not the renderer: Vite transforms many .md files at once, and every one
+    // that arrived while the first was still creating the highlighter used to create its own
+    // (the site's suite logged «30 instances have been created»).
+    let renderer: Promise<MarkdownIt> | null = null;
 
     return {
         name: 'pdx-markdown',
@@ -102,36 +137,10 @@ export function markdownPlugin(): Plugin {
             }
             if (query === 'vite') return; // ?raw and ?url are Vite's
 
-            if (!md) {
-                const pdxGrammar = loadPdxGrammar();
-                const langs = pdxGrammar ? [...LANGS, pdxGrammar] : LANGS;
-                highlighter = await createHighlighter({ themes: [THEME], langs });
-                const hasPdx = !!pdxGrammar;
-                md = new MarkdownIt({
-                    html: true,
-                    linkify: true,
-                    highlight: (code, lang) => {
-                        // .pdx with its own grammar where there is one, otherwise fall back to 'ts'.
-                        let l = lang || 'text';
-                        if (lang === 'pdx') l = hasPdx ? 'pdx' : 'ts';
-                        else if (!LANGS.includes(l)) l = 'text';
-                        try {
-                            return highlighter!.codeToHtml(code, { lang: l, theme: THEME });
-                        } catch {
-                            return ''; // markdown-it falls back to escaped <pre><code>
-                        }
-                    },
-                });
-                // Inject id on h2/h3 so TOC anchors resolve.
-                md.renderer.rules.heading_open = (tokens, idx, options, _env, self) => {
-                    const level = Number(tokens[idx].tag.slice(1));
-                    if (level === 2 || level === 3) {
-                        const inline = tokens[idx + 1];
-                        if (inline && inline.type === 'inline') tokens[idx].attrSet('id', slugify(inline.content));
-                    }
-                    return self.renderToken(tokens, idx, options);
-                };
-            }
+            // A creation that fails is dropped, so the next document tries again instead of
+            // every later one inheriting the rejected promise.
+            renderer ??= createRenderer().catch((err: unknown) => { renderer = null; throw err; });
+            const md = await renderer;
 
             const { data, content } = parseFrontmatter(src);
             const html = md.render(content);
