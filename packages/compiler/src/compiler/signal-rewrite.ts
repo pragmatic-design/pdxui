@@ -74,7 +74,9 @@ export function rewritePropPeeks(expr: string, propNames: Set<string>): string {
 export function generateSignalDeclarations(signals: SignalDecl[], filename: string, propNames: Set<string>, production = false): string {
     return signals.map(s => {
         // If initial expr references a prop, read it with .peek() (string/key-aware)
-        const initExpr = rewritePropPeeks(s.initialExpr, propNames);
+        // `$signal()` starts at undefined. Left empty, the debug name after it became
+        // `signal(, { name })`, a module that does not parse (#186).
+        const initExpr = s.initialExpr.trim() === '' ? 'undefined' : rewritePropPeeks(s.initialExpr, propNames);
         // Production: strip debug name for smaller output
         if (production) {
             return `    const __${s.name} = signal(${initExpr});`;
