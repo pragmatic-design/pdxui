@@ -2,7 +2,7 @@
 export { html } from './template';
 export { repeat } from './list';
 export { repeatWithSlot } from './slot-repeat';
-export { setProp, insert, remove, text, marker } from './dom';
+export { setProp, bindGesture, insert, remove, text, marker } from './dom';
 export { when, each, eachRow, match, pipe, show, portal, dynamic } from './helpers';
 export { enter, exit, injectTransitionCSS, flipAnimate, recordPositions } from './transitions';
 export { defer } from './defer';

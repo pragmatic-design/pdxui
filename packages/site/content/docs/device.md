@@ -77,6 +77,17 @@ scroll that begins on the element does not open a menu.
 `onPinch` reports a `scale` relative to the start of the gesture (`1` is unchanged) and the `center`
 between the two touches, which is the point to zoom around.
 
+In a `.pdx` template you write the gesture on the element, and the compiler wires it:
+
+```html
+<div class="card" @swipe.left="archive()" @longpress="openMenu" @pinch="e => zoom = e.scale">…</div>
+```
+
+`@swipe.left|right|up|down`, `@longpress` and `@pinch` take a handler as `@click` does — a function, a
+call, an assignment. The compiled component hands the element to `bindGesture(el, name, value)`, the
+function both the development and the production render path call, which sets up the primitive above
+with its defaults.
+
 ## The notch and the home indicator
 
 `useSafeArea()` ([Composables](/docs/composables)) gives you the insets as signals. Two helpers apply

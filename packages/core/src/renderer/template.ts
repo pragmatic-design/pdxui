@@ -4,7 +4,7 @@
 // Importable without a DOM; calling html`` needs one (#93).
 
 import { effect } from '../reactivity/signal';
-import { setProp } from './dom';
+import { setProp, bindGesture } from './dom';
 import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
 import type { Signal } from '../utils/types';
@@ -361,8 +361,10 @@ function bindAttribute(el: Element, key: string, value: TemplateValue): void {
                 // Property binding: :disabled=${expr}
                 bindProperty(el, key.slice(1), value);
             } else if (key.startsWith('@')) {
-                // Event binding: @click.prevent=${handler}
-                bindEvent(el, key.slice(1), value);
+                // A gesture the compiler rewrote (@__swipe, @__longpress, @__pinch) — handed to
+                // bindEvent it was a listener for an event nobody dispatches (#99). Anything else is
+                // an event binding: @click.prevent=${handler}
+                if (!bindGesture(el, key.slice(1), value)) bindEvent(el, key.slice(1), value);
             } else if (typeof value === 'function') {
                 // Reactive attribute (backward-compat)
                 effect(() => {
