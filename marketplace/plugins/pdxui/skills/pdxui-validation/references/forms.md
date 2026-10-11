@@ -2,6 +2,8 @@
 
 # Forms
 
+> **Formal reference:** [docs/language/data.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/data.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 Forms are where complexity piles up: every field's value, validation errors, touched/dirty state,
 overall validity, when to save. Handling it by hand with one signal per field and validation
 scattered around quickly becomes unmanageable. `@form` starts from a **schema** and generates all of

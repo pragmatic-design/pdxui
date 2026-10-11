@@ -6,6 +6,8 @@ order: 7
 
 # Store
 
+> **Formal reference:** [docs/language/data.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/data.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 Signals live inside a component. But some state belongs to the **app**, not a single component: the
 cart, the logged-in user, preferences. Passing them down prop by prop through half the app (prop
 drilling) is painful. A **store** is a global, singleton state that any component accesses directly —

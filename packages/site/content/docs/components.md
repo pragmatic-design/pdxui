@@ -6,6 +6,8 @@ order: 5
 
 # Components
 
+> **Formal reference:** [docs/language/overview.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/overview.md) and [docs/language/script.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/script.md) define the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 A component is the brick you build with. In PDX a component is a `.pdx` file, and it becomes a
 **standard Web Component** (a `<pdx-name>` custom element). That means once defined you use it
 anywhere — in another `.pdx`, in plain HTML, inside React or Vue — with no adapters.

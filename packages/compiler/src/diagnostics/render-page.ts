@@ -30,6 +30,9 @@ export function renderDiagnosticsPage(): string {
         '',
         '# Diagnostics',
         '',
+        '> **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) '
+        + 'indexes the same codes by the construct that raises them.',
+        '',
         `Every finding the compiler, \`pdx check\` and the editor report carries a \`PDX_*\` code — ${all.length} of them. `
         + 'Each is listed here with what it means and what to write instead, generated from the catalog in '
         + '`packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` '

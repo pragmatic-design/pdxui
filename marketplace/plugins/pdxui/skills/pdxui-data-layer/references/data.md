@@ -2,6 +2,8 @@
 
 # Data layer
 
+> **Formal reference:** [docs/language/data.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/data.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 Loading data from an API seems simple until you count everything you actually need: the loading
 state, error handling, refetching when params change, caching to avoid repeating the same call,
 invalidation when you write. Doing it by hand in every component is repetitive and fragile. `@fetch`

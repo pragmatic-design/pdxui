@@ -2,6 +2,8 @@
 
 # Router
 
+> **Formal reference:** [docs/language/routing.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/routing.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 Routing answers one question: *which UI do I show for this URL?* In PDX the answer is declarative and
 lives next to the component. Add `@page` to a component and it becomes a page — but it stays a normal
 custom element, reusable anywhere. `@page` is **metadata, not a cage**.

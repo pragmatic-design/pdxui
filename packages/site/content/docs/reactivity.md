@@ -6,6 +6,8 @@ order: 13
 
 # Reactivity — the full reference
 
+> **Formal reference:** [docs/language/script.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/script.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 This page is the detailed reference. If you're after the *mental model* (why signals exist, when to
 use derived vs effect), start from [Reactivity](/docs/concepts). Here you'll find the details and edge
 cases.

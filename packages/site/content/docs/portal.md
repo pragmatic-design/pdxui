@@ -6,6 +6,8 @@ order: 19
 
 # Portal
 
+> **Formal reference:** [docs/language/template.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/template.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 Sometimes a piece of UI lives in your component logically, but needs to render *elsewhere* in the
 DOM — a modal that must escape an `overflow:hidden` parent, a toast pinned to `document.body`, a
 tooltip that mustn't be clipped. `portal` does exactly that: the content stays owned by your
