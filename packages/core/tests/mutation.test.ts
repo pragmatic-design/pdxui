@@ -46,15 +46,77 @@ describe('mutation — basic', () => {
         expect((m.error() as Error).message).toBe('fail');
     });
 
-    it('prevents double-submit while pending', async () => {
-        let resolve!: (v: unknown) => void;
-        const fn = vi.fn(() => new Promise(r => { resolve = r; }));
-        const m = mutation({ fn });
+    // A call while another is pending queues (#50). It used to reject with «Mutation already in
+    // progress», and a second legitimate write — an autosave and a save, two rows edited — was lost.
+    // The double-submit guard is the button's now: `<pdx-button :action>` (#49).
+    it('queues a call made while one is pending: in call order, never two at once', async () => {
+        let inFlight = 0;
+        let maxInFlight = 0;
+        const order: number[] = [];
+        const m = mutation({
+            fn: async (n: number) => {
+                inFlight++;
+                maxInFlight = Math.max(maxInFlight, inFlight);
+                await new Promise(r => setTimeout(r, 5));
+                order.push(n);
+                inFlight--;
+                return n * 10;
+            },
+        });
 
-        m.execute(undefined);
-        await expect(m.execute(undefined)).rejects.toThrow('Mutation already in progress');
+        const results = await Promise.all([m.execute(1), m.execute(2), m.execute(3)]);
 
-        resolve('ok');
+        expect(results, 'each promise gets its own result').toEqual([10, 20, 30]);
+        expect(order).toEqual([1, 2, 3]);
+        expect(maxInFlight, 'two calls ran at once').toBe(1);
+        expect(m.data(), 'data() is the last call that finished').toBe(30);
+    });
+
+    it('a failing call rejects only its own promise, and the next one still runs', async () => {
+        const m = mutation({
+            fn: async (n: number) => {
+                await new Promise(r => setTimeout(r, 1));
+                if (n === 2) throw new Error('two');
+                return n;
+            },
+        });
+
+        const [a, b, c] = await Promise.allSettled([m.execute(1), m.execute(2), m.execute(3)]);
+
+        expect(a).toEqual({ status: 'fulfilled', value: 1 });
+        expect(b.status).toBe('rejected');
+        expect((b as PromiseRejectedResult).reason.message).toBe('two');
+        expect(c).toEqual({ status: 'fulfilled', value: 3 });
+        expect(m.state(), 'state() is the last call that finished').toBe('success');
+    });
+
+    it('pending() stays true while any call is running or queued', async () => {
+        const releases: Array<() => void> = [];
+        const m = mutation({ fn: () => new Promise<void>(r => { releases.push(() => r()); }) });
+
+        const first = m.execute(undefined);
+        const second = m.execute(undefined);
+        expect(m.pending()).toBe(true);
+
+        await Promise.resolve();
+        releases[0]();
+        await first;
+        expect(m.pending(), 'the queued call is still to run').toBe(true);
+
+        await new Promise(r => setTimeout(r, 0));
+        releases[1]();
+        await second;
+        expect(m.pending()).toBe(false);
+    });
+
+    it('invalidate runs after each successful call', async () => {
+        const cache = createCache();
+        const invalidate = vi.spyOn(cache, 'invalidate');
+        const m = mutation({ fn: async (n: number) => n, invalidate: ['users'], cache });
+
+        await Promise.all([m.execute(1), m.execute(2)]);
+
+        expect(invalidate).toHaveBeenCalledTimes(2);
     });
 
     it('reset() clears state back to idle', async () => {

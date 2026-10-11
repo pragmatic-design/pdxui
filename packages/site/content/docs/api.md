@@ -3247,9 +3247,10 @@ function mutation(options: MutationOptions<TData, TInput>): Mutation<TData, TInp
 A write as reactive state: `execute(input)` plus the `pending`, `data` and `error` a form needs to
 disable its submit button and show what happened.
 
-Concurrent executions are refused, not queued: calling `execute` while one is in flight rejects
-with "Mutation already in progress". That is the double-submit guard — a user double-clicking
-Save must not create two records — and it is why this is not just an async function.
+Calls are queued, not run at once: `execute` while one is in flight waits for it, so two writes
+of the same record never race, and an autosave and a save both land, in order. A user
+double-clicking Save must still not create two records — that guard is the button's:
+`<pdx-button :action="save">` is busy and refuses clicks while `pending()`.
 
 `invalidate` names the cache tags to drop on success, which is how a list refreshes itself after
 an item is created without the caller wiring the two together.

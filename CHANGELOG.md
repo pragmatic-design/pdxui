@@ -22,6 +22,10 @@ semver.
 
 ### Changed
 
+- A `mutation()` called while it is pending queues the call instead of rejecting with "Mutation
+  already in progress": calls run one at a time, in call order, each with its own result, and a
+  failed one does not stop the next. `pending()` stays true until the queue is empty. The
+  double-submit guard is `<pdx-button :action>`. (#50)
 - Context requests follow the Web Components context protocol: the `context-request` event carries
   the key itself, compared by identity, with `callback` and `subscribe`. A provider or consumer
   from another library (Lit's `@lit/context`, for one) and PDX now find each other; a request
