@@ -833,8 +833,10 @@ one enters. `@move(ms)` animates a `@for` row that changes index, with FLIP; `@m
   `Expected '{'`. `@move` may stand alone.
 - **What the runtime reads differs by block.** On `@if`, `when` reads `enter`, `exit`, `stagger` (over
   the branch's top-level nodes) and `mode` — only `'out-in'` sequences, any other is simultaneous —
-  and ignores `move`. On `@for` the list reconciler reads `enter`, `exit` and `move` only: `@stagger`
-  and `@mode` are accepted and have no effect. Not checked today (#207).
+  and ignores `move`. On `@for` the list reconciler reads all five: the n-th row that arrives in an
+  update waits `n × stagger` ms (its `transition-delay`, cleared once it has entered); `'out-in'`
+  holds the arriving rows in their from-state until the leaving ones are gone, and `'in-out'` keeps
+  the leaving rows until the arriving ones have entered.
 - The classes only animate if CSS defines a transition for them. Not checked today.
 - Both render paths pass the same options (`generateTransition`).
 

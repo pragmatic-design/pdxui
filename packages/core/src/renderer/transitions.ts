@@ -64,6 +64,29 @@ export function exit(node: Node, animation?: string): Promise<void> {
     });
 }
 
+/**
+ * The enter of one list row (#207). `delay` is its `@stagger` share, written as the row's
+ * `transition-delay` and cleared when it has entered; the timeout that ends a row with no CSS
+ * transition waits for it too. With `after`, the row is put in its from-state at once and starts
+ * entering only when `after` settles: `@mode('out-in')`, where the leaving rows go first.
+ */
+export function enterRow(node: Node, animation: string, delay = 0, after?: Promise<unknown>): Promise<void> {
+    if (!(node instanceof HTMLElement)) return Promise.resolve();
+    const el = node;
+    el.classList.add(`pdx-${animation}`, 'pdx-enter-from');
+    if (delay > 0) el.style.transitionDelay = `${delay}ms`;
+    const start = (): Promise<void> => {
+        void el.offsetHeight;
+        el.classList.remove('pdx-enter-from');
+        el.classList.add('pdx-enter-active');
+        return onTransitionEnd(el, 1000 + delay).then(() => {
+            el.classList.remove(`pdx-${animation}`, 'pdx-enter-active');
+            if (delay > 0) el.style.transitionDelay = '';
+        });
+    };
+    return after ? after.then(start, start) : start();
+}
+
 // ─── Transition-aware DOM helpers for when()/each() ────────────────
 
 /**
