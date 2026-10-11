@@ -229,7 +229,8 @@ export default { plugins: [pdx()] };
 
 ```js
 // src/main.js
-import '@pdxui/design';       // the whole design system, once
+import '@pdxui/design/base';              // tokens, layout and the @layer order, once
+import '@pdxui/design/themes/neutral';    // one theme; each component brings its own CSS
 import './app-shell.pdx';
 import './routes/job-list.pdx';   // importing a route registers its @page
 ```

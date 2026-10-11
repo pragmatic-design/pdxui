@@ -37,15 +37,22 @@ describe('pdx new project', () => {
             scripts: Record<string, string>; dependencies: Record<string, string>; devDependencies: Record<string, string>;
         };
         const range = `^${CLI_PKG.version}`;
-        expect(pkg.dependencies).toEqual({ '@pdxui/framework': range });
+        // @pdxui/design because index.html imports it by name: reached only through @pdxui/framework,
+        // a strict installer (pnpm) does not resolve it.
+        expect(pkg.dependencies).toEqual({ '@pdxui/framework': range, '@pdxui/design': range });
         expect(pkg.devDependencies).toEqual({ '@pdxui/cli': range, '@pdxui/compiler': range, vite: CLI_PKG.peerDependencies.vite });
         // Every script calls the CLI the project now depends on.
         for (const script of Object.values(pkg.scripts)) expect(script).toMatch(/^pdx /);
     });
 
-    it('imports the design system once, and places the app element it loads', async () => {
+    it('imports the design system\'s base and one theme, and places the app element it loads', async () => {
         const html = readFileSync(join(await scaffold(), 'index.html'), 'utf-8');
-        expect(html).toContain("import '@pdxui/framework/css';");
+        // Base plus the theme that applies with no pdx-theme attribute; each component brings its
+        // own CSS. The full sheet — every component and all 13 themes — is not a starter's to pay.
+        expect(html).toContain("import '@pdxui/design/base';");
+        expect(html).toContain("import '@pdxui/design/themes/neutral';");
+        expect(html).not.toContain('@pdxui/framework/css');
+        expect(html).not.toMatch(/<html[^>]*pdx-theme=/);
         // App.pdx is <pdx-app>: loaded and never placed, it rendered nothing.
         expect(html).toContain('<pdx-app></pdx-app>');
         expect(html).toContain("import './src/App.pdx';");

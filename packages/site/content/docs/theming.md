@@ -170,7 +170,9 @@ import '@pdxui/design/base';        // tokens, layout, surfaces, and the @layer 
 import '@pdxui/design/themes/pragmatic';
 ```
 
-Import several if you offer a few — or `@pdxui/design/themes` for all of them, which is what an
+A project made by `pdx new project` starts this way, on `neutral` — the theme that applies with no
+`pdx-theme` on `<html>`. Each component brings its own CSS when it is imported, so the base and a
+theme are all a page needs before it renders one. Import several if you offer a few — or `@pdxui/design/themes` for all of them, which is what an
 app with a theme picker wants. The base goes in once either way. Both halves are needed: `base` is
 where the `@layer` declaration lives, and that declaration is what makes **your** unlayered CSS beat
 everything the design system ships, with no `!important` anywhere.
