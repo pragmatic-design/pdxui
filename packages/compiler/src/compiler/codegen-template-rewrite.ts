@@ -4,13 +4,14 @@
 
 import type { CompileContext } from './compile-context';
 import { prefixCtx, callSignals, asArrowBody } from './codegen-prefix';
-import { splitAtDepthZero, findAtDepthZero, findClosing } from './tokenizer';
+import { splitAtDepthZero, findClosing } from './tokenizer';
 import { escapeForTemplateLiteral } from './codegen-shared';
 import { boundPropName } from './codegen-prop-names';
 import { VOID_ELEMENTS } from './codegen-template-inline';
 import { attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote } from './js-literal';
+import { camelToKebab, expandAttributeForms } from './codegen-attribute-forms';
 
 // ─── Event handler building ──────────────────────────────────────
 //
@@ -366,27 +367,11 @@ function rewriteTagAttributes(tag: string, ctx: CompileContext,
         return `::${parts.join('.')}=\${${m('::' + prop)}${prefixCtx(expr, ctx)}}`;
     });
 
-    // 2.5. :class="{ a: x, b: y }" → :class.a=${...} :class.b=${...} (object binding)
-    // :style="{ color: x, fontSize: y }" → :style.color=${...} :style.font-size=${...}
-    tag = tag.replace(/:class=(?:"(\{[^"]*?\})"|'(\{[^']*?\})')/g, (_, dq: string, sq: string) => {
-        const expr = dq ?? sq;
-        // Parse { active: has(a, b), big: big } — depth/string-aware so commas and
-        // colons inside the condition (calls, ternaries, strings) don't break the split.
-        const inner = expr.slice(1, -1).trim();
-        return splitObjectPairs(inner).map(([cls, cond]) => {
-            const cleanCls = cls.replace(/['"]/g, '');
-            return `:class.${cleanCls}=\${${m(':class')}() => !!(${callSignals(prefixCtx(cond, ctx), ctx)})}`;
-        }).join(' ');
-    });
-
-    tag = tag.replace(/:style=(?:"(\{[^"]*?\})"|'(\{[^']*?\})')/g, (_, dq: string, sq: string) => {
-        const expr = dq ?? sq;
-        const inner = expr.slice(1, -1).trim();
-        return splitObjectPairs(inner).map(([prop, val]) => {
-            const cleanProp = prop.replace(/['"]/g, '');
-            const cssProp = camelToKebab(cleanProp);
-            return `:style.${cssProp}=\${${m(':style')}() => ${callSignals(prefixCtx(val, ctx), ctx)}}`;
-        }).join(' ');
+    // 2.5. :class / :style objects → one :class.x / :style.x per key, the expansion the inline path
+    // shares (#96). Step 3 below binds them; each keeps the origin of the attribute it came from.
+    tag = expandAttributeForms(tag, (name, from) => {
+        const o = origins?.get(from);
+        if (origins && o != null) origins.set(name, o);
     });
 
     // 3. :prop="expr" → :prop=${() => ctx.expr()}
@@ -600,27 +585,3 @@ export function isSimpleAccess(expr: string, ctx?: CompileContext): boolean {
     return ctx ? ctx.scopeVars.has(root) : false;
 }
 
-/** Convert camelCase to kebab-case for HTML-safe attribute names. */
-export function camelToKebab(s: string): string {
-    return s.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
-}
-
-/**
- * Split an object-literal body `key: value, key2: value2` into [key, value] pairs.
- * Depth- and string-aware: commas/colons inside calls, brackets, ternaries or
- * strings (e.g. `{ active: has(a, b), label: x ? 'a:b' : 'c' }`) don't break it.
- * The pair key is taken as the first depth-0 `:`; the rest is the value.
- */
-function splitObjectPairs(inner: string): [string, string][] {
-    const pairs: [string, string][] = [];
-    for (const part of splitAtDepthZero(inner, ',')) {
-        const seg = part.trim();
-        if (!seg) continue;
-        const colon = findAtDepthZero(seg, 0, ':');
-        if (colon === -1) continue;
-        const key = seg.slice(0, colon).trim();
-        const value = seg.slice(colon + 1).trim();
-        if (key && value) pairs.push([key, value]);
-    }
-    return pairs;
-}

@@ -13,6 +13,7 @@ import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope,
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { buildEventHandler, dynamicComponentCall, scopedSlotCall } from './codegen-template-rewrite';
+import { expandAttributeForms } from './codegen-attribute-forms';
 import { hoistSlotTemplate } from './codegen-template';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
@@ -327,6 +328,14 @@ class InlineGen {
     // ─── Attribute Processing ─────────────────────────────────
 
     private attrs(tag: string, el: string, kind: ElementKind, origins: Map<string, number> | null = null, raw = false): void {
+        // :class / :style objects → :class.x / :style.x, the expansion the template path shares: read
+        // raw, the object reached classBind as "[object Object]" and propBind as a whole el.style (#96).
+        if (!raw) {
+            tag = expandAttributeForms(tag, (name, from) => {
+                const o = origins?.get(from);
+                if (origins && o != null) origins.set(name, o);
+            });
+        }
         const sp = tag.indexOf(' ');
         if (sp === -1) return;
         const s = tag.slice(sp, tag.endsWith('/>') ? -2 : -1);
