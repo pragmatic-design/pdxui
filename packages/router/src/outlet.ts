@@ -549,6 +549,16 @@ class PdxRouterOutlet extends HTMLElement {
             return;
         }
 
+        // The same holds after the bootstrap until the FIRST navigation has resolved. It awaits the
+        // app's `onBeforeNavigate` hooks, which may be async — an app fetching the route's strings —
+        // so the microtask can find no route yet. A null route with no error is that state: a 404
+        // sets '404' and a refusal '403'. Read as a 404 it drew an error page and, through
+        // `_focusActive`, let the start-up splash go before any page was there.
+        if (!route && currentRoute() === null && currentNavError() === null) {
+            this._claimedRoute = prevRoute;
+            return;
+        }
+
         this._previousRoute = route;
         // Update provided routeParams signal for new route
         routeParams.set(route?.params ?? {});
