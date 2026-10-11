@@ -30,10 +30,26 @@ test('/docs with no slug opens getting started', async ({ page }) => {
     await expect(page.locator('.doc-body')).not.toBeEmpty();
 });
 
+test('an API module page opens under the API reference, which links every export to its page', async ({ page }) => {
+    await page.goto('/docs/api-reactivity', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.doc-body h1')).toHaveText('Reactivity API');
+    await expect(page.locator('.doc-body h2#signal')).toHaveCount(1);
+    // The guides' nav does not list thirteen module pages; it marks the index as where you are.
+    await expect(page.locator('.doc-nav a.active')).toHaveAttribute('href', '/docs/api');
+    await expect(page.locator('.doc-nav a[href^="/docs/api-"]')).toHaveCount(0);
+
+    await page.goto('/docs/api', { waitUntil: 'domcontentloaded' });
+    await page.locator('.doc-body a[href="/docs/api-testing#mount"]').click();
+    await expect(page).toHaveURL(/\/docs\/api-testing#mount$/);
+    await expect(page.locator('.doc-body h2#mount')).toHaveCount(1);
+});
+
 test('search finds a doc by its title, from the metadata alone', async ({ page }) => {
     await page.goto('/search', { waitUntil: 'domcontentloaded' });
     await page.locator('.search-input').fill('router');
-    await expect(page.locator('.search-item', { hasText: 'Router' }).filter({ hasText: 'doc' })).toHaveCount(1);
+    // The guide, by its URL: the Router API page is a doc with that word in its title too.
+    await expect(page.locator('.search-item[href="/docs/router"]').filter({ hasText: 'doc' })).toHaveCount(1);
+    await expect(page.locator('.search-item[href="/docs/api-router"]')).toHaveCount(1);
 });
 
 test('the playground loads its compiler and compiles the starting component', async ({ page }) => {

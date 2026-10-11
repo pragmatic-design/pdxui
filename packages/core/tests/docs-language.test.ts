@@ -60,7 +60,7 @@ describe('the repository publishes in English', () => {
         // Two rules hold when a page is translated: a measurement keeps the conditions it was taken
         // under, and a finding keeps its severity — the prose changes, the record does not. A page
         // that is GENERATED is fixed where it is generated: the skill catalogue at `gen-catalog.mjs`
-        // and the site's api.md at the JSDoc in `packages/core/src/data/field-definition.ts`.
+        // and the site's API reference at the JSDoc in `packages/core/src/data/field-definition.ts`.
         expect(italian, 'these published files carry Italian prose').toEqual([]);
     });
 

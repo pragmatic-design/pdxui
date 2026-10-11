@@ -9,11 +9,12 @@
 // undocumented export the test names it.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { surfaceOfPackage, render, SKILL_OUT } from '../../site/scripts/gen-api.mjs';
+import { surfaceOfPackage, render, renderPages, isApiReferencePage, SKILL_OUT } from '../../site/scripts/gen-api.mjs';
 
-const API_MD = join(__dirname, '..', '..', 'site', 'content', 'docs', 'api.md');
+const DOCS = join(__dirname, '..', '..', 'site', 'content', 'docs');
+const API_MD = join(DOCS, 'api.md');
 
 /**
  * The ratchet. It may never go up.
@@ -38,10 +39,30 @@ describe('API reference', () => {
         expect(core.get('signal')?.specifier).toBe('@pdxui/core');
     });
 
-    it('the committed page is what the generator produces now', () => {
+    it('the committed pages are what the generator produces now, and no other', () => {
+        const pages = renderPages() as Map<string, string>;
         expect(existsSync(API_MD), 'run `pnpm --filter @pdxui/site run api`').toBe(true);
-        // Line endings normalised, as the skill's copy below: with core.autocrlf a checkout writes CRLF.
-        expect(readFileSync(API_MD, 'utf8').replace(/\r\n/g, '\n'), 'api.md is stale — regenerate it').toBe(render());
+        for (const [file, text] of pages) {
+            const path = join(DOCS, file);
+            expect(existsSync(path), `${file} is missing — run \`pnpm --filter @pdxui/site run api\``).toBe(true);
+            expect(readFileSync(path, 'utf8'), `${file} is stale — regenerate it`).toBe(text);
+        }
+        // A module page the generator no longer writes is a URL that lies.
+        const committed = readdirSync(DOCS).filter(isApiReferencePage);
+        expect(committed.sort()).toEqual([...pages.keys()].sort());
+    });
+
+    it('puts every export on exactly one module page, and no page holds the whole surface', () => {
+        // One page held all of it: 175 kB of markdown, a 636 kB chunk to read one entry.
+        const pages = renderPages() as Map<string, string>;
+        const headings = [...pages].filter(([f]) => f !== 'api.md')
+            .flatMap(([, text]) => [...text.matchAll(/^## `([^`]+)`$/gm)].map(m => m[1]));
+        const router = surfaceOfPackage('router') as Map<string, unknown>;
+        expect(headings.length).toBe(core.size + router.size);
+        expect(new Set(headings).size, 'an export appears on two pages').toBe(headings.length);
+        for (const [file, text] of pages) {
+            expect(text.length, `${file} is ${Math.round(text.length / 1024)} kB of markdown`).toBeLessThan(64 * 1024);
+        }
     });
 
     it('the skill carries the same page, generated, not edited', () => {

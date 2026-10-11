@@ -268,7 +268,7 @@ describe('the docs destructure only what the type declares', () => {
 //
 // So every `import { … } from '@pdxui/core'` on a doc page is checked against what
 // `packages/core/src/index.ts` actually re-exports.
-import { surfaceOfPackage } from '../../site/scripts/gen-api.mjs';
+import { surfaceOfPackage, isApiReferencePage } from '../../site/scripts/gen-api.mjs';
 
 describe('the docs import only what core exports', () => {
     const DOCS = join(ROOT, 'site', 'content', 'docs');
@@ -294,7 +294,8 @@ describe('the docs import only what core exports', () => {
     it('names nothing @pdxui/core does not export', () => {
         const exported = coreExports();
         const missing: string[] = [];
-        for (const file of readdirSync(DOCS).filter(f => f.endsWith('.md') && f !== 'api.md')) {
+        // The API reference pages are generated from that surface: checking them against it is circular.
+        for (const file of readdirSync(DOCS).filter(f => f.endsWith('.md') && !isApiReferencePage(f))) {
             const text = readFileSync(join(DOCS, file), 'utf8');
             // The barrel and every sub-path: `@pdxui/core`, `@pdxui/core/testing`, …
             for (const m of text.matchAll(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core(?:\/[a-z-]+)?'/g)) {

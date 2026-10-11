@@ -3,7 +3,7 @@
     <nav class="doc-nav">
       <span class="doc-nav-title">Documentation</span>
       @for (navItems as item; track item.slug) {
-        <a :class="item.slug === current ? 'doc-nav-link active' : 'doc-nav-link'" :href="'/docs/' + item.slug" @click="followLink">{{ item.title }}</a>
+        <a :class="item.slug === navCurrent ? 'doc-nav-link active' : 'doc-nav-link'" :href="'/docs/' + item.slug" @click="followLink">{{ item.title }}</a>
       }
     </nav>
     <!-- On a narrow screen the page list is one closed line above the article: laid out open it is
@@ -14,7 +14,7 @@
       <summary>Documentation · {{ currentTitle }}</summary>
       <nav aria-label="Documentation">
         @for (navItems as item; track item.slug) {
-          <a :class="item.slug === current ? 'doc-nav-link active' : 'doc-nav-link'" :href="'/docs/' + item.slug" @click="followLink">{{ item.title }}</a>
+          <a :class="item.slug === navCurrent ? 'doc-nav-link active' : 'doc-nav-link'" :href="'/docs/' + item.slug" @click="followLink">{{ item.title }}</a>
         }
       </nav>
     </details>
@@ -50,12 +50,17 @@ const docLoaders = import.meta.glob('../../content/docs/**/*.md', { import: 'def
 const loaderBySlug = {};
 for (const _k in docLoaders) loaderBySlug[_k.split('/').pop().replace(/\.md$/, '')] = docLoaders[_k];
 
+// A page with a `parent` (an API module page) is reached from its parent, and the nav shows the
+// parent as the current page: thirteen module pages listed beside the guides would bury them.
 const navItems = $derived(docMetas
+  .filter(d => !d.frontmatter.parent)
   .map(d => ({ slug: d.slug, title: d.frontmatter.title || d.slug, order: Number(d.frontmatter.order || 999) }))
   .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title)));
 
 const current = $derived(currentParams().slug || 'getting-started');
-const currentTitle = $derived((navItems.find(i => i.slug === current) || {}).title || 'Getting started');
+const currentMeta = $derived(docMetas.find(d => d.slug === current));
+const navCurrent = $derived((currentMeta && currentMeta.frontmatter.parent) || current);
+const currentTitle = $derived((currentMeta && currentMeta.frontmatter.title) || 'Getting started');
 
 let bodyRef = $signal(null);
 let _doc = $signal(null);
