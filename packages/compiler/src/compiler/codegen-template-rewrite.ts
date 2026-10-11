@@ -303,7 +303,9 @@ export function scopedSlotCall(
         : 'null';
 
     const isSelfClosing = tag.trimEnd().endsWith('/>');
-    let defaultContent = 'null';
+    // No content between the tags renders nothing. `'null'` was a truthy string, so the fallback below
+    // never applied, and `renderSlot` called null with no fill: `defaultFn is not a function` (#221).
+    let defaultContent = '() => html``';
     // After processing, the main loop must resume PAST the </slot> so the default
     // content (and the orphan closing tag) aren't emitted a second time.
     let nextIndex = tagEnd + 1;
@@ -320,7 +322,7 @@ export function scopedSlotCall(
         }
     }
 
-    const call = `renderSlot(ctx.__slots, ${jsQuote(slotName)}, ${scopeArg}, ${defaultContent || '() => html``'})`;
+    const call = `renderSlot(ctx.__slots, ${jsQuote(slotName)}, ${scopeArg}, ${defaultContent})`;
     return { call, nextIndex };
 }
 
