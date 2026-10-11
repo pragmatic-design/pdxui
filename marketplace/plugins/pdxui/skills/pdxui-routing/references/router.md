@@ -45,8 +45,20 @@ A dynamic segment is written `:name`, with an optional constraint:
 @page '/users/:id(number)';
 ```
 
-Inside the page you read params as signals (reactive: they change when you go from `/users/1` to
-`/users/2` without remounting):
+Inside the page, declare the params you read with `@params`, each with its type. Each one is a name the
+template and the script read, like a `$derived`, and it follows the URL: going from `/users/1` to
+`/users/2` updates it without remounting the page.
+
+```pdx
+@page '/users/:id';
+@params { id: number };
+
+const next = $derived(id + 1);   // `id` is a number: 1, then 2
+```
+
+A `number` param is converted with `Number` (`0` when the URL does not have it), a `boolean` one is
+`true` only for the text `'true'`, and any other type is the string (`''` when absent). Untyped, the
+same values are in `currentParams()`, as strings:
 
 ```pdx
 import { currentParams } from '@pdxui/router';
@@ -509,7 +521,7 @@ so does an HMR pass that re-creates the router. It is idempotent.
 @redirect '/old' -> '/new';      // redirect
 @alias '/people';                // alternative path for the same page
 @outlet 'sidebar' -> 'pdx-nav';  // named outlet
-@params { id: number };          // param types: parsed, not implemented
+@params { id: number };          // typed params, read by name (see the top of this page)
 @prefetch 'hover';               // 'hover' (the default), 'eager', 'viewport', or 'never'
 ```
 
@@ -526,7 +538,7 @@ so does an HMR pass that re-creates the router. It is idempotent.
 | You want… | Declare |
 | --- | --- |
 | a page | `@page '/path'` |
-| a variable segment | `@page '/x/:id'` + `currentParams()` |
+| a variable segment | `@page '/x/:id'` + `@params { id: number }` |
 | to protect it | `@guard 'permission'` |
 | data ready on entry | `@loader fn` |
 | a shared frame | `@layout 'admin'` — or, for a frame inside a frame, a parent page with a `<pdx-router-outlet>` |
