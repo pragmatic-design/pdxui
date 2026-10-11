@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-434 value exports.
+435 value exports.
 
 ### `__adoptStyles`
 
@@ -474,6 +474,21 @@ Outside it each write flushes at once, so two writes in a row run their subscrib
 first run sees the second value not yet written. Use it when several writes are one change.
 
 Nested calls flush once, at the outermost exit.
+
+### `bindTwoWay`
+
+```ts
+import { bindTwoWay } from '@pdxui/core';
+
+function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void
+```
+
+Two-way binding with optional modifiers (.trim, .number, .lazy): `::value`, `::checked`.
+
+The inline build calls this too, so the two builds listen the same way: a component through its
+`pdx-input`/`pdx-change` and their `detail`, a `<select>` and a checkbox through `change`. The
+inline path had its own copy that listened to `input` on everything, and `::value` was one-way
+on a component in a production build (#97).
 
 ### `booleanIcon`
 

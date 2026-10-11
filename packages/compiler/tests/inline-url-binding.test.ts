@@ -34,9 +34,12 @@ describe('inlineBindings: a URL binding is sanitised', () => {
         expect(code).toMatch(/removeAttribute\("src"\)/);
     });
 
-    it('a two-way binding on a URL name is sanitised as well', () => {
+    it('a two-way binding on a URL name goes through core\'s bindTwoWay, which sanitises it', () => {
+        // The inline path calls the runtime's two-way wiring (#97); that it sanitises a URL name is
+        // core's two-way-url.test.ts.
         const code = inline('<input ::formaction="url" />');
-        expect(code).toMatch(/sanitizeBoundUrl\(\w+, "formaction", /);
+        expect(code).toMatch(/bindTwoWay\(\w+, 'formaction', ctx\.url\)/);
+        expect(code, 'the raw value must not be assigned').not.toMatch(/\["formaction"\] = /);
     });
 });
 

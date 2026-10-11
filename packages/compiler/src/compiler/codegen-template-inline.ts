@@ -338,7 +338,7 @@ class InlineGen {
             // The statement this attribute becomes points at it.
             const origin = origins?.get(n);
             this.pending = origin == null ? '' : originMark(origin);
-            if (n.startsWith('::'))          this.twoWay(el, n.slice(2), val, kind);
+            if (n.startsWith('::'))          this.twoWay(el, n.slice(2), val);
             else if (n.startsWith(':class.')) this.classToggle(el, n.slice(7), val);
             else if (n.startsWith(':style.')) this.styleProp(el, n.slice(7), val);
             else if (n === ':show')           this.showBind(el, val);
@@ -490,16 +490,14 @@ class InlineGen {
         }
     }
 
-    private twoWay(el: string, desc: string, expr: string, kind: ElementKind): void {
-        this.imports.add('effect');
-        const parts = desc.split('.'), prop = this.boundName(parts[0], kind), mods = new Set(parts.slice(1));
-        const sig = prefixCtx(expr, this.ctx), p = jsString(propName(prop, kind));
-        this.out(`effect(() => { ${this.assign(el, prop, `${sig}()`, kind)} });`);
-        const ev = mods.has('lazy') ? 'change' : 'input';
-        let val = `${el}[${p}]`;
-        if (mods.has('trim')) val = `(typeof ${val}==='string'?${val}.trim():${val})`;
-        if (mods.has('number')) val = `(Number(${val})||0)`;
-        this.out(`${el}.addEventListener(${jsQuote(ev)},()=>{${sig}.set(${val});});`);
+    /**
+     * `::value`, `::checked`: core's `bindTwoWay`, the call the template path makes, with the same
+     * descriptor. A copy here listened to `input` on everything — a component's `pdx-change` and a
+     * `<select>`'s `change` never reached the signal (#97) — so the wiring exists once, in core.
+     */
+    private twoWay(el: string, desc: string, expr: string): void {
+        this.imports.add('bindTwoWay');
+        this.out(`bindTwoWay(${el}, ${jsQuote(desc)}, ${prefixCtx(expr, this.ctx)});`);
     }
 
     private classToggle(el: string, cls: string, expr: string): void {

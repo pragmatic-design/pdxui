@@ -651,9 +651,10 @@ const helper = 'ok';
 let name = $signal('');
 </script>`;
         const { code } = compile(source, 'inline-twoway.pdx', [], undefined, { production: true, inlineBindings: true });
-        expect(code).toContain('effect(');
-        expect(code).toContain("addEventListener('input'");
-        expect(code).toContain('.set(');
+        // Core's two-way wiring, handed the signal itself (#97): which event, and how the value is
+        // read back, is the runtime's — measured on both paths by core's render-parity table.
+        expect(code).toMatch(/bindTwoWay\(__el\d+, 'value', ctx\.name\);/);
+        expect(code).toMatch(/import \{[^}]*\bbindTwoWay\b[^}]*\} from '@pdxui\/core'/);
     });
 
     it('handles :class.x toggle bindings', () => {

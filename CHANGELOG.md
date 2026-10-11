@@ -42,6 +42,10 @@ semver.
 - A top-level `const` or `let` with a type annotation (`const SORT: Sort[] = […]`) reaches the
   template. It was left out of the setup's return: `undefined` in dev, and in a production build
   the component threw at mount and rendered nothing. (#44)
+- In a production build, `::value` on a component (`<pdx-select ::value="country">`) and on a
+  `<select>` updates the signal again: the build listened to `input` on everything, and a
+  component's `pdx-change` or a select's `change` never reached it. Both builds now share core's
+  `bindTwoWay`, newly exported, which also sanitises a URL name such as `::formaction`. (#97)
 - A production build loads a component used only inside `@defer`: the trigger used to fire and
   leave an unknown, empty element. (#98)
 - In a production build, a binding writes a property only when its value changes. It wrote again
