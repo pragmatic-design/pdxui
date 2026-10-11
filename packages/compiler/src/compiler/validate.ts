@@ -8,6 +8,7 @@ import type { ScriptAnalysis } from './script-analyzer';
 import { findComponentTags, selfDefinedTags } from './resolve';
 import { onlyNear } from './edit-distance';
 import { checkUndeclaredRefs } from './validate-refs';
+import { checkFormRules } from './form-rules';
 import { validateLegacy } from './validate-legacy';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
@@ -92,6 +93,10 @@ function reactiveSurfaces(analysis: ScriptAnalysis, exclude: string): string[] {
     for (const sto of analysis.stores) if (sto.name !== exclude) expr(sto.initialExpr);
     for (const w of analysis.watches) { expr(w.source); expr(w.callback); expr(w.options); }
     for (const pr of analysis.provides) expr(pr.expr);
+    // A @fetch's options and a @form's expressions read the script's names too: `enabled: () => ready`
+    // is a use of `ready` (#203). The URL's `${…}` are read through the same template literal.
+    for (const f of analysis.fetches) { expr(f.options); if (f.hasReactiveParams) expr('`' + f.url + '`'); }
+    for (const f of analysis.forms) { expr(f.validate); expr(f.source); expr(f.parent); }
     for (const ef of analysis.effects) block(ef);
     for (const m of analysis.lifecycle.onMount) block(m);
     for (const d of analysis.lifecycle.onDestroy) block(d);
@@ -276,6 +281,8 @@ export function validate(
     const templateIds = collectTemplateIdentifiers(ast, declaredNames);
     // A name read and declared nowhere.
     checkUndeclaredRefs(analysis, templateIds, warnings);
+    // A @form rule that is neither core's nor the script's.
+    checkFormRules(analysis, warnings);
 
     // ─── Check 1: Non-reactive variables in template ───────────────
 

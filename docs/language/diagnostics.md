@@ -99,6 +99,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_FORM_NO_SUBMIT` | info | A `@form` that nothing submits. | `@form`, [data.md](data.md) |
 | `PDX_FORM_ARRAY_RULES_IGNORED` | warn | Validation rules inside a `@form` array field. | `@form`, [data.md](data.md) |
 | `PDX_FORM_FIELD_UNPARSED` | warn | A `@form` field the compiler did not understand. | `@form`, [data.md](data.md) |
+| `PDX_FORM_UNKNOWN_RULE` | error | A `@form` rule that is neither a core validator nor a function of the script. | `@form`, [data.md](data.md) |
 | `PDX_STORE_EXPORT` | error | An `export` in a `@store` module that reads a name the store owns. | `@store`, [data.md](data.md) |
 
 ## The build and the project

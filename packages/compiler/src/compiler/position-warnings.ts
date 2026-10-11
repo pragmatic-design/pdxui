@@ -133,6 +133,14 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const form = name ?? /@form (\w+)/.exec(w.message)?.[1];
             return form ? find(source, script, new RegExp(`@form\\s+${escape(form)}\\b`)) : undefined;
         }
+        case 'PDX_FORM_UNKNOWN_RULE': {
+            // Match: the rule's name after its form's `@form f`, at the name.
+            const form = /@form (\w+)/.exec(w.message)?.[1];
+            const rule = quotedName(w.message);
+            return form && rule
+                ? find(source, script, new RegExp(`(?<=@form\\s+${escape(form)}\\b[\\s\\S]*?)(?<![\\w$])${escape(rule)}(?![\\w$])`))
+                : undefined;
+        }
         case 'PDX_LEGACY_IN_SETUP': {
             // Match: `carries defineProps,` — the marker the message names.
             const marker = /carries (\w+)/.exec(w.message)?.[1];

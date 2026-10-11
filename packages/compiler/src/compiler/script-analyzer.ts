@@ -529,7 +529,11 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         // ─── @fetch name: 'METHOD /url' as Type { options }; ───
         // Tokenizer-based: handles complex types like User<T>[], nested options blocks
         if (trimmed.startsWith('@fetch ')) {
-            const fetchResult = parseFetchDecl(trimmed);
+            // The whole declaration, which may go on to the next lines: an options block opened on
+            // this line and closed below it was cut here, and its lines reached the setup as code (#203).
+            const decl = collectDeclarationStatement(lines, i);
+            const fetchResult = parseFetchDecl(decl.text.trim());
+            if (fetchResult) i = decl.endLine;
             if (fetchResult) {
                 fetches.push({
                     name: fetchResult.name,

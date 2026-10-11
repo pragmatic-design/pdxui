@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 68 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 69 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -271,6 +271,37 @@ No field is generated, so the control bound to it swallows what is typed.
 The form validates and holds values, and no `handleSubmit` sends them anywhere.
 
 **Fix.** Wire `form.handleSubmit(async (values) => { … })`, or hand the form to `<pdx-form :form>`.
+
+### PDX_FORM_UNKNOWN_RULE
+
+*error* — A `@form` rule that is neither a core validator nor a function of the script.
+
+The rule is called by its name, and nothing of that name exists: the form throws when it is created.
+
+**Fix.** Use one of core's rules (`required`, `minLength`, `email`, …), or declare a function that returns a validator: `function shout() { return (v) => (ok ? null : 'message'); }`.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script setup>
+@form f: { name: string { shout } };
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script setup>
+@form f: { name: string { shout } };
+function shout() { return (v) => (v === String(v).toUpperCase() ? null : 'Shout it'); }
+</script>
+```
 
 ### PDX_GLOBAL_SELECTOR
 

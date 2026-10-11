@@ -20,6 +20,7 @@ function declaresFormSection(script: string): boolean {
 }
 import { assembleModule, detectDeadSignals, deduplicateBindings, extractTag, renderReturnIndex } from './codegen-shared';
 import { jsQuote } from './js-literal';
+import { coreRuleImports } from './form-rules';
 
 /** Compile using decorator+rune syntax. Auto-return, auto-import, signal mutation rewriting. */
 export function compileNewMode(
@@ -41,21 +42,11 @@ export function compileNewMode(
         imports.add('resource');
         imports.add('getDefaultClient');
     }
-    // @form needs createForm + validators used in inline schemas
+    // @form needs createForm, and the core validators its inline schemas name — sub-fields' included.
+    // A rule the script declares is the script's, and is not imported (#203).
     if (analysis.forms.length > 0) {
         imports.add('createForm');
-        // Auto-import validators referenced in inline schemas
-        for (const f of analysis.forms) {
-            if (f.kind === 'inline' && f.fields) {
-                for (const fd of f.fields) {
-                    if (fd.required) imports.add('required');
-                    for (const rule of fd.rules) {
-                        const fn = rule.includes(':') ? rule.slice(0, rule.indexOf(':')).trim() : rule;
-                        imports.add(fn);
-                    }
-                }
-            }
-        }
+        for (const name of coreRuleImports(analysis)) imports.add(name);
     }
     // @title/@meta needs useHead import
     if (analysis.head.meta.length > 0 || (analysis.head.title && !analysis.head.title.isDynamic)) {
