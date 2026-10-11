@@ -1,13 +1,11 @@
 // The seam only works if it is the ONLY door.
 //
-// `packages/router/src/active.ts` is what a production build swaps for the generated router. A file
-// in this package that imports `./runtime` directly bypasses that swap, and the result is the worst
-// shape a router can take: two routers alive in one build, one navigating and the other
-// being read. It is invisible in dev — where both are the same module — and it is invisible in a
-// production build too, because nothing fails; the page simply stops agreeing with the URL.
+// `packages/router/src/active.ts` is where a production build installs its route table (#108). A
+// file in this package that imports `./runtime` directly could be evaluated before the seam, and
+// read `routeTable()` before anything installed it: an outlet that starts the router with no routes.
+// Nothing fails; the app simply answers 404 in a production build only.
 //
-// So the seam is asserted on the SHAPE of the package rather than on a behaviour. There is no test
-// that can catch a split brain after the fact.
+// So the seam is asserted on the SHAPE of the package rather than on a behaviour.
 
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -41,7 +39,7 @@ describe('every router import in this package goes through the seam', () => {
                 .map(() => f.file));
 
         expect([...new Set(offenders)],
-            'these bypass the dev/prod swap and would run a second router beside the one navigating',
+            'these bypass the seam, where a production build installs the route table',
         ).toEqual([]);
     });
 
@@ -54,10 +52,9 @@ describe('every router import in this package goes through the seam', () => {
     });
 
     it('the package entry re-exports from the seam, so a component gets the running router', () => {
-        // `@pdxui/router` is what a compiled component imports. If index.ts kept re-exporting
-        // ./runtime, every component in a production build would read the interpreted router while
-        // the outlet navigated with the generated one — and p2-plus.test.ts's assertion that no
-        // component imports `virtual:pdx-router` would be guarding a split brain it cannot see.
+        // `@pdxui/router` is what a compiled component imports. If index.ts re-exported ./runtime,
+        // an app that imported only from the package would never evaluate the seam, and the route
+        // table a production build installs there would never be installed.
         const index = files.find(f => f.file === 'index.ts')!;
 
         expect(index.text).toMatch(/from\s+'\.\/active'/);

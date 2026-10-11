@@ -63,7 +63,7 @@ describe('minifyHTML', () => {
 //
 // Dropping the space would make `vite dev` render "clicked 0 times" and `vite build` render
 // "clicked 0times". The text a user reads would differ between the two, which is the dev/prod seam
-// again — the same shape as the generated router.
+// again.
 describe('a production compile keeps the text the author wrote', () => {
     const SOURCE = '<template>\n  <button>clicked {{ count }} times</button>\n</template>\n'
         + '\n<script setup>\nlet count = $signal(0);\n</script>\n';

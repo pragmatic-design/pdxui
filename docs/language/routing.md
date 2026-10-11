@@ -11,8 +11,9 @@ work on any component.
 
 The registration is the same in both modes of the build: the page module registers its route when it
 is imported, and the plugin scans every `.pdx` that has an `@page` line with the same analyzer and
-writes the route table into the router (`virtual:pdx-router` in a build, `virtual:pdx-routes-dev` in
-dev), so a route is known before its page is downloaded.
+emits the route table (`virtual:pdx-routes`), which the router reads — installed through the router's
+seam in a build, handed over from `index.html` in dev — so a route is known before its page is
+downloaded.
 
 ```ebnf
 Path        ::= "'/" [^']* "'" | '"/' [^"]* '"'

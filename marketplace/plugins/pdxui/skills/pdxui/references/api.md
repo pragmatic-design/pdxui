@@ -5925,7 +5925,20 @@ Usage:
 
 ## @pdxui/router
 
-24 value exports.
+26 value exports.
+
+### `configureRouter`
+
+```ts
+import { configureRouter } from '@pdxui/router';
+
+function configureRouter(options?: RouterOptions): void
+```
+
+Options the routes cannot carry: a base path, extra redirects, where a denied guard goes.
+
+Merged into the running router. A base path that changes while it is running re-resolves the
+current URL, which until then was matched with the old prefix.
 
 ### `createRouter`
 
@@ -5935,9 +5948,26 @@ import { createRouter } from '@pdxui/router';
 function createRouter(routes: RouteConfig[], options?: string | RouterOptions): void
 ```
 
-Create a runtime router from route configs.
+Create the router from route configs, and start it: listen for navigations and resolve the URL
+the page was opened at.
+
+The matcher is built here, once, from `routes` — `compileMatcher` — so a navigation does no
+parsing. A static route is tried before any dynamic one, and among dynamic routes the declared
+order holds: matching `/customers/:id` first would let it catch `/customers/import`.
+
 @param routes - Array of route configurations
 @param options - Router options or basePath string (backward compat)
+
+### `createRouterFromTable`
+
+```ts
+import { createRouterFromTable } from '@pdxui/router';
+
+function createRouterFromTable(table: RouteTable, options?: RouterOptions): void
+```
+
+Install a build's route table and start the router on it — what an app with no
+`<pdx-router-outlet>` calls. The outlet does the same from `routeTable()`.
 
 ### `currentLoaderData`
 
@@ -6038,6 +6068,9 @@ import { destroyRouter } from '@pdxui/router';
 
 function destroyRouter(): void
 ```
+
+Tear down the active router: removes the popstate/navigation listener.
+Call on app teardown or before re-creating the router (HMR). Idempotent.
 
 ### `loaderData`
 

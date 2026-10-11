@@ -1,27 +1,23 @@
-// The signal the generated router is measured against.
+// The router's behaviour suite, run against every way an app hands it its routes.
 //
-// PDX has TWO routers. `packages/router/src/runtime.ts` is the interpreted one, used in dev;
-// `generateOptimizedRouter` in the compiler emits a second implementation — a switch statement with
-// no regex and no loop — that replaces it in production builds.
+// There is one router (`packages/router/src/runtime.ts`). Until #108 a production build ran a
+// second one, emitted by the compiler as a string, and this file was the parity table that kept the
+// two alike. Now the build emits route DATA (`generateRouteTable`) and the one router reads it, so
+// what is compared is the PRODUCERS: the table a build emits, the table the dev server emits, and
+// the routes an app passes to `createRouter` itself. A field one producer drops, or a behaviour that
+// depends on how the routes arrived, fails here on that producer and not on the others.
 //
-// Without a shared table, each change would invent its own assertions and "parity" would mean
-// whatever the last author happened to test. So: one behaviour, written once, run against both. A
-// row the generated router cannot satisfy is skipped WITH ITS OWNER IN ITS NAME — never silently
-// omitted, because a row nobody has claimed is a row that will be forgotten. The last case in this
-// file asserts that count is zero.
-//
-// The generated module is a string. It is evaluated the way the site's playground evaluates compiled
-// PDX: rewrite the `@pdxui/core` import to an injected namespace, strip the export keywords, and
-// run it through `new Function`. That is the only way to test the artefact a production build would
-// actually ship, rather than a re-implementation of it.
+// Each table is the module the compiler would serve, evaluated the way the site's playground
+// evaluates compiled PDX: the export keywords stripped, run through `new Function`. That tests the
+// artefact an app actually loads, not a re-implementation of it.
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import * as core from '@pdxui/core';
-import { generateOptimizedRouter, type ScannedRoute } from '../../compiler/src/plugin-utils';
+import { generateRouteTable, buildSpecifier, devSpecifier, type ModuleSpecifier } from '../../compiler/src/route-table';
+import type { ScannedRoute } from '../../compiler/src/plugin-utils';
 import {
-    createRouter, destroyRouter, navigate as rtNavigate,
+    createRouter, createRouterFromTable, configureRouter, destroyRouter, installRouteTable, routeTable,
+    toRouteConfig, navigate as rtNavigate,
     currentPath as rtPath, currentParams as rtParams,
     currentRoute as rtRoute, currentSearch as rtSearch,
     currentNavError as rtNavError, currentNavErrorDepth as rtNavErrorDepth,
@@ -32,8 +28,9 @@ import {
     currentLoaderData as rtLoaderData, currentLoaderState as rtLoaderState,
     loaderData as rtLoaderDataFor,
 } from '../src/runtime';
+import type { RouteTable } from '../src/runtime';
 
-// ─── The two implementations, behind one shape ───────────────────────────────
+// ─── The router, behind one shape ────────────────────────────────────────────
 
 interface RouterUnderTest {
     navigate(path: string, params?: Record<string, string>, state?: Record<string, unknown>): void;
@@ -50,9 +47,11 @@ interface RouterUnderTest {
     meta(): Record<string, unknown> | undefined;
     /** The matched route's PATTERN, or null when nothing matched. */
     matched(): string | null;
-    /** What the route's @loader returned. undefined in a router that cannot run one. */
+    /** The matched route's `@scroll`, which the router hands to core's restoration. */
+    scroll(): string | undefined;
+    /** What the route's @loader returned. */
     loaderData(): unknown;
-    /** 'idle' | 'loading' | 'done' | 'error' — 'idle' in a router that cannot run one. */
+    /** 'idle' | 'loading' | 'done' | 'error'. */
     loaderState(): string;
     /** What a SPECIFIC level's @loader returned, by its route pattern. */
     loaderDataFor(path: string): unknown;
@@ -61,16 +60,16 @@ interface RouterUnderTest {
     navError(): string | null;
     /** Which nesting level the error belongs to: the outlet at this depth renders it. */
     navErrorDepth(): number;
-    /** Install the guard evaluator. Both routers keep this OUT of route configuration on purpose. */
+    /** Install the guard evaluator. Kept OUT of route configuration on purpose. */
     registerGuard(checker: (name: string) => boolean | Promise<boolean>): void;
     /** Returning false cancels the navigation. Returns an unsubscribe. */
     onBefore(hook: (from: string, to: string) => boolean | Promise<boolean>): () => void;
     onAfter(hook: (from: string, to: string) => void): () => void;
-    /** Release the navigation listeners. Idempotent in both. */
+    /** Release the navigation listeners. Idempotent. */
     destroy(): void;
 }
 
-/** Options a row needs configured before its first navigation. Both routers take them differently. */
+/** Options a row needs configured before its first navigation. */
 interface UnderTestOptions {
     basePath?: string;
     redirects?: { from: string; to: string }[];
@@ -79,16 +78,16 @@ interface UnderTestOptions {
 /**
  * A route as this table declares it.
  *
- * `ScannedRoute.loader` is the loader's NAME — serialisable build-time data, which is all the
- * generated module can hold. The FUNCTION lives in the page module, and reaches both routers the
- * same way it does in production: the compiled page module publishes it into `globalThis.__pdx_routes`
- * when it is imported. `loaderFn` is this table's stand-in for that module.
+ * `ScannedRoute.loader` is the loader's NAME — serialisable build-time data, which is all a route
+ * table can hold. The FUNCTION lives in the page module, and reaches the router the way it does in
+ * an app: the compiled page module publishes it into `globalThis.__pdx_routes` when it is imported,
+ * and the table's loader bridge reads it from there. `loaderFn` is this table's stand-in for that
+ * module.
  */
 type ParityRoute = ScannedRoute & { loaderFn?: () => Promise<unknown> };
 
 /**
- * Publish the live loaders the way a compiled page module does — `globalThis.__pdx_routes`, the same
- * table the generated router already consults for late-registered redirects.
+ * Publish the live loaders the way a compiled page module does — `globalThis.__pdx_routes`.
  *
  * This is not a shim for the test: `codegen-shared.ts` emits exactly this push, with the loader as a
  * live reference, for every `@page` that declares a `@loader`. Seeding it here is what "the page
@@ -115,8 +114,7 @@ const ROUTES: ParityRoute[] = [
     { path: '/admin', file: 'admin.pdx', tag: 'pdx-admin', guard: 'admin.access' },
     { path: '/legacy', file: 'legacy.pdx', tag: 'pdx-legacy', redirect: '/about' },
     // A route-level redirect pointing off-origin. Developer-authored, like every redirect source,
-    // so this is defence in depth — but the router refuses it, and a
-    // second implementation of redirects is exactly where that decision gets lost.
+    // so this is defence in depth — but the router refuses it.
     { path: '/hostile', file: 'hostile.pdx', tag: 'pdx-hostile', redirect: 'https://evil.example/steal' },
     { path: '/orders/:oid(number)', file: 'order.pdx', tag: 'pdx-order' },
     { path: '/files/*', file: 'files.pdx', tag: 'pdx-files' },
@@ -154,99 +152,15 @@ const ROUTES: ParityRoute[] = [
     { path: '/pages/:n(number)', file: 'page-n.pdx', tag: 'pdx-page-n' },
     // A static path with a regex metacharacter in it: the dot is a dot.
     { path: '/feed.xml', file: 'feed.pdx', tag: 'pdx-feed' },
+    // Two params in ONE segment: not a whole-segment pattern, so the matcher keeps a regex for it.
+    { path: '/docs/:name.:ext', file: 'doc.pdx', tag: 'pdx-doc' },
+    // `@scroll`, which the router hands to core's restoration from the matched route.
+    { path: '/always-top', file: 't.pdx', tag: 'pdx-t', scroll: 'top' },
+    { path: '/keep-place', file: 'k.pdx', tag: 'pdx-k', scroll: 'preserve' },
 ];
 
-/**
- * Evaluate the generated module into a live object.
- *
- * ESM cannot be `new Function`'d, so the import becomes a destructure of an injected namespace and
- * the export keywords are removed — the same transformation `packages/site/src/lib/playground-compile.ts`
- * applies to compiled PDX, for the same reason.
- */
-function evaluateGenerated(routes: ParityRoute[], options?: UnderTestOptions): RouterUnderTest {
-    // Before the module is evaluated: it resolves location.pathname at import, so a loader for the
-    // landing path runs during that resolution and has to be findable already.
-    publishPageModules(routes);
-    const src = generateOptimizedRouter(routes)
-        .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
-        .replace(/^export\s+/gm, '');
-
-    // The tail asks for a fixed set of names and lets the ones this module does not export yet come
-    // back undefined. Without that, a `return { …, onBeforeNavigate }` for a symbol the module does
-    // not export throws a ReferenceError that fails every unrelated row. `typeof`
-    // is the only expression that is safe on an undeclared binding, hence the eval.
-    const factory = new Function('__core', `${src}\nconst OPTIONAL = 'currentNavError currentNavErrorDepth registerGuardChecker configureRouter onBeforeNavigate onAfterNavigate currentQuery currentMeta currentState setQuery setQueryParam destroyRouter currentLoaderData currentLoaderState loaderData loaderState';
-return { routes, currentPath, currentSearch, currentParams, currentRoute, navigate,
-  ...Object.fromEntries(OPTIONAL.split(' ').map(n => [n, eval('typeof ' + n + " !== 'undefined' ? " + n + ' : undefined')])) };`);
-    const m = factory(core) as {
-        currentPath: () => string;
-        currentSearch: () => string;
-        currentParams: () => Record<string, string>;
-        currentRoute: () => { path: string } | null;
-        currentNavError?: () => string | null;
-        currentNavErrorDepth?: () => number;
-        currentQuery?: () => Record<string, string>;
-        currentMeta?: () => Record<string, unknown> | undefined;
-        currentState?: () => Record<string, unknown> | undefined;
-        setQuery?: (params: Record<string, string>) => void;
-        setQueryParam?: (key: string, value: string | null) => void;
-        navigate: (path: string, params?: Record<string, string>, state?: Record<string, unknown>) => void;
-        registerGuardChecker?: (c: (n: string) => boolean | Promise<boolean>) => void;
-        configureRouter?: (o: { guardFailRedirect?: string } & UnderTestOptions) => void;
-        onBeforeNavigate?: (h: (f: string, t: string) => boolean | Promise<boolean>) => () => void;
-        onAfterNavigate?: (h: (f: string, t: string) => void) => () => void;
-        destroyRouter?: () => void;
-        currentLoaderData?: () => unknown;
-        currentLoaderState?: () => string;
-        loaderData?: (path: string) => unknown;
-        loaderState?: (path: string) => string;
-    };
-
-    // The generated module resolves location.pathname at import; options arrive after. That is a
-    // real difference from createRouter(routes, options) and configureRouter() is what closes it.
-    if (options) m.configureRouter?.(options);
-
-    return {
-        navigate: (p, params, state) => m.navigate(p, params, state),
-        path: () => m.currentPath(),
-        params: () => m.currentParams(),
-        query: () => m.currentQuery?.() ?? {},
-        setQuery: (params) => m.setQuery?.(params),
-        setQueryParam: (k, v) => m.setQueryParam?.(k, v),
-        state: () => m.currentState?.(),
-        meta: () => m.currentMeta?.(),
-        matched: () => m.currentRoute()?.path ?? null,
-        search: () => m.currentSearch(),
-        navError: () => m.currentNavError?.() ?? null,
-        navErrorDepth: () => m.currentNavErrorDepth?.() ?? 0,
-        loaderData: () => m.currentLoaderData?.(),
-        loaderState: () => m.currentLoaderState?.() ?? 'idle',
-        registerGuard: (c) => m.registerGuardChecker?.(c),
-        onBefore: (h) => m.onBeforeNavigate?.(h) ?? (() => {}),
-        onAfter: (h) => m.onAfterNavigate?.(h) ?? (() => {}),
-        loaderDataFor: (path) => m.loaderData?.(path),
-        destroy: () => m.destroyRouter?.(),
-    };
-}
-
-function useRuntime(routes: ParityRoute[], options?: UnderTestOptions): RouterUnderTest {
-    // `guard` has to travel: without it the runtime router has nothing to deny and the guard rows
-    // pass for the wrong reason. Same for `redirect`.
-    createRouter(routes.map(r => ({
-        path: r.path,
-        component: () => document.createElement('div'),
-        ...(r.guard ? { guard: r.guard } : {}),
-        ...(r.redirect ? { redirect: r.redirect } : {}),
-        ...(r.meta ? { meta: r.meta } : {}),
-        ...(r.loaderFn ? { loader: r.loaderFn } : {}),
-        // And `label`, for the same reason: without it the trail rows fail on the interpreted
-        // router while passing on the generated one, because the crumb's name never reaches the
-        // table this builds.
-        ...(r.label ? { label: r.label } : {}),
-        // And `hasOutlet`. Without it `chainFor` sees no parents and every nested row passes for
-        // the wrong reason, on the router that implements nesting.
-        ...(r.hasOutlet ? { hasOutlet: r.hasOutlet } : {}),
-    })), options);
+/** The router's readers and writers, the same whichever producer started it. */
+function underTest(): RouterUnderTest {
     return {
         navigate: (p, params, state) => rtNavigate(p, params, state),
         path: () => rtPath(),
@@ -257,6 +171,7 @@ function useRuntime(routes: ParityRoute[], options?: UnderTestOptions): RouterUn
         state: () => rtState(),
         meta: () => rtMeta(),
         matched: () => rtRoute()?.config.path ?? null,
+        scroll: () => rtRoute()?.config.scroll,
         loaderData: () => rtLoaderData(),
         loaderState: () => rtLoaderState(),
         loaderDataFor: (path) => rtLoaderDataFor(path),
@@ -270,21 +185,62 @@ function useRuntime(routes: ParityRoute[], options?: UnderTestOptions): RouterUn
     };
 }
 
-const IMPLEMENTATIONS = [
-    { name: 'runtime', make: useRuntime },
-    { name: 'generated', make: evaluateGenerated },
+/** The route-table module the compiler emits, evaluated into the object an import of it gives. */
+function evaluateTable(routes: ParityRoute[], specifierOf: ModuleSpecifier): RouteTable {
+    const src = generateRouteTable(routes, specifierOf).replace(/^export\s+/gm, '');
+    return new Function(`${src}\nreturn { routes, pageModules, redirects };`)() as RouteTable;
+}
+
+/** A production build: the seam installs the table, the router starts from it. */
+function fromBuildTable(routes: ParityRoute[], options?: UnderTestOptions): RouterUnderTest {
+    publishPageModules(routes);
+    createRouterFromTable(evaluateTable(routes, buildSpecifier), options);
+    return underTest();
+}
+
+/**
+ * The dev server: the table arrives as `globalThis.__pdx_route_table`, and the router is started
+ * the way the outlet starts it — from `routeTable()`, through `toRouteConfig`.
+ */
+function fromDevTable(routes: ParityRoute[], options?: UnderTestOptions): RouterUnderTest {
+    publishPageModules(routes);
+    globalThis.__pdx_route_table = evaluateTable(routes, devSpecifier('/app'));
+    createRouter(routeTable()!.map(toRouteConfig), options);
+    return underTest();
+}
+
+/** An app with no plugin: its own RouteConfigs, loaders as functions. */
+function fromRoutes(routes: ParityRoute[], options?: UnderTestOptions): RouterUnderTest {
+    createRouter(routes.map(r => ({
+        path: r.path,
+        component: () => document.createElement('div'),
+        ...(r.guard ? { guard: r.guard } : {}),
+        ...(r.redirect ? { redirect: r.redirect } : {}),
+        ...(r.meta ? { meta: r.meta } : {}),
+        ...(r.loaderFn ? { loader: r.loaderFn } : {}),
+        ...(r.label ? { label: r.label } : {}),
+        ...(r.hasOutlet ? { hasOutlet: r.hasOutlet } : {}),
+        ...(r.scroll ? { scroll: r.scroll } : {}),
+    })), options);
+    return underTest();
+}
+
+const PRODUCERS = [
+    { name: 'build table', make: fromBuildTable },
+    { name: 'dev table', make: fromDevTable },
+    { name: 'createRouter(routes)', make: fromRoutes },
 ] as const;
 
-/** The runtime router settles asynchronously (guards may be async); the generated one is sync. */
+/** Guards and loaders may be async; give a navigation time to settle. */
 const settle = () => new Promise(r => setTimeout(r, 20));
 
-/** Scroll restoration runs inside requestAnimationFrame, in both routers. */
+/** Scroll restoration runs inside requestAnimationFrame. */
 const raf = () => new Promise(r => requestAnimationFrame(() => r(null)));
 
 /**
- * The browser's back button, simulated by the event the browser actually fires. Neither router has
- * a `back()` of its own — both listen for `popstate` — so this belongs to the harness rather than
- * to `RouterUnderTest`, and it exercises the same code path a real back press does.
+ * The browser's back button, simulated by the event the browser actually fires. The router has no
+ * `back()` of its own — it listens for `popstate` — so this belongs to the harness rather than to
+ * `RouterUnderTest`, and it exercises the same code path a real back press does.
  */
 function popTo(path: string, state: Record<string, unknown> | null = null): void {
     history.replaceState(state, '', path);
@@ -292,30 +248,19 @@ function popTo(path: string, state: Record<string, unknown> | null = null): void
 }
 
 // ─── The table ───────────────────────────────────────────────────────────────
-//
-// `owner` names the issue that will make the generated router satisfy the row. A row with no owner
-// must pass on BOTH today.
 
 interface Row {
     name: string;
-    /** The issue of this repository (`#123`) that owns making this row pass. Undefined = it must pass on both TODAY. */
-    owner?: string;
-    /**
-     * Which implementation cannot satisfy it yet. 'generated' is the expected direction — the
-     * sequence is about capabilities it lacks. 'runtime' means the table found the two DISAGREEING,
-     * which is the finding this file exists to make possible and which nothing else compares.
-     */
-    failsOn?: 'generated' | 'runtime';
-    /** Configured before the first navigation — createRouter options / configureRouter(). */
+    /** Configured before the first navigation — createRouter options. */
     options?: UnderTestOptions;
     run(r: RouterUnderTest): Promise<void> | void;
 }
 
 /**
  * The four shapes a router target must refuse — a redirect is not an `<a href>`
- * and `history.replaceState` cannot leave the origin at all. Written once here and run against both
- * routers, because a second implementation of redirects is precisely where a decision like this gets
- * quietly dropped.
+ * and `history.replaceState` cannot leave the origin at all. Written once here and run against every
+ * producer: a redirect table entry arrives through the options, the build's table and the page
+ * modules, and each is a place a decision like this can get quietly dropped.
  */
 const HOSTILE_TARGETS = [
     ['a protocol-relative target', '//evil.example'],
@@ -358,10 +303,9 @@ const PARITY: Row[] = [
         },
     },
     {
-        // Written here rather than in a file of its own because a capability that lives in one
-        // implementation is half a capability: present in the interpreted router and absent from
-        // a production build, the breadcrumb reads an empty trail while the route table plainly
-        // carries the labels.
+        // Written here rather than in a file of its own because the labels reach the router through
+        // the table: a producer that dropped them would give a production build an empty trail
+        // while the route table plainly carries the labels.
         name: 'publishes the breadcrumb trail: labelled ancestors, params filled in, leaf marked',
         run: async (r) => {
             r.navigate('/shop/abc123');
@@ -488,10 +432,9 @@ const PARITY: Row[] = [
         },
     },
     {
-        // The generated router puts a static route in a `switch` case, tried before any dynamic
-        // one. An interpreted router that took the FIRST registered route that matched would mount
-        // `/customers/import` as the page for a customer called «import», because the scan lists
-        // `customer.pdx` first: the same URL one page in dev and another in a build.
+        // A static route is a key of the matcher's map, tried before any dynamic one. A router that
+        // took the FIRST registered route that matched would mount `/customers/import` as the page
+        // for a customer called «import», because the scan lists `customer.pdx` first.
         name: 'a static route wins over a param route declared before it',
         run: async (r) => {
             r.navigate('/teams/new');
@@ -715,10 +658,10 @@ const PARITY: Row[] = [
     },
     {
         name: 'runs a route loader and exposes its data and state',
-        // The generated module is `virtual:pdx-router` and does not import the page modules, so a
-        // function declared in one cannot be referenced from it: `ScannedRoute` carries only
-        // serialisable fields. The loader reaches both routers through `globalThis.__pdx_routes`,
-        // which the compiled page module publishes (see `publishPageModules`).
+        // The route table must not import the page modules statically, so a function declared in
+        // one cannot be written into it: the table carries a bridge that reads the loader from
+        // `globalThis.__pdx_routes`, which the compiled page module publishes (see
+        // `publishPageModules`). `createRouter(routes)` gets the function itself.
         run: async (r) => {
             r.navigate('/data');
             await settle();
@@ -906,8 +849,8 @@ const PARITY: Row[] = [
             await settle();
             expect(r.matched()).toBe('/about');
             expect(r.path()).toBe('/about');
-            // The ADDRESS, not only the resolved route. Comparing only what the two routers publish
-            // stays green while one writes the address and the other does not.
+            // The ADDRESS, not only the resolved route: comparing only what the router publishes
+            // stays green while the address keeps the path that redirected.
             expect(location.pathname, 'the address stayed on the path that redirects').toBe('/about');
         },
     },
@@ -1147,9 +1090,9 @@ const PARITY: Row[] = [
     },
     {
         name: 'a wildcard needs at least one segment after its prefix',
-        // The runtime compiles `*` to `(.+)`, which cannot match nothing, so the bare prefix is a
-        // 404 rather than the catch-all with an empty tail. Written down because "at least one" is
-        // the difference between `(.+)` and `(.*)`, and a generated matcher could pick either.
+        // A trailing `*` takes a NON-EMPTY rest, so the bare prefix is a 404 rather than the
+        // catch-all with an empty tail. Written down because "at least one" is the difference
+        // between `(.+)` and `(.*)`, and a matcher could pick either.
         run: async (r) => {
             r.navigate('/files');
             await settle();
@@ -1180,6 +1123,56 @@ const PARITY: Row[] = [
             expect(r.path(), 'followed a route redirect off-origin').not.toContain('evil.example');
         },
     },
+    {
+        // The hash is the page's, not the route's: `/about#team` is `/about`, scrolled. A router
+        // that matched the whole string answered 404 for any link to an anchor on another page.
+        name: 'matches a target with a hash on its path, without the hash',
+        run: async (r) => {
+            r.navigate('/about#team');
+            await settle();
+            expect(r.matched(), 'the hash was matched as part of the path').toBe('/about');
+            expect(r.navError()).toBeNull();
+        },
+    },
+    {
+        // Two params in one segment: the one pattern shape the segment matcher hands to a regex.
+        // It must keep matching, with both params named — not a param called `name.:ext`.
+        name: 'matches two params in one segment and names both',
+        run: async (r) => {
+            r.navigate('/docs/guide.pdf');
+            await settle();
+            expect(r.matched()).toBe('/docs/:name.:ext');
+            expect(r.params()).toEqual({ name: 'guide', ext: 'pdf' });
+        },
+    },
+    {
+        // `@scroll` is one field, read off the matched route and handed to core's restoration
+        // (`restoreScrollPosition(path, isBack, outlet, route.scroll)`). A producer that drops it
+        // makes the declaration do nothing — 'top' restores on Back, 'preserve' does not restore.
+        name: "carries @scroll 'top' to the matched route",
+        run: async (r) => {
+            r.navigate('/always-top');
+            await settle();
+            expect(r.scroll(), 'the declaration stopped at the route table').toBe('top');
+        },
+    },
+    {
+        name: "carries @scroll 'preserve' to the matched route",
+        run: async (r) => {
+            r.navigate('/keep-place');
+            await settle();
+            expect(r.scroll()).toBe('preserve');
+        },
+    },
+    {
+        name: 'and no @scroll for a route that declares none',
+        // The control: a producer that put 'top' on everything would satisfy the two above.
+        run: async (r) => {
+            r.navigate('/about');
+            await settle();
+            expect(r.scroll()).toBeUndefined();
+        },
+    },
     ...HOSTILE_ROWS,
 ];
 
@@ -1193,329 +1186,118 @@ beforeEach(() => {
 });
 afterEach(() => {
     destroyRouter();
-    // The stand-in for the imported page modules is global state, and a table left behind would let
-    // a later row find a loader no route in it declares.
+    // The stand-ins for the imported page modules and for the installed table are global state, and
+    // one left behind would let a later row find a loader, or a redirect, no route in it declares.
     delete (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes;
+    delete globalThis.__pdx_route_table;
+    installRouteTable(null);
 });
 
-for (const impl of IMPLEMENTATIONS) {
-    describe(`${impl.name} router`, () => {
+for (const producer of PRODUCERS) {
+    describe(`the router, from the ${producer.name}`, () => {
         for (const row of PARITY) {
-            // A row this implementation cannot satisfy yet is SKIPPED BY NAME, with its owner in the
-            // title, so `vitest --reporter=verbose` reads as a to-do list rather than a silence.
-            const skip = row.owner !== undefined && (row.failsOn ?? 'generated') === impl.name;
-            const title = skip ? `${row.name} — not yet: ${row.owner}` : row.name;
-            (skip ? it.skip : it)(title, async () => {
-                await row.run(impl.make(ROUTES, row.options));
+            it(row.name, async () => {
+                await row.run(producer.make(ROUTES, row.options));
             });
         }
     });
 }
 
-describe('the parity table itself', () => {
-    it('covers both implementations', () => {
-        // A one-implementation table would let "parity" mean nothing.
-        expect(IMPLEMENTATIONS.map(i => i.name)).toEqual(['runtime', 'generated']);
+describe('the behaviour table itself', () => {
+    it('covers every producer', () => {
+        // A suite fed by one producer would let a field the other drops pass unseen.
+        expect(PRODUCERS.map(p => p.name)).toEqual(['build table', 'dev table', 'createRouter(routes)']);
     });
 
     it('is a table worth calling one', () => {
         expect(PARITY.length).toBeGreaterThan(20);
     });
-
-    it('names the implementation each pending row fails on', () => {
-        // Without this, a row could be marked pending and skipped on neither side — claimed on
-        // paper and asserted nowhere.
-        const bad = PARITY.filter(r => r.owner !== undefined
-            && r.failsOn !== undefined
-            && !IMPLEMENTATIONS.some(i => i.name === r.failsOn));
-        expect(bad.map(r => r.name)).toEqual([]);
-    });
-
-    it('records the disagreements separately from the missing capabilities', () => {
-        // A row failing on the RUNTIME is a different kind of finding: the two routers behave
-        // differently on the same input, which is what this table is uniquely able to see. The list
-        // is empty, and the assertion stays: a disagreement has to be marked as one, not filed as a
-        // missing capability.
-        const disagreements = PARITY.filter(r => r.failsOn === 'runtime').map(r => r.name);
-        expect(disagreements).toEqual([]);
-    });
-
-    it('has no unclaimed row', () => {
-        // The rule this file exists to enforce: every behaviour the generated router does not have
-        // yet names the issue that will give it one. A row with no owner must already pass on both,
-        // and the suite above is what proves it does.
-        const unclaimed = PARITY.filter(r => r.owner !== undefined && !/^#\d+$/.test(r.owner));
-        expect(unclaimed.map(r => r.name), 'these are marked pending with no issue behind them').toEqual([]);
-    });
-
-    it('claims every row that the generated router cannot satisfy', () => {
-        // Stated as a number so a row losing its owner is visible.
-        const claimed = PARITY.filter(r => r.owner !== undefined);
-        // Zero: both routers satisfy every row. A rise is a finding stated rather than smoothed over.
-        expect(claimed.length).toBe(0);
-        expect([...new Set(claimed.map(r => r.owner))].sort()).toEqual([]);
-    });
 });
 
-// ─── Guard decisions the shared table cannot express ─────────────────────────
+// ─── Where a denied guard goes, set with configureRouter ─────────────────────
 //
-// Both belong to the GENERATED router only, for a reason worth stating: the runtime router keeps its
-// guard checker in a module-level variable with no way to clear it, so "no checker is registered" is
-// a state a shared row cannot reach once any earlier row has registered one. The runtime's own
-// version of the first case is packages/router/tests/guard-unregistered.test.ts; the second has no
-// runtime equivalent because `guardFailRedirect` is a createRouter option there and a
-// configureRouter() call here.
+// `guardFailRedirect` is an option the routes cannot carry. createRouter takes it, and
+// configureRouter changes it on a running router — what an app does once its session is known.
 
-describe('the generated router, on guards it decides alone', () => {
-    it('denies a guarded route when NO checker is registered', () => {
-        // A declared guard that cannot be evaluated is denied, never
-        // allowed. An app that forgets to register a checker must not get its admin routes opened by
-        // the omission — and it is warned, once, rather than silently refused forever.
-        const r = evaluateGenerated(ROUTES);
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        r.navigate('/admin');
-        return new Promise<void>(resolve => setTimeout(() => {
-            expect(r.matched(), 'a guard nothing can evaluate must not open the route').toBeNull();
-            expect(r.navError()).toBe('403');
-            expect(warn).toHaveBeenCalledTimes(1);
-            expect(String(warn.mock.calls[0][0])).toContain('denied, never allowed');
-            warn.mockRestore();
-            resolve();
-        }, 20));
+for (const producer of PRODUCERS) {
+    describe(`configureRouter on the router from the ${producer.name}`, () => {
+        it('sends a denied navigation to guardFailRedirect', async () => {
+            const r = producer.make(ROUTES);
+            r.registerGuard(() => false);
+            configureRouter({ guardFailRedirect: '/about' });
+            r.navigate('/admin');
+            await settle();
+
+            // The redirect target wins over the 403: the app said where a denial should land.
+            expect(r.matched()).toBe('/about');
+            expect(r.navError()).toBeNull();
+            // And the ADDRESS goes with it. Asserting the resolved route alone lets a missing write
+            // through: the page rendered is the redirect target while the URL is still the route
+            // that was refused, so a reload goes back to the denial.
+            expect(location.pathname).toBe('/about');
+        });
+
+        it('asks a FUNCTION which way a denial goes, and takes null for "refuse here"', async () => {
+            // A denial has two causes: no session wants the login, a session without the permission
+            // wants the 403 where it happened. The router cannot tell them apart — the checker
+            // answers a boolean — so the app answers, per denied permission.
+            const r = producer.make(ROUTES);
+            const asked: string[] = [];
+            r.registerGuard(() => false);
+            configureRouter({ guardFailRedirect: (permission) => { asked.push(permission); return null; } });
+            r.navigate('/admin');
+            await settle();
+
+            expect(asked, 'the function was never called').toEqual(['admin.access']);
+            expect(r.navError(), 'null means refuse here, and it redirected instead').toBe('403');
+            expect(location.pathname, 'a 403 that moves the address bar cannot be reloaded or linked')
+                .toBe('/admin');
+        });
+
+        it('and takes a path from that same function', async () => {
+            // The control for the row above: a function that answers a path is a redirect, so "null
+            // refuses" is not satisfied by a router that ignores functions altogether.
+            const r = producer.make(ROUTES);
+            r.registerGuard(() => false);
+            configureRouter({ guardFailRedirect: () => '/about' });
+            r.navigate('/admin');
+            await settle();
+
+            expect(r.matched()).toBe('/about');
+            expect(r.navError()).toBeNull();
+            expect(location.pathname).toBe('/about');
+        });
+
+        it('does not loop when the redirect target is itself denied', async () => {
+            // Loop-safety: redirecting to the path we are already on would recurse forever.
+            const r = producer.make([
+                { path: '/', file: 'h.pdx', tag: 'pdx-h' },
+                { path: '/denied', file: 'd.pdx', tag: 'pdx-d', guard: 'nope' },
+            ]);
+            r.registerGuard(() => false);
+            configureRouter({ guardFailRedirect: '/denied' });
+            r.navigate('/denied');
+            await settle();
+
+            expect(r.navError(), 'redirecting to the denied path itself must fall through to 403').toBe('403');
+        });
     });
-
-    it('sends a denied navigation to guardFailRedirect when one is configured', async () => {
-        const src = generateOptimizedRouter(ROUTES)
-            .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
-            .replace(/^export\s+/gm, '');
-        const m = new Function('__core', `${src}
-return { currentRoute, currentNavError, navigate, registerGuardChecker, configureRouter };`)(core) as {
-            currentRoute: () => { path: string } | null;
-            currentNavError: () => string | null;
-            navigate: (p: string) => void;
-            registerGuardChecker: (c: () => boolean) => void;
-            configureRouter: (o: { guardFailRedirect?: string }) => void;
-        };
-
-        m.registerGuardChecker(() => false);
-        m.configureRouter({ guardFailRedirect: '/about' });
-        m.navigate('/admin');
-        await settle();
-
-        // The redirect target wins over the 403: the app said where a denial should land.
-        expect(m.currentRoute()?.path).toBe('/about');
-        expect(m.currentNavError()).toBeNull();
-        // And the ADDRESS goes with it. Asserting the resolved route alone lets a missing write
-        // through: the page rendered is the redirect target while the URL is still the route that
-        // was refused, so a reload goes back to the denial. The runtime router's half is
-        // guard-redirect-boot.test.ts.
-        expect(location.pathname).toBe('/about');
-    });
-
-    it('asks a FUNCTION which way a denial goes, and takes null for "refuse here"', async () => {
-        // A denial has two causes: no session wants the login, a session without the permission
-        // wants the 403 where it happened. The router cannot tell them apart — the checker answers
-        // a boolean — so the app answers, per denied permission.
-        //
-        // Here as a parity row because a generated router that ignores anything that is not a
-        // string would show the 403 in dev and go to the login in a production build, which is
-        // the mode difference this file exists to make impossible.
-        const src = generateOptimizedRouter(ROUTES)
-            .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
-            .replace(/^export\s+/gm, '');
-        const m = new Function('__core', `${src}
-return { currentRoute, currentNavError, navigate, registerGuardChecker, configureRouter };`)(core) as {
-            currentRoute: () => { path: string } | null;
-            currentNavError: () => string | null;
-            navigate: (p: string) => void;
-            registerGuardChecker: (c: () => boolean) => void;
-            configureRouter: (o: { guardFailRedirect?: string | ((p: string) => string | null) }) => void;
-        };
-
-        const asked: string[] = [];
-        m.registerGuardChecker(() => false);
-        m.configureRouter({ guardFailRedirect: (permission) => { asked.push(permission); return null; } });
-        m.navigate('/admin');
-        await settle();
-
-        expect(asked, 'the generated router never called the function').toEqual(['admin.access']);
-        expect(m.currentNavError(), 'null means refuse here, and it redirected instead').toBe('403');
-        expect(location.pathname, 'a 403 that moves the address bar cannot be reloaded or linked')
-            .toBe('/admin');
-    });
-
-    it('and takes a path from that same function', async () => {
-        // The control for the row above: a function that answers a path is a redirect, so "null
-        // refuses" is not satisfied by a build that ignores functions altogether.
-        const src = generateOptimizedRouter(ROUTES)
-            .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
-            .replace(/^export\s+/gm, '');
-        const m = new Function('__core', `${src}
-return { currentRoute, currentNavError, navigate, registerGuardChecker, configureRouter };`)(core) as {
-            currentRoute: () => { path: string } | null;
-            currentNavError: () => string | null;
-            navigate: (p: string) => void;
-            registerGuardChecker: (c: () => boolean) => void;
-            configureRouter: (o: { guardFailRedirect?: string | ((p: string) => string | null) }) => void;
-        };
-
-        m.registerGuardChecker(() => false);
-        m.configureRouter({ guardFailRedirect: () => '/about' });
-        m.navigate('/admin');
-        await settle();
-
-        expect(m.currentRoute()?.path).toBe('/about');
-        expect(m.currentNavError()).toBeNull();
-        expect(location.pathname).toBe('/about');
-    });
-
-    it('does not loop when the redirect target is itself denied', async () => {
-        // Loop-safety: redirecting to the path we are already on would recurse forever.
-        const routes = [
-            { path: '/', file: 'h.pdx', tag: 'pdx-h' },
-            { path: '/denied', file: 'd.pdx', tag: 'pdx-d', guard: 'nope' },
-        ];
-        const src = generateOptimizedRouter(routes)
-            .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
-            .replace(/^export\s+/gm, '');
-        const m = new Function('__core', `${src}
-return { currentNavError, navigate, registerGuardChecker, configureRouter };`)(core) as {
-            currentNavError: () => string | null;
-            navigate: (p: string) => void;
-            registerGuardChecker: (c: () => boolean) => void;
-            configureRouter: (o: { guardFailRedirect?: string }) => void;
-        };
-
-        m.registerGuardChecker(() => false);
-        m.configureRouter({ guardFailRedirect: '/denied' });
-        m.navigate('/denied');
-        await settle();
-
-        expect(m.currentNavError(), 'redirecting to the denied path itself must fall through to 403').toBe('403');
-    });
-});
-
-// ─── What each router HANDS to the shared core ───────────────────────────────
-//
-// One missing argument is enough to make `@scroll 'top'` do nothing in a production build: the
-// interpreted router calls `restoreScroll(path, isBack, outlet, config.scroll)`, and a generated
-// `restoreScrollPosition(pathname, isBack, _primaryOutlet())` drops the last one. Inside core, an
-// absent `behavior` collapses the decision to `restoring = isBack`, so BOTH declarations become
-// no-ops — `'top'` restores on Back and `'preserve'` does not restore on a forward navigation.
-//
-// The rows above cannot see it: they compare what the two routers PUBLISH — the path, the params,
-// the matched route — and this is about what they CALL. So the comparison is on the calls
-// themselves, and it is general rather than about scrolling: for every core function both routers
-// use, the generated one must pass at least as many arguments as the interpreted one. A dropped
-// argument is the shape this family of defect takes (`loader`, `scroll`, `hasOutlet`, `label`).
-
-const RUNTIME_SRC = readFileSync(join(__dirname, '..', 'src', 'runtime.ts'), 'utf-8');
-
-/** `import { a as b, c } from '@pdxui/core'` → { a: 'b', c: 'c' }: the LOCAL name of each. */
-function coreLocalNames(src: string): Map<string, string> {
-    const names = new Map<string, string>();
-    // EVERY such statement, not the first: `runtime.ts` has three, and the scroll pair is in the
-    // second — reading only one of them misses the defect this guard exists for.
-    // `import type` is skipped: a type is not a call.
-    for (const m of src.matchAll(/import\s+(?!type\s)\{([^}]*)\}\s*from\s*'@pdxui\/core'/g)) {
-        for (const part of m[1].split(',')) {
-            const [imported, local] = part.trim().split(/\s+as\s+/);
-            if (imported) names.set(imported.trim(), (local ?? imported).trim());
-        }
-    }
-    return names;
 }
 
-/** How many arguments the widest call to `fn` passes. 0 when it is never called. */
-function maxArity(src: string, fn: string): number {
-    let widest = 0;
-    const call = new RegExp(`\\b${fn}\\s*\\(`, 'g');
-    let hit: RegExpExecArray | null;
-    while ((hit = call.exec(src)) !== null) {
-        let depth = 1, args = 0, seen = false;
-        for (let i = hit.index + hit[0].length; i < src.length && depth > 0; i++) {
-            const ch = src[i];
-            if (ch === '(' || ch === '[' || ch === '{') depth++;
-            else if (ch === ')' || ch === ']' || ch === '}') depth--;
-            else if (ch === ',' && depth === 1) args++;
-            if (depth === 1 && !/\s/.test(ch) && ch !== ',') seen = true;
-        }
-        widest = Math.max(widest, seen ? args + 1 : 0);
-    }
-    return widest;
-}
-
-describe('the two routers hand the same things to core', () => {
-    const generatedSrc = generateOptimizedRouter(ROUTES);
-    const runtimeNames = coreLocalNames(RUNTIME_SRC);
-    const generatedNames = coreLocalNames(generatedSrc);
-
-    it('read both sources, and they do import core', () => {
-        // Without this the comparison below is two empty lists agreeing.
-        expect(runtimeNames.size, 'runtime.ts imports nothing from core').toBeGreaterThan(2);
-        expect(generatedNames.size, 'the generated router imports nothing from core').toBeGreaterThan(2);
-    });
-
-    it('passes every argument the interpreted one passes', () => {
-        const shared = [...runtimeNames.keys()].filter((fn) => generatedNames.has(fn));
-        expect(shared.length, 'the two routers share no core function at all').toBeGreaterThan(1);
-
-        const thinner = shared
-            .map((fn) => ({
-                fn,
-                runtime: maxArity(RUNTIME_SRC, runtimeNames.get(fn)!),
-                generated: maxArity(generatedSrc, generatedNames.get(fn)!),
-            }))
-            .filter((r) => r.generated < r.runtime);
-
-        expect(thinner,
-            'the generated router calls these with fewer arguments than the interpreted one, so '
-            + 'whatever the last argument decides is decided by its default in a production build',
-        ).toEqual([]);
-    });
-});
-
-describe('the generated router carries @scroll to the restoration', () => {
-    // The behaviour behind the rule above, measured rather than inferred — and the mirror of
-    // `outlet-scroll-behavior.test.ts`, which asserts exactly this for the interpreted router.
-    function behavioursSeen(routes: ParityRoute[], path: string): (string | undefined)[] {
-        const seen: (string | undefined)[] = [];
-        const spyCore = {
-            ...core,
-            restoreScrollPosition: (_p: string, _b: boolean, _el?: Element | null, behavior?: string) => {
-                seen.push(behavior);
-            },
-        };
-        const src = generateOptimizedRouter(routes)
-            .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
-            .replace(/^export\s+/gm, '');
-        const m = new Function('__core', `${src}\nreturn { navigate };`)(spyCore) as
-            { navigate: (p: string) => void };
-        seen.length = 0;
-        m.navigate(path);
-        return seen;
-    }
-
-    const SCROLL_ROUTES: ParityRoute[] = [
-        { path: '/', file: 'h.pdx', tag: 'pdx-h' },
-        { path: '/always-top', file: 't.pdx', tag: 'pdx-t', scroll: 'top' },
-        { path: '/keep-place', file: 'k.pdx', tag: 'pdx-k', scroll: 'preserve' },
-        { path: '/plain', file: 'p.pdx', tag: 'pdx-p' },
-    ];
-
-    it("passes 'top' through", () => {
-        expect(behavioursSeen(SCROLL_ROUTES, '/always-top'),
-            'the declaration stopped at the route table: a production build ignores @scroll')
-            .toEqual(['top']);
-    });
-
-    it("passes 'preserve' through", () => {
-        expect(behavioursSeen(SCROLL_ROUTES, '/keep-place')).toEqual(['preserve']);
-    });
-
-    it('and nothing for a route that declares nothing', () => {
-        // The control: a router that passed 'top' to everything would satisfy the two above.
-        expect(behavioursSeen(SCROLL_ROUTES, '/plain'),
-            'a route with no @scroll acquired one').toEqual([undefined]);
+describe('a table route reaches the router with every field', () => {
+    // `toRouteConfig` is the one place a table route becomes a RouteConfig. A field it dropped
+    // would fail in silence on the two table producers and pass on `createRouter(routes)`.
+    it('keeps what the router reads', () => {
+        const table = evaluateTable([{
+            path: '/x/:id', file: 'x.pdx', tag: 'pdx-x', guard: 'g', meta: { a: 1 }, hasOutlet: true,
+            scroll: 'top', label: 'X :id', labelKey: 'x.title', loader: 'loadX',
+        }], buildSpecifier);
+        const config = toRouteConfig(table.routes[0]);
+        expect(config).toMatchObject({
+            path: '/x/:id', guard: 'g', meta: { a: 1 }, hasOutlet: true, scroll: 'top',
+            label: 'X :id', labelKey: 'x.title',
+        });
+        expect(typeof config.loader, 'the loader bridge was dropped').toBe('function');
+        expect((config.component() as Element).tagName.toLowerCase()).toBe('pdx-x');
     });
 });

@@ -47,13 +47,11 @@ describe('@search validation codegen', () => {
     });
 
     it('imports currentSearch from @pdxui/router — the router that is RUNNING, never a second one', () => {
-        // There is exactly ONE router in a build — `@pdxui/router` funnels through
-        // `src/active.ts`, whose CONTENT is the generated module in a production build — so
-        // importing from the package is how a component gets the router that is actually
-        // navigating. Naming `virtual:pdx-router` directly is the split-brain state: it would
-        // instantiate the generated module a second time, beside the one the outlet drives, with
-        // its own signals and its own popstate listener — one router listening to popstate, the
-        // other being read, and a search signal that goes stale.
+        // There is exactly ONE router — `@pdxui/router`, which a production build reaches through
+        // `src/active.ts` with the route table installed in front of it (#108) — so importing from
+        // the package is how a component gets the router that is actually navigating. A compiled
+        // component has no business naming a virtual module of the plugin's: the route table is the
+        // router's input, not a component's.
         const { code } = compile(`
 <template><div>{{ searchParams.page }}</div></template>
 <script setup>
@@ -62,8 +60,8 @@ describe('@search validation codegen', () => {
 </script>`, 'items.pdx');
 
         expect(code).toContain("import { currentSearch } from '@pdxui/router';");
-        expect(code, 'a component naming the virtual module gets a router nothing is navigating')
-            .not.toContain("from 'virtual:pdx-router'");
+        expect(code, 'a component named a virtual module instead of the router package')
+            .not.toMatch(/from ['"]virtual:/);
     });
 
     it('applies default + number validation from the @search schema', () => {

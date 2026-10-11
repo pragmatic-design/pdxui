@@ -7,9 +7,8 @@
 // import by hand, or the framework's own first rule is broken: if the dev writes wiring, it is a
 // bug of the framework.
 //
-// From `@pdxui/router`, never from `virtual:pdx-router`: the package is the address of the
-// router that is RUNNING (the seam decides which), and naming the virtual module instantiates a
-// second one beside the one the outlet drives. p2-plus.test.ts holds that rule for `@search`.
+// From `@pdxui/router`, never from a virtual module of the plugin's: the package is the address of
+// the router that is RUNNING. p2-plus.test.ts holds that rule for `@search`.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
@@ -35,10 +34,8 @@ describe('a page that declares @loader can read its own data', () => {
         expect(code).toMatch(/import \{[^}]*currentLoaderState[^}]*\} from '@pdxui\/router';/);
     });
 
-    it('takes them from the package, not from the virtual module', () => {
-        // Naming `virtual:pdx-router` gets a router nothing is navigating: its own signals, its own
-        // popstate listener, beside the one the outlet drives.
-        expect(out(LOADER_PAGE)).not.toContain("from 'virtual:pdx-router'");
+    it('takes them from the package, not from a virtual module', () => {
+        expect(out(LOADER_PAGE)).not.toMatch(/from ['"]virtual:/);
     });
 
     it('imports nothing for a page that declares no @loader', () => {

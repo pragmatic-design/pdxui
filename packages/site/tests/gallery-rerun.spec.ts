@@ -6,8 +6,8 @@
  * the same route — a new `currentParams()` object with the same values, which a `$derived` passes on
  * as a change — runs the effect again. If the first run keeps polling the element the second removed,
  * twenty frames later it wipes the second run's gallery, which has rendered, and the page shows
- * "Full interactive demos are being finalized". An awaited before-hook puts the generated router's
- * second resolution after mount, which is how it happens in practice.
+ * "Full interactive demos are being finalized". An awaited before-hook puts the router's second
+ * resolution after mount, which is how it happens in practice.
  *
  * Two same-URL navigations in one task give two resolutions of the route at once, deterministically.
  */

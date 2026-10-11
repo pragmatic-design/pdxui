@@ -82,7 +82,8 @@ describe('@layout resolves to the chain the outlet reads', () => {
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { scanForRoutes, generateOptimizedRouter, type ScannedRoute } from '../src/plugin-utils';
+import { scanForRoutes, type ScannedRoute } from '../src/plugin-utils';
+import { generateRouteTable } from '../src/route-table';
 
 describe('and the same page in a production build', () => {
     let dir: string;
@@ -103,7 +104,7 @@ describe('and the same page in a production build', () => {
             .toEqual(['pdx-admin-layout']);
     });
 
-    it('compiles the chain into the generated router', () => {
-        expect(generateOptimizedRouter(routes)).toContain('layouts: ["pdx-admin-layout"]');
+    it('compiles the chain into the route table', () => {
+        expect(generateRouteTable(routes)).toContain('layouts: ["pdx-admin-layout"]');
     });
 });

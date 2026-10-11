@@ -162,12 +162,8 @@ export function compileNewMode(
     // Merge plugin user imports into the user imports list
     const allUserImports = [...analysis.userImports];
     if (runner) allUserImports.push(...runner.extraUserImports);
-    // @search: import currentSearch from `@pdxui/router`, never from 'virtual:pdx-router'.
-    //
-    // The virtual module is what `@pdxui/router` RESOLVES TO in a production build, and it exposes
-    // the same reactive signal — but importing the virtual module by name instantiates a SECOND
-    // router beside the one the outlet is driving, with its own signals and its own popstate listener. The package is the only address of the router
-    // that is running. `packages/compiler/tests/p2-plus.test.ts` holds this.
+    // @search: import currentSearch from `@pdxui/router`, the only address of the router that is
+    // running. `packages/compiler/tests/p2-plus.test.ts` holds this.
     if (analysis.route.searchParams && analysis.route.searchParams.length > 0) {
         autoImportRouter(allUserImports, ['currentSearch']);
     }
@@ -308,10 +304,8 @@ export function compileStoreMode(
  * is a duplicate binding and a SyntaxError, and it would appear only for the author who reached for
  * the import before the compiler offered it — the one person who cannot be blamed for it.
  *
- * Always from `@pdxui/router`, never from `virtual:pdx-router`. The package is the address of
- * the router that is RUNNING — `packages/router/src/active.ts` is what a production build swaps
- * — while naming the virtual module instantiates a SECOND router beside the one the
- * outlet is driving, with its own signals and its own popstate listener.
+ * Always from `@pdxui/router`: the package is the address of the router that is RUNNING, and a
+ * production build installs its route table through it (`packages/router/src/active.ts`).
  */
 function autoImportRouter(userImports: string[], names: string[]): void {
     const missing = names.filter(name => !userImports.some(

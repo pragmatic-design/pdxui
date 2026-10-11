@@ -1,10 +1,9 @@
 // The seam, asserted on a real build's output rather than on the intent.
 //
-// Every other test of the seam checks a hook in isolation: `load` answers for `active.ts`, the
-// generated module exports the right names, no file in the router package bypasses it. None of them
-// proves the thing that matters, which is that after Vite has resolved, bundled and tree-shaken an
-// app, the code that ships is the generated router and the interpreted one is GONE. A seam that
-// swaps the module but leaves the old one in the graph is two routers in one bundle.
+// Every other test of the seam checks a hook in isolation: `load` answers for `active.ts` with the
+// table installed in front of it, no file in the router package bypasses it. None of them proves
+// the thing that matters, which is that after Vite has resolved, bundled and tree-shaken an app, the
+// bundle carries the app's route table, installs it, and contains ONE router (#108).
 //
 // So this runs an actual production build of a minimal app and reads the chunk — on a fixture
 // instead of on packages/site, so it can live in a suite.
@@ -68,23 +67,32 @@ describe('what a production build actually ships', () => {
         expect(code.length).toBeGreaterThan(1000);
     });
 
-    it('ships the generated switch, compiled from the app\'s own @page declarations', () => {
-        expect(code, 'the production bundle is not running the generated router')
-            .toContain('case "/about"');
-        expect(code).toContain('case "/admin"');
+    it('ships the route table, compiled from the app\'s own @page declarations', () => {
+        expect(code, 'the production bundle carries no route table').toContain('path: "/about"');
+        expect(code).toContain('path: "/admin"');
     });
 
-    it('does not ship the interpreted router beside it', () => {
-        // A string only `packages/router/src/runtime.ts` contains. Chosen over an identifier because
-        // identifiers are renamed by a minifier and a string literal is not — this assertion has to
-        // keep meaning something when `minify` is on.
-        expect(code, 'both routers are in the bundle: one navigates, the other is read')
-            .not.toContain('Refused a redirect from');
+    it('installs it through the seam', () => {
+        expect(code, 'the table is in the bundle but nothing installs it').toMatch(/installRouteTable\w*\(/);
     });
 
-    it('carries the guard the app declared, as data the generated matcher reads', () => {
-        // A production build evaluates @guard with the generated matcher, not the dev one; otherwise
-        // the generated router's guard is inert data nobody reads.
+    it('ships one router', () => {
+        // A string the router's navigation contains once. A string literal rather than an
+        // identifier, because a minifier renames identifiers — this has to keep meaning something
+        // when `minify` is on. Two would be two routers in one bundle: one navigates, the other is read.
+        expect(code.split('Redirect loop detected').length - 1, 'not exactly one router in the bundle').toBe(1);
+    });
+
+    it('carries no path of the machine that built it', () => {
+        // The table once named each lazy page by `file`, the absolute path the build imported it
+        // from, beside the `import()` that already loads it: every app shipped its build machine's
+        // folders.
+        const slashed = root.replace(/\\/g, '/');
+        expect(code.includes(slashed), `the bundle names ${slashed}`).toBe(false);
+        expect(code.includes(root), `the bundle names ${root}`).toBe(false);
+    });
+
+    it('carries the guard the app declared, as data the router reads', () => {
         expect(code).toContain('guard: "admin.access"');
     });
 });

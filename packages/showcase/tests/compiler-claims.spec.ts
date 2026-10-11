@@ -47,21 +47,26 @@ test.describe('dead code elimination: a signal nothing reads is removed — TRUE
     });
 });
 
-test.describe('the router is the generated one, not the interpreted one — TRUE', () => {
-    test('the interpreted matcher\'s regex construction is absent', () => {
-        // `pathToRegex` builds `([^/]+)` for every unconstrained param. The generated router reads
-        // path segments from an array instead, so that string appears only if the interpreted
-        // router shipped. It is a string literal, so minification keeps it.
-        expect(bundle('.js'), 'the interpreted router is in the production bundle')
-            .not.toContain('([^/]+)');
+test.describe('one router; the build emits the route table as data — TRUE (#108)', () => {
+    test('the route table is in the bundle, as data', () => {
+        // The compiler emits `{ path: "…", tag: "…" }` per route; the router builds its matcher from
+        // it once, when it starts. A string literal, so minification keeps it.
+        expect(bundle('.js'), 'the route table is not in the production bundle').toContain('"/tickets/:id"');
     });
 
-    test('and this app declares no param constraint, so it really is zero regex for routing', () => {
-        // The generator's own header only claims "zero regex" when no route declares a constraint,
-        // and it compiles one RegExp per constraint when they do. Stated here so the claim is read
-        // with its condition rather than as an absolute.
+    test('and the bundle carries one router, not two', () => {
+        // A string the router's navigation contains once. Two would be the old shape: a router the
+        // build generated beside the one the package ships.
+        expect(bundle('.js').split('Redirect loop detected').length - 1, 'not exactly one router').toBe(1);
+    });
+
+    test('this app declares only whole-segment patterns, so its navigation runs no regex', () => {
+        // The rule — whole-segment patterns match by segment, a constraint is the one regex, a
+        // pattern that is not made of whole segments keeps one — is measured by counting regex runs
+        // in `packages/router/tests/matcher.test.ts`. Stated here so the claim is read with its
+        // condition rather than as an absolute.
         const paths = ['/tickets/:id', '/tickets/:id/interventions/:n'];
-        for (const p of paths) expect(p).not.toMatch(/\(/);
+        for (const p of paths) expect(p).not.toMatch(/\(|\*|:\w+(?=[^\w/])/);
     });
 });
 

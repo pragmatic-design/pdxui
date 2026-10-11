@@ -1,11 +1,11 @@
 /**
  * `@scroll`, against the production build.
  *
- * The generated router passes `config.scroll` to the restoration as the interpreted one does. With
- * three arguments instead of four, core's decision collapses to `restoring = isBack` and BOTH
- * declarations become no-ops — `'top'` restores on Back, `'preserve'` does not restore on a forward
- * navigation. Development runs interpreted, so a developer who declares `@scroll` watches it work
- * and ships the other router.
+ * The router passes the matched route's `scroll` to the restoration, and in a build that field
+ * arrives through the route table. With three arguments instead of four, core's decision collapses
+ * to `restoring = isBack` and BOTH declarations become no-ops — `'top'` restores on Back,
+ * `'preserve'` does not restore on a forward navigation. A table that dropped the field would let a
+ * developer watch `@scroll` work in one mode and ship it broken in the other.
  *
  * Three things this file does because of what happens without them:
  *

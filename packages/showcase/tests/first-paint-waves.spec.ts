@@ -6,9 +6,9 @@
 // network it is a full RTT, paid by every first-time visitor.
 //
 // Vite emits `rel="modulepreload"` for what it can see statically, and a route is a dynamic import
-// the generated router resolves — so it cannot see it. The compiler can: the route table is built
-// at compile time, which is the premise of the generated router. The plugin names the landing
-// route's chunk, and the chunks that chunk imports statically, in the HTML.
+// the router resolves — so it cannot see it. The compiler can: the route table is built at compile
+// time. The plugin names the landing route's chunk, and the chunks that chunk imports statically,
+// in the HTML.
 //
 // Two measurements, and they fail for different reasons: the HTML one says the links are there, the
 // wave one says they did something. A preload that names the wrong file passes the first and not

@@ -9,8 +9,8 @@
 // `preload` — rather than in a new directive. A second syntax for "something about this route" is
 // a second thing to learn and a second thing to forget.
 //
-// This file measures the SCAN, which is what builds the route table the generated router compiles
-// in. The analyzer and the scan can read one directive differently, so the scan gets its own
+// This file measures the SCAN, which is what builds the route table the compiler emits. The
+// analyzer and the scan can read one directive differently, so the scan gets its own
 // assertion.
 
 import { describe, it, expect, afterEach } from 'vitest';

@@ -34,6 +34,9 @@ declare global {
     var __pdx_redirects: unknown;
     // eslint-disable-next-line no-var
     var __pdx_error_pages: unknown;
+    /** The dev server's route table, handed over by the module the plugin puts in index.html. */
+    // eslint-disable-next-line no-var
+    var __pdx_route_table: unknown;
     /** Opt-in path to redirect to when a route guard denies access (default: show 403). */
     // eslint-disable-next-line no-var
     /**

@@ -5,7 +5,7 @@
 // them existed, the entry would contain the whole application, and `@page`'s code splitting could
 // not happen — the dynamic import the outlet performs would resolve to a module already in the entry.
 //
-// The generated router carries the table. Every field the outlet reads has to be in it, and a
+// The compiler emits the table. Every field the outlet reads has to be in it, and a
 // field that is missing is not an error: it is a page that renders in dev with a transition, or a
 // keep-alive, or a scroll behaviour, and without it in a production build — a field dropped by a
 // mapping that nothing compares.
@@ -17,7 +17,8 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { scanForRoutes, generateOptimizedRouter, type ScannedRoute } from '../src/plugin-utils';
+import { scanForRoutes, type ScannedRoute } from '../src/plugin-utils';
+import { generateRouteTable } from '../src/route-table';
 
 const PAGE = `
 <template>
@@ -93,8 +94,8 @@ describe('the scan reads the whole declaration', () => {
     });
 });
 
-describe('the generated router emits what the scan found', () => {
-    const source = (): string => generateOptimizedRouter(routes);
+describe('the route table emits what the scan found', () => {
+    const source = (): string => generateRouteTable(routes);
 
     it('every field reaches the emitted table', () => {
         const js = source();
@@ -117,10 +118,11 @@ describe('the generated router emits what the scan found', () => {
             .not.toMatch(/import\("[^"]*home\.pdx"\)/);
     });
 
-    it('the table is reachable as a function, not only as a const', () => {
-        // `routeTable()` is what the outlet calls through the seam; the interpreted router answers
-        // null and the outlet falls back to the module registrations.
-        expect(source()).toContain('export function routeTable()');
-        expect(source()).toContain('export function pageModule(');
+    it('exports the routes and the page imports under the names the router installs', () => {
+        // `RouteTable` in @pdxui/router: `routes`, `pageModules`, `redirects`. `routeTable()` and
+        // `pageModule()` are the router's readers of them.
+        expect(source()).toContain('export const routes = [');
+        expect(source()).toContain('export const pageModules = {');
+        expect(source()).toContain('export const redirects = ');
     });
 });

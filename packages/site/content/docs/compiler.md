@@ -91,7 +91,7 @@ assertion per row against a real production build.
 | Aspect | Dev (interpreted) | Prod (compiled) | |
 | --- | --- | --- | --- |
 | Binding | `setProp()` with dispatch | direct inline assignment | **yes** — the default; 19 ms → 5.5 ms on a 1500-row mount |
-| Router | regex matching | generated switch | **yes**, while no route declares a constraint |
+| Router | one router, the table from the dev server | the same router, the table compiled from `@page` | **one implementation** — a build emits the route table as data, and the router builds its matcher once at start-up: a navigation runs no regex for a whole-segment pattern (a constraint is the only one) |
 | CSS | injected at runtime | extracted to a stylesheet | **yes** — a route carries its CSS in a `.css`, not in its JS chunk |
 | Unread signal | present | removed | **yes** — semantic dead-code elimination, measured on the bundle |
 | Template | runtime with placeholders | pre-compiled DOM factory | only for a template with **no interpolation at all** |
@@ -127,9 +127,9 @@ the stylesheets they import:
 <link rel="preload" as="style" crossorigin href="/assets/dashboard-BJbnitW9.css">
 ```
 
-Vite emits those for what it can SEE — and a route is a dynamic import the generated router
-resolves, so it sees none of them. The compiler does: the route table is built at compile time,
-which is the same table the production router compiles in.
+Vite emits those for what it can SEE — and a route is a dynamic import the router resolves, so it
+sees none of them. The compiler does: the route table is built at compile time, and it is the same
+table the router reads.
 
 Measured on the showcase: without the preload, a cold first screen fetches its JavaScript in **three
 waves** — the entry, then the route's chunk once the browser has run the entry and learnt of it, then

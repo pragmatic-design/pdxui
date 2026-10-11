@@ -7,13 +7,13 @@
 // `customers.pdx`, so its crumb would vanish.
 //
 // So the label can be a dictionary KEY, written the way a template writes it — `$t('customers.title')`
-// — and carried as data, `labelKey`, in every table: the page's own registration, the generated
-// router and the dev server's. The router translates it with the route's params.
+// — and carried as data, `labelKey`, in every table: the page's own registration and the route
+// table, in a build and on the dev server. The router translates it with the route's params.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { analyzeScript } from '../src/compiler/script-analyzer';
-import { generateOptimizedRouter, generateDevRouteTable } from '../src/plugin-utils';
+import { generateRouteTable, devSpecifier } from '../src/route-table';
 
 const src = (script: string) =>
     `<template>\n<div>x</div>\n</template>\n<script setup>\n${script}\n</script>`;
@@ -39,8 +39,8 @@ describe('a label that names a dictionary key', () => {
         expect(code, 'the call went into the registration as a string').not.toContain('label:"$t(');
     });
 
-    it('the generated router carries the key, so an ancestor that is never loaded still names itself', () => {
-        const module = generateOptimizedRouter([
+    it('the route table carries the key, so an ancestor that is never loaded still names itself', () => {
+        const module = generateRouteTable([
             { path: '/customers', file: '/src/customers.pdx', tag: 'pdx-customers', labelKey: 'customers.title', lazy: true },
             { path: '/customers/:id', file: '/src/customer.pdx', tag: 'pdx-customer', lazy: true },
         ]);
@@ -48,11 +48,11 @@ describe('a label that names a dictionary key', () => {
     });
 
     it('the dev server\'s table carries it too', () => {
-        const table = generateDevRouteTable(
+        const table = generateRouteTable(
             [{ path: '/customers', file: '/app/src/customers.pdx', tag: 'pdx-customers', labelKey: 'customers.title', lazy: true }],
-            '/app',
+            devSpecifier('/app'),
         );
-        expect(table).toContain('"labelKey":"customers.title"');
+        expect(table).toContain('labelKey: "customers.title"');
     });
 
     it('control — a string label and a function label are what they were', () => {

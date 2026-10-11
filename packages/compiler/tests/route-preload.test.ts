@@ -5,8 +5,8 @@
 // chunk imports. The gaps between them are 24 of 80 ms on localhost, where a round-trip is free.
 //
 // Vite emits `modulepreload` for what it can SEE statically, and a route is a dynamic import the
-// generated router resolves, so on its own Vite puts none in `dist/index.html`. The compiler can see it: the
-// route table is built here, which is the premise of the generated router.
+// router resolves, so on its own Vite puts none in `dist/index.html`. The compiler can see it: the
+// route table is built here.
 //
 // This file measures the choice — which chunks, and which deliberately not. The effect on the
 // browser is `packages/showcase/tests/first-paint-waves.spec.ts`, which counts the waves.
