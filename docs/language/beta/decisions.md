@@ -76,6 +76,9 @@ issue implements it. Each line names where the rule lives.
 | 47 | `invalidate` takes tags, as documented; a `@fetch` tags itself with its own key, so its URL invalidates it | data.md |
 | 48 | `pdx-pin-input` is removed: `pdx-otp-input` declares `mask` and `numeric` (mechanical) | library.md, migration.md |
 | 49 | `pdx-button`'s toggle mode is removed: a pressed button is `pdx-toggle` (mechanical) | library.md, migration.md |
+| 51 | `pdx-button-group`'s selection modes (`mode="single"`, `mode="multiple"`) are removed: selecting among buttons is `pdx-toggle-group`; `pdx-button-group` only groups action buttons visually (mechanical) | library.md, migration.md |
+| 52 | `pdx-otp-input mask` takes the PIN defaults: `autocomplete="off"` and the accessible name «PIN» | library.md |
+| 53 | A `pdx-button toggle` migrated to `pdx-toggle` gets `variant="solid"`, the closest to its filled look | migration.md |
 | 50 | One rule across the library: a prop the component writes itself is a `@model`, one only the parent writes is a `@prop`, a read-only output emits `<name>-change`; overlays emit `open-change`; overlays share `show()`/`close()`/`toggle()`, navigation `next()`/`prev()`/`goTo(n)` | library.md |
 
 ## Still open

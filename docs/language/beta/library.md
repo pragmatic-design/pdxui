@@ -13,7 +13,9 @@ issue.
 open items of an accordion) emits `<name>-change` with `{ value }` without being a model. Overlays
 emit `open-change`, and share `show()`, `close()`, `toggle()`; navigation shares `next()`, `prev()`,
 `goTo(n)`. One component per job: `pdx-pin-input` is gone (`pdx-otp-input mask numeric`), and a
-pressed button is `pdx-toggle`, not a mode of `pdx-button` (decisions.md 48, 49). The families and
+pressed button is `pdx-toggle`, not a mode of `pdx-button`, and selecting among buttons is
+`pdx-toggle-group`, not a mode of `pdx-button-group` (decisions.md 48, 49, 51). A masked
+`pdx-otp-input` is a PIN: `autocomplete="off"`, accessible name «PIN» (decisions.md 52). The families and
 their issues are #286–#293.
 
 | Area | The component | Source |

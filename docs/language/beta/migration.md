@@ -52,7 +52,8 @@ proposals the implementing issue may change.
 | `::x` on a component prop that is not two-way | `@model x` in the child | flagged (the child is another file, maybe another package) | #124 (flagging †) |
 | `@await (x as T)`, where `as T` was a TypeScript assertion (alpha has no `as` binding) | `@await ((x as T))`: in the beta a trailing `as Name` binds the value | mechanical: parenthesises every `@await` whose expression ends in `as <Identifier>` | † (decision 18) |
 | `<pdx-pin-input>` | `<pdx-otp-input mask numeric length="4">` — pin-input defaulted to 4 cells and `numeric`, otp-input to 6; an explicit `length` or `:numeric` is carried over | mechanical | † (decision 48) |
-| `<pdx-button toggle :pressed="p">` | `<pdx-toggle ::pressed="p">` | mechanical | † (decision 49) |
+| `<pdx-button toggle :pressed="p">` | `<pdx-toggle variant="solid" ::pressed="p">` (an explicit outline or ghost variant is kept) | mechanical | † (decisions 49, 53) |
+| `<pdx-button-group mode="multiple">` or `mode="single"` | `<pdx-toggle-group type="multiple">` or `type="single"`, with `pdx-toggle` items | mechanical where every child is a plain button; flagged otherwise | † (decision 51) |
 | `@pdx-open` / `@pdx-close` on an overlay | `@open-change` (`$event.detail.value`) | mechanical | † (decision 50) |
 | overlay `hide()`, dropdown-menu/fab/context-menu `open()`; wizard `goNext()`/`goPrev()`/`goto()`, carousel `goto()`, pagination `goto()` | `close()`, `show()`; `next()`/`prev()`/`goTo(n)` | mechanical in templates and `:ref` calls; flagged elsewhere | † (decision 50) |
 | `:style.color="c"`, `:style.--accent="c"` | `:style="{ color: c, '--accent': c }"` | mechanical (merged into an existing object) | † (decision 5) |
