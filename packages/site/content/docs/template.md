@@ -6,6 +6,8 @@ order: 6
 
 # Template & directives
 
+> **Formal reference:** [docs/language/template.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/template.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 The `<template>` is plain HTML with four superpowers: **interpolation** (show values), **binding**
 (connect attributes and properties to signals), **events** (react to the user) and **directives**
 (`@if`, `@for`, `@defer`…) for structure. Everything is reactive: when a signal read in the template

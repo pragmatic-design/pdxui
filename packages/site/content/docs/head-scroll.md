@@ -6,6 +6,8 @@ order: 12
 
 # Head & Scroll
 
+> **Formal reference:** [docs/language/routing.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/routing.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 Two things SPAs often neglect and that make the difference between an app "that works" and a polished
 one: the `<head>` (title and meta that change with the page, for users and for SEO/social) and
 **scroll** (position preserved as you navigate back and forth). PDX makes both declarative.

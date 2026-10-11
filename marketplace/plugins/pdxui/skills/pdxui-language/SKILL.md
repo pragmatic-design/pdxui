@@ -10,6 +10,12 @@ already in their head cannot start at all.
 Everything here is read off the compiler, not remembered: the runes from `compiler/src/runes.d.ts`,
 the declarations and directives from the analyzer and the template parser.
 
+When the exact grammar of a construct matters — what `@fetch`, `@for` or `::value` accept, which
+diagnostic a wrong form raises — the formal reference is
+[docs/language](https://github.com/pragmatic-design/pdxui/tree/main/docs/language): one section per
+construct, with its EBNF, its semantics, its rules with their `PDX_*` codes, and examples a test
+compiles. This page is the working summary; the reference is the definition.
+
 ## A file
 
 ```html

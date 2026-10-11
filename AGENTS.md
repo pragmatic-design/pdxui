@@ -51,6 +51,7 @@ which is worth it for a component change.
 | | |
 |---|---|
 | Architecture | [docs/architecture](docs/architecture): `framework.md`, then `core.md` and `compiler.md` |
+| The language's formal reference: every rune and directive, its grammar, its diagnostics | [docs/language](docs/language), held to the compiler by `packages/compiler/tests/language-reference.test.ts` |
 | Component design rules (the compiler's design checks cite them) | [docs/PDX-COMPONENT-DESIGN.md](docs/PDX-COMPONENT-DESIGN.md) |
 | User documentation, published as the site | `packages/site/content/docs/` |
 | A component | `packages/ui/src/{name}/pdx-{name}.ts` |

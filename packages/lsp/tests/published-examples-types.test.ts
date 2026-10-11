@@ -17,7 +17,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { DIAGNOSTICS } from '@pdxui/compiler';
 import { typecheckPdx } from '../src/typecheck';
-import { docsExamples, skillExamples } from '../../compiler/tests/support/published-examples';
+import { docsExamples, skillExamples, languageExamples } from '../../compiler/tests/support/published-examples';
 
 const PACKAGES = join(__dirname, '..', '..');
 const SITE = join(PACKAGES, 'site');
@@ -53,9 +53,12 @@ const TYPE_ERRORS_SHOWN: Record<string, { tsCode: number; why: string }[]> = {
     // The editor's projection does not declare a @params field as a name; the compiler does (#185).
     'diagnostics catalogue PDX_ROUTE_FIELD_INVALID (bad)': [{ tsCode: 2304, why: '#185' }],
     'diagnostics catalogue PDX_ROUTE_FIELD_INVALID (good)': [{ tsCode: 2304, why: '#185' }],
+    // The editor's projection declares neither a @snippet's name nor $emit; both compile (#206).
+    'docs/language/script.md:450': [{ tsCode: 2304, why: '#206' }],
+    'docs/language/script.md:791': [{ tsCode: 2304, why: '#206' }],
 };
 
-const EXAMPLES = [...docsExamples(), ...skillExamples().filter(e => !e.partial), ...CATALOGUE].map(e => ({
+const EXAMPLES = [...docsExamples(), ...skillExamples().filter(e => !e.partial), ...languageExamples(), ...CATALOGUE].map(e => ({
     ...e,
     path: join(SITE, '__published-examples__', e.filename),
 }));

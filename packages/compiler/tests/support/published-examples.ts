@@ -119,6 +119,32 @@ export function skillExamples(): PublishedExample[] {
     return found;
 }
 
+/** The formal language reference, one page per area (#120). */
+export const LANGUAGE = join(REPO, 'docs', 'language');
+
+/**
+ * Every ```pdx fence of the language reference. Each is a complete .pdx as written: the reference
+ * shows whole files, so nothing is assembled around it, and a fence that is not one fails its check.
+ */
+export function languageExamples(): PublishedExample[] {
+    const out: PublishedExample[] = [];
+    for (const file of readdirSync(LANGUAGE).filter(f => f.endsWith('.md'))) {
+        const text = readFileSync(join(LANGUAGE, file), 'utf-8').replace(/\r\n/g, '\n');
+        const re = /^```pdx\n([\s\S]*?)^```[ \t]*$/gm;
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(text)) !== null) {
+            const line = text.slice(0, m.index).split('\n').length;
+            out.push({
+                where: `docs/language/${file}:${line}`,
+                source: m[1],
+                filename: `language-${file.replace('.md', '')}-${line}.pdx`,
+                partial: false,
+            });
+        }
+    }
+    return out;
+}
+
 /**
  * `src="./x.ts"` on a block is resolved by the Vite plugin against the file system. The examples
  * teach it, with files that do not exist: stand in for them by extension, so what is compiled is

@@ -6,6 +6,8 @@ order: 18
 
 # Component Communication
 
+> **Formal reference:** [docs/language/script.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/script.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
+
 Props go down and events go up — until the two components that need each other are eight levels
 apart, or siblings, or not related at all. PDX ships six mechanisms for those cases. They are
 genuinely different, and picking the wrong one is the kind of mistake you only notice much later.

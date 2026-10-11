@@ -463,7 +463,8 @@ function splitPipes(raw: string): string[] {
 
 // ─── Directive Detection ───────────────────────────────────────────
 
-const DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'try', 'await',
+/** The block directives the parser reads; the language reference has a section for each (#120). */
+export const DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'try', 'await',
     'let', 'slot', 'raw', 'else', 'catch', 'case', 'default', 'placeholder', 'loading', 'error', 'empty'] as const;
 
 // No module-level mutable state — custom directives passed via parseTemplate() parameter.
