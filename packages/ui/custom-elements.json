@@ -11975,7 +11975,7 @@
             {
               "kind": "field",
               "name": "required",
-              "description": "Marks the field as required.",
+              "description": "Marks the field required: `aria-required` on its control and the required marker on its\nlabel. Not needed for a field the form requires — one whose validators include\n`required()` is marked the same way without it.",
               "type": {
                 "text": "boolean"
               },
@@ -12123,7 +12123,7 @@
             {
               "name": "required",
               "fieldName": "required",
-              "description": "Marks the field as required.",
+              "description": "Marks the field required: `aria-required` on its control and the required marker on its\nlabel. Not needed for a field the form requires — one whose validators include\n`required()` is marked the same way without it.",
               "type": {
                 "text": "boolean"
               },

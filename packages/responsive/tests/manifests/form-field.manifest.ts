@@ -110,6 +110,34 @@ export const formField: ComponentManifest = {
                 </div>`,
         },
         {
+            // (e) Required by the FORM, not the markup (#249): `email` has `required()` among its
+            //     validators and no `required` prop; `name` has a validator that is not `required()`.
+            //     The form is a JS object, so the setup builds it and hands it to the <pdx-form>.
+            id: 'form-field-schema-required',
+            title: 'Form Field — Required by the form\'s validators',
+            html: `
+                <div style="max-width: 420px;">
+                    <pdx-form data-test="form" aria-label="Contact">
+                        <pdx-form-field data-test="req" name="email" label="Email address">
+                            <input class="pdx-input" type="email" />
+                        </pdx-form-field>
+                        <pdx-form-field data-test="opt" name="name" label="Name">
+                            <input class="pdx-input" />
+                        </pdx-form-field>
+                    </pdx-form>
+                </div>`,
+            setup: `
+                const { createForm, required, minLength } = await import('@pdxui/core');
+                const host = document.querySelector('section:not([hidden]) [data-test="form"]');
+                host.form = createForm({
+                    initialValues: { email: '', name: '' },
+                    validators: { email: [required()], name: [minLength(2)] },
+                });
+                for (let i = 0; i < 40 && !host.querySelector('[aria-required="true"]'); i++) {
+                    await new Promise(r => requestAnimationFrame(r));
+                }`,
+        },
+        {
             id: 'form-field-in-stack',
             title: 'Form Field — Children of pdx-stack gap="md"',
             html: `
@@ -125,6 +153,30 @@ export const formField: ComponentManifest = {
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'form-field-schema-required': {
+                standalone: [
+                    {
+                        selector: 'section:not([hidden]) [data-test="req"] input[aria-required="true"]',
+                        description: 'the control of a field the form requires is aria-required',
+                        count: { op: '==', value: 1 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="req"] label.pdx-field-required',
+                        description: 'its label carries the required marker',
+                        count: { op: '==', value: 1 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="opt"] [aria-required], section:not([hidden]) [data-test="opt"] .pdx-field-required',
+                        description: 'a field the form does not require is marked neither way',
+                        count: { op: '==', value: 0 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="req"] input[required]',
+                        description: 'never the native required attribute — its bubble would compete with the form',
+                        count: { op: '==', value: 0 },
+                    },
+                ],
+            },
             'form-field-basic': {
                 standalone: [
                     {
@@ -279,7 +331,8 @@ export const formField: ComponentManifest = {
         // Both scenarios: the basic one checks the bound label plus the describedby(hint); the error one
         // also checks aria-invalid plus the describedby(error). If the label↔input association were missing,
         // axe would report the "label" / "form field has multiple labels" rule.
-        scenarios: ['form-field-basic', 'form-field-error'],
+        // And the field the form requires: aria-required on a labelled control.
+        scenarios: ['form-field-basic', 'form-field-error', 'form-field-schema-required'],
     },
 
     // ── Dim. 3: style isolation ──

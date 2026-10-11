@@ -35,6 +35,7 @@ A designer works at levels **1–2**. Level 3 is a *consumer*: when a component 
 | `--pdx-tab-indicator` | `underline` · `pill` |
 | `--pdx-card-style` | `bordered` · `elevated` · `flat` |
 | `--pdx-accordion-glyph` + `--pdx-accordion-open-transform` | the glyph, and how it rotates when open |
+| `--pdx-field-required-marker` | the `content` after a required field's label: `' *'` (unset) · any string · `none`. Inherited, so it can also be set on one form or one field; the control's `aria-required` is set whatever it is |
 | density | `compact` · `normal` · `comfort` |
 
 **C. Scales**: spacing, radii, **typography** (font plus a modular scale), **shadows** (5 levels), motion.
@@ -523,6 +524,12 @@ The space a pdx-form-field leaves below itself, in any container.
 | Token | Default |
 |---|---|
 | `--pdx-form-field-gap` | `var(--pdx-space-md)` |
+
+### The marker after a required field's label. Inherited: a form or one field can set its own,
+
+| Token | Default |
+|---|---|
+| `--pdx-field-required-marker` | `' *'` |
 
 ### Button
 

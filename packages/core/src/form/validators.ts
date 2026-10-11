@@ -11,6 +11,9 @@ export type AsyncValidator<T = unknown> = (value: T) => Promise<string | Validat
 
 // ─── String validators ─────────────────────────────────────────────
 
+/** The brand `required()` puts on what it returns. Module-private: {@link isRequiredValidator} reads it. */
+const REQUIRED = Symbol('pdx:required-validator');
+
 /**
  * Rejects a value the user has not supplied: `null`, `undefined`, a string that is only whitespace,
  * or an empty array.
@@ -18,14 +21,29 @@ export type AsyncValidator<T = unknown> = (value: T) => Promise<string | Validat
  * Note what it does NOT reject: `0` and `false` are values, and a required numeric or checkbox field
  * is satisfied by them. Pass `msg` to override the message; without it the text comes from the
  * active validation locale.
+ *
+ * The function it returns is branded, so a form can tell a required field from an optional one
+ * (`FormField.required`, {@link isRequiredValidator}) and mark its control `aria-required`.
  */
 export function required(msg?: string): Validator {
-    return (value) => {
+    const validator: Validator = (value) => {
         if (value === null || value === undefined) return msg ?? validationMessage(VALIDATION_KEYS.required, 'This field is required');
         if (typeof value === 'string' && value.trim() === '') return msg ?? validationMessage(VALIDATION_KEYS.required, 'This field is required');
         if (Array.isArray(value) && value.length === 0) return msg ?? validationMessage(VALIDATION_KEYS.required, 'This field is required');
         return undefined;
     };
+    (validator as Validator & { [REQUIRED]?: true })[REQUIRED] = true;
+    return validator;
+}
+
+/**
+ * Whether `validator` is one {@link required} returned.
+ *
+ * Only the built-in rule counts: a hand-written function that rejects empty values is
+ * indistinguishable from any other check, so a field validated by one is not reported as required.
+ */
+export function isRequiredValidator(validator: unknown): boolean {
+    return typeof validator === 'function' && (validator as { [REQUIRED]?: true })[REQUIRED] === true;
 }
 
 /**

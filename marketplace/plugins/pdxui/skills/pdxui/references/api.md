@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-438 value exports.
+439 value exports.
 
 ### `__adoptStyles`
 
@@ -2951,6 +2951,19 @@ ISO weeks start on Monday and week 1 is the one containing the first Thursday of
 first days of January can belong to week 52 or 53 of the PREVIOUS year. That rule is why this is
 not `Math.ceil(dayOfYear / 7)`.
 
+### `isRequiredValidator`
+
+```ts
+import { isRequiredValidator } from '@pdxui/core';
+
+function isRequiredValidator(validator: unknown): boolean
+```
+
+Whether `validator` is one {@link required} returned.
+
+Only the built-in rule counts: a hand-written function that rejects empty values is
+indistinguishable from any other check, so a field validated by one is not reported as required.
+
 ### `isRTL`
 
 ```ts
@@ -4041,6 +4054,9 @@ or an empty array.
 Note what it does NOT reject: `0` and `false` are values, and a required numeric or checkbox field
 is satisfied by them. Pass `msg` to override the message; without it the text comes from the
 active validation locale.
+
+The function it returns is branded, so a form can tell a required field from an optional one
+(`FormField.required`, {@link isRequiredValidator}) and mark its control `aria-required`.
 
 ### `requirePermission`
 

@@ -389,8 +389,12 @@ pdx-form-field:last-child {
     color: var(--pdx-color-text);
 }
 
+/* The required marker. Changed or removed with one custom property, inherited: set it on a
+   <pdx-form> for the whole form, on a <pdx-form-field> for one field, or in a theme;
+   `--pdx-field-required-marker: none` turns it off. The control's aria-required carries the
+   meaning whatever the marker is. */
 .pdx-field-required::after {
-    content: ' *';
+    content: var(--pdx-field-required-marker, ' *');
     color: var(--pdx-color-danger-ink);
 }
 

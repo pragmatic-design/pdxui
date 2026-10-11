@@ -78,6 +78,25 @@ function save(values) { /* already validated */ }
 
 `handleSubmit(save)` calls `save` **only if** the form is valid, handing you the clean values.
 
+**A required field says so, from the schema.** A field whose rules include `required` is marked
+required with no prop on its `<pdx-form-field>`: its control gets `aria-required="true"`, so a screen
+reader announces «Name, required» before any error, and its label gets the required marker (` *` by
+default). The `required` prop still does the same for a field the form does not require. Code that
+needs the answer reads `form.fields.name.required`; it is `true` when the field's validators include
+`required()`, the rows a field list adds included, and always `false` for a form validated by an
+external Standard Schema, which does not say generically which fields it requires. A component that
+holds a validator list of its own asks `isRequiredValidator(v)`: only `required()` counts, not a
+hand-written function that happens to reject empty values.
+
+The marker is presentation and is set in CSS, with one inherited custom property: on a `<pdx-form>`
+for the whole form, on a `<pdx-form-field>` for one field, or in a theme. `aria-required` stays
+whatever the marker is.
+
+```css
+pdx-form.compact { --pdx-field-required-marker: ' (required)'; }
+pdx-form.quiet   { --pdx-field-required-marker: none; }
+```
+
 **A section in its own component is wired too.** The wiring is compile-time, so a control inside a
 child component is compiled from another file. A child whose script calls `tryUseForm()` declares
 itself a section of the `<pdx-form>` above it, and its named controls are wired to that form like the

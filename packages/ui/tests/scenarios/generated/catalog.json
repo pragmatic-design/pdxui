@@ -979,6 +979,10 @@
           "title": "Form Field — Direct children of pdx-form"
         },
         {
+          "id": "form-field-schema-required",
+          "title": "Form Field — Required by the form's validators"
+        },
+        {
           "id": "form-field-in-stack",
           "title": "Form Field — Children of pdx-stack gap=\"md\""
         }

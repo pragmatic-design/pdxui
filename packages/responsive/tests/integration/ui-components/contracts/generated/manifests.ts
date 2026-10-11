@@ -229,6 +229,7 @@ export const scenarioPage: Record<string, string> = {
     "form-field-error": "tier-2",
     "form-field-nested": "tier-2",
     "form-field-in-form": "tier-2",
+    "form-field-schema-required": "tier-2",
     "form-field-in-stack": "tier-2",
     "form-section-basic": "tier-2",
     "form-template-grid": "tier-2",
