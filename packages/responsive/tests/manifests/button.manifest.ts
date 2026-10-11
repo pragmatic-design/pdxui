@@ -55,6 +55,15 @@ export const button: ComponentManifest = {
                 </div>`,
         },
         {
+            // An `action` whose write is in flight (#49): the button is busy and takes no click. The
+            // action is given by `setup` as an object whose `pending()` is true, the state a
+            // `mutation()` is in while its `fn` has not settled — deterministic, with no timer.
+            id: 'button-action-pending',
+            title: 'Button — Action pending',
+            html: `<pdx-button data-test="btn-pending">Save</pdx-button>`,
+            setup: `document.querySelector('section:not([hidden]) [data-test="btn-pending"]').action = { execute() {}, pending: () => true };`,
+        },
+        {
             // Every variant whose label sits on a fill, or is the text itself. Primary is
             // measured by the theme gate: the Pragmatic themes paint it with a gradient.
             id: 'button-labels',
@@ -116,6 +125,15 @@ export const button: ComponentManifest = {
                             { description: 'sm < md', left: 'sm.height', op: '<', right: 'md.height' },
                             { description: 'md < lg', left: 'md.height', op: '<', right: 'lg.height' },
                         ],
+                    },
+                ],
+            },
+            'button-action-pending': {
+                standalone: [
+                    {
+                        selector: 'section:not([hidden]) [data-test="btn-pending"] button',
+                        description: 'a button whose action is pending takes no click',
+                        pointerEvents: { op: 'is', value: 'none' },
                     },
                 ],
             },

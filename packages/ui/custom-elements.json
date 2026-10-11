@@ -3281,9 +3281,35 @@
               },
               "default": "''",
               "attribute": "arialabelledby"
+            },
+            {
+              "kind": "field",
+              "name": "action",
+              "description": "A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button is busy and refuses clicks, so a double click sends one write.",
+              "type": {
+                "text": "object"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "actionArg",
+              "description": "The value a click passes to `action.execute`.",
+              "type": {
+                "text": "object"
+              },
+              "default": "null"
             }
           ],
           "events": [
+            {
+              "name": "pdx-action-error",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "When the `action`'s `execute` rejects. The error is the one\nthe action keeps on its `error()`; the button is idle again.",
+              "detail": "{ error }"
+            },
             {
               "name": "pdx-toggle",
               "type": {
