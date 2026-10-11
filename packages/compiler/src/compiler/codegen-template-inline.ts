@@ -636,6 +636,9 @@ class InlineGen {
     letN(node: LetNode): void {
         const expr = callSignals(prefixCtx(node.expr, this.ctx), this.ctx);
         this.out(`ctx.${node.name}=${expr};`);
+        // What the @let holds is a value, as on the template path: read after this as `ctx.name`,
+        // not called. Called, it threw at mount — `ctx.total is not a function` (#162).
+        this.ctx.nonSignalNames?.add(node.name);
     }
 
     switchN(node: SwitchNode): void {

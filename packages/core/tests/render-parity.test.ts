@@ -219,8 +219,8 @@ const ROWS: Row[] = [
     // Both paths pass the transition options to when()/each() since #85: the enter classes match.
     { name: '@if with @transition', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
     { name: '@for with @transition', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },
-    // Inline: reads the @let name as a signal and throws.
-    { name: '@let', template: '@let total = a + b; <p>{{ total }}</p>', script: 'let a = $signal(1); let b = $signal(2);', owner: 162 },
+    // The inline path read the @let name as a signal and threw at mount (#162).
+    { name: '@let', template: '@let total = a + b; <p>{{ total }}</p>', script: 'let a = $signal(1); let b = $signal(2);' },
     { name: 'an interpolated Node', template: '<div>{{ node }}</div>', script: "const node = document.createElement('em'); node.textContent = 'n';" },
     { name: 'an interpolated Node in a signal', template: '<div>{{ node }}</div>', script: "const el = document.createElement('em'); el.textContent = 'n'; let node = $signal(el);" },
     // Inline: the array becomes its string, "a,b".

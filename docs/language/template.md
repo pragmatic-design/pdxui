@@ -1212,8 +1212,7 @@ and assigns it to `ctx.total`; nodes after it read it as `total`. On the templat
 
 - The value is a snapshot, not reactive: it does not follow the signals it read. Use `$derived` in the
   script for a value that must follow. Not checked today.
-- **It throws in a production build** (the inline path): a read of the name is compiled as a signal
-  call, `ctx.total()`, on a number (#162). Not checked today.
+- Both render paths read the name as the value it holds, `ctx.total`, not as a signal call.
 - Without its `;` the compile stops: `Invalid @let syntax`.
 
 #### Examples
