@@ -45,9 +45,10 @@
         import.meta.glob('./src/components/**/*.pdx', { eager: true });
         // The app shell.
         import './src/app.pdx';
-        // Route auto-discovery: every file registers its own @page.
+        // No import of the routes: the compiler's route table names each @page and imports it the
+        // first time it is shown, so each route is its own chunk. Importing them here as well put
+        // every route in this entry (tests/entry-budget.spec.ts).
         // The @pdxui/ui <pdx-*> components used in templates are auto-imported by the compiler.
-        import.meta.glob('./src/routes/**/*.pdx', { eager: true });
         // Cloudflare Web Analytics, on pdxui.com only — not in dev, preview or the tests.
         import { installAnalytics } from './src/lib/analytics';
         installAnalytics();
