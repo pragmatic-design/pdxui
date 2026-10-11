@@ -72,6 +72,13 @@ describe('projectScript', () => {
             .toContain("Type 'number' is not assignable to type 'string'");
     });
 
+    it('declares a @snippet as a function of its parameters, and $emit (#206)', () => {
+        const src = "@snippet row(name) {\n  <li>${name}</li>\n}\nfunction pick(v: string) { $emit('pdx-change', v); }\n$watch(() => 1, () => {}, { once: true });\n";
+        expect(diagnose(src, "<ul>{{ row('Ada') }}</ul>")).toEqual([]);
+        expect(diagnose(src + 'const n: number = row;\n').join('\n'), 'a snippet is a function')
+            .toContain("is not assignable to type 'number'");
+    });
+
     it('declares @search\'s searchParams with its fields\' types, as the compiler does (#204)', () => {
         const src = "@page '/list';\n@search { page: number = 1, q?: string, open: boolean }\nconst next = $derived(searchParams.page + 1);\n";
         expect(diagnose(src, '<p>{{ next }} {{ searchParams.q ?? \'\' }} {{ searchParams.open ? 1 : 0 }}</p>')).toEqual([]);

@@ -13,7 +13,11 @@ declare global {
   function $derived<T>(value: T): T;
   function $store<T extends object>(v: T): T;
   function $effect(fn: () => unknown): void;
-  function $watch<T>(src: T | (() => T), cb: (v: T, prev: T) => void, opts?: { immediate?: boolean }): void;
+  // Core's WatchOptions, whole (#206).
+  type PdxWatchOptions = { immediate?: boolean; once?: boolean; name?: string };
+  function $watch<T>(src: T | (() => T), cb: (v: T, prev: T) => void, opts?: PdxWatchOptions): void;
+  // The untyped emit the compiler declares when a script calls it (#206).
+  function $emit(event: string, detail?: unknown): void;
   function $t(key: string, params?: Record<string, unknown>): string;
   function $n(v: number, opts?: Intl.NumberFormatOptions): string;
   function $d(v: Date | number | string, opts?: Intl.DateTimeFormatOptions): string;
@@ -31,7 +35,7 @@ declare global {
   function effect(fn: () => unknown): () => void;
   function batch(fn: () => void): void;
   function untrack<T>(fn: () => T): T;
-  function watch(src: unknown, cb: (v: any, p: any) => void, opts?: { immediate?: boolean }): () => void;
+  function watch(src: unknown, cb: (v: any, p: any) => void, opts?: PdxWatchOptions): () => void;
   // An async callback too, as core's own signature allows.
   function onMount(fn: () => void | (() => void) | Promise<unknown>): void;
   function onDestroy(fn: () => void): void;

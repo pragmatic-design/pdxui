@@ -53,9 +53,6 @@ const TYPE_ERRORS_SHOWN: Record<string, { tsCode: number; why: string }[]> = {
     // The defect it shows: a quoted type drops the field, in the compiler and in the editor alike,
     // so the name it would have declared is not there.
     'diagnostics catalogue PDX_ROUTE_FIELD_INVALID (bad)': [{ tsCode: 2304, why: 'the field it drops' }],
-    // The editor's projection declares neither a @snippet's name nor $emit; both compile (#206).
-    'docs/language/script.md:450': [{ tsCode: 2304, why: '#206' }],
-    'docs/language/script.md:797': [{ tsCode: 2304, why: '#206' }],
 };
 
 const EXAMPLES = [...docsExamples(), ...skillExamples().filter(e => !e.partial), ...languageExamples(), ...CATALOGUE].map(e => ({

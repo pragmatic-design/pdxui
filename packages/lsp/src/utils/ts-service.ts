@@ -74,6 +74,18 @@ export function projectScript(scriptContent: string): string {
             const ev = /^\s+([A-Za-z_$][\w$]*)\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
             if (ev) emitters.push(ev[2] ? `var ${ev[1]}: (detail: ${ev[2]}) => void;` : `var ${ev[1]}: (detail?: unknown) => void;`);
         }
+        if (kw === 'snippet') {
+            // Match: @snippet name(a, b) — the function the compiler declares (#206).
+            // Groups: [1]=name [2]=parameters as written
+            const sn = /^\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/.exec(s.slice(m.index + 1 + kw.length));
+            if (sn) {
+                const params = sn[2].split(',').map((p) => p.trim()).filter(Boolean);
+                // Plain names keep their names; a default or a pattern is not read, so any arguments go.
+                const signature = params.every((p) => /^[A-Za-z_$][\w$]*$/.test(p))
+                    ? params.map((p) => `${p}?: any`).join(', ') : '...args: any[]';
+                emitters.push(`var ${sn[1]}: (${signature}) => unknown;`);
+            }
+        }
         let depth = 0, j = m.index, ended = false;
         for (; j < s.length; j++) {
             const c = s[j];
