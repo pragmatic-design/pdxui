@@ -533,10 +533,12 @@ class InlineGen {
         } else {
             const w: string[] = [];
             if (rt.has('self')) w.push('if(e.target!==e.currentTarget)return;');
+            // A key filter applies to keyboard events only, as core's bindEvent applies it: applied to
+            // every event, `@click.enter` never fired on a click (#100).
             for (const [mod, keys] of Object.entries(KEY_MAP)) {
                 if (rt.has(mod)) {
                     const a = Array.isArray(keys) ? keys : [keys];
-                    w.push(`if(!${jsString(a)}.includes(e.key))return;`);
+                    w.push(`if(e instanceof KeyboardEvent&&!${jsString(a)}.includes(e.key))return;`);
                 }
             }
             if (rt.has('prevent')) w.push('e.preventDefault();');
@@ -579,10 +581,10 @@ class InlineGen {
     // ─── Interpolation ────────────────────────────────────────
 
     interp(node: InterpolationNode): void {
-        this.imports.add('effect');
-        // The template path's rule, from core: null, undefined and false are empty text. With
-        // `String(…)` here the build would show the words the dev server does not.
-        this.imports.add('interpolationText');
+        // core's bindInterpolation, the template path's own: a primitive is the text node's text
+        // (null, undefined and false empty), a Node or an array is put in as nodes. Writing only
+        // `.data`, an array read `a,b` in a build and `ab` in dev (#100).
+        this.imports.add('bindInterpolation');
         const t = this.v('t');
         const expr = this.read(node.expr);
         this.out(`const ${t}=document.createTextNode('');`);
@@ -591,9 +593,9 @@ class InlineGen {
         if (node.pipes?.length > 0) {
             // The same chain as the template path, the value first in every pipe (#199).
             this.imports.add('templatePipe');
-            this.out(`effect(()=>{${t}.data=interpolationText(${pipeChain(expr, node.pipes, this.ctx)});});`);
+            this.out(`bindInterpolation(${t},()=>${pipeChain(expr, node.pipes, this.ctx)});`);
         } else {
-            this.out(`effect(()=>{${t}.data=interpolationText(${expr});});`);
+            this.out(`bindInterpolation(${t},()=>${expr});`);
         }
     }
 
@@ -805,8 +807,12 @@ class InlineGen {
             const cf = this.v('cf');
             this.out(`const ${cf}=(()=>{${generated}})();`);
             this.out(`if(${cf} instanceof Node)${this.parent()}.appendChild(${cf});`);
+            return;
         }
-        // Unknown directives: silently skip (consistent with template codegen fallback comment)
+        // A directive the parser read with no handler to generate it: the comment the template path
+        // writes, not nothing (#100). compile() cannot reach it — the parser reads exactly the names
+        // that have a handler — but a caller of generateInlineNodes with its own context can.
+        this.out(`${this.parent()}.appendChild(document.createComment(${jsString(` unknown directive @${node.name} `)}));`);
     }
 
     // ─── Build Output ─────────────────────────────────────────

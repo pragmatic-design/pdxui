@@ -812,39 +812,7 @@ function replaceTextNode(textNode: Text, values: TemplateValue[]): void {
                 // Reactive text binding
                 const anchor = document.createTextNode('');
                 parent.insertBefore(anchor, textNode);
-                let currentNodes: Node[] = [anchor];
-
-                effect(() => {
-                    const result = (value as () => unknown)();
-
-                    // Remove old nodes (except anchor)
-                    for (let i = 1; i < currentNodes.length; i++) {
-                        currentNodes[i].parentNode?.removeChild(currentNodes[i]);
-                    }
-
-                    const newNodes = toNodes(result);
-                    const ref = currentNodes[0];
-
-                    if (newNodes.length === 0) {
-                        if (ref instanceof Text) ref.data = '';
-                        currentNodes = [ref];
-                    } else if (newNodes.length === 1 && newNodes[0] instanceof Text && ref instanceof Text) {
-                        // Optimize: update text in-place
-                        ref.data = (newNodes[0] as Text).data;
-                        currentNodes = [ref];
-                    } else {
-                        // Use the LIVE parent, not the one captured at hydration: after
-                        // the append to the DOM the original parent may be the dead fragment
-                        // (the same as replaceCommentNode).
-                        const refNext = ref.nextSibling;
-                        const liveParent = ref.parentNode ?? parent;
-                        liveParent.removeChild(ref);
-                        for (const n of newNodes) {
-                            placePartNode(liveParent, n, refNext);
-                        }
-                        currentNodes = newNodes;
-                    }
-                });
+                bindInterpolation(anchor, value as () => unknown);
             } else {
                 // Static value
                 const nodes = toNodes(value);
@@ -858,6 +826,55 @@ function replaceTextNode(textNode: Text, values: TemplateValue[]): void {
     }
 
     parent.removeChild(textNode);
+}
+
+/**
+ * Render what `value()` returns where `anchor`, an empty text node already in place, stands, and follow
+ * it: a primitive is the anchor's text (`interpolationText`), a Node, a fragment or an array is put in
+ * as nodes. Both render paths interpolate through it — the inline path wrote only text, so an array
+ * read `a,b` in a production build and `ab` in dev (#100).
+ */
+export function bindInterpolation(anchor: Text, value: () => unknown): void {
+    const parent = anchor.parentNode!;
+    let currentNodes: Node[] = [anchor];
+
+    effect(() => {
+        const result = value();
+        const ref = currentNodes[0];
+
+        // A primitive into a single text node: the text changes in place, nothing is created.
+        if (currentNodes.length === 1 && ref instanceof Text && !(result instanceof Node) && !Array.isArray(result)) {
+            ref.data = interpolationText(result);
+            return;
+        }
+
+        // Remove old nodes (except the first, which marks the place)
+        for (let i = 1; i < currentNodes.length; i++) {
+            currentNodes[i].parentNode?.removeChild(currentNodes[i]);
+        }
+
+        const newNodes = toNodes(result);
+
+        if (newNodes.length === 0) {
+            if (ref instanceof Text) ref.data = '';
+            currentNodes = [ref];
+        } else if (newNodes.length === 1 && newNodes[0] instanceof Text && ref instanceof Text) {
+            // Optimize: update text in-place
+            ref.data = (newNodes[0] as Text).data;
+            currentNodes = [ref];
+        } else {
+            // Use the LIVE parent, not the one captured at hydration: after
+            // the append to the DOM the original parent may be the dead fragment
+            // (the same as replaceCommentNode).
+            const refNext = ref.nextSibling;
+            const liveParent = ref.parentNode ?? parent;
+            liveParent.removeChild(ref);
+            for (const n of newNodes) {
+                placePartNode(liveParent, n, refNext);
+            }
+            currentNodes = newNodes;
+        }
+    });
 }
 
 // ─── Utilities ─────────────────────────────────────────────────────

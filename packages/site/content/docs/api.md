@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-437 value exports.
+438 value exports.
 
 ### `__adoptStyles`
 
@@ -502,6 +502,19 @@ Wire a gesture directive the compiler emits — `@__swipe` with `[direction, han
 and `@__pinch` with a handler — to the pointer gesture it names. `name` is the attribute without
 its `@`. False for any other name, which is an ordinary event. Both render paths call it: the
 template path's `bindAttribute` before its generic event branch, the inline path directly (#99).
+
+### `bindInterpolation`
+
+```ts
+import { bindInterpolation } from '@pdxui/core';
+
+function bindInterpolation(anchor: Text, value: () => unknown): void
+```
+
+Render what `value()` returns where `anchor`, an empty text node already in place, stands, and follow
+it: a primitive is the anchor's text (`interpolationText`), a Node, a fragment or an array is put in
+as nodes. Both render paths interpolate through it — the inline path wrote only text, so an array
+read `a,b` in a production build and `ab` in dev (#100).
 
 ### `bindTwoWay`
 

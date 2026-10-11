@@ -28,6 +28,10 @@ Inside the braces goes an expression, not just a name: `{{ count * 2 }}`, `{{ ok
 show the value itself, convert it: `{{ String(debug) }}` prints `false`. The rule is
 `interpolationText` in `@pdxui/core`, and the dev server and a production build both apply it.
 
+A value that is already markup is put in as markup: an element (`{{ icon }}`, where `icon` is a
+`Node`), a fragment, or an array of them, one after the other. Both builds do it through
+`bindInterpolation`, which also follows the value when it changes.
+
 ## Bind attributes: `:attr`
 
 To bind an attribute or property to an expression, prefix it with `:`.

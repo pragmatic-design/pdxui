@@ -59,6 +59,9 @@ semver.
 
 ### Fixes
 
+- A production build renders an interpolated array as its items, as dev does — it printed `a,b` — and
+  fires `@click.enter` on a click: a key filter applies to keyboard events only. Both render paths
+  now interpolate through core's new `bindInterpolation`. (#100)
 - `@swipe.left|right|up|down`, `@longpress` and `@pinch` call their handler, in dev and in a build:
   neither render path wired them, and on the template path a handler such as `n++` ran once at render.
   Both now hand the element to core's new `bindGesture`, with the handler built as an `@event`'s is.

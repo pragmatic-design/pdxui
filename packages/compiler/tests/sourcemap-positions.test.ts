@@ -199,9 +199,9 @@ function save() { throw new Error('nope'); }
         expect(probe(TEMPLATE, code, map, [
             ['@click="save"', "__el1.addEventListener('click'"],
             [':value="name"', 'let __el2w_value = {}; effect('],
-            ['label }}', 'effect(()=>{__t4.data'],
+            ['label }}', 'bindInterpolation(__t4,'],
             ['items as item', 'const __cf7=eachRow('],
-            ['item }}</li>', 'effect(()=>{__t6.data'],
+            ['item }}</li>', 'bindInterpolation(__t6,'],
             ['show) {', 'const __cf9=when('],
         ])).toEqual([]);
     });

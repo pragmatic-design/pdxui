@@ -190,9 +190,9 @@ const ROWS: Row[] = [
         act: click('input'),
         read: (h) => h.querySelector('input')!.checked,
     },
-    // A key filter applies to keyboard events: a click passes it on the template path.
-    // Inline: the key filter applies to the click too, which never fires.
-    { name: '@click.enter', template: '<p>{{ n }}</p><button @click.enter="n++">+</button>', script: 'let n = $signal(0);', act: click('button'), owner: 100 },
+    // A key filter applies to keyboard events: a click passes it. The inline path applied it to the
+    // click too, which never fired (#100).
+    { name: '@click.enter', template: '<p>{{ n }}</p><button @click.enter="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
     // The body, once the promise has settled. (The body reads the promise itself, not its value, on
     // both paths: binding the value is #145.)
     { name: '@await', template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }', script: "let data = $signal(Promise.resolve('done'));" },
@@ -223,8 +223,8 @@ const ROWS: Row[] = [
     { name: '@let', template: '@let total = a + b; <p>{{ total }}</p>', script: 'let a = $signal(1); let b = $signal(2);' },
     { name: 'an interpolated Node', template: '<div>{{ node }}</div>', script: "const node = document.createElement('em'); node.textContent = 'n';" },
     { name: 'an interpolated Node in a signal', template: '<div>{{ node }}</div>', script: "const el = document.createElement('em'); el.textContent = 'n'; let node = $signal(el);" },
-    // Inline: the array becomes its string, "a,b".
-    { name: 'an interpolated array', template: '<div>{{ list }}</div>', script: "const list = ['a', 'b'];", owner: 100 },
+    // The inline path wrote the array as its string, "a,b" (#100).
+    { name: 'an interpolated array', template: '<div>{{ list }}</div>', script: "const list = ['a', 'b'];" },
     { name: 'content inside a component tag', template: '<x-probe><span>child</span></x-probe>' },
     // The inline path emitted `batchHandler(() => )` for @keepAlive: a module that does not parse (#200).
     {
