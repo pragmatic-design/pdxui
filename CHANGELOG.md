@@ -59,6 +59,10 @@ semver.
 
 ### Fixes
 
+- In a `<style scoped>`, the rule after a statement at-rule (`@layer a, b;`, `@import …;`,
+  `@charset …;`) is scoped: it was read as part of the at-rule and applied to the whole page. At-rule
+  names are matched in any case and as whole names, so `@CONTAINER` is scoped like `@container` and
+  `@media-x` is not treated as `@media`. (#180)
 - A production build renders a component that uses `@let`: the build read the `@let` name as a
   signal and the component threw at mount (`ctx.total is not a function`), rendering nothing. (#162)
 - Two dialogs opened from code in one batch — `dialog.open(…)` then `dialog.confirm(…)` in one
