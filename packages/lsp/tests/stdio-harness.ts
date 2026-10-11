@@ -6,6 +6,7 @@ import { rmSync } from 'fs';
 import { spawn, type ChildProcess } from 'child_process';
 import { pathToFileURL } from 'url';
 import { build } from 'esbuild';
+import { bundleOptions } from '../esbuild-options.mjs';
 import { StreamMessageReader, StreamMessageWriter, createProtocolConnection, type ProtocolConnection } from 'vscode-languageserver/node';
 
 const LSP = join(__dirname, '..');
@@ -35,9 +36,8 @@ export async function startServer(root: string, initializationOptions?: unknown,
     const bundle = shipped ?? bundlePath();
     if (!shipped) {
         await build({
-            entryPoints: [join(LSP, 'src', 'server.ts')], bundle: true, platform: 'node', format: 'cjs',
-            outfile: bundle, external: ['vscode'], logLevel: 'silent',
-            alias: { '@pdxui/compiler': join(LSP, '..', 'compiler', 'src', 'index.ts') },
+            ...bundleOptions,
+            entryPoints: [join(LSP, 'src', 'server.ts')], outfile: bundle, external: ['vscode'], logLevel: 'silent',
         });
     }
     const server: ChildProcess = spawn(process.execPath, [bundle, '--stdio'], { stdio: ['pipe', 'pipe', 'inherit'] });

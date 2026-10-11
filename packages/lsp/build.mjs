@@ -1,19 +1,11 @@
 import { build } from 'esbuild';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { bundleOptions } from './esbuild-options.mjs';
 
 await build({
+    ...bundleOptions,
     entryPoints: ['src/server.ts'],
-    bundle: true,
-    platform: 'node',
-    format: 'cjs',
     outfile: 'dist/server.cjs',
     external: ['vscode'],
-    alias: {
-        '@pdxui/compiler': resolve(__dirname, '../compiler/src/index.ts'),
-    },
     sourcemap: true,
     logLevel: 'info',
 });
@@ -23,15 +15,10 @@ await build({
 // CommonJS, as the server is: vscode-languageserver is CommonJS and requires node builtins at load,
 // which an ESM bundle cannot do ("Dynamic require of node:util is not supported" — measured).
 await build({
+    ...bundleOptions,
     entryPoints: ['src/typecheck.ts'],
-    bundle: true,
-    platform: 'node',
-    format: 'cjs',
     outfile: 'dist/typecheck.cjs',
     external: ['typescript'],
-    alias: {
-        '@pdxui/compiler': resolve(__dirname, '../compiler/src/index.ts'),
-    },
     sourcemap: true,
     logLevel: 'info',
 });

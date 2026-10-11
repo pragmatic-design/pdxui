@@ -20,7 +20,11 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { DetachedWindowAPI } from 'happy-dom';
 import { installAnalytics } from '../../site/src/lib/analytics';
+
+// The test environment's own window API, which happy-dom adds to the window it provides.
+declare const window: Window & { happyDOM: DetachedWindowAPI };
 
 const WEB_CONFIG = join(__dirname, '..', '..', 'site', 'public', 'web.config');
 const config = readFileSync(WEB_CONFIG, 'utf8');
@@ -122,11 +126,21 @@ describe('the headers pdxui.com declares', () => {
         expect(installAnalytics('127.0.0.1')).toBeNull();
         expect(document.querySelectorAll('script[data-cf-beacon]')).toHaveLength(0);
 
-        const script = installAnalytics('pdxui.com')!;
-        expect(script.src).toBe('https://static.cloudflareinsights.com/beacon.min.js');
-        expect(JSON.parse(script.getAttribute('data-cf-beacon')!)).toEqual({ token: 'bee9003c93894465ab2b9d8397939622' });
-        expect(script.isConnected).toBe(true);
-        script.remove();
+        // happy-dom never fetches a script here; connecting a module script makes it say so with a
+        // console error that reads as a failure in the suite's output. For this test the refused load
+        // counts as a load, and the setting goes back after it.
+        const settings = window.happyDOM.settings;
+        const before = settings.handleDisabledFileLoadingAsSuccess;
+        settings.handleDisabledFileLoadingAsSuccess = true;
+        try {
+            const script = installAnalytics('pdxui.com')!;
+            expect(script.src).toBe('https://static.cloudflareinsights.com/beacon.min.js');
+            expect(JSON.parse(script.getAttribute('data-cf-beacon')!)).toEqual({ token: 'bee9003c93894465ab2b9d8397939622' });
+            expect(script.isConnected).toBe(true);
+            script.remove();
+        } finally {
+            settings.handleDisabledFileLoadingAsSuccess = before;
+        }
     });
 
     it('says in the file why unsafe-eval is there', () => {

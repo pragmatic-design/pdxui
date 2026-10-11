@@ -27,7 +27,7 @@
 // same surface.
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync, existsSync, mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -133,8 +133,13 @@ describe('the local publish set is derived, not listed', () => {
     });
 
     it('refuses a version that is not semver', () => {
-        // `2.0` or `latest` is not a version npm can publish.
-        expect(() => plan('2.0', PACKAGES)).toThrow();
+        // `2.0` or `latest` is not a version npm can publish. The refusal is read here rather than
+        // left to fall through to the suite's output, where it read as a failure nobody had.
+        const refused = spawnSync(process.execPath,
+            [SCRIPT, '2.0', '--packages-dir', PACKAGES, '--plan-only', '--json'], { encoding: 'utf8' });
+        expect(refused.status).toBe(1);
+        expect(refused.stdout).toBe('');
+        expect(refused.stderr).toContain('"2.0" is not a semver version');
     });
 });
 
