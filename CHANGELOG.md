@@ -59,6 +59,9 @@ semver.
 
 ### Fixes
 
+- `pdx build` and `pdx dev` on a project whose `vite.config` registers `pdx()` — as the one
+  `pdx new project` writes does — use that plugin and add no second one. With two, every module was
+  compiled twice and a production build rendered nothing (`component is not defined`). (#197)
 - `$signal()` with no initial value compiles to a signal that starts at `undefined`. It compiled to
   `signal(, { name })`, a module that did not parse wherever it was imported. (#186)
 - `@params { id: number }` declares `id` for the page: the template reads `{{ id }}` and the script

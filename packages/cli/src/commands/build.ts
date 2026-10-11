@@ -8,6 +8,7 @@ import { loadConfigOrExit, resolveConfig } from '../config/loader';
 import { scanPdxFiles } from '../manifest/scanner';
 import { analyzeComponent } from '../manifest/generator';
 import { logger } from '../utils/logger';
+import { configRegistersPdx } from '../utils/vite-config';
 
 export default defineCommand({
     meta: { name: 'build', description: 'Production build' },
@@ -67,10 +68,13 @@ async function buildSpa(
     }
 
     const { pdx } = await import('@pdxui/compiler');
+    // The project's vite.config may register pdx() itself, as `pdx new project` writes it: adding a
+    // second one compiles every module twice and the app renders nothing (#197).
+    const own = await configRegistersPdx(vite, cwd, { command: 'build', mode: 'production' });
 
     await vite.build({
         root: cwd,
-        plugins: [pdx({ plugins: resolved.plugins, minify: true, components: [resolved.components] })],
+        plugins: own ? [] : [pdx({ plugins: resolved.plugins, minify: true, components: [resolved.components] })],
         build: {
             outDir,
             minify: 'esbuild',
