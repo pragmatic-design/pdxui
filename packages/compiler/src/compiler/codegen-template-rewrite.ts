@@ -208,8 +208,17 @@ function expandSelfClosing(tag: string): string {
  * `${dynamic(() => ctx.expr(), () => ({ prop: ctx.val() }), { keepAlive: true, ... })}`.
  */
 function rewriteDynamicComponent(tag: string, ctx: CompileContext): string {
+    const call = dynamicComponentCall(tag, ctx);
+    return call === null ? tag : `\${${call}}`;
+}
+
+/**
+ * The `dynamic(…)` call a `<component :is="expr" …>` tag stands for, or null without `:is`. Shared by
+ * both render paths, so the inline one makes the same component with the same keep-alive cache (#200).
+ */
+export function dynamicComponentCall(tag: string, ctx: CompileContext): string | null {
     const isMatch = tag.match(/:is=(?:"([^"]*?)"|'([^']*?)')/);
-    if (!isMatch) return tag;
+    if (!isMatch) return null;
 
     const tagExpr = isMatch[1] ?? isMatch[2];
     const tagCode = callSignals(prefixCtx(tagExpr, ctx), ctx);
@@ -253,7 +262,7 @@ function rewriteDynamicComponent(tag: string, ctx: CompileContext): string {
         ? `, { ${optionParts.join(', ')} }`
         : '';
 
-    return `\${dynamic(() => ${tagCode}, ${propsArg}${optionsArg})}`;
+    return `dynamic(() => ${tagCode}, ${propsArg}${optionsArg})`;
 }
 
 // ─── Scoped Slot ─────────────────────────────────────────────────
@@ -265,6 +274,18 @@ function rewriteDynamicComponent(tag: string, ctx: CompileContext): string {
 function rewriteScopedSlot(
     tag: string, fullHtml: string, _tagStart: number, tagEnd: number, ctx: CompileContext,
 ): { code: string; nextIndex: number } {
+    const slot = scopedSlotCall(tag, fullHtml, tagEnd, ctx);
+    return { code: `\${${slot.call}}`, nextIndex: slot.nextIndex };
+}
+
+/**
+ * The `renderSlot(…)` call for a scoped slot outlet opened by `tag`, and the index just past its
+ * `</slot>`. Shared by both render paths, so they cannot disagree about the name, the scope or the
+ * default content (#200).
+ */
+export function scopedSlotCall(
+    tag: string, fullHtml: string, tagEnd: number, ctx: CompileContext,
+): { call: string; nextIndex: number } {
     const nameMatch = tag.match(/name=(?:"([^"]*?)"|'([^']*?)')/);
     const slotName = nameMatch ? (nameMatch[1] ?? nameMatch[2]) : 'default';
 
@@ -299,8 +320,8 @@ function rewriteScopedSlot(
         }
     }
 
-    const code = `\${renderSlot(ctx.__slots, ${jsQuote(slotName)}, ${scopeArg}, ${defaultContent || '() => html``'})}`;
-    return { code, nextIndex };
+    const call = `renderSlot(ctx.__slots, ${jsQuote(slotName)}, ${scopeArg}, ${defaultContent || '() => html``'})`;
+    return { call, nextIndex };
 }
 
 // ─── Tag Attributes ──────────────────────────────────────────────

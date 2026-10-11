@@ -60,6 +60,19 @@ describe('the inline path emits a module a bundler can read', () => {
         expect(parses(code)).toBe(true);
     });
 
+    // Each emitted `batchHandler(() => )`, `const __b = ;` or a literal <slot> element (#200).
+    for (const [form, template, script] of [
+        ['<component :is> with @keepAlive', '<component :is="view" @keepAlive />', "let view = $signal('x-a');"],
+        ['the :name shorthand', '<input :value />', "let value = $signal('a');"],
+        ['a scoped slot outlet', '<slot name="cell" :row="row"><em>none</em></slot>', 'let row = $signal(1);'],
+    ]) {
+        it(`${form}`, () => {
+            const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+            const { code } = compile(src, 'forms.pdx', [], undefined, { production: true, inlineBindings: true });
+            expect(parses(code)).toBe(true);
+        });
+    }
+
     it('and the injected binding reaches the element instead of becoming text', () => {
         // The precise symptom: the tail of the arrow was appended as a text node. `?.error()` is
         // part of the expression the compiler injected and belongs in code, never in the document.

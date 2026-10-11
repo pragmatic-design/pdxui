@@ -59,6 +59,10 @@ semver.
 
 ### Fixes
 
+- A production build compiles `<component :is="view" @keepAlive>` and the shorthand `<input :value>`
+  to a module that parses — both were a `SyntaxError` that stopped the page loading — and a scoped
+  slot outlet `<slot :row="row">` to the same `renderSlot` call as in dev, not a literal `<slot>`
+  element. (#200)
 - A template pipe renders its value: `{{ name | upper }}`, a chain, and `{{ price | money('EUR') }}`
   (the value first, then the arguments), in dev and in a build, following the signal it reads. The
   compiled module called core's signal operator `pipe` instead of the value chain `templatePipe`, so
