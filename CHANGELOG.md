@@ -59,6 +59,8 @@ semver.
 
 ### Fixes
 
+- A production build renders a component that uses `@let`: the build read the `@let` name as a
+  signal and the component threw at mount (`ctx.total is not a function`), rendering nothing. (#162)
 - Two dialogs opened from code in one batch — `dialog.open(…)` then `dialog.confirm(…)` in one
   click — each close on Escape. The one underneath registered its Escape for the dialog on top and
   never closed. `overlayStack.onDismiss(id, callback)` registers for a given overlay. (#114)
