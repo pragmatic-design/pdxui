@@ -4,7 +4,7 @@
 
 import { effect, collectDisposers, onDispose, signal, untracked } from '../reactivity/signal';
 import type { Signal } from '../utils/types';
-import { enter, exit, recordPositions, flipAnimate } from './transitions';
+import { enterRow, exit, recordPositions, flipAnimate } from './transitions';
 import { placePartNode } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
@@ -244,15 +244,20 @@ function reconcile<T>(
         }
     }
 
-    // Remove items no longer in list (with exit transition)
+    // Remove items no longer in list (with exit transition). `@mode` orders exits and enters (#207):
+    // 'out-in' holds the arriving rows until the leaving ones are gone, 'in-out' keeps the leaving
+    // rows until the arriving ones have entered.
+    const mode = transitions?.mode ?? 'simultaneous';
+    const arriving = !!transitions?.enter && lisPositions.some((p) => p === -1);
+    const leavingNodes: Node[] = [];
     for (const old of oldMap.values()) {
-        if (transitions?.exit) {
-            for (const n of old.nodes) exit(n, transitions.exit);
-        } else {
-            for (const n of old.nodes) n.parentNode?.removeChild(n);
-        }
+        if (transitions?.exit) leavingNodes.push(...old.nodes);
+        else for (const n of old.nodes) n.parentNode?.removeChild(n);
         old.dispose?.();
     }
+    const runExits = (): Promise<unknown> => Promise.all(leavingNodes.map((n) => exit(n, transitions!.exit)));
+    const exitsAfterEnters = mode === 'in-out' && arriving && leavingNodes.length > 0;
+    const exitsDone = leavingNodes.length > 0 && !exitsAfterEnters ? runExits() : null;
 
     // Find LIS of old positions (items already in correct relative order)
     const lisIndices = longestIncreasingSubsequence(lisPositions);
@@ -286,13 +291,19 @@ function reconcile<T>(
         }
     }
 
-    // Enter transition for new items
+    // Enter transition for new items: the n-th arriving row waits n × `@stagger` ms (#207), and under
+    // 'out-in' every one waits for the exits.
     if (transitions?.enter) {
+        const stagger = transitions.stagger ?? 0;
+        const after = mode === 'out-in' && exitsDone ? exitsDone : undefined;
+        const enters: Promise<void>[] = [];
+        let arrived = 0;
         for (let i = 0; i < newMapped.length; i++) {
-            if (lisPositions[i] === -1) { // new item
-                for (const n of newMapped[i].nodes) enter(n, transitions.enter);
-            }
+            if (lisPositions[i] !== -1) continue; // reused, not arriving
+            const delay = stagger * arrived++;
+            for (const n of newMapped[i].nodes) enters.push(enterRow(n, transitions.enter, delay, after));
         }
+        if (exitsAfterEnters) void Promise.all(enters).then(runExits);
     }
 
     // FLIP: animate moved items

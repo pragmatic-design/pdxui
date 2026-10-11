@@ -59,6 +59,10 @@ semver.
 
 ### Fixes
 
+- `@stagger` and `@mode` on an `@for` animate the list: the n-th row that arrives waits n × stagger
+  ms, `@mode('out-in')` holds arriving rows until the leaving ones are gone, and `@mode('in-out')`
+  keeps leaving rows until the arriving ones have entered. The list reconciler read only `enter`,
+  `exit` and `move`, so both were accepted and did nothing. (#207)
 - The editor no longer reports `Cannot find name` on a call to a `@snippet` or to `$emit`: the
   snippet is declared as a function of its parameters, `$emit(event, detail?)` is declared, and
   `$watch` takes `once` and `name` as core's `watch` does. (#206)
