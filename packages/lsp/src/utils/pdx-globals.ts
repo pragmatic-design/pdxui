@@ -80,6 +80,7 @@ declare global {
     readonly warning: PdxReadonly<string | undefined>;
     readonly touched: PdxReadonly<boolean>;
     readonly dirty: PdxReadonly<boolean>;
+    readonly required: boolean;
     onChange(value: T): void;
     onBlur(): void;
     reset(): void;
