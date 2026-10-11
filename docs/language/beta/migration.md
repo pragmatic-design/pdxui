@@ -8,7 +8,9 @@ Every alpha form that the beta changes or removes.
 - A **target change** depends on `pdx({ target })` (#152, #156).
 
 «Mechanical» means `pdx migrate` rewrites it; «flagged» means it reports the location and the beta
-form and a person rewrites it; «behaviour» means the source stays valid but its meaning changes.
+form and a person rewrites it; «behaviour» means the source stays valid but its meaning changes —
+the compiler is silent there, and `pdx migrate` rewrites or flags it (#121 registers these as
+`changed` entries).
 The column **Source** says who specifies the migration: the issue, or this specification (†), whose
 proposals the implementing issue may change.
 
@@ -49,8 +51,12 @@ proposals the implementing issue may change.
 |---|---|---|---|
 | `::x` on a component prop that is not two-way | `@model x` in the child | flagged (the child is another file, maybe another package) | #124 (flagging †) |
 | `@await (x as T)`, where `as T` was a TypeScript assertion (alpha has no `as` binding) | `@await ((x as T))`: in the beta a trailing `as Name` binds the value | mechanical: parenthesises every `@await` whose expression ends in `as <Identifier>` | † (decision 18) |
+| `<pdx-pin-input>` | `<pdx-otp-input mask numeric length="4">` — pin-input defaulted to 4 cells and `numeric`, otp-input to 6; an explicit `length` or `:numeric` is carried over | mechanical | † (decision 48) |
+| `<pdx-button toggle :pressed="p">` | `<pdx-toggle ::pressed="p">` | mechanical | † (decision 49) |
+| `@pdx-open` / `@pdx-close` on an overlay | `@open-change` (`$event.detail.value`) | mechanical | † (decision 50) |
+| overlay `hide()`, dropdown-menu/fab/context-menu `open()`; wizard `goNext()`/`goPrev()`/`goto()`, carousel `goto()`, pagination `goto()` | `close()`, `show()`; `next()`/`prev()`/`goTo(n)` | mechanical in templates and `:ref` calls; flagged elsewhere | † (decision 50) |
 | `:style.color="c"`, `:style.--accent="c"` | `:style="{ color: c, '--accent': c }"` | mechanical (merged into an existing object) | † (decision 5) |
-| `{{ price \| money }}` (a single pipe) | still valid; `PDX_PIPE_SINGLE` (info) suggests `{{ money(price) }}`; chains of two or more stay | mechanical, optional | † (decision 4) |
+| `{{ price \| money }}` (a single pipe) | still valid; `PDX_PIPE_SINGLE` (info) suggests `{{ money(price) }}`; chains of two or more stay | a fix offered by the diagnostic (`pdx check --fix`), not by `pdx migrate` | † (decision 4) |
 | `@pdx-change="…"` on a library value component | `@<model>-change="…"` — `@checked-change` on `pdx-checkbox` and `pdx-switch`, `@pressed-change` on `pdx-toggle`, `@value-change` on the others — **with the payload converted**: each `$event.detail.<field>` / `e.detail.<field>` read is rewritten through the component's mapping in the manifest (on `pdx-checkbox`: `detail.checked` → `detail.value`; `detail.value`, the choice identifier → `$event.currentTarget.value`; `detail.indeterminate` → `$event.currentTarget.indeterminate`) | mechanical only when the handler is written inline and every `detail` read in it has a mapping; **flagged** when the handler is a reference to a script function, passes `detail` or the event on, or reads a field with no mapping | #125 (payload conversion †) |
 | `@change`, `@valuechange`, `@pressedchange`, `@pdx-pressed-change` on a library value component | the model's change event | flagged | #125 |
 | `::value.number` writes `0` for empty or invalid | writes `null` for empty; leaves the value and marks invalid otherwise | behaviour: flagged on every `.number` binding | #126 (flagging †) |

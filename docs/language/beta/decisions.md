@@ -71,6 +71,12 @@ issue implements it. Each line names where the rule lives.
 | 42 | The golden compile corpus is regenerated in bulk for #107, accepted only when the parity table and the browser suites are green and a script shows that each entry changed in its render function only; entries that change anything else are read line by line | performance.md |
 | 43 | Benchmark thresholds (`pnpm bench:jfb`) fail in a nightly CI job, not in the pre-push gate | performance.md |
 | 44 | The component library is brought to the beta contract in the same refactoring, component by component, with the accessibility and agent rules | [library.md](library.md) |
+| 45 | `@virtual`'s scroll container is the parent written in the template, with spacers of the body root's tag; any other shape is `PDX_VIRTUAL_SHAPE` | performance.md |
+| 46 | `content-visibility` applies per component, on div-based rows, after reading what each draws outside a row; measured on a real long list | performance.md R7 |
+| 47 | `invalidate` takes tags, as documented; a `@fetch` tags itself with its own key, so its URL invalidates it | data.md |
+| 48 | `pdx-pin-input` is removed: `pdx-otp-input` declares `mask` and `numeric` (mechanical) | library.md, migration.md |
+| 49 | `pdx-button`'s toggle mode is removed: a pressed button is `pdx-toggle` (mechanical) | library.md, migration.md |
+| 50 | One rule across the library: a prop the component writes itself is a `@model`, one only the parent writes is a `@prop`, a read-only output emits `<name>-change`; overlays emit `open-change`; overlays share `show()`/`close()`/`toggle()`, navigation `next()`/`prev()`/`goTo(n)` | library.md |
 
 ## Still open
 
@@ -80,12 +86,16 @@ issue implements it. Each line names where the rule lives.
 - **Starting data with a built-in `@defer` trigger** (`viewport`): needs the trigger to be readable
   as a signal; deferred.
 - **The WebMCP adapter**: revisited at the end of Chrome's origin trial.
+- **Four questions the examples raised**, for the next revision: whether a `data-part` may sit inside
+  a `@for`; how `@part` and `@state` names relate to the script's other names; whether the callee rule
+  (decision 17) covers `onSave?.()`; whether `execute()` rejects when the action fails, or only on
+  cancellation.
 
 ## Names this specification chose
 
 Diagnostics and types the issues describe without naming: `PDX_LOADER_UNKNOWN_OPTION` (#148),
 `PDX_ACTION_UNKNOWN_OPTION` (#142), `PDX_RUNE_POSITION`, `PDX_FORM_FIELD_RESERVED`,
-`PDX_PIPE_SINGLE`, `PDX_DEFER_UNKNOWN_TRIGGER`, `PDX_AWAIT_TIMING`, `PDX_AWAIT_MAXMS_CHANGED`,
+`PDX_PIPE_SINGLE`, `PDX_DEFER_UNKNOWN_TRIGGER`, `PDX_AWAIT_TIMING`, `PDX_VIRTUAL_SHAPE`,
 `PDX_VIRTUAL_TRANSITION`, `PDX_AGENT_ACTION_UNBOUND`, `PDX_HOST_INVALID_ATTRIBUTE`; the types
 `LoaderContext<P>` (#146), `AwaitTimeoutError`, `HttpTimeoutError`, `ActionDisabledError`; and the
 `keep-alive-max` attribute. The

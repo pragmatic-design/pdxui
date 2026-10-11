@@ -8,6 +8,14 @@ issue.
 
 ## What every component meets
 
+**One rule for the whole library** (decisions.md 50): a prop the component writes itself is a
+`@model`; a prop only the parent writes stays a `@prop`; a read-only output (an affix's state, the
+open items of an accordion) emits `<name>-change` with `{ value }` without being a model. Overlays
+emit `open-change`, and share `show()`, `close()`, `toggle()`; navigation shares `next()`, `prev()`,
+`goTo(n)`. One component per job: `pdx-pin-input` is gone (`pdx-otp-input mask numeric`), and a
+pressed button is `pdx-toggle`, not a mode of `pdx-button` (decisions.md 48, 49). The families and
+their issues are #286–#293.
+
 | Area | The component | Source |
 |---|---|---|
 | Contract | declares its API with the typed descriptor, or is a `.pdx` file — one declaration model for both | #123, #137 |
