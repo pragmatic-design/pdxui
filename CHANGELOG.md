@@ -59,6 +59,9 @@ semver.
 
 ### Fixes
 
+- A production build binds `:class` and `:style` written as objects: `<p :class="{ active: on }">`
+  rendered `class="[object Object]"`, and `:style="{ color: c }"` set nothing. Both render paths now
+  expand the object into one `:class.x` / `:style.x` per key, the same way. (#96)
 - A scoped slot outlet, `<slot name="cell" :row="r">`, renders the parent's `@slot(cell, { row })`
   fill with its scope: the child collected the fills only after rendering, so the default was always
   shown. A self-closing outlet with no fill no longer fails the mount with `defaultFn is not a

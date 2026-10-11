@@ -147,11 +147,11 @@ const ROWS: Row[] = [
     { name: ':attr', template: '<a :href="url" :title="t">x</a>', script: "let url = $signal('/a'); let t = $signal('T');" },
     { name: ':prop on a custom element', template: '<x-probe :value="v"></x-probe>', script: 'let v = $signal({ a: 1 });', read: (h) => JSON.stringify((h.querySelector('x-probe') as unknown as { value: unknown }).value) },
     { name: ':class with a string', template: "<p :class=\"on ? 'yes' : 'no'\">x</p>", script: 'let on = $signal(true);' },
-    // Inline: class="[object Object]".
-    { name: ':class with an object', template: '<p :class="{ active: on, off: !on }">x</p>', script: 'let on = $signal(true);', owner: 96 },
+    // The inline path wrote class="[object Object]" (#96).
+    { name: ':class with an object', template: '<p :class="{ active: on, off: !on }">x</p>', script: 'let on = $signal(true);' },
     { name: ':class.x', template: '<p class="base" :class.active="on">x</p>', script: 'let on = $signal(true);' },
-    // Inline: the object is assigned to el.style, which keeps no colour.
-    { name: ':style with an object', template: "<p :style=\"{ color: 'red' }\">x</p>", owner: 96 },
+    // The inline path assigned the object to el.style, which keeps no colour (#96).
+    { name: ':style with an object', template: "<p :style=\"{ color: 'red' }\">x</p>" },
     { name: ':style.x', template: '<p :style.color="c">x</p>', script: "let c = $signal('blue');" },
     { name: ':show', template: '<p :show="on">x</p><p :show="!on">y</p>', script: 'let on = $signal(true);' },
     { name: '@click', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },

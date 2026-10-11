@@ -233,8 +233,8 @@ removes the classes the binding wrote last and adds its own, and never removes a
 
 #### Rules
 
-- **The object form works only on the template path.** The inline path binds the object as a string,
-  `class="[object Object]"` (#96). Not checked today. `:class.name` works on both.
+- The object form is expanded into one `:class.name` per key before either render path reads the
+  tag, so both bind the same classes.
 - The object form is recognised only when the whole value is one `{ … }`; a value that merely
   contains an object is the string form. Not checked today.
 
@@ -277,8 +277,8 @@ into one `:style.name` per pair, the key turned to kebab-case (`fontSize` → `f
 
 #### Rules
 
-- **The object form works only on the template path.** The inline path assigns the object to
-  `el.style`, which keeps nothing (#96). Not checked today. `:style.name` works on both.
+- The object form is expanded into one `:style.name` per key (a camelCase key in kebab-case) before
+  either render path reads the tag, so both set the same properties.
 - A custom property is a `:style.name` too: `:style.--accent="c"`. Not checked today.
 
 #### Examples
