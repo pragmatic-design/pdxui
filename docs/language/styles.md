@@ -45,9 +45,8 @@ itself.
 
 - `:global(…)` is not CSS; it raises `PDX_GLOBAL_SELECTOR` (warning) and the browser drops the rule.
   A plain descendant selector already reaches what a child component renders.
-- The selector list is split at every comma (#205), including a comma inside `:is()`, `:where()`, `:not()`
-  or `:has()`: `:is(.a, .b) > span` becomes `[data-pdx-HASH] :is(.a, [data-pdx-HASH] .b) > span`,
-  which no longer means what was written. Not checked today.
+- The selector list is split at its top-level commas only: a list inside `:is()`, `:where()`,
+  `:not()` or `:has()` is one selector, `:is(.a, .b) > span` → `[data-pdx-HASH] :is(.a, .b) > span`.
 - A statement at-rule — `@import`, `@charset`, `@namespace`, `@layer a, b;` — ends at its `;` (one
   inside parentheses or quotes does not end it). It is copied as written, and the rule after it is
   scoped as usual.
@@ -114,8 +113,8 @@ CSS it owns, such as rules for elements it creates imperatively, which carry no 
 #### Rules
 
 - `:global(…)` raises `PDX_GLOBAL_SELECTOR` here too.
-- `responsive()` and `bind()` are left as written in a plain block (#205), and the browser drops the
-  declaration that holds them. Not checked today.
+- `responsive()` and `bind()` are rewritten in a plain block as in a scoped one. A bound custom
+  property is set on the host, so it reaches the component's own elements only.
 - `<style />`, self-closing without `src`, carries no CSS and is ignored. Not checked today.
 
 #### Examples
@@ -155,10 +154,9 @@ file resolver throws `<style src="…"> requires a file resolver`; the Vite plug
 
 #### Rules
 
-- In a production build the CSS of a `src=` block comes out **empty**: the virtual style module
-  (see [Development and production](#development-and-production)) re-reads the `.pdx` from disk and
-  does not resolve `src=`, so the import resolves to an empty stylesheet. Development is not
-  affected. Not checked today.
+- In a production build the virtual style module (see
+  [Development and production](#development-and-production)) resolves `src=` with the same resolver,
+  and the same project-root check, as the transform.
 - A missing file is an error from the resolver, not a `PDX_*` diagnostic.
 
 #### Examples
@@ -240,17 +238,19 @@ Both lengths take the same unit.
 `responsive(min, max)` becomes a fluid `clamp()` between a viewport of 320px and one of 1920px;
 `responsive(min, max, vMin, vMax)` names the viewport range, in pixels, unitless. With `delta = max −
 min`, the output is `clamp(min, calc(min + delta * ((100vw - vMinpx) / (vMax − vMin))), max)`:
-`responsive(16px, 64px)` → `clamp(16px, calc(16px + 48 * ((100vw - 320px) / 1600)), 64px)`. Nothing
-of it reaches the runtime.
+`responsive(16px, 64px)` → `clamp(16px, calc(16px + 48 * ((100vw - 320px) / 1600)), 64px)`. The middle
+term is a length in px, so with `rem` or `em` `delta` is converted at 16px each, the browsers' default
+root size: `responsive(1rem, 2rem)` → `clamp(1rem, calc(1rem + 16 * ((100vw - 320px) / 1600)), 2rem)`.
+The ends stay in the unit written. Nothing of it reaches the runtime.
 
 #### Rules
 
 - A call that does not match the grammar — two different units, a unit other than `px`, `rem` or
   `em`, a `calc()` argument — is left as written, and the browser drops the declaration. Not checked
   today.
-- The slope is exact only for `px`. With `rem` or `em` the middle term grows by `delta` **pixels**
-  across the range, not by `delta` rem (#205): `responsive(1rem, 2rem)` grows from 1rem to 1rem + 1px at
-  1920px wide and never reaches `max`. Not checked today.
+- With `rem` the slope assumes a 16px root, with `em` a 16px font where the declaration applies:
+  under another size the middle term reaches `max` a little before or after `vMax`, and the `clamp()`
+  still holds both ends. Not checked today.
 - Not to be confused with `responsive()` in `@pdxui/core`, the runtime breakpoint signal.
 
 #### Examples
@@ -283,19 +283,16 @@ Word           ::= [A-Za-z0-9_]+
 
 `bind(name)` becomes `var(--pdx-HASH-name)`, so the stylesheet stays static. The setup the compiler
 generates adds one `ctx.track(() => { … })` that, for every name bound in any block of the file,
-calls `ctx.el.style.setProperty('--pdx-HASH-name', String(ctx.name()))` on the host; the property
+calls `ctx.el.style.setProperty('--pdx-HASH-name', String(value))` on the host, reading the name as
+the setup does — `__name()` for a `$signal`, `name()` for a `$derived`, `ctx.name()` for a prop; the property
 inherits into the subtree (and into a shadow root). The effect reads every bound name, so a change
 to any of them re-writes all the bound properties of that instance.
 
 #### Rules
 
-- `name` must be an `@prop`. The effect is created inside setup, before setup returns, and reads
-  `ctx.name` at once: a prop is on `ctx` by then, but a `$signal` or a `$derived` is put there only
-  from what setup returns, so binding one fails the mount with
-  `setup failed: TypeError: ctx.name is not a function`. Not checked today (#205).
+- `name` is an `@prop`, a `$signal`, a `$derived` or a route param of the script. Not checked today.
 - The value is written with `String(…)`, with no unit added: `bind(n)` with `n = 42` gives `42`,
-  which is not a length. Bind a value that already carries its unit. Not checked today.
-- In a plain `<style>` block `bind()` is not rewritten, though the setup still writes the property.
+  which is not a length. Bind a value that already carries its unit, or write `calc(bind(n) * 1px)`.
   Not checked today.
 
 #### Examples
@@ -353,7 +350,6 @@ component is the exception: its CSS is minified and stays in the module.
 - If the `.pdx` cannot be read when the virtual module loads, the build warns
   `could not read the styles of …` and ships the component unstyled (a build warning, not a `PDX_*`
   code).
-- A `src=` block is empty in a build (#205); see [`src=` on a style block](#src-on-a-style-block).
 
 #### Examples
 

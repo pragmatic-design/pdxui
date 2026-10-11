@@ -59,6 +59,12 @@ semver.
 
 ### Fixes
 
+- Style rewrites produce the CSS that was written. A selector list inside `:is()`, `:where()`,
+  `:not()` or `:has()` is scoped as one selector instead of being split. `responsive(1rem, 2rem)`
+  grows by 1rem (taken as 16px) across the range instead of 1px. `bind()` follows a `$signal` and a
+  `$derived`, which failed the mount with `ctx.name is not a function`. A `<style src>` block is no
+  longer empty in a production build. A plain `<style>` rewrites `responsive()` and `bind()` as a
+  scoped one does. (#205)
 - Page declarations compile to the route they describe. `@page '/x' { keepAlive: true }` registers
   `keepAlive: true`, not `NaN`. `@search`'s `searchParams` is read as a `$derived` in the script too —
   `searchParams.page + 1` was `NaN` — and is declared for `pdx check` and the editor. A `@page`

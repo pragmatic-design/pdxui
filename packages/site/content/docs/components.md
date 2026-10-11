@@ -161,14 +161,15 @@ let pct = $signal(42);
 </script>
 <style scoped>
 .bar {
-  width: bind(pct);                    /* → var(--pdx-a1b2c3-pct), updated when pct changes */
+  width: calc(bind(pct) * 1%);         /* → var(--pdx-a1b2c3-pct), updated when pct changes */
   font-size: responsive(16px, 64px);   /* → clamp(16px, calc(…), 64px) */
 }
 </style>
 ```
 
 `bind(name)` is the bridge from a signal to CSS: the compiler emits a custom property and keeps it in
-sync, so the stylesheet stays static and the browser does the work. `responsive(min, max)` becomes a
+sync, so the stylesheet stays static and the browser does the work. The value is written as it is, with
+no unit: a number becomes a length through `calc(… * 1%)` or `calc(… * 1px)`. `responsive(min, max)` becomes a
 `clamp()` — see [Responsive](/docs/device).
 
 And like the script, the styles can live in their own file:
