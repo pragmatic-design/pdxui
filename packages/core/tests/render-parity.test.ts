@@ -226,6 +226,17 @@ const ROWS: Row[] = [
     // Inline: the array becomes its string, "a,b".
     { name: 'an interpolated array', template: '<div>{{ list }}</div>', script: "const list = ['a', 'b'];", owner: 100 },
     { name: 'content inside a component tag', template: '<x-probe><span>child</span></x-probe>' },
+    // The inline path emitted `batchHandler(() => )` for @keepAlive: a module that does not parse (#200).
+    {
+        name: '<component :is> with @keepAlive',
+        template: '<component :is="tag" @keepAlive></component><button @click="tag = tag === \'x-probe\' ? \'x-field\' : \'x-probe\'">swap</button>',
+        script: "let tag = $signal('x-probe');",
+        act: click('button'),
+    },
+    // The inline path emitted `const __b = ;` for a binding with no value (#200).
+    { name: ':name shorthand', template: '<input :value>', script: "let value = $signal('a');", read: (h) => h.querySelector('input')!.value },
+    // The inline path wrote a literal <slot> element, with a `row` property, around its default (#200).
+    { name: 'a scoped slot outlet with its default', template: '<slot name="cell" :row="r"><em>none</em></slot>', script: 'let r = $signal(1);' },
     // Neither path wires the gesture. On the template path the handler also runs once at render, and
     // the count is NaN before anyone swipes; on the inline path `.left` is read as a key filter.
     { name: '@swipe.left', template: '<div @swipe.left="n++">s</div><p>{{ n }}</p>', script: 'let n = $signal(0);', owner: 99 },

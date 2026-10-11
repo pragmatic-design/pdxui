@@ -186,8 +186,8 @@ On the inline path the same rule is generated inline, in one `effect` per bindin
   (warning), one that matches a prop only ignoring case is `PDX_PROP_NAME_CASE` (warning), and a
   literal value outside a prop's declared values is `PDX_INVALID_ENUM_VALUE` (warning). The plugin
   passes what it knows of the components; a bare `compile()` has no list and checks none of them.
-- **The shorthand `:name` without a value works only on the template path.** The inline path emits
-  `const __b = ;` and the production module does not parse. Not checked today (#200).
+- The shorthand `:name` without a value reads the identifier of the same name: `<input :value>` is
+  `<input :value="value">`, on both render paths.
 - The template path also accepts `:name="${expr}"` and strips the `${ }` — but the check above stops
   the compile first.
 
@@ -572,9 +572,8 @@ the swap, `@mode('out-in')` sequences it.
 
 #### Rules
 
-- **`<component :is>` works only on the template path.** The inline path builds a literal
-  `<component>` element with `is` and the props as properties, and `@keepAlive` as an event listener
-  with an empty handler: the production module does not parse. Not checked today (#200).
+- Both render paths compile it to the same `dynamic(…)` call; what is written between
+  `<component>` and `</component>` is dropped.
 - Only `:is`, `:prop` bindings and the three options are read; an `@event`, a `::` binding or a plain
   attribute on `<component>` is dropped. Not checked today.
 - The tags it may render must be registered: the auto-import reads the tags written in the markup,
@@ -619,8 +618,9 @@ gives none. `name` defaults to `default`. Declare what a slot passes with `@slot
 
 #### Rules
 
-- **It works only on the template path.** The inline path builds a literal `<slot>` element with the
-  bound names as its properties, and the scope never reaches the parent's fill. Not checked today (#200).
+- Both render paths compile it to the same `renderSlot(…)` call.
+- **The parent's fill does not reach it today: the default is always rendered.** `renderSlot` reads
+  the parent's slot functions while the child renders, and the child collects them only after (#221).
 - A bound name is `[A-Za-z0-9_]+`: no `-`. Not checked today.
 
 #### Examples
