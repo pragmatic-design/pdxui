@@ -72,3 +72,26 @@ describe('decodeJwt UTF-8', () => {
         expect(store.user()?.name).toBe('Càffè Größe'); // decoded as latin1, it would be garbled
     });
 });
+
+// #43: the store kept the refresh token and gave no way to read it, so an app refreshing a session
+// had to store the token a second time itself.
+describe('getRefreshToken — the refresh token the store holds', () => {
+    afterEach(() => { localStorage.clear(); });
+
+    it('returns what setTokens stored, and null after clear', () => {
+        const store = createAuthStore();
+        expect(store.getRefreshToken()).toBeNull();
+        store.setTokens({ access: fakeJwt({ sub: 'u1' }), refresh: 'r1' });
+        expect(store.getRefreshToken()).toBe('r1');
+        store.setTokens({ access: fakeJwt({ sub: 'u1' }) });
+        expect(store.getRefreshToken(), 'a token set without a refresh token leaves none').toBeNull();
+        store.setTokens({ access: fakeJwt({ sub: 'u1' }), refresh: 'r2' });
+        store.clear();
+        expect(store.getRefreshToken()).toBeNull();
+    });
+
+    it('is read back from storage by a new store', () => {
+        createAuthStore({ storageKey: 'auth-43' }).setTokens({ access: fakeJwt({ sub: 'u1' }), refresh: 'r1' });
+        expect(createAuthStore({ storageKey: 'auth-43' }).getRefreshToken()).toBe('r1');
+    });
+});

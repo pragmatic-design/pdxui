@@ -39,6 +39,7 @@ shape. Without it you get the raw claims.
 | `auth.user()` | the decoded user, or `null` |
 | `auth.isAuthenticated()` | reactive: a non-expired access token is present |
 | `auth.getToken()` | the raw access token, or `null` |
+| `auth.getRefreshToken()` | the refresh token `setTokens` stored, or `null` |
 | `auth.authFetch(url, init?)` | `fetch` with `Authorization: Bearer …` attached |
 | `auth.clear()` | sign out |
 
@@ -51,8 +52,31 @@ Four things worth knowing before you build on it:
   on someone else's server, so this one is not configurable away by accident.
 - **Expiry flips by itself.** A timer armed on the token's `exp` makes `isAuthenticated` go false when
   it lapses, rather than waiting for the next read to notice.
-- **Refreshing is yours.** The store *keeps* the refresh token; it never spends it. When
-  `isAuthenticated` goes false, call your token endpoint and `setTokens()` again.
+- **Refreshing is yours.** The store *keeps* the refresh token and hands it over with
+  `getRefreshToken()`; it never spends it. When a request answers 401, or `isAuthenticated` goes
+  false, call your token endpoint with it and `setTokens()` again.
+
+```ts
+async function refreshSession(): Promise<boolean> {
+  const refresh = auth.getRefreshToken();
+  if (!refresh) return false;
+  const res = await fetch('/oauth/token', {
+    method: 'POST',
+    body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh }),
+  });
+  if (!res.ok) { auth.clear(); return false; }
+  const { access_token, refresh_token } = await res.json();
+  // A server that does not rotate refresh tokens sends none back: keep the one you have.
+  auth.setTokens({ access: access_token, refresh: refresh_token ?? refresh });
+  return true;
+}
+
+let res = await auth.authFetch('/api/orders');
+if (res.status === 401 && await refreshSession()) res = await auth.authFetch('/api/orders');
+```
+
+Several requests that fail together each start their own refresh with this function; sharing one
+refresh between them is not something the store does.
 
 For requests, join it to the HTTP client once at startup, instead of reading storage by hand:
 
