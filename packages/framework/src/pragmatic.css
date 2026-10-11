@@ -1,2 +1,4 @@
-/* Re-export the full Pragmatic Design CSS system. */
+/* Re-export the full Pragmatic Design CSS system: every component and all 13 themes, for a page that
+   does not know which components it will render. An app that does imports @pdxui/design/base and one
+   theme, as `pdx new project` writes, and each component brings its own CSS. */
 @import '@pdxui/design';

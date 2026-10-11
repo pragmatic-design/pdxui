@@ -12,7 +12,11 @@ pnpm add -D @pdxui/cli
 |--------|----------|
 | `@pdxui/framework` | Everything the four packages export |
 | `@pdxui/framework/core`, `/ui`, `/router` | One package at a time |
-| `@pdxui/framework/css` | The design system's stylesheet |
+| `@pdxui/framework/css` | Everything the design system styles — every component and all 13 themes — for a page that does not know which components it will render |
+
+An app that knows what it renders imports `@pdxui/design/base` and one theme
+(`@pdxui/design/themes/neutral` applies with no `pdx-theme` on `<html>`), and each component
+brings its own CSS; that is what `pdx new project` writes.
 
 The CLI is a separate dev dependency, and so is the compiler, which is a build-time Vite plugin.
 Neither ships to the browser. An application that wants to choose its packages installs them one

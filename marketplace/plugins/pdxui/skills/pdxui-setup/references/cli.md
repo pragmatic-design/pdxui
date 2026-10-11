@@ -144,9 +144,12 @@ file: `pdx new component user-card`, `pdx new page settings`, `pdx new project s
 somewhere other than the current folder. A project comes with an `AGENTS.md`, which tells an AI agent
 opened in it how to work — see [Using PDX with an AI agent](agents.md).
 
-A new project depends on `@pdxui/framework`, with `@pdxui/cli`, `@pdxui/compiler` and `vite` as dev
-dependencies, all at the version of the CLI that created it; its `index.html` imports the design system
-once and places `<pdx-app>`. Start it from a folder with no project yet with
+A new project depends on `@pdxui/framework` and `@pdxui/design`, with `@pdxui/cli`, `@pdxui/compiler`
+and `vite` as dev dependencies, all at the version of the CLI that created it. Its `index.html` imports
+the design system's base and one theme — `@pdxui/design/base` and `@pdxui/design/themes/neutral`, the
+theme that applies with no `pdx-theme` on `<html>` — and places `<pdx-app>`; each component brings its
+own CSS when the compiler imports it. To use another theme, import it instead of neutral and set
+`pdx-theme` on `<html>` ([Theming](https://pdxui.com/docs/theming#shipping-one-instead-of-thirteen)). Start it from a folder with no project yet with
 `npx @pdxui/cli new project shop`, then `npm install` and `npm run dev`.
 
 ## pdx analyze — the project manifest

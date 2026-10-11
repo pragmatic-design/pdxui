@@ -45,6 +45,18 @@ export default {
 };
 ```
 
+The look comes from `@pdxui/design` (`pnpm add @pdxui/design`): import its base and one theme once, in
+the page's entry, and each `<pdx-*>` brings its own CSS when the compiler imports it.
+
+```ts
+import '@pdxui/design/base';
+import '@pdxui/design/themes/neutral';   // applies with no pdx-theme on <html>
+```
+
+That is what `pdx new project` writes. `import '@pdxui/design'` loads every component's CSS and all
+thirteen themes instead — for a page that does not know what it will render
+([Theming](https://pdxui.com/docs/theming#shipping-one-instead-of-thirteen)).
+
 ## Your first component, layer by layer
 
 A `.pdx` file has three blocks: `<template>` (what you see), `<script setup>` (state and logic),

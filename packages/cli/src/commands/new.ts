@@ -103,13 +103,17 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
         version: '0.1.0',
         type: 'module',
         scripts: { dev: 'pdx dev', build: 'pdx build', check: 'pdx check' },
-        dependencies: { '@pdxui/framework': range },
+        // @pdxui/design by name, because index.html imports it: through @pdxui/framework alone a
+        // strict installer (pnpm) does not resolve it.
+        dependencies: { '@pdxui/framework': range, '@pdxui/design': range },
         devDependencies: { '@pdxui/cli': range, '@pdxui/compiler': range, 'vite': cli?.vite ?? '^6.4.3' },
     }, null, 2));
 
-    // The design system once, through the package the project depends on; then the app, placed: the
-    // page loaded App.pdx and never put `<pdx-app>` in it, so it rendered nothing. `pdx-scheme`
-    // because the tokens' light-dark() needs one to resolve.
+    // The design system's base and one theme — neutral, the one that applies with no `pdx-theme` on
+    // <html> — not the full sheet, which carries every component and all 13 themes: each component
+    // brings its own CSS when it is imported. Then the app, placed: the page loaded App.pdx and never
+    // put `<pdx-app>` in it, so it rendered nothing. `pdx-scheme` because the tokens' light-dark()
+    // needs one to resolve.
     writeFileSync(join(dir, 'index.html'), `<!DOCTYPE html>
 <html lang="en" pdx-scheme="light">
 <head>
@@ -120,7 +124,8 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
 <body>
   <pdx-app></pdx-app>
   <script type="module">
-    import '@pdxui/framework/css';
+    import '@pdxui/design/base';
+    import '@pdxui/design/themes/neutral';
     import './src/App.pdx';
   </script>
 </body>

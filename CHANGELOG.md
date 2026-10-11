@@ -22,6 +22,10 @@ semver.
 
 ### Changed
 
+- A project made by `pdx new project` imports `@pdxui/design/base` and `@pdxui/design/themes/neutral`
+  instead of the whole design system, and depends on `@pdxui/design`: each component brings its own
+  CSS, and the page no longer loads every component's CSS and all 13 themes before it renders one.
+  `@pdxui/framework/css` still loads everything. (#46)
 - Dependency tracking keeps an effect's or a computed's subscriptions between runs and updates them
   in place: a source read twice in one run is recorded once, and a re-run that reads the same
   sources touches no subscription. Measured on the flush benchmark, 1.2× to 4× the updates per
