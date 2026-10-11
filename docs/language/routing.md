@@ -598,36 +598,34 @@ The analyzer's form: `@params { id: number }`. The block may span lines.
 
 #### Semantics
 
-`@params` types the route's params. The route carries `paramTypes:{id:"number"}`, and the setup
-reads the `routeParams` context the main `<pdx-router-outlet>` provides,
-`const __routeParams = inject('routeParams', ctx.el)`, and declares one
-`computed(() => Number(__routeParams()?.id ?? 0))` per field: a `number` field is coerced with
-`Number` (`0` when absent), a `boolean` field is `=== 'true'`, any other type is the string (`''`
-when absent). The computed is named `__id`: today the declared name `id` is not in scope in the
-script or the template (#185), so a declared param is not readable by its name.
+`@params` types the route's params and declares each one as a name the page reads. The route
+carries `paramTypes:{id:"number"}`, and the setup reads the `routeParams` context the main
+`<pdx-router-outlet>` provides, `const __routeParams = inject('routeParams', ctx.el)`, and declares
+one computed per field under the field's own name, `const id = computed(() => Number(__routeParams()?.id ?? 0))`,
+before the deriveds and the body. A `number` field is coerced with `Number` (`0` when absent), a
+`boolean` field is `=== 'true'`, any other type is the string (`''` when absent). It is read like a
+`$derived`: `{{ id }}` in the template, `id` in the script (rewritten to `id()`), and it follows a
+navigation that changes the param while the page stays mounted.
 
 #### Rules
 
 - A field that is not `name: type` with a bare type name — a type in quotes, `id: 'number'` —
   raises `PDX_ROUTE_FIELD_INVALID` and is dropped.
-- Reading a declared param by its name in the template raises `PDX_UNDECLARED_REF`; in the script
-  the name is left as written and is undefined at run time. Read `currentParams()` from
-  `@pdxui/router` instead.
-- A field that names no param of the path is not checked today.
+- A field that names no param of the path is not checked today; it reads as the default.
+- The name is the field's: declaring `const id` beside `@params { id }` declares it twice.
 
 #### Examples
 
 ```pdx
 <template>
-  <p>User {{ id }}</p>
+  <p>User {{ id }}, next {{ next }}</p>
 </template>
 
 <script setup>
 @page '/users/:id';
 @params { id: number };
-import { currentParams } from '@pdxui/router';
 
-const id = $derived(Number(currentParams().id));
+const next = $derived(id + 1);
 </script>
 ```
 

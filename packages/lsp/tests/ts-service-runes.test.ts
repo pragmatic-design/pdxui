@@ -64,6 +64,13 @@ describe('projectScript', () => {
         expect(projectScript(src)).not.toContain('@provide');
         expect(diagnose(src)).toEqual([]);
     });
+
+    it('declares each @params field under its type, as the compiler does (#185)', () => {
+        const src = "@page '/t/:id/:slug';\n@params { id: number, slug: string, open: boolean }\nconst next = $derived(id + 1);\n";
+        expect(diagnose(src, '<p>{{ next }} {{ slug.length }} {{ open ? 1 : 0 }}</p>')).toEqual([]);
+        expect(diagnose(src + 'const wrong: string = id;\n').join('\n'), 'a number param must be a number')
+            .toContain("Type 'number' is not assignable to type 'string'");
+    });
 });
 
 describe('$event narrowed to the event a component declares', () => {

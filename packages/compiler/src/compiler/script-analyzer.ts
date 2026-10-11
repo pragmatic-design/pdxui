@@ -727,6 +727,11 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             if (paramsBlock) {
                 route.params = parseRouteParams(paramsBlock);
                 warnings.push(...routeFieldWarnings(paramsBlock, 'params'));
+                // Each param is a name the template and the script read, a computed like a
+                // $derived: without this it was emitted and reachable by nobody (#185).
+                for (const p of route.params) {
+                    if (!p.name.startsWith('_') && !exports.some(e => e.name === p.name)) exports.push({ name: p.name, kind: 'derived' });
+                }
                 i = block.endLine;
                 continue;
             }

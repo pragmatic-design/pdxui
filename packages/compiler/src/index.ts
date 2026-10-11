@@ -32,6 +32,8 @@ export { componentPackages } from './component-packages';
 export { RUNES, DECORATOR_RUNES } from './compiler/runes';
 /** The one reading of an `@fetch` line: the LSP types the resource from its `as Type`. */
 export { parseFetchDecl } from './compiler/script-analyzer-helpers';
+/** The one reading of an `@params` block: the LSP declares each param under its type. */
+export { parseRouteParams } from './compiler/script-analyzer-helpers';
 export type { RuneInfo } from './compiler/runes';
 export type { ComponentPackage } from './component-packages';
 export type { ComponentEntry } from './component-resolver';

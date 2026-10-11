@@ -59,6 +59,10 @@ semver.
 
 ### Fixes
 
+- `@params { id: number }` declares `id` for the page: the template reads `{{ id }}` and the script
+  `id`, coerced to the declared type, and it follows a navigation that changes the param without a
+  remount. The compiler emitted the value under another name, so the template raised
+  `PDX_UNDECLARED_REF` and the script read `undefined`; the editor declares the name too. (#185)
 - In a `<style scoped>`, the rule after a statement at-rule (`@layer a, b;`, `@import …;`,
   `@charset …;`) is scoped: it was read as part of the at-rule and applied to the whole page. At-rule
   names are matched in any case and as whole names, so `@CONTAINER` is scoped like `@container` and

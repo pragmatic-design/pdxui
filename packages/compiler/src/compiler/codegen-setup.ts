@@ -122,6 +122,20 @@ export function buildSetupBody(
         parts.push(markFirst(`    const ${s.name} = store(${storeExpr});`, s.origin));
     }
 
+    // @params — typed route params with coercion: the outlet's routeParams signal, and one computed
+    // per param under the param's own name, like a $derived, so the script reads `id` (as `id()`)
+    // and the auto-return hands it to the template. Declared before the deriveds and the body that
+    // read them (#185).
+    if (analysis.route.params && analysis.route.params.length > 0) {
+        parts.push(`    const __routeParams = inject('routeParams', ctx.el) ?? (() => ({}));`);
+        for (const p of analysis.route.params) {
+            const coerce = p.type === 'number' ? `Number(__routeParams()?.${p.name} ?? 0)`
+                : p.type === 'boolean' ? `__routeParams()?.${p.name} === 'true'`
+                : `__routeParams()?.${p.name} ?? ''`;
+            parts.push(`    const ${p.name} = computed(() => ${coerce});`);
+        }
+    }
+
     // Callable names: props + derived + route params — need () appended in body/effect/lifecycle
     const signalNames = new Set(analysis.signals.map(s => s.name));
     const callableNames = new Set<string>();
@@ -255,7 +269,8 @@ export function buildSetupBody(
     // be declared BEFORE the body (else `const x = derived(); ... function f(){ x() }`
     // is fine, but a top-level body statement reading it would TDZ).
     const derivedNames = new Set(analysis.deriveds.map(d => d.name));
-    const allCallableInDerived = new Set([...derivedNames, ...propNames]);
+    // Route params are computeds too, read as `id()` inside a $derived (#185).
+    const allCallableInDerived = new Set([...derivedNames, ...propNames, ...(analysis.route.params ?? []).map(p => p.name)]);
     const bodyForDerived = analysis.body || '';
     // Deriveds reference EARLIER deriveds (source order = dependency order). computed() is lazy, so
     // a dependency need not be declared before its dependent, and the partition below is
@@ -436,17 +451,6 @@ export function buildSetupBody(
             signalNames.has(n) ? `${n}: __${n}` : `${n}`,
         ).join(', ');
         parts.push(`    ctx.expose({ ${exposeObj} });`);
-    }
-
-    // @params — typed route params with coercion (inject routeParams signal, derive typed values)
-    if (analysis.route.params && analysis.route.params.length > 0) {
-        parts.push(`    const __routeParams = inject('routeParams', ctx.el) ?? (() => ({}));`);
-        for (const p of analysis.route.params) {
-            const coerce = p.type === 'number' ? `Number(__routeParams()?.${p.name} ?? 0)`
-                : p.type === 'boolean' ? `__routeParams()?.${p.name} === 'true'`
-                : `__routeParams()?.${p.name} ?? ''`;
-            parts.push(`    const __${p.name} = computed(() => ${coerce});`);
-        }
     }
 
     // @provide — declarative context provider (DOM-scoped on host element)
