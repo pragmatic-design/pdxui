@@ -14,6 +14,7 @@ import { describe, it, expect } from 'vitest';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
 import { parseTemplate } from '../src/parser/template';
 import * as template from '../../core/src/renderer/template';
+import { pipe as templatePipe } from '../../core/src/renderer/helpers';
 
 /** The rule as the template path applies it, written out: the expectation, not an implementation. */
 const documented = (v: unknown): string => (v == null || v === false ? '' : String(v));
@@ -36,11 +37,13 @@ const textOf = (n: FakeNode): string => (n.data ?? '') + n.children.map(textOf).
 function renderInline(markup: string, ctx: Record<string, unknown>): string {
     const imports = new Set<string>();
     const iife = generateInlineNodes(parseTemplate(markup), imports);
+    // The real value chain core exports as `templatePipe`, not a stand-in: a hand-written `pipe` here
+    // is what hid that the module imported core's SIGNAL operator under that name (#199).
     const runtime: Record<string, unknown> = {
         effect: (fn: () => void) => fn(),
-        pipe: (v: unknown, ...fns: ((x: unknown) => unknown)[]) => fns.reduce((acc, f) => f(acc), v),
+        templatePipe,
     };
-    const names = [...imports].filter((n) => n !== 'effect' && n !== 'pipe');
+    const names = [...imports].filter((n) => n !== 'effect' && n !== 'templatePipe');
     for (const name of names) {
         const fn = (template as Record<string, unknown>)[name];
         expect(fn, `the inline module imports ${name}, which core's renderer does not export`).toBeTypeOf('function');

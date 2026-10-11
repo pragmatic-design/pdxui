@@ -10,7 +10,7 @@ import type {
     SlotTemplateNode,
 } from '../parser/template';
 import type { CompileContext } from './compile-context';
-import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg } from './codegen-prefix';
+import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg, pipeChain } from './codegen-prefix';
 import { rewriteHtmlBindings, isSimpleAccess } from './codegen-template-rewrite';
 import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
@@ -142,15 +142,9 @@ function generateInterpolation(node: InterpolationNode, imports: Set<string>, ct
     const expr = prefixCtx(node.expr, ctx);
 
     if (node.pipes.length > 0) {
-        imports.add('pipe');
-        const pipeFns = node.pipes.map(p => {
-            // Pipe with arguments: currency('EUR') → (v) => ctx.currency(v, 'EUR')
-            const argMatch = p.match(/^(\w+)\((.+)\)$/);
-            if (argMatch) return `(v) => ctx.${argMatch[1]}(v, ${argMatch[2]})`;
-            // Simple pipe: uppercase → ctx.uppercase
-            return `ctx.${p}`;
-        }).join(', ');
-        return `\${() => pipe(${expr}(), ${pipeFns})}`;
+        // core's value chain, not the `pipe` signal operator it used to import (#199).
+        imports.add('templatePipe');
+        return `\${() => ${pipeChain(callSignals(expr, ctx), node.pipes, ctx)}}`;
     }
 
     if (isSimpleAccess(node.expr, ctx)) {

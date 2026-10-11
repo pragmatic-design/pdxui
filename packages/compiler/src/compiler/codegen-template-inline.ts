@@ -9,7 +9,7 @@ import type {
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
     CustomDirectiveNode, SlotTemplateNode,
 } from '../parser/template';
-import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg } from './codegen-prefix';
+import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg, pipeChain } from './codegen-prefix';
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { buildEventHandler } from './codegen-template-rewrite';
@@ -534,9 +534,9 @@ class InlineGen {
         this.out(`${this.parent()}.appendChild(${t});`);
         this.pending = templateMark(this.ctx, node.exprOffset);
         if (node.pipes?.length > 0) {
-            this.imports.add('pipe');
-            const fns = node.pipes.map(p => `ctx.${p}`).join(',');
-            this.out(`effect(()=>{${t}.data=interpolationText(pipe(${expr},${fns}));});`);
+            // The same chain as the template path, the value first in every pipe (#199).
+            this.imports.add('templatePipe');
+            this.out(`effect(()=>{${t}.data=interpolationText(${pipeChain(expr, node.pipes, this.ctx)});});`);
         } else {
             this.out(`effect(()=>{${t}.data=interpolationText(${expr});});`);
         }

@@ -115,38 +115,34 @@ quotes are part of the expression (`splitPipes` in the parser).
 
 #### Semantics
 
-Each pipe names a function the component declares; the value goes through them left to right. On
-the template path `{{ price | money }}` compiles to `${() => pipe(ctx.price(), ctx.money)}`, and a pipe
-with arguments, `money('EUR')`, to `(v) => ctx.money(v, 'EUR')`. On the inline path every pipe is
-`ctx.name` as written: `ctx.money('EUR')`, a call with the arguments and without the value.
+Each pipe names a function the script declares or imports; the value goes through them left to
+right, and the text follows the signals the value reads. Both render paths compile
+`{{ price | money }}` to core's value chain, `templatePipe(ctx.price(), ctx.money)`, and a pipe with
+arguments, `money('EUR')`, to `(v) => ctx.money(v, 'EUR')`: the value first, then the arguments. A
+function the script imports is called by its own name, `fmt`, not `ctx.fmt`.
 
 #### Rules
 
-- **Pipes do not render today, on either path.** The `pipe` the compiled module imports from
-  `@pdxui/core` is the signal operator `pipe(source, ...operators)` of `reactivity/pipe.ts`, not the
-  value chain (core exports that one as `templatePipe`). It returns a function, and the page shows its
-  source text, `() => current()`. Measured in happy-dom on the template path. Call the function
-  instead: `{{ money(price) }}`. Not checked today (#199).
-- A pipe with arguments is compiled differently by the two paths (above). Not checked today (#199).
-- A pipe name is always read as `ctx.name`: a function the script imports compiles to `ctx.fmt`,
-  which is undefined, while the call `{{ fmt(n) }}` reaches the import. Not checked today.
+- A pipe name that the script neither declares nor imports raises `PDX_UNDECLARED_REF`.
+- `{{ money(price) }}` is the same call written directly; a pipe chain reads left to right where nested
+  calls read inside out.
 
 #### Examples
 
 ```pdx
 <template>
-  <p>{{ money(price) }}</p>
   <p>{{ price | money }}</p>
+  <p>{{ price | money | upper }}</p>
+  <p>{{ price | currency('EUR') }}</p>
 </template>
 
 <script setup>
 let price = $signal(12.5);
-function money(value: number) { return value.toFixed(2) + ' EUR'; }
+function money(value: number) { return value.toFixed(2); }
+function upper(value: string) { return value.toUpperCase(); }
+function currency(value: number, code: string) { return `${value.toFixed(2)} ${code}`; }
 </script>
 ```
-
-The first line is what works today; the second is the pipe form, which compiles and renders the text
-of a function.
 
 #### Since
 
