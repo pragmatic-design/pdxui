@@ -50,6 +50,11 @@ Here the compiler knows the whole project and generates the optimized output (in
 pre-compiled templates, pre-linked routes, dead code removed). It produces the static artifacts to
 serve.
 
+`pdx dev` and `pdx build` use the project's `vite.config` when it has one. If that config already
+registers `pdx()` — as the one `pdx new project` writes does — they use that plugin and its options,
+and add no second one; the `plugins` and `components` of `pdx.config` then go in that `pdx({ … })`
+call. Without a `pdx()` in the Vite config, they add their own, configured from `pdx.config`.
+
 Source maps are off by default. `--sourcemap` turns them on, and they point at the line of the `.pdx`
 you wrote, not at the generated code:
 

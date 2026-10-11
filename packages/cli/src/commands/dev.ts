@@ -4,6 +4,7 @@ import { defineCommand } from 'citty';
 import { loadConfigOrExit, resolveConfig } from '../config/loader';
 import { detectEntry } from '../utils/paths';
 import { logger } from '../utils/logger';
+import { configRegistersPdx } from '../utils/vite-config';
 
 export default defineCommand({
     meta: { name: 'dev', description: 'Start dev server with HMR' },
@@ -31,9 +32,12 @@ export default defineCommand({
         const entry = detectEntry(cwd);
         const port = parseInt(args.port as string, 10);
 
+        // The project's vite.config may register pdx() itself: a second one compiles twice (#197).
+        const own = await configRegistersPdx(vite, cwd, { command: 'serve', mode: 'development' });
+
         const server = await vite.createServer({
             root: cwd,
-            plugins: [pdx({ plugins: resolved.plugins, components: [resolved.components] })],
+            plugins: own ? [] : [pdx({ plugins: resolved.plugins, components: [resolved.components] })],
             server: {
                 port,
                 host: args.host as string,
