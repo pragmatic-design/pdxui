@@ -28,9 +28,9 @@
     "./package.json": "./package.json"
   },
 
-  "files": ["dist"],
+  "files": ["dist", "bin"],
   "bin": {
-    "pdx-lsp": "./dist/server.cjs"
+    "pdx-lsp": "./bin/pdx-lsp.cjs"
   },
   "scripts": {
     "build": "node build.mjs",
