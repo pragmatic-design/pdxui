@@ -39,8 +39,20 @@ const ASSIGN = /^([A-Za-z_$][\w$]*)\s*(=(?!=)|\+=|-=|\*=|\/=|%=)\s*([\s\S]+)$/;
  *  reference · arrow (pass-through) · single mutation · single expression · multi-statement block.
  * Without this, `@click="count++"` would compile to `safeHandler(ctx.count++)` — evaluated once
  * at bind time, clobbering the signal; arrows would be double-wrapped; `$event` unavailable.
+ *
+ * Every handler runs inside `batch()` (#114, the owner's decision): writes outside it flush one by
+ * one, so a handler writing three signals ran an effect reading them three times, twice on a state
+ * half written. Core's `batchHandler` does it, once per module import rather than spelled out at
+ * every handler, keeping the call's `this` and its return value — `safeHandler` reads the promise
+ * an async handler returns to route its rejection. Both render paths call this builder; the caller
+ * imports `batchHandler`.
  */
 export function buildEventHandler(expr: string, ctx: CompileContext): string {
+    return `batchHandler(${unbatchedHandler(expr, ctx)})`;
+}
+
+/** The handler itself, before `buildEventHandler` puts it inside `batch()`. */
+function unbatchedHandler(expr: string, ctx: CompileContext): string {
     const e = expr.trim();
 
     // 1. Bare reference → function reference (the event is passed as the first argument).

@@ -542,6 +542,8 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
  *
  * Outside it each write flushes at once, so two writes in a row run their subscribers twice, and the
  * first run sees the second value not yet written. Use it when several writes are one change.
+ * A compiled template's event handlers already run inside it (`batchHandler`); code anywhere
+ * else — a hand-written listener, a timer, a promise callback — flushes per write.
  *
  * Nested calls flush once, at the outermost exit.
  */
@@ -552,6 +554,20 @@ export function batch(fn: () => void): void {
         batchDepth--;
         if (batchDepth === 0) flush();
     }
+}
+
+/**
+ * `handler`, run inside `batch()` on every call: what a compiled template does with each of its
+ * `@event` handlers (#114), so a handler writing three signals runs an effect reading them once,
+ * on the finished state. The call keeps its `this` and returns what the handler returns — the
+ * promise of an async handler, which is batched up to its first `await`.
+ */
+export function batchHandler<A extends unknown[], R>(handler: (...args: A) => R): (...args: A) => R {
+    return function (this: unknown, ...args: A): R {
+        let result!: R;
+        batch(() => { result = handler.apply(this, args); });
+        return result;
+    };
 }
 
 // --- Internal: Notification + Flush ---

@@ -189,7 +189,9 @@ declared once and holds forever.
 
 With these three building blocks — and the compiler generating the wiring — you describe *what* must
 be true, not *how* to update it. The rest of reactivity (watch, batch, ownership) is in
-[Reactivity (API)](/docs/reactivity), but 90% of daily work lives here.
+[Reactivity (API)](/docs/reactivity), but 90% of daily work lives here. One part of it you get for
+free: the writes of a template event handler (`@click`, `@input`…) are batched, so an effect reading
+them runs once, after the handler, never on a state half written.
 
 The last two rows are the tenth: when the problem is about **time** — the search that fires on every
 keystroke, the value you need the previous of, the request that must cancel the one before it — a

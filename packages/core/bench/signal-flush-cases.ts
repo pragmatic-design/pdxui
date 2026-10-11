@@ -13,7 +13,9 @@
 // Each case is built once and then `run()` many times. `effectRuns()` counts the effect bodies run
 // by `run()` calls since the case was built, so a count is read after exactly one `run()`.
 
+import * as core from '../src/index';
 import { signal, computed, effect, batch, eachRow } from '../src/index';
+import { compile } from '../../compiler/src/plugin';
 
 export type Strategy = 'sync' | 'batched';
 export const STRATEGIES: readonly Strategy[] = ['sync', 'batched'];
@@ -136,6 +138,32 @@ export function unchangedComputed(strategy: Strategy): FlushCase {
     return { run, effectRuns: () => runs };
 }
 
+let compiledSeq = 0;
+
+/**
+ * (f) A real compiled template handler writing 3 signals read by one effect: `@click="a = t; b = t;
+ * c = t"`, compiled by the compiler and clicked. Since #114 the compiler puts every template handler
+ * inside `batch()`, so it runs at the batched numbers under either strategy — the strategy only
+ * wraps it in a second batch, which nests.
+ */
+export function compiledHandler(strategy: Strategy): FlushCase {
+    const name = `flushprobe${++compiledSeq}`;
+    const src = `<template><button @click="tick = tick + 1; a = tick; b = tick; c = tick">go</button></template>
+<script setup>
+let tick = $signal(0); let a = $signal(0); let b = $signal(0); let c = $signal(0);
+$effect(() => { a; b; c; globalThis.__flushProbeRuns = (globalThis.__flushProbeRuns ?? 0) + 1; });
+</script>`;
+    const { code } = compile(src, `${name}.pdx`, [], undefined, {});
+    new Function('__core', code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;'))(core);
+    const el = document.createElement(`pdx-${name}`);
+    document.body.appendChild(el);
+    const button = el.querySelector('button') as HTMLButtonElement;
+    const g = globalThis as { __flushProbeRuns?: number };
+    const base = g.__flushProbeRuns ?? 0;
+    const run = handler(strategy, () => { button.click(); });
+    return { run, effectRuns: () => (g.__flushProbeRuns ?? 0) - base };
+}
+
 /** Every case, named as the bench and the test report it. */
 export const CASES: { name: string; build: (s: Strategy) => FlushCase }[] = [
     { name: '(a) 1 signal, 1 effect', build: s => writesReadByOneEffect(s, 1) },
@@ -145,4 +173,5 @@ export const CASES: { name: string; build: (s: Strategy) => FlushCase }[] = [
     { name: '(c) @for of 1000 rows, select + relabel', build: s => listOfRows(s) },
     { name: '(d) 3 signals, computed chain 10 deep', build: s => computedChain(s) },
     { name: '(e) 3 writes, computed value unchanged', build: s => unchangedComputed(s) },
+    { name: '(f) a compiled template handler, 3 signals', build: s => compiledHandler(s) },
 ];

@@ -22,6 +22,10 @@ semver.
 
 ### Changed
 
+- A template event handler runs inside `batch()`: `@click="a = 1; b = 1; c = 1"` runs an effect
+  reading the three once, on the finished state, instead of three times on states half written. An
+  `async` handler is batched up to its first `await`; code outside a template handler still flushes
+  per write. `batchHandler(fn)`, which the compiler emits, is exported from `@pdxui/core`. (#114)
 - A `mutation()` called while it is pending queues the call instead of rejecting with "Mutation
   already in progress": calls run one at a time, in call order, each with its own result, and a
   failed one does not stop the next. `pending()` stays true until the queue is empty. The
@@ -36,6 +40,9 @@ semver.
 
 ### Fixes
 
+- Two dialogs opened from code in one batch — `dialog.open(…)` then `dialog.confirm(…)` in one
+  click — each close on Escape. The one underneath registered its Escape for the dialog on top and
+  never closed. `overlayStack.onDismiss(id, callback)` registers for a given overlay. (#114)
 - Scoped `<style scoped>` rules inside `@container` and `@starting-style` now apply only to the
   component. Before, they were emitted unscoped and applied to every matching element on the page.
   (#104 — entry by @jay23606, from #166)

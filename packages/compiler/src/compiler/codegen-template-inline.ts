@@ -459,6 +459,7 @@ class InlineGen {
         //
         // A `${…}` value arrives already rewritten by the caller and is passed through untouched.
         const rawHandler = preRewritten ? expr : buildEventHandler(expr, this.ctx);
+        if (!preRewritten) this.imports.add('batchHandler');
         // Wrap with safeHandler for global error interception
         this.imports.add('safeHandler');
         const handler = `safeHandler(${rawHandler}, ctx.el?.tagName?.toLowerCase(), ${jsQuote(ev)})`;

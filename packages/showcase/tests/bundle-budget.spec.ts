@@ -144,7 +144,9 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // (#44). Same commit, 360.6 KB on the template path and 378.4 KB on the inline one: imperative DOM
 // code is longer than a template string, page by page. The entry and the blocking bytes went DOWN
 // (34.4 → 34.0, 88.3 → 87.9). 378.4 KB measured.
-const BUDGET_KB = { entry: 35, js: 379, css: 59, blocking: 89 };
+// js 379 → 380: every compiled template handler runs inside batch() (#114) — `batchHandler(…)` around
+// each, so an effect reading a handler's writes runs once, on the finished state. 379.1 KB measured.
+const BUDGET_KB = { entry: 35, js: 380, css: 59, blocking: 89 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

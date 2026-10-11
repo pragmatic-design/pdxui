@@ -6,6 +6,7 @@
 // cannot rely on it alone.
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { batch } from '@pdxui/core';
 import { cleanup, mount, tick } from './helpers';
 import { dialog } from '../../src/dialog/dialog-service';
 import '../../src/overlay/pdx-overlay-outlet';
@@ -72,6 +73,43 @@ describe('stacked outlet dialogs', () => {
         dialog.closeAll();
         await tick(20);
         expect(document.activeElement).toBe(trigger);
+    });
+});
+
+// Two dialogs opened in one batch reach the outlet in one render. Each must still be closed by
+// Escape when it is the one on top. The dismiss was registered for whatever was on top WHEN the
+// dialog was drawn — with both already pushed, the dialog underneath registered under the top's id,
+// was overwritten by it, and its own Escape did nothing. A template handler is batched (#114), so
+// `dialog.open(…); dialog.confirm(…)` in one click is this case.
+describe('two dialogs opened in one batch', () => {
+    beforeEach(async () => {
+        cleanup();
+        await mount('pdx-overlay-outlet');
+    });
+    afterEach(() => dialog.closeAll());
+
+    const escape = () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    const open = () => [...document.querySelectorAll<HTMLElement>('[data-dialog-id]')]
+        .filter(w => w.hasAttribute('data-open'))
+        .map(w => w.querySelector('.pdx-dialog-panel')!.getAttribute('aria-label'));
+
+    it('Escape closes the top, and then the one under it', async () => {
+        let answer!: Promise<boolean>;
+        batch(() => {
+            void dialog.open({ title: 'Settings' });
+            answer = dialog.confirm({ title: 'Reset?' });
+        });
+        await tick(20);
+        expect(open()).toEqual(['Settings', 'Reset?']);
+
+        escape();
+        expect(await answer).toBe(false);
+        await tick(20);
+        expect(open(), 'the first Escape closed the wrong dialog').toEqual(['Settings']);
+
+        escape();
+        await tick(20);
+        expect(open(), 'the dialog underneath has no Escape of its own').toEqual([]);
     });
 });
 

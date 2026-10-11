@@ -36,6 +36,12 @@ export interface OverlayStack {
     modalCount: ReadonlySignal<number>;
     /** Register a callback invoked when the top overlay should be dismissed (Escape). */
     onDismissTop(callback: () => void): Dispose;
+    /**
+     * Register the dismiss callback of the overlay `id`, invoked when Escape is pressed while it is
+     * on top. Not `onDismissTop`'s «whatever is on top now»: an overlay registering after others were
+     * pushed above it — two dialogs opened in one batch, drawn in one pass — would take the top's id.
+     */
+    onDismiss(id: string, callback: () => void): Dispose;
     /** Get all entries (readonly snapshot). */
     entries(): readonly OverlayEntry[];
 }
@@ -118,6 +124,10 @@ function onDismissTop(callback: () => void): Dispose {
     // Register for current top — recalculated on each call
     const id = top();
     if (!id) return () => {};
+    return onDismiss(id, callback);
+}
+
+function onDismiss(id: string, callback: () => void): Dispose {
     _dismissCallbacks.set(id, callback);
     // The dispose removes ONLY if the registered callback is still its own:
     // without the check, disposing an old registration would delete the new one
@@ -140,6 +150,7 @@ export const overlayStack: OverlayStack = {
     count: _count,
     modalCount: _modalCount,
     onDismissTop,
+    onDismiss,
     entries,
 };
 

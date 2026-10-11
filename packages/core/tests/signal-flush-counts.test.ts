@@ -25,6 +25,9 @@ const EXPECTED: Record<string, Record<Strategy, number>> = {
     '(d) 3 signals, computed chain 10 deep': { sync: 3, batched: 1 },
     // Today the effect re-runs although the computed it reads kept its value; #115 brings both to 0.
     '(e) 3 writes, computed value unchanged': { sync: 3, batched: 1 },
+    // Compiled handlers are batched by the compiler (#114): one run under either strategy. Without
+    // the compiler's batch the sync column reads 3, one per write the effect reads (measured).
+    '(f) a compiled template handler, 3 signals': { sync: 1, batched: 1 },
 };
 
 describe('effect runs per handler call, by flush strategy', () => {

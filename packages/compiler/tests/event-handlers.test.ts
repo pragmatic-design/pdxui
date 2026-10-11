@@ -12,7 +12,8 @@ function handlerCode(clickExpr: string): string {
 describe('@event handlers', () => {
     it('bare reference is passed as a function reference', () => {
         const out = handlerCode('inc');
-        expect(out).toContain('safeHandler(ctx.inc');
+        // Inside the batchHandler every compiled handler gets (#114), still the reference itself.
+        expect(out).toContain('safeHandler(batchHandler(ctx.inc)');
         expect(out).not.toContain('() => ctx.inc'); // not wrapped
     });
 
