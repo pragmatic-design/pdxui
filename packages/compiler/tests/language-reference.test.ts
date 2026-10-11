@@ -40,7 +40,10 @@ function sections(): Section[] {
 
 /** Whether a heading names `token` (`@for`, `$signal`) as a whole word, not `@for-x` or `@format`. */
 const names = (heading: string, token: string): boolean =>
-    new RegExp(`(^|[^\\w$@-])${token.replace(/\$/g, '\\$')}(?![\\w-])`).test(heading);
+    new RegExp(`(^|[^\\w$@-])${escapeRegExp(token)}(?![\\w-])`).test(heading);
+
+/** `text` as a literal inside a RegExp: every metacharacter escaped, the backslash included. */
+const escapeRegExp = (text: string): string => text.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 
 describe('docs/language, the formal reference', () => {
     it('has its seven pages', () => {
@@ -119,7 +122,7 @@ describe('the reference\'s examples', () => {
     const compileOf = (f: { source: string; filename: string }) => compile(f.source, `C:/docs/language/${f.filename}`, [], resolveStub);
 
     it('are whole files', () => {
-        const partial = all.filter(f => !/<template[\s>]/.test(f.source) && !/<script[\s>]/.test(f.source)).map(f => f.where);
+        const partial = all.filter(f => !/<template[\s>]/i.test(f.source) && !/<script[\s>]/i.test(f.source)).map(f => f.where);
         expect(partial, 'a pdx fence in the reference is a whole .pdx, not a fragment').toEqual([]);
     });
 
