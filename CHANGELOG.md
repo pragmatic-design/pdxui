@@ -59,6 +59,10 @@ semver.
 
 ### Fixes
 
+- `@swipe.left|right|up|down`, `@longpress` and `@pinch` call their handler, in dev and in a build:
+  neither render path wired them, and on the template path a handler such as `n++` ran once at render.
+  Both now hand the element to core's new `bindGesture`, with the handler built as an `@event`'s is.
+  (#99)
 - A production build binds `:class` and `:style` written as objects: `<p :class="{ active: on }">`
   rendered `class="[object Object]"`, and `:style="{ color: c }"` set nothing. Both render paths now
   expand the object into one `:class.x` / `:style.x` per key, the same way. (#96)

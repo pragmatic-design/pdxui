@@ -13,7 +13,7 @@ import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope,
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { buildEventHandler, dynamicComponentCall, scopedSlotCall } from './codegen-template-rewrite';
-import { expandAttributeForms } from './codegen-attribute-forms';
+import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { hoistSlotTemplate } from './codegen-template';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
@@ -387,6 +387,7 @@ class InlineGen {
             else if (n === ':ref' || n === 'ref') this.refBind(el, val);
             else if (n === ':class')          this.classBind(el, val, staticClassValue, preRewritten);
             else if (n.startsWith(':'))       this.propBind(el, n.slice(1), val, kind, preRewritten);
+            else if (gestureOf(n))            this.gestureBind(el, gestureOf(n)!, val, preRewritten);
             else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten);
             else if (n === 'class')           continue; // written first, above
             else if (val)                     this.out(`${el}.setAttribute(${jsString(n)}, ${jsString(decodeEntities(val))});`);
@@ -490,6 +491,18 @@ class InlineGen {
             ? `const __safeUrl = sanitizeBoundUrl(${el}, ${a}, __v); if (__safeUrl == null) ${el}.removeAttribute(${a}); else ${el}.setAttribute(${a}, __safeUrl);`
             : `${el}.setAttribute(${a}, __v === true ? '' : String(__v));`;
         return `const __v = ${value}; if (__v == null || __v === false) ${el}.removeAttribute(${a}); else { ${set} }`;
+    }
+
+    /**
+     * `@swipe.left`, `@longpress`, `@pinch` → `bindGesture(el, name, value)`, core's gesture setup, with
+     * the handler built as an event handler is (#99). As an event, `@swipe.left` listened for `swipe`
+     * filtered by the ArrowLeft key.
+     */
+    private gestureBind(el: string, gesture: Gesture, expr: string, preRewritten = false): void {
+        this.imports.add('bindGesture');
+        if (!preRewritten) this.imports.add('batchHandler');
+        const handler = preRewritten ? expr : buildEventHandler(expr, this.ctx);
+        this.out(`bindGesture(${el}, ${jsQuote(gesture.name)}, ${gestureValue(gesture, handler)});`);
     }
 
     private eventBind(el: string, desc: string, expr: string, preRewritten = false): void {

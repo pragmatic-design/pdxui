@@ -237,9 +237,18 @@ const ROWS: Row[] = [
     { name: ':name shorthand', template: '<input :value>', script: "let value = $signal('a');", read: (h) => h.querySelector('input')!.value },
     // The inline path wrote a literal <slot> element, with a `row` property, around its default (#200).
     { name: 'a scoped slot outlet with its default', template: '<slot name="cell" :row="r"><em>none</em></slot>', script: 'let r = $signal(1);' },
-    // Neither path wires the gesture. On the template path the handler also runs once at render, and
-    // the count is NaN before anyone swipes; on the inline path `.left` is read as a key filter.
-    { name: '@swipe.left', template: '<div @swipe.left="n++">s</div><p>{{ n }}</p>', script: 'let n = $signal(0);', owner: 99 },
+    // Neither path wired the gesture: on the template path the handler ran once at render and the count
+    // read NaN, on the inline path `.left` was a key filter (#99). Swiped left, both count 1.
+    {
+        name: '@swipe.left',
+        template: '<div @swipe.left="n++">s</div><p>{{ n }}</p>',
+        script: 'let n = $signal(0);',
+        act: (h) => {
+            const pad = h.querySelector('div')!;
+            pad.dispatchEvent(new PointerEvent('pointerdown', { clientX: 200, clientY: 10, bubbles: true }));
+            pad.dispatchEvent(new PointerEvent('pointerup', { clientX: 100, clientY: 10, bubbles: true }));
+        },
+    },
     // An @name the parser does not know is text on both paths. The divergence #100 names needs a
     // directive a plugin registers; this row keeps the plain case honest.
     { name: 'an unknown @name is text', template: '<p>a</p>@frobnicate { <p>b</p> }' },

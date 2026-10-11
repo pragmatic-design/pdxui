@@ -10,6 +10,31 @@
 // source form both paths already read, the two cannot disagree about it.
 
 import { splitAtDepthZero, findAtDepthZero } from './tokenizer';
+import { jsQuote } from './js-literal';
+
+/** A gesture directive: the runtime name `bindGesture` takes, and a swipe's direction. */
+export interface Gesture {
+    name: '__swipe' | '__longpress' | '__pinch';
+    direction?: 'left' | 'right' | 'up' | 'down';
+}
+
+/**
+ * The gesture an attribute name declares — `@swipe.left`, `@longpress`, `@pinch` — or null for any
+ * other name, which is an ordinary event. One reading for both render paths (#99): on the inline path
+ * `@swipe.left` was an event named `swipe` with `.left` read as the ArrowLeft key filter.
+ */
+export function gestureOf(attr: string): Gesture | null {
+    // Match: @swipe.<direction>, @longpress or @pinch, the whole name.  Groups: [1]=direction [2]=other
+    const m = /^@(?:swipe\.(left|right|up|down)|(longpress|pinch))$/.exec(attr);
+    if (!m) return null;
+    if (m[1]) return { name: '__swipe', direction: m[1] as Gesture['direction'] };
+    return { name: m[2] === 'longpress' ? '__longpress' : '__pinch' };
+}
+
+/** The value `bindGesture` takes around a built handler: `[direction, handler]` for a swipe. */
+export function gestureValue(g: Gesture, handler: string): string {
+    return g.direction ? `[${jsQuote(g.direction)}, ${handler}]` : handler;
+}
 
 /**
  * Split an object-literal body `key: value, key2: value2` into [key, value] pairs.

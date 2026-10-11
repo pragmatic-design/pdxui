@@ -516,17 +516,16 @@ GestureBinding ::= "@swipe." ( "left" | "right" | "up" | "down" ) "=" AttrValue
 
 #### Semantics
 
-The compiler rewrites them into `@__swipe=${['left', handler]}`, `@__longpress=${handler}` and
-`@__pinch=${handler}`, meant for core's `onSwipe`, `onLongpress` and `onPinch` (`renderer/dom.ts`
-`setProp`). A value with `(` becomes `() => …`; any other is used as written — a reference, or an
-expression evaluated once, when the template is built (`n++` runs at render).
+Both render paths hand the element to core's `bindGesture` — `__swipe` with `['left', handler]`,
+`__longpress` and `__pinch` with the handler — which wires `onSwipe`, `onLongpress` and `onPinch`. The
+value is built as an `@event`'s is: a reference, a call, a mutation such as `n++`, or an arrow, run when
+the gesture happens. A swipe is 50px along its axis within 300ms; a longpress is a 500ms hold that
+moves less than 10px; a pinch hands `{ scale, center }` while two pointers are down.
 
 #### Rules
 
-- **No gesture is wired today, on either path** (#99): the template path routes the rewritten name to
-  `addEventListener('__swipe', …)`, which nothing dispatches, and the inline path listens to `swipe`
-  with `.left` read as a key filter. Call `onSwipe(el, 'left', fn)` from `@pdxui/core` on a `:ref`
-  instead. Not checked today.
+- A swipe direction other than `left`, `right`, `up` or `down` is not a gesture: `@swipe.x` is an
+  event named `swipe`. Not checked today.
 
 #### Examples
 

@@ -11,7 +11,7 @@ import { VOID_ELEMENTS } from './codegen-template-inline';
 import { attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote } from './js-literal';
-import { camelToKebab, expandAttributeForms } from './codegen-attribute-forms';
+import { camelToKebab, expandAttributeForms, gestureOf, gestureValue } from './codegen-attribute-forms';
 
 // ─── Event handler building ──────────────────────────────────────
 //
@@ -489,47 +489,19 @@ function escapeRawInterpolationInAttrs(tag: string, ctx: CompileContext): string
 // ─── Gesture Directives ──────────────────────────────────────────
 
 /**
- * Rewrite gesture attributes into runtime gesture setup via custom events.
- * @swipe.left="handler()" → @__swipe=${['left', () => handler()]}
+ * Rewrite gesture attributes into the runtime gesture setup: `@swipe.left="next()"` →
+ * `@__swipe=${['left', handler]}`, which core's `bindAttribute` hands to `bindGesture`. The handler is
+ * built as an event handler is, so `n++` is a write when the gesture happens — written as a plain
+ * read it ran once at render, and the count was NaN before anyone swiped (#99).
  */
 function rewriteGestureAttributes(tag: string, ctx: CompileContext): string {
-    // @swipe.dir="expr"
-    tag = tag.replace(
-        /@swipe\.(left|right|up|down)=(?:"([^"]*?)"|'([^']*?)')/g,
-        (_, dir: string, dq: string, sq: string) => {
-            const expr = dq ?? sq;
-            const handler = expr.includes('(')
-                ? `() => ${callSignals(prefixCtx(expr, ctx), ctx)}`
-                : prefixCtx(expr, ctx);
-            return `@__swipe=\${[${jsQuote(dir)}, ${handler}]}`;
-        },
-    );
-
-    // @longpress="expr"
-    tag = tag.replace(
-        /@longpress=(?:"([^"]*?)"|'([^']*?)')/g,
-        (_, dq: string, sq: string) => {
-            const expr = dq ?? sq;
-            const handler = expr.includes('(')
-                ? `() => ${callSignals(prefixCtx(expr, ctx), ctx)}`
-                : prefixCtx(expr, ctx);
-            return `@__longpress=\${${handler}}`;
-        },
-    );
-
-    // @pinch="expr"
-    tag = tag.replace(
-        /@pinch=(?:"([^"]*?)"|'([^']*?)')/g,
-        (_, dq: string, sq: string) => {
-            const expr = dq ?? sq;
-            const handler = expr.includes('(')
-                ? `() => ${callSignals(prefixCtx(expr, ctx), ctx)}`
-                : prefixCtx(expr, ctx);
-            return `@__pinch=\${${handler}}`;
-        },
-    );
-
-    return tag;
+    // Match: @swipe.<dir>, @longpress or @pinch with a quoted value.
+    // Groups: [1]=the name after @ [2]/[3]=double- or single-quoted value
+    return tag.replace(/@(swipe\.\w+|longpress|pinch)=(?:"([^"]*?)"|'([^']*?)')/g, (all, name: string, dq: string, sq: string) => {
+        const gesture = gestureOf(`@${name}`);
+        if (!gesture) return all;
+        return `@${gesture.name}=\${${gestureValue(gesture, buildEventHandler(dq ?? sq, ctx))}}`;
+    });
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────

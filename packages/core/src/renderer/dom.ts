@@ -12,26 +12,33 @@ const isBrowser = typeof document !== 'undefined';
 // :data) and is only a URL on the native <object>; sanitizing it stringifies bound data.
 const URL_ATTRS = new Set(['href', 'src', 'action', 'formaction', 'xlink:href', 'poster']);
 
+/**
+ * Wire a gesture directive the compiler emits — `@__swipe` with `[direction, handler]`, `@__longpress`
+ * and `@__pinch` with a handler — to the pointer gesture it names. `name` is the attribute without
+ * its `@`. False for any other name, which is an ordinary event. Both render paths call it: the
+ * template path's `bindAttribute` before its generic event branch, the inline path directly (#99).
+ */
+export function bindGesture(el: Element, name: string, value: unknown): boolean {
+    if (name === '__swipe' && Array.isArray(value)) {
+        onSwipe(el as HTMLElement, value[0], value[1]);
+        return true;
+    }
+    if (name === '__longpress' && typeof value === 'function') {
+        onLongpress(el as HTMLElement, value as (e: PointerEvent) => void);
+        return true;
+    }
+    if (name === '__pinch' && typeof value === 'function') {
+        onPinch(el as HTMLElement, value as (e: { scale: number; center: { x: number; y: number } }) => void);
+        return true;
+    }
+    return false;
+}
+
 /** Set a property or attribute on an element. Handles special cases (events, boolean attrs, style, class). */
 export function setProp(el: Element, key: string, value: unknown): void {
     if (key.startsWith('@')) {
         const event = key.slice(1);
-
-        // Gesture: @__swipe → ['direction', callback]
-        if (event === '__swipe' && Array.isArray(value)) {
-            onSwipe(el as HTMLElement, value[0], value[1]);
-            return;
-        }
-        // Gesture: @__longpress → callback
-        if (event === '__longpress' && typeof value === 'function') {
-            onLongpress(el as HTMLElement, value as (e: PointerEvent) => void);
-            return;
-        }
-        // Gesture: @__pinch → callback
-        if (event === '__pinch' && typeof value === 'function') {
-            onPinch(el as HTMLElement, value as (e: { scale: number; center: { x: number; y: number } }) => void);
-            return;
-        }
+        if (bindGesture(el, event, value)) return;
 
         // Standard event: @click → addEventListener('click', handler)
         el.addEventListener(event, value as EventListener);

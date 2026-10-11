@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-436 value exports.
+437 value exports.
 
 ### `__adoptStyles`
 
@@ -489,6 +489,19 @@ function batchHandler(handler: (...args: A) => R): (...args: A) => R
 `@event` handlers (#114), so a handler writing three signals runs an effect reading them once,
 on the finished state. The call keeps its `this` and returns what the handler returns — the
 promise of an async handler, which is batched up to its first `await`.
+
+### `bindGesture`
+
+```ts
+import { bindGesture } from '@pdxui/core';
+
+function bindGesture(el: Element, name: string, value: unknown): boolean
+```
+
+Wire a gesture directive the compiler emits — `@__swipe` with `[direction, handler]`, `@__longpress`
+and `@__pinch` with a handler — to the pointer gesture it names. `name` is the attribute without
+its `@`. False for any other name, which is an ordinary event. Both render paths call it: the
+template path's `bindAttribute` before its generic event branch, the inline path directly (#99).
 
 ### `bindTwoWay`
 
