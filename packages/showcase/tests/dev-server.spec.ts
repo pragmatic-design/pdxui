@@ -1,11 +1,11 @@
 /**
  * `pdx dev` serves the app's routes.
  *
- * The interpreted router learns what routes exist from `globalThis.__pdx_routes`, and a page module
- * fills it WHEN IT IS IMPORTED. There is no eager glob importing them all — that glob would put
- * every page in the first chunk — so dev needs a route table of its own, or every route renders the
- * router's "404 · Page not found". This file exists because every other spec in this package runs
- * against the build, and none of them would notice.
+ * A page module registers itself in `globalThis.__pdx_routes` only WHEN IT IS IMPORTED, and there is
+ * no eager glob importing them all — that glob would put every page in the first chunk — so the
+ * router learns what routes exist from the route table the plugin hands it (in dev, through a module
+ * in `index.html`), or every route renders the router's "404 · Page not found". This file exists
+ * because every other spec in this package runs against the build, and none of them would notice.
  *
  * The framework's own rule is that development requires no build, so this is not a small defect in
  * a demo: an app that takes the documented shape has to run in development.

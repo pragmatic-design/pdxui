@@ -1,38 +1,27 @@
-// The router that is running — the dev/prod seam, and the only place either implementation is named.
+// The router that is running — and the door a production build installs its route table through.
 //
-// PDX has two routers. `./runtime` is the interpreted one: a regex matcher that needs no build step,
-// and the one dev uses. `@pdxui/compiler` emits a second — a switch with no regex and no loop,
-// compiled from the project's own `@page` declarations. This file is what makes a production build
-// use it: without the swap, the Dual Mode table (docs/architecture/framework.md) would claim a row
-// that is not true, and a production build would evaluate every `@guard` with the dev matcher.
+// There is one router, `./runtime`, in TypeScript. What a build adds is DATA: the route table the
+// compiler emits from the project's `@page` declarations (`virtual:pdx-routes`) — paths, lazy
+// `import()`s, layouts, guards, redirects, meta, labels. In a production build the compiler's
+// `load` hook answers for THIS FILE with a module that installs that table and then re-exports
+// `./runtime`, so the table is in place before anything can ask for it. The router builds its
+// matcher from it once, when the outlet starts it; a navigation does no parsing.
 //
-// The swap is by CONTENT, not by a fork: in a production build the compiler's `load` hook answers
-// for THIS FILE with the generated module. Every other file in the package — `index.ts`, `outlet.ts`,
-// `link.ts` — imports the router from here and never from an implementation, so there is exactly one
-// router in a build and no way to end up reading one while navigating with the other. That is also
-// what keeps `p2-plus.test.ts`'s "no compiled component imports virtual:pdx-router" assertion
-// meaningful: components import `@pdxui/router`, which comes through here.
+// Dev gets the same table from a module the plugin puts in `index.html` (`route-table.ts` says
+// why that door, not this one), and an app with no plugin passes its routes to `createRouter`.
 //
-// The two implementations are drop-in for each other, and `packages/router/tests/parity.test.ts`
-// is what says so — one behaviour, written once, run against both. `createRouter` is the only name
-// whose MEANING differs: the interpreted router builds its table from the argument, the generated
-// one baked it in at build time and ignores it. Both accept the call, which is why the outlet does
-// not need to know which one it got.
-//
-// A file that imports `./runtime` directly is a hole in this seam, and
-// `packages/router/tests/seam.test.ts` is the assertion that closes it.
+// Every other file in the package imports the router from here and never from `./runtime`, so
+// the table a build installs is the one every reader sees: `packages/router/tests/seam.test.ts` is
+// the assertion that keeps it the only door.
 
 export {
-    createRouter, destroyRouter, navigate,
+    createRouter, createRouterFromTable, configureRouter, destroyRouter, navigate,
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
     currentLoaderData, currentLoaderState, loaderData, loaderState, currentRoute, currentNavError,
     currentNavErrorDepth,
     onBeforeNavigate, onAfterNavigate,
     registerGuardChecker, setQuery, setQueryParam,
-    // The build-time route table, or null in dev. See the note on the interpreted router's copy.
-    routeTable, pageModule,
+    installRouteTable, routeTable, pageModule, toRouteConfig,
 } from './runtime';
 
-// Types describe the shape both implementations answer with; they are erased before the swap
-// happens, so they always come from the interpreted router's declarations.
-export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop } from './runtime';
+export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute } from './runtime';

@@ -363,8 +363,8 @@ describe('a trailing slash', () => {
     });
 
     it('leaves currentPath as the address bar holds it', async () => {
-        // Only the MATCH is normalised. The generated router does the same: it normalises inside
-        // resolve() and stores the raw pathname, so a link built from currentPath() is unchanged.
+        // Only the MATCH is normalised — inside the matcher — and the raw pathname is stored, so a
+        // link built from currentPath() is unchanged.
         navigate('/about/');
         await tick();
         expect(currentPath()).toBe('/about/');

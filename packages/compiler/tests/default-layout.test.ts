@@ -6,7 +6,7 @@
 // sign-in) says so with `@layout 'none'`.
 //
 // Both readers of a route are pinned, because they must not disagree: the page's own registration
-// (`compile`) and the table the generated router is built from (`scanForRoutes`).
+// (`compile`) and the route table the compiler emits from the scan (`scanForRoutes`).
 import { describe, it, expect, afterEach } from 'vitest';
 import { compile } from '../src/plugin';
 import { scanForRoutes, type ScannedRoute } from '../src/plugin-utils';
@@ -55,7 +55,7 @@ function scan(source: string, defaultLayout?: string): ScannedRoute[] {
     return routes;
 }
 
-describe('the route table the generated router is built from', () => {
+describe('the route table the compiler emits', () => {
     it('takes the default layout when the page declares none', () => {
         expect(scan(page(''), 'shell')[0].layouts).toEqual(['pdx-shell-layout']);
     });

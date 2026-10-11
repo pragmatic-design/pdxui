@@ -1,8 +1,8 @@
 // `@page { label: fn }` — a crumb the application computes from the params.
 //
 // A string label names the ROUTE and cannot name the record: `Tickets / Ticket 1`, where a real
-// one says `Tickets / T-1042 · Printer jam`. Both runtimes read the other half —
-// `RegisteredRoute.label` and the generated router both read
+// one says `Tickets / T-1042 · Printer jam`. The router reads the other half —
+// `RegisteredRoute.label`, through
 // `typeof label === 'function' ? label(params) : fillParams(label, params)` — so the analyzer must
 // not read the option as a string, nor the codegen write it out as one.
 //

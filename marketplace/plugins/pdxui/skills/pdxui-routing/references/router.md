@@ -103,8 +103,10 @@ is not a missing session**: sending an authenticated visitor to a sign-in form a
 thing they already have, and signing in again lands them back on the same denial. The router cannot
 tell the two apart — it asks a guard checker that answers a boolean — so the application does.
 
-The same value reaches `createRouter({ guardFailRedirect })` for an app that boots the router
-itself. A target outside the origin is refused either way.
+The same value reaches `createRouter(routes, { guardFailRedirect })` and
+`createRouterFromTable(table, { guardFailRedirect })` for an app that boots the router itself, and
+`configureRouter({ guardFailRedirect })` changes it on a router that is already running — once the
+app knows whether there is a session, say. A target outside the origin is refused either way.
 
 ## Data before the page: @loader
 
@@ -319,9 +321,11 @@ navigation without this router, and for a test that wants a trail without one.
 A route is a **split point**. `@page` makes the page its own JavaScript chunk, and the browser
 downloads it the first time that route is shown — not before.
 
-You write nothing. The compiler scans the project's `@page` declarations at build time and emits the
-route table into the router, so the router knows every route without loading any page. The outlet
-imports the one it is about to render.
+You write nothing. The compiler scans the project's `@page` declarations and emits the route table
+— data: the paths, the guards, the layouts, a lazy `import()` per page — and the router reads it, so
+it knows every route without loading any page. The outlet imports the one it is about to render.
+There is one router: dev, a build and an app that calls `createRouter(routes)` itself all run the
+same code, and it builds its matcher from the routes once, when it starts.
 
 What that costs you is one line in your entry, and it is a line to **delete**:
 
@@ -342,8 +346,8 @@ Two things worth knowing:
 - a route that splits **stalls the first time it is opened**, which is the cost of not downloading it
   earlier. That is what prefetching is for, and it is the next section.
 
-In dev nothing changes: there is no bundle to split, the glob costs nothing, and the interpreted
-router builds its table from the pages as they are imported.
+In dev the same table reaches the router, from a script the plugin puts in `index.html`, and the dev
+server serves a page the first time it is shown — the shape a build has.
 
 ## The first screen: a splash, then the app
 

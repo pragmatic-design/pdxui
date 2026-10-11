@@ -25,7 +25,8 @@ import { collectOrigins, mapFromOrigins, insertMapLines } from './compiler/sourc
 import type { SourceMapJSON } from './compiler/sourcemap';
 import { PluginRunner } from './plugin-system';
 import type { CompilerPlugin } from './plugin-system';
-import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, generateOptimizedRouter, generateDevRouteTable, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
+import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
+import { generateRouteTable, routerSeamModule, devRouteTableModule, buildSpecifier, devSpecifier, ROUTE_TABLE_ID } from './route-table';
 import { FormControlRegistry } from './compiler/codegen-form-binding';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
@@ -33,22 +34,16 @@ import { injectSplash, type SplashOptions } from './splash';
 import type { PropsLookup } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
 import { jsQuote } from './compiler/js-literal';
-const VIRTUAL_ROUTER_ID = 'virtual:pdx-router';
-const RESOLVED_VIRTUAL_ID = '\0virtual:pdx-router';
+/** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
+const RESOLVED_ROUTE_TABLE_ID = '\0' + ROUTE_TABLE_ID;
 /**
- * The route table, for DEV.
+ * The route table's door in DEV — a module `index.html` loads first, which hands the table to the
+ * router as `globalThis.__pdx_route_table`.
  *
- * A production build gets its routes from the generated router, which the seam swaps in. Dev runs
- * the interpreted one, which learns what routes exist from `globalThis.__pdx_routes` — filled by a
- * page module WHEN IT IS IMPORTED. An eager `import.meta.glob` importing them all would put every
- * page in the first chunk and defeat the code splitting `@page` promises.
- *
- * Without a table, dev answers 404 on every route including `/` — and invisibly, when the whole
- * suite runs against the build.
- *
- * This module seeds the same table the scan already produces, with each page's URL instead of its
- * module, so the outlet imports one page when it first shows it. The app imports nothing it does
- * not render, exactly as in a build.
+ * Without a table, dev answers 404 on every route including `/`: a page module registers itself
+ * only WHEN IT IS IMPORTED, and an eager `import.meta.glob` importing them all would put every page
+ * in the first chunk and defeat the code splitting `@page` promises. With it, the outlet imports
+ * one page when it first shows it — the same shape a build has.
  */
 const VIRTUAL_ROUTES_DEV_ID = 'virtual:pdx-routes-dev';
 const RESOLVED_ROUTES_DEV_ID = '\0virtual:pdx-routes-dev';
@@ -194,7 +189,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
 
     // Store registry: tracks @store declarations for auto-import
     const storeRegistry = new Map<string, string>(); // storeName → filePath
-    // Route registry: tracks @page declarations for generated router
+    // Route registry: tracks @page declarations for the route table
     const scannedRoutes: ScannedRoute[] = [];
     // Component resolver: auto-import for <pdx-*> tags in templates
     const componentResolver = new ComponentResolver();
@@ -271,8 +266,8 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             // The ROOT VITE RESOLVED, not process.cwd(). They are the same when `vite build` is run
             // from the app directory and different every other time — `vite build --root app`, a
             // task runner invoking the API, a build launched from the repo root. Scanning the cwd
-            // would find no `@page`, and the route table would come out empty: a production app
-            // with no routes, since the seam ships the generated router.
+            // would find no `@page`, and the route table would come out empty: an app with no
+            // routes, since the router reads them from that table.
             const root = viteRoot ?? process.cwd();
             // Build component auto-import registry (resolve @pdxui/ui from the app's
             // node_modules when consumed as a package, or the packages/ui sibling in the monorepo).
@@ -305,9 +300,8 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             }
         },
 
-        // Virtual module: optimized switch-based router
         resolveId(id: string) {
-            if (id === VIRTUAL_ROUTER_ID) return RESOLVED_VIRTUAL_ID;
+            if (id === ROUTE_TABLE_ID) return RESOLVED_ROUTE_TABLE_ID;
             if (id === VIRTUAL_ROUTES_DEV_ID) return RESOLVED_ROUTES_DEV_ID;
             if (id === VIRTUAL_DEVTOOLS_ID) return RESOLVED_DEVTOOLS_ID;
             // A component's `<style scoped>` block, as a real stylesheet. The id keeps
@@ -316,12 +310,12 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             if (id.startsWith(STYLE_MODULE_PREFIX)) return '\0' + id;
         },
         load(id: string) {
-            if (id === RESOLVED_VIRTUAL_ID) {
-                return generateOptimizedRouter(scannedRoutes);
+            if (id === RESOLVED_ROUTE_TABLE_ID) {
+                // The two producers differ only in how a page's module is named.
+                return generateRouteTable(scannedRoutes,
+                    isDevMode ? devSpecifier(viteRoot ?? process.cwd()) : buildSpecifier);
             }
-            if (id === RESOLVED_ROUTES_DEV_ID) {
-                return generateDevRouteTable(scannedRoutes, viteRoot ?? process.cwd());
-            }
+            if (id === RESOLVED_ROUTES_DEV_ID) return devRouteTableModule();
             if (id.startsWith('\0' + STYLE_MODULE_PREFIX)) {
                 // The source file and the block index are in the id, read back by the inverse of
                 // the function that wrote it; the CSS is produced by the SAME function the dev-mode
@@ -350,17 +344,21 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 // rewritten to a real URL before the browser ever sees it.
                 return `import { initDevTools } from '@pdxui/core/devtools';\ninitDevTools();\n`;
             }
-            // The dev/prod seam. `@pdxui/router` funnels every import of a router
-            // through one file, `src/active.ts`, which in dev is a real module re-exporting the
-            // interpreted router. In a production build this hook answers for that file with the
-            // generated one, so the swap happens in ONE place, by content, with no fork through the
-            // package and no second router alive beside the first.
+            // The router's seam. `@pdxui/router` funnels every import of the router through one
+            // file, `src/active.ts`. In a production build this hook answers for that file with its
+            // own source and the route table installed in front of it, so the table is in place
+            // before the outlet can ask for it. Dev gets the table through `index.html` instead.
             //
             // Matched on the path rather than on a bare specifier because by the time `load` runs
             // Vite has already resolved it to a file, and the package ships the same layout whether
             // it is the monorepo sibling or an install under node_modules.
+            //
+            // `moduleSideEffects: true` because the package declares `active.ts` free of side
+            // effects, and it was: a module of re-exports. Installed, the table IS its effect, and
+            // without the flag Rollup follows the re-exports straight to `./runtime` and drops the
+            // call — a production app with an empty route table.
             if (!isDevMode && isRouterSeam(id)) {
-                return generateOptimizedRouter(scannedRoutes);
+                return { code: routerSeamModule(readFileSync(id.split('?')[0], 'utf-8')), moduleSideEffects: true };
             }
         },
 

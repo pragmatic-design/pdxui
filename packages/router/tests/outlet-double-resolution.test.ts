@@ -9,7 +9,7 @@
 // removal and TWO additions: every page mounted twice, cards accumulating on each visit, and the
 // copy the visitor sees is the stale one, which never updates its params.
 //
-// The generated router does not do this (packages/compiler/src/plugin-utils.ts). The outlet is a
+// The router does not do this (`runtime-navigation-api-refusal.test.ts`). The outlet is a
 // public component that anyone can drive — two navigate() calls in a tick, a host with its own
 // popstate handling — and it should be correct on its own, not correct because its caller behaves.
 

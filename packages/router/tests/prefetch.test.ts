@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-/** Which route patterns the fake generated router was asked to load. */
+/** Which route patterns the fake route table was asked to load. */
 const loaded: string[] = [];
 
 vi.mock('../src/active', async () => {

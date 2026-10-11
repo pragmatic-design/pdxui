@@ -11,9 +11,9 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-    scanForStores, scanForRoutes, injectStoreImports, injectComponentImports,
-    generateOptimizedRouter, type ScannedRoute,
+    scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, type ScannedRoute,
 } from '../src/plugin-utils';
+import { generateRouteTable } from '../src/route-table';
 import { ComponentResolver } from '../src/component-resolver';
 import { scanNoImportTags } from '../src/no-import-tags';
 import { checkEnumValues } from '../src/compiler/validate-enums';
@@ -104,7 +104,7 @@ describe('finding the routes in a project', () => {
         expect(routes[0].tag).toBe('pdx-my-dash');
     });
 
-    it('carries the @guard through, because the generated router needs it', () => {
+    it('carries the @guard through, because the route table needs it', () => {
         write('src/admin.pdx', "@page '/admin';\n@guard 'admin.access';");
         const routes: ScannedRoute[] = [];
         scanForRoutes(root, routes);
@@ -304,42 +304,37 @@ describe('judging static enum attributes', () => {
     });
 });
 
-describe('the generated router module', () => {
-    it('is a whole router that matches nothing when the project has no @page', () => {
-        // Not a two-line stub — `export const routes = []` and nothing else: this module IS
-        // packages/router/src/active.ts in a production build, so a stub is a build that fails on
-        // every other import, in production only. An app can legitimately have no @page yet.
-        const out = generateOptimizedRouter([]);
+describe('the route table module', () => {
+    it('exports an empty table when the project has no @page', () => {
+        // The seam imports it in every build: a module that exported nothing would fail the build,
+        // in production only. An app can legitimately have no @page yet.
+        const out = generateRouteTable([]);
 
         expect(out).toMatch(/export const routes = \[\s*\]/);
-        expect(out, 'nothing to match, so nothing to switch on').not.toContain('switch (path)');
-        expect(out, 'the module has to answer every import @pdxui/router makes').toContain('export function navigate');
-        expect(out).toContain('export function createRouter');
+        expect(out).toContain('export const pageModules = {}');
+        expect(out).toContain('export const redirects = []');
     });
 
-    it('emits a switch case for a static route', () => {
-        const out = generateOptimizedRouter([{ path: '/about', file: 'a.pdx', tag: 'pdx-about' }]);
-        expect(out).toContain('switch (path)');
-        expect(out).toContain('case "/about"');
-    });
-
-    it('emits a length check and a decoded param for a dynamic route', () => {
-        const out = generateOptimizedRouter([{ path: '/users/:id', file: 'u.pdx', tag: 'pdx-users' }]);
-        expect(out).toContain('s.length === 2');
-        expect(out).toContain('s[0] === "users"');
-        expect(out).toContain('"id": decodeURIComponent(s[1])');
+    it('carries static and dynamic routes alike, as data — the router builds the matcher', () => {
+        const out = generateRouteTable([
+            { path: '/about', file: 'a.pdx', tag: 'pdx-about' },
+            { path: '/users/:id', file: 'u.pdx', tag: 'pdx-users' },
+        ]);
+        expect(out).toContain('path: "/about", tag: "pdx-about"');
+        expect(out).toContain('path: "/users/:id", tag: "pdx-users"');
+        expect(out, 'the table started matching paths itself').not.toContain('switch');
     });
 
     it('carries a guard into the route table, and omits the key when there is none', () => {
-        const guarded = generateOptimizedRouter([{ path: '/a', file: 'a.pdx', tag: 'pdx-a', guard: 'admin' }]);
+        const guarded = generateRouteTable([{ path: '/a', file: 'a.pdx', tag: 'pdx-a', guard: 'admin' }]);
         expect(guarded).toContain('guard: "admin"');
-        const plain = generateOptimizedRouter([{ path: '/a', file: 'a.pdx', tag: 'pdx-a' }]);
+        const plain = generateRouteTable([{ path: '/a', file: 'a.pdx', tag: 'pdx-a' }]);
         expect(plain).not.toContain('guard:');
     });
 
     it('escapes a path rather than pasting it into the generated source', () => {
         // JSON.stringify is what stands between a route path and broken (or injectable) output.
-        const out = generateOptimizedRouter([{ path: '/a\'b"c', file: 'a.pdx', tag: 'pdx-a' }]);
+        const out = generateRouteTable([{ path: '/a\'b"c', file: 'a.pdx', tag: 'pdx-a' }]);
         expect(out).toContain(JSON.stringify('/a\'b"c'));
     });
 });

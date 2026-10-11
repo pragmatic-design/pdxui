@@ -86,7 +86,7 @@ The framework runs in two distinct modes, and that is a deliberate choice:
 
 | Aspect | Dev (interpreted) | Prod (compiled) | Status |
 |---------|-------------------|------------------|--------|
-| Router | Regex matching at runtime | A generated switch statement | ✅ The build swaps `packages/router/src/active.ts` for the generated router. "Zero regex" holds while no route declares a constraint |
+| Router | One router, routes from the page modules or the plugin's table | The same router, the route table compiled from every `@page` | ✅ One implementation (#108). The build emits route DATA, installed through `packages/router/src/active.ts`; the matcher is built once at startup, and a navigation runs no regex for whole-segment patterns — a constraint is the one regex, a pattern that is not made of whole segments keeps one |
 | Bindings | `setProp()` with dispatch | Direct property assignment, inline | ✅ The default of a production build. Mount of a 1500-row list: 19 ms → 5.5 ms, +0.4 KB raw, 0 KB gzip. `pdx({ inlineBindings: false })` turns it off |
 | Template | `html\`\`` with reactive placeholders | A pre-compiled DOM factory | ⚠️ Only for a template with no interpolation |
 | CSS | Scoping through a data attribute at runtime | CSS extracted, zero JS overhead | ✅ A production build imports each component's styles as a stylesheet the bundler extracts. Dev keeps the injection: it is what makes a `<style scoped>` hot-reload |

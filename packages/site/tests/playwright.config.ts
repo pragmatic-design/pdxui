@@ -1,10 +1,11 @@
 /**
  * The DEPLOYED site, not the dev one.
  *
- * This matters more here than anywhere else in the repository. The site runs the GENERATED router —
- * the switch-based module the plugin substitutes for `@pdxui/router` in a production build (the
- * dev/prod seam). `vite dev` never runs it. A suite pointed at the dev server is blind to a bug that
- * breaks every page transition on pdxui.com, which is the definition of a check that cannot fail.
+ * This matters more here than anywhere else in the repository. The deployed site is a production
+ * build: its route table goes in through the seam, its pages are split chunks, its templates take
+ * the inline render path. `vite dev` runs none of that. A suite pointed at the dev server is blind to
+ * a bug that breaks every page transition on pdxui.com, which is the definition of a check that
+ * cannot fail.
  *
  * Same shape as `packages/builder/tests/playwright.static.config.ts`, for the same reason:
  * `reuseExistingServer: false`, because a preview left running from a previous build would certify

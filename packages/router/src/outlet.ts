@@ -12,7 +12,7 @@
 // Opt-in: @page '/path' { keepAlive } -> freeze/resume pattern
 
 import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp } from '@pdxui/core';
-import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule } from './active';
+import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule, toRouteConfig } from './active';
 import type { RouteConfig, ResolvedRoute, NavigationHop } from './active';
 import { prefetchedLoad } from './prefetch';
 
@@ -139,16 +139,15 @@ function autoInitRouter(): void {
         }
     });
 
-    // The BUILD-TIME table first, the modules' registrations second.
+    // The project's route table first, the modules' registrations second.
     //
     // `globalThis.__pdx_routes` is filled by a page module WHEN IT IS IMPORTED, so taking it as the
     // only source would mean the app had to import every page before the router knew any of them
     // existed — and `@page`'s code splitting could not happen, because the dynamic import the
-    // outlet performs would resolve to a module already in the entry chunk. In a production build
-    // the generated router carries the whole table, compiled from the same `@page` declarations, and
-    // the outlet imports a page the first time it shows it. In dev `routeTable()` is null and
-    // nothing changes: there is no bundle to split.
-    const compiled = routeTable() as RegisteredRoute[] | null;
+    // outlet performs would resolve to a module already in the entry chunk. The compiler emits the
+    // whole table from the same `@page` declarations, in dev and in a build, and the outlet imports
+    // a page the first time it shows it. The registrations are what an app without the plugin has.
+    const compiled = routeTable() as readonly RegisteredRoute[] | null;
     const registered = (compiled && compiled.length > 0)
         ? compiled
         : globalThis.__pdx_routes as RegisteredRoute[] | undefined;
@@ -156,29 +155,9 @@ function autoInitRouter(): void {
 
     for (const r of registered) routeConfigMap.set(r.path, r);
 
-    const routes: RouteConfig[] = registered.map(r => ({
-        path: r.path,
-        component: () => document.createElement(r.tag),
-        guard: r.guard,
-        redirect: r.redirect,
-        meta: r.meta,
-        // Every field below must be carried by this map, and a field dropped here fails in silence.
-        // Without `loader` the runtime's loader code — correct, and awaited on every navigation — is
-        // unreachable: `currentLoaderData()` stays undefined forever and `currentLoaderState()`
-        // never leaves 'idle'.
-        loader: r.loader,
-        // Without `scroll` the compiler's `@scroll 'top'` never reaches the restoration, and the
-        // declaration does nothing at all.
-        scroll: r.scroll,
-        // And this one is what makes a route a PARENT rather than a sibling with a shared prefix.
-        // Dropped here, every nested route would render flat and the nesting would silently not
-        // happen — the same failure as the two above, which is why it is spelled out.
-        hasOutlet: r.hasOutlet,
-        // Without it the breadcrumb's trail is empty and the declaration does nothing.
-        label: r.label,
-        // The same warning: a key dropped here is a crumb that vanishes.
-        labelKey: r.labelKey,
-    }));
+    // `toRouteConfig` is the one place a table route becomes a RouteConfig, and it lists why each
+    // field has to travel: a field dropped there fails in silence.
+    const routes: RouteConfig[] = registered.map(toRouteConfig);
 
     // Read redirect table from __pdx_redirects
     const globalRedirects = globalThis.__pdx_redirects as { from: string; to: string }[] | undefined;
@@ -209,12 +188,9 @@ function autoInitRouter(): void {
 /**
  * The element a route renders.
  *
- * Not `route.config.component()` — a closure the outlet itself put on the RouteConfig it handed to
- * `createRouter`. That works only for a router whose table the outlet built, and the generated one
- * bakes its table in at build time, where a function cannot travel. What both routers do agree on
- * is the PATH, and `routeConfigMap` — built from `globalThis.__pdx_routes`, the same registration
- * in either mode — is what turns a path into a tag. The closure is the fallback for a route the map
- * does not know.
+ * The tag from `routeConfigMap` — the registration the outlet started the router from — and
+ * `route.config.component()` only for a route the map does not know: one an app handed to
+ * `createRouter` itself.
  */
 function elementFor(route: ResolvedRoute): HTMLElement {
     const tag = routeConfigMap.get(route.config.path)?.tag;
@@ -480,9 +456,8 @@ class PdxRouterOutlet extends HTMLElement {
         //
         // The router says which hop this is. Inferring it from the address bar —
         // `location.pathname.endsWith(approved.to)` — holds only while the router leaves the
-        // address on the source path through a redirect: the interpreted router does, the
-        // generated one moves it, so a production build would ask twice and dev once.
-        // `redirected` is a fact the router has and the address bar is not.
+        // address on the source path through a redirect, which depends on whether the URL was
+        // already written. `redirected` is a fact the router has and the address bar is not.
         const approved = this._leaveApproved;
         if (hop?.redirected && approved && approved.el === el) return true;
 
@@ -560,8 +535,9 @@ class PdxRouterOutlet extends HTMLElement {
         // matched route is worse: `routeConfigMap` is what turns it into an element, so activating
         // before the table lands produces nothing while still marking the route as handled, and the
         // second resolution takes the same-path early return. That is a page that stays blank
-        // forever, and the generated router reaches it on every hard load — it resolves the URL
-        // when it is IMPORTED, so the effect's first synchronous run already has a route.
+        // forever, and any router started before the outlet connects reaches it — an app that
+        // calls `createRouterFromTable` itself, so the effect's first synchronous run already has
+        // a route.
         //
         // The microtask in connectedCallback resolves again the moment the table lands.
         if (!routerBootstrapped) {
@@ -796,7 +772,8 @@ class PdxRouterOutlet extends HTMLElement {
         }
 
         // Lazy loading — only if CE is NOT already registered (eagerly imported in index.html)
-        if (config?.lazy && config.file && !customElements.get(config.tag)) {
+        const tableLoad = pageModule(path);
+        if (config?.lazy && (tableLoad || config.file) && !customElements.get(config.tag)) {
             const gen = this._navGen; // capture: a newer navigation invalidates this import result
             // The stand-in, on the design system's tokens (`injectPlaceholderCSS`) and HIDDEN for
             // its first `LOADING_DELAY_MS`: a chunk that arrives sooner is never announced by a
@@ -817,11 +794,12 @@ class PdxRouterOutlet extends HTMLElement {
             this._placeholder = placeholder;
             this._focusOnArrival = false;
 
-            // The generated router's literal `import()` when there is one, the runtime string
+            // The route table's literal `import()` when there is one, the runtime string
             // otherwise. The literal is what makes the page its own chunk: `/* @vite-ignore */`
             // tells Rollup not to look at the specifier, so on its own it produces no split at all
-            // and every page stays in the entry. The fallback keeps dev working, where the page is
-            // already imported and this branch is never reached.
+            // and every page stays in the entry. The fallback is for a registration with a `file`
+            // and no table behind it; a table route carries no `file`, since in a build it would be
+            // the page's absolute path on the machine that built it.
             //
             // A load a prefetch already started is AWAITED, not repeated: a second `import()` does
             // not wait for the stylesheet the first one is fetching, and the page would paint
@@ -829,7 +807,7 @@ class PdxRouterOutlet extends HTMLElement {
             const prefetched = prefetchedLoad(route.path);
             const load = prefetched
                 ? () => prefetched
-                : pageModule(route.path) ?? (() => import(/* @vite-ignore */ config.file!));
+                : tableLoad ?? (() => import(/* @vite-ignore */ config.file!));
             load().then(async () => {
                 clearTimeout(reveal);
                 // Superseded while importing: drop the result. Don't mount, don't clobber
@@ -869,7 +847,7 @@ class PdxRouterOutlet extends HTMLElement {
                 placeholder.textContent = routerString('loadFailed').replace('{message}', String(err.message));
                 placeholder.classList.add('pdx-route-error');
                 placeholder.hidden = false;
-                console.error(`[pdx-router] Lazy load failed for ${config.file}:`, err);
+                console.error(`[pdx-router] Lazy load failed for ${path}:`, err);
                 firstPageShown();
             });
             return;

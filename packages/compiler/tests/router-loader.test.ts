@@ -1,23 +1,21 @@
-// How the generated router runs a @loader.
+// How the route table reaches a @loader.
 //
-// The runtime router's way cannot be copied, because the two routers get their routes from
-// different places: the runtime one reads
-// `globalThis.__pdx_routes`, which each compiled page pushes to when it is imported and which can
-// therefore carry a live function; the generated one is `virtual:pdx-router`, built from
-// `ScannedRoute` — serialisable data only — and it does not import the page modules, because
-// importing them statically is exactly the code splitting it exists to keep.
+// A route table is data built by scanning the sources, and it must not import the page modules
+// statically — that would put every page in the entry chunk, which is the code splitting `@page`
+// exists to keep. So a function declared in a page cannot be written into it.
 //
-// The answer: the generated module carries the loader's NAME, and takes the FUNCTION from the same
-// registration the runtime router reads. For a lazily loaded route that registration does not exist
-// yet on the first visit, so the module imports the page first, from
-// a table of literal `import()` specifiers the bundler can see and split.
+// The answer: the table carries a BRIDGE per route that declares a loader. It takes the function
+// from the registration the page module publishes into `globalThis.__pdx_routes` when it is
+// imported; for a lazily loaded route that registration does not exist yet on the first visit, so
+// the bridge imports the page first — through a literal `import()` the bundler can see and split.
 //
-// The parity table (packages/router/tests/parity.test.ts) proves the BEHAVIOUR against both routers.
-// This file pins what is emitted and the paths the parity row does not take: the lazy first visit,
-// and a declared loader that resolves to nothing.
+// The behaviour suite (packages/router/tests/parity.test.ts) runs the loader rows against the table.
+// This file pins what is emitted and the paths those rows do not take: the lazy first visit, and a
+// declared loader that resolves to nothing.
 
 import { describe, it, expect, afterEach } from 'vitest';
-import { generateOptimizedRouter, scanForRoutes, type ScannedRoute } from '../src/plugin-utils';
+import { scanForRoutes, type ScannedRoute } from '../src/plugin-utils';
+import { generateRouteTable } from '../src/route-table';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -25,100 +23,82 @@ import { join } from 'node:path';
 const DATA: ScannedRoute = { path: '/data', file: '/app/pages/data.pdx', tag: 'pdx-data', loader: 'loadRows' };
 const PLAIN: ScannedRoute = { path: '/about', file: '/app/pages/about.pdx', tag: 'pdx-about' };
 
-/** A stub of the two core symbols the module reads at load time, with real signal semantics. */
-function coreStub() {
-    return {
-        signal: (initial: unknown) => {
-            let v = initial;
-            const s = () => v;
-            return Object.assign(s, { set: (n: unknown) => { v = n; }, peek: () => v });
-        },
-        computed: (fn: () => unknown) => fn,
-        sanitizeUrl: (u: string) => u,
-        saveScrollPosition: () => {},
-        restoreScrollPosition: () => {},
-    };
-}
+type TableRoute = { path: string; loader?: () => Promise<unknown> };
 
 /**
- * Evaluate the generated module and hand back the private pieces this file needs.
- *
- * `_resolveLoader` is module-private on purpose — it is not part of the router's surface — so the
- * tail exports it for the test rather than the module exporting it for everyone.
+ * Evaluate the table module. `import(` is routed through `importer`, so a test decides what loading
+ * the page does — `new Function` has no module loader of its own.
  */
-function evaluate(routes: ScannedRoute[]) {
-    const body = generateOptimizedRouter(routes)
-        .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
-        .replace(/^\s*export\s+/gm, '');
-    return new Function('__core', `${body}\nreturn { _resolveLoader, _registeredLoader, currentLoaderState, currentLoaderData };`)(coreStub()) as {
-        _resolveLoader: (c: { path: string; loader?: string }) => Promise<(() => Promise<unknown>) | null>;
-        _registeredLoader: (p: string) => (() => Promise<unknown>) | null;
-        currentLoaderState: () => string;
-        currentLoaderData: () => unknown;
-    };
+function evaluate(routes: ScannedRoute[], importer: (spec: string) => Promise<unknown>): TableRoute[] {
+    const body = generateRouteTable(routes)
+        .replace(/^export\s+/gm, '')
+        .replace(/\bimport\(/g, '__import(');
+    return new Function('__import', `${body}\nreturn routes;`)(importer) as TableRoute[];
 }
+
+const neverImported = (spec: string): Promise<unknown> => Promise.reject(new Error(`imported ${spec}`));
 
 afterEach(() => {
     delete (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes;
 });
 
-describe('what the generated module carries', () => {
-    it('carries the loader NAME on the route, not a function', () => {
-        const code = generateOptimizedRouter([DATA]);
+describe('what the table carries', () => {
+    it('carries a bridge on the route, never the name as a value to call', () => {
+        const code = generateRouteTable([DATA]);
 
-        expect(code, 'the name did not reach the route entry').toContain('loader: "loadRows"');
-        // The generated module has no function to embed.
-        expect(code).not.toContain('loader: loadRows');
+        expect(code, 'the bridge did not reach the route entry').toContain('loader: () => __load("/data", () => import("/app/pages/data.pdx"), "loadRows")');
+        // A string where the router expects a function is a call on a string.
+        expect(code).not.toContain('loader: "loadRows"');
     });
 
-    it('emits one import() with a LITERAL specifier for the page that declares it', () => {
-        const code = generateOptimizedRouter([DATA]);
-
+    it('imports the page with a LITERAL specifier', () => {
         // A literal is what lets the bundler split the chunk. A runtime-computed specifier would
         // make the import unanalysable and pull the page into the main bundle, or nothing at all.
-        expect(code).toContain('"/data": () => import("/app/pages/data.pdx")');
+        expect(generateRouteTable([DATA])).toContain('import("/app/pages/data.pdx")');
     });
 
-    it('emits nothing for a route that declares no loader', () => {
-        const code = generateOptimizedRouter([PLAIN]);
+    it('emits no loader for a route that declares none', () => {
+        const code = generateRouteTable([PLAIN]);
 
-        expect(code, 'a route with no loader pulled its page module into the router')
+        expect(code, 'a route with no loader pulled its page module into the table')
             .not.toContain('about.pdx');
-        expect(code).toContain('const _loaderModules = {};');
+        expect(evaluate([PLAIN], neverImported)[0].loader).toBeUndefined();
     });
 });
 
 describe('how the function is found', () => {
     it('takes it from the registration the page module published', async () => {
-        const m = evaluate([DATA]);
-        const fn = async () => ({ rows: 2 });
-        (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/data', loader: fn }];
+        const [route] = evaluate([DATA], neverImported);
+        (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/data', loader: async () => ({ rows: 2 }) }];
 
-        expect(await m._resolveLoader({ path: '/data', loader: 'loadRows' })).toBe(fn);
-    });
-
-    it('ignores a registration whose loader is not callable', async () => {
-        // A loader emitted as a STRING and called anyway is a call on a string. A router that
-        // accepts whatever is in that field makes that call one layer down.
-        const m = evaluate([PLAIN]);
-        (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/about', loader: 'loadRows' }];
-
-        expect(m._registeredLoader('/about')).toBeNull();
+        expect(await route.loader!()).toEqual({ rows: 2 });
     });
 
     it('imports the page module when nothing has registered yet — the lazy first visit', async () => {
-        // The path the parity row cannot take: there, the page module is already published. Here
-        // the import is real and its specifier does not resolve inside `new Function`, so it
-        // REJECTS — which is the observable proof that the fallback ran rather than being skipped.
-        const m = evaluate([DATA]);
+        const imported: string[] = [];
+        const [route] = evaluate([DATA], async (spec) => {
+            imported.push(spec);
+            // What a compiled page module does when it loads.
+            (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/data', loader: async () => 'fresh' }];
+        });
 
-        await expect(m._resolveLoader({ path: '/data', loader: 'loadRows' })).rejects.toThrow();
+        expect(await route.loader!()).toBe('fresh');
+        expect(imported).toEqual(['/app/pages/data.pdx']);
     });
 
-    it('returns null rather than importing when the route declares no loader', async () => {
-        const m = evaluate([PLAIN]);
+    it('ignores a registration whose loader is not callable', async () => {
+        // A loader emitted as a STRING and called anyway is a call on a string. The bridge goes on to
+        // import the page instead — which, here, is the rejection that proves it did.
+        const [route] = evaluate([DATA], neverImported);
+        (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/data', loader: 'loadRows' }];
 
-        expect(await m._resolveLoader({ path: '/about' })).toBeNull();
+        await expect(route.loader!()).rejects.toThrow('imported /app/pages/data.pdx');
+    });
+
+    it('names the loader when the page module registered none', async () => {
+        const [route] = evaluate([DATA], async () => { /* a page that registers nothing */ });
+
+        await expect(route.loader!()).rejects.toThrow('@loader "loadRows" is declared on /data but the page module registered none');
     });
 });
 
@@ -156,3 +136,4 @@ describe('scanForRoutes reads @loader', () => {
         expect(r.loader).toBeUndefined();
     });
 });
+

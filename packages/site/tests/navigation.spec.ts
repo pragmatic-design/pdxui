@@ -1,9 +1,9 @@
 /**
  * One navigation, one page.
  *
- * A click must not mount a page TWICE. If `navigate()` in the generated router calls
- * `history.pushState` and then resolves the route by hand, the route resolves twice: `pushState`
- * fires the Navigation API's `navigate` event, which the same module listens to and also resolves.
+ * A click must not mount a page TWICE. If the router's `navigate()` calls `history.pushState` and
+ * then resolves the route by hand, the route resolves twice: `pushState` fires the Navigation API's
+ * `navigate` event, which the same module listens to and also resolves.
  * Because the outlet awaits `onBeforeLeave` before recording the route it moved from, the second
  * resolution misses the same-route early return and activates again.
  *

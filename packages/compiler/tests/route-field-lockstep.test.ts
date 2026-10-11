@@ -2,12 +2,13 @@
 //
 // The three, and what each one costs when it is missed:
 //
-//   1. `plugin-utils.ts` → `routeEntries`, the scanned table the GENERATED router compiles in.
-//      Missed: the field is absent from a production build.
+//   1. `route-table.ts` → `routeEntries`, the route table the compiler emits (#108).
+//      Missed: the field is absent from every app built with the plugin, in dev and in a build.
 //   2. `codegen-shared.ts` → `routeParts`, the page module's own `__pdx_pushRoute({…})`.
 //      Missed: it is there until the page loads, then disappears — the worst of the three, because
 //      the manifest in the bundle plainly contains the value.
-//   3. `router/src/outlet.ts`, which reads the registration. Missed: it is absent in dev.
+//   3. `router/src/outlet.ts`, which reads the registration, and `router/src/route-table.ts` →
+//      `toRouteConfig`, which turns it into what the router reads. Missed: the router never sees it.
 //
 // A missed field fails silently: a missing `loader` makes `currentLoaderData()` undefined forever;
 // `scroll`, `@scroll 'top'` do nothing; `hasOutlet`, every nested route render flat; `label`, the
@@ -19,14 +20,14 @@
 // elsewhere (`gen-manifest-fresh`, `skill-catalog-lockstep`, `template-directives-lockstep`) — by
 // regenerating the fact and comparing.
 //
-// ⚠️ "Read by outlet.ts's MAP" is right for place 3 for the four fields above and wrong for the
-// rest. The outlet has TWO readers: the runtime router, which
-// receives a `RouteConfig` the map builds field by field, and the outlet itself, which keeps the
-// whole registration in `routeConfigMap` and reads `keepAlive`, `transition`, `prefetch` and
-// `outlets` straight off it. Demanding the map for those would demand they be added to
-// `RouteConfig`, where nothing would read them. So place 3 is checked as: the outlet DECLARES the
-// field on `RegisteredRoute`, and copies it into the map exactly when `RouteConfig` declares it —
-// which is what each of the four failures above is.
+// ⚠️ "Read through `toRouteConfig`" is right for place 3 for the four fields above and wrong for the
+// rest. A registration has TWO readers: the router, which receives a `RouteConfig` that
+// `toRouteConfig` builds field by field, and the outlet itself, which keeps the whole registration
+// in `routeConfigMap` and reads `keepAlive`, `transition`, `prefetch` and `outlets` straight off it.
+// Demanding the map for those would demand they be added to `RouteConfig`, where nothing would read
+// them. So place 3 is checked as: the outlet DECLARES the field on `RegisteredRoute`, and
+// `toRouteConfig` copies it exactly when `RouteConfig` declares it — which is what each of the four
+// failures above is.
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -36,9 +37,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 const read = (rel: string) => readFileSync(join(here, rel), 'utf8');
 
 const PLUGIN_UTILS = read('../src/plugin-utils.ts');
+const ROUTE_TABLE = read('../src/route-table.ts');
 const CODEGEN_SHARED = read('../src/compiler/codegen-shared.ts');
 const OUTLET = read('../../router/src/outlet.ts');
-const RUNTIME = read('../../router/src/runtime.ts');
+const ROUTER_TYPES = read('../../router/src/types.ts');
+const ROUTER_TABLE = read('../../router/src/route-table.ts');
 
 /**
  * Build-time only: these describe how the build finds and ships the page, not how the route
@@ -66,9 +69,9 @@ const TABLE_LEVEL = new Set(['redirects']);
  * Each is measured, not assumed — `grep` over `packages/router/src` and `packages/core/src` finds
  * no reader for any of them:
  *
- *   - `paramConstraints` — `:id(number)`, which BOTH routers parse out of the path itself
- *     (`runtime.ts` builds the regex from it; the generated router compiles a matcher). Genuinely
- *     derived from `path`, so the key is redundant rather than lost.
+ *   - `paramConstraints` — `:id(number)`, which the router parses out of the path itself
+ *     (`matcher.ts` builds the matcher from it). Genuinely derived from `path`, so the key is
+ *     redundant rather than lost.
  *   - `paramTypes` — `@params { id: number }`. Nothing in the monorepo reads it.
  *
  * `layouts` is not here: `@layout 'admin'` resolves to the tag at build time, so what the page
@@ -104,12 +107,12 @@ function emittedKeys(src: string, from: string, to: string, pattern: RegExp): st
     return [...new Set([...body.matchAll(pattern)].map(m => m[1]))].sort();
 }
 
-/** `ScannedRoute` — the shape the scan produces and the generated router compiles in. */
+/** `ScannedRoute` — the shape the scan produces and the route table is written from. */
 const scannedFields = () => interfaceFields(PLUGIN_UTILS, 'ScannedRoute');
 
-/** `routeEntries` — the same fields, as the text of the generated route table. */
+/** `routeEntries` — the same fields, as the text of the emitted route table. */
 const routeEntriesFields = () => emittedKeys(
-    PLUGIN_UTILS, 'const routeEntries = routes.map', ').join(\',\\n\');', /[,{]\s*(\w+):\s/g);
+    ROUTE_TABLE, 'const routeEntries = routes.map', ').join(\',\\n\');', /[`',]\s*(\w+):\s/g);
 
 /**
  * `routeParts` — what the page module pushes into `globalThis.__pdx_routes` when imported.
@@ -123,12 +126,12 @@ const routePartsFields = () => emittedKeys(
 /** `RegisteredRoute` — what the outlet knows a registration can carry. */
 const registeredFields = () => interfaceFields(OUTLET, 'RegisteredRoute');
 
-/** `RouteConfig` — what the interpreted router reads, and therefore what the map must build. */
-const routeConfigFields = () => interfaceFields(RUNTIME, 'RouteConfig');
+/** `RouteConfig` — what the router reads, and therefore what `toRouteConfig` must build. */
+const routeConfigFields = () => interfaceFields(ROUTER_TYPES, 'RouteConfig');
 
-/** The outlet's `registered.map(r => ({…}))` — the field-by-field copy that dropped four fields. */
+/** `toRouteConfig` — the field-by-field copy; its earlier form in the outlet dropped four fields. */
 const outletMapFields = () => emittedKeys(
-    OUTLET, 'const routes: RouteConfig[] = registered.map', '}));', /^\s*(\w+):\s/gm);
+    ROUTER_TABLE, 'export function toRouteConfig', '\n    };', /^\s*(\w+):\s/gm);
 
 // ─── The check ─────────────────────────────────────────────────────────────
 
@@ -148,13 +151,13 @@ export function drift(field: string, lists: {
 }): string[] {
     const missing: string[] = [];
     if (!lists.routeEntries.includes(field))
-        missing.push('the scanned table (plugin-utils.ts → routeEntries): absent from a production build');
+        missing.push('the route table (route-table.ts → routeEntries): absent from a production build and from the dev server');
     if (!lists.routeParts.includes(field))
         missing.push("the page's own registration (codegen-shared.ts → routeParts): present until the page loads, then gone");
     if (!lists.registered.includes(field))
         missing.push('the outlet\'s RegisteredRoute (router/src/outlet.ts): the outlet cannot read it');
     if (lists.routeConfig.includes(field) && !lists.outletMap.includes(field))
-        missing.push('the outlet\'s map into RouteConfig (router/src/outlet.ts): RouteConfig declares it, so the interpreted router expects it and gets undefined');
+        missing.push('the map into RouteConfig (router/src/route-table.ts → toRouteConfig): RouteConfig declares it, so the router expects it and gets undefined');
     return missing;
 }
 
@@ -200,7 +203,7 @@ describe('a route field is written in three places, and the three agree', () => 
     it('and the redirect TABLE travels through all three too', () => {
         // `redirects` is excluded above as table-level, so this is the assertion that replaces it
         // rather than the hole the exclusion would otherwise leave.
-        expect(PLUGIN_UTILS, 'the generated router no longer compiles the redirect table')
+        expect(ROUTE_TABLE, 'the route table no longer carries the redirect table')
             .toContain('const redirectPairs = routes.flatMap(r => r.redirects');
         expect(CODEGEN_SHARED, 'a page no longer publishes its @redirect pairs')
             .toContain('globalThis.__pdx_redirects.push');
