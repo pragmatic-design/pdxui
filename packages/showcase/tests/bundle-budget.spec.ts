@@ -146,7 +146,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // (34.4 → 34.0, 88.3 → 87.9). 378.4 KB measured.
 // js 379 → 380: every compiled template handler runs inside batch() (#114) — `batchHandler(…)` around
 // each, so an effect reading a handler's writes runs once, on the finished state. 379.1 KB measured.
-const BUDGET_KB = { entry: 35, js: 380, css: 59, blocking: 89 };
+// entry 35 → 36, blocking 89 → 90: one router instead of two (#108). A build used to swap the
+// router for one generated as a string; now it ships the TypeScript router and a route table. That
+// router builds its matcher once at start-up — static paths in a map, dynamic ones as segment lists
+// — and keeps a regex only for a pattern that is not made of whole segments, so both matchers are in
+// the entry, with createRouterFromTable beside createRouter. About half a kilobyte: 34.9 → 35.4
+// entry, 88.7 → 89.2 blocking (main measured in CI, this branch locally, both on LF sources).
+const BUDGET_KB = { entry: 36, js: 380, css: 59, blocking: 90 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
