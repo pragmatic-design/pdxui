@@ -90,6 +90,18 @@ await addUser.execute(dto);
 The mental model is the same as reactivity: you declare the relationships (this resource has these
 tags), and the update propagates.
 
+**The button that sends it.** Give the mutation to `<pdx-button>` as its `action`, and the button
+does the rest:
+
+```html
+<pdx-button :action="addUser" :action-arg="dto">Add</pdx-button>
+```
+
+A click calls `addUser.execute(dto)`; while the write is pending the button is busy and refuses
+clicks, so a double click sends one write. A refused write stays on `addUser.error()`, which is
+where the form reads it, and the button is idle again. You write no `:loading`, no `:disabled` and
+no `@click` for it.
+
 ## Writing before the server agrees
 
 Invalidating after the response is honest and slow: the user waits a round trip to see their own

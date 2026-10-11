@@ -21,6 +21,9 @@ const VARIANT_MAP: Record<string, string> = {
 
 /**
  * A button over the Pragmatic CSS button styles, with variants, sizes and a loading state.
+ *
+ * @fires pdx-action-error {{ error }} - When the `action`'s `execute` rejects. The error is the one
+ * the action keeps on its `error()`; the button is idle again.
  */
 component('pdx-button', {
     props: {
@@ -42,19 +45,49 @@ component('pdx-button', {
         ariaLabel: { type: String, default: '' },
         /** The id of an element whose text names the button, forwarded to the inner `<button>`. */
         ariaLabelledby: { type: String, default: '' },
+        /** A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button is busy and refuses clicks, so a double click sends one write. */
+        action: { type: Object, default: null },
+        /** The value a click passes to `action.execute`. */
+        actionArg: { type: Object, default: null },
     },
     setup(ctx) {
         let _pressed = false;
 
+        /** The `action`, if it has the shape: an `execute` to call and a `pending` to read. */
+        function action(): { execute: (arg?: unknown) => unknown; pending: () => boolean } | null {
+            const a = ctx.action() as { execute?: unknown; pending?: unknown } | null;
+            return a && typeof a.execute === 'function' && typeof a.pending === 'function'
+                ? a as { execute: (arg?: unknown) => unknown; pending: () => boolean }
+                : null;
+        }
+
+        /** Busy: `loading` set, or the action's write in flight. */
+        function isBusy(): boolean {
+            return !!(ctx.loading() || action()?.pending());
+        }
+
         function getClass(): string {
             const base = VARIANT_MAP[ctx.variant() as string] || 'pdx-primary';
-            let cls = ctx.loading() ? `${base} pdx-loading` : base;
+            let cls = isBusy() ? `${base} pdx-loading` : base;
             if (ctx.toggle() && _pressed) cls += ' pdx-pressed';
             return cls;
         }
 
         function isDisabled(): boolean {
-            return !!(ctx.disabled() || ctx.loading());
+            return !!(ctx.disabled() || isBusy());
+        }
+
+        /**
+         * Runs the action. A refusal stays where `mutation()` puts it, on `error()`, for the form to
+         * show — and is announced as `pdx-action-error`, so the button holds the promise it started
+         * instead of leaving an unhandled rejection behind every failed save.
+         */
+        function runAction(): void {
+            const a = action();
+            if (!a) return;
+            Promise.resolve(a.execute(ctx.actionArg())).then(undefined, (error: unknown) => {
+                ctx.emit('pdx-action-error', { error });
+            });
         }
 
         // Disabled or loading: the click stops at the host, before the app's @click.
@@ -76,6 +109,7 @@ component('pdx-button', {
                 }
                 ctx.emit('pdx-toggle', { pressed: _pressed }, { bubbles: false });
             }
+            runAction();
         }
 
         // Propagate size/full/toggle to inner <button> via DOM (after render)
@@ -113,7 +147,7 @@ component('pdx-button', {
                 + `give it aria-label (or aria-labelledby, or a label). ${ctx.el.outerHTML.slice(0, 120)}`);
         });
 
-        return { getClass, isDisabled, onClick };
+        return { getClass, isBusy, isDisabled, onClick };
     },
     // The name goes on the element with the role: `aria-label` left on the host names nothing, and
     // an icon-only button would be read "button".
@@ -122,7 +156,7 @@ component('pdx-button', {
             :type=${() => ctx.type()}
             :class=${() => ctx.getClass()}
             :disabled=${() => ctx.isDisabled()}
-            :aria-busy=${() => ctx.loading() ? 'true' : null}
+            :aria-busy=${() => ctx.isBusy() ? 'true' : null}
             :aria-label=${() => (ctx.ariaLabel() as string) || null}
             :aria-labelledby=${() => (ctx.ariaLabelledby() as string) || null}
             @click=${ctx.onClick}

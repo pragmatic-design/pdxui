@@ -59,6 +59,7 @@
         // The per-scenario setup scripts (state markup cannot express). Run after the CEs upgrade
         // and after their initial render, before signalling ready.
         const __setups = {
+        "button-action-pending": async function () { document.querySelector('section:not([hidden]) [data-test="btn-pending"]').action = { execute() {}, pending: () => true }; },
         "dd-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dd-open"]');
                 if (host && host.__dropdownMenu && typeof host.__dropdownMenu.open === 'function') host.__dropdownMenu.open();
@@ -216,6 +217,11 @@
                     <pdx-button data-test="icon-settings" variant="ghost" aria-label="Settings"><span aria-hidden="true">⚙</span></pdx-button>
                     <pdx-button data-test="icon-more" variant="outline" aria-label="More actions"><span aria-hidden="true">…</span></pdx-button>
                 </div>
+    </section>
+
+    <section data-scenario="button-action-pending">
+        <h3>Button — Action pending</h3>
+        <pdx-button data-test="btn-pending">Save</pdx-button>
     </section>
 
     <section data-scenario="button-labels">

@@ -2,6 +2,20 @@
 
 Clickable action — 9 variants, sizes, loading and icons.
 
+**A button that runs a write: `:action`.** Give it a `mutation()` — or anything with `execute(arg?)`
+and `pending()` — and what it passes:
+
+```html
+<pdx-button :action="save" :action-arg="dto">Save</pdx-button>
+```
+
+A click calls `save.execute(dto)`. While `save.pending()` is true the button is busy (`aria-busy`,
+the spinner) and refuses clicks, so a double click sends one write — the double-submit guard is the
+button's, not something each form wires. `loading` and `disabled` set explicitly still win. A
+rejected write stays on `save.error()` for the form to show, is announced as `pdx-action-error`
+(`detail: { error }`), and the button is idle again. No `:loading="save.pending()"`, no `:disabled`,
+no `@click` to write.
+
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `variant` | `variant` | 'solid' \| 'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'danger' \| 'success' \| 'warning' \| 'info' | `'primary'` | Visual variant. |
@@ -15,8 +29,10 @@ Clickable action — 9 variants, sizes, loading and icons.
 | `label` | `label` | string | `''` | The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected. |
 | `ariaLabel` | `arialabel` | string | `''` | The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name. |
 | `ariaLabelledby` | `arialabelledby` | string | `''` | The id of an element whose text names the button, forwarded to the inner `<button>`. |
+| `action` | — | object | `null` | A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button is busy and refuses clicks, so a double click sends one write. |
+| `actionArg` | — | object | `null` | The value a click passes to `action.execute`. |
 
-**Events:** `pdx-toggle` → `detail: { pressed }` — Fired when toggled open or closed. Does not bubble.
+**Events:** `pdx-action-error` → `detail: { error }` — When the `action`'s `execute` rejects. The error is the one the action keeps on its `error()`; the button is idle again.; `pdx-toggle` → `detail: { pressed }` — Fired when toggled open or closed. Does not bubble.
 
 
 #### Examples

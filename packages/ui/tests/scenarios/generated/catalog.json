@@ -307,6 +307,10 @@
           "title": "Button — Icon-only, named"
         },
         {
+          "id": "button-action-pending",
+          "title": "Button — Action pending"
+        },
+        {
           "id": "button-labels",
           "title": "Button — Labels of every variant"
         }

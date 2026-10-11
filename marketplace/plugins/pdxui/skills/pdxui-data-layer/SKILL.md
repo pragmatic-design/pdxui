@@ -17,6 +17,7 @@ read is `pdx-data-source`'s page in `pdxui-data`, which lists every component th
 | it to re-run when state changes | put the signal in the URL: `` `GET /users/${id}` `` | [data](references/data.md) § Reactive params |
 | no duplicate requests | `staleTime` + `tags` | [data](references/data.md) § Cache |
 | lists to refresh after a write | `mutation({ fn, invalidate: [...] })` | [data](references/data.md) § Mutations |
+| a button that sends the write, once | `<pdx-button :action="save" :action-arg="dto">` — busy and click-proof while pending | [data](references/data.md) § Mutations |
 | rows for a grid, a list or a select | `createDataSource(rows)` or `createDataSource({ transport })` | [data](references/data.md) § In practice |
 | a socket message to update a row | `applyServerChange`, not `refresh()` | [data](references/data.md) § Live data |
 | state shared by many components, or kept across navigation | `@store` | [store](references/store.md) |
