@@ -66,8 +66,7 @@ StyleBlock     ::= "<style" ( S "scoped" )? ( S "src=" StringLiteral S? "/>" | "
 - **At most one `<template>` and one `<script>`.** `<style>` may appear more than once: a component
   can carry its scoped CSS and the page-level CSS it owns side by side.
 - **`src`** reads the block from another file, as if its contents were written inline: bindings,
-  form wiring and scoping work unchanged. One exception today: a production build extracts a
-  `<style src>` empty (#205); see [styles.md](styles.md).
+  form wiring and scoping work unchanged, in development and in a production build.
 - **`<template shadow>`** renders into a shadow root instead of light DOM; the component's CSS is
   adopted into the root, unrewritten, and `scoped` makes no difference there. Light DOM is the default.
 - **`<script setup>`** is the convention. What the compiler reads are the runes, line by line; `setup`

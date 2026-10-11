@@ -330,7 +330,14 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 if (!target) return null;
                 const { file, index } = target;
                 try {
-                    return styleCssFor(parseSFC(readFileSync(file, 'utf-8')), file, index, true);
+                    // A block's `src=` resolved as the transform resolves it: re-reading the .pdx alone
+                    // gave a `<style src>` block no content, and the build shipped it empty (#205).
+                    const descriptor = parseSFC(readFileSync(file, 'utf-8'));
+                    const resolver = projectFileResolver(normalize(viteRoot ?? process.cwd()));
+                    for (const style of descriptor.styles ?? (descriptor.style ? [descriptor.style] : [])) {
+                        if (style.src) style.content = resolver(style.src, file);
+                    }
+                    return styleCssFor(descriptor, file, index, true);
                 } catch {
                     // A file that moved between the transform and this load: an empty stylesheet is
                     // wrong, but it is not a build that fails for a reason nobody can read.
@@ -439,40 +446,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 // Vite's root, not the cwd: with cwd ≠ root a template inside the app would be refused as
                 // "outside the project root", and one outside it but under the cwd let in.
                 const projectRoot = normalize(viteRoot ?? process.cwd());
-                const resolver: FileResolver = (srcPath, fromFile) => {
-                    const dir = dirname(fromFile);
-                    const resolved = normalize(resolve(dir, srcPath));
-                    // Guard against path traversal outside project root.
-                    // relative() catches shared-prefix siblings such as ui-framework-evil.
-                    if (!isPathInsideRoot(projectRoot, resolved)) {
-                        throw new Error(
-                            `src="${srcPath}" resolves outside the project root.\n` +
-                            `  Resolved: ${resolved}\n` +
-                            `  Project root: ${projectRoot}\n` +
-                            `  Hint: src= paths must stay within the project directory.`
-                        );
-                    }
-                    // Also resolve symlinks: a symlink inside the repo pointing outside would pass
-                    // the lexical check above but readFileSync follows it (could embed secrets in CI).
-                    let realResolved: string | null = null;
-                    try { realResolved = normalize(realpathSync(resolved)); } catch { /* missing → readFileSync errors below */ }
-                    if (realResolved && !isPathInsideRoot(projectRoot, realResolved)) {
-                        throw new Error(
-                            `src="${srcPath}" resolves (via symlink) outside the project root.\n` +
-                            `  Real path: ${realResolved}\n` +
-                            `  Project root: ${projectRoot}`
-                        );
-                    }
-                    try {
-                        return readFileSync(resolved, 'utf-8');
-                    } catch {
-                        throw new Error(
-                            `Cannot resolve src="${srcPath}" from ${fromFile}.\n` +
-                            `  Looked for: ${resolved}\n` +
-                            `  Hint: src= paths are relative to the .pdx file.`
-                        );
-                    }
-                };
+                const resolver = projectFileResolver(projectRoot);
                 // Determine minify: explicit option wins, otherwise auto-detect from build mode
                 const minify = shouldMinify !== undefined ? shouldMinify : !isDevMode;
                 const result = compile(code, id, compilerPlugins, resolver, {
@@ -1042,5 +1016,47 @@ function extractFilename(path: string): string {
 function isPathInsideRoot(root: string, target: string): boolean {
     const rel = relative(root, target);
     return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+}
+
+/**
+ * Reads a block's `src=` file, relative to the `.pdx`, refusing one that resolves outside the project
+ * root. One resolver for the transform and for the production style module, so the two read the same
+ * file.
+ */
+function projectFileResolver(projectRoot: string): FileResolver {
+    return (srcPath, fromFile) => {
+        const dir = dirname(fromFile);
+        const resolved = normalize(resolve(dir, srcPath));
+        // Guard against path traversal outside project root.
+        // relative() catches shared-prefix siblings such as ui-framework-evil.
+        if (!isPathInsideRoot(projectRoot, resolved)) {
+            throw new Error(
+                `src="${srcPath}" resolves outside the project root.\n` +
+                `  Resolved: ${resolved}\n` +
+                `  Project root: ${projectRoot}\n` +
+                `  Hint: src= paths must stay within the project directory.`
+            );
+        }
+        // Also resolve symlinks: a symlink inside the repo pointing outside would pass
+        // the lexical check above but readFileSync follows it (could embed secrets in CI).
+        let realResolved: string | null = null;
+        try { realResolved = normalize(realpathSync(resolved)); } catch { /* missing → readFileSync errors below */ }
+        if (realResolved && !isPathInsideRoot(projectRoot, realResolved)) {
+            throw new Error(
+                `src="${srcPath}" resolves (via symlink) outside the project root.\n` +
+                `  Real path: ${realResolved}\n` +
+                `  Project root: ${projectRoot}`
+            );
+        }
+        try {
+            return readFileSync(resolved, 'utf-8');
+        } catch {
+            throw new Error(
+                `Cannot resolve src="${srcPath}" from ${fromFile}.\n` +
+                `  Looked for: ${resolved}\n` +
+                `  Hint: src= paths are relative to the .pdx file.`
+            );
+        }
+    };
 }
 

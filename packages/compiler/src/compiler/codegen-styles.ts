@@ -51,7 +51,7 @@ export function generateStyles(descriptor: SFCDescriptor, filename: string, prod
         // did and the golden snapshots do not move.
         const id = index === 0 ? hash(filename) : `${hash(filename)}-${index}`;
 
-        let css = block.scoped ? scopeStyles(content, `data-pdx-${hash(filename)}`) : content.trim();
+        let css = blockCss(block.scoped, content, filename);
         if (production) css = minifyCSS(css);
         return styleInjection(css, id);
     }).join('');
@@ -94,8 +94,18 @@ export function styleCssFor(descriptor: SFCDescriptor, filename: string, index: 
     if (!block) return '';
     // Line endings first: see the note in generateStyles.
     const content = block.content.replace(/\r\n/g, '\n');
-    const css = block.scoped ? scopeStyles(content, `data-pdx-${hash(filename)}`) : content.trim();
+    const css = blockCss(block.scoped, content, filename);
     return production ? minifyCSS(css) : css;
+}
+
+/**
+ * One block's CSS: scoped when it says so, and with `responsive()` and `bind()` rewritten either way.
+ * A plain block kept them as written, which no browser reads, while the setup still set the bound
+ * custom property (#205).
+ */
+function blockCss(scoped: boolean | undefined, content: string, filename: string): string {
+    const scopeId = `data-pdx-${hash(filename)}`;
+    return scoped ? scopeStyles(content, scopeId) : transformCssFunctions(content, scopeId).trim();
 }
 
 /**
@@ -237,9 +247,18 @@ function transformBindCSS(css: string, scopeId: string): string {
  *
  * responsive(16px, 64px)           → clamp(16px, calc(16px + 48 * ((100vw - 320px) / 1600)), 64px)
  * responsive(14px, 18px, 480, 1200) → clamp(14px, calc(14px + 4 * ((100vw - 480px) / 720)), 18px)
+ * responsive(1rem, 2rem)            → clamp(1rem, calc(1rem + 16 * ((100vw - 320px) / 1600)), 2rem)
+ *
+ * The growth term is a length in px: `(100vw - 320px) / 1600` is px, and a calc() cannot multiply two
+ * lengths. So a `rem`/`em` difference is converted at 16px each, the browsers' default root size; kept
+ * as a bare number it grew by 1px across the range instead of 1rem (#205). The ends stay in the
+ * author's unit.
  *
  * This is a compile-time transform — zero runtime cost.
  */
+/** The px a `rem` or `em` is taken as in `responsive()`'s growth term: the browsers' default. */
+const ROOT_FONT_PX = 16;
+
 function transformResponsiveCSS(css: string): string {
     // Match: responsive(min_value unit, max_value unit [, viewportMin, viewportMax])
     // Support negative values with optional minus sign
@@ -250,7 +269,8 @@ function transformResponsiveCSS(css: string): string {
             const max = parseFloat(maxStr);
             const vMin = vMinStr ? parseFloat(vMinStr) : 320;
             const vMax = vMaxStr ? parseFloat(vMaxStr) : 1920;
-            const delta = max - min;
+            // Rounded once converted: `(1.2 - 1) * 16` is 3.1999999999999997 in floating point.
+            const delta = unit === 'px' ? max - min : Math.round((max - min) * ROOT_FONT_PX * 1000) / 1000;
             const vDelta = vMax - vMin;
             return `clamp(${min}${unit}, calc(${min}${unit} + ${delta} * ((100vw - ${vMin}px) / ${vDelta})), ${max}${unit})`;
         }
@@ -336,8 +356,7 @@ function scopeBlock(css: string, scopeId: string): string {
         const blockEnd = findCSSBlockEnd(css, braceIdx);
         const properties = css.slice(braceIdx + 1, blockEnd);
 
-        const scopedSelector = selector
-            .split(',')
+        const scopedSelector = splitSelectorList(selector)
             .map(s => scopeSelector(s.trim(), scopeId))
             .join(', ');
 
@@ -346,6 +365,32 @@ function scopeBlock(css: string, scopeId: string): string {
     }
 
     return result;
+}
+
+/**
+ * The selectors of a list, split at its top-level commas only. A comma inside parentheses belongs to
+ * a functional pseudo-class's own list — `:is(.a, .b)`, `:where`, `:not`, `:has` — and one inside a
+ * string or an attribute selector is text: split there, the scope was pasted into the middle (#205).
+ */
+function splitSelectorList(selector: string): string[] {
+    const parts: string[] = [];
+    let depth = 0;
+    let quote = '';
+    let start = 0;
+    for (let i = 0; i < selector.length; i++) {
+        const ch = selector[i];
+        if (quote) {
+            if (ch === '\\') i++;
+            else if (ch === quote) quote = '';
+            continue;
+        }
+        if (ch === '"' || ch === "'") quote = ch;
+        else if (ch === '(' || ch === '[') depth++;
+        else if (ch === ')' || ch === ']') depth--;
+        else if (ch === ',' && depth === 0) { parts.push(selector.slice(start, i)); start = i + 1; }
+    }
+    parts.push(selector.slice(start));
+    return parts;
 }
 
 /**

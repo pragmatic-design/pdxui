@@ -573,8 +573,13 @@ export function buildSetupBody(
         const scopeHash = hash(filename);
         const bindings = extractCSSBindings(cssBlocks.map(b => b.content).join('\n'), `data-pdx-${scopeHash}`);
         if (bindings.length > 0) {
+            // Read by its name in the setup: `ctx.width()` exists only for a prop, so a `$signal` or a
+            // `$derived` threw while setup was still running and the component never mounted (#205).
+            // The body's own rewrite turns the name into its read — `__width()`, `half()` — and a
+            // prop is read off `ctx`, where its signal is.
+            const readOf = (name: string): string => propNames.has(name) ? `ctx.${name}()` : rewriteAll(name);
             const setProps = bindings.map(name =>
-                `      ctx.el.style.setProperty('--pdx-${scopeHash}-${name}', String(ctx.${name}()));`
+                `      ctx.el.style.setProperty('--pdx-${scopeHash}-${name}', String(${readOf(name)}));`
             ).join('\n');
             parts.push(`    ctx.track(() => {\n${setProps}\n    });`);
         }
