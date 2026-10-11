@@ -771,9 +771,8 @@ reconciliation. `@empty` wraps the loop in `when(() => items?.length > 0, …, (
 #### Rules
 
 - `as` and `; track` are required: `Invalid @for syntax` stops the compile.
-- A destructured binding — `@for (pairs as { key, value }; track key)` — compiles on both paths, but
-  the check for undeclared names takes the whole pattern as one name and reports each name in it as
-  `PDX_UNDECLARED_REF` (error). Bind a plain item and read its fields (#201).
+- A destructured binding — `@for (pairs as { key, value }; track key)` — puts each name of the pattern
+  in the body's scope.
 - An empty body is `PDX_EMPTY_FOR` (warning).
 - The key must be unique and stable: a changing field in it recreates the row. Not checked today.
 - On the template path in a production build with `inlineBindings: false`, a loop whose body reads a
@@ -1111,8 +1110,7 @@ even if the promise is still pending.
 - The resolved value is not handed to the body: read it from where the promise wrote it. Not checked
   today.
 - `@error` takes at most two names, distinct identifiers; anything else stops the compile.
-- **A second name other than `retry` is not in scope**: `@error (e, again)` compiles `again()` as
-  `ctx.again()`, on both paths. Use `retry`. Not checked today (#201).
+- Both names are in the `@error` body's scope, whatever they are called.
 - The timing block is recognised only when it contains `minMs` or `maxMs`; it is not an expression.
 
 #### Examples
@@ -1160,11 +1158,8 @@ second, `retry` when omitted, renders the body again.
 
 - `@catch` is required right after the body: `Expected @catch after @try`.
 - At most two names, valid identifiers, not the same twice; anything else stops the compile.
-- **Only some names are in scope in the `@catch` body today**: the two names are not added to the
-  template's scope, and a name works only if the compiler already leaves it unprefixed — `e`, `err`,
-  `error` and `retry` among them, and only when the script declares no name of its own like it.
-  `@catch (problem)` compiles `{{ problem.message }}` as `ctx.problem().message`, on both paths. Write
-  `@catch (err, retry)`. Not checked today (#201).
+- Both names are in the `@catch` body's scope, whatever they are called: `@catch (problem, again)`
+  reads `problem.message` and calls `again()`.
 
 #### Examples
 

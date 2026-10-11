@@ -9,7 +9,7 @@ import type {
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
     CustomDirectiveNode, SlotTemplateNode,
 } from '../parser/template';
-import { prefixCtx, callSignals, isRowBinding, withLoopScope, trackKeyArg, pipeChain } from './codegen-prefix';
+import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope, trackKeyArg, pipeChain } from './codegen-prefix';
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { buildEventHandler, dynamicComponentCall, scopedSlotCall } from './codegen-template-rewrite';
@@ -730,7 +730,7 @@ class InlineGen {
     tryN(node: TryNode): void {
         this.imports.add('errorBoundary');
         const body = this.sub(node.body);
-        const catchBody = this.sub(node.catchBody);
+        const catchBody = withBoundaryScope(node.errorVar, node.retryVar, this.ctx, () => this.sub(node.catchBody));
         const cf = this.v('cf');
         this.out(`const ${cf}=errorBoundary(()=>{${body}},(${node.errorVar},${node.retryVar})=>{${catchBody}});`);
         this.out(`${this.parent()}.appendChild(${cf});`);
@@ -757,12 +757,14 @@ class InlineGen {
         if (node.errorBody) {
             this.imports.add('errorBoundary');
             const errVar = node.errorVar || 'err';
-            const errBody = this.sub(node.errorBody);
+            const retryVar = node.retryVar ?? 'retry';
+            const errorBody = node.errorBody;
+            const errBody = withBoundaryScope(errVar, retryVar, this.ctx, () => this.sub(errorBody));
             const wrap = this.v('cf');
             // The switch is built INSIDE the content function: a boundary that renders its content
             // again (retry, or resetOn) needs a new one, not the fragment the first render emptied.
             // resetOn: a new promise in the awaited expression leaves @error.
-            this.out(`const ${wrap}=errorBoundary(()=>{const f=document.createDocumentFragment();f.appendChild(${switchCall});return f;},(${errVar},${node.retryVar ?? 'retry'})=>{${errBody}},{resetOn:()=>${awaited}});`);
+            this.out(`const ${wrap}=errorBoundary(()=>{const f=document.createDocumentFragment();f.appendChild(${switchCall});return f;},(${errVar},${retryVar})=>{${errBody}},{resetOn:()=>${awaited}});`);
             this.out(`${this.parent()}.appendChild(${wrap});`);
         } else {
             const cf = this.v('cf');
