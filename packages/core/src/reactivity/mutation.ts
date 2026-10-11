@@ -1,7 +1,8 @@
 // Reactive mutation primitive — execute, track state, invalidate cache, optimistic update.
 //
 // Security:
-//   - Double-submit guard: execute() is no-op while pending
+//   - Calls are serialised: one runs at a time, the others wait in call order (the double-submit
+//     guard is the button's: `<pdx-button :action>`)
 //   - Optimistic rollback: snapshot restored atomically on error
 //   - No credentials/tokens in error signals
 //
@@ -41,16 +42,16 @@ export interface MutationOptions<TData, TInput> {
 }
 
 export interface Mutation<TData, TInput> {
-    /** Execute the mutation. Rejects on error — and with Error('Mutation already in progress')
-     *  when called while an execution is already pending (a guard against double submits). */
+    /** Execute the mutation. A call made while another is pending waits its turn: calls run one at
+     *  a time, in call order, and each promise resolves or rejects with its own result. */
     execute(input: TInput): Promise<TData>;
-    /** Last successful result. */
+    /** The result of the last call that finished, if it succeeded. */
     readonly data: ReadonlySignal<TData | undefined>;
-    /** Last error. */
+    /** The error of the last call that finished, if it failed. */
     readonly error: ReadonlySignal<unknown | undefined>;
-    /** Current state. */
+    /** `pending` while any call is running or queued; otherwise the outcome of the last one. */
     readonly state: ReadonlySignal<MutationState>;
-    /** Whether mutation is in progress. */
+    /** Whether any call is running or queued. */
     readonly pending: ReadonlySignal<boolean>;
     /** Reset state to idle. */
     reset(): void;
@@ -62,9 +63,10 @@ export interface Mutation<TData, TInput> {
  * A write as reactive state: `execute(input)` plus the `pending`, `data` and `error` a form needs to
  * disable its submit button and show what happened.
  *
- * Concurrent executions are refused, not queued: calling `execute` while one is in flight rejects
- * with "Mutation already in progress". That is the double-submit guard — a user double-clicking
- * Save must not create two records — and it is why this is not just an async function.
+ * Calls are queued, not run at once: `execute` while one is in flight waits for it, so two writes
+ * of the same record never race, and an autosave and a save both land, in order. A user
+ * double-clicking Save must still not create two records — that guard is the button's:
+ * `<pdx-button :action="save">` is busy and refuses clicks while `pending()`.
  *
  * `invalidate` names the cache tags to drop on success, which is how a list refreshes itself after
  * an item is created without the caller wiring the two together.
@@ -78,23 +80,37 @@ export function mutation<TData, TInput = void>(
     const _error = signal<unknown | undefined>(undefined);
     const _state = signal<MutationState>('idle');
 
-    // Double-submit guard
-    let isPending = false;
+    // The queue: calls made and not yet settled, and the settlement of the last one, which the next
+    // call waits for. Settled either way — a rejected call must not stop the ones behind it.
+    let outstanding = 0;
+    let tail: Promise<void> = Promise.resolve();
 
-    async function execute(input: TInput): Promise<TData> {
-        // Guard: prevent concurrent executions
-        if (isPending) {
-            throw new Error('Mutation already in progress');
+    function execute(input: TInput): Promise<TData> {
+        outstanding++;
+        // Nothing in flight: start now, as a call always has — the optimistic value is in the cache
+        // and `fn` has been called before `execute` returns. Otherwise wait for the call before.
+        let run: Promise<TData>;
+        if (outstanding === 1) {
+            _state.set('pending');
+            run = runOne(input);
+        } else {
+            run = tail.then(() => runOne(input));
         }
+        tail = run.then(settled, settled);
+        return run;
+    }
 
-        isPending = true;
+    /** One call off the queue has settled, whatever its outcome (the caller's promise carries it). */
+    function settled(): void {
+        outstanding--;
+    }
+
+    /** What the last call to finish leaves in `state()`: still `pending` while others are queued. */
+    const finalState = (outcome: MutationState): MutationState => (outstanding > 1 ? 'pending' : outcome);
+
+    async function runOne(input: TInput): Promise<TData> {
         let snapshot: unknown = undefined;
         let hasSnapshot = false;
-
-        batch(() => {
-            _state.set('pending');
-            _error.set(undefined);
-        });
 
         // Optimistic update: snapshot current cache value, apply optimistic
         let hadEntry = false;
@@ -118,7 +134,7 @@ export function mutation<TData, TInput = void>(
             batch(() => {
                 _data.set(result);
                 _error.set(undefined);
-                _state.set('success');
+                _state.set(finalState('success'));
             });
 
             // Invalidate cache after success
@@ -141,15 +157,13 @@ export function mutation<TData, TInput = void>(
 
             batch(() => {
                 _error.set(err);
-                _state.set('error');
+                _state.set(finalState('error'));
             });
 
             options.onError?.(err, input);
             options.onSettled?.(undefined, err, input);
 
             throw err;
-        } finally {
-            isPending = false;
         }
     }
 
@@ -160,7 +174,6 @@ export function mutation<TData, TInput = void>(
         state: computed(() => _state()) as ReadonlySignal<MutationState>,
         pending: computed(() => _state() === 'pending') as ReadonlySignal<boolean>,
         reset(): void {
-            isPending = false;
             batch(() => {
                 _data.set(undefined);
                 _error.set(undefined);

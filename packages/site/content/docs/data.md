@@ -138,9 +138,11 @@ Three more things the type does not say:
 
 - **`update` throwing is not fatal.** If your update function raises, the optimistic step is
   skipped and the mutation proceeds as a normal write — you do not get a half-applied cache.
-- **`execute()` refuses to run twice at once.** A second call while one is pending rejects with
-  `Mutation already in progress` — the double-submit guard, so a double-clicked button sends one
-  request.
+- **`execute()` calls queue.** A call made while another is pending waits its turn: one runs at a
+  time, in call order, each promise gets its own result, and a failed call does not stop the ones
+  behind it. `pending()` stays true until the queue is empty; `data()` and `error()` are the last call
+  that finished. The double-submit guard is the button's — `<pdx-button :action="save">` refuses
+  clicks while `save.pending()` — so a double click still sends one request.
 - **`state()` is `idle | pending | success | error`**, and `pending()` is the one to disable a
   button with.
 
