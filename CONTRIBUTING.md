@@ -203,6 +203,17 @@ dependencies; the next run reuses it. PDX is built from your checkout: core, com
 in `scripts/bench-jfb/`. A PDX build that is not keyed stops the run before anything is measured.
 `node --test scripts/bench-jfb/summarize.test.mjs` tests the table.
 
+### How signals flush
+
+`pnpm --filter @pdxui/core run bench` times one event handler's writes under two flush strategies:
+the synchronous flush, and the handler's body inside `batch()`. Its cases are in
+`packages/core/bench/signal-flush-cases.ts`: one or many signals, one or a hundred effects, a list
+of 1000 rows, a chain of computeds, a computed whose value does not change. Run it before and after
+a change to `signal.ts` or to how compiled handlers write, and read the two strategies side by side
+from one run. The effect-run counts of the same cases are asserted in the gate
+(`tests/signal-flush-counts.test.ts`); a change that moves one updates that table in the same pull
+request.
+
 The benchmark looks for Chrome in one place per platform, and on Linux that is `/snap/bin/chromium`.
 On a machine where Chrome is elsewhere, or with no display, pass `--chrome <path>` and `--headless`.
 A headless run is fine for a before-and-after on the same machine. It is not comparable with the

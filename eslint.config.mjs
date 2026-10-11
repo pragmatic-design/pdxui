@@ -15,7 +15,6 @@ export default tseslint.config(
             '**/node_modules/**',
             '**/*.d.ts',
             '**/demo/**',
-            'benchmarks/**',
             '.internals/**',
             '.claude/**',
             'templates/**',

@@ -81,6 +81,7 @@
     "build": "vite build && vite build --config vite.config.iife.ts && tsc --emitDeclarationOnly",
     "test": "vitest run",
     "test:perf": "vitest run --config vitest.perf.config.ts",
+    "bench": "vitest bench --run --config vitest.bench.config.ts",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },

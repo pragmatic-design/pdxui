@@ -28,6 +28,7 @@
     // `"*.ts"` is the package ROOT: `vite.config.ts` and friends. A build config that does
     // not typecheck is a build that breaks on a rename nobody sees, as in `builder` and
     // `showcase`.
-    "include": ["*.ts", "src/**/*.ts", "tests/**/*.ts"],
+    // `bench/` too: a benchmark that does not typecheck times code that no longer exists.
+    "include": ["*.ts", "src/**/*.ts", "tests/**/*.ts", "bench/**/*.ts"],
     "exclude": ["node_modules", "dist"]
 }
