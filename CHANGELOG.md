@@ -59,6 +59,9 @@ semver.
 
 ### Fixes
 
+- The editor no longer reports `Cannot find name` on a call to a `@snippet` or to `$emit`: the
+  snippet is declared as a function of its parameters, `$emit(event, detail?)` is declared, and
+  `$watch` takes `once` and `name` as core's `watch` does. (#206)
 - Style rewrites produce the CSS that was written. A selector list inside `:is()`, `:where()`,
   `:not()` or `:has()` is scoped as one selector instead of being split. `responsive(1rem, 2rem)`
   grows by 1rem (taken as 16px) across the range instead of 1px. `bind()` follows a `$signal` and a
