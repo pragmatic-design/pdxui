@@ -12,7 +12,9 @@
         body { font-family: var(--pdx-font-sans, system-ui); padding: 40px; margin: 0; }
         section { margin-bottom: 60px; padding: 20px; }
         section[hidden] { display: none; }
-        h3 { margin: 0 0 16px; color: #666; font-size: 14px; text-transform: uppercase; }
+        /* The theme's muted text, which every theme holds at AA on its bg in both schemes: a fixed
+           grey read 3.15-3.64:1 on the dark grounds, and the builder's oracle failed the page (#213). */
+        h3 { margin: 0 0 16px; color: var(--pdx-color-muted, #595959); font-size: 14px; text-transform: uppercase; }
         .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
     </style>
     <script type="module">
