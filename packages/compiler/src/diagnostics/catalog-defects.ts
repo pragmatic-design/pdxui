@@ -283,6 +283,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: '`<pdx-field-list :item-fields="[{ name, required: true }]">`, which registers the rule as each row is added.',
         reproducedIn: `${T}form-directive.test.ts`,
     },
+    PDX_FORM_UNKNOWN_RULE: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@form` rule that is neither a core validator nor a function of the script.',
+        explanation: 'The rule is called by its name, and nothing of that name exists: the form throws when it is created.',
+        fix: 'Use one of core\'s rules (`required`, `minLength`, `email`, …), or declare a function that returns a validator: `function shout() { return (v) => (ok ? null : \'message\'); }`.',
+        example: {
+            bad: pdx('<p>x</p>', '@form f: { name: string { shout } };'),
+            good: pdx('<p>x</p>', '@form f: { name: string { shout } };\nfunction shout() { return (v) => (v === String(v).toUpperCase() ? null : \'Shout it\'); }'),
+        },
+    },
     PDX_FORM_FIELD_UNPARSED: {
         severity: 'warn', category: 'defect',
         summary: 'A `@form` field the compiler did not understand.',

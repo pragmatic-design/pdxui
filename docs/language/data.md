@@ -27,7 +27,6 @@ OptionKey    ::= "key" | "staleTime" | "retry" | "tags" | "enabled" | "transform
                | "onSuccess" | "onError" | "cache" | "stale"
 ```
 
-The whole declaration is one line.
 
 #### Semantics
 
@@ -40,7 +39,7 @@ inside an effect, so a change to anything the URL reads fetches again, under the
 resource's `data()`, `error()`, `state()` (`idle`, `loading`, `reloading`, `success`, `stale`, `error`,
 `local`), `loading()` and `status()` are signals; `refetch()`, `mutate(value)` and `abort()` act on it.
 Responses are cached by key and stay fresh for `staleTime` (30 000 ms by default). The options block is
-spliced into the options object as written. The type after `as` is read by the editor and
+spliced into the options object, its signals and props read as in the rest of the script. The type after `as` is read by the editor and
 `pdx check --types` (`name.data()` is `Type | undefined`); nothing is generated for it.
 
 #### Rules
@@ -53,10 +52,9 @@ spliced into the options object as written. The type after `as` is read by the e
 - An option `resource()` does not take is `PDX_FETCH_UNKNOWN_OPTION`. A spread in the block names no
   key and is not checked.
 - A template that never branches on the resource's error is `PDX_FETCH_NO_ERROR_UI` (info).
-- The options are copied as written (#203): a signal or a prop named inside them (`enabled: () => ready`) is
-  not rewritten, and reads a name the module does not have. Not checked today.
-- A declaration continued on the next line loses its options block, and the lines after it reach the
-  setup as code (`PDX_SCRIPT_SYNTAX_ERROR`).
+- The options are an expression like the rest of the script: a signal or a prop named inside them
+  (`enabled: () => ready`) is read (`__ready()`).
+- The declaration may go on to the next lines, its options block opened on the first one.
 - The spec ends at the next occurrence of its opening quote: a URL that contains that character is
   cut there. Not checked today.
 - A name that starts with `_` is not handed to the template.
@@ -142,7 +140,8 @@ before the rest of the setup. Each field starts empty by its type: `number` → 
 `false`, `T[]` → `[]`, any other type → `''`; a rows field (`[{ … }]`) → `[]`, and an object field is
 emitted nested (`address: { city: '' }`), which `createForm` flattens into dotted paths. A field's
 validators are `required()` when its rules say `required`, then each other rule as a call: `min: 18` →
-`min(18)`, `email` → `email()`; every rule name is imported from `@pdxui/core`. An object's sub-fields
+`min(18)`, `email` → `email()`. A rule is one of `@pdxui/core`'s validators, imported from there, or a
+function of the script's own that returns a validator, called the same way. An object's sub-fields
 are validated under their dotted path (`'address.city'`). An external schema compiles to
 `createForm({ initialValues: {}, schema: Name, …options })`, where `Name` is a Standard Schema v1 value
 (Zod, Valibot, ArkType). The options map to `createForm`'s: `save` → `saveMode`, `fields` →
@@ -163,16 +162,15 @@ are validated under their dotted path (`'address.city'`). An external schema com
   (info).
 - `?` makes a field not required even when its rules say `required`; on an object or a rows field it
   changes nothing.
-- A rule name is imported from `@pdxui/core` (#203), so it must be one of core's validators: `required`,
-  `minLength`, `maxLength`, `email`, `pattern`, `url`, `min`, `max`, `integer`. Not checked today.
-- The rules of an object's sub-fields are emitted but not imported: they work only when the module
-  imports the same rule for another field. Not checked today.
+- A rule is one of core's validators — `required`, `minLength`, `maxLength`, `email`, `pattern`, `url`,
+  `min`, `max`, `integer` — or a name the script declares or imports. Anything else is
+  `PDX_FORM_UNKNOWN_RULE`. A script function of the same name as a core rule replaces it.
 - A rule argument cannot contain `,` or `}`. Not checked today.
 - Options are separated by `;` or a line break, not by commas; an option the list above does not name
   is ignored. Not checked today.
-- The schema and the `validate`, `source` and `parent` expressions are evaluated where the form is
-  created, before the script's own statements: a `const` declared in the same script (#203) is not yet
-  initialised there (a function declaration is). Not checked today.
+- The form is created before the script's own statements, unless its schema, its `validate`, `source`
+  or `parent`, or a rule of the script's own reads a `const`, `let` or `var` the script declares: then
+  it is created right after the statement that declares it, wherever the `@form` was written.
 - A name that starts with `_` is not handed to the template.
 
 #### Examples

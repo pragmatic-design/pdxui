@@ -14,6 +14,7 @@ import { lateSignals, lateSignalOffsets, insertLateSignalMarkers, replaceLateSig
 import { originMark } from './sourcemap';
 import { maskNonCode } from './tokenizer';
 import { jsQuote, jsString } from './js-literal';
+import { formRuleNames, CORE_FORM_RULES } from './form-rules';
 
 // ─── Public API ────────────────────────────────────────────────────
 
@@ -172,7 +173,12 @@ export function buildSetupBody(
             const fetchUrl = f.hasReactiveParams ? rewriteAll(`\`${safeUrl}\``) : jsString(f.url);
             const optsEntries: string[] = [`key: ${cacheKey}`];
             if (f.options) {
-                optsEntries.push(f.options.slice(1, -1).trim());
+                // Rewritten like any script expression: `enabled: () => ready` reads the signal
+                // (`__ready()`), not a name the module does not have (#203). In parentheses so the
+                // block parses as an object, not as statements.
+                const rewritten = rewriteAll(`(${f.options})`);
+                const object = rewritten.startsWith('(') && rewritten.endsWith(')') ? rewritten.slice(1, -1) : f.options;
+                optsEntries.push(object.trim().slice(1, -1).trim());
             }
             parts.push(`    const ${f.name} = resource(() => __httpClient.get(${fetchUrl}), { ${optsEntries.join(', ')} });`);
         }
@@ -180,6 +186,19 @@ export function buildSetupBody(
 
     // @form declarations → createForm() calls with field configs
     // (BEFORE derived — derived may reference form state)
+    //
+    // A form whose schema, `validate`, `source`, `parent` or a rule of the script's own reads a
+    // `const`/`let` the script declares cannot go before the body: it would read it in its temporal dead
+    // zone. Such a form is late, declared right after the statement that declares what it reads (#203).
+    const tdzLocals = collectBodyLocalTdzNames(analysis.body);
+    const lateForms: { name: string; initialExpr: string; declare: () => string }[] = [];
+    const placeForm = (f: (typeof analysis.forms)[number], decl: string): void => {
+        const reads = [f.schemaExpr, f.validate, f.source, f.parent,
+            ...formRuleNames(f).filter(n => !CORE_FORM_RULES.has(n))].filter(Boolean).join(' ');
+        const readsLocal = [...tdzLocals].some(n => new RegExp(`(?<![\\w$.])${n}(?![\\w$])`).test(reads));
+        if (readsLocal) lateForms.push({ name: f.name, initialExpr: reads, declare: () => decl });
+        else parts.push(decl);
+    };
     for (const f of analysis.forms) {
         // Extended-option tail shared by inline + external forms. `warnUnsaved` goes to createForm,
         // which installs the leave guard itself: the in-app confirm, not window.confirm.
@@ -204,7 +223,7 @@ export function buildSetupBody(
         const tail = optionParts.length > 0 ? `, ${optionParts.join(', ')}` : '';
 
         if (f.kind === 'external') {
-            parts.push(`    const ${f.name} = createForm({ initialValues: {}, schema: ${f.schemaExpr}${tail} });`);
+            placeForm(f, `    const ${f.name} = createForm({ initialValues: {}, schema: ${f.schemaExpr}${tail} });`);
         } else if (f.fields) {
             /** A field's empty value, by declared type. A list type (`string[]`) starts empty. */
             const defaultFor = (type: string) => type.endsWith('[]') ? '[]'
@@ -262,7 +281,7 @@ export function buildSetupBody(
                 formCode += `, validators: { ${validatorEntries.join(', ')} }`;
             }
             formCode += `${tail} });`;
-            parts.push(formCode);
+            placeForm(f, formCode);
         }
     }
 
@@ -335,6 +354,7 @@ export function buildSetupBody(
     const bodyReads = (name: string): boolean => new RegExp(`\\b${name}\\b`).test(bodyForDerived);
     const lateDecls = [
         ...signalsAfterBody.map(s => ({ name: s.name, initialExpr: s.initialExpr, declare: () => declareSignal(s) })),
+        ...lateForms,
         ...derivedsAfterBody.map(d => ({
             name: d.name, initialExpr: d.expr, unplaced: bodyReads(d.name) ? 'start' as const : 'end' as const,
             declare: () => declareDerived(d),
@@ -390,6 +410,7 @@ export function buildSetupBody(
     // signals, then the remaining deriveds.
     if (!lateOffsets) {
         if (signalsAfterBody.length > 0) parts.push(signalsAfterBody.map(declareSignal).join('\n'));
+        for (const form of lateForms) parts.push(form.declare());
         if (derivedsAfterBody.length > 0) parts.push(derivedsAfterBody.map(declareDerived).join('\n'));
     }
 

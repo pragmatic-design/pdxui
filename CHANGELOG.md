@@ -59,6 +59,13 @@ semver.
 
 ### Fixes
 
+- `@fetch` options read signals and props like the rest of the script: `enabled: () => ready`
+  threw `ReferenceError: ready is not defined`, and `ready` was reported unused. A declaration whose
+  options block goes on to the next lines keeps it. `@form` imports from `@pdxui/core` only core's
+  validators, an object's sub-field rules included; a rule of the script's own is called as its
+  function, and a rule that is neither is `PDX_FORM_UNKNOWN_RULE` (error). A form whose schema,
+  `validate`, `source`, `parent` or own rule reads a `const` of the script is created after it,
+  instead of reading it before it is initialised. (#203)
 - Three script forms compile as written. `$derived(a * 2,)` — a trailing comma, also in `$signal`
   and `$store` — no longer emits a module that does not parse, and a `$derived` the compiler cannot
   read reports `PDX_REWRITE_FALLBACK` as a warning instead of only on the console.

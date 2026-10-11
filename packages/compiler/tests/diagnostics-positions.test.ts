@@ -55,6 +55,7 @@ const ROWS: Record<string, Row> = {
     PDX_FETCH_UNKNOWN_OPTION: { src: pdx('<p>{{ users }}</p>', "let a = $signal(1);\n@fetch users: 'GET /api/users' { stalTime: 1 };"), at: '@fetch users' },
     PDX_FORM_NO_SUBMIT: { src: pdx('<p>{{ login }}</p>', 'let a = $signal(1);\n@form login: { email: string { required } };'), at: '@form login' },
     PDX_FORM_ARRAY_RULES_IGNORED: { src: pdx('<p>{{ order }}</p>', 'let a = $signal(1);\n@form order: { lines: [{ name: string { required } }] };'), at: '@form order' },
+    PDX_FORM_UNKNOWN_RULE: { src: pdx('<p>{{ f }}</p>', 'let a = $signal(1);\n@form f: { name: string { required, shout } };'), at: 'shout' },
     PDX_FORM_FIELD_UNPARSED: { src: pdx('<p>{{ x }}</p>', 'let a = $signal(1);\n@form x: {\n  a: string,\n  weird: <<nonsense>>\n};'), at: 'weird' },
     PDX_REWRITE_FALLBACK: { src: pdx('<div>{{ count }}</div>', 'let count = $signal(0);\nfunction bump() { count = ( }'), at: 'function bump()' },
     PDX_LEGACY_IN_SETUP: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\nconst props = defineProps({});'), at: 'defineProps' },
