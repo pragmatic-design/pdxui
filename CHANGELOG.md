@@ -40,6 +40,9 @@ semver.
 
 ### Fixes
 
+- Two dialogs opened from code in one batch — `dialog.open(…)` then `dialog.confirm(…)` in one
+  click — each close on Escape. The one underneath registered its Escape for the dialog on top and
+  never closed. `overlayStack.onDismiss(id, callback)` registers for a given overlay. (#114)
 - Scoped `<style scoped>` rules inside `@container` and `@starting-style` now apply only to the
   component. Before, they were emitted unscoped and applied to every matching element on the page.
   (#104 — entry by @jay23606, from #166)

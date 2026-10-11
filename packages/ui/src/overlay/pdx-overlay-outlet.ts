@@ -281,8 +281,10 @@ component('pdx-overlay-outlet', {
             // A click on the backdrop or on the dialog's text keeps focus inside.
             holdModalFocus(wrapper, panel);
 
-            // Escape dismissal via overlayStack
-            dismissDisposers.set(item.id, overlayStack.onDismissTop(() => {
+            // Escape dismissal via overlayStack, registered under this dialog's own id: the queue
+            // pushed it with that id, and with two opened in one batch the one on top when this runs
+            // is the other one.
+            dismissDisposers.set(item.id, overlayStack.onDismiss(item.id, () => {
                 if (item.type === 'confirm') closeDialog(item, false);
                 else closeDialog(item, undefined);
             }));
