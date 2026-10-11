@@ -5,7 +5,7 @@
 //   node tools/docs/surface-scan.mjs --taught   the other side of the ledger
 //
 // Every exported FUNCTION of `@pdxui/core` and `@pdxui/router`, checked against the text of
-// the narrative pages. `api.md` is excluded from the corpus on purpose: it is generated from this
+// the narrative pages. The API reference (`api.md`, `api-*.md`) is excluded from the corpus on purpose: it is generated from this
 // same surface, so it names every export by construction and would report a documentation set that
 // teaches nothing as fully documented.
 //
@@ -28,7 +28,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { surfaceOfPackage } from '../../packages/site/scripts/gen-api.mjs';
+import { surfaceOfPackage, isApiReferencePage } from '../../packages/site/scripts/gen-api.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DOCS = join(ROOT, 'packages', 'site', 'content', 'docs');
@@ -55,10 +55,10 @@ export function publicFunctions() {
     return found;
 }
 
-/** The narrative pages, as one blob. `api.md` is generated and would match everything. */
+/** The narrative pages, as one blob. The API reference pages are generated and would match everything. */
 export function narrativeText() {
     return readdirSync(DOCS)
-        .filter(f => f.endsWith('.md') && f !== 'api.md')
+        .filter(f => f.endsWith('.md') && !isApiReferencePage(f))
         .map(f => readFileSync(join(DOCS, f), 'utf8'))
         .join('\n');
 }

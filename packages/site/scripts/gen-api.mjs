@@ -1,4 +1,5 @@
-// Generate the API reference page from the code, so it cannot go stale.
+// Generate the API reference from the code, so it cannot go stale: on the site an index and one
+// page per module (MODULE_PAGES), in the skill one page with everything.
 //
 // Prose pages do not name every export — `useMediaQuery`, `onSwipe`, `spring`, the whole
 // form-control registry, the calendar helpers. For a framework that sells itself as agent-native,
@@ -11,8 +12,8 @@
 // Run from `build`, alongside gen-llms.mjs. The output is committed so it is reviewable in a diff,
 // and a test asserts it is current.
 
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { readFileSync, writeFileSync, readdirSync, existsSync, rmSync } from 'node:fs';
+import { join, dirname, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
@@ -20,12 +21,65 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SITE = join(__dirname, '..');
 const PACKAGES = join(SITE, '..');
 const OUT = join(SITE, 'content', 'docs', 'api.md');
-// The same page, where an agent looks: the skill's references. An agent that finds the reference
-// only on the site reads core's dist/index.d.ts to learn what core exports.
+// The reference where an agent looks: the skill's references. An agent that finds the reference
+// only on the site reads core's dist/index.d.ts to learn what core exports. One file there: an
+// agent reads it from disk, and nothing downloads it.
 export const SKILL_OUT = join(PACKAGES, '..', 'marketplace', 'plugins', 'pdxui', 'skills', 'pdxui', 'references', 'api.md');
 
 /** Packages whose surface the reference covers, in the order they appear on the page. */
 const COVERED = ['core', 'router'];
+
+/**
+ * The site's reference is one page per module, and a module is a folder of a package's `src/`.
+ * One page held every export: 175 kB of markdown, a 636 kB chunk to read one entry, and one URL
+ * for all of it. A folder too small to be a page shares one with its neighbours. A folder this
+ * list does not place fails the generation by name: an export is never left off the site.
+ */
+export const MODULE_PAGES = [
+    { slug: 'api-reactivity', title: 'Reactivity', sources: ['core/reactivity'],
+      description: 'Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache.' },
+    { slug: 'api-components', title: 'Components', sources: ['core/component'],
+      description: 'Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures.' },
+    { slug: 'api-rendering', title: 'Rendering', sources: ['core/renderer'],
+      description: 'Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer.' },
+    { slug: 'api-forms', title: 'Forms', sources: ['core/form'],
+      description: 'Forms, fields, field arrays, validators, schemas and form-associated custom elements.' },
+    { slug: 'api-data', title: 'Data and HTTP', sources: ['core/data', 'core/http', 'core/auth'],
+      description: 'The HTTP client and its middleware, uploads, data sources and transports, the data grid model, CSV and XLSX export, and the auth store.' },
+    { slug: 'api-accessibility', title: 'Accessibility', sources: ['core/a11y'],
+      description: 'Focus management, focus traps, roving tabindex, active descendant, live regions and the announcer.' },
+    { slug: 'api-i18n', title: 'Internationalisation', sources: ['core/i18n'],
+      description: 'Locales and translations, ICU messages, the $t, $d, $n and $r formatters, component strings and right-to-left direction.' },
+    { slug: 'api-calendar', title: 'Calendar', sources: ['core/calendar'],
+      description: 'Date arithmetic, month grids, week, quarter and fiscal ranges, ISO dates: the engine behind the date components.' },
+    { slug: 'api-browser', title: 'Browser and device', sources: ['core/browser', 'core/mobile', 'core/navigation'],
+      description: 'Storage, online and idle state, the title and head, media queries, scroll, the splash screen, bottom sheets, pull-to-refresh, safe areas and the route trail.' },
+    { slug: 'api-testing', title: 'Testing', sources: ['core/testing'],
+      description: 'Mounting a component in a test, queries by role, text and test id, events, typing and waiting.' },
+    { slug: 'api-devtools', title: 'Debugging and devtools', sources: ['core/debug', 'core/devtools'],
+      description: 'The devtools entry point and overlay, the debug handle, telemetry and navigation recording.' },
+    { slug: 'api-utilities', title: 'Security and utilities', sources: ['core/security', 'core/utils'],
+      description: 'URL sanitising and the development flag.' },
+    { slug: 'api-router', title: 'Router', sources: ['router/*'],
+      description: 'Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching.' },
+];
+
+/**
+ * Whether a file in content/docs is one of the generated reference pages. They name every export
+ * by construction, so the scans that ask "which exports does no page explain" leave them out.
+ */
+export const isApiReferencePage = (file) => /^api(-[a-z0-9-]+)?\.md$/.test(file);
+
+/** The module of an export: its package and the first folder of `src/` its declaration is in. */
+function moduleOf(pkgName, file) {
+    const parts = relative(join(PACKAGES, pkgName, 'src'), file).split(sep);
+    return `${pkgName}/${parts.length > 1 ? parts[0] : parts[0].replace(/\.ts$/, '')}`;
+}
+
+function pageOf(module) {
+    const pkg = module.split('/')[0];
+    return MODULE_PAGES.find(p => p.sources.includes(module) || p.sources.includes(`${pkg}/*`));
+}
 
 /**
  * Map every export name of a package to the sub-path a consumer must import it from.
@@ -114,7 +168,7 @@ function surfaceOf(file, seen = new Set()) {
                 const local = (el.propertyName ?? el.name).getText(source);
                 const name = el.name.getText(source);
                 const got = inner.get(local);
-                found.set(name, got ? { ...got, name } : { name, signature: name, doc: '' });
+                found.set(name, got ? { ...got, name } : { name, signature: name, doc: '', file });
             }
             continue;
         }
@@ -136,12 +190,13 @@ function surfaceOf(file, seen = new Set()) {
                     // Keep the fuller of the two: later declarations refine the signature, and the
                     // implementation of an overloaded function usually has no doc of its own.
                     doc: (doc.length >= (prev?.doc?.length ?? 0)) ? doc : prev.doc,
+                    file,
                 });
             }
         } else if (ts.isVariableStatement(stmt)) {
             for (const d of stmt.declarationList.declarations) {
                 const name = d.name.getText(source);
-                found.set(name, { name, signature: signatureOf(stmt, name), doc: docOf(stmt) });
+                found.set(name, { name, signature: signatureOf(stmt, name), doc: docOf(stmt), file });
             }
         }
     }
@@ -191,22 +246,114 @@ function render() {
         const surface = surfaceOfPackage(pkgName);
         const names = [...surface.keys()].sort((a, b) => a.localeCompare(b));
         lines.push(`## @pdxui/${pkgName}`, '', `${names.length} value exports.`, '');
-        for (const name of names) {
-            const { signature, doc, specifier } = surface.get(name);
-            lines.push(`### \`${name}\``, '');
-            lines.push('```ts', `import { ${name} } from '${specifier}';`, '', signature, '```', '');
-            if (doc) lines.push(doc, '');
-        }
+        for (const name of names) lines.push(...entryLines('###', name, surface.get(name)));
     }
     return lines.join('\n');
 }
 
-// Run directly (not imported by the test). A file:// URL comparison is unreliable on Windows.
-if (process.argv[1]?.endsWith('gen-api.mjs')) {
-    const out = render();
-    writeFileSync(OUT, out);
-    writeFileSync(SKILL_OUT, out);
-    console.log(`api.md: ${out.split('\n').length} lines (site docs + pdxui skill references)`);
+/** One export: its heading, the import that works, its signature and its doc. */
+function entryLines(depth, name, { signature, doc, specifier }) {
+    const lines = [`${depth} \`${name}\``, ''];
+    lines.push('```ts', `import { ${name} } from '${specifier}';`, '', signature, '```', '');
+    if (doc) lines.push(doc, '');
+    return lines;
 }
 
-export { render };
+/** The id the site's markdown gives the heading of `name` (vite-markdown.ts, `slugify`). */
+const anchorOf = (name) => name.toLowerCase().replace(/[^\w-]/g, '');
+
+/**
+ * The site's reference: `api.md`, the index, and one `api-<module>.md` per entry of MODULE_PAGES.
+ * Returns file name → content.
+ */
+function renderPages() {
+    /** slug → [name, info][] */
+    const byPage = new Map(MODULE_PAGES.map(p => [p.slug, []]));
+    const unplaced = [];
+    for (const pkgName of COVERED) {
+        for (const [name, info] of surfaceOfPackage(pkgName)) {
+            const module = moduleOf(pkgName, info.file);
+            const page = pageOf(module);
+            if (page) byPage.get(page.slug).push([name, info]);
+            else unplaced.push(`${name} (${module})`);
+        }
+    }
+    if (unplaced.length) {
+        throw new Error(`gen-api: no page in MODULE_PAGES takes these exports: ${unplaced.join(', ')}`);
+    }
+    const sorted = (list) => [...list].sort((a, b) => a[0].localeCompare(b[0]));
+
+    const files = new Map();
+    for (const page of MODULE_PAGES) {
+        const entries = sorted(byPage.get(page.slug));
+        if (entries.length === 0) throw new Error(`gen-api: ${page.slug} has no exports — drop it from MODULE_PAGES`);
+        const lines = [
+            '---',
+            `title: ${page.title} API`,
+            `description: "${page.description}"`,
+            'order: 24',
+            // Not in the docs nav: the reference index is, and it links here.
+            'parent: api',
+            '---',
+            '',
+            `# ${page.title} API`,
+            '',
+            `${page.description} ${entries.length} exports, from ${[...new Set(entries.map(([, i]) => `\`${i.specifier}\``))].join(' and ')}.`,
+            '',
+            'Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.',
+            '',
+        ];
+        for (const [name, info] of entries) lines.push(...entryLines('##', name, info));
+        files.set(`${page.slug}.md`, lines.join('\n'));
+    }
+
+    const index = [
+        // Frontmatter: the docs route builds its nav from the glob and orders by this. Without it
+        // the page exists, renders, and is reachable only by typing the URL — which is the defect
+        // this page was written to fix.
+        '---',
+        'title: API reference',
+        'description: "Every value export of @pdxui/core and @pdxui/router, one page per module, with the import specifier that works. Generated from the source."',
+        'order: 24',
+        '---',
+        '',
+        '# API reference',
+        '',
+        'Generated from the source by `packages/site/scripts/gen-api.mjs` — every value export of',
+        '`@pdxui/core` and `@pdxui/router`, one page per module, with the specifier that actually',
+        'imports it. The prose pages are the place to start; this is the index they link into.',
+        '',
+        'A symbol reachable only from a sub-path shows that sub-path. `mount` is in',
+        '`@pdxui/core/testing`, not in the barrel, and that distinction is what these pages exist',
+        'to make visible.',
+        '',
+        '## Modules',
+        '',
+    ];
+    for (const page of MODULE_PAGES) {
+        index.push(`- [${page.title}](/docs/${page.slug}) — ${page.description} ${byPage.get(page.slug).length} exports.`);
+    }
+    index.push('', '## Every export, A–Z', '');
+    const all = [];
+    for (const page of MODULE_PAGES) for (const [name] of byPage.get(page.slug)) all.push([name, page.slug]);
+    all.sort((a, b) => a[0].localeCompare(b[0]));
+    index.push(all.map(([name, slug]) => `[\`${name}\`](/docs/${slug}#${anchorOf(name)})`).join(' · '), '');
+    files.set('api.md', index.join('\n'));
+    return files;
+}
+
+// Run directly (not imported by the test). A file:// URL comparison is unreliable on Windows.
+if (process.argv[1]?.endsWith('gen-api.mjs')) {
+    const pages = renderPages();
+    const docs = dirname(OUT);
+    // A module page that is no longer generated goes: a stale page is a URL that lies.
+    for (const f of readdirSync(docs)) {
+        if (isApiReferencePage(f) && !pages.has(f)) rmSync(join(docs, f));
+    }
+    for (const [f, text] of pages) writeFileSync(join(docs, f), text);
+    const out = render();
+    writeFileSync(SKILL_OUT, out);
+    console.log(`api: ${pages.size} site pages; skill reference ${out.split('\n').length} lines`);
+}
+
+export { render, renderPages };

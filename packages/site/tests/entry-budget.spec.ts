@@ -10,7 +10,7 @@
  * suite's web server just built. Node-side: no browser.
  */
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
@@ -32,6 +32,31 @@ test('the entry chunk is under the budget', () => {
     const bytes = readFileSync(join(dist, src!));
     const gzipKb = gzipSync(bytes).length / 1024;
     expect(gzipKb, `${src}: ${(bytes.length / 1024).toFixed(0)} kB, ${gzipKb.toFixed(0)} kB gzip`).toBeLessThanOrEqual(ENTRY_BUDGET_KB);
+});
+
+/**
+ * kB a docs page's chunk may weigh: Vite's own warning threshold. A page loads only when it is
+ * opened, but it is one download to read one section of it. The API reference was one page, 636 kB
+ * to look up one export; it is one page per module now (scripts/gen-api.mjs, MODULE_PAGES).
+ */
+const DOC_CHUNK_KB = 500;
+
+test('no docs page is a chunk over the budget', () => {
+    const docs = readdirSync(fileURLToPath(new URL('../content/docs/', import.meta.url)))
+        .filter(f => f.endsWith('.md')).map(f => f.replace(/\.md$/, ''));
+    const chunks = readdirSync(join(dist, 'assets')).filter(f => f.endsWith('.js'));
+    const sizes: string[] = [];
+    let found = 0;
+    for (const slug of docs) {
+        // Vite names a doc's chunk after its file: `api-reactivity-<hash>.js`.
+        const chunk = chunks.find(f => new RegExp(`^${slug}-[\\w-]{8}\\.js$`).test(f));
+        if (!chunk) continue;
+        found++;
+        const kb = statSync(join(dist, 'assets', chunk)).size / 1024;
+        if (kb > DOC_CHUNK_KB) sizes.push(`${chunk}: ${kb.toFixed(0)} kB`);
+    }
+    expect(found, 'no docs chunk found: the naming this test reads has changed').toBeGreaterThan(10);
+    expect(sizes, 'docs chunks over the budget').toEqual([]);
 });
 
 test('the compiler and TypeScript are not in the entry chunk', () => {

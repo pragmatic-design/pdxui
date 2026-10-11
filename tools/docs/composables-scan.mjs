@@ -4,7 +4,7 @@
 //   node tools/docs/composables-scan.mjs --all      every composable, with its state
 //   node tools/docs/composables-scan.mjs --count    one number
 //
-// `api.md` is excluded on purpose: it is generated from the surface, so it mentions every export by
+// The API reference (`api.md`, `api-*.md`) is excluded on purpose: it is generated from the surface, so it mentions every export by
 // construction and would make this scan pass on a documentation set that teaches nothing. What is
 // measured is the NARRATIVE pages — the ones a reader reads.
 //
@@ -19,7 +19,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { surfaceOfPackage } from '../../packages/site/scripts/gen-api.mjs';
+import { surfaceOfPackage, isApiReferencePage } from '../../packages/site/scripts/gen-api.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DOCS = join(ROOT, 'packages', 'site', 'content', 'docs');
@@ -51,10 +51,10 @@ export function composables() {
     return found;
 }
 
-/** The narrative pages, as one blob. `api.md` is generated and would match everything. */
+/** The narrative pages, as one blob. The API reference pages are generated and would match everything. */
 export function narrativeText() {
     return readdirSync(DOCS)
-        .filter(f => f.endsWith('.md') && f !== 'api.md')
+        .filter(f => f.endsWith('.md') && !isApiReferencePage(f))
         .map(f => readFileSync(join(DOCS, f), 'utf8'))
         .join('\n');
 }

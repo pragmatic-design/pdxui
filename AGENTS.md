@@ -70,7 +70,7 @@ These are generated. Change the source and run the command; the gate fails when 
 | the `exports` of `packages/ui/package.json` | the component folders | `pnpm --dir packages/ui run exports` |
 | `packages/ui/tests/scenarios/generated/`, `…/contracts/generated/` | the certification manifests | `pnpm certify:gen` |
 | the skill catalogue under `marketplace/plugins/pdxui/skills/` | `custom-elements.json`, the site's summaries, the sources' events | `node marketplace/plugins/pdxui/skills/pdxui/tools/gen-catalog.mjs` and `gen-topics.mjs` |
-| `packages/site/content/docs/api.md` and the skill's `api.md` | core's public surface | `node packages/site/scripts/gen-api.mjs` |
+| `packages/site/content/docs/api.md`, the `api-*.md` module pages, and the skill's `api.md` | core's and router's public surface | `node packages/site/scripts/gen-api.mjs` |
 
 A snapshot (`__snapshots__/*.snap`) is updated with `vitest -u` only after reading every line of its
 diff. A change under `marketplace/` raises the plugin's `version` in `.claude-plugin/marketplace.json`
