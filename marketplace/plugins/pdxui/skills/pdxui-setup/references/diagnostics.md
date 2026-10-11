@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 67 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 68 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -641,6 +641,42 @@ write:
 A syntax error in the setup would reach the generated module as broken code. It is reported with its position in the script.
 
 **Fix.** Fix the syntax at the reported line.
+
+### PDX_SIGNAL_MUTATED_IN_PLACE
+
+*warn* — A `$signal`'s value changed in place: a mutating method (`push`, `splice`, `set`, `add`…) or a write to a member (`user.name = …`, `items[0] = …`).
+
+A signal notifies when it is set, and `set` compares with `Object.is`. Changing the array or object it already holds calls no `set` at all, so nothing that reads the signal updates: the list on screen does not grow. A `$store` is a proxy, where in-place mutation is the point, and is not reported.
+
+**Fix.** Assign a new value: `items = [...items, x]` for a push, `user = { ...user, name: v }` for a field. The fix rewrites those two; the other forms get the hint. A value meant to be changed in place is a `$store`. `pdx check --fix` and the editor apply it.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ items.length }}</p>
+</template>
+<script setup>
+let items = $signal<number[]>([]);
+function add(x: number) {
+  items.push(x);
+}
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ items.length }}</p>
+</template>
+<script setup>
+let items = $signal<number[]>([]);
+function add(x: number) {
+  items = [...items, x];
+}
+</script>
+```
 
 ### PDX_STORE_EXPORT
 

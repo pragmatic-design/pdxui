@@ -55,7 +55,7 @@ const TYPE_ERRORS_SHOWN: Record<string, { tsCode: number; why: string }[]> = {
     'diagnostics catalogue PDX_ROUTE_FIELD_INVALID (good)': [{ tsCode: 2304, why: '#185' }],
     // The editor's projection declares neither a @snippet's name nor $emit; both compile (#206).
     'docs/language/script.md:450': [{ tsCode: 2304, why: '#206' }],
-    'docs/language/script.md:791': [{ tsCode: 2304, why: '#206' }],
+    'docs/language/script.md:797': [{ tsCode: 2304, why: '#206' }],
 };
 
 const EXAMPLES = [...docsExamples(), ...skillExamples().filter(e => !e.partial), ...languageExamples(), ...CATALOGUE].map(e => ({
@@ -66,6 +66,13 @@ const EXAMPLES = [...docsExamples(), ...skillExamples().filter(e => !e.partial),
 describe('the published .pdx examples type-check', () => {
     it('are found', () => {
         expect(EXAMPLES.length).toBeGreaterThan(50);
+    });
+
+    it('excuses only examples that exist', () => {
+        // A key is where an example is; when the page moves it, the entry would excuse nothing and
+        // say nothing, while the example it meant fails under another name.
+        const stale = Object.keys(TYPE_ERRORS_SHOWN).filter(where => !EXAMPLES.some(e => e.where === where));
+        expect(stale, 'TYPE_ERRORS_SHOWN names examples that no longer exist: point them at where the example is now').toEqual([]);
     });
 
     it('with no TypeScript error, and every import resolved', () => {

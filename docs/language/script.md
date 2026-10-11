@@ -593,6 +593,12 @@ the rewritten expression is `undefined`.
 - A destructuring assignment to a signal (`[count] = pair`) is not rewritten, and `count` is not
   defined at run time — not checked today.
 - A plain `let` the template reads and the script changes raises `PDX_NON_REACTIVE`.
+- Changing the value in place — a mutating method (`items.push(x)`, `splice`, `sort`, a `Map`'s or
+  `Set`'s `set`, `add`, `delete`, `clear`) or a write to a member (`user.name = v`, `items[0] = v`,
+  `user.age++`) — sets nothing, so nothing that reads the signal updates: `PDX_SIGNAL_MUTATED_IN_PLACE`
+  (warning), with a fix for `push` (`items = [...items, x]`) and a one-level field
+  (`user = { ...user, name: v }`). A `:ref` target and a `$store` are not reported: setting an
+  element's properties, and mutating a store in place, is what they are for.
 - A signal nothing reads raises `PDX_UNUSED_REACTIVE` (info); a leading `_` silences it.
 - A signal only ever incremented and read to be discarded raises `PDX_VERSION_COUNTER`.
 - A fragment the rewriter cannot parse raises `PDX_REWRITE_FALLBACK`, and the signal is not called there.
