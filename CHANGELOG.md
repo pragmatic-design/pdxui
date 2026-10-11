@@ -22,6 +22,9 @@ semver.
 
 ### Changed
 
+- An effect reading a computed runs only when the computed's value changed. A source change used
+  to re-run it even when the computed recomputed to the same value: `computed(() => n() % 2)` and
+  three writes of `n` that keep it at 1 ran an effect on it three times, now none. (#115)
 - A template event handler runs inside `batch()`: `@click="a = 1; b = 1; c = 1"` runs an effect
   reading the three once, on the finished state, instead of three times on states half written. An
   `async` handler is batched up to its first `await`; code outside a template handler still flushes
