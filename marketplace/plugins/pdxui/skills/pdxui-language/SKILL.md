@@ -85,7 +85,8 @@ it doing five things.
 
 ⚠️ **A `$signal`'s value is replaced, never changed in place.** `items.push(x)` or `user.name = v` sets
 nothing, so nothing on screen updates. Write `items = [...items, x]` and `user = { ...user, name: v }`.
-The compiler reports the in-place form as `PDX_SIGNAL_MUTATED_IN_PLACE`, and `pdx check --fix` rewrites
+The compiler reports the in-place form as `PDX_SIGNAL_MUTATED_IN_PLACE` — in the script and in a
+template handler (`@click="items.push(x)"`) — and `pdx check --fix` rewrites
 a push and a field. A list or object you want to mutate in place is a `$store`; a `:ref` target (an
 element) is not reported.
 

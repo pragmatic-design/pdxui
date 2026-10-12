@@ -27,7 +27,8 @@ count = 5;      // → __count.setRaw(5)
 A signal notifies when it is **set**. Changing the array or object it holds in place sets nothing, so
 nothing that reads it updates: `items.push(x)` leaves the list on screen as it was. Assign a new value
 instead — `items = [...items, x]`, `user = { ...user, name: v }`. The compiler reports the in-place
-form as `PDX_SIGNAL_MUTATED_IN_PLACE`, with that fix for a push and a field. A value meant to be
+form as `PDX_SIGNAL_MUTATED_IN_PLACE`, in the script and in a template handler
+(`@click="items.push(x)"`), with that fix for a push and a field. A value meant to be
 changed in place is a [`$store`](/docs/store); a `:ref` target, which holds an element, is not reported.
 
 An **assignment stores the value as it is**, a function too; an **update** (`++`, `--`, `+=` and the

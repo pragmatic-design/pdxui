@@ -4,14 +4,17 @@
 // `$signal([])` mutates the array the signal already holds, so no `set` runs and nothing that reads
 // `items` updates. The rewriter only rewrites assignments to the name itself, so this is valid
 // JavaScript that compiles and does nothing visible. Reported where it is written, over the script's
-// TypeScript tree; `push` and a one-level property assignment carry the fix to the immutable form. A
-// $store is a proxy, where in-place mutation is the point, and is not in the set of names checked.
+// TypeScript tree and over each template event handler's (#210); `push` and a one-level property
+// assignment carry the fix to the immutable form. A $store is a proxy, where in-place mutation is the
+// point, and is not in the set of names checked.
 
 import ts from 'typescript';
 import type { SFCDescriptor } from '../parser/sfc';
+import type { TemplateNode, HtmlNode } from '../parser/template';
 import type { ScriptAnalysis } from './script-analyzer-types';
 import type { ValidationWarning, FixProposal } from './validate';
 import { parseableScript } from './validate-design';
+import { bindingNames } from './codegen-prefix';
 
 /** Array, Map and Set methods that change the object they are called on. */
 const MUTATING_METHODS = new Set([
@@ -68,22 +71,106 @@ function writeTarget(n: ts.Node): ts.Expression | null {
     return null;
 }
 
+/** A template event handler's code, where it starts in the template's content, and the names the template binds around it. */
+interface TemplateHandler {
+    code: string;
+    offset: number;
+    bound: Set<string>;
+}
+
 /**
- * The script's in-place mutations of a $signal value, each positioned in the .pdx, with a fix where
- * the immutable form is one rewrite of the statement.
+ * Every event handler in the template, each with the names in scope where it is written: a `@for`
+ * item and index, a `@let`, a slot's `let:` names, the error and retry names of `@catch` and `@error`.
+ * Those are the template's own values, not the script's $signals, whatever their name.
  */
-export function validateSignalMutation(descriptor: SFCDescriptor, analysis: ScriptAnalysis | null, source: string): ValidationWarning[] {
+function templateHandlers(ast: TemplateNode[]): TemplateHandler[] {
+    const out: TemplateHandler[] = [];
+    const walk = (nodes: TemplateNode[] | undefined, outer: Set<string>): void => {
+        // A `@let` names its value for the rest of its block.
+        const bound = new Set(outer);
+        const plus = (...names: (string | undefined)[]): Set<string> => new Set([...bound, ...names.filter((n): n is string => !!n)]);
+        for (const node of nodes ?? []) {
+            switch (node.type) {
+                case 'html': if (!node.raw) out.push(...handlersIn(node, bound)); break;
+                case 'let': bound.add(node.name); break;
+                case 'for': walk(node.body, plus(...bindingNames(node.item), node.index)); walk(node.emptyBody, bound); break;
+                case 'slot-template': walk(node.body, plus(...node.scopeVars)); break;
+                case 'try': walk(node.body, bound); walk(node.catchBody, plus(node.errorVar, node.retryVar)); break;
+                case 'await':
+                    walk(node.body, bound); walk(node.loading, bound);
+                    walk(node.errorBody, plus(node.errorVar, node.retryVar ?? 'retry'));
+                    break;
+                case 'if': case 'require': walk(node.body, bound); walk(node.elseBody, bound); break;
+                case 'switch': for (const c of node.cases) walk(c.body, bound); walk(node.defaultBody, bound); break;
+                case 'show': case 'portal': case 'custom-directive': walk(node.body, bound); break;
+                case 'defer': walk(node.body, bound); walk(node.placeholder, bound); walk(node.loading, bound); walk(node.error, bound); break;
+            }
+        }
+    };
+    walk(ast, new Set());
+    return out;
+}
+
+/** The event handlers of one piece of markup, positioned in the template's content. */
+function handlersIn(node: HtmlNode, bound: Set<string>): TemplateHandler[] {
+    if (node.loc?.offset === undefined) return [];
+    const base = node.loc.offset;
+    const shifts = node.shifts ?? [];
+    // A comment is not rendered: blanked to spaces, so every index still points where it did.
+    const markup = node.content.replace(/<!--[\s\S]*?-->/g, c => ' '.repeat(c.length));
+    const out: TemplateHandler[] = [];
+    // Match: an event attribute and its quoted handler, `@click="…"` or `@input.prevent='…'`, after the
+    // space that separates it from the tag name or the attribute before it — as the codegen reads it.
+    // Groups: [1]=double-quoted handler [2]=single-quoted handler
+    for (const m of markup.matchAll(/\s@[\w.-]+=(?:"([^"]*)"|'([^']*)')/g)) {
+        const at = m.index + 1;
+        let code = m[1] ?? m[2];
+        let start = m.index + m[0].length - 1 - code.length;
+        // An `@@` escape is text, not an attribute; and past one inside the handler, the content and
+        // the source no longer line up character for character.
+        if (shifts.some(s => s >= at && s < start + code.length)) continue;
+        // `@click="${handler}"` is the same handler, written the way the codegen also accepts.
+        const wrapped = code.match(/^\$\{(.+)\}$/);
+        if (wrapped) { code = wrapped[1]; start += 2; }
+        out.push({ code, offset: base + start + shifts.filter(s => s < at).length, bound });
+    }
+    return out;
+}
+
+/**
+ * The in-place mutations of a $signal value — in the script and in each template event handler —
+ * each positioned in the .pdx, with a fix where the immutable form is one rewrite of the statement.
+ */
+export function validateSignalMutation(
+    descriptor: SFCDescriptor, analysis: ScriptAnalysis | null, source: string, ast?: TemplateNode[],
+): ValidationWarning[] {
     const script = descriptor.script;
+    const template = descriptor.template;
     // A `:ref` target holds an element (or a component's host), and setting its properties —
     // `bar.style.width = …`, `dialog.open = true` — is what it is for, not state the signal tracks.
-    const refs = refTargets(descriptor.template?.content ?? '');
+    const refs = refTargets(template?.content ?? '');
     const signals = new Set((analysis?.signals ?? []).map(s => s.name).filter(n => !refs.has(n)));
-    // A script read from another file has no offsets in this one: its findings could not be placed.
-    if (!script || script.src || signals.size === 0 || !script.content.trim()) return [];
-    const sf = parseableScript(script.content);
-    /** Offset in the .pdx of a node's start, or of a script offset. */
-    const fileOffset = (scriptOffset: number): number => script.start + scriptOffset;
-    const text = (n: ts.Node): string => script.content.slice(n.getStart(sf), n.getEnd());
+    if (signals.size === 0) return [];
+    const warnings: ValidationWarning[] = [];
+    // A block read from another file has no offsets in this one: its findings could not be placed.
+    if (script && !script.src && script.content.trim()) {
+        warnings.push(...mutationsIn(parseableScript(script.content), script.content, script.start, signals, source));
+    }
+    if (template && !template.src && ast) {
+        for (const h of templateHandlers(ast)) {
+            const names = new Set([...signals].filter(n => !h.bound.has(n)));
+            const sf = ts.createSourceFile('__pdx_handler.ts', h.code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+            warnings.push(...mutationsIn(sf, h.code, template.start + h.offset, names, source));
+        }
+    }
+    return warnings;
+}
+
+/** The in-place mutations of `signals` in one parsed piece of code that starts at `base` in the .pdx. */
+function mutationsIn(sf: ts.SourceFile, code: string, base: number, signals: Set<string>, source: string): ValidationWarning[] {
+    /** Offset in the .pdx of an offset in the code. */
+    const fileOffset = (codeOffset: number): number => base + codeOffset;
+    const text = (n: ts.Node): string => code.slice(n.getStart(sf), n.getEnd());
     const warnings: ValidationWarning[] = [];
 
     const report = (n: ts.Node, name: string, what: string, fix?: FixProposal): void => {

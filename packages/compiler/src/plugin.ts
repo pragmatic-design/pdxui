@@ -765,7 +765,7 @@ export function compile(
     // A name declared twice by runes or @prop: the output would keep one of them in silence.
     allWarnings.push(...validateDeclarations(descriptor, source));
     // A $signal's value changed in place: the signal is never set, and nothing updates.
-    allWarnings.push(...validateSignalMutation(descriptor, cachedAnalysis, source));
+    allWarnings.push(...validateSignalMutation(descriptor, cachedAnalysis, source, ast));
 
     // A `${` inside a bound value would be written into the module as it is, and the module would not
     // parse: the build would die in rollup, far from the line at fault. Stop here, at the line.
