@@ -62,8 +62,6 @@
 @page '/components/list';
 @title 'List — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

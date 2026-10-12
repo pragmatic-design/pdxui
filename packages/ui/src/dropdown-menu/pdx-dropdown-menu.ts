@@ -44,7 +44,7 @@ component('pdx-dropdown-menu', {
         label: { type: String, default: '' },
         variant: { type: String, default: 'outline' },
         size: { type: String, default: 'sm' },
-        icon: { type: String, default: '' },
+        icon: { type: String, default: '', iconName: true },
         placement: { type: String, default: 'bottom-start' },
         disabled: { type: Boolean, default: false },
         minWidth: { type: Number, default: 200 },

@@ -5,14 +5,19 @@
 import { signal, effect, component, html } from '@pdxui/core';
 import { resolveIcon } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
-import { registerPragmaticIcons } from './pragmatic-icons';
+import { registerPragmaticResolver } from './pragmatic-resolver';
+
+// How an imported icon reaches the page: `import check from '@pdxui/ui/icons/check'` is the SVG, and
+// this adds it. The compiler emits the pair for every icon a template names (#47).
+export { defineIcons } from './icon-map';
 
 // Register the "pragmatic" set BEFORE component() (= before the customElements.define, which does
 // the synchronous upgrade of the <pdx-icon>s already in the DOM). If the registration happened after
 // (from the body of index.ts, say, which runs after ALL the imports), the first resolveIcon of the icons
 // already mounted would return null and the <svg> would never be rendered (the effect does not re-run). It is the
-// default set → `<pdx-icon name="...">` works out of the box.
-registerPragmaticIcons();
+// default set → `<pdx-icon name="...">` works out of the box. The resolver, not the set: an icon is
+// on the page when something imported it, and a name that is not loads its own module on demand (#47).
+registerPragmaticResolver();
 
 const SIZES: Record<string, number> = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 };
 
@@ -39,8 +44,12 @@ component('pdx-icon', {
 
         // Weight map → stroke-width
         const WEIGHTS: Record<string, number> = { thin: 1, light: 1.5, regular: 2, bold: 2.5, fill: 0 };
+        // Which run of the effect drew last. An icon that arrives after the name changed — loaded on
+        // demand, or fetched — belongs to a run that is no longer the current one and draws nothing.
+        let drawRun = 0;
 
         effect(() => {
+            const run = ++drawRun;
             const el = containerRef();
             if (!el) return;
 
@@ -95,15 +104,17 @@ component('pdx-icon', {
                 fetch(srcProp)
                     .then(r => r.text())
                     .then(text => {
+                        if (run !== drawRun) return;
                         el.innerHTML = sanitizeSVG(text);
                         applySvgAttrs(el, sizePx, weightVal);
                     })
-                    .catch(() => { el.innerHTML = ''; });
+                    .catch(() => { if (run === drawRun) el.innerHTML = ''; });
                 return;
             }
 
             if (nameProp) {
                 resolveIcon(nameProp, setProp || undefined).then(result => {
+                    if (run !== drawRun) return;
                     if (!result) { el.innerHTML = ''; return; }
                     if (typeof result === 'string') {
                         el.innerHTML = sanitizeSVG(result);

@@ -8,6 +8,10 @@ import { uiString } from '../shared/i18n';
 // and no more.
 import '@pdxui/design/components/empty-state';
 import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconInbox from '../icon/pragmatic/inbox';
+defineIcons({ inbox: iconInbox });
 
 /**
  * A placeholder for an empty data view: an icon, a title and a description, with an optional action
@@ -16,7 +20,7 @@ import '../icon/pdx-icon'; // rendered by this component, and registered by nobo
 component('pdx-empty-state', {
     props: {
         /** Icon name */
-        icon: { type: String, default: 'inbox' },
+        icon: { type: String, default: 'inbox', iconName: true },
         /** Title text. Empty: the empty-state.title component string, «No data». */
         title: { type: String, default: '' },
         /** Description text */

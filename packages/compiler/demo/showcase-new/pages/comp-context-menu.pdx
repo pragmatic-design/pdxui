@@ -58,8 +58,6 @@
 @page '/components/context-menu';
 @title 'ContextMenu — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

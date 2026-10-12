@@ -41,9 +41,7 @@
 import { currentPath, navigate } from '@pdxui/router';
 import '@pdxui/router/outlet';
 import '@pdxui/router/link';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 import './showcase-shared.css';
-registerPragmaticIcons();
 
 let menuOpen = $signal(false);
 const path = $derived(currentPath());

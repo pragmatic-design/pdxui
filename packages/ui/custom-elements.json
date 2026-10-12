@@ -7036,7 +7036,8 @@
                 "text": "string"
               },
               "default": "'inbox'",
-              "attribute": "emptyicon"
+              "attribute": "emptyicon",
+              "iconName": true
             },
             {
               "kind": "field",
@@ -9599,7 +9600,8 @@
                 "text": "string"
               },
               "default": "''",
-              "attribute": "icon"
+              "attribute": "icon",
+              "iconName": true
             },
             {
               "kind": "field",
@@ -10006,7 +10008,8 @@
                 "text": "string"
               },
               "default": "'inbox'",
-              "attribute": "icon"
+              "attribute": "icon",
+              "iconName": true
             },
             {
               "kind": "field",
@@ -10573,7 +10576,8 @@
                 "text": "string"
               },
               "default": "'plus'",
-              "attribute": "icon"
+              "attribute": "icon",
+              "iconName": true
             },
             {
               "kind": "field",
@@ -12931,7 +12935,8 @@
                 "text": "string"
               },
               "default": "'image-off'",
-              "attribute": "fallbackicon"
+              "attribute": "fallbackicon",
+              "iconName": true
             },
             {
               "kind": "field",
@@ -14728,7 +14733,8 @@
                 "text": "string"
               },
               "default": "'inbox'",
-              "attribute": "emptyicon"
+              "attribute": "emptyicon",
+              "iconName": true
             },
             {
               "kind": "method",
@@ -16179,7 +16185,8 @@
                 "text": "string"
               },
               "default": "''",
-              "attribute": "brandicon"
+              "attribute": "brandicon",
+              "iconName": true
             },
             {
               "kind": "field",
@@ -22136,7 +22143,8 @@
                 "text": "string"
               },
               "default": "''",
-              "attribute": "icon"
+              "attribute": "icon",
+              "iconName": true
             },
             {
               "kind": "field",
@@ -22551,7 +22559,8 @@
                 "text": "string"
               },
               "default": "''",
-              "attribute": "icon"
+              "attribute": "icon",
+              "iconName": true
             },
             {
               "kind": "field",

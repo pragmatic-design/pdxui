@@ -19,6 +19,8 @@ import { component, html, tryInject, repeatWithSlot } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
 import { uiString } from '../shared/i18n';
+import { defineIcons } from '../icon/icon-map';
+import iconInbox from '../icon/pragmatic/inbox';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/list';
@@ -55,7 +57,7 @@ component('pdx-list', {
         /** The empty state's title. Empty: the list.empty component string, «No items». */
         emptyTitle: { type: String, default: '' },
         emptyDescription: { type: String, default: '' },
-        emptyIcon: { type: String, default: 'inbox' },
+        emptyIcon: { type: String, default: 'inbox', iconName: true },
     },
     setup(ctx) {
         let built = false;
@@ -195,6 +197,9 @@ component('pdx-list', {
                 const emptyTitle = (ctx.emptyTitle() as string) || uiString('list', 'empty');
                 const emptyDesc = ctx.emptyDescription() as string;
 
+                // Its default icon is in the list's chunk: an empty list is what a page shows while
+                // its items load, and loaded on demand it cost a request after the route had (#47).
+                defineIcons({ inbox: iconInbox });
                 const icon = document.createElement('pdx-icon');
                 icon.setAttribute('name', emptyIconName);
                 icon.setAttribute('size', '40');

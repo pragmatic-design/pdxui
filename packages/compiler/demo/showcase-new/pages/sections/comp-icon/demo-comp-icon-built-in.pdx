@@ -1,7 +1,7 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Built-in Pragmatic Icons</h2>
-    <p class="pdx-txt-small pdx-ink-muted">{{ iconCount }} icons included. Zero dependencies. Register with <code>registerPragmaticIcons()</code>.</p>
+    <p class="pdx-txt-small pdx-ink-muted">{{ iconCount }} icons included. Zero dependencies. A page ships the icons it names: the compiler imports each one a template or a script names, and any other name loads on demand. <code>registerPragmaticIcons()</code> puts the whole set on the page, as this gallery does.</p>
 
     <div class="icon-grid">
       @for (iconNames as name; track name) {
@@ -14,11 +14,12 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
-
+      <pre class="pdx-txt-mono"><code>&lt;!-- No setup: the compiler imports check and settings --&gt;
 &lt;pdx-icon name="check" size="lg"&gt;&lt;/pdx-icon&gt;
-&lt;pdx-icon name="settings" size="md"&gt;&lt;/pdx-icon&gt;</code></pre>
+&lt;pdx-icon name="settings" size="md"&gt;&lt;/pdx-icon&gt;
+
+// The whole set up front, for a gallery like this one:
+registerPragmaticIcons();  // from '@pdxui/ui/icon/pragmatic-icons'</code></pre>
     </details>
   </section>
 </template>

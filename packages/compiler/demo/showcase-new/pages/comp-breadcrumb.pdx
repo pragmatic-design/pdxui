@@ -47,8 +47,6 @@
 @page '/components/breadcrumb';
 @title 'Breadcrumb — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

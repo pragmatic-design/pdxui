@@ -4496,7 +4496,6 @@ import { batchHandler, component, computed, effect, html, safeHandler, signal } 
 import { currentPath, navigate } from '@pdxui/router';
 import '@pdxui/router/outlet';
 import '@pdxui/router/link';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 import './showcase-shared.css';
 
 {
@@ -4516,18 +4515,7 @@ component('pdx-app', {
     const __tocNavEl = signal(null, { name: 'app:tocNavEl' });
     const path = computed(() => currentPath(), { name: 'app:path' });
     const section = computed(() => path().startsWith('/components') || path().startsWith('/infra') ? 'components' : 'design', { name: 'app:section' });
-registerPragmaticIcons();
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
+function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     
     function onSearch(evt) {
         __searchQuery.setRaw(evt.target.value);
@@ -4850,7 +4838,7 @@ registerPragmaticIcons();
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:307" });
+}, { name: "app.pdx:305" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -4901,7 +4889,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-accordion.pdx 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-kvdszq");
@@ -4912,7 +4899,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-accordion', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Accordion" });
     ctx.el.setAttribute('data-pdx-kvdszq', '');
 
@@ -4974,7 +4960,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-affix.pdx 1`] 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-5cdsw2");
@@ -4985,7 +4970,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-affix', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Affix — PDX Components" });
     ctx.el.setAttribute('data-pdx-5cdsw2', '');
 
@@ -5109,7 +5093,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-app-layout.pdx
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-6xzcy8");
@@ -5120,7 +5103,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-app-layout', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "AppLayout — PDX Components" });
     ctx.el.setAttribute('data-pdx-6xzcy8', '');
 
@@ -5526,7 +5508,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-avatar-group.p
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-t0f3wb");
@@ -5537,7 +5518,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-avatar-group', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "AvatarGroup — PDX Components" });
     ctx.el.setAttribute('data-pdx-t0f3wb', '');
 
@@ -5610,7 +5590,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-badge.pdx 1`] 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-du5o7p");
@@ -5621,7 +5600,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-badge', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Badge Component" });
     ctx.el.setAttribute('data-pdx-du5o7p', '');
 
@@ -5834,7 +5812,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-bottom-nav.pdx
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-6wl0jf");
@@ -5845,7 +5822,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-bottom-nav', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "BottomNav — PDX Components" });
     ctx.el.setAttribute('data-pdx-6wl0jf', '');
 
@@ -5993,7 +5969,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-breadcrumb.pdx
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qr6agz");
@@ -6004,7 +5979,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-breadcrumb', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Breadcrumb — PDX Components" });
     ctx.el.setAttribute('data-pdx-qr6agz', '');
 
@@ -6128,7 +6102,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-button.pdx 1`]
 
 ============================================================
 import { batchHandler, component, computed, eachRow, html, safeHandler, useHead, when } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 import { useButtonConsole } from './sections/comp-button/state.pdx';
 
 {
@@ -6140,10 +6113,7 @@ import { useButtonConsole } from './sections/comp-button/state.pdx';
 component('pdx-comp-button', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
-    
-    
-    // Event console: every section writes to it, the page shows it (sections/comp-button/state.pdx.ts).
+// Event console: every section writes to it, the page shows it (sections/comp-button/state.pdx.ts).
     const buttonConsole = useButtonConsole();
     const logs = computed(() => buttonConsole.logs(), { name: 'comp-button:logs' });
     
@@ -6261,7 +6231,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-button-group.p
 
 ============================================================
 import { batchHandler, component, computed, eachRow, html, safeHandler, useHead, when } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 import { useButtonGroupDemo } from './sections/comp-button-group/state.pdx';
 
 {
@@ -6273,10 +6242,7 @@ import { useButtonGroupDemo } from './sections/comp-button-group/state.pdx';
 component('pdx-comp-button-group', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
-    
-    
-    // Event console: the toggle sections write to it, the page shows it (sections/comp-button-group/state.pdx.ts).
+// Event console: the toggle sections write to it, the page shows it (sections/comp-button-group/state.pdx.ts).
     const demo = useButtonGroupDemo();
     const logs = computed(() => demo.logs(), { name: 'comp-button-group:logs' });
     
@@ -6988,7 +6954,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-chip.pdx 1`] =
 
 ============================================================
 import { batchHandler, component, computed, eachRow, html, safeHandler, useHead, when } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 import { useChipConsole } from './sections/comp-chip/state.pdx';
 
 {
@@ -7000,10 +6965,7 @@ import { useChipConsole } from './sections/comp-chip/state.pdx';
 component('pdx-comp-chip', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
-    
-    
-    // Console: the sections write to it, the page shows it (sections/comp-chip/state.pdx.ts).
+// Console: the sections write to it, the page shows it (sections/comp-chip/state.pdx.ts).
     const chipConsole = useChipConsole();
     const logs = computed(() => chipConsole.logs(), { name: 'comp-chip:logs' });
     
@@ -7285,7 +7247,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-context-menu.p
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-c65e1");
@@ -7296,7 +7257,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-context-menu', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "ContextMenu — PDX Components" });
     ctx.el.setAttribute('data-pdx-c65e1', '');
 
@@ -7370,7 +7330,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-data-grid.pdx 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-2xthh7");
@@ -7381,7 +7340,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-data-grid', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Data Grid — PDX Components" });
     ctx.el.setAttribute('data-pdx-2xthh7', '');
 
@@ -8074,7 +8032,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-description-li
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-r89vt5");
@@ -8085,7 +8042,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-description-list', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "DescriptionList — PDX Components" });
     ctx.el.setAttribute('data-pdx-r89vt5', '');
 
@@ -8166,7 +8122,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-dialog.pdx 1`]
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-xri7uq");
@@ -8177,7 +8132,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-dialog', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Dialog" });
     ctx.el.setAttribute('data-pdx-xri7uq', '');
 
@@ -8333,7 +8287,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-drawer.pdx 1`]
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7cfa8l");
@@ -8344,7 +8297,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-drawer', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Drawer" });
     ctx.el.setAttribute('data-pdx-7cfa8l', '');
 
@@ -8543,7 +8495,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-empty-state.pd
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-kwgytf");
@@ -8554,7 +8505,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-empty-state', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "EmptyState — PDX Components" });
     ctx.el.setAttribute('data-pdx-kwgytf', '');
 
@@ -8784,7 +8734,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-fab.pdx 1`] = 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-8arf7r");
@@ -8795,7 +8744,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-fab', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "FAB — PDX Components" });
     ctx.el.setAttribute('data-pdx-8arf7r', '');
 
@@ -9883,7 +9831,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-image.pdx 1`] 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-zekarx");
@@ -9894,7 +9841,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-image', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Image — PDX Components" });
     ctx.el.setAttribute('data-pdx-zekarx', '');
 
@@ -9999,7 +9945,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-infinite-scrol
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-ruz99k");
@@ -10010,7 +9955,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-infinite-scroll', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "InfiniteScroll — PDX Components" });
     ctx.el.setAttribute('data-pdx-ruz99k', '');
 
@@ -10554,7 +10498,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-list.pdx 1`] =
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-suprvs");
@@ -10565,7 +10508,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-list', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "List — PDX Components" });
     ctx.el.setAttribute('data-pdx-suprvs', '');
 
@@ -10861,7 +10803,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-menu.pdx 1`] =
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-9xravt");
@@ -10872,7 +10813,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-menu', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Menu — PDX Components" });
     ctx.el.setAttribute('data-pdx-9xravt', '');
 
@@ -10981,7 +10921,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-menubar.pdx 1`
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qtv8ca");
@@ -10992,7 +10931,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-menubar', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Menubar — PDX Components" });
     ctx.el.setAttribute('data-pdx-qtv8ca', '');
 
@@ -11084,7 +11022,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-nav-menu.pdx 1
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-enry2r");
@@ -11095,7 +11032,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-nav-menu', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "NavMenu — PDX Components" });
     ctx.el.setAttribute('data-pdx-enry2r', '');
 
@@ -11205,7 +11141,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-navbar.pdx 1`]
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-hv5ofq");
@@ -11216,7 +11151,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-navbar', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Navbar — PDX Components" });
     ctx.el.setAttribute('data-pdx-hv5ofq', '');
 
@@ -11679,7 +11613,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-overlay-stack.
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-rbf8cd");
@@ -11690,7 +11623,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-overlay-stack', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Overlay Stack" });
     ctx.el.setAttribute('data-pdx-rbf8cd', '');
 
@@ -12061,7 +11993,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-popover.pdx 1`
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-eq69t5");
@@ -12072,7 +12003,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-popover', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Popover" });
     ctx.el.setAttribute('data-pdx-eq69t5', '');
 
@@ -13058,7 +12988,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-sidebar.pdx 1`
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-p8blyq");
@@ -13069,7 +12998,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-sidebar', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Sidebar — PDX Components" });
     ctx.el.setAttribute('data-pdx-p8blyq', '');
 
@@ -13479,7 +13407,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-split-button.p
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-j6pdfl");
@@ -13490,7 +13417,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-split-button', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "SplitButton — PDX Components" });
     ctx.el.setAttribute('data-pdx-j6pdfl', '');
 
@@ -13556,7 +13482,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-splitter.pdx 1
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-bxj5mp");
@@ -13567,7 +13492,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-splitter', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Splitter — PDX Components" });
     ctx.el.setAttribute('data-pdx-bxj5mp', '');
 
@@ -13636,7 +13560,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-statistic.pdx 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-lafe2m");
@@ -13647,7 +13570,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-statistic', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Statistic — PDX Components" });
     ctx.el.setAttribute('data-pdx-lafe2m', '');
 
@@ -13804,7 +13726,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-tabs.pdx 1`] =
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-57objs");
@@ -13815,7 +13736,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-tabs', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Tabs" });
     ctx.el.setAttribute('data-pdx-57objs', '');
 
@@ -14221,7 +14141,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-timeline.pdx 1
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-lgupiz");
@@ -14232,7 +14151,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-timeline', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Timeline — PDX Components" });
     ctx.el.setAttribute('data-pdx-lgupiz', '');
 
@@ -14318,7 +14236,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-toast.pdx 1`] 
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-grag87");
@@ -14329,7 +14246,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-toast', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Toast" });
     ctx.el.setAttribute('data-pdx-grag87', '');
 
@@ -14588,7 +14504,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-toolbar.pdx 1`
 
 ============================================================
 import { batchHandler, component, html, safeHandler, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-blaxf1");
@@ -14599,10 +14514,7 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-toolbar', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
-    
-    
-    // Toggle active state on toolbar buttons (for demo interactivity). One delegated listener on the
+// Toggle active state on toolbar buttons (for demo interactivity). One delegated listener on the
     // page's root: it hears every toolbar button this page renders, with no wait for them to exist.
     function onToolbarClick(e) {
       const btnEl = e.target.closest && e.target.closest('.pdx-toolbar .pdx-btn');
@@ -14680,7 +14592,6 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-tooltip.pdx 1`
 
 ============================================================
 import { component, html, useHead } from '@pdxui/core';
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4kqsi3");
@@ -14691,7 +14602,6 @@ import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 component('pdx-comp-tooltip', {
   props: {},
   setup(ctx) {
-registerPragmaticIcons();
     useHead({ title: "Tooltip" });
     ctx.el.setAttribute('data-pdx-4kqsi3', '');
 
@@ -33253,7 +33163,7 @@ component('pdx-demo-comp-icon-built-in', {
   render: (ctx) => html\`
   <section>
     <h2 class="pdx-txt-heading section-heading">Built-in Pragmatic Icons</h2>
-    <p class="pdx-txt-small pdx-ink-muted">\${ctx.iconCount} icons included. Zero dependencies. Register with <code>registerPragmaticIcons()</code>.</p>
+    <p class="pdx-txt-small pdx-ink-muted">\${ctx.iconCount} icons included. Zero dependencies. A page ships the icons it names: the compiler imports each one a template or a script names, and any other name loads on demand. <code>registerPragmaticIcons()</code> puts the whole set on the page, as this gallery does.</p>
 
     <div class="icon-grid">
       \${eachRow(() => ctx.iconNames(), (name) => name, (name) => html\`
@@ -33265,11 +33175,12 @@ component('pdx-demo-comp-icon-built-in', {
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
-
+      <pre class="pdx-txt-mono"><code>&lt;!-- No setup: the compiler imports check and settings --&gt;
 &lt;pdx-icon name="check" size="lg"&gt;&lt;/pdx-icon&gt;
-&lt;pdx-icon name="settings" size="md"&gt;&lt;/pdx-icon&gt;</code></pre>
+&lt;pdx-icon name="settings" size="md"&gt;&lt;/pdx-icon&gt;
+
+// The whole set up front, for a gallery like this one:
+registerPragmaticIcons();  // from '@pdxui/ui/icon/pragmatic-icons'</code></pre>
     </details>
   </section>
 \`,
@@ -33429,8 +33340,7 @@ component('pdx-demo-comp-icon-icon-sets', {
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>// Register multiple sets — first one becomes default
-registerPragmaticIcons();  // "pragmatic" set (89 icons)
+      <pre class="pdx-txt-mono"><code>// pdx-icon registers the "pragmatic" set when it loads: the first, so the default
 
 // Add third-party sets alongside
 registerIconSet('lucide', resolver);

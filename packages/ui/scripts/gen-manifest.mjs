@@ -161,6 +161,7 @@ function extractProps(optionsObj, sourceFile, tag) {
         let type = 'string';
         let def;
         let enumType = null;   // an `enum: [...]` field → string-literal union (drives playground dropdown + IntelliSense)
+        let iconName = false;  // `iconName: true` → the value names an icon: the compiler imports a literal one (#47)
         for (const field of decl.initializer.properties) {
             if (!ts.isPropertyAssignment(field)) continue;
             const key = field.name.getText(sourceFile);
@@ -172,6 +173,8 @@ function extractProps(optionsObj, sourceFile, tag) {
             } else if (key === 'enum' && ts.isArrayLiteralExpression(field.initializer)) {
                 const lits = field.initializer.elements.filter(e => ts.isStringLiteralLike(e)).map(e => `'${e.text}'`);
                 if (lits.length >= 2) enumType = lits.join(' | ');
+            } else if (key === 'iconName') {
+                iconName = field.initializer.kind === ts.SyntaxKind.TrueKeyword;
             }
         }
         // A declared `default: null` on a primitive is part of the type: the prop can hold null, and
@@ -182,7 +185,7 @@ function extractProps(optionsObj, sourceFile, tag) {
         // survives the attribute — and without this the catalogue would say `string` beside prose
         // promising a number, leaving an agent no way to know which one the code believes.
         const declaredType = jsdocDeclaredType(decl, sourceFile);
-        props.push({ name, type: declaredType || enumType || type, default: def, description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
+        props.push({ name, type: declaredType || enumType || type, default: def, iconName, description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
     }
     return props;
 }
@@ -728,6 +731,7 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
         kind: 'field', name: p.name, ...(p.description ? { description: p.description } : {}),
         type: { text: p.type }, ...(p.default !== undefined ? { default: p.default } : {}),
         ...(PROP_ONLY.has(p.type) ? {} : { attribute: p.name.toLowerCase() }),
+        ...(p.iconName ? { iconName: true } : {}),
     }));
     // What ctx.expose({...}) puts on the element: methods to call through a ref, and getters to read
     // (a read-only field in the Custom Elements Manifest schema, with no attribute).

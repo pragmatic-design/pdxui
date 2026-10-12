@@ -321,10 +321,20 @@ marks as an icon name.
 
 #### Semantics
 
-A literal `name`, and a literal value of a prop the manifest marks as an icon name (`icon="edit"`),
-import that icon's module at build time; a name that arrives through data is loaded on demand the
-first time it is drawn, and appears a frame later (#47, decided 2026-10-11). `registerPragmaticIcons()`
-loads the whole set up front; the CDN build calls it.
+A literal `name`, a literal value of a prop the manifest marks as an icon name (`<pdx-fab icon="edit">`),
+and a literal value of an `icon` property in the `.pdx` script (`actions([{ icon: 'eye' }])`) import
+that icon's module at build time — the module is the SVG, and the compiler hands it to `defineIcons`
+(#47, decided 2026-10-11; the script case decided 2026-10-12, when loading those on demand measured
+one round trip more on the first screen). A name the compiler cannot see — computed, or written in a
+`.ts` module — is loaded on demand the first time it is drawn, and appears a round trip later; an app
+that wants one on its first screen imports it (`import trash from '@pdxui/ui/icons/trash'`,
+`defineIcons({ trash })`). `registerPragmaticIcons()` loads the whole set up front; `import '@pdxui/ui'`
+(every component, for a page with no compiler) does it first.
+
+Landed (#47). Divergence from the issue: the issue's example `<pdx-button icon="edit">` does not
+exist — `pdx-button` has no icon prop; the nine props marked are `pdx-fab`, `pdx-empty-state`,
+`pdx-split-button`, `pdx-statistic` and `pdx-dropdown-menu` `icon`, `pdx-data-grid` and `pdx-list`
+`emptyIcon`, `pdx-image` `fallbackIcon`, `pdx-navbar` `brandIcon`.
 
 #### Since
 

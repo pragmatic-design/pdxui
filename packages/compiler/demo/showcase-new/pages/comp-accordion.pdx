@@ -43,10 +43,8 @@ data-disabled     Disable individual item</code></pre>
 </template>
 
 <script setup>
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 @page '/components/accordion';
 @title 'Accordion';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

@@ -6,6 +6,8 @@ import { sanitizeHTML } from '../shared/sanitize';
 import { sanitizeUrl, DEV } from '@pdxui/core';
 import { openGridMenu } from './grid-menu';
 import { t } from './grid-i18n';
+import { defineIcons } from '../icon/icon-map';
+import iconMoreHorizontal from '../icon/pragmatic/more-horizontal';
 
 /** `pdx-icon` the first time a cell action names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
@@ -152,6 +154,10 @@ function renderCellContent(value: unknown, col: AnyColumn, row: Record<string, u
                 btn.setAttribute('aria-haspopup', 'menu');
                 btn.setAttribute('aria-expanded', 'false');
                 loadIcon();
+                // The row menu's own icon, whatever the data: in the grid's chunk rather than loaded a
+                // round trip after the rows (#47). Added here, where it is drawn, so the module stays
+                // free of load-time effects. The icons a cell action names come from data.
+                defineIcons({ 'more-horizontal': iconMoreHorizontal });
                 const ic = document.createElement('pdx-icon');
                 ic.setAttribute('name', cell.icon ?? 'more-horizontal');
                 btn.appendChild(ic);

@@ -76,8 +76,6 @@
 @page '/components/menubar';
 @title 'Menubar — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

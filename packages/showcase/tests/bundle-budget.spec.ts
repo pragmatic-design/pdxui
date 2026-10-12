@@ -156,7 +156,15 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // reads the validators) and a submit stops when a value moved under its async validation (#253: every
 // field's value recorded at the start, compared after). Core's form code, in the chunks of the pages
 // that have a form; the entry and the first paint did not move. 380.1 KB measured in CI.
-const BUDGET_KB = { entry: 36, js: 381, css: 59, blocking: 90 };
+// js 381 → 459: every icon of the set is its own chunk now (#47), 359 of them, about 84 KB gzipped in
+// all — and no visitor downloads them all: a page loads the icons it draws, one ~240-byte chunk each.
+// What every page with an icon paid went DOWN: the `pdx-icon` chunk carried the whole set, 16.3 KB,
+// and carries pdx-icon and the map of where each icon is, 6.9 KB. This sum counts every chunk once,
+// which is why it is the number to report and the wrong one to optimise. 458.0 KB measured.
+// blocking 90 → 91: the dashboard's `pdx-list` brings its empty state's icon, `inbox`, which shows
+// while the queue loads (#47). Loaded on demand it was a request after the first paint; it is a few
+// hundred bytes of the preloaded list chunk now. 90.4 KB measured.
+const BUDGET_KB = { entry: 36, js: 459, css: 59, blocking: 91 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

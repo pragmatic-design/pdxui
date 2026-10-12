@@ -48,8 +48,6 @@
 @page '/components/toolbar';
 @title 'Toolbar — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 
 // Toggle active state on toolbar buttons (for demo interactivity). One delegated listener on the
 // page's root: it hears every toolbar button this page renders, with no wait for them to exist.

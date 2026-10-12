@@ -34,8 +34,6 @@
 @page '/components/sidebar';
 @title 'Sidebar — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

@@ -66,4 +66,13 @@ describe('gen-exports adds what the manifest has and the exports map does not', 
         const { exports } = computeExports({ './package.json': './package.json', './a': './dist/a.js' }, []);
         expect(Object.keys(exports).at(-1)).toBe('./package.json');
     });
+
+    it('exports the icon modules as one pattern, @pdxui/ui/icons/<name> (#47)', () => {
+        const { exports } = computeExports({}, []);
+        expect(exports['./icons/*']).toEqual({
+            development: './src/icon/pragmatic/*.ts',
+            types: './dist/icon/pragmatic/*.d.ts',
+            import: './dist/icon/pragmatic/*.js',
+        });
+    });
 });

@@ -27,8 +27,7 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>// Register multiple sets — first one becomes default
-registerPragmaticIcons();  // "pragmatic" set (89 icons)
+      <pre class="pdx-txt-mono"><code>// pdx-icon registers the "pragmatic" set when it loads: the first, so the default
 
 // Add third-party sets alongside
 registerIconSet('lucide', resolver);

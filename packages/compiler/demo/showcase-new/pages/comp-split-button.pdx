@@ -50,8 +50,6 @@
 @page '/components/split-button';
 @title 'SplitButton — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

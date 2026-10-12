@@ -42,10 +42,8 @@
 </template>
 
 <script setup>
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 @page '/components/tooltip';
 @title 'Tooltip';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

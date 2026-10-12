@@ -3,10 +3,10 @@
 // Without them an agent pays for three gaps with browser measurements: event payloads
 // (pdx-tag-input's list is `detail.tags`, not `detail.value`), rendered roles (pdx-select's trigger
 // is a combobox; pdx-transfer's rows are options, not checkboxes), and pdx-icon's names (in
-// pragmatic-icons.ts; the lucide file is an empty registrar). The detail shapes and roles come from the manifest, the icon names from the
+// pragmatic-icon-data.ts; the lucide file is an empty registrar). The detail shapes and roles come from the manifest, the icon names from the
 // icon file: this checks they reach the pages an agent reads.
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { areaText } from './skill-pages';
 
@@ -54,8 +54,10 @@ describe('interactive components say what they render', () => {
 
 describe('pdx-icon lists its names', () => {
     it('every built-in name, read from the file that defines them', () => {
-        const src = readFileSync(join(REPO, 'packages/ui/src/icon/pragmatic-icons.ts'), 'utf-8');
-        const names = [...src.matchAll(/^ {4}'([a-z0-9-]+)':/gm)].map(m => m[1]);
+        // The generated module of each icon (#47), not a second regex over the data file: one written
+        // like the catalogue's extractor would share its blind spot, and `alarm-clock`, an entry with
+        // no indent, was missing from both.
+        const names = readdirSync(join(REPO, 'packages/ui/src/icon/pragmatic')).map(f => f.replace(/\.ts$/, ''));
         expect(names.length, 'the extractor found the set').toBeGreaterThan(300);
         const e = entry('display', 'pdx-icon');
         const missing = names.filter(n => !e.includes('`' + n + '`'));

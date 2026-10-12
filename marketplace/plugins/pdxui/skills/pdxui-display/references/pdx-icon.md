@@ -2,9 +2,27 @@
 
 Crisp SVG icons from a shared set.
 
-**A `name` that is not in the set renders nothing, silently.** The built-in set is `pragmatic`, and
-`pdx-icon` registers it itself, so it is the default: `<pdx-icon name="search">` works with no
-setup. Its names are listed below, generated from `packages/ui/src/icon/pragmatic-icons.ts`.
+**A `name` that is not in the set renders nothing** (in development it says so in the console). The
+built-in set is `pragmatic`, and `pdx-icon` registers it itself, so it is the default:
+`<pdx-icon name="search">` works with no setup. Its names are listed below, generated from
+`packages/ui/src/icon/pragmatic-icon-data.ts`.
+
+**A page ships the icons it draws, not the set.** Each icon is its own module,
+`@pdxui/ui/icons/<name>`, whose default export is the SVG. The compiler imports the ones it can see:
+a literal `<pdx-icon name="check">`, a literal value of an icon prop (`<pdx-fab icon="edit">`,
+`<pdx-empty-state icon="inbox">`), and a literal value of an `icon` property in the `.pdx` script
+(`actions([{ icon: 'eye', … }])`, menu items). Any other name — computed, or written in a `.ts` module
+— loads on demand the first time it is drawn and appears a round trip later. To have one on the first
+screen, import it yourself:
+
+```ts
+import { defineIcons } from '@pdxui/ui/icon/pdx-icon';
+import trash from '@pdxui/ui/icons/trash';
+defineIcons({ trash });
+```
+
+`registerPragmaticIcons()` from `@pdxui/ui/icon/pragmatic-icons` puts the whole set on the page up
+front; `import '@pdxui/ui'` (every component, for a page with no compiler) does it for you.
 
 `set="lucide"` is **not** a library that ships with it: `@pdxui/ui/icon/lucide-icons` exports
 `registerLucideIcons(icons)`, and `icons` is a `{ name: svgString }` map the app provides, for example
@@ -25,7 +43,7 @@ Any other set: `registerIconSet(name, resolver)` from `@pdxui/core`, then `set="
 
 **Renders:** roles `img`
 
-**Built-in names** (358, set `pragmatic`, the default): `arrow-left` `arrow-right` `arrow-up` `arrow-down` `chevron-left` `chevron-right` `chevron-up` `chevron-down` `chevrons-left` `chevrons-right` `home` `menu` `more-horizontal` `more-vertical` `external-link` `check` `check-circle` `x` `x-circle` `plus` `plus-circle` `minus` `minus-circle` `copy` `clipboard` `download` `upload` `refresh` `trash` `edit` `save` `send` `link` `share` `undo` `redo` `mail` `bell` `message-circle` `phone` `search` `filter` `sort-asc` `sort-desc` `list` `type` `bold` `italic` `underline` `align-left` `align-center` `align-right` `grid` `columns` `table` `file` `file-text` `folder` `image` `eye` `eye-off` `lock` `unlock` `settings` `sliders` `alert-circle` `alert-triangle` `info` `help-circle` `loader` `spinner` `user` `users` `shield` `shield-check` `calendar` `clock` `tag` `bookmark` `star` `heart` `zap` `sun` `moon` `circle-user` `sliders-horizontal` `keyboard` `folder-kanban` `share-2` `rows-3` `group` `database` `server` `cloud` `globe` `terminal` `code` `package` `key` `log-in` `log-out` `activity` `trending-up` `bar-chart` `pie-chart` `archive` `arrow-down-left` `arrow-left-right` `arrow-up-right` `at-sign` `award` `badge-alert` `badge-check` `badge-minus` `badge-plus` `badge-x` `banknote` `barcode` `battery` `battery-charging` `bell-off` `bell-ring` `binary` `bluetooth` `book` `book-open` `box` `boxes` `braces` `briefcase` `brush` `bug` `building` `calculator` `calendar-check` `calendar-clock` `calendar-days` `calendar-minus` `calendar-plus` `camera` `chart-area` `chart-bar` `chart-column` `chart-line` `chart-no-axes-column` `chart-pie` `check-square` `chevrons-up-down` `circle` `circle-alert` `circle-check` `circle-dot` `circle-help` `circle-minus` `circle-pause` `circle-play` `circle-plus` `circle-x` `cloud-download` `cloud-off` `cloud-upload` `cog` `coins` `compass` `component` `contact` `corner-down-left` `corner-up-right` `cpu` `credit-card` `crop` `crosshair` `crown` `diamond` `eraser` `expand` `fast-forward` `file-archive` `file-audio` `file-check` `file-code` `file-image` `file-input` `file-json` `file-minus` `file-output` `file-plus` `file-search` `file-spreadsheet` `file-video` `file-x` `files` `film` `fingerprint` `flag` `flip-horizontal` `flip-vertical` `focus` `folder-check` `folder-minus` `folder-open` `folder-plus` `form-input` `forward` `gem` `gift` `git-branch` `git-commit` `git-merge` `git-pull-request` `grab` `graduation-cap` `grip-horizontal` `grip-vertical` `hammer` `hand` `hard-drive` `hash` `heading` `headphones` `highlighter` `history` `hourglass` `id-card` `inbox` `infinity` `key-round` `laptop` `layers` `layout` `layout-dashboard` `layout-grid` `layout-list` `list-checks` `list-filter` `list-minus` `list-ordered` `list-plus` `list-tree` `lock-keyhole` `map` `map-pin` `maximize` `megaphone` `message-square` `message-square-plus` `mic` `mic-off` `minimize` `monitor` `mouse-pointer-click` `move` `music` `navigation` `newspaper` `notebook` `octagon-alert` `omega` `package-check` `package-x` `paintbrush` `palette` `panel-bottom` `panel-left` `panel-right` `panel-top` `pause` `pen-line` `pencil` `pencil-line` `percent` `pi` `pilcrow` `pin` `play` `plug` `pointer` `power` `printer` `qr-code` `quote` `radio` `receipt` `rectangle-horizontal` `rectangle-vertical` `regex` `repeat` `reply` `reply-all` `rewind` `rotate-ccw` `rotate-cw` `route` `rss` `ruler` `satellite` `scan` `scan-barcode` `scan-line` `scissors` `scroll` `shield-alert` `shield-off` `shopping-bag` `shopping-cart` `shrink` `sidebar` `sigma` `signal` `signpost` `skip-back` `skip-forward` `smartphone` `space` `sparkles` `spell-check` `split` `square` `store` `strikethrough` `subscript` `superscript` `tablet` `tags` `target` `test-tube` `text-cursor` `text-cursor-input` `thumbs-down` `thumbs-up` `ticket` `timer` `toggle-left` `toggle-right` `trending-down` `triangle-alert` `trophy` `truck` `usb` `user-check` `user-cog` `user-minus` `user-plus` `user-x` `users-round` `variable` `video` `volume-x` `wallet` `wand-sparkles` `wifi` `wifi-off` `wrench` `dollar-sign` `bar-chart-2` `arrow-down-circle` `gallery-horizontal` `image-off`
+**Built-in names** (359, set `pragmatic`, the default): `arrow-left` `arrow-right` `arrow-up` `arrow-down` `chevron-left` `chevron-right` `chevron-up` `chevron-down` `chevrons-left` `chevrons-right` `home` `menu` `more-horizontal` `more-vertical` `external-link` `check` `check-circle` `x` `x-circle` `plus` `plus-circle` `minus` `minus-circle` `copy` `clipboard` `download` `upload` `refresh` `trash` `edit` `save` `send` `link` `share` `undo` `redo` `mail` `bell` `message-circle` `phone` `search` `filter` `sort-asc` `sort-desc` `list` `type` `bold` `italic` `underline` `align-left` `align-center` `align-right` `grid` `columns` `table` `file` `file-text` `folder` `image` `eye` `eye-off` `lock` `unlock` `settings` `sliders` `alert-circle` `alert-triangle` `info` `help-circle` `loader` `spinner` `user` `users` `shield` `shield-check` `calendar` `clock` `tag` `bookmark` `star` `heart` `zap` `sun` `moon` `circle-user` `sliders-horizontal` `keyboard` `folder-kanban` `share-2` `rows-3` `group` `database` `server` `cloud` `globe` `terminal` `code` `package` `key` `log-in` `log-out` `activity` `trending-up` `bar-chart` `pie-chart` `alarm-clock` `archive` `arrow-down-left` `arrow-left-right` `arrow-up-right` `at-sign` `award` `badge-alert` `badge-check` `badge-minus` `badge-plus` `badge-x` `banknote` `barcode` `battery` `battery-charging` `bell-off` `bell-ring` `binary` `bluetooth` `book` `book-open` `box` `boxes` `braces` `briefcase` `brush` `bug` `building` `calculator` `calendar-check` `calendar-clock` `calendar-days` `calendar-minus` `calendar-plus` `camera` `chart-area` `chart-bar` `chart-column` `chart-line` `chart-no-axes-column` `chart-pie` `check-square` `chevrons-up-down` `circle` `circle-alert` `circle-check` `circle-dot` `circle-help` `circle-minus` `circle-pause` `circle-play` `circle-plus` `circle-x` `cloud-download` `cloud-off` `cloud-upload` `cog` `coins` `compass` `component` `contact` `corner-down-left` `corner-up-right` `cpu` `credit-card` `crop` `crosshair` `crown` `diamond` `eraser` `expand` `fast-forward` `file-archive` `file-audio` `file-check` `file-code` `file-image` `file-input` `file-json` `file-minus` `file-output` `file-plus` `file-search` `file-spreadsheet` `file-video` `file-x` `files` `film` `fingerprint` `flag` `flip-horizontal` `flip-vertical` `focus` `folder-check` `folder-minus` `folder-open` `folder-plus` `form-input` `forward` `gem` `gift` `git-branch` `git-commit` `git-merge` `git-pull-request` `grab` `graduation-cap` `grip-horizontal` `grip-vertical` `hammer` `hand` `hard-drive` `hash` `heading` `headphones` `highlighter` `history` `hourglass` `id-card` `inbox` `infinity` `key-round` `laptop` `layers` `layout` `layout-dashboard` `layout-grid` `layout-list` `list-checks` `list-filter` `list-minus` `list-ordered` `list-plus` `list-tree` `lock-keyhole` `map` `map-pin` `maximize` `megaphone` `message-square` `message-square-plus` `mic` `mic-off` `minimize` `monitor` `mouse-pointer-click` `move` `music` `navigation` `newspaper` `notebook` `octagon-alert` `omega` `package-check` `package-x` `paintbrush` `palette` `panel-bottom` `panel-left` `panel-right` `panel-top` `pause` `pen-line` `pencil` `pencil-line` `percent` `pi` `pilcrow` `pin` `play` `plug` `pointer` `power` `printer` `qr-code` `quote` `radio` `receipt` `rectangle-horizontal` `rectangle-vertical` `regex` `repeat` `reply` `reply-all` `rewind` `rotate-ccw` `rotate-cw` `route` `rss` `ruler` `satellite` `scan` `scan-barcode` `scan-line` `scissors` `scroll` `shield-alert` `shield-off` `shopping-bag` `shopping-cart` `shrink` `sidebar` `sigma` `signal` `signpost` `skip-back` `skip-forward` `smartphone` `space` `sparkles` `spell-check` `split` `square` `store` `strikethrough` `subscript` `superscript` `tablet` `tags` `target` `test-tube` `text-cursor` `text-cursor-input` `thumbs-down` `thumbs-up` `ticket` `timer` `toggle-left` `toggle-right` `trending-down` `triangle-alert` `trophy` `truck` `usb` `user-check` `user-cog` `user-minus` `user-plus` `user-x` `users-round` `variable` `video` `volume-x` `wallet` `wand-sparkles` `wifi` `wifi-off` `wrench` `dollar-sign` `bar-chart-2` `arrow-down-circle` `gallery-horizontal` `image-off`
 
 
 #### Examples
@@ -34,16 +52,17 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Built-in Pragmatic Icons** — {{ iconCount }} icons included. Zero dependencies. Register with `registerPragmaticIcons()`.
-
-```js
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
-```
+**Built-in Pragmatic Icons** — {{ iconCount }} icons included. Zero dependencies. A page ships the icons it names: the compiler imports each one a template or a script names, and any other name loads on demand. `registerPragmaticIcons()` puts the whole set on the page, as this gallery does.
 
 ```html
+<!-- No setup: the compiler imports check and settings -->
 <pdx-icon name="check" size="lg"></pdx-icon>
 <pdx-icon name="settings" size="md"></pdx-icon>
+```
+
+```js
+// The whole set up front, for a gallery like this one:
+registerPragmaticIcons();  // from '@pdxui/ui/icon/pragmatic-icons'
 ```
 
 **Sizes** — 5 preset sizes. Optical size compensation adjusts stroke weight for smaller icons.
@@ -107,8 +126,7 @@ registerIconSet('lucide', (name) => lucideIcons[name]);
 **Multiple Icon Sets** — Register multiple sets and use them simultaneously. The first registered becomes the default. Use the `set` prop to pick a specific set per icon.
 
 ```js
-// Register multiple sets — first one becomes default
-registerPragmaticIcons();  // "pragmatic" set (89 icons)
+// pdx-icon registers the "pragmatic" set when it loads: the first, so the default
 
 // Add third-party sets alongside
 registerIconSet('lucide', resolver);

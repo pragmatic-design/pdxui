@@ -92,13 +92,11 @@
 </template>
 
 <script setup>
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 import { useButtonConsole } from './sections/comp-button/state.pdx';
 
 @page '/components/button';
 @title 'Button Component';
 
-registerPragmaticIcons();
 
 // Event console: every section writes to it, the page shows it (sections/comp-button/state.pdx.ts).
 const buttonConsole = useButtonConsole();
