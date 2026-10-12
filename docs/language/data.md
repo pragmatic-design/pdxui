@@ -162,6 +162,12 @@ are validated under their dotted path (`'address.city'`). An external schema com
 `Form`: `fields.x` (`value()`, `error()`, `touched()`, `onChange(v)`, `onBlur()`), `valid()`,
 `errors()`, `dirty()`, `getValues()`, `handleSubmit(fn)`, `reset()`, `array(name)`.
 
+`handleSubmit(fn)` returns a handler that returns the submit's promise; a second submit while one
+runs sends nothing and returns the running one's. An autosave (`saveMode` other than `onSubmit`)
+whose `onFieldSave` callback returns its save's promise keeps one save per field in flight and at
+most one waiting, which starts with the field's newest value when the one in flight settles —
+rules F2 and F7 of the beta reference (#279).
+
 #### Rules
 
 - A declaration without the colon after the name (`@form user { … }`), or whose schema is not one

@@ -113,7 +113,7 @@ declare global {
     readonly validateOn: 'onChange' | 'onBlur' | 'onSubmit';
     readonly state: PdxReadonly<'idle' | 'validating' | 'submitting' | 'success' | 'error'>;
     readonly submitError: PdxReadonly<unknown>;
-    handleSubmit(fn: (values: V) => Promise<void> | void): (e: Event) => void;
+    handleSubmit(fn: (values: V) => Promise<void> | void): (e: Event) => Promise<void>;
     reset(newValues?: Partial<V>): void;
     setValues(values: Partial<V>): void;
     validate(): Promise<boolean>;
@@ -122,7 +122,7 @@ declare global {
     // TypeScript cannot relate core's conditional return across two different value types.
     array<U = unknown>(name: string): PdxFieldArray<U>;
     getValues(): V;
-    onFieldSave(callback: (fieldName: string, value: unknown) => void): void;
+    onFieldSave(callback: (fieldName: string, value: unknown) => void | Promise<unknown>): void;
     dispose(): void;
   }
 }

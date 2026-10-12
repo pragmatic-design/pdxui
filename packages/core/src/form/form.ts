@@ -8,7 +8,7 @@
 //   - Batch updates on reset/setValues
 //
 // Security:
-//   - handleSubmit prevents double-submit via submitting guard
+//   - handleSubmit prevents double-submit: a second submit returns the running one's promise
 //   - Async validation: a per-field debounce with a stale guard on the current value
 
 import { DEV } from '../utils/env';
@@ -178,8 +178,11 @@ export interface Form<T extends Record<string, unknown>> {
     /** Submission error (if state = 'error'). */
     readonly submitError: ReadonlySignal<unknown | undefined>;
 
-    /** Wrap a submit handler with validation + state management. */
-    handleSubmit(fn: (values: T) => Promise<void> | void): (e: Event) => void;
+    /**
+     * Wrap a submit handler with validation + state management. The handler returns the submit's
+     * promise; a second call while one runs submits nothing and returns the running one's.
+     */
+    handleSubmit(fn: (values: T) => Promise<void> | void): (e: Event) => Promise<void>;
     /**
      * Reset all fields to the snapshot: the initial values, or the last values passed here.
      *
@@ -202,8 +205,12 @@ export interface Form<T extends Record<string, unknown>> {
     /** Get current values snapshot (non-reactive). */
     getValues(): T;
 
-    /** Set callback for per-field save (used by DataSource integration). */
-    onFieldSave(callback: (fieldName: string, value: unknown) => void): void;
+    /**
+     * Set callback for per-field save (used by DataSource integration). Return the save's promise and
+     * the form keeps one save per field in flight: a save asked for meanwhile waits, and starts with
+     * the field's newest value when the one in flight settles.
+     */
+    onFieldSave(callback: (fieldName: string, value: unknown) => void | Promise<unknown>): void;
 
     /** Dispose all effects and cleanup. */
     dispose(): void;
@@ -327,6 +334,9 @@ export function createForm<T extends Record<string, unknown>>(
 
     // Save debounce timers (for onChange/immediate save modes)
     const saveTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+    // The fields with a save in flight, and those with one waiting for it (beta spec, F7).
+    const savesInFlight = new Set<string>();
+    const savesWaiting = new Set<string>();
 
     // Build fields from flattened initial values
     function buildField(name: string, initial: unknown): void {
@@ -404,12 +414,28 @@ export function createForm<T extends Record<string, unknown>>(
         function scheduleSave(): void {
             if (fieldSaveMode === 'onSubmit') return; // handled by handleSubmit
             if (saveTimers[name]) clearTimeout(saveTimers[name]);
-            if (fieldSaveMode === 'immediate') {
-                // No debounce — fire on next microtask to batch
-                saveTimers[name] = setTimeout(() => _onFieldSave?.(name, _value.peek()), 0);
-            } else {
-                saveTimers[name] = setTimeout(() => _onFieldSave?.(name, _value.peek()), fieldSaveDebounce);
-            }
+            // 'immediate': no debounce — fire on the next task, to batch
+            saveTimers[name] = setTimeout(fireSave, fieldSaveMode === 'immediate' ? 0 : fieldSaveDebounce);
+        }
+
+        /**
+         * One save of this field in flight, at most one waiting (beta spec, F7): two writes of one
+         * field never run together, so the older can no longer land last. A save asked for while one
+         * runs waits; when that one settles — answered or failed — the waiting one starts, with the
+         * value the field holds THEN. A callback that returns nothing has nothing to wait for: each
+         * save starts at once, as before.
+         */
+        function fireSave(): void {
+            delete saveTimers[name];
+            if (savesInFlight.has(name)) { savesWaiting.add(name); return; }
+            const result = _onFieldSave?.(name, _value.peek());
+            if (!result || typeof (result as Promise<unknown>).then !== 'function') return;
+            savesInFlight.add(name);
+            const settled = (): void => {
+                savesInFlight.delete(name);
+                if (savesWaiting.delete(name)) fireSave();
+            };
+            (result as Promise<unknown>).then(settled, settled);
         }
 
         const field: FormField<T[typeof name]> = {
@@ -466,7 +492,7 @@ export function createForm<T extends Record<string, unknown>>(
     const fieldArrays = new Map<string, FieldArray<unknown>>();
 
     // Save callback — set by <pdx-form> or manually for DataSource integration
-    let _onFieldSave: ((fieldName: string, value: unknown) => void) | undefined;
+    let _onFieldSave: ((fieldName: string, value: unknown) => void | Promise<unknown>) | undefined;
 
     // External bindings (DataSource, parent coordinator) disposed on form.dispose()
     const _externalDisposers: Dispose[] = [];
@@ -692,7 +718,8 @@ export function createForm<T extends Record<string, unknown>>(
         return out as T;
     }
 
-    let isSubmitting = false;
+    /** The submit running now: what a second submit returns instead of submitting again (beta spec, F2). */
+    let runningSubmit: Promise<void> | null = null;
 
     const form: Form<T> = {
         fields: fieldMap as Form<T>['fields'],
@@ -708,44 +735,45 @@ export function createForm<T extends Record<string, unknown>>(
         state: computed(() => _state()) as ReadonlySignal<FormState>,
         submitError: computed(() => _submitError()) as ReadonlySignal<unknown | undefined>,
 
-        handleSubmit(fn: (values: T) => Promise<void> | void): (e: Event) => void {
-            return async (e: Event) => {
+        handleSubmit(fn: (values: T) => Promise<void> | void): (e: Event) => Promise<void> {
+            return (e: Event) => {
                 e.preventDefault();
-                // Double-submit guard MUST be set before the validation await — otherwise
-                // two concurrent submits both pass the guard while validateAll() is pending.
-                if (isSubmitting) return;
-                isSubmitting = true;
+                // A second submit while one runs is dropped, and WAITS for it (beta spec, F2): it
+                // returns the running submit's promise, so code awaiting it — a test, a «saved»
+                // toast — runs after the save, not before. Taken before the validation await, or two
+                // concurrent submits would both start while validateAll() is pending.
+                if (runningSubmit) return runningSubmit;
+                runningSubmit = runSubmit().finally(() => { runningSubmit = null; });
+                return runningSubmit;
+            };
+
+            async function runSubmit(): Promise<void> {
+                // Touch all fields so errors show
+                batch(() => {
+                    for (const name of Object.keys(fieldTouched)) fieldTouched[name].set(true);
+                });
+
+                const isValid = await validateAll();
+                if (!isValid) return;
+
+                _state.set('submitting');
+                _submitError.set(undefined);
 
                 try {
-                    // Touch all fields so errors show
+                    const submitted = getValues();
+                    await fn(submitted);
                     batch(() => {
-                        for (const name of Object.keys(fieldTouched)) fieldTouched[name].set(true);
+                        rebaseTo(submitted);
+                        _state.set('success');
+                        _submitted.set(true);
                     });
-
-                    const isValid = await validateAll();
-                    if (!isValid) return; // finally resets isSubmitting
-
-                    _state.set('submitting');
-                    _submitError.set(undefined);
-
-                    try {
-                        const submitted = getValues();
-                        await fn(submitted);
-                        batch(() => {
-                            rebaseTo(submitted);
-                            _state.set('success');
-                            _submitted.set(true);
-                        });
-                    } catch (err) {
-                        batch(() => {
-                            _state.set('error');
-                            _submitError.set(err);
-                        });
-                    }
-                } finally {
-                    isSubmitting = false;
+                } catch (err) {
+                    batch(() => {
+                        _state.set('error');
+                        _submitError.set(err);
+                    });
                 }
-            };
+            }
         },
 
         reset(newValues?: Partial<T>): void {
@@ -821,13 +849,15 @@ export function createForm<T extends Record<string, unknown>>(
 
         getValues,
 
-        onFieldSave(callback: (fieldName: string, value: unknown) => void): void {
+        onFieldSave(callback: (fieldName: string, value: unknown) => void | Promise<unknown>): void {
             _onFieldSave = callback;
         },
 
         dispose(): void {
             for (const timer of Object.values(asyncTimers)) clearTimeout(timer);
             for (const timer of Object.values(saveTimers)) clearTimeout(timer);
+            // A save waiting for the one in flight is dropped: nothing starts after dispose().
+            savesWaiting.clear();
             for (const [, arr] of fieldArrays) arr.dispose();
             for (const d of _externalDisposers) d();
         },

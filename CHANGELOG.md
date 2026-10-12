@@ -12,6 +12,11 @@ semver.
 ### Features
 
 - Initial public release.
+- A form's second submit waits for the first: `handleSubmit(fn)`'s handler returns the submit's
+  promise, and a press while one runs sends nothing and returns the running one's — it used to
+  resolve at once, before the save. An autosave keeps one save per field in flight: an
+  `onFieldSave` callback that returns its save's promise holds the next save of that field until it
+  settles, then sends the newest value once, so two writes of one field no longer race. (#279)
 - `useQuery`'s refetch on focus and on reconnect no longer start a request while one is in flight
   for the key — switching tab and back during a slow first load used to abort it and start it
   again — the same rule polling already followed. And polling pauses on a hidden tab whatever
