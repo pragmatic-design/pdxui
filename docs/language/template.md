@@ -1051,8 +1051,10 @@ and renders the body; if the load fails it shows `@error`.
 #### Rules
 
 - The trigger is not an expression and not quoted: `@defer ('viewport')` names the trigger
-  `'viewport'` with its quotes, which is unknown, and an unknown trigger fires at once. Not checked
-  today.
+  `'viewport'` with its quotes, which is unknown. An unknown trigger — misspelt, quoted, or from
+  another framework — is `PDX_DEFER_UNKNOWN_TRIGGER`, an error naming the part of a `|` combination
+  that is not a trigger (#260). The runtime still fires one at once when it reaches it through a
+  hand-written `defer()` call, and warns in development.
 - `@error` here takes no parameters: `@error (e)` stops the compile with `Expected '{'`. The error and
   a retry are not available to its body.
 - Each sub-block may follow in any order; a second one of the same kind replaces the first.

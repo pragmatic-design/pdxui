@@ -23,6 +23,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Drop the `${ }`: `:label="${x}"` → `:label="x"`. A template literal inside the expression (`` :class="`btn-${size}`" ``) is fine.',
         example: { bad: pdx('<p :title="${n}">x</p>', 'let n = $signal(1);'), good: pdx('<p :title="n">x</p>', 'let n = $signal(1);') },
     },
+    PDX_DEFER_UNKNOWN_TRIGGER: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@defer` trigger the runtime does not know (`@defer (viewprt)`).',
+        explanation: 'The runtime loads a block whose trigger it does not recognise at once — the opposite of deferring it — and nothing else says so. Triggers combine with `|`, and each part is checked.',
+        fix: 'Use one of `immediate`, `viewport`, `idle`, `idle(ms)`, `interaction`, `hover`, `timer(ms)`; write `immediate` to load at once.',
+        example: { bad: pdx('@defer (viewprt) { <p>chart</p> }', ''), good: pdx('@defer (viewport) { <p>chart</p> }', '') },
+    },
     PDX_NON_REACTIVE: {
         severity: 'warn', category: 'defect', fixable: true,
         summary: 'A plain `let` the template reads and the script changes.',

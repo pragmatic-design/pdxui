@@ -3,6 +3,7 @@
 
 import { signal, effect } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
+import { DEV } from '../utils/env';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -191,10 +192,19 @@ function activateTrigger(
         return () => clearTimeout(id);
     }
 
-    // Unknown trigger — fire immediately
+    // Unknown trigger — fire immediately. The safe failure for a hand-written defer() (render rather
+    // than never render); a `.pdx` never gets here, the compiler stops it as PDX_DEFER_UNKNOWN_TRIGGER.
+    // In development it says so, once per trigger: loading at once is the opposite of what was asked.
+    if (DEV && !warnedTriggers.has(trigger)) {
+        warnedTriggers.add(trigger);
+        console.warn(`[pdx] defer: '${trigger}' is not a trigger, so the block loads at once. The triggers are immediate, viewport, idle, idle(<n>), interaction, hover, timer(<n>), combined with |.`);
+    }
     onTrigger();
     return null;
 }
+
+/** The unknown triggers already warned about, so a list of deferred rows warns once. */
+const warnedTriggers = new Set<string>();
 
 function setupViewportTrigger(
     parent: Node,

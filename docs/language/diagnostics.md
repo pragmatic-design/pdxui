@@ -63,6 +63,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_INVALID_ENUM_VALUE` | warn | A static or literal attribute value (`size="huge"`, `:size="'huge'"`) outside the values its prop declares. | attributes, [template.md](template.md) |
 | `PDX_EMPTY_FOR` | warn | An `@for` with an empty body. | `@for`, [template.md](template.md) |
 | `PDX_AWAIT_NO_LOADING` | info | `@await` without a `@loading` block. | `@await`, [template.md](template.md) |
+| `PDX_DEFER_UNKNOWN_TRIGGER` | error | A `@defer` trigger the runtime does not know (`@defer (viewprt)`). | `@defer`, [template.md](template.md) |
 | `PDX_INLINE_NODE_UNSUPPORTED` | warn | A template node the inline render path cannot compile. | the compiled template, [template.md](template.md) |
 
 ## Styles
