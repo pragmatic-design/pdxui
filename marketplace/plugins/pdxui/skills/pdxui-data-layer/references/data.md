@@ -94,6 +94,17 @@ await addUser.execute(dto);
 The mental model is the same as reactivity: you declare the relationships (this resource has these
 tags), and the update propagates.
 
+**Every `@fetch` is also tagged with its own cache key**, which is `METHOD:url` —
+`'GET:/api/users'` for `@fetch users: 'GET /api/users'`, the URL as it resolves for one that reads a
+signal. So a mutation can name one fetch by its key, in the same array, with no tag written on it:
+
+```ts
+invalidate: ['GET:/api/users']   // the @fetch whose key it is
+invalidate: ['users']            // every @fetch tagged 'users'
+```
+
+Tags are for invalidating several fetches at once; the key is for one.
+
 **The button that sends it.** Give the mutation to `<pdx-button>` as its `action`, and the button
 does the rest:
 

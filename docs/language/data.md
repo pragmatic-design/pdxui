@@ -38,8 +38,11 @@ the spec was written with, and `key` becomes a function of the same text; `resou
 inside an effect, so a change to anything the URL reads fetches again, under the new key. The
 resource's `data()`, `error()`, `state()` (`idle`, `loading`, `reloading`, `success`, `stale`, `error`,
 `local`), `loading()` and `status()` are signals; `refetch()`, `mutate(value)` and `abort()` act on it.
-Responses are cached by key and stay fresh for `staleTime` (30 000 ms by default). The options block is
-spliced into the options object, its signals and props read as in the rest of the script. The type after `as` is read by the editor and
+Responses are cached by key and stay fresh for `staleTime` (30 000 ms by default). Every `@fetch` is
+tagged with its own key — `tags: (k) => [k, …the options' tags]`, `k` being the key the resource
+resolved — so `invalidate(['GET:/url'])`, whose array matches tags, reaches it by key (#282). The
+options block is evaluated once into a constant spread into the options object, its signals and props
+read as in the rest of the script. The type after `as` is read by the editor and
 `pdx check --types` (`name.data()` is `Type | undefined`); nothing is generated for it.
 
 #### Rules
