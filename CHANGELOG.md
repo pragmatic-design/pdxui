@@ -112,6 +112,11 @@ semver.
 
 ### Fixes
 
+- A scoped slot outlet's fallback that interpolates or holds a block —
+  `<slot name="row" :item="it"><span>{{ it.label }}</span></slot>` — renders inside the outlet, only
+  when the parent gives no fill. It was emitted beside the outlet, so it rendered next to the parent's
+  fill, with an orphan `</slot>` on the template path. The outlet is now one node of the template
+  parser, its fallback a body like any block's. (#276)
 - A `$signal`, `$derived` or `$store` whose type argument has a comma, parentheses or an arrow —
   `$signal<Record<string, string>>({})`, `$signal<(A & B)[]>([])`, `$signal<() => void>(…)` — is read
   as a rune. It was split in two or left as code, and in a `.pdx.ts` store shipped `$signal` in the

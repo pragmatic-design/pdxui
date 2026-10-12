@@ -11,7 +11,7 @@ import type {
 } from '../parser/template';
 import type { CompileContext } from './compile-context';
 import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope, trackKeyArg, pipeChain } from './codegen-prefix';
-import { rewriteHtmlBindings, isSimpleAccess } from './codegen-template-rewrite';
+import { rewriteHtmlBindings, isSimpleAccess, scopedSlotCall } from './codegen-template-rewrite';
 import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
 import { escapeForTemplateLiteral } from './codegen-shared';
@@ -111,6 +111,11 @@ export function generateNodes(nodes: TemplateNode[], imports: Set<string>, ctx: 
             case 'slot-template':
                 flushHtml();
                 parts.push(generateSlotTemplate(node, imports, ctx));
+                break;
+            case 'scoped-slot':
+                // The fallback is the node's body, generated like any block's (#276).
+                flushHtml();
+                parts.push(`\${${scopedSlotCall(node.tag, `() => ${generateNodes(node.body, imports, ctx)}`, ctx)}}`);
                 break;
             case 'custom-directive':
                 flushHtml();

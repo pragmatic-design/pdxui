@@ -766,7 +766,7 @@ function checkDeferTriggers(nodes: TemplateNode[], warnings: ValidationWarning[]
                 case 'portal': walk(node.body); break;
                 case 'try': walk(node.body); walk(node.catchBody); break;
                 case 'await': walk(node.body); walk(node.loading); walk(node.errorBody); break;
-                case 'slot-template': walk(node.body); break;
+                case 'slot-template': case 'scoped-slot': walk(node.body); break;
                 case 'custom-directive': walk(node.body); break;
             }
         }
@@ -821,6 +821,9 @@ function checkRawInterpolation(nodes: TemplateNode[], warnings: ValidationWarnin
                 case 'try': walk(node.body); walk(node.catchBody); break;
                 case 'await': walk(node.body); if (node.loading) walk(node.loading); if (node.errorBody) walk(node.errorBody); break;
                 case 'slot-template': walk(node.body); break;
+                // The outlet's tag was html content before it had a node of its own (#276): it is
+                // checked as such, then its fallback.
+                case 'scoped-slot': walk([{ type: 'html', content: node.tag, loc: node.loc }]); walk(node.body); break;
                 case 'custom-directive': walk(node.body); break;
             }
         }
@@ -933,6 +936,12 @@ function walkNodes(
                 // `scopeVars` are the CHILD's — `let:row` names a value the child
                 // supplies — so they are treated exactly as a loop variable is: seen, then removed.
                 for (const v of node.scopeVars) loopVars.add(v);
+                walkNodes(node.body, ids, loopVars);
+                break;
+            case 'scoped-slot':
+                // The outlet's scope bindings (`:item="first"`) read the component's names, as any
+                // bound attribute does; then its fallback (#276).
+                extractHtmlBindingIds(node.tag, ids);
                 walkNodes(node.body, ids, loopVars);
                 break;
         }
