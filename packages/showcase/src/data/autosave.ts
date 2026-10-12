@@ -115,7 +115,9 @@ export function createAutosave<R extends object = Values>(options: AutosaveOptio
         options.after?.(name, value);
     }
 
-    form.onFieldSave(name => { void saveField(name); });
+    // The save's promise goes back to the form, which keeps one save per field in flight and sends
+    // the newest value next (#279); the queue above still orders writes across fields.
+    form.onFieldSave(name => saveField(name));
 
     function load(): void {
         const read = options.read();

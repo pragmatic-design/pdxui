@@ -88,6 +88,16 @@ make it once in the script, `const onSubmit = user.handleSubmit(save);`, and bin
 `<form @submit="onSubmit">`. Written inline, `@submit="user.handleSubmit(save)"` only builds a
 handler on each submit and never calls it.
 
+**A second submit waits for the first.** The handler returns the submit's promise. Pressed again
+while a submit runs, it sends nothing and returns the running one's promise, so whatever awaits it —
+a «saved» message, a test — runs after the save, not before.
+
+**An autosave keeps one save per field in flight.** With a `saveMode` other than `onSubmit`, a
+callback given to `onFieldSave` that returns its save's promise lets the form hold the next save of
+that field until the one in flight settles; then it sends the field's newest value, once. Two writes
+of one field never race, so the older can no longer land last. A callback that returns nothing is
+called on every debounce, as before.
+
 **A required field says so, from the schema.** A field whose rules include `required` is marked
 required with no prop on its `<pdx-form-field>`: its control gets `aria-required="true"`, so a screen
 reader announces «Name, required» before any error, and its label gets the required marker (` *` by
