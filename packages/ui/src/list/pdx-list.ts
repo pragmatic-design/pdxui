@@ -71,6 +71,20 @@ component('pdx-list', {
             if (show && emptyEl.querySelector('pdx-icon') && !customElements.get('pdx-icon')) void import('../icon/pdx-icon');
         }
         let blockEl: HTMLElement | null = null;
+
+        /**
+         * Draw the loading overlay while the source loads, and say so only then (#299): the overlay's
+         * spinner is a «Loading» status, so out of the accessibility tree whenever it is not drawn, and
+         * the host is aria-busy while loading — pdx-block-ui's own rules.
+         */
+        function showBusy(loading: boolean): void {
+            if (!blockEl) return;
+            blockEl.classList.toggle('pdx-block-ui-visible', loading);
+            if (loading) blockEl.removeAttribute('aria-hidden');
+            else blockEl.setAttribute('aria-hidden', 'true');
+            if (loading) ctx.el.setAttribute('aria-busy', 'true');
+            else ctx.el.removeAttribute('aria-busy');
+        }
         let repeatFragment: DocumentFragment | null = null;
 
         let injectedDS: DataSource<unknown> | null = null;
@@ -313,6 +327,7 @@ component('pdx-list', {
                     // Block UI overlay
                     blockEl = document.createElement('div');
                     blockEl.className = 'pdx-block-ui-overlay';
+                    blockEl.setAttribute('aria-hidden', 'true');
                     const spinWrap = document.createElement('div');
                     spinWrap.className = 'pdx-block-ui-spinner';
                     const spinner = document.createElement('pdx-spinner');
@@ -338,7 +353,7 @@ component('pdx-list', {
 
                     // Initial state
                     showEmpty(dataItems.length === 0 && !loading);
-                    if (blockEl) blockEl.classList.toggle('pdx-block-ui-visible', loading);
+                    showBusy(loading);
                 });
                 return;
             }
@@ -346,9 +361,7 @@ component('pdx-list', {
             // Update visibility
             requestAnimationFrame(() => {
                 showEmpty(dataItems.length === 0 && !loading);
-                if (blockEl) {
-                    blockEl.classList.toggle('pdx-block-ui-visible', loading);
-                }
+                showBusy(loading);
             });
         });
 
