@@ -12,16 +12,11 @@
  * a component added tomorrow is tested tomorrow, with no fixture to remember to update.
  */
 import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
-import { readFileSync } from 'node:fs';
 import { unstyledScaffolding } from './scaffolding';
+import { LIBRARY_TAGS } from './library-tags';
+import { PHONE, expectFitsPhone, settledAtPhone } from './phone-checks';
 
-interface Decl { tagName: string }
-
-const manifestUrl = new URL('../../ui/custom-elements.json', import.meta.url);
-const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8')) as {
-    modules: { declarations: Decl[] }[];
-};
-const tags = manifest.modules.map(m => m.declarations?.[0]).filter(Boolean).map(d => d.tagName);
+const tags = LIBRARY_TAGS;
 
 /**
  * Floors measured across all 112 pages: the thinnest page is `overlay-outlet` at 1454 characters
@@ -107,13 +102,24 @@ test.describe('every component page loads', () => {
 
     for (const tag of tags) {
         const short = tag.replace(/^pdx-/, '');
-        test(`${short} — no page error, and something on the page`, async ({ page, baseURL }) => {
+        test(`${short} — no page error, something on the page, and it fits a phone`, async ({ page, baseURL }) => {
             const c = watch(page, baseURL!);
 
+            // One load, two widths (#322). The page is LOADED at phone width, as a phone loads it —
+            // a component that picks its layout when it mounts is measured as it would be there —
+            // and measured with phone-width.spec.ts's three checks. Then the window goes back to its
+            // desktop size for the checks below, which are about errors, content and style.
+            const desktop = page.viewportSize()!;
+            await page.setViewportSize(PHONE);
             await page.goto(`/components/${tag}`, { waitUntil: 'networkidle' });
-            // The page mounts its gallery lazily; give the outlet a beat to put it in the DOM.
+            await settledAtPhone(page, '.cmp-gallery');
+            await expectFitsPhone(page, '.cmp-title', `${short} at 390 × 844`);
+            await page.setViewportSize(desktop);
+
+            // The gallery, which mounts lazily, is in the DOM: settledAtPhone waited for its first
+            // section (or the overview of a page without one). That wait replaces the fixed 500 ms
+            // this test used to sleep for the same purpose.
             await expect(page.locator('pdx-router-outlet > *')).toHaveCount(1);
-            await page.waitForTimeout(500);
 
             const seen = await page.evaluate(() => {
                 const main = document.querySelector('main') ?? document.body;

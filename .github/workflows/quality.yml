@@ -12,8 +12,8 @@ name: Quality (every package with a suite)
 # Parallel jobs, not one. As one job this took 41 minutes, 35 of them in `pnpm test` running the
 # browser suites one after another with one Playwright worker each — site 13.4 min, showcase
 # 9.6 min — and coverage ran four of the unit suites a second time (#60). Each job here runs a
-# share on its own runner; the browser suites keep one worker each and are split into shards
-# instead, so the worker budget a test was written against does not change.
+# share on its own runner; the browser suites are split into shards, and the site and showcase
+# shards run two workers each, measured in #322 (see the browser job).
 #
 # No path filter, on purpose. `build · typecheck · lint · test · coverage` is a REQUIRED check on
 # `main`, and a required check that a path filter skips never reports: the pull request waits on
@@ -101,8 +101,10 @@ jobs:
       - name: Unit suites
         run: pnpm test:unit:uncovered
 
-  # The browser half of `pnpm test`, one runner per suite or shard. One worker each, as before:
-  # the shards are what make it faster, not a bigger worker count.
+  # The browser half of `pnpm test`, one runner per suite or shard. The site and showcase shards run
+  # two Playwright workers on the runner's 4 vCPUs (#322): measured over three runs, the showcase's
+  # suite step went from ~4m50s with one worker to 3m45s, 2m40s and 3m45s, with no flaky test. The
+  # other suites keep their config's single CI worker.
   browser:
     name: browser (${{ matrix.suite }}${{ matrix.shard && format(' {0}', matrix.shard) || '' }})
     runs-on: ubuntu-latest
@@ -111,12 +113,12 @@ jobs:
       matrix:
         include:
           - { suite: design, run: 'pnpm --filter @pdxui/design run test' }
-          - { suite: site, shard: 1/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=1/3' }
-          - { suite: site, shard: 2/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=2/3' }
-          - { suite: site, shard: 3/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=3/3' }
+          - { suite: site, shard: 1/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=1/3 --workers=2' }
+          - { suite: site, shard: 2/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=2/3 --workers=2' }
+          - { suite: site, shard: 3/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=3/3 --workers=2' }
           # The dev-server config is five tests against its own server: once, with the first shard.
-          - { suite: showcase, shard: 1/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=1/2 && pnpm --filter @pdxui/showcase run test:dev' }
-          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2' }
+          - { suite: showcase, shard: 1/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=1/2 --workers=2 && pnpm --filter @pdxui/showcase run test:dev' }
+          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2' }
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
