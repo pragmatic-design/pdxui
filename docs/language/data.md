@@ -166,7 +166,10 @@ are validated under their dotted path (`'address.city'`). An external schema com
 runs sends nothing and returns the running one's. An autosave (`saveMode` other than `onSubmit`)
 whose `onFieldSave` callback returns its save's promise keeps one save per field in flight and at
 most one waiting, which starts with the field's newest value when the one in flight settles —
-rules F2 and F7 of the beta reference (#279).
+rules F2 and F7 of the beta reference (#279). A submit rejected with RFC 9457 field errors (an
+`errors` map of path → messages, in an `HttpError`'s body or thrown as it is) puts each message on
+the field the path names — as written, else ignoring case — and the rest in `formError()`; a field's
+clears on its next edit, and all of them when a submit starts — rule F5 (#280).
 
 #### Rules
 

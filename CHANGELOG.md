@@ -12,6 +12,11 @@ semver.
 ### Features
 
 - Initial public release.
+- A form's server field errors land on their fields: a submit rejected with RFC 9457 problem
+  details carrying an `errors` map (in an `HttpError`'s body, or thrown as it is) shows each message
+  on the field it names — `Email` reaches `email`, `Items[0].Name` reaches `items.0.name` — and the
+  new `formError()` holds what names no field. They clear on the field's next edit, and all of them
+  when a submit starts. (#280)
 - A form's second submit waits for the first: `handleSubmit(fn)`'s handler returns the submit's
   promise, and a press while one runs sends nothing and returns the running one's — it used to
   resolve at once, before the save. An autosave keeps one save per field in flight: an
