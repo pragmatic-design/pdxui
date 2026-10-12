@@ -235,7 +235,6 @@ export const fieldGroup: ComponentManifest = {
                 selector: 'section:not([hidden]) [data-test="group"] fieldset.pdx-field-group',
                 tolerancePx: 10,
                 skipHeight: true,
-                leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }],
             },
         ],
     },

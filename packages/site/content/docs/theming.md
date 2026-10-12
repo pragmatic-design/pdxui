@@ -187,10 +187,12 @@ it away from them, put it in a layer declared **before** the design system's:
 ```
 
 Then nothing the design system declares can be overridden by it. The certification measures this
-contract on every component (style isolation, on `neutral` and `material`). One gap remains today:
-text properties a component inherits from `<body>` instead of declaring them (colour, font, line
-height, letter spacing) are still reached by a bare element rule in that layer. Each manifest lists
-those leaks, and they are being closed.
+contract on every component (style isolation, on `neutral` and `material`). A component's text —
+colour, font, line height, letter spacing — follows the container you place it in, as a native
+element's does: a rule in that layer that styles the container reaches the component through it,
+by design, and a bare `span { … }` no longer reaches the elements the component draws itself. One
+gap remains: a bare rule that draws a **border** (`div { border: … }`) still reaches some of a
+component's inner elements. Each manifest lists those leaks, and they are being closed (#319).
 
 **The component styles are not in `base`.** Each component imports its own — `@pdxui/ui/data-grid`
 brings `@pdxui/design/components/data-grid` with it — so an app ships the styles of what it

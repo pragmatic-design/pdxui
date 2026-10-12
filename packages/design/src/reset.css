@@ -25,6 +25,19 @@ body {
     line-height: 1.6;
 }
 
+/* A component's elements take their text style from the component, never from a host's bare
+   element rule (#170). Most of them declare no colour, font or spacing and inherit them; a host's
+   `div { color: … }` or `span { font-family: … }` is a direct declaration, which beats inheritance —
+   even from a layer declared before `pdx`, as the design system asks a host to load its CSS. Saying
+   `inherit` here, in the lowest pdx layer, wins over that layer and loses to every component rule. */
+:where([class*="pdx-"], [class*="pdx-"] *) {
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-size: inherit;
     font-weight: inherit;

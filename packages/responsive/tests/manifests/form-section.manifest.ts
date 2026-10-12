@@ -177,7 +177,6 @@ export const formSection: ComponentManifest = {
                 selector: 'section:not([hidden]) [data-test="form-section"] fieldset.pdx-form-section',
                 tolerancePx: 10,
                 skipHeight: true,
-                leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing'] }],
             },
         ],
     },
