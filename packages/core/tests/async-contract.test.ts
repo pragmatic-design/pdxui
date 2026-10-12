@@ -361,6 +361,104 @@ describe('useQuery', () => {
     });
 });
 
+// ─── case 7: consumers of one key share one request and one value ───
+
+describe('case 7 — consumers of one key share one request and one value', () => {
+    it('two components on one key make one request; it goes on until the last of them goes', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const make = () => resource(({ signal: s }) => t.call(s), { key: 'ac-shared-mount', cache });
+        const a = await mountWith(make);
+        const b = await mountWith(make);
+        expect(t.calls.length, 'two consumers of one key made two requests').toBe(1);
+        const [s] = t.calls as AbortSignal[];
+        a.remove();
+        await settle();
+        expect(s.aborted, 'the request was aborted while a consumer still waited for it').toBe(false);
+        b.remove();
+        await settle();
+        expect(s.aborted, 'the last consumer went and the request kept running').toBe(true);
+    });
+
+    it('both consumers receive the shared answer', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r1 = resource(() => t.call(), { key: 'ac-shared-value', cache });
+        const r2 = resource(() => t.call(), { key: 'ac-shared-value', cache });
+        await settle();
+        expect(t.calls.length).toBe(1);
+        t.answer(0, 'v');
+        await settle();
+        expect([r1.data(), r2.data()]).toEqual(['v', 'v']);
+        expect([r1.state(), r2.state()]).toEqual(['success', 'success']);
+        r1.dispose(); r2.dispose();
+    });
+
+    it('one consumer\'s refetch() during the request supersedes it for both, and both receive the new value', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r1 = resource(({ signal: s }) => t.call(s), { key: 'ac-shared-refetch', cache });
+        const r2 = resource(({ signal: s }) => t.call(s), { key: 'ac-shared-refetch', cache });
+        await settle();
+        void r1.refetch();
+        await settle();
+        expect(t.calls.length, 'a refetch made more than one new request').toBe(2);
+        expect((t.calls[0] as AbortSignal).aborted, 'the superseded shared request still runs').toBe(true);
+        t.answer(1, 'new');
+        await settle();
+        expect([r1.data(), r2.data()], 'a consumer missed the new value').toEqual(['new', 'new']);
+        expect(r2.state()).toBe('success');
+        r1.dispose(); r2.dispose();
+    });
+
+    it('one consumer\'s mutate(v) reaches the other, and no request is made', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r1 = resource(() => t.call(), { key: 'ac-shared-mutate', cache });
+        const r2 = resource(() => t.call(), { key: 'ac-shared-mutate', cache });
+        await settle();
+        t.answer(0, 'v');
+        await settle();
+        r1.mutate('m');
+        await settle();
+        expect(r2.data(), 'the other consumer kept the old value').toBe('m');
+        expect(t.calls.length, 'mutate made a request').toBe(1);
+        r1.dispose(); r2.dispose();
+    });
+
+    it('a refetch() after the answer reaches the other consumer', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r1 = resource(() => t.call(), { key: 'ac-shared-later', cache });
+        const r2 = resource(() => t.call(), { key: 'ac-shared-later', cache });
+        await settle();
+        // However many requests the first load made, all of them answer 'first'.
+        for (let i = 0; i < t.calls.length; i++) t.answer(i, 'first');
+        await settle();
+        expect(r2.data()).toBe('first');
+        const before = t.calls.length;
+        void r1.refetch();
+        await settle();
+        expect(t.calls.length, 'the refetch made no request, or more than one').toBe(before + 1);
+        t.answer(before, 'second');
+        await settle();
+        expect(r2.data(), 'the other consumer kept the old value until its own next fetch').toBe('second');
+        r1.dispose(); r2.dispose();
+    });
+
+    it('with staleTime: 0, a resource writing its own result does not refetch', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r = resource(() => t.call(), { key: 'ac-shared-loop', cache, staleTime: 0 });
+        await settle();
+        t.answer(0, 'v');
+        await settle();
+        await settle();
+        expect(t.calls.length, 'its own write triggered a refetch').toBe(1);
+        r.dispose();
+    });
+});
+
 // ─── case 6: one layer retries, and only reads ──────────────────────
 
 describe('case 6 — one layer retries, and only reads', () => {

@@ -14,7 +14,8 @@
 import { signal, computed, effect, batch, collectDisposers, onDispose } from './signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
 import { getDefaultCache } from './cache';
-import type { Cache } from './cache';
+import type { Cache, CacheWriteListener, Flight } from './cache';
+import { joinRequest, leaveRequest, supersedeRequest } from './cache';
 import { isRetryableError, retryDelayMs } from '../http/middleware';
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -154,16 +155,37 @@ export function resource<T>(
     const _error = signal<unknown | undefined>(undefined);
     const _state = signal<ResourceState>('idle');
 
-    // Abort management
-    let currentController: AbortController | null = null;
+    // The shared request this resource waits for, and the key it was for (beta spec, data.md, E7):
+    // concurrent reads of one key share one request, which is aborted when its last consumer leaves.
+    let current: { key: string; flight: Flight } | null = null;
     let fetchGeneration = 0; // guards against stale responses
+    let disposed = false;
+
+    /** Stop waiting for the shared request, which goes on for the other consumers of its key. */
+    function leaveCurrent(): void {
+        if (!current) return;
+        leaveRequest(cache, current.key, current.flight, onWrite);
+        current = null;
+    }
+
+    // The value another consumer of the key wrote — its answer, its refetch, its mutate(): applied
+    // here without a request. Also this resource's identity, as a consumer and as a writer, which
+    // the cache does not tell its own writes.
+    const onWrite: CacheWriteListener = (value) => {
+        if (disposed) return;
+        batch(() => {
+            _data.set(value as T);
+            _error.set(undefined);
+            _state.set('success');
+        });
+    };
 
     // Cache subscription
     let cacheUnsub: Dispose | null = null;
 
     function subscribeToCacheKey(key: string): void {
         cacheUnsub?.();
-        cacheUnsub = cache.subscribe(key);
+        cacheUnsub = cache.subscribe(key, onWrite);
     }
 
     // Check cache for existing data
@@ -220,25 +242,29 @@ export function resource<T>(
         }
         _error.set(undefined);
 
-        // Abort previous request
-        if (currentController) currentController.abort();
-        currentController = new AbortController();
-        const thisController = currentController;
+        // Leave the request this resource waited for before: it is superseded for this resource,
+        // and aborted if no other consumer of its key still waits for it.
+        leaveCurrent();
+        let flight: Flight | undefined;
 
         try {
-            // The request's own signal (beta spec, data.md, E2): aborted when a newer request
-            // supersedes it, on abort() and on dispose, so the transport stops instead of running to
-            // the end for an answer nobody will read.
-            const raw = await fetcher({ signal: thisController.signal });
+            // Join the request in flight for the key, or start it. Its signal (beta spec, data.md,
+            // E2) is aborted when its last consumer leaves — superseded, abort(), dispose — so the
+            // transport stops instead of running to the end for an answer nobody will read.
+            flight = joinRequest(cache, resolvedKey, onWrite, (signal) => fetcher({ signal }));
+            current = { key: resolvedKey, flight };
+            const raw = await flight.promise;
 
-            // Guard: if another fetch started, discard this result
+            // Guard: if another fetch started, or this one was left, discard this result
             if (generation !== fetchGeneration) return;
-            if (thisController.signal.aborted) return;
+            if (current?.flight !== flight) return;
+            current = null;
 
             const data = transform ? transform(raw) : raw as unknown as T;
 
-            // Update cache
-            cache.set(resolvedKey, data, { tags: tagsFor(resolvedKey), staleTime, silent: true });
+            // Update cache: silent, so this write triggers no refetch; the other consumers of the key
+            // are told the value through their write listeners.
+            cache.set(resolvedKey, data, { tags: tagsFor(resolvedKey), staleTime, silent: true, writer: onWrite });
             subscribeToCacheKey(resolvedKey);
 
             batch(() => {
@@ -249,9 +275,13 @@ export function resource<T>(
 
             opts.onSuccess?.(data);
         } catch (err) {
-            // Guard: discard errors from cancelled requests
+            // Guard: discard errors from requests this resource no longer waits for
             if (generation !== fetchGeneration) return;
-            if (thisController.signal.aborted) return;
+            if (flight && current?.flight !== flight) return;
+            current = null;
+            // Superseded for everyone by another consumer's refetch: wait for the request it started.
+            if (flight?.superseded) return doFetch(attempt);
+            if (flight?.controller.signal.aborted) return;
 
             // Retry what retrying can fix, with the HTTP client's classifier and backoff (beta spec,
             // E6): not a 4xx, a cancellation or a timeout; jitter, and Retry-After when the server
@@ -272,10 +302,6 @@ export function resource<T>(
             });
 
             opts.onError?.(err);
-        } finally {
-            if (currentController === thisController) {
-                currentController = null;
-            }
         }
     }
 
@@ -323,8 +349,6 @@ export function resource<T>(
         };
     });
 
-    let disposed = false;
-
     // isPending: true only during background refresh (data exists + refetching)
     const isPending = computed(() => {
         const s = state();
@@ -343,8 +367,10 @@ export function resource<T>(
 
         async refetch(): Promise<void> {
             if (disposed) return;
-            // Invalidate cache entry to force refetch
+            // Invalidate cache entry to force refetch, and supersede the request in flight for the
+            // key for every consumer (beta spec, E7): they wait for the one this starts.
             cache.remove(resolvedKey, true);
+            supersedeRequest(cache, resolvedKey);
             await doFetch();
         },
 
@@ -355,17 +381,18 @@ export function resource<T>(
                 _error.set(undefined);
                 _state.set('local');
             });
-            cache.set(resolvedKey, value, { tags: tagsFor(resolvedKey), staleTime, silent: true });
+            // Written for every consumer of the key (E7), and without a request: silent.
+            cache.set(resolvedKey, value, { tags: tagsFor(resolvedKey), staleTime, silent: true, writer: onWrite });
         },
 
         abort(): void {
-            if (!currentController) return;
+            if (!current) return;
             // Cancelling is not failing (beta spec, data.md, E3): the bump stops the retry chain
             // too, and the source goes back to its last settled state — it stayed 'loading' for
-            // good, its late answer discarded. error() is left as it was.
+            // good, its late answer discarded. error() is left as it was. The shared request is
+            // left, and aborted only if no other consumer of the key still waits for it (E7).
             fetchGeneration++;
-            currentController.abort();
-            currentController = null;
+            leaveCurrent();
             _state.set(_data.peek() !== undefined ? 'success' : 'idle');
         },
 
@@ -375,10 +402,9 @@ export function resource<T>(
             // It invalidates the retries waiting in the backoff too: without the bump, the chain
             // would start fetching again after the dispose.
             fetchGeneration++;
-            if (currentController) {
-                currentController.abort();
-                currentController = null;
-            }
+            // The shared request goes on for the other consumers of the key, and is aborted when
+            // this was the last one (E7).
+            leaveCurrent();
             disposeEffect();
             cacheUnsub?.();
         },

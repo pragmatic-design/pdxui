@@ -37,6 +37,9 @@ export interface CacheConfig {
     gcInterval?: number;
 }
 
+/** Told the value written to a cache key by someone else (see {@link Cache.subscribe}). */
+export type CacheWriteListener = (data: unknown) => void;
+
 /** Matcher for invalidation: exact key, wildcard pattern, tag array, or predicate. */
 export type InvalidationMatcher =
     | string                         // exact key or wildcard (contains *)
@@ -47,14 +50,22 @@ export interface Cache {
     /** Get a cache entry by key. Returns undefined if not found or expired. */
     get<T = unknown>(key: string): CacheEntry<T> | undefined;
 
-    /** Set a cache entry. `silent` skips subscriber notification (internal resource writes). */
-    set<T>(key: string, data: T, options?: { tags?: string[]; staleTime?: number; silent?: boolean }): void;
+    /**
+     * Set a cache entry. `silent` skips the key's version bump, so nothing refetches (a resource
+     * storing its own result). Every `onWrite` listener of the key is told either way, except
+     * `writer`'s — the listener of whoever wrote.
+     */
+    set<T>(key: string, data: T, options?: { tags?: string[]; staleTime?: number; silent?: boolean; writer?: CacheWriteListener }): void;
 
     /** Check if a non-expired entry exists. */
     has(key: string): boolean;
 
-    /** Subscribe to a cache key (increments subscriber count). Returns unsubscribe. */
-    subscribe(key: string): Dispose;
+    /**
+     * Subscribe to a cache key (increments subscriber count). `onWrite`, when given, is called with the
+     * value on every `set` of the key — silent or not — that another writer makes: how two consumers
+     * of one key see each other's writes. Returns unsubscribe.
+     */
+    subscribe(key: string, onWrite?: CacheWriteListener): Dispose;
 
     /** Invalidate entries matching the pattern. Returns count of invalidated entries. */
     invalidate(matcher: InvalidationMatcher): number;
@@ -127,6 +138,8 @@ export function createCache(config: CacheConfig = {}): Cache {
     const gcInterval = config.gcInterval ?? 60_000;
 
     const entries = new Map<string, CacheEntry>();
+    // The value channel, next to the version (invalidation) channel: who is told a key's new value.
+    const writeListeners = new Map<string, Set<CacheWriteListener>>();
     const _version = signal(0);
     const _keyVersions = new Map<string, ReturnType<typeof signal<number>>>();
 
@@ -186,7 +199,7 @@ export function createCache(config: CacheConfig = {}): Cache {
         // `silent` skips the keyVersion bump — used by a resource storing its OWN freshly
         // fetched data (it already holds it; bumping would re-trigger its own auto-fetch).
         // External/optimistic writes omit it so resources reading the key observe the change.
-        set<T>(key: string, data: T, options?: { tags?: string[]; staleTime?: number; silent?: boolean }): void {
+        set<T>(key: string, data: T, options?: { tags?: string[]; staleTime?: number; silent?: boolean; writer?: CacheWriteListener }): void {
             const now = Date.now();
             const ttl = options?.staleTime ?? staleTime;
             const existing = entries.get(key);
@@ -206,6 +219,15 @@ export function createCache(config: CacheConfig = {}): Cache {
             // observed by resources reading this key — without this the only cache→UI bridge
             // would be invalidate(), and optimistic updates would never render.
             if (!options?.silent) bumpKeyVersion(key);
+            // The value channel (beta spec, data.md, E7): every other consumer of the key gets the
+            // value, silent write or not — a resource's own result, or its mutate(), reaches the
+            // resources sharing its key without a request. Not the writer: it has the value already.
+            const listeners = writeListeners.get(key);
+            if (listeners) {
+                batch(() => {
+                    for (const listener of [...listeners]) if (listener !== options?.writer) listener(data);
+                });
+            }
             if (entries.size > maxEntries) evictLRU();
         },
 
@@ -213,15 +235,25 @@ export function createCache(config: CacheConfig = {}): Cache {
             return entries.has(key);
         },
 
-        subscribe(key: string): Dispose {
+        subscribe(key: string, onWrite?: CacheWriteListener): Dispose {
             const entry = entries.get(key);
             if (entry) {
                 entry.subscribers++;
+            }
+            if (onWrite) {
+                let set = writeListeners.get(key);
+                if (!set) writeListeners.set(key, set = new Set());
+                set.add(onWrite);
             }
             let disposed = false;
             return () => {
                 if (disposed) return;
                 disposed = true;
+                if (onWrite) {
+                    const set = writeListeners.get(key);
+                    set?.delete(onWrite);
+                    if (set?.size === 0) writeListeners.delete(key);
+                }
                 const e = entries.get(key);
                 if (e && e.subscribers > 0) {
                     e.subscribers--;
@@ -358,6 +390,7 @@ export function createCache(config: CacheConfig = {}): Cache {
         dispose(): void {
             if (gcTimerId !== undefined) clearInterval(gcTimerId);
             entries.clear();
+            writeListeners.clear();
             _keyVersions.clear();
             accessOrder.length = 0;
         },
@@ -369,6 +402,94 @@ export function createCache(config: CacheConfig = {}): Cache {
     return cache;
 }
 
+// ─── Requests in flight, shared per key ────────────────────────────
+// Concurrent reads of one key share one request (beta spec, data.md, E7). Internal: resource() is
+// the only caller. Kept beside the cache rather than in it, by cache, so a cache made by hand —
+// anything with the Cache interface — shares requests too.
+
+/** One request in flight for a key: what it resolves to, how to stop it, and who waits for it. */
+export interface Flight {
+    /** Settles with the request, or rejects the moment the request is aborted. */
+    readonly promise: Promise<unknown>;
+    readonly controller: AbortController;
+    readonly consumers: Set<object>;
+    /** The key's version when it started: an invalidation since means its answer may predate a write. */
+    readonly version: number;
+    /** Aborted by a refetch, which started the request its consumers wait for next. */
+    superseded: boolean;
+}
+
+const flightsByCache = new WeakMap<Cache, Map<string, Flight>>();
+
+function flightsOf(cache: Cache): Map<string, Flight> {
+    let flights = flightsByCache.get(cache);
+    if (!flights) flightsByCache.set(cache, flights = new Map());
+    return flights;
+}
+
+/**
+ * Join the request in flight for `key`, or start it with `start(signal)` when there is none. The
+ * signal is the request's, aborted only when its last consumer leaves ({@link leaveRequest}) or a
+ * refetch supersedes it ({@link supersedeRequest}).
+ * @internal
+ */
+export function joinRequest<T>(cache: Cache, key: string, consumer: object, start: (signal: AbortSignal) => Promise<T>): Flight & { promise: Promise<T> } {
+    const flights = flightsOf(cache);
+    const version = cache.keyVersion(key).peek();
+    let flight = flights.get(key);
+    // A request that started before the key was invalidated may answer with what the write
+    // replaced: it is not joined, a new one is started for everyone.
+    if (flight && flight.version !== version) {
+        supersedeRequest(cache, key);
+        flight = undefined;
+    }
+    if (!flight || flight.controller.signal.aborted) {
+        const controller = new AbortController();
+        const request = start(controller.signal);
+        // Rejects the moment the request is aborted, whatever the transport does with the signal:
+        // a consumer waiting for a superseded request has to learn it, to wait for the next one.
+        const promise = new Promise<T>((resolve, reject) => {
+            request.then(resolve, reject);
+            controller.signal.addEventListener('abort', () => reject(controller.signal.reason), { once: true });
+        });
+        const created: Flight = { promise, controller, consumers: new Set(), version, superseded: false };
+        flight = created;
+        flights.set(key, created);
+        // Settled: the next read starts its own request. Only this flight's entry, not a newer one.
+        const clear = () => { if (flights.get(key) === created) flights.delete(key); };
+        promise.then(clear, clear);
+    }
+    flight.consumers.add(consumer);
+    return flight as Flight & { promise: Promise<T> };
+}
+
+/**
+ * `consumer` stops waiting for `flight` — it aborted, its key changed, it was disposed. The request
+ * goes on for the others, and is aborted when the last one leaves.
+ * @internal
+ */
+export function leaveRequest(cache: Cache, key: string, flight: Flight, consumer: object): void {
+    flight.consumers.delete(consumer);
+    if (flight.consumers.size > 0 || flight.controller.signal.aborted) return;
+    flight.controller.abort();
+    const flights = flightsOf(cache);
+    if (flights.get(key) === flight) flights.delete(key);
+}
+
+/**
+ * Abort the request in flight for `key` for everyone: a refetch starts the one they all wait for
+ * next, and each consumer gets its value through the cache's write listeners.
+ * @internal
+ */
+export function supersedeRequest(cache: Cache, key: string): void {
+    const flights = flightsOf(cache);
+    const flight = flights.get(key);
+    if (!flight) return;
+    flights.delete(key);
+    flight.superseded = true;
+    flight.controller.abort();
+}
+
 // ─── Default Cache Singleton ───────────────────────────────────────
 
 let _defaultCache: Cache | null = null;
@@ -377,8 +498,9 @@ let _defaultCache: Cache | null = null;
  * The process-wide cache every {@link resource} uses unless given its own, created on first use.
  *
  * Being a singleton is the point: two components asking for the same key share one request and one
- * value. It is also why a test that leaves entries behind can change the next test's behaviour —
- * see {@link setDefaultCache}.
+ * value — concurrent reads join the request in flight, and a value one resource writes (its answer,
+ * its `mutate`) reaches the others on the key. It is also why a test that leaves entries behind can
+ * change the next test's behaviour — see {@link setDefaultCache}.
  */
 export function getDefaultCache(): Cache {
     if (!_defaultCache) _defaultCache = createCache();

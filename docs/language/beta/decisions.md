@@ -119,7 +119,7 @@ test; an entry marked *inference* is filed as «write the test first».
 - `resource.abort()` leaves the state pending; the HTTP client reports its own timeout as an
   `AbortError` (E3 — landed, #255).
 - The `AbortSignal` does not reach the transport (E2 — landed, #256).
-- Two consumers of one key make two requests (E7).
+- Two consumers of one key make two requests (E7 — landed, #258).
 - `useQuery` retries on top of the client's retry; the client retries `PUT` and `DELETE` by default
   (E6 — landed, #257).
 - `useQuery`'s refetch on focus and on reconnect supersedes a request in flight.

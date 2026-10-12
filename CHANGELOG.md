@@ -12,6 +12,11 @@ semver.
 ### Features
 
 - Initial public release.
+- Readers of one cache key share one request and one value, as the default cache always promised:
+  two components with the same `@fetch` make one request, which is aborted only when the last of
+  them goes; a `refetch()` from one replaces it for all, and a value one writes — its answer, its
+  `mutate()` — reaches the others without a request. `Cache.subscribe(key, onWrite)` takes the
+  listener that carries it (`CacheWriteListener`). (#258)
 - One layer retries, and only reads. The HTTP client retries GET, HEAD and OPTIONS by default — no
   longer PUT and DELETE: a write is replayed only when its request asks, `{ retry: 2 }`
   (`RequestOptions.retry`, `false` turns it off for one request). A read source owns its retries:

@@ -45,6 +45,8 @@ resource's `data()`, `error()`, `state()` (`idle`, `loading`, `reloading`, `succ
 `abort()` cancels, which is not failing: the source goes back to `idle`, or to `success` when it has
 data, and `error()` is left as it was; a request that outlives the client's `timeout` fails with an
 `HttpTimeoutError` in `error()` (#255).
+Concurrent reads of one key share one request, aborted only when its last reader goes; a value one
+reader writes — its answer, its `refetch()`, its `mutate()` — reaches the others on the key (#258).
 Responses are cached by key and stay fresh for `staleTime` (30 000 ms by default). Every `@fetch` is
 tagged with its own key — `tags: (k) => [k, …the options' tags]`, `k` being the key the resource
 resolved — so `invalidate(['GET:/url'])`, whose array matches tags, reaches it by key (#282). The
