@@ -120,7 +120,7 @@ import { useQuery } from '@pdxui/core';
 let page = $signal(1);
 
 const users = useQuery(
-  () => fetch(`/api/users?page=${page}`).then(r => r.json()),
+  ({ signal }) => fetch(`/api/users?page=${page}`, { signal }).then(r => r.json()),
   { key: () => `users:${page}`, staleTime: 60_000, tags: ['users'] },
 );
 </script>
@@ -128,6 +128,11 @@ const users = useQuery(
 
 The query function is the **first argument**; the options object does not carry it. Then
 `users.data()`, `users.isLoading()`, `users.error()`, `users.refetch()`.
+
+It receives the request's **`signal`**: hand it to the transport, and a request that a newer one
+supersedes (`page` changed again), or one in flight when the component goes, stops on the network
+instead of running to the end for an answer nobody reads. A query function that takes no parameter
+still works; its superseded requests are ignored, not stopped.
 
 **`useQuery` or `@fetch`?** They are not rivals, and neither is going away:
 

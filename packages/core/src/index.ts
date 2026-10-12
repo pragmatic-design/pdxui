@@ -61,7 +61,7 @@ export type { EventBus, EventRecord, BusOptions } from './reactivity/bus';
 
 // Resource (async data loading)
 export { resource, resourceWhen } from './reactivity/resource';
-export type { Resource, ResourceOptions, ResourceState, ResourceStatus, ResourceHandlers } from './reactivity/resource';
+export type { Resource, ResourceOptions, ResourceState, ResourceStatus, ResourceHandlers, ResourceFetcher } from './reactivity/resource';
 
 // Mutation
 export { mutation } from './reactivity/mutation';

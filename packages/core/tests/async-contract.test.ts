@@ -117,6 +117,47 @@ describe('resource()', () => {
         expect(t.calls.length, 'a request went out after its component was destroyed').toBe(1);
     });
 
+    it('case 2 — the request a newer one supersedes is aborted on the transport', async () => {
+        const t = heldTransport<string>();
+        const id = signal(1);
+        const cache = createCache({ gcInterval: 0 });
+        const r = resource(({ signal: s }) => t.call(s), { key: () => `ac-signal:${id()}`, cache });
+        await settle();
+        id.set(2);
+        await settle();
+        const [first, second] = t.calls as AbortSignal[];
+        expect(first, 'the fetcher received no AbortSignal').toBeInstanceOf(AbortSignal);
+        expect(first.aborted, 'the superseded request still runs on the network').toBe(true);
+        expect(second.aborted, 'control: the current request is not aborted').toBe(false);
+        r.dispose();
+        expect(second.aborted, 'dispose did not abort the request in flight').toBe(true);
+    });
+
+    it('case 2 — abort() aborts the request on the transport', async () => {
+        const t = heldTransport<string>();
+        const r = resource(({ signal: s }) => t.call(s), { key: 'ac-signal-abort', cache: createCache({ gcInterval: 0 }) });
+        await settle();
+        const [s] = t.calls as AbortSignal[];
+        expect(s).toBeInstanceOf(AbortSignal);
+        r.abort();
+        expect(s.aborted, 'abort() left the request running').toBe(true);
+        r.dispose();
+    });
+
+    it('case 2 — httpResource hands the signal to the HTTP client', async () => {
+        const seen: (AbortSignal | undefined)[] = [];
+        vi.stubGlobal('fetch', vi.fn((_url: string, init?: RequestInit) => {
+            seen.push(init?.signal ?? undefined);
+            return new Promise<Response>(() => {});
+        }));
+        core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
+        const r = core.httpResource<string>('/api/ac-http-resource');
+        await settle();
+        expect(seen[0], 'the HTTP request carries no signal').toBeInstanceOf(AbortSignal);
+        r.dispose();
+        expect(seen[0]!.aborted, 'disposing the httpResource left its request running').toBe(true);
+    });
+
     it('case 3 — abort() during a first load returns to idle, and the error is not touched', async () => {
         const t = heldTransport<string>();
         const cache = createCache({ gcInterval: 0 });
@@ -220,6 +261,28 @@ describe('a compiled @fetch', () => {
         expect(el.querySelector('p')!.textContent, 'the older answer overwrote the newer one').toBe('two');
     });
 
+    it('case 2 — a superseded @fetch request, and the one in flight when the component goes, are aborted', async () => {
+        const signals: AbortSignal[] = [];
+        vi.stubGlobal('fetch', vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+            if (init?.signal) signals.push(init.signal);
+            return new Promise<Response>(() => {});
+        }));
+        core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
+        defineCompiled('acfetchsignal', "<template><p></p><button @click=\"id = 2\">2</button></template>\n"
+            + "<script setup>\nlet id = $signal(1);\n@fetch user: 'GET /api/ac-signal/${id}' as User;\n</script>\n");
+        const el = document.createElement('pdx-acfetchsignal');
+        document.body.appendChild(el);
+        await settle();
+        el.querySelector('button')!.click();
+        await settle();
+        expect(signals.length, 'the @fetch requests carry no signal').toBe(2);
+        expect(signals[0].aborted, 'the superseded @fetch request still runs').toBe(true);
+        expect(signals[1].aborted).toBe(false);
+        el.remove();
+        await settle();
+        expect(signals[1].aborted, 'the request in flight outlived its component').toBe(true);
+    });
+
     it('case 8 — the component going releases the @fetch cache subscription', async () => {
         const t = stubFetch();
         defineCompiled('acfetchdispose', "<template><p>{{ users.data()?.length ?? 0 }}</p></template>\n"
@@ -273,5 +336,20 @@ describe('useQuery', () => {
         await settle();
         expect(q.data(), 'the older answer overwrote the newer one').toBe('two');
         q.dispose();
+    });
+
+    it('case 2 — the query function receives the signal, and a superseded or disposed request is aborted', async () => {
+        const t = heldTransport<string>();
+        const id = signal(1);
+        const q = useQuery(({ signal: s }) => t.call(s), { key: () => `ac-query-signal:${id()}`, refetchOnFocus: false, refetchOnReconnect: false, retry: 0 });
+        await settle();
+        id.set(2);
+        await settle();
+        const [first, second] = t.calls as AbortSignal[];
+        expect(first, 'the query function received no AbortSignal').toBeInstanceOf(AbortSignal);
+        expect(first.aborted, 'the superseded query still runs').toBe(true);
+        expect(second.aborted).toBe(false);
+        q.dispose();
+        expect(second.aborted, 'dispose did not abort the query in flight').toBe(true);
     });
 });

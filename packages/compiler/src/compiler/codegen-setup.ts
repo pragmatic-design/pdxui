@@ -208,6 +208,9 @@ export function buildSetupBody(
                 ? `() => ${rewriteAll(`\`${f.method}:${safeUrl}\``)}`
                 : jsString(`${f.method}:${f.url}`);
             const fetchUrl = f.hasReactiveParams ? rewriteAll(`\`${safeUrl}\``) : jsString(f.url);
+            // The request's signal reaches the client, so a superseded or disposed request stops on
+            // the network (beta spec, E2). `__signal`: the module imports core's `signal` by name.
+            const fetcher = `({ signal: __signal }) => __httpClient.get(${fetchUrl}, { signal: __signal })`;
             // Every @fetch is tagged with its own cache key (#282): an array given to `invalidate`
             // matches tags, so `invalidate: ['GET:/api/users']` reaches the fetch whose key it is.
             // `k` is the key the resource resolved at that write — the current one for a reactive URL,
@@ -222,9 +225,9 @@ export function buildSetupBody(
                 const object = rewritten.startsWith('(') && rewritten.endsWith(')') ? rewritten.slice(1, -1) : f.options;
                 const opts = `__${f.name}_opts`;
                 parts.push(`    const ${opts} = ${object.trim()};`);
-                parts.push(`    const ${f.name} = resource(() => __httpClient.get(${fetchUrl}), { key: ${cacheKey}, ...${opts}, tags: (k) => [k, ...(Array.isArray(${opts}.tags) ? ${opts}.tags : [])] });`);
+                parts.push(`    const ${f.name} = resource(${fetcher}, { key: ${cacheKey}, ...${opts}, tags: (k) => [k, ...(Array.isArray(${opts}.tags) ? ${opts}.tags : [])] });`);
             } else {
-                parts.push(`    const ${f.name} = resource(() => __httpClient.get(${fetchUrl}), { key: ${cacheKey}, tags: (k) => [k] });`);
+                parts.push(`    const ${f.name} = resource(${fetcher}, { key: ${cacheKey}, tags: (k) => [k] });`);
             }
         }
     }
