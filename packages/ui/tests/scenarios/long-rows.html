@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Long Rows Harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: var(--pdx-color-bg, #fff); color: var(--pdx-color-text, #111); font-family: var(--pdx-font-sans, system-ui); padding: 16px; }
+        #stage { max-width: 720px; display: flex; flex-direction: column; gap: 32px; }
+    </style>
+    <script type="module">
+        // Three long lists that are NOT virtualised, for what `content-visibility: auto` saves (#285).
+        //
+        // `pdx-list`, `pdx-tree` (every branch open) and `pdx-transfer`, `?rows=N` rows each (2,000 by
+        // default). The page asserts nothing: the spec reads which rows Chromium skipped and how long
+        // the first render spent in layout. `?cv=off` forces `content-visibility: visible` on every
+        // element before anything renders: the same page with the rule turned off, the control.
+        //
+        // Last, a short `pdx-list` whose rows come from the `item` slot: the application's markup,
+        // which the rule must not reach.
+        import '@pdxui/design';
+        // The components it renders, not the barrel.
+        import '@pdxui/ui/list';
+        import '@pdxui/ui/tree';
+        import '@pdxui/ui/transfer';
+
+        const p = new URLSearchParams(location.search);
+        const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
+        const rows = Number(p.get('rows') ?? '2000');
+        if (p.get('cv') === 'off') {
+            const off = document.createElement('style');
+            off.textContent = '* { content-visibility: visible !important; }';
+            document.head.appendChild(off);
+        }
+
+        // Which rows Chromium is skipping. `checkVisibility()` cannot say it: `content-visibility`
+        // skips an element's CONTENTS, so the row itself always reports visible, and a list row
+        // written as text has no child element to ask. The event fires on the row as it starts and
+        // stops being skipped; it does not bubble, hence the capture.
+        document.addEventListener('contentvisibilityautostatechange', (e) => {
+            e.target.toggleAttribute('data-skipped', e.skipped);
+        }, true);
+
+        const stage = document.createElement('div');
+        stage.id = 'stage';
+        document.body.appendChild(stage);
+
+        const list = document.createElement('pdx-list');
+        list.setAttribute('data-test', 'list');
+        // Clickable: its rows take focus, so the spec can see where the focus ring is drawn.
+        list.setAttribute('clickable', '');
+        list.items = Array.from({ length: rows }, (_, i) => ({ id: i + 1, label: 'List row ' + (i + 1) }));
+        stage.appendChild(list);
+
+        // Forty branches of 49 leaves: 2,000 rows when `rows` is 2,000, all of them open.
+        const branches = Math.max(1, Math.round(rows / 50));
+        const tree = document.createElement('pdx-tree');
+        tree.setAttribute('data-test', 'tree');
+        tree.setAttribute('label', 'Long tree');
+        tree.setAttribute('default-expand-all', '');
+        tree.nodes = Array.from({ length: branches }, (_, b) => ({
+            id: 'b' + b,
+            label: 'Branch ' + (b + 1),
+            children: Array.from({ length: 49 }, (_, l) => ({ id: 'b' + b + '-' + l, label: 'Leaf ' + (b + 1) + '.' + (l + 1) })),
+        }));
+        stage.appendChild(tree);
+
+        const transfer = document.createElement('pdx-transfer');
+        transfer.setAttribute('data-test', 'transfer');
+        transfer.items = Array.from({ length: rows }, (_, i) => ({ value: 'v' + (i + 1), label: 'Transfer row ' + (i + 1) }));
+        stage.appendChild(transfer);
+
+        // What compiled parent code hands a component for `<slot name="item" let:item>`.
+        const slotted = document.createElement('pdx-list');
+        slotted.setAttribute('data-test', 'slotted');
+        slotted.items = [{ id: 1, label: 'Slot row 1' }, { id: 2, label: 'Slot row 2' }];
+        const carrier = document.createElement('template');
+        carrier.__pdxSlotName = 'item';
+        carrier.__pdxSlot = ({ item }) => {
+            const span = document.createElement('span');
+            span.className = 'mine';
+            span.textContent = item.label;
+            return span;
+        };
+        slotted.appendChild(carrier);
+        stage.appendChild(slotted);
+
+        // `data-pdx-ready` on <html> is the harness's contract — `openPage` waits for it.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-rows', String(rows));
+            document.documentElement.setAttribute('data-pdx-ready', '');
+        }));
+    </script>
+</head>
+<body>
+</body>
+</html>

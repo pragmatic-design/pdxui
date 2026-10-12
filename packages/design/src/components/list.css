@@ -23,6 +23,21 @@ pdx-list { display: block; }
     min-height: 40px;
 }
 
+/* A row the list writes itself (text only): skipped until it nears the viewport, so a long list
+   does not lay out the rows nobody sees. `auto` keeps a row's last laid-out height afterwards.
+   Not on a row of the `item` slot or of a `renderItem` node: that is the application's markup,
+   and paint containment would clip an overlay positioned inside it. The ring is drawn inside the
+   row for the same reason: containment clips what the row paints beyond its border box.
+   The size is the row's CONTENT box (the padding adds to it), measured in Chromium: 24px of a
+   48px row, neutral theme, normal density. */
+.pdx-list-item-text {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 24px;
+}
+.pdx-list-item-text:focus-visible {
+    outline-offset: calc(-1 * var(--pdx-focus-width));
+}
+
 .pdx-list-item-clickable {
     cursor: pointer;
     transition: background 0.1s;
