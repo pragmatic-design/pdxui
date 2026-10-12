@@ -112,6 +112,10 @@ semver.
 
 ### Fixes
 
+- A template directive no plugin registers — `@tooltip ('Save') { … }` in an app without the plugin
+  that provides it — raises `PDX_UNKNOWN_DIRECTIVE` (warning), once per name in a file. It was
+  written into the page as text with no diagnostic. Literal `@word (…)` text is written `@@word`.
+  (#296)
 - A scoped slot outlet's fallback that interpolates or holds a block —
   `<slot name="row" :item="it"><span>{{ it.label }}</span></slot>` — renders inside the outlet, only
   when the parent gives no fill. It was emitted beside the outlet, so it rendered next to the parent's

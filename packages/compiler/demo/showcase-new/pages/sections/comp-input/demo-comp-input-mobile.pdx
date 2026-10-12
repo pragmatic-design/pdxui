@@ -12,7 +12,7 @@
       <li><strong>Larger hit areas</strong> — clear/action buttons 28px on touch vs 20px on desktop</li>
     </ul>
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
-      These apply automatically via <code>@media (pointer: coarse)</code> — no props needed.
+      These apply automatically via <code>@@media (pointer: coarse)</code> — no props needed.
       Test on a real device or Chrome DevTools mobile emulation to see the differences.
     </p>
   </section>

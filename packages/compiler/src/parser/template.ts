@@ -13,6 +13,8 @@
 //
 // ALL position advancement goes through advance() for accurate line/column tracking.
 
+import { BLOCK_DIRECTIVES, TEMPLATE_AT_DIRECTIVES } from './template-directives';
+
 // ─── Source Location ───────────────────────────────────────────────
 
 /** Source position for source map generation. */
@@ -220,11 +222,18 @@ export interface TransitionConfig {
  *   content begins on the `<template>` line: without it every column of that line counts from the
  *   content, ten characters early, and a fix that reads the text at the position does not apply.
  *   The lines after it start at column 0 as they do in the file.
+ * @param onUnknownDirective - Told of each `@word (` / `@word {` that is no directive and no near
+ *   typo of one, left as text (#296). Only a caller that knows the plugins' directives passes it:
+ *   anywhere else every plugin directive would look unknown.
  */
-export function parseTemplate(source: string, lineOffset = 1, directives?: Set<string>, columnOffset = 0): TemplateNode[] {
+export function parseTemplate(
+    source: string, lineOffset = 1, directives?: Set<string>, columnOffset = 0,
+    onUnknownDirective?: (name: string, loc: SourceLoc) => void,
+): TemplateNode[] {
     const ctx: ParseContext = {
         source, pos: 0, base: 0, line: lineOffset, column: columnOffset,
         customDirectives: directives ?? new Set(),
+        onUnknownDirective,
     };
     return parseNodes(ctx);
 }
@@ -251,6 +260,8 @@ interface ParseContext {
     column: number;   // 0-based
     /** Custom directive names recognized by this parse invocation. */
     customDirectives: Set<string>;
+    /** Where an unknown `@word (` is reported, if the caller can judge it (#296). */
+    onUnknownDirective?: (name: string, loc: SourceLoc) => void;
 }
 
 // ─── Core Traversal ────────────────────────────────────────────────
@@ -373,6 +384,8 @@ function parseNodes(ctx: ParseContext, stopAt?: string): TemplateNode[] {
                         `\n  Hint: Valid directives are @if, @for, @switch, @try, @defer, @await, @show, @portal.`
                     );
                 }
+                // No near match: left as text, as before — but said, to whoever can judge it (#296).
+                ctx.onUnknownDirective?.(unknown, getLoc(ctx));
             }
         }
 
@@ -479,8 +492,7 @@ function splitPipes(raw: string): string[] {
 // ─── Directive Detection ───────────────────────────────────────────
 
 /** The block directives the parser reads; the language reference has a section for each (#120). */
-export const DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'try', 'await',
-    'let', 'slot', 'raw', 'else', 'catch', 'case', 'default', 'placeholder', 'loading', 'error', 'empty'] as const;
+export const DIRECTIVES = BLOCK_DIRECTIVES;
 
 // No module-level mutable state — custom directives passed via parseTemplate() parameter.
 function peekDirective(ctx: ParseContext): string | null {
@@ -502,9 +514,9 @@ function peekDirective(ctx: ParseContext): string | null {
     return null;
 }
 
-// Valid directive-shaped keywords that peekDirective does NOT return (handled in other contexts:
-// @transition/@mode follow a block; the rest are block sub-clauses) — never flag these.
-const KNOWN_DIRECTIVE_WORDS = new Set<string>([...DIRECTIVES, 'transition', 'mode']);
+// Valid directive-shaped keywords, including those peekDirective does NOT return (@transition and
+// @mode follow a block, @stagger and @move sit in a @for header) — never flagged.
+const KNOWN_DIRECTIVE_WORDS = new Set<string>(TEMPLATE_AT_DIRECTIVES);
 
 /**
  * If `@word` (word = letters/digits/-) followed by `(` or `{` sits at the cursor and `word` is
@@ -1327,6 +1339,7 @@ function parseBlock(ctx: ParseContext): TemplateNode[] {
         line: blockStartLoc.line,
         column: blockStartLoc.column,
         customDirectives: ctx.customDirectives,
+        onUnknownDirective: ctx.onUnknownDirective,
     };
     return parseNodes(innerCtx);
 }
