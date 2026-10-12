@@ -43,8 +43,13 @@ export interface ResourceOptions<T = unknown> {
     staleTime?: number;
     /** Max retry attempts on error (default: 0). */
     retry?: number;
-    /** Tags for semantic invalidation (e.g. ['users', 'admin']). */
-    tags?: string[];
+    /**
+     * Tags for semantic invalidation (e.g. ['users', 'admin']) — or a function of the key the
+     * resource resolved, called at each cache write, so a resource whose key changes is tagged with
+     * the current one. Every `@fetch` passes `(k) => [k, …its own tags]`: an array given to
+     * `invalidate` matches tags, and this is what lets it name a fetch by its key.
+     */
+    tags?: string[] | ((key: string) => string[]);
     /** Disable fetching until condition is met (for dependent queries). */
     enabled?: boolean | (() => boolean);
     /** Transform raw response before caching. */
@@ -125,7 +130,9 @@ export function resource<T>(
     const opts = options ?? {};
     const staleTime = opts.staleTime ?? 30_000;
     const maxRetry = opts.retry ?? 0;
-    const tags = opts.tags ?? [];
+    /** The tags of a cache write for this key: the static list, or the function of the key. */
+    const tagsFor = (key: string): string[] =>
+        typeof opts.tags === 'function' ? opts.tags(key) : (opts.tags ?? []);
     const transform = opts.transform;
     const cache = opts.cache ?? getDefaultCache();
 
@@ -219,7 +226,7 @@ export function resource<T>(
             const data = transform ? transform(raw) : raw as unknown as T;
 
             // Update cache
-            cache.set(resolvedKey, data, { tags, staleTime, silent: true });
+            cache.set(resolvedKey, data, { tags: tagsFor(resolvedKey), staleTime, silent: true });
             subscribeToCacheKey(resolvedKey);
 
             batch(() => {
@@ -334,7 +341,7 @@ export function resource<T>(
                 _error.set(undefined);
                 _state.set('local');
             });
-            cache.set(resolvedKey, value, { tags, staleTime, silent: true });
+            cache.set(resolvedKey, value, { tags: tagsFor(resolvedKey), staleTime, silent: true });
         },
 
         abort(): void {

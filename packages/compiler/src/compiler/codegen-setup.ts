@@ -208,16 +208,24 @@ export function buildSetupBody(
                 ? `() => ${rewriteAll(`\`${f.method}:${safeUrl}\``)}`
                 : jsString(`${f.method}:${f.url}`);
             const fetchUrl = f.hasReactiveParams ? rewriteAll(`\`${safeUrl}\``) : jsString(f.url);
-            const optsEntries: string[] = [`key: ${cacheKey}`];
+            // Every @fetch is tagged with its own cache key (#282): an array given to `invalidate`
+            // matches tags, so `invalidate: ['GET:/api/users']` reaches the fetch whose key it is.
+            // `k` is the key the resource resolved at that write — the current one for a reactive URL,
+            // the author's for a custom `key` option.
             if (f.options) {
                 // Rewritten like any script expression: `enabled: () => ready` reads the signal
                 // (`__ready()`), not a name the module does not have (#203). In parentheses so the
-                // block parses as an object, not as statements.
+                // block parses as an object, not as statements. Evaluated ONCE into a constant, so the
+                // author's own `tags` are spread after the key without being rewritten into the
+                // function that runs at each write.
                 const rewritten = rewriteAll(`(${f.options})`);
                 const object = rewritten.startsWith('(') && rewritten.endsWith(')') ? rewritten.slice(1, -1) : f.options;
-                optsEntries.push(object.trim().slice(1, -1).trim());
+                const opts = `__${f.name}_opts`;
+                parts.push(`    const ${opts} = ${object.trim()};`);
+                parts.push(`    const ${f.name} = resource(() => __httpClient.get(${fetchUrl}), { key: ${cacheKey}, ...${opts}, tags: (k) => [k, ...(Array.isArray(${opts}.tags) ? ${opts}.tags : [])] });`);
+            } else {
+                parts.push(`    const ${f.name} = resource(() => __httpClient.get(${fetchUrl}), { key: ${cacheKey}, tags: (k) => [k] });`);
             }
-            parts.push(`    const ${f.name} = resource(() => __httpClient.get(${fetchUrl}), { ${optsEntries.join(', ')} });`);
         }
     }
 
