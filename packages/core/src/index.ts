@@ -73,7 +73,7 @@ export type { LinkedSignalOptions, LinkedSignalPrevious } from './reactivity/lin
 
 // Cache & Invalidation
 export { createCache, getDefaultCache, setDefaultCache, invalidate, invalidateAll } from './reactivity/cache';
-export type { Cache, CacheEntry, CacheConfig, InvalidationMatcher } from './reactivity/cache';
+export type { Cache, CacheEntry, CacheConfig, InvalidationMatcher, CacheWriteListener } from './reactivity/cache';
 
 // HTTP Client
 export { createHttpClient, getDefaultClient, setDefaultClient, configureClient } from './http/client';

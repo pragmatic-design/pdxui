@@ -73,6 +73,12 @@ takes `resource()`'s options — `key`, `staleTime`, `retry`, `tags`, `enabled`,
 nothing (`staleTime` is the option) — and any other key is the error `PDX_FETCH_UNKNOWN_OPTION`: a
 misspelled option would otherwise do nothing.
 
+**Readers of one key share one request and one value.** A list and a counter that both declare
+`@fetch users: 'GET /api/users'` make one request on load and both get its answer. The request goes
+on while any of them still waits for it, and is aborted when the last one goes. A `refetch()` from
+either replaces it for both; a `mutate(value)` from either writes the key for both, without a
+request. The same holds for any `resource()`, `httpResource` or `useQuery` on one key and one cache.
+
 **A read source owns its retries.** `retry` on a `@fetch` (0 by default) is the only retry its
 requests get: it turns the HTTP client's own retry off for them, so `retry: 2` is three requests at
 most, not twelve. It retries what retrying can fix — a network error, a 5xx, 408, 429 — never a 4xx,

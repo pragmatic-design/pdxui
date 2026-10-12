@@ -2349,8 +2349,9 @@ function getDefaultCache(): Cache
 The process-wide cache every {@link resource} uses unless given its own, created on first use.
 
 Being a singleton is the point: two components asking for the same key share one request and one
-value. It is also why a test that leaves entries behind can change the next test's behaviour —
-see {@link setDefaultCache}.
+value — concurrent reads join the request in flight, and a value one resource writes (its answer,
+its `mutate`) reaches the others on the key. It is also why a test that leaves entries behind can
+change the next test's behaviour — see {@link setDefaultCache}.
 
 ### `getDefaultClient`
 
