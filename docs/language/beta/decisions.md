@@ -121,7 +121,7 @@ test; an entry marked *inference* is filed as «write the test first».
 - The `AbortSignal` does not reach the transport (E2 — landed, #256).
 - Two consumers of one key make two requests (E7).
 - `useQuery` retries on top of the client's retry; the client retries `PUT` and `DELETE` by default
-  (E6).
+  (E6 — landed, #257).
 - `useQuery`'s refetch on focus and on reconnect supersedes a request in flight.
 - `@await (x)` on a non-promise decides by truthiness, so `null` or `0` stays on `@loading` (E5).
 - `@await { maxMs }` renders the body over a pending promise.

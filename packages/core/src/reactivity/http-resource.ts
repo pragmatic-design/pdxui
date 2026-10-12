@@ -72,8 +72,9 @@ export function httpResource<T>(
         const client = getDefaultClient();
         const resolvedUrl = resolveFullUrl();
         const body = typeof options?.body === 'function' ? (options.body as () => unknown)() : options?.body;
-        // The resource's signal: a superseded or disposed request stops on the network (E2).
-        const requestOptions = { headers: options?.headers, signal };
+        // The resource's signal: a superseded or disposed request stops on the network (E2). The
+        // transport's retry off: the resource's `retry` is the only one (E6).
+        const requestOptions = { headers: options?.headers, signal, retry: false as const };
 
         switch (method) {
             case 'GET':    return client.get<T>(resolvedUrl, requestOptions);

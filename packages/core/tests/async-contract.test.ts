@@ -7,11 +7,18 @@
 //
 //   - case 1 (E1, latest wins): two requests in flight, the older one answering last, does not
 //     overwrite the newer one's data;
+//   - case 2 (E2, a signal per request): a superseded, aborted or disposed request is aborted on the
+//     transport (#256);
+//   - case 3 (E3, cancelling is not failing): abort() returns the source to its settled state, and a
+//     transport timeout is an HttpTimeoutError (#255);
+//   - case 6 (E6, one layer retries, only reads): the transport calls of a failing read are the
+//     source's retries and no more, a write is not replayed unless it asks, a 4xx is not retried
+//     (#257);
 //   - case 8 (E8, disposed with its scope): a source created in a component's setup lets go of its
 //     cache subscription when the component goes, so the entry is collected, and a retry waiting in
 //     its backoff does not fire (#254).
 //
-// The issues for E2, E3, E6 and E7 add their cases here; the route-loader rows come with the loaders.
+// The issue for E7 adds its case here; the route-loader rows come with the loaders.
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import * as core from '../src/index';
@@ -351,5 +358,104 @@ describe('useQuery', () => {
         expect(second.aborted).toBe(false);
         q.dispose();
         expect(second.aborted, 'dispose did not abort the query in flight').toBe(true);
+    });
+});
+
+// ─── case 6: one layer retries, and only reads ──────────────────────
+
+describe('case 6 — one layer retries, and only reads', () => {
+    /** A fetch that answers `statuses` in turn, then 200; counts the calls. */
+    function scriptedFetch(statuses: number[]) {
+        const seen = { calls: 0 };
+        vi.stubGlobal('fetch', vi.fn(() => {
+            const status = statuses[seen.calls++];
+            return Promise.resolve(status
+                ? new Response('{}', { status, headers: { 'content-type': 'application/json' } })
+                : json({ ok: true }));
+        }));
+        return seen;
+    }
+    const always503 = () => Array.from({ length: 50 }, () => 503);
+
+    it('a compiled @fetch with retry: 2 over the default client: three transport calls, not twelve', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        const seen = scriptedFetch(always503());
+        core.setDefaultClient(core.createHttpClient({ timeout: 0 })); // its own retry on, as by default
+        defineCompiled('acretryfetch', "<template><p></p></template>\n"
+            + "<script setup>\n@fetch users: 'GET /api/ac-retry-fetch' as string[] { retry: 2 };\n</script>\n");
+        document.body.appendChild(document.createElement('pdx-acretryfetch'));
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(seen.calls, 'the transport retried under the source\'s retries').toBe(3);
+    });
+
+    it('control — a read that fails twice then succeeds with retry: 2 is three calls', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        const seen = scriptedFetch([503, 503]);
+        core.setDefaultClient(core.createHttpClient({ timeout: 0 }));
+        defineCompiled('acretryfetchok', "<template><p></p></template>\n"
+            + "<script setup>\n@fetch users: 'GET /api/ac-retry-ok' as string[] { retry: 2 };\n</script>\n");
+        document.body.appendChild(document.createElement('pdx-acretryfetchok'));
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(seen.calls).toBe(3);
+    });
+
+    it('resource(): a 404 is not retried — retrying cannot fix it', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        let calls = 0;
+        const r = resource(() => { calls++; return Promise.reject(new core.HttpError(404, 'Not Found', '/api/x')); },
+            { key: 'ac-retry-404', cache: createCache({ gcInterval: 0 }), retry: 3 });
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(calls, 'a 404 was retried').toBe(1);
+        expect(r.state()).toBe('error');
+        r.dispose();
+    });
+
+    it('resource(): a network failure is retried, with retry: 2 three calls in all', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        let calls = 0;
+        const r = resource(() => { calls++; return calls <= 2 ? Promise.reject(new TypeError('network')) : Promise.resolve('ok'); },
+            { key: 'ac-retry-network', cache: createCache({ gcInterval: 0 }), retry: 2 });
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(calls).toBe(3);
+        expect(r.data()).toBe('ok');
+        r.dispose();
+    });
+
+    it('useQuery over its own fetcher: retry: 2 and a read failing twice is three calls', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        let calls = 0;
+        const q = useQuery(() => { calls++; return calls <= 2 ? Promise.reject(new TypeError('network')) : Promise.resolve('ok'); },
+            { key: 'ac-retry-query', retry: 2, refetchOnFocus: false, refetchOnReconnect: false });
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(calls).toBe(3);
+        expect(q.data()).toBe('ok');
+        q.dispose();
+    });
+
+    it('a PUT that fails with a 503 is sent once: a write is not replayed by default', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        const seen = scriptedFetch(always503());
+        const caught = core.createHttpClient({ timeout: 0 }).put('/api/ac-put', { id: 7 }).catch((e: unknown) => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(await caught).toBeInstanceOf(core.HttpError);
+        expect(seen.calls, 'the PUT was replayed').toBe(1);
+    });
+
+    it('the same PUT asking for retry: 2 is sent three times', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        const seen = scriptedFetch(always503());
+        const caught = core.createHttpClient({ timeout: 0 }).put('/api/ac-put', { id: 7 }, { retry: 2 }).catch((e: unknown) => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(await caught).toBeInstanceOf(core.HttpError);
+        expect(seen.calls, 'retry: 2 on the request was not honoured').toBe(3);
+    });
+
+    it('retry: false on a GET turns the transport retry off for that request', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        const seen = scriptedFetch(always503());
+        const caught = core.createHttpClient({ timeout: 0 }).get('/api/ac-get', { retry: false }).catch((e: unknown) => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+        expect(await caught).toBeInstanceOf(core.HttpError);
+        expect(seen.calls).toBe(1);
     });
 });

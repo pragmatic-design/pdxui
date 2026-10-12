@@ -15,6 +15,7 @@ import { signal, computed, effect, batch, collectDisposers, onDispose } from './
 import type { ReadonlySignal, Dispose } from '../utils/types';
 import { getDefaultCache } from './cache';
 import type { Cache } from './cache';
+import { isRetryableError, retryDelayMs } from '../http/middleware';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -252,9 +253,11 @@ export function resource<T>(
             if (generation !== fetchGeneration) return;
             if (thisController.signal.aborted) return;
 
-            // Retry logic (exponential backoff)
-            if (attempt < maxRetry) {
-                const delay = Math.min(300 * Math.pow(2, attempt), 10_000);
+            // Retry what retrying can fix, with the HTTP client's classifier and backoff (beta spec,
+            // E6): not a 4xx, a cancellation or a timeout; jitter, and Retry-After when the server
+            // sends one. A read source owns its retries — `@fetch` turns the transport's off.
+            if (attempt < maxRetry && isRetryableError(err)) {
+                const delay = retryDelayMs(err, attempt);
                 await new Promise(r => setTimeout(r, delay));
                 if (generation === fetchGeneration) {
                     return doFetch(attempt + 1);

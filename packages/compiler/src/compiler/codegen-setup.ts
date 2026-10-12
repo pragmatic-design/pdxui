@@ -210,7 +210,9 @@ export function buildSetupBody(
             const fetchUrl = f.hasReactiveParams ? rewriteAll(`\`${safeUrl}\``) : jsString(f.url);
             // The request's signal reaches the client, so a superseded or disposed request stops on
             // the network (beta spec, E2). `__signal`: the module imports core's `signal` by name.
-            const fetcher = `({ signal: __signal }) => __httpClient.get(${fetchUrl}, { signal: __signal })`;
+            // The transport's retry is off: the source's `retry` is the only one (E6), or a `retry: 2`
+            // over the client's own three made twelve requests.
+            const fetcher = `({ signal: __signal }) => __httpClient.get(${fetchUrl}, { signal: __signal, retry: false })`;
             // Every @fetch is tagged with its own cache key (#282): an array given to `invalidate`
             // matches tags, so `invalidate: ['GET:/api/users']` reaches the fetch whose key it is.
             // `k` is the key the resource resolved at that write — the current one for a reactive URL,
