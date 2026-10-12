@@ -152,7 +152,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // — and keeps a regex only for a pattern that is not made of whole segments, so both matchers are in
 // the entry, with createRouterFromTable beside createRouter. About half a kilobyte: 34.9 → 35.4
 // entry, 88.7 → 89.2 blocking (main measured in CI, this branch locally, both on LF sources).
-const BUDGET_KB = { entry: 36, js: 380, css: 59, blocking: 90 };
+// js 380 → 381: a form field knows it is required (#249: `required()` is branded, `FormField.required`
+// reads the validators) and a submit stops when a value moved under its async validation (#253: every
+// field's value recorded at the start, compared after). Core's form code, in the chunks of the pages
+// that have a form; the entry and the first paint did not move. 380.1 KB measured in CI.
+const BUDGET_KB = { entry: 36, js: 381, css: 59, blocking: 90 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

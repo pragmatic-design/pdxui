@@ -104,6 +104,9 @@ test('the status chart is a doughnut whose legend names its slices', async ({ pa
 
 test('the status counts are not all the same', async ({ page }) => {
     await openDashboard(page);
+    // The counts arrive with the store's data; until then each reads the placeholder «—», and three
+    // placeholders are three equal counts. Wait for the numbers, then compare them.
+    for (const k of ['open', 'waiting', 'closed']) await expect(value(page, k)).toHaveText(/^\d+$/);
     const counts = await Promise.all(['open', 'waiting', 'closed'].map(k => value(page, k).innerText()));
     expect(new Set(counts).size, `the counts read ${counts.join(' / ')}`).toBeGreaterThan(1);
 });
