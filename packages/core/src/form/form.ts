@@ -177,6 +177,12 @@ export interface Form<T extends Record<string, unknown>> {
     readonly state: ReadonlySignal<FormState>;
     /** Submission error (if state = 'error'). */
     readonly submitError: ReadonlySignal<unknown | undefined>;
+    /**
+     * The server's messages that name no field of the form, joined by a newline: from a submit
+     * rejected with RFC 9457 field errors (`{ errors: { path: [message] } }`), whose other messages
+     * land on their fields' `error()`. Cleared when a submit starts.
+     */
+    readonly formError: ReadonlySignal<string | undefined>;
 
     /**
      * Wrap a submit handler with validation + state management. The handler returns the submit's
@@ -326,7 +332,45 @@ export function createForm<T extends Record<string, unknown>>(
      * itself.
      */
     function effectiveError(name: string): string | undefined {
-        return fieldErrors[name]?.() ?? _crossErrors()[name];
+        return fieldErrors[name]?.() ?? _crossErrors()[name] ?? _serverErrors()[name];
+    }
+
+    /**
+     * What the server said about each field when it refused the last submit (beta spec, F5): the
+     * third source of a field's message, after its own validator's and the form-level rule's. A
+     * field's message clears on its next edit; all of them, and `_formError`, when a submit starts.
+     */
+    const _serverErrors = signal<Record<string, string>>({});
+    /** The server's messages that name no field of the form (an empty path, `$`, an unknown one). */
+    const _formError = signal<string | undefined>(undefined);
+
+    /**
+     * Read a rejection as RFC 9457 problem details with an `errors` member — `{ errors: { path:
+     * message | message[] } }`, as ASP.NET Core's validation problems and most servers send it —
+     * from an `HttpError`'s parsed body or the rejection itself. Each path's first message goes to
+     * the field it names, as written or ignoring case (`Email` → `email`, `Items[0].Name` →
+     * `items.0.name`); the rest is joined into the form's error. Anything else changes nothing.
+     */
+    function applyServerErrors(err: unknown): void {
+        const body = err && typeof err === 'object' && 'data' in err && (err as { data: unknown }).data
+            && typeof (err as { data: unknown }).data === 'object' ? (err as { data: object }).data : err;
+        const reported = body && typeof body === 'object' ? (body as { errors?: unknown }).errors : undefined;
+        if (!reported || typeof reported !== 'object' || Array.isArray(reported)) return;
+        const byLowerCase = new Map(Object.keys(fieldMap).map((name) => [name.toLowerCase(), name]));
+        const onFields: Record<string, string> = {};
+        const unmatched: string[] = [];
+        for (const [rawPath, raw] of Object.entries(reported as Record<string, unknown>)) {
+            const messages = (Array.isArray(raw) ? raw : [raw]).filter((m): m is string => typeof m === 'string' && m !== '');
+            if (messages.length === 0) continue;
+            // `items[0].name` → `items.0.name`: the form's dotted path.
+            const path = rawPath.replace(/\[(\d+)\]/g, '.$1').replace(/^\$\.?/, '');
+            const field = path === '' ? undefined : (fieldMap[path] ? path : byLowerCase.get(path.toLowerCase()));
+            if (field) { if (!onFields[field]) onFields[field] = messages[0]; } else unmatched.push(...messages);
+        }
+        batch(() => {
+            _serverErrors.set(onFields);
+            _formError.set(unmatched.length > 0 ? unmatched.join('\n') : undefined);
+        });
     }
 
     // Async validation timers
@@ -450,6 +494,11 @@ export function createForm<T extends Record<string, unknown>>(
 
             onChange(newValue: T[typeof name]): void {
                 _value.set(newValue);
+                // What the server said about the old value no longer holds for the new one.
+                if (name in _serverErrors.peek()) {
+                    const { [name]: _cleared, ...rest } = _serverErrors.peek();
+                    _serverErrors.set(rest);
+                }
                 _dirty.set(!Object.is(newValue, flatSnapshot[name]));
                 if (validateOn === 'onChange' || _touched.peek()) {
                     validateField(newValue);
@@ -511,8 +560,9 @@ export function createForm<T extends Record<string, unknown>>(
             if (fieldErrors[name]()) return false;
         }
         // The form-level rule's messages, including any keyed to no field: an unroutable message
-        // that left `valid()` true would read exactly like a rule that passed.
-        return Object.keys(_crossErrors()).length === 0;
+        // that left `valid()` true would read exactly like a rule that passed. And the server's, on
+        // its fields: a form the server just refused is not valid until they are edited.
+        return Object.keys(_crossErrors()).length === 0 && Object.keys(_serverErrors()).length === 0;
     });
 
     const dirty = computed(() => {
@@ -542,9 +592,9 @@ export function createForm<T extends Record<string, unknown>>(
 
     const errors = computed(() => {
         _fieldVersion();
-        // The form-level rule's messages first, so a field's own error overwrites one for the
-        // same field — the same precedence `effectiveError` gives a single field.
-        const result: Record<string, string> = { ..._crossErrors() };
+        // The server's messages, then the form-level rule's, then each field's own, each overwriting
+        // the one before for the same field — the precedence `effectiveError` gives a single field.
+        const result: Record<string, string> = { ..._serverErrors(), ..._crossErrors() };
         for (const name of Object.keys(fieldErrors)) {
             const err = fieldErrors[name]();
             if (err) result[name] = err;
@@ -734,6 +784,7 @@ export function createForm<T extends Record<string, unknown>>(
         validateOn,
         state: computed(() => _state()) as ReadonlySignal<FormState>,
         submitError: computed(() => _submitError()) as ReadonlySignal<unknown | undefined>,
+        formError: computed(() => _formError()) as ReadonlySignal<string | undefined>,
 
         handleSubmit(fn: (values: T) => Promise<void> | void): (e: Event) => Promise<void> {
             return (e: Event) => {
@@ -748,9 +799,12 @@ export function createForm<T extends Record<string, unknown>>(
             };
 
             async function runSubmit(): Promise<void> {
-                // Touch all fields so errors show
+                // Touch all fields so errors show; and what the server said about the last submit
+                // goes — this one is judged on its own values.
                 batch(() => {
                     for (const name of Object.keys(fieldTouched)) fieldTouched[name].set(true);
+                    _serverErrors.set({});
+                    _formError.set(undefined);
                 });
 
                 const isValid = await validateAll();
@@ -771,6 +825,8 @@ export function createForm<T extends Record<string, unknown>>(
                     batch(() => {
                         _state.set('error');
                         _submitError.set(err);
+                        // The server's field errors on their fields (beta spec, F5).
+                        applyServerErrors(err);
                     });
                 }
             }

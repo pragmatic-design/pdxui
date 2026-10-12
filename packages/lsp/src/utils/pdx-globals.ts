@@ -113,6 +113,7 @@ declare global {
     readonly validateOn: 'onChange' | 'onBlur' | 'onSubmit';
     readonly state: PdxReadonly<'idle' | 'validating' | 'submitting' | 'success' | 'error'>;
     readonly submitError: PdxReadonly<unknown>;
+    readonly formError: PdxReadonly<string | undefined>;
     handleSubmit(fn: (values: V) => Promise<void> | void): (e: Event) => Promise<void>;
     reset(newValues?: Partial<V>): void;
     setValues(values: Partial<V>): void;

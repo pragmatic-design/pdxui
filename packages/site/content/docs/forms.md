@@ -102,6 +102,19 @@ that field until the one in flight settles; then it sends the field's newest val
 of one field never race, so the older can no longer land last. A callback that returns nothing is
 called on every debounce, as before.
 
+**The server's field errors land on their fields.** When the submit function rejects with
+validation problem details (RFC 9457) — an `errors` member keyed by field path, as ASP.NET Core and
+most servers send it, in an `HttpError`'s body or thrown as it is — each message shows on the field
+it names: `Email` reaches `email`, `Items[0].Name` reaches `items.0.name`. What names no field is
+`formError()`, for a line above the buttons. A field's server message clears when it is edited, and
+all of them when the next submit starts; `submitError()` is still the rejection itself.
+
+```ts
+// The server answers 422 with { "errors": { "Email": ["Already registered"], "": ["Try later"] } }
+signup.fields.email.error();   // 'Already registered'
+signup.formError();            // 'Try later'
+```
+
 **A required field says so, from the schema.** A field whose rules include `required` is marked
 required with no prop on its `<pdx-form-field>`: its control gets `aria-required="true"`, so a screen
 reader announces «Name, required» before any error, and its label gets the required marker (` *` by
