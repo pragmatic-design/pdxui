@@ -136,11 +136,10 @@ describe('useQuery: refetchInterval', () => {
     //
     // The decision, written down here so it lives in the suite and not in someone's memory: the
     // interval does NOT fire while the tab is hidden, and it does not fire a catch-up round when it
-    // comes back either — `refetchOnFocus`, on by default, already does exactly that. Pausing is
-    // therefore free: the same freshness the moment the user returns, and none of the requests in
-    // between. An app that turned `refetchOnFocus` off has no catch-up, so for that app the
-    // interval keeps running hidden; that is the one case where polling a background tab is the
-    // lesser wrong.
+    // comes back either — `refetchOnFocus`, on by default, already does exactly that. It pauses
+    // whatever `refetchOnFocus` says (beta spec, data.md, «Polling and refetch on focus /
+    // reconnect»; #259): an app that turned the focus refetch off gets its data on the next tick
+    // after the tab comes back, not a request every period in a tab nobody looks at.
     //
     // This asserts OUR branch on `document.visibilityState`, not the browser's delivery of it.
     it('does not poll a hidden tab, and resumes when it comes back', async () => {
@@ -164,7 +163,7 @@ describe('useQuery: refetchInterval', () => {
         q.dispose();
     });
 
-    it('keeps polling a hidden tab when refetchOnFocus is off, because nothing else would catch up', async () => {
+    it('does not poll a hidden tab when refetchOnFocus is off either, and resumes on return', async () => {
         const f = tickCounter();
         const q = useQuery(f.fetcher, {
             key: nextKey(), staleTime: 0, refetchOnReconnect: false, refetchOnFocus: false,
@@ -175,8 +174,71 @@ describe('useQuery: refetchInterval', () => {
 
         setVisibility('hidden');
         await vi.advanceTimersByTimeAsync(PERIOD * 3);
-        expect(f.count - before, 'the interval stopped, and nothing will refetch on return').toBe(3);
+        expect(f.count, 'a hidden tab was polled because refetchOnFocus is off').toBe(before);
         setVisibility('visible');
+        await vi.advanceTimersByTimeAsync(PERIOD);
+        expect(f.count, 'polling did not resume when the tab came back').toBe(before + 1);
+        q.dispose();
+    });
+
+    // ── Focus and reconnect while a request is in flight ───────────────────────
+    //
+    // The same rule as the polling's skip (beta spec, «Polling and refetch on focus / reconnect»;
+    // #259): a trigger never starts a request while one is in flight. A user who switches tab and
+    // back during a slow first load would otherwise abort it and start it again.
+    it('coming back to the tab during the first load does not start a second request', async () => {
+        const f = countingFetcher();
+        const q = useQuery(f.fetcher, { key: nextKey(), staleTime: 0, refetchOnReconnect: false });
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count, 'the initial load did not start').toBe(1);
+
+        setVisibility('visible');
+        document.dispatchEvent(new Event('visibilitychange'));
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count, 'the focus refetch superseded the load in flight').toBe(1);
+
+        f.settleAll();
+        await vi.advanceTimersByTimeAsync(0);
+        document.dispatchEvent(new Event('visibilitychange'));
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count, 'control: with nothing in flight, coming back refetches').toBe(2);
+        q.dispose();
+    });
+
+    it('a query reloading over stale data counts as in flight too', async () => {
+        // The state is 'stale', not 'reloading', while a source that found stale data in the cache
+        // fetches: `loading()` is false, and a check on it let a focus refetch supersede the request.
+        const key = nextKey();
+        getDefaultCache().set(key, 0, { staleTime: -1 });
+        const f = countingFetcher();
+        const q = useQuery(f.fetcher, { key, staleTime: 0, refetchOnReconnect: false });
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count, 'the reload over stale data did not start').toBe(1);
+        expect(q.isLoading(), 'control: loading() does not show this request').toBe(false);
+
+        setVisibility('visible');
+        document.dispatchEvent(new Event('visibilitychange'));
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count, 'the focus refetch superseded the reload in flight').toBe(1);
+        f.settleAll();
+        q.dispose();
+    });
+
+    it('going back online during the first load does not start a second request', async () => {
+        const f = countingFetcher();
+        const q = useQuery(f.fetcher, { key: nextKey(), staleTime: 0, refetchOnFocus: false });
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count).toBe(1);
+
+        window.dispatchEvent(new Event('online'));
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count, 'the reconnect refetch superseded the load in flight').toBe(1);
+
+        f.settleAll();
+        await vi.advanceTimersByTimeAsync(0);
+        window.dispatchEvent(new Event('online'));
+        await vi.advanceTimersByTimeAsync(0);
+        expect(f.count, 'control: with nothing in flight, reconnecting refetches').toBe(2);
         q.dispose();
     });
 

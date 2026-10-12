@@ -12,6 +12,11 @@ semver.
 ### Features
 
 - Initial public release.
+- `useQuery`'s refetch on focus and on reconnect no longer start a request while one is in flight
+  for the key — switching tab and back during a slow first load used to abort it and start it
+  again — the same rule polling already followed. And polling pauses on a hidden tab whatever
+  `refetchOnFocus` says: with the focus refetch off it used to keep polling a background tab.
+  (#259)
 - Readers of one cache key share one request and one value, as the default cache always promised:
   two components with the same `@fetch` make one request, which is aborted only when the last of
   them goes; a `refetch()` from one replaces it for all, and a value one writes — its answer, its

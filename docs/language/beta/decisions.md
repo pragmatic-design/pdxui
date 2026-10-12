@@ -122,7 +122,7 @@ test; an entry marked *inference* is filed as «write the test first».
 - Two consumers of one key make two requests (E7 — landed, #258).
 - `useQuery` retries on top of the client's retry; the client retries `PUT` and `DELETE` by default
   (E6 — landed, #257).
-- `useQuery`'s refetch on focus and on reconnect supersedes a request in flight.
+- `useQuery`'s refetch on focus and on reconnect supersedes a request in flight (landed, #259).
 - `@await (x)` on a non-promise decides by truthiness, so `null` or `0` stays on `@loading` (E5).
 - `@await { maxMs }` renders the body over a pending promise.
 - An unknown `@defer` trigger fires immediately.

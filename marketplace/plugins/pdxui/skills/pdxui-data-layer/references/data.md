@@ -208,15 +208,15 @@ jobs.dispose();                                                                 
 ```
 
 **A hidden tab is not polled.** The interval pauses while `document.visibilityState` is `hidden`
-and resumes when the tab comes back. That costs nothing, because `refetchOnFocus` is on by default
-and refetches on return anyway: the same freshness the moment the user looks, and none of the
-requests in between. The exception is an app that turned `refetchOnFocus` **off** — it has no
-catch-up, so for that app the interval keeps running hidden.
+and resumes when the tab comes back, whatever `refetchOnFocus` says. With the focus refetch on (the
+default) the data is refreshed the moment the user looks; with it off, on the next tick after. Either
+way a tab nobody looks at makes no requests.
 
-**A tick that arrives while the last refetch is still in flight is skipped.** Polling every second
-means asking every second, not starting a request every second regardless of the one before: at a
-1s interval against a 3s endpoint, starting a request per second regardless would mean none of them
-is ever the one whose result gets used.
+**No trigger starts a request while one is in flight for the key.** A polling tick, coming back to
+the tab and going back online all skip when a request is already running — the first load, a
+refetch, or another reader's request for the same key. Polling every second means asking every
+second, not starting a request every second regardless of the one before; and switching tab and back
+during a slow first load does not abort it and start it again.
 
 **`dispose()` is for a query you created outside a component.** Inside one, the query is torn down
 with the component — the interval and both listeners — because it registers with the same ownership
