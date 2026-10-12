@@ -53,8 +53,8 @@ test('the theme is set from the page, as the profile menu sets it', async ({ pag
 test('the density and the language are set from the page too', async ({ page }) => {
     await signIn(page, 'admin');
     await page.getByRole('radiogroup', { name: 'Density' }).getByRole('radio', { name: 'Compact' }).click();
-    await expect.poll(() => page.evaluate(() => document.documentElement.style.getPropertyValue('--pdx-density-factor')))
-        .toBe('0.75');
+    await expect.poll(() => page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pdx-density-factor'))))
+        .toBe(0.75);
 
     await page.getByRole('radiogroup', { name: 'Language' }).getByRole('radio', { name: /Italiano/ }).click();
     await expect(page.locator('html')).toHaveAttribute('lang', 'it');

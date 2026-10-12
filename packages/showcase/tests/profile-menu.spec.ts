@@ -124,14 +124,14 @@ test('Settings holds the scheme and the density, and says which are on', async (
 
     await again.getByRole('menuitemradio', { name: 'Compact' }).click();
     await expect.poll(() => page.evaluate(() =>
-        document.documentElement.style.getPropertyValue('--pdx-density-factor'))).toBe('0.75');
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pdx-density-factor')))).toBe(0.75);
 
     // Both survive a reload: a preference asked for again on every visit is not a preference.
     await page.reload();
     await expect(page.locator('[data-test="account"]')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.getAttribute('pdx-scheme'))).toBe('dark');
     expect(await page.evaluate(() =>
-        document.documentElement.style.getPropertyValue('--pdx-density-factor'))).toBe('0.75');
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pdx-density-factor')))).toBe(0.75);
 });
 
 // The radios are DERIVED from the scheme and the density, rather than patched before each opening,
