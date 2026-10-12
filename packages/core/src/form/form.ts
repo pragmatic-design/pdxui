@@ -274,6 +274,8 @@ export function createForm<T extends Record<string, unknown>>(
     // Per-field warning pass, kept reachable from validateAll(). The warning rules live in a
     // closure inside buildField, so without this handle only the interactive path could run them.
     const fieldRunWarnings: Record<string, (value: unknown) => void> = {};
+    /** Each field's own validation path — what an edit runs — for a submit that a change interrupted. */
+    const fieldValidate: Record<string, (value: unknown) => void> = {};
     // Keep flat snapshot for dirty tracking (dotted-path keys → initial values)
     const flatSnapshot: Record<string, unknown> = { ...flatInitial };
 
@@ -390,6 +392,8 @@ export function createForm<T extends Record<string, unknown>>(
             // through a blur would keep a message that no longer applies.
             runFormValidate();
         }
+
+        fieldValidate[name] = validateField;
 
         // Resolve per-field save mode (field override > form default)
         const fieldSaveMode = config.fieldConfig?.[name]?.saveMode ?? saveMode;
@@ -534,6 +538,9 @@ export function createForm<T extends Record<string, unknown>>(
     async function validateAll(): Promise<boolean> {
         _state.set('validating');
         const currentFields = Object.keys(fieldValues);
+        // What this validation is about. The async rules answer for these values; a field that
+        // moves on before they answer was not validated, and the submit must not send it.
+        const validated = new Map(currentFields.map((name) => [name, fieldValues[name].peek()]));
 
         // Run schema validation if provided
         if (config.schema) {
@@ -613,6 +620,19 @@ export function createForm<T extends Record<string, unknown>>(
         }
 
         if (asyncPromises.length > 0) await Promise.all(asyncPromises);
+
+        // A value edited during the wait was validated by nothing: the answer about the old value
+        // was (rightly) dropped above, and a dropped answer is not a pass. That stops this submit —
+        // invalid, and the next one validates the new value (beta spec, data.md, F4). The changed
+        // fields go through the path an edit takes, so the new value's own errors show now.
+        const moved = currentFields.filter((name) => fieldValues[name] && !Object.is(fieldValues[name].peek(), validated.get(name)));
+        if (moved.length > 0) {
+            batch(() => {
+                for (const name of moved) fieldValidate[name]?.(fieldValues[name].peek());
+            });
+            _state.set('idle');
+            return false;
+        }
 
         _state.set('idle');
         return !hasError;
@@ -874,6 +894,7 @@ export function createForm<T extends Record<string, unknown>>(
                     delete fieldMap[key];
                     delete flatSnapshot[key];
                     delete dynamicValidators[key];
+                    delete fieldValidate[key];
                     // The pending timers of the removed field: without the clear, an armed
                     // saveTimer would save a phantom field after the removal.
                     if (asyncTimers[key]) { clearTimeout(asyncTimers[key]); delete asyncTimers[key]; }

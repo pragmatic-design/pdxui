@@ -80,7 +80,10 @@ function save(values) { /* already validated */ }
 </script>
 ```
 
-`handleSubmit(save)` calls `save` **only if** the form is valid, handing you the clean values.
+`handleSubmit(save)` calls `save` **only if** the form is valid, handing you the clean values. Never a
+value it did not validate: a field edited while the submit waits for an async validator (a «username
+is free» check) cancels that submit — the form stays where it is, the new value's errors show, and
+the next submit validates it.
 
 **A required field says so, from the schema.** A field whose rules include `required` is marked
 required with no prop on its `<pdx-form-field>`: its control gets `aria-required="true"`, so a screen
