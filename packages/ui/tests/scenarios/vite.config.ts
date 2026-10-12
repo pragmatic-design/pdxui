@@ -13,6 +13,8 @@ import { offlineEndpoint } from './offline-endpoint';
 const here = dirname(fileURLToPath(import.meta.url));
 const ui = resolve(here, '../../src');
 const core = resolve(here, '../../../core/src/index.ts');
+// The router, for a hand-written page that mounts an outlet (keepalive-children.html, #268).
+const router = resolve(here, '../../../router/src');
 // The FOUNDATION, not the whole design system. Each component's stylesheet travels
 // with the component, so the scenario pages must get it from the modules they import — which is
 // what makes `pnpm certify` the proof that no component lost its styles. Aliasing the full entry
@@ -74,6 +76,8 @@ export default defineConfig({
             // Generated from the export map, so a component added tomorrow is resolvable here by
             // being exported — which the component workflow already requires.
             ...uiSubpathAliases(),
+            { find: /^@pdxui\/router\/outlet$/, replacement: resolve(router, 'outlet.ts') },
+            { find: /^@pdxui\/router$/, replacement: resolve(router, 'index.ts') },
             ...Object.entries({
             '@pdxui/core': core,
             // The prefix alias, AFTER the sub-paths: `@pdxui/ui` alone is the whole library,

@@ -730,6 +730,14 @@ class PdxRouterOutlet extends HTMLElement {
         // The element lives in a DocumentFragment (already disconnected), so removing it
         // from the DOM would NOT re-fire disconnectedCallback — its disposers would leak.
         // Invoke the CE lifecycle explicitly to run full teardown, then detach from the fragment.
+        // Its child components were frozen with it and will not be disconnected again either: they
+        // are torn down the same way, deepest first, before the page (#268).
+        const children = Array.from(entry.element.querySelectorAll('*'))
+            .filter((el) => (el as { _frozenWithAncestor?: boolean })._frozenWithAncestor === true);
+        for (const child of children.reverse()) {
+            (child as { _frozenWithAncestor?: boolean })._frozenWithAncestor = false;
+            (child as { disconnectedCallback?: () => void }).disconnectedCallback?.();
+        }
         (entry.element as { disconnectedCallback?: () => void }).disconnectedCallback?.();
         entry.element.remove();
         this._frozenPages.delete(path);

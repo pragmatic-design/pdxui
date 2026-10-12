@@ -112,6 +112,9 @@ semver.
 
 ### Fixes
 
+- The child components of a kept-alive route page keep their state when the page is frozen: they
+  were destroyed by the move that froze it, and set up again on return. They are frozen with the
+  page — `onHide`, then `onShow` — and destroyed with it when the outlet discards it. (#268)
 - A template directive no plugin registers — `@tooltip ('Save') { … }` in an app without the plugin
   that provides it — raises `PDX_UNKNOWN_DIRECTIVE` (warning), once per name in a file. It was
   written into the page as text with no diagnostic. Literal `@word (…)` text is written `@@word`.

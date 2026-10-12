@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Keep-alive Children Harness</title>
+    <script type="module">
+        // A kept-alive route page with a child component that holds state (#268).
+        //
+        // The outlet freezes a keep-alive page by moving it into a DocumentFragment, with only the
+        // PAGE marked `_keepAlive`. The page asserts nothing: the spec counts, increments, navigates
+        // away and back, and reads what the child kept and how often each lifecycle ran — in
+        // Chromium, whose connect and disconnect order is the one a browser delivers.
+        import { component, html, signal, onDestroy, onShow, onHide } from '@pdxui/core';
+
+        const log = window.__lifecycle = { setup: 0, destroy: 0, show: 0, hide: 0 };
+
+        component('pdx-ka-counter', {
+            setup() {
+                log.setup++;
+                const count = signal(0);
+                onDestroy(() => { log.destroy++; });
+                onShow(() => { log.show++; });
+                onHide(() => { log.hide++; });
+                return { count, inc: () => count.set((n) => n + 1) };
+            },
+            render: (ctx) => html`<button data-test="inc" @click=${ctx.inc}>+</button><output data-test="count">${ctx.count}</output>`,
+        });
+        component('pdx-ka-page', { render: () => html`<h1>kept</h1><pdx-ka-counter></pdx-ka-counter>` });
+        component('pdx-ka-other', { render: () => html`<h1 data-test="other">other</h1>` });
+
+        // `?timeout=N`: the page is kept N ms after it is left, then destroyed for good.
+        const timeout = Number(new URLSearchParams(location.search).get('timeout') ?? '0');
+        globalThis.__pdx_routes = [
+            { path: '/', tag: 'pdx-ka-other' },
+            { path: '/keep', tag: 'pdx-ka-page', keepAlive: timeout > 0 ? timeout : true },
+        ];
+        history.replaceState(null, '', '/keep');
+        const { navigate } = await import('@pdxui/router');
+        await import('@pdxui/router/outlet');
+        window.__go = (to) => navigate(to);
+        document.body.appendChild(document.createElement('pdx-router-outlet'));
+        for (let i = 0; i < 60 && !document.querySelector('pdx-ka-counter [data-test="count"]'); i++) {
+            await new Promise((r) => requestAnimationFrame(r));
+        }
+        document.documentElement.setAttribute('data-pdx-ready', '');
+    </script>
+</head>
+<body></body>
+</html>
