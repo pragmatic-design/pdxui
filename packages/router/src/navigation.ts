@@ -7,6 +7,7 @@ import { publishTrail } from './trail';
 import { tableRedirect } from './route-table';
 import {
     isBrowser, _path, _params, _search, _meta, _state, _route, _navError, _navErrorDepth, _loaderFocus,
+    _navTarget,
 } from './state';
 import {
     isRouterTarget, markShown, restoreShown, writeUrl, publishQuery, parseQueryString, primaryOutlet,
@@ -166,6 +167,16 @@ function refuse(source: string, target: string): void {
  */
 export async function handleNavigation(fullPath: string, isBack = false, depth = 0, commit?: (target: string) => void): Promise<void> {
     const navId = ++_navSeq;
+    try {
+        await resolveNavigation(navId, fullPath, isBack, depth, commit);
+    } finally {
+        // Published, refused, denied, failed: whatever ended the CURRENT navigation ends what
+        // `navigation.pending()` reports. A superseded one leaves it to the navigation that replaced it.
+        if (navId === _navSeq) _navTarget.set(null);
+    }
+}
+
+async function resolveNavigation(navId: number, fullPath: string, isBack: boolean, depth: number, commit?: (target: string) => void): Promise<void> {
     const isCurrent = () => navId === _navSeq;
 
     // Every path that reaches the address bar comes through here — `navigate()`, the redirect
@@ -222,8 +233,9 @@ export async function handleNavigation(fullPath: string, isBack = false, depth =
         }
     }
 
-    // Accepted: now the address bar may say where we are going.
+    // Accepted: now the address bar may say where we are going, and the app that it is on its way.
     commit?.(fullPath);
+    _navTarget.set(fullPath);
     // Prefer the URL bar (kept in sync by navigate/setQuery), fall back to the query carried
     // in the incoming path when the environment hasn't reflected it into location.search.
     _search.set(isBrowser ? (location.search || searchFromPath) : searchFromPath);

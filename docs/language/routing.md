@@ -680,6 +680,53 @@ const next = $derived(searchParams.page + 1);
 
 alpha
 
+### navigation
+
+#### Syntax
+
+```ebnf
+NavigationRead ::= "navigation" "." ( "pending" | "to" ) "(" ")"
+```
+
+A read, in a template expression or in the script — not a declaration.
+
+#### Semantics
+
+`navigation` is the router's navigation state, from `@pdxui/router`. A component that reads it gets
+the import written by the compiler, on both render paths; one that does not read it imports nothing.
+
+- `navigation.pending()` is `true` from the moment the before-hooks (`onBeforeNavigate`) accept a
+  navigation until its route is published, or it is refused, denied by a guard, or abandoned. While a
+  hook is still deciding — a "leave this page?" on screen — nothing loads, and it is `false`.
+- `navigation.to()` is the target of the navigation in progress, query included, and `null` when
+  none is. A newer navigation replaces the target; the one it replaced no longer changes either value.
+
+Both are signals: a template or a `$derived` that reads them updates with them.
+
+#### Rules
+
+- The name is the router's only where the component neither declares nor imports a `navigation` of
+  its own; one it declares is its own, and nothing is imported.
+- In a template, an expression that reads it counts; text that mentions the word does not.
+- Without the import the name would be the browser's `window.navigation` (the Navigation API), which
+  has neither method.
+
+#### Examples
+
+```pdx
+<template>
+  @if (navigation.pending()) { <div class="route-progress" role="progressbar"></div> }
+  <pdx-router-outlet></pdx-router-outlet>
+</template>
+
+<script setup>
+</script>
+```
+
+#### Since
+
+beta (#149)
+
 ## The document head
 
 ### @title

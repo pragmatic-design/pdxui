@@ -12,6 +12,7 @@ import { liftStoreExports } from './store-exports';
 import type { CompileContext } from './compile-context';
 import { applyFormBindings, applyInjectedFormBindings } from './codegen-form-binding';
 import { maskNonCode } from './tokenizer';
+import { navigationIsRouter, templateReadsNavigation, setupReadsNavigation } from './navigation-import';
 
 /** The script calls `useForm()` or `tryUseForm()`: the component is a section of a form above it. */
 function declaresFormSection(script: string): boolean {
@@ -102,6 +103,11 @@ export function compileNewMode(
     ctx.declaredNames = declared;
     // What the script imports is in scope for the template as it is.
     ctx.importedNames = new Set(analysis.importedNames ?? []);
+    // And so is the router's `navigation`, imported below, when the template reads it (#149).
+    const navigationFromRouter = navigationIsRouter(analysis);
+    const templateNavigation = navigationFromRouter
+        && templateReadsNavigation(ast, descriptor.template?.content ?? '');
+    if (templateNavigation) ctx.importedNames.add('navigation');
 
     // Form-binding pass: auto-wire <pdx-input name="x"> inside <pdx-form :form="xxx">
     // Always run — works whether the form was created via @form rune or manually.
@@ -175,6 +181,10 @@ export function compileNewMode(
     // broken: if the dev writes wiring, it is a bug of the framework.
     if (analysis.route.loader) {
         autoImportRouter(allUserImports, ['currentLoaderData', 'currentLoaderState']);
+    }
+    // navigation: no declaration implies it — reading it does (navigation-import.ts says why).
+    if (templateNavigation || (navigationFromRouter && setupReadsNavigation(setupParts))) {
+        autoImportRouter(allUserImports, ['navigation']);
     }
 
     // $inline blocks: wrap render function to include render-time code

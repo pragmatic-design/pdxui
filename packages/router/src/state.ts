@@ -43,6 +43,8 @@ export const _navError = signal<'403' | '404' | null>(null);
  * The outlet at this depth renders the refusal; the ones above it render their route.
  */
 export const _navErrorDepth = signal(0);
+/** The target of the navigation in progress — set once the before-hooks accept, null when none is. */
+export const _navTarget = signal<string | null>(null);
 
 export const currentPath: ReadonlySignal<string> = computed(() => _path());
 export const currentParams: ReadonlySignal<Record<string, string>> = computed(() => _params());
@@ -97,3 +99,19 @@ export const currentNavError: ReadonlySignal<'403' | '404' | null> = computed(()
  * which is the whole-page behaviour of a flat route.
  */
 export const currentNavErrorDepth: ReadonlySignal<number> = computed(() => _navErrorDepth());
+
+/**
+ * The navigation in progress, for a progress bar or a dimmed page while chunks and data load:
+ * `@if (navigation.pending()) { … }`. Auto-imported in a `.pdx` that reads it.
+ *
+ * `pending()` is true from the moment the before-hooks accept a navigation — not while one of them
+ * is still asking "leave this page?" — until its route is published, or it is refused, denied or
+ * abandoned. `to()` is its target, query included, while pending; a newer navigation replaces it.
+ */
+export const navigation: {
+    readonly pending: ReadonlySignal<boolean>;
+    readonly to: ReadonlySignal<string | null>;
+} = {
+    pending: computed(() => _navTarget() !== null),
+    to: computed(() => _navTarget()),
+};

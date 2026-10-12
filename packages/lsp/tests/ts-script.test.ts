@@ -75,4 +75,18 @@ describe('getScriptDiagnostics', () => {
         const vf = buildVirtualFile(sc, start, [], '', -1);
         expect(getTsDiagnostics(svc, URI, vf, src)).toHaveLength(0);
     });
+
+    // The compiler imports the router's `navigation` where a .pdx reads it (#149), so the editor
+    // must know the name and its type with no import written.
+    const script = (sc: string) => {
+        const src = '<template></template>\n<script setup>' + sc + '</script>';
+        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        return getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src)
+            .map((d: { message: string }) => d.message);
+    };
+
+    it('navigation is known, typed, with no import', () => {
+        expect(script('\nconst busy: boolean = navigation.pending();\nconst to: string | null = navigation.to();\n')).toEqual([]);
+        expect(script('\nconst n: number = navigation.pending();\n').some(m => /boolean/.test(m))).toBe(true);
+    });
 });

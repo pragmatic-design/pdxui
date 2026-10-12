@@ -21,7 +21,7 @@ export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTab
 export {
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
     currentLoaderData, currentLoaderState, loaderData, loaderState, currentRoute, currentNavError,
-    currentNavErrorDepth,
+    currentNavErrorDepth, navigation,
 } from './state';
 export { setQuery, setQueryParam } from './address';
 export { navigate, registerGuardChecker, onBeforeNavigate, onAfterNavigate } from './navigation';

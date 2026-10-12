@@ -173,10 +173,11 @@ SearchDecl ::= "@search" S? "{" S? SearchField ( S? "," S? SearchField )* S? "}"
 
 ### navigation
 
-`navigation` from `@pdxui/router`, auto-imported in a `.pdx` (#149):
+`navigation` from `@pdxui/router`, auto-imported in a `.pdx` that reads it (#149 — landed):
 
 - `navigation.pending(): boolean` — true from the start of a navigation until the route is published
-  or the navigation is abandoned or rejected;
+  or the navigation is abandoned or rejected. The start is when the before-hooks accept it: while one
+  is still asking "leave this page?" nothing loads, and nothing is pending;
 - `navigation.to(): string | null` — the target while pending; a newer navigation replaces it.
 
 ```pdx

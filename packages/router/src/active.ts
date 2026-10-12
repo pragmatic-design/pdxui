@@ -18,7 +18,7 @@ export {
     createRouter, createRouterFromTable, configureRouter, destroyRouter, navigate,
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
     currentLoaderData, currentLoaderState, loaderData, loaderState, currentRoute, currentNavError,
-    currentNavErrorDepth,
+    currentNavErrorDepth, navigation,
     onBeforeNavigate, onAfterNavigate,
     registerGuardChecker, setQuery, setQueryParam,
     installRouteTable, routeTable, pageModule, toRouteConfig,

@@ -48,6 +48,8 @@ declare global {
   function onRouteChange(fn: (...a: any[]) => void): void;
   function onVisible(fn: (...a: any[]) => void): void;
   function onResize(fn: (...a: any[]) => void): void;
+  // The router's navigation state, which the compiler imports from @pdxui/router where it is read (#149).
+  const navigation: { readonly pending: PdxReadonly<boolean>; readonly to: PdxReadonly<string | null> };
   // What \`@fetch name: 'GET /url' as T\` gives the script and the template: core's Resource<T>, whose
   // reads are signals — \`name.data()\`, not \`name.data\`. tests/fetch-types.test.ts fails when a
   // member of Resource is missing here.
