@@ -66,6 +66,9 @@ function buildLeadingCells(gc: GridContext, target: HTMLElement, rowSpan = 1, la
     }
 }
 
+/** The ids of the header labels, which name their columnheader through aria-labelledby. */
+let labelSeq = 0;
+
 /** Build a single leaf column header cell (sort caret, filter icon, resize handle, drag reorder). */
 function buildColumnTh(gc: GridContext, col: AnyColumn, root: HTMLElement): HTMLElement {
     // Drag reorder state (per-th; shared cleanup queries `root`)
@@ -133,21 +136,25 @@ function buildColumnTh(gc: GridContext, col: AnyColumn, root: HTMLElement): HTML
     }
     const labelHost: HTMLElement = sortBtn ?? th;
 
-    // Header slot: header:{field}
+    // The label — the default text or a header:{field} slot's content — lives in ONE span, the flex
+    // squeeze target that truncates with an ellipsis in a narrow column. It is also the header's
+    // name (#263): without aria-labelledby the columnheader is named by everything inside it, the
+    // sort button's text and the filter button's label, «Name Filter Name». The two buttons keep
+    // their own names for when they are focused.
+    const label = document.createElement('span');
+    label.className = 'pdx-dg-th-label';
+    label.id = `pdx-dg-th-label-${++labelSeq}`;
     const headerSlot = gc.getSlot(`header:${col.field}`);
     if (headerSlot) {
-        const content = headerSlot({ col, field: col.field, header: col.header });
-        labelHost.appendChild(content instanceof DocumentFragment ? content : content);
+        label.appendChild(headerSlot({ col, field: col.field, header: col.header }));
     } else {
-        // Label — flex squeeze target: truncates with ellipsis in narrow columns
-        const label = document.createElement('span');
-        label.className = 'pdx-dg-th-label';
         label.textContent = col.header;
         // Tooltip for truncated text. On a sortable header the button's own title carries the
         // name AND how to add it to the sort; a title here would hide it under the label.
         if (!sortBtn) label.title = col.header;
-        labelHost.appendChild(label);
     }
+    labelHost.appendChild(label);
+    th.setAttribute('aria-labelledby', label.id);
     if (sortBtn) sortBtn.title = t('sort.hint').replace('{column}', String(col.header ?? col.field));
 
     // Sort indicator — stacked caret pattern

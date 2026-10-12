@@ -645,6 +645,10 @@
         {
           "id": "data-grid-row-menu",
           "title": "Data grid — a row's own menu, open"
+        },
+        {
+          "id": "data-grid-header-names",
+          "title": "Data grid — header names: a sortable filterable column, a slotted header, a plain one"
         }
       ]
     },

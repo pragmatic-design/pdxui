@@ -191,6 +191,7 @@ export const scenarioPage: Record<string, string> = {
     "data-grid-quick-filters": "tier-6",
     "data-grid-empty": "tier-6",
     "data-grid-row-menu": "tier-6",
+    "data-grid-header-names": "tier-6",
     "date-picker-closed": "tier-3",
     "date-picker-open": "tier-3",
     "date-picker-month-open": "tier-3",

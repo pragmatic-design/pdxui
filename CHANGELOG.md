@@ -112,6 +112,10 @@ semver.
 
 ### Fixes
 
+- A `pdx-data-grid` column header is named by its label alone: a screen reader announced a sortable,
+  filterable «Name» column as «Name Filter Name». Each header is `aria-labelledby` its label, and a
+  `header:{field}` slot's content now sits in that label span (`.pdx-dg-th-label`), as the default
+  text does. (#263)
 - A `:ref` goes back to `null` when its element leaves the page — its `@if` branch turns false, its
   `@for` row is removed, the component is destroyed — on both render paths; it kept the detached
   element. Two branches of an `@if`/`@else` binding the same ref leave it on the element shown.
