@@ -236,6 +236,7 @@ export function createHttpClient(config: HttpClientConfig = {}): HttpClient {
             meta: Object.freeze({
                 ...(options?.meta ?? {}),
                 _timeout: options?.timeout,
+                _retry: options?.retry,
                 _responseType: options?.responseType,
             }),
         };

@@ -73,6 +73,12 @@ takes `resource()`'s options — `key`, `staleTime`, `retry`, `tags`, `enabled`,
 nothing (`staleTime` is the option) — and any other key is the error `PDX_FETCH_UNKNOWN_OPTION`: a
 misspelled option would otherwise do nothing.
 
+**A read source owns its retries.** `retry` on a `@fetch` (0 by default) is the only retry its
+requests get: it turns the HTTP client's own retry off for them, so `retry: 2` is three requests at
+most, not twelve. It retries what retrying can fix — a network error, a 5xx, 408, 429 — never a 4xx,
+with the client's backoff and jitter. The same holds for `resource()` and `useQuery` (3 by default);
+a `useQuery` whose query function calls the client itself decides that client call's retry.
+
 **A `@fetch` lives as long as its component.** When the component goes, so does the resource: a
 request in flight is aborted, a retry waiting in its backoff does not fire, and it lets go of its
 cache entry, which is then collected after the cache's `gcTime` like any entry no one reads. The same
@@ -240,7 +246,7 @@ Two are on by default, because an application that has neither is worse off and 
 | | |
 |---|---|
 | **timeout** | 30 s. A request with no deadline never fails: `loading` stays true and no `error` is ever produced. A request that runs out of time fails with an `HttpTimeoutError` — not an `AbortError`, which is what your own cancel produces — so a page can say «the server did not answer». Set `timeout: 0` to disable it. |
-| **retry** | Idempotent methods only — GET, HEAD, OPTIONS, PUT, DELETE — on 5xx, 408 and 429, with backoff. A POST or PATCH is never replayed, nor a request that timed out or was cancelled. Set `retry: false` to disable it. |
+| **retry** | Reads only — GET, HEAD, OPTIONS — on network errors, 5xx, 408 and 429, with backoff and jitter, honouring `Retry-After`. A write (POST, PUT, PATCH, DELETE) is never replayed unasked, nor a request that timed out or was cancelled. One request asks for its own: `api.put(url, dto, { retry: 2 })` retries a write the server makes idempotent, `{ retry: false }` turns it off for that request. Set `retry: false` on the client to disable it everywhere. |
 
 The rest are opt-in. You install them once, at startup, with `configureClient`:
 

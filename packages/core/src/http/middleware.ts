@@ -62,31 +62,71 @@ export interface RetryMiddlewareOptions {
     maxDelay?: number;
     /** Retry on these HTTP statuses. Default: 500-599 + 408 (timeout) + 429 (rate limit). */
     retryStatuses?: number[];
-    /** Only retry idempotent methods (GET, HEAD, OPTIONS, PUT, DELETE). Default: true. */
+    /**
+     * Only retry the methods that only read (GET, HEAD, OPTIONS). Default: true. A write that should
+     * be retried asks for it on its own request (`retry: 2`) instead of turning this off for all.
+     */
     idempotentOnly?: boolean;
 }
 
-const IDEMPOTENT_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE']);
+/**
+ * The methods retried without being asked: the ones that only read (beta spec, E6). PUT and DELETE
+ * are idempotent by the HTTP spec, not by every server's implementation — one that applied the write
+ * and then failed would apply it again.
+ */
+const RETRIED_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 const DEFAULT_RETRY_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
+
+/**
+ * Whether retrying could fix this failure: a network error, a 5xx, 408 or 429. Not a 4xx (the request
+ * itself is wrong), not a cancellation or a timeout, not an offline request (already queued).
+ * One classifier for the HTTP client's retry and a read source's (`resource()`'s `retry`).
+ */
+export function isRetryableError(err: unknown, retryStatuses: ReadonlySet<number> = DEFAULT_RETRY_STATUSES): boolean {
+    // By NAME, not class: fetch rejects with a DOMException, and the client converts it to its own
+    // `AbortError` (which extends Error) before any middleware sees it — an `instanceof DOMException`
+    // test never fired, and a request killed by its own deadline was replayed until retries ran out.
+    // A timeout is the client's own error (#255) and is not retried either (beta spec, E6).
+    // An OfflineError for a sharper reason than "it would not help": the retry sits OUTSIDE the
+    // caller's middleware, so every attempt re-enters `offlineMiddleware` — which QUEUES the request
+    // before throwing. One offline PUT would be queued four times and sent four times on reconnect.
+    if (err instanceof Error && (err.name === 'AbortError' || err.name === 'HttpTimeoutError' || err.name === 'OfflineError')) return false;
+    if (err instanceof HttpError) return retryStatuses.has(err.status);
+    return true;
+}
+
+/**
+ * How long to wait before retry number `attempt + 1`: exponential backoff with jitter,
+ * `base * 2^attempt * (0.5..1.5)`, capped at `max`; a 429 or 503 with `Retry-After` waits what the
+ * server asked for (capped too). The jitter is not decoration: without it every client that failed
+ * together retries together, and the recovering server is hit by the spike that took it down.
+ */
+export function retryDelayMs(err: unknown, attempt: number, base = 300, max = 10_000): number {
+    if (err instanceof HttpError && (err.status === 429 || err.status === 503)) {
+        const retryAfter = parseRetryAfter(err);
+        if (retryAfter !== null) return Math.min(retryAfter, max);
+    }
+    const exponential = base * Math.pow(2, attempt);
+    const jitter = 0.5 + Math.random(); // [0.5, 1.5)
+    return Math.min(exponential * jitter, max);
+}
 
 /**
  * Retries a failed request with exponential backoff and jitter.
  *
  * Retries only what retrying can fix: 5xx, 408 and 429, plus network errors. A 4xx is the server
- * saying the request itself is wrong, and repeating it changes nothing.
+ * saying the request itself is wrong, and repeating it changes nothing; a cancel or a timeout is not
+ * retried either. A read source's own `retry` (`resource()`, `useQuery`) follows the same rule.
  *
- * By default it also retries only IDEMPOTENT methods (GET, HEAD, OPTIONS, PUT, DELETE), because a
- * POST that timed out may well have succeeded — replaying it can charge a card twice. Set
- * `idempotentOnly: false` only when the endpoint is idempotent by its own design (an idempotency
- * key, say).
- *
- * The jitter is not decoration: without it every client that failed together retries together, and
- * the recovering server is hit by the same spike that took it down.
+ * By default it retries only the methods that READ (GET, HEAD, OPTIONS): a write that failed may well
+ * have been applied — replaying a POST can charge a card twice, and a PUT or DELETE is idempotent only
+ * if the server made it so. A request that should be retried says so itself, `retry: 2` in its
+ * options; `retry: false` turns the retry off for one request (a read source does, owning its own).
  *
  * On by default in {@link createHttpClient}; pass `retry: false` there to turn it off.
  */
 export function retryMiddleware(options: RetryMiddlewareOptions = {}): HttpMiddleware {
-    const maxRetries = options.maxRetries ?? 3;
+    const defaultRetries = options.maxRetries ?? 3;
     const baseDelay = options.baseDelay ?? 300;
     const maxDelay = options.maxDelay ?? 10_000;
     const retryStatuses = options.retryStatuses
@@ -95,10 +135,14 @@ export function retryMiddleware(options: RetryMiddlewareOptions = {}): HttpMiddl
     const idempotentOnly = options.idempotentOnly ?? true;
 
     return async (request, next) => {
-        // Don't retry non-idempotent methods unless explicitly allowed
-        if (idempotentOnly && !IDEMPOTENT_METHODS.has(request.method)) {
+        // The request's own say, `retry` in its options: a number asks for that many retries (a write
+        // included), `false` for none.
+        const asked = request.meta._retry as number | false | undefined;
+        if (asked === false) return next(request);
+        if (asked === undefined && idempotentOnly && !RETRIED_METHODS.has(request.method)) {
             return next(request);
         }
+        const maxRetries = typeof asked === 'number' ? asked : defaultRetries;
 
         let lastError: unknown;
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -106,47 +150,10 @@ export function retryMiddleware(options: RetryMiddlewareOptions = {}): HttpMiddl
                 return await next(request);
             } catch (err) {
                 lastError = err;
-
-                // Don't retry if aborted (user cancelled or timeout).
-                // Match on the NAME, not the class: fetch rejects with a DOMException, but the
-                // client converts it to its own `AbortError` (which extends Error) before any
-                // middleware sees it — so an `instanceof DOMException` test never fired, and a
-                // request killed by its own deadline was replayed until maxRetries ran out.
-                if (err instanceof Error && err.name === 'AbortError') throw err;
-                // Nor a timeout, which the client reports as its own error (#255). Whether a timeout
-                // is retried is a decision of its own (beta spec, E6); until then it is not.
-                if (err instanceof Error && err.name === 'HttpTimeoutError') throw err;
-                if (request.signal?.aborted) throw err;
-
-                // Don't retry an OfflineError either, and for a sharper reason than "it would not
-                // help": retry sits OUTSIDE the caller's middleware, so every attempt re-enters
-                // `offlineMiddleware` — which QUEUES the request before throwing. On a real network
-                // drop, one offline PUT would be queued four times and the server would receive
-                // the same write four times on reconnect. The device being offline is
-                // not a transient failure of this request; the request is already on its way.
-                if (err instanceof Error && err.name === 'OfflineError') throw err;
-
-                // Don't retry client errors (4xx) except retryable ones
-                if (err instanceof HttpError && !retryStatuses.has(err.status)) throw err;
-
+                if (!isRetryableError(err, retryStatuses) || request.signal?.aborted) throw err;
                 // Last attempt — don't delay, just throw
                 if (attempt === maxRetries) break;
-
-                // Exponential backoff with jitter: delay * 2^attempt * (0.5..1.5)
-                const exponential = baseDelay * Math.pow(2, attempt);
-                const jitter = 0.5 + Math.random(); // [0.5, 1.5)
-                const delay = Math.min(exponential * jitter, maxDelay);
-
-                // Respect Retry-After header (429 rate limit / 503)
-                if (err instanceof HttpError && (err.status === 429 || err.status === 503)) {
-                    const retryAfterDelay = parseRetryAfter(err);
-                    if (retryAfterDelay !== null) {
-                        await sleep(Math.min(retryAfterDelay, maxDelay));
-                        continue;
-                    }
-                }
-
-                await sleep(delay);
+                await sleep(retryDelayMs(err, attempt, baseDelay, maxDelay));
             }
         }
 

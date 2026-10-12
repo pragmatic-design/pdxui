@@ -4252,15 +4252,13 @@ function retryMiddleware(options: RetryMiddlewareOptions = {}): HttpMiddleware
 Retries a failed request with exponential backoff and jitter.
 
 Retries only what retrying can fix: 5xx, 408 and 429, plus network errors. A 4xx is the server
-saying the request itself is wrong, and repeating it changes nothing.
+saying the request itself is wrong, and repeating it changes nothing; a cancel or a timeout is not
+retried either. A read source's own `retry` (`resource()`, `useQuery`) follows the same rule.
 
-By default it also retries only IDEMPOTENT methods (GET, HEAD, OPTIONS, PUT, DELETE), because a
-POST that timed out may well have succeeded — replaying it can charge a card twice. Set
-`idempotentOnly: false` only when the endpoint is idempotent by its own design (an idempotency
-key, say).
-
-The jitter is not decoration: without it every client that failed together retries together, and
-the recovering server is hit by the same spike that took it down.
+By default it retries only the methods that READ (GET, HEAD, OPTIONS): a write that failed may well
+have been applied — replaying a POST can charge a card twice, and a PUT or DELETE is idempotent only
+if the server made it so. A request that should be retried says so itself, `retry: 2` in its
+options; `retry: false` turns the retry off for one request (a read source does, owning its own).
 
 On by default in {@link createHttpClient}; pass `retry: false` there to turn it off.
 

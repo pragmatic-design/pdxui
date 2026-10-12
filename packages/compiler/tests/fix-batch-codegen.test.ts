@@ -281,7 +281,7 @@ describe('#16 @fetch URL is escaped', () => {
 </script>`;
         const { code } = compile(source, 'fetch.pdx', [], undefined, { production: false });
         // The URL is emitted via JSON.stringify → a double-quoted string literal.
-        expect(code).toContain('__httpClient.get("/api/users", { signal: __signal })');
+        expect(code).toContain('__httpClient.get("/api/users", { signal: __signal, retry: false })');
         // The cache key is also a structurally-escaped string, not raw single quotes.
         expect(code).toContain('key: "GET:/api/users"');
     });

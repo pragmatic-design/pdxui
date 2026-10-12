@@ -12,6 +12,13 @@ semver.
 ### Features
 
 - Initial public release.
+- One layer retries, and only reads. The HTTP client retries GET, HEAD and OPTIONS by default — no
+  longer PUT and DELETE: a write is replayed only when its request asks, `{ retry: 2 }`
+  (`RequestOptions.retry`, `false` turns it off for one request). A read source owns its retries:
+  `@fetch` and `httpResource` turn the client's off, so `{ retry: 2 }` is three requests at most, not
+  twelve. `resource()` and `useQuery` retry with the client's rule and backoff — never a 4xx, with
+  jitter and `Retry-After`. **Behaviour change:** a `@fetch` with no `retry` option is no longer
+  retried by the client; give it `retry` if it needs one. (#257)
 - A request a newer one supersedes, or one in flight when its resource is aborted or disposed, is
   aborted on the network instead of running to the end for an answer nobody reads. `resource()`'s
   fetcher and `useQuery`'s query function receive `{ signal }` (type `ResourceFetcher`); `@fetch` and

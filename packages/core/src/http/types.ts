@@ -74,6 +74,12 @@ export interface RequestOptions {
     headers?: Record<string, string>;
     signal?: AbortSignal;
     timeout?: number;
+    /**
+     * This request's retries, over the client's: a number asks for that many — a write too, which is
+     * never retried unasked — and `false` turns the retry off for it (a read source does: it owns
+     * its retries).
+     */
+    retry?: number | false;
     meta?: Record<string, unknown>;
     /** Override response parsing: 'json' (default), 'text', 'blob', 'arrayBuffer', 'none'. */
     responseType?: ResponseType;
