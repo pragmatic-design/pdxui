@@ -132,6 +132,9 @@
           "include": "#pdx-css-functions"
         },
         {
+          "include": "#pdx-css-variant"
+        },
+        {
           "include": "source.css"
         }
       ]
@@ -139,11 +142,11 @@
     "pdx-directives": {
       "patterns": [
         {
-          "match": "@(if|else|for|switch|case|default|show|defer|portal|try|catch|require|stagger|mode|move)\\b",
+          "match": "@(if|for|switch|require|show|portal|defer|try|await|let|slot|raw|else|catch|case|default|placeholder|loading|error|empty|transition|mode|stagger|move)\\b",
           "name": "keyword.control.pdx"
         },
         {
-          "match": "\\b(as|track)\\b",
+          "match": "\\b(as|track|prefetch|when)\\b",
           "name": "keyword.operator.pdx"
         }
       ]
@@ -171,7 +174,7 @@
     "pdx-bindings": {
       "patterns": [
         {
-          "begin": "(::|:|@)(\\w[\\w.-]*)\\s*(=)\\s*(\")",
+          "begin": "(attach:)(\\w[\\w-]*)\\s*(=)\\s*(\")",
           "beginCaptures": {
             "1": {
               "name": "keyword.operator.binding.pdx"
@@ -200,7 +203,7 @@
           ]
         },
         {
-          "begin": "(::|:|@)(\\w[\\w.-]*)\\s*(=)\\s*(')",
+          "begin": "(attach:)(\\w[\\w-]*)\\s*(=)\\s*(')",
           "beginCaptures": {
             "1": {
               "name": "keyword.operator.binding.pdx"
@@ -229,7 +232,76 @@
           ]
         },
         {
-          "match": "(::|:|@)(\\w[\\w.-]*)",
+          "match": "(attach:)(\\w[\\w-]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.operator.binding.pdx"
+            },
+            "2": {
+              "name": "entity.other.attribute-name.pdx"
+            }
+          }
+        },
+        {
+          "begin": "(::|:|@)(\\w[\\w.-]*(?:\\(\\d+\\))?)\\s*(=)\\s*(\")",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.operator.binding.pdx"
+            },
+            "2": {
+              "name": "entity.other.attribute-name.pdx"
+            },
+            "3": {
+              "name": "punctuation.separator.key-value.html"
+            },
+            "4": {
+              "name": "punctuation.definition.string.begin.html"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.html"
+            }
+          },
+          "contentName": "source.ts",
+          "patterns": [
+            {
+              "include": "source.ts"
+            }
+          ]
+        },
+        {
+          "begin": "(::|:|@)(\\w[\\w.-]*(?:\\(\\d+\\))?)\\s*(=)\\s*(')",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.operator.binding.pdx"
+            },
+            "2": {
+              "name": "entity.other.attribute-name.pdx"
+            },
+            "3": {
+              "name": "punctuation.separator.key-value.html"
+            },
+            "4": {
+              "name": "punctuation.definition.string.begin.html"
+            }
+          },
+          "end": "'",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.html"
+            }
+          },
+          "contentName": "source.ts",
+          "patterns": [
+            {
+              "include": "source.ts"
+            }
+          ]
+        },
+        {
+          "match": "(::|:|@)(\\w[\\w.-]*(?:\\(\\d+\\))?)",
           "captures": {
             "1": {
               "name": "keyword.operator.binding.pdx"
@@ -270,6 +342,14 @@
         {
           "match": "\\b(bind|responsive|responsiveValue)\\s*\\(",
           "name": "support.function.css.pdx"
+        }
+      ]
+    },
+    "pdx-css-variant": {
+      "patterns": [
+        {
+          "match": "@variant\\s+[\\w-]+\\([\\w-]+\\)(?:\\s+and\\s+[\\w-]+\\([\\w-]+\\))*",
+          "name": "keyword.control.at-rule.variant.pdx"
         }
       ]
     }

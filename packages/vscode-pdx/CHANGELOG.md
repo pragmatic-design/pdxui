@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- The template directives are generated from the compiler's own list of template `@`-words, so a
+  directive the compiler learns is highlighted with it: `@await`, `@let`, `@raw`, `@slot`,
+  `@placeholder`, `@loading`, `@error`, `@empty` and `@transition` were plain text.
+- A binding whose modifier takes an argument (`::value.debounce(300)="q"`) keeps its value
+  highlighted as TypeScript; `attach:name` is a binding, with or without a value.
+- `prefetch` and `when` are keywords inside a `@defer`'s parentheses; `@variant size(sm) and …` is
+  marked in a style block.
+
 ## 0.9.0 — pre-release
 
 The first release on the Marketplace, as a pre-release: the stable line starts at 1.0.0.
