@@ -477,6 +477,16 @@ export function leaveRequest(cache: Cache, key: string, flight: Flight, consumer
 }
 
 /**
+ * Whether a request for `key` is in flight — what a refetch on focus, on reconnect or on a polling
+ * tick waits for instead of superseding it (#259).
+ * @internal
+ */
+export function requestInFlight(cache: Cache, key: string): boolean {
+    const flight = flightsOf(cache).get(key);
+    return !!flight && !flight.controller.signal.aborted;
+}
+
+/**
  * Abort the request in flight for `key` for everyone: a refetch starts the one they all wait for
  * next, and each consumer gets its value through the cache's write listeners.
  * @internal

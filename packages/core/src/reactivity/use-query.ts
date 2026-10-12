@@ -4,6 +4,7 @@
 
 import { resource } from './resource';
 import { computed, onDispose } from './signal';
+import { getDefaultCache, requestInFlight } from './cache';
 import type { ResourceOptions, ResourceFetcher } from './resource';
 import type { ReadonlySignal } from '../utils/types';
 
@@ -29,8 +30,8 @@ export interface UseQueryOptions<T> {
     /**
      * Refetch interval in ms. 0 = disabled. Default: 0.
      *
-     * Paused while the tab is hidden (unless `refetchOnFocus` is off, which would leave nothing to
-     * catch up on return), and a tick is skipped while the previous refetch is still in flight.
+     * Paused while the tab is hidden, whatever `refetchOnFocus` says, and a tick is skipped while a
+     * request for the key is in flight — as the focus and reconnect refetches are.
      */
     refetchInterval?: number;
     /** Callbacks. */
@@ -99,11 +100,24 @@ export function useQuery<T>(
 
     const res = resource(queryFn, resourceOpts);
 
+    // The three triggers — focus, reconnect, polling — never start a request while one is in flight
+    // (beta spec, data.md, «Polling and refetch on focus / reconnect»; #259). A refetch supersedes the
+    // request in flight for every reader of the key (#258): coming back to the tab during a slow
+    // first load would abort it and start it again, and a polling tick against a slower endpoint
+    // would start a request every period, none of them ever the one whose result got used.
+    // In flight for the KEY, from the cache's registry of shared requests: not `loading()`, which is
+    // false while a source with stale data reloads, and blind to another reader's request.
+    const cache = getDefaultCache();
+    const refreshUnlessPending = (): void => {
+        if (requestInFlight(cache, res.key)) return;
+        void res.refetch();
+    };
+
     // Auto-refetch on focus
     let focusHandler: (() => void) | null = null;
     if (opts.refetchOnFocus !== false && typeof document !== 'undefined') {
         focusHandler = () => {
-            if (document.visibilityState === 'visible') res.refetch();
+            if (document.visibilityState === 'visible') refreshUnlessPending();
         };
         document.addEventListener('visibilitychange', focusHandler);
     }
@@ -111,32 +125,19 @@ export function useQuery<T>(
     // Auto-refetch on reconnect
     let onlineHandler: (() => void) | null = null;
     if (opts.refetchOnReconnect !== false && typeof window !== 'undefined') {
-        onlineHandler = () => res.refetch();
+        onlineHandler = refreshUnlessPending;
         window.addEventListener('online', onlineHandler);
     }
 
-    // Polling interval
-    //
-    // Two rules beyond a plain timer:
-    //
-    //   - a tick that arrives while the previous refetch is STILL IN FLIGHT is skipped. "Poll every
-    //     second" means asking every second, not starting a request every second whatever became of
-    //     the last one — at a 1s interval against a 3s endpoint, every tick would start a fetch and
-    //     abort the bookkeeping of the one before it, so none of them would ever be the one whose
-    //     result got used;
-    //   - a HIDDEN TAB is not polled. This is free rather than a trade-off, because `refetchOnFocus`
-    //     is on by default and refetches the moment the tab comes back: same freshness on return,
-    //     none of the requests in between. The exception is an app that turned `refetchOnFocus` off
-    //     — it has no catch-up, so for that app the interval keeps running hidden.
+    // Polling interval. A tick skips while a request is in flight, like the other triggers, and a
+    // HIDDEN TAB is not polled, whatever `refetchOnFocus` says: with the focus refetch on (the
+    // default) the tab is refreshed the moment it comes back; with it off, on the next tick after.
+    // Either way a tab nobody looks at makes no requests.
     let intervalId: ReturnType<typeof setInterval> | null = null;
-    let pollInFlight = false;
-    const pauseWhileHidden = focusHandler !== null;
     if (opts.refetchInterval && opts.refetchInterval > 0) {
         intervalId = setInterval(() => {
-            if (pollInFlight) return;
-            if (pauseWhileHidden && document.visibilityState === 'hidden') return;
-            pollInFlight = true;
-            void res.refetch().finally(() => { pollInFlight = false; });
+            if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+            refreshUnlessPending();
         }, opts.refetchInterval);
     }
 

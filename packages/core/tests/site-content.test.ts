@@ -647,16 +647,20 @@ describe('the data page teaches polling, the rollback, and the offline queue', (
         // direction.
         expect(flat, 'the page does not say what a hidden tab does, which is the thing that bites')
             .toMatch(/hidden tab is not polled|pauses while/i);
-        // And the exception, which is the half a reader acts on: with refetchOnFocus off there is
-        // no catch-up, so the pause would silently freeze the data.
-        expect(flat, 'the page does not say what the pause costs an app with refetchOnFocus off')
-            .toMatch(/turned `refetchOnFocus` \*\*off\*\*/i);
+        // And what it means for an app with refetchOnFocus off, the half a reader acts on: the pause
+        // holds for it too (#259), and its data comes back on the next tick after the tab does.
+        expect(flat, 'the page does not say the pause holds whatever refetchOnFocus says')
+            .toMatch(/whatever `refetchOnFocus` says/i);
+        expect(flat, 'the page still says the interval keeps running hidden with refetchOnFocus off')
+            .not.toMatch(/keeps running hidden/i);
     });
 
     // Two behaviours a reader cannot guess. The page states them, and the two lines below are what stops a rewrite from dropping either.
-    it('says a tick is skipped while the last refetch is still in flight', () => {
+    it('says no trigger starts a request while one is in flight', () => {
         expect(flat, 'overlap is unstated: a slow endpoint under a fast interval is a trap')
-            .toMatch(/still in flight/i);
+            .toMatch(/while one is in flight|already running/i);
+        expect(flat, 'the page does not say coming back to the tab skips a request in flight too')
+            .toMatch(/coming back to\s+the tab/i);
     });
 
     it('says a query inside a component does not need dispose(), and one outside does', () => {
