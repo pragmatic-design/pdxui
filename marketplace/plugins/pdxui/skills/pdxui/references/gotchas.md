@@ -9,12 +9,10 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
 > read before every `.pdx` anyone writes.
 
 ## Template reactivity
-- **An import is not on `ctx`**: a signal imported and used in the template makes the component throw at mount
-  (`ctx.X is not a function`); a function imported and used in `@click` throws the same when clicked, and nothing
-  happens. Bring it into the `<script setup>`: a **function** as `const goTo = go` or a wrapper function; a **shared
-  signal** as `const user = $derived(shared())`, then `{{ user.name }}` follows it. Not `const user = shared()` —
-  a snapshot that never updates — and not `const user = shared` read as `{{ user.name }}`, which renders "read",
-  a property of the signal function. (Measured.)
+- **An import in the template is called as written**, without `ctx.`: `@click="go('home')"` calls the imported
+  `go`, and an imported signal is read with its parentheses, `{{ shared().name }}`, which follows it. In the script,
+  `const user = $derived(shared())` follows it too; `const user = shared()` does not — it is a snapshot that never
+  updates. (Measured: `packages/ui/tests/unit/import-in-template.test.ts`.)
 - **The name `error` is forbidden** for a signal (the compiler does not rewrite it) → use `errMsg`.
 
 ## Binding & DOM
