@@ -112,6 +112,11 @@ semver.
 
 ### Fixes
 
+- A `$signal`, `$derived` or `$store` whose type argument has a comma, parentheses or an arrow —
+  `$signal<Record<string, string>>({})`, `$signal<(A & B)[]>([])`, `$signal<() => void>(…)` — is read
+  as a rune. It was split in two or left as code, and in a `.pdx.ts` store shipped `$signal` in the
+  JavaScript with no diagnostic. A plain `<script>` whose only rune has a type argument is in the new
+  mode, and a rune declaration that cannot be read is `PDX_UNKNOWN_DECLARATION`. (#275)
 - `@show` false hides text at the root of its block too: `@show (open) { Details: <b>…</b> }` left
   «Details:» on the page. A root text node is swapped for a placeholder while hidden and put back,
   current, when shown; elements still take `display: none`. The template path's text binding also

@@ -823,11 +823,11 @@ let count = $signal(0);
 
 ### PDX_UNKNOWN_DECLARATION
 
-*error* — A known `@` declaration written in a shape the compiler does not recognise.
+*error* — A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise.
 
-The line is dropped and nothing is generated for it; left in the body it would make the module unparseable.
+The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds.
 
-**Fix.** Write it in the shape the hint shows for that keyword.
+**Fix.** Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`.
 
 ### PDX_UNKNOWN_PROP
 

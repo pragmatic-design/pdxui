@@ -592,9 +592,12 @@ the rewritten expression is `undefined`.
 
 #### Rules
 
-- `$signal` is read only as the initialiser of a declaration at the start of a line. Anywhere else —
-  inside a function, an array, an argument — the call is left as written, and `$signal` is not defined
-  at run time — not checked today.
+- `$signal` is read only as the whole initialiser of a named declarator, in a `let`/`const`/`var` at
+  the start of a line, with or without a type argument — whatever the type holds: `Record<string,
+  string>`, `(A & B)[]`, `() => void` (#275). Elsewhere in such a statement — an argument
+  (`wrap($signal(1))`), a destructuring pattern, a statement that does not parse — it is
+  `PDX_UNKNOWN_DECLARATION` (error), and nothing is generated for it. Inside a function the call is
+  left as written, and `$signal` is not defined at run time — not checked today.
 - A destructuring assignment to a signal (`[count] = pair`) is not rewritten, and `count` is not
   defined at run time — not checked today.
 - A plain `let` the template reads and the script changes raises `PDX_NON_REACTIVE`.
