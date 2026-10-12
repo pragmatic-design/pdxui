@@ -37,6 +37,11 @@ component('pdx-form-field', {
         /** Non-blocking warning message (yellow, below error). */
         warning: { type: String, default: '' },
         success: { type: String, default: '' },
+        /**
+         * Marks the field required: `aria-required` on its control and the required marker on its
+         * label. Not needed for a field the form requires — one whose validators include
+         * `required()` is marked the same way without it.
+         */
         required: { type: Boolean, default: false },
         optional: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
@@ -130,6 +135,18 @@ component('pdx-form-field', {
             return false;
         }
 
+        /**
+         * Required by the markup (`required`) or by the form: a field whose validators include
+         * `required()` (`FormField.required`). One answer for the control's `aria-required` and the
+         * label's marker, so the two cannot disagree.
+         */
+        function isRequired(): boolean {
+            if (ctx.required()) return true;
+            const form = currentForm();
+            const name = resolveFieldName();
+            return !!(form && name && form.fields[name]?.required === true);
+        }
+
         function shouldShowError(): boolean {
             const err = resolveError();
             if (!err) return false;
@@ -155,7 +172,7 @@ component('pdx-form-field', {
             let cls = 'pdx-field-label';
             const s = ctx.size() as string;
             if (s) cls += ' pdx-field-label-' + s;
-            if (ctx.required()) cls += ' pdx-field-required';
+            if (isRequired()) cls += ' pdx-field-required';
             if (ctx.optional()) cls += ' pdx-field-optional';
             if (ctx.disabled()) cls += ' pdx-field-label-disabled';
             return cls;
@@ -191,7 +208,7 @@ component('pdx-form-field', {
             const hasDesc = !!(ctx.description() as string);
             const disabled = ctx.disabled();
             const size = ctx.size() as string;
-            const required = !!ctx.required();
+            const required = isRequired();
             const hasLabel = !!(ctx.label() as string);
             const a11yLabel = ctx.a11yLabel() as string;
 

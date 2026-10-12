@@ -52,5 +52,7 @@ test('design-forms marks a required label with one asterisk', async ({ page }) =
     await page.goto('/design/forms', { waitUntil: 'networkidle' });
     const label = page.locator('label.pdx-field-required', { hasText: 'Email' }).first();
     await expect(label).toHaveText('Email');
-    expect(await label.evaluate(el => getComputedStyle(el, '::after').content)).toBe('" *"');
+    // One asterisk, and an empty alternative text after the slash: the marker is for the eye and
+    // stays out of the label's accessible name (#249).
+    expect(await label.evaluate(el => getComputedStyle(el, '::after').content)).toBe('" *" / ""');
 });

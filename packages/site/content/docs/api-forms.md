@@ -7,7 +7,7 @@ parent: api
 
 # Forms API
 
-Forms, fields, field arrays, validators, schemas and form-associated custom elements. 42 exports, from `@pdxui/core`.
+Forms, fields, field arrays, validators, schemas and form-associated custom elements. 43 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -237,6 +237,19 @@ function isFormControl(tagName: string): boolean
 
 Check if a tag is a registered form control (built-in or custom).
 
+## `isRequiredValidator`
+
+```ts
+import { isRequiredValidator } from '@pdxui/core';
+
+function isRequiredValidator(validator: unknown): boolean
+```
+
+Whether `validator` is one {@link required} returned.
+
+Only the built-in rule counts: a hand-written function that rejects empty values is
+indistinguishable from any other check, so a field validated by one is not reported as required.
+
 ## `isStandardSchema`
 
 ```ts
@@ -387,6 +400,9 @@ or an empty array.
 Note what it does NOT reject: `0` and `false` are values, and a required numeric or checkbox field
 is satisfied by them. Pass `msg` to override the message; without it the text comes from the
 active validation locale.
+
+The function it returns is branded, so a form can tell a required field from an optional one
+(`FormField.required`, {@link isRequiredValidator}) and mark its control `aria-required`.
 
 ## `resolveValidationMessage`
 

@@ -9,8 +9,11 @@ import * as validators from '../src/form/validators';
 import * as core from '../src/index';
 import { CORE_FORM_RULES } from '../../compiler/src/compiler/form-rules';
 
-/** The validator factories: every function `validators.ts` exports but its two schema helpers. */
-const HELPERS = new Set(['validateSchema', 'isStandardSchema']);
+/**
+ * The validator factories: every function `validators.ts` exports but its helpers — the two schema
+ * ones, and the predicate that recognises a `required()` validator.
+ */
+const HELPERS = new Set(['validateSchema', 'isStandardSchema', 'isRequiredValidator']);
 
 describe('CORE_FORM_RULES', () => {
     it("is exactly the validator factories core's validators.ts exports", () => {

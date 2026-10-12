@@ -32,7 +32,7 @@ let pinError = $signal(''); // set when the server refuses the PIN: pinError = '
 | `error` | `error` | string | `''` | The error message. Shown only when the field is touched, when `show-error` is set, or when its form validates onChange: an error decided by code (a server rejection, a check on save) goes with `show-error`. |
 | `warning` | `warning` | string | `''` | Non-blocking warning message (yellow, below error). |
 | `success` | `success` | string | `''` | Applies the success state styling. |
-| `required` | `required` | boolean | `false` | Marks the field as required. |
+| `required` | `required` | boolean | `false` | Marks the field required: `aria-required` on its control and the required marker on its label. Not needed for a field the form requires — one whose validators include `required()` is marked the same way without it. |
 | `optional` | `optional` | boolean | `false` | Shows an 'optional' marker. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `touched` | `touched` | boolean | `false` | Whether the field has been interacted with (gates validation display). |

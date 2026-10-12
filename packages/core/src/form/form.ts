@@ -15,7 +15,7 @@ import { DEV } from '../utils/env';
 import { signal, computed, batch } from '../reactivity/signal';
 import type { Signal, ReadonlySignal, Dispose } from '../utils/types';
 import type { Validator, AsyncValidator, StandardSchema } from './validators';
-import { validateSchema } from './validators';
+import { validateSchema, isRequiredValidator } from './validators';
 import { createFieldArray } from './field-array';
 import type { FieldArray } from './field-array';
 import { flattenValues, unflattenValues, getNestedValue, setNestedValue } from './form-path';
@@ -40,6 +40,15 @@ export interface FormField<T = unknown> {
     readonly touched: ReadonlySignal<boolean>;
     /** Whether the value differs from the initial value. */
     readonly dirty: ReadonlySignal<boolean>;
+    /**
+     * Whether the field must be filled in: its validators include `required()`.
+     *
+     * Read when asked, so the validators a field list adds to a row later count too. What a control
+     * reads to mark itself `aria-required` and its label with the required marker. Always `false` for
+     * a form validated by a Standard Schema (`schema`): a schema does not say, generically, which
+     * fields it requires.
+     */
+    readonly required: boolean;
     /** Update the value (triggers validation if configured). */
     onChange(value: T): void;
     /** Mark as touched (triggers blur validation). */
@@ -329,9 +338,13 @@ export function createForm<T extends Record<string, unknown>>(
         fieldTouched[name] = _touched;
         fieldDirty[name] = _dirty;
 
+        /** Config validators (static), then dynamic validators (from addField) — looked up each time. */
+        function validatorsOf(): Validator<unknown>[] | undefined {
+            return (config.validators as Record<string, Validator<unknown>[]>)?.[name] ?? dynamicValidators[name];
+        }
+
         function runSyncValidation(value: unknown): string | undefined {
-            // Check config validators (static) then dynamic validators (from addField)
-            const validators = (config.validators as Record<string, Validator<unknown>[]>)?.[name] ?? dynamicValidators[name];
+            const validators = validatorsOf();
             if (validators) {
                 for (const v of validators) {
                     const err = v(value);
@@ -399,6 +412,9 @@ export function createForm<T extends Record<string, unknown>>(
             warning: computed(() => _warning()) as ReadonlySignal<string | undefined>,
             touched: computed(() => _touched()) as ReadonlySignal<boolean>,
             dirty: computed(() => _dirty()) as ReadonlySignal<boolean>,
+            get required(): boolean {
+                return validatorsOf()?.some(isRequiredValidator) ?? false;
+            },
 
             onChange(newValue: T[typeof name]): void {
                 _value.set(newValue);

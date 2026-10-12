@@ -404,6 +404,9 @@
     /* Form field — the space a pdx-form-field leaves below itself, in any container.
        space-md already carries the density factor. */
     --pdx-form-field-gap:    var(--pdx-space-md);
+    /* The marker after a required field's label. Inherited: a form or one field can set its own,
+       and `none` removes it — the control's aria-required is set whatever it is. */
+    --pdx-field-required-marker: ' *';
 
     /* Button — shape is expressed by --pdx-button-radius (what the CSS actually reads);
        the engine derives it from the design-language's buttonShape. */

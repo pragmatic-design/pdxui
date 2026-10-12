@@ -100,7 +100,7 @@ export { createFieldArray } from './form/field-array';
 export type { FieldArray, FieldArrayItem } from './form/field-array';
 export {
     required, minLength, maxLength, email, pattern, url,
-    min, max, integer, validateSchema, isStandardSchema,
+    min, max, integer, validateSchema, isStandardSchema, isRequiredValidator,
 } from './form/validators';
 export type { Validator, AsyncValidator, StandardSchema } from './form/validators';
 export { setValidationLocale, clearValidationLocale, resolveValidationMessage, validationMessage, onLocaleChange, VALIDATION_KEYS } from './form/validation-i18n';

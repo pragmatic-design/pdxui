@@ -103,6 +103,38 @@ test('the wizard survives typing: its panels are nested, and a field\'s event is
     expect(await state(), 'typing in a field moved the wizard').toEqual({ value: '0', shown: 1 });
 });
 
+test('a field the form requires says so: aria-required on the control, the marker on the label', async ({ page }) => {
+    // `@form intake` declares requester and email `{ required }`; their `<pdx-form-field>`s carry
+    // no `required` prop. Until #249 neither was announced as required, and neither label had the
+    // asterisk, until an error appeared.
+    await openIntake(page);
+    // EXACT names: the marker is for the eye, and it stays out of the accessible name — «Requester»,
+    // not «Requester star». `aria-required` is what says it.
+    const requester = page.getByRole('textbox', { name: 'Requester', exact: true });
+    const email = page.getByRole('textbox', { name: 'Email', exact: true });
+    await expect(requester).toHaveAttribute('aria-required', 'true');
+    await expect(email).toHaveAttribute('aria-required', 'true');
+
+    const label = page.locator('pdx-form-field[name="requester"] label');
+    const marker = () => label.evaluate((el) => getComputedStyle(el, '::after').content);
+    expect(await marker(), 'no required marker on the label').toMatch(/^" \*"/);
+
+    // The marker is the theme's to change or remove, with one custom property on the form; the
+    // meaning stays on the control.
+    await label.evaluate((el) => el.closest<HTMLElement>('pdx-form')!.style.setProperty('--pdx-field-required-marker', 'none'));
+    expect(await marker(), 'the marker did not follow --pdx-field-required-marker').not.toContain('*');
+    await expect(label, 'the label drew a marker after it was turned off').toHaveCSS('width', await label.evaluate((el) => {
+        // The label's width without any ::after: measured on a clone that carries no marker class.
+        const clone = el.cloneNode(true) as HTMLElement;
+        clone.classList.remove('pdx-field-required');
+        el.parentElement!.appendChild(clone);
+        const w = getComputedStyle(clone).width;
+        clone.remove();
+        return w;
+    }));
+    await expect(requester).toHaveAttribute('aria-required', 'true');
+});
+
 test('a step does not advance while its own fields are invalid', async ({ page }) => {
     await openIntake(page);
     // Next with an empty required field: the wizard's `pdx-before-change` is cancelled.
