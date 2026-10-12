@@ -50,7 +50,7 @@ component('pdx-counter', {
                                                                //          are not signals
     function bump() { __count.set(__v => __v + 1); changed(__count()); }
                                     // count++ became .set(), and `count` as an argument became a read
-    function reset() { __count.set(5); }                       // count = 5 → .set(5)
+    function reset() { __count.setRaw(5); }                    // count = 5 → .setRaw(5): stored as is
 
     const doubled = computed(() => __count() * 2, { name: 'counter:doubled' });  // $derived → computed
     ctx.expose({ bump, reset });                               // @expose → the imperative API

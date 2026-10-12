@@ -119,14 +119,15 @@ describe('fix 4 — extended compound assignment operators', () => {
     const sig = new Set(['c']);
     const rw = (code: string) => rewriteAst(code, sig, new Set(), 'x');
 
+    // An assignment, so it stores the value as it is: setRaw (#187).
     it('||= short-circuits (only sets when falsy)', () => {
-        expect(rw('c ||= 5')).toBe('(__c() || __c.set(5))');
+        expect(rw('c ||= 5')).toBe('(__c() || __c.setRaw(5))');
     });
     it('&&= short-circuits', () => {
-        expect(rw('c &&= 5')).toBe('(__c() && __c.set(5))');
+        expect(rw('c &&= 5')).toBe('(__c() && __c.setRaw(5))');
     });
     it('??= short-circuits', () => {
-        expect(rw('c ??= 5')).toBe('(__c() ?? __c.set(5))');
+        expect(rw('c ??= 5')).toBe('(__c() ?? __c.setRaw(5))');
     });
     it('**= uses functional set', () => {
         expect(rw('c **= 2')).toBe('__c.set(__v => __v ** 2)');

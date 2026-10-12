@@ -21,6 +21,12 @@ export interface CompileContext {
     /** Names that are NOT signals — form refs, resources, functions. callSignals() skips adding (). */
     nonSignalNames: Set<string> | null;
 
+    /**
+     * The names declared with `$signal` — state, not deriveds or props. Such a name in callee position
+     * is read, then called (`ctx.x()(args)`), and its `peek`/`setRaw` reach the signal itself (#187).
+     */
+    stateSignalNames: Set<string> | null;
+
     /** Names declared in the setup (signal/derived/prop/export): a declared name that
      *  collides with a common loop variable (item, error, e…) is prefixed all the same. */
     declaredNames: Set<string> | null;
@@ -106,6 +112,7 @@ export function createCompileContext(options?: {
         scopeVars: new Set(),
         rowVars: new Set(),
         nonSignalNames: null,
+        stateSignalNames: null,
         declaredNames: null,
         importedNames: null,
         hoistedSlots: [],

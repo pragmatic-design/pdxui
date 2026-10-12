@@ -16,14 +16,15 @@ const prod = (src: string, inlineBindings = false) =>
 
 describe('loop invariants never hoist a signal the loop writes', () => {
     for (const inline of [false, true]) {
-        it(`an assignment in an @for handler stays a .set() on the signal (inlineBindings: ${inline})`, () => {
+        it(`an assignment in an @for handler stays a write on the signal (inlineBindings: ${inline})`, () => {
             const code = prod(`<template>@for (items as it; track it.href) { <a :href="it.href" @click="open = false">{{ it.label }}</a> }</template>
 <script setup>
 let open = $signal(true);
 let items = $signal([{ href: '/a', label: 'A' }]);
 </script>`, inline);
             expect(code, `the write was rewritten onto the value:\n${code}`).not.toMatch(/__li_open\(\)\.set/);
-            expect(code).toMatch(/ctx\.open\.set\(false\)/);
+            // An assignment stores its value as it is: setRaw (#187).
+            expect(code).toMatch(/ctx\.open\.setRaw\(false\)/);
         });
 
         it(`the same for ++ and a compound assignment (inlineBindings: ${inline})`, () => {

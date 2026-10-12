@@ -36,7 +36,7 @@ on 2026-10-11 (#187): **assignment stores the value as it is**.
 | `count += x` (and every compound operator) | `__count.set(__v => __v + x)` |
 | `count \|\|= x`, `count &&= x`, `count ??= x` | `(__count() \|\| __count.setRaw(x))`, `(__count() && __count.setRaw(x))`, `(__count() ?? __count.setRaw(x))` — the short circuit stays, and the assignment branch stores `x` as it is (β #187: a logical assignment is an assignment, not an update; `handler ??= callback` stores `callback`) |
 | `count = x` | **`__count.setRaw(x)`** (β #187) — `x` is stored even when it is a function |
-| `count = f(count)` (the right side reads `count`) | `__count.setRaw(f(__count()))` (β #187) |
+| `count = f(count)` (the right side reads `count`) | `__count.setRaw(f(__count.peek()))` (β #187) — the read on the right side is untracked, as the updater form's `prev` was: tracked, `count = count + 1` inside an effect would make the effect depend on what it writes and re-run without end |
 | `count.peek()`, `count.setRaw(v)` | `__count.peek()`, `__count.setRaw(v)` — the signal's own methods (β #187) |
 | `{ count }` (shorthand property) | `{ count: __count() }` |
 | `total` (a prop, a model or a `$derived`, read) | `total()` |

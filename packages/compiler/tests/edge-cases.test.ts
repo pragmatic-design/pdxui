@@ -49,8 +49,8 @@ function reset() {
 }
 </script>`, 'test.pdx');
 
-        // Multi-line array should be wrapped in .set() completely
-        expect(code).toContain('__items.set([');
+        // Multi-line array should be wrapped in .setRaw() completely (an assignment, #187)
+        expect(code).toContain('__items.setRaw([');
         expect(code).toContain('30,');
         expect(code).toContain('])');
         // Should NOT have broken syntax like .set([)

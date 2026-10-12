@@ -79,11 +79,11 @@ describe('and the forms that were silently broken are right on their own terms',
     });
 
     it('a signal assignment does not replace the signal', () => {
-        expect(handlerOf('open = !open', true)).toBe('() => ctx.open.set(!ctx.open())');
+        expect(handlerOf('open = !open', true)).toBe('() => ctx.open.setRaw(!ctx.open())');
     });
 
     it('a signal written inside an arrow goes through .set too', () => {
-        expect(handlerOf('e => name = e.target.value', true)).toBe('e => ctx.name.set(e.target.value)');
+        expect(handlerOf('e => name = e.target.value', true)).toBe('e => ctx.name.setRaw(e.target.value)');
     });
 
     it('two statements are a block, not two arguments', () => {

@@ -20,9 +20,9 @@ component('pdx-color-card', {
     const __color = signal('#3b82f6', { name: 'color-card:color' });
     const __radius = signal(12, { name: 'color-card:radius' });
     const __scalePercent = signal(100, { name: 'color-card:scalePercent' });
-function onColor(e) { __color.set(e.target.value); }
-      function onRadius(e) { __radius.set(parseInt(e.target.value)); }
-      function onScale(e) { __scalePercent.set(parseInt(e.target.value)); }
+function onColor(e) { __color.setRaw(e.target.value); }
+      function onRadius(e) { __radius.setRaw(parseInt(e.target.value)); }
+      function onScale(e) { __scalePercent.setRaw(parseInt(e.target.value)); }
     const scale = computed(() => (__scalePercent() / 100).toFixed(2), { name: 'color-card:scale' });
     const previewStyle = computed(() => \`background: \${__color()}; border-radius: \${__radius()}px; transform: scale(\${scale()})\`, { name: 'color-card:previewStyle' });
     ctx.el.setAttribute('data-pdx-tdfsr4', '');
@@ -205,8 +205,8 @@ function inc() { __count.set(__v => __v + 1); }
     }
   }, { name: "effect-test.pdx:25" });
     onMount(() => {
-    __count.set(initial());
-    __mountMsg.set('mounted with ' + initial());
+    __count.setRaw(initial());
+    __mountMsg.setRaw('mounted with ' + initial());
   });
     ctx.el.setAttribute('data-pdx-tt8bks', '');
     return { count: __count, mountMsg: __mountMsg, doubled, inc };
@@ -285,10 +285,10 @@ component('pdx-demo-a11y', {
     const __rovingRef = signal(null, { name: 'demo-a11y:rovingRef' });
 // Active Descendant
     const ad = useActiveDescendant(() => __adInputRef(), () => __adListRef(), {
-        onActiveChange: function(id) { __adActiveId.set(id || ''); },
+        onActiveChange: function(id) { __adActiveId.setRaw(id || ''); },
         onSelect: function(id, idx) {
             var items = __adListRef() ? __adListRef().querySelectorAll('[role="option"]') : [];
-            __adSelected.set(items[idx] ? items[idx].textContent : '');
+            __adSelected.setRaw(items[idx] ? items[idx].textContent : '');
         },
     });
     
@@ -296,7 +296,7 @@ component('pdx-demo-a11y', {
     // Roving Tabindex
     const roving = useRovingTabindex(() => __rovingRef(), {
         orientation: 'horizontal',
-        onActiveChange: function(el, idx) { __rovingIndex.set(idx); },
+        onActiveChange: function(el, idx) { __rovingIndex.setRaw(idx); },
     });
     
     
@@ -309,14 +309,14 @@ component('pdx-demo-a11y', {
     function announcePolite() {
         var msg = 'Item saved successfully #' + announceN++;
         live.announce(msg, 'polite');
-        __liveMsg.set(msg);
+        __liveMsg.setRaw(msg);
     }
     function announceAssertive() {
         var msg = 'Error: connection lost #' + announceN++;
         live.announce(msg, 'assertive');
-        __liveMsg.set(msg);
+        __liveMsg.setRaw(msg);
     }
-    function clearLive() { live.clear(); __liveMsg.set('cleared'); }
+    function clearLive() { live.clear(); __liveMsg.setRaw('cleared'); }
     onMount(() => {
     onDestroy(() => { ad.dispose(); roving.dispose(); live.dispose(); });
 });
@@ -569,7 +569,7 @@ component('pdx-demo-container', {
         const mA = measure(a);
         const mB = measure(b);
         const rel = measureRelative(a, b);
-        __measureLog.set('A: ' + Math.round(mA.width) + 'x' + Math.round(mA.height) + ' at (' + Math.round(mA.x) + ', ' + Math.round(mA.y) + ')\\n' +
+        __measureLog.setRaw('A: ' + Math.round(mA.width) + 'x' + Math.round(mA.height) + ' at (' + Math.round(mA.x) + ', ' + Math.round(mA.y) + ')\\n' +
             'B: ' + Math.round(mB.width) + 'x' + Math.round(mB.height) + ' at (' + Math.round(mB.x) + ', ' + Math.round(mB.y) + ')\\n' +
             'Relative: dx=' + Math.round(rel.dx) + ', dy=' + Math.round(rel.dy) + ', overlap=' + rel.overlap);
     }
@@ -582,11 +582,11 @@ component('pdx-demo-container', {
         const cs = useContainerSize(() => el);
 
         effect(() => {
-            __width.set(cs.width());
-            __height.set(cs.height());
-            __isCompact.set(cs.isCompact());
-            __isMedium.set(cs.isMedium());
-            __isWide.set(cs.isWide());
+            __width.setRaw(cs.width());
+            __height.setRaw(cs.height());
+            __isCompact.setRaw(cs.isCompact());
+            __isMedium.setRaw(cs.isMedium());
+            __isWide.setRaw(cs.isWide());
         });
     });
 });
@@ -752,7 +752,7 @@ component('pdx-demo-datasource', {
             currentSortDir = 'asc';
         }
         ds.setSort([{ field: field, dir: currentSortDir }]);
-        __sortDesc.set(field + ' ' + currentSortDir);
+        __sortDesc.setRaw(field + ' ' + currentSortDir);
     }
     
     function sortById() { toggleSort('id'); }
@@ -762,10 +762,10 @@ component('pdx-demo-datasource', {
         var val = e.target.value;
         if (val) {
             ds.setFilter([{ field: 'name', operator: 'contains', value: val }]);
-            __filterDesc.set('name contains "' + val + '"');
+            __filterDesc.setRaw('name contains "' + val + '"');
         } else {
             ds.setFilter([]);
-            __filterDesc.set('none');
+            __filterDesc.setRaw('none');
         }
     }
     
@@ -782,18 +782,18 @@ component('pdx-demo-datasource', {
     function cancelAll() { ds.cancelChanges(); }
     onMount(() => {
     var d1 = effect(() => {
-        __rows.set(ds.data());
-        __currentPage.set(ds.page());
-        __totalPages.set(ds.totalPages());
-        __totalItems.set(ds.total());
-        __loading.set(ds.isLoading());
-        __dirty.set(ds.hasChanges());
+        __rows.setRaw(ds.data());
+        __currentPage.setRaw(ds.page());
+        __totalPages.setRaw(ds.totalPages());
+        __totalItems.setRaw(ds.total());
+        __loading.setRaw(ds.isLoading());
+        __dirty.setRaw(ds.hasChanges());
     });
     var d2 = effect(() => {
         var ch = ds.changes();
-        __addedCount.set(ch.added.length);
-        __updatedCount.set(ch.updated.length);
-        __removedCount.set(ch.removed.length);
+        __addedCount.setRaw(ch.added.length);
+        __updatedCount.setRaw(ch.updated.length);
+        __removedCount.setRaw(ch.removed.length);
     });
     onDestroy(() => { d1(); d2(); ds.dispose(); });
 });
@@ -921,7 +921,7 @@ component('pdx-demo-drag', {
     const dropA = useDropZone(() => __zoneARef(), {
         onDrop: function(data) {
             moveCard(data, __zoneARef());
-            __dropLog.set(prev => prev + '> Moved ' + data + ' → Zone A\\n');
+            __dropLog.setRaw(__dropLog.peek() + '> Moved ' + data + ' → Zone A\\n');
         },
         onEnter: function() { },
         onLeave: function() { },
@@ -930,18 +930,18 @@ component('pdx-demo-drag', {
     const dropB = useDropZone(() => __zoneBRef(), {
         onDrop: function(data) {
             moveCard(data, __zoneBRef());
-            __dropLog.set(prev => prev + '> Moved ' + data + ' → Zone B\\n');
+            __dropLog.setRaw(__dropLog.peek() + '> Moved ' + data + ' → Zone B\\n');
         },
     });
     onMount(() => {
     // Free drag position + velocity tracking
     const d1 = effect(() => {
-        __freeDragging.set(freeDrag.isDragging());
+        __freeDragging.setRaw(freeDrag.isDragging());
         const pos = freeDrag.position();
-        __freeX.set(Math.round(pos.x));
-        __freeY.set(Math.round(pos.y));
+        __freeX.setRaw(Math.round(pos.x));
+        __freeY.setRaw(Math.round(pos.y));
         const vel = freeDrag.velocity();
-        __freeVel.set(Math.round(Math.sqrt(vel.vx * vel.vx + vel.vy * vel.vy)));
+        __freeVel.setRaw(Math.round(Math.sqrt(vel.vx * vel.vx + vel.vy * vel.vy)));
         const el = __freeRef();
         if (el) el.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
     });
@@ -1152,16 +1152,16 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
     function activateTrap() {
         const container = __trapContainer();
         if (!container) return;
-        __trapActive.set(true);
+        __trapActive.setRaw(true);
         trapDispose = focusTrap(container, { initialFocus: 'first', restoreFocus: true });
-        __trapLog.set('Trap activated — Tab cycles within the box');
+        __trapLog.setRaw('Trap activated — Tab cycles within the box');
     }
     
     function deactivateTrap() {
         trapDispose?.();
         trapDispose = null;
-        __trapActive.set(false);
-        __trapLog.set(prev => prev + '\\nTrap deactivated — focus restored');
+        __trapActive.setRaw(false);
+        __trapLog.setRaw(__trapLog.peek() + '\\nTrap deactivated — focus restored');
     }
     
     // Track last focused target button so save captures the right element
@@ -1169,16 +1169,16 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
     
     function trackTarget(e) {
         lastTarget = e.currentTarget;
-        __restoreLog.set('Focused: "' + e.currentTarget.textContent.trim() + '" — now click Save.');
+        __restoreLog.setRaw('Focused: "' + e.currentTarget.textContent.trim() + '" — now click Save.');
     }
     
     function saveFocus() {
-        if (!lastTarget) { __restoreLog.set('Click a colored button first!'); return; }
+        if (!lastTarget) { __restoreLog.setRaw('Click a colored button first!'); return; }
         // Temporarily focus the target so fr.save() captures it
         lastTarget.focus();
         fr.save();
         const name = lastTarget.textContent.trim();
-        __restoreLog.set('Saved: "' + name + '". Focus moved to input.');
+        __restoreLog.setRaw('Saved: "' + name + '". Focus moved to input.');
         const input = __restoreInputRef();
         if (input) input.focus();
     }
@@ -1187,7 +1187,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
         fr.restore();
         const active = document.activeElement;
         const name = active ? (active.textContent || active.tagName).trim() : 'nothing';
-        __restoreLog.set(prev => prev + '\\nRestored to: "' + name + '"');
+        __restoreLog.setRaw(__restoreLog.peek() + '\\nRestored to: "' + name + '"');
     }
     onMount(() => {
     // Focus groups — use ref elements, guaranteed to be in the DOM at onMount
@@ -1197,8 +1197,8 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
             orientation: 'vertical',
             wrap: true,
             skipDisabled: true,
-            onFocus: (el, i) => { __groupLog.set(\`Focused: \${el.textContent.trim()} (index \${i})\`); },
-            onSelect: (el, i) => { __groupLog.set(\`Selected: \${el.textContent.trim()} (index \${i})\`); },
+            onFocus: (el, i) => { __groupLog.setRaw(\`Focused: \${el.textContent.trim()} (index \${i})\`); },
+            onSelect: (el, i) => { __groupLog.setRaw(\`Selected: \${el.textContent.trim()} (index \${i})\`); },
         });
     }
 
@@ -1362,8 +1362,8 @@ component('pdx-demo-i18n-mobile', {
     
     var sheet = useBottomSheet(() => __sheetRef(), {
         detents: [0.25, 0.5, 1],
-        onDetentChange: function(d) { __sheetDetent.set(Math.round(d * 100)); },
-        onClose: function() { __sheetDetent.set(0); },
+        onDetentChange: function(d) { __sheetDetent.setRaw(Math.round(d * 100)); },
+        onClose: function() { __sheetDetent.setRaw(0); },
     });
     
     
@@ -1382,21 +1382,21 @@ component('pdx-demo-i18n-mobile', {
     var sa = useSafeArea();
     onMount(() => {
     var d1 = effect(() => {
-        __selectPlaceholder.set(phSignal());
-        __selectNoResults.set(nrSignal());
-        __dir.set(direction());
-        __rtl.set(isRTL());
+        __selectPlaceholder.setRaw(phSignal());
+        __selectNoResults.setRaw(nrSignal());
+        __dir.setRaw(direction());
+        __rtl.setRaw(isRTL());
     });
     var d2 = effect(() => {
-        __sheetHeight.set(Math.round(sheet.height()));
+        __sheetHeight.setRaw(Math.round(sheet.height()));
     });
     var d3 = effect(() => {
         var insets = sa.insets();
-        __safeTop.set(insets.top);
-        __safeRight.set(insets.right);
-        __safeBottom.set(insets.bottom);
-        __safeLeft.set(insets.left);
-        __hasInsets.set(sa.hasInsets());
+        __safeTop.setRaw(insets.top);
+        __safeRight.setRaw(insets.right);
+        __safeBottom.setRaw(insets.bottom);
+        __safeLeft.setRaw(insets.left);
+        __hasInsets.setRaw(sa.hasInsets());
     });
     onDestroy(() => { d1(); d2(); d3(); sheet.dispose(); });
 });
@@ -1524,23 +1524,23 @@ const ICONS = {
     // Register immediately so <pdx-icon> can resolve during mount
     registerIconSet('demo', (name) => ICONS[name] || null);
     
-    __resultText.set('Set "demo" registered with ' + iconNames.length + ' icons');
+    __resultText.setRaw('Set "demo" registered with ' + iconNames.length + ' icons');
     
     
     function doRegister() {
         clearIconSets();
         registerIconSet('demo', (name) => ICONS[name] || null);
-        __resultText.set('Set "demo" re-registered with ' + iconNames.length + ' icons');
+        __resultText.setRaw('Set "demo" re-registered with ' + iconNames.length + ' icons');
     }
     
     async function doResolve() {
         const result = await resolveIcon('check');
-        __resultText.set(result ? 'Resolved "check" OK' : 'Not found — register first');
+        __resultText.setRaw(result ? 'Resolved "check" OK' : 'Not found — register first');
     }
     
     async function doMissing() {
         const result = await resolveIcon('nonexistent');
-        __resultText.set(result ? 'Found (unexpected)' : 'null — icon not in set (expected)');
+        __resultText.setRaw(result ? 'Found (unexpected)' : 'null — icon not in set (expected)');
     }
     onMount(() => {
     doRegister();
@@ -1688,7 +1688,7 @@ let counter = 0;
     
     
     
-    function log(msg) { __logText.set(prev => prev + msg + '\\n'); }
+    function log(msg) { __logText.setRaw(__logText.peek() + msg + '\\n'); }
     
     // ── Visible overlay elements ──
     const overlayEls = new Map();
@@ -1821,12 +1821,12 @@ let counter = 0;
         log('Opened ' + dlgId + ' (modal, z=' + dlgZ + ')');
     }
     onMount(() => {
-    const d1 = effect(() => { __count.set(overlayStack.count()); });
-    const d2 = effect(() => { __modals.set(overlayStack.modalCount()); });
+    const d1 = effect(() => { __count.setRaw(overlayStack.count()); });
+    const d2 = effect(() => { __modals.setRaw(overlayStack.modalCount()); });
     const d3 = effect(() => {
         // Read the stack reactively
         const c = overlayStack.count();
-        __topName.set(overlayStack.top() ?? 'none');
+        __topName.setRaw(overlayStack.top() ?? 'none');
     });
     onDestroy(() => { d1(); d2(); d3(); });
 });
@@ -1963,13 +1963,13 @@ const placements = [
     }
     
     function setPlacement(p) {
-        __currentPlacement.set(p);
+        __currentPlacement.setRaw(p);
         startAutoUpdate();
     }
     
-    function toggleOffset(e) { __useOffset.set(e.target.checked); updatePosition(); }
-    function toggleFlip(e) { __useFlip.set(e.target.checked); updatePosition(); }
-    function toggleShift(e) { __useShift.set(e.target.checked); updatePosition(); }
+    function toggleOffset(e) { __useOffset.setRaw(e.target.checked); updatePosition(); }
+    function toggleFlip(e) { __useFlip.setRaw(e.target.checked); updatePosition(); }
+    function toggleShift(e) { __useShift.setRaw(e.target.checked); updatePosition(); }
     
     function buildMiddleware() {
         // Use the arena's visible area as boundary for flip/shift —
@@ -1998,14 +1998,14 @@ const placements = [
         const hidden = result.middlewareData.hide?.hidden;
         if (hidden) {
             fl.style.display = 'none';
-            __posLog.set('Reference out of bounds — floating hidden');
+            __posLog.setRaw('Reference out of bounds — floating hidden');
             return;
         }
     
         fl.style.display = 'block';
         fl.style.left = result.x + 'px';
         fl.style.top = result.y + 'px';
-        __posLog.set('placement: ' + result.placement + ' | x: ' + Math.round(result.x) + ' | y: ' + Math.round(result.y));
+        __posLog.setRaw('placement: ' + result.placement + ' | x: ' + Math.round(result.x) + ' | y: ' + Math.round(result.y));
     }
     
     function startAutoUpdate() {
@@ -2080,7 +2080,7 @@ const placements = [
                     });
                     iframeFloatEl.style.left = result.x + 'px';
                     iframeFloatEl.style.top = result.y + 'px';
-                    __iframeLog.set('Positioned at x:' + Math.round(result.x) + ' y:' + Math.round(result.y) + ' — scrolls with page');
+                    __iframeLog.setRaw('Positioned at x:' + Math.round(result.x) + ' y:' + Math.round(result.y) + ' — scrolls with page');
                 }
 
                 // autoUpdate: re-position on scroll/resize
@@ -2217,14 +2217,14 @@ const options = [
         const item = el.querySelector('[data-item="10"]');
         if (item) sb2?.scrollIntoView(item, { block: 'center' });
     }
-    function selectOption(opt) { __selected.set(opt); }
+    function selectOption(opt) { __selected.setRaw(opt); }
     onMount(() => {
     sb1 = useScrollbar(() => __box1Ref(), { mode: 'overlay', autoHideMs: 1200 });
     sb2 = useScrollbar(() => __box2Ref(), { mode: 'overlay' });
     sb3 = useScrollbar(() => __box3Ref(), { mode: 'overlay', axis: 'horizontal' });
     sb4 = useScrollbar(() => __box4Ref(), { mode: 'overlay', autoHideMs: 800 });
 
-    const d1 = effect(() => { __scrollTop1.set(sb1.scrollTop()); });
+    const d1 = effect(() => { __scrollTop1.setRaw(sb1.scrollTop()); });
 
     onDestroy(() => {
         d1();
@@ -2419,17 +2419,17 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
     onMount(() => {
     const d1 = effect(() => {
         const sel = singleSel.selected();
-        __singleInfo.set(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') : 'Nothing selected');
+        __singleInfo.setRaw(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') : 'Nothing selected');
     });
     const d2 = effect(() => {
         const sel = multiSel.selected();
-        __multiInfo.set(sel.size > 0
+        __multiInfo.setRaw(sel.size > 0
             ? 'Selected (' + sel.size + '): ' + [...sel].join(', ') + '\\nAnchor: ' + multiSel.anchor()
             : 'Nothing selected');
     });
     const d3 = effect(() => {
         const sel = gridSel.selected();
-        __gridInfo.set(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') + ' (' + sel.size + ' rows)' : 'No rows selected');
+        __gridInfo.setRaw(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') + ' (' + sel.size + ' rows)' : 'No rows selected');
     });
     onDestroy(() => { d1(); d2(); d3(); });
 });
@@ -2535,8 +2535,8 @@ function reorderItems(from, to) {
         var arr = current.slice();
         var moved = arr.splice(from, 1)[0];
         arr.splice(to, 0, moved);
-        __items.set(arr);
-        __orderLog.set(arr.map(function(i) { return i.label; }).join(' → '));
+        __items.setRaw(arr);
+        __orderLog.setRaw(arr.map(function(i) { return i.label; }).join(' → '));
     }
     
     function reorderTabs(from, to) {
@@ -2544,7 +2544,7 @@ function reorderItems(from, to) {
         var arr = current.slice();
         var moved = arr.splice(from, 1)[0];
         arr.splice(to, 0, moved);
-        __tabs.set(arr);
+        __tabs.setRaw(arr);
     }
     
     const vSort = useSortable(() => __listRef(), {
@@ -2560,7 +2560,7 @@ function reorderItems(from, to) {
         axis: 'horizontal',
     });
     onMount(() => {
-    __orderLog.set(__items().map(function(i) { return i.label; }).join(' → '));
+    __orderLog.setRaw(__items().map(function(i) { return i.label; }).join(' → '));
     onDestroy(() => { vSort.dispose(); hSort.dispose(); });
 });
     ctx.el.setAttribute('data-pdx-qui0xl', '');
@@ -2660,12 +2660,12 @@ component('pdx-demo-tier0c', {
     
     function submitForm() {
         form.submit(function(values) {
-            __submitResult.set('OK: ' + JSON.stringify(values));
+            __submitResult.setRaw('OK: ' + JSON.stringify(values));
         });
     }
     function resetForm() {
         form.reset();
-        __submitResult.set('');
+        __submitResult.setRaw('');
         if (__nameRef()) __nameRef().value = '';
         if (__emailRef()) __emailRef().value = '';
     }
@@ -2712,16 +2712,16 @@ component('pdx-demo-tier0c', {
     /** How many of the three are in view: computed from their signals, not counted by an effect (CD-D2). */
     onMount(() => {
     var d1 = effect(() => {
-        __nameError.set(nameField.errors().join(', '));
-        __emailError.set(emailField.errors().join(', '));
-        __formDirty.set(form.state.dirty());
-        __formValid.set(form.state.valid());
-        __formSubmitted.set(form.state.submitted());
+        __nameError.setRaw(nameField.errors().join(', '));
+        __emailError.setRaw(emailField.errors().join(', '));
+        __formDirty.setRaw(form.state.dirty());
+        __formValid.setRaw(form.state.valid());
+        __formSubmitted.setRaw(form.state.submitted());
     });
     var d2 = effect(() => {
-        __adaptiveMode.set(adaptive.mode());
-        __adaptiveMobile.set(adaptive.isMobile());
-        __adaptiveWidth.set(adaptive.width());
+        __adaptiveMode.setRaw(adaptive.mode());
+        __adaptiveMobile.setRaw(adaptive.isMobile());
+        __adaptiveWidth.setRaw(adaptive.width());
     });
     onDestroy(() => {
         d1(); d2();
@@ -2844,11 +2844,11 @@ component('pdx-demo-utilities', {
     
     
     const clip = useClipboard({
-        onCopy: function(t) { __clipCopied.set(t); },
-        onPaste: function(t) { __clipPasted.set(t); },
+        onCopy: function(t) { __clipCopied.setRaw(t); },
+        onPaste: function(t) { __clipPasted.setRaw(t); },
     });
     
-    __clipSupported.set(clip.isSupported);
+    __clipSupported.setRaw(clip.isSupported);
     
     
     function doCopy() {
@@ -2894,7 +2894,7 @@ component('pdx-demo-utilities', {
     onMount(() => {
     const d1 = effect(() => {
         var s = resize.size();
-        __panelSize.set(Math.round(s));
+        __panelSize.setRaw(Math.round(s));
         var el = __panelRef();
         if (el) el.style.width = s + 'px';
     });
@@ -2902,8 +2902,8 @@ component('pdx-demo-utilities', {
 });
     onMount(() => {
     const d2 = effect(() => {
-        __toasts.set(queue.items());
-        __toastCount.set(queue.count());
+        __toasts.setRaw(queue.items());
+        __toastCount.setRaw(queue.count());
     });
     onDestroy(() => { d2(); });
 });
@@ -3034,8 +3034,8 @@ const COUNT1 = 10000;
             effect(() => {
                 const items = v1.items();
                 const total = v1.totalSize();
-                __rendered1.set(items.length);
-                __totalH1.set((total / 1000).toFixed(0) + 'K px');
+                __rendered1.setRaw(items.length);
+                __totalH1.setRaw((total / 1000).toFixed(0) + 'K px');
                 innerEl1.style.height = total + 'px';
                 let html = '';
                 for (const item of items) {
@@ -3056,7 +3056,7 @@ const COUNT1 = 10000;
             effect(() => {
                 const items = v2.items();
                 const total = v2.totalSize();
-                __rendered2.set(items.length);
+                __rendered2.setRaw(items.length);
                 innerEl2.style.height = total + 'px';
                 let html = '';
                 for (const item of items) {
@@ -3131,7 +3131,7 @@ const page = linkedSignal({
       });
     
     
-      function onCategory(e) { __category.set(e.target.value); }
+      function onCategory(e) { __category.setRaw(e.target.value); }
       function prevPage() { if (page() > 1) page.set(page.peek() - 1); }
       function nextPage() { page.set(page.peek() + 1); }
     ctx.el.setAttribute('data-pdx-q8y824', '');
@@ -3186,12 +3186,12 @@ const store = useTheme();
     
     
     
-    function showPage(name) { __activePage.set(name); }
+    function showPage(name) { __activePage.setRaw(name); }
     
     function onThemeChange(e) { store.setTheme(e.target.value); }
     function onDarkToggle() {
         store.toggleDark();
-        __isDark.set(prev => !prev);
+        __isDark.setRaw(!__isDark.peek());
     }
     ctx.el.setAttribute('data-pdx-j826xt', '');
     return { store, activePage: __activePage, isDark: __isDark, showPage, onThemeChange, onDarkToggle };
@@ -3338,20 +3338,20 @@ function flash(e) {
         var btn = e.target;
         var original = btn.textContent;
         btn.textContent = '✓ Clicked!';
-        __log.set('Clicked: ' + original.trim() + ' at ' + new Date().toLocaleTimeString());
+        __log.setRaw('Clicked: ' + original.trim() + ' at ' + new Date().toLocaleTimeString());
         setTimeout(function() { btn.textContent = original; }, 1000);
     }
     
     function doLoad1() {
-        __loading1.set(true);
-        __log.set('Saving...');
-        setTimeout(function() { __loading1.set(false); __log.set('Saved successfully!'); }, 1500);
+        __loading1.setRaw(true);
+        __log.setRaw('Saving...');
+        setTimeout(function() { __loading1.setRaw(false); __log.setRaw('Saved successfully!'); }, 1500);
     }
     
     function doLoad2() {
-        __loading2.set(true);
-        __log.set('Deleting...');
-        setTimeout(function() { __loading2.set(false); __log.set('Deleted.'); }, 1500);
+        __loading2.setRaw(true);
+        __log.setRaw('Deleting...');
+        setTimeout(function() { __loading2.setRaw(false); __log.setRaw('Deleted.'); }, 1500);
     }
     useHead({ title: "Button — PDX Components" });
     ctx.el.setAttribute('data-pdx-63wg72', '');
@@ -3462,7 +3462,7 @@ function openConfirm() {
     
     function doDelete() {
         if (__confirmRef()) __confirmRef().open = false;
-        __dialogLog.set('Item deleted at ' + new Date().toLocaleTimeString());
+        __dialogLog.setRaw('Item deleted at ' + new Date().toLocaleTimeString());
     }
     
     function openInfo() {
@@ -3529,17 +3529,17 @@ component('pdx-page-input', {
     const __showPw = signal(false, { name: 'page-input:showPw' });
     const __num = signal(5, { name: 'page-input:num' });
     const __descLen = signal(0, { name: 'page-input:descLen' });
-function onNameInput(e) { __name.set(e.target.value); }
-    function onSearchInput(e) { __search.set(e.target.value); }
-    function clearSearch() { __search.set(''); }
-    function togglePw() { __showPw.set(prev => !prev); }
+function onNameInput(e) { __name.setRaw(e.target.value); }
+    function onSearchInput(e) { __search.setRaw(e.target.value); }
+    function clearSearch() { __search.setRaw(''); }
+    function togglePw() { __showPw.setRaw(!__showPw.peek()); }
     function incNum() { if (__num() < 100) __num.set(__v => __v + 1); }
     function decNum() { if (__num() > 0) __num.set(__v => __v - 1); }
     function onNumInput(e) {
         var v = parseInt(e.target.value);
-        if (!isNaN(v)) __num.set(Math.max(0, Math.min(100, v)));
+        if (!isNaN(v)) __num.setRaw(Math.max(0, Math.min(100, v)));
     }
-    function onDescInput(e) { __descLen.set(e.target.value.length); }
+    function onDescInput(e) { __descLen.setRaw(e.target.value.length); }
     useHead({ title: "Input — PDX Components" });
     ctx.el.setAttribute('data-pdx-1yonx6', '');
     return { name: __name, search: __search, showPw: __showPw, num: __num, descLen: __descLen, onNameInput, onSearchInput, clearSearch, togglePw, incNum, decNum, onNumInput, onDescInput };
@@ -3641,12 +3641,12 @@ const __store_theme = createGlobalStore('theme', () => {
     const __darkMode = signal(false, { name: 'theme-store:darkMode' });
     const __density = signal('', { name: 'theme-store:density' });
 function setTheme(name) {
-        __currentTheme.set(name);
+        __currentTheme.setRaw(name);
         document.documentElement.setAttribute('pdx-theme', name);
     }
     
     function toggleDark() {
-        __darkMode.set(prev => !prev);
+        __darkMode.setRaw(!__darkMode.peek());
         if (__darkMode()) {
             document.documentElement.setAttribute('pdx-dark', '');
             document.documentElement.setAttribute('pdx-scheme', 'dark');
@@ -3657,7 +3657,7 @@ function setTheme(name) {
     }
     
     function setDensity(d) {
-        __density.set(d);
+        __density.setRaw(d);
         if (d) {
             document.documentElement.setAttribute('pdx-density', d);
         } else {
@@ -3831,18 +3831,18 @@ component('pdx-app-shell', {
     
     // App bootstrap — simulates async init (auth, config, etc.)
     
-    setTimeout(() => { __appReady.set(true); }, 400);
+    setTimeout(() => { __appReady.setRaw(true); }, 400);
     
     
     // Navigation middleware — loading indicator
     
     onBeforeNavigate((_from, _to) => {
-      __navigating.set(true);
+      __navigating.setRaw(true);
       return true;
     });
     
     onAfterNavigate((_from, _to) => {
-      __navigating.set(false);
+      __navigating.setRaw(false);
     });
     
     
@@ -3866,7 +3866,7 @@ component('pdx-app-shell', {
     
     function switchLocale(lang) {
       setLocale(lang);
-      __activeLang.set(lang);
+      __activeLang.setRaw(lang);
     }
     const currentPage = computed(() => currentPath(), { name: 'app-shell:currentPage' });
     const formattedRevenue = computed(() => $n(98750.5, { style: 'currency', currency: 'EUR' }), { name: 'app-shell:formattedRevenue' });
@@ -3936,20 +3936,20 @@ function flashBtn(e) {
         var btn = e.target;
         var original = btn.textContent;
         btn.textContent = '✓ Done!';
-        __btnLog.set('Clicked: ' + original.trim());
+        __btnLog.setRaw('Clicked: ' + original.trim());
         setTimeout(function() { btn.textContent = original; }, 1000);
     }
     
     function doLoad1() {
-        __loading1.set(true);
-        __btnLog.set('Saving...');
-        setTimeout(function() { __loading1.set(false); __btnLog.set('Saved successfully!'); }, 1500);
+        __loading1.setRaw(true);
+        __btnLog.setRaw('Saving...');
+        setTimeout(function() { __loading1.setRaw(false); __btnLog.setRaw('Saved successfully!'); }, 1500);
     }
     
     function doLoad2() {
-        __loading2.set(true);
-        __btnLog.set('Deleting...');
-        setTimeout(function() { __loading2.set(false); __btnLog.set('Deleted.'); }, 1500);
+        __loading2.setRaw(true);
+        __btnLog.setRaw('Deleting...');
+        setTimeout(function() { __loading2.setRaw(false); __btnLog.setRaw('Deleted.'); }, 1500);
     }
     useHead({ title: "Components — PDX Showcase" });
     ctx.el.setAttribute('data-pdx-7lnk9y', '');
@@ -4294,28 +4294,28 @@ const __store_tasks = createGlobalStore('tasks', () => {
     const ___nextId = signal(7, { name: 'task-store:_nextId' });
 function addTask(text, category) {
       const id = ___nextId();
-      ___nextId.set(prev => prev + 1);
-      __items.set(prev => [...prev, { id, text, category, done: false }]);
+      ___nextId.setRaw(___nextId.peek() + 1);
+      __items.setRaw([...__items.peek(), { id, text, category, done: false }]);
     }
     
     function toggleTask(id) {
-      __items.set(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+      __items.setRaw(__items.peek().map(t => t.id === id ? { ...t, done: !t.done } : t));
     }
     
     function removeTask(id) {
-      __items.set(prev => prev.filter(t => t.id !== id));
+      __items.setRaw(__items.peek().filter(t => t.id !== id));
     }
     
     function setFilter(f) {
-      __filter.set(f);
+      __filter.setRaw(f);
     }
     
     function clearDone() {
-      __items.set(prev => prev.filter(t => !t.done));
+      __items.setRaw(__items.peek().filter(t => !t.done));
     }
     
     function resetStore() {
-      __items.set([
+      __items.setRaw([
         { id: 1, text: 'Design @form API', category: 'design', done: true },
         { id: 2, text: 'Implement resource() cache', category: 'dev', done: true },
         { id: 3, text: 'Write integration tests', category: 'test', done: false },
@@ -4323,8 +4323,8 @@ function addTask(text, category) {
         { id: 5, text: 'Create showcase demo', category: 'dev', done: false },
         { id: 6, text: 'Review form validation', category: 'test', done: false },
       ]);
-      __filter.set('all');
-      ___nextId.set(7);
+      __filter.setRaw('all');
+      ___nextId.setRaw(7);
     }
     const __items = signal([
   { id: 1, text: 'Design @form API', category: 'design', done: true },
@@ -4377,9 +4377,9 @@ const _debouncedSearch = debounced(() => __searchRaw(), 300);
     function setLight() { setTheme('light'); }
     function setDark() { setTheme('dark'); }
     function doToggle() { toggleDarkMode(); }
-    function onPrimary(e) { __primary.set(e.target.value); }
-    function onAccent(e) { __accent.set(e.target.value); }
-    function onSearch(e) { __searchRaw.set(e.target.value); }
+    function onPrimary(e) { __primary.setRaw(e.target.value); }
+    function onAccent(e) { __accent.setRaw(e.target.value); }
+    function onSearch(e) { __searchRaw.setRaw(e.target.value); }
     const theme = computed(() => currentTheme(), { name: 'theme-picker:theme' });
     const previewStyle = computed(() => \`background: linear-gradient(135deg, \${__primary()}, \${__accent()}); color: white; padding: 12px; border-radius: 8px; text-align: center; font-family: monospace; font-size: 0.8rem;\`, { name: 'theme-picker:previewStyle' });
     useHead({ title: "Settings — TaskMgr" });
@@ -4527,10 +4527,10 @@ registerPragmaticIcons();
     
     
     
-    function toggleMenu() { __menuOpen.set(prev => !prev); }
+    function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     
     function onSearch(evt) {
-        __searchQuery.set(evt.target.value);
+        __searchQuery.setRaw(evt.target.value);
     }
     
     // Filter nav items by search query — returns flat list when searching
@@ -4555,7 +4555,7 @@ registerPragmaticIcons();
     
     function onNavSelect(e) {
         navigate(e.detail.key);
-        __menuOpen.set(false);
+        __menuOpen.setRaw(false);
     }
     function goDesign() { navigate('/design/typography'); }
     function goComponents() { navigate('/components/icon'); }
@@ -18309,7 +18309,7 @@ component('pdx-demo-comp-affix-live', {
       <div class="scroll-spacer">
         <p class="pdx-txt-small pdx-ink-muted">Scroll down to see the toolbar become sticky.</p>
       </div>
-      <pdx-affix :offset-top=\${0} target="#affix-container" @pdx-change=\${safeHandler(batchHandler(e => ctx.affixed.set(e.detail.affixed)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}>
+      <pdx-affix :offset-top=\${0} target="#affix-container" @pdx-change=\${safeHandler(batchHandler(e => ctx.affixed.setRaw(e.detail.affixed)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}>
         <div class="sticky-bar">
           <pdx-icon name="filter" size="16"></pdx-icon>
           <strong>Sticky Toolbar</strong>
@@ -18355,9 +18355,9 @@ component('pdx-demo-comp-alert-dialog-basic', {
   props: {},
   setup(ctx) {
     const __basicOpen = signal(false, { name: 'demo-comp-alert-dialog-basic:basicOpen' });
-function openBasic() { __basicOpen.set(true); }
-    function onBasicConfirm() { __basicOpen.set(false); }
-    function onBasicCancel() { __basicOpen.set(false); }
+function openBasic() { __basicOpen.setRaw(true); }
+    function onBasicConfirm() { __basicOpen.setRaw(false); }
+    function onBasicCancel() { __basicOpen.setRaw(false); }
     return { basicOpen: __basicOpen, openBasic, onBasicConfirm, onBasicCancel };
   },
   render: (ctx) => html\`
@@ -18383,9 +18383,9 @@ component('pdx-demo-comp-alert-dialog-danger', {
   props: {},
   setup(ctx) {
     const __dangerOpen = signal(false, { name: 'demo-comp-alert-dialog-danger:dangerOpen' });
-function openDanger() { __dangerOpen.set(true); }
-    function onDangerConfirm() { __dangerOpen.set(false); }
-    function onDangerCancel() { __dangerOpen.set(false); }
+function openDanger() { __dangerOpen.setRaw(true); }
+    function onDangerConfirm() { __dangerOpen.setRaw(false); }
+    function onDangerCancel() { __dangerOpen.setRaw(false); }
     return { dangerOpen: __dangerOpen, openDanger, onDangerConfirm, onDangerCancel };
   },
   render: (ctx) => html\`
@@ -18412,9 +18412,9 @@ component('pdx-demo-comp-alert-dialog-timer', {
   props: {},
   setup(ctx) {
     const __timerOpen = signal(false, { name: 'demo-comp-alert-dialog-timer:timerOpen' });
-function openTimer() { __timerOpen.set(true); }
-    function onTimerConfirm() { __timerOpen.set(false); }
-    function onTimerCancel() { __timerOpen.set(false); }
+function openTimer() { __timerOpen.setRaw(true); }
+    function onTimerConfirm() { __timerOpen.setRaw(false); }
+    function onTimerCancel() { __timerOpen.setRaw(false); }
     return { timerOpen: __timerOpen, openTimer, onTimerConfirm, onTimerCancel };
   },
   render: (ctx) => html\`
@@ -18441,9 +18441,9 @@ component('pdx-demo-comp-alert-dialog-type-to-confirm', {
   props: {},
   setup(ctx) {
     const __typeOpen = signal(false, { name: 'demo-comp-alert-dialog-type-to-confirm:typeOpen' });
-function openTypeConfirm() { __typeOpen.set(true); }
-    function onTypeConfirm() { __typeOpen.set(false); }
-    function onTypeCancel() { __typeOpen.set(false); }
+function openTypeConfirm() { __typeOpen.setRaw(true); }
+    function onTypeConfirm() { __typeOpen.setRaw(false); }
+    function onTypeCancel() { __typeOpen.setRaw(false); }
     return { typeOpen: __typeOpen, openTypeConfirm, onTypeConfirm, onTypeCancel };
   },
   render: (ctx) => html\`
@@ -18493,14 +18493,14 @@ component('pdx-demo-comp-app-layout-full', {
       <pdx-app-layout headerheight="44px" navbarwidth="160px" asidewidth="120px" footerheight="36px" :navbar-collapsed=\${() => !ctx.navOpen()}>
         <div data-region="header" class="shell-header">
           <button type="button" class="shell-hamburger" aria-label="Toggle navigation" aria-controls="demo-nav-1"
-                  :aria-expanded=\${() => ctx.navOpen() ? 'true' : 'false'} @click=\${safeHandler(batchHandler(() => ctx.navOpen.set(!ctx.navOpen())), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="menu" size="14"></pdx-icon></button>
+                  :aria-expanded=\${() => ctx.navOpen() ? 'true' : 'false'} @click=\${safeHandler(batchHandler(() => ctx.navOpen.setRaw(!ctx.navOpen())), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="menu" size="14"></pdx-icon></button>
           <pdx-icon name="package" size="16"></pdx-icon>
           <strong>My App</strong>
         </div>
         <div data-region="navbar" class="shell-nav" id="demo-nav-1">
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page() === 'Dashboard' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page.set('Dashboard')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="home" size="14"></pdx-icon> Dashboard</button>
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page() === 'Users' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page.set('Users')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="users" size="14"></pdx-icon> Users</button>
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page() === 'Settings' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page.set('Settings')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="settings" size="14"></pdx-icon> Settings</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page() === 'Dashboard' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page.setRaw('Dashboard')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="home" size="14"></pdx-icon> Dashboard</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page() === 'Users' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page.setRaw('Users')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="users" size="14"></pdx-icon> Users</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page() === 'Settings' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page.setRaw('Settings')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="settings" size="14"></pdx-icon> Settings</button>
         </div>
         <div class="shell-main">
           <h3>\${ctx.page}</h3>
@@ -18573,11 +18573,11 @@ component('pdx-demo-comp-app-layout-header-navbar', {
           <pdx-icon name="user" size="16"></pdx-icon>
         </div>
         <div data-region="navbar" class="shell-nav">
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Overview' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.set('Overview')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="home" size="14"></pdx-icon> Overview</button>
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Analytics' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.set('Analytics')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="bar-chart" size="14"></pdx-icon> Analytics</button>
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Projects' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.set('Projects')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="folder" size="14"></pdx-icon> Projects</button>
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Team' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.set('Team')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="users" size="14"></pdx-icon> Team</button>
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Settings' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.set('Settings')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="settings" size="14"></pdx-icon> Settings</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Overview' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.setRaw('Overview')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="home" size="14"></pdx-icon> Overview</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Analytics' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.setRaw('Analytics')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="bar-chart" size="14"></pdx-icon> Analytics</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Projects' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.setRaw('Projects')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="folder" size="14"></pdx-icon> Projects</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Team' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.setRaw('Team')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="users" size="14"></pdx-icon> Team</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page2() === 'Settings' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page2.setRaw('Settings')), ctx.el?.tagName?.toLowerCase(), 'click')}><pdx-icon name="settings" size="14"></pdx-icon> Settings</button>
         </div>
         <div class="shell-main">
           <h3>\${ctx.page2}</h3>
@@ -18612,8 +18612,8 @@ component('pdx-demo-comp-app-layout-without-border', {
           <strong>Branded App</strong>
         </div>
         <div data-region="navbar" class="shell-nav">
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page3() === 'Home' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page3.set('Home')), ctx.el?.tagName?.toLowerCase(), 'click')}>Home</button>
-          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page3() === 'About' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page3.set('About')), ctx.el?.tagName?.toLowerCase(), 'click')}>About</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page3() === 'Home' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page3.setRaw('Home')), ctx.el?.tagName?.toLowerCase(), 'click')}>Home</button>
+          <button type="button" class="shell-nav-item" :aria-current=\${() => ctx.page3() === 'About' ? 'page' : null} @click=\${safeHandler(batchHandler(() => ctx.page3.setRaw('About')), ctx.el?.tagName?.toLowerCase(), 'click')}>About</button>
         </div>
         <div class="shell-main">
           <p class="pdx-txt-small pdx-ink-muted">No borders between regions.</p>
@@ -18883,7 +18883,7 @@ component('pdx-demo-comp-autocomplete-basic', {
     
     
     
-    function onFruitChange(e) { __fruitValue.set(e.detail.value ?? e.detail); }
+    function onFruitChange(e) { __fruitValue.setRaw(e.detail.value ?? e.detail); }
     return { fruits, fruitValue: __fruitValue, onFruitChange };
   },
   render: (ctx) => html\`
@@ -18927,7 +18927,7 @@ component('pdx-demo-comp-autocomplete-cascading', {
     
     
     
-    function onLangChange(e) { __langValue.set(e.detail.value ?? e.detail); }
+    function onLangChange(e) { __langValue.setRaw(e.detail.value ?? e.detail); }
     return { programmingLangs, langValue: __langValue, onLangChange };
   },
   render: (ctx) => html\`
@@ -18976,11 +18976,11 @@ component('pdx-demo-comp-autocomplete-creatable', {
     
     function onTagCreate(e) {
       const val = e.detail.value ?? e.detail;
-      __tags.set(prev => prev.slice().concat([val]));
-      __createdTags.set(prev => prev.slice().concat([val]));
+      __tags.setRaw(__tags.peek().slice().concat([val]));
+      __createdTags.setRaw(__createdTags.peek().slice().concat([val]));
     }
     
-    function onTagChange(e) { __tagValue.set(e.detail.value ?? e.detail); }
+    function onTagChange(e) { __tagValue.setRaw(e.detail.value ?? e.detail); }
     return { tags: __tags, tagValue: __tagValue, createdTags: __createdTags, onTagCreate, onTagChange };
   },
   render: (ctx) => html\`
@@ -19032,7 +19032,7 @@ component('pdx-demo-comp-autocomplete-force-selection', {
     
     
     
-    function onColorChange(e) { __colorValue.set(e.detail.value ?? e.detail); }
+    function onColorChange(e) { __colorValue.setRaw(e.detail.value ?? e.detail); }
     return { colors, colorValue: __colorValue, onColorChange };
   },
   render: (ctx) => html\`
@@ -19109,7 +19109,7 @@ component('pdx-demo-comp-autocomplete-object-array', {
     
     
     
-    function onCityChange(e) { __cityValue.set(e.detail.value ? e.detail.label + ' (value: ' + e.detail.value + ')' : ''); }
+    function onCityChange(e) { __cityValue.setRaw(e.detail.value ? e.detail.label + ' (value: ' + e.detail.value + ')' : ''); }
     return { cities, cityValue: __cityValue, onCityChange };
   },
   render: (ctx) => html\`
@@ -19179,7 +19179,7 @@ component('pdx-demo-comp-autocomplete-remote', {
     
     
     
-    function onCountryChange(e) { __countryValue.set(e.detail.value ?? e.detail); }
+    function onCountryChange(e) { __countryValue.setRaw(e.detail.value ?? e.detail); }
     return { allCountries, countryDS, countryValue: __countryValue, onCountryChange };
   },
   render: (ctx) => html\`
@@ -19666,11 +19666,11 @@ component('pdx-demo-comp-avatar-group-clickable', {
   setup(ctx) {
     const __clickLog = signal('Click an avatar...', { name: 'demo-comp-avatar-group-clickable:clickLog' });
 function onAvatarClick(e) {
-      __clickLog.set('pdx-click: ' + e.detail.item.name + ' (index ' + e.detail.index + ')');
+      __clickLog.setRaw('pdx-click: ' + e.detail.item.name + ' (index ' + e.detail.index + ')');
     }
     
     function onOverflowClick(e) {
-      __clickLog.set('pdx-overflow-click: +' + e.detail.count + ' hidden avatars');
+      __clickLog.setRaw('pdx-overflow-click: +' + e.detail.count + ' hidden avatars');
     }
     ctx.el.setAttribute('data-pdx-o892wn', '');
     return { clickLog: __clickLog, onAvatarClick, onOverflowClick };
@@ -20094,15 +20094,15 @@ component('pdx-demo-comp-badge-interactive', {
     function notifStr() { return '' + __notifCount(); }
     
     function addNotif() {
-        __notifCount.set(prev => prev + 1);
+        __notifCount.setRaw(__notifCount.peek() + 1);
     }
     
     function removeNotif() {
-        if (__notifCount() > 0) __notifCount.set(prev => prev - 1);
+        if (__notifCount() > 0) __notifCount.setRaw(__notifCount.peek() - 1);
     }
     
     function clearNotif() {
-        __notifCount.set(0);
+        __notifCount.setRaw(0);
     }
     return { notifCount: __notifCount, notifStr, addNotif, removeNotif, clearNotif };
   },
@@ -20364,7 +20364,7 @@ component('pdx-demo-comp-block-ui-basic', {
   props: {},
   setup(ctx) {
     const __blocked = signal(false, { name: 'demo-comp-block-ui-basic:blocked' });
-function toggleBlock() { __blocked.set(prev => !prev); }
+function toggleBlock() { __blocked.setRaw(!__blocked.peek()); }
     return { blocked: __blocked, toggleBlock };
   },
   render: (ctx) => html\`
@@ -20413,8 +20413,8 @@ component('pdx-demo-comp-block-ui-delay', {
   setup(ctx) {
     const __saving = signal(false, { name: 'demo-comp-block-ui-delay:saving' });
 function save(ms) {
-      __saving.set(true);
-      setTimeout(function() { __saving.set(false); }, ms);
+      __saving.setRaw(true);
+      setTimeout(function() { __saving.setRaw(false); }, ms);
     }
     return { saving: __saving, save };
   },
@@ -20450,8 +20450,8 @@ component('pdx-demo-comp-block-ui-fullscreen', {
   setup(ctx) {
     const __pageBlocked = signal(false, { name: 'demo-comp-block-ui-fullscreen:pageBlocked' });
 function blockPage() {
-      __pageBlocked.set(true);
-      setTimeout(function() { __pageBlocked.set(false); }, 1500);
+      __pageBlocked.setRaw(true);
+      setTimeout(function() { __pageBlocked.setRaw(false); }, 1500);
     }
     return { pageBlocked: __pageBlocked, blockPage };
   },
@@ -20485,10 +20485,10 @@ component('pdx-demo-comp-block-ui-simulated-fetch', {
     const __fetchLoading = signal(false, { name: 'demo-comp-block-ui-simulated-fetch:fetchLoading' });
     const __fetchContent = signal('Click "Load Data" to simulate a fetch...', { name: 'demo-comp-block-ui-simulated-fetch:fetchContent' });
 function simulateFetch() {
-      __fetchLoading.set(true);
+      __fetchLoading.setRaw(true);
       setTimeout(function() {
-        __fetchLoading.set(false);
-        __fetchContent.set('Data loaded successfully at ' + new Date().toLocaleTimeString());
+        __fetchLoading.setRaw(false);
+        __fetchContent.setRaw('Data loaded successfully at ' + new Date().toLocaleTimeString());
       }, 2000);
     }
     return { fetchLoading: __fetchLoading, fetchContent: __fetchContent, simulateFetch };
@@ -20562,7 +20562,7 @@ const navItems = [
     function onNavSelect(e) {
       const nav = e.target;
       if (nav) nav.setAttribute('activekey', e.detail.key);
-      __navLabel.set(e.detail.item.label);
+      __navLabel.setRaw(e.detail.item.label);
     }
     return { navItems, navLabel: __navLabel, onNavSelect };
   },
@@ -20619,7 +20619,7 @@ const badgeItems = [
     function onBadgeSelect(e) {
       const nav = e.target;
       if (nav) nav.setAttribute('activekey', e.detail.key);
-      __badgeLabel.set(e.detail.item.label);
+      __badgeLabel.setRaw(e.detail.item.label);
     }
     return { badgeItems, badgeLabel: __badgeLabel, onBadgeSelect };
   },
@@ -20663,8 +20663,8 @@ component('pdx-demo-comp-bottom-sheet-action-sheet', {
     const actionDetents = [0.35];
     
     
-    function openAction() { __actionOpen.set(true); }
-    function closeAction() { __actionOpen.set(false); }
+    function openAction() { __actionOpen.setRaw(true); }
+    function closeAction() { __actionOpen.setRaw(false); }
     
     function pickAction(name) {
         closeAction();
@@ -20716,8 +20716,8 @@ component('pdx-demo-comp-bottom-sheet-basic', {
 // Basic
     
     
-    function openBasic() { __basicOpen.set(true); }
-    function closeBasic() { __basicOpen.set(false); }
+    function openBasic() { __basicOpen.setRaw(true); }
+    function closeBasic() { __basicOpen.setRaw(false); }
     return { basicOpen: __basicOpen, openBasic, closeBasic };
   },
   render: (ctx) => html\`
@@ -20755,8 +20755,8 @@ component('pdx-demo-comp-bottom-sheet-close-button', {
 // Close button
     
     
-    function openClose() { __closeOpen.set(true); }
-    function closeCloseSheet() { __closeOpen.set(false); }
+    function openClose() { __closeOpen.setRaw(true); }
+    function closeCloseSheet() { __closeOpen.setRaw(false); }
     return { closeOpen: __closeOpen, openClose, closeCloseSheet };
   },
   render: (ctx) => html\`
@@ -20792,8 +20792,8 @@ component('pdx-demo-comp-bottom-sheet-detents', {
     const threeDetents = [0.25, 0.5, 0.9];
     
     
-    function openThree() { __threeOpen.set(true); }
-    function closeThree() { __threeOpen.set(false); }
+    function openThree() { __threeOpen.setRaw(true); }
+    function closeThree() { __threeOpen.setRaw(false); }
     return { threeOpen: __threeOpen, threeDetents, openThree, closeThree };
   },
   render: (ctx) => html\`
@@ -20837,8 +20837,8 @@ component('pdx-demo-comp-bottom-sheet-no-handle', {
     
     
     
-    function openNoHandle() { __noHandleOpen.set(true); }
-    function closeNoHandle() { __noHandleOpen.set(false); }
+    function openNoHandle() { __noHandleOpen.setRaw(true); }
+    function closeNoHandle() { __noHandleOpen.setRaw(false); }
     return { noHandleOpen: __noHandleOpen, noHandle: __noHandle, noSwipe: __noSwipe, openNoHandle, closeNoHandle };
   },
   render: (ctx) => html\`
@@ -20874,8 +20874,8 @@ component('pdx-demo-comp-bottom-sheet-scrollable', {
     const scrollDetents = [0.4, 0.85];
     
     
-    function openScroll() { __scrollOpen.set(true); }
-    function closeScroll() { __scrollOpen.set(false); }
+    function openScroll() { __scrollOpen.setRaw(true); }
+    function closeScroll() { __scrollOpen.setRaw(false); }
     return { scrollOpen: __scrollOpen, scrollDetents, openScroll, closeScroll };
   },
   render: (ctx) => html\`
@@ -20924,10 +20924,10 @@ component('pdx-demo-comp-bottom-sheet-stacking', {
     
     
     
-    function openNested() { __nestedOpen.set(true); }
-    function closeNested() { __nestedOpen.set(false); }
-    function openNestedDialog() { __nestedDialogOpen.set(true); }
-    function closeNestedDialog() { __nestedDialogOpen.set(false); }
+    function openNested() { __nestedOpen.setRaw(true); }
+    function closeNested() { __nestedOpen.setRaw(false); }
+    function openNestedDialog() { __nestedDialogOpen.setRaw(true); }
+    function closeNestedDialog() { __nestedDialogOpen.setRaw(false); }
     return { nestedOpen: __nestedOpen, nestedDialogOpen: __nestedDialogOpen, openNested, closeNested, openNestedDialog, closeNestedDialog };
   },
   render: (ctx) => html\`
@@ -21187,10 +21187,10 @@ const actions = [
     
     
     
-    function inc() { __count.set(prev => prev + 1); }
-    function dec() { __count.set(prev => prev > 0 ? prev - 1 : 0); }
-    function onAction(e) { __last.set('pdx-action: ' + e.detail.key); }
-    function onClear() { __count.set(0); __last.set('pdx-clear'); }
+    function inc() { __count.setRaw(__count.peek() + 1); }
+    function dec() { __count.setRaw(__count.peek() > 0 ? __count.peek() - 1 : 0); }
+    function onAction(e) { __last.setRaw('pdx-action: ' + e.detail.key); }
+    function onClear() { __count.setRaw(0); __last.setRaw('pdx-clear'); }
     ctx.el.setAttribute('data-pdx-9ufwpw', '');
     return { actions, count: __count, last: __last, inc, dec, onAction, onClear };
   },
@@ -21456,23 +21456,23 @@ const buttonConsole = useButtonConsole();
     
     function toggleLoading() {
         if (__loadingPrimary()) return;
-        __loadingPrimary.set(true);
+        __loadingPrimary.setRaw(true);
         buttonConsole.log({ target: { closest: () => ({ textContent: 'Save', getAttribute: () => 'primary', className: '' }) } });
-        setTimeout(() => { __loadingPrimary.set(false); }, 2000);
+        setTimeout(() => { __loadingPrimary.setRaw(false); }, 2000);
     }
     
     function toggleLoadingSec() {
         if (__loadingSecondary()) return;
-        __loadingSecondary.set(true);
+        __loadingSecondary.setRaw(true);
         buttonConsole.log({ target: { closest: () => ({ textContent: 'Load Data', getAttribute: () => 'secondary', className: '' }) } });
-        setTimeout(() => { __loadingSecondary.set(false); }, 2000);
+        setTimeout(() => { __loadingSecondary.setRaw(false); }, 2000);
     }
     
     function toggleLoadingDanger() {
         if (__loadingDanger()) return;
-        __loadingDanger.set(true);
+        __loadingDanger.setRaw(true);
         buttonConsole.log({ target: { closest: () => ({ textContent: 'Delete', getAttribute: () => 'danger', className: '' }) } });
-        setTimeout(() => { __loadingDanger.set(false); }, 2000);
+        setTimeout(() => { __loadingDanger.setRaw(false); }, 2000);
     }
     return { buttonConsole, loadingPrimary: __loadingPrimary, loadingSecondary: __loadingSecondary, loadingDanger: __loadingDanger, toggleLoading, toggleLoadingSec, toggleLoadingDanger };
   },
@@ -23084,7 +23084,7 @@ component('pdx-demo-comp-chart-advanced-dynamic', {
   { category: 'F', value: 73 },
 ], { name: 'demo-comp-chart-advanced-dynamic:dynamicData' });
 function randomize() {
-      __dynamicData.set(prev => prev.map(d => ({ ...d, value: Math.floor(Math.random() * 100) + 10 })));
+      __dynamicData.setRaw(__dynamicData.peek().map(d => ({ ...d, value: Math.floor(Math.random() * 100) + 10 })));
     }
     ctx.el.setAttribute('data-pdx-do8btg', '');
     return { dynamicData: __dynamicData, randomize };
@@ -23526,10 +23526,10 @@ component('pdx-demo-comp-checkbox-composition', {
     <div class="comp-card">
       <h3 class="pdx-txt-subheading">Permissions</h3>
       <div class="comp-form-single">
-        <pdx-checkbox label="Select all" :checked=\${() => allOn(ctx.perms())} :indeterminate=\${() => someOn(ctx.perms())} @pdx-change=\${safeHandler(batchHandler(e => ctx.perms.set(setAll(ctx.perms(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
+        <pdx-checkbox label="Select all" :checked=\${() => allOn(ctx.perms())} :indeterminate=\${() => someOn(ctx.perms())} @pdx-change=\${safeHandler(batchHandler(e => ctx.perms.setRaw(setAll(ctx.perms(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
         <div style="padding-left:var(--pdx-space-lg);display:flex;flex-direction:column;gap:var(--pdx-space-sm)">
           \${eachRow(() => ctx.perms(), 'label', (perm) => html\`
-            <pdx-checkbox :label=\${() => perm().label} :description=\${() => perm().description} :value=\${() => perm().label} :checked=\${() => perm().on} @pdx-change=\${safeHandler(batchHandler(e => ctx.perms.set(setOne(ctx.perms(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
+            <pdx-checkbox :label=\${() => perm().label} :description=\${() => perm().description} :value=\${() => perm().label} :checked=\${() => perm().on} @pdx-change=\${safeHandler(batchHandler(e => ctx.perms.setRaw(setOne(ctx.perms(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
           \`)}</div>
       </div>
     </div>
@@ -23617,10 +23617,10 @@ component('pdx-demo-comp-checkbox-indeterminate', {
     </p>
 
     <div class="demo-stack">
-      <pdx-checkbox label="Select all items" :checked=\${() => allOn(ctx.items())} :indeterminate=\${() => someOn(ctx.items())} @pdx-change=\${safeHandler(batchHandler(e => ctx.items.set(setAll(ctx.items(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
+      <pdx-checkbox label="Select all items" :checked=\${() => allOn(ctx.items())} :indeterminate=\${() => someOn(ctx.items())} @pdx-change=\${safeHandler(batchHandler(e => ctx.items.setRaw(setAll(ctx.items(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
       \${eachRow(() => ctx.items(), 'label', (item) => html\`
         <div style="padding-left:var(--pdx-space-xl)">
-          <pdx-checkbox :label=\${() => item().label} :value=\${() => item().label} :checked=\${() => item().on} @pdx-change=\${safeHandler(batchHandler(e => ctx.items.set(setOne(ctx.items(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
+          <pdx-checkbox :label=\${() => item().label} :value=\${() => item().label} :checked=\${() => item().on} @pdx-change=\${safeHandler(batchHandler(e => ctx.items.setRaw(setOne(ctx.items(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-checkbox>
         </div>
       \`)}</div>
 
@@ -23737,7 +23737,7 @@ component('pdx-demo-comp-checkbox-group-basic', {
     <div class="demo-stack">
       <div class="pdx-field">
         <pdx-label text="Interests" description="Select all that apply"></pdx-label>
-        <pdx-checkbox-group value="code,design" @pdx-change=\${safeHandler(batchHandler(e => ctx.interests.set(e.detail.values.join(', ') || 'none')), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}>
+        <pdx-checkbox-group value="code,design" @pdx-change=\${safeHandler(batchHandler(e => ctx.interests.setRaw(e.detail.values.join(', ') || 'none')), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}>
           <pdx-checkbox label="Coding" value="code"></pdx-checkbox>
           <pdx-checkbox label="Design" value="design"></pdx-checkbox>
           <pdx-checkbox label="Marketing" value="marketing"></pdx-checkbox>
@@ -23907,10 +23907,10 @@ const chipConsole = useChipConsole();
 
     <div class="demo-row">
       \${eachRow(() => ctx.people(), 'name', (person) => html\`
-        <pdx-chip :avatar=\${() => person().avatar} :variant=\${() => person().variant} removable :value=\${() => person().name} @pdx-remove=\${safeHandler(batchHandler(e => ctx.people.set(ctx.dropPerson(ctx.people(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove')}>\${() => person().name}</pdx-chip>
+        <pdx-chip :avatar=\${() => person().avatar} :variant=\${() => person().variant} removable :value=\${() => person().name} @pdx-remove=\${safeHandler(batchHandler(e => ctx.people.setRaw(ctx.dropPerson(ctx.people(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove')}>\${() => person().name}</pdx-chip>
       \`)}<pdx-chip avatar="/avatars/person-3.svg" variant="tonal-success">Mary Kim</pdx-chip>
       \${when(() => ctx.people().length < 2, () => html\`
-        <button class="pdx-ghost" size="sm" @click=\${safeHandler(batchHandler(() => ctx.people.set(ctx.startPeople())), ctx.el?.tagName?.toLowerCase(), 'click')}>Reset</button>
+        <button class="pdx-ghost" size="sm" @click=\${safeHandler(batchHandler(() => ctx.people.setRaw(ctx.startPeople())), ctx.el?.tagName?.toLowerCase(), 'click')}>Reset</button>
       \`, null)}</div>
 
     <details class="source-block">
@@ -23984,9 +23984,9 @@ const chipConsole = useChipConsole();
       <h3 class="pdx-txt-subheading">Team Members</h3>
       <div class="pdx-chip-group" style="margin-top:var(--pdx-space-sm)">
         \${eachRow(() => ctx.team(), 'name', (member) => html\`
-          <pdx-chip :avatar=\${() => member().avatar} removable :value=\${() => member().name} @pdx-remove=\${safeHandler(batchHandler(e => ctx.team.set(ctx.dropPerson(ctx.team(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove')}>\${() => member().name}</pdx-chip>
+          <pdx-chip :avatar=\${() => member().avatar} removable :value=\${() => member().name} @pdx-remove=\${safeHandler(batchHandler(e => ctx.team.setRaw(ctx.dropPerson(ctx.team(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove')}>\${() => member().name}</pdx-chip>
         \`)}\${when(() => ctx.team().length === 0, () => html\`
-          <button class="pdx-ghost" size="sm" @click=\${safeHandler(batchHandler(() => ctx.team.set(ctx.startTeam())), ctx.el?.tagName?.toLowerCase(), 'click')}>Add everyone back</button>
+          <button class="pdx-ghost" size="sm" @click=\${safeHandler(batchHandler(() => ctx.team.setRaw(ctx.startTeam())), ctx.el?.tagName?.toLowerCase(), 'click')}>Add everyone back</button>
         \`, null)}</div>
     </div>
   </section>
@@ -24140,7 +24140,7 @@ const chipConsole = useChipConsole();
         const val = e.detail ? e.detail.value : '';
         if (!val) return;
         const at = __tags().indexOf(val);
-        __tags.set(prev => prev.filter(t => t !== val));
+        __tags.setRaw(__tags.peek().filter(t => t !== val));
         addLog('removed: ' + val);
         requestAnimationFrame(() => {
             const row = __tagRow();
@@ -24152,7 +24152,7 @@ const chipConsole = useChipConsole();
     }
     
     function resetTags() {
-        __tags.set(['React', 'Vue', 'Angular', 'Svelte', 'Solid']);
+        __tags.setRaw(['React', 'Vue', 'Angular', 'Svelte', 'Solid']);
         addLog('tags reset');
     }
     return { chipConsole, addLog, tags: __tags, tagRow: __tagRow, removeTag, resetTags };
@@ -24213,7 +24213,7 @@ const chipConsole = useChipConsole();
     function toggleInterest(e) {
         const val = e.detail ? e.detail.value : '';
         if (val) {
-            __interests.set(prev => prev.map(i => i.label === val ? { label: i.label, selected: !i.selected } : i));
+            __interests.setRaw(__interests.peek().map(i => i.label === val ? { label: i.label, selected: !i.selected } : i));
             addLog('toggle: ' + val + ' → ' + (e.detail.selected ? 'on' : 'off'));
         }
     }
@@ -24317,7 +24317,7 @@ component('pdx-demo-comp-color-picker-alpha', {
 // ─── Alpha ───
     
     
-    function onAlphaChange(e) { __alphaValue.set(e.detail.value ?? e.detail); }
+    function onAlphaChange(e) { __alphaValue.setRaw(e.detail.value ?? e.detail); }
     return { alphaValue: __alphaValue, onAlphaChange };
   },
   render: (ctx) => html\`
@@ -24353,7 +24353,7 @@ component('pdx-demo-comp-color-picker-basic', {
 // ─── Basic ───
     
     
-    function onColorChange(e) { __colorValue.set(e.detail.value ?? e.detail); }
+    function onColorChange(e) { __colorValue.setRaw(e.detail.value ?? e.detail); }
     return { colorValue: __colorValue, onColorChange };
   },
   render: (ctx) => html\`
@@ -24425,9 +24425,9 @@ component('pdx-demo-comp-color-picker-formats', {
     
     
     
-    function onHexChange(e) { __hexOutput.set(e.detail.value ?? e.detail); }
-    function onRgbChange(e) { __rgbOutput.set(e.detail.value ?? e.detail); }
-    function onHslChange(e) { __hslOutput.set(e.detail.value ?? e.detail); }
+    function onHexChange(e) { __hexOutput.setRaw(e.detail.value ?? e.detail); }
+    function onRgbChange(e) { __rgbOutput.setRaw(e.detail.value ?? e.detail); }
+    function onHslChange(e) { __hslOutput.setRaw(e.detail.value ?? e.detail); }
     return { hexOutput: __hexOutput, rgbOutput: __rgbOutput, hslOutput: __hslOutput, onHexChange, onRgbChange, onHslChange };
   },
   render: (ctx) => html\`
@@ -24475,7 +24475,7 @@ component('pdx-demo-comp-color-picker-inline', {
 // ─── Inline ───
     
     
-    function onInlineChange(e) { __inlineValue.set(e.detail.value ?? e.detail); }
+    function onInlineChange(e) { __inlineValue.setRaw(e.detail.value ?? e.detail); }
     return { inlineValue: __inlineValue, onInlineChange };
   },
   render: (ctx) => html\`
@@ -24514,7 +24514,7 @@ component('pdx-demo-comp-color-picker-presets', {
     
     
     
-    function onPresetChange(e) { __presetValue.set(e.detail.value ?? e.detail); }
+    function onPresetChange(e) { __presetValue.setRaw(e.detail.value ?? e.detail); }
     return { presetColors, presetValue: __presetValue, onPresetChange };
   },
   render: (ctx) => html\`
@@ -24603,8 +24603,8 @@ const commandItems = [
     
     
     function onSelect(e) {
-      __lastRun.set((e.detail && e.detail.label) || '—');
-      __open.set(false);
+      __lastRun.setRaw((e.detail && e.detail.label) || '—');
+      __open.setRaw(false);
     }
     return { open: __open, lastRun: __lastRun, commandItems, onSelect };
   },
@@ -24618,7 +24618,7 @@ const commandItems = [
       skipped by the arrows, never run. A <code>shortcut</code> is shown and announced as a key shortcut.
     </p>
     <div class="demo-container">
-      <button class="pdx-btn pdx-primary" @click=\${safeHandler(batchHandler(() => ctx.open.set(true)), ctx.el?.tagName?.toLowerCase(), 'click')}>
+      <button class="pdx-btn pdx-primary" @click=\${safeHandler(batchHandler(() => ctx.open.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'click')}>
         <pdx-icon name="search" size="14"></pdx-icon> Open command palette
       </button>
       <span class="run-note pdx-txt-small pdx-ink-muted">Last run: <strong>\${ctx.lastRun}</strong></span>
@@ -24626,8 +24626,8 @@ const commandItems = [
         :open=\${ctx.open}
         :items=\${() => ctx.commandItems}
         placeholder="Search commands…"
-        @pdx-open=\${safeHandler(batchHandler(() => ctx.open.set(true)), ctx.el?.tagName?.toLowerCase(), 'pdx-open')}
-        @pdx-close=\${safeHandler(batchHandler(() => ctx.open.set(false)), ctx.el?.tagName?.toLowerCase(), 'pdx-close')}
+        @pdx-open=\${safeHandler(batchHandler(() => ctx.open.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'pdx-open')}
+        @pdx-close=\${safeHandler(batchHandler(() => ctx.open.setRaw(false)), ctx.el?.tagName?.toLowerCase(), 'pdx-close')}
         @pdx-select=\${safeHandler(batchHandler(ctx.onSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select')}>
       </pdx-command>
     </div>
@@ -24673,7 +24673,7 @@ const fileItems = [
     
     
     function onFile(e) {
-      __lastFile.set((e.detail && e.detail.label) || '—');
+      __lastFile.setRaw((e.detail && e.detail.label) || '—');
     }
     ctx.el.setAttribute('data-pdx-7u5zc8', '');
     return { filesOpen: __filesOpen, lastFile: __lastFile, fileItems, onFile };
@@ -24691,7 +24691,7 @@ const fileItems = [
       This one sets <code>:hotkey="false"</code>, so Ctrl+K stays with the palette above.
     </p>
     <div class="demo-container">
-      <button class="pdx-btn pdx-outline" @click=\${safeHandler(batchHandler(() => ctx.filesOpen.set(true)), ctx.el?.tagName?.toLowerCase(), 'click')}>Find a file</button>
+      <button class="pdx-btn pdx-outline" @click=\${safeHandler(batchHandler(() => ctx.filesOpen.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'click')}>Find a file</button>
       <span class="run-note pdx-txt-small pdx-ink-muted">Opened: <strong>\${ctx.lastFile}</strong></span>
       <pdx-command
         :open=\${ctx.filesOpen}
@@ -24699,8 +24699,8 @@ const fileItems = [
         :hotkey=\${false}
         placeholder="Find a file…"
         empty-text="No file with that name — check the spelling."
-        @pdx-open=\${safeHandler(batchHandler(() => ctx.filesOpen.set(true)), ctx.el?.tagName?.toLowerCase(), 'pdx-open')}
-        @pdx-close=\${safeHandler(batchHandler(() => ctx.filesOpen.set(false)), ctx.el?.tagName?.toLowerCase(), 'pdx-close')}
+        @pdx-open=\${safeHandler(batchHandler(() => ctx.filesOpen.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'pdx-open')}
+        @pdx-close=\${safeHandler(batchHandler(() => ctx.filesOpen.setRaw(false)), ctx.el?.tagName?.toLowerCase(), 'pdx-close')}
         @pdx-select=\${safeHandler(batchHandler(ctx.onFile), ctx.el?.tagName?.toLowerCase(), 'pdx-select')}>
         \${slotCarrier('item', __pdxSlot_item_0)}
       </pdx-command>
@@ -25807,7 +25807,7 @@ const multiDS = createDataSource({ data: data.slice(), pageSize: 0 });
     function onSelect(evt) {
       const count = evt.detail.count;
       const ids = evt.detail.selected;
-      __selLog.set(count + ' row' + (count !== 1 ? 's' : '') + ' selected: IDs [' + ids.join(', ') + ']');
+      __selLog.setRaw(count + ' row' + (count !== 1 ? 's' : '') + ' selected: IDs [' + ids.join(', ') + ']');
     }
     ctx.el.setAttribute('data-pdx-p1a3ib', '');
     return { multiDS, selLog: __selLog, onSelect };
@@ -26585,8 +26585,8 @@ component('pdx-demo-comp-data-source-cascading', {
     
     
     
-    function onCountryPick(e) { __pickedCountry.set(e.detail.value ?? e.detail); __pickedCity.set(null); }
-    function onCityPick(e) { __pickedCity.set(e.detail.value ?? e.detail); }
+    function onCountryPick(e) { __pickedCountry.setRaw(e.detail.value ?? e.detail); __pickedCity.setRaw(null); }
+    function onCityPick(e) { __pickedCity.setRaw(e.detail.value ?? e.detail); }
     return { cities, countryList, pickedCountry: __pickedCountry, pickedCity: __pickedCity, filteredCityList, pickedCityLabel, onCountryPick, onCityPick };
   },
   render: (ctx) => html\`
@@ -27878,8 +27878,8 @@ component('pdx-demo-comp-dialog-basic', {
   props: {},
   setup(ctx) {
     const __basicOpen = signal(false, { name: 'demo-comp-dialog-basic:basicOpen' });
-function openBasic() { __basicOpen.set(true); }
-    function closeBasic() { __basicOpen.set(false); }
+function openBasic() { __basicOpen.setRaw(true); }
+    function closeBasic() { __basicOpen.setRaw(false); }
     return { basicOpen: __basicOpen, openBasic, closeBasic };
   },
   render: (ctx) => html\`
@@ -27917,8 +27917,8 @@ component('pdx-demo-comp-dialog-footer-actions', {
   props: {},
   setup(ctx) {
     const __footerOpen = signal(false, { name: 'demo-comp-dialog-footer-actions:footerOpen' });
-function openFooter() { __footerOpen.set(true); }
-    function closeFooter() { __footerOpen.set(false); }
+function openFooter() { __footerOpen.setRaw(true); }
+    function closeFooter() { __footerOpen.setRaw(false); }
     return { footerOpen: __footerOpen, openFooter, closeFooter };
   },
   render: (ctx) => html\`
@@ -27975,8 +27975,8 @@ component('pdx-demo-comp-dialog-initial-focus', {
 const focusSelector = '.focus-email';
     
     
-    function openFocus() { __focusOpen.set(true); }
-    function closeFocus() { __focusOpen.set(false); }
+    function openFocus() { __focusOpen.setRaw(true); }
+    function closeFocus() { __focusOpen.setRaw(false); }
     return { focusOpen: __focusOpen, focusSelector, openFocus, closeFocus };
   },
   render: (ctx) => html\`
@@ -28026,10 +28026,10 @@ component('pdx-demo-comp-dialog-nested', {
   setup(ctx) {
     const __nested1Open = signal(false, { name: 'demo-comp-dialog-nested:nested1Open' });
     const __nested2Open = signal(false, { name: 'demo-comp-dialog-nested:nested2Open' });
-function openNested1() { __nested1Open.set(true); }
-    function closeNested1() { __nested1Open.set(false); }
-    function openNested2() { __nested2Open.set(true); }
-    function closeNested2() { __nested2Open.set(false); }
+function openNested1() { __nested1Open.setRaw(true); }
+    function closeNested1() { __nested1Open.setRaw(false); }
+    function openNested2() { __nested2Open.setRaw(true); }
+    function closeNested2() { __nested2Open.setRaw(false); }
     return { nested1Open: __nested1Open, nested2Open: __nested2Open, openNested1, closeNested1, openNested2, closeNested2 };
   },
   render: (ctx) => html\`
@@ -28077,8 +28077,8 @@ component('pdx-demo-comp-dialog-no-close-button', {
   props: {},
   setup(ctx) {
     const __noCloseOpen = signal(false, { name: 'demo-comp-dialog-no-close-button:noCloseOpen' });
-function openNoClose() { __noCloseOpen.set(true); }
-    function closeNoClose() { __noCloseOpen.set(false); }
+function openNoClose() { __noCloseOpen.setRaw(true); }
+    function closeNoClose() { __noCloseOpen.setRaw(false); }
     return { noCloseOpen: __noCloseOpen, openNoClose, closeNoClose };
   },
   render: (ctx) => html\`
@@ -28120,8 +28120,8 @@ component('pdx-demo-comp-dialog-prevent-close', {
   props: {},
   setup(ctx) {
     const __preventOpen = signal(false, { name: 'demo-comp-dialog-prevent-close:preventOpen' });
-function openPrevent() { __preventOpen.set(true); }
-    function closePrevent() { __preventOpen.set(false); }
+function openPrevent() { __preventOpen.setRaw(true); }
+    function closePrevent() { __preventOpen.setRaw(false); }
     
     // prevent-close already blocks Escape, the backdrop and the close button; the event says a close
     // was attempted. Ask in the page, never with window.confirm: the browser's modal stops automated
@@ -28134,7 +28134,7 @@ function openPrevent() { __preventOpen.set(true); }
         cancelLabel: 'Stay',
         variant: 'danger',
       });
-      if (leave) __preventOpen.set(false);
+      if (leave) __preventOpen.setRaw(false);
     }
     return { preventOpen: __preventOpen, openPrevent, closePrevent, onBeforeClose };
   },
@@ -28203,8 +28203,8 @@ component('pdx-demo-comp-dialog-scrollable', {
   props: {},
   setup(ctx) {
     const __scrollOpen = signal(false, { name: 'demo-comp-dialog-scrollable:scrollOpen' });
-function openScroll() { __scrollOpen.set(true); }
-    function closeScroll() { __scrollOpen.set(false); }
+function openScroll() { __scrollOpen.setRaw(true); }
+    function closeScroll() { __scrollOpen.setRaw(false); }
     ctx.el.setAttribute('data-pdx-rkfsw2', '');
     return { scrollOpen: __scrollOpen, openScroll, closeScroll };
   },
@@ -28269,11 +28269,11 @@ component('pdx-demo-comp-dialog-sizes', {
     const __sizeOpen = signal(false, { name: 'demo-comp-dialog-sizes:sizeOpen' });
     const __currentSize = signal('md', { name: 'demo-comp-dialog-sizes:currentSize' });
 function openSize(e) {
-      __currentSize.set(e.currentTarget.dataset.size || 'md');
-      __sizeOpen.set(true);
+      __currentSize.setRaw(e.currentTarget.dataset.size || 'md');
+      __sizeOpen.setRaw(true);
     }
     
-    function closeSizeDialog() { __sizeOpen.set(false); }
+    function closeSizeDialog() { __sizeOpen.setRaw(false); }
     const sizeTitle = computed(() => 'Dialog — ' + __currentSize(), { name: 'demo-comp-dialog-sizes:sizeTitle' });
     return { sizeOpen: __sizeOpen, currentSize: __currentSize, sizeTitle, openSize, closeSizeDialog };
   },
@@ -28476,8 +28476,8 @@ component('pdx-demo-comp-drawer-form-drawer', {
 // Form drawer
     
     
-    function openForm() { __formOpen.set(true); }
-    function closeForm() { __formOpen.set(false); }
+    function openForm() { __formOpen.setRaw(true); }
+    function closeForm() { __formOpen.setRaw(false); }
     ctx.el.setAttribute('data-pdx-xx71yn', '');
     return { formOpen: __formOpen, openForm, closeForm };
   },
@@ -28566,8 +28566,8 @@ component('pdx-demo-comp-drawer-positions', {
     
     
     
-    function openDrawer(pos) { __drawerPos.set(pos); __drawerOpen.set(true); }
-    function closeDrawer() { __drawerOpen.set(false); }
+    function openDrawer(pos) { __drawerPos.setRaw(pos); __drawerOpen.setRaw(true); }
+    function closeDrawer() { __drawerOpen.setRaw(false); }
     return { drawerOpen: __drawerOpen, drawerPos: __drawerPos, openDrawer, closeDrawer };
   },
   render: (ctx) => html\`
@@ -28615,8 +28615,8 @@ component('pdx-demo-comp-drawer-sizes', {
     
     
     
-    function openSized(s) { __sizedSize.set(s); __sizedOpen.set(true); }
-    function closeSized() { __sizedOpen.set(false); }
+    function openSized(s) { __sizedSize.setRaw(s); __sizedOpen.setRaw(true); }
+    function closeSized() { __sizedOpen.setRaw(false); }
     return { sizedOpen: __sizedOpen, sizedSize: __sizedSize, openSized, closeSized };
   },
   render: (ctx) => html\`
@@ -28705,7 +28705,7 @@ const optionItems = [
     ];
     
     
-    function onCheck(e) { __lastCheck.set(e.detail ? (e.detail.key + ' → ' + e.detail.checked) : '—'); }
+    function onCheck(e) { __lastCheck.setRaw(e.detail ? (e.detail.key + ' → ' + e.detail.checked) : '—'); }
     return { lastCheck: __lastCheck, optionItems, onCheck };
   },
   render: (ctx) => html\`
@@ -28929,10 +28929,10 @@ const schema = { fields: [
     
     
     
-    function openNew() { __editing.set(null); __drawerOpen.set(true); }
-    function openEdit() { __editing.set({ id: 1, name: 'Alice Johnson', role: 'Engineer' }); __drawerOpen.set(true); }
-    function onSave(e) { __lastSaved.set(e.detail.mode + ': ' + JSON.stringify(e.detail.values)); __drawerOpen.set(false); }
-    function onCancel() { __drawerOpen.set(false); }
+    function openNew() { __editing.setRaw(null); __drawerOpen.setRaw(true); }
+    function openEdit() { __editing.setRaw({ id: 1, name: 'Alice Johnson', role: 'Engineer' }); __drawerOpen.setRaw(true); }
+    function onSave(e) { __lastSaved.setRaw(e.detail.mode + ': ' + JSON.stringify(e.detail.values)); __drawerOpen.setRaw(false); }
+    function onCancel() { __drawerOpen.setRaw(false); }
     ctx.el.setAttribute('data-pdx-4843ny', '');
     return { schema, drawerOpen: __drawerOpen, editing: __editing, lastSaved: __lastSaved, openNew, openEdit, onSave, onCancel };
   },
@@ -29064,7 +29064,7 @@ component('pdx-demo-comp-empty-state-with-action', {
   setup(ctx) {
     const __actionLog = signal('Click the action button...', { name: 'demo-comp-empty-state-with-action:actionLog' });
 function onAction() {
-      __actionLog.set('pdx-action fired! Create document...');
+      __actionLog.setRaw('pdx-action fired! Create document...');
     }
     ctx.el.setAttribute('data-pdx-asz6gi', '');
     return { actionLog: __actionLog, onAction };
@@ -29109,7 +29109,7 @@ const schema = { fields: [
     
     
     
-    function logEvent(name, detail) { __logCount.set(prev => prev + 1); __logLines.set(prev => [...prev, '#' + __logCount() + ' ' + name + ' ' + JSON.stringify(detail)].slice(-6)); }
+    function logEvent(name, detail) { __logCount.setRaw(__logCount.peek() + 1); __logLines.setRaw([...__logLines.peek(), '#' + __logCount() + ' ' + name + ' ' + JSON.stringify(detail)].slice(-6)); }
     function onCreate(e) { logEvent('pdx-create', e.detail); }
     function onUpdate(e) { logEvent('pdx-update', e.detail); }
     function onDelete(e) { logEvent('pdx-delete', e.detail); }
@@ -29212,21 +29212,21 @@ component('pdx-demo-comp-error-boundary-async-action', {
     
     
     function submitForm() {
-      __formState.set('submitting');
-      __formAttempts.set(prev => prev + 1);
+      __formState.setRaw('submitting');
+      __formAttempts.setRaw(__formAttempts.peek() + 1);
       setTimeout(() => {
         if (__formAttempts() < 2) {
-          __formError.set('ValidationError: "not-an-email" is not a valid email address');
-          __formState.set('error');
+          __formError.setRaw('ValidationError: "not-an-email" is not a valid email address');
+          __formState.setRaw('error');
         } else {
-          __formState.set('success');
+          __formState.setRaw('success');
         }
       }, 800);
     }
     
     function resetForm() {
-      __formState.set('idle');
-      __formError.set('');
+      __formState.setRaw('idle');
+      __formError.setRaw('');
     }
     return { formState: __formState, formError: __formError, formAttempts: __formAttempts, submitForm, resetForm };
   },
@@ -29286,8 +29286,8 @@ component('pdx-demo-comp-error-boundary-global-error', {
     
     
     onGlobalError(function handleGlobalError(error, context) {
-      __errorId.set(prev => prev + 1);
-      __globalErrors.set(prev => prev.slice().concat([{
+      __errorId.setRaw(__errorId.peek() + 1);
+      __globalErrors.setRaw(__globalErrors.peek().slice().concat([{
         id: __errorId(),
         source: context.source,
         message: error.message,
@@ -29404,23 +29404,23 @@ component('pdx-demo-comp-error-boundary-network-fetch', {
     
     
     function startNetworkDemo() {
-      __netState.set('loading');
-      __netRetry.set(0);
+      __netState.setRaw('loading');
+      __netRetry.setRaw(0);
       simulateFetch();
     }
     
     function simulateFetch() {
       setTimeout(() => {
-        __netRetry.set(prev => prev + 1);
-        __netError.set('NetworkError: fetch /api/users failed (ERR_CONNECTION_REFUSED)');
-        __netState.set('error');
+        __netRetry.setRaw(__netRetry.peek() + 1);
+        __netError.setRaw('NetworkError: fetch /api/users failed (ERR_CONNECTION_REFUSED)');
+        __netState.setRaw('error');
     
         if (__netRetry() < 3) {
           startCountdown(3, () => {
-            __netState.set('loading');
+            __netState.setRaw('loading');
             setTimeout(() => {
               if (__netRetry() >= 2) {
-                __netState.set('success');
+                __netState.setRaw('success');
               } else {
                 simulateFetch();
               }
@@ -29431,9 +29431,9 @@ component('pdx-demo-comp-error-boundary-network-fetch', {
     }
     
     function startCountdown(seconds, onDone) {
-      __netCountdown.set(seconds);
+      __netCountdown.setRaw(seconds);
       timers.id = setInterval(() => {
-        __netCountdown.set(prev => prev - 1);
+        __netCountdown.setRaw(__netCountdown.peek() - 1);
         if (__netCountdown() <= 0) {
           clearInterval(timers.id);
           onDone();
@@ -29444,10 +29444,10 @@ component('pdx-demo-comp-error-boundary-network-fetch', {
     function resetNetworkDemo() {
       clearInterval(timers.id);
       timers.id = 0;
-      __netState.set('idle');
-      __netError.set('');
-      __netRetry.set(0);
-      __netCountdown.set(0);
+      __netState.setRaw('idle');
+      __netError.setRaw('');
+      __netRetry.setRaw(0);
+      __netCountdown.setRaw(0);
     }
     return { netState: __netState, netError: __netError, netRetry: __netRetry, netCountdown: __netCountdown, timers, startNetworkDemo, simulateFetch, startCountdown, resetNetworkDemo };
   },
@@ -29660,7 +29660,7 @@ component('pdx-demo-comp-fab-basic', {
   setup(ctx) {
     const __fabLog = signal('Click the FAB...', { name: 'demo-comp-fab-basic:fabLog' });
 function onFabClick() {
-      __fabLog.set('pdx-click fired!');
+      __fabLog.setRaw('pdx-click fired!');
     }
     return { fabLog: __fabLog, onFabClick };
   },
@@ -29764,7 +29764,7 @@ component('pdx-demo-comp-fab-speed-dial', {
   setup(ctx) {
     const __dialLog = signal('Click a FAB, then select an action...', { name: 'demo-comp-fab-speed-dial:dialLog' });
 function onDialSelect(e) {
-      __dialLog.set('pdx-select: ' + e.detail.key + ' — ' + e.detail.action.label);
+      __dialLog.setRaw('pdx-select: ' + e.detail.key + ' — ' + e.detail.action.label);
     }
     return { dialLog: __dialLog, onDialSelect };
   },
@@ -30007,7 +30007,7 @@ const orderForm = createForm({
     
     
     function submitOrder(e) {
-      __submitted.set('Submitted: ' + JSON.stringify(e.detail.values));
+      __submitted.setRaw('Submitted: ' + JSON.stringify(e.detail.values));
     }
     return { orderForm, submitted: __submitted, submitOrder };
   },
@@ -30143,7 +30143,7 @@ const lineFields = [
     
     
     
-    function submitOrder(e) { __orderValues.set(JSON.stringify(e.detail.values, null, 2)); }
+    function submitOrder(e) { __orderValues.setRaw(JSON.stringify(e.detail.values, null, 2)); }
     return { lineFields, lineDefault, orderForm, orderValues: __orderValues, submitOrder };
   },
   render: (ctx) => html\`
@@ -30262,7 +30262,7 @@ const people = [
     
     
     
-    function submitTasks(e) { __taskValues.set(JSON.stringify(e.detail.values, null, 2)); }
+    function submitTasks(e) { __taskValues.setRaw(JSON.stringify(e.detail.values, null, 2)); }
     
     function setTask(index, key, value) {
       taskForm.fields['tasks.' + index + '.' + key].onChange(value);
@@ -30365,7 +30365,7 @@ component('pdx-demo-comp-fieldset-collapsible', {
   setup(ctx) {
     const __collapsed1 = signal(false, { name: 'demo-comp-fieldset-collapsible:collapsed1' });
 function onToggle(e) {
-      __collapsed1.set(e.detail.collapsed);
+      __collapsed1.setRaw(e.detail.collapsed);
     }
     return { collapsed1: __collapsed1, onToggle };
   },
@@ -30499,7 +30499,7 @@ component('pdx-demo-comp-file-upload-basic', {
     const __selectedFiles = signal('None', { name: 'demo-comp-file-upload-basic:selectedFiles' });
 function onSelect(e) {
       const names = e.detail.files.map(f => f.name);
-      __selectedFiles.set(names.join(', ') || 'None');
+      __selectedFiles.setRaw(names.join(', ') || 'None');
     }
     return { selectedFiles: __selectedFiles, onSelect };
   },
@@ -30600,7 +30600,7 @@ component('pdx-demo-comp-file-upload-image-only', {
     const __imageFiles = signal('None', { name: 'demo-comp-file-upload-image-only:imageFiles' });
 function onImageSelect(e) {
       const names = e.detail.files.map(f => f.name);
-      __imageFiles.set(names.join(', ') || 'None');
+      __imageFiles.setRaw(names.join(', ') || 'None');
     }
     return { imageFiles: __imageFiles, onImageSelect };
   },
@@ -30679,12 +30679,12 @@ component('pdx-demo-comp-file-upload-size-limit', {
     const __errorMsg = signal('', { name: 'demo-comp-file-upload-size-limit:errorMsg' });
     const __sizeFiles = signal('', { name: 'demo-comp-file-upload-size-limit:sizeFiles' });
 function onError(e) {
-      __errorMsg.set(e.detail.file.name + ': ' + e.detail.error);
+      __errorMsg.setRaw(e.detail.file.name + ': ' + e.detail.error);
     }
     
     function onSizeSelect(e) {
       const names = e.detail.files.map(f => f.name);
-      __sizeFiles.set(names.join(', '));
+      __sizeFiles.setRaw(names.join(', '));
     }
     ctx.el.setAttribute('data-pdx-4gfe9k', '');
     return { errorMsg: __errorMsg, sizeFiles: __sizeFiles, onError, onSizeSelect };
@@ -31082,9 +31082,9 @@ component('pdx-demo-comp-form-data-source', {
     
     function saveDsForm() {
       dsForm.validate().then(valid => {
-        if (!valid) { __dsFormMessage.set('Validation failed'); return; }
+        if (!valid) { __dsFormMessage.setRaw('Validation failed'); return; }
         sessionStorage.setItem('pdx-demo-company', JSON.stringify(dsForm.getValues()));
-        __dsFormMessage.set('Saved at ' + new Date().toLocaleTimeString());
+        __dsFormMessage.setRaw('Saved at ' + new Date().toLocaleTimeString());
         dsForm.reset(dsForm.getValues());
       });
     }
@@ -31887,7 +31887,7 @@ component('pdx-demo-comp-form-advanced-nested-forms', {
     
     
     
-    function submitAllNested() { coordinator.validateAll().then(valid => { __nestedStatus.set(valid ? 'All valid — order submitted!' : 'Fix errors above'); }); }
+    function submitAllNested() { coordinator.validateAll().then(valid => { __nestedStatus.setRaw(valid ? 'All valid — order submitted!' : 'Fix errors above'); }); }
     function nestedStatusText() { return __nestedStatus(); }
     function nestedStatusClass() { return 'form-status-badge' + (__nestedStatus().includes('submitted') ? ' success' : __nestedStatus().includes('Fix') ? ' error' : ''); }
     
@@ -31990,8 +31990,8 @@ component('pdx-demo-comp-form-advanced-prefill', {
     
     
     
-    function loadUser() { try { const saved = sessionStorage.getItem('pdx-demo-user42'); if (saved) { prefillForm.reset(JSON.parse(saved)); __prefillStatus.set('Loaded saved data'); return; } } catch {} const mockUser = { name: 'Jane Cooper', email: 'jane.cooper@acme.com', role: 'Editor', department: 'Engineering', bio: 'Senior frontend developer with 8 years of experience.' }; prefillForm.reset(mockUser); __prefillStatus.set('Loaded user #42 (mock)'); }
-    function savePrefill() { const values = prefillForm.getValues(); sessionStorage.setItem('pdx-demo-user42', JSON.stringify(values)); prefillForm.reset(values); __prefillStatus.set('Saved at ' + new Date().toLocaleTimeString()); }
+    function loadUser() { try { const saved = sessionStorage.getItem('pdx-demo-user42'); if (saved) { prefillForm.reset(JSON.parse(saved)); __prefillStatus.setRaw('Loaded saved data'); return; } } catch {} const mockUser = { name: 'Jane Cooper', email: 'jane.cooper@acme.com', role: 'Editor', department: 'Engineering', bio: 'Senior frontend developer with 8 years of experience.' }; prefillForm.reset(mockUser); __prefillStatus.setRaw('Loaded user #42 (mock)'); }
+    function savePrefill() { const values = prefillForm.getValues(); sessionStorage.setItem('pdx-demo-user42', JSON.stringify(values)); prefillForm.reset(values); __prefillStatus.setRaw('Saved at ' + new Date().toLocaleTimeString()); }
     function prefillStatusText() { return __prefillStatus(); }
     function prefillStatusClass() { return 'form-status-badge' + (__prefillStatus() !== 'No data loaded' ? ' active' : ''); }
     return { roleOptions, prefillForm, prefillStatus: __prefillStatus, loadUser, savePrefill, prefillStatusText, prefillStatusClass };
@@ -32080,9 +32080,9 @@ component('pdx-demo-comp-form-advanced-tab-wizard', {
     const stepFields = [['username', 'password'], ['fullName', 'avatar'], []];
     
     
-    function goToStep(n) { __wizardStep.set(n); }
-    function prevStep() { if (__wizardStep() > 0) __wizardStep.set(prev => prev - 1); }
-    function nextStep() { if (__wizardStep() >= 2) { wizardForm.validate(); return; } const fields = stepFields[__wizardStep()]; let valid = true; for (const f of fields) { const field = wizardForm.fields[f]; if (field) { field.onBlur(); const err = field.error(); if (err) valid = false; } } if (valid) __wizardStep.set(prev => prev + 1); }
+    function goToStep(n) { __wizardStep.setRaw(n); }
+    function prevStep() { if (__wizardStep() > 0) __wizardStep.setRaw(__wizardStep.peek() - 1); }
+    function nextStep() { if (__wizardStep() >= 2) { wizardForm.validate(); return; } const fields = stepFields[__wizardStep()]; let valid = true; for (const f of fields) { const field = wizardForm.fields[f]; if (field) { field.onBlur(); const err = field.error(); if (err) valid = false; } } if (valid) __wizardStep.setRaw(__wizardStep.peek() + 1); }
     function wizardSummary() { const v = wizardForm.dirty(); return JSON.stringify({ username: wizardForm.fields.username?.value(), password: wizardForm.fields.password?.value() ? '***' : '', fullName: wizardForm.fields.fullName?.value(), avatar: wizardForm.fields.avatar?.value() }, null, 2); }
     function tabClass0() { return 'wizard-tab' + (__wizardStep() === 0 ? ' active' : ''); }
     function tabClass1() { return 'wizard-tab' + (__wizardStep() === 1 ? ' active' : ''); }
@@ -32190,7 +32190,7 @@ component('pdx-demo-comp-form-advanced-validation-i18n', {
     
     
     
-    function setLang(lang) { __currentLang.set(lang); const dict = translations[lang] || translations.en; setValidationLocale((key, params) => { const tmpl = dict[key]; if (!tmpl) return undefined; const merged = Object.assign({ field: 'This field', min: '?', max: '?' }, params || {}); return tmpl.replace(/\\{(\\w+)\\}/g, (_, k) => String(merged[k] ?? k)); }); i18nForm.validate(); }
+    function setLang(lang) { __currentLang.setRaw(lang); const dict = translations[lang] || translations.en; setValidationLocale((key, params) => { const tmpl = dict[key]; if (!tmpl) return undefined; const merged = Object.assign({ field: 'This field', min: '?', max: '?' }, params || {}); return tmpl.replace(/\\{(\\w+)\\}/g, (_, k) => String(merged[k] ?? k)); }); i18nForm.validate(); }
     function langBtnEn() { return 'pdx-btn pdx-sm ' + (__currentLang() === 'en' ? 'pdx-primary' : 'pdx-outline'); }
     function langBtnIt() { return 'pdx-btn pdx-sm ' + (__currentLang() === 'it' ? 'pdx-primary' : 'pdx-outline'); }
     function langBtnDe() { return 'pdx-btn pdx-sm ' + (__currentLang() === 'de' ? 'pdx-primary' : 'pdx-outline'); }
@@ -33097,7 +33097,7 @@ const profileSchema = {
     
     
     function onSubmit(e) {
-      __submitted.set(JSON.stringify((e.detail && e.detail.values) || {}));
+      __submitted.setRaw(JSON.stringify((e.detail && e.detail.values) || {}));
     }
     ctx.el.setAttribute('data-pdx-dry3dx', '');
     return { submitted: __submitted, profileSchema, onSubmit };
@@ -33625,11 +33625,11 @@ component('pdx-demo-comp-image-authenticated', {
   setup(ctx) {
     const __authLog = signal('Waiting for auth fetch...', { name: 'demo-comp-image-authenticated:authLog' });
 const authFetchFn = function(url) {
-        __authLog.set('Fetching with auth: Authorization: Bearer fake-jwt-...');
+        __authLog.setRaw('Fetching with auth: Authorization: Bearer fake-jwt-...');
         return new Promise(function(resolve) {
             setTimeout(function() {
                 fetch(url).then(function(r) { return r.blob(); }).then(function(blob) {
-                    __authLog.set('Auth fetch complete. Token: Bearer fake-jwt-12345');
+                    __authLog.setRaw('Auth fetch complete. Token: Bearer fake-jwt-12345');
                     resolve(blob);
                 });
             }, 1000);
@@ -33995,7 +33995,7 @@ component('pdx-demo-comp-infinite-scroll-basic', {
             _div.innerHTML = '<strong>' + _item.title + '</strong><span class="pdx-ink-muted" style="font-size:var(--pdx-text-xs)">' + _item.description + '</span>';
             _container.appendChild(_div);
         }
-        __basicLog.set('Loaded items: ' + _data.length + ' of ' + scrollDS.total());
+        __basicLog.setRaw('Loaded items: ' + _data.length + ' of ' + scrollDS.total());
     }
 }, { name: "demo-comp-infinite-scroll-basic.pdx:57" });
     return { allItems, scrollDS, basicItems: __basicItems, basicLog: __basicLog };
@@ -34139,7 +34139,7 @@ component('pdx-demo-comp-infinite-scroll-manual', {
     
     function onManualLoad() {
         manualDS.loadMore();
-        __manualLog.set('Loading more...');
+        __manualLog.setRaw('Loading more...');
         // Hide button when no more data after load
         setTimeout(function() {
             if (__manualLoadMore() && !manualDS.hasMore()) __manualLoadMore().style.display = 'none';
@@ -34157,7 +34157,7 @@ component('pdx-demo-comp-infinite-scroll-manual', {
             _div.textContent = _item.title;
             _container.appendChild(_div);
         }
-        __manualLog.set('Showing ' + _data.length + ' of ' + manualDS.total() + ' items');
+        __manualLog.setRaw('Showing ' + _data.length + ' of ' + manualDS.total() + ' items');
     }
 }, { name: "demo-comp-infinite-scroll-manual.pdx:59" });
     ctx.el.setAttribute('data-pdx-7vbk09', '');
@@ -35716,7 +35716,7 @@ const basicItems = [
     }
     
     function onItemClick(evt) {
-      __listLog.set('Clicked: ' + evt.detail.item.name + ' (id: ' + evt.detail.id + ')');
+      __listLog.setRaw('Clicked: ' + evt.detail.item.name + ' (id: ' + evt.detail.id + ')');
     }
     return { basicItems, renderBasicItem, onItemClick, listLog: __listLog };
   },
@@ -35999,8 +35999,8 @@ component('pdx-demo-comp-list-pagination', {
   const total = pagedDS.total();
   const pageNum = pagedDS.page();
   const dataLen = pagedDS.data().length;
-  __pagedTotal.set(total);
-  __pagedPage.set(pageNum);
+  __pagedTotal.setRaw(total);
+  __pagedPage.setRaw(pageNum);
 }, { name: "demo-comp-list-pagination.pdx:55" });
     return { allUsers, pagedDS, pagedTotal: __pagedTotal, pagedPage: __pagedPage, pagedInfo, onPageChange, renderPagedItem };
   },
@@ -36111,7 +36111,7 @@ const slotItems = [
     
     
     function onSlotItemClick(evt) {
-      __slotLog.set('Clicked: ' + evt.detail.item.name + ' (index: ' + evt.detail.index + ')');
+      __slotLog.setRaw('Clicked: ' + evt.detail.item.name + ' (index: ' + evt.detail.index + ')');
     }
     ctx.el.setAttribute('data-pdx-d9ol42', '');
     return { slotItems, onSlotItemClick, slotLog: __slotLog };
@@ -37115,11 +37115,11 @@ const fullMenubar = [
     
     
     function onSelect(e) {
-      __menubarLog.set('pdx-select: ' + e.detail.key);
+      __menubarLog.setRaw('pdx-select: ' + e.detail.key);
     }
     
     function onCheck(e) {
-      __menubarLog.set('pdx-check: ' + e.detail.key + ' = ' + e.detail.checked);
+      __menubarLog.setRaw('pdx-check: ' + e.detail.key + ' = ' + e.detail.checked);
     }
     ctx.el.setAttribute('data-pdx-1xx1k3', '');
     return { fullMenubar, menubarLog: __menubarLog, onSelect, onCheck };
@@ -37462,7 +37462,7 @@ const fullSidebar = [
     
     
     function onSelect(e) {
-      __navLog.set('pdx-select: ' + e.detail.key);
+      __navLog.setRaw('pdx-select: ' + e.detail.key);
     }
     ctx.el.setAttribute('data-pdx-w173hn', '');
     return { fullSidebar, navLog: __navLog, onSelect };
@@ -38053,7 +38053,7 @@ function toggleResp() {
   if (!frame || !hamburger || !nav) return;
   const observer = new ResizeObserver((entries) => {
     const w = Math.round(entries[0].contentRect.width);
-    __respWidth.set('Width: ' + w + 'px');
+    __respWidth.setRaw('Width: ' + w + 'px');
     if (w < 500) {
       hamburger.style.display = 'flex';
       nav.style.display = 'none';
@@ -38912,7 +38912,7 @@ async function onConfirm() {
             confirmLabel: 'Save',
             cancelLabel: 'Discard',
         });
-        __confirmResult.set(result ? 'true (confirmed)' : 'false (cancelled)');
+        __confirmResult.setRaw(result ? 'true (confirmed)' : 'false (cancelled)');
     }
     return { confirmResult: __confirmResult, onConfirm };
   },
@@ -38949,7 +38949,7 @@ async function onDangerConfirm() {
             confirmLabel: 'Delete',
             confirmText: 'delete my account',
         });
-        __dangerResult.set(result ? 'DELETED' : 'cancelled');
+        __dangerResult.setRaw(result ? 'DELETED' : 'cancelled');
     }
     return { dangerResult: __dangerResult, onDangerConfirm };
   },
@@ -38979,8 +38979,8 @@ component('pdx-demo-comp-overlay-stack-mixed', {
   props: {},
   setup(ctx) {
     const __declOpen = signal(false, { name: 'demo-comp-overlay-stack-mixed:declOpen' });
-function openDeclarative() { __declOpen.set(true); }
-    function closeDeclarative() { __declOpen.set(false); }
+function openDeclarative() { __declOpen.setRaw(true); }
+    function closeDeclarative() { __declOpen.setRaw(false); }
     
     async function onNestedConfirm() {
         const result = await dialog.confirm({
@@ -38991,7 +38991,7 @@ function openDeclarative() { __declOpen.set(true); }
         });
         if (result) {
             toast.success('Item deleted!');
-            __declOpen.set(false);
+            __declOpen.setRaw(false);
         }
     }
     return { declOpen: __declOpen, openDeclarative, closeDeclarative, onNestedConfirm };
@@ -39102,7 +39102,7 @@ component('pdx-demo-comp-pagination-basic', {
   setup(ctx) {
     const __pageLog = signal('Click a page...', { name: 'demo-comp-pagination-basic:pageLog' });
 function onPageChange(e) {
-      __pageLog.set('pdx-change: page ' + e.detail.page + ', pageSize ' + e.detail.pageSize);
+      __pageLog.setRaw('pdx-change: page ' + e.detail.page + ', pageSize ' + e.detail.pageSize);
     }
     ctx.el.setAttribute('data-pdx-zdbkwz', '');
     return { pageLog: __pageLog, onPageChange };
@@ -39917,7 +39917,7 @@ component('pdx-demo-comp-provide-single', {
   setup(ctx) {
     const __greetingMsg = signal('Hello from provider!', { name: 'demo-comp-provide-single:greetingMsg' });
 function changeGreeting() {
-      __greetingMsg.set(prev => prev === 'Hello from provider!' ? 'Ciao dal provider!' : 'Hello from provider!');
+      __greetingMsg.setRaw(__greetingMsg.peek() === 'Hello from provider!' ? 'Ciao dal provider!' : 'Hello from provider!');
     }
     return { greetingMsg: __greetingMsg, changeGreeting };
   },
@@ -40278,7 +40278,7 @@ component('pdx-demo-comp-rating-half-star', {
   setup(ctx) {
     const __rating2 = signal(2.5, { name: 'demo-comp-rating-half-star:rating2' });
 function onRating2(e) {
-      __rating2.set(e.detail.value);
+      __rating2.setRaw(e.detail.value);
     }
     return { rating2: __rating2, onRating2 };
   },
@@ -40369,7 +40369,7 @@ component('pdx-demo-comp-rating-thresholds', {
   setup(ctx) {
     const __rating4 = signal(4, { name: 'demo-comp-rating-thresholds:rating4' });
 function onRating4(e) {
-      __rating4.set(e.detail.value);
+      __rating4.setRaw(e.detail.value);
     }
     return { rating4: __rating4, onRating4 };
   },
@@ -40926,7 +40926,7 @@ component('pdx-demo-comp-row-col-animated', {
   setup(ctx) {
     const __sidebarSpan = signal(3, { name: 'demo-comp-row-col-animated:sidebarSpan' });
 function onSliderChange(e) {
-        __sidebarSpan.set(Number(e.target.value));
+        __sidebarSpan.setRaw(Number(e.target.value));
     }
     const contentSpan = computed(() => 12 - __sidebarSpan(), { name: 'demo-comp-row-col-animated:contentSpan' });
     ctx.el.setAttribute('data-pdx-qfo1fq', '');
@@ -41598,7 +41598,7 @@ component('pdx-demo-comp-segmented-basic', {
   setup(ctx) {
     const __view = signal('day', { name: 'demo-comp-segmented-basic:view' });
 function onView(e) {
-      __view.set(e.detail.value);
+      __view.setRaw(e.detail.value);
     }
     return { view: __view, onView };
   },
@@ -41694,7 +41694,7 @@ component('pdx-demo-comp-segmented-full-width', {
   setup(ctx) {
     const __layout = signal('grid', { name: 'demo-comp-segmented-full-width:layout' });
 function onLayout(e) {
-      __layout.set(e.detail.value);
+      __layout.setRaw(e.detail.value);
     }
     return { layout: __layout, onLayout };
   },
@@ -41829,8 +41829,8 @@ component('pdx-demo-comp-select-cascading', {
     
     
     
-    function onCountryChange(e) { __selectedCountry.set(e.detail.value ?? e.detail); __selectedCity.set(null); }
-    function onCityChange(e) { __selectedCity.set(e.detail.value ?? e.detail); }
+    function onCountryChange(e) { __selectedCountry.setRaw(e.detail.value ?? e.detail); __selectedCity.setRaw(null); }
+    function onCityChange(e) { __selectedCity.setRaw(e.detail.value ?? e.detail); }
     
     const cities = [
       { id: 1, name: 'New York', country: 'USA' },
@@ -43196,7 +43196,7 @@ component('pdx-demo-comp-sortable-list-horizontal', {
   { id: 's', label: 'Status' },
   { id: 'o', label: 'Owner' },
 ], { name: 'demo-comp-sortable-list-horizontal:columns' });
-function onColumnReorder(e) { __columns.set(prev => move(prev, e.detail)); }
+function onColumnReorder(e) { __columns.setRaw(move(__columns.peek(), e.detail)); }
     return { columns: __columns, onColumnReorder };
   },
   render: (ctx) => html\`
@@ -43237,7 +43237,7 @@ component('pdx-demo-comp-sortable-list-rows', {
   { id: 'b', label: 'Reproduce', owner: 'Engineering' },
   { id: 'c', label: 'Ship the fix', owner: 'Engineering' },
 ], { name: 'demo-comp-sortable-list-rows:steps' });
-function onStepReorder(e) { __steps.set(prev => move(prev, e.detail)); }
+function onStepReorder(e) { __steps.setRaw(move(__steps.peek(), e.detail)); }
     ctx.el.setAttribute('data-pdx-ghfz00', '');
     return { steps: __steps, onStepReorder };
   },
@@ -43707,11 +43707,11 @@ const saveItems = [
     
     
     function onPrimary() {
-      __splitLog.set('pdx-click: primary action (Save)');
+      __splitLog.setRaw('pdx-click: primary action (Save)');
     }
     
     function onSelect(e) {
-      __splitLog.set('pdx-select: ' + e.detail.key + ' — ' + e.detail.item.label);
+      __splitLog.setRaw('pdx-select: ' + e.detail.key + ' — ' + e.detail.item.label);
     }
     ctx.el.setAttribute('data-pdx-mzuwsj', '');
     return { saveItems, splitLog: __splitLog, onPrimary, onSelect };
@@ -45012,7 +45012,7 @@ component('pdx-demo-comp-tag-input-basic', {
     
     function onBasicChange(e) {
         const tags = e.detail ? e.detail.tags : [];
-        __basicTags.set(tags);
+        __basicTags.setRaw(tags);
         addLog('basic change: [' + tags.join(', ') + ']');
     }
     
@@ -45070,7 +45070,7 @@ component('pdx-demo-comp-tag-input-initial', {
     
     function onPrefilledChange(e) {
         const tags = e.detail ? e.detail.tags : [];
-        __prefilledTags.set(tags);
+        __prefilledTags.setRaw(tags);
         addLog('prefilled change: [' + tags.join(', ') + ']');
     }
     
@@ -45122,7 +45122,7 @@ component('pdx-demo-comp-tag-input-max-tags', {
     
     function onMaxChange(e) {
         const tags = e.detail ? e.detail.tags : [];
-        __maxTags.set(tags);
+        __maxTags.setRaw(tags);
         addLog('max-tags change (' + tags.length + '/5): [' + tags.join(', ') + ']');
     }
     
@@ -45179,11 +45179,11 @@ component('pdx-demo-comp-tag-input-no-duplicates', {
     
     function onDupeChange(e) {
         const tags = e.detail ? e.detail.tags : [];
-        __dupeTags.set(tags);
+        __dupeTags.setRaw(tags);
         if (tags.length <= 2) {
-            __dupeMessage.set('Duplicates rejected. Current: [' + tags.join(', ') + ']');
+            __dupeMessage.setRaw('Duplicates rejected. Current: [' + tags.join(', ') + ']');
         } else {
-            __dupeMessage.set('Tags: [' + tags.join(', ') + ']');
+            __dupeMessage.setRaw('Tags: [' + tags.join(', ') + ']');
         }
         addLog('dupe-test change: [' + tags.join(', ') + ']');
     }
@@ -45239,7 +45239,7 @@ component('pdx-demo-comp-tag-input-paste', {
     
     function onPasteChange(e) {
         const tags = e.detail ? e.detail.tags : [];
-        __pasteTags.set(tags);
+        __pasteTags.setRaw(tags);
         addLog('paste change: [' + tags.join(', ') + ']');
     }
     
@@ -45732,7 +45732,7 @@ component('pdx-demo-comp-time-picker-basic', {
       An empty picker shows <code>--</code>, the way the native time input does — not midnight.
     </p>
     <div class="demo-row">
-      <pdx-time-picker :value=\${ctx.meeting} format="24h" aria-label="Meeting time" @pdx-change=\${safeHandler(batchHandler(e => ctx.meeting.set(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
+      <pdx-time-picker :value=\${ctx.meeting} format="24h" aria-label="Meeting time" @pdx-change=\${safeHandler(batchHandler(e => ctx.meeting.setRaw(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
       <span class="pdx-txt-small pdx-ink-muted">value: <code class="live-value">\${() => ctx.meeting() || '(empty)'}</code></span>
     </div>
     <div class="demo-row">
@@ -45831,10 +45831,10 @@ function minutes(v) {
     <div class="comp-card">
       <div class="form-grid-2">
         <pdx-form-field label="Start" hint="Opening hours 08:00–20:00">
-          <pdx-time-picker :value=\${ctx.start} format="24h" min="08:00" max="20:00" step="15" aria-label="Start" @pdx-change=\${safeHandler(batchHandler(e => ctx.start.set(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
+          <pdx-time-picker :value=\${ctx.start} format="24h" min="08:00" max="20:00" step="15" aria-label="Start" @pdx-change=\${safeHandler(batchHandler(e => ctx.start.setRaw(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
         </pdx-form-field>
         <pdx-form-field label="End" hint="After the start">
-          <pdx-time-picker :value=\${ctx.end} format="24h" :min=\${ctx.start} max="20:00" step="15" aria-label="End" @pdx-change=\${safeHandler(batchHandler(e => ctx.end.set(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
+          <pdx-time-picker :value=\${ctx.end} format="24h" :min=\${ctx.start} max="20:00" step="15" aria-label="End" @pdx-change=\${safeHandler(batchHandler(e => ctx.end.setRaw(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
         </pdx-form-field>
       </div>
       <p class="pdx-txt-small summary">Booked <strong>\${ctx.start}</strong> – <strong>\${ctx.end}</strong> · \${() => ctx.duration()}</p>
@@ -45885,7 +45885,7 @@ component('pdx-demo-comp-time-picker-min-max', {
       An empty picker starts from <code>min</code> on the first arrow press.
     </p>
     <div class="demo-row">
-      <pdx-time-picker :value=\${ctx.office} format="24h" min="09:00" max="18:00" step="30" aria-label="Office hours" @pdx-change=\${safeHandler(batchHandler(e => ctx.office.set(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
+      <pdx-time-picker :value=\${ctx.office} format="24h" min="09:00" max="18:00" step="30" aria-label="Office hours" @pdx-change=\${safeHandler(batchHandler(e => ctx.office.setRaw(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
       <span class="pdx-txt-small pdx-ink-muted">value: <code>\${() => ctx.office() || '(empty)'}</code> · range 09:00–18:00</span>
     </div>
     <details class="source-block">
@@ -45924,7 +45924,7 @@ component('pdx-demo-comp-time-picker-seconds', {
       </div>
       <div class="demo-stack">
         <span class="pdx-txt-small pdx-weight-semibold">step 15 — press ↑ on the minutes</span>
-        <pdx-time-picker :value=\${ctx.quarter} format="24h" step="15" aria-label="Quarter hours" @pdx-change=\${safeHandler(batchHandler(e => ctx.quarter.set(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
+        <pdx-time-picker :value=\${ctx.quarter} format="24h" step="15" aria-label="Quarter hours" @pdx-change=\${safeHandler(batchHandler(e => ctx.quarter.setRaw(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'pdx-change')}></pdx-time-picker>
         <span class="pdx-txt-small pdx-ink-muted">value: <code>\${ctx.quarter}</code></span>
       </div>
     </div>
@@ -46063,7 +46063,7 @@ const basicEvents = [
     
     
     function onTimelineClick(evt) {
-      __timelineLog.set('Clicked: ' + evt.detail.item.title + ' (index: ' + evt.detail.index + ')');
+      __timelineLog.setRaw('Clicked: ' + evt.detail.item.title + ' (index: ' + evt.detail.index + ')');
     }
     ctx.el.setAttribute('data-pdx-qbqa1', '');
     return { basicEvents, timelineLog: __timelineLog, onTimelineClick };
@@ -46551,7 +46551,7 @@ component('pdx-demo-comp-toggle-in-group-multiple', {
   setup(ctx) {
     const __formatting = signal('', { name: 'demo-comp-toggle-in-group-multiple:formatting' });
 function onFormatting(e) {
-      __formatting.set(e.detail.value);
+      __formatting.setRaw(e.detail.value);
     }
     return { formatting: __formatting, onFormatting };
   },
@@ -46585,7 +46585,7 @@ component('pdx-demo-comp-toggle-in-group-single', {
   setup(ctx) {
     const __align = signal('left', { name: 'demo-comp-toggle-in-group-single:align' });
 function onAlign(e) {
-      __align.set(e.detail.value);
+      __align.setRaw(e.detail.value);
     }
     return { align: __align, onAlign };
   },
@@ -46620,11 +46620,11 @@ component('pdx-demo-comp-toggle-standalone', {
     const __bold = signal(false, { name: 'demo-comp-toggle-standalone:bold' });
     const __italic = signal(false, { name: 'demo-comp-toggle-standalone:italic' });
 function onBold(e) {
-      __bold.set(e.detail.pressed);
+      __bold.setRaw(e.detail.pressed);
     }
     
     function onItalic(e) {
-      __italic.set(e.detail.pressed);
+      __italic.setRaw(e.detail.pressed);
     }
     return { bold: __bold, italic: __italic, onBold, onItalic };
   },
@@ -48271,11 +48271,11 @@ component('pdx-demo-comp-wizard-events', {
   setup(ctx) {
     const __wizardLog = signal('No events yet', { name: 'demo-comp-wizard-events:wizardLog' });
 function onStepChange(e) {
-      __wizardLog.set('pdx-change: step ' + e.detail.value + ' (from ' + e.detail.previous + ')');
+      __wizardLog.setRaw('pdx-change: step ' + e.detail.value + ' (from ' + e.detail.previous + ')');
     }
     
     function onComplete(e) {
-      __wizardLog.set('pdx-complete: step ' + e.detail.value + ' — Done!');
+      __wizardLog.setRaw('pdx-complete: step ' + e.detail.value + ' — Done!');
     }
     ctx.el.setAttribute('data-pdx-kji6b4', '');
     return { wizardLog: __wizardLog, onStepChange, onComplete };
@@ -48665,8 +48665,8 @@ component('pdx-demo-design-animations-entrance', {
   setup(ctx) {
     const __playing = signal(false, { name: 'demo-design-animations-entrance:playing' });
 function play() {
-        __playing.set(false);
-        setTimeout(() => { __playing.set(true); }, 30);
+        __playing.setRaw(false);
+        setTimeout(() => { __playing.setRaw(true); }, 30);
     }
     ctx.el.setAttribute('data-pdx-clwost', '');
     return { playing: __playing, play };
@@ -48781,8 +48781,8 @@ component('pdx-demo-design-animations-stagger', {
   setup(ctx) {
     const __staggerPlaying = signal(false, { name: 'demo-design-animations-stagger:staggerPlaying' });
 function playStagger() {
-        __staggerPlaying.set(false);
-        setTimeout(() => { __staggerPlaying.set(true); }, 30);
+        __staggerPlaying.setRaw(false);
+        setTimeout(() => { __staggerPlaying.setRaw(true); }, 30);
     }
     ctx.el.setAttribute('data-pdx-nhhtuq', '');
     return { staggerPlaying: __staggerPlaying, playStagger };
@@ -56635,11 +56635,11 @@ component('pdx-demo-infra-container-container-size', {
         const cs = useContainerSize(() => el);
 
         effect(() => {
-            __width.set(cs.width());
-            __height.set(cs.height());
-            __isCompact.set(cs.isCompact());
-            __isMedium.set(cs.isMedium());
-            __isWide.set(cs.isWide());
+            __width.setRaw(cs.width());
+            __height.setRaw(cs.height());
+            __isCompact.setRaw(cs.isCompact());
+            __isMedium.setRaw(cs.isMedium());
+            __isWide.setRaw(cs.isWide());
         });
     });
 });
@@ -56698,7 +56698,7 @@ function doMeasure() {
         const mA = measure(a);
         const mB = measure(b);
         const rel = measureRelative(a, b);
-        __measureLog.set('A: ' + Math.round(mA.width) + 'x' + Math.round(mA.height) + ' at (' + Math.round(mA.x) + ', ' + Math.round(mA.y) + ')\\n' +
+        __measureLog.setRaw('A: ' + Math.round(mA.width) + 'x' + Math.round(mA.height) + ' at (' + Math.round(mA.x) + ', ' + Math.round(mA.y) + ')\\n' +
             'B: ' + Math.round(mB.width) + 'x' + Math.round(mB.height) + ' at (' + Math.round(mB.x) + ', ' + Math.round(mB.y) + ')\\n' +
             'Relative: dx=' + Math.round(rel.dx) + ', dy=' + Math.round(rel.dy) + ', overlap=' + rel.overlap);
     }
@@ -56884,7 +56884,7 @@ component('pdx-demo-infra-drag-drop-zones', {
     const dropA = useDropZone(() => __zoneARef(), {
         onDrop: function(data) {
             moveCard(data, __zoneARef());
-            __dropLog.set(prev => prev + '> Moved ' + data + ' → Zone A\\n');
+            __dropLog.setRaw(__dropLog.peek() + '> Moved ' + data + ' → Zone A\\n');
         },
         onEnter: function() { },
         onLeave: function() { },
@@ -56893,7 +56893,7 @@ component('pdx-demo-infra-drag-drop-zones', {
     const dropB = useDropZone(() => __zoneBRef(), {
         onDrop: function(data) {
             moveCard(data, __zoneBRef());
-            __dropLog.set(prev => prev + '> Moved ' + data + ' → Zone B\\n');
+            __dropLog.setRaw(__dropLog.peek() + '> Moved ' + data + ' → Zone B\\n');
         },
     });
     onMount(() => {
@@ -56993,12 +56993,12 @@ component('pdx-demo-infra-drag-free', {
     onMount(() => {
     // Free drag position + velocity tracking
     const d1 = effect(() => {
-        __freeDragging.set(freeDrag.isDragging());
+        __freeDragging.setRaw(freeDrag.isDragging());
         const pos = freeDrag.position();
-        __freeX.set(Math.round(pos.x));
-        __freeY.set(Math.round(pos.y));
+        __freeX.setRaw(Math.round(pos.x));
+        __freeY.setRaw(Math.round(pos.y));
         const vel = freeDrag.velocity();
-        __freeVel.set(Math.round(Math.sqrt(vel.vx * vel.vx + vel.vy * vel.vy)));
+        __freeVel.setRaw(Math.round(Math.sqrt(vel.vx * vel.vx + vel.vy * vel.vy)));
         const el = __freeRef();
         if (el) el.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px)';
     });
@@ -57138,8 +57138,8 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
             orientation: 'vertical',
             wrap: true,
             skipDisabled: true,
-            onFocus: (el, i) => { __groupLog.set(\`Focused: \${el.textContent.trim()} (index \${i})\`); },
-            onSelect: (el, i) => { __groupLog.set(\`Selected: \${el.textContent.trim()} (index \${i})\`); },
+            onFocus: (el, i) => { __groupLog.setRaw(\`Focused: \${el.textContent.trim()} (index \${i})\`); },
+            onSelect: (el, i) => { __groupLog.setRaw(\`Selected: \${el.textContent.trim()} (index \${i})\`); },
         });
     }
 });
@@ -57181,16 +57181,16 @@ const fr = focusRestore();
     
     function trackTarget(e) {
         lastTarget = e.currentTarget;
-        __restoreLog.set('Focused: "' + e.currentTarget.textContent.trim() + '" — now click Save.');
+        __restoreLog.setRaw('Focused: "' + e.currentTarget.textContent.trim() + '" — now click Save.');
     }
     
     function saveFocus() {
-        if (!lastTarget) { __restoreLog.set('Click a colored button first!'); return; }
+        if (!lastTarget) { __restoreLog.setRaw('Click a colored button first!'); return; }
         // Temporarily focus the target so fr.save() captures it
         lastTarget.focus();
         fr.save();
         const name = lastTarget.textContent.trim();
-        __restoreLog.set('Saved: "' + name + '". Focus moved to input.');
+        __restoreLog.setRaw('Saved: "' + name + '". Focus moved to input.');
         const input = __restoreInputRef();
         if (input) input.focus();
     }
@@ -57199,7 +57199,7 @@ const fr = focusRestore();
         fr.restore();
         const active = document.activeElement;
         const name = active ? (active.textContent || active.tagName).trim() : 'nothing';
-        __restoreLog.set(prev => prev + '\\nRestored to: "' + name + '"');
+        __restoreLog.setRaw(__restoreLog.peek() + '\\nRestored to: "' + name + '"');
     }
     return { restoreInputRef: __restoreInputRef, restoreLog: __restoreLog, fr, lastTarget, trackTarget, saveFocus, restoreFocus };
   },
@@ -57250,16 +57250,16 @@ let trapDispose = null;
     function activateTrap() {
         const container = __trapContainer();
         if (!container) return;
-        __trapActive.set(true);
+        __trapActive.setRaw(true);
         trapDispose = focusTrap(container, { initialFocus: 'first', restoreFocus: true });
-        __trapLog.set('Trap activated — Tab cycles within the box');
+        __trapLog.setRaw('Trap activated — Tab cycles within the box');
     }
     
     function deactivateTrap() {
         trapDispose?.();
         trapDispose = null;
-        __trapActive.set(false);
-        __trapLog.set(prev => prev + '\\nTrap deactivated — focus restored');
+        __trapActive.setRaw(false);
+        __trapLog.setRaw(__trapLog.peek() + '\\nTrap deactivated — focus restored');
     }
     ctx.el.setAttribute('data-pdx-qt53ms', '');
     return { trapActive: __trapActive, trapLog: __trapLog, trapDispose, trapContainer: __trapContainer, activateTrap, deactivateTrap };
@@ -57501,12 +57501,12 @@ component('pdx-demo-infra-overlay-stack', {
     function popAllDialogs() { overlayDemo.popAllDialogs(); }
     function popAll() { overlayDemo.popAll(); }
     onMount(() => {
-    const d1 = effect(() => { __count.set(overlayStack.count()); });
-    const d2 = effect(() => { __modals.set(overlayStack.modalCount()); });
+    const d1 = effect(() => { __count.setRaw(overlayStack.count()); });
+    const d2 = effect(() => { __modals.setRaw(overlayStack.modalCount()); });
     const d3 = effect(() => {
         // Read the stack reactively
         const c = overlayStack.count();
-        __topName.set(overlayStack.top() ?? 'none');
+        __topName.setRaw(overlayStack.top() ?? 'none');
     });
     onDestroy(() => { d1(); d2(); d3(); });
 });
@@ -57589,7 +57589,7 @@ let iframeFloatEl = null;
                     });
                     iframeFloatEl.style.left = result.x + 'px';
                     iframeFloatEl.style.top = result.y + 'px';
-                    __iframeLog.set('Positioned at x:' + Math.round(result.x) + ' y:' + Math.round(result.y) + ' — scrolls with page');
+                    __iframeLog.setRaw('Positioned at x:' + Math.round(result.x) + ' y:' + Math.round(result.y) + ' — scrolls with page');
                 }
 
                 // autoUpdate: re-position on scroll/resize
@@ -57677,13 +57677,13 @@ const placements = [
     }
     
     function setPlacement(p) {
-        __currentPlacement.set(p);
+        __currentPlacement.setRaw(p);
         startAutoUpdate();
     }
     
-    function toggleOffset(e) { __useOffset.set(e.target.checked); updatePosition(); }
-    function toggleFlip(e) { __useFlip.set(e.target.checked); updatePosition(); }
-    function toggleShift(e) { __useShift.set(e.target.checked); updatePosition(); }
+    function toggleOffset(e) { __useOffset.setRaw(e.target.checked); updatePosition(); }
+    function toggleFlip(e) { __useFlip.setRaw(e.target.checked); updatePosition(); }
+    function toggleShift(e) { __useShift.setRaw(e.target.checked); updatePosition(); }
     
     function buildMiddleware() {
         // Use the arena's visible area as boundary for flip/shift —
@@ -57712,14 +57712,14 @@ const placements = [
         const hidden = result.middlewareData.hide?.hidden;
         if (hidden) {
             fl.style.display = 'none';
-            __posLog.set('Reference out of bounds — floating hidden');
+            __posLog.setRaw('Reference out of bounds — floating hidden');
             return;
         }
     
         fl.style.display = 'block';
         fl.style.left = result.x + 'px';
         fl.style.top = result.y + 'px';
-        __posLog.set('placement: ' + result.placement + ' | x: ' + Math.round(result.x) + ' | y: ' + Math.round(result.y));
+        __posLog.setRaw('placement: ' + result.placement + ' | x: ' + Math.round(result.x) + ' | y: ' + Math.round(result.y));
     }
     
     function startAutoUpdate() {
@@ -57915,7 +57915,7 @@ const people = [
     onMount(() => {
     const d3 = effect(() => {
         const sel = gridSel.selected();
-        __gridInfo.set(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') + ' (' + sel.size + ' rows)' : 'No rows selected');
+        __gridInfo.setRaw(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') + ' (' + sel.size + ' rows)' : 'No rows selected');
     });
     onDestroy(() => { d3(); });
 });
@@ -58003,7 +58003,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
     onMount(() => {
     const d2 = effect(() => {
         const sel = multiSel.selected();
-        __multiInfo.set(sel.size > 0
+        __multiInfo.setRaw(sel.size > 0
             ? 'Selected (' + sel.size + '): ' + [...sel].join(', ') + '\\nAnchor: ' + multiSel.anchor()
             : 'Nothing selected');
     });
@@ -58064,7 +58064,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
     onMount(() => {
     const d1 = effect(() => {
         const sel = singleSel.selected();
-        __singleInfo.set(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') : 'Nothing selected');
+        __singleInfo.setRaw(sel.size > 0 ? 'Selected: ' + [...sel].join(', ') : 'Nothing selected');
     });
     onDestroy(() => { d1(); });
 });
@@ -58132,8 +58132,8 @@ const COUNT1 = 10000;
             effect(() => {
                 const items = v1.items();
                 const total = v1.totalSize();
-                __rendered1.set(items.length);
-                __totalH1.set((total / 1000).toFixed(0) + 'K px');
+                __rendered1.setRaw(items.length);
+                __totalH1.setRaw((total / 1000).toFixed(0) + 'K px');
                 innerEl1.style.height = total + 'px';
                 let html = '';
                 for (const item of items) {
@@ -58203,7 +58203,7 @@ const COUNT2 = 5000;
             effect(() => {
                 const items = v2.items();
                 const total = v2.totalSize();
-                __rendered2.set(items.length);
+                __rendered2.setRaw(items.length);
                 innerEl2.style.height = total + 'px';
                 let html = '';
                 for (const item of items) {
@@ -58321,19 +58321,19 @@ component('pdx-showcase-settings', {
     }
     
     function setTheme(key) {
-        __theme.set(key);
+        __theme.setRaw(key);
         _applyTheme(key);
         localStorage.setItem('pdx-theme', key);
     }
     
     function setDensity(key) {
-        __density.set(key);
+        __density.setRaw(key);
         _applyDensity(key);
         localStorage.setItem('pdx-density', key);
     }
     
     function setDark(isDark) {
-        __dark.set(isDark);
+        __dark.setRaw(isDark);
         _applyScheme(isDark);
         localStorage.setItem('pdx-scheme', isDark ? 'dark' : 'light');
     }
@@ -58341,7 +58341,7 @@ component('pdx-showcase-settings', {
     function onThemeSelect(e) { setTheme(e.detail.key); }
     function onDensitySelect(e) { setDensity(e.detail.key); }
     function toggleMode() { setDark(!__dark()); }
-    function toggleSettings() { __settingsOpen.set(prev => !prev); }
+    function toggleSettings() { __settingsOpen.setRaw(!__settingsOpen.peek()); }
     
     _applyTheme(__theme());
     
@@ -58406,19 +58406,19 @@ const __store_tasks = createGlobalStore('tasks', () => {
     const __items = signal([], { name: 'task-store:items' });
     const __filter = signal('all', { name: 'task-store:filter' });
 function addTask(text) {
-      __items.set(prev => [...prev, { id: Date.now(), text, done: false }]);
+      __items.setRaw([...__items.peek(), { id: Date.now(), text, done: false }]);
     }
     
     function toggleTask(id) {
-      __items.set(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+      __items.setRaw(__items.peek().map(t => t.id === id ? { ...t, done: !t.done } : t));
     }
     
     function removeTask(id) {
-      __items.set(prev => prev.filter(t => t.id !== id));
+      __items.setRaw(__items.peek().filter(t => t.id !== id));
     }
     
     function clearDone() {
-      __items.set(prev => prev.filter(t => !t.done));
+      __items.setRaw(__items.peek().filter(t => !t.done));
     }
     const filtered = computed(() => __filter() === 'all' ? __items()
     : __filter() === 'done' ? __items().filter(t => t.done)
@@ -58465,12 +58465,12 @@ let nextId = 4;
     
       function addItem() {
         if (!__newItem().trim()) return;
-        __items.set(prev => [...prev, { id: nextId++, text: __newItem() }]);
-        __newItem.set('');
+        __items.setRaw([...__items.peek(), { id: nextId++, text: __newItem() }]);
+        __newItem.setRaw('');
       }
     
       function remove(id) {
-        __items.set(prev => prev.filter(i => i.id !== id));
+        __items.setRaw(__items.peek().filter(i => i.id !== id));
       }
     const remaining = computed(() => __items().length, { name: 'todo-list:remaining' });
     ctx.el.setAttribute('data-pdx-9864yt', '');
