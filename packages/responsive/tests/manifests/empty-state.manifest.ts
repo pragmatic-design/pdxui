@@ -145,8 +145,10 @@ export const emptyState: ComponentManifest = {
     isolation: {
         scenario: 'empty-state-basic',
         targets: [
-            // A content-driven container (the icon, the text and the padding): a wider tolerance.
-            { selector: 'section:not([hidden]) [data-test="empty"]', tolerancePx: 16, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor', 'height'] }] },
+            // A content-driven container (the icon, the text and the padding): its text follows the
+            // container it is placed in (#170), so a host that enlarges the container's font makes it
+            // taller by design. skipHeight, as the wizard does for the same reason.
+            { selector: 'section:not([hidden]) [data-test="empty"]', tolerancePx: 16, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
         ],
     },
 

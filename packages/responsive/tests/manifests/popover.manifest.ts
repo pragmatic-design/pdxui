@@ -160,7 +160,9 @@ export const popover: ComponentManifest = {
     isolation: {
         scenario: 'popover-bottom',
         targets: [
-            { selector: '[data-test="trigger"]', tolerancePx: 10, leaks: [{ issue: 170, properties: ['color', 'fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'borderTopColor'] }] },
+            // The component's own element. The trigger beside it is the application's `<button>`: a
+            // host rule styling it is the host styling its own markup, not a leak of the popover.
+            { selector: 'section:not([hidden]) pdx-popover', tolerancePx: 10, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
         ],
     },
 
