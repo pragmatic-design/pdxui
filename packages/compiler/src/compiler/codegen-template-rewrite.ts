@@ -262,7 +262,22 @@ export function dynamicComponentCall(tag: string, ctx: CompileContext): string |
     const optionParts: string[] = [];
 
     if (tag.includes('@keepAlive') || tag.includes('keep-alive')) {
-        optionParts.push('keepAlive: true');
+        // `@keepAlive(n)`: at most n views kept, the least recently shown dropped first (#270). Without
+        // it the runtime's default, 10. Match: `@keepAlive(…)`. Groups: [1]=what is inside.
+        const max = tag.match(/@keepAlive\s*\(\s*([^)]*?)\s*\)/);
+        if (max && /^[1-9]\d*$/.test(max[1])) {
+            optionParts.push(`keepAlive: true, maxAlive: ${max[1]}`);
+        } else {
+            if (max) {
+                ctx.warnings.push({
+                    code: 'PDX_KEEPALIVE_MAX',
+                    severity: 'error',
+                    message: `"${max[0]}": the maximum of kept-alive views is a whole number of at least 1.`,
+                    hint: 'Write @keepAlive(3) for three views, or @keepAlive alone for the default of 10.',
+                });
+            }
+            optionParts.push('keepAlive: true');
+        }
     }
 
     const transMatch = tag.match(/@transition\s*\(\s*['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"])?\s*\)/);

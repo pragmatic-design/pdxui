@@ -10,7 +10,8 @@ export const BLOCK_DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'port
 
 /**
  * Every template `@`-word: the block directives, `@transition` and `@mode` after a block, `@stagger`
- * and `@move` in a `@for` header. A `@word (` or `@word {` that is none of these and no plugin's is
- * text — and `PDX_UNKNOWN_DIRECTIVE` where the compiler knows the plugins.
+ * and `@move` in a `@for` header, `@keepAlive(n)` on `<component :is>` (#270). A `@word (` or
+ * `@word {` that is none of these and no plugin's is text — and `PDX_UNKNOWN_DIRECTIVE` where the
+ * compiler knows the plugins.
  */
-export const TEMPLATE_AT_DIRECTIVES = [...BLOCK_DIRECTIVES, 'transition', 'mode', 'stagger', 'move'] as const;
+export const TEMPLATE_AT_DIRECTIVES = [...BLOCK_DIRECTIVES, 'transition', 'mode', 'stagger', 'move', 'keepAlive'] as const;

@@ -110,6 +110,9 @@ let routerInitialized = false;
 // "the table isn't loaded yet", NOT "no such page" — see _handleRouteChange.
 let routerBootstrapped = false;
 
+/** How many frozen pages an outlet keeps without a `keep-alive-max` attribute (#270). */
+const DEFAULT_KEEP_ALIVE_MAX = 10;
+
 /**
  * Take a page out for good. A keep-alive page carries `_keepAlive = true` from its first activation,
  * and a removal would only freeze it — no cleanup — so the flag is cleared first. For a page that
@@ -677,6 +680,7 @@ class PdxRouterOutlet extends HTMLElement {
             fragment.appendChild(this._activeElement);
             this._frozenPages.set(path, { fragment, element: this._activeElement });
             this._activeElement = null;
+            this._boundFrozen();
             if (typeof config.keepAlive === 'number' && config.keepAlive > 0) {
                 const entry = this._frozenPages.get(path)!;
                 entry.timeout = setTimeout(() => this._destroyFrozen(path), config.keepAlive);
@@ -703,6 +707,7 @@ class PdxRouterOutlet extends HTMLElement {
             fragment.appendChild(this._activeElement);
             this._frozenPages.set(path, { fragment, element: this._activeElement });
             this._activeElement = null;
+            this._boundFrozen();
 
             // Start auto-destroy timer if keepAlive has timeout
             if (typeof config.keepAlive === 'number' && config.keepAlive > 0) {
@@ -718,6 +723,21 @@ class PdxRouterOutlet extends HTMLElement {
             // Destroy: remove from DOM (full disconnectedCallback cleanup)
             discard(this._activeElement);
             this._activeElement = null;
+        }
+    }
+
+    /**
+     * At most `keep-alive-max` frozen pages (default 10): past it, the least recently used is
+     * destroyed (#270). The map's insertion order is that order — a resumed page leaves it, and comes
+     * back at the end when it is frozen again. `@page { keepAlive: n }` stays a timeout in ms.
+     */
+    private _boundFrozen(): void {
+        const raw = this.getAttribute('keep-alive-max');
+        const asked = raw === null ? NaN : Number(raw);
+        const max = Number.isInteger(asked) && asked >= 1 ? asked : DEFAULT_KEEP_ALIVE_MAX;
+        for (const path of this._frozenPages.keys()) {
+            if (this._frozenPages.size <= max) break;
+            this._destroyFrozen(path);
         }
     }
 

@@ -142,7 +142,7 @@
     "pdx-directives": {
       "patterns": [
         {
-          "match": "@(if|for|switch|require|show|portal|defer|try|await|let|slot|raw|else|catch|case|default|placeholder|loading|error|empty|transition|mode|stagger|move)\\b",
+          "match": "@(if|for|switch|require|show|portal|defer|try|await|let|slot|raw|else|catch|case|default|placeholder|loading|error|empty|transition|mode|stagger|move|keepAlive)\\b",
           "name": "keyword.control.pdx"
         },
         {

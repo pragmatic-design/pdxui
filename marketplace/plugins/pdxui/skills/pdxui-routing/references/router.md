@@ -453,6 +453,16 @@ and, on return, re-appended to the DOM, reconciling with state. Come back and yo
 it was. Use it for views that are expensive to rebuild or hold precious user state; leave the default
 (destroy) for the rest, so you don't accumulate memory.
 
+The outlet keeps at most **10** frozen pages; past that, the least recently used one is destroyed. Set
+the bound on the outlet itself — `keepAlive: 30000` on a page stays what it is, a timeout in ms:
+
+```html
+<pdx-router-outlet keep-alive-max="3"></pdx-router-outlet>
+```
+
+Child components of a frozen page are frozen with it: `onHide` when it leaves, `onShow` when it comes
+back, `onDestroy` when the page is discarded.
+
 ## The query string
 
 The query is a signal, and it is read the same way params are:

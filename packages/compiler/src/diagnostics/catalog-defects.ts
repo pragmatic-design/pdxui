@@ -30,6 +30,14 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use one of `immediate`, `viewport`, `idle`, `idle(ms)`, `interaction`, `hover`, `timer(ms)`; write `immediate` to load at once.',
         example: { bad: pdx('@defer (viewprt) { <p>chart</p> }', ''), good: pdx('@defer (viewport) { <p>chart</p> }', '') },
     },
+    PDX_KEEPALIVE_MAX: {
+        severity: 'error', category: 'defect',
+        summary: 'A `<component :is @keepAlive(n)>` whose maximum is not a whole number of at least 1.',
+        explanation: '`@keepAlive(n)` keeps at most n views, dropping the least recently shown. A value that is not a positive whole number keeps no meaning; the component is compiled with the default of 10.',
+        fix: 'Write `@keepAlive(3)` for three views, or `@keepAlive` alone for the default of 10.',
+        example: { bad: pdx('<component :is="view" @keepAlive(0)></component>', "let view = $signal('pdx-a');"), good: pdx('<component :is="view" @keepAlive(3)></component>', "let view = $signal('pdx-a');") },
+        reproducedIn: `${T}keepalive-max.test.ts`,
+    },
     PDX_UNKNOWN_DIRECTIVE: {
         severity: 'warn', category: 'defect',
         summary: 'A `@word (…)` or `@word { … }` in the template that is no directive and no plugin\'s (`@tooltip (msg) { … }` without its plugin).',
