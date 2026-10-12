@@ -15,10 +15,14 @@
 // file pins that CI goes through it, so the two cannot drift apart.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import config from '../../responsive/tests/playwright-ui.config';
+import { CERTIFY_PROJECTS } from '../../responsive/tests/certify-projects';
+import { CERTIFY_EXCLUSIONS } from '../../responsive/tests/certify-exclusions';
 
 const workflow = readFileSync(join(__dirname, '../../../.github/workflows/certify.yml'), 'utf-8');
+const SPEC_DIR = join(__dirname, '..', '..', 'responsive', 'tests', 'integration', 'ui-components');
 
 /**
  * The job named `visual`, with comment lines removed.
@@ -101,6 +105,63 @@ describe('CI certifies what pnpm certify certifies', () => {
             { config: 'tests/playwright-ui.config.ts', filters: ['a-runner'] },
             { config: 'tests/b.config.ts', filters: [] },
         ]);
+    });
+});
+
+// The certification folder is split into projects, and each project into its own shards (#321):
+// Playwright shards by test COUNT, and the folder's specs differ fivefold in cost per test. The split
+// must lose nothing: every spec belongs to exactly one project, and the CI matrix runs every shard
+// of every project.
+describe('the CI matrix runs every certification project, and every spec is in one', () => {
+    const specs = readdirSync(SPEC_DIR).filter((f) => f.endsWith('.spec.ts'));
+
+    /** The project a spec file falls in, by the patterns the config gives each project. */
+    function projectsOf(file: string): string[] {
+        const matches = (patterns: string[]) => patterns.some((p) => p === `**/${file}`);
+        return config.projects!.filter((p) => {
+            const match = ([] as string[]).concat((p.testMatch as string | string[] | undefined) ?? []);
+            const ignore = ([] as string[]).concat((p.testIgnore as string | string[] | undefined) ?? []);
+            if (match.length && !matches(match)) return false;
+            return !matches(ignore);
+        }).map((p) => p.name!);
+    }
+
+    it('the config declares one project per entry of CERTIFY_PROJECTS', () => {
+        expect(config.projects?.map((p) => p.name)).toEqual(CERTIFY_PROJECTS.map((p) => p.name));
+        expect(CERTIFY_PROJECTS.filter((p) => p.files === 'rest').length, 'one project takes the rest').toBe(1);
+    });
+
+    it('every pattern is a plain `**/<file>`, so the check below reads it exactly', () => {
+        for (const p of config.projects ?? []) {
+            for (const pattern of ([] as unknown[]).concat(p.testMatch ?? [], p.testIgnore ?? [])) {
+                expect(pattern, `${p.name}: a pattern this check cannot read`).toMatch(/^\*\*\/[\w.-]+\.spec\.ts$/);
+            }
+        }
+    });
+
+    it('every spec of the folder that certify runs is in exactly one project', () => {
+        expect(specs.length, 'no spec found: the check would pass on nothing').toBeGreaterThan(10);
+        const excluded = new Set(CERTIFY_EXCLUSIONS.map((e) => e.file));
+        const wrong = specs.filter((f) => !excluded.has(f))
+            .map((f) => ({ f, in: projectsOf(f) }))
+            .filter((x) => x.in.length !== 1)
+            .map((x) => `${x.f} → [${x.in.join(', ')}]`);
+        expect(wrong).toEqual([]);
+    });
+
+    it('the contracts job runs the ui config by project and shard', () => {
+        const ui = playwrightInvocations(jobBody('contracts')).filter((p) => p.config.endsWith('playwright-ui.config.ts'));
+        const flat = jobBody('contracts').replace(/\s+/g, ' ');
+        expect(ui.length).toBeGreaterThan(0);
+        expect(flat).toContain('--project=${{ matrix.project }}');
+        expect(flat).toContain('--shard=${{ matrix.shard }}/${{ matrix.of }}');
+    });
+
+    it('the matrix lists every shard of every project, and nothing else', () => {
+        const entries = [...jobBody('contracts').matchAll(/-\s*\{\s*project:\s*([\w-]+),\s*shard:\s*(\d+),\s*of:\s*(\d+)\s*\}/g)]
+            .map((m) => `${m[1]} ${m[2]}/${m[3]}`);
+        const expected = CERTIFY_PROJECTS.flatMap((p) => Array.from({ length: p.shards }, (_, i) => `${p.name} ${i + 1}/${p.shards}`));
+        expect(entries.sort()).toEqual(expected.sort());
     });
 });
 
