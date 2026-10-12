@@ -459,7 +459,7 @@ component in a `@defer` body is no longer lazy — a dependency of #136.
 *render* mounts the body. The triggers before `;` start the render — and the load, if it has not
 happened yet; the triggers after `prefetch` start only the load. `@defer (interaction; prefetch idle)`
 fetches the chart's code when the browser is idle and mounts it on the first pointer or focus entry
-into the block (`pointerenter`/`focusin`, `defer.ts:184-185`; the alpha spelling `hover` is removed —
+into the block (`pointerenter`/`focusin`, `defer.ts:286-287`; the alpha spelling `hover` is removed —
 decisions.md 37).
 Without `prefetch`, the two phases start together, as in alpha. **`when (expr)`** — the expression in
 its own parentheses, since `|` and `;` separate triggers — fires the first time the expression is
@@ -473,14 +473,14 @@ shows only if that load fails. A render trigger's load goes ahead of the prefetc
 **Rules**
 
 - A trigger that is not one of the grammar's is `PDX_DEFER_UNKNOWN_TRIGGER` (error). Alpha accepts
-  any text (`parser/template.ts:827-829`) and fires an unknown trigger at once (`core/src/renderer/defer.ts:194`).
+  any text (`parser/template.ts:827-829`) and fires an unknown trigger at once (`core/src/renderer/defer.ts:195`).
 - **Removal while loading.** When the block is removed (an `@if` around it, the component destroyed)
   before its code arrives, its triggers are released and the late module mounts nothing — alpha
-  already does both (`defer.ts:112`, and the render effect is disposed with the branch). **Everything
+  already does both (`defer.ts:113`, and the render effect is disposed with the branch). **Everything
   the body mounted is disposed with the block**: the bindings of a body rendered after an
-  asynchronous load belong to the block's scope. Alpha does not guarantee that today — the render
-  effect does not collect what its re-run creates (`defer.ts:118-152`), so a body mounted late may
-  outlive its block (to confirm with a test; it is an inference from the code).
+  asynchronous load belong to the block's scope. Alpha does this since #261: each state renders in
+  its own scope, disposed when the state changes and when the block is removed (`defer.ts`, the
+  render effect), measured on both render paths by `core/tests/defer-body-dispose.test.ts`.
 - **A deferred template does not defer its parent's data.** A `@fetch` or a `@loader` declared in
   the component that contains the `@defer` starts when that component mounts, deferred or not. Three
   orders, each with its form:
