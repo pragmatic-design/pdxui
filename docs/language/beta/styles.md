@@ -196,4 +196,4 @@ keeps mirroring them as attributes on `<html>` (alpha). Since: beta (#156).
 
 `pdx-density="compact|normal|comfort"` on any element sets `--pdx-density-factor` (0.75, 1, 1.25) in
 the layer `pdx.preferences`, ordered after `pdx.themes`, so the user's choice overrides a theme's
-default factor; without the attribute the theme's own factor applies (#157). Since: beta (#157).
+default factor; without the attribute the theme's own factor applies (#157 — landed). Since: beta (#157).

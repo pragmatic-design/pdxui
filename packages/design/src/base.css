@@ -20,10 +20,14 @@
    `pdx.themes`, so a single theme lands in the right layer whether or not this file came first.
    ========================================================================== */
 
-@layer pdx.reset, pdx.tokens, pdx.layout, pdx.surfaces, pdx.typography, pdx.media, pdx.components, pdx.adaptive, pdx.themes, pdx.composition, pdx.print;
+@layer pdx.reset, pdx.tokens, pdx.layout, pdx.surfaces, pdx.typography, pdx.media, pdx.components, pdx.adaptive, pdx.themes, pdx.preferences, pdx.composition, pdx.print;
 
 @import "./reset.css"      layer(pdx.reset);
 @import "./tokens.css"     layer(pdx.tokens);
+/* The reader's choices (density), in the layer after the themes: a theme sets a default, the
+   reader overrides it. Imported here although the themes come later — the layer ORDER above is the
+   cascade, not the order of the imports. */
+@import "./preferences.css" layer(pdx.preferences);
 @import "./layout.css"     layer(pdx.layout);
 @import "./surfaces/_all.css"   layer(pdx.surfaces);
 @import "./typography.css"  layer(pdx.typography);

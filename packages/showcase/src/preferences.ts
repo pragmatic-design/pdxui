@@ -3,9 +3,10 @@
 // The profile menu's Settings set it, and so does the account page: two writers, so the rule
 // lives here and both call it.
 //
-// The density is the design system's `--pdx-density-factor`, set inline on <html> as
-// CONTRIBUTING.md says (a style property, not an attribute selector), and remembered in the browser like
-// the rail. The scheme is not here: it is core's (`setScheme`, `getScheme`), and a store of its
+// The density is the design system's `pdx-density` attribute on <html>, which sets
+// `--pdx-density-factor` over the theme's own default (the rules are in `pdx.preferences`, the layer
+// after the themes), and is remembered in the browser like the rail. `normal` is no attribute: the
+// theme's own density, which is what this app called normal before it had a choice. The scheme is not here: it is core's (`setScheme`, `getScheme`), and a store of its
 // own here would split core's precedence — the visitor's choice, then the document's `pdx-scheme`,
 // then the OS — in two.
 
@@ -16,7 +17,8 @@ export const DENSITIES = ['compact', 'normal', 'comfortable'] as const;
 export type Density = (typeof DENSITIES)[number];
 
 const DENSITY_KEY = 'showcase.density';
-const FACTOR: Record<Density, string> = { compact: '0.75', normal: '1', comfortable: '1.25' };
+/** The design system's name for each choice. `normal` is none: the theme's own density. */
+const ATTRIBUTE: Record<Density, string | null> = { compact: 'compact', normal: null, comfortable: 'comfort' };
 
 /** What the visitor chose, or `normal`, as it is in storage. */
 export function storedDensity(): Density {
@@ -33,9 +35,9 @@ export const density: ReadonlySignal<Density> = _density;
 
 /** Put a density on the page without remembering it — the boot applies the stored one this way. */
 export function applyDensity(key: string): void {
-    const root = document.documentElement.style;
-    if (key === 'normal' || !(key in FACTOR)) root.removeProperty('--pdx-density-factor');
-    else root.setProperty('--pdx-density-factor', FACTOR[key as Density]);
+    const value = key in ATTRIBUTE ? ATTRIBUTE[key as Density] : null;
+    if (value) document.documentElement.setAttribute('pdx-density', value);
+    else document.documentElement.removeAttribute('pdx-density');
 }
 
 /** Remember a density and put it on the page. */

@@ -540,13 +540,8 @@
 [pdx-scheme="dark"]  { color-scheme: dark; }
 [pdx-scheme="auto"]  { color-scheme: light dark; }
 
-/* Density: scales all spacing/sizing tokens.
-   Note: themes may set a default --pdx-density-factor (e.g. cyberpunk=0.85).
-   The user-facing density selector in app.pdx overrides via inline style
-   (style.setProperty) which always wins over stylesheet declarations. */
-[pdx-density="compact"] { --pdx-density-factor: 0.75; }
-[pdx-density="normal"]  { --pdx-density-factor: 1; }
-[pdx-density="comfort"] { --pdx-density-factor: 1.25; }
+/* Density: the `[pdx-density]` rules are in preferences.css, in `pdx.preferences` — after the
+   themes, which may set a default factor the reader's choice has to override. */
 
 /* Touch targets: a finger gets the coarse minimum, without app CSS. */
 @media (pointer: coarse) {

@@ -1,0 +1,13 @@
+/* ==========================================================================
+   Pragmatic Design CSS — the reader's preferences.
+
+   Imported into `pdx.preferences`, the layer AFTER `pdx.themes`: a theme sets a default, and the
+   reader's choice overrides it. These rules lived in `pdx.tokens`, before the themes, so on the seven
+   themes that set their own density factor the attribute did nothing (#157).
+   ========================================================================== */
+
+/* Density: scales every spacing and sizing token. A theme may set a default factor (fluent 0.9,
+   cyberpunk 0.85…); `pdx-density` on <html> — or on any element, for a denser subtree — wins over it. */
+[pdx-density="compact"] { --pdx-density-factor: 0.75; }
+[pdx-density="normal"]  { --pdx-density-factor: 1; }
+[pdx-density="comfort"] { --pdx-density-factor: 1.25; }

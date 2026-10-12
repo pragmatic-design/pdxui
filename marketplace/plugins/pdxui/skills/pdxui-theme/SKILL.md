@@ -167,10 +167,13 @@ a hardcoded `rgb(255,255,255)` expectation breaks in dark mode.
   1. **Spacing** — `pdx theme --density=compact|normal|comfort` at generation time. Measured: it scales
      **only** the eight `--pdx-space-*` tokens (`md` 0.85rem vs 1.15rem). It emits **no** density factor
      and leaves control heights untouched.
-  2. **Control heights** — the runtime factor, set as an **inline style via JS**:
-     `document.documentElement.style.setProperty('--pdx-density-factor', '0.75')`
-     (`compact 0.75 | normal 1 | comfort 1.25`); heights are `calc(var(--pdx-*-min-height) * var(--pdx-density-factor, 1))`.
-     CSS attribute selectors are **not** reliable here (Vite doesn't propagate them).
+  2. **Control heights** — the runtime factor, set with the **attribute**:
+     `pdx-density="compact|normal|comfort"` on `<html>` (or on any element, for a denser subtree)
+     sets `--pdx-density-factor` to `0.75 | 1 | 1.25`; heights are `calc(var(--pdx-*-min-height) * var(--pdx-density-factor, 1))`.
+     It overrides a theme's own factor (its rules are in the layer `pdx.preferences`, after `pdx.themes`),
+     and it works the same on the dev server and in a build. Remove the attribute to get the theme's own
+     density back. Do not write the factor as an inline style: it works, but it is the workaround for a
+     layer order that is fixed.
 - **Behavior tokens** drive structural variants app-wide: `--pdx-button-radius`, `--pdx-input-style`
   (`outlined|filled|underlined`), `--pdx-tab-indicator` (`underline|pill|filled`), `--pdx-card-style`,
   `--pdx-accordion-glyph` + `--pdx-accordion-open-transform`, `--pdx-breadcrumb-separator`,
