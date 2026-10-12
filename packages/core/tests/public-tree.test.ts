@@ -15,6 +15,23 @@ import { join, posix } from 'node:path';
 
 const REPO = join(__dirname, '..', '..', '..');
 
+/**
+ * A published file's text, read from disk once for this whole file (#325). A dozen tests below each
+ * ask one question of every published file — a scope, a licence, a citation — and reading the tree
+ * again for each was most of their time: alone they ran at 0.3-0.5 s each, and on a busy machine two
+ * of them went past the 5 s test timeout and stopped the pre-push with nothing broken.
+ */
+const texts = new Map<string, string>();
+function textOf(...path: string[]): string {
+    const key = path.join('/');
+    let text = texts.get(key);
+    if (text === undefined) {
+        text = readFileSync(join(REPO, ...path), 'utf-8');
+        texts.set(key, text);
+    }
+    return text;
+}
+
 const published = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], { cwd: REPO, encoding: 'utf-8' })
     .split('\n').map(s => s.trim()).filter(Boolean);
 
@@ -39,7 +56,7 @@ describe('the repository publishes no private agent material', () => {
     it('the root CLAUDE.md is the public one: it imports AGENTS.md, and both are published', () => {
         expect(publishedPaths.has('AGENTS.md'), 'AGENTS.md is not published').toBe(true);
         expect(publishedPaths.has('CLAUDE.md'), 'CLAUDE.md is not published').toBe(true);
-        expect(readFileSync(join(REPO, 'CLAUDE.md'), 'utf-8').replace(/\r\n/g, '\n'), 'CLAUDE.md does not import AGENTS.md')
+        expect(textOf('CLAUDE.md').replace(/\r\n/g, '\n'), 'CLAUDE.md does not import AGENTS.md')
             .toMatch(/^@AGENTS\.md$/m);
     });
 
@@ -103,7 +120,7 @@ describe('the repository cites only what it publishes', () => {
     });
 
     it('NO published file cites a document that is not published', () => {
-        const dangling = citing.flatMap(f => unresolvedCitations(f, readFileSync(join(REPO, f), 'utf-8')));
+        const dangling = citing.flatMap(f => unresolvedCitations(f, textOf(f)));
         expect([...new Set(dangling)], 'these citations point outside the published tree').toEqual([]);
     });
 
@@ -128,7 +145,7 @@ describe('the repository cites only what it publishes', () => {
 // first broken thing a new reader finds.
 
 function packageJson(dir: string): { name?: string; private?: boolean } {
-    return JSON.parse(readFileSync(join(REPO, dir, 'package.json'), 'utf-8'));
+    return JSON.parse(textOf(dir, 'package.json'));
 }
 
 const packageDirs = published.filter(f => /^packages\/[^/]+\/package\.json$/.test(f))
@@ -169,13 +186,13 @@ describe('a stranger finds an open project', () => {
     });
 
     it('the root README links the community files, and each one exists', () => {
-        const readme = readFileSync(join(REPO, 'README.md'), 'utf-8').replace(/\r\n/g, '\n');
+        const readme = textOf('README.md').replace(/\r\n/g, '\n');
         expect(COMMUNITY.filter(f => !publishedPaths.has(f)), 'these files are missing').toEqual([]);
         expect(COMMUNITY.filter(f => !readme.includes(`](${f})`)), 'the README does not link these').toEqual([]);
     });
 
     it('NO relative link in the markdown a reader opens is broken', () => {
-        const broken = readerMarkdown.flatMap(f => brokenLinks(f, readFileSync(join(REPO, f), 'utf-8')));
+        const broken = readerMarkdown.flatMap(f => brokenLinks(f, textOf(f)));
         expect(broken, 'these links lead nowhere').toEqual([]);
     });
 
@@ -201,7 +218,7 @@ const PUBLIC_REPO_GIT = 'git+https://github.com/pragmatic-design/pdxui.git';
 function oldScopeFiles(): string[] {
     return published.filter(f => f !== 'packages/core/tests/public-tree.test.ts'
         && !/\.(png|jpe?g|gif|webp|ico|woff2?|ttf|otf|pdf|zip|gz|vsix)$/i.test(f))
-        .filter(f => OLD_SCOPE.test(readFileSync(join(REPO, f), 'utf-8')));
+        .filter(f => OLD_SCOPE.test(textOf(f)));
 }
 
 // "Pragmatic Design UI" (the site's lockup, the builder's title) and "Pragmatic Design eXperience"
@@ -217,7 +234,7 @@ function oldProductNameFiles(): string[] {
         (packageJson(d) as { description?: string }).description ?? '')).map(d => `${d}/package.json`);
     const texts = published.filter(f => FRONT_DOOR.includes(f)
         || pkgs.some(d => f === `${d}/README.md` || (f.startsWith(`${d}/src/`) && TEXT.test(f))));
-    return [...descriptions, ...texts.filter(f => OLD_PRODUCT_NAME.test(readFileSync(join(REPO, f), 'utf-8')))];
+    return [...descriptions, ...texts.filter(f => OLD_PRODUCT_NAME.test(textOf(f)))];
 }
 
 describe('the packages carry a scope the project owns', () => {
@@ -270,7 +287,7 @@ describe('the packages carry a scope the project owns', () => {
         // packages. This file is the one exception: it holds the names it looks for.
         const old = published.filter(f => f !== 'packages/core/tests/public-tree.test.ts'
             && !/\.(png|jpe?g|gif|webp|ico|woff2?|ttf|otf|pdf|zip|gz|vsix)$/i.test(f))
-            .filter(f => OLD_PRODUCT_NAME.test(readFileSync(join(REPO, f), 'utf-8')));
+            .filter(f => OLD_PRODUCT_NAME.test(textOf(f)));
         expect(old, 'these files still name the product the old way').toEqual([]);
     });
 
@@ -303,7 +320,7 @@ const BINARY = /\.(png|jpe?g|gif|webp|ico|woff2?|ttf|otf|pdf|zip|gz|vsix)$/i;
 
 function oldLicenceFiles(): string[] {
     return published.filter(f => !BINARY.test(f) && f !== 'packages/core/tests/public-tree.test.ts')
-        .filter(f => OLD_LICENCE.test(readFileSync(join(REPO, f), 'utf-8')));
+        .filter(f => OLD_LICENCE.test(textOf(f)));
 }
 
 describe('everything in the repository is MIT', () => {
@@ -341,7 +358,7 @@ const LOCAL_PATH = /C:[\\/]+Pragmatic\b|\/c\/Pragmatic\b|Pragmatic[\\/]examples\
 const PERSONAL_MAIL = /[\w.+-]+@(gmail|outlook|hotmail|yahoo|icloud)\.com/gi;
 
 function matchesIn(re: RegExp): string[] {
-    return exportedText.flatMap(f => [...readFileSync(join(REPO, f), 'utf-8').matchAll(re)].map(m => `${f} → ${m[0]}`));
+    return exportedText.flatMap(f => [...textOf(f).matchAll(re)].map(m => `${f} → ${m[0]}`));
 }
 
 /** A baseline directory and the spec it belongs to: `x.spec.ts-snapshots/`, `__screenshots__/x.spec.ts/`, `__snapshots__/x.test.ts.snap`. */
@@ -402,7 +419,7 @@ describe('the export carries the project, and only the project', () => {
             'integrations/README.md: export-ignore: unspecified',
         ]);
         const local = published.filter(f => f.startsWith('integrations/')).filter(f => /(^|\/)\.npmrc$/.test(f)
-            || /localhost:4873|verdaccio/i.test(readFileSync(join(REPO, f), 'utf-8')));
+            || /localhost:4873|verdaccio/i.test(textOf(f)));
         expect(local, 'these point an app at a local registry').toEqual([]);
     });
 
@@ -413,7 +430,7 @@ describe('the export carries the project, and only the project', () => {
     it('EVERY script a package runs with node exists', () => {
         const missing = published.filter(f => /(^|\/)package\.json$/.test(f))
             .flatMap(f => {
-                const scripts = (JSON.parse(readFileSync(join(REPO, f), 'utf-8')).scripts ?? {}) as Record<string, string>;
+                const scripts = (JSON.parse(textOf(f)).scripts ?? {}) as Record<string, string>;
                 return Object.entries(scripts).flatMap(([name, cmd]) =>
                     scriptFiles(f.slice(0, -'package.json'.length), cmd)
                         .filter(p => !publishedPaths.has(p))
@@ -430,7 +447,7 @@ describe('the export carries the project, and only the project', () => {
      * of the package that owns the tsconfig.
      */
     it('NO root script runs a tsc the root does not declare', () => {
-        const root = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf-8')) as {
+        const root = JSON.parse(textOf('package.json')) as {
             scripts: Record<string, string>; devDependencies?: Record<string, string> };
         if (root.devDependencies?.typescript) return;
         const loose = Object.entries(root.scripts).filter(([, cmd]) => /(^|&&\s*)pnpm exec tsc\b/.test(cmd)).map(([n]) => n);
@@ -484,7 +501,7 @@ const NOT_YET_CLEAN = new Set<string>([]);
 function trackerHitsByArea(): Map<string, string[]> {
     const hits = new Map<string, string[]>();
     for (const f of exportedText) {
-        const text = readFileSync(join(REPO, f), 'utf-8');
+        const text = textOf(f);
         if (!TRACKER_KEY.test(text) && !SESSION_LINK.test(text) && !REVIEW_REF.test(text)) continue;
         const area = areaOf(f);
         hits.set(area, [...(hits.get(area) ?? []), f]);
