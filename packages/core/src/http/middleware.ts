@@ -113,6 +113,9 @@ export function retryMiddleware(options: RetryMiddlewareOptions = {}): HttpMiddl
                 // middleware sees it — so an `instanceof DOMException` test never fired, and a
                 // request killed by its own deadline was replayed until maxRetries ran out.
                 if (err instanceof Error && err.name === 'AbortError') throw err;
+                // Nor a timeout, which the client reports as its own error (#255). Whether a timeout
+                // is retried is a decision of its own (beta spec, E6); until then it is not.
+                if (err instanceof Error && err.name === 'HttpTimeoutError') throw err;
                 if (request.signal?.aborted) throw err;
 
                 // Don't retry an OfflineError either, and for a sharper reason than "it would not

@@ -345,10 +345,14 @@ export function resource<T>(
         },
 
         abort(): void {
-            if (currentController) {
-                currentController.abort();
-                currentController = null;
-            }
+            if (!currentController) return;
+            // Cancelling is not failing (beta spec, data.md, E3): the bump stops the retry chain
+            // too, and the source goes back to its last settled state — it stayed 'loading' for
+            // good, its late answer discarded. error() is left as it was.
+            fetchGeneration++;
+            currentController.abort();
+            currentController = null;
+            _state.set(_data.peek() !== undefined ? 'success' : 'idle');
         },
 
         dispose(): void {

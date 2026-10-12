@@ -235,8 +235,8 @@ Two are on by default, because an application that has neither is worse off and 
 
 | | |
 |---|---|
-| **timeout** | 30 s. A request with no deadline never fails: `loading` stays true and no `error` is ever produced. Set `timeout: 0` to disable it. |
-| **retry** | Idempotent methods only — GET, HEAD, OPTIONS, PUT, DELETE — on 5xx, 408 and 429, with backoff. A POST or PATCH is never replayed. Set `retry: false` to disable it. |
+| **timeout** | 30 s. A request with no deadline never fails: `loading` stays true and no `error` is ever produced. A request that runs out of time fails with an `HttpTimeoutError` — not an `AbortError`, which is what your own cancel produces — so a page can say «the server did not answer». Set `timeout: 0` to disable it. |
+| **retry** | Idempotent methods only — GET, HEAD, OPTIONS, PUT, DELETE — on 5xx, 408 and 429, with backoff. A POST or PATCH is never replayed, nor a request that timed out or was cancelled. Set `retry: false` to disable it. |
 
 The rest are opt-in. You install them once, at startup, with `configureClient`:
 

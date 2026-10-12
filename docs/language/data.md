@@ -38,6 +38,9 @@ the spec was written with, and `key` becomes a function of the same text; `resou
 inside an effect, so a change to anything the URL reads fetches again, under the new key. The
 resource's `data()`, `error()`, `state()` (`idle`, `loading`, `reloading`, `success`, `stale`, `error`,
 `local`), `loading()` and `status()` are signals; `refetch()`, `mutate(value)` and `abort()` act on it.
+`abort()` cancels, which is not failing: the source goes back to `idle`, or to `success` when it has
+data, and `error()` is left as it was; a request that outlives the client's `timeout` fails with an
+`HttpTimeoutError` in `error()` (#255).
 Responses are cached by key and stay fresh for `staleTime` (30 000 ms by default). Every `@fetch` is
 tagged with its own key — `tags: (k) => [k, …the options' tags]`, `k` being the key the resource
 resolved — so `invalidate(['GET:/url'])`, whose array matches tags, reaches it by key (#282). The

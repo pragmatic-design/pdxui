@@ -117,6 +117,69 @@ describe('resource()', () => {
         expect(t.calls.length, 'a request went out after its component was destroyed').toBe(1);
     });
 
+    it('case 3 — abort() during a first load returns to idle, and the error is not touched', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r = resource(() => t.call(), { key: 'ac-abort-first', cache, retry: 0 });
+        await settle();
+        expect(r.state(), 'control: the first load is in flight').toBe('loading');
+        const before = r.error();
+        r.abort();
+        expect(r.state(), 'cancelling left the source loading').toBe('idle');
+        expect(r.loading(), 'a spinner bound to loading() never stops').toBe(false);
+        expect(r.error(), 'cancelling is not failing: error() changed').toBe(before);
+
+        t.answer(0, 'late');
+        await settle();
+        expect(r.data(), 'the cancelled request wrote its answer').toBeUndefined();
+        expect(r.state()).toBe('idle');
+        r.dispose();
+    });
+
+    it('case 3 — abort() during a refresh returns to success, with the data kept', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r = resource(() => t.call(), { key: 'ac-abort-refresh', cache, retry: 0 });
+        await settle();
+        t.answer(0, 'first');
+        await settle();
+        void r.refetch();
+        await settle();
+        expect(r.state(), 'control: the refresh is in flight').toBe('reloading');
+        r.abort();
+        expect(r.state(), 'cancelling a refresh left the source reloading').toBe('success');
+        expect(r.data()).toBe('first');
+
+        t.answer(1, 'second');
+        await settle();
+        expect(r.data(), 'the cancelled refresh wrote its answer').toBe('first');
+        r.dispose();
+    });
+
+    it('case 3 — a transport timeout settles error with an HttpTimeoutError, attempted once', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        let attempts = 0;
+        // As fetch does: a signal aborted with a reason rejects with that reason.
+        vi.stubGlobal('fetch', vi.fn((_url: string, init?: RequestInit) => {
+            attempts++;
+            return new Promise<Response>((_resolve, reject) => {
+                init?.signal?.addEventListener('abort', () => reject(init.signal!.reason), { once: true });
+            });
+        }));
+        const client = core.createHttpClient({ timeout: 1000 });
+        const cache = createCache({ gcInterval: 0 });
+        const r = resource(() => client.get('/api/ac-timeout'), { key: 'ac-timeout', cache, retry: 0 });
+        await vi.advanceTimersByTimeAsync(0);
+        await vi.advanceTimersByTimeAsync(1000);
+        await vi.advanceTimersByTimeAsync(20_000);
+
+        expect(r.state(), 'a timed-out request did not fail the source').toBe('error');
+        expect(r.error(), 'a timeout reported as something else').toBeInstanceOf(core.HttpTimeoutError);
+        expect((r.error() as Error).name).not.toBe('AbortError');
+        expect(attempts, 'the retry middleware replayed a timed-out request').toBe(1);
+        r.dispose();
+    });
+
     it('control: a resource created outside any component is not disposed by anything', async () => {
         const t = heldTransport<string>();
         const cache = createCache({ gcInterval: 0 });

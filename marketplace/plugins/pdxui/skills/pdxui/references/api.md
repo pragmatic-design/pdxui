@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-439 value exports.
+440 value exports.
 
 ### `__adoptStyles`
 
@@ -174,7 +174,7 @@ import { AbortError } from '@pdxui/core';
 class AbortError
 ```
 
-Error thrown when a request is aborted (timeout or manual).
+Error thrown when the caller aborts a request — a cancellation, not a failure. A timeout is {@link HttpTimeoutError}.
 
 ### `actions`
 
@@ -2696,9 +2696,9 @@ It carries the status, so calling code branches on `err.status === 404` rather t
 message, and the parsed body, so a validation error from the server is available without a second
 read of a stream that has already been consumed.
 
-Distinct from {@link AbortError} (the request never got an answer — timeout or cancellation) and
-{@link OfflineError} (it was never sent). {@link retryMiddleware} tells them apart for exactly
-this reason: a 503 is worth repeating, an abort is not.
+Distinct from {@link HttpTimeoutError} (the server did not answer in time), {@link AbortError}
+(the caller cancelled) and {@link OfflineError} (it was never sent). {@link retryMiddleware} tells
+them apart for exactly this reason: a 503 is worth repeating, a cancellation is not.
 
 ### `httpResource`
 
@@ -2718,6 +2718,18 @@ Usage:
       method: 'POST',
       body: () => ({ query: searchQuery() }),
   });
+
+### `HttpTimeoutError`
+
+```ts
+import { HttpTimeoutError } from '@pdxui/core';
+
+class HttpTimeoutError
+```
+
+Error thrown when a request outlives the client's `timeout`: the server did not answer in time. A
+failure, not a cancellation — an `AbortError` is what the caller's own abort produces — and not
+replayed by the retry middleware.
 
 ### `humanizeField`
 
