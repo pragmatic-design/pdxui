@@ -3,7 +3,7 @@
 // Template caching: same template strings → reuse parsed HTMLTemplateElement.
 // Importable without a DOM; calling html`` needs one (#93).
 
-import { effect } from '../reactivity/signal';
+import { effect, onDispose } from '../reactivity/signal';
 import { setProp, bindGesture } from './dom';
 import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
@@ -610,6 +610,9 @@ function bindRef(el: Element, value: TemplateValue): void {
     const sig = value as Signal<unknown>;
     if (typeof sig === 'function' && typeof sig.set === 'function') {
         sig.set(el);
+        // Let go of the element when the scope that rendered it is disposed (#262) — unless another
+        // element has taken the ref meanwhile, as the other branch of an `@if`/`@else` does.
+        onDispose(() => { if (sig.peek() === el) sig.set(null); });
     }
 }
 

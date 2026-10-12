@@ -60,7 +60,10 @@ marked *inference* are read from the code and still need the test that shows the
   again on resume.
 - `useQuery` pauses polling only while the **document** is hidden (`core/src/reactivity/use-query.ts:137`).
 - `@fetch` leaks its cache subscription when its component is destroyed (data.md E8).
-- `:ref` is never reset: `bindRef` only sets the element (`core/src/renderer/template.ts:609-614`).
+- `:ref` was never reset: `bindRef` only set the element. Since #262 both render paths reset it to
+  `null` when the scope that rendered the element is disposed, unless another element has taken it
+  (`core/src/renderer/template.ts`, `bindRef`; `compiler/src/compiler/codegen-template-inline.ts`,
+  `refBind`); `core/tests/ref-reset.test.ts`.
 - `<component :is @keepAlive>` keeps at most 10 instances, LRU (`core/src/renderer/dynamic.ts:51,103`),
   hidden with `display: none` and still connected, so they keep running and receive no `onHide`;
   the compiler emits only `keepAlive: true`, so a `.pdx` cannot set the maximum

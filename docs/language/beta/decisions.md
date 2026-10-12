@@ -126,9 +126,10 @@ test; an entry marked *inference* is filed as «write the test first».
 - `@await (x)` on a non-promise decides by truthiness, so `null` or `0` stays on `@loading` (E5).
 - `@await { maxMs }` renders the body over a pending promise.
 - An unknown `@defer` trigger fires immediately.
-- A `@defer` body mounted after its load may not be disposed with its block (*inference*).
+- A `@defer` body mounted after its load is not disposed with its block (confirmed by its test —
+  landed, #261).
 - A frozen route page keeps running effects and polling, and its child components are probably
   destroyed (*inference* for the children).
-- `:ref` is never reset to `null` when its element is removed.
+- `:ref` is never reset to `null` when its element is removed (landed, #262).
 - `pdx-data-grid` column headers take their tools into their accessible name.
 - The compiler micro-benchmark asserts 200 ms where its comment states 50 ms.

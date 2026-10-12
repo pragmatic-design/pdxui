@@ -485,6 +485,11 @@ The quoted value names a signal.
 is built, core's `bindRef` calls `box.set(element)`; the inline path does the same. Read it after the
 mount — in `onMount`, an `$effect` or a handler — as `box`, like any signal.
 
+When the scope that rendered the element is disposed — its `@if` branch, its `@for` row, the
+component — the ref is set back to `null`, unless it no longer holds that element (the other branch
+of an `@if`/`@else` binding the same ref has taken it). A component's `onDestroy` callbacks run before
+its scope is disposed, so they still read the element.
+
 #### Rules
 
 - A value that is not a signal (no `.set`) is ignored without a word: declare the ref as

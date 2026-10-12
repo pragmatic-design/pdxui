@@ -575,7 +575,10 @@ class InlineGen {
 
     private refBind(el: string, expr: string): void {
         const px = prefixCtx(expr, this.ctx);
-        this.out(`if(typeof ${px}==='function'&&typeof ${px}.set==='function')${px}.set(${el});`);
+        // Reset on disposal of the rendering scope, unless another element has taken the ref (#262):
+        // what core's bindRef does on the template path.
+        this.imports.add('onDispose');
+        this.out(`if(typeof ${px}==='function'&&typeof ${px}.set==='function'){const __r=${px};__r.set(${el});onDispose(()=>{if(__r.peek()===${el})__r.set(null);});}`);
     }
 
     // ─── Interpolation ────────────────────────────────────────
