@@ -1,5 +1,9 @@
 import { defineConfig } from '@playwright/test';
 import { CERTIFY_EXCLUSIONS } from './certify-exclusions';
+import { CERTIFY_PROJECTS } from './certify-projects';
+
+const excluded = CERTIFY_EXCLUSIONS.map((e) => `**/${e.file}`);
+const named = CERTIFY_PROJECTS.flatMap((p) => (p.files === 'rest' ? [] : p.files));
 
 export default defineConfig({
     testDir: './integration/ui-components',
@@ -7,7 +11,13 @@ export default defineConfig({
     // certify-exclusions.ts. Naming the runners instead would leave every other spec here in no
     // gate; the exclusion list is the only way to leave one out, and a test in core fails if a spec
     // is neither run nor listed.
-    testIgnore: CERTIFY_EXCLUSIONS.map((e) => `**/${e.file}`),
+    testIgnore: excluded,
+    // The folder in projects, so that CI shards each on its own (certify-projects.ts, #321). A local
+    // `pnpm certify` runs them all: the same tests as one folder. The project that takes the rest
+    // ignores what the others name, so every spec is in exactly one.
+    projects: CERTIFY_PROJECTS.map((p) => (p.files === 'rest'
+        ? { name: p.name, testIgnore: [...excluded, ...named.map((f) => `**/${f}`)] }
+        : { name: p.name, testMatch: p.files.map((f) => `**/${f}`) })),
     // Parallelise by TEST, not by file.
     //
     // Unset, this defaults to false, and Playwright's unit of parallelism becomes the spec file.

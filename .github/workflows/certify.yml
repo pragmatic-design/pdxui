@@ -23,14 +23,22 @@ env:
 jobs:
   # Dimensions 1-4: deterministic, fast, no screenshots → no Docker needed.
   contracts:
-    name: contracts (dim 1-4)
+    name: contracts (dim 1-4) (${{ matrix.project }} ${{ matrix.shard }}/${{ matrix.of }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        # Sharded, to parallelise as the components grow. Playwright splits by test COUNT, not by
-        # duration: with two shards one took 16.5 min and the other 5.5 (#60).
-        shard: [1, 2, 3, 4]
+        # By project, then by shard (certify-projects.ts, #321). Playwright splits by test COUNT,
+        # not by duration: four shards over the whole folder took 8, 9, 1 and 4 minutes, because the
+        # cheapest spec (manifest-contract, which shares pages) filled one shard by itself. Each
+        # project is sharded as its cost asks; core's ci-certification test checks that this list
+        # holds every shard of every project.
+        include:
+          - { project: axe, shard: 1, of: 2 }
+          - { project: axe, shard: 2, of: 2 }
+          - { project: contracts, shard: 1, of: 1 }
+          - { project: guards, shard: 1, of: 2 }
+          - { project: guards, shard: 2, of: 2 }
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -49,16 +57,17 @@ jobs:
         run: >
           pnpm --filter @pdxui/responsive exec playwright test
           --config tests/playwright-ui.config.ts
-          --shard=${{ matrix.shard }}/4
+          --project=${{ matrix.project }}
+          --shard=${{ matrix.shard }}/${{ matrix.of }}
       # The component-coherence behavior suite, which `test:certify` runs after the folder.
-      # 37 tests, ~15 s: once, in the first shard.
+      # 37 tests, ~15 s: once, in the shortest job.
       - name: Behavior suite
-        if: matrix.shard == 1
+        if: matrix.project == 'contracts'
         run: pnpm --filter @pdxui/responsive exec playwright test --config tests/playwright-behavior.config.ts
       - uses: actions/upload-artifact@v6
         if: failure()
         with:
-          name: contracts-report-${{ matrix.shard }}
+          name: contracts-report-${{ matrix.project }}-${{ matrix.shard }}
           path: packages/responsive/test-results
 
   # Dimension 5: visual regression in the pinned Docker image (bit-for-bit determinism).
