@@ -574,8 +574,10 @@ class InlineGen {
     }
 
     private refBind(el: string, expr: string): void {
-        const px = prefixCtx(expr, this.ctx);
-        this.out(`if(typeof ${px}==='function'&&typeof ${px}.set==='function')${px}.set(${el});`);
+        // core's bindRef, the template path's own: it sets the ref and resets it to null when the
+        // rendering scope is disposed (#262).
+        this.imports.add('bindRef');
+        this.out(`bindRef(${el},${prefixCtx(expr, this.ctx)});`);
     }
 
     // ─── Interpolation ────────────────────────────────────────

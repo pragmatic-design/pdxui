@@ -112,6 +112,10 @@ semver.
 
 ### Fixes
 
+- A `:ref` goes back to `null` when its element leaves the page — its `@if` branch turns false, its
+  `@for` row is removed, the component is destroyed — on both render paths; it kept the detached
+  element. Two branches of an `@if`/`@else` binding the same ref leave it on the element shown.
+  Both paths bind through core's new `bindRef`. (#262)
 - A `@defer` body rendered after its load or a later trigger is disposed with its block: its
   bindings belonged to no scope, so removing the block (an `@if` around it, the component destroyed)
   left them re-running on detached nodes. Each state of the block now renders in its own scope.

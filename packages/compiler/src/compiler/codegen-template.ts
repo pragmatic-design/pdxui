@@ -238,6 +238,11 @@ export function extractLoopInvariants(bodyCode: string, loopVar: string, ctx: Co
     const handlerRe = /safeHandler\(\s*ctx\.([\w$]+)\s*,/g;
     let hm: RegExpExecArray | null;
     while ((hm = handlerRe.exec(bodyCode)) !== null) handlerNames.add(hm[1]);
+    // A `:ref` target is the signal itself, written by the binding, never a read of its value:
+    // `bindRef(el, ctx.NAME)` on the inline path, `:ref=${ctx.NAME}` on the template path. Hoisted,
+    // the binding would receive the value (`null`) and the ref would never be set (#262).
+    const refRe = /(?:bindRef\([^,]+,|:ref=\$\{)\s*ctx\.([\w$]+)/g;
+    while ((hm = refRe.exec(bodyCode)) !== null) handlerNames.add(hm[1]);
 
     const reads = new Set<string>();
     const pattern = /ctx\.(\w+)(?:\(\))?/g;

@@ -249,6 +249,13 @@ const ROWS: Row[] = [
             pad.dispatchEvent(new PointerEvent('pointerup', { clientX: 100, clientY: 10, bubbles: true }));
         },
     },
+    // Both paths kept the removed element in the ref (#262); both now reset it to null.
+    {
+        name: ':ref after its @if turns false',
+        template: "@if (on) { <input class=\"f\" :ref=\"field\"> }<p>{{ field ? field.className : 'none' }}</p><button @click=\"on = false\">x</button>",
+        script: 'let on = $signal(true); let field = $signal(null);',
+        act: click('button'),
+    },
     // An @name the parser does not know is text on both paths. The divergence #100 names needs a
     // directive a plugin registers; this row keeps the plain case honest.
     { name: 'an unknown @name is text', template: '<p>a</p>@frobnicate { <p>b</p> }' },

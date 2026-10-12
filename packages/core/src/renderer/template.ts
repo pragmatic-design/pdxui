@@ -3,7 +3,7 @@
 // Template caching: same template strings → reuse parsed HTMLTemplateElement.
 // Importable without a DOM; calling html`` needs one (#93).
 
-import { effect } from '../reactivity/signal';
+import { effect, onDispose } from '../reactivity/signal';
 import { setProp, bindGesture } from './dom';
 import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
@@ -606,10 +606,17 @@ function setInlineStyle(el: Element, value: unknown): void {
 // ─── Element Reference (:ref) ──────────────────────────────────────
 
 /** Bind a ref signal to an element — sets signal value to the element. */
-function bindRef(el: Element, value: TemplateValue): void {
+/**
+ * Put `el` in the ref signal `value`, and take it out again — back to `null` — when the scope that
+ * rendered it is disposed (#262), unless another element has taken the ref meanwhile, as the other
+ * branch of an `@if`/`@else` does. A value that is not a signal is ignored. Both render paths bind a
+ * `:ref` through it.
+ */
+export function bindRef(el: Element, value: unknown): void {
     const sig = value as Signal<unknown>;
     if (typeof sig === 'function' && typeof sig.set === 'function') {
         sig.set(el);
+        onDispose(() => { if (sig.peek() === el) sig.set(null); });
     }
 }
 
