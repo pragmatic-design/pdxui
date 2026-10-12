@@ -275,13 +275,17 @@ function replaceCommentNode(comment: Comment, value: TemplateValue): void {
             const ref = currentNodes[0];
             // Use ref.parentNode (live parent in DOM), NOT the captured `parent`
             // (which may be the original DocumentFragment, now empty after appendTo DOM)
+            // The text cases change the anchor in place and need no parent: a text node taken out of
+            // the page — `@show` false hides a root text that way (#265) — must still be current when
+            // it is put back. Only replacing the anchor with other nodes needs one.
             const liveParent = ref.parentNode;
-            if (!liveParent) { currentNodes = [ref]; return; }
             if (newNodes.length === 0) {
                 if (ref instanceof Text) ref.data = '';
                 currentNodes = [ref];
             } else if (newNodes.length === 1 && newNodes[0] instanceof Text && ref instanceof Text) {
                 ref.data = (newNodes[0] as Text).data;
+                currentNodes = [ref];
+            } else if (!liveParent) {
                 currentNodes = [ref];
             } else {
                 const refNext = ref.nextSibling;

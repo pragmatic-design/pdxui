@@ -969,12 +969,15 @@ ShowBlock      ::= "@show" S? Paren Block
 #### Semantics
 
 `show(() => cond, html\`…\`)`: the body is rendered once, and its top-level elements get
-`style.display = 'none'` while the condition is falsy. Unlike `@if`, nothing is removed.
+`style.display = 'none'` while the condition is falsy. Unlike `@if`, no element is removed: its
+state, focus and components survive. A top-level **text** node cannot take a style, so it is
+swapped for a placeholder comment while hidden and put back in its place when shown, still bound:
+`@show (open) { Details: {{ name }} <b>…</b> }` false shows nothing.
 
 #### Rules
 
-- Only top-level **elements** are hidden: text directly in the body stays visible. Wrap it. Not
-  checked today.
+- Hiding does not pause: effects and components in the body keep running while it is hidden. Code
+  that must stop while hidden belongs in an `@if`.
 
 #### Examples
 

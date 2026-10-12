@@ -249,6 +249,20 @@ const ROWS: Row[] = [
             pad.dispatchEvent(new PointerEvent('pointerup', { clientX: 100, clientY: 10, bubbles: true }));
         },
     },
+    // @show false left a root text node on the page on both paths (#265); both now take it out, and
+    // put it back current: hidden, renamed, shown.
+    {
+        name: '@show false over a root text node',
+        template: "@show (open) { Details: {{ who }} <b>x</b> }<button class=\"t\" @click=\"open = !open\">t</button><button class=\"r\" @click=\"who = 'Bob'\">r</button>",
+        script: "let open = $signal(true); let who = $signal('Ann');",
+        act: async (h) => {
+            click('.t')(h);
+            await new Promise((r) => setTimeout(r, 0));
+            click('.r')(h);
+            await new Promise((r) => setTimeout(r, 0));
+            click('.t')(h);
+        },
+    },
     // Both paths kept the removed element in the ref (#262); both now reset it to null.
     {
         name: ':ref after its @if turns false',

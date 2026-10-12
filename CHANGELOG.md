@@ -112,6 +112,10 @@ semver.
 
 ### Fixes
 
+- `@show` false hides text at the root of its block too: `@show (open) { Details: <b>…</b> }` left
+  «Details:» on the page. A root text node is swapped for a placeholder while hidden and put back,
+  current, when shown; elements still take `display: none`. The template path's text binding also
+  updates a text node that is out of the page, as the inline path's did. (#265)
 - A `pdx-list` that has finished loading no longer announces «Loading»: its loading overlay, a
   spinner with `role="status"`, stayed in the accessibility tree while transparent. It is
   `aria-hidden` unless drawn, and the list is `aria-busy` while its source loads. (#299)

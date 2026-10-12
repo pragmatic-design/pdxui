@@ -329,12 +329,21 @@ export function show(
 
     for (const n of nodes) frag.appendChild(n);
 
-    // Toggle display on all root nodes
+    // A root TEXT node cannot take display:none: hidden, it is swapped for a comment that keeps its
+    // place, and swapped back when shown (#265). It holds no state, so detaching it is safe; an
+    // element keeps its node and takes display:none, so its state, focus and component survive.
+    const placeholders = new Map<Text, Comment>();
+    for (const n of nodes) if (n instanceof Text) placeholders.set(n, document.createComment('show'));
+
     effect(() => {
         const visible = condition();
         for (const n of nodes) {
             if (n instanceof HTMLElement) {
                 n.style.display = visible ? '' : 'none';
+            } else if (n instanceof Text) {
+                const placeholder = placeholders.get(n)!;
+                if (visible) { if (placeholder.parentNode) placeholder.replaceWith(n); }
+                else if (n.parentNode) n.replaceWith(placeholder);
             }
         }
     });
