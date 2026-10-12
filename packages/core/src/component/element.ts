@@ -44,6 +44,18 @@ function slotsIn(content: Node | null): Element[] {
     return out;
 }
 
+/**
+ * Whether `el` sits under a kept-alive element — a frozen route page. Read in a disconnect: the
+ * freeze moves the page into a DocumentFragment whole, so the parent chain is intact there, while an
+ * element removed on its own (an `@if`, a row) has no parent left to walk (#268).
+ */
+function keptAliveAncestor(el: Element): boolean {
+    for (let n = el.parentNode; n; n = n.parentNode) {
+        if ((n as { _keepAlive?: boolean })._keepAlive === true) return true;
+    }
+    return false;
+}
+
 /** Base class for PDX UI Web Components. */
 export abstract class PdxElement extends HTMLElementBase {
     /** Override to declare observed attributes that auto-map to signals. */
@@ -119,6 +131,12 @@ export abstract class PdxElement extends HTMLElementBase {
 
     /** Keep-alive flag — when true, disconnectedCallback skips cleanup (freeze, not destroy). */
     _keepAlive = false;
+
+    /**
+     * Frozen with a kept-alive ancestor (#268): disconnected by the move that froze it, not destroyed.
+     * The next connect is a resume, and runs `onShow`.
+     */
+    _frozenWithAncestor = false;
 
     /** Set by {@link moveMounted} while a DOM move takes this element out and puts it back. */
     _moving = false;
@@ -281,9 +299,10 @@ export abstract class PdxElement extends HTMLElementBase {
                     for (const fn of this._routeChangeCallbacks) fn(e.detail);
                 }) as EventListener);
             }
-        } else if (this._keepAlive) {
+        } else if (this._keepAlive || this._frozenWithAncestor) {
             // Resume from freeze: DOM is intact, effects will re-track on signal read.
             // Signal reads in effects/computeds auto-reconcile with current store state.
+            this._frozenWithAncestor = false;
             emitDevTools('component:show', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
             for (const fn of this._showCallbacks) fn();
         }
@@ -293,8 +312,14 @@ export abstract class PdxElement extends HTMLElementBase {
         // Taken out to be put straight back (moveMounted): nothing ends, and the connect that follows
         // finds the element still mounted, so it does nothing either.
         if (this._moving) return;
-        if (this._keepAlive) {
-            // Freeze mode: skip cleanup, just notify onHide
+        // Freeze mode: skip cleanup, just notify onHide — for the kept-alive element itself, and for a
+        // component inside one, which the same move disconnected (#268). The kept-alive page is still
+        // its ancestor: the move keeps the subtree whole, inside the fragment.
+        // Out of the document, too: a component MOVED within a kept-alive page gets this callback
+        // once it is already back in the page, and that is no freeze.
+        const frozenWithAncestor = !this._keepAlive && this._mounted && !this.isConnected && keptAliveAncestor(this);
+        if (this._keepAlive || frozenWithAncestor) {
+            if (frozenWithAncestor) this._frozenWithAncestor = true;
             for (const fn of this._hideCallbacks) fn();
             emitDevTools('component:hide', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
             return;

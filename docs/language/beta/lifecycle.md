@@ -54,10 +54,13 @@ marked *inference* are read from the code and still need the test that shows the
 - *Effects keep running while frozen*: the router moves the page into a `DocumentFragment` and skips
   its cleanup (`router/src/outlet.ts:714-719`, `core/src/component/element.ts:296-301`); nothing in
   the reactive core pauses them. `outlet.ts:4-6` says «zero CPU cost while frozen».
-- *Inference: children of a frozen page are destroyed.* Only the page element is marked
-  `_keepAlive` (`outlet.ts:716`); the descendants are not, unlike the light-DOM move in
-  `element.ts:203-213`, so each child's `disconnectedCallback` cleans up and the child runs its setup
-  again on resume.
+- Children of a frozen page were destroyed — measured in Chromium, then fixed by #268. Only the page
+  element is marked `_keepAlive`, so each child's `disconnectedCallback` cleaned up and the child ran
+  its setup again on resume, its state lost. A mounted component that is disconnected while a
+  kept-alive ancestor still holds it is now frozen with the page: `onHide`, then `onShow` on resume,
+  and the outlet tears the children down, deepest first, when it destroys a frozen page for good
+  (`core/src/component/element.ts`, `router/src/outlet.ts` `_destroyFrozen`;
+  `responsive/tests/integration/ui-components/keepalive-children.spec.ts`).
 - `useQuery` pauses polling only while the **document** is hidden (`core/src/reactivity/use-query.ts:137`).
 - `@fetch` leaks its cache subscription when its component is destroyed (data.md E8).
 - `:ref` was never reset: `bindRef` only set the element. Since #262 both render paths reset it to
