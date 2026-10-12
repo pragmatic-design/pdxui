@@ -602,8 +602,10 @@ the rewritten expression is `undefined`.
   `Set`'s `set`, `add`, `delete`, `clear`) or a write to a member (`user.name = v`, `items[0] = v`,
   `user.age++`) — sets nothing, so nothing that reads the signal updates: `PDX_SIGNAL_MUTATED_IN_PLACE`
   (warning), with a fix for `push` (`items = [...items, x]`) and a one-level field
-  (`user = { ...user, name: v }`). A `:ref` target and a `$store` are not reported: setting an
-  element's properties, and mutating a store in place, is what they are for.
+  (`user = { ...user, name: v }`). It is reported in the script and in a template event handler
+  (`@click="items.push(x)"`), where a name the template binds — a `@for` item or index, a `@let`, a
+  slot's `let:`, an arrow parameter — is not the signal. A `:ref` target and a `$store` are not
+  reported: setting an element's properties, and mutating a store in place, is what they are for.
 - A signal nothing reads raises `PDX_UNUSED_REACTIVE` (info); a leading `_` silences it.
 - A signal only ever incremented and read to be discarded raises `PDX_VERSION_COUNTER`.
 - A fragment the rewriter cannot parse raises `PDX_REWRITE_FALLBACK`, and the signal is not called there.

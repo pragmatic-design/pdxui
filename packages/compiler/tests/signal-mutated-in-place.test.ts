@@ -93,3 +93,52 @@ describe('PDX_SIGNAL_MUTATED_IN_PLACE', () => {
         expect(findings(source)).toEqual([]);
     });
 });
+
+// The same mutation written in a template event handler updates nothing either (#210).
+describe('PDX_SIGNAL_MUTATED_IN_PLACE in a template event handler', () => {
+    it('reports `@click="items.push(1)"` at its attribute, and its fix compiles clean', () => {
+        const source = file(DECLS, '<button @click="items.push(1)">add</button> {{ items.length }}');
+        const found = findings(source);
+        expect(found, `no ${CODE} for a push in a handler`).toHaveLength(1);
+        // The template's content is line 2, after two spaces; `items` is 16 characters into the tag.
+        expect(found[0].line).toBe(2);
+        expect(found[0].column).toBe(19);
+        expect(source.split('\n')[1].slice(found[0].column! - 1)).toMatch(/^items\.push\(1\)/);
+        const fixed = applied(source, found[0]);
+        expect(fixed).toContain('@click="items = [...items, 1]"');
+        expect(compile(fixed, 'C:/x/example.pdx').warnings.filter(x => x.severity !== 'info')).toEqual([]);
+    });
+
+    it('reports a field written from an arrow handler, and a fixable field write', () => {
+        const arrow = findings(file(DECLS, '<input @input="e => user.name = e.target.value"> {{ user.name }}'));
+        expect(arrow, 'no finding for a field written from an arrow handler').toHaveLength(1);
+        const source = file(DECLS, `<button @click='user.name = "b"'>rename</button> {{ user.name }}`);
+        const [w] = findings(source);
+        expect(w?.fix, 'a field write in a handler carries no fix').toBeDefined();
+        expect(applied(source, w)).toContain(`@click='user = { ...user, name: "b" }'`);
+    });
+
+    it('does not report a handler that mutates a loop item', () => {
+        const source = file('let rows = $signal([{ id: 1, done: false }]);',
+            '@for (rows as row; track row.id) { <button @click="row.done = true">{{ row.id }}</button> }');
+        expect(findings(source)).toEqual([]);
+    });
+
+    it('does not report a name the handler or the template binds over a $signal', () => {
+        const quiet = [
+            // A loop variable, a destructured one and an index named like the script's $signals.
+            '@for (groups as items; track items.id) { <button @click="items.push(1)">x</button> }',
+            '@for (people as { user }; track user.id) { <button @click="user.name = \'b\'">x</button> }',
+            // An arrow parameter.
+            '<button @click="items => items.push(1)">x</button>',
+            // A function reference, an immutable write, a :ref target.
+            '<button @click="add">x</button><button @click="items = [...items, 1]">y</button>',
+        ];
+        for (const template of quiet) {
+            const source = file(`${DECLS}\nlet groups = $signal([]);\nlet people = $signal([]);\nfunction add() {}`, template);
+            expect(findings(source), `reported: ${template}`).toEqual([]);
+        }
+        const ref = file('let box = $signal(null);', '<div :ref="box"></div><button @click="box.classList.add(\'on\')">x</button>');
+        expect(findings(ref)).toEqual([]);
+    });
+});

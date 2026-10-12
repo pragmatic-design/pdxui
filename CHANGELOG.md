@@ -22,7 +22,9 @@ semver.
   `splice`, `sort`, a `Map`/`Set` `set`/`add`/`delete`/`clear`, `user.name = v`, `items[0] = v` —
   sets nothing, so nothing that reads it updates. Reported where it is written, with a fix for a push
   (`items = [...items, x]`) and a field (`user = { ...user, name: v }`). A `$store` and a `:ref`
-  target are not reported. (#151)
+  target are not reported. (#151) A template event handler is checked too — `@click="items.push(x)"`
+  is reported at its attribute, with the same fixes; a name the template binds (a `@for` item, an
+  arrow parameter) is not the signal. (#210)
 - `<pdx-button :action="save" :action-arg="dto">` runs a write: a click calls `save.execute(dto)`,
   and while `save.pending()` the button is busy and refuses clicks, so a double click sends one
   write. A refusal stays on `save.error()` and is announced as `pdx-action-error`. Any object with

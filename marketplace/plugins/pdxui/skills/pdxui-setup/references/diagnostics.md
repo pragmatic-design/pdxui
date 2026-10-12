@@ -707,7 +707,7 @@ A syntax error in the setup would reach the generated module as broken code. It 
 
 *warn* — A `$signal`'s value changed in place: a mutating method (`push`, `splice`, `set`, `add`…) or a write to a member (`user.name = …`, `items[0] = …`).
 
-A signal notifies when it is set, and `set` compares with `Object.is`. Changing the array or object it already holds calls no `set` at all, so nothing that reads the signal updates: the list on screen does not grow. A `$store` is a proxy, where in-place mutation is the point, and is not reported.
+A signal notifies when it is set, and `set` compares with `Object.is`. Changing the array or object it already holds calls no `set` at all, so nothing that reads the signal updates: the list on screen does not grow. It is reported in the script and in a template event handler (`@click="items.push(x)"`); a name the template binds itself — a `@for` item, an arrow parameter — is not the signal. A `$store` is a proxy, where in-place mutation is the point, and is not reported.
 
 **Fix.** Assign a new value: `items = [...items, x]` for a push, `user = { ...user, name: v }` for a field. The fix rewrites those two; the other forms get the hint. A value meant to be changed in place is a `$store`. `pdx check --fix` and the editor apply it.
 

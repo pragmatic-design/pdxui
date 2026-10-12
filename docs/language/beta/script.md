@@ -54,7 +54,7 @@ on 2026-10-11 (#187): **assignment stores the value as it is**.
   proposed); the hint names the core function for that place (`signal()`, `effect()`).
 - Changing a signal's value in place is `PDX_SIGNAL_MUTATED_IN_PLACE` (warning, #151 — landed): a
   mutating method (`push`, `splice`, `sort`, `set`, `add`, `delete`, `clear`, …) or a member write,
-  with a fix for `push` and a one-level field.
+  with a fix for `push` and a one-level field. In a template event handler too (#210 — landed).
 - A fragment the rewriter cannot parse is `PDX_REWRITE_FALLBACK` (warning).
 
 ### Since
