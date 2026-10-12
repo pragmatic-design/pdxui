@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 45 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 46 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -121,6 +121,19 @@ Render what `value()` returns where `anchor`, an empty text node already in plac
 it: a primitive is the anchor's text (`interpolationText`), a Node, a fragment or an array is put in
 as nodes. Both render paths interpolate through it — the inline path wrote only text, so an array
 read `a,b` in a production build and `ab` in dev (#100).
+
+## `bindRef`
+
+```ts
+import { bindRef } from '@pdxui/core';
+
+function bindRef(el: Element, value: unknown): void
+```
+
+Put `el` in the ref signal `value`, and take it out again — back to `null` — when the scope that
+rendered it is disposed (#262), unless another element has taken the ref meanwhile, as the other
+branch of an `@if`/`@else` does. A value that is not a signal is ignored. Both render paths bind a
+`:ref` through it.
 
 ## `bindTwoWay`
 

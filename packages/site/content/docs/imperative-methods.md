@@ -128,5 +128,7 @@ in the generated `.d.ts`.
   is removed, the component destroyed: the ref is set to `null`, so `if (field) field.focus()` never
   acts on a detached element. Two branches of an `@if`/`@else` can bind the same ref — it holds the
   element of the branch on screen. An `onDestroy` still sees the element: refs are reset after it runs.
+  Both the dev and the build output bind a ref through core's `bindRef(el, signal)`, which a
+  hand-written `html` template can call too.
 - **Methods exist after mount.** Call them in response to user actions or after `onMount`, once the
   element has upgraded.

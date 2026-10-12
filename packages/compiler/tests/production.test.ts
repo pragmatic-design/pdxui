@@ -724,7 +724,9 @@ let visible = $signal(true);
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline-ref.pdx', [], undefined, { production: true, inlineBindings: true });
-        expect(code).toContain('.set(');
+        // Through core's bindRef, the template path's own, which sets the ref and resets it (#262).
+        expect(code).toMatch(/bindRef\(__el\d+,ctx\.inputRef\);/);
+        expect(code).toMatch(/import\s*\{[^}]*\bbindRef\b[^}]*\}\s*from\s*'@pdxui\/core'/);
     });
 
     it('handles deeply nested elements', () => {

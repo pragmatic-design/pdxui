@@ -132,7 +132,7 @@ export type { Signal, ReadonlySignal, HistorySignal, SignalOptions, Dispose } fr
 export { DEV } from './utils/env';
 
 // Renderer
-export { html, clearBoundProperty, assignBoundProperty, bindTwoWay, bindInterpolation, interpolationText } from './renderer/template';
+export { html, clearBoundProperty, assignBoundProperty, bindTwoWay, bindInterpolation, bindRef, interpolationText } from './renderer/template';
 export { repeat } from './renderer/list';
 export { repeatWithSlot } from './renderer/slot-repeat';
 export { setProp, bindGesture, insert, remove, text, marker, __staticHTML } from './renderer/dom';
