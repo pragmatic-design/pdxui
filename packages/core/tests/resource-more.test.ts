@@ -5,7 +5,7 @@
 // The state machine is the feature: `loading` vs `reloading` vs `stale` is the difference between
 // blanking the screen and refreshing behind the data, and each of those transitions is tested here.
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { resource, resourceWhen } from '../src/reactivity/resource';
 import { createCache } from '../src/reactivity/cache';
 import { signal } from '../src/reactivity/signal';
@@ -180,12 +180,24 @@ describe('the cache in front of the fetcher', () => {
 });
 
 describe('retry', () => {
+    // The backoff is the HTTP client's (#257): 300 ms doubling, with jitter up to ×1.5. Slept for on
+    // the wall clock it was a margin, not a synchronisation (#352): the timers are the test's here,
+    // and the jitter its longest.
+    beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        vi.spyOn(Math, 'random').mockReturnValue(0.999);
+    });
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.useRealTimers();
+    });
+
     it('retries up to the configured number and then reports the error', async () => {
         const boom = new Error('flaky');
         const fetcher = scripted<string>(boom, boom, boom);
         const res = resource(fetcher, { cache: createCache(), key: 'r1', retry: 2 });
 
-        await tick(1500);   // 300ms + 600ms of backoff
+        await vi.advanceTimersByTimeAsync(60_000);
 
         expect(fetcher.mock.calls.length, 'the retries did not run').toBe(3);
         expect(res.state()).toBe('error');
@@ -197,7 +209,7 @@ describe('retry', () => {
         const fetcher = scripted<string>(new Error('once'), 'ok');
         const res = resource(fetcher, { cache: createCache(), key: 'r2', retry: 3 });
 
-        await tick(600);
+        await vi.advanceTimersByTimeAsync(60_000);
 
         expect(fetcher.mock.calls.length).toBe(2);
         expect(res.data()).toBe('ok');

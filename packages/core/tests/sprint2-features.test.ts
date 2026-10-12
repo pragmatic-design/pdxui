@@ -1,6 +1,6 @@
 // Tests for Sprint 2: resource(), portal(), named slots, dynamic()
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { signal } from '../src/reactivity/signal';
 import { resource, resourceWhen } from '../src/reactivity/resource';
 import { html } from '../src/renderer/template';
@@ -37,19 +37,29 @@ describe('resource()', () => {
     });
 
     it('retries on error with retry option', async () => {
-        let attempts = 0;
-        const res = resource(() => {
-            attempts++;
-            if (attempts < 3) return Promise.reject(new Error('fail'));
-            return Promise.resolve('ok');
-        }, { retry: 3 });
+        // The backoff is the HTTP client's (#257): 300 ms doubling, with jitter up to ×1.5 — two
+        // failures wait up to 1350 ms. Waited for on the wall clock it outlasted the test's budget
+        // on a Linux runner (#352); the timers are the test's, and the jitter its longest.
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        const random = vi.spyOn(Math, 'random').mockReturnValue(0.999);
+        try {
+            let attempts = 0;
+            const res = resource(() => {
+                attempts++;
+                if (attempts < 3) return Promise.reject(new Error('fail'));
+                return Promise.resolve('ok');
+            }, { retry: 3 });
 
-        // Wait for retries (200ms + 400ms backoff + margin)
-        await waitUntil(() => res.state() === 'success', 'the query to succeed on a later attempt');
-        expect(res.state()).toBe('success');
-        expect(res.data()).toBe('ok');
-        expect(attempts).toBe(3);
-    }, 5000);
+            await vi.advanceTimersByTimeAsync(60_000);
+            expect(res.state()).toBe('success');
+            expect(res.data()).toBe('ok');
+            expect(attempts).toBe(3);
+            res.dispose();
+        } finally {
+            random.mockRestore();
+            vi.useRealTimers();
+        }
+    });
 
     it('mutate() sets data optimistically', async () => {
         const res = resource(() => Promise.resolve('server'));
