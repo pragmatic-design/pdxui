@@ -68,10 +68,11 @@ marked *inference* are read from the code and still need the test that shows the
   (`core/src/renderer/template.ts`, `bindRef`; `compiler/src/compiler/codegen-template-inline.ts`,
   `refBind`); `core/tests/ref-reset.test.ts`.
 - `<component :is @keepAlive>` keeps at most 10 instances, LRU (`core/src/renderer/dynamic.ts:51,103`),
-  hidden with `display: none` and still connected, so they keep running and receive no `onHide`;
-  the compiler emits only `keepAlive: true`, so a `.pdx` cannot set the maximum
-  (`compiler/src/compiler/codegen-template-rewrite.ts:248-249`). Route pages have no maximum, only
-  an optional timeout (`outlet.ts:722-726`).
+  hidden with `display: none` and still connected, so they keep running and receive no `onHide`.
+  Since #270 `@keepAlive(n)` sets the maximum (`maxAlive: n`, both render paths), and a route
+  outlet keeps at most `keep-alive-max` frozen pages (default 10), the least recently used
+  destroyed past it; `@page { keepAlive: n }` stays a timeout (`core/tests/keepalive-max-dynamic.test.ts`,
+  `router/tests/outlet-keepalive-max.test.ts`).
 - `@show` hid only the block's root elements: a root text node stayed visible. Since #265 a root
   text node is swapped for a placeholder while hidden and put back, still bound, when shown
   (`core/src/renderer/helpers.ts`, `show`); acceptance case 7 is `core/tests/show-root-text.test.ts`.

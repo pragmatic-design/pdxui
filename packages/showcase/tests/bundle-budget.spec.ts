@@ -164,7 +164,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // blocking 90 → 91: the dashboard's `pdx-list` brings its empty state's icon, `inbox`, which shows
 // while the queue loads (#47). Loaded on demand it was a request after the first paint; it is a few
 // hundred bytes of the preloaded list chunk now. 90.4 KB measured.
-const BUDGET_KB = { entry: 36, js: 459, css: 59, blocking: 91 };
+// entry 36 → 37: the router outlet is in the entry, and a kept-alive page is bounded and frozen
+// whole now — its child components frozen with it, by an ancestor walk in core's element (#268),
+// and the least recently used frozen page destroyed past `keep-alive-max` (#270). A few hundred
+// bytes; the showcase keeps no page alive, so it pays them and uses none. 36.1 KB measured.
+const BUDGET_KB = { entry: 37, js: 459, css: 59, blocking: 91 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

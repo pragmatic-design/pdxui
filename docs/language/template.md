@@ -566,7 +566,7 @@ alpha
 
 ```ebnf
 DynamicComponent ::= "<component" S ":is=" AttrValue ( S DynamicOption )* S? ( "/>" | ">" )
-DynamicOption    ::= PropBinding | "@keepAlive" | "keep-alive"
+DynamicOption    ::= PropBinding | "@keepAlive" ( S? "(" S? Digits S? ")" )? | "keep-alive"
                    | "@transition" S? "(" StringLiteral ( S? "," S? StringLiteral )? ")"
                    | "@mode" S? "(" StringLiteral ")"
 ```
@@ -577,13 +577,17 @@ The tag becomes `dynamic(() => tag, () => ({ prop: … }), { keepAlive, transiti
 expression giving a tag name; when it changes, the element is replaced (`<component>` itself is never
 in the DOM). Each other `:prop` is passed to the element, camelCased (`:item-label` → `itemLabel`).
 With `@keepAlive` an element left behind is hidden, not destroyed, and shown again when its tag comes
-back; the cache keeps at most 10, least recently used first out. `@transition('in', 'out')` animates
-the swap, `@mode('out-in')` sequences it.
+back; the cache keeps at most 10, least recently used first out — `@keepAlive(n)` keeps at most n
+(`dynamic(…, { keepAlive: true, maxAlive: n })`), and the view it drops is destroyed.
+`@transition('in', 'out')` animates the swap, `@mode('out-in')` sequences it.
 
 #### Rules
 
 - Both render paths compile it to the same `dynamic(…)` call; what is written between
-  `<component>` and `</component>` is dropped.
+  `<component>` and `</component>` is dropped on the inline path and rendered beside the component
+  on the template path (#358).
+- `@keepAlive(n)` takes a whole number of at least 1; anything else is `PDX_KEEPALIVE_MAX` (error),
+  and the default of 10 applies.
 - Only `:is`, `:prop` bindings and the three options are read; an `@event`, a `::` binding or a plain
   attribute on `<component>` is dropped. Not checked today.
 - The tags it may render must be registered: the auto-import reads the tags written in the markup,

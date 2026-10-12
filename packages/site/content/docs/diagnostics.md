@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 71 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 72 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -404,6 +404,36 @@ The node would be left out of the production render. The warning makes a missing
 A component receives a value its type does not admit and falls back to its default, silently.
 
 **Fix.** Use one of the allowed values the hint lists.
+
+### PDX_KEEPALIVE_MAX
+
+*error* — A `<component :is @keepAlive(n)>` whose maximum is not a whole number of at least 1.
+
+`@keepAlive(n)` keeps at most n views, dropping the least recently shown. A value that is not a positive whole number keeps no meaning; the component is compiled with the default of 10.
+
+**Fix.** Write `@keepAlive(3)` for three views, or `@keepAlive` alone for the default of 10.
+
+Instead of:
+
+```html
+<template>
+  <component :is="view" @keepAlive(0)></component>
+</template>
+<script setup>
+let view = $signal('pdx-a');
+</script>
+```
+
+write:
+
+```html
+<template>
+  <component :is="view" @keepAlive(3)></component>
+</template>
+<script setup>
+let view = $signal('pdx-a');
+</script>
+```
 
 ### PDX_LABEL_NOT_FOUND
 
