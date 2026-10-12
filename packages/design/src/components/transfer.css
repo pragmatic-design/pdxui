@@ -101,6 +101,16 @@ pdx-transfer {
     cursor: pointer;
     transition: background 0.15s;
     user-select: none;
+    /* Skipped until it nears the viewport: a long panel does not lay out the rows nobody sees.
+       The size is the row's CONTENT box (the padding adds to it), measured in Chromium: 24px of
+       a 40px row, neutral theme, normal density; `auto` keeps a row's own height once it has been
+       laid out. The label clips and the check stays inside, so the paint containment clips
+       nothing but the focus ring, which is drawn inside below. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 24px;
+}
+.pdx-transfer-item:focus-visible {
+    outline-offset: calc(-1 * var(--pdx-focus-width));
 }
 
 .pdx-transfer-item:hover {

@@ -105,7 +105,8 @@ component('pdx-list', {
         function defaultRenderItem(item: unknown, index: number): Node {
             const record = item as Record<string, unknown>;
             const li = document.createElement('div');
-            li.className = 'pdx-list-item';
+            // Text only, written by the list: `.pdx-list-item-text` lets it be skipped off screen.
+            li.className = 'pdx-list-item pdx-list-item-text';
             if (ctx.clickable()) { li.classList.add('pdx-list-item-clickable'); li.tabIndex = 0; }
             li.setAttribute('role', 'listitem');
             li.setAttribute('data-list-index', String(index));
@@ -148,7 +149,7 @@ component('pdx-list', {
             const content = renderFn(item, index);
             if (typeof content === 'string') {
                 const li = document.createElement('div');
-                li.className = 'pdx-list-item';
+                li.className = 'pdx-list-item pdx-list-item-text';
                 if (ctx.clickable()) { li.classList.add('pdx-list-item-clickable'); li.tabIndex = 0; }
                 li.setAttribute('role', 'listitem');
                 li.setAttribute('data-list-index', String(index));

@@ -30,6 +30,13 @@
     cursor: pointer;
     color: var(--pdx-color-text);
     min-height: 2rem;
+    /* Skipped until it nears the viewport: a long tree does not lay out the rows nobody sees.
+       Nothing the row draws leaves it (the label clips, the ring is inside), so the paint
+       containment that comes with it clips nothing. The size is the row's CONTENT box (the
+       padding adds to it), measured in Chromium: 25.6px of a 33.6px row, neutral theme, normal
+       density. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 25.6px;
 }
 
 .pdx-tree-item:hover {
