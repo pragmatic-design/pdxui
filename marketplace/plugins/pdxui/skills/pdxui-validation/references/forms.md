@@ -27,9 +27,11 @@ Three things are easy to get wrong, and the compiler accepts none of them:
 - fields separated by **commas**, not semicolons;
 - rules in **braces** after the type (`string { required, email }`), not bare.
 
-Get one wrong and the declaration is **dropped** — there is no form, and every read of `user` below
-finds nothing. The compiler says so, as `PDX_UNKNOWN_DECLARATION`, naming the keyword and the shape
-it expected.
+A missing colon **drops the whole declaration** — there is no form, and every read of `user` below
+finds nothing: `PDX_UNKNOWN_DECLARATION`, an error naming the keyword and the shape it expected. A
+semicolon or bare rules drop **the field**: the form is generated without it, and the control bound
+to it swallows what is typed — `PDX_FORM_FIELD_UNPARSED`, a warning naming the field. The grammar is
+in the [reference](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/data.md#form).
 
 That line becomes:
 
@@ -59,7 +61,7 @@ change and blur into `form.fields.x` for every named control, and `<pdx-form-fie
 touched and warning from the same place — you write no `:value`, no `@input`:
 
 ```pdx
-<pdx-form :form="user">
+<pdx-form :form="user" @pdx-submit="save($event.detail.values)">
   <pdx-form-field name="name" label="Name"><pdx-input name="name" /></pdx-form-field>
   <pdx-form-field name="email" label="Email"><pdx-input name="email" type="email" /></pdx-form-field>
   <pdx-button type="submit" :disabled="!user.valid()">Save</pdx-button>
@@ -76,10 +78,15 @@ function save(values) { /* already validated */ }
 </script>
 ```
 
-`handleSubmit(save)` calls `save` **only if** the form is valid, handing you the clean values. Never a
-value it did not validate: a field edited while the submit waits for an async validator (a «username
-is free» check) cancels that submit — the form stays where it is, the new value's errors show, and
-the next submit validates it.
+On submit `<pdx-form>` validates every field and emits `pdx-submit` with the clean values **only if**
+the form is valid; otherwise it scrolls to the first error. Never a value it did not validate: a field
+edited while the submit waits for an async validator (a «username is free» check) cancels that
+submit — the form stays where it is, the new value's errors show, and the next submit validates it.
+
+Without `<pdx-form>`, `user.handleSubmit(save)` builds the same handler for a `<form>` of your own:
+make it once in the script, `const onSubmit = user.handleSubmit(save);`, and bind it,
+`<form @submit="onSubmit">`. Written inline, `@submit="user.handleSubmit(save)"` only builds a
+handler on each submit and never calls it.
 
 **A required field says so, from the schema.** A field whose rules include `required` is marked
 required with no prop on its `<pdx-form-field>`: its control gets `aria-required="true"`, so a screen
@@ -225,8 +232,23 @@ The moment of saving is configurable, globally or per field:
 - `onChange` / `onBlur` — save as the user edits or when they leave the field.
 - `immediate` — sync right away.
 
-Per field you can fine-tune with `saveMode` and `saveDebounce` (e.g. save with 400ms debounce while
-typing). The `warnUnsaved` option warns if the user tries to leave with unsaved changes.
+They go in the options block after the fields, as `save`; per field, `fields` takes a `save` and a
+`saveDebounce` in milliseconds (500 by default) — `fields` written on one line. `warnUnsaved` asks
+before the user leaves with unsaved changes. Options are separated by `;` or a line break, not by
+commas:
+
+```pdx
+@form profile: {
+  name: string { required },
+  bio: string
+} {
+  save: 'onBlur';
+  fields: { bio: { save: 'onChange', saveDebounce: 400 } };
+  warnUnsaved
+}
+```
+
+The grammar of the options is in the [reference](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/data.md#form).
 
 ## One form, several components
 
@@ -272,7 +294,7 @@ anything, so a half-saved screen is not reachable through it.
 | write a field | `user.fields.name.onChange(v)` |
 | show a field error | `@if (user.errors().name) { … }` |
 | disable submit when invalid | `:disabled="!user.valid()"` |
-| save only if valid | `@submit="user.handleSubmit(save)"` |
+| save only if valid | `<pdx-form :form="user" @pdx-submit="save($event.detail.values)">`, or `const onSubmit = user.handleSubmit(save)` bound to your own `<form @submit="onSubmit">` |
 | a list of rows | `[{ … }]` in the schema, then `user.array('lines')` → `append()` / `remove(i)` |
 | the same validation as the backend | `@form x: ExternalSchema` |
 | one form across several components | `<pdx-form :form>` + `tryUseForm()` in each section: its named controls are wired |

@@ -111,7 +111,7 @@ describe('@mixin component composition', () => {
         const source = `
 <template><div>{{ pagination }}</div></template>
 <script setup>
-  @mixin './with-pagination.pdx' as pagination;
+  @mixin './with-pagination.ts' as pagination;
   @prop items: string[] = [];
 </script>`;
         const { code } = compile(source, 'mixin.pdx');

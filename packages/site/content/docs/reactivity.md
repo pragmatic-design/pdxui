@@ -20,7 +20,7 @@ functions** (`effect`, `watch`, `batch`, `ref`, `collectDisposers`) are imported
 
 ```pdx
 let count = $signal(0);
-count++;        // → __count.set(v => v + 1)
+count++;        // → __count.set(__v => __v + 1)
 count = 5;      // → __count.setRaw(5)
 ```
 

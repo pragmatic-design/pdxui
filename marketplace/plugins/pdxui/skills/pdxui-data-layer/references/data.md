@@ -65,7 +65,8 @@ can control how long data stays "fresh" and group it with tags for invalidation:
 
 `staleTime` avoids needless refetches within the window; the `tags` serve the next step. The block
 takes `resource()`'s options — `key`, `staleTime`, `retry`, `tags`, `enabled`, `transform`,
-`onSuccess`, `onError`, `cache` — and any other key is the error `PDX_FETCH_UNKNOWN_OPTION`: a
+`onSuccess`, `onError`, `cache`, and `stale`, an old boolean accepted for compatibility that does
+nothing (`staleTime` is the option) — and any other key is the error `PDX_FETCH_UNKNOWN_OPTION`: a
 misspelled option would otherwise do nothing.
 
 **A `@fetch` lives as long as its component.** When the component goes, so does the resource: a

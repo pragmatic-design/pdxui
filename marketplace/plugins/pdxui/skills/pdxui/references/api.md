@@ -442,7 +442,8 @@ function awaitTimed(condition: () => boolean, thenFn: () => Node | DocumentFragm
 
 Timed conditional rendering for @await { minMs, maxMs }.
 - minMs: don't show loading until this delay (avoid flash for fast loads)
-- maxMs: force timeout error after this duration
+- maxMs: stop waiting after this duration — the body renders even if the condition is still false
+  (not an error)
 
 Usage:
   ${awaitTimed(() => ready(), () => html`<main/>`, () => html`<loading/>`, { minMs: 200 })}
@@ -1148,8 +1149,9 @@ are declared against one flat key space.
 still typing shows them an error for a value they have not finished writing. Async validators are
 debounced (300ms) for the same reason.
 
-In a `.pdx` file `@form UserDto` compiles to this, and `<pdx-form :form>` shares it with the
-fields below it — which is what `provideForm`/`useForm` are for.
+In a `.pdx` file `@form user: { … }` (or `@form user: UserSchema`) compiles to this, and
+`<pdx-form :form>` shares it with the fields below it — which is what `provideForm`/`useForm` are
+for.
 
 ### `createFormCoordinator`
 

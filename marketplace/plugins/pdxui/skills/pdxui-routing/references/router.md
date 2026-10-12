@@ -429,11 +429,14 @@ answers whether a fetch was started.
 ## Transitions
 
 ```pdx
-@transition 'fade';   <!-- or slide-left/right/up/down, scale -->
+@transition 'fade';   <!-- or slide-left/right/up/down, scale, collapse, none -->
 ```
 
 On navigation the router applies the transition between the outgoing and incoming page, using
-`@pdxui/core`'s enter/exit classes.
+`@pdxui/core`'s enter/exit classes. `fade` and `scale` use `fade-in`/`fade-out` and
+`scale-in`/`scale-out`; the slides and `collapse` use their own name for both; `none` animates
+nothing. Any other name is used as the class for both enter and exit, so a transition of your own is
+a name and the CSS that animates it.
 
 ## Destroy or keep: keep-alive
 

@@ -164,7 +164,8 @@ export function awaitReady(value: unknown): boolean {
 /**
  * Timed conditional rendering for @await { minMs, maxMs }.
  * - minMs: don't show loading until this delay (avoid flash for fast loads)
- * - maxMs: force timeout error after this duration
+ * - maxMs: stop waiting after this duration — the body renders even if the condition is still false
+ *   (not an error)
  *
  * Usage:
  *   ${awaitTimed(() => ready(), () => html`<main/>`, () => html`<loading/>`, { minMs: 200 })}

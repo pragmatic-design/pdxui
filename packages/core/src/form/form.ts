@@ -122,7 +122,8 @@ export interface FormConfig<T extends Record<string, unknown>> {
     /**
      * Ask before the page is left with unsaved work: an in-app confirm (strings `form.unsaved*`)
      * on navigation, the browser's own prompt on close and reload. Needs a component setup to
-     * attach to. `@form f { warnUnsaved }` compiles to this.
+     * attach to. `@form f: { … } { warnUnsaved }` compiles to this — the options are the block after
+     * the fields.
      */
     warnUnsaved?: boolean;
 }
@@ -240,8 +241,9 @@ export interface FormInternals {
  * still typing shows them an error for a value they have not finished writing. Async validators are
  * debounced (300ms) for the same reason.
  *
- * In a `.pdx` file `@form UserDto` compiles to this, and `<pdx-form :form>` shares it with the
- * fields below it — which is what `provideForm`/`useForm` are for.
+ * In a `.pdx` file `@form user: { … }` (or `@form user: UserSchema`) compiles to this, and
+ * `<pdx-form :form>` shares it with the fields below it — which is what `provideForm`/`useForm` are
+ * for.
  */
 export function createForm<T extends Record<string, unknown>>(
     config: FormConfig<T>,

@@ -83,8 +83,9 @@ are declared against one flat key space.
 still typing shows them an error for a value they have not finished writing. Async validators are
 debounced (300ms) for the same reason.
 
-In a `.pdx` file `@form UserDto` compiles to this, and `<pdx-form :form>` shares it with the
-fields below it — which is what `provideForm`/`useForm` are for.
+In a `.pdx` file `@form user: { … }` (or `@form user: UserSchema`) compiles to this, and
+`<pdx-form :form>` shares it with the fields below it — which is what `provideForm`/`useForm` are
+for.
 
 ## `createFormCoordinator`
 
