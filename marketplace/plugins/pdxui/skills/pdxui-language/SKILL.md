@@ -32,9 +32,11 @@ button { margin-top: var(--pdx-space-md); }
 </style>
 ```
 
-Three optional blocks. `<script setup>` is where state and logic live; a plain `<script>` is the
-legacy mode and should not be used for new files. `<style scoped>` is scoped by the compiler through a
-`data-pdx-*` attribute — no Shadow DOM anywhere in this framework.
+Three optional blocks. `<script setup>` is where state and logic live. A plain `<script>` is the new
+mode too when it uses a rune or a declaration — the legacy mode is only a `<script>` without them, or
+one with `defineProps`/`defineEmits`/a top-level `return {}` — but write `<script setup>` for new
+files. `<style scoped>` is scoped by the compiler through a `data-pdx-*` attribute; components render
+in the light DOM, unless the template is `<template shadow>`, which renders into a shadow root.
 
 **The tag comes from the filename**: `src/job-list.pdx` → `<pdx-job-list>`. Override with `@tag`.
 A `<script setup>` compiles the same way whatever it holds: one with no rune — only imports, consts,
@@ -73,15 +75,11 @@ it doing five things.
 
 | rune | what it does |
 |---|---|
-| `$signal(v)` | reactive state. Write it like a plain variable: `count++`, `name = 'x'` — the compiler rewrites those into `.set(…)` |
+| `$signal(v)` | reactive state. Write it like a plain variable: `count++` is an update (`.set(…)`), `name = 'x'` stores the value as it is (`.setRaw(…)`), a function too — so a `$signal` can hold a handler, and `handler()` calls it |
 | `$derived(expr)` | a computed value; recomputes when what it reads changes |
 | `$effect(fn)` | runs when its dependencies change; return a function to clean up |
 | `$emit(event, payload)` | dispatch a `CustomEvent` from this component — the untyped form; prefer an `@event` |
 | `onMount(fn)` / `onDestroy(fn)` | lifecycle. `onMount` is **one-shot**, not reactive |
-
-⚠️ **A trailing comma inside `$derived(…)` silently kills the reactivity.** `$derived(\n  expr,\n)` is
-legal JavaScript and the rewriter bails out with `PDX_REWRITE_FALLBACK`, leaving a value that never
-updates. Keep the expression on one line, with no trailing comma.
 
 ⚠️ **`error` is a forbidden name for a signal** — the compiler does not rewrite it. Use `errMsg`.
 
@@ -113,7 +111,7 @@ The full vocabulary the analyzer accepts:
 
 `@prop` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
 `@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@scroll`
-`@i18n` `@raw`
+`@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use` `@mixin`
 
 **`@form f: Schema { … }`** builds a form (`createForm` underneath). Its options: `save` (when a field
 saves), `source`, `parent`, `fields` (per-field save), and **`warnUnsaved`** — written bare,
@@ -148,18 +146,19 @@ select or date picker inside it. Listen on the component that opens and closes. 
 component event bubbles — `pdx-change` does, like `change` — so a listener on a container that must
 ignore its children's events still takes `.self`.
 
-⚠️ **A signal appears in the template only inside an expression**, never as a bare identifier:
-`@if (open())` and `{{ count }}` are fine; `@if (openBare)` is a ReferenceError. An import used
-directly in a template is not on `ctx` and gives `ctx.X is not a function` — for a signal, at mount.
-Bring it into the script: a function as `const goTo = go` (or a wrapper); a shared signal as
-`const user = $derived(shared())`. Not `const user = shared()`: that is a snapshot, and it never updates.
+⚠️ **In the template a `$signal` is read by its name**: `@if (open)`, `{{ count }}`. With
+parentheses it is *called* — `open()` reads the value and calls it, which is right for a `$signal`
+that holds a function (`{{ format(n) }}`) and a TypeError for one that holds a boolean. A `$derived`,
+a prop, a function of the script and a `const` keep their own form (`{{ total }}`, `{{ label() }}` for a
+function). An import used in a template is called as written: `{{ fmt(n) }}` calls the imported `fmt`,
+and an imported signal is read with its parentheses, `{{ shared() }}`.
 
 ### Block directives
 
 ```html
-@if (ready()) { … } @else { … }
+@if (ready) { … } @else { … }
 @for (jobs as job; track job.id) { … } @empty { … }
-@switch (status()) { @case ('open') { … } @default { … } }
+@switch (status) { @case ('open') { … } @default { … } }
 @await (promise) { … } @loading { … } @error (e) { … }
 @defer (viewport) { … } @placeholder { … }
 ```
@@ -180,8 +179,9 @@ if it rejects (a boolean works too: the body when true). Two things it needs:
   block re-runs and never settles. Keep the promise in a signal, or use a resource.
 - **the value is not handed to the body.** Read it from the signal or resource that holds it.
 
-With timing — `minMs` holds the `@loading` back so a fast answer does not flash it, `maxMs` turns a
-slow one into an error:
+With timing — `minMs` holds the `@loading` back so a fast answer does not flash it, and `maxMs` stops
+waiting: once it passes, the body renders even though the promise has not settled (it is not an
+error):
 
 ```html
 @await (job) { minMs: 200, maxMs: 5000 } { <p>{{ result }}</p> } @loading { <pdx-spinner></pdx-spinner> } @error (e) { <p>{{ e.message }}</p> }

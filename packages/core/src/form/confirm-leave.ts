@@ -1,6 +1,6 @@
 // Leaving with unsaved work — the question, and the guard that asks it.
 //
-// `@form f { warnUnsaved }` does not compile to `confirm('You have unsaved changes. Leave anyway?')`:
+// `@form f: { … } { warnUnsaved }` does not compile to `confirm('You have unsaved changes. Leave anyway?')`:
 // that is the browser's modal, a sentence no app could translate, and a dialog that blocks every
 // automated browser. The question goes through the page's dialog queue, which <pdx-overlay-outlet> draws, in strings an app overrides like any component's.
 

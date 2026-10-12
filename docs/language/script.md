@@ -360,12 +360,12 @@ alpha
 MixinDecl ::= "@mixin" S "'" [^']+ "'" S "as" S Identifier S? ";"?
 ```
 
-The analyzer's form: `@mixin './use-thing.pdx' as thing;`
+The analyzer's form: `@mixin './use-thing.ts' as thing;`
 
 #### Semantics
 
 Runs another module's `setup` inside this one, under a name: the module gets
-`import { setup as __mixin_thing } from './use-thing.pdx';` and the setup body
+`import { setup as __mixin_thing } from './use-thing.ts';` and the setup body
 `const thing = __mixin_thing(ctx);`. `thing` is whatever that `setup` returns, and is returned to the
 template.
 

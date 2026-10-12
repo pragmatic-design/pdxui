@@ -64,15 +64,30 @@ reading the store.
 
 ## Persistence
 
-Often you want state to survive a refresh. One declaration does it:
+Often you want state to survive a refresh. `persist` on the declaration keeps the store's
+**top-level `$signal`s**:
 
 ```pdx
-@store cart { persist: 'local' };     // localStorage
-@store ui   { persist: 'session' };   // sessionStorage
+<!-- cart.pdx -->
+<script setup>
+@store cart { persist: 'local' };
+
+let count = $signal(0);   // persisted
+let lines = $signal([]);  // persisted
+let view = $store({ open: false });   // NOT persisted: a $store object is not saved
+
+function add(line) {
+  lines = [...lines, line];
+  count++;
+}
+</script>
 ```
 
-The store is serialized on every change and restored on startup. The user finds their cart after
-closing and reopening the tab, without you writing a line of serialization.
+`persist: 'local'` keeps them in `localStorage`, any other value in `sessionStorage` (`'session'` is
+the one to write; another value is not checked). They are restored when the store is first created
+and written about 100 ms after they change, a changed signal at a time, under `__pdx_store_cart`. A
+`$store` object and a `$derived` are not persisted: state meant to survive a refresh goes in a
+`$signal`. The rules are in the [reference](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/data.md#store).
 
 ## Store or signal? The rule
 
