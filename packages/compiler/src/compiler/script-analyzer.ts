@@ -15,10 +15,11 @@ import {
     extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, PREFETCH_POLICIES, extractSearchBlock, parseHeadBlock,
     parseRouteBlock, parseRouteParams, parseObjectLiteralToJson, splitAtTopLevelCommas, invalidRouteFields,
 } from './script-analyzer-helpers';
-import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
+import { maskNonCode, skipNonCode } from './tokenizer';
 import { importedLocalNames } from './import-names';
 import { coreRuntimeNames } from './core-import-names';
 import { destructuredNames } from './destructured-names';
+import { RUNE_CALL, readDeclarators } from './rune-declarations';
 import { DECORATOR_RUNES } from './runes';
 import { liftStoreExports } from './store-exports';
 
@@ -222,8 +223,9 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                t.startsWith('@provide ') || t.startsWith('@inject ') ||
                t.startsWith('@store ') || t.startsWith('@title ') || t.startsWith('@meta ') || t.startsWith('@scroll ') || t.startsWith('@snippet ') ||
                t.startsWith('@i18n ') || t.startsWith('@i18n{') ||
-               t.includes('$signal(') || t.includes('$derived(') || t.includes('$effect(') ||
-               t.includes('$store(') || t.includes('$watch(') || t.includes('linkedSignal(');
+               // A rune with a type argument too, `$signal<number>(0)` (#275).
+               RUNE_CALL.test(t) || t.includes('$effect(') ||
+               t.includes('$watch(') || t.includes('linkedSignal(');
     });
 
     // `<script setup>` states an intent, checked here against the mode the file actually compiles
@@ -853,55 +855,55 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             // Only treat as a rune statement if at least one declarator uses a rune.
             const codeView = maskNonCode(stmt.text);
             // A rune may carry a type argument, `$signal<number>(0)`, which the editor declares and the
-            // module's type erasure removes. Match: `$signal(` or `$signal<…>(`.
-            if (/\$(?:signal|derived|store)\s*(?:<[^()]*>)?\s*\(/.test(codeView)) {
-                // Strip the leading keyword, then split declarators at top-level commas.
-                const afterKw = stmt.text.replace(/^\s*(let|const|var)\s+/, '');
-                const declarators = splitAtTopLevelCommas(afterKw);
-                let handledAny = false;
-                for (const decl of declarators) {
-                    const d = decl.trim();
-                    // Match: `name = $signal(`, with an annotation (`name: number =`) and a type
-                    // argument (`$signal<number>(`) allowed. Groups: [1]=name. The match ends at `(`.
-                    const rune = (r: string) => d.match(new RegExp(`^(\\w+)\\s*(?::[^=]+)?=\\s*\\$${r}\\s*(?:<[^()]*>)?\\s*\\(`));
-                    const sigM = rune('signal');
-                    const derM = rune('derived');
-                    const stoM = rune('store');
-                    if (sigM) {
-                        const name = sigM[1];
-                        signals.push({ name, initialExpr: extractRuneArg(d, sigM[0].length - 1), origin: originOf(i) ?? undefined });
+            // module's type erasure removes — whatever it holds: `Record<string, string>`,
+            // `(A & B)[]`, `() => void`. The statement is read by TypeScript's parser, which balances
+            // every bracket, and the type argument is skipped whole (#275).
+            if (RUNE_CALL.test(codeView)) {
+                const read = readDeclarators(stmt.text);
+                // A rune is only read as the whole initialiser of a named declarator. Anywhere else —
+                // a statement that does not parse, `wrap($signal(1))`, a pattern — it would reach the
+                // module as `$signal`, a ReferenceError at run time: an error here instead.
+                const unread = !read || read.declarators.some(d =>
+                    d.kind ? d.name === null : RUNE_CALL.test(maskNonCode(d.text)));
+                if (unread) {
+                    warnings.push({
+                        code: 'PDX_UNKNOWN_DECLARATION',
+                        severity: 'error' as const,
+                        message: `Unrecognised rune declaration: "${trimmed}". It was dropped — nothing is generated for it.`,
+                        hint: 'Use: let name = $signal<Type>(initial); — the rune is the whole initialiser, and its brackets are balanced.',
+                    });
+                    i = stmt.endLine;
+                    continue;
+                }
+                for (const d of read.declarators) {
+                    const name = d.name!;
+                    if (d.kind === 'signal') {
+                        signals.push({ name, initialExpr: d.arg, origin: originOf(i) ?? undefined });
                         if (!name.startsWith('_')) exports.push({ name, kind: 'signal' });
                         usedFeatures.add('signal');
-                        handledAny = true;
-                    } else if (derM) {
-                        const name = derM[1];
-                        deriveds.push({ name, expr: extractRuneArg(d, derM[0].length - 1), origin: originOf(i) ?? undefined });
+                    } else if (d.kind === 'derived') {
+                        deriveds.push({ name, expr: d.arg, origin: originOf(i) ?? undefined });
                         if (!name.startsWith('_')) exports.push({ name, kind: 'derived' });
                         usedFeatures.add('computed');
-                        handledAny = true;
-                    } else if (stoM) {
-                        const name = stoM[1];
-                        stores.push({ name, initialExpr: extractRuneArg(d, stoM[0].length - 1), keyword: runeDeclStart[1] as 'let' | 'const' | 'var', origin: originOf(i) ?? undefined });
+                    } else if (d.kind === 'store') {
+                        stores.push({ name, initialExpr: d.arg, keyword: runeDeclStart[1] as 'let' | 'const' | 'var', origin: originOf(i) ?? undefined });
                         if (!name.startsWith('_')) exports.push({ name, kind: 'const' });
                         usedFeatures.add('store');
-                        handledAny = true;
                     } else {
                         // A non-rune declarator on the same statement (e.g. `let a=$signal(0), x=2`).
                         // Keep it as a real binding using the ORIGINAL keyword — degrading `let x`
                         // to `const x` would break a later reassignment `x = …`.
                         const kw = runeDeclStart[1];
-                        const nm = d.match(/^(\w+)/);
-                        if (nm && !nm[1].startsWith('_')) {
-                            exports.push({ name: nm[1], kind: (kw === 'let' ? 'let' : 'const') });
+                        if (d.name && !d.name.startsWith('_')) {
+                            exports.push({ name: d.name, kind: (kw === 'let' ? 'let' : 'const') });
                         }
-                        pushBody(`    ${kw} ${d};`, i);
-                        handledAny = true;
+                        pushBody(`    ${kw} ${d.text};`, i);
                     }
                 }
-                if (handledAny) {
-                    i = stmt.endLine;
-                    continue;
-                }
+                // Code after the statement on its last line stays code.
+                if (read.rest) pushBody(`    ${read.rest}`, stmt.endLine);
+                i = stmt.endLine;
+                continue;
             }
         }
 
@@ -1263,19 +1265,6 @@ function continuesOnNextLine(line: string, next: string | undefined): boolean {
     return /^(?:\?\.|\.(?!\.\.)|\?|:|&&|\|\||\?\?|[+\-*/%&|^<>=,]|in\s|instanceof\s)/.test(next.trimStart());
 }
 
-/**
- * Extract the balanced argument of a rune call given the index of its opening `(`.
- * Returns the trimmed content between the parens (string/comment-aware).
- *
- * A trailing comma, `$derived(a * 2,)`, is JavaScript's and is dropped: an expression never ends in
- * one, and kept it was pasted into `computed(() => a * 2,, …)`, a module that does not parse (#202).
- */
-function extractRuneArg(decl: string, openParenIdx: number): string {
-    const close = findClosing(decl, openParenIdx);
-    const end = close === -1 ? decl.length : close;
-    const arg = decl.slice(openParenIdx + 1, end).trim();
-    return arg.endsWith(',') ? arg.slice(0, -1).trimEnd() : arg;
-}
 
 /** Strip comments AND string contents from a line for safe feature detection.
  *  Returns only actual code — string bodies replaced with spaces, comments removed. */

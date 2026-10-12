@@ -27,7 +27,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 
 | Code | Severity | Meaning | Construct |
 |---|---|---|---|
-| `PDX_UNKNOWN_DECLARATION` | error | A known `@` declaration written in a shape the compiler does not recognise. | any `@` declaration, [script.md](script.md) |
+| `PDX_UNKNOWN_DECLARATION` | error | A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise. | any `@` declaration, `$signal`, [script.md](script.md) |
 | `PDX_DUP_DECLARATION` | error | The same name declared twice at the top of the script: runes, `@prop`, functions, classes, plain variables. | [script.md](script.md) |
 | `PDX_PROP_NO_TYPE` | error | `@prop` without a type annotation. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_INVALID_TYPE` | warn | A `@prop`'s type annotation is malformed. | `@prop`, [script.md](script.md) |
