@@ -1,7 +1,7 @@
 // Lazy loading with composite triggers and permission integration.
 // Innovation: viewport | idle(2000) composite triggers + @require permission-aware.
 
-import { signal, effect } from '../reactivity/signal';
+import { signal, effect, collectDisposers } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
 
@@ -124,24 +124,23 @@ export function defer(
         for (const n of currentNodes) n.parentNode?.removeChild(n);
         currentNodes = [];
 
-        let content: Node | DocumentFragment | null | undefined = null;
-
-        switch (s) {
-            case 'placeholder':
-                content = options.placeholder?.();
-                break;
-            case 'loading':
-                content = options.loading?.() ?? options.placeholder?.();
-                break;
-            case 'loaded':
-                content = renderFn(loadedModule.peek());
-                break;
-            case 'error': {
-                const err = loadError.peek();
-                content = err ? options.error?.(err, retry) : null;
-                break;
+        // Each state renders in its own scope, disposed when the state changes and when the block is
+        // removed (#261). A later run — the body once the load has resolved — happens in a flush, where
+        // no scope is current: without its own, what the body created belonged to nobody.
+        const [content, disposeState] = collectDisposers((): Node | DocumentFragment | null | undefined => {
+            switch (s) {
+                case 'placeholder':
+                    return options.placeholder?.();
+                case 'loading':
+                    return options.loading?.() ?? options.placeholder?.();
+                case 'loaded':
+                    return renderFn(loadedModule.peek());
+                case 'error': {
+                    const err = loadError.peek();
+                    return err ? options.error?.(err, retry) : null;
+                }
             }
-        }
+        });
 
         if (content) {
             const nodes = content instanceof DocumentFragment
@@ -150,6 +149,7 @@ export function defer(
             for (const n of nodes) placePartNode(parent, n, end);
             currentNodes = nodes;
         }
+        return disposeState;
     });
 
     return frag;

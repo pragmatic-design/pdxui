@@ -112,6 +112,10 @@ semver.
 
 ### Fixes
 
+- A `@defer` body rendered after its load or a later trigger is disposed with its block: its
+  bindings belonged to no scope, so removing the block (an `@if` around it, the component destroyed)
+  left them re-running on detached nodes. Each state of the block now renders in its own scope.
+  (#261)
 - A production build renders an interpolated array as its items, as dev does — it printed `a,b` — and
   fires `@click.enter` on a click: a key filter applies to keyboard events only. Both render paths
   now interpolate through core's new `bindInterpolation`. (#100)
