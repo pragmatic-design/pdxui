@@ -626,6 +626,9 @@ gives none. `name` defaults to `default`. Declare what a slot passes with `@slot
 #### Rules
 
 - Both render paths compile it to the same `renderSlot(…)` call.
+- The fallback is a template like any block's body: an interpolation, an element, a block directive
+  (`@if`, `@for`, …) in it are rendered inside the outlet, only when the parent gives no fill (#276).
+  The outlet is closed by the first `</slot>` that is not a nested outlet's own.
 - The child collects the parent's fills before it renders, so a fill the parent writes is the one
   rendered. A fill added later, after the child has mounted, is not read.
 - With nothing between the tags, or self-closing, the default renders nothing.

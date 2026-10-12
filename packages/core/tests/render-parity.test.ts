@@ -249,6 +249,10 @@ const ROWS: Row[] = [
             pad.dispatchEvent(new PointerEvent('pointerup', { clientX: 100, clientY: 10, bubbles: true }));
         },
     },
+    // A scoped slot outlet's fallback with an interpolation or a block was emitted BESIDE the outlet,
+    // on the template path with an orphan </slot> (#276): both paths now render it inside, once.
+    { name: 'a scoped slot outlet whose fallback interpolates', template: '<div><slot name="row" :item="who">none {{ who }}</slot></div>', script: "let who = $signal('Ada');" },
+    { name: 'a scoped slot outlet whose fallback is a block', template: '<div><slot name="row" :item="who">@if (who) { <b>x {{ who }}</b> }</slot></div>', script: "let who = $signal('Ada');" },
     // @show false left a root text node on the page on both paths (#265); both now take it out, and
     // put it back current: hidden, renamed, shown.
     {

@@ -39,6 +39,7 @@ export type TemplateNode =
     | AwaitNode
     | LetNode
     | SlotTemplateNode
+    | ScopedSlotNode
     | CustomDirectiveNode;
 
 /** Plugin-defined custom directive node. */
@@ -182,6 +183,20 @@ export interface SlotTemplateNode {
     /** Destructured scope variable names from the child (e.g. ['value', 'index']) */
     scopeVars: string[];
     /** Template body nodes */
+    body: TemplateNode[];
+    loc?: SourceLoc;
+}
+
+/**
+ * Child-side scoped slot outlet: `<slot name="row" :item="it">fallback</slot>`. One node, so its
+ * fallback is a list of nodes like any block's body — an interpolation or a directive in it no longer
+ * splits it across `html` nodes, where the code generators lost it (#276).
+ */
+export interface ScopedSlotNode {
+    type: 'scoped-slot';
+    /** The opening tag as written, `<slot name="row" :item="it">`: the name and the scope bindings. */
+    tag: string;
+    /** The fallback, rendered when the parent does not fill the slot. */
     body: TemplateNode[];
     loc?: SourceLoc;
 }
@@ -363,7 +378,7 @@ function parseNodes(ctx: ParseContext, stopAt?: string): TemplateNode[] {
 
         // <slot name="..." let:var> — parent-side scoped slot (HTML-native syntax)
         if (lookAhead(ctx, '<slot ') || lookAhead(ctx, '<slot>')) {
-            const slotNode = tryParseParentSlotTag(ctx);
+            const slotNode = tryParseParentSlotTag(ctx) ?? tryParseScopedSlotOutlet(ctx);
             if (slotNode) {
                 flushHtml();
                 nodes.push(slotNode);
@@ -1126,6 +1141,28 @@ function tryParseParentSlotTag(ctx: ParseContext): SlotTemplateNode | null {
     }
 
     return { type: 'slot-template', name, scopeVars, body, loc };
+}
+
+/**
+ * Try to parse `<slot name="row" :item="it">fallback</slot>` as a scoped slot outlet: a `<slot>`
+ * with a `:` binding and no `let:`. The fallback is parsed as nodes up to `</slot>`, so an
+ * interpolation or a block in it stays inside the outlet (#276); a nested outlet consumes its own
+ * `</slot>`. Does NOT advance ctx if returning null — the caller accumulates the char as HTML.
+ */
+function tryParseScopedSlotOutlet(ctx: ParseContext): ScopedSlotNode | null {
+    const tagEndIdx = findTagEndInSource(ctx.source, ctx.pos);
+    if (tagEndIdx === -1) return null;
+    const tag = ctx.source.slice(ctx.pos, tagEndIdx + 1);
+    // Match: a bound attribute, ` :item=` — what makes the outlet scoped.
+    if (tag.includes('let:') || !/\s:[\w-]+\s*=/.test(tag)) return null;
+
+    const loc = getLoc(ctx);
+    advanceTo(ctx, tagEndIdx + 1);
+    if (tag.trimEnd().endsWith('/>')) return { type: 'scoped-slot', tag, body: [], loc };
+
+    const body = parseNodes(ctx, '</slot>');
+    if (lookAhead(ctx, '</slot>')) advanceTo(ctx, ctx.pos + 7); // </slot>
+    return { type: 'scoped-slot', tag, body, loc };
 }
 
 /**

@@ -187,6 +187,12 @@ export function projectTemplate(
                     for (const v of node.scopeVars) emit(`let ${v}: any;\n`);
                     walk(node.body);
                     break;
+                case 'scoped-slot':
+                    // The outlet's tag is markup with bindings, projected as html was before it had a
+                    // node of its own (#276); then its fallback.
+                    walk([{ type: 'html', content: node.tag, loc: node.loc }]);
+                    walk(node.body);
+                    break;
                 case 'custom-directive':
                     if (node.expr) stmt(node.expr);
                     if (node.body) walk(node.body);
