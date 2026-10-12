@@ -1,6 +1,6 @@
 // The accessibility the framework guarantees, measured on the showcase (beta spec, agents.md,
 // «Accessibility the framework guarantees»; acceptance: every rule A1–A6 holds on the showcase).
-// A3, A4 and A5 here (#299); A1 is #249, A2 and A6 are #274.
+// A2 and A6 (#274), A3, A4 and A5 (#299) here; A1 is #249.
 //
 // Read off the browser's accessibility tree — getByRole, aria attributes as Chromium exposes them —
 // because that is what a screen reader and an agent read. Axe does not flag a status region that has
@@ -71,6 +71,57 @@ test.describe('A4 — a region says it is busy only while it is', () => {
         await expect(queue.locator('pdx-list')).not.toHaveAttribute('aria-busy', 'true');
         // The tree, as an agent reads it: nothing named «Loading» / «Caricamento» in the queue.
         expect(await queue.ariaSnapshot()).not.toMatch(/status "/);
+    });
+});
+
+/** `/intake`, on its first step, with the wizard's stepper drawn (intake.spec.ts). */
+async function openIntake(page: Page): Promise<void> {
+    await page.goto('/intake');
+    await expect(page.locator('[data-test="intake"]')).toBeVisible();
+    await expect(page.locator('[data-test="wizard"] .pdx-stepper')).toBeVisible();
+}
+
+test.describe('A2 — a field in error says so, and points at its message', () => {
+    test('/intake: an invalid email is aria-invalid, and its aria-describedby reaches the error shown', async ({ page }) => {
+        await openIntake(page);
+        const email = page.getByRole('textbox', { name: 'Email', exact: true });
+        // The control: valid, the field is not marked.
+        await expect(email).not.toHaveAttribute('aria-invalid', 'true');
+        await email.fill('not-an-email');
+        await email.blur();
+        await expect(email, 'the field in error is not aria-invalid').toHaveAttribute('aria-invalid', 'true');
+        const ids = ((await email.getAttribute('aria-describedby')) ?? '').split(/\s+/).filter(Boolean);
+        expect(ids.length, 'the field in error describes itself with nothing').toBeGreaterThan(0);
+        const described = (await Promise.all(ids.map((id) => page.locator(`[id="${id}"]`).textContent())))
+            .map((t) => (t ?? '').trim()).filter(Boolean).join(' ');
+        // The error as shown on screen, in the field's own error slot.
+        const field = page.locator('pdx-form-field').filter({ has: email });
+        const shown = ((await field.locator('.pdx-field-error').textContent()) ?? '').trim();
+        expect(shown, 'no error is shown on screen: the case measures nothing').not.toBe('');
+        expect(described, 'aria-describedby does not reach the error on screen').toContain(shown);
+    });
+});
+
+test.describe('A6 — a multi-step flow marks its current step', () => {
+    test('/intake: the current step is aria-current="step", and moves with the wizard', async ({ page }) => {
+        await openIntake(page);
+        const wizard = page.locator('[data-test="wizard"]');
+        const current = wizard.locator('[aria-current="step"]');
+        await expect(current, 'not exactly one current step').toHaveCount(1);
+        await expect(current).toHaveAccessibleName('Requester');
+        // A step of the stepper is a tab (pdx-wizard's stepper is a tablist).
+        await expect(wizard.getByRole('tab', { name: 'Requester', exact: true })).toHaveAttribute('aria-current', 'step');
+
+        await page.locator('[data-test="requester"] input:not([type="hidden"])').fill('Anna Bianchi');
+        await page.getByRole('textbox', { name: 'Email', exact: true }).fill('anna@example.com');
+        await page.getByRole('textbox', { name: 'Email', exact: true }).blur();
+        await page.locator('[data-wizard-next]').click();
+        await expect(page.locator('[data-wizard-step][data-label="Window"]')).toBeVisible();
+
+        await expect(current, 'the current step did not move').toHaveAccessibleName('Window');
+        await expect(current).toHaveCount(1);
+        await expect(wizard.getByRole('tab', { name: 'Requester', exact: true })).not.toHaveAttribute('aria-current', 'step');
+        await expect(wizard.getByRole('tab', { name: 'Window', exact: true })).toHaveAttribute('aria-current', 'step');
     });
 });
 
