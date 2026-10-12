@@ -4,7 +4,7 @@
 
 import { resource } from './resource';
 import { computed, onDispose } from './signal';
-import type { ResourceOptions } from './resource';
+import type { ResourceOptions, ResourceFetcher } from './resource';
 import type { ReadonlySignal } from '../utils/types';
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ export interface QueryResult<T> {
  *
  * Usage:
  *   const users = useQuery(
- *     () => fetch(`/api/users?page=${page()}`).then(r => r.json()),
+ *     ({ signal }) => fetch(`/api/users?page=${page()}`, { signal }).then(r => r.json()),
  *     { key: () => `users:${page()}`, staleTime: 60_000, refetchOnFocus: true },
  *   );
  *   users.data();      // the value, or undefined
@@ -80,7 +80,7 @@ export interface QueryResult<T> {
  * client; reach for `useQuery` when the fetcher is your own promise.
  */
 export function useQuery<T>(
-    queryFn: () => Promise<T>,
+    queryFn: ResourceFetcher<T>,
     options?: UseQueryOptions<T>,
 ): QueryResult<T> {
     const opts = options ?? {} as UseQueryOptions<T>;

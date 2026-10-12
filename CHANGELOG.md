@@ -12,6 +12,11 @@ semver.
 ### Features
 
 - Initial public release.
+- A request a newer one supersedes, or one in flight when its resource is aborted or disposed, is
+  aborted on the network instead of running to the end for an answer nobody reads. `resource()`'s
+  fetcher and `useQuery`'s query function receive `{ signal }` (type `ResourceFetcher`); `@fetch` and
+  `httpResource` hand it to the HTTP client. A fetcher that takes no parameter keeps working, and its
+  superseded requests are still only ignored. (#256)
 - `resource().abort()` cancels instead of leaving the source loading for good: it goes back to
   `idle`, or to `success` when it has data, and `error()` is untouched. A request that outlives the
   HTTP client's `timeout` fails with the new `HttpTimeoutError` (exported from `@pdxui/core`) instead

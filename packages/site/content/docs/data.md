@@ -180,7 +180,7 @@ Three ways, in the order you should reach for them.
 import { useQuery, getDefaultClient } from '@pdxui/core';
 
 const http = getDefaultClient();
-const users = useQuery(() => http.get('/api/users'));   // refetchOnFocus and refetchOnReconnect: on
+const users = useQuery(({ signal }) => http.get('/api/users', { signal }));   // refetchOnFocus and refetchOnReconnect: on
 ```
 
 A user who alt-tabs away for ten minutes gets fresh data on return, and an app that was offline
@@ -195,7 +195,7 @@ A screen that must refresh on return uses `useQuery`, or refetches its resource 
 import { useQuery } from '@pdxui/core';
 
 // The first argument is the FETCHER, not a URL: useQuery(queryFn, options).
-const jobs = useQuery(() => http.get('/api/jobs'), { refetchInterval: 5000 });   // every 5s
+const jobs = useQuery(({ signal }) => http.get('/api/jobs', { signal }), { refetchInterval: 5000 });   // every 5s
 jobs.dispose();                                                                   // stops it
 ```
 
@@ -650,7 +650,10 @@ Below `@fetch` there is a `resource`, and two shapes of it are worth knowing by 
 - **`httpResource(url, options)`** — a resource over the configured `HttpClient`, where `url` may
   be a **function** and `params` a signal-returning one. Read either inside the fetcher and the
   resource refetches when they change: that is how a filter or a page number drives a request
-  without an effect written by hand.
+  without an effect written by hand. The request a newer one supersedes is aborted on the network,
+  as it is for `@fetch`: a search box that starts ten requests while the user types leaves one
+  running, not ten. A `resource(fetcher)` of your own gets the same when its fetcher takes the
+  request's signal and passes it on: `resource(({ signal }) => fetch(url, { signal }))`.
 - **`resourceWhen(res, handlers)`** — renders a resource's states as a fragment, so a template
   branches on them without a chain of `@if`s. The handlers are `loading`, `success(data)`,
   `error(err, retry)` — the retry is handed to you, so the error branch can offer it —

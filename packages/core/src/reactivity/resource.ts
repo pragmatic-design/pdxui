@@ -103,6 +103,14 @@ export interface ResourceHandlers<T> {
 
 // ─── resource() ────────────────────────────────────────────────────
 
+/**
+ * What a resource calls to load: it receives the request's `signal` and hands it to its transport —
+ * `({ signal }) => fetch(url, { signal })`, `({ signal }) => client.get(url, { signal })` — so a
+ * request that is superseded, aborted or disposed stops on the network. A fetcher that takes no
+ * parameter is one too; its request is ignored when it is superseded, but runs to the end.
+ */
+export type ResourceFetcher<T> = (ctx: { signal: AbortSignal }) => Promise<T>;
+
 let resourceCounter = 0;
 
 /**
@@ -124,7 +132,7 @@ let resourceCounter = 0;
  * In a `.pdx` file `@fetch users: 'GET /api/users'` compiles to this.
  */
 export function resource<T>(
-    fetcher: () => Promise<T>,
+    fetcher: ResourceFetcher<T>,
     options?: ResourceOptions<T>,
 ): Resource<T> {
     const opts = options ?? {};
@@ -217,7 +225,10 @@ export function resource<T>(
         const thisController = currentController;
 
         try {
-            const raw = await fetcher();
+            // The request's own signal (beta spec, data.md, E2): aborted when a newer request
+            // supersedes it, on abort() and on dispose, so the transport stops instead of running to
+            // the end for an answer nobody will read.
+            const raw = await fetcher({ signal: thisController.signal });
 
             // Guard: if another fetch started, discard this result
             if (generation !== fetchGeneration) return;

@@ -31,8 +31,10 @@ OptionKey    ::= "key" | "staleTime" | "retry" | "tags" | "enabled" | "transform
 #### Semantics
 
 `@fetch` declares a read: the compiler emits `const __httpClient = getDefaultClient();` once and, for
-each declaration, `const name = resource(() => __httpClient.get(url), { key: 'GET:/url', …options })`,
-before the rest of the setup. When the URL holds a `${…}` it is emitted as a template literal in which
+each declaration, `const name = resource(({ signal: __signal }) => __httpClient.get(url, { signal:
+__signal }), { key: 'GET:/url', …options })`, before the rest of the setup. The signal is the
+request's own: it is aborted when a newer request supersedes it, on `abort()` and when the component
+goes, so the request stops on the network (#256). When the URL holds a `${…}` it is emitted as a template literal in which
 signals and props are read (`${page}` → `${__page()}`, `${userId}` → `${userId()}`), whatever quote
 the spec was written with, and `key` becomes a function of the same text; `resource()` runs its fetcher
 inside an effect, so a change to anything the URL reads fetches again, under the new key. The

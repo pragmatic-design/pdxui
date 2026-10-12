@@ -642,7 +642,7 @@ PDX renders into the light DOM, so ids are neither unique nor available when `on
 ```ts
 import { resource } from '@pdxui/core';
 
-function resource(fetcher: () => Promise<T>, options?: ResourceOptions<T>): Resource<T>
+function resource(fetcher: ResourceFetcher<T>, options?: ResourceOptions<T>): Resource<T>
 ```
 
 An async value as reactive state: `data`, `error` and `state` you read like signals, with the
@@ -1017,7 +1017,7 @@ Usage:
 ```ts
 import { useQuery } from '@pdxui/core';
 
-function useQuery(queryFn: () => Promise<T>, options?: UseQueryOptions<T>): QueryResult<T>
+function useQuery(queryFn: ResourceFetcher<T>, options?: UseQueryOptions<T>): QueryResult<T>
 ```
 
 Declarative data fetching with caching, retry, and auto-refetch.
@@ -1028,7 +1028,7 @@ be called as the fetcher.)
 
 Usage:
   const users = useQuery(
-    () => fetch(`/api/users?page=${page()}`).then(r => r.json()),
+    ({ signal }) => fetch(`/api/users?page=${page()}`, { signal }).then(r => r.json()),
     { key: () => `users:${page()}`, staleTime: 60_000, refetchOnFocus: true },
   );
   users.data();      // the value, or undefined

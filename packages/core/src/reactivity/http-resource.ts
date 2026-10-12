@@ -68,17 +68,19 @@ export function httpResource<T>(
         key: keyFn,
     };
 
-    return resource<T>(() => {
+    return resource<T>(({ signal }) => {
         const client = getDefaultClient();
         const resolvedUrl = resolveFullUrl();
         const body = typeof options?.body === 'function' ? (options.body as () => unknown)() : options?.body;
+        // The resource's signal: a superseded or disposed request stops on the network (E2).
+        const requestOptions = { headers: options?.headers, signal };
 
         switch (method) {
-            case 'GET':    return client.get<T>(resolvedUrl, { headers: options?.headers });
-            case 'POST':   return client.post<T>(resolvedUrl, body, { headers: options?.headers });
-            case 'PUT':    return client.put<T>(resolvedUrl, body, { headers: options?.headers });
-            case 'PATCH':  return client.patch<T>(resolvedUrl, body, { headers: options?.headers });
-            case 'DELETE': return client.delete<T>(resolvedUrl, { headers: options?.headers });
+            case 'GET':    return client.get<T>(resolvedUrl, requestOptions);
+            case 'POST':   return client.post<T>(resolvedUrl, body, requestOptions);
+            case 'PUT':    return client.put<T>(resolvedUrl, body, requestOptions);
+            case 'PATCH':  return client.patch<T>(resolvedUrl, body, requestOptions);
+            case 'DELETE': return client.delete<T>(resolvedUrl, requestOptions);
         }
     }, resourceOpts);
 }
