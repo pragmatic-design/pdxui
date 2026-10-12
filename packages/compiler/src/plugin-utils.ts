@@ -10,6 +10,7 @@ import { parseSFC } from './parser/sfc';
 import { moduleDir } from './module-dir';
 import { jsQuote } from './compiler/js-literal';
 import { elementContent, findOpenTag, removeHtmlComments } from './text-scan';
+import { iconImportLines } from './icon-imports';
 
 /**
  * Auto-discover @pdxui/* packages in the workspace.
@@ -60,6 +61,15 @@ export function discoverPragmaticAliases(): Record<string, string> {
                                 // mis-resolves `@pdxui/x/sub` → `.../src/index.ts/sub`.
                                 const targetPath = typeof targetObj === 'string' ? targetObj :
                                     targetObj?.development ?? targetObj?.import ?? targetObj?.types;
+                                // A pattern (`./icons/*` → `./src/icon/pragmatic/*.ts`) is an alias of
+                                // its folder: Vite matches `@pdxui/ui/icons/check` by prefix and finds
+                                // `check.ts` by extension. Without it the base alias takes the id, and
+                                // `@pdxui/ui/icons/check` becomes `.../src/index.ts/icons/check`.
+                                if (targetPath && subpath.endsWith('/*') && /\/\*\.[a-z]+$/.test(targetPath)) {
+                                    const folder = join(packagesDir, entry, targetPath.replace(/\/\*\.[a-z]+$/, ''));
+                                    if (existsSync(folder)) aliases[aliasName.slice(0, -2)] = normalizePath(folder);
+                                    continue;
+                                }
                                 if (targetPath) {
                                     const fullPath = join(packagesDir, entry, targetPath);
                                     if (existsSync(fullPath)) {
@@ -609,12 +619,12 @@ export function injectComponentImports(
         }
     }
 
-    // Resolve imports for used tags
-    const imports = resolver.resolveImports(
-        Array.from(usedTags),
-        compiledCode,
-        currentFile,
-    );
+    // Resolve imports for used tags, then for the icons the markup names (#47): one module each,
+    // handed to pdx-icon's `defineIcons`.
+    const imports = [
+        ...resolver.resolveImports(Array.from(usedTags), compiledCode, currentFile),
+        ...iconImportLines(outsideDefer, resolver, scriptContent),
+    ];
 
     if (imports.length === 0) return compiledCode;
 

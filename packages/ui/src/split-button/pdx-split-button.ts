@@ -26,7 +26,7 @@ component('pdx-split-button', {
         /** Primary button label */
         label: { type: String, default: '' },
         /** Primary button icon name */
-        icon: { type: String, default: '' },
+        icon: { type: String, default: '', iconName: true },
         /** Dropdown menu items */
         items: { type: Array, default: [] },
         /** Variant: primary, secondary, outline, ghost, danger */

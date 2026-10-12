@@ -53,8 +53,13 @@ describe('the barrel registers every documented component', () => {
 
     it('imports no module that declares nothing', () => {
         const declaring = new Set(documented().map(d => d.module));
-        expect([...importedModules()].filter(m => !declaring.has(m)),
+        // The one side effect the barrel wants that is not a component, by name and with its reason.
+        const notAComponent = new Map([
+            ['src/icon/pragmatic-all.ts', 'puts the whole icon set on the page before any component draws an icon (#47)'],
+        ]);
+        expect([...importedModules()].filter(m => !declaring.has(m) && !notAComponent.has(m)),
             'the barrel imports a module the manifest never mentions').toEqual([]);
+        for (const m of notAComponent.keys()) expect(importedModules().has(m), `${m} is excused, and the barrel no longer imports it`).toBe(true);
     });
 
     it('covers a module that declares two components with one import', () => {

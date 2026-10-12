@@ -8,6 +8,10 @@ import { uiString } from '../shared/i18n';
 // and no more.
 import '@pdxui/design/components/fab';
 import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconPlus from '../icon/pragmatic/plus';
+defineIcons({ plus: iconPlus });
 
 export interface FabAction {
     key: string;
@@ -21,7 +25,7 @@ export interface FabAction {
 component('pdx-fab', {
     props: {
         /** Main button icon name */
-        icon: { type: String, default: 'plus' },
+        icon: { type: String, default: 'plus', iconName: true },
         /** Main button label (screen reader). Empty: the fab.label component string, «Actions». */
         label: { type: String, default: '' },
         /** Speed dial actions */

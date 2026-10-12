@@ -15,6 +15,12 @@ import '../bulk-actions/pdx-bulk-actions';
 import '../edit-drawer/pdx-edit-drawer';
 import '../alert-dialog/pdx-alert-dialog';
 import '../icon/pdx-icon';
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconPlus from '../icon/pragmatic/plus';
+import iconPencil from '../icon/pragmatic/pencil';
+import iconTrash from '../icon/pragmatic/trash';
+defineIcons({ plus: iconPlus, pencil: iconPencil, trash: iconTrash });
 
 type Row = Record<string, unknown>;
 /** A delete waiting for the confirmation: one row's (with the row) or the selection's. */

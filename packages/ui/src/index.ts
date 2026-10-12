@@ -2,7 +2,9 @@
 // Side-effect imports register custom elements.
 
 // Tier 1A: Atoms
-// pdx-icon registers the "pragmatic" set (the default) itself before defining the CE — see pdx-icon.ts.
+// The barrel is every component, for a page with no compiler: it puts the whole «pragmatic» icon set on
+// the page first, so no icon loads on demand. pdx-icon alone registers only the set's resolver (#47).
+import './icon/pragmatic-all';
 import './icon/pdx-icon';
 import './button/pdx-button';
 import './button-group/pdx-button-group';

@@ -7,6 +7,13 @@ import { uiString } from '../shared/i18n';
 // and no more.
 import '@pdxui/design/components/banner';
 import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconInfo from '../icon/pragmatic/info';
+import iconCheckCircle from '../icon/pragmatic/check-circle';
+import iconAlertTriangle from '../icon/pragmatic/alert-triangle';
+import iconAlertCircle from '../icon/pragmatic/alert-circle';
+defineIcons({ info: iconInfo, 'check-circle': iconCheckCircle, 'alert-triangle': iconAlertTriangle, 'alert-circle': iconAlertCircle });
 
 const VARIANT_ICONS: Record<string, string> = {
     info: 'info',

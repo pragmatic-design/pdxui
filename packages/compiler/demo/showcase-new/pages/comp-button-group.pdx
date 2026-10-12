@@ -92,13 +92,11 @@
 </template>
 
 <script setup>
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 import { useButtonGroupDemo } from './sections/comp-button-group/state.pdx';
 
 @page '/components/button-group';
 @title 'ButtonGroup Component';
 
-registerPragmaticIcons();
 
 // Event console: the toggle sections write to it, the page shows it (sections/comp-button-group/state.pdx.ts).
 const demo = useButtonGroupDemo();

@@ -68,6 +68,7 @@ These are generated. Change the source and run the command; the gate fails when 
 |---|---|---|
 | `packages/ui/custom-elements.json` | the components' `component()` declarations | `pnpm --dir packages/ui run manifest` |
 | the `exports` of `packages/ui/package.json` | the component folders | `pnpm --dir packages/ui run exports` |
+| `packages/ui/src/icon/pragmatic/*.ts`, `…/icon/pragmatic-loaders.ts` | `packages/ui/src/icon/pragmatic-icon-data.ts` | `pnpm --dir packages/ui run icons` |
 | `packages/ui/tests/scenarios/generated/`, `…/contracts/generated/` | the certification manifests | `pnpm certify:gen` |
 | the skill catalogue under `marketplace/plugins/pdxui/skills/` | `custom-elements.json`, the site's summaries, the sources' events | `node marketplace/plugins/pdxui/skills/pdxui/tools/gen-catalog.mjs` and `gen-topics.mjs` |
 | `packages/site/content/docs/api.md`, the `api-*.md` module pages, and the skill's `api.md` | core's and router's public surface | `node packages/site/scripts/gen-api.mjs` |

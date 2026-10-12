@@ -2,8 +2,8 @@
 // `defineConfig` has no such key — so the whole block would be untyped and a misspelt option in
 // it would be silent. Same function, one key wider.
 import { defineConfig } from 'vitest/config';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, readdirSync } from 'fs';
+import { resolve, dirname } from 'path';
 import { unitTestWorkers } from '../../build/unit-test-workers';
 
 // Library build for PACKAGE consumption (Verdaccio / npm), not just the workspace.
@@ -29,9 +29,14 @@ const entries: Record<string, string> = {};
 for (const entry of Object.values(pkg.exports)) {
     const targets = typeof entry === 'string' ? [entry] : Object.values(entry);
     for (const t of targets) {
-        if (typeof t === 'string' && /^\.\/src\/.*\.ts$/.test(t)) {
-            const rel = t.replace(/^\.\/src\//, '').replace(/\.ts$/, ''); // e.g. button/pdx-button
-            entries[rel] = resolve(t.slice(2));
+        if (typeof t !== 'string' || !/^\.\/src\/.*\.ts$/.test(t)) continue;
+        // A pattern (`./icons/*` → ./src/icon/pragmatic/*.ts) is one entry per file it matches.
+        const files = t.includes('*')
+            ? readdirSync(resolve(dirname(t.slice(2)))).filter(f => f.endsWith('.ts')).map(f => `${dirname(t)}/${f}`)
+            : [t];
+        for (const f of files) {
+            const rel = f.replace(/^\.\/src\//, '').replace(/\.ts$/, ''); // e.g. button/pdx-button
+            entries[rel] = resolve(f.slice(2));
         }
     }
 }

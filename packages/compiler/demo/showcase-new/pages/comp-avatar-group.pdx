@@ -57,8 +57,6 @@
 @page '/components/avatar-group';
 @title 'AvatarGroup — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

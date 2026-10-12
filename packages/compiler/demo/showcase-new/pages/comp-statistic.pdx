@@ -66,8 +66,6 @@
 @page '/components/statistic';
 @title 'Statistic — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

@@ -64,10 +64,8 @@
 </template>
 
 <script setup>
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 @page '/components/tabs';
 @title 'Tabs';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

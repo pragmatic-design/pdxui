@@ -57,11 +57,9 @@
 </template>
 
 <script setup>
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 
 @page '/components/overlay-stack';
 @title 'Overlay Stack';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

@@ -31,6 +31,8 @@ import { addRow as addRowFn, deleteRow as deleteRowFn, openEditDialog, startRowE
 import { applyGridAria, applyRoving, setupGridNav } from './grid-a11y';
 import { trackInputModality } from './grid-input-modality';
 import { t } from './grid-i18n'; // also registers the default strings
+import { defineIcons } from '../icon/icon-map';
+import iconInbox from '../icon/pragmatic/inbox';
 
 // Runtime sub-components created via document.createElement (toolbar/filter/edit/footer).
 // Imported here so the data-grid self-registers its dependencies in any consumer,
@@ -118,7 +120,7 @@ component('pdx-data-grid', {
         stateKey: { type: String, default: '' },
         /** The empty state's text. Unset, it is the grid string `empty.title`. */
         emptyTitle: { type: String, default: '' },
-        emptyIcon: { type: String, default: 'inbox' },
+        emptyIcon: { type: String, default: 'inbox', iconName: true },
         showFooter: { type: Boolean, default: true },
         filterable: { type: Boolean, default: false },
         filterMode: { type: String, default: 'none' },
@@ -590,6 +592,9 @@ component('pdx-data-grid', {
             const icon = document.createElement('div');
             icon.className = 'pdx-dg-empty-icon';
             // Built with the grid and hidden while it has rows: `pdx-icon` is loaded when it SHOWS.
+            // Its default icon is in the grid's chunk: an empty grid is what a page shows while its
+            // rows load, and loaded on demand it cost a request after the route had arrived (#47).
+            defineIcons({ inbox: iconInbox });
             const pdxIcon = document.createElement('pdx-icon');
             pdxIcon.setAttribute('name', (ctx.emptyIcon() as string) || 'inbox');
             pdxIcon.setAttribute('size', '40');

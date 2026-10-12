@@ -94,8 +94,6 @@
 @page '/components/nav-menu';
 @title 'NavMenu — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

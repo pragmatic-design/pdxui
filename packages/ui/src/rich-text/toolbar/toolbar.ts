@@ -6,6 +6,38 @@ import { marksAtSelection } from '../model/selection.js';
 import type { EditorView } from '../view/view.js';
 import type { Mark } from '../model/types.js';
 import { uiString, uiAttr} from '../../shared/i18n';
+// Every button is a <pdx-icon>, so the toolbar registers it: nothing else in the editor did, and on a
+// page where the editor drew the only icons every button stayed empty. With it, the icons of the
+// buttons below, which are on screen with the editor (#47).
+import '../../icon/pdx-icon';
+import { defineIcons } from '../../icon/icon-map';
+import iconBold from '../../icon/pragmatic/bold';
+import iconItalic from '../../icon/pragmatic/italic';
+import iconUnderline from '../../icon/pragmatic/underline';
+import iconStrikethrough from '../../icon/pragmatic/strikethrough';
+import iconCode from '../../icon/pragmatic/code';
+import iconLink from '../../icon/pragmatic/link';
+import iconHighlighter from '../../icon/pragmatic/highlighter';
+import iconHeading from '../../icon/pragmatic/heading';
+import iconQuote from '../../icon/pragmatic/quote';
+import iconFileCode from '../../icon/pragmatic/file-code';
+import iconList from '../../icon/pragmatic/list';
+import iconListOrdered from '../../icon/pragmatic/list-ordered';
+import iconListChecks from '../../icon/pragmatic/list-checks';
+import iconImage from '../../icon/pragmatic/image';
+import iconMinus from '../../icon/pragmatic/minus';
+import iconUndo from '../../icon/pragmatic/undo';
+import iconRedo from '../../icon/pragmatic/redo';
+
+/** The toolbar's icons on the page, before it draws them. Called by renderToolbar, not at load: this module has no load-time effect. */
+function defineToolbarIcons(): void {
+  defineIcons({
+    bold: iconBold, italic: iconItalic, underline: iconUnderline, strikethrough: iconStrikethrough, code: iconCode,
+    link: iconLink, highlighter: iconHighlighter, heading: iconHeading, quote: iconQuote, 'file-code': iconFileCode,
+    list: iconList, 'list-ordered': iconListOrdered, 'list-checks': iconListChecks, image: iconImage, minus: iconMinus,
+    undo: iconUndo, redo: iconRedo,
+  });
+}
 
 export interface ToolbarItem {
   name: string;
@@ -119,6 +151,7 @@ export function renderToolbar(
   view: EditorView,
   container: HTMLElement,
 ): void {
+  defineToolbarIcons();
   container.innerHTML = '';
   container.classList.add('pdx-rt-toolbar');
   container.setAttribute('role', 'toolbar');

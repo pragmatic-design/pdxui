@@ -8,6 +8,11 @@ import { uiString, format } from '../shared/i18n';
 // and no more.
 import '@pdxui/design/components/file-upload';
 import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconFile from '../icon/pragmatic/file';
+import iconCheck from '../icon/pragmatic/check';
+defineIcons({ file: iconFile, check: iconCheck });
 
 interface FileEntry {
     file: File;

@@ -9,6 +9,13 @@ import { uiString, uiAttr} from '../shared/i18n';
 // and no more.
 import '@pdxui/design/components/toast';
 import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconCheckCircle from '../icon/pragmatic/check-circle';
+import iconAlertCircle from '../icon/pragmatic/alert-circle';
+import iconAlertTriangle from '../icon/pragmatic/alert-triangle';
+import iconInfo from '../icon/pragmatic/info';
+defineIcons({ 'check-circle': iconCheckCircle, 'alert-circle': iconAlertCircle, 'alert-triangle': iconAlertTriangle, info: iconInfo });
 
 let _globalQueue: ToastQueue | null = null;
 

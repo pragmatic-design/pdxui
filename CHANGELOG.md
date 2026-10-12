@@ -12,6 +12,16 @@ semver.
 ### Features
 
 - Initial public release.
+- A page ships the icons it draws, not the icon set. Each icon of the «pragmatic» set is its own
+  module, `@pdxui/ui/icons/<name>`, whose default export is the SVG. The compiler imports the ones it
+  can see — `<pdx-icon name="check">`, a literal icon prop (`<pdx-fab icon="edit">`), a literal
+  `icon:` in the `.pdx` script — and any other name loads on demand the first time it is drawn. An
+  app that wants an icon from a `.ts` module on its first screen imports it and hands it to
+  `defineIcons` (from `@pdxui/ui/icon/pdx-icon`). `registerPragmaticIcons()` still puts the whole set
+  on the page, and `import '@pdxui/ui'` does it first. On the showcase the `pdx-icon` chunk went from
+  16.3 to 6.9 KB gzipped. (#47)
+- `pdx-rich-text`'s toolbar registers `pdx-icon`: on a page where the editor drew the only icons,
+  every button was empty. (#47)
 - `@params` and `@search` report a field they cannot read with `PDX_ROUTE_FIELD_INVALID`, an error,
   instead of dropping it; a quoted type (`id: 'number'`) carries the fix to `id: number`. Both
   blocks may span several lines. (#105)

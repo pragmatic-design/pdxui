@@ -124,9 +124,9 @@ const esc = (s) => String(s ?? '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').
 /** `s` with `re` removed until nothing more is: one pass can join two halves into a new match (#72). */
 const removeAll = (s, re) => { let prev; do { prev = s; s = s.replace(re, ''); } while (s !== prev); return s; };
 
-/** The names of the built-in icon set: the keys of `icons` in pragmatic-icons.ts, in file order. */
+/** The names of the built-in icon set: the keys of `PRAGMATIC_SVGS` in pragmatic-icon-data.ts, in file order. */
 function builtInIconNames() {
-  const txt = readFileSync(join(UISRC, 'icon', 'pragmatic-icons.ts'), 'utf8');
+  const txt = readFileSync(join(UISRC, 'icon', 'pragmatic-icon-data.ts'), 'utf8');
   // Match: a four-space-indented quoted key opening an entry of the `icons` map. Groups: [1]=name
   return [...txt.matchAll(/^ {4}'([a-z0-9-]+)':/gm)].map(m => m[1]);
 }

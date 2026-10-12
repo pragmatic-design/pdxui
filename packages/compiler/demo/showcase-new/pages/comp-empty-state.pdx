@@ -36,8 +36,6 @@
 @page '/components/empty-state';
 @title 'EmptyState — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

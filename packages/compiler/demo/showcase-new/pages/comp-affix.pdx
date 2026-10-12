@@ -41,8 +41,6 @@
 @page '/components/affix';
 @title 'Affix — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

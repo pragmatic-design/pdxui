@@ -33,7 +33,7 @@ component('pdx-image', {
         /** Fallback image URL on error */
         fallback: { type: String, default: '' },
         /** Icon name shown on error (pragmatic-icons) */
-        fallbackIcon: { type: String, default: 'image-off' },
+        fallbackIcon: { type: String, default: 'image-off', iconName: true },
         /** Placeholder style: blur | skeleton | none */
         placeholder: { type: String, default: 'skeleton' },
         /** Aspect ratio e.g. '16/9', '1/1' */

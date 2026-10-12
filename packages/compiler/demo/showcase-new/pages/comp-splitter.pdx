@@ -53,8 +53,6 @@
 @page '/components/splitter';
 @title 'Splitter — PDX Components';
 
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
-registerPragmaticIcons();
 </script>
 
 <style scoped>

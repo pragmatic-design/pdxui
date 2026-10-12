@@ -37,6 +37,10 @@ export class ComponentResolver {
     private enums = new Map<string, Map<string, string[]>>();
     /** tag → the props a binding can set (manifest fields that are not read-only). */
     private props = new Map<string, Set<string>>();
+    /** tag → the props whose value names an icon (`iconName` in the manifest). */
+    private iconProps = new Map<string, Set<string>>();
+    /** The icons a component package publishes one module each (`./icons/*`): name → import path. */
+    private icons = new Map<string, string>();
     private _collisions: ValidationWarning[] = [];
     /** The component packages that registered something, in order. */
     private _packages: string[] = [];
@@ -124,6 +128,19 @@ export class ComponentResolver {
         return this.props.get(tag) ?? null;
     }
 
+    /** The props of a manifest component whose value names an icon, by declared (camelCase) name. */
+    iconPropsOf(tag: string): ReadonlySet<string> | null {
+        return this.iconProps.get(tag) ?? null;
+    }
+
+    /**
+     * The import that puts an icon on the page (`@pdxui/ui/icons/check`), or null when no component
+     * package publishes an icon by that name — a name outside the set, or one of another set.
+     */
+    iconImport(name: string): string | null {
+        return this.icons.get(name) ?? null;
+    }
+
     /**
      * The component packages the project depends on (see `componentPackages`): each one's manifest
      * → tag→import map, plus each component's settable props and prop enums. Returns how many
@@ -180,6 +197,7 @@ export class ComponentResolver {
                 targetToName.set(normalizeModulePath(target), name);
             }
         }
+        this._registerIconModules(pkg, exportsMap as Record<string, unknown>);
 
         let count = 0;
         for (const mod of manifest.modules || []) {
@@ -195,17 +213,43 @@ export class ComponentResolver {
             });
             const propEnums = new Map<string, string[]>();
             const settable = new Set<string>();
+            const iconProps = new Set<string>();
             for (const member of decl.members || []) {
                 if (member.kind !== 'field') continue;
                 if (!member.readonly) settable.add(member.name);
+                if (member.iconName) iconProps.add(member.name);
                 const vals = parseEnumUnion(member.type?.text);
                 if (vals) propEnums.set(member.name, vals);
             }
             if (propEnums.size) this.enums.set(decl.tagName, propEnums);
+            if (iconProps.size) this.iconProps.set(decl.tagName, iconProps);
             this.props.set(decl.tagName, settable);
             count++;
         }
         return count;
+    }
+
+    /**
+     * The icons a package publishes one module each, under `./icons/*` (#47): the files its pattern
+     * matches on disk, from the first target whose folder is there — dist in an installed package,
+     * the sources in the workspace. A name another package registered first keeps its first owner.
+     */
+    private _registerIconModules(pkg: ComponentPackage, exportsMap: Record<string, unknown>): void {
+        const def = exportsMap['./icons/*'];
+        if (!def) return;
+        for (const target of exportTargets(def)) {
+            // Match: a target pattern `dir/*.ext`. Groups: [1]=dir [2]=extension. `.d.ts` is types, not code.
+            const m = target.match(/^(.*)\/\*(\.(?:js|mjs|ts))$/);
+            if (!m || target.endsWith('.d.ts')) continue;
+            const dir = join(pkg.dir, m[1]);
+            if (!existsSync(dir)) continue;
+            for (const file of readdirSync(dir)) {
+                if (!file.endsWith(m[2]) || file.endsWith('.d.ts')) continue;
+                const name = file.slice(0, -m[2].length);
+                if (!this.icons.has(name)) this.icons.set(name, `${pkg.name}/icons/${name}`);
+            }
+            return;
+        }
     }
 
     /**
@@ -425,7 +469,7 @@ function isAlreadyImported(existingImports: string, importPath: string): boolean
 
 // ─── Manifest-driven resolution helpers ──────────────────────────────────────
 
-interface ManifestMember { kind?: string; name: string; readonly?: boolean; type?: { text?: string } }
+interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; type?: { text?: string } }
 interface ManifestDeclaration { tagName?: string; members?: ManifestMember[] }
 interface ManifestModule { path?: string; declarations?: ManifestDeclaration[] }
 

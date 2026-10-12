@@ -627,6 +627,11 @@
       "types": "./dist/sortable-list/pdx-sortable-list.d.ts",
       "import": "./dist/sortable-list/pdx-sortable-list.js"
     },
+    "./icons/*": {
+      "development": "./src/icon/pragmatic/*.ts",
+      "types": "./dist/icon/pragmatic/*.d.ts",
+      "import": "./dist/icon/pragmatic/*.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -634,10 +639,12 @@
     "dist/**/pdx-*.js",
     "dist/data-grid/grid-i18n.js",
     "dist/shared/i18n.js",
+    "dist/icon/pragmatic-all.js",
     "src/index.ts",
     "src/**/pdx-*.ts",
     "src/data-grid/grid-i18n.ts",
-    "src/shared/i18n.ts"
+    "src/shared/i18n.ts",
+    "src/icon/pragmatic-all.ts"
   ],
   "files": [
     "dist",
@@ -646,8 +653,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && tsc --emitDeclarationOnly",
+    "build": "node scripts/gen-icons.mjs && node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && tsc --emitDeclarationOnly",
     "manifest": "node scripts/gen-manifest.mjs",
+    "icons": "node scripts/gen-icons.mjs",
     "exports": "node scripts/gen-exports.mjs",
     "test": "vitest run",
     "test:watch": "vitest"

@@ -24,7 +24,7 @@ component('pdx-statistic', {
         /** Text/symbol after value (e.g. '%') */
         suffix: { type: String, default: '' },
         /** Icon name (left of title) */
-        icon: { type: String, default: '' },
+        icon: { type: String, default: '', iconName: true },
         /** Trend direction: 'up' | 'down' | 'flat' | '' */
         trend: { type: String, default: '' },
         /** Trend text e.g. '+12.5%' */

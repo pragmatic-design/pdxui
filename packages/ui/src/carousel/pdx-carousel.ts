@@ -12,6 +12,13 @@ import { format } from '../shared/i18n';
 // and no more.
 import '@pdxui/design/components/carousel';
 import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconChevronLeft from '../icon/pragmatic/chevron-left';
+import iconChevronRight from '../icon/pragmatic/chevron-right';
+import iconPlay from '../icon/pragmatic/play';
+import iconPause from '../icon/pragmatic/pause';
+defineIcons({ 'chevron-left': iconChevronLeft, 'chevron-right': iconChevronRight, play: iconPlay, pause: iconPause });
 
 export interface CarouselItem {
     src?: string;

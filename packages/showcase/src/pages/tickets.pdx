@@ -199,6 +199,16 @@ import { createListActions } from '../data/list-actions';
 import { createUrlFilter, FILTER_PARAMS } from '../data/url-filter';
 import { createLiveList } from '../data/live-list';
 import { bulkActionSet, dispatchBulk } from '../tickets/bulk-actions';
+// The bulk bar's icons are named in `bulk-actions.ts`, which the compiler does not read: imported here,
+// so they are on the page with the list instead of a round trip after it (#47).
+import { defineIcons } from '@pdxui/ui/icon/pdx-icon';
+import arrowLeft from '@pdxui/ui/icons/arrow-left';
+import check from '@pdxui/ui/icons/check';
+import trash from '@pdxui/ui/icons/trash';
+import download from '@pdxui/ui/icons/download';
+import tag from '@pdxui/ui/icons/tag';
+import user from '@pdxui/ui/icons/user';
+defineIcons({ 'arrow-left': arrowLeft, check, trash, download, tag, user });
 import { liveDemoKnobs } from '../tickets/live-demo';
 
 // ─── The source ────────────────────────────────────────────────────────────────

@@ -6,6 +6,10 @@ import { component, html, signal } from '@pdxui/core';
 // here: on a page that does not import the whole library the tag would never upgrade and the
 // prefix would measure 0x0.
 import '../icon/pdx-icon';
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import { defineIcons } from '../icon/icon-map';
+import iconSearch from '../icon/pragmatic/search';
+defineIcons({ search: iconSearch });
 import { uiString } from '../shared/i18n';
 import { setOwnProp } from '../shared/own-prop';
 

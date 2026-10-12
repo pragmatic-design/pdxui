@@ -32,7 +32,7 @@ component('pdx-navbar', {
         /** Brand text */
         brand: { type: String, default: '' },
         /** Brand icon name */
-        brandIcon: { type: String, default: '' },
+        brandIcon: { type: String, default: '', iconName: true },
         /** Navigation items */
         items: { type: Array, default: [] },
         /** Sticky */

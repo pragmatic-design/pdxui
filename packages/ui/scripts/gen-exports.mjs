@@ -35,6 +35,10 @@ function distConditions(srcPath) {
     };
 }
 
+/** The subpath of the icon modules, and the source pattern it maps to. */
+export const ICONS_SUBPATH = './icons/*';
+const ICONS_SOURCE = './src/icon/pragmatic/*.ts';
+
 const BARREL = {
     development: './src/index.ts',
     types: './dist/index.d.ts',
@@ -102,6 +106,10 @@ export function computeExports(currentExports, manifestModules) {
         covered.add(normalizeModulePath(mod.path));
         added.push(`${key} ← ${mod.path}`);
     }
+
+    // One module per icon of the «pragmatic» set (scripts/gen-icons.mjs), as one pattern: the compiler
+    // imports `@pdxui/ui/icons/<name>` for an icon a template names (#47).
+    if (!out[ICONS_SUBPATH]) out[ICONS_SUBPATH] = distConditions(ICONS_SOURCE);
 
     // Expose the manifest so tooling (e.g. the pdx compiler's component auto-resolver) can
     // `require.resolve('@pdxui/ui/package.json')` from a consuming app to read these exports.

@@ -74,10 +74,8 @@ toast.add({ message: 'Starred!', type: 'success', icon: 'star' });</code></pre>
 </template>
 
 <script setup>
-import { registerPragmaticIcons } from '@pdxui/ui/icon/pragmatic-icons';
 @page '/components/toast';
 @title 'Toast';
-registerPragmaticIcons();
 </script>
 
 <style scoped>
