@@ -89,6 +89,31 @@
                 }
                 trigger.click();
                 await new Promise(r => requestAnimationFrame(r)); },
+        "data-grid-header-names": async function () { 
+                const stage = document.querySelector('section:not([hidden]) [data-test="dg-host"]');
+                const grid = document.createElement('pdx-data-grid');
+                grid.setAttribute('data-test', 'dg');
+                grid.setAttribute('label', 'People');
+                grid.columns = [
+                    { field: 'name', header: 'Name', sortable: true },
+                    { field: 'city', header: 'City', sortable: true },
+                    { field: 'category', header: 'Category', sortable: false },
+                ];
+                grid.data = [
+    {"id":1,"name":"Ada","city":"Torino","category":"Books"},
+    {"id":2,"name":"Grace","city":"Milano","category":"Books"},
+    {"id":3,"name":"Katherine","city":"Torino","category":"Music"}
+];
+                const carrier = document.createElement('template');
+                carrier.__pdxSlotName = 'header:city';
+                carrier.__pdxSlot = () => {
+                    const em = document.createElement('em');
+                    em.textContent = 'Town';
+                    return em;
+                };
+                grid.appendChild(carrier);
+                stage.appendChild(grid);
+                for (let i = 0; i < 30 && !grid.querySelector('[role="columnheader"]'); i++) await new Promise(r => requestAnimationFrame(r)); },
         "scroll-spy-basic": async function () { 
     const links = Array.from(document.querySelectorAll('section:not([hidden]) [data-test="scroll-spy"] .spy-link'));
     links.forEach((l, i) => {
@@ -269,6 +294,11 @@
     {"id":2,"name":"Grace","city":"Milano","category":"Books"},
     {"id":3,"name":"Katherine","city":"Torino","category":"Music"}
 ]'></pdx-data-grid>
+    </section>
+
+    <section data-scenario="data-grid-header-names">
+        <h3>Data grid — header names: a sortable filterable column, a slotted header, a plain one</h3>
+        <div data-test="dg-host"></div>
     </section>
 
     <section data-scenario="fab-basic">

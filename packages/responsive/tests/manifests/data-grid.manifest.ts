@@ -173,6 +173,37 @@ export const dataGrid: ComponentManifest = {
                 trigger.click();
                 await new Promise(r => requestAnimationFrame(r));`,
         },
+        {
+            // What each column header is CALLED (#263): a sortable filterable column, a slotted
+            // sortable one, a plain filterable one. A header's name is its label alone, not the sort
+            // and filter buttons inside it. Built from JS: the header slot is a function carrier, and
+            // it has to be a child before the grid connects.
+            id: 'data-grid-header-names',
+            title: 'Data grid — header names: a sortable filterable column, a slotted header, a plain one',
+            html: `
+                <div data-test="dg-host"></div>`,
+            setup: `
+                const stage = document.querySelector('section:not([hidden]) [data-test="dg-host"]');
+                const grid = document.createElement('pdx-data-grid');
+                grid.setAttribute('data-test', 'dg');
+                grid.setAttribute('label', 'People');
+                grid.columns = [
+                    { field: 'name', header: 'Name', sortable: true },
+                    { field: 'city', header: 'City', sortable: true },
+                    { field: 'category', header: 'Category', sortable: false },
+                ];
+                grid.data = ${PEOPLE};
+                const carrier = document.createElement('template');
+                carrier.__pdxSlotName = 'header:city';
+                carrier.__pdxSlot = () => {
+                    const em = document.createElement('em');
+                    em.textContent = 'Town';
+                    return em;
+                };
+                grid.appendChild(carrier);
+                stage.appendChild(grid);
+                for (let i = 0; i < 30 && !grid.querySelector('[role="columnheader"]'); i++) await new Promise(r => requestAnimationFrame(r));`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
@@ -388,7 +419,7 @@ export const dataGrid: ComponentManifest = {
     // with a role (the filter row and the totals row included); every control has a name. No
     // rule is disabled.
     a11y: {
-        scenarios: ['data-grid-basic', 'data-grid-select-filter', 'data-grid-grouped-toolbar', 'data-grid-filtered-toolbar', 'data-grid-empty'],
+        scenarios: ['data-grid-basic', 'data-grid-select-filter', 'data-grid-grouped-toolbar', 'data-grid-filtered-toolbar', 'data-grid-empty', 'data-grid-header-names'],
     },
 
     // ── Dim. 4: keyboard (APG data grid) ──
