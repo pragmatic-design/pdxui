@@ -112,6 +112,9 @@ semver.
 
 ### Fixes
 
+- A `pdx-list` that has finished loading no longer announces «Loading»: its loading overlay, a
+  spinner with `role="status"`, stayed in the accessibility tree while transparent. It is
+  `aria-hidden` unless drawn, and the list is `aria-busy` while its source loads. (#299)
 - A `pdx-data-grid` column header is named by its label alone: a screen reader announced a sortable,
   filterable «Name» column as «Name Filter Name». Each header is `aria-labelledby` its label, and a
   `header:{field}` slot's content now sits in that label span (`.pdx-dg-th-label`), as the default
