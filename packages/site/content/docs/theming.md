@@ -236,6 +236,15 @@ height = calc(var(--pdx-*-min-height) * var(--pdx-density-factor))
 with `--pdx-density-factor` = 0.75 / 1 / 1.25. Change the factor and every control tightens or widens
 consistently — useful for dense dashboards vs touch interfaces.
 
+The factor is set with an attribute: `pdx-density="compact|normal|comfort"` on `<html>`, or on any
+element for a denser or roomier part of the page. Seven themes declare a density of their own
+(`fluent` 0.9, `editorial` 1.2, …); the attribute overrides it, because its rules sit in a cascade
+layer after the themes, and without the attribute the theme's own density applies.
+
+```html
+<html pdx-theme="fluent" pdx-density="compact">
+```
+
 > There are **two** densities and they are not the same knob. The one above is a *runtime*
 > multiplier you can change live. The generator's `density` option (`0.85 / 1 / 1.15`) multiplies
 > the spacing values when a theme is produced and bakes them into it. Use the runtime factor for

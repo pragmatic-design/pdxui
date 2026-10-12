@@ -23,7 +23,8 @@ export default defineConfig({
     testDir: '.',
     // `permissions-edit.spec.ts` edits the mock server's roles: here, on a server of its
     // own, so a revoked grant cannot race the build's specs that read it.
-    testMatch: ['dev-server.spec.ts', 'permissions-edit.spec.ts'],
+    // `density.spec.ts` here too: the old density workaround blamed the dev server (#157).
+    testMatch: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'density.spec.ts'],
     fullyParallel: true,
     // Derived, not a literal, for the reason `playwright-worker-budget.test.ts` states: a number
     // that is a quarter of a 32-core machine is four times an 8-core laptop's budget. Five tests

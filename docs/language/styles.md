@@ -373,3 +373,44 @@ in a build the module imports `virtual:pdx-style/…-0.css` and `virtual:pdx-sty
 #### Since
 
 alpha
+
+## The design system's attributes
+
+### Density
+
+#### Syntax
+
+```ebnf
+DensityAttr ::= "pdx-density=" Quote ( "compact" | "normal" | "comfort" ) Quote
+```
+
+#### Semantics
+
+`pdx-density` on any element sets `--pdx-density-factor` for that element and its subtree: `compact`
+0.75, `normal` 1, `comfort` 1.25. Control heights are `calc(var(--pdx-*-min-height) *
+var(--pdx-density-factor, 1))`, and the spacing tokens scale by the same factor. The rules live in the
+layer `pdx.preferences`, ordered after `pdx.themes`, so the reader's choice overrides a theme's default
+factor (seven shipped themes declare one); without the attribute the theme's own factor applies.
+
+#### Rules
+
+- Not a `.pdx` construct and not checked by a diagnostic: it is the design package's CSS, measured by
+  `packages/design/tests/density.spec.ts` on every theme.
+- An inline `--pdx-density-factor` still wins over the attribute, as any inline style does.
+
+#### Examples
+
+On the page, `<html pdx-theme="fluent" pdx-density="compact">` gives 0.75 over fluent's own 0.9. In
+a component, a subtree:
+
+```pdx
+<template>
+  <section pdx-density="comfort">
+    <pdx-input label="Name"></pdx-input>
+  </section>
+</template>
+```
+
+#### Since
+
+alpha; overriding a theme's own factor since #157.

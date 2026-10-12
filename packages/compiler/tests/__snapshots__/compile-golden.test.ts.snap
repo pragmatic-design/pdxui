@@ -58275,8 +58275,6 @@ component('pdx-showcase-settings', {
     
     const _cardStyleMap = { material: 'elevated', playful: 'elevated' };
     
-    const _densityMap = { compact: '0.75', normal: '1', comfort: '1.25' };
-    
     
     // Restore theme/scheme/density from querystring or localStorage
     const _params = new URLSearchParams(location.search);
@@ -58310,9 +58308,10 @@ component('pdx-showcase-settings', {
         _applyBehaviorAttrs(key);
     }
     
+    // The attribute alone: its rules are in the design system's \`pdx.preferences\` layer, after the
+    // themes, so it sets the factor over a theme's own default (#157).
     function _applyDensity(key) {
         document.documentElement.setAttribute('pdx-density', key);
-        document.documentElement.style.setProperty('--pdx-density-factor', _densityMap[key] || '1');
     }
     
     function _applyScheme(isDark) {
@@ -58348,9 +58347,7 @@ component('pdx-showcase-settings', {
     
     _applyScheme(__dark());
     
-    document.documentElement.setAttribute('pdx-density', __density());
-    
-    if (__density() !== 'normal') document.documentElement.style.setProperty('--pdx-density-factor', _densityMap[__density()] || '1');
+    _applyDensity(__density());
     ctx.el.setAttribute('data-pdx-mwg9c1', '');
     return { themeItems, densityItems, theme: __theme, density: __density, dark: __dark, settingsOpen: __settingsOpen, themeLabel, densityLabel, modeIcon, setTheme, setDensity, setDark, onThemeSelect, onDensitySelect, toggleMode, toggleSettings };
   },

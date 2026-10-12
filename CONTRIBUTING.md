@@ -121,8 +121,8 @@ A component in `packages/ui` follows one workflow:
 
 Themes and tokens are documented for designers in [THEMING.md](packages/design/THEMING.md). Two of
 its rules are the ones most often broken. First, a fill colour is never a text colour: text takes
-`--pdx-color-*-ink`. Second, the density factor is set as an inline style property, not with an
-attribute selector.
+`--pdx-color-*-ink`. Second, density is the `pdx-density` attribute, which overrides a theme's own
+factor because its rules are in a layer after the themes; do not write the factor inline.
 
 A change to the CSS in `packages/design/src` reaches a built consumer only after
 `node packages/design/scripts/build-css.mjs`. A theme shipped inside `@pdxui/design` is added to the

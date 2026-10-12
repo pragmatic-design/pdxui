@@ -65,7 +65,6 @@ const _inputStyleMap = { material: 'filled', editorial: 'underlined', cyberpunk:
 const _inputFocusMap = { fluent: 'bottom' };
 const _tabStyleMap = { pragmatic: 'pill', 'pragmatic-gold': 'pill', cupertino: 'pill', playful: 'pill', neumorphic: 'pill' };
 const _cardStyleMap = { material: 'elevated', playful: 'elevated' };
-const _densityMap = { compact: '0.75', normal: '1', comfort: '1.25' };
 
 // Restore theme/scheme/density from querystring or localStorage
 const _params = new URLSearchParams(location.search);
@@ -92,9 +91,10 @@ function _applyTheme(key) {
     _applyBehaviorAttrs(key);
 }
 
+// The attribute alone: its rules are in the design system's `pdx.preferences` layer, after the
+// themes, so it sets the factor over a theme's own default (#157).
 function _applyDensity(key) {
     document.documentElement.setAttribute('pdx-density', key);
-    document.documentElement.style.setProperty('--pdx-density-factor', _densityMap[key] || '1');
 }
 
 function _applyScheme(isDark) {
@@ -128,8 +128,7 @@ function toggleSettings() { settingsOpen = !settingsOpen; }
 
 _applyTheme(theme);
 _applyScheme(dark);
-document.documentElement.setAttribute('pdx-density', density);
-if (density !== 'normal') document.documentElement.style.setProperty('--pdx-density-factor', _densityMap[density] || '1');
+_applyDensity(density);
 </script>
 
 <style scoped>

@@ -36,7 +36,7 @@ A designer works at levels **1–2**. Level 3 is a *consumer*: when a component 
 | `--pdx-card-style` | `bordered` · `elevated` · `flat` |
 | `--pdx-accordion-glyph` + `--pdx-accordion-open-transform` | the glyph, and how it rotates when open |
 | `--pdx-field-required-marker` | the `content` after a required field's label: `' *'` (unset) · any string · `none`. Inherited, so it can also be set on one form or one field; the control's `aria-required` is set whatever it is |
-| density | `compact` · `normal` · `comfort` |
+| density | `compact` · `normal` · `comfort` — a theme may declare its own `--pdx-density-factor`; the reader's `pdx-density` attribute (on `<html>` or any element) overrides it, from the layer `pdx.preferences` after the themes |
 
 **C. Scales**: spacing, radii, **typography** (font plus a modular scale), **shadows** (5 levels), motion.
 
