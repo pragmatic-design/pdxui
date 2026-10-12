@@ -9,6 +9,7 @@ import { findComponentTags, selfDefinedTags } from './resolve';
 import { onlyNear } from './edit-distance';
 import { checkUndeclaredRefs } from './validate-refs';
 import { checkFormRules } from './form-rules';
+import { DEFER_TRIGGERS, unknownDeferTriggers } from './defer-triggers';
 import { validateLegacy } from './validate-legacy';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
@@ -483,6 +484,11 @@ export function validate(
     // (it is NOT reactive in the template). Warn so authors switch to {{ }} or :attr binding.
     checkRawInterpolation(ast, warnings);
 
+    // ─── @defer triggers the runtime does not know (#260) ──
+    // The runtime fires an unknown trigger at once — the safe failure for a hand-written defer(),
+    // the opposite of what `@defer (viewprt)` meant. So it is an error here, at the @defer.
+    checkDeferTriggers(ast, warnings);
+
     // ─── Check 12: @page path validation ────────────────────────
 
     if (analysis.route.page) {
@@ -730,6 +736,42 @@ function checkBoundValues(content: string, loc: SourceLoc | undefined, warnings:
         }
     }
     return ranges;
+}
+
+/**
+ * Report every part of a `@defer (…)` trigger the runtime does not read: PDX_DEFER_UNKNOWN_TRIGGER,
+ * an error, one per unknown part, at the `@defer`. The walk reaches a `@defer` inside any block.
+ */
+function checkDeferTriggers(nodes: TemplateNode[], warnings: ValidationWarning[]): void {
+    const walk = (list: TemplateNode[] | undefined): void => {
+        for (const node of list ?? []) {
+            switch (node.type) {
+                case 'defer':
+                    for (const part of unknownDeferTriggers(node.trigger)) {
+                        warnings.push({
+                            code: 'PDX_DEFER_UNKNOWN_TRIGGER',
+                            severity: 'error',
+                            message: `@defer (${node.trigger}): '${part}' is not a trigger. The runtime would load the block at once — the opposite of deferring it.`,
+                            hint: `The triggers are ${DEFER_TRIGGERS.join(', ')}, combined with |. Write immediate to load at once.`,
+                            ...(node.loc ? { line: node.loc.line, column: node.loc.column } : {}),
+                        });
+                    }
+                    walk(node.body); walk(node.placeholder); walk(node.loading); walk(node.error);
+                    break;
+                case 'if': walk(node.body); walk(node.elseBody); break;
+                case 'for': walk(node.body); walk(node.emptyBody); break;
+                case 'switch': for (const c of node.cases) walk(c.body); walk(node.defaultBody); break;
+                case 'require': walk(node.body); walk(node.elseBody); break;
+                case 'show': walk(node.body); break;
+                case 'portal': walk(node.body); break;
+                case 'try': walk(node.body); walk(node.catchBody); break;
+                case 'await': walk(node.body); walk(node.loading); walk(node.errorBody); break;
+                case 'slot-template': walk(node.body); break;
+                case 'custom-directive': walk(node.body); break;
+            }
+        }
+    };
+    walk(nodes);
 }
 
 /**
