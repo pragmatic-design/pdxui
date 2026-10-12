@@ -37,7 +37,10 @@ Block          ::= S? "{" Template "}"
   and then a blank, `(`, `{` or the end. Any other `@word` is text, unless it is followed by `(` or `{`
   and is within two edits of `if`, `for`, `switch`, `require`, `show`, `portal`, `defer`, `try`,
   `await` or `slot`: then the compile stops with `Unknown directive @fro … Did you mean @for?`.
-  `@media (…)` inside a template stays text.
+  Any other `@word (` or `@word {` that no plugin registers stays text and raises
+  `PDX_UNKNOWN_DIRECTIVE` (warning), once per name in a file: `@media (…)` inside a template is
+  written `@@media (…)` (#296). The names the parser reads are `TEMPLATE_AT_DIRECTIVES`
+  (`compiler/src/parser/template-directives.ts`).
 - **A block's braces are counted.** `Block` ends at the `}` that balances its `{`; a `{` or `}` in
   text inside a block — `<p>a { b</p>` — throws `Unclosed block`. Write `&#123;` and `&#125;`. Quotes
   count as string delimiters only after `=` and inside `{{ }}`.

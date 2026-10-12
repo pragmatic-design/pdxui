@@ -6,6 +6,7 @@ import { readFileSync, realpathSync } from 'fs';
 import { dirname, resolve, normalize, relative, isAbsolute, basename } from 'path';
 import { parseSFC } from './parser/sfc';
 import { parseTemplate, templateStartInFile } from './parser/template';
+import type { SourceLoc } from './parser/template';
 import { compileSFC, deriveTag } from './compiler/codegen';
 import { analyzeScript } from './compiler/script-analyzer';
 import { validate } from './compiler/validate';
@@ -734,11 +735,25 @@ export function compile(
 
     // And its column, when the content starts on the `<template>` line.
     const templateColumn = templateStartInFile(source, descriptor.template!).column;
-    const ast = parseTemplate(templateContent, templateLineOffset + 1, parserDirectives, templateColumn);
+    // A `@word (` that is no directive and no plugin's: the parser leaves it as text and tells us,
+    // because only here are the plugins' directives known. The first occurrence of each name (#296).
+    const unknownDirectives = new Map<string, SourceLoc>();
+    const ast = parseTemplate(templateContent, templateLineOffset + 1, parserDirectives, templateColumn,
+        (name, loc) => { if (!unknownDirectives.has(name)) unknownDirectives.set(name, loc); });
 
     // Run validation pass — cross-check template vs script declarations
     // Also reuse this analysis in compileSFC to avoid double-parsing
     const allWarnings: ValidationWarning[] = [];
+    for (const [name, loc] of unknownDirectives) {
+        allWarnings.push({
+            code: 'PDX_UNKNOWN_DIRECTIVE',
+            severity: 'warn',
+            message: `\`@${name}\` is not a directive: no plugin registers it, so it is written into the page as text.`,
+            hint: `Register it with a plugin's \`templateDirectives\`, or write \`@@${name}\` for the text.`,
+            line: loc.line,
+            column: loc.column,
+        });
+    }
     let cachedAnalysis: ReturnType<typeof analyzeScript> | null = null;
     if (scriptContent) {
         // Where the script starts in the .pdx, so the analysis can say where each line came from and

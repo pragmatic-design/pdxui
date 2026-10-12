@@ -64,6 +64,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_EMPTY_FOR` | warn | An `@for` with an empty body. | `@for`, [template.md](template.md) |
 | `PDX_AWAIT_NO_LOADING` | info | `@await` without a `@loading` block. | `@await`, [template.md](template.md) |
 | `PDX_DEFER_UNKNOWN_TRIGGER` | error | A `@defer` trigger the runtime does not know (`@defer (viewprt)`). | `@defer`, [template.md](template.md) |
+| `PDX_UNKNOWN_DIRECTIVE` | warn | A `@word (…)` or `@word { … }` in the template that is no directive and no plugin's: left as text, reported once per name. | any `@`-word, [template.md](template.md) |
 | `PDX_INLINE_NODE_UNSUPPORTED` | warn | A template node the inline render path cannot compile. | the compiled template, [template.md](template.md) |
 
 ## Styles

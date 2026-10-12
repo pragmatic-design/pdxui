@@ -20,7 +20,8 @@ const REPO = join(__dirname, '..', '..', '..');
 const PAGE = join(REPO, 'marketplace', 'plugins', 'pdxui', 'skills', 'pdxui-language', 'SKILL.md');
 const RUNES_DTS = join(REPO, 'packages', 'compiler', 'src', 'runes.d.ts');
 const ANALYZER = join(REPO, 'packages', 'compiler', 'src', 'compiler', 'script-analyzer.ts');
-const TEMPLATE = join(REPO, 'packages', 'compiler', 'src', 'parser', 'template.ts');
+// The parser's DIRECTIVES are BLOCK_DIRECTIVES, in the list of every template @-word (#296).
+const TEMPLATE_DIRECTIVES_FILE = join(REPO, 'packages', 'compiler', 'src', 'parser', 'template-directives.ts');
 
 const page = (): string => readFileSync(PAGE, 'utf8').replace(/\r\n/g, '\n');
 
@@ -30,11 +31,11 @@ function realRunes(): string[] {
         .map(m => m[1]);
 }
 
-/** The block directives the template parser accepts, from its own DIRECTIVES list. */
+/** The block directives the template parser accepts, from its own list. */
 function realDirectives(): string[] {
-    const src = readFileSync(TEMPLATE, 'utf8');
-    const block = src.match(/const DIRECTIVES = \[([\s\S]*?)\] as const;/);
-    if (!block) throw new Error('DIRECTIVES list not found — this check would be vacuous');
+    const src = readFileSync(TEMPLATE_DIRECTIVES_FILE, 'utf8');
+    const block = src.match(/const BLOCK_DIRECTIVES = \[([\s\S]*?)\] as const;/);
+    if (!block) throw new Error('BLOCK_DIRECTIVES list not found — this check would be vacuous');
     return [...block[1].matchAll(/'([a-z]+)'/g)].map(m => m[1]);
 }
 

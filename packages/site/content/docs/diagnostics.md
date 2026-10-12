@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 70 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 71 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -828,6 +828,36 @@ let count = $signal(0);
 The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds.
 
 **Fix.** Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`.
+
+### PDX_UNKNOWN_DIRECTIVE
+
+*warn* — A `@word (…)` or `@word { … }` in the template that is no directive and no plugin's (`@tooltip (msg) { … }` without its plugin).
+
+The parser leaves an unknown `@word` as text, so literal `@`-text keeps working: the characters `@tooltip (msg) {` reach the page. A near typo of a built-in (`@fro` for `@for`) stops the compile instead. Reported once per name in a file, at its first occurrence.
+
+**Fix.** Register the directive with a plugin's `templateDirectives`, or write `@@word` for the text (`@@media (pointer: coarse)`).
+
+Instead of:
+
+```html
+<template>
+  <p>@media (pointer: coarse) is CSS</p>
+</template>
+<script setup>
+
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>@@media (pointer: coarse) is CSS</p>
+</template>
+<script setup>
+
+</script>
+```
 
 ### PDX_UNKNOWN_PROP
 

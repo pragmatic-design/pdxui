@@ -27,8 +27,10 @@ export interface PublishedExample {
 /**
  * A line only a script starts with: a declaration rune, or a JavaScript statement. A template line
  * starts with markup, an interpolation or a block directive (`@if`, `@for`…), none of which is here.
+ * `i18n` was missing: the i18n page's `@i18n { … }` was read as template text, and nothing checked
+ * it (found by #296, whose warning named it).
  */
-const SCRIPT_LINE = /^\s*(?:@(?:form|fetch|store|page|guard|prop|event|title|meta|scroll|slot|loader|expose|params|search|redirect|alias|outlet|prefetch)\b|(?:import|export|let|const|var|function|async|class|interface|type)\s|\$\w+\(|(?:effect|watch|onMount|onDestroy)\()/m;
+const SCRIPT_LINE = /^\s*(?:@(?:form|fetch|store|page|guard|prop|event|title|meta|scroll|slot|loader|expose|params|search|redirect|alias|outlet|prefetch|i18n)\b|(?:import|export|let|const|var|function|async|class|interface|type)\s|\$\w+\(|(?:effect|watch|onMount|onDestroy)\()/m;
 
 /**
  * The smallest .pdx that carries a docs fragment. A fence with a `<script` is a file already, give

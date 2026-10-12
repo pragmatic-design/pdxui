@@ -30,6 +30,14 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use one of `immediate`, `viewport`, `idle`, `idle(ms)`, `interaction`, `hover`, `timer(ms)`; write `immediate` to load at once.',
         example: { bad: pdx('@defer (viewprt) { <p>chart</p> }', ''), good: pdx('@defer (viewport) { <p>chart</p> }', '') },
     },
+    PDX_UNKNOWN_DIRECTIVE: {
+        severity: 'warn', category: 'defect',
+        summary: 'A `@word (…)` or `@word { … }` in the template that is no directive and no plugin\'s (`@tooltip (msg) { … }` without its plugin).',
+        explanation: 'The parser leaves an unknown `@word` as text, so literal `@`-text keeps working: the characters `@tooltip (msg) {` reach the page. A near typo of a built-in (`@fro` for `@for`) stops the compile instead. Reported once per name in a file, at its first occurrence.',
+        fix: 'Register the directive with a plugin\'s `templateDirectives`, or write `@@word` for the text (`@@media (pointer: coarse)`).',
+        example: { bad: pdx('<p>@media (pointer: coarse) is CSS</p>', ''), good: pdx('<p>@@media (pointer: coarse) is CSS</p>', '') },
+        reproducedIn: `${T}unknown-directive.test.ts`,
+    },
     PDX_NON_REACTIVE: {
         severity: 'warn', category: 'defect', fixable: true,
         summary: 'A plain `let` the template reads and the script changes.',
