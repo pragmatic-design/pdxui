@@ -17,12 +17,13 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { test, expect, type Page } from '@playwright/test';
 import { discoverComponentPackages } from '../../compiler/src/discover-component-packages.mjs';
-
-const PHONE = { width: 390, height: 844 };
+import { LIBRARY_TAGS } from './library-tags';
+import { PHONE, expectFitsPhone, settledAtPhone } from './phone-checks';
 
 // Every route of the site: a hand-picked handful misses the pages that run past the edge. The pages
 // come from the sources the site builds them from: every component package's manifest (the router's
-// too), and the showcase's design pages.
+// too), and the showcase's design pages. A library component's page is measured by
+// component-pages.spec.ts, in the one load it makes of it (#322); the others are measured here.
 const SITE = fileURLToPath(new URL('..', import.meta.url));
 const COMPONENTS = discoverComponentPackages(SITE, SITE)
     .flatMap((p) => (JSON.parse(readFileSync(p.manifest, 'utf8')) as { modules: { declarations?: { tagName: string }[] }[] }).modules)
@@ -41,7 +42,8 @@ const PAGES: Route[] = [
     { path: '/playground', title: 'main h1' },
     { path: '/integrations', title: 'main h1' },
     { path: '/search', title: 'main h1' },
-    ...COMPONENTS.map((tag) => ({ path: `/components/${tag}`, title: '.cmp-title', gallery: '.cmp-gallery' })),
+    ...COMPONENTS.filter((tag) => !LIBRARY_TAGS.includes(tag))
+        .map((tag) => ({ path: `/components/${tag}`, title: '.cmp-title', gallery: '.cmp-gallery' })),
     ...DESIGN_TOPICS.map((t) => ({ path: `/design/${t}`, title: 'main h1', gallery: '.design-gallery' })),
 ];
 
@@ -50,66 +52,17 @@ const HEADER_LINKS = ['/docs', '/components', '/design', '/playground', '/integr
 async function open(page: Page, path: string, gallery?: string): Promise<void> {
     await page.setViewportSize(PHONE);
     await page.goto(path, { waitUntil: gallery ? 'networkidle' : 'domcontentloaded' });
-    await page.locator('main h1').first().waitFor();
-    // A gallery is a lazy module that renders its sections after the route: measure it, not the
-    // empty box it arrives in. A component with no gallery shows an overview instead.
-    if (gallery) await page.locator(`${gallery} section, main #overview`).first().waitFor();
+    await settledAtPhone(page, gallery);
 }
 
-/**
- * Components whose own box clips content past its edge by design. Named one by one, each with its
- * reason: skipping everything under an `overflow: hidden` box would hide real losses — /design/colors
- * can lose four grey chips exactly that way. The box itself must still fit the screen.
- */
-const CLIPPED_BY_DESIGN: [selector: string, reason: string][] = [
-    ['.pdx-progress-indeterminate', 'the indeterminate bar slides through its own track'],
-    ['.pdx-carousel-root', 'the slides not on show wait inside the carousel'],
-];
-
-/**
- * Elements inside `main` whose right edge is past the screen, except those a box of theirs scrolls
- * sideways (`overflow-x: auto | scroll`) — the one place wide content is allowed to be — and those a
- * component of CLIPPED_BY_DESIGN hides inside itself.
- */
-async function offscreen(page: Page): Promise<string[]> {
-    return page.evaluate((clipped) => {
-        const vw = window.innerWidth;
-        const main = document.querySelector('main');
-        if (!main) return ['<no main>'];
-        const scrolls = (el: Element | null): boolean => {
-            for (let a = el?.parentElement ?? null; a && a !== main; a = a.parentElement) {
-                const ox = getComputedStyle(a).overflowX;
-                if (ox === 'auto' || ox === 'scroll') return true;
-            }
-            return false;
-        };
-        const clippedByDesign = (el: Element): boolean => clipped.some(([sel]) => {
-            const box = el.parentElement?.closest(sel);
-            if (!box || !main.contains(box)) return false;
-            const ox = getComputedStyle(box).overflowX;
-            return (ox === 'hidden' || ox === 'clip') && box.getBoundingClientRect().right <= vw + 0.5;
-        });
-        const past = new Set<Element>();
-        for (const el of main.querySelectorAll('*')) {
-            const r = el.getBoundingClientRect();
-            if (r.width === 0 || r.height === 0) continue;
-            if (r.right <= vw + 0.5) continue;
-            if (scrolls(el) || clippedByDesign(el)) continue;
-            past.add(el);
-        }
-        // Reported by the outermost element past the edge: its descendants are the same fault.
-        const name = (el: Element) => {
-            const cls = typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/).join('.') : '';
-            return `${el.tagName.toLowerCase()}${cls}`;
-        };
-        const out: string[] = [];
-        for (const el of past) {
-            if (el.parentElement && past.has(el.parentElement)) continue;
-            out.push(`${name(el)} in ${el.parentElement ? name(el.parentElement) : '?'} right=${Math.round(el.getBoundingClientRect().right)}`);
-        }
-        return out;
-    }, CLIPPED_BY_DESIGN);
-}
+test('a library component\'s page is measured at phone width once, by component-pages, not here too', () => {
+    // component-pages.spec.ts loads each library component page once and runs these checks on it
+    // (#322): loading it again here doubled the suite's cost for the same measure.
+    const twice = PAGES.filter((p) => LIBRARY_TAGS.some((t) => p.path === `/components/${t}`)).map((p) => p.path);
+    expect(twice).toEqual([]);
+    // What stays here: the component pages no library manifest lists — the router's.
+    expect(PAGES.map((p) => p.path)).toEqual(expect.arrayContaining(['/components/pdx-link', '/components/pdx-router-outlet']));
+});
 
 test('the route list covers the site', () => {
     // The list is read from sources; if one of them moved, this file would measure a handful of pages.
@@ -118,20 +71,12 @@ test('the route list covers the site', () => {
     expect(DESIGN_TOPICS.length, 'design-*.pdx pages').toBeGreaterThan(20);
 });
 
-// One page load per route, three measures on it (147 routes: one load each keeps the suite in minutes).
+// One page load per route, three measures on it. The library's component pages get the same three
+// in component-pages.spec.ts, during the one load that file makes of each.
 for (const p of PAGES) {
     test(`${p.path} at 390 × 844: not wider than the screen, nothing past the edge, title on the first screen`, async ({ page }) => {
         await open(page, p.path, p.gallery);
-        const { scrollWidth, innerWidth } = await page.evaluate(() => ({
-            scrollWidth: document.body.scrollWidth, innerWidth: window.innerWidth,
-        }));
-        expect.soft(scrollWidth, 'body.scrollWidth').toBeLessThanOrEqual(innerWidth);
-
-        const offenders = await offscreen(page);
-        expect.soft(offenders.slice(0, 10), `${offenders.length} element(s) past the edge`).toEqual([]);
-
-        const top = await page.locator(p.title).first().evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
-        expect.soft(top, 'the page title is on the first screen').toBeLessThan(PHONE.height);
+        await expectFitsPhone(page, p.title);
     });
 }
 

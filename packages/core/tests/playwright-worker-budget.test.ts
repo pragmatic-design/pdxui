@@ -1,11 +1,13 @@
 // Four Playwright suites share one machine, and each of them has to say so.
 //
-// `pnpm test` runs the packages in PARALLEL. Four are Playwright suites — design, site, builder e2e,
-// builder static — and Playwright's default is half the logical cores. On a 32-core machine that is
-// 16 workers EACH: the shared run could ask for ~64 browsers on top of six vitest pools. The result
-// is not a slow suite, it is assertions timing out while their browser waits for a core.
+// When this was written, `pnpm test` ran the packages in PARALLEL. Four are Playwright suites —
+// design, site, builder e2e, builder static — and Playwright's default is half the logical cores. On
+// a 32-core machine that is 16 workers EACH: the shared run could ask for ~64 browsers on top of six
+// vitest pools. The result was not a slow suite, it was assertions timing out while their browser
+// waited for a core. The browser half now runs one package at a time (`test:browser`); a suite on its
+// own is CPU-bound too, and its cap is measured in its config (#322).
 //
-// Measured: the failure moves around, which is what makes it hard to read:
+// Measured then: the failure moves around, which is what makes it hard to read:
 //
 //   full `pnpm test`               design lost 8 of 263; builder passed
 //   the three suites alone         design passed 263/263; builder lost 1 of 152
