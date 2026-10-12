@@ -12,7 +12,7 @@ in the roadmap (#107, #109–#119) is not repeated. The order of the work this p
 |---|---|---|---|
 | C1 | Compile time is linear in the number of declarations | `compiler/tests/perf/compiler-scaling.test.ts`: 500 declarations under 600 ms (about 15 ms measured; the O(n²) regression it guards was about 1230 ms) | **landed** |
 | C2 | A production compile costs at most 3× a development one | `compiler/tests/perf/production-speed.test.ts:69` | **landed** |
-| C3 | One component compiles in a few ms in development | `compiler/tests/perf/compiler-bench.test.ts:103` asserts an average under 200 ms for ten components, while its comment says «<50ms» — the assertion is 4× looser than its intent; proposed: assert the intent | **landed, loose** |
+| C3 | One component compiles in a few ms in development | `compiler/tests/perf/compiler-bench.test.ts:103` asserts an average under 50 ms for ten components, what its comment says (#264; it asserted 200). Measured on 2026-10-12: 14.3–16.8 ms | **landed** |
 | C4 | **Edit to screen in development**: a `.pdx` save reaches the open page within 300 ms on the showcase; an edit to `<style scoped>` only swaps the style, without remounting the component or losing its state | a dev-server test that edits a file and times the DOM change | proposed: no test measures HMR today |
 | C5 | **Project-wide passes** — `pdx check`, `pdx analyze`, a cold `pdx build` of the showcase — each have a time budget in CI, set at the first measurement + 20% | CI timings | proposed |
 

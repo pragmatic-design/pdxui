@@ -100,7 +100,7 @@ describe('compiler benchmarks', () => {
             }
         }, 20);
         // 10 components should compile in <50ms for fast build
-        expect(avg).toBeLessThan(200);
+        expect(avg).toBeLessThan(50);
     });
 
     it('compile counter.pdx — production mode', () => {
