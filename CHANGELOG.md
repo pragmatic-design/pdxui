@@ -11,12 +11,16 @@ semver.
 
 ### Features
 
+- A navigation in progress is visible: `navigation.pending()` from `@pdxui/router` is true from the
+  moment the before-hooks accept a navigation until its page is shown, refused, denied or replaced,
+  and `navigation.to()` is its target. A `.pdx` that reads `navigation` gets the import from the
+  compiler — `@if (navigation.pending()) { <div class="route-progress"></div> }` needs no wiring.
+  (#149)
 - Kept-alive views are bounded where they live. `<pdx-router-outlet keep-alive-max="n">` keeps at
   most n frozen route pages (default 10), destroying the least recently used past it — before, every
   kept-alive page visited stayed until its own timeout, if it had one. `<component :is @keepAlive(n)>`
   sets the maximum of a dynamic component's cache (default 10); a value that is not a whole number of
   at least 1 is `PDX_KEEPALIVE_MAX`. (#270)
-
 - Initial public release.
 - A form's server field errors land on their fields: a submit rejected with RFC 9457 problem
   details carrying an `errors` map (in an `HttpError`'s body, or thrown as it is) shows each message

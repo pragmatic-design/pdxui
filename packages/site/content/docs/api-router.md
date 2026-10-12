@@ -7,7 +7,7 @@ parent: api
 
 # Router API
 
-Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 26 exports, from `@pdxui/router`.
+Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 27 exports, from `@pdxui/router`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -195,6 +195,24 @@ Navigate programmatically.
 @param path — route path (can include :param placeholders)
 @param params — URL path params to replace :param segments
 @param state — ephemeral navigation state (not in URL, accessible via currentState)
+
+## `navigation`
+
+```ts
+import { navigation } from '@pdxui/router';
+
+const navigation: {
+    readonly pending: ReadonlySignal<boolean>;
+    readonly to: ReadonlySignal<string | null>;
+}
+```
+
+The navigation in progress, for a progress bar or a dimmed page while chunks and data load:
+`@if (navigation.pending()) { … }`. Auto-imported in a `.pdx` that reads it.
+
+`pending()` is true from the moment the before-hooks accept a navigation — not while one of them
+is still asking "leave this page?" — until its route is published, or it is refused, denied or
+abandoned. `to()` is its target, query included, while pending; a newer navigation replaces it.
 
 ## `onAfterNavigate`
 

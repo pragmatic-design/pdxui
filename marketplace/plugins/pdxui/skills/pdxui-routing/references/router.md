@@ -532,6 +532,27 @@ onBeforeNavigate((from, to, hop) => {
 `destroyRouter()` removes the router's own listeners. An application never calls it; a test does, and
 so does an HMR pass that re-creates the router. It is idempotent.
 
+## While a page loads: navigation.pending()
+
+Between a click and the new page, chunks and data load; on a slow network that can be a second in
+which the click seems to have done nothing. `navigation` says a navigation is on its way, and where:
+
+```html
+<template>
+  @if (navigation.pending()) { <div class="route-progress" role="progressbar"></div> }
+  <pdx-router-outlet></pdx-router-outlet>
+</template>
+```
+
+No import: the compiler writes `import { navigation } from '@pdxui/router'` in a `.pdx` that reads it
+— and only there. In plain TypeScript, import it yourself.
+
+- **`navigation.pending()`** is `true` from the moment the hooks above accept a navigation until its
+  page is shown — or until it is refused, denied by a guard, or replaced. Not while a hook is still
+  asking "leave this page?": nothing is loading then.
+- **`navigation.to()`** is where it is going, query included, or `null`. Click again before the first
+  page arrives, and it names the second.
+
 ## Other route declarations
 
 ```pdx

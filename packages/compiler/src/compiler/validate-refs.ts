@@ -21,8 +21,11 @@ const AMBIENT = new Set([
     'structuredClone', 'requestAnimationFrame', 'alert', 'confirm', 'event', 'globalThis',
 ]);
 
+/** The router's readers a template reaches with no import: the compiler writes it (navigation-import.ts). */
+const ROUTER_READS = new Set(['navigation']);
+
 /** Every name the component's script declares for its template to read. */
-function declaredNames(analysis: ScriptAnalysis): Set<string> {
+export function declaredNames(analysis: ScriptAnalysis): Set<string> {
     const s = new Set<string>();
     for (const p of analysis.props) s.add(p.name);
     for (const e of analysis.events) s.add(e.name);
@@ -49,7 +52,7 @@ export function checkUndeclaredRefs(analysis: ScriptAnalysis, templateIds: Reado
     const script = [analysis.body, ...analysis.userImports, ...(analysis.inlineBlocks ?? []),
         ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy, ...analysis.effects].join('\n');
     for (const id of templateIds) {
-        if (declared.has(id) || AMBIENT.has(id) || id.startsWith('$')) continue;
+        if (declared.has(id) || AMBIENT.has(id) || ROUTER_READS.has(id) || id.startsWith('$')) continue;
         if (new RegExp(`(?<![\\w$])${escapeForRegExp(id)}(?![\\w$])`).test(script)) continue;
         const meant = onlyNear(id, declared, 2);
         warnings.push({

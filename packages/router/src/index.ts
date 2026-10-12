@@ -10,7 +10,7 @@ export {
     createRouter, createRouterFromTable, configureRouter, destroyRouter, navigate,
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
     currentLoaderData, currentLoaderState, loaderData, loaderState, currentRoute, currentNavError,
-    onBeforeNavigate, onAfterNavigate,
+    navigation, onBeforeNavigate, onAfterNavigate,
     registerGuardChecker, setQuery, setQueryParam,
 } from './active';
 export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute } from './active';
