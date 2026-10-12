@@ -11,7 +11,7 @@
 //   - AbortController prevents leaked pending requests on component destroy
 //   - Error objects sanitized (no response body in error.message)
 
-import { signal, computed, effect, batch, collectDisposers } from './signal';
+import { signal, computed, effect, batch, collectDisposers, onDispose } from './signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
 import { getDefaultCache } from './cache';
 import type { Cache } from './cache';
@@ -310,7 +310,7 @@ export function resource<T>(
         return (s === 'reloading' || s === 'stale') && _data() !== undefined;
     });
 
-    return {
+    const res: Resource<T> = {
         data,
         error,
         loading,
@@ -358,6 +358,15 @@ export function resource<T>(
             cacheUnsub?.();
         },
     };
+
+    // A resource lives as long as the scope that created it (beta spec, data.md, E8). In a component's
+    // setup — every `@fetch` — that is the component: when it goes, the request is aborted, a retry
+    // waiting in its backoff is dropped, and the cache subscription is released so the entry can be
+    // collected. Without it only the auto-fetch effect stopped, and the subscription pinned the entry
+    // past `maxEntries` and `gcTime`. `onDispose` is a no-op outside a scope, so a resource created at
+    // module level is still disposed by hand; `dispose()` called twice (useQuery's) does nothing more.
+    onDispose(() => res.dispose());
+    return res;
 }
 
 // ─── resourceWhen() — declarative rendering ────────────────────────

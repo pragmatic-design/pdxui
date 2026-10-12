@@ -68,6 +68,12 @@ takes `resource()`'s options — `key`, `staleTime`, `retry`, `tags`, `enabled`,
 `onSuccess`, `onError`, `cache` — and any other key is the error `PDX_FETCH_UNKNOWN_OPTION`: a
 misspelled option would otherwise do nothing.
 
+**A `@fetch` lives as long as its component.** When the component goes, so does the resource: a
+request in flight is aborted, a retry waiting in its backoff does not fire, and it lets go of its
+cache entry, which is then collected after the cache's `gcTime` like any entry no one reads. The same
+holds for a `resource()` you create in a component's setup; one created at module level belongs to no
+component, and `dispose()` is what stops it.
+
 ## Mutations: write and keep everything consistent
 
 After a POST/PUT/DELETE, the lists that showed that data are stale. Instead of updating them by hand
