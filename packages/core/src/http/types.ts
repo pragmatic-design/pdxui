@@ -106,9 +106,9 @@ export interface HttpClient {
  * message, and the parsed body, so a validation error from the server is available without a second
  * read of a stream that has already been consumed.
  *
- * Distinct from {@link AbortError} (the request never got an answer — timeout or cancellation) and
- * {@link OfflineError} (it was never sent). {@link retryMiddleware} tells them apart for exactly
- * this reason: a 503 is worth repeating, an abort is not.
+ * Distinct from {@link HttpTimeoutError} (the server did not answer in time), {@link AbortError}
+ * (the caller cancelled) and {@link OfflineError} (it was never sent). {@link retryMiddleware} tells
+ * them apart for exactly this reason: a 503 is worth repeating, a cancellation is not.
  */
 export class HttpError extends Error {
     readonly status: number;
@@ -131,11 +131,29 @@ export class HttpError extends Error {
     }
 }
 
-/** Error thrown when a request is aborted (timeout or manual). */
+/** Error thrown when the caller aborts a request — a cancellation, not a failure. A timeout is {@link HttpTimeoutError}. */
 export class AbortError extends Error {
     constructor(_url: string) {
         super('Request aborted');
         this.name = 'AbortError';
+    }
+}
+
+/**
+ * Error thrown when a request outlives the client's `timeout`: the server did not answer in time. A
+ * failure, not a cancellation — an `AbortError` is what the caller's own abort produces — and not
+ * replayed by the retry middleware.
+ */
+export class HttpTimeoutError extends Error {
+    readonly url: string;
+    /** The deadline that ran out, in ms. */
+    readonly timeout: number;
+
+    constructor(url: string, timeout: number) {
+        super(`Request timed out after ${timeout} ms`);
+        this.name = 'HttpTimeoutError';
+        this.url = url;
+        this.timeout = timeout;
     }
 }
 

@@ -80,7 +80,7 @@ export { createHttpClient, getDefaultClient, setDefaultClient, configureClient }
 export type { HttpClient, HttpClientConfig, HttpRequest, HttpResponse, HttpMiddleware, HttpHandler, RequestOptions } from './http/types';
 export { uploadFile, downloadFile, saveBlob } from './http/upload';
 export type { UploadOptions, DownloadOptions, TransferHandle, DownloadHandle, TransferStatus } from './http/upload';
-export { HttpError, AbortError, OfflineError } from './http/types';
+export { HttpError, AbortError, HttpTimeoutError, OfflineError } from './http/types';
 
 // HTTP Middleware (tree-shakeable)
 export { authMiddleware, retryMiddleware, timeoutMiddleware, logMiddleware, csrfMiddleware } from './http/middleware';

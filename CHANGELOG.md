@@ -12,6 +12,11 @@ semver.
 ### Features
 
 - Initial public release.
+- `resource().abort()` cancels instead of leaving the source loading for good: it goes back to
+  `idle`, or to `success` when it has data, and `error()` is untouched. A request that outlives the
+  HTTP client's `timeout` fails with the new `HttpTimeoutError` (exported from `@pdxui/core`) instead
+  of an `AbortError`, so a timeout can be told from a cancel; neither is retried. A `catch` that
+  tested `AbortError` to detect a timeout tests `HttpTimeoutError` now. (#255)
 - A page ships the icons it draws, not the icon set. Each icon of the «pragmatic» set is its own
   module, `@pdxui/ui/icons/<name>`, whose default export is the SVG. The compiler imports the ones it
   can see — `<pdx-icon name="check">`, a literal icon prop (`<pdx-fab icon="edit">`), a literal

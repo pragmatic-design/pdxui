@@ -16,7 +16,7 @@ import type {
     HttpClient, HttpClientConfig, HttpRequest, HttpResponse,
     HttpMethod, HttpHandler, HttpMiddleware, RequestOptions, ResponseType,
 } from './types';
-import { HttpError, AbortError } from './types';
+import { HttpError, AbortError, HttpTimeoutError } from './types';
 import { sanitizeUrl } from '../security/sanitize-url';
 import { retryMiddleware } from './middleware';
 
@@ -103,17 +103,19 @@ function createBaseFetcher(config: HttpClientConfig): HttpHandler {
         const timeout = (request.meta._timeout as number | undefined) ?? config.timeout ?? DEFAULT_TIMEOUT_MS;
         let timeoutId: ReturnType<typeof setTimeout> | undefined;
         let fetchSignal = request.signal;
+        let controller: AbortController | undefined;
 
         if (timeout > 0) {
-            const controller = new AbortController();
-            timeoutId = setTimeout(() => controller.abort(), timeout);
+            controller = new AbortController();
+            // Aborted WITH a reason: the catch below tells the deadline from the caller's abort by it.
+            timeoutId = setTimeout(() => controller!.abort(new HttpTimeoutError(request.url, timeout)), timeout);
 
             // If caller also provided a signal, link them
             if (request.signal) {
                 if (request.signal.aborted) {
                     controller.abort(request.signal.reason);
                 } else {
-                    request.signal.addEventListener('abort', () => controller.abort(request.signal!.reason), { once: true });
+                    request.signal.addEventListener('abort', () => controller!.abort(request.signal!.reason), { once: true });
                 }
             }
             fetchSignal = controller.signal;
@@ -130,6 +132,11 @@ function createBaseFetcher(config: HttpClientConfig): HttpHandler {
             });
         } catch (err) {
             if (timeoutId !== undefined) clearTimeout(timeoutId);
+            // The deadline ran out: a failure with its own error, not a cancellation (beta spec,
+            // data.md, E3). fetch rejects with the signal's reason, or with a DOMException where it
+            // does not; the signal says which abort it was either way.
+            const reason: unknown = controller?.signal.reason;
+            if (reason instanceof HttpTimeoutError) throw reason;
             if (err instanceof DOMException && err.name === 'AbortError') {
                 throw new AbortError(request.url);
             }
