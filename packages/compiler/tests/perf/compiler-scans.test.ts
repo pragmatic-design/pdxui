@@ -13,6 +13,7 @@ import { stripHtmlComments, isRouterSeam, injectAfterHeadOpen, shortPath } from 
 import { extractLegacyScript } from '../../src/compiler/codegen-legacy';
 import { elementContent } from '../../src/text-scan';
 import { routeFieldQuotedFix } from '../../src/compiler/fix-builders';
+import { parseRouteParams } from '../../src/compiler/script-analyzer-helpers';
 
 /** How long `fn` takes, and how it ended: a malformed input may be refused, and refusing it is timed too. */
 function elapsed(fn: () => void): { ms: number; outcome: string } {
@@ -59,6 +60,8 @@ const cases: [string, () => void][] = [
     ['tag collision message: a run of a (alerts #22, #23)', () => shortPath('a'.repeat(N))],
     ['route field fix: a name and a run of tabs (alert #154)', () => routeFieldQuotedFix('0' + '\t'.repeat(N),
         { code: 'PDX_ROUTE_FIELD_INVALID', severity: 'error', message: '', line: 1, column: 1 })],
+    // Measured on the machine it was written on: 11.7 s for 100,000 characters before the rewrite (#266).
+    ['@params: a run of 0 with no colon (alert #157)', () => parseRouteParams('{ ' + '0'.repeat(N) + ' }')],
 ];
 
 describe('linear scans in the compiler', () => {

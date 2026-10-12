@@ -925,15 +925,22 @@ export function invalidRouteFields(block: string, kind: 'params' | 'search'): In
  */
 export function parseRouteParams(block: string): RouteParamDecl[] {
     const params: RouteParamDecl[] = [];
-    const inner = block.replace(/^\{/, '').replace(/\}$/, '').trim();
-    // Match: name: type — simple key-value pairs
-    const paramRegex = /(\w+)\s*:\s*(\w+)/g;
-    let m: RegExpExecArray | null;
-    while ((m = paramRegex.exec(inner)) !== null) {
-        params.push({ name: m[1], type: m[2] });
+    const inner = block.replace(/^\{/, '').replace(/\}$/, '');
+    // Field by field, not one regex over the block: `(\w+)\s*:\s*(\w+)` in an exec loop re-scans a
+    // long run of word characters from every start position (CodeQL js/polynomial-redos, #266). The
+    // fields are separated by `,`, `;` or a line break; each is `name: type`, both one identifier.
+    for (const field of inner.split(/[,;\n]/)) {
+        const colon = field.indexOf(':');
+        if (colon === -1) continue;
+        const name = field.slice(0, colon).trim();
+        const type = field.slice(colon + 1).trim();
+        if (IDENTIFIER.test(name) && IDENTIFIER.test(type)) params.push({ name, type });
     }
     return params;
 }
+
+/** One identifier, the whole token — anchored, so the test is one pass over a trimmed field. */
+const IDENTIFIER = /^\w+$/;
 
 /**
  * Parse @form options block.
