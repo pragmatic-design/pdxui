@@ -46,14 +46,21 @@ every `@provide` value. A `$signal` named `count` lives in the module as `__coun
 | `count` (a read) | `__count()` |
 | `count++`, `++count` / `count--`, `--count` | `__count.set(__v => __v + 1)` / `__count.set(__v => __v - 1)` |
 | `count += x` (and `-=` `*=` `/=` `%=` `**=` `&=` `\|=` `^=` `<<=` `>>=` `>>>=`) | `__count.set(__v => __v + x)` |
-| `count \|\|= x`, `count &&= x`, `count ??= x` | `(__count() \|\| __count.set(x))`, likewise |
-| `count = x` | `__count.set(x)` |
-| `count = f(count)` (the right side reads `count`) | `__count.set(prev => f(prev))` |
+| `count \|\|= x`, `count &&= x`, `count ??= x` | `(__count() \|\| __count.setRaw(x))`, likewise — the short circuit stays, and `x` is stored as it is |
+| `count = x` | `__count.setRaw(x)` — `x` is stored even when it is a function |
+| `count = f(count)` (the right side reads `count`) | `__count.setRaw(f(__count.peek()))` — the read on the right side is untracked, so inside an effect the assignment does not make the effect depend on what it writes |
+| `count.peek()`, `count.setRaw(v)` | `__count.peek()`, `__count.setRaw(v)` — the signal's own methods |
+| `handler(a)` (a `$signal` called) | `__handler()(a)` — the value is read, then called |
 | `{ count }` (shorthand property) | `{ count: __count() }` |
 | `total` (a prop or a `$derived`, read) | `total()` |
 
+An assignment stores its value; an update (`++`, `--` and the arithmetic and bitwise compound
+operators) computes the new value from the old one. So a `$signal` holds a function as it holds any
+other value: `onSave = () => save()` stores the arrow, and `onSave()` calls it.
+
 A parameter or a local of the same name shadows the signal and is not rewritten; nor is a property
-name (`row.count`), a declared name or a callee (`count(…)`).
+name (`row.count`) or a declared name. A prop or a `$derived` in callee position (`total(…)`) is left
+as written.
 
 ## Component declarations
 
@@ -588,8 +595,6 @@ the rewritten expression is `undefined`.
 - `$signal` is read only as the initialiser of a declaration at the start of a line. Anywhere else —
   inside a function, an array, an argument — the call is left as written, and `$signal` is not defined
   at run time — not checked today.
-- A value that is a function is taken by `set` as an updater: `handler = fn` calls `fn(previous)` —
-  not checked today.
 - A destructuring assignment to a signal (`[count] = pair`) is not rewritten, and `count` is not
   defined at run time — not checked today.
 - A plain `let` the template reads and the script changes raises `PDX_NON_REACTIVE`.

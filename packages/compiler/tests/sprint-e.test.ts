@@ -113,10 +113,9 @@ describe('signal spread rewrite', () => {
   }
 </script>`, 'test.pdx');
 
-        // Self-reference with spread → updater form, the object WRAPPED so the arrow returns it.
-        // Substring checks would pass on `set(prev => { ...prev, a: 5 })`, which is a SyntaxError
-        // on load; the exact form is the assertion.
-        expect(code).toContain('__state.set(prev => ({ ...prev, a: 5 }))');
+        // Self-reference with spread → the value is stored (setRaw, #187), the signal read untracked
+        // on the right side. The exact form is the assertion.
+        expect(code).toContain('__state.setRaw({ ...__state.peek(), a: 5 })');
     });
 
     it('rewrites array spread with signal', () => {
@@ -130,7 +129,6 @@ describe('signal spread rewrite', () => {
   }
 </script>`, 'test.pdx');
 
-        expect(code).toContain('__items.set(prev');
-        expect(code).toContain('...prev');
+        expect(code).toContain('__items.setRaw([...__items.peek(), 4])');
     });
 });

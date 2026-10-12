@@ -33,7 +33,8 @@ const ARROW = /^(\((?:[^()]|\([^()]*\))*\)|[A-Za-z_$][\w$]*)\s*=>\s*([\s\S]+)$/;
 // count++ / ++count / count-- / --count
 const INC_DEC = /^(?:(\+\+|--)\s*([A-Za-z_$][\w$]*)|([A-Za-z_$][\w$]*)\s*(\+\+|--))$/;
 // count = x | count += x | count -= x | count *= x | count /= x | count %= x  (= not ==)
-const ASSIGN = /^([A-Za-z_$][\w$]*)\s*(=(?!=)|\+=|-=|\*=|\/=|%=)\s*([\s\S]+)$/;
+// | count ||= x | count &&= x | count ??= x.  Groups: [1]=name [2]=operator [3]=right side
+const ASSIGN = /^([A-Za-z_$][\w$]*)\s*(=(?!=)|\+=|-=|\*=|\/=|%=|\|\|=|&&=|\?\?=)\s*([\s\S]+)$/;
 
 /**
  * Build the JS for an @event handler value (see the table above). Falls into one of:
@@ -60,15 +61,8 @@ function unbatchedHandler(expr: string, ctx: CompileContext): string {
     if (BARE_REF.test(e)) return prefixCtx(e, ctx);
 
     // 2. Arrow / lambda → keep the function; rewrite its body (params stay local).
-    const arrow = ARROW.exec(e);
-    if (arrow) {
-        const [, params, body] = arrow;
-        const names = paramNames(params);
-        const block = body.trimStart().startsWith('{');
-        const inner = block ? body.trim().slice(1, -1) : body;
-        const rewritten = rewriteStatements(inner, ctx, names);
-        return `${params} => ${block ? `{ ${rewritten} }` : rewritten}`;
-    }
+    const arrow = rewriteArrow(e, ctx);
+    if (arrow !== null) return arrow;
 
     // 3. Inline statement(s). One statement → tight arrow; many → block. The event is `$event`.
     const stmts = splitAtDepthZero(e, ';').map(s => s.trim()).filter(Boolean);
@@ -79,6 +73,22 @@ function unbatchedHandler(expr: string, ctx: CompileContext): string {
     const body = signalMutation(single, ctx) ?? callSignals(prefixCtx(single, ctx), ctx);
     // Expose $event only when referenced, so simple handlers stay as `() => …`.
     return /\$event\b/.test(single) ? `($event) => ${body}` : `() => ${body}`;
+}
+
+/**
+ * An arrow function written in a handler, with its body rewritten as handler statements (its
+ * parameters stay local), or null when `expr` is not one. Used for a handler that IS an arrow and
+ * for an arrow a handler assigns to a `$signal` (`onSave = () => count++`, #187).
+ */
+function rewriteArrow(expr: string, ctx: CompileContext): string | null {
+    const arrow = ARROW.exec(expr);
+    if (!arrow) return null;
+    const [, params, body] = arrow;
+    const names = paramNames(params);
+    const block = body.trimStart().startsWith('{');
+    const inner = block ? body.trim().slice(1, -1) : body;
+    const rewritten = rewriteStatements(inner, ctx, names);
+    return `${params} => ${block ? `{ ${rewritten} }` : rewritten}`;
 }
 
 /** Extract identifier names from an arrow param list (`(a, b)` or `a`); destructuring is skipped. */
@@ -105,7 +115,12 @@ function rewriteStatement(stmt: string, ctx: CompileContext): string {
     return signalMutation(stmt, ctx) ?? callSignals(prefixCtx(stmt, ctx), ctx);
 }
 
-/** Rewrite a bare-identifier mutation to `ctx.name.set(...)`, or null if not a mutation. */
+/**
+ * Rewrite a bare-identifier mutation, or null if not a mutation. An update (`++`, `--`, `+=` …)
+ * keeps the updater form, `ctx.name.set(v => …)`; an assignment (`=`, `||=`, `&&=`, `??=`) stores
+ * its value as it is, `ctx.name.setRaw(…)`, so a function is kept rather than called as an updater
+ * (#187). An arrow on the right side has its body rewritten like a handler's.
+ */
 function signalMutation(expr: string, ctx: CompileContext): string | null {
     let m = INC_DEC.exec(expr);
     if (m) {
@@ -116,12 +131,18 @@ function signalMutation(expr: string, ctx: CompileContext): string | null {
     m = ASSIGN.exec(expr);
     if (m) {
         const [, name, op, rawRhs] = m;
-        const rhs = callSignals(prefixCtx(rawRhs.trim(), ctx), ctx);
-        if (op === '=') return `ctx.${name}.set(${rhs})`;
+        const raw = rawRhs.trim();
+        const rhs = rewriteArrow(raw, ctx) ?? callSignals(prefixCtx(raw, ctx), ctx);
+        if (op === '=') return `ctx.${name}.setRaw(${rhs})`;
+        const logical = LOGICAL[op];
+        if (logical) return `(ctx.${name}() ${logical} ctx.${name}.setRaw(${rhs}))`;
         return `ctx.${name}.set(v => v ${op[0]} (${rhs}))`;
     }
     return null;
 }
+
+/** The logical assignment operators, by the short-circuit operator each stands for. */
+const LOGICAL: Record<string, string> = { '||=': '||', '&&=': '&&', '??=': '??' };
 
 // ─── Main Entry ──────────────────────────────────────────────────
 

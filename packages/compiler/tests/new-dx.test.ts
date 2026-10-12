@@ -187,9 +187,8 @@ describe('compile new mode', () => {
   }
 </script>`, 'todo.pdx');
 
-        // Self-reference: items = items.filter(...) → updater form
-        expect(code).toContain('__items.set(prev =>');
-        expect(code).toContain('prev.filter');
+        // Self-reference: items = items.filter(...) → the result is stored, the signal read untracked (#187)
+        expect(code).toContain('__items.setRaw(__items.peek().filter(');
 
         // Auto-return includes all
         expect(code).toContain('items: __items');

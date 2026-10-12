@@ -378,9 +378,13 @@ The handler is built by `buildEventHandler` (both paths):
 
 - a **reference**, `save` or `form.reset`, is passed as the listener: the event is its first argument;
 - an **arrow**, `e => last = e.button`, is kept, its parameters local and its body rewritten;
-- **one statement** becomes `() => …`: a signal named bare is written through `.set` — `count++` is
-  `ctx.count.set(v => v + 1)`, `open = !open` is `ctx.open.set(!ctx.open())`, `n += 2` is
-  `ctx.n.set(v => v + (2))` — and any other expression is called as written, `save(item)`;
+- **one statement** becomes `() => …`: a signal named bare is updated through `.set` and assigned
+  through `.setRaw`, which stores the value as it is, a function too — `count++` is
+  `ctx.count.set(v => v + 1)`, `n += 2` is `ctx.n.set(v => v + (2))`, `open = !open` is
+  `ctx.open.setRaw(!ctx.open())`, `x ??= v` is `(ctx.x() ?? ctx.x.setRaw(v))`, and an arrow assigned
+  (`onSave = () => count++`) has its body rewritten like a handler's. A `$signal` called,
+  `onSave()`, is read and then called, `ctx.onSave()()`. Any other expression is called as written,
+  `save(item)`;
 - **several statements**, separated by `;`, become `($event) => { …; … }`, each rewritten the same way.
 
 `$event` is the event: a handler that mentions it is `($event) => …`. The result is wrapped as

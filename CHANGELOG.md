@@ -56,6 +56,10 @@ semver.
   `subscribe: true` for a provided signal. (#103)
 - Without a DOM, `html``` throws an error that names the call instead of returning an empty
   fragment. (#93)
+- In a `.pdx`, an assignment to a `$signal` stores its value as it is: an arrow function assigned
+  (`onSave = () => save()`) is now stored, not called, and `onSave()` calls it. `x ??= v`, `x ||= v`
+  and `x &&= v` store `v` the same way; `x.peek()` and `x.setRaw(v)` reach the signal; `++`, `--`
+  and `+=` are unchanged. (#187)
 
 ### Fixes
 

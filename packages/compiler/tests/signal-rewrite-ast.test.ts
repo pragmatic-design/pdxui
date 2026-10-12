@@ -18,14 +18,16 @@ describe('rewriteAst — signal mutations + reads', () => {
         expect(ast('total += 5;', 'total')).toBe('__total.set(__v => __v + 5);');
         expect(ast('total *= n;', 'total')).toBe('__total.set(__v => __v * n);');
     });
+    // An assignment stores its value as it is (#187): setRaw, and a self-reference reads the
+    // current value untracked (peek), as the old `prev` did.
     it('direct assignment', () => {
-        expect(ast('count = 5;', 'count')).toBe('__count.set(5);');
-        expect(ast('count = a + 1;', 'count')).toBe('__count.set(a + 1);');
+        expect(ast('count = 5;', 'count')).toBe('__count.setRaw(5);');
+        expect(ast('count = a + 1;', 'count')).toBe('__count.setRaw(a + 1);');
     });
     it('self-reference', () => {
         expect(ast('items = items.filter(x => x.ok);', 'items'))
-            .toBe('__items.set(prev => prev.filter(x => x.ok));');
-        expect(ast('count = !count;', 'count')).toBe('__count.set(prev => !prev);');
+            .toBe('__items.setRaw(__items.peek().filter(x => x.ok));');
+        expect(ast('count = !count;', 'count')).toBe('__count.setRaw(!__count.peek());');
     });
     it('bare read + spread + other signals in RHS', () => {
         expect(ast('const x = count + 1;', 'count')).toBe('const x = __count() + 1;');
@@ -53,7 +55,7 @@ describe('rewriteAst — fixes the old regex bugs', () => {
     });
     it('optional-chaining self-reference', () => {
         expect(ast('items = items?.map(x => x);', 'items'))
-            .toBe('__items.set(prev => prev?.map(x => x));');
+            .toBe('__items.setRaw(__items.peek()?.map(x => x));');
     });
     it('ternary value without a space before the colon', () => {
         expect(ast('const x = cond ? count: 0;', 'count')).toBe('const x = cond ? __count(): 0;');
@@ -62,7 +64,7 @@ describe('rewriteAst — fixes the old regex bugs', () => {
         expect(ast('const x = foo<number>(count);', 'count')).toBe('const x = foo<number>(__count());');
     });
     it('multiline assignment RHS', () => {
-        expect(ast('count =\n  a +\n  b;', 'count')).toBe('__count.set(a +\n  b);');
+        expect(ast('count =\n  a +\n  b;', 'count')).toBe('__count.setRaw(a +\n  b);');
     });
     it('comment between operand and ++', () => {
         expect(ast('count /* x */ ++;', 'count')).toBe('__count.set(__v => __v + 1);');

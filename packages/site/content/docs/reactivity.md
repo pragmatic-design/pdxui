@@ -21,7 +21,7 @@ functions** (`effect`, `watch`, `batch`, `ref`, `collectDisposers`) are imported
 ```pdx
 let count = $signal(0);
 count++;        // → __count.set(v => v + 1)
-count = 5;      // → __count.set(5)
+count = 5;      // → __count.setRaw(5)
 ```
 
 A signal notifies when it is **set**. Changing the array or object it holds in place sets nothing, so
@@ -30,21 +30,31 @@ instead — `items = [...items, x]`, `user = { ...user, name: v }`. The compiler
 form as `PDX_SIGNAL_MUTATED_IN_PLACE`, with that fix for a push and a field. A value meant to be
 changed in place is a [`$store`](/docs/store); a `:ref` target, which holds an element, is not reported.
 
-`set` has a behavior worth knowing: if you pass a **function**, it treats it as an *updater*
-(`s.set(prev => prev + 1)`). So if the value you want to store *is itself* a function (a handler, a
-template, a component to keep), don't use `set` — you'd accidentally use the updater — but **`setRaw(fn)`**,
-which stores the function as-is.
+An **assignment stores the value as it is**, a function too; an **update** (`++`, `--`, `+=` and the
+other compound operators) computes the new value from the old one. So a `$signal` can hold a handler,
+and calling it calls the function it holds:
 
-```ts
-import { signal } from '@pdxui/core';
+```pdx
+<template>
+  <button @click="onSave()">Save</button>
+</template>
 
-const onClick = signal<(() => void) | null>(null);
-onClick.setRaw(() => doThing());   // stores the function, doesn't invoke it as an updater
+<script setup>
+let saved = $signal(0);
+let onSave = $signal(null);
+
+function arm() {
+  onSave = () => saved++;   // stores the arrow; it does not run it
+}
+arm();
+</script>
 ```
 
-This is the `signal()` of `@pdxui/core`, in a `.ts` file. In a `.pdx` script a `$signal`'s name reads
-its value, so `onClick.setRaw(…)` would call `setRaw` on the value: a `$signal` cannot hold a
-function yet.
+`x ??= v`, `x ||= v` and `x &&= v` are assignments too: they keep their short circuit and store `v`
+as it is.
+
+In TypeScript, with the `signal()` of `@pdxui/core`, the two are spelled out: `set` takes a function as
+an *updater* (`s.set(prev => prev + 1)`), and **`setRaw(fn)`** stores the function itself.
 
 `peek()` reads the value **without** creating a subscription (useful inside an effect when you want to
 read but not depend on that signal).

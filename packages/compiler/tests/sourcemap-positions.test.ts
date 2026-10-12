@@ -300,7 +300,7 @@ function add(item) {
             ['let items = $signal([])', 'const __items = signal('],
             ['const total = $derived(', 'const total = computed('],
             ['function add(item)', 'function add(item)'],
-            ['items = items.concat(item)', '__items.set(prev => prev.concat(item))'],
+            ['items = items.concat(item)', '__items.setRaw(__items.peek().concat(item))'],
             ["if (!item) throw new Error('no item')", "if (!item) throw new Error('no item')"],
         ])).toEqual([]);
     });

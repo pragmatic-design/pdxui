@@ -92,6 +92,7 @@ export function compileNewMode(
         if (e.kind === 'function' || e.kind === 'const' || e.kind === 'let') nonSignals.add(e.name);
     }
     ctx.nonSignalNames = nonSignals;
+    ctx.stateSignalNames = new Set(analysis.signals.map((s) => s.name));
 
     // Every name the setup declares: prefixCtx needs them to tell a signal called
     // "error"/"item" apart from the fallback loop vars of the same name.
@@ -124,6 +125,7 @@ export function compileNewMode(
         renderCode = generateNodes(ast, imports, ctx);
     }
     ctx.nonSignalNames = null;
+    ctx.stateSignalNames = null;
     ctx.declaredNames = null;
     ctx.importedNames = null;
 

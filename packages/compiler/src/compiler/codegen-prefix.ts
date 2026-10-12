@@ -9,11 +9,24 @@ import { jsQuote } from './js-literal';
 
 // ─── Signal call insertion ──────────────────────────────────────
 
-/** Convert ctx.name → ctx.name() for signal reads (skip non-signals). */
+/**
+ * Convert ctx.name → ctx.name() for signal reads (skip non-signals).
+ *
+ * A `$signal` (state, `ctx.stateSignalNames`) also follows the script's rules (#187): in callee
+ * position it is read, then called — `ctx.handler(a)` → `ctx.handler()(a)`, the stored function —
+ * and `ctx.x.peek(` / `ctx.x.setRaw(` reach the signal itself. Any other name followed by `(` is
+ * left as it is: a function, a derived or a prop called by the author.
+ */
 export function callSignals(expr: string, ctx: CompileContext): string {
-    return expr.replace(/ctx\.([\w$]+)(?![\w$])(?!\s*\()/g, (_match, name) => {
-        if (ctx.nonSignalNames?.has(name)) return `ctx.${name}`;
-        return `ctx.${name}()`;
+    // Match: ctx.<name>, and what follows it when that is a call or a signal method call.
+    // Groups: [1]=name [2]=`(` or `.peek(`/`.setRaw(` with the spaces before it
+    return expr.replace(/ctx\.([\w$]+)(?![\w$])(\s*\(|\.(?:peek|setRaw)\s*\()?/g, (match, name: string, after?: string) => {
+        if (ctx.nonSignalNames?.has(name)) return match;
+        const state = ctx.stateSignalNames?.has(name) ?? false;
+        if (after === undefined) return `ctx.${name}()`;
+        if (after.trimStart().startsWith('(')) return state ? `ctx.${name}()${after}` : match;
+        // `.peek(` / `.setRaw(`: the signal's own method on state, the value's member otherwise.
+        return state ? match : `ctx.${name}()${after}`;
     });
 }
 

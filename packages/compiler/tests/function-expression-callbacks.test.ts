@@ -20,7 +20,7 @@ describe('a function-expression callback reads its signals like an arrow does', 
             const out = compile(sfc(`let count = $signal(0);\nlet label = $signal('');\n${call}`), 'piece.pdx');
             expect(fallbacks(out), JSON.stringify(fallbacks(out))).toEqual([]);
             expect(out.code).toContain('= __count()');
-            expect(out.code).toMatch(/__label\.set\(/);
+            expect(out.code).toMatch(/__label\.setRaw\(/);
         });
     }
 

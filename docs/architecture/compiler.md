@@ -123,7 +123,7 @@ let count = $signal(0);        const __count = signal(0);
 count++;                       __count.set(v => v + 1);
 count--;                       __count.set(v => v - 1);
 count += 5;                    __count.set(v => v + 5);
-count = 10;                    __count.set(10);
+count = 10;                    __count.setRaw(10);      // an assignment stores its value as it is
 console.log(count);            console.log(__count());
 ```
 

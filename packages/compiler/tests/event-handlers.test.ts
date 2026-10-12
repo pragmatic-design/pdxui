@@ -30,7 +30,7 @@ describe('@event handlers', () => {
     });
 
     it('count = count + 1 → set with the signal read', () => {
-        expect(handlerCode('count = count + 1')).toContain('ctx.count.set(ctx.count() + 1)');
+        expect(handlerCode('count = count + 1')).toContain('ctx.count.setRaw(ctx.count() + 1)');
     });
 
     it("alert('hi') (a global call) → () => alert('hi')", () => {
@@ -41,8 +41,8 @@ describe('@event handlers', () => {
         expect(handlerCode('inc()')).toContain('() => ctx.inc()');
     });
 
-    it('toggle via negation: open = !open → set(!ctx.open())', () => {
-        expect(handlerCode('open = !open')).toContain('ctx.open.set(!ctx.open())');
+    it('toggle via negation: open = !open → setRaw(!ctx.open())', () => {
+        expect(handlerCode('open = !open')).toContain('ctx.open.setRaw(!ctx.open())');
     });
 
     // ── Lambdas / arrows ──────────────────────────────────────────
@@ -53,7 +53,7 @@ describe('@event handlers', () => {
 
     it('arrow with a body mutation rewrites to .set, param stays local', () => {
         const out = handlerCode('e => count = e.detail');
-        expect(out).toContain('e => ctx.count.set(e.detail)');
+        expect(out).toContain('e => ctx.count.setRaw(e.detail)');
     });
 
     it('parenthesized arrow with empty params', () => {
@@ -81,7 +81,7 @@ describe('@event handlers', () => {
 
     it('$event in a mutation RHS', () => {
         const out = handlerCode('count = $event.detail');
-        expect(out).toContain('($event) => ctx.count.set($event.detail)');
+        expect(out).toContain('($event) => ctx.count.setRaw($event.detail)');
     });
 
     // ── Multiple statements ───────────────────────────────────────

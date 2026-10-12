@@ -6,10 +6,13 @@
 //
 // One walk rewrites, in a single pass:
 //   • signal reads      count       → __count()
-//   • signal mutations  count++      → __count.set(__v => __v + 1)
+//   • signal updates    count++      → __count.set(__v => __v + 1)
 //                       count += x   → __count.set(__v => __v + x)
-//                       count = x    → __count.set(x)
-//                       count = …count… → __count.set(prev => …prev…)   (self-reference)
+//   • assignments       count = x    → __count.setRaw(x)    (stored as is, a function too: #187)
+//                       count = …count… → __count.setRaw(…__count.peek()…)   (untracked self-read)
+//                       count ??= x  → (__count() ?? __count.setRaw(x))   (and ||=, &&=)
+//   • signal methods    count.peek() → __count.peek()      (and setRaw)
+//   • a call            handler(a)   → __handler()(a)       (read, then called)
 //   • callable reads    total/prop   → total()    (deriveds + props + typed route params)
 //
 // The AST gives lexical scope/shadowing for free and natively handles generics, multiline,
@@ -102,16 +105,17 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
     const shadowed = (name: string): boolean => scopeStack.some((f) => f.has(name));
     const isSignal = (n: ts.Node): n is ts.Identifier => ts.isIdentifier(n) && signalNames.has(n.text) && !shadowed(n.text);
 
-    // selfName: inside the RHS of `name = …` a read of `name` becomes `prev`; other signals/
-    // callables still get rewritten normally.
-    function visit(node: ts.Node, selfName?: string): void {
+    // peekName: inside the right side of `name = …` a read of `name` is `__name.peek()` — the
+    // value it has now, untracked, as the old `set(prev => …)` read it: inside an effect a tracked
+    // self-read would make `count = count + 1` re-run its own effect forever.
+    function visit(node: ts.Node, peekName?: string): void {
         const frame = scopeBindings(node);
         if (frame) scopeStack.push(new Set(frame));
-        if (!handle(node, selfName)) ts.forEachChild(node, (c) => visit(c, selfName));
+        if (!handle(node, peekName)) ts.forEachChild(node, (c) => visit(c, peekName));
         if (frame) scopeStack.pop();
     }
 
-    function handle(node: ts.Node, selfName?: string): boolean {
+    function handle(node: ts.Node, peekName?: string): boolean {
         // count++ / ++count / count-- / --count
         if ((ts.isPostfixUnaryExpression(node) || ts.isPrefixUnaryExpression(node)) &&
             (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken) &&
@@ -126,40 +130,49 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
             const name = (node.left as ts.Identifier).text;
             const logicalOp = LOGICAL_ASSIGN_OP[node.operatorToken.kind];
             if (logicalOp) {
-                // Short-circuiting compound assignment: `c ||= x` / `c &&= x` / `c ??= x`.
-                // Preserve semantics: only set when the logical op would assign.
-                //   c ||= x  → (__c() || __c.set(x))      (sets only when falsy)
-                //   c &&= x  → (__c() && __c.set(x))      (sets only when truthy)
-                //   c ??= x  → (__c() ?? __c.set(x))      (sets only when null/undefined)
-                edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `(__${name}() ${logicalOp} __${name}.set(` });
+                // Short-circuiting compound assignment: `c ||= x` / `c &&= x` / `c ??= x`. An
+                // assignment, so it stores `x` as it is (setRaw: a function is kept, not called as
+                // an updater, #187), and only when the logical op would assign.
+                //   c ||= x  → (__c() || __c.setRaw(x))      (sets only when falsy)
+                //   c &&= x  → (__c() && __c.setRaw(x))      (sets only when truthy)
+                //   c ??= x  → (__c() ?? __c.setRaw(x))      (sets only when null/undefined)
+                edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `(__${name}() ${logicalOp} __${name}.setRaw(` });
                 edits.push({ start: node.right.getEnd(), end: node.right.getEnd(), text: '))' });
-                visit(node.right, selfName);
+                visit(node.right, peekName);
                 return true;
             }
             const jsOp = COMPOUND_OP[node.operatorToken.kind];
             if (jsOp) {
                 edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `__${name}.set(__v => __v ${jsOp} ` });
                 edits.push({ start: node.right.getEnd(), end: node.right.getEnd(), text: ')' });
-                visit(node.right, selfName);
+                visit(node.right, peekName);
                 return true;
             }
             if (node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-                if (containsRead(node.right, name)) {
-                    // A right-hand side that starts with `{` becomes the arrow's BODY, read as a block:
-                    // `prev => { ...prev }` is a SyntaxError that takes the whole module down. Wrap it
-                    // so the arrow returns the object. Checked on the source text, so
-                    // `{ … } as const` is covered and an already-parenthesised `({ … })` is left alone.
-                    const wrap = code[node.right.getStart(sf)] === '{';
-                    edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `__${name}.set(prev => ${wrap ? '(' : ''}` });
-                    edits.push({ start: node.right.getEnd(), end: node.right.getEnd(), text: wrap ? '))' : ')' });
-                    visit(node.right, name);
-                } else {
-                    edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `__${name}.set(` });
-                    edits.push({ start: node.right.getEnd(), end: node.right.getEnd(), text: ')' });
-                    visit(node.right, selfName);
-                }
+                // An assignment stores its value as it is (#187): `setRaw`, never `set`, which
+                // would call a function value as an updater. A right side that reads the signal
+                // reads its current value untracked (`__x.peek()`, see peekName), so `x = f(x)`
+                // needs no updater either.
+                edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `__${name}.setRaw(` });
+                edits.push({ start: node.right.getEnd(), end: node.right.getEnd(), text: ')' });
+                visit(node.right, name);
                 return true;
             }
+        }
+
+        // `x.peek()` / `x.setRaw(v)` on a $signal: the signal's own methods, not the value's (#187).
+        if (ts.isPropertyAccessExpression(node) && isSignal(node.expression) && SIGNAL_METHODS.has(node.name.text)) {
+            const name = (node.expression as ts.Identifier).text;
+            edits.push({ start: node.expression.getStart(sf), end: node.expression.getEnd(), text: `__${name}` });
+            return true;
+        }
+
+        // `x(args)` with `x` a $signal: read the value, then call it (decision 17, #187).
+        if (ts.isCallExpression(node) && isSignal(node.expression)) {
+            const name = (node.expression as ts.Identifier).text;
+            edits.push({ start: node.expression.getStart(sf), end: node.expression.getEnd(), text: `__${name}()` });
+            for (const arg of node.arguments) visit(arg, peekName);
+            return true;
         }
 
         // { count } → { count: __count() }   (regex would emit invalid { __count() })
@@ -179,10 +192,10 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
             return true;
         }
 
-        // reads: signal → __count() (or prev), callable → total()
+        // reads: signal → __count(), callable → total()
         if (ts.isIdentifier(node) && isReadPosition(node) && !shadowed(node.text)) {
             if (signalNames.has(node.text)) {
-                edits.push({ start: node.getStart(sf), end: node.getEnd(), text: selfName && node.text === selfName ? 'prev' : `__${node.text}()` });
+                edits.push({ start: node.getStart(sf), end: node.getEnd(), text: peekName === node.text ? `__${node.text}.peek()` : `__${node.text}()` });
                 return true;
             }
             if (callableNames.has(node.text)) {
@@ -221,6 +234,9 @@ const COMPOUND_OP: Partial<Record<ts.SyntaxKind, string>> = {
     [ts.SyntaxKind.GreaterThanGreaterThanEqualsToken]: '>>',
     [ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken]: '>>>',
 };
+
+/** The members of a $signal the script reaches on the signal itself, not on its value (#187). */
+const SIGNAL_METHODS = new Set(['peek', 'setRaw']);
 
 // Logical compound assignments must short-circuit (only assign when needed) — they cannot
 // use the `prev => prev OP x` wrapper form, which would always evaluate/assign x.
@@ -293,23 +309,6 @@ function isDestructuringAssignmentTarget(id: ts.Identifier): boolean {
         return false;
     }
     return false;
-}
-
-/** Does `node` contain a non-shadowed value read of `name` (self-reference detection)? */
-function containsRead(node: ts.Node, name: string): boolean {
-    let found = false;
-    const local: Set<string>[] = [];
-    const shadowed = () => local.some((f) => f.has(name));
-    const walk = (n: ts.Node): void => {
-        if (found) return;
-        const frame = scopeBindings(n);
-        if (frame) local.push(new Set(frame));
-        if (ts.isIdentifier(n) && n.text === name && isReadPosition(n) && !shadowed()) found = true;
-        else ts.forEachChild(n, walk);
-        if (frame) local.pop();
-    };
-    walk(node);
-    return found;
 }
 
 /** Binding names a scope-introducing node adds, or null if `node` opens no scope. */

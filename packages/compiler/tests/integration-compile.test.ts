@@ -214,11 +214,11 @@ describe('integration — @form codegen', () => {
 describe('integration — signal rewrite in callbacks', () => {
     it('effect-test.pdx: onMount rewrites signal assignments', () => {
         const { code } = compileDemo('effect-test.pdx');
-        // onMount body: count = initial → __count.set(initial())
+        // onMount body: count = initial → __count.setRaw(initial())
         // The ctx.track wrapper should contain rewritten signal assignments
-        expect(code).toContain('__count.set(');
-        // mountMsg = 'mounted...' → __mountMsg.set(...)
-        expect(code).toContain('__mountMsg.set(');
+        expect(code).toContain('__count.setRaw(');
+        // mountMsg = 'mounted...' → __mountMsg.setRaw(...)
+        expect(code).toContain('__mountMsg.setRaw(');
     });
 
     it('effect-test.pdx: $effect rewrites signal reads', () => {
@@ -253,7 +253,7 @@ describe('integration — @store compilation', () => {
 
     it('task-store.pdx: signals are rewritten inside store factory', () => {
         const { code } = compileDemo('task-store.pdx');
-        expect(code).toContain('__items.set(');
+        expect(code).toContain('__items.setRaw(');
         expect(code).toContain('__filter');
     });
 
