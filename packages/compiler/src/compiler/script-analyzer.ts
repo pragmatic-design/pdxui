@@ -175,6 +175,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const exposes: string[] = [];
     const states: StateDecl[] = [];
     let host: HostAttr[] | undefined;
+    const parts: string[] = [];
     const route: RouteInfo = {};
     let globalStore: GlobalStoreDirective | undefined;
     let customTag: string | undefined;
@@ -216,7 +217,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const hasLegacyMarkers = legacyMarkerAt !== -1;
     const isNewMode = (options.setup === true && !hasLegacyMarkers) || codeLines.some(l => {
         const t = l.trim();
-        return t.startsWith('@prop ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || /^@host\s*\{/.test(t) ||
+        return t.startsWith('@prop ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) ||
                t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||
                t.startsWith('@search ') || t.startsWith('@prefetch ') || t.startsWith('@layout ') ||
                t.startsWith('@fetch ') || t.startsWith('@form ') ||
@@ -618,6 +619,14 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             const block = extractBlock(lines, i);
             host = [...(host ?? []), ...parseHostBlock(block.content)];
             i = block.endLine;
+            continue;
+        }
+
+        // ─── @part name1, name2; — named, public parts of the component (#134) ───
+        // Match: @part trigger, popup;   Groups: [1]=the names
+        const partMatch = trimmed.match(/^@part\s+([\w\s,]+?)\s*;?\s*$/);
+        if (partMatch) {
+            parts.push(...partMatch[1].split(',').map(n => n.trim()).filter(Boolean));
             continue;
         }
 
@@ -1072,6 +1081,15 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         pushBody(line, i);
     }
 
+    // Each @part is the ref of its element (#134): a signal holding it, null until the element is
+    // rendered, which the script reads by the part's name — as a `:ref` written to a `$signal(null)`.
+    // A name the script already declares is left to that declaration.
+    for (const name of parts) {
+        if (signals.some(s => s.name === name) || exports.some(e => e.name === name)) continue;
+        signals.push({ name, initialExpr: 'null' });
+        exports.push({ name, kind: 'signal' });
+    }
+
     // The loop above scans LINE BY LINE, and several of its branches swallow a whole block and
     // `continue` — a `function` declaration, `onMount(…)`, `$effect(…)`. So the body of a function
     // never reaches the detector there, and none of the core APIs called inside one would be
@@ -1110,6 +1128,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         exposes,
         states,
         ...(host ? { host } : {}),
+        parts,
         route,
         globalStore,
         customTag,

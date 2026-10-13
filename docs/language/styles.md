@@ -44,7 +44,9 @@ itself.
 #### Rules
 
 - `:global(…)` is not CSS; it raises `PDX_GLOBAL_SELECTOR` (warning) and the browser drops the rule.
-  A plain descendant selector already reaches what a child component renders.
+  A plain descendant selector already reaches what a child component renders. What a child component
+  makes public to it is its parts, `pdx-menu [data-part="popup"]` (`@part`, #134), its states,
+  `:state(name)` (`@state`, #132), and its tokens; its internal classes are not public.
 - The selector list is split at its top-level commas only: a list inside `:is()`, `:where()`,
   `:not()` or `:has()` is one selector, `:is(.a, .b) > span` → `[data-pdx-HASH] :is(.a, .b) > span`.
 - A statement at-rule — `@import`, `@charset`, `@namespace`, `@layer a, b;` — ends at its `;` (one

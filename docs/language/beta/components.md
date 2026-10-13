@@ -346,6 +346,13 @@ let open = $signal(false);
 </script>
 ```
 
+**Landed** (#134). The part's ref is a signal holding the element (`null` while it is not rendered),
+as a `:ref` to a `$signal(null)`. The editor types it `HTMLElement | null`; the tag's own type
+(`HTMLDivElement`) needs the template, which is the editor's template projection (#122). The count is of the attribute as written, so a `data-part` inside an
+`@for` counts once: whether it may sit there is still one of the open questions (decisions.md). A
+name the script declares itself keeps its declaration, and the element is bound to it. The manifest
+lists a TypeScript component's `parts` as `cssParts`.
+
 ### Since
 
 beta (#134)

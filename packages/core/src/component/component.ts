@@ -128,9 +128,10 @@ export type ComponentContext = ComponentContextBase & Record<string, unknown>;
  * What a descriptor declares besides its props (#123), the TypeScript form of the `.pdx` runes. `events`
  * type `ctx.emit`, and an undeclared name is reported in development. `states` are the host's custom
  * states, set with `ctx.state` (#132). `host` (#133) is declared beside `setup` in each options type,
- * where its functions are typed with the component's context. The others are part of the
- * descriptor's type now and get their behaviour in their own issues: models #124, slots #131, parts
- * #134, expose #140, variants #153.
+ * where its functions are typed with the component's context. `parts` (#134) name the component's
+ * public elements, `[data-part="name"]`, for the manifest; a `.pdx` checks and binds them at compile
+ * time. The others are part of the descriptor's type now and get their behaviour in their own issues:
+ * models #124, slots #131, expose #140, variants #153.
  */
 export interface ComponentDeclarations<E extends EventMap = EventMap> {
     events?: E;

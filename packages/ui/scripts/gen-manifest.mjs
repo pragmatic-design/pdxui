@@ -250,6 +250,14 @@ function builtProp(initializer, sourceFile) {
     return { type: typeArg || runtime, runtime, default: def, ...(required ? { required: true } : {}) };
 }
 
+/** The string literals of a descriptor's array field, `parts: ['trigger', 'popup']` → their values. */
+function stringArrayField(optionsObj, sourceFile, field) {
+    const prop = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === field);
+    if (!prop || !ts.isArrayLiteralExpression(prop.initializer)) return [];
+    return prop.initializer.elements.filter(e => ts.isStringLiteralLike(e)).map(e => e.text);
+}
+
 /**
  * The states a descriptor declares, `states: ['open', 'invalid']` (#132) → { name, description }, the
  * description from a `@cssstate name - text` tag on the component, as for `@csspart`.
@@ -825,6 +833,10 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
         if (!slots.some(s => s.name === name)) slots.push({ name, description: name ? '' : 'The content placed inside the element.' });
     }
     const cssParts = tags.filter(t => t.tag === 'csspart').map(t => splitNameDesc(t.text));
+    // The descriptor's `parts` (#134), each reached as `[data-part="name"]`; a `@csspart` describes it.
+    for (const name of stringArrayField(optionsObj, sourceFile, 'parts')) {
+        if (!cssParts.some(p => p.name === name)) cssParts.push({ name, description: `The element reached as \`[data-part="${name}"]\`.` });
+    }
     const cssProperties = tags.filter(t => t.tag === 'cssprop' || t.tag === 'cssproperty').map(t => splitNameDesc(t.text));
     const cssStates = extractDescriptorStates(optionsObj, sourceFile, tags);
     const summary = tags.find(t => t.tag === 'summary')?.text || '';

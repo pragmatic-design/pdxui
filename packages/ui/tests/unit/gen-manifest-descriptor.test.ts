@@ -69,6 +69,26 @@ describe('gen-manifest reads a typed descriptor', () => {
     });
 });
 
+describe('gen-manifest reads the descriptor\'s parts (#134)', () => {
+    const source = [
+        '/**',
+        ' * A widget.',
+        ' * @csspart popup - The list of options.',
+        ' */',
+        "component('pdx-widget', {",
+        "    parts: ['trigger', 'popup'],",
+        '    render: () => html`<div></div>`,',
+        '});',
+    ].join('\n');
+
+    it('lists them as cssParts, each once, described by @csspart where it says', () => {
+        expect(analyzeFile('src/widget/pdx-widget.ts', source, {})[0].declarations[0].cssParts).toEqual([
+            { name: 'popup', description: 'The list of options.' },
+            { name: 'trigger', description: 'The element reached as `[data-part="trigger"]`.' },
+        ]);
+    });
+});
+
 describe('gen-manifest reads the descriptor\'s states (#132)', () => {
     const source = [
         '/**',

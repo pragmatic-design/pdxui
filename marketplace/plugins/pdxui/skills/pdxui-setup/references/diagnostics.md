@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 76 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 79 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -598,6 +598,96 @@ write:
 </template>
 <script setup>
 @page '/users';
+</script>
+```
+
+### PDX_PART_DUPLICATE
+
+*error* — A `@part` written on more than one element.
+
+A part names one element. On two, a theme styles both under one name and the script's ref holds whichever rendered last.
+
+**Fix.** Keep `data-part="x"` on one element, and give the others parts of their own.
+
+Instead of:
+
+```html
+<template>
+  <button data-part="action">A</button><button data-part="action">B</button>
+</template>
+<script setup>
+@part action;
+</script>
+```
+
+write:
+
+```html
+<template>
+  <button data-part="ok">A</button><button data-part="cancel">B</button>
+</template>
+<script setup>
+@part ok, cancel;
+</script>
+```
+
+### PDX_PART_MISSING
+
+*error* — A declared `@part` that no element of the template carries.
+
+A part is a public name for one element: a theme styles `[data-part="x"]` and the script reads `x` as the element. With no element, both reach nothing, and the manifest lists a part that is not there.
+
+**Fix.** Write `data-part="x"` on the element it names, or remove `x` from `@part`.
+
+Instead of:
+
+```html
+<template>
+  <button>Menu</button>
+</template>
+<script setup>
+@part trigger;
+</script>
+```
+
+write:
+
+```html
+<template>
+  <button data-part="trigger">Menu</button>
+</template>
+<script setup>
+@part trigger;
+</script>
+```
+
+### PDX_PART_UNDECLARED
+
+*error* — A `data-part` that names no `@part`.
+
+Parts are the component's public styling surface and the manifest lists them from `@part`: an undeclared one is public by accident, and nothing says it exists.
+
+**Fix.** Declare it, `@part x;`, or remove the attribute.
+
+Instead of:
+
+```html
+<template>
+  <div data-part="popup">x</div>
+</template>
+<script setup>
+let open = $signal(false);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <div data-part="popup">x</div>
+</template>
+<script setup>
+@part popup;
 </script>
 ```
 

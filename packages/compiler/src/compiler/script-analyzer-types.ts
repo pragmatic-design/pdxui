@@ -228,6 +228,7 @@ export interface ScriptAnalysis {
     exposes: string[];       // names declared via @expose
     states: StateDecl[];     // @state name = expr;
     host?: HostAttr[];       // @host { role="x" :aria-expanded="open" @keydown="onKey" }
+    parts: string[];         // @part trigger, popup;
     route: RouteInfo;       // route metadata from @page/@guard/etc.
     globalStore?: GlobalStoreDirective;  // @store rune (file = store module)
     customTag?: string;      // @tag 'pdx-custom-name' — overrides file-derived tag

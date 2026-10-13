@@ -19,6 +19,7 @@ import { escapeForRegExp } from './regexp-escape';
 import { bindingNames } from './codegen-prefix';
 import { stateExprIsNotBoolean } from './validate-state';
 import { invalidHostAttribute } from './host-block';
+import { checkParts } from './validate-parts';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -353,6 +354,8 @@ export function validate(
 
     for (const e of analysis.exports) {
         if (e.name.startsWith('_')) continue; // underscore = intentionally unused
+        // A @part's ref (#134) is public by declaration: the element is the use, not a read.
+        if (analysis.parts.includes(e.name)) continue;
         if (!templateIds.has(e.name) && e.kind !== 'function') {
             // Only warn for signals/derived that are never in template.
             if (e.kind === 'signal' || e.kind === 'derived') {
@@ -492,6 +495,10 @@ export function validate(
             hint: 'Remove it from @host.',
         });
     }
+
+    // ─── Check 10d: each @part on exactly one element (#134) ────
+
+    warnings.push(...checkParts(analysis.parts, ast));
 
     // ─── Check 11: @prop default type mismatch ──────────────────
 
