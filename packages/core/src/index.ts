@@ -12,6 +12,8 @@
 // Reactivity
 export { signal, computed, effect, batch, batchHandler, onCleanup, onDispose, collectDisposers, ref, untracked, enableDevMode, pushErrorHandler, popErrorHandler } from './reactivity/signal';
 export type { ComputedOptions, EffectOptions } from './reactivity/signal';
+export { selector } from './reactivity/selector';
+export type { Selector } from './reactivity/selector';
 
 // Deep Reactive Store
 export { store, shallowStore } from './reactivity/store';

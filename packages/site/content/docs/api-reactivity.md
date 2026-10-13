@@ -7,7 +7,7 @@ parent: api
 
 # Reactivity API
 
-Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 70 exports, from `@pdxui/core`.
+Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 71 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -760,6 +760,16 @@ Accumulate values over time (like Array.reduce but reactive).
 Usage:
   const total = scan(() => clicks(), (acc, v) => acc + v, 0);
   // Every click adds to total
+
+## `selector`
+
+```ts
+import { selector } from '@pdxui/core';
+
+function selector(source: () => T): Selector<T>
+```
+
+A selector over `source`, compared with `Object.is`.
 
 ## `setDefaultCache`
 

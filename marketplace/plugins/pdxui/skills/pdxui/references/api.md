@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-443 value exports.
+444 value exports.
 
 ### `__adoptStyles`
 
@@ -4514,6 +4514,16 @@ function scrollTo(target: string | number | Element, options?: { behavior?: Scro
 ```
 
 Scroll to a target: CSS selector, element, or Y position.
+
+### `selector`
+
+```ts
+import { selector } from '@pdxui/core';
+
+function selector(source: () => T): Selector<T>
+```
+
+A selector over `source`, compared with `Object.is`.
 
 ### `setComponentStrings`
 

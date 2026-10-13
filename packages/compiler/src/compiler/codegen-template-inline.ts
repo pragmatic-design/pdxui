@@ -23,6 +23,7 @@ import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
 import { specialisedClassBinding } from './inline-class-binding';
 import { delegableHandler } from './inline-event-delegation';
+import { rewriteKeyedSelectors, selectorName } from './inline-keyed-selector';
 
 // ─── Constants ────────────────────────────────────────────────────
 
@@ -229,7 +230,13 @@ class InlineGen {
     private inTable(): boolean { return this.tableStack[this.tableStack.length - 1] ?? this.baseTable; }
     /** Is the current parent a component, under one, or in a @portal? */
     private opaque(): boolean { return this.opaqueStack[this.opaqueStack.length - 1] ?? this.baseOpaque; }
-    private read(expr: string): string { return callSignals(prefixCtx(expr, this.ctx), this.ctx); }
+    private read(expr: string): string {
+        const code = callSignals(prefixCtx(expr, this.ctx), this.ctx);
+        if (this.ctx.rowKeys.length === 0) return code;
+        // In a @for, `key === sig` reads a keyed selector: a change of sig re-runs two rows (#117).
+        const keys = this.ctx.rowKeys.map(k => callSignals(prefixCtx(k, this.ctx), this.ctx));
+        return rewriteKeyedSelectors(code, keys, (name) => this.ctx.selectors.add(name));
+    }
     /** A binding's value as written: shared with its repeats when this generator deduplicates. */
     private shared(value: string): string { return this.dedup ? this.dedup.share(value) : value; }
 
@@ -937,7 +944,10 @@ class InlineGen {
             lines = [...shared.decls, ...shared.lines];
         }
         const prologue = this.tree.prologue(this.hoists, this.imports);
-        const body = [...leading, ...prologue, ...lines].map(l => '    ' + l).join('\n');
+        // One keyed selector per signal a @for compares its key with (#117), owned by the render.
+        const selectors = [...this.ctx.selectors].map(n => `const ${selectorName(n)}=selector(()=>ctx.${n}());`);
+        if (selectors.length > 0) this.imports.add('selector');
+        const body = [...leading, ...prologue, ...selectors, ...lines].map(l => '    ' + l).join('\n');
         return `(() => {\n${body}\n    return __frag;\n  })()`;
     }
 }

@@ -30,6 +30,9 @@ export interface CompileContext {
     /** The event types this component delegates to one listener each (#113; inline-event-delegation). */
     delegatedEvents: Set<string>;
 
+    /** The signals a keyed selector is declared for at the top of the render (#117; inline-keyed-selector). */
+    readonly selectors: Set<string>;
+
     /** Names that are NOT signals — form refs, resources, functions. callSignals() skips adding (). */
     nonSignalNames: Set<string> | null;
 
@@ -133,6 +136,7 @@ export function createCompileContext(options?: {
         rowKeys: [],
         literalConsts: new Set(),
         delegatedEvents: new Set(),
+        selectors: new Set(),
         nonSignalNames: null,
         stateSignalNames: null,
         declaredNames: null,
