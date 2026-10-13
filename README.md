@@ -132,10 +132,11 @@ __pdx_pushRoute({ path: "/employees", tag: "pdx-employees", scroll: "preserve",
                   labelKey: "employees.title", lazy: true, file: './employees.pdx' });
 ```
 
-In development nothing is built: `pdx dev` interprets templates, with hot reload. `pdx build`
-compiles with knowledge of the whole project: routes split into chunks, the landing route's chunk
-preloaded, bindings inlined, CSS extracted, diagnostics stripped. The two must render the same; the
-compiler's parity tests compare them, and a difference between the two is a compiler bug.
+In development nothing is built: `pdx dev` compiles each `.pdx` when it is requested, through the
+same render path a build uses, with hot reload. `pdx build` compiles with knowledge of the whole
+project: routes split into chunks, the landing route's chunk preloaded, repeated bindings shared, CSS
+extracted, diagnostics stripped. The two must render the same; the render parity table holds it, and
+a difference between the two is a compiler bug.
 
 ---
 

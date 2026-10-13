@@ -32,7 +32,7 @@ const PLAIN = `<template><p :title="t">{{ t }}</p></template>
 </script>`;
 
 const emitted = (source: string): string =>
-    compile(source, 'team.pdx', [], undefined, { production: true, inlineBindings: true }).code;
+    compile(source, 'team.pdx', [], undefined, { production: true }).code;
 
 /** The names the module imports from `@pdxui/core`. */
 function importedNames(code: string): string[] {

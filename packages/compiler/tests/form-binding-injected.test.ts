@@ -35,7 +35,7 @@ describe('a section that calls useForm() is wired to the form above it', () => {
 
     it('the production build\'s inline path emits the same lookup, as valid JS', () => {
         const { code } = compile(sfc("import { useForm } from '@pdxui/core';\nconst form = useForm();", FIELD),
-            'section.pdx', [], undefined, { production: true, inlineBindings: true });
+            'section.pdx', [], undefined, { production: true });
         parses(code);
         expect(code).toContain('tryUseForm(ctx.el)?.fields.deep?.onChange(');
         expect(code).toMatch(/import \{[^}]*\btryUseForm\b[^}]*\} from '@pdxui\/core'/);

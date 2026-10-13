@@ -608,8 +608,6 @@ export interface CompileOptions {
      * the console prints defects. The returned `warnings` carry both either way.
      */
     logDesign?: boolean;
-    /** Production: generate imperative DOM code instead of html`` tagged templates. */
-    inlineBindings?: boolean;
     /**
      * Declared props of known components (the plugin passes the UI manifest's). With it, a bound
      * name that matches a prop only case-insensitively — `:withborder` — is emitted as the prop, and
@@ -812,7 +810,7 @@ export function compile(
     const beforeCodegen = allWarnings.length;
     let code = compileSFC(
         descriptor, ast, filename, runner,
-        { production: options?.production, inlineBindings: options?.inlineBindings, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
+        { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
           sourceFile: options?.sourceFile,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.
@@ -919,7 +917,6 @@ function compileScriptOnly(
         const ast = parseTemplate(descriptor.template!.content, 1);
         const out = mapped(compileSFC(descriptor, ast, filename, runner, {
             production: options?.production,
-            inlineBindings: options?.inlineBindings,
         }, codegenAnalysis()));
         let code = out.code;
         if (runner) code = runner.runTransformOutput(code);
@@ -934,7 +931,6 @@ function compileScriptOnly(
     const ast = parseTemplate(sfcDesc.template!.content, 1);
     let code = compileSFC(sfcDesc, ast, filename, runner, {
         production: options?.production,
-        inlineBindings: options?.inlineBindings,
         scriptOnly: true,
     }, codegenAnalysis());
 

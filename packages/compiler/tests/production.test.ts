@@ -465,7 +465,7 @@ describe('inline bindings (Phase 3)', () => {
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'inline.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline.pdx', [], undefined, { production: true });
         expect(code).toContain('document.createElement');
         expect(code).toContain('createDocumentFragment');
         expect(code).not.toContain("html\`");
@@ -478,7 +478,7 @@ describe('inline bindings (Phase 3)', () => {
 <script setup>
 let loading = $signal(false);
 </script>`;
-        const { code } = compile(source, 'inline-prop.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-prop.pdx', [], undefined, { production: true });
         expect(code).toContain('createElement');
         expect(code).toContain("effect(");
         expect(code).toContain('disabled');
@@ -492,7 +492,7 @@ let loading = $signal(false);
 @prop label: string = '';
 function save() {}
 </script>`;
-        const { code } = compile(source, 'inline-event.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-event.pdx', [], undefined, { production: true });
         expect(code).toContain("addEventListener('click'");
     });
 
@@ -504,7 +504,7 @@ function save() {}
 @prop label: string = '';
 function save() {}
 </script>`;
-        const { code } = compile(source, 'inline-mod.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-mod.pdx', [], undefined, { production: true });
         expect(code).toContain('preventDefault');
         expect(code).toContain('stopPropagation');
     });
@@ -516,7 +516,7 @@ function save() {}
 <script setup>
 let count = $signal(0);
 </script>`;
-        const { code } = compile(source, 'inline-text.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-text.pdx', [], undefined, { production: true });
         expect(code).toContain('createTextNode');
         // core's bindInterpolation follows the signal, as the template path's interpolation does (#100).
         expect(code).toContain('bindInterpolation(__t1,()=>ctx.count())');
@@ -531,7 +531,7 @@ let count = $signal(0);
 <script setup>
 let visible = $signal(true);
 </script>`;
-        const { code } = compile(source, 'inline-if.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-if.pdx', [], undefined, { production: true });
         expect(code).toContain('when(');
         expect(code).toContain('createElement');
     });
@@ -545,7 +545,7 @@ let visible = $signal(true);
 <script setup>
 let items = $signal([]);
 </script>`;
-        const { code } = compile(source, 'inline-for.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-for.pdx', [], undefined, { production: true });
         expect(code).toContain('eachRow(');
         expect(code).toContain('createElement');
     });
@@ -559,7 +559,7 @@ let items = $signal([]);
 <script setup>
 let items = $signal([]);
 </script>`;
-        const { code } = compile(source, 'inline-for-scope.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-for-scope.pdx', [], undefined, { production: true });
         // The item is a row getter; its PROPERTY is still never called.
         // The value goes through core's bindInterpolation, not a bare String().
         expect(code).toContain('()=>item().name)');
@@ -575,7 +575,7 @@ let items = $signal([]);
 let count = $signal(0);
 const helper = 'ok';
 </script>`;
-        const { code } = compile(source, 'inline-nonsignal.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-nonsignal.pdx', [], undefined, { production: true });
         expect(code).toContain('ctx.helper');
         expect(code).not.toContain('ctx.helper()');
     });
@@ -587,7 +587,7 @@ const helper = 'ok';
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'inline-nest.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-nest.pdx', [], undefined, { production: true });
         // Should have nested appendChild calls
         expect(code).toContain("createElement('div')");
         expect(code).toContain("createElement('span')");
@@ -601,7 +601,7 @@ const helper = 'ok';
 <script setup>
 let name = $signal('');
 </script>`;
-        const { code } = compile(source, 'inline-twoway.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-twoway.pdx', [], undefined, { production: true });
         // Core's two-way wiring, handed the signal itself (#97): which event, and how the value is
         // read back, is the runtime's — measured on both paths by core's render-parity table.
         expect(code).toMatch(/bindTwoWay\(__el\d+, 'value', ctx\.name\);/);
@@ -615,7 +615,7 @@ let name = $signal('');
 <script setup>
 let isActive = $signal(false);
 </script>`;
-        const { code } = compile(source, 'inline-class.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-class.pdx', [], undefined, { production: true });
         expect(code).toContain('classList.toggle');
         expect(code).toContain('"active"');
     });
@@ -625,7 +625,7 @@ let isActive = $signal(false);
 <script setup>
 let unused = $signal(0);
 </script>`;
-        const { code } = compile(source, 'inline-dead.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-dead.pdx', [], undefined, { production: true });
         expect(code).not.toContain('signal(0)');
     });
 
@@ -638,7 +638,7 @@ let unused = $signal(0);
 <script setup>
 let off = $signal(false);
 </script>`;
-        const { code } = compile(source, 'inline-void.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-void.pdx', [], undefined, { production: true });
         expect(code).toContain("createElement('input')");
         expect(code).toContain("createElement('br')");
         expect(code).toContain("createElement('img')");
@@ -652,7 +652,7 @@ let off = $signal(false);
 let textColor = $signal('red');
 let visible = $signal(true);
 </script>`;
-        const { code } = compile(source, 'inline-style.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-style.pdx', [], undefined, { production: true });
         expect(code).toContain('style.setProperty');
         expect(code).toContain('style.display');
     });
@@ -664,7 +664,7 @@ let visible = $signal(true);
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'inline-ref.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-ref.pdx', [], undefined, { production: true });
         // Through core's bindRef, the template path's own, which sets the ref and resets it (#262).
         expect(code).toMatch(/bindRef\(__el\d+,ctx\.inputRef\);/);
         expect(code).toMatch(/import\s*\{[^}]*\bbindRef\b[^}]*\}\s*from\s*'@pdxui\/core'/);
@@ -677,7 +677,7 @@ let visible = $signal(true);
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'inline-deep.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-deep.pdx', [], undefined, { production: true });
         // 4 createElement calls (div, div, div, span) + correct nesting via appendChild
         const createCount = (code.match(/createElement/g) || []).length;
         expect(createCount).toBe(4);
@@ -693,7 +693,7 @@ let visible = $signal(true);
 let first = $signal('John');
 let last = $signal('Doe');
 </script>`;
-        const { code } = compile(source, 'inline-multi-interp.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-multi-interp.pdx', [], undefined, { production: true });
         // Two text nodes, each following its own signal
         expect(code).toContain('()=>ctx.first())');
         expect(code).toContain('()=>ctx.last())');
@@ -711,7 +711,7 @@ let last = $signal('Doe');
 <script setup>
 let status = $signal('active');
 </script>`;
-        const { code } = compile(source, 'inline-switch.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(source, 'inline-switch.pdx', [], undefined, { production: true });
         expect(code).toContain('match(');
         expect(code).toContain('createElement');
     });

@@ -53,7 +53,7 @@ describe('production compile speed benchmarks', () => {
 
     it('inline bindings compile speed', () => {
         const { ops } = bench('inline mode', () => {
-            compile(counterSrc, 'counter.pdx', [], undefined, { production: true, inlineBindings: true });
+            compile(counterSrc, 'counter.pdx', [], undefined, { production: true });
         });
         expect(ops).toBeGreaterThan(100);
     });

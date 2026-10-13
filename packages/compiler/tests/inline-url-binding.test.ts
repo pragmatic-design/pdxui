@@ -15,7 +15,7 @@ import { URL_BINDINGS } from '../src/compiler/codegen-template-inline';
 
 function inline(template: string, script = "let url = $signal('/');"): string {
     const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
-    return compile(source, 'inline-url.pdx', [], undefined, { production: true, inlineBindings: true }).code;
+    return compile(source, 'inline-url.pdx', [], undefined, { production: true }).code;
 }
 
 describe('inlineBindings: a URL binding is sanitised', () => {

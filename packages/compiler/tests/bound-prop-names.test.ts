@@ -83,7 +83,7 @@ describe('a bound name on a known component', () => {
 describe('the inline build binds a component prop the same way', () => {
     it('resolves the lowercase name, and assigns through core\'s assignBoundProperty', () => {
         const source = '<template>\n<pdx-app-layout :withborder="on"></pdx-app-layout>\n</template>\n<script setup>\n  let on = $signal(false);\n</script>';
-        const r = compile(source, 'bound-names.pdx', [], undefined, { production: true, inlineBindings: true, propsOf });
+        const r = compile(source, 'bound-names.pdx', [], undefined, { production: true, propsOf });
         expect(r.code).toMatch(/assignBoundProperty\(__el\d+, "withBorder", /);
         expect(r.code).toMatch(/import \{[^}]*\bassignBoundProperty\b[^}]*\} from '@pdxui\/core'/);
         expect(codes(r)).toContain('PDX_PROP_NAME_CASE');

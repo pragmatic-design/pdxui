@@ -18,7 +18,7 @@ import { analyzeScript } from '../src/compiler/script-analyzer';
 const PATHS = {
     dev: {},
     build: { production: true },
-    'production inline': { production: true, inlineBindings: true },
+    'production inline': { production: true },
 } as const;
 
 function sfc(script: string, template = '<button @click="picked(\'a\')">x</button>'): string {

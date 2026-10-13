@@ -3,7 +3,7 @@
 //   extractTag/deriveTag  — filename → CE tag
 //   indent                — block indentation
 //   detectDeadSignals     — production: dead signal elimination
-//   deduplicateBindings   — production: shared computed for repeated bindings
+//   referencesLocalScope  — whether an expression may be hoisted (inline-dedup.ts)
 
 import type { SFCDescriptor } from '../parser/sfc';
 import { generateStyles } from './codegen-styles';
@@ -11,7 +11,7 @@ import { skipNonCode, maskNonCode } from './tokenizer';
 import { extractBlock } from './script-analyzer-helpers';
 import type { analyzeScript } from './script-analyzer';
 import type { ValidationWarning } from './validate';
-import { originMark, ORIGIN_PREFIX } from './sourcemap';
+import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
 import { routeParams } from '../text-scan';
 
@@ -197,7 +197,6 @@ export function assembleModule(
         params?: { name: string; type: string }[];
     },
     production?: boolean,
-    inlineBindings?: boolean,
     /** Codegen diagnostics sink — PDX_LOADER_NOT_FOUND is raised here. */
     warnings?: { push(w: ValidationWarning): void },
     /** Where a tag's module lives — used to resolve `@layout` and to import what it resolves to. */
@@ -207,14 +206,6 @@ export function assembleModule(
     /** The .pdx relative to the app root, registered with the component — dev builds. */
     sourceFile?: string | null,
 ): string {
-    // Production: static template pre-compilation — use __staticHTML instead of html``
-    // Skip for inline bindings (they generate imperative code, not html``)
-    const isStaticAssembly = production && !inlineBindings && !renderCode.includes('${');
-    if (isStaticAssembly) {
-        imports.delete('html');
-        imports.add('__staticHTML');
-    }
-
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
     // the emitted body rather than passed down: the decision is made in buildSetupBody, and a second
@@ -300,13 +291,7 @@ export function assembleModule(
     code += `  ${frameMark(descriptor.script)}setup(ctx) {\n`;
     code += setupBody + '\n';
     code += `  },\n`;
-    if (isStaticAssembly) {
-        code += `  static: true,\n`;
-        const staticContent = renderCode.slice(5, -1); // strip html` and `
-        code += `  ${frameMark(descriptor.template)}render: () => __staticHTML(\`${staticContent}\`),\n`;
-    } else {
-        code += `  ${frameMark(descriptor.template)}render: (ctx) => ${renderCode},\n`;
-    }
+    code += `  ${frameMark(descriptor.template)}render: (ctx) => ${renderCode},\n`;
     code += `});\n`;
 
     // Auto-register route from @page declaration — zero manual createRouter() needed
@@ -469,11 +454,6 @@ export function detectDeadSignals(
 }
 
 /**
- * Deduplicate identical reactive binding expressions in template output.
- * Extracts duplicated ${() => expr} patterns into shared computed() signals.
- * Uses brace-balanced extraction for correct handling of nested expressions.
- */
-/**
  * Index of the `return ` that BEGINS the render statement, in a block-form render body.
  *
  * The body is `{ …statements…; return html`…` }`, so every character the page displays sits inside
@@ -501,127 +481,6 @@ export function renderReturnIndex(blockCode: string): number {
         else if (depth === 1 && ch === 'r' && code.startsWith('return ', i) && !/[\w$]/.test(code[i - 1] ?? '')) found = i;
     }
     return found;
-}
-
-export function deduplicateBindings(renderCode: string): { code: string; computeds: string[] } {
-    // A binding carries its origin mark just inside its `${` when the compile builds a source map.
-    // Two copies of one expression are still one expression: they are compared without
-    // their marks, and each keeps its own mark when it is replaced.
-    if (renderCode.includes(ORIGIN_PREFIX)) return deduplicateMarkedBindings(renderCode);
-    const marker = '${() => ';
-    const exprCounts = new Map<string, number>();
-
-    // Every `${…}` interpolation span. A binding inside another interpolation sits in a
-    // control-flow branch (`${when(…)}`, `${each(…)}`, `${errorBoundary(…)}`…) that may guard it:
-    // hoisting it to the top of render would evaluate it while the branch is closed —
-    // `@if (x()) { … x().a … }` would throw on `null.a` in production only. Only bindings at
-    // the top level of the render template are counted; a guarded copy never makes one hoistable.
-    const spans: [number, number][] = [];
-    for (let p = renderCode.indexOf('${'); p !== -1; p = renderCode.indexOf('${', p + 2)) {
-        if (renderCode[p - 1] === '\\') continue; // an escaped `\${` is template text, not an interpolation
-        spans.push([p, interpolationEnd(renderCode, p)]);
-    }
-    const isNested = (pos: number): boolean => spans.some(([s, e]) => s < pos && pos < e);
-
-    // Collect the top-level ${() => expr} interpolations
-    let i = 0;
-    while (true) {
-        const start = renderCode.indexOf(marker, i);
-        if (start === -1) break;
-        const j = interpolationEnd(renderCode, start);
-        if (!isNested(start)) {
-            const fullExpr = renderCode.slice(start, j + 1); // "${() => ...}"
-            exprCounts.set(fullExpr, (exprCounts.get(fullExpr) || 0) + 1);
-        }
-        i = j + 1;
-    }
-
-    const computeds: string[] = [];
-    let code = renderCode;
-    let idx = 0;
-
-    for (const [interpolation, count] of exprCounts) {
-        if (count < 2) continue;
-        const arrowExpr = interpolation.slice(2, -1); // "() => ctx.xxx()"
-        // Hoisting moves this into a top-level computed(), OUTSIDE any each() scope.
-        // If the expression references a loop-local (a bare identifier that is not a
-        // ctx.* access, global, or literal), hoisting would cause a ReferenceError.
-        // Only dedup expressions whose free identifiers are all ctx.* / globals.
-        if (referencesLocalScope(arrowExpr)) continue;
-        const varName = `__bd_${idx++}`;
-        computeds.push(`const ${varName} = computed(${arrowExpr});`);
-        code = code.split(interpolation).join(`\${${varName}}`);
-    }
-
-    return { code, computeds };
-}
-
-/**
- * `deduplicateBindings` for a render that carries origin marks: the same rules — copies counted at
- * the top level only, every copy replaced — with each `${() => …}` compared without its mark and
- * replaced by `${<its mark>__bd_N}`.
- */
-function deduplicateMarkedBindings(renderCode: string): { code: string; computeds: string[] } {
-    const spans: [number, number][] = [];
-    for (let p = renderCode.indexOf('${'); p !== -1; p = renderCode.indexOf('${', p + 2)) {
-        if (renderCode[p - 1] === '\\') continue;
-        spans.push([p, interpolationEnd(renderCode, p)]);
-    }
-    const isNested = (pos: number): boolean => spans.some(([s, e]) => s < pos && pos < e);
-
-    // Every `${<mark?>() => …}`, nested ones included: [start, end, mark, the binding without its mark].
-    const found: { start: number; end: number; mark: string; key: string; top: boolean }[] = [];
-    // Match: an interpolation that opens an arrow, with an origin mark or not. Groups: [1]=the mark
-    const opener = /\$\{(\/\*@pdx-at:\d+\*\/)?\(\) => /g;
-    for (const m of renderCode.matchAll(opener)) {
-        const start = m.index ?? 0;
-        if (renderCode[start - 1] === '\\') continue;
-        const end = interpolationEnd(renderCode, start);
-        const mark = m[1] ?? '';
-        const key = '${' + renderCode.slice(start + 2 + mark.length, end + 1);
-        found.push({ start, end, mark, key, top: !isNested(start) });
-    }
-
-    const counts = new Map<string, number>();
-    for (const f of found) if (f.top) counts.set(f.key, (counts.get(f.key) ?? 0) + 1);
-    const names = new Map<string, string>();
-    const computeds: string[] = [];
-    for (const [key, count] of counts) {
-        if (count < 2) continue;
-        const arrowExpr = key.slice(2, -1);
-        if (referencesLocalScope(arrowExpr)) continue;
-        const varName = `__bd_${names.size}`;
-        names.set(key, varName);
-        computeds.push(`const ${varName} = computed(${arrowExpr});`);
-    }
-
-    // A copy inside another copy that is replaced goes with it: replacing it first would move the
-    // outer one's end. The rest are replaced from the end, so earlier positions stay where they are.
-    const replaced = found.filter((f) => names.has(f.key));
-    const outermost = replaced.filter((f) => !replaced.some((o) => o !== f && o.start < f.start && f.end <= o.end));
-    let code = renderCode;
-    for (const f of outermost.sort((a, b) => b.start - a.start)) {
-        code = code.slice(0, f.start) + '${' + f.mark + names.get(f.key) + '}' + code.slice(f.end + 1);
-    }
-    return { code, computeds };
-}
-
-/**
- * Index of the `}` that closes the interpolation opened by the `${` at `start`.
- * String/template/comment-aware brace counting — a `{` inside a string (e.g. "{") or a nested
- * template literal must not unbalance the scan. Returns `code.length` when unbalanced.
- */
-function interpolationEnd(code: string, start: number): number {
-    let depth = 1;
-    let j = start + 2; // past ${
-    while (j < code.length && depth > 0) {
-        const skip = skipNonCode(code, j);
-        if (skip !== null && skip > j) { j = skip; continue; }
-        if (code[j] === '{') depth++;
-        else if (code[j] === '}') depth--;
-        if (depth > 0) j++;
-    }
-    return j;
 }
 
 /**

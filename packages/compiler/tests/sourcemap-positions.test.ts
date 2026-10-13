@@ -195,7 +195,7 @@ function save() { throw new Error('nope'); }
         ])).toEqual([]);
     });
 
-    for (const [where, options] of [['a production build', { production: true, inlineBindings: true }], ['dev, every .pdx\'s since #107', {}]] as const) {
+    for (const [where, options] of [['a production build', { production: true }], ['dev, every .pdx\'s since #107', {}]] as const) {
         it(`the inline path (${where}): the same six`, () => {
             const { code, map } = compile(TEMPLATE, 'tpl.pdx', [], undefined, options);
             expect(probe(TEMPLATE, code, map, [
@@ -271,7 +271,7 @@ export const team = [
 export function first() { return team[0]; }
 `;
         // A production build too: the site's build is where this broke.
-        for (const opts of [{}, { production: true, minify: true, inlineBindings: true }]) {
+        for (const opts of [{}, { production: true, minify: true }]) {
             const built = compile(DATA, 'state.pdx.ts', [], undefined, opts).code;
             const parse = ts.createSourceFile('state.js', built, ts.ScriptTarget.Latest, false, ts.ScriptKind.JS);
             const diagnostics = (parse as unknown as { parseDiagnostics: ts.Diagnostic[] }).parseDiagnostics ?? [];

@@ -50,7 +50,7 @@ function parses(code: string): true {
 
 describe('the inline path emits a module a bundler can read', () => {
     it('a @form component, where the compiler injects `${() => …}` into the markup', () => {
-        const { code } = compile(FORM, 'order.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(FORM, 'order.pdx', [], undefined, { production: true });
         expect(parses(code)).toBe(true);
     });
 
@@ -68,7 +68,7 @@ describe('the inline path emits a module a bundler can read', () => {
     ]) {
         it(`${form}`, () => {
             const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-            const { code } = compile(src, 'forms.pdx', [], undefined, { production: true, inlineBindings: true });
+            const { code } = compile(src, 'forms.pdx', [], undefined, { production: true });
             expect(parses(code)).toBe(true);
         });
     }
@@ -76,7 +76,7 @@ describe('the inline path emits a module a bundler can read', () => {
     it('and the injected binding reaches the element instead of becoming text', () => {
         // The precise symptom: the tail of the arrow was appended as a text node. `?.error()` is
         // part of the expression the compiler injected and belongs in code, never in the document.
-        const { code } = compile(FORM, 'order.pdx', [], undefined, { production: true, inlineBindings: true });
+        const { code } = compile(FORM, 'order.pdx', [], undefined, { production: true });
         expect(code, 'part of an injected expression was emitted as text')
             .not.toMatch(/createTextNode\("[^"]*\?\.error\(\)/);
     });

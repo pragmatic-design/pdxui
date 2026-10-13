@@ -18,7 +18,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 function inline(template: string, script = "let label = $signal('x');\nlet id = $signal(1);\nlet url = $signal('#t');\nfunction go() {}"): string {
     const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
-    return compile(source, 'inline-names.pdx', [], undefined, { production: true, inlineBindings: true }).code;
+    return compile(source, 'inline-names.pdx', [], undefined, { production: true }).code;
 }
 
 /** The emitted module must parse: a generator that writes broken JS is the defect itself. */
