@@ -1,6 +1,7 @@
 // Inline DOM construction codegen: the render path of every .pdx, in dev and in a build (#107).
-// Generates imperative createElement/appendChild code instead of html`` tagged templates.
-// Eliminates: innerHTML parsing, placeholder regex, bindAttribute dispatch, DOM walking.
+// Generates imperative DOM code instead of html`` tagged templates: no innerHTML parsing, no
+// placeholder regex, no bindAttribute dispatch. Each block's static markup is built once and cloned,
+// and the render binds the nodes a compile-time walk reaches (inline-static-tree.ts, #109).
 
 import { deferLoadFn, extractLoopInvariants, generateTransition } from './codegen-template';
 import type {
@@ -18,6 +19,7 @@ import { hoistSlotTemplate } from './codegen-template';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
+import { StaticTree, type TemplateHoists } from './inline-static-tree';
 
 // ─── Constants ────────────────────────────────────────────────────
 
@@ -132,22 +134,34 @@ const KEY_MAP: Record<string, string | string[]> = {
 
 // ─── Public API ───────────────────────────────────────────────────
 
-/** Generate imperative DOM construction code from template AST. Returns an IIFE. */
-export function generateInlineNodes(nodes: TemplateNode[], imports: Set<string>, ctx?: CompileContext): string {
-    const gen = new InlineGen(imports, 0, ctx);
+/**
+ * Generate imperative DOM construction code from template AST. Returns an IIFE.
+ *
+ * Each block's static-markup builder and walk are module-level declarations: given `hoists`, they are
+ * pushed there for the caller to write before the component; without it they open the IIFE itself, so
+ * the expression stands on its own.
+ */
+export function generateInlineNodes(nodes: TemplateNode[], imports: Set<string>, ctx?: CompileContext, hoists?: TemplateHoists): string {
+    const own: TemplateHoists = hoists ?? { lines: [], count: 0 };
+    const gen = new InlineGen(imports, 0, ctx, false, own);
     // A production build shares a binding repeated at the top level of the render (inline-dedup.ts).
     if (ctx?.production) gen.dedup = new BindingDedup();
     gen.walk(nodes);
-    return gen.build();
+    return gen.build(hoists ? [] : own.lines);
 }
 
 // ─── Generator ────────────────────────────────────────────────────
 
 class InlineGen {
+    /** The render's statements: the dynamic work. The static markup is in `tree`. */
     private lines: string[] = [];
     private idx: number;
-    private stack: string[] = [];
-    /** Parallel to `stack`: whether that element's children are in the SVG namespace. */
+    private readonly tree = new StaticTree();
+    /** Where every block's builder and walk are declared, shared by the generators of one render. */
+    private readonly hoists: TemplateHoists;
+    /** The tags this block and the blocks inside it create — `@defer` loads them. */
+    private readonly tags = new Set<string>();
+    /** Parallel to the open elements: whether that element's children are in the SVG namespace. */
     private svgStack: boolean[] = [];
     /** Whether the top level of this generator is inside an <svg> (a block body within one). */
     private readonly baseSvg: boolean;
@@ -158,10 +172,11 @@ class InlineGen {
     /** The top-level generator's binding deduplication; a block body's generator has none. */
     dedup: BindingDedup | null = null;
 
-    constructor(imports: Set<string>, startIdx = 0, ctx?: CompileContext, baseSvg = false) {
+    constructor(imports: Set<string>, startIdx: number, ctx: CompileContext | undefined, baseSvg: boolean, hoists: TemplateHoists) {
         this.imports = imports;
         this.idx = startIdx;
         this.baseSvg = baseSvg;
+        this.hoists = hoists;
         // Fallback context for backward compat (tests that don't pass ctx). Built by the factory
         // rather than spelled out: an inline literal would silently go stale every time
         // CompileContext gains a field.
@@ -171,8 +186,24 @@ class InlineGen {
     private v(prefix = 'el'): string { return `__${prefix}${this.idx++}`; }
     /** The origin mark the next line written carries: set just before a node's statement. */
     private pending = '';
-    private out(line: string): void { this.lines.push(this.pending + line); this.pending = ''; }
-    private parent(): string { return this.stack[this.stack.length - 1] ?? '__frag'; }
+    private out(line: string): void {
+        if (!this.tree.discarding()) this.lines.push(this.pending + line);
+        this.pending = '';
+    }
+
+    /**
+     * Put the node `expr` evaluates to where the walk has reached: an empty text node in the static
+     * markup marks the place, and the render replaces it. `guard`: `expr` may not be a Node, and then
+     * the marker is only removed.
+     */
+    private place(expr: string, guard = false): void {
+        if (this.tree.discarding()) return;
+        const m = this.v('m');
+        this.tree.anchor(m);
+        this.out(guard
+            ? `if(${expr} instanceof Node)${m}.replaceWith(${expr});else ${m}.remove();`
+            : `${m}.replaceWith(${expr});`);
+    }
     /** Are the elements created here, under the current parent, SVG? */
     private childrenSvg(): boolean { return this.svgStack[this.svgStack.length - 1] ?? this.baseSvg; }
     private read(expr: string): string { return callSignals(prefixCtx(expr, this.ctx), this.ctx); }
@@ -181,6 +212,8 @@ class InlineGen {
 
     walk(nodes: TemplateNode[]): void {
         for (const node of nodes) {
+            // Inside `<component :is>…</component>` only the markup is read, to find the closing tag.
+            if (this.tree.discarding() && node.type !== 'html') continue;
             switch (node.type) {
                 case 'html': this.html(node.content, htmlOriginOf(this.ctx, node), node.raw === true); break;
                 case 'interpolation': this.interp(node); break;
@@ -217,13 +250,13 @@ class InlineGen {
      *
      * The function is hoisted by the SAME helper the template path uses, so the two cannot disagree
      * about a slot's name, its scope variables or its body. What differs is only where the carrier
-     * goes: interpolated into the template there, appended to the current parent here.
+     * goes: interpolated into the template there, put in place here.
      *
      * The body is generated by the template path — `html``` and all — which is why the module still
      * needs the `html` import even though this render path never writes one itself.
      */
     private slotTemplateN(node: SlotTemplateNode): void {
-        this.out(`${this.parent()}.appendChild(${hoistSlotTemplate(node, this.imports, this.ctx)});`);
+        this.place(hoistSlotTemplate(node, this.imports, this.ctx));
     }
 
     /**
@@ -233,7 +266,7 @@ class InlineGen {
      */
     private scopedSlotN(node: ScopedSlotNode): void {
         this.imports.add('renderSlot');
-        this.out(`${this.parent()}.appendChild(${scopedSlotCall(node.tag, `()=>{${this.sub(node.body)}}`, this.ctx)});`);
+        this.place(scopedSlotCall(node.tag, `()=>{${this.sub(node.body)}}`, this.ctx));
     }
 
     // ─── HTML Fragment Parsing ────────────────────────────────
@@ -249,14 +282,14 @@ class InlineGen {
                 // nothing would make two inline siblings run together in a build.
                 if (text) {
                     const data = /^\s+$/.test(text) ? ' ' : decodeEntities(text);
-                    this.out(`${this.parent()}.appendChild(document.createTextNode(${jsString(data)}));`);
+                    this.tree.text(jsString(data));
                 }
                 i = next === -1 ? content.length : next;
                 continue;
             }
             if (content[i + 1] === '/') {
                 const end = content.indexOf('>', i);
-                if (this.stack.length > 0) { this.stack.pop(); this.svgStack.pop(); }
+                if (this.tree.depth() > 0) { this.tree.close(); this.svgStack.pop(); }
                 i = end === -1 ? content.length : end + 1;
             } else if (content[i + 1] === '!') {
                 const end = content.indexOf('-->', i);
@@ -302,13 +335,11 @@ class InlineGen {
             this.imports.add('dynamic');
             const node = this.v();
             this.out(`const ${node} = ${dynamicCall};`);
-            this.out(`${this.parent()}.appendChild(${node});`);
-            // Its closing tag pops something: a fragment nothing renders, as the template path drops
-            // what is written between the tags.
+            this.place(node);
+            // Its closing tag pops something: content nothing renders, as the template path drops
+            // what is written between the tags (#358).
             if (!isVoid) {
-                const sink = this.v();
-                this.out(`const ${sink} = document.createDocumentFragment();`);
-                this.stack.push(sink);
+                this.tree.openSink();
                 this.svgStack.push(false);
             }
             return;
@@ -319,15 +350,16 @@ class InlineGen {
         const kind: ElementKind = { custom: !svg && name.includes('-'), svg, tag: name.toLowerCase() };
 
         const el = this.v();
-        this.out(svg
-            ? `const ${el} = document.createElementNS(${jsString(SVG_NS)}, ${jsQuote(name)});`
-            : `const ${el} = document.createElement(${jsQuote(name)});`);
+        if (!this.tree.discarding()) this.tags.add(kind.tag);
+        this.tree.element(el, svg
+            ? `__d.createElementNS(${jsString(SVG_NS)}, ${jsQuote(name)})`
+            : `__d.createElement(${jsQuote(name)})`, isVoid);
+        // An element the render binds — an attribute that became a statement of the render — is one
+        // the walk reaches.
+        const before = this.lines.length;
         this.attrs(tag, el, kind, at ? attributeOrigins(tag, at) : null, raw);
-        this.out(`${this.parent()}.appendChild(${el});`);
-        if (!isVoid) {
-            this.stack.push(el);
-            this.svgStack.push(svg && name !== 'foreignObject');
-        }
+        if (this.lines.length > before) this.tree.target(el);
+        if (!isVoid) this.svgStack.push(svg && name !== 'foreignObject');
     }
 
     // ─── Attribute Processing ─────────────────────────────────
@@ -359,7 +391,7 @@ class InlineGen {
         // Match: ` class="a b"` (not `:class`, not `data-class`)  Groups: [1]/[2]=the value
         const staticClass = /\sclass=(?:"([^"]*)"|'([^']*)')/.exec(s);
         const staticClassValue = staticClass ? (staticClass[1] ?? staticClass[2]) : '';
-        if (staticClass) this.out(`${el}.setAttribute("class", ${jsString(staticClassValue)});`);
+        if (staticClass) this.tree.statement(`${el}.setAttribute("class", ${jsString(staticClassValue)});`);
         let m;
         while ((m = re.exec(s)) !== null) {
             const n = m[1];
@@ -376,7 +408,7 @@ class InlineGen {
                 if (raw) {
                     // In @raw it is what the author wrote, and the browser reads it as a plain value:
                     // the template path's markup shows `${x}`, and so does this (#71).
-                    this.out(`${el}.setAttribute(${jsString(n)}, ${jsString(s.slice(open, close + 1))});`);
+                    this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(s.slice(open, close + 1))});`);
                     continue;
                 }
                 val = s.slice(open + 2, close);
@@ -395,8 +427,8 @@ class InlineGen {
             else if (gestureOf(n))            this.gestureBind(el, gestureOf(n)!, val, preRewritten);
             else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten);
             else if (n === 'class')           continue; // written first, above
-            else if (val)                     this.out(`${el}.setAttribute(${jsString(n)}, ${jsString(decodeEntities(val))});`);
-            else                              this.out(`${el}.setAttribute(${jsString(n)}, '');`);
+            else if (val)                     this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(decodeEntities(val))});`);
+            else                              this.tree.statement(`${el}.setAttribute(${jsString(n)}, '');`);
             this.pending = '';
         }
     }
@@ -598,8 +630,7 @@ class InlineGen {
         this.imports.add('bindInterpolation');
         const t = this.v('t');
         const expr = this.read(node.expr);
-        this.out(`const ${t}=document.createTextNode('');`);
-        this.out(`${this.parent()}.appendChild(${t});`);
+        this.tree.anchor(t);
         this.pending = templateMark(this.ctx, node.exprOffset);
         if (node.pipes?.length > 0) {
             // The same chain as the template path, the value first in every pipe (#199).
@@ -612,13 +643,17 @@ class InlineGen {
 
     // ─── Control Flow ─────────────────────────────────────────
 
-    private sub(nodes: TemplateNode[]): string {
+    /** A block's body — its render, cloning its own static markup — and the tags it creates. */
+    private block(nodes: TemplateNode[]): { code: string; tags: Set<string> } {
         // A block inside an <svg> builds SVG elements too.
-        const g = new InlineGen(this.imports, this.idx, this.ctx, this.childrenSvg());
+        const g = new InlineGen(this.imports, this.idx, this.ctx, this.childrenSvg(), this.hoists);
         g.walk(nodes);
         this.idx = g.idx;
-        return `const __frag=document.createDocumentFragment();${g.lines.join('')}return __frag;`;
+        for (const t of g.tags) this.tags.add(t);
+        return { code: `${g.tree.prologue(this.hoists, this.imports).join('')}${g.lines.join('')}return __frag;`, tags: g.tags };
     }
+
+    private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
 
     ifN(node: IfNode): void {
         this.imports.add('when');
@@ -628,7 +663,7 @@ class InlineGen {
         const cf = this.v('cf');
         this.pending = templateMark(this.ctx, node.exprOffset);
         this.out(`const ${cf}=when(()=>${cond},()=>{${then}},${els}${generateTransition(node.transition)});`);
-        this.out(`${this.parent()}.appendChild(${cf});`);
+        this.place(cf);
     }
 
     forN(node: ForNode): void {
@@ -673,11 +708,11 @@ class InlineGen {
             this.pending = templateMark(this.ctx, node.exprOffset);
             this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}}${transition});`);
             this.out(`const ${wf}=when(()=>${items}?.length>0,()=>{const f=document.createDocumentFragment();f.appendChild(${cf});return f;},()=>{${emptyBody}});`);
-            this.out(`${this.parent()}.appendChild(${wf});`);
+            this.place(wf);
         } else {
             this.pending = templateMark(this.ctx, node.exprOffset);
             this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}}${transition});`);
-            this.out(`${this.parent()}.appendChild(${cf});`);
+            this.place(cf);
         }
     }
 
@@ -716,7 +751,7 @@ class InlineGen {
         if (node.defaultBody) cases.push(`_:()=>{${this.sub(node.defaultBody)}}`);
         const cf = this.v('cf');
         this.out(`const ${cf}=match(()=>${expr},{${cases.join(',')}});`);
-        this.out(`${this.parent()}.appendChild(${cf});`);
+        this.place(cf);
     }
 
     requireN(node: RequireNode): void {
@@ -725,7 +760,7 @@ class InlineGen {
         const els = node.elseBody ? `()=>{${this.sub(node.elseBody)}}` : 'null';
         const cf = this.v('cf');
         this.out(`const ${cf}=requirePermission(${jsQuote(node.permission)},()=>{${body}},${els});`);
-        this.out(`${this.parent()}.appendChild(${cf});`);
+        this.place(cf);
     }
 
     showN(node: ShowNode): void {
@@ -734,7 +769,7 @@ class InlineGen {
         const body = this.sub(node.body);
         const cf = this.v('cf');
         this.out(`const ${cf}=show(()=>${cond},(()=>{${body}})());`);
-        this.out(`${this.parent()}.appendChild(${cf});`);
+        this.place(cf);
     }
 
     portalN(node: PortalNode): void {
@@ -742,24 +777,22 @@ class InlineGen {
         const body = this.sub(node.body);
         const cf = this.v('cf');
         this.out(`const ${cf}=portal(()=>(()=>{${body}})(),${jsQuote(node.target)});`);
-        this.out(`${this.parent()}.appendChild(${cf});`);
+        this.place(cf);
     }
 
     deferN(node: DeferNode): void {
         this.imports.add('defer');
-        const body = this.sub(node.body);
+        const { code: body, tags: created } = this.block(node.body);
         const opts: string[] = [`trigger:${jsQuote(node.trigger)}`];
         if (node.placeholder) opts.push(`placeholder:()=>{${this.sub(node.placeholder)}}`);
         if (node.loading) opts.push(`loading:()=>{${this.sub(node.loading)}}`);
         if (node.error) opts.push(`error:()=>{${this.sub(node.error)}}`);
-        // The tags the body creates, read off its `createElement` calls as the template path reads
-        // them off its markup: the block loads its components, or nothing does (#44).
-        // Match: createElement('pdx-x') or createElementNS(ns, 'pdx-x'). Groups: [1]=tag
-        const tags = [...new Set([...body.matchAll(/createElement(?:NS)?\((?:[^,()]*,\s*)?['"](pdx-[\w-]+)['"]/g)]
-            .map(m => m[1].toLowerCase()))];
+        // The components the body creates, its own and those of the blocks inside it, as the template
+        // path reads them off its markup: the block loads its components, or nothing does (#44).
+        const tags = [...created].filter((t) => t.startsWith('pdx-'));
         const cf = this.v('cf');
         this.out(`const ${cf}=defer({${opts.join(',')}},${deferLoadFn(tags, this.ctx)},()=>{${body}});`);
-        this.out(`${this.parent()}.appendChild(${cf});`);
+        this.place(cf);
     }
 
     tryN(node: TryNode): void {
@@ -768,7 +801,7 @@ class InlineGen {
         const catchBody = withBoundaryScope(node.errorVar, node.retryVar, this.ctx, () => this.sub(node.catchBody));
         const cf = this.v('cf');
         this.out(`const ${cf}=errorBoundary(()=>{${body}},(${node.errorVar},${node.retryVar})=>{${catchBody}});`);
-        this.out(`${this.parent()}.appendChild(${cf});`);
+        this.place(cf);
     }
 
     awaitN(node: AwaitNode): void {
@@ -800,11 +833,11 @@ class InlineGen {
             // again (retry, or resetOn) needs a new one, not the fragment the first render emptied.
             // resetOn: a new promise in the awaited expression leaves @error.
             this.out(`const ${wrap}=errorBoundary(()=>{const f=document.createDocumentFragment();f.appendChild(${switchCall});return f;},(${errVar},${retryVar})=>{${errBody}},{resetOn:()=>${awaited}});`);
-            this.out(`${this.parent()}.appendChild(${wrap});`);
+            this.place(wrap);
         } else {
             const cf = this.v('cf');
             this.out(`const ${cf}=${switchCall};`);
-            this.out(`${this.parent()}.appendChild(${cf});`);
+            this.place(cf);
         }
     }
 
@@ -817,25 +850,27 @@ class InlineGen {
             const generated = handler.generate(node.expr, bodyCode, this.imports);
             const cf = this.v('cf');
             this.out(`const ${cf}=(()=>{${generated}})();`);
-            this.out(`if(${cf} instanceof Node)${this.parent()}.appendChild(${cf});`);
+            this.place(cf, true);
             return;
         }
         // A directive the parser read with no handler to generate it: the comment the template path
         // writes, not nothing (#100). compile() cannot reach it — the parser reads exactly the names
         // that have a handler — but a caller of generateInlineNodes with its own context can.
-        this.out(`${this.parent()}.appendChild(document.createComment(${jsString(` unknown directive @${node.name} `)}));`);
+        this.tree.comment(jsString(` unknown directive @${node.name} `));
     }
 
     // ─── Build Output ─────────────────────────────────────────
 
-    build(): string {
+    /** The render's IIFE; `leading` are module-level declarations written into it, when it stands alone. */
+    build(leading: string[]): string {
         let lines = this.lines;
         if (this.dedup) {
             const shared = this.dedup.finish(lines);
             if (shared.decls.length > 0) this.imports.add('computed');
             lines = [...shared.decls, ...shared.lines];
         }
-        const body = lines.map(l => '    ' + l).join('\n');
-        return `(() => {\n    const __frag = document.createDocumentFragment();\n${body}\n    return __frag;\n  })()`;
+        const prologue = this.tree.prologue(this.hoists, this.imports);
+        const body = [...leading, ...prologue, ...lines].map(l => '    ' + l).join('\n');
+        return `(() => {\n${body}\n    return __frag;\n  })()`;
     }
 }

@@ -378,7 +378,11 @@ function go() {}
         expect(render).not.toContain('draft');
         expect(render).not.toContain('html');
         expect(render.match(/bindInterpolation\(/g) ?? []).toHaveLength(1);
-        expect(render).toMatch(/createElement\('span'\)/);
+        // The static markup is built by the block's module-level builder (#109): the comment is not there either.
+        const builder = out.slice(0, out.indexOf("component('"));
+        expect(builder).toMatch(/createElement\('span'\)/);
+        expect(builder).not.toContain('draft');
+        expect(builder).not.toContain('go');
     });
 });
 

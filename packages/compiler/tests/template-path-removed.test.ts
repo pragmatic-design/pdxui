@@ -15,7 +15,7 @@ describe('the template path is removed from new-mode compilation', () => {
         const options: Record<string, unknown> = { production: true, inlineBindings: false };
         const { code } = compile(SRC, 'removed.pdx', [], undefined, options);
         expect(code, 'inlineBindings: false still reached the template path').not.toMatch(/\bhtml`/);
-        expect(code).toContain("document.createElement('p')");
+        expect(code).toContain("__d.createElement('p')");
     });
 
     it('the code generator does not carry the switch', () => {

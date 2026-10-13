@@ -37,6 +37,13 @@ export interface CompileContext {
      */
     importedNames: Set<string> | null;
 
+    /**
+     * Module-level declarations of the inline render, one per line: each block's static markup builder
+     * and its walk (#109). Generated code with no TypeScript in it, so `compileSFC` puts them into the
+     * module after the script's types are erased — not through a TypeScript parse of their own.
+     */
+    readonly moduleHoists: string[];
+
     /** Hoisted slot functions — generated as variables before the html`` template.
      * Each entry: [varName, code]. Emitted by codegen before the render return. */
     hoistedSlots: [string, string][];
@@ -115,6 +122,7 @@ export function createCompileContext(options?: {
         stateSignalNames: null,
         declaredNames: null,
         importedNames: null,
+        moduleHoists: [],
         hoistedSlots: [],
         customDirectiveHandlers: options?.customDirectiveHandlers ?? null,
         customDirectives: options?.customDirectives ?? new Set(),

@@ -107,20 +107,30 @@ test.describe('CSS "extracted, zero JS overhead" — TRUE', () => {
     });
 });
 
+test.describe('template: a block\'s static markup is built once and copied — TRUE (#109)', () => {
+    test('the bundle copies markup it built, rather than building it on every render', () => {
+        // `importNode` is what core's `staticBlock` calls on the markup a compiled block built once,
+        // and nothing else in `@pdxui/core` calls it (its html`` clones a template with cloneNode):
+        // it is in the bundle only when the compiler's output imports staticBlock. A property name,
+        // so minification keeps it.
+        expect(bundle('.js'), 'no block copies its markup: the render builds it node by node')
+            .toContain('.importNode(');
+    });
+});
+
 test.describe('the claims this app cannot settle', () => {
     /**
      * Stated rather than asserted, because an assertion that cannot fail is worse than a gap.
      *
-     * Two claims this app cannot settle:
+     * One claim this app cannot settle:
      *
-     *  - "Template: pre-compiled DOM factory" — since #107 every .pdx builds its DOM directly, in
-     *    dev and in a build, and the template path's factory (`__staticHTML`) is gone from new-mode
-     *    compilation (#238). The inline path's own — a `<template>` cloned per mount — is #109.
      *  - "Component flattening" — withdrawn, with "Signals: the call chain inlined": both were
      *    measured as worth too little for what they cost.
      *
      * The others are settled, and each is measured where it lives:
      *
+     *  - Template pre-compiled — each block's static markup is built once and copied (#109): the
+     *    block above, and `packages/compiler/tests/inline-template-clone.test.ts` on the module.
      *  - Bindings inlined — the one render path, dev and build:
      *    `packages/compiler/tests/inline-bindings-default.test.ts`.
      *  - Validation stripped — the diagnostics sit behind `DEV` and leave the bundle:
@@ -139,7 +149,7 @@ test.describe('the claims this app cannot settle', () => {
         const open = self.indexOf('/**', describeAt);
         const block = self.slice(open, self.indexOf('*/', open));
         expect(block.length, 'the block\'s comment was not found').toBeGreaterThan(200);
-        // What is still true: the two claims this app cannot settle, and where each settled one is
+        // What is still true: the claim this app cannot settle, and where each settled one is
         // measured. A settled claim is never required to be listed as unsettled: that would be a
         // guard holding a falsehood in place.
         for (const named of ['#109', 'withdrawn', 'diagnostics.spec.ts', 'first-paint-waves.spec.ts', 'inline-bindings-default.test.ts']) {

@@ -64,7 +64,7 @@ describe('what a vite.config.ts gets', () => {
         const { code, warnings } = await buildWith({ devtools: false });
 
         expect(code, 'a default production build did not take the inline path')
-            .toContain('document.createElement("p")');
+            .toContain('__d.createElement("p")');
         expect(code, 'the markup string is in the bundle: the template path was taken')
             .not.toContain(MARKUP);
         expect(warnings).not.toContain('PDX_INLINE_BINDINGS_IGNORED');
@@ -74,6 +74,6 @@ describe('what a vite.config.ts gets', () => {
         const { code, warnings } = await buildWith({ devtools: false, inlineBindings: false });
         expect(warnings).toContain('PDX_INLINE_BINDINGS_IGNORED');
         expect(code, 'inlineBindings: false still reached the compiler').not.toContain(MARKUP);
-        expect(code).toContain('document.createElement("p")');
+        expect(code).toContain('__d.createElement("p")');
     }, 120_000);
 });

@@ -141,7 +141,8 @@ let count = $signal(0);
         const ast = parseTemplate(descriptor.template!.content);
 
         const prodCode = compileSFC(descriptor, ast, 'about.pdx', null, { production: true });
-        expect(prodCode).toMatch(/^import \{ component \} from '@pdxui\/core';/);
+        // staticBlock is the markup built once and copied (#109): nothing reactive.
+        expect(prodCode).toMatch(/^import \{ component, staticBlock \} from '@pdxui\/core';/);
         expect(prodCode).not.toMatch(/effect\(|bindInterpolation\(/);
     });
 });
@@ -440,7 +441,7 @@ describe('static templates', () => {
         const { code } = compile(source, 'static.pdx', [], undefined, { production: true });
         expect(code).not.toContain('__staticHTML');
         expect(code).not.toMatch(/import.*\bhtml\b.*from '@pdxui\/core'/);
-        expect(code).toContain("document.createElement('div')");
+        expect(code).toContain("__d.createElement('div')");
     });
 
     it('dev mode renders a static component inline, as a build does (#107)', () => {
@@ -451,7 +452,7 @@ describe('static templates', () => {
         const { code } = compile(source, 'dev-about.pdx', [], undefined, { production: false });
         expect(code).not.toContain('__staticHTML');
         expect(code).not.toContain("html\`");
-        expect(code).toContain("document.createElement('div')");
+        expect(code).toContain("__d.createElement('div')");
     });
 });
 
@@ -466,8 +467,9 @@ describe('inline bindings (Phase 3)', () => {
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline.pdx', [], undefined, { production: true });
-        expect(code).toContain('document.createElement');
-        expect(code).toContain('createDocumentFragment');
+        expect(code).toContain('__d.createElement');
+        // The static markup is built once and copied per render (#109).
+        expect(code).toContain('staticBlock(');
         expect(code).not.toContain("html\`");
     });
 
@@ -678,8 +680,8 @@ let visible = $signal(true);
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline-deep.pdx', [], undefined, { production: true });
-        // 4 createElement calls (div, div, div, span) + correct nesting via appendChild
-        const createCount = (code.match(/createElement/g) || []).length;
+        // 4 createElement calls (div, div, div, span) in the block's builder + correct nesting via appendChild
+        const createCount = (code.match(/__d\.createElement/g) || []).length;
         expect(createCount).toBe(4);
         const appendCount = (code.match(/appendChild/g) || []).length;
         expect(appendCount).toBeGreaterThanOrEqual(4); // 4 elements + frag
@@ -769,7 +771,7 @@ describe('production output size benchmarks', () => {
         const { code: devCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: false });
         const { code: prodCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: true });
         expect(prodCode.length).toBeLessThanOrEqual(devCode.length);
-        expect(prodCode).toMatch(/^import \{ component \} from '@pdxui\/core';/);
+        expect(prodCode).toMatch(/^import \{ component, staticBlock \} from '@pdxui\/core';/);
     });
 
     it('dead signal elimination reduces output size', () => {

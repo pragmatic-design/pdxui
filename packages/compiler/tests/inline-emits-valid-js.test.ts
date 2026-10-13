@@ -57,7 +57,7 @@ describe('the inline path emits a module a bundler can read', () => {
     it('control — and the module renders something: the form is built', () => {
         // Without this, a change that made the render emit nothing would pass the test above.
         const { code } = compile(FORM, 'order.pdx', [], undefined, { production: true });
-        expect(code).toMatch(/document\.createElement\('pdx-form'\)/);
+        expect(code).toMatch(/__d\.createElement\('pdx-form'\)/);
     });
 
     // Each emitted `batchHandler(() => )`, `const __b = ;` or a literal <slot> element (#200).

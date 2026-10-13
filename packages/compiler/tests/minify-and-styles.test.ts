@@ -73,7 +73,7 @@ describe('a production compile keeps the text the author wrote', () => {
     function render(minify: boolean): string {
         return compile(SOURCE, 'C:/tmp/probe.pdx', undefined, undefined, { minify }).code;
     }
-    const VISIBLE = ['document.createTextNode("clicked ")', 'document.createTextNode(" times")'];
+    const VISIBLE = ['__d.createTextNode("clicked ")', '__d.createTextNode(" times")'];
 
     it('emits both spaces with minification on', () => {
         for (const text of VISIBLE) expect(render(true)).toContain(text);

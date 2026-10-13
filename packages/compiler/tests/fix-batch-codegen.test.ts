@@ -87,7 +87,7 @@ describe('#3 template-literal escaping', () => {
         const source = '<template><p>premi ` e ${x}</p></template>\n<script setup>\nlet x = $signal(1);\n</script>';
         const { code } = compile(source, 'esc.pdx', [], undefined, { production: false });
         // The inline render (#107) writes the text as a string literal: nothing in it is code.
-        expect(code).toContain('document.createTextNode("premi ` e ${x}")');
+        expect(code).toContain('__d.createTextNode("premi ` e ${x}")');
         // The module body parses without throwing (no stray template break).
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
     });
@@ -95,7 +95,7 @@ describe('#3 template-literal escaping', () => {
     it('in production too', () => {
         const source = '<template><p>a ` b ${y}</p></template>\n<script setup>\nlet y = $signal(2);\n</script>';
         const { code } = compile(source, 'esc-prod.pdx', [], undefined, { production: true });
-        expect(code).toContain('document.createTextNode("a ` b ${y}")');
+        expect(code).toContain('__d.createTextNode("a ` b ${y}")');
     });
 
     it('a scoped slot body, which the template generator still writes, escapes them in its html``', () => {

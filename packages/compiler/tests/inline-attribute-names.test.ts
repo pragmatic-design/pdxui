@@ -73,15 +73,15 @@ describe('inlineBindings: SVG is created in the SVG namespace', () => {
         const code = inline('<svg viewBox="0 0 10 10"><g><circle cx="5" cy="5" r="2"></circle></g></svg><p>after</p>');
         parses(code);
         for (const tag of ['svg', 'g', 'circle']) {
-            expect(code, tag).toContain(`document.createElementNS(${JSON.stringify(SVG_NS)}, '${tag}')`);
+            expect(code, tag).toContain(`__d.createElementNS(${JSON.stringify(SVG_NS)}, '${tag}')`);
         }
-        expect(code, 'an HTML sibling after the svg stays HTML').toContain("document.createElement('p')");
+        expect(code, 'an HTML sibling after the svg stays HTML').toContain("__d.createElement('p')");
     });
 
     it('an element inside a block inside the svg is SVG too: @for', () => {
         const code = inline('<svg>@for (items as it; track it) {<circle :r="it"></circle>}</svg>', 'let items = $signal([1, 2]);');
         parses(code);
-        expect(code).toContain(`document.createElementNS(${JSON.stringify(SVG_NS)}, 'circle')`);
+        expect(code).toContain(`__d.createElementNS(${JSON.stringify(SVG_NS)}, 'circle')`);
     });
 
     it('a bound attribute on an SVG element is set as the attribute, and a static class too', () => {
@@ -95,7 +95,7 @@ describe('inlineBindings: SVG is created in the SVG namespace', () => {
     it('the children of foreignObject are HTML again', () => {
         const code = inline('<svg><foreignObject><div>html</div></foreignObject></svg>');
         parses(code);
-        expect(code).toContain("document.createElement('div')");
+        expect(code).toContain("__d.createElement('div')");
     });
 });
 
@@ -121,7 +121,7 @@ describe('the controls', () => {
 
     it('an HTML element is still created with createElement', () => {
         const code = inline('<div><span>x</span></div>');
-        expect(code).toContain("document.createElement('div')");
+        expect(code).toContain("__d.createElement('div')");
         expect(code).not.toContain('createElementNS');
     });
 });

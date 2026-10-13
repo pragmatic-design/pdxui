@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 46 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 47 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -602,6 +602,23 @@ Usage:
   // → "linear(0, 0.042, 0.158, 0.336, ...)"
 
 @returns CSS easing string for use in transition-timing-function
+
+## `staticBlock`
+
+```ts
+import { staticBlock } from '@pdxui/core';
+
+function staticBlock(build: (frag: DocumentFragment, doc: Document) => void): () => DocumentFragment
+```
+
+The static markup of one block of a compiled template — the root, an `@if` branch, an `@for` row —
+built once and copied per render. Emitted by the compiler: `build` appends the block's static nodes
+to the fragment it is handed, creating them with the document it is handed.
+
+The markup is built on the first call, not at import (#93), into a `<template>`'s content: that
+document has no custom-element registry and loads nothing, so no component constructor runs and no
+image is fetched while it is built. Each call returns `importNode` of it, which brings the copy into
+the page and upgrades its components, as `createElement` did.
 
 ## `templatePipe`
 

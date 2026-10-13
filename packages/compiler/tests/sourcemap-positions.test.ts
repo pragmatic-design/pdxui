@@ -204,7 +204,7 @@ function save() { throw new Error('nope'); }
                 ['label }}', 'bindInterpolation(__t4,'],
                 ['items as item', 'const __cf7=eachRow('],
                 ['item }}</li>', 'bindInterpolation(__t6,'],
-                ['show) {', 'const __cf9=when('],
+                ['show) {', 'const __cf10=when('],
             ])).toEqual([]);
         });
     }

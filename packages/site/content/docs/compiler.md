@@ -41,8 +41,12 @@ function reset() { count = 5; }
 and here is what the compiler emits for it — not a paraphrase, the actual output:
 
 ```js
-import { bindInterpolation, component, computed, signal, store } from '@pdxui/core';
+import { bindInterpolation, component, computed, signal, staticBlock, store } from '@pdxui/core';
 
+// the template's static markup → built once, on first render, then copied
+const __blk0=staticBlock((__frag,__d)=>{const __el0=__d.createElement('div');__frag.appendChild(__el0);const __t1=__d.createTextNode('');__el0.appendChild(__t1);__el0.appendChild(__d.createTextNode(" "));const __t2=__d.createTextNode('');__el0.appendChild(__t2);__el0.appendChild(__d.createTextNode(" "));const __t3=__d.createTextNode('');__el0.appendChild(__t3);});
+// the walk → from the copy to the nodes the render binds, computed at compile time
+const __walk0=(r)=>{const __el0=r.firstChild;const __t1=__el0.firstChild;const __t2=__t1.nextSibling.nextSibling;const __t3=__t2.nextSibling.nextSibling;return [__t1,__t2,__t3];};
 component('pdx-counter', {
   props: {
     label: { type: String, default: 'Hello' }        // @prop → declared prop + attribute sync
@@ -61,20 +65,11 @@ component('pdx-counter', {
 
     return { count: __count, doubled, prefs, bump, reset, changed };
   },
-  render: (ctx) => (() => {                                    // the template → the DOM, built directly
-    const __frag = document.createDocumentFragment();
-    const __el0 = document.createElement('div');
-    __frag.appendChild(__el0);
-    const __t1=document.createTextNode('');
-    __el0.appendChild(__t1);
+  render: (ctx) => (() => {                                    // the template → a copy of its markup
+    const __frag=__blk0();
+    const [__t1,__t2,__t3]=__walk0(__frag);
     bindInterpolation(__t1,()=>ctx.label());                   // {{ label }} → a text node that follows it
-    __el0.appendChild(document.createTextNode(" "));
-    const __t2=document.createTextNode('');
-    __el0.appendChild(__t2);
     bindInterpolation(__t2,()=>ctx.count());
-    __el0.appendChild(document.createTextNode(" "));
-    const __t3=document.createTextNode('');
-    __el0.appendChild(__t3);
     bindInterpolation(__t3,()=>ctx.doubled());
     return __frag;
   })(),
@@ -82,8 +77,9 @@ component('pdx-counter', {
 ```
 
 Three things to read off it. The variable you declared is now `__count` and every **read** of it —
-including the one you wrote as a bare argument — became a call; the **template** became DOM calls
-that read through `ctx`, which is why you never write `count()` in markup; and `$store` is the one
+including the one you wrote as a bare argument — became a call; the **template** became markup
+built once and copied per render, and the render does only what changes — binds what reads through
+`ctx`, which is why you never write `count()` in markup; and `$store` is the one
 that is *not* rewritten, because a store is a proxy and its keys are properties, not signals.
 
 The same holds for the higher-level runes: `@page` generates the route entry and the lazy import,

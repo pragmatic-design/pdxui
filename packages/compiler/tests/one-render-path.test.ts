@@ -22,7 +22,7 @@ describe('one render path', () => {
     it('a dev compile renders with DOM calls, not a tagged template', () => {
         const { code } = compile(SFC, 'one.pdx');
         expect(code, 'the dev render is still the tagged template').not.toMatch(/\bhtml`/);
-        expect(code).toMatch(/document\.createElement\('p'\)/);
+        expect(code).toMatch(/__d\.createElement\('p'\)/);
         expect(code).not.toMatch(/import \{[^}]*\bhtml\b[^}]*\} from '@pdxui\/core'/);
     });
 

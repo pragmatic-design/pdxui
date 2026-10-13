@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
 import { parseTemplate } from '../src/parser/template';
+import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 
 /** The render of `template` placed in a scoped slot's body, the template generator's. */
 function render(template: string, opts: Parameters<typeof compile>[4] = {}): string {
@@ -31,15 +32,15 @@ function inlineTree(template: string): Node {
         appendChild(c: Node): Node { this.children.push(c); return c; }
     }
     const iife = generateInlineNodes(parseTemplate(template), new Set());
-    const document = {
+    const document = withBlockCopies({
         createDocumentFragment: () => new Stub('#fragment'),
         createElement: (t: string) => new Stub(t),
         createTextNode: (t: string) => ({ tagName: '#text', data: t, children: [] }),
-    };
+    }, (n) => (n instanceof Stub ? new Stub(n.tagName) : { ...n }));
     const noop = () => {};
     const id = (f: unknown) => f;
-    return new Function('document', 'effect', 'ctx', 'assignBoundProperty', 'safeHandler', 'batchHandler', `return ${iife};`)(
-        document, noop, { v: () => 'x' }, noop, id, id) as Node;
+    return new Function('document', 'staticBlock', 'effect', 'ctx', 'assignBoundProperty', 'safeHandler', 'batchHandler', `return ${iife};`)(
+        document, stubStaticBlock(document), noop, { v: () => 'x' }, noop, id, id) as Node;
 }
 const tags = (n: Node) => n.children.map((c) => c.tagName).filter((t) => t !== '#text');
 

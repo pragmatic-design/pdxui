@@ -16,6 +16,7 @@ import { createCompileContext } from './compile-context';
 import { compileNewMode, compileStoreMode } from './codegen-new';
 import { compileLegacyMode } from './codegen-legacy';
 import { eraseTypes } from './erase-types';
+import { insertModuleHoists } from './codegen-shared';
 
 // Re-exported for external callers (e.g. plugin-utils imports deriveTag from here).
 export { extractTag, deriveTag } from './codegen-shared';
@@ -86,7 +87,8 @@ export function compileSFC(
             if (analysis.globalStore) {
                 return erase(compileStoreMode(descriptor, filename, analysis, runner));
             }
-            return erase(compileNewMode(descriptor, ast, filename, analysis, runner, ctx, options?.scriptOnly));
+            // The render's block declarations go in after the erasure: generated, with no types (#109).
+            return insertModuleHoists(erase(compileNewMode(descriptor, ast, filename, analysis, runner, ctx, options?.scriptOnly)), ctx.moduleHoists);
         }
         return erase(compileLegacyMode(descriptor, ast, filename, runner, ctx));
     }

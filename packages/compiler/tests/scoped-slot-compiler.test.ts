@@ -38,7 +38,8 @@ let x = $signal(0);
 
         const result = compile(source, 'panel.pdx');
         // Without :bindings, the slot stays an element (basic slot projection), with its name
-        expect(result.code).toMatch(/(__el\d+) = document\.createElement\('slot'\);\s*\1\.setAttribute\("name", "header"\)/);
+        // Built by the block's builder (#109): created, put in its parent, then named.
+        expect(result.code).toMatch(/const (__el\d+)=__d\.createElement\('slot'\);__el\d+\.appendChild\(\1\);\1\.setAttribute\("name", "header"\)/);
         expect(result.code).not.toContain('renderSlot');
     });
 
