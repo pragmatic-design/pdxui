@@ -509,13 +509,17 @@ template path's `bindAttribute` before its generic event branch, the inline path
 ```ts
 import { bindInterpolation } from '@pdxui/core';
 
-function bindInterpolation(anchor: Text, value: () => unknown): void
+function bindInterpolation(anchor: Text, value: () => unknown, constant = false): void
 ```
 
 Render what `value()` returns where `anchor`, an empty text node already in place, stands, and follow
 it: a primitive is the anchor's text (`interpolationText`), a Node, a fragment or an array is put in
 as nodes. Both render paths interpolate through it — the inline path wrote only text, so an array
 read `a,b` in a production build and `ab` in dev (#100).
+
+`constant`: the compiler knows the value cannot change — a literal, or a `@for` row's track key
+(#110). It is written once, by the same rule, outside any tracking: no effect is created, and what
+it reads does not subscribe the render it sits in.
 
 ### `bindRef`
 
