@@ -179,7 +179,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // host attaches for its declared states, and the Demo panel's `@state expanded`, the showcase's first.
 // A few hundred bytes on top of the typed descriptor (#123), which had left the total on the ceiling:
 // 467.0 KB measured locally, 467.1 in CI.
-const BUDGET_KB = { entry: 37, js: 468, css: 59, blocking: 92 };
+// entry 37 → 38, blocking 92 → 93: every host that exposes something listens for invoker commands
+// (#140) — `exposeOnElement`, in the entry since every component may expose — on top of `@host`
+// (#133) and `@part` (#134) in the compiled pages. Measured locally: entry 37.0, blocking 92.1, js
+// 467.4; CI has measured 0.1 KB above local before, and the entry sat on its ceiling.
+const BUDGET_KB = { entry: 38, js: 468, css: 59, blocking: 93 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

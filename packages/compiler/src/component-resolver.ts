@@ -39,6 +39,8 @@ export class ComponentResolver {
     private props = new Map<string, Set<string>>();
     /** tag → the props whose value names an icon (`iconName` in the manifest). */
     private iconProps = new Map<string, Set<string>>();
+    /** tag → the methods the component exposes (manifest members of kind `method`). */
+    private methods = new Map<string, Set<string>>();
     /** The icons a component package publishes one module each (`./icons/*`): name → import path. */
     private icons = new Map<string, string>();
     private _collisions: ValidationWarning[] = [];
@@ -128,6 +130,14 @@ export class ComponentResolver {
         return this.props.get(tag) ?? null;
     }
 
+    /**
+     * The methods a manifest component exposes — what `ctx.expose` puts on the element, and what a
+     * `command="--name"` can call (#140) — or null when the tag has no manifest entry.
+     */
+    methodsOf(tag: string): ReadonlySet<string> | null {
+        return this.methods.get(tag) ?? null;
+    }
+
     /** The props of a manifest component whose value names an icon, by declared (camelCase) name. */
     iconPropsOf(tag: string): ReadonlySet<string> | null {
         return this.iconProps.get(tag) ?? null;
@@ -214,7 +224,10 @@ export class ComponentResolver {
             const propEnums = new Map<string, string[]>();
             const settable = new Set<string>();
             const iconProps = new Set<string>();
+            const methods = new Set<string>();
             for (const member of decl.members || []) {
+                // What the component exposes to be called (#140): its invoker commands.
+                if (member.kind === 'method') methods.add(member.name);
                 if (member.kind !== 'field') continue;
                 if (!member.readonly) settable.add(member.name);
                 if (member.iconName) iconProps.add(member.name);
@@ -224,6 +237,7 @@ export class ComponentResolver {
             if (propEnums.size) this.enums.set(decl.tagName, propEnums);
             if (iconProps.size) this.iconProps.set(decl.tagName, iconProps);
             this.props.set(decl.tagName, settable);
+            this.methods.set(decl.tagName, methods);
             count++;
         }
         return count;

@@ -17,6 +17,8 @@ export interface AnalyzeOptions {
     propsOf?: (tag: string) => ReadonlySet<string> | null;
     /** The allowed values of enum props, for PDX_INVALID_ENUM_VALUE. */
     enumValues?: (tag: string, prop: string) => readonly string[] | null;
+    /** The methods library components expose, for PDX_COMMAND_UNKNOWN. */
+    methodsOf?: (tag: string) => ReadonlySet<string> | null;
 }
 
 /** Parse and analyze a .pdx source string. Never throws. */
@@ -57,7 +59,7 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
             // The column too, for a template that starts on the `<template>` line.
             const start = templateStartInFile(source, template);
             const fileAst = parseTemplate(template.content, start.line, undefined, start.column);
-            result.warnings.push(...validate(result.analysis, fileAst, filename, { enumValues: options?.enumValues }));
+            result.warnings.push(...validate(result.analysis, fileAst, filename, { enumValues: options?.enumValues, methodsOf: options?.methodsOf }));
         } catch { /* validation error */ }
     }
 
@@ -68,7 +70,7 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
     if (result.descriptor.template) {
         try {
             const listed = new Map(result.warnings.map((w, i) => [`${w.code}: ${w.message}`, i]));
-            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, applyIgnores: false }).warnings) {
+            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, methodsOf: options?.methodsOf, applyIgnores: false }).warnings) {
                 const key = `${w.code}: ${w.message}`;
                 const at = listed.get(key);
                 if (at !== undefined) { result.warnings[at] = w; continue; }

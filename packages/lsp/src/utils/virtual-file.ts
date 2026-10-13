@@ -7,6 +7,7 @@ import { projectScript } from './ts-service';
 import { projectTemplate } from './template-projection';
 import type { ResolveType } from './template-projection';
 import type { SegmentMap } from './segment-map';
+import { refTargets, typeRefs, type ResolveExposed } from './ref-types';
 
 const EPILOGUE = '\n;export {};\n';
 
@@ -21,8 +22,11 @@ export function buildVirtualFile(
     scriptContent: string, scriptStart: number,
     ast: TemplateNode[] | null, templateContent: string | null, templateStart: number,
     resolveType?: ResolveType,
+    /** What a component tag exposes, to type a `:ref` on it (#140). */
+    resolveExposed?: ResolveExposed,
 ): VirtualFile {
-    let content = projectScript(scriptContent) + EPILOGUE;
+    const { script, declarations } = typeRefs(projectScript(scriptContent), refTargets(ast, resolveExposed));
+    let content = script + EPILOGUE + (declarations ? declarations + '\n' : '');
     let templateMap: SegmentMap | null = null;
 
     if (ast && ast.length > 0 && templateContent != null && templateStart >= 0) {

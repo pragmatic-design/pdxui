@@ -34,6 +34,7 @@ import { ComponentResolver } from './component-resolver';
 import { injectSplash, type SplashOptions } from './splash';
 import type { PropsLookup } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
+import type { MethodsLookup } from './compiler/validate-commands';
 import { jsQuote } from './compiler/js-literal';
 /** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
 const RESOLVED_ROUTE_TABLE_ID = '\0' + ROUTE_TABLE_ID;
@@ -454,6 +455,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     defaultLayout,
                     propsOf: (tag) => componentResolver.propsOf(tag),
                     enumValues: (tag, prop) => componentResolver.enumValues(tag, prop),
+                    methodsOf: (tag) => componentResolver.methodsOf(tag),
                     importPathOf: (tag) => componentResolver.resolve(tag)?.importPath ?? null,
                 });
                 let output = result.code;
@@ -620,6 +622,11 @@ export interface CompileOptions {
      */
     enumValues?: EnumLookup;
     /**
+     * Methods library components expose (the plugin passes the UI manifest's). With it, a
+     * `command="--name"` its target does not expose is PDX_COMMAND_UNKNOWN (#140).
+     */
+    methodsOf?: MethodsLookup;
+    /**
      * Where a `<pdx-…>` tag's module lives, for the components a `@defer` block renders.
      *
      * The tag scan auto-imports a component with a STATIC import at the top of the module, and a
@@ -763,7 +770,7 @@ export function compile(
         // Collect structural warnings from analyzer (@prop without type, etc.)
         allWarnings.push(...cachedAnalysis.warnings);
         // Cross-check template identifiers against script declarations
-        allWarnings.push(...validate(cachedAnalysis, ast, filename, { enumValues: options?.enumValues }));
+        allWarnings.push(...validate(cachedAnalysis, ast, filename, { enumValues: options?.enumValues, methodsOf: options?.methodsOf }));
         // The app's default layout, or none for `@layout 'none'`.
         if (cachedAnalysis.route?.page) {
             cachedAnalysis.route.layout = routeLayout(cachedAnalysis.route.layout, options?.defaultLayout);

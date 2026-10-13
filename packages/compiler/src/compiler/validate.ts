@@ -20,6 +20,7 @@ import { bindingNames } from './codegen-prefix';
 import { stateExprIsNotBoolean } from './validate-state';
 import { invalidHostAttribute } from './host-block';
 import { checkParts } from './validate-parts';
+import { checkCommands, type MethodsLookup } from './validate-commands';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -196,6 +197,12 @@ export interface ValidateOptions {
      * checked.
      */
     enumValues?: EnumLookup;
+    /**
+     * The methods a library component exposes — the resolver's `methodsOf`. With it, a
+     * `command="--name"` its target does not expose is PDX_COMMAND_UNKNOWN (#140); without it, a
+     * custom command is not checked.
+     */
+    methodsOf?: MethodsLookup;
     /**
      * Where the caller looked for components — the resolver's `searched`: its component packages,
      * then its project folders. PDX_UNRESOLVED_COMPONENT's hint names them, so a package that was
@@ -499,6 +506,10 @@ export function validate(
     // ─── Check 10d: each @part on exactly one element (#134) ────
 
     warnings.push(...checkParts(analysis.parts, ast));
+
+    // ─── Check 10e: invoker commands reach a target that answers them (#140) ──
+
+    warnings.push(...checkCommands(ast, options?.methodsOf));
 
     // ─── Check 11: @prop default type mismatch ──────────────────
 

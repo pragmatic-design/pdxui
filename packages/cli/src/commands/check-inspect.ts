@@ -34,6 +34,8 @@ export interface InspectOptions {
     propsOf?: (tag: string) => ReadonlySet<string> | null;
     /** The allowed values of enum props, for PDX_INVALID_ENUM_VALUE. */
     enumValues?: (tag: string, prop: string) => readonly string[] | null;
+    /** The methods library components expose, for PDX_COMMAND_UNKNOWN. */
+    methodsOf?: (tag: string) => ReadonlySet<string> | null;
 }
 
 const SEVERITY_ORDER: Record<string, number> = { error: 0, warn: 1, info: 2 };
@@ -77,6 +79,7 @@ export function inspectFile(source: string, file: string, options: InspectOption
     const validated = validate(analysis, ast, file, {
         ...(options.isKnownTag ? { isKnownTag: options.isKnownTag, knownTags: options.knownTags, searched: options.searched } : {}),
         enumValues: options.enumValues,
+        methodsOf: options.methodsOf,
     });
     for (const w of positionWarnings(source, validated, analysis.body)) add(w);
 
@@ -90,7 +93,7 @@ export function inspectFile(source: string, file: string, options: InspectOption
     if (!validated.some((w) => w.code === 'PDX_RAW_INTERPOLATION_IN_BINDING')) {
         // Exemptions are applied below, once, to everything: compile() would apply them to its part only.
         const compiled = compile(source, file, [], (src, from) => readFileSync(resolvePath(dirname(from), src), 'utf-8'), {
-            propsOf: options.propsOf, enumValues: options.enumValues, applyIgnores: false,
+            propsOf: options.propsOf, enumValues: options.enumValues, methodsOf: options.methodsOf, applyIgnores: false,
         });
         for (const w of compiled.warnings) add(w);
     }

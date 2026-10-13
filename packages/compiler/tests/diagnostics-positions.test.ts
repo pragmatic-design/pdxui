@@ -45,6 +45,8 @@ const ROWS: Record<string, Row> = {
     PDX_DUP_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event changed: number;\n@event changed: string;'), at: '@event changed: string;' },
     PDX_EVENT_NAME_CASE: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event savedItem: number;'), at: '@event savedItem' },
     PDX_EXPOSE_UNDECLARED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@expose close;'), at: '@expose close;' },
+    PDX_COMMAND_TARGET_MISSING: { src: pdx('<p>{{ a }}</p>\n<button commandfor="gone" command="close">x</button>', 'let a = $signal(1);'), at: 'commandfor="gone"' },
+    PDX_COMMAND_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<button commandfor="d" command="show">x</button><dialog id="d"></dialog>', 'let a = $signal(1);'), at: 'command="show"' },
     PDX_PART_MISSING: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@part trigger;'), at: '@part trigger;' },
     PDX_PART_DUPLICATE: { src: pdx('<b data-part="x">1</b><i data-part="x">2</i>', '@part x;'), at: 'data-part="x">2' },
     PDX_PART_UNDECLARED: { src: pdx('<p data-part="popup">{{ a }}</p>', 'let a = $signal(1);'), at: 'data-part="popup"' },
