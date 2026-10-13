@@ -12,6 +12,7 @@
 import ts from 'typescript';
 import type { CompileContext } from './compile-context';
 import { bindingNames } from './codegen-prefix';
+import { maskNonCode } from './tokenizer';
 
 /** The keywords a literal expression may contain as words. */
 const LITERAL_NAMES = new Set(['true', 'false', 'null']);
@@ -70,9 +71,9 @@ export function isLiteralExpression(expr: string, keys: readonly string[] = []):
     const text = expr.trim();
     if (!text) return false;
     // Most bindings name a signal: a name that is neither a literal keyword nor the start of a key
-    // settles it without a parse. Strings are masked first, so their words are not names.
-    // Match: a quoted or backtick string, escapes included.
-    const unquoted = text.replace(/'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`/g, '""');
+    // settles it without a parse. Strings are blanked first, by the tokenizer's linear scan, so their
+    // words are not names. A template literal's `${…}` is blanked with it: the parse below settles it.
+    const unquoted = maskNonCode(text);
     const keyRoots = new Set(keys.flatMap(rootNames));
     if (rootNames(unquoted).some(n => !LITERAL_NAMES.has(n) && !keyRoots.has(n))) return false;
     const sf = ts.createSourceFile('__pdx_constant.ts', `(${text});`, ts.ScriptTarget.Latest, true);

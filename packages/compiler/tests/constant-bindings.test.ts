@@ -77,6 +77,12 @@ describe('an expression of literals is written once', () => {
         expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>MAX\(\)\)/);
     });
 
+    it('a word inside a string is not a name; a name inside a template literal\'s ${} is', () => {
+        const out = render('<p :title="\'label\'" :lang="`${label}`"></p>');
+        expect(out).not.toMatch(/effect\(\(\) => \{ const __b = 'label';/);
+        expect(out).toMatch(/let __el\d+w_lang = \{\}; effect\(/);
+    });
+
     it('a call is never constant, even of literals: it may read a signal ($t reads the locale)', () => {
         const out = render('<p>{{ $t(\'x\') }}</p>');
         expect(out).not.toMatch(/,true\)/);
