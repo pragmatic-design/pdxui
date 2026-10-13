@@ -37,7 +37,6 @@ export function compileSFC(
     runner?: PluginRunner | null,
     options?: {
         production?: boolean;
-        inlineBindings?: boolean;
         scriptOnly?: boolean;
         /**
          * Sink for diagnostics raised during CODE GENERATION, which validate() never runs and so
@@ -59,9 +58,6 @@ export function compileSFC(
     precomputedAnalysis?: ReturnType<typeof analyzeScript> | null,
 ): string {
     const production = options?.production ?? false;
-    // The one render path of a .pdx, in dev and in a build (#107). `false` is an internal switch for
-    // the tests that still measure the template path; the Vite plugin does not forward the option.
-    const inlineBindings = options?.inlineBindings ?? true;
 
     // Build per-invocation compile context — replaces all module-level mutable state
     let customDirectiveHandlers: Map<string, import('../plugin-system').TemplateDirectiveHandler> | undefined;
@@ -90,7 +86,7 @@ export function compileSFC(
             if (analysis.globalStore) {
                 return erase(compileStoreMode(descriptor, filename, analysis, runner));
             }
-            return erase(compileNewMode(descriptor, ast, filename, analysis, runner, ctx, inlineBindings, options?.scriptOnly));
+            return erase(compileNewMode(descriptor, ast, filename, analysis, runner, ctx, options?.scriptOnly));
         }
         return erase(compileLegacyMode(descriptor, ast, filename, runner, ctx));
     }

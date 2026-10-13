@@ -19,7 +19,7 @@ const RECIPES = join(__dirname, '../../../marketplace/plugins/pdxui/skills/pdxui
 
 const PATHS = {
     dev: {},
-    'production inline': { production: true, inlineBindings: true },
+    'production inline': { production: true },
 } as const;
 
 function compileTemplate(template: string, opts: object): string {

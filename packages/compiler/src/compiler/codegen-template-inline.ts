@@ -1,7 +1,6 @@
 // Inline DOM construction codegen: the render path of every .pdx, in dev and in a build (#107).
 // Generates imperative createElement/appendChild code instead of html`` tagged templates.
 // Eliminates: innerHTML parsing, placeholder regex, bindAttribute dispatch, DOM walking.
-// `inlineBindings: false` (internal, for the tests that still measure the template path) opts out.
 
 import { deferLoadFn, extractLoopInvariants, generateTransition } from './codegen-template';
 import type {
@@ -515,7 +514,7 @@ class InlineGen {
         const parts = desc.split('.');
         const ev = parts[0], mods = new Set(parts.slice(1));
         // The SAME builder the template path uses, so every handler form the docs promise compiles
-        // the same under `inlineBindings`: `$event` bound, `count++` and `open = !open` rewritten
+        // the same here: `$event` bound, `count++` and `open = !open` rewritten
         // as signal writes, and two statements kept as two statements.
         //
         // A `${…}` value arrives already rewritten by the caller and is passed through untouched.

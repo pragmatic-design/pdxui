@@ -42,9 +42,10 @@ which is worth it for a component change.
 3. **Bind attributes with `:attr=`, never `${}`.** The compiler warns with `PDX_RAW_INTERPOLATION`.
 4. **A fill colour is never a text colour.** Text in a semantic colour takes
    `--pdx-color-{name}-ink`; the tint behind it, `-soft`.
-5. **Dev and a production build must render the same.** Dev interprets templates, a build compiles
-   them; a difference between the two is a compiler bug, and a test that runs only one of them does
-   not show it.
+5. **Dev and a production build must render the same.** There is one render path, the same in both
+   (#107); a build only adds optimisations on top. A difference between the two is a compiler bug:
+   the render parity table (`packages/core/tests/render-parity.test.ts`) and the dev-server suites
+   hold it, and a test that runs only one of them does not show it.
 
 ## Where things live
 

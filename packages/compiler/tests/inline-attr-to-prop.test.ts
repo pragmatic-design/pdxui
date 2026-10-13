@@ -20,7 +20,7 @@ import { clearBoundProperty, assignBoundProperty } from '../../core/src/renderer
 
 function inline(template: string, script = "let label = $signal('x');\nlet id = $signal(1);"): string {
     const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
-    return compile(source, 'inline-attr.pdx', [], undefined, { production: true, inlineBindings: true }).code;
+    return compile(source, 'inline-attr.pdx', [], undefined, { production: true }).code;
 }
 
 function parses(code: string): void {

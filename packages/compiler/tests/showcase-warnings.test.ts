@@ -47,7 +47,7 @@ function warningsOf(file: string): string[] {
     const result = compile(source, rel, [], undefined, { propsOf, enumValues });
     // The production path too, with inline bindings, its default: that is where `:label="${x}"`
     // becomes unparseable — the dev module is byte-identical either way.
-    const built = compile(source, rel, [], undefined, { propsOf, enumValues, production: true, inlineBindings: true });
+    const built = compile(source, rel, [], undefined, { propsOf, enumValues, production: true });
     return [
         ...result.warnings.map((w) => `${w.code}: ${w.message}`),
         ...parseErrors(result.code),

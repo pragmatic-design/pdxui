@@ -114,8 +114,8 @@ test.describe('the claims this app cannot settle', () => {
      * Two claims this app cannot settle:
      *
      *  - "Template: pre-compiled DOM factory" — since #107 every .pdx builds its DOM directly, in
-     *    dev and in a build; the template path's own factory (`isStaticAssembly` → `__staticHTML`)
-     *    is reached only through compile()'s internal switch, which no app sets (#238 removes it).
+     *    dev and in a build, and the template path's factory (`__staticHTML`) is gone from new-mode
+     *    compilation (#238). The inline path's own — a `<template>` cloned per mount — is #109.
      *  - "Component flattening" — withdrawn, with "Signals: the call chain inlined": both were
      *    measured as worth too little for what they cost.
      *
@@ -142,7 +142,7 @@ test.describe('the claims this app cannot settle', () => {
         // What is still true: the two claims this app cannot settle, and where each settled one is
         // measured. A settled claim is never required to be listed as unsettled: that would be a
         // guard holding a falsehood in place.
-        for (const named of ['isStaticAssembly', 'withdrawn', 'diagnostics.spec.ts', 'first-paint-waves.spec.ts', 'inline-bindings-default.test.ts']) {
+        for (const named of ['#109', 'withdrawn', 'diagnostics.spec.ts', 'first-paint-waves.spec.ts', 'inline-bindings-default.test.ts']) {
             expect(block, `"${named}" is no longer named in the block`).toContain(named);
         }
         // And what is no longer true is no longer said.

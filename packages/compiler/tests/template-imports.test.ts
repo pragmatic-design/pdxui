@@ -16,7 +16,7 @@ import { compile } from '../src/plugin';
 const PATHS = {
     dev: {},
     build: { production: true },
-    'production inline': { production: true, inlineBindings: true },
+    'production inline': { production: true },
 } as const;
 
 function sfc(script: string, template: string): string {

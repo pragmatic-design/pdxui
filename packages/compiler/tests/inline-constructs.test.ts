@@ -13,7 +13,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const OPTS = { production: true, inlineBindings: true };
+const OPTS = { production: true };
 
 /** Compile in the production inline mode and return the module body without its imports. */
 function inline(template: string, setup = 'let count = $signal(0);'): string {

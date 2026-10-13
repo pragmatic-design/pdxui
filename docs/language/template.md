@@ -8,11 +8,10 @@ The `<template>` block is HTML with three additions: interpolation (`{{ }}`), bo
 
 A template compiles along one **render path**, in the dev server and in a production build alike
 (#107): the **inline path**, imperative `createElement` code (`codegen-template-inline.ts`).
-`pdx({ inlineBindings })` no longer selects anything (`PDX_INLINE_BINDINGS_IGNORED`). The **template
-path** — an `html\`…\`` tagged template that core parses and binds at runtime (`codegen-template.ts`)
-— still generates the function of a hoisted scoped slot, and `compile()`'s internal
-`inlineBindings: false` reaches it for the tests that measure it, until it is removed (#238). Where a
-construct behaves differently on the two, its Rules say so.
+`pdx({ inlineBindings })` no longer selects anything (`PDX_INLINE_BINDINGS_IGNORED`), and nothing else
+does (#238). The **template path** — an `html\`…\`` tagged template that core parses and binds at
+runtime (`codegen-template.ts`) — still generates one thing in a `.pdx`: the body of a scoped slot fill
+(#364). Where a construct behaves differently there, its Rules say so.
 
 ```ebnf
 Template       ::= ( Text | Comment | AtEscape | Element | Interpolation | Directive )*
@@ -736,8 +735,8 @@ IfBlock        ::= "@if" S? Paren S? BlockTransition? Block ( S? "@else" S? ( ( 
 `when(() => cond, () => html\`…\`, () => html\`…\`, options)`: the body is rendered while the
 condition is truthy, the `@else` body while it is not, and a branch is built again only when the
 truthiness changes. A branch's effects are disposed with it. `@else if (…)` and `@else @if (…)` nest a
-second `when` in the else branch. In a production build on the template path a literal `true` or
-`false` condition is folded away.
+second `when` in the else branch. In a production build a literal `true` or `false` condition is
+folded away (#236).
 
 #### Rules
 
@@ -795,9 +794,9 @@ reconciliation. `@empty` wraps the loop in `when(() => items?.length > 0, …, (
   in the body's scope.
 - An empty body is `PDX_EMPTY_FOR` (warning).
 - The key must be unique and stable: a changing field in it recreates the row. Not checked today.
-- On the template path in a production build with `inlineBindings: false`, a loop whose body reads a
-  signal that does not depend on the row has that read hoisted into one `computed` — and then its
-  `@empty` is dropped. Not checked today. The default inline path keeps it.
+- On the template path — in a `.pdx`, only a scoped slot's body (#364) — in a production build, a
+  loop whose body reads a signal that does not depend on the row has that read hoisted into one
+  `computed`, and then its `@empty` is dropped. Not checked today. The inline path keeps it.
 
 #### Examples
 
