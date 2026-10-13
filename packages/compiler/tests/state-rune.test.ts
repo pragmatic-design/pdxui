@@ -59,6 +59,16 @@ describe('PDX_STATE_NOT_BOOLEAN', () => {
     });
 });
 
+describe('a signal a @state reads is read', () => {
+    it('is not PDX_UNUSED_REACTIVE when the @state is its only reader', () => {
+        expect(codes('let open = $signal(false);\n@state expanded = open;', 'PDX_UNUSED_REACTIVE')).toHaveLength(0);
+    });
+
+    it('the control: a signal nothing reads still is', () => {
+        expect(codes('let open = $signal(false);', 'PDX_UNUSED_REACTIVE')).toHaveLength(1);
+    });
+});
+
 describe('PDX_MALFORMED_STATE', () => {
     it('a @state with no expression is reported, not dropped', () => {
         expect(codes('@state open;', 'PDX_MALFORMED_STATE')).toHaveLength(1);

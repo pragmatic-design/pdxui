@@ -45,6 +45,7 @@ const ROWS: Record<string, Row> = {
     PDX_DUP_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event changed: number;\n@event changed: string;'), at: '@event changed: string;' },
     PDX_EVENT_NAME_CASE: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event savedItem: number;'), at: '@event savedItem' },
     PDX_EXPOSE_UNDECLARED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@expose close;'), at: '@expose close;' },
+    PDX_HOST_INVALID_ATTRIBUTE: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@host {\n  role="button"\n  data-part="x"\n}'), at: 'data-part="x"' },
     PDX_MALFORMED_STATE: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state open;'), at: '@state open;' },
     PDX_STATE_NOT_BOOLEAN: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state busy = a;'), at: '@state busy' },
     PDX_CIRCULAR_DERIVED: { src: pdx('<p>{{ a }}</p>', 'const a = $derived(b + 1);\nconst b = $derived(a + 1);'), at: 'const a = $derived' },

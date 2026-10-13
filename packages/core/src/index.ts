@@ -178,7 +178,7 @@ export { PdxElement, moveMounted } from './component/element';
 export type { EmitOptions } from './component/element';
 export { define, __pdx_hmr_swap, __pdx_hmr_rerender } from './component/define';
 export { component, __pdx_hmr_save, __pdx_hmr_restore } from './component/component';
-export type { ComponentOptions, ComponentOptionsWithSetup, ComponentContext, ComponentContextBase, TypedComponentContext, PropDefinition, TypedProp, ComponentDeclarations, EventMap } from './component/component';
+export type { ComponentOptions, ComponentOptionsWithSetup, ComponentContext, ComponentContextBase, TypedComponentContext, PropDefinition, TypedProp, ComponentDeclarations, EventMap, HostOf } from './component/component';
 export { prop, event, model, slot } from './component/component-descriptor';
 export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, SlotSpec, EventDetail, EmitOf } from './component/component-descriptor';
 

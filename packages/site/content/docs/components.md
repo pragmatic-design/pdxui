@@ -287,6 +287,26 @@ function close() { isOpen = false; }
 From the parent, with a reference to the element: `dialogRef.open()`. Use it sparingly: if you can
 get the same result with a prop (`:open="..."`), prefer the prop — it's more declarative.
 
+## @host — the component's own element
+
+In a web component the element on the page **is** the component. Its role, its ARIA state and a
+listener for its keys go on it, declared in the script with the same attribute syntax as an element in
+the template:
+
+```pdx
+@prop label: string = 'Choose';
+let open = $signal(false);
+@host { role="combobox" :aria-expanded="open ? 'true' : 'false'" @keydown.enter="open = !open" }
+```
+
+A static attribute (`role="combobox"`) is set when the element connects, **unless the page already
+set it**: `<my-combo role="listbox">` keeps its `listbox`. A bound one (`:aria-expanded`) follows what
+it reads; `null`, `undefined` and `false` remove it. A listener (`@keydown.enter`) takes the same forms
+and modifiers as in the template, and is removed when the element leaves the page. `::x`, `data-part`
+and a generic argument mean nothing on a host and are `PDX_HOST_INVALID_ATTRIBUTE`. A TypeScript
+component declares the same thing in its descriptor:
+`host: { role: 'combobox', ':aria-expanded': (ctx) => ctx.open(), '@keydown.enter': (ctx, e) => … }`.
+
 ## @state — a visual state of the host
 
 Open, selected, invalid, loading: a state the outside styles. Declare it with the condition it is on

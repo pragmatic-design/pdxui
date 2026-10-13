@@ -174,6 +174,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it first (`function close() { … }`), or remove it from `@expose`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_HOST_INVALID_ATTRIBUTE: {
+        severity: 'error', category: 'defect',
+        summary: 'On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument.',
+        explanation: 'The host is the component\'s own element. It has no two-way binding — the parent\'s `::x` is the component\'s `@model x` — it is not a part of itself, and a generic argument (`T="User"`) is the parent\'s to give. The message names which of the three it is; the attribute is not compiled.',
+        fix: 'Remove it from `@host`: declare `@model x` for a two-way value, put `data-part` on an element of the template, declare a type parameter with `@generic`.',
+        example: { bad: pdx('<p>x</p>', '@host { role="button" data-part="root" }'), good: pdx('<p>x</p>', '@host { role="button" }') },
+    },
     PDX_MALFORMED_STATE: {
         severity: 'error', category: 'defect',
         summary: '`@state` written in a shape the compiler does not recognise.',
