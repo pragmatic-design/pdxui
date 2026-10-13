@@ -647,7 +647,7 @@ component('pdx-demo-datasource', {
     bindInterpolation(__t11,()=>ctx.sortIcon('id'));
     __el12.addEventListener('click', safeHandler(batchHandler(ctx.sortByName), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t13,()=>ctx.sortIcon('name'));
-    const __cf22=eachRow(()=>ctx.rows(),'id',(row)=>{const __frag=__blk0();const [__t17,__t19,__t21]=__walk0(__frag);bindInterpolation(__t17,()=>row().id);bindInterpolation(__t19,()=>row().name);bindInterpolation(__t21,()=>row().email);return __frag;});
+    const __cf22=eachRow(()=>ctx.rows(),'id',(row)=>{const __frag=__blk0();const [__t17,__t19,__t21]=__walk0(__frag);bindInterpolation(__t17,()=>row().id,true);bindInterpolation(__t19,()=>row().name);bindInterpolation(__t21,()=>row().email);return __frag;});
     __m23.replaceWith(__cf22);
     __el25.addEventListener('click', safeHandler(batchHandler(ctx.prevPage), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el25w_disabled = {}; effect(() => { const __b = ctx.currentPage() <= 1; if (Object.is(__b, __el25w_disabled)) return; __el25w_disabled = __b; if ("disabled" in __el25) { const __v = __b; if (__v == null) clearBoundProperty(__el25, "disabled", "disabled"); else __el25["disabled"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el25.removeAttribute("disabled"); else { __el25.setAttribute("disabled", __v === true ? '' : String(__v)); } } });
@@ -1006,14 +1006,14 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
     __el12.addEventListener('click', safeHandler(batchHandler(ctx.deactivateTrap), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t14,()=>ctx.trapLog());
     bindRef(__el18,ctx.verticalRef);
-    const __cf21=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el19,__t20]=__walk0(__frag);let __el19w_aria_disabled = {}; effect(() => { const __b = fruit() === 'Cherry' ? 'true' : null; if (Object.is(__b, __el19w_aria_disabled)) return; __el19w_aria_disabled = __b; const __v = __b; if (__v == null || __v === false) __el19.removeAttribute("aria-disabled"); else { __el19.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } });bindInterpolation(__t20,()=>fruit());return __frag;});
+    const __cf21=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el19,__t20]=__walk0(__frag);{ const __v = fruit() === 'Cherry' ? 'true' : null; if (__v == null || __v === false) __el19.removeAttribute("aria-disabled"); else { __el19.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } }bindInterpolation(__t20,()=>fruit(),true);return __frag;});
     __m22.replaceWith(__cf21);
     bindInterpolation(__t24,()=>ctx.groupLog());
     bindRef(__el28,ctx.horizontalRef);
-    const __cf31=eachRow(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk1();const [__t30]=__walk1(__frag);bindInterpolation(__t30,()=>tab());return __frag;});
+    const __cf31=eachRow(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk1();const [__t30]=__walk1(__frag);bindInterpolation(__t30,()=>tab(),true);return __frag;});
     __m32.replaceWith(__cf31);
     bindRef(__el36,ctx.typeaheadRef);
-    const __cf39=eachRow(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk2();const [__t38]=__walk2(__frag);bindInterpolation(__t38,()=>c());return __frag;});
+    const __cf39=eachRow(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk2();const [__t38]=__walk2(__frag);bindInterpolation(__t38,()=>c(),true);return __frag;});
     __m40.replaceWith(__cf39);
     __el45.addEventListener('click', safeHandler(batchHandler(ctx.trackTarget), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el46.addEventListener('click', safeHandler(batchHandler(ctx.trackTarget), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -1277,11 +1277,11 @@ const ICONS = {
     __el7.addEventListener('click', safeHandler(batchHandler(ctx.doResolve), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el8.addEventListener('click', safeHandler(batchHandler(ctx.doMissing), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t10,()=>ctx.resultText());
-    const __cf21=eachRow(()=>ctx.sizeList,'name',(s)=>{const __frag=__blk0();const [__el16,__t19,__t20]=__walk0(__frag);let __el16w_style = {}; effect(() => { const __b = 'width:' + s().px + 'px;height:' + s().px + 'px'; if (Object.is(__b, __el16w_style)) return; __el16w_style = __b; if ("style" in __el16) { const __v = __b; if (__v == null) clearBoundProperty(__el16, "style", "style"); else __el16["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el16.removeAttribute("style"); else { __el16.setAttribute("style", __v === true ? '' : String(__v)); } } });bindInterpolation(__t19,()=>s().name);bindInterpolation(__t20,()=>s().px);return __frag;});
+    const __cf21=eachRow(()=>ctx.sizeList,'name',(s)=>{const __frag=__blk0();const [__el16,__t19,__t20]=__walk0(__frag);let __el16w_style = {}; effect(() => { const __b = 'width:' + s().px + 'px;height:' + s().px + 'px'; if (Object.is(__b, __el16w_style)) return; __el16w_style = __b; if ("style" in __el16) { const __v = __b; if (__v == null) clearBoundProperty(__el16, "style", "style"); else __el16["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el16.removeAttribute("style"); else { __el16.setAttribute("style", __v === true ? '' : String(__v)); } } });bindInterpolation(__t19,()=>s().name,true);bindInterpolation(__t20,()=>s().px);return __frag;});
     __m22.replaceWith(__cf21);
-    const __cf29=eachRow(()=>ctx.iconEntries,'name',(entry)=>{const __frag=__blk1();const [__el26,__t28]=__walk1(__frag);bindRef(__el26,entry().ref);bindInterpolation(__t28,()=>entry().name);return __frag;});
+    const __cf29=eachRow(()=>ctx.iconEntries,'name',(entry)=>{const __frag=__blk1();const [__el26,__t28]=__walk1(__frag);bindRef(__el26,entry().ref);bindInterpolation(__t28,()=>entry().name,true);return __frag;});
     __m30.replaceWith(__cf29);
-    const __cf69=eachRow(()=>ctx.colors,'color',(c)=>{const __frag=__blk2();const [__el68]=__walk2(__frag);let __el68w_style = {}; effect(() => { const __b = 'color:' + c().color; if (Object.is(__b, __el68w_style)) return; __el68w_style = __b; if ("style" in __el68) { const __v = __b; if (__v == null) clearBoundProperty(__el68, "style", "style"); else __el68["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el68.removeAttribute("style"); else { __el68.setAttribute("style", __v === true ? '' : String(__v)); } } });bindRef(__el68,c().ref);return __frag;});
+    const __cf69=eachRow(()=>ctx.colors,'color',(c)=>{const __frag=__blk2();const [__el68]=__walk2(__frag);{ if ("style" in __el68) { const __v = 'color:' + c().color; if (__v == null) clearBoundProperty(__el68, "style", "style"); else __el68["style"] = __v; } else { const __v = 'color:' + c().color; if (__v == null || __v === false) __el68.removeAttribute("style"); else { __el68.setAttribute("style", __v === true ? '' : String(__v)); } } }bindRef(__el68,c().ref);return __frag;});
     __m70.replaceWith(__cf69);
     return __frag;
   })(),
@@ -1700,7 +1700,7 @@ const placements = [
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m13,__el14,__el15,__el18,__t21,__el27,__el29,__el31,__el36,__t38,__el42]=__walk3(__frag);
-    const __cf12=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m11]=__walk2(__frag);const __cf10=when(()=>p(),()=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);__el7.addEventListener('click', safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));{ const __s = new Set(["pdx-ghost"]); let __w = []; effect(() => { const __n = String(ctx.currentPlacement() === p() ? 'active' : '' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el7.classList.remove(__t); for (const __t of __n) __el7.classList.add(__t); __w = __n; }); }bindInterpolation(__t8,()=>p());return __frag;},()=>{const __frag=__blk1();return __frag;});__m11.replaceWith(__cf10);return __frag;});
+    const __cf12=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m11]=__walk2(__frag);const __cf10=when(()=>p(),()=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);__el7.addEventListener('click', safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));{ const __s = new Set(["pdx-ghost"]); let __w = []; effect(() => { const __n = String(ctx.currentPlacement() === p() ? 'active' : '' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el7.classList.remove(__t); for (const __t of __n) __el7.classList.add(__t); __w = __n; }); }bindInterpolation(__t8,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m11.replaceWith(__cf10);return __frag;});
     __m13.replaceWith(__cf12);
     bindRef(__el14,ctx.arenaEl);
     bindRef(__el15,ctx.arenaScrollEl);
@@ -1801,7 +1801,7 @@ const options = [
     bindRef(__el33,ctx.box2Ref);
     bindRef(__el56,ctx.box3Ref);
     bindRef(__el68,ctx.box4Ref);
-    const __cf71=eachRow(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t70]=__walk0(__frag);__el69.addEventListener('click', safeHandler(batchHandler(() => ctx.selectOption(opt())), ctx.el?.tagName?.toLowerCase(), 'click'));{ const __s = new Set(["dropdown-item"]); let __w = []; effect(() => { const __n = String(ctx.selected() === opt() ? 'active' : '' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el69.classList.remove(__t); for (const __t of __n) __el69.classList.add(__t); __w = __n; }); }bindInterpolation(__t70,()=>opt());return __frag;});
+    const __cf71=eachRow(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t70]=__walk0(__frag);__el69.addEventListener('click', safeHandler(batchHandler(() => ctx.selectOption(opt())), ctx.el?.tagName?.toLowerCase(), 'click'));{ const __s = new Set(["dropdown-item"]); let __w = []; effect(() => { const __n = String(ctx.selected() === opt() ? 'active' : '' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el69.classList.remove(__t); for (const __t of __n) __el69.classList.add(__t); __w = __n; }); }bindInterpolation(__t70,()=>opt(),true);return __frag;});
     __m72.replaceWith(__cf71);
     bindInterpolation(__t75,()=>ctx.selected());
     return __frag;
@@ -1932,10 +1932,10 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m11,__t13,__m23,__el25,__el26,__t28,__el35,__m52,__t54]=__walk3(__frag);
-    const __cf10=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el8,__t9]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.singleClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el8.classList.remove(__t); for (const __t of __n) __el8.classList.add(__t); __w = __n; }); }__el8.addEventListener('click', safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t9,()=>fruit());return __frag;});
+    const __cf10=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el8,__t9]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.singleClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el8.classList.remove(__t); for (const __t of __n) __el8.classList.add(__t); __w = __n; }); }__el8.addEventListener('click', safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t9,()=>fruit(),true);return __frag;});
     __m11.replaceWith(__cf10);
     bindInterpolation(__t13,()=>ctx.singleInfo());
-    const __cf22=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk1();const [__el20,__t21]=__walk1(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.multiClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el20.classList.remove(__t); for (const __t of __n) __el20.classList.add(__t); __w = __n; }); }__el20.addEventListener('click', safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t21,()=>fruit());return __frag;});
+    const __cf22=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk1();const [__el20,__t21]=__walk1(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.multiClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el20.classList.remove(__t); for (const __t of __n) __el20.classList.add(__t); __w = __n; }); }__el20.addEventListener('click', safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t21,()=>fruit(),true);return __frag;});
     __m23.replaceWith(__cf22);
     __el25.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits)), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el26.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.clear()), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -3981,7 +3981,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     __el21.addEventListener('click', safeHandler(batchHandler(ctx.toggleMenu), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el23w_items = {}; effect(() => { const __b = ctx.filteredItems(); if (Object.is(__b, __el23w_items)) return; __el23w_items = __b; assignBoundProperty(__el23, "items", __b); });
     let __el23w_active_key = {}; effect(() => { const __b = ctx.activeKey(); if (Object.is(__b, __el23w_active_key)) return; __el23w_active_key = __b; assignBoundProperty(__el23, "activeKey", __b); });
-    let __el23w_indent = {}; effect(() => { const __b = 24; if (Object.is(__b, __el23w_indent)) return; __el23w_indent = __b; assignBoundProperty(__el23, "indent", __b); });
+    { assignBoundProperty(__el23, "indent", 24); }
     __el23.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onNavSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     bindRef(__el24,ctx.pageContent);
     bindRef(__el26,ctx.pageToc);
@@ -9523,7 +9523,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-affix
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-u4xb1z");
@@ -9544,7 +9544,7 @@ component('pdx-demo-comp-affix-live', {
     const __frag=__blk0();
     const [__t6,__el10]=__walk0(__frag);
     bindInterpolation(__t6,()=>ctx.affixed() ? 'yes' : 'no');
-    let __el10w_offsetTop = {}; effect(() => { const __b = 0; if (Object.is(__b, __el10w_offsetTop)) return; __el10w_offsetTop = __b; assignBoundProperty(__el10, "offsetTop", __b); });
+    { assignBoundProperty(__el10, "offsetTop", 0); }
     __el10.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.affixed.setRaw(e.detail.affixed)), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     return __frag;
   })(),
@@ -9773,7 +9773,7 @@ component('pdx-demo-comp-app-layout-without-border', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el7,__el8]=__walk0(__frag);
-    let __el3w_withBorder = {}; effect(() => { const __b = false; if (Object.is(__b, __el3w_withBorder)) return; __el3w_withBorder = __b; assignBoundProperty(__el3, "withBorder", __b); });
+    { assignBoundProperty(__el3, "withBorder", false); }
     let __el7w_aria_current = {}; effect(() => { const __b = ctx.page3() === 'Home' ? 'page' : null; if (Object.is(__b, __el7w_aria_current)) return; __el7w_aria_current = __b; const __v = __b; if (__v == null || __v === false) __el7.removeAttribute("aria-current"); else { __el7.setAttribute("aria-current", __v === true ? '' : String(__v)); } });
     __el7.addEventListener('click', safeHandler(batchHandler(() => ctx.page3.setRaw('Home')), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el8w_aria_current = {}; effect(() => { const __b = ctx.page3() === 'About' ? 'page' : null; if (Object.is(__b, __el8w_aria_current)) return; __el8w_aria_current = __b; const __v = __b; if (__v == null || __v === false) __el8.removeAttribute("aria-current"); else { __el8.setAttribute("aria-current", __v === true ? '' : String(__v)); } });
@@ -9873,7 +9873,7 @@ const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_fields = {}; effect(() => { const __b = ctx.formFields; if (Object.is(__b, __el4w_fields)) return; __el4w_fields = __b; assignBoundProperty(__el4, "fields", __b); });
-    let __el4w_columns = {}; effect(() => { const __b = 12; if (Object.is(__b, __el4w_columns)) return; __el4w_columns = __b; assignBoundProperty(__el4, "columns", __b); });
+    { assignBoundProperty(__el4, "columns", 12); }
     return __frag;
   })(),
 });
@@ -9926,7 +9926,7 @@ const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];
     let __el8w_columns = {}; effect(() => { const __b = ctx.triColumns; if (Object.is(__b, __el8w_columns)) return; __el8w_columns = __b; assignBoundProperty(__el8, "columns", __b); });
     let __el10w_fields = {}; effect(() => { const __b = ctx.triFields; if (Object.is(__b, __el10w_fields)) return; __el10w_fields = __b; assignBoundProperty(__el10, "fields", __b); });
     let __el10w_source = {}; effect(() => { const __b = ctx.triDS; if (Object.is(__b, __el10w_source)) return; __el10w_source = __b; assignBoundProperty(__el10, "source", __b); });
-    let __el10w_columns = {}; effect(() => { const __b = 12; if (Object.is(__b, __el10w_columns)) return; __el10w_columns = __b; assignBoundProperty(__el10, "columns", __b); });
+    { assignBoundProperty(__el10, "columns", 12); }
     return __frag;
   })(),
 });
@@ -10227,8 +10227,8 @@ component('pdx-demo-comp-autocomplete-remote', {
     const __frag=__blk0();
     const [__el4,__t6]=__walk0(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.countryDS; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
-    let __el4w_debounce = {}; effect(() => { const __b = 300; if (Object.is(__b, __el4w_debounce)) return; __el4w_debounce = __b; assignBoundProperty(__el4, "debounce", __b); });
-    let __el4w_min_length = {}; effect(() => { const __b = 2; if (Object.is(__b, __el4w_min_length)) return; __el4w_min_length = __b; assignBoundProperty(__el4, "minLength", __b); });
+    { assignBoundProperty(__el4, "debounce", 300); }
+    { assignBoundProperty(__el4, "minLength", 2); }
     __el4.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onCountryChange), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     bindInterpolation(__t6,()=>ctx.countryValue());
     return __frag;
@@ -10656,7 +10656,7 @@ component('pdx-demo-comp-avatar-group-basic', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_max = {}; effect(() => { const __b = 5; if (Object.is(__b, __el4w_max)) return; __el4w_max = __b; assignBoundProperty(__el4, "max", __b); });
+    { assignBoundProperty(__el4, "max", 5); }
     return __frag;
   })(),
 });
@@ -10696,8 +10696,8 @@ function onAvatarClick(e) {
     const __frag=__blk0();
     const [__el4,__t6]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_max = {}; effect(() => { const __b = 4; if (Object.is(__b, __el4w_max)) return; __el4w_max = __b; assignBoundProperty(__el4, "max", __b); });
-    let __el4w_clickable = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_clickable)) return; __el4w_clickable = __b; assignBoundProperty(__el4, "clickable", __b); });
+    { assignBoundProperty(__el4, "max", 4); }
+    { assignBoundProperty(__el4, "clickable", true); }
     __el4.addEventListener('pdx-click', safeHandler(batchHandler(ctx.onAvatarClick), ctx.el?.tagName?.toLowerCase(), 'pdx-click'));
     __el4.addEventListener('pdx-overflow-click', safeHandler(batchHandler(ctx.onOverflowClick), ctx.el?.tagName?.toLowerCase(), 'pdx-overflow-click'));
     bindInterpolation(__t6,()=>ctx.clickLog());
@@ -10725,9 +10725,9 @@ component('pdx-demo-comp-avatar-group-custom-max', {
     const __frag=__blk0();
     const [__el5,__el8]=__walk0(__frag);
     let __el5w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
-    let __el5w_max = {}; effect(() => { const __b = 3; if (Object.is(__b, __el5w_max)) return; __el5w_max = __b; assignBoundProperty(__el5, "max", __b); });
+    { assignBoundProperty(__el5, "max", 3); }
     let __el8w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el8w_items)) return; __el8w_items = __b; assignBoundProperty(__el8, "items", __b); });
-    let __el8w_max = {}; effect(() => { const __b = 7; if (Object.is(__b, __el8w_max)) return; __el8w_max = __b; assignBoundProperty(__el8, "max", __b); });
+    { assignBoundProperty(__el8, "max", 7); }
     return __frag;
   })(),
 });
@@ -10752,7 +10752,7 @@ component('pdx-demo-comp-avatar-group-reversed', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_max = {}; effect(() => { const __b = 5; if (Object.is(__b, __el4w_max)) return; __el4w_max = __b; assignBoundProperty(__el4, "max", __b); });
+    { assignBoundProperty(__el4, "max", 5); }
     return __frag;
   })(),
 });
@@ -10777,19 +10777,19 @@ component('pdx-demo-comp-avatar-group-sizes', {
     const __frag=__blk0();
     const [__el5,__el8,__el11,__el14,__el17]=__walk0(__frag);
     let __el5w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
-    let __el5w_max = {}; effect(() => { const __b = 4; if (Object.is(__b, __el5w_max)) return; __el5w_max = __b; assignBoundProperty(__el5, "max", __b); });
-    let __el5w_overlap = {}; effect(() => { const __b = -6; if (Object.is(__b, __el5w_overlap)) return; __el5w_overlap = __b; assignBoundProperty(__el5, "overlap", __b); });
+    { assignBoundProperty(__el5, "max", 4); }
+    { assignBoundProperty(__el5, "overlap", -6); }
     let __el8w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el8w_items)) return; __el8w_items = __b; assignBoundProperty(__el8, "items", __b); });
-    let __el8w_max = {}; effect(() => { const __b = 4; if (Object.is(__b, __el8w_max)) return; __el8w_max = __b; assignBoundProperty(__el8, "max", __b); });
-    let __el8w_overlap = {}; effect(() => { const __b = -6; if (Object.is(__b, __el8w_overlap)) return; __el8w_overlap = __b; assignBoundProperty(__el8, "overlap", __b); });
+    { assignBoundProperty(__el8, "max", 4); }
+    { assignBoundProperty(__el8, "overlap", -6); }
     let __el11w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el11w_items)) return; __el11w_items = __b; assignBoundProperty(__el11, "items", __b); });
-    let __el11w_max = {}; effect(() => { const __b = 4; if (Object.is(__b, __el11w_max)) return; __el11w_max = __b; assignBoundProperty(__el11, "max", __b); });
+    { assignBoundProperty(__el11, "max", 4); }
     let __el14w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el14w_items)) return; __el14w_items = __b; assignBoundProperty(__el14, "items", __b); });
-    let __el14w_max = {}; effect(() => { const __b = 4; if (Object.is(__b, __el14w_max)) return; __el14w_max = __b; assignBoundProperty(__el14, "max", __b); });
-    let __el14w_overlap = {}; effect(() => { const __b = -10; if (Object.is(__b, __el14w_overlap)) return; __el14w_overlap = __b; assignBoundProperty(__el14, "overlap", __b); });
+    { assignBoundProperty(__el14, "max", 4); }
+    { assignBoundProperty(__el14, "overlap", -10); }
     let __el17w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el17w_items)) return; __el17w_items = __b; assignBoundProperty(__el17, "items", __b); });
-    let __el17w_max = {}; effect(() => { const __b = 4; if (Object.is(__b, __el17w_max)) return; __el17w_max = __b; assignBoundProperty(__el17, "max", __b); });
-    let __el17w_overlap = {}; effect(() => { const __b = -12; if (Object.is(__b, __el17w_overlap)) return; __el17w_overlap = __b; assignBoundProperty(__el17, "overlap", __b); });
+    { assignBoundProperty(__el17, "max", 4); }
+    { assignBoundProperty(__el17, "overlap", -12); }
     return __frag;
   })(),
 });
@@ -10823,7 +10823,7 @@ component('pdx-demo-comp-avatar-group-with-images', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = ctx.imageItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_max = {}; effect(() => { const __b = 4; if (Object.is(__b, __el4w_max)) return; __el4w_max = __b; assignBoundProperty(__el4, "max", __b); });
+    { assignBoundProperty(__el4, "max", 4); }
     return __frag;
   })(),
 });
@@ -10848,8 +10848,8 @@ component('pdx-demo-comp-avatar-group-without-border', {
     const __frag=__blk0();
     const [__el3]=__walk0(__frag);
     let __el3w_items = {}; effect(() => { const __b = teamItems; if (Object.is(__b, __el3w_items)) return; __el3w_items = __b; assignBoundProperty(__el3, "items", __b); });
-    let __el3w_max = {}; effect(() => { const __b = 5; if (Object.is(__b, __el3w_max)) return; __el3w_max = __b; assignBoundProperty(__el3, "max", __b); });
-    let __el3w_bordered = {}; effect(() => { const __b = false; if (Object.is(__b, __el3w_bordered)) return; __el3w_bordered = __b; assignBoundProperty(__el3, "bordered", __b); });
+    { assignBoundProperty(__el3, "max", 5); }
+    { assignBoundProperty(__el3, "bordered", false); }
     return __frag;
   })(),
 });
@@ -11785,7 +11785,7 @@ component('pdx-demo-comp-bottom-sheet-scrollable', {
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openScroll), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el4w_open = {}; effect(() => { const __b = ctx.scrollOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
     let __el4w_detents = {}; effect(() => { const __b = ctx.scrollDetents; if (Object.is(__b, __el4w_detents)) return; __el4w_detents = __b; assignBoundProperty(__el4, "detents", __b); });
-    let __el4w_initialDetent = {}; effect(() => { const __b = 1; if (Object.is(__b, __el4w_initialDetent)) return; __el4w_initialDetent = __b; assignBoundProperty(__el4, "initialDetent", __b); });
+    { assignBoundProperty(__el4, "initialDetent", 1); }
     __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeScroll), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     return __frag;
   })(),
@@ -11919,7 +11919,7 @@ const longItems = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = ctx.longItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_maxItems = {}; effect(() => { const __b = 3; if (Object.is(__b, __el4w_maxItems)) return; __el4w_maxItems = __b; assignBoundProperty(__el4, "maxItems", __b); });
+    { assignBoundProperty(__el4, "maxItems", 3); }
     return __frag;
   })(),
 });
@@ -12972,7 +12972,7 @@ component('pdx-demo-comp-carousel-autoplay', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = basicSlides; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_interval = {}; effect(() => { const __b = 3000; if (Object.is(__b, __el4w_interval)) return; __el4w_interval = __b; assignBoundProperty(__el4, "interval", __b); });
+    { assignBoundProperty(__el4, "interval", 3000); }
     return __frag;
   })(),
 });
@@ -13096,9 +13096,9 @@ const cardSlides = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = ctx.cardSlides; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_slides_per_view = {}; effect(() => { const __b = 3; if (Object.is(__b, __el4w_slides_per_view)) return; __el4w_slides_per_view = __b; assignBoundProperty(__el4, "slidesPerView", __b); });
-    let __el4w_gap = {}; effect(() => { const __b = 16; if (Object.is(__b, __el4w_gap)) return; __el4w_gap = __b; assignBoundProperty(__el4, "gap", __b); });
-    let __el4w_show_dots = {}; effect(() => { const __b = false; if (Object.is(__b, __el4w_show_dots)) return; __el4w_show_dots = __b; assignBoundProperty(__el4, "showDots", __b); });
+    { assignBoundProperty(__el4, "slidesPerView", 3); }
+    { assignBoundProperty(__el4, "gap", 16); }
+    { assignBoundProperty(__el4, "showDots", false); }
     return __frag;
   })(),
 });
@@ -13123,7 +13123,7 @@ component('pdx-demo-comp-carousel-no-loop', {
     const __frag=__blk0();
     const [__el5]=__walk0(__frag);
     let __el5w_items = {}; effect(() => { const __b = basicSlides; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
-    let __el5w_loop = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_loop)) return; __el5w_loop = __b; assignBoundProperty(__el5, "loop", __b); });
+    { assignBoundProperty(__el5, "loop", false); }
     return __frag;
   })(),
 });
@@ -13193,7 +13193,7 @@ component('pdx-demo-comp-carousel-swipe', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = basicSlides; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_show_arrows = {}; effect(() => { const __b = false; if (Object.is(__b, __el4w_show_arrows)) return; __el4w_show_arrows = __b; assignBoundProperty(__el4, "showArrows", __b); });
+    { assignBoundProperty(__el4, "showArrows", false); }
     return __frag;
   })(),
 });
@@ -13427,10 +13427,10 @@ component('pdx-demo-comp-chart-area', {
     const __frag=__blk0();
     const [__el5]=__walk0(__frag);
     let __el5w_data = {}; effect(() => { const __b = lineData; if (Object.is(__b, __el5w_data)) return; __el5w_data = __b; assignBoundProperty(__el5, "data", __b); });
-    let __el5w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el5w_x_field)) return; __el5w_x_field = __b; assignBoundProperty(__el5, "xField", __b); });
-    let __el5w_y_field = {}; effect(() => { const __b = 'revenue'; if (Object.is(__b, __el5w_y_field)) return; __el5w_y_field = __b; assignBoundProperty(__el5, "yField", __b); });
-    let __el5w_series_names = {}; effect(() => { const __b = 'Revenue'; if (Object.is(__b, __el5w_series_names)) return; __el5w_series_names = __b; assignBoundProperty(__el5, "seriesNames", __b); });
-    let __el5w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_legend)) return; __el5w_legend = __b; assignBoundProperty(__el5, "legend", __b); });
+    { assignBoundProperty(__el5, "xField", 'month'); }
+    { assignBoundProperty(__el5, "yField", 'revenue'); }
+    { assignBoundProperty(__el5, "seriesNames", 'Revenue'); }
+    { assignBoundProperty(__el5, "legend", false); }
     return __frag;
   })(),
 });
@@ -13455,9 +13455,9 @@ component('pdx-demo-comp-chart-bar', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = barData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'quarter'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_y_field = {}; effect(() => { const __b = 'desktop,mobile,tablet'; if (Object.is(__b, __el4w_y_field)) return; __el4w_y_field = __b; assignBoundProperty(__el4, "yField", __b); });
-    let __el4w_series_names = {}; effect(() => { const __b = 'Desktop,Mobile,Tablet'; if (Object.is(__b, __el4w_series_names)) return; __el4w_series_names = __b; assignBoundProperty(__el4, "seriesNames", __b); });
+    { assignBoundProperty(__el4, "xField", 'quarter'); }
+    { assignBoundProperty(__el4, "yField", 'desktop,mobile,tablet'); }
+    { assignBoundProperty(__el4, "seriesNames", 'Desktop,Mobile,Tablet'); }
     return __frag;
   })(),
 });
@@ -13482,9 +13482,9 @@ component('pdx-demo-comp-chart-line', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = lineData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_y_field = {}; effect(() => { const __b = 'revenue,profit'; if (Object.is(__b, __el4w_y_field)) return; __el4w_y_field = __b; assignBoundProperty(__el4, "yField", __b); });
-    let __el4w_series_names = {}; effect(() => { const __b = 'Revenue,Profit'; if (Object.is(__b, __el4w_series_names)) return; __el4w_series_names = __b; assignBoundProperty(__el4, "seriesNames", __b); });
+    { assignBoundProperty(__el4, "xField", 'month'); }
+    { assignBoundProperty(__el4, "yField", 'revenue,profit'); }
+    { assignBoundProperty(__el4, "seriesNames", 'Revenue,Profit'); }
     return __frag;
   })(),
 });
@@ -13522,13 +13522,13 @@ const pieData = [
     const __frag=__blk0();
     const [__el6,__el10]=__walk0(__frag);
     let __el6w_data = {}; effect(() => { const __b = ctx.pieData; if (Object.is(__b, __el6w_data)) return; __el6w_data = __b; assignBoundProperty(__el6, "data", __b); });
-    let __el6w_x_field = {}; effect(() => { const __b = 'browser'; if (Object.is(__b, __el6w_x_field)) return; __el6w_x_field = __b; assignBoundProperty(__el6, "xField", __b); });
-    let __el6w_y_field = {}; effect(() => { const __b = 'share'; if (Object.is(__b, __el6w_y_field)) return; __el6w_y_field = __b; assignBoundProperty(__el6, "yField", __b); });
-    let __el6w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el6w_legend)) return; __el6w_legend = __b; assignBoundProperty(__el6, "legend", __b); });
+    { assignBoundProperty(__el6, "xField", 'browser'); }
+    { assignBoundProperty(__el6, "yField", 'share'); }
+    { assignBoundProperty(__el6, "legend", false); }
     let __el10w_data = {}; effect(() => { const __b = ctx.pieData; if (Object.is(__b, __el10w_data)) return; __el10w_data = __b; assignBoundProperty(__el10, "data", __b); });
-    let __el10w_x_field = {}; effect(() => { const __b = 'browser'; if (Object.is(__b, __el10w_x_field)) return; __el10w_x_field = __b; assignBoundProperty(__el10, "xField", __b); });
-    let __el10w_y_field = {}; effect(() => { const __b = 'share'; if (Object.is(__b, __el10w_y_field)) return; __el10w_y_field = __b; assignBoundProperty(__el10, "yField", __b); });
-    let __el10w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el10w_legend)) return; __el10w_legend = __b; assignBoundProperty(__el10, "legend", __b); });
+    { assignBoundProperty(__el10, "xField", 'browser'); }
+    { assignBoundProperty(__el10, "yField", 'share'); }
+    { assignBoundProperty(__el10, "legend", false); }
     return __frag;
   })(),
 });
@@ -13553,9 +13553,9 @@ component('pdx-demo-comp-chart-stacked-bar', {
     const __frag=__blk0();
     const [__el5]=__walk0(__frag);
     let __el5w_data = {}; effect(() => { const __b = barData; if (Object.is(__b, __el5w_data)) return; __el5w_data = __b; assignBoundProperty(__el5, "data", __b); });
-    let __el5w_x_field = {}; effect(() => { const __b = 'quarter'; if (Object.is(__b, __el5w_x_field)) return; __el5w_x_field = __b; assignBoundProperty(__el5, "xField", __b); });
-    let __el5w_y_field = {}; effect(() => { const __b = 'desktop,mobile,tablet'; if (Object.is(__b, __el5w_y_field)) return; __el5w_y_field = __b; assignBoundProperty(__el5, "yField", __b); });
-    let __el5w_series_names = {}; effect(() => { const __b = 'Desktop,Mobile,Tablet'; if (Object.is(__b, __el5w_series_names)) return; __el5w_series_names = __b; assignBoundProperty(__el5, "seriesNames", __b); });
+    { assignBoundProperty(__el5, "xField", 'quarter'); }
+    { assignBoundProperty(__el5, "yField", 'desktop,mobile,tablet'); }
+    { assignBoundProperty(__el5, "seriesNames", 'Desktop,Mobile,Tablet'); }
     return __frag;
   })(),
 });
@@ -13580,15 +13580,15 @@ component('pdx-demo-comp-chart-advanced-axis-format', {
     const __frag=__blk0();
     const [__el11,__el15]=__walk0(__frag);
     let __el11w_data = {}; effect(() => { const __b = lineData; if (Object.is(__b, __el11w_data)) return; __el11w_data = __b; assignBoundProperty(__el11, "data", __b); });
-    let __el11w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el11w_x_field)) return; __el11w_x_field = __b; assignBoundProperty(__el11, "xField", __b); });
-    let __el11w_y_field = {}; effect(() => { const __b = 'revenue'; if (Object.is(__b, __el11w_y_field)) return; __el11w_y_field = __b; assignBoundProperty(__el11, "yField", __b); });
-    let __el11w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el11w_legend)) return; __el11w_legend = __b; assignBoundProperty(__el11, "legend", __b); });
-    let __el11w_y_format = {}; effect(() => { const __b = 'currency'; if (Object.is(__b, __el11w_y_format)) return; __el11w_y_format = __b; assignBoundProperty(__el11, "yFormat", __b); });
+    { assignBoundProperty(__el11, "xField", 'month'); }
+    { assignBoundProperty(__el11, "yField", 'revenue'); }
+    { assignBoundProperty(__el11, "legend", false); }
+    { assignBoundProperty(__el11, "yFormat", 'currency'); }
     let __el15w_data = {}; effect(() => { const __b = lineData; if (Object.is(__b, __el15w_data)) return; __el15w_data = __b; assignBoundProperty(__el15, "data", __b); });
-    let __el15w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el15w_x_field)) return; __el15w_x_field = __b; assignBoundProperty(__el15, "xField", __b); });
-    let __el15w_y_field = {}; effect(() => { const __b = 'revenue'; if (Object.is(__b, __el15w_y_field)) return; __el15w_y_field = __b; assignBoundProperty(__el15, "yField", __b); });
-    let __el15w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el15w_legend)) return; __el15w_legend = __b; assignBoundProperty(__el15, "legend", __b); });
-    let __el15w_y_format = {}; effect(() => { const __b = 'compact'; if (Object.is(__b, __el15w_y_format)) return; __el15w_y_format = __b; assignBoundProperty(__el15, "yFormat", __b); });
+    { assignBoundProperty(__el15, "xField", 'month'); }
+    { assignBoundProperty(__el15, "yField", 'revenue'); }
+    { assignBoundProperty(__el15, "legend", false); }
+    { assignBoundProperty(__el15, "yFormat", 'compact'); }
     return __frag;
   })(),
 });
@@ -13628,12 +13628,12 @@ const dualAxisData = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = ctx.dualAxisData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
+    { assignBoundProperty(__el4, "xField", 'month'); }
     let __el4w_series_config = {}; effect(() => { const __b = ctx.dualSeriesConfig; if (Object.is(__b, __el4w_series_config)) return; __el4w_series_config = __b; assignBoundProperty(__el4, "seriesConfig", __b); });
-    let __el4w_y_axis_name = {}; effect(() => { const __b = 'Revenue'; if (Object.is(__b, __el4w_y_axis_name)) return; __el4w_y_axis_name = __b; assignBoundProperty(__el4, "yAxisName", __b); });
-    let __el4w_y_axis_right_name = {}; effect(() => { const __b = 'Growth'; if (Object.is(__b, __el4w_y_axis_right_name)) return; __el4w_y_axis_right_name = __b; assignBoundProperty(__el4, "yAxisRightName", __b); });
-    let __el4w_y_format = {}; effect(() => { const __b = 'currency'; if (Object.is(__b, __el4w_y_format)) return; __el4w_y_format = __b; assignBoundProperty(__el4, "yFormat", __b); });
-    let __el4w_y_right_format = {}; effect(() => { const __b = 'percent'; if (Object.is(__b, __el4w_y_right_format)) return; __el4w_y_right_format = __b; assignBoundProperty(__el4, "yRightFormat", __b); });
+    { assignBoundProperty(__el4, "yAxisName", 'Revenue'); }
+    { assignBoundProperty(__el4, "yAxisRightName", 'Growth'); }
+    { assignBoundProperty(__el4, "yFormat", 'currency'); }
+    { assignBoundProperty(__el4, "yRightFormat", 'percent'); }
     return __frag;
   })(),
 });
@@ -13675,9 +13675,9 @@ function randomize() {
     const __frag=__blk0();
     const [__el4,__el6]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = ctx.dynamicData(); if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'category'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_y_field = {}; effect(() => { const __b = 'value'; if (Object.is(__b, __el4w_y_field)) return; __el4w_y_field = __b; assignBoundProperty(__el4, "yField", __b); });
-    let __el4w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el4w_legend)) return; __el4w_legend = __b; assignBoundProperty(__el4, "legend", __b); });
+    { assignBoundProperty(__el4, "xField", 'category'); }
+    { assignBoundProperty(__el4, "yField", 'value'); }
+    { assignBoundProperty(__el4, "legend", false); }
     __el6.addEventListener('click', safeHandler(batchHandler(ctx.randomize), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
   })(),
@@ -13703,15 +13703,15 @@ component('pdx-demo-comp-chart-advanced-legend', {
     const __frag=__blk0();
     const [__el7,__el11]=__walk0(__frag);
     let __el7w_data = {}; effect(() => { const __b = lineData; if (Object.is(__b, __el7w_data)) return; __el7w_data = __b; assignBoundProperty(__el7, "data", __b); });
-    let __el7w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el7w_x_field)) return; __el7w_x_field = __b; assignBoundProperty(__el7, "xField", __b); });
-    let __el7w_y_field = {}; effect(() => { const __b = 'revenue,profit'; if (Object.is(__b, __el7w_y_field)) return; __el7w_y_field = __b; assignBoundProperty(__el7, "yField", __b); });
-    let __el7w_series_names = {}; effect(() => { const __b = 'Revenue,Profit'; if (Object.is(__b, __el7w_series_names)) return; __el7w_series_names = __b; assignBoundProperty(__el7, "seriesNames", __b); });
-    let __el7w_legend_position = {}; effect(() => { const __b = 'bottom'; if (Object.is(__b, __el7w_legend_position)) return; __el7w_legend_position = __b; assignBoundProperty(__el7, "legendPosition", __b); });
+    { assignBoundProperty(__el7, "xField", 'month'); }
+    { assignBoundProperty(__el7, "yField", 'revenue,profit'); }
+    { assignBoundProperty(__el7, "seriesNames", 'Revenue,Profit'); }
+    { assignBoundProperty(__el7, "legendPosition", 'bottom'); }
     let __el11w_data = {}; effect(() => { const __b = lineData; if (Object.is(__b, __el11w_data)) return; __el11w_data = __b; assignBoundProperty(__el11, "data", __b); });
-    let __el11w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el11w_x_field)) return; __el11w_x_field = __b; assignBoundProperty(__el11, "xField", __b); });
-    let __el11w_y_field = {}; effect(() => { const __b = 'revenue,profit'; if (Object.is(__b, __el11w_y_field)) return; __el11w_y_field = __b; assignBoundProperty(__el11, "yField", __b); });
-    let __el11w_series_names = {}; effect(() => { const __b = 'Revenue,Profit'; if (Object.is(__b, __el11w_series_names)) return; __el11w_series_names = __b; assignBoundProperty(__el11, "seriesNames", __b); });
-    let __el11w_legend_position = {}; effect(() => { const __b = 'right'; if (Object.is(__b, __el11w_legend_position)) return; __el11w_legend_position = __b; assignBoundProperty(__el11, "legendPosition", __b); });
+    { assignBoundProperty(__el11, "xField", 'month'); }
+    { assignBoundProperty(__el11, "yField", 'revenue,profit'); }
+    { assignBoundProperty(__el11, "seriesNames", 'Revenue,Profit'); }
+    { assignBoundProperty(__el11, "legendPosition", 'right'); }
     return __frag;
   })(),
 });
@@ -13736,9 +13736,9 @@ component('pdx-demo-comp-chart-advanced-theme', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = lineData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'month'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_y_field = {}; effect(() => { const __b = 'revenue,profit'; if (Object.is(__b, __el4w_y_field)) return; __el4w_y_field = __b; assignBoundProperty(__el4, "yField", __b); });
-    let __el4w_series_names = {}; effect(() => { const __b = 'Revenue,Profit'; if (Object.is(__b, __el4w_series_names)) return; __el4w_series_names = __b; assignBoundProperty(__el4, "seriesNames", __b); });
+    { assignBoundProperty(__el4, "xField", 'month'); }
+    { assignBoundProperty(__el4, "yField", 'revenue,profit'); }
+    { assignBoundProperty(__el4, "seriesNames", 'Revenue,Profit'); }
     return __frag;
   })(),
 });
@@ -13766,9 +13766,9 @@ const zoomData = Array.from({ length: 90 }, (_, i) => ({
     const __frag=__blk0();
     const [__el5]=__walk0(__frag);
     let __el5w_data = {}; effect(() => { const __b = ctx.zoomData; if (Object.is(__b, __el5w_data)) return; __el5w_data = __b; assignBoundProperty(__el5, "data", __b); });
-    let __el5w_x_field = {}; effect(() => { const __b = 'day'; if (Object.is(__b, __el5w_x_field)) return; __el5w_x_field = __b; assignBoundProperty(__el5, "xField", __b); });
-    let __el5w_y_field = {}; effect(() => { const __b = 'value'; if (Object.is(__b, __el5w_y_field)) return; __el5w_y_field = __b; assignBoundProperty(__el5, "yField", __b); });
-    let __el5w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_legend)) return; __el5w_legend = __b; assignBoundProperty(__el5, "legend", __b); });
+    { assignBoundProperty(__el5, "xField", 'day'); }
+    { assignBoundProperty(__el5, "yField", 'value'); }
+    { assignBoundProperty(__el5, "legend", false); }
     return __frag;
   })(),
 });
@@ -13801,8 +13801,8 @@ const candleData = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = ctx.candleData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'date'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el4w_legend)) return; __el4w_legend = __b; assignBoundProperty(__el4, "legend", __b); });
+    { assignBoundProperty(__el4, "xField", 'date'); }
+    { assignBoundProperty(__el4, "legend", false); }
     return __frag;
   })(),
 });
@@ -13833,9 +13833,9 @@ const funnelData = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = ctx.funnelData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'stage'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_y_field = {}; effect(() => { const __b = 'users'; if (Object.is(__b, __el4w_y_field)) return; __el4w_y_field = __b; assignBoundProperty(__el4, "yField", __b); });
-    let __el4w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el4w_legend)) return; __el4w_legend = __b; assignBoundProperty(__el4, "legend", __b); });
+    { assignBoundProperty(__el4, "xField", 'stage'); }
+    { assignBoundProperty(__el4, "yField", 'users'); }
+    { assignBoundProperty(__el4, "legend", false); }
     return __frag;
   })(),
 });
@@ -13918,9 +13918,9 @@ const heatmapData = buildHeatmap();
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = ctx.heatmapData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'hour'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_y_field = {}; effect(() => { const __b = 'day'; if (Object.is(__b, __el4w_y_field)) return; __el4w_y_field = __b; assignBoundProperty(__el4, "yField", __b); });
-    let __el4w_legend = {}; effect(() => { const __b = false; if (Object.is(__b, __el4w_legend)) return; __el4w_legend = __b; assignBoundProperty(__el4, "legend", __b); });
+    { assignBoundProperty(__el4, "xField", 'hour'); }
+    { assignBoundProperty(__el4, "yField", 'day'); }
+    { assignBoundProperty(__el4, "legend", false); }
     return __frag;
   })(),
 });
@@ -13952,9 +13952,9 @@ const radarData = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_data = {}; effect(() => { const __b = ctx.radarData; if (Object.is(__b, __el4w_data)) return; __el4w_data = __b; assignBoundProperty(__el4, "data", __b); });
-    let __el4w_x_field = {}; effect(() => { const __b = 'skill'; if (Object.is(__b, __el4w_x_field)) return; __el4w_x_field = __b; assignBoundProperty(__el4, "xField", __b); });
-    let __el4w_y_field = {}; effect(() => { const __b = 'alice,bob'; if (Object.is(__b, __el4w_y_field)) return; __el4w_y_field = __b; assignBoundProperty(__el4, "yField", __b); });
-    let __el4w_series_names = {}; effect(() => { const __b = 'Alice,Bob'; if (Object.is(__b, __el4w_series_names)) return; __el4w_series_names = __b; assignBoundProperty(__el4, "seriesNames", __b); });
+    { assignBoundProperty(__el4, "xField", 'skill'); }
+    { assignBoundProperty(__el4, "yField", 'alice,bob'); }
+    { assignBoundProperty(__el4, "seriesNames", 'Alice,Bob'); }
     return __frag;
   })(),
 });
@@ -14081,7 +14081,7 @@ component('pdx-demo-comp-checkbox-composition', {
     let __el14w_checked = {}; effect(() => { const __b = allOn(ctx.perms()); if (Object.is(__b, __el14w_checked)) return; __el14w_checked = __b; assignBoundProperty(__el14, "checked", __b); });
     let __el14w_indeterminate = {}; effect(() => { const __b = someOn(ctx.perms()); if (Object.is(__b, __el14w_indeterminate)) return; __el14w_indeterminate = __b; assignBoundProperty(__el14, "indeterminate", __b); });
     __el14.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.perms.setRaw(setAll(ctx.perms(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    const __cf17=eachRow(()=>ctx.perms(),'label',(perm)=>{const __frag=__blk0();const [__el16]=__walk0(__frag);let __el16w_label = {}; effect(() => { const __b = perm().label; if (Object.is(__b, __el16w_label)) return; __el16w_label = __b; assignBoundProperty(__el16, "label", __b); });let __el16w_description = {}; effect(() => { const __b = perm().description; if (Object.is(__b, __el16w_description)) return; __el16w_description = __b; assignBoundProperty(__el16, "description", __b); });let __el16w_value = {}; effect(() => { const __b = perm().label; if (Object.is(__b, __el16w_value)) return; __el16w_value = __b; assignBoundProperty(__el16, "value", __b); });let __el16w_checked = {}; effect(() => { const __b = perm().on; if (Object.is(__b, __el16w_checked)) return; __el16w_checked = __b; assignBoundProperty(__el16, "checked", __b); });__el16.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.perms.setRaw(setOne(ctx.perms(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));return __frag;});
+    const __cf17=eachRow(()=>ctx.perms(),'label',(perm)=>{const __frag=__blk0();const [__el16]=__walk0(__frag);{ assignBoundProperty(__el16, "label", perm().label); }let __el16w_description = {}; effect(() => { const __b = perm().description; if (Object.is(__b, __el16w_description)) return; __el16w_description = __b; assignBoundProperty(__el16, "description", __b); });{ assignBoundProperty(__el16, "value", perm().label); }let __el16w_checked = {}; effect(() => { const __b = perm().on; if (Object.is(__b, __el16w_checked)) return; __el16w_checked = __b; assignBoundProperty(__el16, "checked", __b); });__el16.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.perms.setRaw(setOne(ctx.perms(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));return __frag;});
     __m18.replaceWith(__cf17);
     return __frag;
   })(),
@@ -14166,7 +14166,7 @@ component('pdx-demo-comp-checkbox-indeterminate', {
     let __el5w_checked = {}; effect(() => { const __b = allOn(ctx.items()); if (Object.is(__b, __el5w_checked)) return; __el5w_checked = __b; assignBoundProperty(__el5, "checked", __b); });
     let __el5w_indeterminate = {}; effect(() => { const __b = someOn(ctx.items()); if (Object.is(__b, __el5w_indeterminate)) return; __el5w_indeterminate = __b; assignBoundProperty(__el5, "indeterminate", __b); });
     __el5.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.items.setRaw(setAll(ctx.items(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    const __cf8=eachRow(()=>ctx.items(),'label',(item)=>{const __frag=__blk0();const [__el7]=__walk0(__frag);let __el7w_label = {}; effect(() => { const __b = item().label; if (Object.is(__b, __el7w_label)) return; __el7w_label = __b; assignBoundProperty(__el7, "label", __b); });let __el7w_value = {}; effect(() => { const __b = item().label; if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });let __el7w_checked = {}; effect(() => { const __b = item().on; if (Object.is(__b, __el7w_checked)) return; __el7w_checked = __b; assignBoundProperty(__el7, "checked", __b); });__el7.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.items.setRaw(setOne(ctx.items(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));return __frag;});
+    const __cf8=eachRow(()=>ctx.items(),'label',(item)=>{const __frag=__blk0();const [__el7]=__walk0(__frag);{ assignBoundProperty(__el7, "label", item().label); }{ assignBoundProperty(__el7, "value", item().label); }let __el7w_checked = {}; effect(() => { const __b = item().on; if (Object.is(__b, __el7w_checked)) return; __el7w_checked = __b; assignBoundProperty(__el7, "checked", __b); });__el7.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.items.setRaw(setOne(ctx.items(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));return __frag;});
     __m9.replaceWith(__cf8);
     return __frag;
   })(),
@@ -14420,7 +14420,7 @@ const chipConsole = useChipConsole();
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__m8,__m12]=__walk2(__frag);
-    const __cf7=eachRow(()=>ctx.people(),'name',(person)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);let __el5w_avatar = {}; effect(() => { const __b = person().avatar; if (Object.is(__b, __el5w_avatar)) return; __el5w_avatar = __b; assignBoundProperty(__el5, "avatar", __b); });let __el5w_variant = {}; effect(() => { const __b = person().variant; if (Object.is(__b, __el5w_variant)) return; __el5w_variant = __b; assignBoundProperty(__el5, "variant", __b); });let __el5w_value = {}; effect(() => { const __b = person().name; if (Object.is(__b, __el5w_value)) return; __el5w_value = __b; assignBoundProperty(__el5, "value", __b); });__el5.addEventListener('pdx-remove', safeHandler(batchHandler(e => ctx.people.setRaw(ctx.dropPerson(ctx.people(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove'));bindInterpolation(__t6,()=>person().name);return __frag;});
+    const __cf7=eachRow(()=>ctx.people(),'name',(person)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);let __el5w_avatar = {}; effect(() => { const __b = person().avatar; if (Object.is(__b, __el5w_avatar)) return; __el5w_avatar = __b; assignBoundProperty(__el5, "avatar", __b); });let __el5w_variant = {}; effect(() => { const __b = person().variant; if (Object.is(__b, __el5w_variant)) return; __el5w_variant = __b; assignBoundProperty(__el5, "variant", __b); });{ assignBoundProperty(__el5, "value", person().name); }__el5.addEventListener('pdx-remove', safeHandler(batchHandler(e => ctx.people.setRaw(ctx.dropPerson(ctx.people(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove'));bindInterpolation(__t6,()=>person().name,true);return __frag;});
     __m8.replaceWith(__cf7);
     const __cf11=when(()=>ctx.people().length < 2,()=>{const __frag=__blk1();const [__el10]=__walk1(__frag);__el10.addEventListener('click', safeHandler(batchHandler(() => ctx.people.setRaw(ctx.startPeople())), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;},null);
     __m12.replaceWith(__cf11);
@@ -14470,7 +14470,7 @@ const chipConsole = useChipConsole();
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__m25,__m28]=__walk2(__frag);
-    const __cf24=eachRow(()=>ctx.team(),'name',(member)=>{const __frag=__blk0();const [__el22,__t23]=__walk0(__frag);let __el22w_avatar = {}; effect(() => { const __b = member().avatar; if (Object.is(__b, __el22w_avatar)) return; __el22w_avatar = __b; assignBoundProperty(__el22, "avatar", __b); });let __el22w_value = {}; effect(() => { const __b = member().name; if (Object.is(__b, __el22w_value)) return; __el22w_value = __b; assignBoundProperty(__el22, "value", __b); });__el22.addEventListener('pdx-remove', safeHandler(batchHandler(e => ctx.team.setRaw(ctx.dropPerson(ctx.team(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove'));bindInterpolation(__t23,()=>member().name);return __frag;});
+    const __cf24=eachRow(()=>ctx.team(),'name',(member)=>{const __frag=__blk0();const [__el22,__t23]=__walk0(__frag);let __el22w_avatar = {}; effect(() => { const __b = member().avatar; if (Object.is(__b, __el22w_avatar)) return; __el22w_avatar = __b; assignBoundProperty(__el22, "avatar", __b); });{ assignBoundProperty(__el22, "value", member().name); }__el22.addEventListener('pdx-remove', safeHandler(batchHandler(e => ctx.team.setRaw(ctx.dropPerson(ctx.team(), e))), ctx.el?.tagName?.toLowerCase(), 'pdx-remove'));bindInterpolation(__t23,()=>member().name,true);return __frag;});
     __m25.replaceWith(__cf24);
     const __cf27=when(()=>ctx.team().length === 0,()=>{const __frag=__blk1();const [__el26]=__walk1(__frag);__el26.addEventListener('click', safeHandler(batchHandler(() => ctx.team.setRaw(ctx.startTeam())), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;},null);
     __m28.replaceWith(__cf27);
@@ -14603,7 +14603,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-chip/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, bindRef, component, eachRow, effect, safeHandler, signal, staticBlock, when } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, bindRef, component, eachRow, safeHandler, signal, staticBlock, when } from '@pdxui/core';
 import { useChipConsole } from './state.pdx';
 
 const __blk0=staticBlock((__frag,__d)=>{__frag.appendChild(__d.createTextNode(" "));const __el7=__d.createElement('pdx-chip');__frag.appendChild(__el7);__el7.setAttribute("removable", '');const __t8=__d.createTextNode('');__el7.appendChild(__t8);__frag.appendChild(__d.createTextNode(" "));});
@@ -14651,7 +14651,7 @@ const chipConsole = useChipConsole();
     const __frag=__blk2();
     const [__el6,__m10,__m13,__el14]=__walk2(__frag);
     bindRef(__el6,ctx.tagRow);
-    const __cf9=eachRow(()=>ctx.tags(),(tag) => tag,(tag)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);let __el7w_value = {}; effect(() => { const __b = tag(); if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });__el7.addEventListener('pdx-remove', safeHandler(batchHandler(ctx.removeTag), ctx.el?.tagName?.toLowerCase(), 'pdx-remove'));bindInterpolation(__t8,()=>tag());return __frag;});
+    const __cf9=eachRow(()=>ctx.tags(),(tag) => tag,(tag)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);{ assignBoundProperty(__el7, "value", tag()); }__el7.addEventListener('pdx-remove', safeHandler(batchHandler(ctx.removeTag), ctx.el?.tagName?.toLowerCase(), 'pdx-remove'));bindInterpolation(__t8,()=>tag(),true);return __frag;});
     __m10.replaceWith(__cf9);
     const __cf12=when(()=>ctx.tags().length === 0,()=>{const __frag=__blk1();return __frag;},null);
     __m13.replaceWith(__cf12);
@@ -14708,7 +14708,7 @@ const chipConsole = useChipConsole();
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m10,__t12]=__walk1(__frag);
-    const __cf9=eachRow(()=>ctx.interests(),'label',(item)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);let __el7w_selected = {}; effect(() => { const __b = item().selected; if (Object.is(__b, __el7w_selected)) return; __el7w_selected = __b; assignBoundProperty(__el7, "selected", __b); });let __el7w_value = {}; effect(() => { const __b = item().label; if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });__el7.addEventListener('pdx-toggle', safeHandler(batchHandler(ctx.toggleInterest), ctx.el?.tagName?.toLowerCase(), 'pdx-toggle'));bindInterpolation(__t8,()=>item().label);return __frag;});
+    const __cf9=eachRow(()=>ctx.interests(),'label',(item)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);let __el7w_selected = {}; effect(() => { const __b = item().selected; if (Object.is(__b, __el7w_selected)) return; __el7w_selected = __b; assignBoundProperty(__el7, "selected", __b); });{ assignBoundProperty(__el7, "value", item().label); }__el7.addEventListener('pdx-toggle', safeHandler(batchHandler(ctx.toggleInterest), ctx.el?.tagName?.toLowerCase(), 'pdx-toggle'));bindInterpolation(__t8,()=>item().label,true);return __frag;});
     __m10.replaceWith(__cf9);
     bindInterpolation(__t12,()=>ctx.selectedStr());
     return __frag;
@@ -15090,7 +15090,7 @@ const fileItems = [
     bindInterpolation(__t11,()=>ctx.lastFile());
     let __el12w_open = {}; effect(() => { const __b = ctx.filesOpen(); if (Object.is(__b, __el12w_open)) return; __el12w_open = __b; assignBoundProperty(__el12, "open", __b); });
     let __el12w_items = {}; effect(() => { const __b = ctx.fileItems; if (Object.is(__b, __el12w_items)) return; __el12w_items = __b; assignBoundProperty(__el12, "items", __b); });
-    let __el12w_hotkey = {}; effect(() => { const __b = false; if (Object.is(__b, __el12w_hotkey)) return; __el12w_hotkey = __b; assignBoundProperty(__el12, "hotkey", __b); });
+    { assignBoundProperty(__el12, "hotkey", false); }
     __el12.addEventListener('pdx-open', safeHandler(batchHandler(() => ctx.filesOpen.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'pdx-open'));
     __el12.addEventListener('pdx-close', safeHandler(batchHandler(() => ctx.filesOpen.setRaw(false)), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     __el12.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onFile), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
@@ -15526,9 +15526,9 @@ component('pdx-demo-comp-data-grid-editing-batch-edit', {
     const [__el5]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.batchDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
     let __el5w_columns = {}; effect(() => { const __b = ctx.batchColumns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_editable = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_editable)) return; __el5w_editable = __b; assignBoundProperty(__el5, "editable", __b); });
-    let __el5w_edit_mode = {}; effect(() => { const __b = 'batch'; if (Object.is(__b, __el5w_edit_mode)) return; __el5w_edit_mode = __b; assignBoundProperty(__el5, "editMode", __b); });
-    let __el5w_show_toolbar = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_show_toolbar)) return; __el5w_show_toolbar = __b; assignBoundProperty(__el5, "showToolbar", __b); });
+    { assignBoundProperty(__el5, "editable", true); }
+    { assignBoundProperty(__el5, "editMode", 'batch'); }
+    { assignBoundProperty(__el5, "showToolbar", true); }
     return __frag;
   })(),
 });
@@ -15564,8 +15564,8 @@ component('pdx-demo-comp-data-grid-editing-cell-edit', {
     const [__el7]=__walk0(__frag);
     let __el7w_source = {}; effect(() => { const __b = ctx.cellDS; if (Object.is(__b, __el7w_source)) return; __el7w_source = __b; assignBoundProperty(__el7, "source", __b); });
     let __el7w_columns = {}; effect(() => { const __b = ctx.cellColumns; if (Object.is(__b, __el7w_columns)) return; __el7w_columns = __b; assignBoundProperty(__el7, "columns", __b); });
-    let __el7w_editable = {}; effect(() => { const __b = true; if (Object.is(__b, __el7w_editable)) return; __el7w_editable = __b; assignBoundProperty(__el7, "editable", __b); });
-    let __el7w_edit_mode = {}; effect(() => { const __b = 'cell'; if (Object.is(__b, __el7w_edit_mode)) return; __el7w_edit_mode = __b; assignBoundProperty(__el7, "editMode", __b); });
+    { assignBoundProperty(__el7, "editable", true); }
+    { assignBoundProperty(__el7, "editMode", 'cell'); }
     return __frag;
   })(),
 });
@@ -15602,8 +15602,8 @@ component('pdx-demo-comp-data-grid-editing-dialog-edit', {
     const [__el5]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.dialogDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
     let __el5w_columns = {}; effect(() => { const __b = ctx.dialogColumns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_editable = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_editable)) return; __el5w_editable = __b; assignBoundProperty(__el5, "editable", __b); });
-    let __el5w_edit_mode = {}; effect(() => { const __b = 'dialog'; if (Object.is(__b, __el5w_edit_mode)) return; __el5w_edit_mode = __b; assignBoundProperty(__el5, "editMode", __b); });
+    { assignBoundProperty(__el5, "editable", true); }
+    { assignBoundProperty(__el5, "editMode", 'dialog'); }
     return __frag;
   })(),
 });
@@ -15640,8 +15640,8 @@ component('pdx-demo-comp-data-grid-editing-row-edit', {
     const [__el5]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.rowDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
     let __el5w_columns = {}; effect(() => { const __b = ctx.rowColumns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_editable = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_editable)) return; __el5w_editable = __b; assignBoundProperty(__el5, "editable", __b); });
-    let __el5w_edit_mode = {}; effect(() => { const __b = 'row'; if (Object.is(__b, __el5w_edit_mode)) return; __el5w_edit_mode = __b; assignBoundProperty(__el5, "editMode", __b); });
+    { assignBoundProperty(__el5, "editable", true); }
+    { assignBoundProperty(__el5, "editMode", 'row'); }
     return __frag;
   })(),
 });
@@ -15709,7 +15709,7 @@ const enumColumns = [
     const [__el7]=__walk0(__frag);
     let __el7w_source = {}; effect(() => { const __b = ctx.enumDS; if (Object.is(__b, __el7w_source)) return; __el7w_source = __b; assignBoundProperty(__el7, "source", __b); });
     let __el7w_columns = {}; effect(() => { const __b = ctx.enumColumns; if (Object.is(__b, __el7w_columns)) return; __el7w_columns = __b; assignBoundProperty(__el7, "columns", __b); });
-    let __el7w_filterable = {}; effect(() => { const __b = true; if (Object.is(__b, __el7w_filterable)) return; __el7w_filterable = __b; assignBoundProperty(__el7, "filterable", __b); });
+    { assignBoundProperty(__el7, "filterable", true); }
     return __frag;
   })(),
 });
@@ -15756,7 +15756,7 @@ component('pdx-demo-comp-data-grid-filtering-enum-server', {
     const [__el6]=__walk0(__frag);
     let __el6w_source = {}; effect(() => { const __b = ctx.serverDS; if (Object.is(__b, __el6w_source)) return; __el6w_source = __b; assignBoundProperty(__el6, "source", __b); });
     let __el6w_columns = {}; effect(() => { const __b = ctx.serverColumns; if (Object.is(__b, __el6w_columns)) return; __el6w_columns = __b; assignBoundProperty(__el6, "columns", __b); });
-    let __el6w_filterable = {}; effect(() => { const __b = true; if (Object.is(__b, __el6w_filterable)) return; __el6w_filterable = __b; assignBoundProperty(__el6, "filterable", __b); });
+    { assignBoundProperty(__el6, "filterable", true); }
     return __frag;
   })(),
 });
@@ -15783,7 +15783,7 @@ const filterDS = createDataSource({ data: products.slice(), pageSize: 10 });
     const [__el6]=__walk0(__frag);
     let __el6w_source = {}; effect(() => { const __b = ctx.filterDS; if (Object.is(__b, __el6w_source)) return; __el6w_source = __b; assignBoundProperty(__el6, "source", __b); });
     let __el6w_columns = {}; effect(() => { const __b = filterColumns; if (Object.is(__b, __el6w_columns)) return; __el6w_columns = __b; assignBoundProperty(__el6, "columns", __b); });
-    let __el6w_filterable = {}; effect(() => { const __b = true; if (Object.is(__b, __el6w_filterable)) return; __el6w_filterable = __b; assignBoundProperty(__el6, "filterable", __b); });
+    { assignBoundProperty(__el6, "filterable", true); }
     return __frag;
   })(),
 });
@@ -15879,7 +15879,7 @@ const toolbarFilterDS = createDataSource({ data: products.slice(), pageSize: 10 
     const [__el5]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.toolbarFilterDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
     let __el5w_columns = {}; effect(() => { const __b = filterColumns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_show_toolbar = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_show_toolbar)) return; __el5w_show_toolbar = __b; assignBoundProperty(__el5, "showToolbar", __b); });
+    { assignBoundProperty(__el5, "showToolbar", true); }
     return __frag;
   })(),
 });
@@ -15906,8 +15906,8 @@ const groupDS = createDataSource({ data: products.slice(), pageSize: 0 });
     const [__el5]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.groupDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
     let __el5w_columns = {}; effect(() => { const __b = columns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_show_group_bar = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_show_group_bar)) return; __el5w_show_group_bar = __b; assignBoundProperty(__el5, "showGroupBar", __b); });
-    let __el5w_show_toolbar = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_show_toolbar)) return; __el5w_show_toolbar = __b; assignBoundProperty(__el5, "showToolbar", __b); });
+    { assignBoundProperty(__el5, "showGroupBar", true); }
+    { assignBoundProperty(__el5, "showToolbar", true); }
     return __frag;
   })(),
 });
@@ -15937,7 +15937,7 @@ const progDS = createDataSource({ data: products.slice(), pageSize: 0 });
     let __el6w_source = {}; effect(() => { const __b = ctx.progDS; if (Object.is(__b, __el6w_source)) return; __el6w_source = __b; assignBoundProperty(__el6, "source", __b); });
     let __el6w_columns = {}; effect(() => { const __b = columns; if (Object.is(__b, __el6w_columns)) return; __el6w_columns = __b; assignBoundProperty(__el6, "columns", __b); });
     let __el6w_group_by = {}; effect(() => { const __b = ctx.groupByCategory; if (Object.is(__b, __el6w_group_by)) return; __el6w_group_by = __b; assignBoundProperty(__el6, "groupBy", __b); });
-    let __el6w_show_group_bar = {}; effect(() => { const __b = true; if (Object.is(__b, __el6w_show_group_bar)) return; __el6w_show_group_bar = __b; assignBoundProperty(__el6, "showGroupBar", __b); });
+    { assignBoundProperty(__el6, "showGroupBar", true); }
     return __frag;
   })(),
 });
@@ -16008,7 +16008,7 @@ const reorderDS = createDataSource({ data: data.slice(), pageSize: 0 });
     const [__el5]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.reorderDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
     let __el5w_columns = {}; effect(() => { const __b = columns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_show_toolbar = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_show_toolbar)) return; __el5w_show_toolbar = __b; assignBoundProperty(__el5, "showToolbar", __b); });
+    { assignBoundProperty(__el5, "showToolbar", true); }
     return __frag;
   })(),
 });
@@ -16146,7 +16146,7 @@ component('pdx-demo-comp-data-grid-toolbar-enum-filter', {
     const [__el5]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.enumFilterDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
     let __el5w_columns = {}; effect(() => { const __b = ctx.enumFilterColumns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_filterable = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_filterable)) return; __el5w_filterable = __b; assignBoundProperty(__el5, "filterable", __b); });
+    { assignBoundProperty(__el5, "filterable", true); }
     return __frag;
   })(),
 });
@@ -16219,8 +16219,8 @@ component('pdx-demo-comp-data-grid-toolbar-group-bar', {
     const [__el4]=__walk0(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.groupBarDS; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
     let __el4w_columns = {}; effect(() => { const __b = ctx.groupBarColumns; if (Object.is(__b, __el4w_columns)) return; __el4w_columns = __b; assignBoundProperty(__el4, "columns", __b); });
-    let __el4w_show_group_bar = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_show_group_bar)) return; __el4w_show_group_bar = __b; assignBoundProperty(__el4, "showGroupBar", __b); });
-    let __el4w_show_toolbar = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_show_toolbar)) return; __el4w_show_toolbar = __b; assignBoundProperty(__el4, "showToolbar", __b); });
+    { assignBoundProperty(__el4, "showGroupBar", true); }
+    { assignBoundProperty(__el4, "showToolbar", true); }
     return __frag;
   })(),
 });
@@ -16305,7 +16305,7 @@ component('pdx-demo-comp-data-grid-toolbar-inline-filters', {
     const [__el6]=__walk0(__frag);
     let __el6w_source = {}; effect(() => { const __b = ctx.filterDS; if (Object.is(__b, __el6w_source)) return; __el6w_source = __b; assignBoundProperty(__el6, "source", __b); });
     let __el6w_columns = {}; effect(() => { const __b = ctx.filterColumns; if (Object.is(__b, __el6w_columns)) return; __el6w_columns = __b; assignBoundProperty(__el6, "columns", __b); });
-    let __el6w_filterable = {}; effect(() => { const __b = true; if (Object.is(__b, __el6w_filterable)) return; __el6w_filterable = __b; assignBoundProperty(__el6, "filterable", __b); });
+    { assignBoundProperty(__el6, "filterable", true); }
     return __frag;
   })(),
 });
@@ -16344,7 +16344,7 @@ component('pdx-demo-comp-data-grid-toolbar-pagination-position', {
     const [__el8]=__walk0(__frag);
     let __el8w_source = {}; effect(() => { const __b = ctx.pagPosDS; if (Object.is(__b, __el8w_source)) return; __el8w_source = __b; assignBoundProperty(__el8, "source", __b); });
     let __el8w_columns = {}; effect(() => { const __b = ctx.pagColumns; if (Object.is(__b, __el8w_columns)) return; __el8w_columns = __b; assignBoundProperty(__el8, "columns", __b); });
-    let __el8w_pagination_position = {}; effect(() => { const __b = 'both'; if (Object.is(__b, __el8w_pagination_position)) return; __el8w_pagination_position = __b; assignBoundProperty(__el8, "paginationPosition", __b); });
+    { assignBoundProperty(__el8, "paginationPosition", 'both'); }
     return __frag;
   })(),
 });
@@ -16379,7 +16379,7 @@ component('pdx-demo-comp-data-grid-toolbar-row-detail', {
     const [__el6]=__walk0(__frag);
     let __el6w_source = {}; effect(() => { const __b = ctx.detailDS; if (Object.is(__b, __el6w_source)) return; __el6w_source = __b; assignBoundProperty(__el6, "source", __b); });
     let __el6w_columns = {}; effect(() => { const __b = ctx.detailColumns; if (Object.is(__b, __el6w_columns)) return; __el6w_columns = __b; assignBoundProperty(__el6, "columns", __b); });
-    let __el6w_expandable = {}; effect(() => { const __b = true; if (Object.is(__b, __el6w_expandable)) return; __el6w_expandable = __b; assignBoundProperty(__el6, "expandable", __b); });
+    { assignBoundProperty(__el6, "expandable", true); }
     return __frag;
   })(),
 });
@@ -16416,7 +16416,7 @@ component('pdx-demo-comp-data-grid-toolbar-toolbar', {
     const [__el4]=__walk0(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.toolbarDS; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
     let __el4w_columns = {}; effect(() => { const __b = ctx.toolbarColumns; if (Object.is(__b, __el4w_columns)) return; __el4w_columns = __b; assignBoundProperty(__el4, "columns", __b); });
-    let __el4w_show_toolbar = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_show_toolbar)) return; __el4w_show_toolbar = __b; assignBoundProperty(__el4, "showToolbar", __b); });
+    { assignBoundProperty(__el4, "showToolbar", true); }
     return __frag;
   })(),
 });
@@ -16452,7 +16452,7 @@ component('pdx-demo-comp-data-grid-toolbar-toolbar-paginated', {
     const [__el4]=__walk0(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.toolbarFilterDS; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
     let __el4w_columns = {}; effect(() => { const __b = ctx.toolbarFilterColumns; if (Object.is(__b, __el4w_columns)) return; __el4w_columns = __b; assignBoundProperty(__el4, "columns", __b); });
-    let __el4w_show_toolbar = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_show_toolbar)) return; __el4w_show_toolbar = __b; assignBoundProperty(__el4, "showToolbar", __b); });
+    { assignBoundProperty(__el4, "showToolbar", true); }
     return __frag;
   })(),
 });
@@ -16495,8 +16495,8 @@ var bigData = [];
     const [__el7]=__walk0(__frag);
     let __el7w_source = {}; effect(() => { const __b = ctx.virtualDS; if (Object.is(__b, __el7w_source)) return; __el7w_source = __b; assignBoundProperty(__el7, "source", __b); });
     let __el7w_columns = {}; effect(() => { const __b = ctx.virtualColumns; if (Object.is(__b, __el7w_columns)) return; __el7w_columns = __b; assignBoundProperty(__el7, "columns", __b); });
-    let __el7w_virtual_scroll = {}; effect(() => { const __b = true; if (Object.is(__b, __el7w_virtual_scroll)) return; __el7w_virtual_scroll = __b; assignBoundProperty(__el7, "virtualScroll", __b); });
-    let __el7w_max_height = {}; effect(() => { const __b = 400; if (Object.is(__b, __el7w_max_height)) return; __el7w_max_height = __b; assignBoundProperty(__el7, "maxHeight", __b); });
+    { assignBoundProperty(__el7, "virtualScroll", true); }
+    { assignBoundProperty(__el7, "maxHeight", 400); }
     return __frag;
   })(),
 });
@@ -16550,8 +16550,8 @@ const columns = [
     const [__el3]=__walk0(__frag);
     let __el3w_source = {}; effect(() => { const __b = ctx.virtualDS; if (Object.is(__b, __el3w_source)) return; __el3w_source = __b; assignBoundProperty(__el3, "source", __b); });
     let __el3w_columns = {}; effect(() => { const __b = ctx.columns; if (Object.is(__b, __el3w_columns)) return; __el3w_columns = __b; assignBoundProperty(__el3, "columns", __b); });
-    let __el3w_virtual_scroll = {}; effect(() => { const __b = true; if (Object.is(__b, __el3w_virtual_scroll)) return; __el3w_virtual_scroll = __b; assignBoundProperty(__el3, "virtualScroll", __b); });
-    let __el3w_max_height = {}; effect(() => { const __b = 500; if (Object.is(__b, __el3w_max_height)) return; __el3w_max_height = __b; assignBoundProperty(__el3, "maxHeight", __b); });
+    { assignBoundProperty(__el3, "virtualScroll", true); }
+    { assignBoundProperty(__el3, "maxHeight", 500); }
     return __frag;
   })(),
 });
@@ -17098,7 +17098,7 @@ const rangePresets = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5]=__walk0(__frag);
-    let __el5w_number_of_months = {}; effect(() => { const __b = 2; if (Object.is(__b, __el5w_number_of_months)) return; __el5w_number_of_months = __b; assignBoundProperty(__el5, "numberOfMonths", __b); });
+    { assignBoundProperty(__el5, "numberOfMonths", 2); }
     let __el5w_presets = {}; effect(() => { const __b = ctx.rangePresets; if (Object.is(__b, __el5w_presets)) return; __el5w_presets = __b; assignBoundProperty(__el5, "presets", __b); });
     return __frag;
   })(),
@@ -17351,7 +17351,7 @@ component('pdx-demo-comp-description-list-bordered', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = basicItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_bordered)) return; __el4w_bordered = __b; assignBoundProperty(__el4, "bordered", __b); });
+    { assignBoundProperty(__el4, "bordered", true); }
     return __frag;
   })(),
 });
@@ -17376,8 +17376,8 @@ component('pdx-demo-comp-description-list-bordered-striped', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = basicItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_bordered)) return; __el4w_bordered = __b; assignBoundProperty(__el4, "bordered", __b); });
-    let __el4w_striped = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_striped)) return; __el4w_striped = __b; assignBoundProperty(__el4, "striped", __b); });
+    { assignBoundProperty(__el4, "bordered", true); }
+    { assignBoundProperty(__el4, "striped", true); }
     return __frag;
   })(),
 });
@@ -17453,7 +17453,7 @@ const customItems = [
     const [__el5]=__walk0(__frag);
     let __el5w_items = {}; effect(() => { const __b = ctx.customItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
     let __el5w_render_value = {}; effect(() => { const __b = ctx.renderCustomValue; if (Object.is(__b, __el5w_render_value)) return; __el5w_render_value = __b; assignBoundProperty(__el5, "renderValue", __b); });
-    let __el5w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_bordered)) return; __el5w_bordered = __b; assignBoundProperty(__el5, "bordered", __b); });
+    { assignBoundProperty(__el5, "bordered", true); }
     return __frag;
   })(),
 });
@@ -17508,7 +17508,7 @@ const iconItems = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = ctx.iconItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_bordered)) return; __el4w_bordered = __b; assignBoundProperty(__el4, "bordered", __b); });
+    { assignBoundProperty(__el4, "bordered", true); }
     return __frag;
   })(),
 });
@@ -17541,7 +17541,7 @@ const productItems = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = ctx.productItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_columns = {}; effect(() => { const __b = 2; if (Object.is(__b, __el4w_columns)) return; __el4w_columns = __b; assignBoundProperty(__el4, "columns", __b); });
+    { assignBoundProperty(__el4, "columns", 2); }
     return __frag;
   })(),
 });
@@ -17570,11 +17570,11 @@ const sizeItems = [
     const __frag=__blk0();
     const [__el7,__el11,__el15]=__walk0(__frag);
     let __el7w_items = {}; effect(() => { const __b = ctx.sizeItems; if (Object.is(__b, __el7w_items)) return; __el7w_items = __b; assignBoundProperty(__el7, "items", __b); });
-    let __el7w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el7w_bordered)) return; __el7w_bordered = __b; assignBoundProperty(__el7, "bordered", __b); });
+    { assignBoundProperty(__el7, "bordered", true); }
     let __el11w_items = {}; effect(() => { const __b = ctx.sizeItems; if (Object.is(__b, __el11w_items)) return; __el11w_items = __b; assignBoundProperty(__el11, "items", __b); });
-    let __el11w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el11w_bordered)) return; __el11w_bordered = __b; assignBoundProperty(__el11, "bordered", __b); });
+    { assignBoundProperty(__el11, "bordered", true); }
     let __el15w_items = {}; effect(() => { const __b = ctx.sizeItems; if (Object.is(__b, __el15w_items)) return; __el15w_items = __b; assignBoundProperty(__el15, "items", __b); });
-    let __el15w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el15w_bordered)) return; __el15w_bordered = __b; assignBoundProperty(__el15, "bordered", __b); });
+    { assignBoundProperty(__el15, "bordered", true); }
     return __frag;
   })(),
 });
@@ -17615,8 +17615,8 @@ const slotDlItems = [
     const __frag=__blk0();
     const [__el5,__m6]=__walk0(__frag);
     let __el5w_items = {}; effect(() => { const __b = ctx.slotDlItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
-    let __el5w_columns = {}; effect(() => { const __b = 2; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
-    let __el5w_bordered = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_bordered)) return; __el5w_bordered = __b; assignBoundProperty(__el5, "bordered", __b); });
+    { assignBoundProperty(__el5, "columns", 2); }
+    { assignBoundProperty(__el5, "bordered", true); }
     __m6.replaceWith(slotCarrier('value', __pdxSlot_value_0));
     return __frag;
   })();
@@ -17731,7 +17731,7 @@ const focusSelector = '.focus-email';
     const [__el4,__el5,__el12,__el13]=__walk0(__frag);
     __el4.addEventListener('click', safeHandler(batchHandler(ctx.openFocus), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el5w_open = {}; effect(() => { const __b = ctx.focusOpen(); if (Object.is(__b, __el5w_open)) return; __el5w_open = __b; assignBoundProperty(__el5, "open", __b); });
-    let __el5w_initialfocus = {}; effect(() => { const __b = ctx.focusSelector; if (Object.is(__b, __el5w_initialfocus)) return; __el5w_initialfocus = __b; assignBoundProperty(__el5, "initialfocus", __b); });
+    { assignBoundProperty(__el5, "initialfocus", ctx.focusSelector); }
     __el5.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeFocus), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     __el12.addEventListener('click', safeHandler(batchHandler(ctx.closeFocus), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el13.addEventListener('click', safeHandler(batchHandler(ctx.closeFocus), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -17797,9 +17797,9 @@ function openNoClose() { __noCloseOpen.setRaw(true); }
     const [__el4,__el5,__el8]=__walk0(__frag);
     __el4.addEventListener('click', safeHandler(batchHandler(ctx.openNoClose), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el5w_open = {}; effect(() => { const __b = ctx.noCloseOpen(); if (Object.is(__b, __el5w_open)) return; __el5w_open = __b; assignBoundProperty(__el5, "open", __b); });
-    let __el5w_show_close = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_show_close)) return; __el5w_show_close = __b; assignBoundProperty(__el5, "showClose", __b); });
-    let __el5w_close_on_backdrop = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_close_on_backdrop)) return; __el5w_close_on_backdrop = __b; assignBoundProperty(__el5, "closeOnBackdrop", __b); });
-    let __el5w_close_on_escape = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_close_on_escape)) return; __el5w_close_on_escape = __b; assignBoundProperty(__el5, "closeOnEscape", __b); });
+    { assignBoundProperty(__el5, "showClose", false); }
+    { assignBoundProperty(__el5, "closeOnBackdrop", false); }
+    { assignBoundProperty(__el5, "closeOnEscape", false); }
     __el8.addEventListener('click', safeHandler(batchHandler(ctx.closeNoClose), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
   })(),
@@ -18645,7 +18645,7 @@ const schema = { fields: [
     __el4.addEventListener('pdx-create', safeHandler(batchHandler(ctx.onCreate), ctx.el?.tagName?.toLowerCase(), 'pdx-create'));
     __el4.addEventListener('pdx-update', safeHandler(batchHandler(ctx.onUpdate), ctx.el?.tagName?.toLowerCase(), 'pdx-update'));
     __el4.addEventListener('pdx-delete', safeHandler(batchHandler(ctx.onDelete), ctx.el?.tagName?.toLowerCase(), 'pdx-delete'));
-    const __cf10=eachRow(()=>ctx.logLines(),(line) => line,(line)=>{const __frag=__blk0();const [__t9]=__walk0(__frag);bindInterpolation(__t9,()=>line());return __frag;});
+    const __cf10=eachRow(()=>ctx.logLines(),(line) => line,(line)=>{const __frag=__blk0();const [__t9]=__walk0(__frag);bindInterpolation(__t9,()=>line(),true);return __frag;});
     __m11.replaceWith(__cf10);
     effect(()=>{__el12.style.display=(ctx.logLines().length === 0)?'':'none';});
     return __frag;
@@ -19010,7 +19010,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-error
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, component as defineComponent, computed as rawComputed, effect, html as h, safeHandler, signal, signal as rawSignal, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, component as defineComponent, computed as rawComputed, html as h, safeHandler, signal, signal as rawSignal, staticBlock } from '@pdxui/core';
 
 const __blk0=staticBlock((__frag,__d)=>{__frag.appendChild(__d.createTextNode(" "));const __el0=__d.createElement('section');__frag.appendChild(__el0);__el0.appendChild(__d.createTextNode(" "));const __el1=__d.createElement('h2');__el0.appendChild(__el1);__el1.setAttribute("class", "pdx-txt-heading");__el1.appendChild(__d.createTextNode("\\u003Cpdx-error-boundary\\u003E — Component Wrapper"));__el0.appendChild(__d.createTextNode(" "));const __el2=__d.createElement('p');__el0.appendChild(__el2);__el2.setAttribute("class", "pdx-txt-small pdx-ink-muted");__el2.appendChild(__d.createTextNode("\\n      Declarative error boundary with built-in fallback UI, retry button, max retries, and\\n      "));const __el3=__d.createElement('code');__el2.appendChild(__el3);__el3.appendChild(__d.createTextNode("pdx-error"));__el2.appendChild(__d.createTextNode(" event for logging. Provides "));const __el4=__d.createElement('code');__el2.appendChild(__el4);__el4.appendChild(__d.createTextNode("errorContext"));__el2.appendChild(__d.createTextNode(" to descendants.\\n    "));__el0.appendChild(__d.createTextNode(" "));const __el5=__d.createElement('div');__el0.appendChild(__el5);__el5.setAttribute("class", "demo-controls demo-row");__el5.appendChild(__d.createTextNode(" "));const __el6=__d.createElement('button');__el5.appendChild(__el6);__el6.setAttribute("class", "pdx-btn pdx-btn-sm pdx-btn-outline");__el6.appendChild(__d.createTextNode("Make it throw"));__el5.appendChild(__d.createTextNode(" "));const __el7=__d.createElement('button');__el5.appendChild(__el7);__el7.setAttribute("class", "pdx-btn pdx-btn-sm pdx-btn-outline");__el7.appendChild(__d.createTextNode("Fix the data source"));__el5.appendChild(__d.createTextNode(" "));__el0.appendChild(__d.createTextNode(" "));const __el8=__d.createElement('div');__el0.appendChild(__el8);__el8.setAttribute("class", "demo-box");__el8.appendChild(__d.createTextNode(" "));const __el9=__d.createElement('pdx-error-boundary');__el8.appendChild(__el9);__el9.setAttribute("fallback-message", "Dashboard widget crashed.");__el9.appendChild(__d.createTextNode(" "));const __el10=__d.createElement('div');__el9.appendChild(__el10);__el10.setAttribute("class", "demo-widget");__el10.appendChild(__d.createTextNode(" "));const __el11=__d.createElement('demo-flaky-widget');__el10.appendChild(__el11);__el10.appendChild(__d.createTextNode(" "));const __el12=__d.createElement('p');__el10.appendChild(__el12);__el12.setAttribute("class", "pdx-txt-small pdx-ink-muted");__el12.appendChild(__d.createTextNode("Wrapped in \\u003Cpdx-error-boundary\\u003E. \\"Make it throw\\" breaks its data source: the fallback shows, with Retry. Retry while it is still broken counts toward "));const __el13=__d.createElement('code');__el12.appendChild(__el13);__el13.appendChild(__d.createTextNode("max-retries"));__el12.appendChild(__d.createTextNode("; fix it first and Retry brings it back."));__el10.appendChild(__d.createTextNode(" "));__el9.appendChild(__d.createTextNode(" "));__el8.appendChild(__d.createTextNode(" "));__el0.appendChild(__d.createTextNode(" "));const __el14=__d.createElement('p');__el0.appendChild(__el14);__el14.setAttribute("class", "pdx-txt-small pdx-ink-muted");__el14.appendChild(__d.createTextNode("Errors logged: "));const __t15=__d.createTextNode('');__el14.appendChild(__t15);__el0.appendChild(__d.createTextNode(" "));const __el16=__d.createElement('details');__el0.appendChild(__el16);__el16.setAttribute("class", "source");const __el17=__d.createElement('summary');__el16.appendChild(__el17);__el17.appendChild(__d.createTextNode("Source"));const __el18=__d.createElement('pre');__el16.appendChild(__el18);const __el19=__d.createElement('code');__el18.appendChild(__el19);__el19.appendChild(__d.createTextNode("\\u003Cpdx-error-boundary\\n  fallback-message=\\"Dashboard widget crashed.\\"\\n  :max-retries=\\"3\\"\\n  @pdx-error=\\"onError\\"\\u003E\\n  \\u003Cpdx-dashboard-widget /\\u003E\\n\\u003C/pdx-error-boundary\\u003E"));__el0.appendChild(__d.createTextNode(" "));__frag.appendChild(__d.createTextNode(" "));});
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;const __el7=__el6.nextSibling.nextSibling;const __el8=__el5.nextSibling.nextSibling;const __el9=__el8.firstChild.nextSibling;const __el14=__el8.nextSibling.nextSibling;const __t15=__el14.firstChild.nextSibling;return [__el6,__el7,__el9,__t15];};
@@ -19043,7 +19043,7 @@ component('pdx-demo-comp-error-boundary-wrapper', {
     const [__el6,__el7,__el9,__t15]=__walk0(__frag);
     __el6.addEventListener('click', safeHandler(batchHandler(ctx.breakWidget), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el7.addEventListener('click', safeHandler(batchHandler(ctx.fixWidget), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el9w_max_retries = {}; effect(() => { const __b = 3; if (Object.is(__b, __el9w_max_retries)) return; __el9w_max_retries = __b; assignBoundProperty(__el9, "maxRetries", __b); });
+    { assignBoundProperty(__el9, "maxRetries", 3); }
     __el9.addEventListener('pdx-error', safeHandler(batchHandler(ctx.onBoundaryError), ctx.el?.tagName?.toLowerCase(), 'pdx-error'));
     bindInterpolation(__t15,()=>ctx.boundaryErrorCount());
     return __frag;
@@ -19131,7 +19131,7 @@ component('pdx-demo-comp-fab-mask-overlay', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_actions = {}; effect(() => { const __b = speedDialActions; if (Object.is(__b, __el4w_actions)) return; __el4w_actions = __b; assignBoundProperty(__el4, "actions", __b); });
-    let __el4w_show_tooltip = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_show_tooltip)) return; __el4w_show_tooltip = __b; assignBoundProperty(__el4, "showTooltip", __b); });
+    { assignBoundProperty(__el4, "showTooltip", true); }
     return __frag;
   })(),
 });
@@ -19160,16 +19160,16 @@ function onDialSelect(e) {
     const __frag=__blk0();
     const [__el5,__el8,__el11,__el14,__t16]=__walk0(__frag);
     let __el5w_actions = {}; effect(() => { const __b = speedDialActions; if (Object.is(__b, __el5w_actions)) return; __el5w_actions = __b; assignBoundProperty(__el5, "actions", __b); });
-    let __el5w_show_tooltip = {}; effect(() => { const __b = true; if (Object.is(__b, __el5w_show_tooltip)) return; __el5w_show_tooltip = __b; assignBoundProperty(__el5, "showTooltip", __b); });
+    { assignBoundProperty(__el5, "showTooltip", true); }
     __el5.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onDialSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     let __el8w_actions = {}; effect(() => { const __b = speedDialActions; if (Object.is(__b, __el8w_actions)) return; __el8w_actions = __b; assignBoundProperty(__el8, "actions", __b); });
-    let __el8w_show_tooltip = {}; effect(() => { const __b = false; if (Object.is(__b, __el8w_show_tooltip)) return; __el8w_show_tooltip = __b; assignBoundProperty(__el8, "showTooltip", __b); });
+    { assignBoundProperty(__el8, "showTooltip", false); }
     __el8.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onDialSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     let __el11w_actions = {}; effect(() => { const __b = speedDialActions; if (Object.is(__b, __el11w_actions)) return; __el11w_actions = __b; assignBoundProperty(__el11, "actions", __b); });
-    let __el11w_show_tooltip = {}; effect(() => { const __b = true; if (Object.is(__b, __el11w_show_tooltip)) return; __el11w_show_tooltip = __b; assignBoundProperty(__el11, "showTooltip", __b); });
+    { assignBoundProperty(__el11, "showTooltip", true); }
     __el11.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onDialSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     let __el14w_actions = {}; effect(() => { const __b = speedDialActions; if (Object.is(__b, __el14w_actions)) return; __el14w_actions = __b; assignBoundProperty(__el14, "actions", __b); });
-    let __el14w_show_tooltip = {}; effect(() => { const __b = false; if (Object.is(__b, __el14w_show_tooltip)) return; __el14w_show_tooltip = __b; assignBoundProperty(__el14, "showTooltip", __b); });
+    { assignBoundProperty(__el14, "showTooltip", false); }
     __el14.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onDialSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     bindInterpolation(__t16,()=>ctx.dialLog());
     return __frag;
@@ -19897,7 +19897,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-file-
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, when } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4gfe9k");
@@ -19930,7 +19930,7 @@ function onError(e) {
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__el5,__m11,__m17]=__walk2(__frag);
-    let __el5w_max_size = {}; effect(() => { const __b = 2097152; if (Object.is(__b, __el5w_max_size)) return; __el5w_max_size = __b; assignBoundProperty(__el5, "maxSize", __b); });
+    { assignBoundProperty(__el5, "maxSize", 2097152); }
     __el5.addEventListener('pdx-error', safeHandler(batchHandler(ctx.onError), ctx.el?.tagName?.toLowerCase(), 'pdx-error'));
     __el5.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onSizeSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     const __cf10=when(()=>ctx.errorMsg(),()=>{const __frag=__blk0();const [__t9]=__walk0(__frag);bindInterpolation(__t9,()=>ctx.errorMsg());return __frag;},null);
@@ -20111,8 +20111,8 @@ component('pdx-demo-comp-form-all-controls', {
     let __el12w_error = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.slider?.error())(); if (Object.is(__b, __el12w_error)) return; __el12w_error = __b; assignBoundProperty(__el12, "error", __b); });
     let __el12w_touched = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.slider?.touched())(); if (Object.is(__b, __el12w_touched)) return; __el12w_touched = __b; assignBoundProperty(__el12, "touched", __b); });
     let __el12w_warning = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.slider?.warning())(); if (Object.is(__b, __el12w_warning)) return; __el12w_warning = __b; assignBoundProperty(__el12, "warning", __b); });
-    let __el13w_min = {}; effect(() => { const __b = 0; if (Object.is(__b, __el13w_min)) return; __el13w_min = __b; assignBoundProperty(__el13, "min", __b); });
-    let __el13w_max = {}; effect(() => { const __b = 100; if (Object.is(__b, __el13w_max)) return; __el13w_max = __b; assignBoundProperty(__el13, "max", __b); });
+    { assignBoundProperty(__el13, "min", 0); }
+    { assignBoundProperty(__el13, "max", 100); }
     let __el13w_value = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.slider?.value())(); if (Object.is(__b, __el13w_value)) return; __el13w_value = __b; assignBoundProperty(__el13, "value", __b); });
     __el13.addEventListener('pdx-change', safeHandler((e) => ctx.allTypesForm.fields.slider?.onChange(e.detail?.value), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     __el13.addEventListener('pdx-blur', safeHandler(() => ctx.allTypesForm.fields.slider?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
@@ -20477,8 +20477,8 @@ component('pdx-demo-comp-form-programmatic', {
     let __el8w_error = {}; effect(() => { const __b = (() => ctx.codeForm.fields.age?.error())(); if (Object.is(__b, __el8w_error)) return; __el8w_error = __b; assignBoundProperty(__el8, "error", __b); });
     let __el8w_touched = {}; effect(() => { const __b = (() => ctx.codeForm.fields.age?.touched())(); if (Object.is(__b, __el8w_touched)) return; __el8w_touched = __b; assignBoundProperty(__el8, "touched", __b); });
     let __el8w_warning = {}; effect(() => { const __b = (() => ctx.codeForm.fields.age?.warning())(); if (Object.is(__b, __el8w_warning)) return; __el8w_warning = __b; assignBoundProperty(__el8, "warning", __b); });
-    let __el9w_min = {}; effect(() => { const __b = 0; if (Object.is(__b, __el9w_min)) return; __el9w_min = __b; assignBoundProperty(__el9, "min", __b); });
-    let __el9w_max = {}; effect(() => { const __b = 150; if (Object.is(__b, __el9w_max)) return; __el9w_max = __b; assignBoundProperty(__el9, "max", __b); });
+    { assignBoundProperty(__el9, "min", 0); }
+    { assignBoundProperty(__el9, "max", 150); }
     let __el9w_value = {}; effect(() => { const __b = (() => ctx.codeForm.fields.age?.value())(); if (Object.is(__b, __el9w_value)) return; __el9w_value = __b; assignBoundProperty(__el9, "value", __b); });
     __el9.addEventListener('pdx-change', safeHandler((e) => ctx.codeForm.fields.age?.onChange(e.detail?.value ?? e.target?.value), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     __el9.addEventListener('pdx-blur', safeHandler(() => ctx.codeForm.fields.age?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
@@ -21136,8 +21136,8 @@ component('pdx-demo-comp-form-advanced-validation-i18n', {
     let __el15w_error = {}; effect(() => { const __b = (() => ctx.i18nForm.fields.age?.error())(); if (Object.is(__b, __el15w_error)) return; __el15w_error = __b; assignBoundProperty(__el15, "error", __b); });
     let __el15w_touched = {}; effect(() => { const __b = (() => ctx.i18nForm.fields.age?.touched())(); if (Object.is(__b, __el15w_touched)) return; __el15w_touched = __b; assignBoundProperty(__el15, "touched", __b); });
     let __el15w_warning = {}; effect(() => { const __b = (() => ctx.i18nForm.fields.age?.warning())(); if (Object.is(__b, __el15w_warning)) return; __el15w_warning = __b; assignBoundProperty(__el15, "warning", __b); });
-    let __el16w_min = {}; effect(() => { const __b = 0; if (Object.is(__b, __el16w_min)) return; __el16w_min = __b; assignBoundProperty(__el16, "min", __b); });
-    let __el16w_max = {}; effect(() => { const __b = 150; if (Object.is(__b, __el16w_max)) return; __el16w_max = __b; assignBoundProperty(__el16, "max", __b); });
+    { assignBoundProperty(__el16, "min", 0); }
+    { assignBoundProperty(__el16, "max", 150); }
     let __el16w_value = {}; effect(() => { const __b = (() => ctx.i18nForm.fields.age?.value())(); if (Object.is(__b, __el16w_value)) return; __el16w_value = __b; assignBoundProperty(__el16, "value", __b); });
     __el16.addEventListener('pdx-change', safeHandler((e) => ctx.i18nForm.fields.age?.onChange(e.detail?.value ?? e.target?.value), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     __el16.addEventListener('pdx-blur', safeHandler(() => ctx.i18nForm.fields.age?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
@@ -21991,7 +21991,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-icon/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, eachRow, effect, signal, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, eachRow, signal, staticBlock } from '@pdxui/core';
 import { getPragmaticIconNames, PRAGMATIC_ICON_COUNT } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
@@ -22016,7 +22016,7 @@ component('pdx-demo-comp-icon-built-in', {
     const __frag=__blk1();
     const [__t3,__m11]=__walk1(__frag);
     bindInterpolation(__t3,()=>ctx.iconCount());
-    const __cf10=eachRow(()=>ctx.iconNames(),(name) => name,(name)=>{const __frag=__blk0();const [__el7,__t9]=__walk0(__frag);let __el7w_name = {}; effect(() => { const __b = name(); if (Object.is(__b, __el7w_name)) return; __el7w_name = __b; assignBoundProperty(__el7, "name", __b); });bindInterpolation(__t9,()=>name());return __frag;});
+    const __cf10=eachRow(()=>ctx.iconNames(),(name) => name,(name)=>{const __frag=__blk0();const [__el7,__t9]=__walk0(__frag);{ assignBoundProperty(__el7, "name", name()); }bindInterpolation(__t9,()=>name(),true);return __frag;});
     __m11.replaceWith(__cf10);
     return __frag;
   })(),
@@ -22389,7 +22389,7 @@ const authFetchFn = function(url) {
     const __frag=__blk0();
     const [__el5,__t7]=__walk0(__frag);
     let __el5w_fetch_fn = {}; effect(() => { const __b = ctx.authFetchFn; if (Object.is(__b, __el5w_fetch_fn)) return; __el5w_fetch_fn = __b; assignBoundProperty(__el5, "fetchFn", __b); });
-    let __el5w_lazy = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_lazy)) return; __el5w_lazy = __b; assignBoundProperty(__el5, "lazy", __b); });
+    { assignBoundProperty(__el5, "lazy", false); }
     bindInterpolation(__t7,()=>ctx.authLog());
     return __frag;
   })(),
@@ -22471,7 +22471,7 @@ const customFetchFn = function(url) {
     const __frag=__blk0();
     const [__el5]=__walk0(__frag);
     let __el5w_fetch_fn = {}; effect(() => { const __b = ctx.customFetchFn; if (Object.is(__b, __el5w_fetch_fn)) return; __el5w_fetch_fn = __b; assignBoundProperty(__el5, "fetchFn", __b); });
-    let __el5w_lazy = {}; effect(() => { const __b = false; if (Object.is(__b, __el5w_lazy)) return; __el5w_lazy = __b; assignBoundProperty(__el5, "lazy", __b); });
+    { assignBoundProperty(__el5, "lazy", false); }
     return __frag;
   })(),
 });
@@ -22723,7 +22723,7 @@ component('pdx-demo-comp-infinite-scroll-basic', {
     const __frag=__blk0();
     const [__el5,__el6,__t8]=__walk0(__frag);
     let __el5w_source = {}; effect(() => { const __b = ctx.scrollDS; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
-    let __el5w_threshold = {}; effect(() => { const __b = 200; if (Object.is(__b, __el5w_threshold)) return; __el5w_threshold = __b; assignBoundProperty(__el5, "threshold", __b); });
+    { assignBoundProperty(__el5, "threshold", 200); }
     bindRef(__el6,ctx.basicItems);
     bindInterpolation(__t8,()=>ctx.basicLog());
     return __frag;
@@ -22784,7 +22784,7 @@ component('pdx-demo-comp-infinite-scroll-end-message', {
     const __frag=__blk0();
     const [__el4,__el5]=__walk0(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.endDS; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
-    let __el4w_threshold = {}; effect(() => { const __b = 100; if (Object.is(__b, __el4w_threshold)) return; __el4w_threshold = __b; assignBoundProperty(__el4, "threshold", __b); });
+    { assignBoundProperty(__el4, "threshold", 100); }
     bindRef(__el5,ctx.endItems);
     return __frag;
   })(),
@@ -23034,13 +23034,13 @@ const roleOptions = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el6,__el9,__el12,__el15,__el18,__el21]=__walk0(__frag);
-    let __el6w_value = {}; effect(() => { const __b = 'Alice Johnson'; if (Object.is(__b, __el6w_value)) return; __el6w_value = __b; assignBoundProperty(__el6, "value", __b); });
-    let __el9w_value = {}; effect(() => { const __b = 'engineer'; if (Object.is(__b, __el9w_value)) return; __el9w_value = __b; assignBoundProperty(__el9, "value", __b); });
+    { assignBoundProperty(__el6, "value", 'Alice Johnson'); }
+    { assignBoundProperty(__el9, "value", 'engineer'); }
     let __el9w_options = {}; effect(() => { const __b = ctx.roleOptions; if (Object.is(__b, __el9w_options)) return; __el9w_options = __b; assignBoundProperty(__el9, "options", __b); });
-    let __el12w_value = {}; effect(() => { const __b = 85000; if (Object.is(__b, __el12w_value)) return; __el12w_value = __b; assignBoundProperty(__el12, "value", __b); });
-    let __el15w_value = {}; effect(() => { const __b = '2024-03-15'; if (Object.is(__b, __el15w_value)) return; __el15w_value = __b; assignBoundProperty(__el15, "value", __b); });
-    let __el18w_value = {}; effect(() => { const __b = true; if (Object.is(__b, __el18w_value)) return; __el18w_value = __b; assignBoundProperty(__el18, "value", __b); });
-    let __el21w_value = {}; effect(() => { const __b = 4; if (Object.is(__b, __el21w_value)) return; __el21w_value = __b; assignBoundProperty(__el21, "value", __b); });
+    { assignBoundProperty(__el12, "value", 85000); }
+    { assignBoundProperty(__el15, "value", '2024-03-15'); }
+    { assignBoundProperty(__el18, "value", true); }
+    { assignBoundProperty(__el21, "value", 4); }
     return __frag;
   })(),
 });
@@ -23107,7 +23107,7 @@ const statusOptions = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el7]=__walk0(__frag);
-    let __el4w_value = {}; effect(() => { const __b = 'active'; if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
+    { assignBoundProperty(__el4, "value", 'active'); }
     let __el4w_options = {}; effect(() => { const __b = ctx.statusOptions; if (Object.is(__b, __el4w_options)) return; __el4w_options = __b; assignBoundProperty(__el4, "options", __b); });
     let __el7w_value = {}; effect(() => { const __b = ['frontend', 'design']; if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });
     let __el7w_options = {}; effect(() => { const __b = ctx.tagOptions; if (Object.is(__b, __el7w_options)) return; __el7w_options = __b; assignBoundProperty(__el7, "options", __b); });
@@ -24623,7 +24623,7 @@ component('pdx-demo-comp-list-pagination', {
     let __el4w_render_item = {}; effect(() => { const __b = ctx.renderPagedItem; if (Object.is(__b, __el4w_render_item)) return; __el4w_render_item = __b; assignBoundProperty(__el4, "renderItem", __b); });
     bindInterpolation(__t7,()=>ctx.pagedInfo());
     let __el8w_total = {}; effect(() => { const __b = ctx.pagedTotal(); if (Object.is(__b, __el8w_total)) return; __el8w_total = __b; assignBoundProperty(__el8, "total", __b); });
-    let __el8w_pageSize = {}; effect(() => { const __b = 5; if (Object.is(__b, __el8w_pageSize)) return; __el8w_pageSize = __b; assignBoundProperty(__el8, "pageSize", __b); });
+    { assignBoundProperty(__el8, "pageSize", 5); }
     let __el8w_page = {}; effect(() => { const __b = ctx.pagedPage(); if (Object.is(__b, __el8w_page)) return; __el8w_page = __b; assignBoundProperty(__el8, "page", __b); });
     __el8.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onPageChange), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     return __frag;
@@ -24890,7 +24890,7 @@ component('pdx-demo-comp-mention-basic', {
     const __frag=__blk0();
     const [__el5]=__walk0(__frag);
     let __el5w_items = {}; effect(() => { const __b = users; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
-    let __el5w_rows = {}; effect(() => { const __b = 4; if (Object.is(__b, __el5w_rows)) return; __el5w_rows = __b; assignBoundProperty(__el5, "rows", __b); });
+    { assignBoundProperty(__el5, "rows", 4); }
     return __frag;
   })(),
 });
@@ -24934,9 +24934,9 @@ const allUsers = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.remoteSource; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
-    let __el4w_debounce = {}; effect(() => { const __b = 300; if (Object.is(__b, __el4w_debounce)) return; __el4w_debounce = __b; assignBoundProperty(__el4, "debounce", __b); });
-    let __el4w_minLength = {}; effect(() => { const __b = 1; if (Object.is(__b, __el4w_minLength)) return; __el4w_minLength = __b; assignBoundProperty(__el4, "minLength", __b); });
-    let __el4w_rows = {}; effect(() => { const __b = 4; if (Object.is(__b, __el4w_rows)) return; __el4w_rows = __b; assignBoundProperty(__el4, "rows", __b); });
+    { assignBoundProperty(__el4, "debounce", 300); }
+    { assignBoundProperty(__el4, "minLength", 1); }
+    { assignBoundProperty(__el4, "rows", 4); }
     return __frag;
   })(),
 });
@@ -24966,7 +24966,7 @@ const richUsers = [
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_items = {}; effect(() => { const __b = ctx.richUsers; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_rows = {}; effect(() => { const __b = 4; if (Object.is(__b, __el4w_rows)) return; __el4w_rows = __b; assignBoundProperty(__el4, "rows", __b); });
+    { assignBoundProperty(__el4, "rows", 4); }
     return __frag;
   })(),
 });
@@ -25030,7 +25030,7 @@ const usersAndTags = [
     const __frag=__blk0();
     const [__el6]=__walk0(__frag);
     let __el6w_items = {}; effect(() => { const __b = ctx.usersAndTags; if (Object.is(__b, __el6w_items)) return; __el6w_items = __b; assignBoundProperty(__el6, "items", __b); });
-    let __el6w_rows = {}; effect(() => { const __b = 4; if (Object.is(__b, __el6w_rows)) return; __el6w_rows = __b; assignBoundProperty(__el6, "rows", __b); });
+    { assignBoundProperty(__el6, "rows", 4); }
     return __frag;
   })(),
 });
@@ -27220,7 +27220,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-pagin
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-zdbkwz");
@@ -27243,9 +27243,9 @@ function onPageChange(e) {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__t10]=__walk0(__frag);
-    let __el4w_total = {}; effect(() => { const __b = 100; if (Object.is(__b, __el4w_total)) return; __el4w_total = __b; assignBoundProperty(__el4, "total", __b); });
-    let __el4w_pageSize = {}; effect(() => { const __b = 10; if (Object.is(__b, __el4w_pageSize)) return; __el4w_pageSize = __b; assignBoundProperty(__el4, "pageSize", __b); });
-    let __el4w_page = {}; effect(() => { const __b = 1; if (Object.is(__b, __el4w_page)) return; __el4w_page = __b; assignBoundProperty(__el4, "page", __b); });
+    { assignBoundProperty(__el4, "total", 100); }
+    { assignBoundProperty(__el4, "pageSize", 10); }
+    { assignBoundProperty(__el4, "page", 1); }
     __el4.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onPageChange), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     bindInterpolation(__t10,()=>ctx.pageLog());
     return __frag;
@@ -27975,7 +27975,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-provi
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, component, effect, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, component, staticBlock } from '@pdxui/core';
 import '@pdxui/ui/provide';
 
 const __blk0=staticBlock((__frag,__d)=>{__frag.appendChild(__d.createTextNode(" "));const __el0=__d.createElement('section');__frag.appendChild(__el0);__el0.appendChild(__d.createTextNode(" "));const __el1=__d.createElement('h2');__el0.appendChild(__el1);__el1.setAttribute("class", "pdx-txt-heading");__el1.appendChild(__d.createTextNode("Scoped Override"));__el0.appendChild(__d.createTextNode(" "));const __el2=__d.createElement('p');__el0.appendChild(__el2);__el2.setAttribute("class", "pdx-txt-small pdx-ink-muted");__el2.appendChild(__d.createTextNode("\\n      Nested providers shadow outer ones. The nearest ancestor wins — like CSS cascading.\\n    "));__el0.appendChild(__d.createTextNode(" "));const __el3=__d.createElement('div');__el0.appendChild(__el3);__el3.setAttribute("class", "demo-box");__el3.appendChild(__d.createTextNode(" "));const __el4=__d.createElement('pdx-provide');__el3.appendChild(__el4);__el4.setAttribute("name", "color");__el4.appendChild(__d.createTextNode(" "));const __el5=__d.createElement('div');__el4.appendChild(__el5);__el5.setAttribute("class", "demo-child");__el5.appendChild(__d.createTextNode("\\n          Outer color: "));const __el6=__d.createElement('strong');__el5.appendChild(__el6);__el6.setAttribute("style", "color: blue");__el6.appendChild(__d.createTextNode("blue"));__el5.appendChild(__d.createTextNode(" "));__el4.appendChild(__d.createTextNode(" "));const __el7=__d.createElement('pdx-provide');__el4.appendChild(__el7);__el7.setAttribute("name", "color");__el7.appendChild(__d.createTextNode(" "));const __el8=__d.createElement('div');__el7.appendChild(__el8);__el8.setAttribute("class", "demo-child");__el8.appendChild(__d.createTextNode("\\n            Inner override: "));const __el9=__d.createElement('strong');__el8.appendChild(__el9);__el9.setAttribute("style", "color: red");__el9.appendChild(__d.createTextNode("red"));__el8.appendChild(__d.createTextNode(" "));__el7.appendChild(__d.createTextNode(" "));__el4.appendChild(__d.createTextNode(" "));const __el10=__d.createElement('div');__el4.appendChild(__el10);__el10.setAttribute("class", "demo-child");__el10.appendChild(__d.createTextNode("\\n          Back to outer: "));const __el11=__d.createElement('strong');__el10.appendChild(__el11);__el11.setAttribute("style", "color: blue");__el11.appendChild(__d.createTextNode("blue"));__el10.appendChild(__d.createTextNode(" "));__el4.appendChild(__d.createTextNode(" "));__el3.appendChild(__d.createTextNode(" "));__el0.appendChild(__d.createTextNode(" "));const __el12=__d.createElement('details');__el0.appendChild(__el12);__el12.setAttribute("class", "source");const __el13=__d.createElement('summary');__el12.appendChild(__el13);__el13.appendChild(__d.createTextNode("Source"));const __el14=__d.createElement('pre');__el12.appendChild(__el14);const __el15=__d.createElement('code');__el14.appendChild(__el15);__el15.appendChild(__d.createTextNode("\\u003Cpdx-provide name=\\"color\\" :value=\\"'blue'\\"\\u003E\\n  \\u003C!-- inject('color') → 'blue' --\\u003E\\n  \\u003Cpdx-provide name=\\"color\\" :value=\\"'red'\\"\\u003E\\n    \\u003C!-- inject('color') → 'red' (nearest wins) --\\u003E\\n  \\u003C/pdx-provide\\u003E\\n  \\u003C!-- inject('color') → 'blue' again --\\u003E\\n\\u003C/pdx-provide\\u003E"));__el0.appendChild(__d.createTextNode(" "));__frag.appendChild(__d.createTextNode(" "));});
@@ -27988,8 +27988,8 @@ component('pdx-demo-comp-provide-scoped', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el7]=__walk0(__frag);
-    let __el4w_value = {}; effect(() => { const __b = 'blue'; if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
-    let __el7w_value = {}; effect(() => { const __b = 'red'; if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });
+    { assignBoundProperty(__el4, "value", 'blue'); }
+    { assignBoundProperty(__el7, "value", 'red'); }
     return __frag;
   })(),
 });
@@ -28490,7 +28490,7 @@ const justNow = new Date().toISOString();
     const __frag=__blk0();
     const [__el6]=__walk0(__frag);
     let __el6w_datetime = {}; effect(() => { const __b = ctx.justNow; if (Object.is(__b, __el6w_datetime)) return; __el6w_datetime = __b; assignBoundProperty(__el6, "datetime", __b); });
-    let __el6w_update_interval = {}; effect(() => { const __b = 10000; if (Object.is(__b, __el6w_update_interval)) return; __el6w_update_interval = __b; assignBoundProperty(__el6, "updateInterval", __b); });
+    { assignBoundProperty(__el6, "updateInterval", 10000); }
     return __frag;
   })(),
 });
@@ -28795,8 +28795,8 @@ const sampleDoc = {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_value = {}; effect(() => { const __b = ctx.sampleDoc; if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
-    let __el4w_readonly = {}; effect(() => { const __b = true; if (Object.is(__b, __el4w_readonly)) return; __el4w_readonly = __b; assignBoundProperty(__el4, "readOnly", __b); });
-    let __el4w_toolbar = {}; effect(() => { const __b = false; if (Object.is(__b, __el4w_toolbar)) return; __el4w_toolbar = __b; assignBoundProperty(__el4, "toolbar", __b); });
+    { assignBoundProperty(__el4, "readOnly", true); }
+    { assignBoundProperty(__el4, "toolbar", false); }
     return __frag;
   })(),
 });
@@ -29823,7 +29823,7 @@ const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'C
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_options = {}; effect(() => { const __b = ctx.colors; if (Object.is(__b, __el4w_options)) return; __el4w_options = __b; assignBoundProperty(__el4, "options", __b); });
-    let __el4w_value = {}; effect(() => { const __b = 'Green'; if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
+    { assignBoundProperty(__el4, "value", 'Green'); }
     return __frag;
   })(),
 });
@@ -30192,7 +30192,7 @@ const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'C
     const [__el4,__el5,__el6,__el7,__el8]=__walk0(__frag);
     let __el4w_options = {}; effect(() => { const __b = ctx.colors; if (Object.is(__b, __el4w_options)) return; __el4w_options = __b; assignBoundProperty(__el4, "options", __b); });
     let __el5w_options = {}; effect(() => { const __b = ctx.colors; if (Object.is(__b, __el5w_options)) return; __el5w_options = __b; assignBoundProperty(__el5, "options", __b); });
-    let __el5w_value = {}; effect(() => { const __b = 'Blue'; if (Object.is(__b, __el5w_value)) return; __el5w_value = __b; assignBoundProperty(__el5, "value", __b); });
+    { assignBoundProperty(__el5, "value", 'Blue'); }
     let __el6w_options = {}; effect(() => { const __b = ctx.colors; if (Object.is(__b, __el6w_options)) return; __el6w_options = __b; assignBoundProperty(__el6, "options", __b); });
     let __el7w_options = {}; effect(() => { const __b = ctx.colors; if (Object.is(__b, __el7w_options)) return; __el7w_options = __b; assignBoundProperty(__el7, "options", __b); });
     let __el8w_options = {}; effect(() => { const __b = ctx.colors; if (Object.is(__b, __el8w_options)) return; __el8w_options = __b; assignBoundProperty(__el8, "options", __b); });
@@ -30365,8 +30365,8 @@ const sidebarItems = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el5,__el8,__el10]=__walk0(__frag);
-    let __el4w_width = {}; effect(() => { const __b = 240; if (Object.is(__b, __el4w_width)) return; __el4w_width = __b; assignBoundProperty(__el4, "width", __b); });
-    let __el4w_collapsedWidth = {}; effect(() => { const __b = 56; if (Object.is(__b, __el4w_collapsedWidth)) return; __el4w_collapsedWidth = __b; assignBoundProperty(__el4, "collapsedWidth", __b); });
+    { assignBoundProperty(__el4, "width", 240); }
+    { assignBoundProperty(__el4, "collapsedWidth", 56); }
     bindRef(__el4,ctx.sidebarEl);
     bindRef(__el5,ctx.sidebarHeader);
     __el8.addEventListener('click', safeHandler(batchHandler(ctx.toggleSidebar), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -30401,8 +30401,8 @@ const sidebarItems = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el6,__el7]=__walk0(__frag);
-    let __el6w_width = {}; effect(() => { const __b = 240; if (Object.is(__b, __el6w_width)) return; __el6w_width = __b; assignBoundProperty(__el6, "width", __b); });
-    let __el6w_collapsedWidth = {}; effect(() => { const __b = 56; if (Object.is(__b, __el6w_collapsedWidth)) return; __el6w_collapsedWidth = __b; assignBoundProperty(__el6, "collapsedWidth", __b); });
+    { assignBoundProperty(__el6, "width", 240); }
+    { assignBoundProperty(__el6, "collapsedWidth", 56); }
     let __el7w_items = {}; effect(() => { const __b = ctx.sidebarItems; if (Object.is(__b, __el7w_items)) return; __el7w_items = __b; assignBoundProperty(__el7, "items", __b); });
     return __frag;
   })(),
@@ -30431,7 +30431,7 @@ const shortItems = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el5]=__walk0(__frag);
-    let __el4w_width = {}; effect(() => { const __b = 200; if (Object.is(__b, __el4w_width)) return; __el4w_width = __b; assignBoundProperty(__el4, "width", __b); });
+    { assignBoundProperty(__el4, "width", 200); }
     let __el5w_items = {}; effect(() => { const __b = ctx.shortItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
     return __frag;
   })(),
@@ -32706,7 +32706,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tag-i
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock } from '@pdxui/core';
 import { useTagInputLog } from './state.pdx';
 
 const __blk0=staticBlock((__frag,__d)=>{__frag.appendChild(__d.createTextNode(" "));const __el0=__d.createElement('section');__frag.appendChild(__el0);__el0.appendChild(__d.createTextNode(" "));const __el1=__d.createElement('h2');__el0.appendChild(__el1);__el1.setAttribute("class", "pdx-txt-heading section-heading");__el1.appendChild(__d.createTextNode("Max Tags"));__el0.appendChild(__d.createTextNode(" "));const __el2=__d.createElement('p');__el0.appendChild(__el2);__el2.setAttribute("class", "pdx-txt-small pdx-ink-muted");__el2.appendChild(__d.createTextNode("\\n      Limited to 5 tags. The input field disappears when the limit is reached.\\n    "));__el0.appendChild(__d.createTextNode(" "));const __el3=__d.createElement('div');__el0.appendChild(__el3);__el3.setAttribute("class", "demo-stack");__el3.appendChild(__d.createTextNode(" "));const __el4=__d.createElement('pdx-tag-input');__el3.appendChild(__el4);__el4.setAttribute("placeholder", "Max 5 tags...");__el3.appendChild(__d.createTextNode(" "));__el0.appendChild(__d.createTextNode(" "));const __el5=__d.createElement('p');__el0.appendChild(__el5);__el5.setAttribute("class", "pdx-txt-small pdx-ink-muted");__el5.setAttribute("style", "margin-top:var(--pdx-space-sm)");__el5.appendChild(__d.createTextNode("\\n      Tags: "));const __el6=__d.createElement('strong');__el5.appendChild(__el6);const __t7=__d.createTextNode('');__el6.appendChild(__t7);__el5.appendChild(__d.createTextNode(" "));__el0.appendChild(__d.createTextNode(" "));const __el8=__d.createElement('details');__el0.appendChild(__el8);__el8.setAttribute("class", "source-block");__el8.appendChild(__d.createTextNode(" "));const __el9=__d.createElement('summary');__el8.appendChild(__el9);__el9.appendChild(__d.createTextNode("Source"));__el8.appendChild(__d.createTextNode(" "));const __el10=__d.createElement('pre');__el8.appendChild(__el10);__el10.setAttribute("class", "pdx-txt-mono");const __el11=__d.createElement('code');__el10.appendChild(__el11);__el11.appendChild(__d.createTextNode("\\u003Cpdx-tag-input :max-tags=\\"5\\" placeholder=\\"Max 5 tags...\\" /\\u003E"));__el8.appendChild(__d.createTextNode(" "));__el0.appendChild(__d.createTextNode(" "));__frag.appendChild(__d.createTextNode(" "));});
@@ -32737,7 +32737,7 @@ component('pdx-demo-comp-tag-input-max-tags', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__t7]=__walk0(__frag);
-    let __el4w_max_tags = {}; effect(() => { const __b = 5; if (Object.is(__b, __el4w_max_tags)) return; __el4w_max_tags = __b; assignBoundProperty(__el4, "maxTags", __b); });
+    { assignBoundProperty(__el4, "maxTags", 5); }
     __el4.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onMaxChange), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     bindInterpolation(__t7,()=>ctx.maxTagsStr());
     return __frag;
@@ -33683,7 +33683,7 @@ const slotTimelineItems = [
     const __frag=__blk0();
     const [__el5,__m6]=__walk0(__frag);
     let __el5w_items = {}; effect(() => { const __b = ctx.slotTimelineItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
-    let __el5w_dot_align = {}; effect(() => { const __b = 'center'; if (Object.is(__b, __el5w_dot_align)) return; __el5w_dot_align = __b; assignBoundProperty(__el5, "dotAlign", __b); });
+    { assignBoundProperty(__el5, "dotAlign", 'center'); }
     __m6.replaceWith(slotCarrier('content', __pdxSlot_content_0));
     return __frag;
   })();
@@ -35235,7 +35235,7 @@ component('pdx-demo-comp-tree-select-pre-selected', {
     const __frag=__blk0();
     const [__el3]=__walk0(__frag);
     let __el3w_options = {}; effect(() => { const __b = departments; if (Object.is(__b, __el3w_options)) return; __el3w_options = __b; assignBoundProperty(__el3, "options", __b); });
-    let __el3w_value = {}; effect(() => { const __b = 'frontend'; if (Object.is(__b, __el3w_value)) return; __el3w_value = __b; assignBoundProperty(__el3, "value", __b); });
+    { assignBoundProperty(__el3, "value", 'frontend'); }
     return __frag;
   })(),
 });
@@ -42738,7 +42738,7 @@ component('pdx-demo-design-themes-contrast', {
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m26]=__walk1(__frag);
-    const __cf25=eachRow(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);let __el15w_data_token = {}; effect(() => { const __b = row().token; if (Object.is(__b, __el15w_data_token)) return; __el15w_data_token = __b; const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } });let __el15w_data_text_token = {}; effect(() => { const __b = row().textToken; if (Object.is(__b, __el15w_data_text_token)) return; __el15w_data_text_token = __b; const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("data-text-token"); else { __el15.setAttribute("data-text-token", __v === true ? '' : String(__v)); } });let __el15w_data_ratio = {}; effect(() => { const __b = row().ratio; if (Object.is(__b, __el15w_data_ratio)) return; __el15w_data_ratio = __b; const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("data-ratio"); else { __el15.setAttribute("data-ratio", __v === true ? '' : String(__v)); } });let __el16w_style = {}; effect(() => { const __b = 'background: var(' + row().token + '); color: var(' + row().textToken + ')'; if (Object.is(__b, __el16w_style)) return; __el16w_style = __b; if ("style" in __el16) { const __v = __b; if (__v == null) clearBoundProperty(__el16, "style", "style"); else __el16["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el16.removeAttribute("style"); else { __el16.setAttribute("style", __v === true ? '' : String(__v)); } } });bindInterpolation(__t18,()=>row().token);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);{ const __s = new Set([]); let __w = []; effect(() => { const __n = String(row().pass ? 'ct-verdict ok' : 'ct-verdict bad' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el23.classList.remove(__t); for (const __t of __n) __el23.classList.add(__t); __w = __n; }); }bindInterpolation(__t24,()=>row().pass ? 'AA' : 'fail');return __frag;});
+    const __cf25=eachRow(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);{ const __v = row().token; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } }let __el15w_data_text_token = {}; effect(() => { const __b = row().textToken; if (Object.is(__b, __el15w_data_text_token)) return; __el15w_data_text_token = __b; const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("data-text-token"); else { __el15.setAttribute("data-text-token", __v === true ? '' : String(__v)); } });let __el15w_data_ratio = {}; effect(() => { const __b = row().ratio; if (Object.is(__b, __el15w_data_ratio)) return; __el15w_data_ratio = __b; const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("data-ratio"); else { __el15.setAttribute("data-ratio", __v === true ? '' : String(__v)); } });let __el16w_style = {}; effect(() => { const __b = 'background: var(' + row().token + '); color: var(' + row().textToken + ')'; if (Object.is(__b, __el16w_style)) return; __el16w_style = __b; if ("style" in __el16) { const __v = __b; if (__v == null) clearBoundProperty(__el16, "style", "style"); else __el16["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el16.removeAttribute("style"); else { __el16.setAttribute("style", __v === true ? '' : String(__v)); } } });bindInterpolation(__t18,()=>row().token,true);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);{ const __s = new Set([]); let __w = []; effect(() => { const __n = String(row().pass ? 'ct-verdict ok' : 'ct-verdict bad' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el23.classList.remove(__t); for (const __t of __n) __el23.classList.add(__t); __w = __n; }); }bindInterpolation(__t24,()=>row().pass ? 'AA' : 'fail');return __frag;});
     __m26.replaceWith(__cf25);
     return __frag;
   })(),
@@ -42790,7 +42790,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/design-the
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, eachRow, effect, staticBlock } from '@pdxui/core';
+import { bindInterpolation, component, eachRow, staticBlock } from '@pdxui/core';
 import { THEME_INHERITED } from '@pdxui/design/engine';
 
 {
@@ -42817,7 +42817,7 @@ component('pdx-demo-design-themes-themes', {
     const __frag=__blk1();
     const [__t2,__m22]=__walk1(__frag);
     bindInterpolation(__t2,()=>ctx.themes.length);
-    const __cf21=eachRow(()=>ctx.themes,(t) => t,(t)=>{const __frag=__blk0();const [__el6,__t9]=__walk0(__frag);let __el6w_pdx_theme = {}; effect(() => { const __b = t(); if (Object.is(__b, __el6w_pdx_theme)) return; __el6w_pdx_theme = __b; const __v = __b; if (__v == null || __v === false) __el6.removeAttribute("pdx-theme"); else { __el6.setAttribute("pdx-theme", __v === true ? '' : String(__v)); } });bindInterpolation(__t9,()=>t());return __frag;});
+    const __cf21=eachRow(()=>ctx.themes,(t) => t,(t)=>{const __frag=__blk0();const [__el6,__t9]=__walk0(__frag);{ const __v = t(); if (__v == null || __v === false) __el6.removeAttribute("pdx-theme"); else { __el6.setAttribute("pdx-theme", __v === true ? '' : String(__v)); } }bindInterpolation(__t9,()=>t(),true);return __frag;});
     __m22.replaceWith(__cf21);
     return __frag;
   })(),
@@ -44183,7 +44183,7 @@ const tabNames = ['Dashboard', 'Users', 'Settings', 'Reports'];
     const __frag=__blk1();
     const [__el3,__m7]=__walk1(__frag);
     bindRef(__el3,ctx.horizontalRef);
-    const __cf6=eachRow(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>tab());return __frag;});
+    const __cf6=eachRow(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>tab(),true);return __frag;});
     __m7.replaceWith(__cf6);
     return __frag;
   })(),
@@ -44195,7 +44195,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-focu
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, eachRow, effect, focusGroup, onMount, signal, staticBlock } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, eachRow, focusGroup, onMount, signal, staticBlock } from '@pdxui/core';
 
 const __blk0=staticBlock((__frag,__d)=>{__frag.appendChild(__d.createTextNode(" "));const __el4=__d.createElement('div');__frag.appendChild(__el4);__el4.setAttribute("class", "group-item");__el4.setAttribute("role", "option");__el4.appendChild(__d.createTextNode(" "));const __t5=__d.createTextNode('');__el4.appendChild(__t5);__el4.appendChild(__d.createTextNode(" "));__frag.appendChild(__d.createTextNode(" "));});
 const __walk0=(r)=>{const __el4=r.firstChild.nextSibling;const __t5=__el4.firstChild.nextSibling;return [__el4,__t5];};
@@ -44226,7 +44226,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
     const __frag=__blk1();
     const [__el3,__m7,__t9]=__walk1(__frag);
     bindRef(__el3,ctx.verticalRef);
-    const __cf6=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);let __el4w_aria_disabled = {}; effect(() => { const __b = fruit() === 'Cherry' ? 'true' : null; if (Object.is(__b, __el4w_aria_disabled)) return; __el4w_aria_disabled = __b; const __v = __b; if (__v == null || __v === false) __el4.removeAttribute("aria-disabled"); else { __el4.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } });bindInterpolation(__t5,()=>fruit());return __frag;});
+    const __cf6=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);{ const __v = fruit() === 'Cherry' ? 'true' : null; if (__v == null || __v === false) __el4.removeAttribute("aria-disabled"); else { __el4.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } }bindInterpolation(__t5,()=>fruit(),true);return __frag;});
     __m7.replaceWith(__cf6);
     bindInterpolation(__t9,()=>ctx.groupLog());
     return __frag;
@@ -44381,7 +44381,7 @@ const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'Denma
     const __frag=__blk1();
     const [__el3,__m7]=__walk1(__frag);
     bindRef(__el3,ctx.typeaheadRef);
-    const __cf6=eachRow(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>c());return __frag;});
+    const __cf6=eachRow(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>c(),true);return __frag;});
     __m7.replaceWith(__cf6);
     return __frag;
   })(),
@@ -44816,7 +44816,7 @@ const placements = [
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m10,__el11,__el12,__el15,__t18,__el24,__el26,__el28]=__walk3(__frag);
-    const __cf9=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m8]=__walk2(__frag);const __cf7=when(()=>p(),()=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);__el4.addEventListener('click', safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));{ const __s = new Set(["pdx-ghost"]); let __w = []; effect(() => { const __n = String(ctx.currentPlacement() === p() ? 'active' : '' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el4.classList.remove(__t); for (const __t of __n) __el4.classList.add(__t); __w = __n; }); }bindInterpolation(__t5,()=>p());return __frag;},()=>{const __frag=__blk1();return __frag;});__m8.replaceWith(__cf7);return __frag;});
+    const __cf9=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m8]=__walk2(__frag);const __cf7=when(()=>p(),()=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);__el4.addEventListener('click', safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));{ const __s = new Set(["pdx-ghost"]); let __w = []; effect(() => { const __n = String(ctx.currentPlacement() === p() ? 'active' : '' ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el4.classList.remove(__t); for (const __t of __n) __el4.classList.add(__t); __w = __n; }); }bindInterpolation(__t5,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m8.replaceWith(__cf7);return __frag;});
     __m10.replaceWith(__cf9);
     bindRef(__el11,ctx.arenaEl);
     bindRef(__el12,ctx.arenaScrollEl);
@@ -45053,7 +45053,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m9,__el11,__el12,__t14]=__walk1(__frag);
-    const __cf8=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el6,__t7]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.multiClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el6.classList.remove(__t); for (const __t of __n) __el6.classList.add(__t); __w = __n; }); }__el6.addEventListener('click', safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t7,()=>fruit());return __frag;});
+    const __cf8=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el6,__t7]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.multiClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el6.classList.remove(__t); for (const __t of __n) __el6.classList.add(__t); __w = __n; }); }__el6.addEventListener('click', safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t7,()=>fruit(),true);return __frag;});
     __m9.replaceWith(__cf8);
     __el11.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits)), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el12.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.clear()), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -45104,7 +45104,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m8,__t10]=__walk1(__frag);
-    const __cf7=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.singleClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el5.classList.remove(__t); for (const __t of __n) __el5.classList.add(__t); __w = __n; }); }__el5.addEventListener('click', safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t6,()=>fruit());return __frag;});
+    const __cf7=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = String(ctx.singleClass(fruit()) ?? '').split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el5.classList.remove(__t); for (const __t of __n) __el5.classList.add(__t); __w = __n; }); }__el5.addEventListener('click', safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t6,()=>fruit(),true);return __frag;});
     __m8.replaceWith(__cf7);
     bindInterpolation(__t10,()=>ctx.singleInfo());
     return __frag;
@@ -45572,7 +45572,7 @@ let users = resource(() => {
     bindInterpolation(__t7,()=>ctx.userCount());
     const __cf9=when(()=>ctx.users.loading(),()=>{const __frag=__blk0();return __frag;},null);
     __m10.replaceWith(__cf9);
-    const __cf17=when(()=>ctx.users.state() === 'success' || ctx.users.state() === 'local',()=>{const __frag=__blk2();const [__m16]=__walk2(__frag);const __cf15=eachRow(()=>ctx.userData(),'name',(user)=>{const __frag=__blk1();const [__t13,__t14]=__walk1(__frag);bindInterpolation(__t13,()=>user().name);bindInterpolation(__t14,()=>user().role);return __frag;});__m16.replaceWith(__cf15);return __frag;},null);
+    const __cf17=when(()=>ctx.users.state() === 'success' || ctx.users.state() === 'local',()=>{const __frag=__blk2();const [__m16]=__walk2(__frag);const __cf15=eachRow(()=>ctx.userData(),'name',(user)=>{const __frag=__blk1();const [__t13,__t14]=__walk1(__frag);bindInterpolation(__t13,()=>user().name,true);bindInterpolation(__t14,()=>user().role);return __frag;});__m16.replaceWith(__cf15);return __frag;},null);
     __m18.replaceWith(__cf17);
     const __cf20=when(()=>ctx.users.state() === 'error',()=>{const __frag=__blk3();return __frag;},null);
     __m21.replaceWith(__cf20);

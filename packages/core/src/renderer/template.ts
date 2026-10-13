@@ -3,7 +3,7 @@
 // Template caching: same template strings → reuse parsed HTMLTemplateElement.
 // Importable without a DOM; calling html`` needs one (#93).
 
-import { effect, onDispose } from '../reactivity/signal';
+import { effect, onDispose, untracked } from '../reactivity/signal';
 import { setProp, bindGesture } from './dom';
 import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
@@ -844,12 +844,16 @@ function replaceTextNode(textNode: Text, values: TemplateValue[]): void {
  * it: a primitive is the anchor's text (`interpolationText`), a Node, a fragment or an array is put in
  * as nodes. Both render paths interpolate through it — the inline path wrote only text, so an array
  * read `a,b` in a production build and `ab` in dev (#100).
+ *
+ * `constant`: the compiler knows the value cannot change — a literal, or a `@for` row's track key
+ * (#110). It is written once, by the same rule, outside any tracking: no effect is created, and what
+ * it reads does not subscribe the render it sits in.
  */
-export function bindInterpolation(anchor: Text, value: () => unknown): void {
+export function bindInterpolation(anchor: Text, value: () => unknown, constant = false): void {
     const parent = anchor.parentNode!;
     let currentNodes: Node[] = [anchor];
 
-    effect(() => {
+    const write = (): void => {
         const result = value();
         const ref = currentNodes[0];
 
@@ -885,7 +889,9 @@ export function bindInterpolation(anchor: Text, value: () => unknown): void {
             }
             currentNodes = newNodes;
         }
-    });
+    };
+    if (constant) untracked(write);
+    else effect(write);
 }
 
 // ─── Utilities ─────────────────────────────────────────────────────

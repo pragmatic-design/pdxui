@@ -18,6 +18,15 @@ export interface CompileContext {
      */
     readonly rowVars: Set<string>;
 
+    /**
+     * The track expressions of the `@for` loops around the code being generated, whitespace removed: a
+     * binding that is exactly one of them cannot change in its row (#110). See codegen-constant-bindings.
+     */
+    readonly rowKeys: string[];
+
+    /** The script's top-level `const`s whose value is literals only: constant in the template (#110). */
+    literalConsts: Set<string>;
+
     /** Names that are NOT signals — form refs, resources, functions. callSignals() skips adding (). */
     nonSignalNames: Set<string> | null;
 
@@ -118,6 +127,8 @@ export function createCompileContext(options?: {
         production: options?.production ?? false,
         scopeVars: new Set(),
         rowVars: new Set(),
+        rowKeys: [],
+        literalConsts: new Set(),
         nonSignalNames: null,
         stateSignalNames: null,
         declaredNames: null,

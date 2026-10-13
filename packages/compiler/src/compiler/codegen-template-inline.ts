@@ -20,6 +20,7 @@ import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins'
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
+import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
 
 // ─── Constants ────────────────────────────────────────────────────
 
@@ -444,6 +445,11 @@ class InlineGen {
     }
 
     private propBind(el: string, prop: string, expr: string, kind: ElementKind, preRewritten = false): void {
+        // A value that cannot change — a literal, a @for row's track key — is written once (#110).
+        if (!preRewritten && isConstantBinding(expr, this.ctx)) {
+            this.out(`{ ${this.assign(el, this.boundName(prop, kind), this.read(expr), kind)} }`);
+            return;
+        }
         this.imports.add('effect');
         // Pre-rewritten values are already final JS (often a `() => …` getter from form-binding).
         const value = preRewritten ? `(${expr})()` : this.shared(this.read(expr));
@@ -636,6 +642,9 @@ class InlineGen {
             // The same chain as the template path, the value first in every pipe (#199).
             this.imports.add('templatePipe');
             this.out(`bindInterpolation(${t},()=>${pipeChain(expr, node.pipes, this.ctx)});`);
+        } else if (isConstantBinding(node.expr, this.ctx)) {
+            // Cannot change: core writes it once, by the same rule, with no effect (#110).
+            this.out(`bindInterpolation(${t},()=>${expr},true);`);
         } else {
             this.out(`bindInterpolation(${t},()=>${this.shared(expr)});`);
         }
@@ -673,7 +682,7 @@ class InlineGen {
         this.imports.add(helper);
         const items = callSignals(prefixCtx(node.items, this.ctx), this.ctx);
         const keyArg = trackKeyArg(node, this.ctx);
-        let body = withLoopScope(node, rows, this.ctx, () => this.sub(node.body));
+        let body = withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx, () => this.sub(node.body)));
         const params = node.index ? `${node.item},${node.index}` : node.item;
         const transition = generateTransition(node.transition);
         const cf = this.v('cf');
