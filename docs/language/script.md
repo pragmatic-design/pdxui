@@ -251,6 +251,53 @@ function hide() { open = false; }
 
 alpha
 
+### @part
+
+#### Syntax
+
+```ebnf
+PartDecl      ::= "@part" S Identifier ( S? "," S? Identifier )* S? ";"?
+PartAttribute ::= 'data-part="' Identifier '"'
+```
+
+The analyzer's form: `@part trigger, popup;`, and `data-part="popup"` on the element.
+
+#### Semantics
+
+A named, public element of the component. `@part popup;` in the script, and `data-part="popup"`
+written literally on one element of the template. The attribute stays in the page, so a theme or a
+test reaches the element as `pdx-menu [data-part="popup"]` — with the component's `:state()` and its
+tokens, the public styling surface; its internal classes are not. In the script the name is the
+element: a signal that holds it while it is rendered and `null` otherwise, as a `:ref` written to a
+`$signal(null)`, so `popup?.focus()` needs no `:ref`. The descriptor declares `parts: ['popup']`, and the
+manifest lists them.
+
+#### Rules
+
+- A declared part on no element raises `PDX_PART_MISSING`; on more than one, `PDX_PART_DUPLICATE`; a
+  `data-part` with no declaration, `PDX_PART_UNDECLARED`. The count is of the attribute as written: a
+  `data-part` inside an `@for` counts once (whether it may sit there is an open question of the beta).
+- A name the script declares itself is that declaration: the part's element is bound to it.
+
+#### Examples
+
+```pdx
+<template>
+  <button data-part="trigger" @click="open = !open">Menu</button>
+  @if (open) { <div data-part="popup"><slot></slot></div> }
+</template>
+
+<script setup>
+@part trigger, popup;
+let open = $signal(false);
+function close() { open = false; trigger?.focus(); }
+</script>
+```
+
+#### Since
+
+beta (#134)
+
 ### @host
 
 #### Syntax

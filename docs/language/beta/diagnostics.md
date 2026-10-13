@@ -18,9 +18,9 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_FORM_REQUIRED_IN_MARKUP` | warn | `required` on a control bound to a form field; it belongs in the schema. | `@form` | #128 |
 | `PDX_SLOT_REQUIRED` | error | A required slot the parent does not fill. | `@slot` | #131 |
 | `PDX_STATE_NOT_BOOLEAN` | error | An `@state` expression that is not boolean. | `@state` | #132 |
-| `PDX_PART_MISSING` | error | A declared part with no `data-part` element. | `@part` | #134 |
-| `PDX_PART_DUPLICATE` | error | A part on more than one element. | `@part` | #134 |
-| `PDX_PART_UNDECLARED` | error | A `data-part` with no declaration. | `@part` | #134 |
+| `PDX_PART_MISSING` | error | A declared part with no `data-part` element. | `@part` | #134 (landed) |
+| `PDX_PART_DUPLICATE` | error | A part on more than one element. | `@part` | #134 (landed) |
+| `PDX_PART_UNDECLARED` | error | A `data-part` with no declaration. | `@part` | #134 (landed) |
 | `PDX_EVENT_BUBBLES_UNUSED` | info | An `@event(bubbles)` no ancestor in the project listens to. | `@event` | #138 |
 | `PDX_COMMAND_TARGET_MISSING` | error | A `commandfor` whose target id is not in the template. | commands | #140 |
 | `PDX_COMMAND_UNKNOWN` | error | A custom command that is not an exposed method of the target. | commands | #140 |

@@ -119,6 +119,14 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_EVENT_NAME_CASE':
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`)) : undefined;
+        case 'PDX_PART_MISSING':
+            // Match: the `@part` line that lists the name.
+            return name ? find(source, script, new RegExp(`@part\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;
+        case 'PDX_PART_DUPLICATE':
+            // The second element: the first was there, the second is the one written twice.
+            return name ? find(source, template, new RegExp(`data-part=["']${escape(name)}["']`), 1) : undefined;
+        case 'PDX_PART_UNDECLARED':
+            return name ? find(source, template, new RegExp(`data-part=["']${escape(name)}["']`)) : undefined;
         case 'PDX_HOST_INVALID_ATTRIBUTE': {
             // Match: the attribute the message quotes (`'::value' on @host: …`), inside the @host block.
             const attr = /^'([^']+)' on @host/.exec(w.message)?.[1];

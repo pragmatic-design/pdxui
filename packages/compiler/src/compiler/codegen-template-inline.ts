@@ -467,6 +467,11 @@ class InlineGen {
             else if (gestureOf(n))            this.gestureBind(el, gestureOf(n)!, val, preRewritten);
             else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten, kind.custom || this.opaque());
             else if (n === 'class')           continue; // written first, above
+            else if (val && n === 'data-part' && this.ctx.parts.has(val)) {
+                // A declared part (#134): the attribute is written, and the element is the part's ref.
+                this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(val)});`);
+                this.refBind(el, val);
+            }
             else if (val)                     this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(decodeEntities(val))});`);
             else                              this.tree.statement(`${el}.setAttribute(${jsString(n)}, '');`);
             this.pending = '';

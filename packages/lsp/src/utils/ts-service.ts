@@ -74,6 +74,14 @@ export function projectScript(scriptContent: string): string {
             const ev = /^\s+([A-Za-z_$][\w$]*)\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
             if (ev) emitters.push(ev[2] ? `var ${ev[1]}: (detail: ${ev[2]}) => void;` : `var ${ev[1]}: (detail?: unknown) => void;`);
         }
+        if (kw === 'part') {
+            // Match: @part trigger, popup; — each name is its element, null while not rendered (#134).
+            // Typed by the tag it sits on would need the template; HTMLElement is what it always is.
+            const list = /^\s+([\w\s,]+?)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            for (const name of list ? list[1].split(',').map((n) => n.trim()).filter(Boolean) : []) {
+                emitters.push(`var ${name}: HTMLElement | null;`);
+            }
+        }
         if (kw === 'snippet') {
             // Match: @snippet name(a, b) — the function the compiler declares (#206).
             // Groups: [1]=name [2]=parameters as written

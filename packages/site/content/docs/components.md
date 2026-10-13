@@ -287,6 +287,31 @@ function close() { isOpen = false; }
 From the parent, with a reference to the element: `dialogRef.open()`. Use it sparingly: if you can
 get the same result with a prop (`:open="..."`), prefer the prop — it's more declarative.
 
+## @part — named, public parts
+
+A component's inner elements are its own business, except the ones it names. `@part` declares them,
+and `data-part="…"` marks each, on exactly one element:
+
+```pdx
+<template>
+  <button data-part="trigger" @click="open = !open">Menu</button>
+  @if (open) { <div data-part="popup"><slot></slot></div> }
+</template>
+
+<script setup>
+@part trigger, popup;
+let open = $signal(false);
+function close() { open = false; trigger?.focus(); }
+</script>
+```
+
+The page or a theme styles a part by its name, `my-menu [data-part="popup"] { … }`, instead of an
+internal class that may be renamed; parts, `:state()` and the component's tokens are what is public.
+In the script the name is the element (`null` while it is not rendered), so it needs no `:ref`. A
+declared part on no element is `PDX_PART_MISSING`, on two `PDX_PART_DUPLICATE`, and a `data-part` with
+no `@part` is `PDX_PART_UNDECLARED`. A TypeScript component lists them as `parts: ['trigger', 'popup']`,
+and the manifest lists a component's parts.
+
 ## @host — the component's own element
 
 In a web component the element on the page **is** the component. Its role, its ARIA state and a

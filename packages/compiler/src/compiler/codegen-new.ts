@@ -132,6 +132,8 @@ export function compileNewMode(
     ctx.literalConsts = literalConstNames(descriptor.script?.content ?? '');
     // Bubbling events inside a @for are delegated to one listener per type (#113).
     ctx.delegatedEvents = delegatedEventTypes(ast);
+    // A literal `data-part` naming a declared part is also that part's ref (#134).
+    ctx.parts = new Set(analysis.parts);
     const renderCode = generateInlineNodes(ast, imports, ctx, templateHoists);
     ctx.literalConsts = new Set();
     ctx.delegatedEvents = new Set();
@@ -229,7 +231,8 @@ export function compileNewMode(
     return assembleModule(imports, allUserImports, descriptor, filename, tag, propsCode, setupParts, finalRenderCode, analysis.route, production, ctx.warnings, ctx.importPathOf ?? undefined, ctx.mapOrigins, ctx.sourceFile, templateHoists.lines.length > 0,
         usesUntypedEmit(analysis, descriptor) ? [] : analysis.events.map(e => e.name),
         analysis.states.map(s => s.name),
-        analysis.host ? hostDescriptor(analysis.host, ctx, imports) : '');
+        analysis.host ? hostDescriptor(analysis.host, ctx, imports) : '',
+        analysis.parts);
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

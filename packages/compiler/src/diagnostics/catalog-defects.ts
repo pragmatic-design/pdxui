@@ -174,6 +174,27 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it first (`function close() { … }`), or remove it from `@expose`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_PART_MISSING: {
+        severity: 'error', category: 'defect',
+        summary: 'A declared `@part` that no element of the template carries.',
+        explanation: 'A part is a public name for one element: a theme styles `[data-part="x"]` and the script reads `x` as the element. With no element, both reach nothing, and the manifest lists a part that is not there.',
+        fix: 'Write `data-part="x"` on the element it names, or remove `x` from `@part`.',
+        example: { bad: pdx('<button>Menu</button>', '@part trigger;'), good: pdx('<button data-part="trigger">Menu</button>', '@part trigger;') },
+    },
+    PDX_PART_DUPLICATE: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@part` written on more than one element.',
+        explanation: 'A part names one element. On two, a theme styles both under one name and the script\'s ref holds whichever rendered last.',
+        fix: 'Keep `data-part="x"` on one element, and give the others parts of their own.',
+        example: { bad: pdx('<button data-part="action">A</button><button data-part="action">B</button>', '@part action;'), good: pdx('<button data-part="ok">A</button><button data-part="cancel">B</button>', '@part ok, cancel;') },
+    },
+    PDX_PART_UNDECLARED: {
+        severity: 'error', category: 'defect',
+        summary: 'A `data-part` that names no `@part`.',
+        explanation: 'Parts are the component\'s public styling surface and the manifest lists them from `@part`: an undeclared one is public by accident, and nothing says it exists.',
+        fix: 'Declare it, `@part x;`, or remove the attribute.',
+        example: { bad: pdx('<div data-part="popup">x</div>', 'let open = $signal(false);'), good: pdx('<div data-part="popup">x</div>', '@part popup;') },
+    },
     PDX_HOST_INVALID_ATTRIBUTE: {
         severity: 'error', category: 'defect',
         summary: 'On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument.',

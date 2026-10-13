@@ -50,6 +50,16 @@ describe('the rune declarations', () => {
         expect(projectScript(script)).not.toMatch(/role|aria-expanded|expanded =/);
     });
 
+    it('a @part is its element in the script (#134)', () => {
+        const script = '@part trigger, popup;\nfunction f() { trigger?.focus(); popup?.remove(); }\nf;\n';
+        expect(diagnose(script)).toEqual([]);
+        const vf = buildVirtualFile(script, 0, [], '', -1);
+        const hover = tsHover(svc, URI, vf, script.indexOf('trigger?')) as { contents: { value: string } } | null;
+        // Declared `HTMLElement | null`; the editor's service runs without strictNullChecks, so the
+        // hover shows the element type alone.
+        expect(hover?.contents.value).toMatch(/var trigger: HTMLElement\b/);
+    });
+
     it('$event.target.value is accepted in a handler', () => {
         expect(diagnose("let name = $signal('');", '<input @input="name = $event.target.value">')).toEqual([]);
     });

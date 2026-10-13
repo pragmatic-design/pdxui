@@ -108,6 +108,12 @@ dispatched as `itemPicked` and listened for as `itempicked` — never heard. The
 `PDX_EVENT_NAME_CASE` on such a declaration. Not kebab-case either: the name is also the emitter's
 identifier.
 
+**`@part trigger, popup;`** names a component's public inner elements: write `data-part="popup"` on
+exactly one element each. A page or theme styles a part as `my-menu [data-part="popup"]` — parts,
+`:state()` and the component's tokens are the public styling surface, its internal classes are not. In
+the script `popup` is the element (`null` while not rendered), so it needs no `:ref`. A part on no
+element, on two, or a `data-part` with no `@part` are `PDX_PART_MISSING` / `_DUPLICATE` / `_UNDECLARED`.
+
 **`@host { role="combobox" :aria-expanded="open" @keydown.enter="onKey" }`** puts attributes, bindings
 and listeners on the component's own element — the template's attribute syntax, one line or several.
 Use it instead of `ctx.el.setAttribute(…)` or `ctx.el.addEventListener(…)` in the script. A static
@@ -124,7 +130,7 @@ A TypeScript component declares `states: ['open']` and calls `ctx.state('open', 
 The full vocabulary the analyzer accepts:
 
 `@prop` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
-`@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@host` `@state` `@scroll`
+`@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@part` `@host` `@state` `@scroll`
 `@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use` `@mixin`
 
 **`@form f: Schema { … }`** builds a form (`createForm` underneath). Its options: `save` (when a field
