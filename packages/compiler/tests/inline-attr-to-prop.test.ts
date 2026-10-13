@@ -17,7 +17,7 @@ import { generateInlineNodes, ATTR_TO_PROP } from '../src/compiler/codegen-templ
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 // The generated code imports them from core; the harness hands it the real ones, so the stub cases
 // measure the rule both builds share, not a copy of it.
-import { clearBoundProperty, assignBoundProperty } from '../../core/src/renderer/template';
+import { clearBoundProperty, assignBoundProperty, interpolationText } from '../../core/src/renderer/template';
 
 function inline(template: string, script = "let label = $signal('x');\nlet id = $signal(1);"): string {
     const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
@@ -62,6 +62,15 @@ class StubElement {
     constructor(public tagName: string) {
         // The DOM properties a real element of this tag has, so `name in el` answers as a browser does.
         Object.assign(this, STUB_PROPS[tagName] ?? {});
+        // An HTML element's `className` reflects its class attribute, and `:class` may assign it (#112).
+        // An SVG element (created lowercase, by createElementNS) has none here: it must never be assigned.
+        if (tagName === tagName.toUpperCase()) {
+            Object.defineProperty(this, 'className', {
+                get: () => this.attrs.get('class') ?? '',
+                set: (v: unknown) => { this.attrs.set('class', String(v)); },
+                enumerable: true,
+            });
+        }
         for (const [prop, attr] of Object.entries(STUB_REFLECTED[tagName] ?? {})) {
             Object.defineProperty(this, prop, {
                 get: () => (this.attrs.has(attr) ? Number(this.attrs.get(attr)) : -1),
@@ -105,7 +114,7 @@ function live(template: string, values: Record<string, unknown>): { el: StubElem
     const effects: { fn: () => void; deps: Set<string> }[] = [];
     const run = (e: { fn: () => void; deps: Set<string> }) => { reading = e.deps; try { e.fn(); } finally { reading = null; } };
     const effect = (fn: () => void) => { const e = { fn, deps: new Set<string>() }; effects.push(e); run(e); };
-    const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', `return ${iife};`)(document, stubStaticBlock(document), effect, ctx, clearBoundProperty, assignBoundProperty) as StubElement;
+    const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', 'interpolationText', `return ${iife};`)(document, stubStaticBlock(document), effect, ctx, clearBoundProperty, assignBoundProperty, interpolationText) as StubElement;
     return {
         el: frag.children[0],
         set(next) {

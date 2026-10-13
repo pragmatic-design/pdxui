@@ -21,6 +21,7 @@ import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
+import { specialisedClassBinding } from './inline-class-binding';
 
 // ─── Constants ────────────────────────────────────────────────────
 
@@ -411,6 +412,8 @@ class InlineGen {
         // Match: ` class="a b"` (not `:class`, not `data-class`)  Groups: [1]/[2]=the value
         const staticClass = /\sclass=(?:"([^"]*)"|'([^']*)')/.exec(s);
         const staticClassValue = staticClass ? (staticClass[1] ?? staticClass[2]) : '';
+        // Match: a `:class.x` binding, after the object expansion above. Groups: [1]=the class
+        const toggled = [...s.matchAll(/\s:class\.([\w-]+)/g)].map(t => t[1]);
         if (staticClass) this.tree.statement(`${el}.setAttribute("class", ${jsString(staticClassValue)});`);
         let m;
         while ((m = re.exec(s)) !== null) {
@@ -442,7 +445,7 @@ class InlineGen {
             else if (n.startsWith(':style.')) this.styleProp(el, n.slice(7), val);
             else if (n === ':show')           this.showBind(el, val);
             else if (n === ':ref' || n === 'ref') this.refBind(el, val);
-            else if (n === ':class')          this.classBind(el, val, staticClassValue, preRewritten);
+            else if (n === ':class')          this.classBind(el, val, staticClassValue, preRewritten, toggled, kind);
             else if (n.startsWith(':'))       this.propBind(el, n.slice(1), val, kind, preRewritten);
             else if (gestureOf(n))            this.gestureBind(el, gestureOf(n)!, val, preRewritten);
             else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten);
@@ -495,13 +498,27 @@ class InlineGen {
      * class `:class.x` turned on stay; a dynamic class that is also static is never
      * removed. `el["class"]` is an expando and `className` is read-only on SVG. In a block,
      * so two bound elements in one scope do not collide.
+     *
+     * Where the compiler can see the classes the value yields, a specialised update is written
+     * instead (`inline-class-binding.ts`, #112).
      */
-    private classBind(el: string, expr: string, staticClass: string, preRewritten: boolean): void {
+    private classBind(el: string, expr: string, staticClass: string, preRewritten: boolean, toggled: string[], kind: ElementKind): void {
         this.imports.add('effect');
+        const statics = staticClass.split(/\s+/).filter(Boolean);
+        if (!preRewritten) {
+            const specialised = specialisedClassBinding(el, expr, (e) => this.read(e),
+                { staticClasses: statics, toggled, custom: kind.custom, svg: kind.svg }, this.imports);
+            if (specialised !== null) {
+                this.out(specialised);
+                return;
+            }
+        }
         const value = preRewritten ? `(${expr})()` : this.read(expr);
-        const statics = jsString(staticClass.split(/\s+/).filter(Boolean));
-        this.out(`{ const __s = new Set(${statics}); let __w = []; effect(() => { `
-            + `const __n = String(${value} ?? '').split(/\\s+/).filter(Boolean); `
+        // core's interpolationText: null, undefined and false are no class, as they are no text.
+        // Written as `String(${value} ?? '')`, `a || b` made `a || b ?? ''` — a syntax error.
+        this.imports.add('interpolationText');
+        this.out(`{ const __s = new Set(${jsString(statics)}); let __w = []; effect(() => { `
+            + `const __n = interpolationText(${value}).split(/\\s+/).filter(Boolean); `
             + `for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) ${el}.classList.remove(__t); `
             + `for (const __t of __n) ${el}.classList.add(__t); __w = __n; }); }`);
     }

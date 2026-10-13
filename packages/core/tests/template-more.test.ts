@@ -156,6 +156,17 @@ describe(':prop bindings', () => {
         expect(tokens, 'b is static: dropping the dynamic b must not take it').toEqual(['b', 'base', 'c']);
     });
 
+    it('false, null and undefined are no class, as they are no text (#112)', async () => {
+        // `on && name` with `on` off wrote class="false".
+        const cls = signal<unknown>('big');
+        const el = mount(html`<div class="base" :class=${() => cls()}>x</div>`).querySelector('div')!;
+        for (const off of [false, null, undefined]) {
+            cls.set(off);
+            await Promise.resolve();
+            expect(el.outerHTML, String(off)).toContain('class="base"');
+        }
+    });
+
     it('merges a static :class value too', () => {
         const el = mount(html`<div class="base" :class=${'extra'}>x</div>`).querySelector('div')!;
         expect(el.outerHTML).toContain('class="base extra"');
