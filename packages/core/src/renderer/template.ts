@@ -509,8 +509,9 @@ function bindProperty(el: Element, prop: string, value: TemplateValue): void {
     if (camel === 'className') {
         const staticTokens = new Set((el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean));
         let written: string[] = [];
+        // `false` is no class, as it is no text (interpolationText): `on && 'x'` off wrote class="false".
         const writeClass = (raw: unknown) => {
-            const next = String(raw ?? '').split(/\s+/).filter(Boolean);
+            const next = interpolationText(raw).split(/\s+/).filter(Boolean);
             for (const t of written) if (!next.includes(t) && !staticTokens.has(t)) el.classList.remove(t);
             for (const t of next) el.classList.add(t);
             written = next;

@@ -156,6 +156,13 @@ const ROWS: Row[] = [
     // The inline path wrote class="[object Object]" (#96).
     { name: ':class with an object', expected: '<p class="active">x</p>', template: '<p :class="{ active: on, off: !on }">x</p>', script: 'let on = $signal(true);' },
     { name: ':class.x', expected: '<p class="active base">x</p>', template: '<p class="base" :class.active="on">x</p>', script: 'let on = $signal(true);' },
+    // The specialised forms (#112), each after a change, so the update is measured, not the first write.
+    { name: ':class conditional, after a change', expected: '<p class="no">x</p><button>t</button>', template: "<p :class=\"on ? 'yes' : 'no'\">x</p><button @click=\"on = !on\">t</button>", script: 'let on = $signal(true);', act: click('button') },
+    { name: ':class with &&, after a change', expected: '<p class="">x</p><button>t</button>', template: "<p :class=\"on && 'danger'\">x</p><button @click=\"on = !on\">t</button>", script: 'let on = $signal(true);', act: click('button') },
+    { name: ':class with a plain value, after a change', expected: '<p class="b c">x</p><button>t</button>', template: "<p :class=\"name\">x</p><button @click=\"name = 'b c'\">t</button>", script: "let name = $signal('a');", act: click('button') },
+    // `false` is no class, in every form (#112): the generic routine wrote class="false".
+    { name: ':class with && on a value, after a change', expected: '<p class="base">x</p><button>t</button>', template: "<p class=\"base\" :class=\"on && name\">x</p><button @click=\"on = !on\">t</button>", script: "let on = $signal(true); let name = $signal('a');", act: click('button') },
+    { name: ':class beside a static class, after a change', expected: '<p class="b base">x</p><button>t</button>', template: "<p class=\"base\" :class=\"name\">x</p><button @click=\"name = 'b'\">t</button>", script: "let name = $signal('a');", act: click('button') },
     // The inline path assigned the object to el.style, which keeps no colour (#96).
     { name: ':style with an object', expected: '<p style="color: red;">x</p>', template: "<p :style=\"{ color: 'red' }\">x</p>" },
     { name: ':style.x', expected: '<p style="color: blue;">x</p>', template: '<p :style.color="c">x</p>', script: "let c = $signal('blue');" },
