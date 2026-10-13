@@ -15,10 +15,10 @@ import { compile } from '../../compiler/src/plugin';
 let seq = 0;
 
 /** The component compiled on one path, run against core with `helpers` as its other imports, mounted. */
-function mount(template: string, script: string, inline: boolean, helpers: Record<string, unknown> = {}): HTMLElement {
-    const name = `pipes${++seq}${inline ? 'i' : 't'}`;
+function mount(template: string, script: string, build: boolean, helpers: Record<string, unknown> = {}): HTMLElement {
+    const name = `pipes${++seq}${build ? 'b' : 'd'}`;
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
+    const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'\.\/helpers';?\s*$/gm, 'const {$1} = __helpers;');
@@ -40,17 +40,17 @@ const SCRIPT = [
 ].join('\n');
 
 describe('template pipes', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+    for (const build of [false, true]) {
+        const path = build ? 'build' : 'dev';
 
         it(`a pipe, a chain and a pipe with arguments render their value (${path})`, async () => {
-            const el = mount('<p>{{ name | upper }}</p><p>{{ name | upper | exclaim }}</p><p>{{ price | money(\'EUR\') }}</p>', SCRIPT, inline);
+            const el = mount('<p>{{ name | upper }}</p><p>{{ name | upper | exclaim }}</p><p>{{ price | money(\'EUR\') }}</p>', SCRIPT, build);
             await settle();
             expect([...el.querySelectorAll('p')].map(text)).toEqual(['ADA', 'ADA!', '12 EUR']);
         });
 
         it(`follows the signal it pipes (${path})`, async () => {
-            const el = mount('<p>{{ price | money(\'EUR\') }}</p><button @click="price = 13">+</button>', SCRIPT, inline);
+            const el = mount('<p>{{ price | money(\'EUR\') }}</p><button @click="price = 13">+</button>', SCRIPT, build);
             await settle();
             el.querySelector('button')!.click();
             await settle();
@@ -58,7 +58,7 @@ describe('template pipes', () => {
         });
 
         it(`reaches a pipe the script imports (${path})`, async () => {
-            const el = mount('<p>{{ name | shout }}</p>', "import { shout } from './helpers';\nlet name = $signal('ada');", inline,
+            const el = mount('<p>{{ name | shout }}</p>', "import { shout } from './helpers';\nlet name = $signal('ada');", build,
                 { shout: (v: string) => `${v.toUpperCase()}!` });
             await settle();
             expect(text(el.querySelector('p')!)).toBe('ADA!');

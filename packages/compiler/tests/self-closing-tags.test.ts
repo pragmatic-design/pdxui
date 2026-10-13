@@ -5,20 +5,18 @@
 // rendering its own content — drops it. It is the form JSX and Vue write by habit; Vue and Svelte
 // expand it, and so does the compiler. Void elements (<input />, <br />) keep their form.
 
-// The first block names the template path (`inlineBindings: false`), whose generator expands the
-// tag in its markup; the second measures the tree the inline path — every .pdx's render, #107 —
-// builds from the parsed template.
+// The first block measures the template generator, which expands the tag in its markup; since #107
+// it writes only a scoped slot's body, so each case sits inside one. The second measures the tree
+// the inline path — every other part of a .pdx's render — builds from the parsed template.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
 import { parseTemplate } from '../src/parser/template';
 
-// The template path, named: since #107 a .pdx renders through the inline path, whose tree comes from
-// the parsed template (the cases at the end). The template generator still expands `/>` for what it
-// generates — a hoisted scoped slot — and these cases measure that expansion.
+/** The render of `template` placed in a scoped slot's body, the template generator's. */
 function render(template: string, opts: Parameters<typeof compile>[4] = {}): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  let v = $signal('x');\n</script>`;
-    const code = compile(source, 'self-closing.pdx', [], undefined, { inlineBindings: false, ...opts }).code;
+    const source = `<template>\n<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>\n</template>\n<script setup>\n  let v = $signal('x');\n</script>`;
+    const code = compile(source, 'self-closing.pdx', [], undefined, { ...opts }).code;
     return code.slice(code.indexOf('render:'));
 }
 

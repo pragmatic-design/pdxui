@@ -54,10 +54,10 @@ describe('the inline path emits a module a bundler can read', () => {
         expect(parses(code)).toBe(true);
     });
 
-    it('control — the same component through the template path', () => {
-        // Without this, a change that made BOTH paths emit nothing would pass the test above.
+    it('control — and the module renders something: the form is built', () => {
+        // Without this, a change that made the render emit nothing would pass the test above.
         const { code } = compile(FORM, 'order.pdx', [], undefined, { production: true });
-        expect(parses(code)).toBe(true);
+        expect(code).toMatch(/document\.createElement\('pdx-form'\)/);
     });
 
     // Each emitted `batchHandler(() => )`, `const __b = ;` or a literal <slot> element (#200).

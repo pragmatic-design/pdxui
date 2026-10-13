@@ -18,10 +18,10 @@ import { compile } from '../../compiler/src/plugin';
 let seq = 0;
 const settle = async () => { for (let i = 0; i < 3; i++) await new Promise((r) => setTimeout(r, 0)); };
 
-function mount(template: string, script: string, inline: boolean): HTMLElement {
-    const name = `gesture${++seq}${inline ? 'i' : 't'}`;
+function mount(template: string, script: string, build: boolean): HTMLElement {
+    const name = `gesture${++seq}${build ? 'b' : 'd'}`;
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
+    const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
     const el = document.createElement(`pdx-${name}`);
@@ -36,11 +36,11 @@ const count = (el: HTMLElement) => el.querySelector('p')!.textContent;
 afterEach(() => { vi.useRealTimers(); });
 
 describe('gesture directives', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+    for (const build of [false, true]) {
+        const path = build ? 'build' : 'dev';
 
         it(`@swipe.left runs on a left swipe, and not at render or on a right one (${path})`, async () => {
-            const el = mount('<div class="pad" @swipe.left="n++">s</div><p>{{ n }}</p>', 'let n = $signal(0);', inline);
+            const el = mount('<div class="pad" @swipe.left="n++">s</div><p>{{ n }}</p>', 'let n = $signal(0);', build);
             await settle();
             expect(count(el), 'the handler ran at render').toBe('0');
             const pad = el.querySelector('.pad')!;
@@ -53,7 +53,7 @@ describe('gesture directives', () => {
         });
 
         it(`@longpress runs after a held press (${path})`, async () => {
-            const el = mount('<div class="pad" @longpress="hold()">h</div><p>{{ n }}</p>', 'let n = $signal(0);\nfunction hold() { n++; }', inline);
+            const el = mount('<div class="pad" @longpress="hold()">h</div><p>{{ n }}</p>', 'let n = $signal(0);\nfunction hold() { n++; }', build);
             await settle();
             vi.useFakeTimers();
             pointer(el.querySelector('.pad')!, 'pointerdown', 50);
@@ -64,7 +64,7 @@ describe('gesture directives', () => {
         });
 
         it(`@pinch hands the handler the scale (${path})`, async () => {
-            const el = mount('<div class="pad" @pinch="e => scale = e.scale">p</div><p>{{ scale }}</p>', 'let scale = $signal(1);', inline);
+            const el = mount('<div class="pad" @pinch="e => scale = e.scale">p</div><p>{{ scale }}</p>', 'let scale = $signal(1);', build);
             await settle();
             const pad = el.querySelector('.pad')!;
             pointer(pad, 'pointerdown', 100, 1); pointer(pad, 'pointerdown', 200, 2);

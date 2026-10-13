@@ -15,9 +15,9 @@ import { compile } from '../../compiler/src/plugin';
 let seq = 0;
 
 /** Compile one .pdx on one path and register it against core. */
-function define(name: string, template: string, script: string, inline: boolean): void {
+function define(name: string, template: string, script: string, build: boolean): void {
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
+    const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
 }
@@ -26,14 +26,14 @@ const settle = async () => { for (let i = 0; i < 3; i++) await new Promise((r) =
 const text = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ').trim();
 
 describe('a scoped slot outlet', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+    for (const build of [false, true]) {
+        const path = build ? 'build' : 'dev';
 
         it(`passes its scope to the parent's fill, and follows it (${path})`, async () => {
             const n = ++seq;
             define(`slotchild${n}`, '<div class="cell"><slot name="cell" :row="r"><em>none</em></slot></div><button @click="r++">+</button>',
-                'let r = $signal(1);', inline);
-            define(`slotparent${n}`, `<pdx-slotchild${n}>@slot(cell, { row }) { <b>row {{ row }}</b> }</pdx-slotchild${n}>`, '', inline);
+                'let r = $signal(1);', build);
+            define(`slotparent${n}`, `<pdx-slotchild${n}>@slot(cell, { row }) { <b>row {{ row }}</b> }</pdx-slotchild${n}>`, '', build);
             const el = document.createElement(`pdx-slotparent${n}`);
             document.body.appendChild(el);
             await settle();
@@ -46,7 +46,7 @@ describe('a scoped slot outlet', () => {
 
         it(`renders its default without a fill (${path})`, async () => {
             const n = ++seq;
-            define(`slotalone${n}`, '<div class="cell"><slot name="cell" :row="r"><em>none</em></slot></div>', 'let r = $signal(1);', inline);
+            define(`slotalone${n}`, '<div class="cell"><slot name="cell" :row="r"><em>none</em></slot></div>', 'let r = $signal(1);', build);
             const el = document.createElement(`pdx-slotalone${n}`);
             document.body.appendChild(el);
             await settle();
@@ -56,7 +56,7 @@ describe('a scoped slot outlet', () => {
 
         it(`a self-closing outlet with no fill renders nothing, and the rest of the template (${path})`, async () => {
             const n = ++seq;
-            define(`slotempty${n}`, '<div class="cell"><slot name="cell" :row="r" /></div><p>after</p>', 'let r = $signal(1);', inline);
+            define(`slotempty${n}`, '<div class="cell"><slot name="cell" :row="r" /></div><p>after</p>', 'let r = $signal(1);', build);
             const el = document.createElement(`pdx-slotempty${n}`);
             document.body.appendChild(el);
             await settle();

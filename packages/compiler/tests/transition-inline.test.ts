@@ -1,8 +1,8 @@
-// `@transition`, `@stagger`, `@mode` and `@move` on an `@if` or a `@for` reach the runtime on both
-// render paths: the template path (dev, and a build with `inlineBindings: false`) and the inline path
-// (a production build, by default). The inline path dropped them, so an animation that played in dev
+// `@transition`, `@stagger`, `@mode` and `@move` on an `@if` or a `@for` reach the runtime from both
+// generators: the inline one, every .pdx's render since #107, and the template one, which still
+// writes a scoped slot's body. The inline path dropped them once, so an animation that played in dev
 // did not play in the shipped app (#85). Each form is compiled both ways, and the options object the
-// template path passes to `when` / `each` / `eachRow` must be in the inline output too.
+// template generator passes to `when` / `each` / `eachRow` must be in the inline output too.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
@@ -10,10 +10,10 @@ import { compile } from '../src/plugin';
 const SCRIPT = '<script setup>\nlet on = $signal(true);\nlet list = $signal([1, 2]);\n</script>\n';
 
 function both(template: string): { tpl: string; inline: string } {
-    const src = `<template>${template}</template>\n${SCRIPT}`;
+    const src = (body: string) => `<template>${body}</template>\n${SCRIPT}`;
     return {
-        tpl: compile(src, 'transition-probe.pdx', [], undefined, {}).code,
-        inline: compile(src, 'transition-probe.pdx', [], undefined, { production: true, inlineBindings: true }).code,
+        tpl: compile(src(`<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>`), 'transition-probe.pdx', [], undefined, { production: true }).code,
+        inline: compile(src(template), 'transition-probe.pdx', [], undefined, { production: true }).code,
     };
 }
 
@@ -32,7 +32,7 @@ const FORMS: Array<[string, string, string]> = [
     ['@for over a destructured row', `@for (list as { id }; track id) @transition('fade') { <p>{{ id }}</p> }`, "{ enter: 'fade', exit: 'fade' }"],
 ];
 
-describe('transitions on both render paths', () => {
+describe('transitions on both generators', () => {
     for (const [name, template, expected] of FORMS) {
         it(name, () => {
             const { tpl, inline } = both(template);

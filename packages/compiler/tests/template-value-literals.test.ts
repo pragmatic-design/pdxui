@@ -42,10 +42,10 @@ const cases: Case[] = [
 ];
 
 function module(template: string, inline: boolean): string {
-    const src = `<template>\n  <div>${template}</div>\n</template>\n\n<script setup>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
-    // The template path named: since #107 a dev compile is inline too.
-    const options = inline ? { production: true, inlineBindings: true } : { production: false, inlineBindings: false };
-    return compile(src, 'probe.pdx', [], undefined, options).code;
+    // The template generator writes only a scoped slot's body since #107: its cases sit inside one.
+    const body = inline ? `<div>${template}</div>` : `<pdx-list><slot name="item" let:row><div>${template}</div></slot></pdx-list>`;
+    const src = `<template>\n  ${body}\n</template>\n\n<script setup>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
+    return compile(src, 'probe.pdx', [], undefined, { production: true }).code;
 }
 
 function parsed(code: string): ts.SourceFile {
@@ -74,7 +74,7 @@ function walk(sf: ts.SourceFile): { identifiers: Set<string>; strings: string[];
 
 describe('template values become string literals in the generated module (#69)', () => {
     for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+        const path = inline ? 'the render' : 'a scoped slot body';
         for (const c of cases) {
             it(`${c.site}, ${path}: parses, and the value stays text`, () => {
                 const code = module(c.template, inline);

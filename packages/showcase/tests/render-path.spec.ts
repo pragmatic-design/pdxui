@@ -1,9 +1,9 @@
 /**
  * The showcase is built the way a production app is: through the inline render path (#44).
  *
- * `pdx()` defaults `inlineBindings` to true for a production build, and every app built with
- * `pdx build` gets it. The showcase is the bench the production build is measured on, so it must
- * not opt out: a suite that runs the template path certifies a mode no application ships.
+ * Since #107 it is the one render path of a .pdx, in dev and in a build, and `pdx()` has no way to
+ * select another. The showcase is the bench the production build is measured on: a suite that ran
+ * the template path would certify a mode no application ships.
  *
  * Read off the built chunk, not the config: the config is what was asked, the chunk is what was
  * done. The intervention page's ticket marker is its own markup, in its own chunk

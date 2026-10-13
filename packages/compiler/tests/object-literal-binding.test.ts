@@ -12,13 +12,13 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-/** Compile a template, in both binding modes: the template path (named, since #107 made the inline
- *  path every .pdx's) and the inline one. */
+/** Compile a template on both generators: the template generator — which since #107 writes only a
+ *  scoped slot's body, so the template goes inside one — and the inline one, the rest of a render. */
 function both(template: string): { template: string; inline: string } {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  let on = $signal(1);\n</script>`;
+    const source = (body: string) => `<template>\n${body}\n</template>\n<script setup>\n  let on = $signal(1);\n</script>`;
     return {
-        template: compile(source, 'obj.pdx', [], undefined, { inlineBindings: false }).code,
-        inline: compile(source, 'obj.pdx').code,
+        template: compile(source(`<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>`), 'obj.pdx').code,
+        inline: compile(source(template), 'obj.pdx').code,
     };
 }
 

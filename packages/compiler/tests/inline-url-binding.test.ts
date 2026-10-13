@@ -52,9 +52,11 @@ describe('the controls', () => {
         expect(code).not.toContain('sanitizeBoundUrl');
     });
 
-    it('the interpreted build is unchanged: it binds through html``, which sanitises at runtime', () => {
-        const source = "<template>\n<a :href=\"url\">Go</a>\n</template>\n<script setup>\nlet url = $signal('/');\n</script>";
-        const code = compile(source, 'dev-url.pdx', [], undefined, { production: true, inlineBindings: false }).code;
+    it('a scoped slot body binds through html``, which sanitises at runtime', () => {
+        // The template generator writes only a scoped slot's body since #107: core's html`` binds it.
+        const source = "<template>\n<pdx-list><slot name=\"item\" let:row><a :href=\"url\">Go</a></slot></pdx-list>\n</template>\n<script setup>\nlet url = $signal('/');\n</script>";
+        const code = compile(source, 'slot-url.pdx', [], undefined, { production: true }).code;
+        expect(code).toMatch(/html`<a :href=\$\{[^}]*ctx\.url[^}]*\}>Go<\/a>`/);
         expect(code).not.toContain('sanitizeBoundUrl');
     });
 });

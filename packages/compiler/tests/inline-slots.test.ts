@@ -39,8 +39,8 @@ const PLAIN = `<template><p :title="t">{{ t }}</p></template>
 @prop t: string = '';
 </script>`;
 
-const emitted = (source: string, inlineBindings: boolean): string =>
-    compile(source, 'list.pdx', [], undefined, { production: true, inlineBindings }).code;
+const emitted = (source: string): string =>
+    compile(source, 'list.pdx', [], undefined, { production: true }).code;
 
 /** The names the module imports from `@pdxui/core`. */
 function importedNames(code: string): string[] {
@@ -50,30 +50,25 @@ function importedNames(code: string): string[] {
 
 describe('a scoped slot survives the inline path', () => {
     it('the slot reaches the emitted module', () => {
-        const code = emitted(SLOTTED, true);
+        const code = emitted(SLOTTED);
         expect(code, 'the slot was dropped from the render').toContain("slotCarrier('item'");
         expect(importedNames(code), 'slotCarrier is called and not imported').toContain('slotCarrier');
     });
 
     it('its body is there too, not just the carrier', () => {
         // A carrier with an empty function renders nothing, and would satisfy the assertion above.
-        expect(emitted(SLOTTED, true), 'the slot function has no body').toContain('who');
+        expect(emitted(SLOTTED), 'the slot function has no body').toContain('who');
     });
 
     it('and it is attached to something, not created and forgotten', () => {
-        expect(emitted(SLOTTED, true), 'the carrier was built and never appended')
+        expect(emitted(SLOTTED), 'the carrier was built and never appended')
             .toMatch(/appendChild\(slotCarrier\('item'/);
-    });
-
-    it('control — the template path renders the same slot', () => {
-        // Without this, a change that stopped BOTH paths emitting slots would pass the tests above.
-        expect(emitted(SLOTTED, false)).toContain("slotCarrier('item'");
     });
 });
 
 describe('the module imports what it calls', () => {
     it('html, because the hoisted slot function uses it', () => {
-        const code = emitted(SLOTTED, true);
+        const code = emitted(SLOTTED);
         // Guard the premise: if the hoisted slot ever stops using html``, rewrite this rather than
         // let it pass for a new reason.
         expect(code, 'the hoisted slot no longer uses html`` — re-read this test').toMatch(/html`/);
@@ -83,7 +78,7 @@ describe('the module imports what it calls', () => {
     it('and still drops html when nothing uses it', () => {
         // The delete was not wrong, only unconditional. A component with no slot must not carry an
         // import it never calls, or the inline path would start shipping the template runtime.
-        const code = emitted(PLAIN, true);
+        const code = emitted(PLAIN);
         expect(code).not.toMatch(/html`/);
         expect(importedNames(code), 'an unused html import came back').not.toContain('html');
     });
@@ -93,7 +88,7 @@ describe('and the emitted module parses', () => {
     it('with a slot in it', () => {
         // `new Function` is a parser that is already here. The import lines are stripped because an
         // import statement is illegal in a function body; the body is never called, only compiled.
-        const body = emitted(SLOTTED, true).replace(/^\s*import\b.*$/gm, '');
+        const body = emitted(SLOTTED).replace(/^\s*import\b.*$/gm, '');
         expect(() => new Function(body)).not.toThrow();
     });
 });

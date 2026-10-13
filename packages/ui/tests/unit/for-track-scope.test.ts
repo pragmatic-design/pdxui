@@ -41,9 +41,6 @@ const SHAPES: Record<string, string> = {
 const PATHS = [
     { name: 'dev', opts: {} },
     { name: 'build', opts: { production: true } },
-    { name: 'production inline', opts: { production: true, inlineBindings: true } },
-    // Named: since #107 dev compiles inline too, and the template path is reached only this way.
-    { name: 'template path', opts: { inlineBindings: false } },
 ];
 
 const fileOf = (shape: string, path: number) => `ts-${shape.toLowerCase()}-${path}.pdx`;

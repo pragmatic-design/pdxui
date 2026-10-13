@@ -12,10 +12,10 @@ import { compile } from '../../compiler/src/plugin';
 let seq = 0;
 
 /** Compile `template` + `script` on one path, define it, mount it, and return the host. */
-function mount(template: string, script: string, inline: boolean): HTMLElement {
-    const name = `fnsignal${++seq}${inline ? 'i' : 't'}`;
+function mount(template: string, script: string, build: boolean): HTMLElement {
+    const name = `fnsignal${++seq}${build ? 'b' : 'd'}`;
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const options = inline ? { production: true, inlineBindings: true } : { inlineBindings: false };
+    const options = build ? { production: true } : {};
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
@@ -31,14 +31,14 @@ const click = (el: HTMLElement, sel: string) => (el.querySelector(sel) as HTMLBu
 afterEach(() => { document.body.innerHTML = ''; });
 
 describe('a $signal holds a handler', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+    for (const build of [false, true]) {
+        const path = build ? 'build' : 'dev';
 
         it(`a handler stored in a $signal runs once per click from the template — ${path}`, async () => {
             const el = mount(
                 '<p class="n">{{ count }}</p><button class="arm" @click="arm()">arm</button><button class="go" @click="onSave()">go</button>',
                 'let count = $signal(0);\nlet onSave = $signal(null);\nfunction arm() { onSave = () => count++; }',
-                inline,
+                build,
             );
             await settle();
             click(el, '.arm');
@@ -55,7 +55,7 @@ describe('a $signal holds a handler', () => {
             const el = mount(
                 '<p class="n">{{ count }}</p><button class="arm" @click="onSave = () => count++">arm</button><button class="go" @click="onSave()">go</button>',
                 'let count = $signal(0);\nlet onSave = $signal(null);',
-                inline,
+                build,
             );
             await settle();
             click(el, '.arm');
@@ -70,7 +70,7 @@ describe('a $signal holds a handler', () => {
             const el = mount(
                 '<p class="f">{{ fmt(2) }}</p><button @click="fmt = (n) => \'#\' + n">swap</button>',
                 "let fmt = $signal(null);\nfmt = (n) => 'n' + n;",
-                inline,
+                build,
             );
             await settle();
             expect(text(el, '.f'), 'the template did not call the stored function').toBe('n2');
@@ -83,7 +83,7 @@ describe('a $signal holds a handler', () => {
             const el = mount(
                 '<p class="h">{{ typeof handler }}</p><p class="a">{{ a }}</p><p class="b">{{ b }}</p><button @click="run()">run</button>',
                 'let handler = $signal(null);\nlet a = $signal(null);\nlet b = $signal(3);\nfunction run() { handler ??= () => 1; a ??= 5; b ||= 5; }',
-                inline,
+                build,
             );
             await settle();
             click(el, 'button');
@@ -100,7 +100,7 @@ describe('a $signal holds a handler', () => {
             const el = mount(
                 '<p class="n">{{ count }}</p>',
                 'let count = $signal(0);\n$effect(() => { count = count + 1; });',
-                inline,
+                build,
             );
             await settle();
             await settle();
@@ -111,7 +111,7 @@ describe('a $signal holds a handler', () => {
             const el = mount(
                 '<p class="n">{{ count }}</p><button @click="step()">step</button>',
                 'let count = $signal(0);\nfunction step() { count = count + 1; count++; count += 2; }',
-                inline,
+                build,
             );
             await settle();
             click(el, 'button');

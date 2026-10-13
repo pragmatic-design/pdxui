@@ -15,9 +15,11 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { jsString } from '../src/compiler/js-literal';
 
-const emitted = (template: string, inlineBindings: boolean): string =>
-    compile(`<template>${template}</template>\n<script setup>\nlet _x = $signal(0);\n</script>`,
-        'e.pdx', [], undefined, { production: true, inlineBindings }).code;
+/** The render of `template`; with `inline` false, inside a scoped slot's body — the one place the
+ *  template generator still writes since #107. */
+const emitted = (template: string, inline: boolean): string =>
+    compile(`<template>${inline ? template : `<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>`}</template>\n<script setup>\nlet _x = $signal(0);\n</script>`,
+        'e.pdx', [], undefined, { production: true }).code;
 
 describe('text a reader sees', () => {
     it('a numeric entity becomes its character', () => {
@@ -47,9 +49,10 @@ describe('a static attribute value', () => {
     });
 });
 
-describe('and the two paths agree', () => {
-    // The template path is the reference: whatever the browser would do with innerHTML is what the
-    // inline path has to produce. This is the assertion that keeps them from drifting again.
+describe('and the two generators agree', () => {
+    // The template generator — a scoped slot's body — is the reference: whatever the browser would
+    // do with innerHTML is what the inline path has to produce. This is the assertion that keeps them
+    // from drifting again.
     const CASES = [
         '<pre><code>&#64;for (x as y) {</code></pre>',
         '<p>&lt;div&gt; &amp; &quot;q&quot;</p>',

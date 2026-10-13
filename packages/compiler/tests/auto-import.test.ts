@@ -285,13 +285,14 @@ function go(file) { const h = uploadFile('/u', file); effect(() => { ready = h.p
 // chunk the code lands in, and a chart behind a tab most visitors never open would cost the
 // route's chunk its full size (15 KB on the showcase's ticket route).
 describe('a component only used inside @defer', () => {
-    const compileDeferred = (template: string, inline = false): string => {
+    // `production` or dev: one render path either way since #107.
+    const compileDeferred = (template: string, production = false): string => {
         const source = `<template>${template}</template>\n<script setup>\nlet ready = $signal(true);\n</script>`;
         const resolver = new ComponentResolver();
         resolver.registerUiManifest();
         const { code } = compile(source, 'page.pdx', undefined, undefined, {
             importPathOf: (tag) => resolver.resolve(tag)?.importPath ?? null,
-            ...(inline ? { production: true, inlineBindings: true } : { inlineBindings: false }),
+            production,
         });
         return injectComponentImports(code, 'page.pdx', source, resolver);
     };

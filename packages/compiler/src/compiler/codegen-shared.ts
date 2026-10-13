@@ -482,10 +482,25 @@ export function detectDeadSignals(
  * index lands inside the page instead of before it. Masking strings, templates and comments first
  * leaves only the return that is a statement.
  *
+ * And only the return of the BLOCK ITSELF, at brace depth 1: the inline render is an IIFE with
+ * returns of its own (`return __frag;`), and a declaration inserted before the last of those lands
+ * after the code that uses it — a scoped slot's function read before its `const`, a TDZ error at
+ * the first render (#236).
+ *
  * Returns -1 when the body has no return statement.
  */
 export function renderReturnIndex(blockCode: string): number {
-    return maskNonCode(blockCode).lastIndexOf('return ');
+    const code = maskNonCode(blockCode);
+    let depth = 0;
+    let found = -1;
+    for (let i = 0; i < code.length; i++) {
+        const ch = code[i];
+        if (ch === '{') depth++;
+        else if (ch === '}') depth--;
+        // Match: `return ` as a whole word, in the block's own statements.
+        else if (depth === 1 && ch === 'r' && code.startsWith('return ', i) && !/[\w$]/.test(code[i - 1] ?? '')) found = i;
+    }
+    return found;
 }
 
 export function deduplicateBindings(renderCode: string): { code: string; computeds: string[] } {
@@ -615,7 +630,7 @@ function interpolationEnd(code: string, start: number): number {
  * if any bare identifier (not preceded by `.`, not a global/keyword) appears that
  * is NOT a ctx.* member access.
  */
-function referencesLocalScope(arrowExpr: string): boolean {
+export function referencesLocalScope(arrowExpr: string): boolean {
     // Strip strings/templates/comments so identifiers inside them don't count.
     let masked = '';
     let k = 0;

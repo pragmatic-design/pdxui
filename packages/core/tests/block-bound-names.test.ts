@@ -13,10 +13,10 @@ import { compile } from '../../compiler/src/plugin';
 
 let seq = 0;
 
-function mount(template: string, script: string, inline: boolean): HTMLElement {
-    const name = `bound${++seq}${inline ? 'i' : 't'}`;
+function mount(template: string, script: string, build: boolean): HTMLElement {
+    const name = `bound${++seq}${build ? 'b' : 'd'}`;
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
+    const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
     const el = document.createElement(`pdx-${name}`);
@@ -28,14 +28,14 @@ const settle = async () => { for (let i = 0; i < 5; i++) await new Promise((r) =
 const text = (el: Element | null) => (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
 
 describe('names a block binds', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+    for (const build of [false, true]) {
+        const path = build ? 'build' : 'dev';
 
         it(`@catch (problem, again): both names are the block's (${path})`, async () => {
             const el = mount(
                 '@try { <p class="body">{{ boom() }}</p> } @catch (problem, again) { <p class="caught">{{ problem.message }}</p><i>{{ typeof again }}</i> }',
                 "function boom() { throw new Error('broke'); }",
-                inline,
+                build,
             );
             await settle();
             expect(text(el.querySelector('.caught'))).toBe('broke');
@@ -46,7 +46,7 @@ describe('names a block binds', () => {
             const el = mount(
                 '@await (job) { <p class="ok">ok</p> } @loading { <p>…</p> } @error (fail, again) { <p class="failed">{{ fail.message }}</p><i>{{ typeof again }}</i> }',
                 "let job = $signal(Promise.reject(new Error('down')));",
-                inline,
+                build,
             );
             await settle();
             expect(text(el.querySelector('.failed'))).toBe('down');
@@ -63,12 +63,12 @@ describe('a destructured @for', () => {
         expect(codes).not.toContain('PDX_UNDECLARED_REF');
     });
 
-    for (const inline of [false, true]) {
-        it(`renders each name (${inline ? 'inline path' : 'template path'})`, async () => {
+    for (const build of [false, true]) {
+        it(`renders each name (${build ? 'build' : 'dev'})`, async () => {
             const el = mount(
                 '<ul>@for (pairs as { key, value }; track key) { <li>{{ key }}={{ value }}</li> }</ul>',
                 "let pairs = $signal([{ key: 'a', value: 1 }, { key: 'b', value: 2 }]);",
-                inline,
+                build,
             );
             await settle();
             expect([...el.querySelectorAll('li')].map(text)).toEqual(['a=1', 'b=2']);

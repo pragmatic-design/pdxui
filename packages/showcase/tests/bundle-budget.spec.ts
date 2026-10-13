@@ -90,16 +90,16 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
  * (1.2 MiB, JS-heavy, Alex Russell's «Performance Inequality Gap, 2026»).
  */
 /**
- * `inlineBindings`, measured.
+ * The inline render path, measured.
  *
- * The flag swaps `html``` for imperative DOM construction, and it is the default of a production
- * build, so it is how this app is built and what these ceilings measure (#44;
- * `render-path.spec.ts` reads it off the chunk). Both paths, same machine, same commit, the
- * template path with `inlineBindings: false` set for the measurement:
+ * It swaps `html``` for imperative DOM construction, and since #107 it is the one render path of a
+ * .pdx, so it is how this app is built and what these ceilings measure (`render-path.spec.ts` reads
+ * it off the chunk). The figures below are HISTORICAL, measured before #107 while a build could
+ * still select the template path — both paths, same machine, same commit:
  *
  *                     entry      JS total     CSS        blocking
  *   template          34.4 KB    360.6 KB     58.1 KB    88.3 KB
- *   inlineBindings    34.0 KB    378.4 KB     58.1 KB    87.9 KB
+ *   inline            34.0 KB    378.4 KB     58.1 KB    87.9 KB
  *
  * So the first download is slightly SMALLER and the total is 5% bigger: imperative DOM code is more
  * instructions than a template string, and the pages carry the difference. It is not the
