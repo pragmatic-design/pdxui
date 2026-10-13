@@ -74,9 +74,19 @@ shortest unique one under the nearest such ancestor — a telling attribute (`ar
 component that wraps one clickable control answers for it. The card reads forms' `required` from
 `aria-required` and `required`, and leaves out the controls of a list of data or a navigation. Measured
 on the four pages (`packages/showcase/tests/devtools-v2.spec.ts`, against the snapshot agent-browser
-prints): cards 42–127 tokens, outlines 16–29%, every named control of `main` reachable. Not done: the
-other members of the table (`map`, `shell`, `delta`, `actions`/`run`, `sources`/`forms`), the
-behavioural test of decisions.md 32, and the four-page session criterion.
+prints): cards 42–127 tokens, outlines 16–29%, every named control of `main` reachable.
+
+**Landed** (#272): `map()` and `shell()`. The router hands `map()` the routes it was started with
+(`setDevtoolsMapSource`, development only): a param's type is its constraint (`number`, `uuid`, the
+pattern written) or `string`; the title is the route's crumb — a written `label`, or its `labelKey`
+translated, none while that key's strings have not loaded and none for a label that is a function of the
+record; `access` is the answer of the guard checker a navigation asks, over the route's guard and the
+guards of the routes it renders inside, and is left out when the checker answers asynchronously.
+`shell()` is the outline of the body without the outermost `data-pdx-route`, empty when there is none.
+Measured on the showcase: every `@page` route listed with its params, `/tickets/:id/billing` closed to
+the suite's admin; the shell holds the sidebar's links and no ref inside the route; the four-page
+session costs 25% of the four full snapshots. Not done: `delta`, `actions`/`run`, `sources`/`forms`, and
+the behavioural test of decisions.md 32.
 
 ## Capabilities in production
 
@@ -115,7 +125,7 @@ Baselines from the prototype (four pages of the showcase, 2026-10-11, ~4 charact
 | every named control of `main` is reachable from the outline (listed, or through its row, search or pager) | 59 / 59 |
 | card ≤ 200 tokens | 85–166 |
 | outline of `main` ≤ 50% of the full snapshot | 14% (`/customers`) to 41% (`/intake`) |
-| a session of four pages costs ≤ 40% of four full snapshots (shell once + outlines + cards) | 3008 / 8750 = 34% |
+| a session of four pages costs ≤ 40% of four full snapshots (shell once + outlines + cards) | 3008 / 8750 = 34% (since #272: 25%) |
 | every rule A1–A6 holds on the showcase, in all 13 themes where it is visual | A1 fails today |
 
 The next measurement is behavioural: an agent given only `map`, `shell`, `page` and `outline`

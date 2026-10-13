@@ -49,13 +49,36 @@ An agent driving a browser asks the running app what it is showing through the g
 versioned API whose every answer is JSON. It is there from page load in development, with no level
 to set, and absent from a production build.
 
-Start with the two members made for an agent's budget:
+Start with the members made for an agent's budget. The map and the shell are what every page shares,
+read once per session; the card and the outline are read on each page:
 
 ```js
+__PDX_DEVTOOLS__.map()             // the routes: pattern, params and their types, title, guard, access
+__PDX_DEVTOOLS__.shell()           // the outline of everything outside the route: the navigation, the bar
 __PDX_DEVTOOLS__.page()            // the page card, JSON, a couple of hundred tokens
 __PDX_DEVTOOLS__.outline()         // the outline of the route's content, a fraction of a full snapshot
 __PDX_DEVTOOLS__.outline({ maxItems: 10 })   // show more rows before summarising them
 ```
+
+**`map()`** is the route graph the router was started with — on an app with `@page`, the build's
+route table:
+
+```js
+[
+  { path: '/customers', title: 'Customers' },
+  { path: '/tickets/:id', params: [{ name: 'id', type: 'string' }] },
+  { path: '/tickets/:id/billing', params: [{ name: 'id', type: 'string' }], guard: 'tickets.billing', access: false },
+]
+```
+
+A param's `type` is its constraint — `number`, `uuid`, or the pattern written — and `string` without
+one. The `title` is the route's crumb: its `label`, or its dictionary key translated; a label that is a
+function of the record, or a key whose strings have not loaded yet, gives none. `access` is on a route
+that declares a guard, or renders inside one that does: whether the current user would be let in,
+asked of the same guard checker a navigation asks. A route without it is open.
+
+**`shell()`** is `outline()` applied to everything outside the routed element, with the same rules
+and selectors. It is empty when no router marks a route.
 
 **`page()`** is the page card: the route and its params, the title, the lists shown (how many rows,
 with the total, the sort and the filter where the page says them), the forms (their fields, the
@@ -79,7 +102,8 @@ shell around it — compressed for an agent:
   same selector, call after call.
 
 On the showcase the card is 40–130 tokens and the outline 16–29% of agent-browser's full snapshot of
-the page, measured in `packages/showcase/tests/devtools-v2.spec.ts`.
+the page. A session over four pages — the shell once, then a card and an outline per page — costs a
+quarter of their four full snapshots. Both are measured in `packages/showcase/tests/devtools-v2.spec.ts`.
 
 The members of version 1 are unchanged:
 
@@ -104,15 +128,18 @@ node as `<tag#id>`.
 With `agent-browser`:
 
 ```bash
+agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.map())"
+agent-browser eval "__PDX_DEVTOOLS__.shell()"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.page())"
 agent-browser eval "__PDX_DEVTOOLS__.outline()"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.inspect('pdx-login'))"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.errors())"
 ```
 
-`@pdxui/router` reports the route by itself. A router of your own reports through
-`setDevtoolsRouteSource(() => ({ path, params, query, matched }))` and
-`recordDevtoolsNavigation({ from, to, matched, error })`, both from `@pdxui/core`.
+`@pdxui/router` reports the route and the route graph by itself. A router of your own reports through
+`setDevtoolsRouteSource(() => ({ path, params, query, matched }))`,
+`recordDevtoolsNavigation({ from, to, matched, error })` and
+`setDevtoolsMapSource(() => [{ path, params, title, guard, access }])`, all from `@pdxui/core`.
 
 ## Naming things for readability
 

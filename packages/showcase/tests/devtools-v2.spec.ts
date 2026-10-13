@@ -14,11 +14,16 @@
  *
  * Runs against the dev server: the devtools global exists in development only.
  */
+import { readdirSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test, expect, type Page } from './fixture';
 
 const PAGES = [
     // Ready means the data is in, not the frame: a page measured before its data is a smaller page.
-    { path: '/', ready: '[data-test="kpi-open"]' },
+    // The charts are behind a `@defer (viewport)`: the KPIs alone left the measure to whichever of
+    // the charts and their placeholder was on screen, 725 or 1190 characters from run to run.
+    { path: '/', ready: '[data-test="chart-priority"]' },
     { path: '/customers', ready: '[data-test="customers"] [role="row"]' },
     { path: '/intake', ready: '[data-test="form-intake"] form' },
     { path: '/tickets/12', ready: '[data-test="ticket"]' },
@@ -94,6 +99,111 @@ test('page() on /intake lists the requester and the email as required', async ({
         (window as unknown as { __PDX_DEVTOOLS__: { page(): { forms?: { required?: string[] }[] } } }).__PDX_DEVTOOLS__.page());
     const required = (card.forms ?? []).flatMap((f) => f.required ?? []);
     expect(required).toEqual(expect.arrayContaining(['requester', 'email']));
+});
+
+// ─── map() and shell() (#272) ─────────────────────────────────────
+
+type MapRoute = { path: string; params?: { name: string; type: string }[]; title?: string; guard?: string; access?: boolean };
+
+/** Every `@page` the showcase declares, read from its sources: the reference is not the code under test. */
+function declaredPages(): string[] {
+    const dir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'pages');
+    return readdirSync(dir).filter((f) => f.endsWith('.pdx'))
+        .map((f) => /^@page\s+'([^']+)'/m.exec(readFileSync(join(dir, f), 'utf8'))?.[1])
+        .filter((p): p is string => !!p);
+}
+
+/**
+ * The refs an outline gives: each top-level `[…]`, split on ` | ` (a summary's next refs). Brackets
+ * and bars inside a quoted name or attribute value are text, so the scan tracks the quotes.
+ */
+function refsIn(outline: string): string[] {
+    const refs: string[] = [];
+    let depth = 0;
+    let quoted = false;
+    let current = '';
+    for (let i = 0; i < outline.length; i++) {
+        const ch = outline[i];
+        if (ch === '\\' && quoted) {
+            if (depth > 0) current += ch + outline[i + 1];
+            i++;
+            continue;
+        }
+        if (ch === '"') quoted = !quoted;
+        else if (!quoted && ch === '[') {
+            if (depth++ === 0) { current = ''; continue; }
+        } else if (!quoted && ch === ']') {
+            if (--depth === 0) { refs.push(...current.split(' | ')); continue; }
+        }
+        if (depth > 0) current += ch;
+    }
+    return refs;
+}
+
+test('map() lists every @page route with its params, and closes a guarded route the user cannot enter', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-test="dashboard"]')).toBeVisible();
+    const map = await page.evaluate(() => (window as unknown as { __PDX_DEVTOOLS__: { map(): MapRoute[] } }).__PDX_DEVTOOLS__.map());
+    const declared = declaredPages();
+    expect(declared.length, 'no @page read from the sources').toBeGreaterThan(20);
+    for (const path of declared) {
+        const route = map.find((r) => r.path === path);
+        expect(route, `${path} is missing from map()`).toBeDefined();
+        // The showcase's params carry no constraint, so each is a string.
+        const params = Array.from(path.matchAll(/:([A-Za-z0-9_]+)/g), (m) => ({ name: m[1], type: 'string' }));
+        expect(route!.params ?? [], `${path}: params`).toEqual(params);
+    }
+    // The suite signs in as the admin, whose role does not hold `tickets.billing`
+    // (src/data/roles-seed.ts), and does hold `account.read`.
+    expect(map.find((r) => r.path === '/tickets/:id/billing')).toMatchObject({ guard: 'tickets.billing', access: false });
+    expect(map.find((r) => r.path === '/account')).toMatchObject({ guard: 'account.read', access: true });
+});
+
+test('map() names a route by its crumb once its strings are in', async ({ page }) => {
+    // The showcase loads its dictionary by section: on /customers the customers' strings are in.
+    await page.goto('/customers');
+    await expect(page.locator('[data-test="customers"] [role="row"]').first()).toBeVisible();
+    const map = await page.evaluate(() => (window as unknown as { __PDX_DEVTOOLS__: { map(): MapRoute[] } }).__PDX_DEVTOOLS__.map());
+    expect(map.find((r) => r.path === '/customers')?.title).toBe('Customers');
+    // And no route is named by a dictionary key.
+    expect(map.filter((r) => r.title && /^[a-z]+(\.[A-Za-z]+)+$/.test(r.title)).map((r) => r.title)).toEqual([]);
+});
+
+test('shell() holds the sidebar\'s links and nothing of the route', async ({ page }) => {
+    await page.goto('/customers');
+    await expect(page.locator('[data-test="customers"] [role="row"]').first()).toBeVisible();
+    const shell = await page.evaluate(() => (window as unknown as { __PDX_DEVTOOLS__: { shell(): string } }).__PDX_DEVTOOLS__.shell());
+    // The sidebar's links, read from Playwright's own snapshot of it.
+    const sidebar = await page.locator('[data-test="sidebar"]').ariaSnapshot();
+    const links = Array.from(sidebar.matchAll(/- link "((?:[^"\\]|\\.)*)"/g), (m) => m[1].replace(/\\(.)/g, '$1'));
+    expect(links.length, 'no link read in the sidebar').toBeGreaterThan(5);
+    for (const name of links) expect(shell, `the sidebar's link "${name}"`).toContain(JSON.stringify(name));
+    // Every ref the shell gives is an element outside the route.
+    const refs = refsIn(shell);
+    expect(refs.length).toBeGreaterThan(0);
+    const inside = await page.evaluate((sels) => sels.filter((s) => {
+        const el = document.querySelector(s);
+        return !el || !!el.closest('[data-pdx-route]');
+    }), refs);
+    expect(inside, `refs that miss, or land inside the route:\n${shell}`).toEqual([]);
+});
+
+test('a session of four pages — the shell once, then a card and an outline each — costs at most 40% of four full snapshots', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    let session = 0;
+    let full = 0;
+    for (const [i, { path, ready }] of PAGES.entries()) {
+        await page.goto(path);
+        await expect(page.locator(ready).first()).toBeVisible();
+        const { card, outline, shell } = await page.evaluate((first) => {
+            const dt = (window as unknown as { __PDX_DEVTOOLS__: Devtools & { shell(): string } }).__PDX_DEVTOOLS__;
+            return { card: JSON.stringify(dt.page()), outline: dt.outline(), shell: first ? dt.shell() : '' };
+        }, i === 0);
+        session += shell.length + card.length + outline.length;
+        full += (await agentSnapshot(page)).length;
+    }
+    console.log(`[devtools-v2] session ${Math.round(session / 4)} tokens against ${Math.round(full / 4)} = ${Math.round(100 * session / full)}%`);
+    expect(session / full).toBeLessThanOrEqual(0.4);
 });
 
 test('the API says version 2', async ({ page }) => {

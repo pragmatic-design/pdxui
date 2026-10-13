@@ -1,5 +1,6 @@
 // __PDX_DEVTOOLS__ v2 — what an agent driving a browser can ask a running app. v2 adds `page()`
-// and `outline()` (#271, page-card.ts and outline.ts); the v1 members are unchanged.
+// and `outline()` (#271, page-card.ts and outline.ts), and `shell()` and `map()` (#272); the v1
+// members are unchanged.
 //
 // The inspector (inspector.ts) is built for a person in the console: its component tree holds live
 // DOM nodes, nothing maps a component to its state, and errors are only counted. This is the
@@ -229,6 +230,31 @@ export function recordDevtoolsNavigation(entry: Omit<DevtoolsNavigation, 'time'>
     navigationLog.push({ time: Date.now(), ...entry });
 }
 
+// ─── Map ──────────────────────────────────────────────────────────
+
+/** A route parameter and its type: `number`, `uuid`, `string`, or the constraint's own pattern. */
+export interface DevtoolsMapParam { name: string; type: string }
+
+/**
+ * A route as `map()` describes it. `access` is there when the route, or a route it renders inside,
+ * declares a guard: whether the current user would be let in. A route without it is open.
+ */
+export interface DevtoolsMapRoute {
+    path: string;
+    params?: DevtoolsMapParam[];
+    title?: string;
+    guard?: string;
+    access?: boolean;
+    redirect?: string;
+}
+
+let mapSource: (() => DevtoolsMapRoute[]) | null = null;
+
+/** The router says where to read the route graph from; null removes it. One router at a time. */
+export function setDevtoolsMapSource(source: (() => DevtoolsMapRoute[]) | null): void {
+    mapSource = source;
+}
+
 // ─── The global ───────────────────────────────────────────────────
 
 /** The current route for the page card: its path, the pattern it matched, and its params when it has some. */
@@ -257,6 +283,20 @@ export const devtoolsApi = {
      * actionable node.
      */
     outline: (options?: OutlineOptions): string => (typeof document === 'undefined' ? '' : outlineOf(routeRoot(), options)),
+    /**
+     * The outline of everything outside the route — the navigation, the top bar — with the same
+     * rules and selectors: what every page shares, read once per session (#272). Empty when no
+     * router marks a route, since there is then no boundary to draw.
+     */
+    shell: (options?: OutlineOptions): string => {
+        const route = typeof document === 'undefined' ? null : document.querySelector('[data-pdx-route]');
+        return route ? outlineOf(document.body, options, route) : '';
+    },
+    /**
+     * The route graph (#272): each route's pattern, its params and their types, its title, its
+     * guard, and whether the current user can enter it. Empty with no router.
+     */
+    map: (): DevtoolsMapRoute[] => (mapSource ? devSerialise(mapSource()) as DevtoolsMapRoute[] : []),
     /** PDX components on the page, nested as they are: `[{ id, tag, file, children }]`. */
     tree: (): DevtoolsTreeNode[] => (typeof document === 'undefined' ? [] : treeUnder(document.body)),
     /** One instance — by id, element or CSS selector — with its props, state and deriveds. */
