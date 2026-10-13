@@ -369,7 +369,7 @@ already set it (the consumer's `role` or `tabindex` wins). Descriptor:
 
 - A form that has no meaning on a host is `PDX_HOST_INVALID_ATTRIBUTE` (error), whose message names
   it: a two-way binding (`::x`, the host is the model's owner, not its consumer), `data-part`, a
-  generic argument (decisions.md 21 — proposed; #133 does not list exclusions).
+  generic argument (decisions.md 21, landed with #133).
 - A static attribute the consumer already set is not overwritten (#133).
 
 ### Examples
@@ -386,6 +386,12 @@ let open = $signal(false);
 function onKey(e: KeyboardEvent) { if (e.key === 'Enter') open = !open; }
 </script>
 ```
+
+**Landed** (#133): `@host` compiles into the descriptor's `host`, which core's `bindHost` applies after
+setup with the render's context. A binding and a listener are built by the template's own rewrite, so
+they take the same forms and modifiers; a listener is removed on disconnect; `PDX_HOST_INVALID_ATTRIBUTE`
+names which of the three forms it is, and that attribute is not compiled. A generic argument is told
+by its name, `T="…"`: a capitalised identifier, which an HTML attribute never is.
 
 ### Since
 

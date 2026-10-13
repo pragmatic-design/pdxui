@@ -13,6 +13,8 @@ import { componentLabel, componentFile } from './global-error';
 import { devSetupBegin, devSetupEnd, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
 import { renderSlot } from '../renderer/slot';
+import { bindHost } from './host';
+import type { HostBindings } from './host';
 import { html } from '../renderer/template';
 import type { ComponentScope } from './lifecycle';
 import type { Dispose } from '../utils/types';
@@ -125,9 +127,10 @@ export type ComponentContext = ComponentContextBase & Record<string, unknown>;
 /**
  * What a descriptor declares besides its props (#123), the TypeScript form of the `.pdx` runes. `events`
  * type `ctx.emit`, and an undeclared name is reported in development. `states` are the host's custom
- * states, set with `ctx.state` (#132). The others are part of the descriptor's type now and get their
- * behaviour in their own issues: models #124, slots #131, parts #134, expose #140, host #133,
- * variants #153.
+ * states, set with `ctx.state` (#132). `host` (#133) is declared beside `setup` in each options type,
+ * where its functions are typed with the component's context. The others are part of the
+ * descriptor's type now and get their behaviour in their own issues: models #124, slots #131, parts
+ * #134, expose #140, variants #153.
  */
 export interface ComponentDeclarations<E extends EventMap = EventMap> {
     events?: E;
@@ -136,9 +139,15 @@ export interface ComponentDeclarations<E extends EventMap = EventMap> {
     states?: readonly string[];
     parts?: readonly string[];
     expose?: readonly string[];
-    host?: Record<string, string>;
     variants?: Record<string, readonly string[]>;
 }
+
+/**
+ * The host's attributes, bindings and listeners (#133), by name: `role` is a static value, set
+ * unless the page set it; `:aria-expanded` a function of the context, written whenever what it reads
+ * changes; `@keydown.enter` a listener, with the template's modifiers.
+ */
+export type HostOf<C> = Record<string, string | ((ctx: C, event: Event) => unknown)>;
 
 export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>, E extends EventMap = Record<never, never>>
     extends ComponentDeclarations<E> {
@@ -156,6 +165,8 @@ export interface ComponentOptions<P extends Record<string, PropDefinition> = Rec
     file?: string;
     setup?: (ctx: TypedComponentContext<P, E>) => Record<string, unknown> | void;
     render: (ctx: TypedComponentContext<P, E>) => DocumentFragment | Node;
+    /** See {@link HostOf}. */
+    host?: HostOf<TypedComponentContext<P, E>>;
 }
 
 /** Options with typed setup return — render ctx includes both props and setup exports. */
@@ -172,6 +183,8 @@ export interface ComponentOptionsWithSetup<
     file?: string;
     setup: (ctx: TypedComponentContext<P, E>) => S;
     render: (ctx: TypedComponentContext<P, E> & S) => DocumentFragment | Node;
+    /** See {@link HostOf}: its functions see what `setup` returns, as `render` does. */
+    host?: HostOf<TypedComponentContext<P, E> & S>;
 }
 
 // ─── component() ───────────────────────────────────────────────────
@@ -478,6 +491,9 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                     const result = options.setup(ctx as TypedComponentContext<P>);
                     if (result) Object.assign(ctx, result);
                 }
+                // The host's declared attributes, bindings and listeners (#133), after setup: a
+                // binding reads what setup returned, as the render does.
+                if (options.host) bindHost(this, options.host as HostBindings, ctx, (fn) => this.track(fn));
                 // Register signals for HMR save/restore
                 const signalMap = new Map<string, Signal<unknown>>();
                 for (const [key, value] of Object.entries(ctx)) {

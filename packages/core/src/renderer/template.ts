@@ -759,6 +759,16 @@ const keyMap: Record<string, string | string[]> = {
 
 /** Event binding with modifier support (.prevent, .stop, .once, .self, key filters). */
 function bindEvent(el: Element, descriptor: string, handler: TemplateValue): void {
+    const { type, listener, options } = eventListenerFor(descriptor, handler as EventListener);
+    el.addEventListener(type, listener, options);
+}
+
+/**
+ * What `@name.modifiers="handler"` adds: the event type, the listener with the modifiers applied
+ * (.prevent, .stop, .self, key filters), and the listener options (.once, .capture, .passive). Shared
+ * by the template's `@event` and the host's (#133), which also has to remove it.
+ */
+export function eventListenerFor(descriptor: string, handler: EventListener): { type: string; listener: EventListener; options: AddEventListenerOptions } {
     const parts = descriptor.split('.');
     const eventName = parts[0];
     const modifiers = new Set(parts.slice(1));
@@ -775,10 +785,7 @@ function bindEvent(el: Element, descriptor: string, handler: TemplateValue): voi
     runtimeMods.delete('capture');
     runtimeMods.delete('passive');
 
-    if (runtimeMods.size === 0) {
-        el.addEventListener(eventName, handler as EventListener, options);
-        return;
-    }
+    if (runtimeMods.size === 0) return { type: eventName, listener: handler, options };
 
     // Wrapped handler with runtime modifiers
     const wrapped = (e: Event) => {
@@ -798,10 +805,10 @@ function bindEvent(el: Element, descriptor: string, handler: TemplateValue): voi
         if (runtimeMods.has('prevent')) e.preventDefault();
         if (runtimeMods.has('stop')) e.stopPropagation();
 
-        (handler as EventListener)(e);
+        handler(e);
     };
 
-    el.addEventListener(eventName, wrapped, options);
+    return { type: eventName, listener: wrapped, options };
 }
 
 // ─── Text Hydration ────────────────────────────────────────────────

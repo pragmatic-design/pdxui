@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 75 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 76 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -340,6 +340,36 @@ function shout() { return (v) => (v === String(v).toUpperCase() ? null : 'Shout 
 `:global()` is not CSS, and the browser drops the whole rule. A scoped style already reaches the descendants a child component renders.
 
 **Fix.** Remove the wrapper: `:global(.x) .y` → `.x .y`.
+
+### PDX_HOST_INVALID_ATTRIBUTE
+
+*error* — On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument.
+
+The host is the component's own element. It has no two-way binding — the parent's `::x` is the component's `@model x` — it is not a part of itself, and a generic argument (`T="User"`) is the parent's to give. The message names which of the three it is; the attribute is not compiled.
+
+**Fix.** Remove it from `@host`: declare `@model x` for a two-way value, put `data-part` on an element of the template, declare a type parameter with `@generic`.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script setup>
+@host { role="button" data-part="root" }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script setup>
+@host { role="button" }
+</script>
+```
 
 ### PDX_I18N_MISSING_KEY
 

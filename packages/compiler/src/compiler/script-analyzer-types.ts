@@ -24,6 +24,15 @@ export interface StateDecl {
     expr: string;
 }
 
+/**
+ * One attribute of `@host { … }` (#133), as written: `role` (static), `:aria-expanded` (bound),
+ * `@keydown.enter` (a listener). `value` is absent for a bare attribute (`hidden`).
+ */
+export interface HostAttr {
+    name: string;
+    value?: string;
+}
+
 export interface SlotInfo {
     name: string;
     /** Scope type for scoped slots: '{ row: Item, column: string }' or undefined. */
@@ -218,6 +227,7 @@ export interface ScriptAnalysis {
     forms: FormDecl[];       // @form declarations
     exposes: string[];       // names declared via @expose
     states: StateDecl[];     // @state name = expr;
+    host?: HostAttr[];       // @host { role="x" :aria-expanded="open" @keydown="onKey" }
     route: RouteInfo;       // route metadata from @page/@guard/etc.
     globalStore?: GlobalStoreDirective;  // @store rune (file = store module)
     customTag?: string;      // @tag 'pdx-custom-name' — overrides file-derived tag

@@ -7,8 +7,9 @@ import type { ValidationWarning } from './validate';
 import type {
     PropInfo, EventInfo, SlotInfo, SignalDecl, DerivedDecl, ExportDecl,
     StoreDecl, WatchDecl, FetchDecl, FormDecl, FormFieldDecl, RouteInfo,
-    GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis, StateDecl,
+    GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis, StateDecl, HostAttr,
 } from './script-analyzer-types';
+import { parseHostBlock } from './host-block';
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
     parseInlineFormSchema, parseFormOptions, parsePageOptions, parseSearchParams, normalizeStatementsWithOrigins,
@@ -173,6 +174,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const forms: FormDecl[] = [];
     const exposes: string[] = [];
     const states: StateDecl[] = [];
+    let host: HostAttr[] | undefined;
     const route: RouteInfo = {};
     let globalStore: GlobalStoreDirective | undefined;
     let customTag: string | undefined;
@@ -214,7 +216,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const hasLegacyMarkers = legacyMarkerAt !== -1;
     const isNewMode = (options.setup === true && !hasLegacyMarkers) || codeLines.some(l => {
         const t = l.trim();
-        return t.startsWith('@prop ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') ||
+        return t.startsWith('@prop ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || /^@host\s*\{/.test(t) ||
                t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||
                t.startsWith('@search ') || t.startsWith('@prefetch ') || t.startsWith('@layout ') ||
                t.startsWith('@fetch ') || t.startsWith('@form ') ||
@@ -607,6 +609,15 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         if (exposeMatch) {
             const names = exposeMatch[1].replace(/;$/, '').split(',').map(n => n.trim()).filter(Boolean);
             exposes.push(...names);
+            continue;
+        }
+
+        // ─── @host { attributes } — the component's own element (#133) ───
+        // Match: `@host {` or `@host{`, the block possibly spread over several lines.
+        if (/^@host\s*\{/.test(trimmed)) {
+            const block = extractBlock(lines, i);
+            host = [...(host ?? []), ...parseHostBlock(block.content)];
+            i = block.endLine;
             continue;
         }
 
@@ -1098,6 +1109,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         forms,
         exposes,
         states,
+        ...(host ? { host } : {}),
         route,
         globalStore,
         customTag,

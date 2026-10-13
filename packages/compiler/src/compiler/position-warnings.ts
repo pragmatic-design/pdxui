@@ -119,6 +119,11 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_EVENT_NAME_CASE':
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`)) : undefined;
+        case 'PDX_HOST_INVALID_ATTRIBUTE': {
+            // Match: the attribute the message quotes (`'::value' on @host: …`), inside the @host block.
+            const attr = /^'([^']+)' on @host/.exec(w.message)?.[1];
+            return attr ? find(source, script, new RegExp(`(?<=@host\\s*\\{[^}]*)${escape(attr)}`)) : undefined;
+        }
         case 'PDX_STATE_NOT_BOOLEAN':
             return name ? find(source, script, new RegExp(`@state\\s+${escape(name)}\\b`)) : undefined;
         case 'PDX_EXPOSE_UNDECLARED':

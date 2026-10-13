@@ -251,6 +251,55 @@ function hide() { open = false; }
 
 alpha
 
+### @host
+
+#### Syntax
+
+```ebnf
+HostDecl ::= "@host" S? "{" ( S? Attribute )* S? "}"
+```
+
+`Attribute` is the attribute of an element in the template. The analyzer's form:
+`@host { role="combobox" :aria-expanded="open" @keydown="onKey" }`, on one line or several.
+
+#### Semantics
+
+Attributes, bindings and listeners on the component's own element. In a web component the host is the
+element, so `role`, `aria-expanded` or a `keydown` listener belong on it, written once rather than
+reached through `ctx.el`. The block compiles into the descriptor's `host`, applied after setup with the
+render's context:
+
+- a static attribute (`role="combobox"`) is set at connection, unless the element already carries it —
+  the page's own `role` or `tabindex` wins;
+- a binding (`:aria-expanded="open"`) is read like the template's and written whenever what it reads
+  changes; `null`, `undefined` and `false` remove the attribute;
+- a listener (`@keydown.enter="onKey"`) is built like the template's — a reference, an inline mutation,
+  a call, an arrow — with its modifiers, and removed when the component disconnects.
+
+#### Rules
+
+- A two-way binding (`::x`), `data-part` and a generic argument (`T="User"`) have no meaning on a host:
+  each raises `PDX_HOST_INVALID_ATTRIBUTE`, whose message says which, and is not compiled.
+- A `$signal` read only by `@host` counts as read.
+
+#### Examples
+
+```pdx
+<template>
+  <span>{{ label }}</span>
+</template>
+
+<script setup>
+@prop label: string = 'Choose';
+let open = $signal(false);
+@host { role="combobox" :aria-expanded="open ? 'true' : 'false'" @keydown.enter="open = !open" }
+</script>
+```
+
+#### Since
+
+beta (#133)
+
 ### @state
 
 #### Syntax

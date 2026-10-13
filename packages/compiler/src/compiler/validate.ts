@@ -18,6 +18,7 @@ import { openingTagTexts, routeParams } from '../text-scan';
 import { escapeForRegExp } from './regexp-escape';
 import { bindingNames } from './codegen-prefix';
 import { stateExprIsNotBoolean } from './validate-state';
+import { invalidHostAttribute } from './host-block';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -104,6 +105,9 @@ function reactiveSurfaces(analysis: ScriptAnalysis, exclude: string): string[] {
     for (const d of analysis.lifecycle.onDestroy) block(d);
     for (const b of analysis.inlineBlocks ?? []) block(b);
     if (analysis.head.title && analysis.head.title.isDynamic) expr(analysis.head.title.value);
+    // A @state's condition (#132) and a @host binding's value or handler (#133) read the script too.
+    for (const s of analysis.states) expr(s.expr);
+    for (const h of analysis.host ?? []) if (h.value !== undefined && /^[:@]/.test(h.name)) expr(h.value);
     return out;
 }
 
@@ -473,6 +477,19 @@ export function validate(
             severity: 'error',
             message: `@state '${s.name}' is '${s.expr}', which is not a boolean: a state is on or off.`,
             hint: `Write the condition it is on for (@state ${s.name} = count > 0;). For reactive data, use $signal.`,
+        });
+    }
+
+    // ─── Check 10c: @host holds what a host can carry (#133) ─────
+
+    for (const h of analysis.host ?? []) {
+        const why = invalidHostAttribute(h.name);
+        if (!why) continue;
+        warnings.push({
+            code: 'PDX_HOST_INVALID_ATTRIBUTE',
+            severity: 'error',
+            message: why,
+            hint: 'Remove it from @host.',
         });
     }
 

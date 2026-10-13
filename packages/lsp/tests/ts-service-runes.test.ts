@@ -35,6 +35,21 @@ describe('the rune declarations', () => {
         expect(hover?.contents.value).toMatch(/boolean/);
     });
 
+    it('@host and @state reach TypeScript blanked, on one line or several (#133, #132)', () => {
+        const script = [
+            'let open = $signal(false);',
+            '@host {',
+            '  role="combobox"',
+            '  :aria-expanded="open"',
+            '  @keydown.enter="open = !open"',
+            '}',
+            '@state expanded = open;',
+            'open;',
+        ].join('\n');
+        expect(diagnose(script)).toEqual([]);
+        expect(projectScript(script)).not.toMatch(/role|aria-expanded|expanded =/);
+    });
+
     it('$event.target.value is accepted in a handler', () => {
         expect(diagnose("let name = $signal('');", '<input @input="name = $event.target.value">')).toEqual([]);
     });

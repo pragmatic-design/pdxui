@@ -226,6 +226,8 @@ export function assembleModule(
     events: readonly string[] = [],
     /** The states the script declares with `@state`, written into the descriptor (#132). */
     states: readonly string[] = [],
+    /** The descriptor's `host: { … }` from `@host` (#133), already compiled; '' for none. */
+    hostCode = '',
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -307,6 +309,8 @@ export function assembleModule(
     if (events.length > 0) code += `  events: { ${events.map(e => `${jsQuote(e)}: {}`).join(', ')} },\n`;
     // The descriptor's `states` (#132): the host attaches its internals for them.
     if (states.length > 0) code += `  states: [${states.map(s => jsQuote(s)).join(', ')}],\n`;
+    // The descriptor's `host` (#133): core's bindHost applies it with the render's context.
+    if (hostCode) code += `  host: ${hostCode},\n`;
     code += sourceFileOption(sourceFile);
     // Shadow DOM opt-in via <template shadow>
     if (descriptor.template && 'shadow' in descriptor.template && descriptor.template.shadow) {
