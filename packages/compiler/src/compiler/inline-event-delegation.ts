@@ -29,6 +29,38 @@ export function delegableHandler(type: string, mods: readonly string[], opaque: 
 
 interface Handler { type: string; mods: string[]; inFor: boolean; opaque: boolean }
 
+/**
+ * The tags of a run of markup, in order: one linear scan, quoted values skipped. A regex with a
+ * repeated alternation over the attributes backtracks without bound on markup that never closes
+ * (`<A"` repeated, `<A` and a run of `-`): `tests/perf/compiler-scans.test.ts`. A tag that does not
+ * close ends the scan, as it ends the markup.
+ */
+function* tags(content: string): Generator<{ closing: boolean; name: string; attrs: string }> {
+    const isName = (c: string) => /[\w-]/.test(c);
+    let i = 0;
+    while (i < content.length) {
+        const lt = content.indexOf('<', i);
+        if (lt === -1) return;
+        let j = lt + 1;
+        const closing = content[j] === '/';
+        if (closing) j++;
+        const start = j;
+        while (j < content.length && isName(content[j])) j++;
+        if (j === start) { i = lt + 1; continue; }
+        let quote = '';
+        let k = j;
+        for (; k < content.length; k++) {
+            const c = content[k];
+            if (quote) { if (c === quote) quote = ''; continue; }
+            if (c === '"' || c === "'") { quote = c; continue; }
+            if (c === '>') break;
+        }
+        if (k >= content.length) return;
+        yield { closing, name: content.slice(start, j), attrs: content.slice(j, k) };
+        i = k + 1;
+    }
+}
+
 /** Every `@event` of the template, with where it sits; `twoWay` when any `::` binding is on a plain element. */
 function collect(nodes: TemplateNode[]): { handlers: Handler[]; twoWay: boolean } {
     const handlers: Handler[] = [];
@@ -68,9 +100,7 @@ function collect(nodes: TemplateNode[]): { handlers: Handler[]; twoWay: boolean 
         }
     };
     const readMarkup = (content: string, inFor: boolean, inPortal: boolean): void => {
-        // Match: an opening or closing tag, quoted values skipped. Groups: [1]=`/` [2]=name [3]=attributes
-        for (const m of content.matchAll(/<(\/?)([\w-]+)((?:[^>"']|"[^"]*"|'[^']*')*)>/g)) {
-            const [, closing, name, attrs] = m;
+        for (const { closing, name, attrs } of tags(content)) {
             if (closing) { opened.pop(); continue; }
             const custom = name.includes('-') || opened[opened.length - 1] === true;
             // Match: `@type.mod.mod=`. Groups: [1]=type [2]=modifiers
