@@ -133,6 +133,11 @@ The `track` matters: it tells PDX how to **identify** each item, so when the lis
 the right nodes instead of rebuilding them (minimal reconciliation). Use a stable key (`todo.id`),
 not the index, if items can reorder.
 
+A row that compares its key with a signal — `row.id === selected`, with `track row.id` — reads a
+keyed selector (core's `selector`): when `selected` changes, the two rows it concerns update, not
+every row. The comparison has to be exactly the `track` expression against the signal, either way
+round; anything else is read as written.
+
 An event written in a row — `@click`, `@dblclick`, `@input`, `@change`, `@keydown`, `@keyup`,
 `@pointerdown`, `@pointerup`, `@contextmenu` — does not add a listener per row: the compiler stores
 the handler on the row's element, and the component listens once per event type (core's `delegate`).

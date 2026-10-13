@@ -1490,7 +1490,7 @@ exports[`compile golden — demo corpus > infra/demo-positioning.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, delegate, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, shift, signal, staticBlock, when } from '@pdxui/core';
+import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, delegate, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, selector, shift, signal, staticBlock, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-cpxaos");
@@ -1700,7 +1700,8 @@ const placements = [
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m13,__el14,__el15,__el18,__t21,__el27,__el29,__el31,__el36,__t38,__el42]=__walk3(__frag);
-    const __cf12=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m11]=__walk2(__frag);const __cf10=when(()=>p(),()=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);delegate(ctx.el,__el7,'click',safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.currentPlacement() === p());__el7.classList.toggle("active",__c);});bindInterpolation(__t8,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m11.replaceWith(__cf10);return __frag;});
+    const __sel_currentPlacement=selector(()=>ctx.currentPlacement());
+    const __cf12=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m11]=__walk2(__frag);const __cf10=when(()=>p(),()=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);delegate(ctx.el,__el7,'click',safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(__sel_currentPlacement.is(p()));__el7.classList.toggle("active",__c);});bindInterpolation(__t8,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m11.replaceWith(__cf10);return __frag;});
     __m13.replaceWith(__cf12);
     bindRef(__el14,ctx.arenaEl);
     bindRef(__el15,ctx.arenaScrollEl);
@@ -1723,7 +1724,7 @@ exports[`compile golden — demo corpus > infra/demo-scrollbar.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, bindRef, component, delegate, eachRow, effect, onDestroy, onMount, safeHandler, signal, staticBlock, useScrollbar } from '@pdxui/core';
+import { batchHandler, bindInterpolation, bindRef, component, delegate, eachRow, effect, onDestroy, onMount, safeHandler, selector, signal, staticBlock, useScrollbar } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4mmvf3");
@@ -1793,6 +1794,7 @@ const options = [
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__el6,__t25,__el30,__el31,__el32,__el33,__el56,__el68,__m72,__t75]=__walk1(__frag);
+    const __sel_selected=selector(()=>ctx.selected());
     bindRef(__el6,ctx.box1Ref);
     bindInterpolation(__t25,()=>ctx.scrollTop1());
     delegate(ctx.el,__el30,'click',safeHandler(batchHandler(ctx.scrollToTop), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -1801,7 +1803,7 @@ const options = [
     bindRef(__el33,ctx.box2Ref);
     bindRef(__el56,ctx.box3Ref);
     bindRef(__el68,ctx.box4Ref);
-    const __cf71=eachRow(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t70]=__walk0(__frag);delegate(ctx.el,__el69,'click',safeHandler(batchHandler(() => ctx.selectOption(opt())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.selected() === opt());__el69.classList.toggle("active",__c);});bindInterpolation(__t70,()=>opt(),true);return __frag;});
+    const __cf71=eachRow(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t70]=__walk0(__frag);delegate(ctx.el,__el69,'click',safeHandler(batchHandler(() => ctx.selectOption(opt())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(__sel_selected.is(opt()));__el69.classList.toggle("active",__c);});bindInterpolation(__t70,()=>opt(),true);return __frag;});
     __m72.replaceWith(__cf71);
     bindInterpolation(__t75,()=>ctx.selected());
     return __frag;
@@ -44685,7 +44687,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-posi
 "// 0 warning(s)
 
 ============================================================
-import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, delegate, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, shift, signal, staticBlock, when } from '@pdxui/core';
+import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, delegate, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, selector, shift, signal, staticBlock, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-y9fn6i");
@@ -44816,7 +44818,8 @@ const placements = [
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m10,__el11,__el12,__el15,__t18,__el24,__el26,__el28]=__walk3(__frag);
-    const __cf9=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m8]=__walk2(__frag);const __cf7=when(()=>p(),()=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);delegate(ctx.el,__el4,'click',safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.currentPlacement() === p());__el4.classList.toggle("active",__c);});bindInterpolation(__t5,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m8.replaceWith(__cf7);return __frag;});
+    const __sel_currentPlacement=selector(()=>ctx.currentPlacement());
+    const __cf9=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m8]=__walk2(__frag);const __cf7=when(()=>p(),()=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);delegate(ctx.el,__el4,'click',safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(__sel_currentPlacement.is(p()));__el4.classList.toggle("active",__c);});bindInterpolation(__t5,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m8.replaceWith(__cf7);return __frag;});
     __m10.replaceWith(__cf9);
     bindRef(__el11,ctx.arenaEl);
     bindRef(__el12,ctx.arenaScrollEl);
@@ -45257,7 +45260,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/showcase-settings.p
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, delegate, eachRow, effect, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, delegate, eachRow, effect, safeHandler, selector, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-mwg9c1");
@@ -45382,6 +45385,8 @@ component('pdx-showcase-settings', {
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__el1,__el2,__el3,__el4,__el5,__el7,__el10,__m18,__m25,__el29,__el30,__el31]=__walk2(__frag);
+    const __sel_theme=selector(()=>ctx.theme());
+    const __sel_density=selector(()=>ctx.density());
     let __el1w_label = {}; effect(() => { const __b = ctx.themeLabel(); if (Object.is(__b, __el1w_label)) return; __el1w_label = __b; assignBoundProperty(__el1, "label", __b); });
     let __el1w_items = {}; effect(() => { const __b = ctx.themeItems; if (Object.is(__b, __el1w_items)) return; __el1w_items = __b; assignBoundProperty(__el1, "items", __b); });
     __el1.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onThemeSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
@@ -45393,9 +45398,9 @@ component('pdx-showcase-settings', {
     delegate(ctx.el,__el5,'click',safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el7.classList.add("settings-panel");effect(()=>{const __c=!!(ctx.settingsOpen());__el7.classList.toggle("open",__c);});
     delegate(ctx.el,__el10,'click',safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
-    const __cf17=eachRow(()=>ctx.themeItems,'key',(opt)=>{const __frag=__blk0();const [__el15,__t16]=__walk0(__frag);__el15.classList.add("settings-chip");effect(()=>{const __c=!!(opt().key === ctx.theme());__el15.classList.toggle("active",__c);});delegate(ctx.el,__el15,'click',safeHandler(batchHandler(() => ctx.setTheme(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t16,()=>opt().label);return __frag;});
+    const __cf17=eachRow(()=>ctx.themeItems,'key',(opt)=>{const __frag=__blk0();const [__el15,__t16]=__walk0(__frag);__el15.classList.add("settings-chip");effect(()=>{const __c=!!(__sel_theme.is(opt().key));__el15.classList.toggle("active",__c);});delegate(ctx.el,__el15,'click',safeHandler(batchHandler(() => ctx.setTheme(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t16,()=>opt().label);return __frag;});
     __m18.replaceWith(__cf17);
-    const __cf24=eachRow(()=>ctx.densityItems,'key',(opt)=>{const __frag=__blk1();const [__el22,__t23]=__walk1(__frag);__el22.classList.add("settings-chip");effect(()=>{const __c=!!(opt().key === ctx.density());__el22.classList.toggle("active",__c);});delegate(ctx.el,__el22,'click',safeHandler(batchHandler(() => ctx.setDensity(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t23,()=>opt().label);return __frag;});
+    const __cf24=eachRow(()=>ctx.densityItems,'key',(opt)=>{const __frag=__blk1();const [__el22,__t23]=__walk1(__frag);__el22.classList.add("settings-chip");effect(()=>{const __c=!!(__sel_density.is(opt().key));__el22.classList.toggle("active",__c);});delegate(ctx.el,__el22,'click',safeHandler(batchHandler(() => ctx.setDensity(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t23,()=>opt().label);return __frag;});
     __m25.replaceWith(__cf24);
     __el29.classList.add("settings-chip");effect(()=>{const __c=!!(ctx.dark());__el29.classList.toggle("active",!__c);});
     delegate(ctx.el,__el29,'click',safeHandler(batchHandler(() => ctx.setDark(false)), ctx.el?.tagName?.toLowerCase(), 'click'));

@@ -5,7 +5,8 @@
 // Runs js-framework-benchmark with PDX and the reference frameworks in ONE run, and prints a markdown
 // table of the medians with their ratio to vanillajs. Totals vary between runs on the same machine, so
 // frameworks are compared only within a run; --runs N repeats the whole run and keeps the median of
-// the medians.
+// the medians. After the runs, a local check the benchmark does not have — selecting a row among
+// 10,000 (select10k.mjs) — is measured on the same builds and printed as a table of its own.
 //
 // The benchmark is cloned at a pinned commit into the OS temp directory, never into this repository,
 // and its dependencies stay there. The clone is reused by the next run; delete the folder to start
@@ -18,6 +19,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { combineRuns, readRun, toMarkdown } from './summarize.mjs';
+import { measureSelect10k, select10kMarkdown } from './select10k.mjs';
 
 const JFB_REPO = 'https://github.com/krausest/js-framework-benchmark.git';
 // The commit the procedure was first run against by hand (2026-10-10). Moving it is a change to
@@ -250,6 +252,7 @@ async function main() {
     step(`starting the benchmark server on ${options.port}`);
     const server = await startServer(jfb, options.port);
     const runs = [];
+    let select10k = null;
     try {
         step('checking that the PDX implementation is keyed');
         checkKeyed(webdriver, env, browserArgs);
@@ -265,6 +268,8 @@ async function main() {
             if (missing.length) throw new Error(`run ${i} has no results for ${missing.join(', ')}`);
             runs.push(measured);
         }
+        step('selecting a row among 10,000 (not one of the benchmark\'s results)');
+        select10k = await measureSelect10k({ jfb, port: options.port, frameworks, chrome: options.chrome, headless: options.headless });
     } finally {
         step('stopping the benchmark server');
         stopServer(server);
@@ -277,6 +282,9 @@ async function main() {
     const title = options.runs > 1 ? `median of ${options.runs} runs` : 'one run';
     console.log(`\n## js-framework-benchmark, ${title} (benchmark ${JFB_COMMIT.slice(0, 12)})\n`);
     console.log(toMarkdown(combineRuns(runs), frameworks));
+    // A local check, measured on the same builds after the runs, and kept apart from them (#117).
+    console.log('\n## Local check, not part of js-framework-benchmark\n');
+    console.log(select10kMarkdown(select10k));
 }
 
 main().catch(error => {

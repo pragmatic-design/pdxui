@@ -36,7 +36,7 @@ function save() {}
 @for (groups as g; track g.id) {
   <h3>{{ g.title }}</h3>
   @for (g.items as it; track it.id) {
-    <a :class="it.id === sel ? 'active' : ''">{{ it.name }}</a>
+    <a :class="it.name === sel ? 'active' : ''">{{ it.name }}</a>
   }
 }
 </template>
@@ -44,6 +44,8 @@ function save() {}
 let groups = $signal([]);
 let sel = $signal(null);
 </script>`;
+        // `it.name`, not the track key: `it.id === sel` reads a keyed selector instead (#117), which is
+        // never hoisted, and this guards the hoist.
         const { code } = compile(source, 'nested-hoist.pdx', [], undefined, { production: true });
         // sel is hoisted exactly once, reading ctx.sel() — never itself.
         const decls = code.match(/const (__li\d+_sel)=computed\(\(\)=>([^)]*\(\))\)/g) ?? [];
