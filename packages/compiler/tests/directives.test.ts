@@ -130,8 +130,8 @@ describe('compile: @defer', () => {
   @prop x: number = 0;
 </script>`, 'test.pdx');
 
-        expect(code).toContain('defer');
-        expect(code).toContain("trigger: 'viewport'");
+        expect(code).toContain('defer(');
+        expect(code).toContain("trigger:'viewport'");
     });
 
     it('compiles @defer with @placeholder and @loading', () => {
@@ -151,7 +151,7 @@ describe('compile: @defer', () => {
 
         expect(code).toContain('placeholder:');
         expect(code).toContain('loading:');
-        expect(code).toContain("trigger: 'viewport | idle(2000)'");
+        expect(code).toContain("trigger:'viewport | idle(2000)'");
     });
 });
 

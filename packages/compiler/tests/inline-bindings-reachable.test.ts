@@ -1,18 +1,11 @@
-// `inlineBindings` has to be reachable from a vite.config.ts.
+// What a vite.config.ts gets: the inline render, whatever `inlineBindings` says (#107).
 //
-// The flag swaps `html``` for imperative DOM construction — the "direct property assignment inline"
-// the Dual Mode table promises for production. It has its own generator
-// (`codegen-template-inline.ts`, a whole second render path), and an option that `PdxPluginOptions`
-// does not carry, or that the plugin's call to `compile()` does not pass, is one no application can
-// turn on: its only caller would be the compiler's own suite, calling `compile()` directly.
+// The inline path swaps `html``` for imperative DOM construction, and since #107 it is the one
+// render path of a .pdx, in dev and in a build. `pdx({ inlineBindings })` no longer selects
+// anything: the plugin does not forward it, and says so with PDX_INLINE_BINDINGS_IGNORED.
 //
-// A second implementation of the render path kept green by the tests that are its only caller is
-// worse than no implementation: it costs maintenance, it looks shipped, and nothing measures it.
-//
-// So the assertion is not "the generator works" — the tests beside this one cover that. It is that
-// the option travels from `pdx({ … })` to the emitted module, and that the DEFAULT is unchanged.
-// Both are read off a real Vite build, because "reachable from a config" is exactly the thing a
-// unit test of `compile()` cannot see.
+// Read off a real Vite build, because what reaches the emitted module from a config is exactly the
+// thing a unit test of `compile()` cannot see.
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { build } from 'vite';
@@ -32,8 +25,9 @@ const ENTRY = `import './widget.pdx';\ndocument.createElement('pdx-widget');\n`;
 
 let root: string;
 
-/** Build the same one-component app and return the JS it emits. */
-async function buildWith(options: Parameters<typeof pdx>[0]): Promise<string> {
+/** Build the same one-component app and return the JS it emits, and the codes of its warnings. */
+async function buildWith(options: Parameters<typeof pdx>[0]): Promise<{ code: string; warnings: (string | undefined)[] }> {
+    const warnings: (string | undefined)[] = [];
     const result = await build({
         root,
         logLevel: 'silent',
@@ -42,10 +36,12 @@ async function buildWith(options: Parameters<typeof pdx>[0]): Promise<string> {
             write: false,
             minify: false,
             lib: { entry: join(root, 'src', 'main.js'), formats: ['es'], fileName: 'app' },
+            // A plugin's warning reaches onwarn as PLUGIN_WARNING, with the plugin's own code beside it.
+            rollupOptions: { onwarn: (w) => { warnings.push(typeof w.pluginCode === 'string' ? w.pluginCode : w.code); } },
         },
     });
     const chunks = (Array.isArray(result) ? result[0] : result) as { output: { type: string; code?: string }[] };
-    return chunks.output.filter(o => o.type === 'chunk').map(o => o.code ?? '').join('\n');
+    return { code: chunks.output.filter(o => o.type === 'chunk').map(o => o.code ?? '').join('\n'), warnings };
 }
 
 beforeAll(() => {
@@ -57,31 +53,27 @@ beforeAll(() => {
 
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
-describe('the flag a vite.config.ts can set', () => {
+describe('what a vite.config.ts gets', () => {
     // The marker is the component's own MARKUP, `<p class="line"`, not the string `html\``: the
     // bundle contains the whole of `@pdxui/core`, and core's renderer uses `html\`` itself. An
     // assertion on that string is red on the inline build for a reason that has nothing to do with
     // the component — measured, not guessed.
     const MARKUP = '<p class="line"';
 
-    it('on by default: a production build builds its DOM imperatively', async () => {
-        // This is what a build does with nothing asked for, and this file is where that default is
-        // asserted end to end — through a real
-        // `vite build` with a real `vite.config.ts`, which is the only place the plugin's default
-        // and the code generator's meet.
-        const code = await buildWith({ devtools: false });
+    it('by default: a production build builds its DOM imperatively, and says nothing', async () => {
+        const { code, warnings } = await buildWith({ devtools: false });
 
         expect(code, 'a default production build did not take the inline path')
             .toContain('document.createElement("p")');
-        expect(code, 'the markup string is still in the bundle, so the default did not move')
+        expect(code, 'the markup string is in the bundle: the template path was taken')
             .not.toContain(MARKUP);
+        expect(warnings).not.toContain('PDX_INLINE_BINDINGS_IGNORED');
     }, 120_000);
 
-    it('the way out: pdx({ inlineBindings: false }) goes back to the template path', async () => {
-        // The control, and the reason the flag was kept rather than removed: an inlining that turns
-        // out to be wrong in some case needs a switch. Without this assertion the one above would
-        // pass on a build that emitted neither path.
-        const code = await buildWith({ devtools: false, inlineBindings: false });
-        expect(code, 'inlineBindings: false did not reach the compiler').toContain(MARKUP);
+    it('pdx({ inlineBindings: false }) is reported and changes nothing: the build is still inline', async () => {
+        const { code, warnings } = await buildWith({ devtools: false, inlineBindings: false });
+        expect(warnings).toContain('PDX_INLINE_BINDINGS_IGNORED');
+        expect(code, 'inlineBindings: false still reached the compiler').not.toContain(MARKUP);
+        expect(code).toContain('document.createElement("p")');
     }, 120_000);
 });

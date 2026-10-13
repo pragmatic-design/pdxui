@@ -212,7 +212,7 @@ describe('integration: $inline + @for', () => {
         // render should be a block (not arrow)
         expect(code).toMatch(/render:\s*\(ctx\)\s*=>\s*\{/);
         expect(code).toContain('sorted =');
-        expect(code).toContain('return html`');
+        expect(code).toContain('return (() => {');
     });
 });
 

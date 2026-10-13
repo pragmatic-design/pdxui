@@ -120,8 +120,11 @@ export function compileNewMode(
         applyFormBindings(ast);
     }
 
+    // One render path, in dev and in a build (#107): the inline path. `inlineBindings: false` is an
+    // internal switch kept for the tests that still measure the template path (#236) until it is
+    // removed (#238); the plugin no longer forwards the option.
     let renderCode: string;
-    if (production && inlineBindings) {
+    if (inlineBindings !== false) {
         renderCode = generateInlineNodes(ast, imports, ctx);
         // The `html` import is dropped LATER, once the whole module is assembled — see below, not
         // here. The inline path emits no tagged template in the render, but the module may still
@@ -248,7 +251,7 @@ export function compileNewMode(
     // the mode, because "which render path ran" is the wrong question. The setup is
     // part of the module too: a script function or a @snippet that returns html`` relies on this
     // import, which a .pdx script never writes.
-    if (production && inlineBindings && !/\bhtml`/.test(finalRenderCode) && !/\bhtml\b/.test(setupParts)) imports.delete('html');
+    if (inlineBindings !== false && !/\bhtml`/.test(finalRenderCode) && !/\bhtml\b/.test(setupParts)) imports.delete('html');
 
     return assembleModule(imports, allUserImports, descriptor, filename, tag, propsCode, setupParts, finalRenderCode, analysis.route, production, inlineBindings, ctx.warnings, ctx.importPathOf ?? undefined, ctx.mapOrigins, ctx.sourceFile);
 }

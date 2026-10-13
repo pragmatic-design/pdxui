@@ -68,27 +68,24 @@ describe('a production compile keeps the text the author wrote', () => {
     const SOURCE = '<template>\n  <button>clicked {{ count }} times</button>\n</template>\n'
         + '\n<script setup>\nlet count = $signal(0);\n</script>\n';
 
-    // The whole emitted module, not the `html``` line: WITHOUT minification the template spans several
-    // lines, so that line is only its opening and the text sits below it. Comparing lines would compare
-    // one file's first line against the other's whole template.
+    // The whole emitted module. The inline render (#107) writes the text around an interpolation as
+    // text nodes of their own: `clicked `, the bound value, ` times`.
     function render(minify: boolean): string {
-        const out = compile(SOURCE, 'C:/tmp/probe.pdx', undefined, undefined, { minify });
-        if (!out.code.includes('html`')) throw new Error('no html`` template in the emitted module');
-        return out.code;
+        return compile(SOURCE, 'C:/tmp/probe.pdx', undefined, undefined, { minify }).code;
     }
+    const VISIBLE = ['document.createTextNode("clicked ")', 'document.createTextNode(" times")'];
 
     it('emits both spaces with minification on', () => {
-        expect(render(true)).toContain('clicked ${ctx.count} times');
+        for (const text of VISIBLE) expect(render(true)).toContain(text);
     });
 
     it('and the two modes agree', () => {
-        // The claim is about the TEXT, not the emitted line: without minification the template spans
-        // several lines, so comparing the `html\`` line compares its first line against the whole of
-        // the other. Minification collapsing whitespace BETWEEN TAGS is correct and expected; what
-        // must not differ is what a reader sees.
-        const visible = 'clicked ${ctx.count} times';
-        expect(render(false), 'dev').toContain(visible);
-        expect(render(true), 'prod').toContain(visible);
+        // The claim is about the TEXT a reader sees. Minification collapsing whitespace BETWEEN TAGS
+        // is correct and expected; the spaces inside the sentence must not differ.
+        for (const text of VISIBLE) {
+            expect(render(false), 'dev').toContain(text);
+            expect(render(true), 'prod').toContain(text);
+        }
     });
 });
 

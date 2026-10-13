@@ -378,9 +378,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     PDX_INLINE_NODE_UNSUPPORTED: {
         severity: 'warn', category: 'defect',
         summary: 'A template node the inline render path cannot compile.',
-        explanation: 'The node would be left out of the production render. The warning makes a missing feature visible instead of silent.',
-        fix: 'Build with `pdx({ inlineBindings: false })`, and report the node type.',
+        explanation: 'The node would be left out of the render, in dev and in a build — the inline path is the only one a `.pdx` compiles with. The warning makes a missing feature visible instead of silent.',
+        fix: 'Open an issue naming the node type.',
         unreachable: 'Every template node type has a case in the inline generator today (codegen-template-inline.ts `walk`); this is the net for the next type the parser learns.',
+    },
+    PDX_INLINE_BINDINGS_IGNORED: {
+        severity: 'warn', category: 'defect',
+        summary: '`pdx({ inlineBindings })` is given, and no longer selects a render path.',
+        explanation: 'A `.pdx` compiles with one render path, the inline one, in dev and in a build, so a feature cannot exist in one and be missing from the other. The option changes nothing; the warning says so once per build or dev server.',
+        fix: 'Remove `inlineBindings` from the `pdx()` options.',
+        reproducedIn: `${T}inline-bindings-ignored.test.ts`,
     },
     PDX_GLOBAL_SELECTOR: {
         severity: 'warn', category: 'defect',

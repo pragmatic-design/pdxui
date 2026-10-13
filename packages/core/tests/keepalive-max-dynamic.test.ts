@@ -25,7 +25,7 @@ function defineViews(prefix: string, count: number): void {
 function mountSwitcher(prefix: string, keepAlive: string, inline: boolean): (i: number) => Promise<void> {
     const name = `kvswitch${++seq}${inline ? 'i' : 't'}`;
     const src = `<template><component :is="view" ${keepAlive}></component></template>\n<script setup>\nlet view = $signal('${prefix}-0');\nwindow.__show_${name} = (t) => { view = t; };\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : {});
+    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
     new Function('__core', code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;'))(core);
     document.body.appendChild(document.createElement(`pdx-${name}`));
     const show = (window as unknown as Record<string, (t: string) => void>)[`__show_${name}`];

@@ -121,7 +121,7 @@ let ready = $signal(false);
 </script>`, 'timed.pdx');
 
         expect(code).toContain('awaitTimed');
-        expect(code).toContain('minMs: 200');
+        expect(code).toContain('{minMs:200}');
     });
 
     it('uses when() for @await without timing (no awaitTimed)', () => {

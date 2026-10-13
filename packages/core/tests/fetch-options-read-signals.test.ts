@@ -23,7 +23,7 @@ describe('@fetch options', () => {
             const name = `fetchopts${inline ? 'i' : 't'}`;
             const src = "<template><p>{{ users.data()?.length ?? 0 }}</p><button @click=\"ready = true\">go</button></template>\n"
                 + "<script setup>\nlet ready = $signal(false);\n@fetch users: 'GET /api/users-203-" + name + "' as string[] { enabled: () => ready };\n</script>\n";
-            const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : {});
+            const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
             const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
             new Function('__core', body)(core);
             const el = document.createElement(`pdx-${name}`);

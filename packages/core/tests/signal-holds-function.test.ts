@@ -15,7 +15,7 @@ let seq = 0;
 function mount(template: string, script: string, inline: boolean): HTMLElement {
     const name = `fnsignal${++seq}${inline ? 'i' : 't'}`;
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const options = inline ? { production: true, inlineBindings: true } : {};
+    const options = inline ? { production: true, inlineBindings: true } : { inlineBindings: false };
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);

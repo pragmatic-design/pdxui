@@ -6,11 +6,13 @@ The `<template>` block is HTML with three additions: interpolation (`{{ }}`), bo
 `packages/compiler/src/parser/template.ts`; attributes are rewritten by
 `codegen-template-rewrite.ts` and bound at runtime by core's `renderer/template.ts`.
 
-A template compiles along one of two **render paths**. The dev server, and a production build with
-`pdx({ inlineBindings: false })`, use the **template path**: the template becomes an `html\`…\``
-tagged template that core parses and binds at runtime (`codegen-template.ts`). A production build uses
-the **inline path** by default: imperative `createElement` code (`codegen-template-inline.ts`). Where
-a construct behaves differently on the two, its Rules say so.
+A template compiles along one **render path**, in the dev server and in a production build alike
+(#107): the **inline path**, imperative `createElement` code (`codegen-template-inline.ts`).
+`pdx({ inlineBindings })` no longer selects anything (`PDX_INLINE_BINDINGS_IGNORED`). The **template
+path** — an `html\`…\`` tagged template that core parses and binds at runtime (`codegen-template.ts`)
+— still generates the function of a hoisted scoped slot, and `compile()`'s internal
+`inlineBindings: false` reaches it for the tests that measure it, until it is removed (#238). Where a
+construct behaves differently on the two, its Rules say so.
 
 ```ebnf
 Template       ::= ( Text | Comment | AtEscape | Element | Interpolation | Directive )*
@@ -72,8 +74,8 @@ text, anything else as `String(value)` — `interpolationText` in core, used by 
 
 - A name the script does not declare is `PDX_UNDECLARED_REF` (error). Loop, slot and `@catch`/`@await`
   names, arrow parameters and `$event` are the template's own.
-- `${…}` in text is `PDX_RAW_INTERPOLATION` (warning): it is evaluated once, when the template is
-  built, and never updates.
+- `${…}` in text is `PDX_RAW_INTERPOLATION` (warning): it is written as the text the author typed,
+  never evaluated.
 - The end is the first `}}` outside a string and outside braces, so `{{ { a: 1 }.a }}` is read whole.
   An expression that starts with `{` compiles to `() => { … }` on the template path — a block, not an
   object — and the module does not parse. Not checked today.
@@ -183,8 +185,8 @@ On the inline path the same rule is generated inline, in one `effect` per bindin
 
 - `${…}` inside a bound value — `:title="${n}"` — is `PDX_RAW_INTERPOLATION_IN_BINDING` (error, the
   compile stops). A template literal inside the expression, `` :class="`btn-${size}`" ``, is fine.
-- `${…}` in an unbound attribute — `title="${n}"` — is `PDX_RAW_INTERPOLATION` (warning): it is
-  evaluated once and escaped as text.
+- `${…}` in an unbound attribute — `title="${n}"` — is `PDX_RAW_INTERPOLATION` (warning): the
+  attribute holds the text as written, in a `@for` too; it is never evaluated.
 - On a known library component, a bound name that is not one of its props is `PDX_UNKNOWN_PROP`
   (warning), one that matches a prop only ignoring case is `PDX_PROP_NAME_CASE` (warning), and a
   literal value outside a prop's declared values is `PDX_INVALID_ENUM_VALUE` (warning). The plugin

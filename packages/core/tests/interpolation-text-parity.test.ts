@@ -26,7 +26,7 @@ const settle = async () => { for (let i = 0; i < 3; i++) await new Promise((r) =
 async function render(template: string, literal: string, inline: boolean): Promise<string> {
     const name = `interptext${++seq}${inline ? 'i' : 't'}`;
     const src = `<template>${template}</template>\n<script setup>\nlet v = $signal(${literal});\nfunction same(x) { return x; }\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : {});
+    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
     const el = document.createElement(`pdx-${name}`);

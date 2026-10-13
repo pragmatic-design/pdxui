@@ -80,15 +80,15 @@ The developer never writes boilerplate: no manual imports, no `return {}`, no wi
 
 The framework runs in two distinct modes, and that is a deliberate choice:
 
-**Development** — everything interpreted. `pdx dev` starts Vite with HMR. The `.pdx` files are compiled on the fly, bindings are resolved at runtime, validations are active, warnings appear in the console. The goal is instant feedback: save the file, see the result.
+**Development** — `pdx dev` starts Vite with HMR. The `.pdx` files are compiled on the fly, through the same render path as a build (#107); validations are active, warnings appear in the console. The goal is instant feedback: save the file, see the result.
 
 **Production** — compilation with global knowledge. `pdx build` sees the whole project: it knows which routes exist, which components are used, which signals are read. That allows optimizations no generic bundler can make:
 
-| Aspect | Dev (interpreted) | Prod (compiled) | Status |
+| Aspect | Dev | Prod (compiled) | Status |
 |---------|-------------------|------------------|--------|
 | Router | One router, routes from the page modules or the plugin's table | The same router, the route table compiled from every `@page` | ✅ One implementation (#108). The build emits route DATA, installed through `packages/router/src/active.ts`; the matcher is built once at startup, and a navigation runs no regex for whole-segment patterns — a constraint is the one regex, a pattern that is not made of whole segments keeps one |
-| Bindings | `setProp()` with dispatch | Direct property assignment, inline | ✅ The default of a production build. Mount of a 1500-row list: 19 ms → 5.5 ms, +0.4 KB raw, 0 KB gzip. `pdx({ inlineBindings: false })` turns it off |
-| Template | `html\`\`` with reactive placeholders | A pre-compiled DOM factory | ⚠️ Only for a template with no interpolation |
+| Bindings | Direct property assignment, inline | The same | ✅ One render path, dev and build (#107). Mount of a 1500-row list: 19 ms → 5.5 ms, +0.4 KB raw, 0 KB gzip. `pdx({ inlineBindings })` selects nothing (`PDX_INLINE_BINDINGS_IGNORED`) |
+| Template | The DOM built directly | The same | ✅ Since #107; `html\`\`` stays in core for components written by hand |
 | CSS | Scoping through a data attribute at runtime | CSS extracted, zero JS overhead | ✅ A production build imports each component's styles as a stylesheet the bundler extracts. Dev keeps the injection: it is what makes a `<style scoped>` hot-reload |
 | Signals | A Proxy with dependency tracking | — | ❌ Retired. Profiled on the showcase's densest screen, the reactive runtime is ~4% of mount time: inlining it could win a fraction of that |
 | Validation | Active checks with warnings | Removed | ✅ Diagnostics sit behind a `DEV` constant the bundler folds away. What stays is failures — an unhandled error, a loader that did not answer |

@@ -1,7 +1,7 @@
-// Inline DOM construction codegen for production builds.
+// Inline DOM construction codegen: the render path of every .pdx, in dev and in a build (#107).
 // Generates imperative createElement/appendChild code instead of html`` tagged templates.
 // Eliminates: innerHTML parsing, placeholder regex, bindAttribute dispatch, DOM walking.
-// Gated behind: production: true + inlineBindings: true
+// `inlineBindings: false` (internal, for the tests that still measure the template path) opts out.
 
 import { deferLoadFn, extractLoopInvariants, generateTransition } from './codegen-template';
 import type {
@@ -199,7 +199,7 @@ class InlineGen {
                         code: 'PDX_INLINE_NODE_UNSUPPORTED',
                         severity: 'warn',
                         message: `The inline render path cannot compile a '${(node as { type: string }).type}' node, so it was left out.`,
-                        hint: 'Build without inlineBindings, or open an issue for this node type.',
+                        hint: 'Open an issue naming this node type.',
                     });
                     break;
             }
@@ -379,7 +379,7 @@ class InlineGen {
             // The statement this attribute becomes points at it.
             const origin = origins?.get(n);
             this.pending = origin == null ? '' : originMark(origin);
-            if (n.startsWith('::'))          this.twoWay(el, n.slice(2), val);
+            if (n.startsWith('::'))          this.twoWay(el, n.slice(2), val, kind);
             else if (n.startsWith(':class.')) this.classToggle(el, n.slice(7), val);
             else if (n.startsWith(':style.')) this.styleProp(el, n.slice(7), val);
             else if (n === ':show')           this.showBind(el, val);
@@ -551,10 +551,14 @@ class InlineGen {
      * `::value`, `::checked`: core's `bindTwoWay`, the call the template path makes, with the same
      * descriptor. A copy here listened to `input` on everything — a component's `pdx-change` and a
      * `<select>`'s `change` never reached the signal (#97) — so the wiring exists once, in core.
+     * A component's name is resolved to the prop it declares, as a one-way binding's is: `::withborder`
+     * is its `withBorder`, not an expando. The modifiers after the name are kept.
      */
-    private twoWay(el: string, desc: string, expr: string): void {
+    private twoWay(el: string, desc: string, expr: string, kind: ElementKind): void {
         this.imports.add('bindTwoWay');
-        this.out(`bindTwoWay(${el}, ${jsQuote(desc)}, ${prefixCtx(expr, this.ctx)});`);
+        const [name, ...mods] = desc.split('.');
+        const resolved = [this.boundName(name, kind), ...mods].join('.');
+        this.out(`bindTwoWay(${el}, ${jsQuote(resolved)}, ${prefixCtx(expr, this.ctx)});`);
     }
 
     private classToggle(el: string, cls: string, expr: string): void {

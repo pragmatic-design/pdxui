@@ -25,7 +25,7 @@ describe('compile (end-to-end)', () => {
 </script>`;
 
         const { code } = compile(source, 'greeting.pdx');
-        expect(code).toContain('${ctx.name}');
+        expect(code).toMatch(/bindInterpolation\(__t\d+,\(\)=>ctx\.name\)/);
         expect(code).toContain("const name = signal('World');");
     });
 

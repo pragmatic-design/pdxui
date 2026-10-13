@@ -38,7 +38,7 @@ let x = $signal(0);
 </script>`;
         const result = compile(source, 'test.pdx');
         expect(result.code).toContain('errorBoundary(');
-        expect(result.code).toContain('(err, retry)');
+        expect(result.code).toContain('(err,retry)=>');
     });
 
     it('throws on @catch without @try', () => {

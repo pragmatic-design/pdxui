@@ -37,7 +37,7 @@ function reset() { count = 5; }
 and here is what the compiler emits for it — not a paraphrase, the actual output:
 
 ```js
-import { component, computed, html, signal, store } from '@pdxui/core';
+import { bindInterpolation, component, computed, signal, store } from '@pdxui/core';
 
 component('pdx-counter', {
   props: {
@@ -57,25 +57,43 @@ component('pdx-counter', {
 
     return { count: __count, doubled, prefs, bump, reset, changed };
   },
-  render: (ctx) => html`<div>${ctx.label} ${ctx.count} ${ctx.doubled}</div>`,
+  render: (ctx) => (() => {                                    // the template → the DOM, built directly
+    const __frag = document.createDocumentFragment();
+    const __el0 = document.createElement('div');
+    __frag.appendChild(__el0);
+    const __t1=document.createTextNode('');
+    __el0.appendChild(__t1);
+    bindInterpolation(__t1,()=>ctx.label());                   // {{ label }} → a text node that follows it
+    __el0.appendChild(document.createTextNode(" "));
+    const __t2=document.createTextNode('');
+    __el0.appendChild(__t2);
+    bindInterpolation(__t2,()=>ctx.count());
+    __el0.appendChild(document.createTextNode(" "));
+    const __t3=document.createTextNode('');
+    __el0.appendChild(__t3);
+    bindInterpolation(__t3,()=>ctx.doubled());
+    return __frag;
+  })(),
 });
 ```
 
 Three things to read off it. The variable you declared is now `__count` and every **read** of it —
-including the one you wrote as a bare argument — became a call; the **template** reads through `ctx`,
-which is why you never write `count()` in markup; and `$store` is the one that is *not* rewritten,
-because a store is a proxy and its keys are properties, not signals.
+including the one you wrote as a bare argument — became a call; the **template** became DOM calls
+that read through `ctx`, which is why you never write `count()` in markup; and `$store` is the one
+that is *not* rewritten, because a store is a proxy and its keys are properties, not signals.
 
 The same holds for the higher-level runes: `@page` generates the route entry and the lazy import,
 `@fetch` a typed `resource()`, `@form` a validated form from the schema. In every case the pattern is
 identical: *you declare the intent, the compiler writes the wiring.*
 
-## Dual mode: dev interpreted, prod compiled
+## Dual mode: dev on the fly, prod with the whole project
 
-PDX runs in two modes, and the difference is deliberate.
+PDX runs in two modes, and the difference is deliberate — but a component renders the same way in
+both: one render path, the inline one above, so nothing the dev server shows can be missing from the
+shipped app.
 
-- **Dev** — everything is **interpreted**. No build to wait for: `pdx dev` loads `.pdx` on the fly with
-  HMR. Optimized for the feedback loop.
+- **Dev** — no build to wait for: `pdx dev` compiles each `.pdx` when it is requested, with HMR.
+  Optimized for the feedback loop.
 - **Prod** — the compiler has **global knowledge** of the project (all routes, components, bindings,
   communication) and generates code to measure.
 
@@ -84,13 +102,12 @@ What actually changes between the two:
 Every row below is measured, and `packages/showcase/tests/compiler-claims.spec.ts` holds one
 assertion per row against a real production build.
 
-| Aspect | Dev (interpreted) | Prod (compiled) | |
+| Aspect | Dev | Prod | |
 | --- | --- | --- | --- |
-| Binding | `setProp()` with dispatch | direct inline assignment | **yes** — the default; 19 ms → 5.5 ms on a 1500-row mount |
+| Render | the DOM built directly, one assignment per binding | the same | **one path** — 19 ms → 5.5 ms on a 1500-row mount against the tagged template it replaced |
 | Router | one router, the table from the dev server | the same router, the table compiled from `@page` | **one implementation** — a build emits the route table as data, and the router builds its matcher once at start-up: a navigation runs no regex for a whole-segment pattern (a constraint is the only one) |
 | CSS | injected at runtime | extracted to a stylesheet | **yes** — a route carries its CSS in a `.css`, not in its JS chunk |
 | Unread signal | present | removed | **yes** — semantic dead-code elimination, measured on the bundle |
-| Template | runtime with placeholders | pre-compiled DOM factory | only for a template with **no interpolation at all** |
 | Validation | runtime checks + warnings | stripped | **yes** — the diagnostics that teach the author sit behind `DEV`, a constant the bundler folds, so each leaves with its message: 209.5 → 206.2 KB gzip on the showcase. The failures an app reports about itself stay. Measured by `packages/showcase/tests/diagnostics.spec.ts` on the bundle and `packages/core/tests/diagnostics-behind-dev.test.ts` on the sources |
 
 Route pre-linking ships: the built `index.html` preloads the landing route's chunks — see *The first
@@ -99,18 +116,10 @@ screen, in one round-trip less* below.
 The flattening of single-use components is **not implemented**: it measures at ~1.2% of the bundle in exchange for the element leaving
 the DOM, which is not worth it.
 
-### Turning the inline path off
-
-A production build inlines its bindings. The way back to the tagged template is one option:
-
-```ts
-// vite.config.ts
-export default defineConfig({ plugins: [pdx({ inlineBindings: false })] });
-```
-
-It is kept because a second render path that nothing can select is a cost with no way to pay it: if
-the inlining is ever wrong for a case, this is the switch. In dev it makes no difference — there is
-no build, and the template path is what HMR reloads.
+`pdx({ inlineBindings })`, which used to select the tagged template instead, no longer selects
+anything: a build or a dev server given it says so once, as `PDX_INLINE_BINDINGS_IGNORED`. Remove it.
+The tagged template, `html`, stays in `@pdxui/core` for components written by hand in TypeScript,
+where a bound value still goes through `setProp()`'s dispatch.
 
 ## The first screen, in one round-trip less
 

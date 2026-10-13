@@ -28,7 +28,7 @@ describe('@raw keeps its text as written', () => {
     for (const inline of [false, true]) {
         it(inline ? 'inline path' : 'template path', () => {
             const src = `<template>\n<pre>@raw {${RAW}}</pre>\n</template>\n<script setup>\nlet a = $signal(0);\n</script>\n`;
-            const { code } = compile(src, 'raw.pdx', [], undefined, inline ? { production: true, inlineBindings: true } : { production: false });
+            const { code } = compile(src, 'raw.pdx', [], undefined, inline ? { production: true, inlineBindings: true } : { production: false, inlineBindings: false });
             expect(templateText(code)).toContain(RAW);
         });
     }
@@ -45,7 +45,7 @@ describe('@raw inside a loop binds nothing', () => {
     });
 
     it('template path: the markup carries the text', () => {
-        const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: false });
+        const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: false, inlineBindings: false });
         expect(templateText(code)).toContain('<span title=${item}>');
     });
 });

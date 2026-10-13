@@ -18,7 +18,7 @@ let seq = 0;
 /** Compile `src` as `pdx-<name>` on one path and define it. */
 function define(name: string, template: string, script: string, inline: boolean): void {
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const options = inline ? { production: true, inlineBindings: true } : {};
+    const options = inline ? { production: true, inlineBindings: true } : { inlineBindings: false };
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')

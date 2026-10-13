@@ -27,6 +27,8 @@ function compileTemplate(template: string, withProps = true) {
 }
 
 const codes = (r: ReturnType<typeof compile>) => r.warnings.map((w) => w.code);
+/** The name a one-way binding assigns, in the inline render: `assignBoundProperty(el, "name", …)`. */
+const assigns = (code: string, name: string) => new RegExp(`assignBoundProperty\\(__el\\d+, "${name}", `).test(code);
 
 describe('the manifest gives the compiler each component\'s props', () => {
     it('pdx-app-layout declares withBorder and headerHeight; a readonly getter is not a settable prop', () => {
@@ -41,8 +43,8 @@ describe('the manifest gives the compiler each component\'s props', () => {
 describe('a bound name on a known component', () => {
     it('the lowercase attribute form is emitted as the declared prop', () => {
         const r = compileTemplate('<pdx-app-layout :withborder="on"></pdx-app-layout>');
-        expect(r.code).toContain(':with-border=');
-        expect(r.code).not.toContain(':withborder=');
+        expect(assigns(r.code, 'withBorder'), r.code).toBe(true);
+        expect(assigns(r.code, 'withborder')).toBe(false);
         // ...and said, so the source is fixed rather than relied on.
         expect(codes(r)).toContain('PDX_PROP_NAME_CASE');
     });
@@ -50,7 +52,7 @@ describe('a bound name on a known component', () => {
     it('camelCase and kebab-case are the prop already: unchanged, nothing to say', () => {
         for (const t of ['<pdx-app-layout :withBorder="on"></pdx-app-layout>', '<pdx-app-layout :with-border="on"></pdx-app-layout>']) {
             const r = compileTemplate(t);
-            expect(r.code).toContain(':with-border=');
+            expect(assigns(r.code, 'withBorder'), r.code).toBe(true);
             expect(codes(r).filter((c) => c.startsWith('PDX_PROP') || c === 'PDX_UNKNOWN_PROP')).toEqual([]);
         }
     });
@@ -74,7 +76,7 @@ describe('a bound name on a known component', () => {
 
     it('two-way `::` bindings resolve the same way', () => {
         const r = compileTemplate('<pdx-app-layout ::withborder="on"></pdx-app-layout>');
-        expect(r.code).toContain('::with-border=');
+        expect(r.code).toMatch(/bindTwoWay\(__el\d+, 'withBorder', /);
     });
 });
 
@@ -135,13 +137,13 @@ describe('a bound-name warning says where the attribute is', () => {
 describe('without the component\'s props, nothing is guessed', () => {
     it('an unknown element keeps its name and draws no warning', () => {
         const r = compileTemplate('<my-widget :someprop="on"></my-widget>');
-        expect(r.code).toContain(':someprop=');
+        expect(assigns(r.code, 'someprop'), r.code).toBe(true);
         expect(codes(r)).not.toContain('PDX_UNKNOWN_PROP');
     });
 
     it('a compile with no props lookup behaves as before', () => {
         const r = compileTemplate('<pdx-app-layout :withborder="on"></pdx-app-layout>', false);
-        expect(r.code).toContain(':withborder=');
+        expect(assigns(r.code, 'withborder'), r.code).toBe(true);
         expect(codes(r)).not.toContain('PDX_PROP_NAME_CASE');
     });
 });

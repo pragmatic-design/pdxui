@@ -113,14 +113,15 @@ test.describe('the claims this app cannot settle', () => {
      *
      * Two claims this app cannot settle:
      *
-     *  - "Template: pre-compiled DOM factory" — real for a template with no interpolation
-     *    (`isStaticAssembly` → `__staticHTML`), and this app has none that qualify.
+     *  - "Template: pre-compiled DOM factory" — since #107 every .pdx builds its DOM directly, in
+     *    dev and in a build; the template path's own factory (`isStaticAssembly` → `__staticHTML`)
+     *    is reached only through compile()'s internal `inlineBindings: false`, which no app sets.
      *  - "Component flattening" — withdrawn, with "Signals: the call chain inlined": both were
      *    measured as worth too little for what they cost.
      *
      * The others are settled, and each is measured where it lives:
      *
-     *  - Bindings inlined — the default of a production build:
+     *  - Bindings inlined — the one render path, dev and build:
      *    `packages/compiler/tests/inline-bindings-default.test.ts`.
      *  - Validation stripped — the diagnostics sit behind `DEV` and leave the bundle:
      *    `diagnostics.spec.ts`, beside this file.

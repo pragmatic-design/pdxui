@@ -89,6 +89,14 @@ semver.
 
 ### Changed
 
+- A `.pdx` renders through one path, in dev as in a build: the dev server compiles a template to the
+  same DOM code a production build ships, so nothing it shows can be missing from the built app.
+  `pdx({ inlineBindings })` no longer selects a render path; a value given is reported as
+  `PDX_INLINE_BINDINGS_IGNORED` — remove it. The tagged template, `html`, stays in `@pdxui/core` for
+  components written by hand. Two consequences in dev, already true in a build: an HTML comment in a
+  template is not put in the DOM, and `${…}` in an attribute inside a `@for` is text, as it is
+  everywhere else. A component's `::name` two-way binding now reaches the prop it declares, as `:name`
+  does (`::withborder` is `withBorder`). (#107)
 - A project made by `pdx new project` imports `@pdxui/design/base` and `@pdxui/design/themes/neutral`
   instead of the whole design system, and depends on `@pdxui/design`: each component brings its own
   CSS, and the page no longer loads every component's CSS and all 13 themes before it renders one.

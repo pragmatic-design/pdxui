@@ -144,8 +144,8 @@ describe(':class object binding', () => {
   let isActive = $signal(true);
   let isDisabled = $signal(false);
 </script>`);
-        expect(code).toContain(':class.active=');
-        expect(code).toContain(':class.disabled=');
+        expect(code).toContain('classList.toggle("active",!!(ctx.isActive()))');
+        expect(code).toContain('classList.toggle("disabled",!!(ctx.isDisabled()))');
     });
 });
 
@@ -159,7 +159,7 @@ describe(':style object binding', () => {
   let textColor = $signal('red');
   let size = $signal('14px');
 </script>`);
-        expect(code).toContain(':style.color=');
-        expect(code).toContain(':style.font-size=');
+        expect(code).toMatch(/style\.setProperty\("color",/);
+        expect(code).toMatch(/style\.setProperty\("font-size",/);
     });
 });

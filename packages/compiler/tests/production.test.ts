@@ -483,14 +483,15 @@ let count = $signal(0);
         expect(code).toContain("html\`");
     });
 
-    it('dev mode keeps html`` even for static components', () => {
+    it('dev mode renders a static component inline, as a build does (#107)', () => {
         const source = `<template><div>About Page</div></template>
 <script setup>
 @page '/about';
 </script>`;
         const { code } = compile(source, 'dev-about.pdx', [], undefined, { production: false });
         expect(code).not.toContain('__staticHTML');
-        expect(code).toContain("html\`");
+        expect(code).not.toContain("html\`");
+        expect(code).toContain("document.createElement('div')");
     });
 
     it('static render uses arrow without ctx parameter', () => {
@@ -832,9 +833,10 @@ describe('production output size benchmarks', () => {
     it('static component uses __staticHTML (faster runtime, skips template engine)', () => {
         const { code: devCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: false });
         const { code: prodCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: true, inlineBindings: false });
-        // Dev uses html`` tagged template (requires runtime parsing)
-        expect(devCode).toContain("html\`");
+        // Dev renders inline, the one render path of a .pdx (#107); __staticHTML is the template path's
+        expect(devCode).not.toContain("html\`");
         expect(devCode).not.toContain('__staticHTML');
+        expect(devCode).toContain('document.createElement(');
         // Prod uses __staticHTML (pre-compiled, cloneNode — faster runtime)
         expect(prodCode).toContain('__staticHTML');
         expect(prodCode).not.toContain("html\`");

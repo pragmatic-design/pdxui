@@ -5,6 +5,8 @@ import { component, __pdx_hmr_save, __pdx_hmr_restore } from '../src/component/c
 import { __pdx_hmr_swap, __pdx_hmr_rerender } from '../src/component/define';
 import { signal } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
+import * as core from '../src/index';
+import { compile } from '../../compiler/src/plugin';
 
 // Generate unique tags per test to avoid CE registry collisions
 let tagCounter = 0;
@@ -220,5 +222,48 @@ describe('HMR prototype swapping', () => {
         // V2 template is rendered
         expect(el.querySelector('em')).toBeTruthy();
         expect(el.querySelector('.count')).toBeTruthy();
+    });
+});
+
+// Since #107 the dev server compiles a .pdx with the inline path: its render builds the DOM with
+// createElement calls instead of returning an html`` template. HMR swaps the prototype and renders
+// again through whatever the render function contains — measured here on a module compiled as the
+// dev server compiles it, edited, and taken through the sequence the plugin's accept() runs.
+describe('HMR of a .pdx the dev server compiled (the inline path, #107)', () => {
+    beforeEach(() => { document.body.innerHTML = ''; });
+
+    /** Compile as the dev server does, and evaluate the module the way a re-import would. */
+    function load(template: string): string {
+        const src = `<template>${template}</template>\n<script setup>\nlet count = $signal(0);\n</script>\n`;
+        const { code } = compile(src, 'hmr-inline.pdx');
+        new Function('__core', code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;'))(core);
+        return code;
+    }
+    const settle = () => new Promise<void>(r => setTimeout(r, 0));
+
+    it('the new template is on screen, and the component keeps its state', async () => {
+        const v1 = load('<p class="v1">{{ count }}</p><button @click="count++">+</button>');
+        expect(v1, 'the dev compile is not the inline path: this case measures nothing new').not.toMatch(/\bhtml`/);
+
+        const el = document.createElement('pdx-hmr-inline');
+        document.body.appendChild(el);
+        await settle();
+        for (let i = 0; i < 3; i++) el.querySelector('button')!.click();
+        await settle();
+        expect(el.querySelector('.v1')?.textContent).toBe('3');
+
+        // The edit: the module is evaluated again, then accept() runs the four steps.
+        load('<p class="v2">Count: {{ count }}</p><button @click="count++">+</button>');
+        __pdx_hmr_save('pdx-hmr-inline');
+        __pdx_hmr_swap('pdx-hmr-inline');
+        __pdx_hmr_rerender('pdx-hmr-inline');
+        __pdx_hmr_restore('pdx-hmr-inline');
+        await settle();
+
+        expect(el.querySelector('.v1'), 'the old template is still on screen').toBeNull();
+        expect(el.querySelector('.v2')?.textContent, 'the new template lost the count').toBe('Count: 3');
+        el.querySelector('button')!.click();
+        await settle();
+        expect(el.querySelector('.v2')?.textContent, 'the new template is not live').toBe('Count: 4');
     });
 });

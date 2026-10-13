@@ -27,7 +27,7 @@ describe('@for with a destructured binding', () => {
     it('the body reads the loop\'s names, not the component\'s', () => {
         const code = tpl('@for (rows as { id, user: { name } }; track id) { <b>{{ name }}</b> }');
         expect(code).not.toMatch(/ctx\.name\b/);
-        expect(code).toContain('${name}');
+        expect(code).toMatch(/bindInterpolation\(__t\d+,\(\)=>name\)/);
     });
 });
 
@@ -56,7 +56,7 @@ describe('@for track', () => {
 
     it('control — track item.field stays a field name', () => {
         const code = tpl('@for (rows as r; track r.id) { <b>{{ r.name }}</b> }');
-        expect(code).toContain("eachRow(() => ctx.rows(), 'id',");
+        expect(code).toContain("eachRow(()=>ctx.rows(),'id',");
     });
 
     it('control — a destructured pattern is never read as a regex for the field shortcut', () => {

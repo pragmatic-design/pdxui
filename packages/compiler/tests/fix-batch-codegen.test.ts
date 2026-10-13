@@ -87,14 +87,13 @@ let count = $signal(0);
 });
 
 describe('#3 template-literal escaping', () => {
-    it('escapes author backticks and ${ in literal text (no execution)', () => {
+    it('author backticks and ${ in literal text stay text (no execution)', () => {
         const source = '<template><p>premi ` e ${x}</p></template>\n<script setup>\nlet x = $signal(1);\n</script>';
         const { code } = compile(source, 'esc.pdx', [], undefined, { production: false });
-        // The literal text is escaped: backtick and ${ are backslash-escaped.
-        expect(code).toContain('premi \\` e \\${x}');
-        // The render module body parses without throwing (no stray template break).
-        const render = code.match(/render:[^\n]*html`[\s\S]*?`/);
-        expect(render).not.toBeNull();
+        // The inline render (#107) writes the text as a string literal: nothing in it is code.
+        expect(code).toContain('document.createTextNode("premi ` e ${x}")');
+        // The module body parses without throwing (no stray template break).
+        expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
     });
 
     it('escapes in production too', () => {
@@ -262,14 +261,15 @@ describe('form auto-binding — all injected ${} bindings stay live', () => {
 </pdx-form>
 </template>
 <script setup>
-@form userForm { name: string }
+@form userForm: { name: string };
 </script>`;
-        const { code } = compile(source, 'formbind.pdx', [], undefined, { production: false });
-        // The injected bindings must be LIVE interpolations, never escaped (\${...} = literal text).
+        const { code, warnings } = compile(source, 'formbind.pdx', [], undefined, { production: false });
+        expect(warnings.map(w => w.code), 'the form is not declared').not.toContain('PDX_UNKNOWN_DECLARATION');
+        // The injected bindings are live — bound properties and a listener — never literal text.
         expect(code).not.toContain('\\${');
-        expect(code).toContain(':touched=${');
-        expect(code).toContain(':warning=${');
-        expect(code).toContain('@pdx-blur=${');
+        expect(code).toMatch(/assignBoundProperty\(__el\d+, "touched", __b\)/);
+        expect(code).toMatch(/assignBoundProperty\(__el\d+, "warning", __b\)/);
+        expect(code).toContain("addEventListener('pdx-blur', ");
     });
 });
 

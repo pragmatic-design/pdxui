@@ -29,9 +29,9 @@ How a project is installed, run and built. How its files are written is `pdxui-l
 
 - **The CLI is its own dev dependency.** `@pdxui/framework` does not include it; without the install,
   `npx pdx` asks the registry for a package called `pdx` and gets a 404. ([cli](references/cli.md) § The commands)
-- **Dev and production run different code paths**: bindings are inlined in a production build. If a
-  bug shows only there, `pdx({ inlineBindings: false })` switches back to the template path.
-  ([compiler](references/compiler.md) § Turning the inline path off)
+- **`pdx({ inlineBindings })` does nothing any more**: a `.pdx` renders through one path, the inline
+  one, in dev and in a build, so a bug the build shows, the dev server shows too. The option draws
+  `PDX_INLINE_BINDINGS_IGNORED`; remove it. ([compiler](references/compiler.md) § Dual mode)
 - **Devtools are dev only.** A signal with 0 subscribers that should drive the UI was usually
   snapshotted (`const v = sig()`) instead of read in the template. ([devtools](references/devtools.md) § Gotchas)
 

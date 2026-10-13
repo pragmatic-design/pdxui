@@ -17,7 +17,7 @@ describe('@for with index variable', () => {
         const { code } = compile(source, 'for-index.pdx');
         expect(code).toContain('eachRow(');
         // Callback should have both item and i
-        expect(code).toMatch(/\(item, i\)\s*=>/);
+        expect(code).toMatch(/\(item,\s*i\)\s*=>/);
     });
 
     it('index variable is not prefixed with ctx.', () => {

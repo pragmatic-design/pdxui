@@ -139,7 +139,7 @@ let ready = $signal(false);
 
         const { code } = compile(source, 'await-no-loading.pdx');
         expect(code).toContain('when(');
-        expect(code).toContain(', null)');
+        expect(code).toContain(',null)');
     });
 
     it('compiles @await with @error to errorBoundary wrapping when', () => {

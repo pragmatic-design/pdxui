@@ -265,7 +265,8 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
   let show = $signal(true);
 </script>`, 'test.pdx');
 
-        expect(code).toContain('class="test"');
+        expect(code).toContain('__el0.setAttribute("class", "test");');
+        expect(code).toContain(`__el0.setAttribute("title", "it's fine");`);
         expect(code).toContain("Content");
     });
 });
@@ -313,14 +314,14 @@ let items = $signal([1, 2, 3]);
         expect(out).not.toMatch(/\$\{ctx\.items\.length\}/);
     });
 
-    it('leaves a bare signal as a function reference (the reactive fast path)', () => {
+    it('reads a bare signal by calling it', () => {
         const out = compile(`
 <template><span>{{ count }}</span></template>
 <script setup>
 let count = $signal(0);
 </script>`, 'x.pdx').code;
 
-        expect(out).toContain('${ctx.count}');
+        expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>ctx\.count\(\)\)/);
     });
 
     it('reads a @for item through its row getter, then the property — never calls the property', () => {
@@ -332,7 +333,7 @@ let count = $signal(0);
 let rows = $signal([]);
 </script>`, 'x.pdx').code;
 
-        expect(out).toContain('${() => r().label}');
+        expect(out).toContain('()=>r().label)');
         expect(out).not.toContain('r.label()');
         expect(out).not.toContain('r().label()');
     });
@@ -356,9 +357,38 @@ let draft = $signal({ name: 'a' });
  * comment. The DOM parser then broke the comment open and the sentence appeared in the
  * navigation bar, in production, as visible text.
  */
-describe('HTML comments are copied verbatim, never rewritten', () => {
+describe('HTML comments are never rewritten — the inline render, every .pdx\'s (#107)', () => {
+    // The inline path builds the DOM from the parsed template and emits no comment node: a comment
+    // is the author's prose. What the regression was about holds: nothing in it becomes a binding.
+    const SRC = `
+<template>
+  <!-- no @click="go" here; :value="draft.name" and {{ count }} are examples; a -> b, and 1 > 0; use \`html\` with \${x} -->
+  <span>{{ count }}</span>
+</template>
+<script setup>
+let count = $signal(0);
+let draft = $signal({ name: 'a' });
+function go() {}
+</script>`;
+
+    it('nothing inside a comment is compiled, and the rest still is', () => {
+        const out = compile(SRC, 'x.pdx').code;
+        const render = out.slice(out.indexOf('render:'));
+        expect(render).not.toContain('safeHandler');
+        expect(render).not.toContain('draft');
+        expect(render).not.toContain('html');
+        expect(render.match(/bindInterpolation\(/g) ?? []).toHaveLength(1);
+        expect(render).toMatch(/createElement\('span'\)/);
+    });
+});
+
+describe('HTML comments are copied verbatim, never rewritten — the template path', () => {
+    // The template generator, named (`inlineBindings: false`): it keeps the comment in its markup,
+    // and still generates a hoisted scoped slot's.
+    const compileTemplatePath = (source: string, name: string) => compile(source, name, [], undefined, { inlineBindings: false });
+
     it('does not rewrite a directive mentioned inside a comment', () => {
-        const out = compile(`
+        const out = compileTemplatePath(`
 <template>
   <!-- no @click="go" here -->
   <a href="/x">x</a>
@@ -373,7 +403,7 @@ function go() {}
     });
 
     it('leaves bindings and interpolation inside a comment alone', () => {
-        const out = compile(`
+        const out = compileTemplatePath(`
 <template>
   <!-- :value="draft.name" and {{ count }} are examples, not bindings -->
   <span>{{ count }}</span>
@@ -389,7 +419,7 @@ let draft = $signal({ name: 'a' });
     });
 
     it('a > inside a comment does not end it early', () => {
-        const out = compile(`
+        const out = compileTemplatePath(`
 <template>
   <!-- a -> b, and 1 > 0 -->
   <span>ok</span>
@@ -403,7 +433,7 @@ let count = $signal(0);
     });
 
     it('escapes a backtick or ${ in a comment so the html`` literal survives', () => {
-        const out = compile(`
+        const out = compileTemplatePath(`
 <template>
   <!-- use \`html\` with \${x} carefully -->
   <span>ok</span>
