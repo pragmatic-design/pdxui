@@ -8,15 +8,44 @@ import type { DevtoolsMapParam, DevtoolsMapRoute } from '@pdxui/core';
 import type { Matcher } from './matcher';
 import type { RouteConfig } from './types';
 
-// Match: `:name`, `:name(constraint)` or `*`. Groups: [1]=name [2]=constraint. The constraint ends at
-// the first `)`, as the matcher reads it.
-const PARAM = /:([A-Za-z0-9_]+)(?:\(([^)]*)\))?|\*/g;
+/** `\w`, one character at a time. */
+const isWordChar = (ch: string | undefined): boolean => ch !== undefined && /[A-Za-z0-9_]/.test(ch);
 
-/** A pattern's params, in order, each with its type: the constraint's name or pattern, else `string`. */
+/**
+ * A pattern's params, in order, each with its type: the constraint's name or pattern, else `string`.
+ *
+ * One left-to-right scan, read as the matcher's `pathToRegex` reads a pattern: `:name`, an optional
+ * `(constraint)` that ends at the first `)`, and `*` for the rest. Not a regex: a regex over a
+ * pattern with repeated `:0((` runs in polynomial time (#67).
+ */
 export function paramsOf(path: string): DevtoolsMapParam[] {
-    return Array.from(path.matchAll(PARAM), (m) => m[0] === '*'
-        ? { name: '$rest', type: 'string' }
-        : { name: m[1], type: m[2] || 'string' });
+    const params: DevtoolsMapParam[] = [];
+    let i = 0;
+    while (i < path.length) {
+        if (path[i] === '*') {
+            params.push({ name: '$rest', type: 'string' });
+            i++;
+            continue;
+        }
+        if (path[i] !== ':' || !isWordChar(path[i + 1])) {
+            i++;
+            continue;
+        }
+        let end = i + 1;
+        while (end < path.length && isWordChar(path[end])) end++;
+        const name = path.slice(i + 1, end);
+        let type = 'string';
+        if (path[end] === '(') {
+            const close = path.indexOf(')', end + 1);
+            if (close > end + 1) {
+                type = path.slice(end + 1, close);
+                end = close + 1;
+            }
+        }
+        params.push({ name, type });
+        i = end;
+    }
+    return params;
 }
 
 /**

@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { loadTranslations } from '@pdxui/core';
 import { createRouter, destroyRouter, registerGuardChecker } from '../src/runtime';
 import type { RouteConfig } from '../src/runtime';
+import { paramsOf } from '../src/devtools-map';
 
 interface MapRoute { path: string; params?: { name: string; type: string }[]; title?: string; guard?: string; access?: boolean; redirect?: string }
 const map = (): MapRoute[] => (window as unknown as { __PDX_DEVTOOLS__: { map(): MapRoute[] } }).__PDX_DEVTOOLS__.map();
@@ -33,6 +34,19 @@ describe('__PDX_DEVTOOLS__.map()', () => {
             { path: '/codes/:code([A-Z]{3})/:slug', params: [{ name: 'code', type: '[A-Z]{3}' }, { name: 'slug', type: 'string' }] },
             { path: '/files/*', params: [{ name: '$rest', type: 'string' }] },
         ]);
+    });
+
+    it('reads a hostile pattern in linear time', () => {
+        // `:0(` then `:0((` repeated: what made a regex scan polynomial (#67, CodeQL).
+        const hostile = `/:0(${':0(('.repeat(50_000)}`;
+        const started = performance.now();
+        const params = paramsOf(hostile);
+        expect(performance.now() - started).toBeLessThan(200);
+        expect(params.length).toBeGreaterThan(0);
+    });
+
+    it('a `*` inside a constraint is the constraint\'s, not a rest param', () => {
+        expect(paramsOf('/a/:x(.*)/b')).toEqual([{ name: 'x', type: '.*' }]);
     });
 
     it('names a route by its crumb: a dictionary key translated, else a written label', () => {
