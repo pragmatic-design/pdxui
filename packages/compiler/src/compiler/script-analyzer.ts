@@ -7,7 +7,7 @@ import type { ValidationWarning } from './validate';
 import type {
     PropInfo, EventInfo, SlotInfo, SignalDecl, DerivedDecl, ExportDecl,
     StoreDecl, WatchDecl, FetchDecl, FormDecl, FormFieldDecl, RouteInfo,
-    GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis,
+    GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis, StateDecl,
 } from './script-analyzer-types';
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
@@ -172,6 +172,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const fetches: FetchDecl[] = [];
     const forms: FormDecl[] = [];
     const exposes: string[] = [];
+    const states: StateDecl[] = [];
     const route: RouteInfo = {};
     let globalStore: GlobalStoreDirective | undefined;
     let customTag: string | undefined;
@@ -213,7 +214,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const hasLegacyMarkers = legacyMarkerAt !== -1;
     const isNewMode = (options.setup === true && !hasLegacyMarkers) || codeLines.some(l => {
         const t = l.trim();
-        return t.startsWith('@prop ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') ||
+        return t.startsWith('@prop ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') ||
                t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||
                t.startsWith('@search ') || t.startsWith('@prefetch ') || t.startsWith('@layout ') ||
                t.startsWith('@fetch ') || t.startsWith('@form ') ||
@@ -606,6 +607,24 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         if (exposeMatch) {
             const names = exposeMatch[1].replace(/;$/, '').split(',').map(n => n.trim()).filter(Boolean);
             exposes.push(...names);
+            continue;
+        }
+
+        // ─── @state name = expression; — a visual state of the host (#132) ───
+        // Match: @state expanded = open;
+        // Groups: [1]=name [2]=expression
+        const stateMatch = trimmed.match(/^@state\s+(\w+)\s*=\s*(.+?)\s*;?\s*$/);
+        if (stateMatch) {
+            states.push({ name: stateMatch[1], expr: stateMatch[2] });
+            continue;
+        }
+        if (trimmed.startsWith('@state')) {
+            warnings.push({
+                code: 'PDX_MALFORMED_STATE',
+                severity: 'error' as const,
+                message: `Invalid @state declaration: "${trimmed}".`,
+                hint: 'Use: @state name = booleanExpression;',
+            });
             continue;
         }
 
@@ -1078,6 +1097,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         fetches,
         forms,
         exposes,
+        states,
         route,
         globalStore,
         customTag,

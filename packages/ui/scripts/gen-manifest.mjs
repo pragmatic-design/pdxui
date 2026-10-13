@@ -13,6 +13,7 @@
 //   - slots                 ← JSDoc `@slot name - desc`
 //   - css parts             ← JSDoc `@csspart name - desc`
 //   - css custom properties ← JSDoc `@cssprop --name - desc`
+//   - css states            ← the descriptor's `states: [...]`, described by JSDoc `@cssstate name - desc`
 //   - summary/description   ← JSDoc on the component() statement
 //
 // Usage: node scripts/gen-manifest.mjs   (writes packages/ui/custom-elements.json)
@@ -247,6 +248,23 @@ function builtProp(initializer, sourceFile) {
         : (optionsRuntime(second, sourceFile) ?? inferredRuntime(first));
     const def = required || !first ? undefined : first.getText(sourceFile);
     return { type: typeArg || runtime, runtime, default: def, ...(required ? { required: true } : {}) };
+}
+
+/**
+ * The states a descriptor declares, `states: ['open', 'invalid']` (#132) → { name, description }, the
+ * description from a `@cssstate name - text` tag on the component, as for `@csspart`.
+ */
+function extractDescriptorStates(optionsObj, sourceFile, tags) {
+    const statesProp = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'states');
+    if (!statesProp || !ts.isArrayLiteralExpression(statesProp.initializer)) return [];
+    const described = new Map(tags.filter(t => t.tag === 'cssstate').map(t => {
+        const s = splitNameDesc(t.text);
+        return [s.name, s.description];
+    }));
+    return statesProp.initializer.elements.filter(e => ts.isStringLiteralLike(e)).map(e => ({
+        name: e.text, description: described.get(e.text) || `Matched with \`:state(${e.text})\`.`,
+    }));
 }
 
 /**
@@ -808,6 +826,7 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     }
     const cssParts = tags.filter(t => t.tag === 'csspart').map(t => splitNameDesc(t.text));
     const cssProperties = tags.filter(t => t.tag === 'cssprop' || t.tag === 'cssproperty').map(t => splitNameDesc(t.text));
+    const cssStates = extractDescriptorStates(optionsObj, sourceFile, tags);
     const summary = tags.find(t => t.tag === 'summary')?.text || '';
     const description = jsdocDescription(statement);
 
@@ -864,6 +883,7 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             ...(slots.length ? { slots } : {}),
             ...(cssParts.length ? { cssParts } : {}),
             ...(cssProperties.length ? { cssProperties } : {}),
+            ...(cssStates.length ? { cssStates } : {}),
         }],
         exports: [{
             kind: 'custom-element-definition', name: tag,

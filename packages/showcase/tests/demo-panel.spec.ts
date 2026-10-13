@@ -95,3 +95,19 @@ test('Escape puts the panel away and the focus back on its opener', async ({ pag
     await expect(opener).toBeFocused();
     await expect(opener).toHaveAttribute('aria-expanded', 'false');
 });
+
+// `@state expanded = open;` (#132): the host's custom state follows the signal, and `:state()` matches
+// it — measured here because happy-dom has no custom states.
+test('the panel\'s host matches :state(expanded) while it is open, and only then', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/customers');
+    const host = page.locator('pdx-demo-panel');
+    const expanded = () => host.evaluate((el) => el.matches(':state(expanded)'));
+    expect(await expanded(), 'expanded before anyone opened it').toBe(false);
+    await page.locator('[data-test="demo-open"]').click();
+    await expect(page.locator('[data-test="demo-panel"]')).toBeVisible();
+    await expect.poll(expanded).toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-test="demo-panel"]')).toBeHidden();
+    await expect.poll(expanded).toBe(false);
+});

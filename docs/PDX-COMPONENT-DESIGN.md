@@ -485,7 +485,9 @@ file does*, and *how many files do the same thing*.
 ### CD-C2 — A page does not style a library component's internals
 
 - **Mechanism:** a library element is styled through its props, its documented custom properties
-  (`--pdx-*`) and its variants. What a page keeps needing becomes a prop.
+  (`--pdx-*`), its variants, and its states with `:state(name)` — a component declares them with
+  `@state` (`states` in the TypeScript descriptor), and the manifest lists them (#132). What a page
+  keeps needing becomes a prop.
 - **Why:** Angular "strongly discourages" `::ng-deep` (angular.dev, component styling); Lit (styles)
   and Svelte (best practices: custom properties to style child components) theme through custom
   properties. An internal class is not an API: it is renamed without notice, and every page that

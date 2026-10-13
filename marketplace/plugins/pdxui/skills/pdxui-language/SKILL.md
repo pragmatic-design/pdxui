@@ -108,10 +108,16 @@ dispatched as `itemPicked` and listened for as `itempicked` — never heard. The
 `PDX_EVENT_NAME_CASE` on such a declaration. Not kebab-case either: the name is also the emitter's
 identifier.
 
+**`@state name = condition;`** is a visual state of the host — open, selected, invalid — held in the
+platform's custom states and matched in CSS with `:state(name)` (`my-menu:state(expanded) button { … }`,
+written in a theme or the page). The compiler keeps it in sync with the condition: no class to toggle.
+It takes a boolean only; `@state count = 0;` is `PDX_STATE_NOT_BOOLEAN` — reactive data is a `$signal`.
+A TypeScript component declares `states: ['open']` and calls `ctx.state('open', on)`.
+
 The full vocabulary the analyzer accepts:
 
 `@prop` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
-`@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@scroll`
+`@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@state` `@scroll`
 `@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use` `@mixin`
 
 **`@form f: Schema { … }`** builds a form (`createForm` underneath). Its options: `save` (when a field

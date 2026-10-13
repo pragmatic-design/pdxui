@@ -99,6 +99,11 @@ export interface ComponentContextBase {
     expose(api: Record<string, unknown>): void;
     /** Render a named slot with optional scope data. Falls back to defaultFn if no parent slot. */
     slot(name: string, scope?: Record<string, unknown>, defaultFn?: () => Node | DocumentFragment): DocumentFragment;
+    /**
+     * Turn one of the states the descriptor declares in `states` on or off (#132): a custom state of
+     * the host, which CSS matches with `:state(name)`.
+     */
+    state(name: string, on: boolean): void;
 }
 
 /** The events a descriptor declares, by name. */
@@ -119,9 +124,10 @@ export type ComponentContext = ComponentContextBase & Record<string, unknown>;
 
 /**
  * What a descriptor declares besides its props (#123), the TypeScript form of the `.pdx` runes. `events`
- * type `ctx.emit`, and an undeclared name is reported in development. The others are part of the
- * descriptor's type now and get their behaviour in their own issues: models #124, slots #131, states
- * #132, parts #134, expose #140, host #133, variants #153.
+ * type `ctx.emit`, and an undeclared name is reported in development. `states` are the host's custom
+ * states, set with `ctx.state` (#132). The others are part of the descriptor's type now and get their
+ * behaviour in their own issues: models #124, slots #131, parts #134, expose #140, host #133,
+ * variants #153.
  */
 export interface ComponentDeclarations<E extends EventMap = EventMap> {
     events?: E;
@@ -199,6 +205,8 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
     const propNames = Object.keys(propDefs);
     // Declared events (#123): with any declared, a name that is not one is reported in development.
     const declaredEvents = options.events ? new Set(Object.keys(options.events)) : null;
+    // Declared states (#132): the host attaches its internals for them, and ctx.state sets them.
+    const declaredStates = options.states && options.states.length > 0 ? new Set(options.states) : null;
 
     // Track setup signals per-component for HMR state save/restore
     const _setupSignalRegistry = new WeakMap<HTMLElement, Map<string, Signal<unknown>>>();
@@ -245,11 +253,18 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
         static formAssociated = useFormAssociated;
         static file = options.file;
 
+        /** The host's custom states, when the descriptor declares any and the browser has them. */
+        _customStates: CustomStateSet | null = null;
+
         constructor() {
             super();
-            // Form-associated: attach internals for native form participation
-            if (useFormAssociated && typeof this.attachInternals === 'function') {
-                this._internals = this.attachInternals();
+            // Internals are attached once, for a form-associated component and for declared states.
+            // Only a form-associated one keeps them as `_internals`: the form getters read that, and
+            // `internals.form` throws on an element that is not form-associated.
+            if ((useFormAssociated || declaredStates) && typeof this.attachInternals === 'function') {
+                const internals = this.attachInternals();
+                if (useFormAssociated) this._internals = internals;
+                if (declaredStates) this._customStates = internals.states ?? null;
             }
         }
 
@@ -304,6 +319,13 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                 expose: (api: Record<string, unknown>) => exposeOnElement(this, api),
                 slot: (name: string, scope?: Record<string, unknown>, defaultFn?: () => Node | DocumentFragment) =>
                     renderSlot(slotFns, name, scope ? () => scope : null, defaultFn ?? (() => html``)),
+                state: (name: string, on: boolean) => {
+                    if (!declaredStates?.has(name)) {
+                        if (DEV) console.warn(`[pdx] <${tag}> set the state '${name}', which its descriptor does not declare in \`states\` (declared: ${declaredStates ? [...declaredStates].join(', ') : 'none'}). It is not set.`);
+                        return;
+                    }
+                    if (on) this._customStates?.add(name); else this._customStates?.delete(name);
+                },
                 __slots: slotFns,
             };
             // Form-associated: expose form methods on context

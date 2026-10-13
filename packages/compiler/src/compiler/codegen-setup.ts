@@ -545,6 +545,14 @@ export function buildSetupBody(
         parts.push(`    provide(${jsQuote(p.key)}, ${rewriteAll(p.expr)}, ctx.el);`);
     }
 
+    // @state — a custom state of the host, kept in sync with its expression (#132). After the body
+    // and the deriveds, so the expression can read anything the script declares.
+    if (!scriptOnly) {
+        for (const s of analysis.states) {
+            parts.push(`    ctx.track(() => { ctx.state(${jsQuote(s.name)}, ${rewriteAll(s.expr)}); });`);
+        }
+    }
+
     // keepAlive pages need onShow for resume lifecycle (title refresh, state reconciliation)
     if (analysis.route.keepAlive) {
         analysis.usedFeatures.add('onShow');

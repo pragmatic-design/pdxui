@@ -29,6 +29,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('event', 'Declare an event; `name(payload)` dispatches it from the host.', '@event name: PayloadType;', '@event ${1:name}: ${2:void};'),
     d('slot', 'Declare a named slot, with an optional scope type.', '@slot name: { row: Item };', '@slot ${1:name};'),
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),
+    d('state', 'A visual state of the host, kept in sync with a boolean; CSS matches it with `:state(name)`.', '@state name = booleanExpression;', '@state ${1:name} = ${2:condition};'),
     d('form', 'Declare a form with its fields and validation.', '@form name: { field: string { required } };   // the colon is not optional', '@form ${1:name}: { ${2:field}: ${3:string} };'),
     d('fetch', 'Declare a data fetch, a reactive resource().', "@fetch name: 'GET /api/path' as Type;   // the method is part of the string", "@fetch ${1:data}: 'GET ${2:/api/path}' as ${3:Type[]};"),
     // The file IS the store: `@store name;` names it, `$store({…})` holds its state. `@store name = {…}`

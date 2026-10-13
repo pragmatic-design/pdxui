@@ -226,7 +226,8 @@ export function compileNewMode(
     if (!/\bhtml`/.test(finalRenderCode) && !/\bhtml\b/.test(setupParts)) imports.delete('html');
 
     return assembleModule(imports, allUserImports, descriptor, filename, tag, propsCode, setupParts, finalRenderCode, analysis.route, production, ctx.warnings, ctx.importPathOf ?? undefined, ctx.mapOrigins, ctx.sourceFile, templateHoists.lines.length > 0,
-        usesUntypedEmit(analysis, descriptor) ? [] : analysis.events.map(e => e.name));
+        usesUntypedEmit(analysis, descriptor) ? [] : analysis.events.map(e => e.name),
+        analysis.states.map(s => s.name));
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

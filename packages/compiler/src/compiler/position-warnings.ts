@@ -119,6 +119,8 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_EVENT_NAME_CASE':
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`)) : undefined;
+        case 'PDX_STATE_NOT_BOOLEAN':
+            return name ? find(source, script, new RegExp(`@state\\s+${escape(name)}\\b`)) : undefined;
         case 'PDX_EXPOSE_UNDECLARED':
             // Match: `@expose a, close` — the line that lists the name.
             return name ? find(source, script, new RegExp(`@expose\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;

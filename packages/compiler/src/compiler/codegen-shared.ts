@@ -224,6 +224,8 @@ export function assembleModule(
     hasModuleHoists = false,
     /** The events the script declares with `@event`, written into the descriptor (#123). */
     events: readonly string[] = [],
+    /** The states the script declares with `@state`, written into the descriptor (#132). */
+    states: readonly string[] = [],
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -303,6 +305,8 @@ export function assembleModule(
     // The descriptor's `events` (#123): what `event()` returns for each, so a .pdx and a TypeScript
     // component declare their events the same way.
     if (events.length > 0) code += `  events: { ${events.map(e => `${jsQuote(e)}: {}`).join(', ')} },\n`;
+    // The descriptor's `states` (#132): the host attaches its internals for them.
+    if (states.length > 0) code += `  states: [${states.map(s => jsQuote(s)).join(', ')}],\n`;
     code += sourceFileOption(sourceFile);
     // Shadow DOM opt-in via <template shadow>
     if (descriptor.template && 'shadow' in descriptor.template && descriptor.template.shadow) {

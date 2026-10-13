@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 73 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 75 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -509,6 +509,14 @@ write:
 </script>
 ```
 
+### PDX_MALFORMED_STATE
+
+*error* — `@state` written in a shape the compiler does not recognise.
+
+A state is a name and the condition it is on for. Without both, nothing is declared and nothing sets it.
+
+**Fix.** Write `@state name = condition;`, for example `@state expanded = open;`.
+
 ### PDX_NON_REACTIVE
 
 *warn* — A plain `let` the template reads and the script changes.
@@ -774,6 +782,37 @@ let items = $signal<number[]>([]);
 function add(x: number) {
   items = [...items, x];
 }
+</script>
+```
+
+### PDX_STATE_NOT_BOOLEAN
+
+*error* — `@state` given something that is not a boolean.
+
+A state is on or off: CSS matches it with `:state(name)`, and a number, a string or a `$signal(…)` is data, not a condition. `@state` is not Svelte's `$state`, which declares a reactive variable.
+
+**Fix.** Give it the condition it is on for (`@state busy = count > 0;`); for reactive data, use `$signal`.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script setup>
+@state count = 0;
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script setup>
+let count = $signal(0);
+@state busy = count > 0;
 </script>
 ```
 

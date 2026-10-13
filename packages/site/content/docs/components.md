@@ -287,6 +287,29 @@ function close() { isOpen = false; }
 From the parent, with a reference to the element: `dialogRef.open()`. Use it sparingly: if you can
 get the same result with a prop (`:open="..."`), prefer the prop — it's more declarative.
 
+## @state — a visual state of the host
+
+Open, selected, invalid, loading: a state the outside styles. Declare it with the condition it is on
+for, and the element carries it as one of the platform's custom states, which CSS matches with
+`:state(name)`:
+
+```pdx
+let open = $signal(false);
+@state expanded = open;
+```
+
+```css
+/* In a theme or the page: the menu while it is open. */
+my-menu:state(expanded) button { font-weight: 600; }
+```
+
+The compiler keeps the state in sync with the expression, so there is no class to toggle and no
+attribute to name. The expression has to be a boolean: `@state count = 0;` is `PDX_STATE_NOT_BOOLEAN`
+(reactive data is a `$signal`). A TypeScript component declares `states: ['expanded']` in its
+descriptor and sets one with `ctx.state('expanded', true)`. The manifest lists a component's states as
+`cssStates`. Inside the component's own `<style scoped>` the host is not reachable yet, so `:state()`
+is written from a theme or the page.
+
 ## Putting it all together
 
 ```pdx

@@ -60,6 +60,8 @@ import { demoKnobs } from './demo';
 
 let open = $signal(false);
 let openerEl = $signal(null);
+/** The panel is out: the host matches `:state(expanded)`, for whoever styles the service bar. */
+@state expanded = open;
 
 /** The knobs, the ungrouped first and then one section per heading, in registration order. */
 const sections = $derived(groupKnobs(demoKnobs()));

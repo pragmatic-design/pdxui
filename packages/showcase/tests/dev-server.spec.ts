@@ -45,6 +45,16 @@ test('an agent can ask the running page what it shows: __PDX_DEVTOOLS__ v1, as J
     expect(route).toMatchObject({ path: '/', matched: '/' });
 });
 
+// The same `@state` the build's demo-panel.spec measures (#132), as the dev server compiles it.
+test('a @state is a custom state in dev too: the Demo panel\'s host matches :state(expanded) while open', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-test="dashboard"]')).toBeVisible();
+    const expanded = () => page.locator('pdx-demo-panel').evaluate((el) => el.matches(':state(expanded)'));
+    expect(await expanded()).toBe(false);
+    await page.locator('[data-test="demo-open"]').click();
+    await expect.poll(expanded).toBe(true);
+});
+
 test('a GUARDED route is guarded rather than missing', async ({ page }) => {
     // The difference worth keeping apart: a 404 says the route does not exist, and this one does —
     // it is refused. A dev server where every route is a 404 cannot tell the two apart. Signed in

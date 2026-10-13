@@ -68,3 +68,27 @@ describe('gen-manifest reads a typed descriptor', () => {
         expect(declaration().events.map((e: { name: string }) => e.name)).toEqual(['open', 'pdx-change']);
     });
 });
+
+describe('gen-manifest reads the descriptor\'s states (#132)', () => {
+    const source = [
+        '/**',
+        ' * A widget.',
+        ' * @cssstate open - The list is open.',
+        ' */',
+        "component('pdx-widget', {",
+        "    states: ['open', 'invalid'],",
+        '    render: () => html`<div></div>`,',
+        '});',
+    ].join('\n');
+
+    it('lists them as cssStates, described by @cssstate where it says', () => {
+        expect(analyzeFile('src/widget/pdx-widget.ts', source, {})[0].declarations[0].cssStates).toEqual([
+            { name: 'open', description: 'The list is open.' },
+            { name: 'invalid', description: 'Matched with `:state(invalid)`.' },
+        ]);
+    });
+
+    it('the control: a component with no states has no cssStates', () => {
+        expect(declaration().cssStates).toBeUndefined();
+    });
+});

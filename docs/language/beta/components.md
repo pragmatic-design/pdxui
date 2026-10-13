@@ -298,6 +298,13 @@ let open = $signal(false);
 </style>
 ```
 
+**Landed** (#132), except the `baseline-2024` mirror: the rune, `PDX_STATE_NOT_BOOLEAN`, the
+descriptor's `states` with `ctx.state`, and the manifest's `cssStates`. The `data-state-<name>` mirror
+and its selector in the design build come with the `target` option (#121), which does not exist yet.
+In a `<style scoped>`, `:scope:state(…)` needs the host to be reachable, which is #152; until then a
+state is styled from a theme or the page. Certify's state rules do not read `:state()` yet: that
+arrives with the first library component that declares a state (#286).
+
 ### Since
 
 beta (#132)
@@ -540,8 +547,8 @@ types `ctx.emit` — the name is a declared one and the detail its type — and 
 dispatched. A `.pdx` compiles its `@event` names into `events`, except one that also dispatches with
 `$emit`, which takes any name. The manifest reads a prop's type and an event's detail type from the
 type arguments; `pdx-select` and `pdx-toggle` are written this way. The other fields are typed and do
-nothing yet: `models` #124, `slots` #131, the rest in their own issues. The constructor form is still
-accepted.
+nothing yet: `models` #124, `slots` #131, the rest in their own issues (`states` landed since, #132).
+The constructor form is still accepted.
 
 ### Since
 
