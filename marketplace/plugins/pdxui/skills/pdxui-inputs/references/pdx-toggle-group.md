@@ -13,7 +13,7 @@ Exclusive or multi-select set of toggles.
 | `loop` | `loop` | boolean | `true` |  |
 | `label` | `label` | string | `''` | Visible label text. |
 
-**Events:** `pdx-change` → `detail: { value, values }` — Fired when the value changes.; `valuechange` → `detail: { value, values }` — Fired on `valuechange`.
+**Events:** `pdx-change` → `detail: { value: string; values: string[] }` — Fired when the group's value changes: `value` as the attribute holds it, `values` as a list.; `valuechange` → `detail: { value: string; values: string[] }` — The legacy name of `pdx-change`, kept as an alias.
 
 **Renders:** roles `group`
 

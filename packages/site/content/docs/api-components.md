@@ -7,7 +7,7 @@ parent: api
 
 # Components API
 
-Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 105 exports, from `@pdxui/core`.
+Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 109 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -192,7 +192,7 @@ Clear all global providers (for testing).
 ```ts
 import { component } from '@pdxui/core';
 
-function component(tag: string, options: ComponentOptions<P>): void
+function component(tag: string, options: ComponentOptions<P, E>): void
 ```
 
 Define a function-based Web Component.
@@ -498,6 +498,16 @@ If no handler suppresses it, logs to console.error.
 
 Called internally by the framework — not typically used by app code.
 
+## `event`
+
+```ts
+import { event } from '@pdxui/core';
+
+function event(options?: { bubbles?: boolean }): EventSpec<D>
+```
+
+Declare an event: `event<number>()`, `event<void>({ bubbles: false })`.
+
 ## `exposeOnElement`
 
 ```ts
@@ -669,6 +679,16 @@ function measureRelative(el: HTMLElement, relativeTo: HTMLElement): RelativeMeas
 ```
 
 Measure the relative position between two elements.
+
+## `model`
+
+```ts
+import { model } from '@pdxui/core';
+
+function model(defaultValue: T): ModelSpec<T>
+```
+
+Declare a model: `model<string>('')`.
 
 ## `moveMounted`
 
@@ -923,6 +943,16 @@ class PdxElement
 
 Base class for PDX UI Web Components.
 
+## `prop`
+
+```ts
+import { prop } from '@pdxui/core';
+
+const prop: typeof propBuilder & { required: typeof requiredProp }
+```
+
+Declare a prop: `prop<T>(default, { type? })`, or `prop.required<T>({ type? })`.
+
 ## `provide`
 
 ```ts
@@ -1149,6 +1179,16 @@ function size(options?: SizeOptions): Middleware
 ```
 
 Constrain the floating element's max dimensions to available space.
+
+## `slot`
+
+```ts
+import { slot } from '@pdxui/core';
+
+function slot(): SlotSpec<F>
+```
+
+Declare a slot: `slot<(o: Option) => Node>()`.
 
 ## `swipeDownDismiss`
 

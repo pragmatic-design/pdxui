@@ -20752,7 +20752,7 @@
               "name": "options",
               "description": "The selectable options.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "() => []"
             },
@@ -20761,7 +20761,7 @@
               "name": "source",
               "description": "DataSource instance — dedicated prop for data-driven select. Takes priority over options.",
               "type": {
-                "text": "object"
+                "text": "DataSource<unknown> | null"
               },
               "default": "null"
             },
@@ -20900,7 +20900,7 @@
               "name": "size",
               "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
               "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg' | 'xl'"
+                "text": "'' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'"
               },
               "default": "''",
               "attribute": "size"
@@ -20950,7 +20950,7 @@
               "name": "itemTemplate",
               "description": "Custom render for each option: (item: {label, value, _raw}) => string|Node",
               "type": {
-                "text": "object"
+                "text": "((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null"
               },
               "default": "null"
             },
@@ -20959,7 +20959,7 @@
               "name": "selectedTemplate",
               "description": "Custom render for selected value in trigger: (item: {label, value, _raw}) => string|Node",
               "type": {
-                "text": "object"
+                "text": "((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null"
               },
               "default": "null"
             },
@@ -20968,7 +20968,7 @@
               "name": "searchPosition",
               "description": "Where to show search input: 'trigger' (default) or 'dropdown'",
               "type": {
-                "text": "string"
+                "text": "'trigger' | 'dropdown'"
               },
               "default": "'trigger'",
               "attribute": "searchposition"
@@ -21040,49 +21040,49 @@
           ],
           "events": [
             {
+              "name": "pdx-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the selection changes: `value` and `item` in single mode, `values` and `items` in multiple.",
+              "detail": "{ value: unknown; item: unknown } | { values: unknown[]; items: unknown[] }"
+            },
+            {
               "name": "pdx-open",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it opens. Does not bubble."
+              "description": "Fired when the list opens. Does not bubble."
             },
             {
               "name": "pdx-close",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it closes. Does not bubble."
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ values, items } | { value, item }"
+              "description": "Fired when the list closes. Does not bubble."
             },
             {
               "name": "pdx-clear",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value is cleared."
+              "description": "Fired when the clear button empties the selection, after its `pdx-change`."
             },
             {
               "name": "pdx-search",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when a search is performed.",
-              "detail": "{ query }"
+              "description": "Fired as the user types in the search input.",
+              "detail": "{ query: string }"
             },
             {
               "name": "pdx-create",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when a new item is created.",
-              "detail": "{ value, label }"
+              "description": "Fired when the user creates an option from the search text.",
+              "detail": "{ value: string; label: string }"
             }
           ],
           "roles": [
@@ -21215,7 +21215,7 @@
               "fieldName": "size",
               "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
               "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg' | 'xl'"
+                "text": "'' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'"
               },
               "default": "''"
             },
@@ -21260,7 +21260,7 @@
               "fieldName": "searchPosition",
               "description": "Where to show search input: 'trigger' (default) or 'dropdown'",
               "type": {
-                "text": "string"
+                "text": "'trigger' | 'dropdown'"
               },
               "default": "'trigger'"
             },
@@ -24809,16 +24809,16 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the pressed changes.",
-              "detail": "{ pressed }"
+              "description": "Fired when the toggle is pressed or released.",
+              "detail": "{ pressed: boolean }"
             },
             {
               "name": "pressedchange",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pressedchange`.",
-              "detail": "{ pressed }"
+              "description": "The legacy name of `pdx-pressed-change`, kept as an alias.",
+              "detail": "{ pressed: boolean }"
             }
           ],
           "attributes": [
@@ -24994,16 +24994,16 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, values }"
+              "description": "Fired when the group's value changes: `value` as the attribute holds it, `values` as a list.",
+              "detail": "{ value: string; values: string[] }"
             },
             {
               "name": "valuechange",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `valuechange`.",
-              "detail": "{ value, values }"
+              "description": "The legacy name of `pdx-change`, kept as an alias.",
+              "detail": "{ value: string; values: string[] }"
             }
           ],
           "roles": [

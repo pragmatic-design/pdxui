@@ -3,7 +3,7 @@
 // `multiple` enables multi-select with chip tags.
 // Consumes DataSource or plain arrays. Virtual scroll auto-activates for >100 items.
 
-import { component, html, signal, computed, effect } from '@pdxui/core';
+import { component, html, signal, computed, effect, prop, event } from '@pdxui/core';
 import { createDataSource, isDataSource, tryInject } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { createVirtualizer } from '@pdxui/core';
@@ -53,49 +53,63 @@ function normaliseOptions(
 component('pdx-select', {
     formAssociated: true,
     props: {
-        options: { type: Array, default: () => [] },
+        options: prop<unknown[]>(() => []),
         /** DataSource instance — dedicated prop for data-driven select. Takes priority over options. */
-        source: { type: Object, default: null },
-        value: { type: String, default: null },
-        labelField: { type: String, default: 'label' },
-        valueField: { type: String, default: 'value' },
-        placeholder: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
-        success: { type: Boolean, default: false },
-        warning: { type: Boolean, default: false },
-        clearable: { type: Boolean, default: false },
-        searchable: { type: Boolean, default: false },
-        multiple: { type: Boolean, default: false },
+        source: prop<DataSource<unknown> | null>(null),
+        value: prop<string | null>(null, { type: String }),
+        labelField: prop('label'),
+        valueField: prop('value'),
+        placeholder: prop(''),
+        disabled: prop(false),
+        readonly: prop(false),
+        error: prop(false),
+        success: prop(false),
+        warning: prop(false),
+        clearable: prop(false),
+        searchable: prop(false),
+        multiple: prop(false),
         /** Multi mode: collapse selected tags in the trigger to keep it compact.
          *  -1 = unlimited (default, show all chips); 0 = summary only ("N selected");
          *  N>0 = show N chips + a "+K" overflow chip. The dropdown is unaffected. */
-        maxTagCount: { type: Number, default: -1 },
+        maxTagCount: prop(-1),
         // Five sizes: the trigger is a `.pdx-input-wrap`, sized by inputs.css, and select.css sizes the caret.
         /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
-        size: { type: String, default: '', enum: ['xs', 'sm', 'md', 'lg', 'xl'] },
-        name: { type: String, default: '' },
-        loading: { type: Boolean, default: false },
-        groupField: { type: String, default: '' },
+        size: prop<'' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'>(''),
+        name: prop(''),
+        loading: prop(false),
+        groupField: prop(''),
         /** The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a
          *  label, after a pdx-label, or with a <label for> the select's id: those name it. */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Custom render for each option: (item: {label, value, _raw}) => string|Node */
-        itemTemplate: { type: Object, default: null },
+        itemTemplate: prop<((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null>(null),
         /** Custom render for selected value in trigger: (item: {label, value, _raw}) => string|Node */
-        selectedTemplate: { type: Object, default: null },
+        selectedTemplate: prop<((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null>(null),
         /** Where to show search input: 'trigger' (default) or 'dropdown' */
-        searchPosition: { type: String, default: 'trigger' },
+        searchPosition: prop<'trigger' | 'dropdown'>('trigger'),
         /** Allow creating new options when search has no match. Emits pdx-create. */
-        creatable: { type: Boolean, default: false },
+        creatable: prop(false),
         /** Label template for the create option. Use {query} as placeholder. Empty: the select.create
          *  component string, «Create "{query}"» in English. */
-        createLabel: { type: String, default: '' },
+        createLabel: prop(''),
         /** Enable debounced server-side filtering for remote DataSource. */
-        remote: { type: Boolean, default: false },
+        remote: prop(false),
         /** Debounce delay in ms for remote search. */
-        debounce: { type: Number, default: 200 },
+        debounce: prop(200),
+    },
+    events: {
+        /** Fired when the selection changes: `value` and `item` in single mode, `values` and `items` in multiple. */
+        'pdx-change': event<{ value: unknown; item: unknown } | { values: unknown[]; items: unknown[] }>(),
+        /** Fired when the list opens. */
+        'pdx-open': event<void>({ bubbles: false }),
+        /** Fired when the list closes. */
+        'pdx-close': event<void>({ bubbles: false }),
+        /** Fired when the clear button empties the selection, after its `pdx-change`. */
+        'pdx-clear': event<void>(),
+        /** Fired as the user types in the search input. */
+        'pdx-search': event<{ query: string }>(),
+        /** Fired when the user creates an option from the search text. */
+        'pdx-create': event<{ value: string; label: string }>(),
     },
     setup(ctx) {
         const uid = 'pdx-sel-' + (++_selectCounter);

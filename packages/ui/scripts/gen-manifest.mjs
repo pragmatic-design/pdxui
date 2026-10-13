@@ -156,8 +156,14 @@ function extractProps(optionsObj, sourceFile, tag) {
 
     const props = [];
     for (const decl of propsProp.initializer.properties) {
-        if (!ts.isPropertyAssignment(decl) || !ts.isObjectLiteralExpression(decl.initializer)) continue;
+        if (!ts.isPropertyAssignment(decl)) continue;
         const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
+        const built = builtProp(decl.initializer, sourceFile);
+        if (built) {
+            props.push({ name, ...built, iconName: false, description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
+            continue;
+        }
+        if (!ts.isObjectLiteralExpression(decl.initializer)) continue;
         let type = 'string';
         let def;
         let enumType = null;   // an `enum: [...]` field → string-literal union (drives playground dropdown + IntelliSense)
@@ -185,9 +191,87 @@ function extractProps(optionsObj, sourceFile, tag) {
         // survives the attribute — and without this the catalogue would say `string` beside prose
         // promising a number, leaving an agent no way to know which one the code believes.
         const declaredType = jsdocDeclaredType(decl, sourceFile);
-        props.push({ name, type: declaredType || enumType || type, default: def, iconName, description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
+        props.push({ name, type: declaredType || enumType || type, runtime: type, default: def, iconName, description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
     }
     return props;
+}
+
+/** `prop(…)` or `prop.required(…)`: the builder a typed descriptor declares a prop with (#123). */
+function propBuilderCall(node) {
+    if (!ts.isCallExpression(node)) return null;
+    const callee = node.expression;
+    if (ts.isIdentifier(callee) && callee.text === 'prop') return { call: node, required: false };
+    if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression)
+        && callee.expression.text === 'prop' && callee.name.text === 'required') return { call: node, required: true };
+    return null;
+}
+
+/** The runtime kind a default implies, as `prop()` infers it: string, number, boolean, else array or object. */
+function inferredRuntime(arg) {
+    if (!arg) return 'object';
+    if (ts.isStringLiteralLike(arg)) return 'string';
+    if (ts.isNumericLiteral(arg) || (ts.isPrefixUnaryExpression(arg) && ts.isNumericLiteral(arg.operand))) return 'number';
+    if (arg.kind === ts.SyntaxKind.TrueKeyword || arg.kind === ts.SyntaxKind.FalseKeyword) return 'boolean';
+    if (ts.isArrayLiteralExpression(arg)) return 'array';
+    if (ts.isArrowFunction(arg) || ts.isFunctionExpression(arg)) {
+        const body = ts.isArrowFunction(arg) && !ts.isBlock(arg.body) ? arg.body : null;
+        const value = body && ts.isParenthesizedExpression(body) ? body.expression : body;
+        return value && ts.isArrayLiteralExpression(value) ? 'array' : 'object';
+    }
+    return 'object';
+}
+
+/** The `type` field of a builder's options argument (`{ type: Number }`), as a runtime kind, or null. */
+function optionsRuntime(arg, sourceFile) {
+    if (!arg || !ts.isObjectLiteralExpression(arg)) return null;
+    const field = arg.properties.find(p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'type');
+    if (!field) return null;
+    const t = field.initializer.getText(sourceFile);
+    return TYPE_MAP[t] ?? t.toLowerCase();
+}
+
+/**
+ * A prop declared with the typed builder → { type, runtime, default, required }, or null when the
+ * initializer is not one. The TYPE is the type argument as written (`prop<'sm' | 'md'>('md')` is
+ * `'sm' | 'md'`), else the runtime kind; the RUNTIME kind — what decides whether the prop is also an
+ * attribute — is the options' `type`, else the one the default implies, exactly as `prop()` decides it.
+ */
+function builtProp(initializer, sourceFile) {
+    const found = propBuilderCall(initializer);
+    if (!found) return null;
+    const { call, required } = found;
+    const typeArg = call.typeArguments?.[0]?.getText(sourceFile);
+    const [first, second] = call.arguments;
+    const runtime = required
+        ? (optionsRuntime(first, sourceFile) ?? 'object')
+        : (optionsRuntime(second, sourceFile) ?? inferredRuntime(first));
+    const def = required || !first ? undefined : first.getText(sourceFile);
+    return { type: typeArg || runtime, runtime, default: def, ...(required ? { required: true } : {}) };
+}
+
+/**
+ * The events a typed descriptor declares, `events: { name: event<D>(options?) }` → name →
+ * { detail, noBubble, description }. `detail` is the type argument as written, absent for `void` or
+ * when none is given; `noBubble` is `{ bubbles: false }` in the options.
+ */
+function extractDescriptorEvents(optionsObj, sourceFile) {
+    const out = new Map();
+    const eventsProp = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'events');
+    if (!eventsProp || !ts.isObjectLiteralExpression(eventsProp.initializer)) return out;
+    for (const decl of eventsProp.initializer.properties) {
+        if (!ts.isPropertyAssignment(decl)) continue;
+        const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
+        const init = decl.initializer;
+        const isEvent = ts.isCallExpression(init) && ts.isIdentifier(init.expression) && init.expression.text === 'event';
+        const typeArg = isEvent ? init.typeArguments?.[0]?.getText(sourceFile) : undefined;
+        out.set(name, {
+            detail: typeArg && typeArg !== 'void' ? typeArg : undefined,
+            noBubble: isEvent && passesNoBubble(init.arguments[0]),
+            description: jsdocDescription(decl),
+        });
+    }
+    return out;
 }
 
 /** Heuristic event names from emit('x') and new CustomEvent('x') in the source text. */
@@ -688,15 +772,19 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     };
     const events = [];
     const seenEvents = new Set();
+    const declaredEvents = extractDescriptorEvents(optionsObj, sourceFile);
     const addEvent = (name, description, declared) => {
         if (seenEvents.has(name)) return;
         const detail = detailOf(name, declared);
         // An event kept on the component says so: an app listening on an ancestor does not get it.
         const said = description || describeEvent(name);
-        const text = emitted.get(name)?.noBubble ? `${said.replace(/\.?\s*$/, '.')} Does not bubble.` : said;
+        const noBubble = emitted.get(name)?.noBubble || declaredEvents.get(name)?.noBubble;
+        const text = noBubble ? `${said.replace(/\.?\s*$/, '.')} Does not bubble.` : said;
         events.push({ name, type: { text: 'CustomEvent' }, description: text, ...(detail ? { detail } : {}) });
         seenEvents.add(name);
     };
+    // The descriptor's `events` first: its type argument is the detail's declared type (#123).
+    for (const [name, d] of declaredEvents) addEvent(name, d.description, d.detail);
     for (const t of tags.filter(t => t.tag === 'fires' || t.tag === 'event')) {
         const { name, type, description } = parseFires(t.text);
         addEvent(name, description, type);
@@ -730,7 +818,7 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     const members = props.map(p => ({
         kind: 'field', name: p.name, ...(p.description ? { description: p.description } : {}),
         type: { text: p.type }, ...(p.default !== undefined ? { default: p.default } : {}),
-        ...(PROP_ONLY.has(p.type) ? {} : { attribute: p.name.toLowerCase() }),
+        ...(PROP_ONLY.has(p.runtime) ? {} : { attribute: p.name.toLowerCase() }),
         ...(p.iconName ? { iconName: true } : {}),
     }));
     // What ctx.expose({...}) puts on the element: methods to call through a ref, and getters to read
@@ -755,7 +843,7 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     // shares them. scanNode narrows to one component() statement for those files.
     const shapes = scanExportedShapes(sourceFile, file);
     for (const mm of methods) members.push(mm);
-    const attributes = props.filter(p => !PROP_ONLY.has(p.type)).map(p => ({
+    const attributes = props.filter(p => !PROP_ONLY.has(p.runtime)).map(p => ({
         name: p.name.toLowerCase(), fieldName: p.name,
         ...(p.description ? { description: p.description } : {}),
         type: { text: p.type }, ...(p.default !== undefined ? { default: p.default } : {}),

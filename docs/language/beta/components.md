@@ -532,6 +532,17 @@ slots, states, parts and variants from its types, not from JSDoc. The constructo
 by a measured pilot on three components (#137): if the medium one (`pdx-select`) needs no escape
 hatch, `.pdx` becomes the default for the library.
 
+**Landed** (#123): the builders `prop`, `prop.required`, `event`, `model` and `slot` (`@pdxui/core`),
+every field above in the descriptor's type, and the behaviour of two of them. `props` types `ctx`
+from each type argument; a `prop.required` the host does not set is reported in development. `events`
+types `ctx.emit` — the name is a declared one and the detail its type — and an event declared with
+`{ bubbles: false }` does not bubble; emitting an undeclared one is reported in development and still
+dispatched. A `.pdx` compiles its `@event` names into `events`, except one that also dispatches with
+`$emit`, which takes any name. The manifest reads a prop's type and an event's detail type from the
+type arguments; `pdx-select` and `pdx-toggle` are written this way. The other fields are typed and do
+nothing yet: `models` #124, `slots` #131, the rest in their own issues. The constructor form is still
+accepted.
+
 ### Since
 
 beta (#123, #137)

@@ -51,6 +51,7 @@ component('pdx-counter', {
   props: {
     label: { type: String, default: 'Hello' }        // @prop → declared prop + attribute sync
   },
+  events: { 'changed': {} },                         // @event → declared in the descriptor
   setup(ctx) {
     const changed = (detail) => ctx.emit('changed', detail);   // @event → the emit function
     const __count = signal(0, { name: 'counter:count' });      // $signal → signal + debug name

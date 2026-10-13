@@ -36,8 +36,8 @@ paged table → `pdx-relation-picker`.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `options` | — | array | `() => []` | The selectable options. |
-| `source` | — | object | `null` | DataSource instance — dedicated prop for data-driven select. Takes priority over options. |
+| `options` | — | unknown[] | `() => []` | The selectable options. |
+| `source` | — | DataSource<unknown> \| null | `null` | DataSource instance — dedicated prop for data-driven select. Takes priority over options. |
 | `value` | `value` | string \| null | `null` | The current value. |
 | `labelField` | `labelfield` | string | `'label'` | Object field used as the option label. |
 | `valueField` | `valuefield` | string | `'value'` | Object field used as the option value. |
@@ -51,14 +51,14 @@ paged table → `pdx-relation-picker`.
 | `searchable` | `searchable` | boolean | `false` | Adds a search box to filter options. |
 | `multiple` | `multiple` | boolean | `false` | Allow selecting more than one. |
 | `maxTagCount` | `maxtagcount` | number | `-1` | Multi mode: collapse selected tags in the trigger to keep it compact. -1 = unlimited (default, show all chips); 0 = summary only ("N selected"); N>0 = show N chips + a "+K" overflow chip. The dropdown is unaffected. |
-| `size` | `size` | 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' | `''` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
+| `size` | `size` | '' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' | `''` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `groupField` | `groupfield` | string | `''` | Object field used to group options. |
 | `label` | `label` | string | `''` | The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a label, after a pdx-label, or with a <label for> the select's id: those name it. |
-| `itemTemplate` | — | object | `null` | Custom render for each option: (item: {label, value, _raw}) => string\|Node |
-| `selectedTemplate` | — | object | `null` | Custom render for selected value in trigger: (item: {label, value, _raw}) => string\|Node |
-| `searchPosition` | `searchposition` | string | `'trigger'` | Where to show search input: 'trigger' (default) or 'dropdown' |
+| `itemTemplate` | — | ((item: { label: string; value: unknown; _raw: unknown }) => string \| Node) \| null | `null` | Custom render for each option: (item: {label, value, _raw}) => string\|Node |
+| `selectedTemplate` | — | ((item: { label: string; value: unknown; _raw: unknown }) => string \| Node) \| null | `null` | Custom render for selected value in trigger: (item: {label, value, _raw}) => string\|Node |
+| `searchPosition` | `searchposition` | 'trigger' \| 'dropdown' | `'trigger'` | Where to show search input: 'trigger' (default) or 'dropdown' |
 | `creatable` | `creatable` | boolean | `false` | Allow creating new options when search has no match. Emits pdx-create. |
 | `createLabel` | `createlabel` | string | `''` | Label template for the create option. Use {query} as placeholder. Empty: the select.create component string, «Create "{query}"» in English. |
 | `remote` | `remote` | boolean | `false` | Enable debounced server-side filtering for remote DataSource. |
@@ -73,7 +73,7 @@ paged table → `pdx-relation-picker`.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change` → `detail: { values, items } | { value, item }` — Fired when the value changes.; `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-create` → `detail: { value, label }` — Fired when a new item is created.; `pdx-open` — Fired when it opens. Does not bubble.; `pdx-search` → `detail: { query }` — Fired when a search is performed.
+**Events:** `pdx-change` → `detail: { value: unknown; item: unknown } | { values: unknown[]; items: unknown[] }` — Fired when the selection changes: `value` and `item` in single mode, `values` and `items` in multiple.; `pdx-clear` — Fired when the clear button empties the selection, after its `pdx-change`.; `pdx-close` — Fired when the list closes. Does not bubble.; `pdx-create` → `detail: { value: string; label: string }` — Fired when the user creates an option from the search text.; `pdx-open` — Fired when the list opens. Does not bubble.; `pdx-search` → `detail: { query: string }` — Fired as the user types in the search input.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `presentation` · `status`
 

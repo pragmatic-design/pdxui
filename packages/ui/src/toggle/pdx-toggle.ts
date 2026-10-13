@@ -3,7 +3,7 @@
 // Uses focusGroup from core for roving tabindex in group mode.
 // Distinct from Segmented: toggle = action state (0..N), segmented = exclusive selection (1).
 
-import { component, html, useFormAssociated } from '@pdxui/core';
+import { component, html, useFormAssociated, prop, event } from '@pdxui/core';
 import { guardDisabledClicks } from '../shared/disabled-click';
 import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -18,13 +18,19 @@ import '@pdxui/design/components/toggle';
 component('pdx-toggle', {
     formAssociated: true,
     props: {
-        pressed: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
-        value: { type: String, default: '' },
-        variant: { type: String, default: 'outline' },
-        size: { type: String, default: '' },
+        pressed: prop(false),
+        disabled: prop(false),
+        value: prop(''),
+        variant: prop('outline'),
+        size: prop(''),
         /** The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
-        ariaLabel: { type: String, default: '' },
+        ariaLabel: prop(''),
+    },
+    events: {
+        /** Fired when the toggle is pressed or released. */
+        'pdx-pressed-change': event<{ pressed: boolean }>(),
+        /** The legacy name of `pdx-pressed-change`, kept as an alias. */
+        'pressedchange': event<{ pressed: boolean }>(),
     },
     setup(ctx) {
         // Disabled: the click stops at the host, before the app's @click.
@@ -64,7 +70,7 @@ component('pdx-toggle', {
 
         return { toggle, btnClass };
     },
-    render: (ctx: any) => html`
+    render: (ctx) => html`
         <button
             type="button"
             :class="${ctx.btnClass}"
@@ -88,15 +94,21 @@ component('pdx-toggle', {
  */
 component('pdx-toggle-group', {
     props: {
-        type: { type: String, default: 'single' },
+        type: prop('single'),
         /** For single: string. For multiple: comma-separated string of values. */
-        value: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        orientation: { type: String, default: 'horizontal' },
-        variant: { type: String, default: 'outline' },
-        size: { type: String, default: '' },
-        loop: { type: Boolean, default: true },
-        label: { type: String, default: '' },
+        value: prop(''),
+        disabled: prop(false),
+        orientation: prop('horizontal'),
+        variant: prop('outline'),
+        size: prop(''),
+        loop: prop(true),
+        label: prop(''),
+    },
+    events: {
+        /** Fired when the group's value changes: `value` as the attribute holds it, `values` as a list. */
+        'pdx-change': event<{ value: string; values: string[] }>(),
+        /** The legacy name of `pdx-change`, kept as an alias. */
+        'valuechange': event<{ value: string; values: string[] }>(),
     },
     setup(ctx) {
         function getValues(): string[] {
@@ -218,7 +230,7 @@ component('pdx-toggle-group', {
 
         return { groupClass, onKeydown };
     },
-    render: (ctx: any) => html`
+    render: (ctx) => html`
         <div
             :class="${ctx.groupClass}"
             role="group"
