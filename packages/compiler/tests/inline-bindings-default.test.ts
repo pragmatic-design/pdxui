@@ -3,8 +3,8 @@
 // `inlineBindings` replaces the tagged template — and with it the innerHTML parse, the placeholder
 // scan and the `bindAttribute` dispatch — with `createElement`/`appendChild` and a direct
 // assignment per binding: **3.5x on the mount** of a 1500-row list (19 ms → 5.5 ms) for
-// **+0.4 KB** gzipped. It is the one render path; `compile()`'s internal switch stays only for the
-// render parity table (#237) until it is removed (#238).
+// **+0.4 KB** gzipped. It is the one render path; `compile()`'s internal switch has no test left
+// that sets it since the parity table records its expectations (#237), and is removed with #238.
 //
 // What this file holds is the DEFAULT: many tests of the inline path pass `inlineBindings: true`
 // explicitly, so all of them would go on passing if the default silently went back to false.

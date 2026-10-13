@@ -1,18 +1,19 @@
-// What the two render paths of a .pdx template put in the DOM, row by row (#92).
+// What a .pdx template puts in the DOM, row by row (#92), against recorded expectations (#237).
 //
-// A template compiled two ways: the html`` tagged template that core binds at runtime, and
-// imperative DOM code — the inline path, which since #107 every .pdx takes, in dev and in a build.
-// Until then dev took the template path, and nothing compared what the two actually render, so a
-// feature that works in dev and vanished in a build went unnoticed until someone looked at the
-// build: transitions, `:class` with an object, `::value` on a component. The template path is
-// reached here through compile()'s internal `inlineBindings: false`, until this table records its
-// DOM as expectations (#237).
+// The table began as a comparison of the two render paths — the html`` tagged template core binds at
+// runtime, and the inline path's imperative DOM code — because nothing compared what the two
+// rendered, and a feature that worked in dev vanished in a build: transitions, `:class` with an
+// object, `::value` on a component. Since #107 every .pdx takes the inline path, and the template
+// path is going (#238). Each row's `expected` is what the TEMPLATE path rendered when the two still
+// both ran — recorded once, written here as a literal, the same DOM the inline path rendered then —
+// so the forms the table holds keep the cross-check they had.
 //
-// Each row is compiled twice, mounted twice in happy-dom, acted on the same way, and its DOM
-// compared after normalising what is allowed to differ: the scope attribute, marker comments and
-// whitespace-only text. The router's rule keeps the table honest (router/tests/parity.test.ts):
-//   - a row whose two DOMs differ must name the issue that owns the difference, or it fails;
-//   - a row with an owner whose DOMs now match fails too: the owner is to be removed.
+// Each row is compiled as a production build compiles it, mounted in happy-dom, acted on, and its DOM
+// compared with `expected` (and `read` with `expectedRead`) after normalising what is allowed to
+// vary: the scope attribute, marker comments and whitespace-only text. The router's rule keeps the
+// table honest (router/tests/parity.test.ts):
+//   - a row whose DOM differs from its expectation must name the issue that owns the difference;
+//   - a row with an owner whose DOM now matches fails too: the owner is to be removed.
 //
 // Here, in core, because the compiled component runs on core and core's suite runs in happy-dom; the
 // compiler's runs in Node.
@@ -40,13 +41,17 @@ function lazyImport(specifier: string): Promise<unknown> {
 
 interface Row {
     name: string;
+    /** The normalised markup the row renders, as the template path rendered it (#237). */
+    expected: string;
+    /** What `read` returns, as the template path returned it. */
+    expectedRead?: unknown;
     template: string;
     script?: string;
-    /** Done to both mounts before they are compared: a click, an input, a property set. */
+    /** Done to the mount before it is compared: a click, an input, a property set. */
     act?: (host: HTMLElement) => void | Promise<void>;
-    /** Values read from both mounts and compared too — a property the markup does not show. */
+    /** A value read from the mount and compared too — a property the markup does not show. */
     read?: (host: HTMLElement) => unknown;
-    /** The issue that owns a known difference between the two paths. */
+    /** The issue that owns a known difference from the expectation. */
     owner?: number;
 }
 
@@ -55,20 +60,13 @@ const mountName = (host: HTMLElement) => host.localName.slice(4);
 
 let seq = 0;
 
-/** The compile options of each path. The template path is NAMED: since #107 the default is inline. */
-const PATH_OPTIONS = {
-    template: { inlineBindings: false },
-    inline: { production: true, inlineBindings: true },
-} as const;
-
-/** The component compiled on one path, defined, and mounted in the document. */
-function mount(row: Row, inline: boolean): HTMLElement {
-    const name = `parity${++seq}${inline ? 'i' : 't'}`;
+/** The component compiled as a production build compiles it, defined, and mounted in the document. */
+function mount(row: Row): HTMLElement {
+    const name = `parity${++seq}`;
     const src = `<template>${row.template}</template>\n<script setup>\n${row.script ?? ''}\n</script>\n`;
     // The one component a row may load lazily resolves to a specifier naming this mount.
     const importPathOf = (tag: string) => (tag === 'pdx-deferred-probe' ? `${DEFERRED_MODULE}?for=${name}` : null);
-    const options = { ...(inline ? PATH_OPTIONS.inline : PATH_OPTIONS.template), importPathOf };
-    const { code } = compile(src, `${name}.pdx`, [], undefined, options);
+    const { code } = compile(src, `${name}.pdx`, [], undefined, { production: true, importPathOf });
     // The module's one core import becomes a destructure of the core module this test runs on, and a
     // dynamic import becomes the recorder above.
     const body = code
@@ -89,9 +87,9 @@ async function settle(): Promise<void> {
 }
 
 /**
- * A node's markup with what may differ between the paths taken out: comments (each path places its
- * own markers), whitespace-only text, the `data-pdx-*` scope attribute. Attributes sorted; text with
- * its runs of whitespace collapsed.
+ * A node's markup with what may vary taken out: comments (a render path places its own markers),
+ * whitespace-only text, the `data-pdx-*` scope attribute. Attributes sorted; text with its runs of
+ * whitespace collapsed.
  */
 function normal(node: Node): string {
     if (node.nodeType === Node.TEXT_NODE) {
@@ -113,13 +111,13 @@ function normal(node: Node): string {
 const content = (host: HTMLElement) => [...host.childNodes].map(normal).join('').trim();
 
 /**
- * What a row renders on one path: its markup and what `read` returns, after `act` and settling. A path
- * that throws renders the error: a difference like any other, not a crash of the table.
+ * What a row renders: its markup and what `read` returns, after `act` and settling. A row that throws
+ * renders the error: a difference like any other, not a crash of the table.
  */
-async function render(row: Row, inline: boolean): Promise<{ html: string; read: unknown }> {
+async function render(row: Row): Promise<{ html: string; read: unknown }> {
     let host: HTMLElement | null = null;
     try {
-        host = mount(row, inline);
+        host = mount(row);
         await settle();
         if (row.act) { await row.act(host); await settle(); }
         return { html: content(host), read: row.read?.(host) };
@@ -149,50 +147,50 @@ beforeAll(() => {
 });
 
 const ROWS: Row[] = [
-    { name: 'static markup', template: '<section class="a"><h2 id="t">Title</h2><p>text <b>bold</b></p></section>' },
-    { name: '{{ }} text', template: '<p>{{ n }} items</p>', script: 'let n = $signal(3);' },
-    { name: '{{ }} text after a change', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(1);', act: click('button') },
-    { name: ':attr', template: '<a :href="url" :title="t">x</a>', script: "let url = $signal('/a'); let t = $signal('T');" },
-    { name: ':prop on a custom element', template: '<x-probe :value="v"></x-probe>', script: 'let v = $signal({ a: 1 });', read: (h) => JSON.stringify((h.querySelector('x-probe') as unknown as { value: unknown }).value) },
-    { name: ':class with a string', template: "<p :class=\"on ? 'yes' : 'no'\">x</p>", script: 'let on = $signal(true);' },
+    { name: 'static markup', expected: '<section class="a"><h2 id="t">Title</h2><p>text <b>bold</b></p></section>', template: '<section class="a"><h2 id="t">Title</h2><p>text <b>bold</b></p></section>' },
+    { name: '{{ }} text', expected: '<p>3 items</p>', template: '<p>{{ n }} items</p>', script: 'let n = $signal(3);' },
+    { name: '{{ }} text after a change', expected: '<p>2</p><button>+</button>', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(1);', act: click('button') },
+    { name: ':attr', expected: '<a href="/a" title="T">x</a>', template: '<a :href="url" :title="t">x</a>', script: "let url = $signal('/a'); let t = $signal('T');" },
+    { name: ':prop on a custom element', expected: '<x-probe></x-probe>', expectedRead: '{"a":1}', template: '<x-probe :value="v"></x-probe>', script: 'let v = $signal({ a: 1 });', read: (h) => JSON.stringify((h.querySelector('x-probe') as unknown as { value: unknown }).value) },
+    { name: ':class with a string', expected: '<p class="yes">x</p>', template: "<p :class=\"on ? 'yes' : 'no'\">x</p>", script: 'let on = $signal(true);' },
     // The inline path wrote class="[object Object]" (#96).
-    { name: ':class with an object', template: '<p :class="{ active: on, off: !on }">x</p>', script: 'let on = $signal(true);' },
-    { name: ':class.x', template: '<p class="base" :class.active="on">x</p>', script: 'let on = $signal(true);' },
+    { name: ':class with an object', expected: '<p class="active">x</p>', template: '<p :class="{ active: on, off: !on }">x</p>', script: 'let on = $signal(true);' },
+    { name: ':class.x', expected: '<p class="active base">x</p>', template: '<p class="base" :class.active="on">x</p>', script: 'let on = $signal(true);' },
     // The inline path assigned the object to el.style, which keeps no colour (#96).
-    { name: ':style with an object', template: "<p :style=\"{ color: 'red' }\">x</p>" },
-    { name: ':style.x', template: '<p :style.color="c">x</p>', script: "let c = $signal('blue');" },
-    { name: ':show', template: '<p :show="on">x</p><p :show="!on">y</p>', script: 'let on = $signal(true);' },
-    { name: '@click', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
-    { name: '@click.once', template: '<p>{{ n }}</p><button @click.once="n++">+</button>', script: 'let n = $signal(0);', act: (h) => { click('button')(h); click('button')(h); } },
-    { name: '@click.self', template: '<p>{{ n }}</p><div @click.self="n++"><button>in</button></div>', script: 'let n = $signal(0);', act: click('button') },
-    { name: '@click.stop', template: '<p>{{ n }}</p><div @click="n++"><button @click.stop="n = n + 10">in</button></div>', script: 'let n = $signal(0);', act: click('button') },
-    { name: '@click.prevent', template: '<a href="#x" @click.prevent="seen = true">a</a><p>{{ seen }}</p>', script: 'let seen = $signal(false);', act: click('a') },
+    { name: ':style with an object', expected: '<p style="color: red;">x</p>', template: "<p :style=\"{ color: 'red' }\">x</p>" },
+    { name: ':style.x', expected: '<p style="color: blue;">x</p>', template: '<p :style.color="c">x</p>', script: "let c = $signal('blue');" },
+    { name: ':show', expected: '<p>x</p><p style="display: none;">y</p>', template: '<p :show="on">x</p><p :show="!on">y</p>', script: 'let on = $signal(true);' },
+    { name: '@click', expected: '<p>1</p><button>+</button>', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
+    { name: '@click.once', expected: '<p>1</p><button>+</button>', template: '<p>{{ n }}</p><button @click.once="n++">+</button>', script: 'let n = $signal(0);', act: (h) => { click('button')(h); click('button')(h); } },
+    { name: '@click.self', expected: '<p>0</p><div><button>in</button></div>', template: '<p>{{ n }}</p><div @click.self="n++"><button>in</button></div>', script: 'let n = $signal(0);', act: click('button') },
+    { name: '@click.stop', expected: '<p>10</p><div><button>in</button></div>', template: '<p>{{ n }}</p><div @click="n++"><button @click.stop="n = n + 10">in</button></div>', script: 'let n = $signal(0);', act: click('button') },
+    { name: '@click.prevent', expected: '<a href="#x">a</a><p>true</p>', template: '<a href="#x" @click.prevent="seen = true">a</a><p>{{ seen }}</p>', script: 'let seen = $signal(false);', act: click('a') },
     {
-        name: '::value on an <input>',
+        name: '::value on an <input>', expected: '<input></input><p>typed</p>', expectedRead: 'typed',
         template: '<input ::value="q"><p>{{ q }}</p>',
         script: "let q = $signal('a');",
         act: (h) => { const i = h.querySelector('input')!; i.value = 'typed'; i.dispatchEvent(new Event('input', { bubbles: true })); },
         read: (h) => h.querySelector('input')!.value,
     },
     {
-        name: '::value on a <select>',
+        name: '::value on a <select>', expected: '<select><option value="a">A</option><option value="b">B</option></select><p>b</p>', expectedRead: 'b',
         template: '<select ::value="s"><option value="a">A</option><option value="b">B</option></select><p>{{ s }}</p>',
         script: "let s = $signal('a');",
         act: (h) => { const s = h.querySelector('select')!; s.value = 'b'; s.dispatchEvent(new Event('change', { bubbles: true })); },
         read: (h) => h.querySelector('select')!.value,
     },
     {
-        name: '::value on a component that emits pdx-change',
+        name: '::value on a component that emits pdx-change', expected: '<x-field data-value="b"></x-field><p>b</p>',
         template: '<x-field ::value="v"></x-field><p>{{ v }}</p>',
         script: "let v = $signal('a');",
         act: (h) => { (h.querySelector('x-field') as unknown as { change(v: string): void }).change('b'); },
     },
-    { name: '@if / @else', template: '@if (on) { <p>yes</p> } @else { <p>no</p> }<button @click="on = !on">t</button>', script: 'let on = $signal(true);', act: click('button') },
-    { name: '@for with track', template: '<ul>@for (items as it; track it.id) { <li>{{ it.label }}</li> }</ul>', script: "let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);" },
-    { name: '@for with @empty', template: '<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: 'let items = $signal([]);' },
-    { name: '@switch', template: "@switch (mode) { @case ('a') { <p>A</p> } @case ('b') { <p>B</p> } @default { <p>?</p> } }", script: "let mode = $signal('b');" },
+    { name: '@if / @else', expected: '<p>no</p><button>t</button>', template: '@if (on) { <p>yes</p> } @else { <p>no</p> }<button @click="on = !on">t</button>', script: 'let on = $signal(true);', act: click('button') },
+    { name: '@for with track', expected: '<ul><li>a</li><li>b</li></ul>', template: '<ul>@for (items as it; track it.id) { <li>{{ it.label }}</li> }</ul>', script: "let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);" },
+    { name: '@for with @empty', expected: '<ul><li>none</li></ul>', template: '<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: 'let items = $signal([]);' },
+    { name: '@switch', expected: '<p>B</p>', template: "@switch (mode) { @case ('a') { <p>A</p> } @case ('b') { <p>B</p> } @default { <p>?</p> } }", script: "let mode = $signal('b');" },
     {
-        name: '::checked on a checkbox',
+        name: '::checked on a checkbox', expected: '<input type="checkbox"></input><p>true</p>', expectedRead: true,
         template: '<input type="checkbox" ::checked="on"><p>{{ on }}</p>',
         script: 'let on = $signal(false);',
         act: click('input'),
@@ -200,12 +198,12 @@ const ROWS: Row[] = [
     },
     // A key filter applies to keyboard events: a click passes it. The inline path applied it to the
     // click too, which never fired (#100).
-    { name: '@click.enter', template: '<p>{{ n }}</p><button @click.enter="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
+    { name: '@click.enter', expected: '<p>1</p><button>+</button>', template: '<p>{{ n }}</p><button @click.enter="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
     // The body, once the promise has settled. (The body reads the promise itself, not its value, on
     // both paths: binding the value is #145.)
-    { name: '@await', template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }', script: "let data = $signal(Promise.resolve('done'));" },
+    { name: '@await', expected: '<p>ready</p>', template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }', script: "let data = $signal(Promise.resolve('done'));" },
     {
-        name: '@defer loads a component used only inside it',
+        name: '@defer loads a component used only inside it', expected: '<pdx-deferred-probe></pdx-deferred-probe>', expectedRead: true,
         template: '@defer (immediate) { <pdx-deferred-probe></pdx-deferred-probe> }',
         read: (h) => lazyLoads.some((u) => u.endsWith(`?for=${mountName(h)}`)),
     },
@@ -214,7 +212,7 @@ const ROWS: Row[] = [
         // The binding writes when ITS value changes, so what the component holds since (a field being
         // typed in) stays. Inline wrote again on every re-run: the showcase's category labels took
         // back the saved name over the one being typed (#44).
-        name: ':prop is not written again with the value it already wrote',
+        name: ':prop is not written again with the value it already wrote', expected: '<x-probe></x-probe><button>save</button>', expectedRead: 'typed',
         template: '@for (rows as r; track r.id) { <x-probe :value="r.v"></x-probe> }<button @click="rows = [{ id: 1, v: \'saved\', other: 2 }]">save</button>',
         script: "let rows = $signal([{ id: 1, v: 'saved', other: 1 }]);",
         act: (h) => {
@@ -223,32 +221,32 @@ const ROWS: Row[] = [
         },
         read: (h) => (h.querySelector('x-probe') as unknown as { value: unknown }).value,
     },
-    { name: '@try / @catch', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
+    { name: '@try / @catch', expected: '<p>caught</p>', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
     // Both paths pass the transition options to when()/each() since #85: the enter classes match.
-    { name: '@if with @transition', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
-    { name: '@for with @transition', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },
+    { name: '@if with @transition', expected: '<p class="pdx-enter-active pdx-fade">x</p>', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
+    { name: '@for with @transition', expected: '<ul><li class="pdx-enter-active pdx-fade">a</li></ul>', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },
     // The inline path read the @let name as a signal and threw at mount (#162).
-    { name: '@let', template: '@let total = a + b; <p>{{ total }}</p>', script: 'let a = $signal(1); let b = $signal(2);' },
-    { name: 'an interpolated Node', template: '<div>{{ node }}</div>', script: "const node = document.createElement('em'); node.textContent = 'n';" },
-    { name: 'an interpolated Node in a signal', template: '<div>{{ node }}</div>', script: "const el = document.createElement('em'); el.textContent = 'n'; let node = $signal(el);" },
+    { name: '@let', expected: '<p>3</p>', template: '@let total = a + b; <p>{{ total }}</p>', script: 'let a = $signal(1); let b = $signal(2);' },
+    { name: 'an interpolated Node', expected: '<div><em>n</em></div>', template: '<div>{{ node }}</div>', script: "const node = document.createElement('em'); node.textContent = 'n';" },
+    { name: 'an interpolated Node in a signal', expected: '<div><em>n</em></div>', template: '<div>{{ node }}</div>', script: "const el = document.createElement('em'); el.textContent = 'n'; let node = $signal(el);" },
     // The inline path wrote the array as its string, "a,b" (#100).
-    { name: 'an interpolated array', template: '<div>{{ list }}</div>', script: "const list = ['a', 'b'];" },
-    { name: 'content inside a component tag', template: '<x-probe><span>child</span></x-probe>' },
+    { name: 'an interpolated array', expected: '<div>ab</div>', template: '<div>{{ list }}</div>', script: "const list = ['a', 'b'];" },
+    { name: 'content inside a component tag', expected: '<x-probe><span>child</span></x-probe>', template: '<x-probe><span>child</span></x-probe>' },
     // The inline path emitted `batchHandler(() => )` for @keepAlive: a module that does not parse (#200).
     {
-        name: '<component :is> with @keepAlive',
+        name: '<component :is> with @keepAlive', expected: '<x-probe style="display: none;"></x-probe><x-field></x-field><button>swap</button>',
         template: '<component :is="tag" @keepAlive></component><button @click="tag = tag === \'x-probe\' ? \'x-field\' : \'x-probe\'">swap</button>',
         script: "let tag = $signal('x-probe');",
         act: click('button'),
     },
     // The inline path emitted `const __b = ;` for a binding with no value (#200).
-    { name: ':name shorthand', template: '<input :value>', script: "let value = $signal('a');", read: (h) => h.querySelector('input')!.value },
+    { name: ':name shorthand', expected: '<input></input>', expectedRead: 'a', template: '<input :value>', script: "let value = $signal('a');", read: (h) => h.querySelector('input')!.value },
     // The inline path wrote a literal <slot> element, with a `row` property, around its default (#200).
-    { name: 'a scoped slot outlet with its default', template: '<slot name="cell" :row="r"><em>none</em></slot>', script: 'let r = $signal(1);' },
+    { name: 'a scoped slot outlet with its default', expected: '<em>none</em>', template: '<slot name="cell" :row="r"><em>none</em></slot>', script: 'let r = $signal(1);' },
     // Neither path wired the gesture: on the template path the handler ran once at render and the count
     // read NaN, on the inline path `.left` was a key filter (#99). Swiped left, both count 1.
     {
-        name: '@swipe.left',
+        name: '@swipe.left', expected: '<div>s</div><p>1</p>',
         template: '<div @swipe.left="n++">s</div><p>{{ n }}</p>',
         script: 'let n = $signal(0);',
         act: (h) => {
@@ -259,12 +257,12 @@ const ROWS: Row[] = [
     },
     // A scoped slot outlet's fallback with an interpolation or a block was emitted BESIDE the outlet,
     // on the template path with an orphan </slot> (#276): both paths now render it inside, once.
-    { name: 'a scoped slot outlet whose fallback interpolates', template: '<div><slot name="row" :item="who">none {{ who }}</slot></div>', script: "let who = $signal('Ada');" },
-    { name: 'a scoped slot outlet whose fallback is a block', template: '<div><slot name="row" :item="who">@if (who) { <b>x {{ who }}</b> }</slot></div>', script: "let who = $signal('Ada');" },
+    { name: 'a scoped slot outlet whose fallback interpolates', expected: '<div>none Ada</div>', template: '<div><slot name="row" :item="who">none {{ who }}</slot></div>', script: "let who = $signal('Ada');" },
+    { name: 'a scoped slot outlet whose fallback is a block', expected: '<div><b>x Ada</b></div>', template: '<div><slot name="row" :item="who">@if (who) { <b>x {{ who }}</b> }</slot></div>', script: "let who = $signal('Ada');" },
     // @show false left a root text node on the page on both paths (#265); both now take it out, and
     // put it back current: hidden, renamed, shown.
     {
-        name: '@show false over a root text node',
+        name: '@show false over a root text node', expected: 'Details: Bob<b>x</b><button class="t">t</button><button class="r">r</button>',
         template: "@show (open) { Details: {{ who }} <b>x</b> }<button class=\"t\" @click=\"open = !open\">t</button><button class=\"r\" @click=\"who = 'Bob'\">r</button>",
         script: "let open = $signal(true); let who = $signal('Ann');",
         act: async (h) => {
@@ -277,37 +275,28 @@ const ROWS: Row[] = [
     },
     // Both paths kept the removed element in the ref (#262); both now reset it to null.
     {
-        name: ':ref after its @if turns false',
+        name: ':ref after its @if turns false', expected: '<p>none</p><button>x</button>',
         template: "@if (on) { <input class=\"f\" :ref=\"field\"> }<p>{{ field ? field.className : 'none' }}</p><button @click=\"on = false\">x</button>",
         script: 'let on = $signal(true); let field = $signal(null);',
         act: click('button'),
     },
     // An @name the parser does not know is text on both paths. The divergence #100 names needs a
     // directive a plugin registers; this row keeps the plain case honest.
-    { name: 'an unknown @name is text', template: '<p>a</p>@frobnicate { <p>b</p> }' },
+    { name: 'an unknown @name is text', expected: '<p>a</p>@frobnicate { <p>b</p> }', template: '<p>a</p>@frobnicate { <p>b</p> }' },
 ];
 
-describe('the two render paths put the same DOM in the page (#92)', () => {
-    it('the two mounts compile through two paths, or the table compares a path with itself', () => {
-        const src = '<template><p :title="t">{{ t }}</p></template>\n<script setup>\nlet t = $signal(\'x\');\n</script>\n';
-        const template = compile(src, 'probe-t.pdx', [], undefined, PATH_OPTIONS.template).code;
-        const inline = compile(src, 'probe-i.pdx', [], undefined, PATH_OPTIONS.inline).code;
-        expect(template, 'the template mount did not compile through the template path').toMatch(/\bhtml`/);
-        expect(inline, 'the inline mount did not compile through the inline path').not.toMatch(/\bhtml`/);
-    });
-
+describe('a .pdx puts in the page what the template path did (#92, #237)', () => {
     for (const row of ROWS) {
         it(row.owner ? `${row.name} — differs, owned by #${row.owner}` : row.name, async () => {
-            const template = await render(row, false);
-            const inline = await render(row, true);
-            const same = template.html === inline.html && JSON.stringify(template.read) === JSON.stringify(inline.read);
-            const detail = `\n  template path: ${template.html}${row.read ? `  read=${JSON.stringify(template.read)}` : ''}`
-                + `\n  inline path:   ${inline.html}${row.read ? `  read=${JSON.stringify(inline.read)}` : ''}`;
+            const actual = await render(row);
+            const same = actual.html === row.expected && JSON.stringify(actual.read) === JSON.stringify(row.expectedRead);
+            const detail = `\n  expected: ${row.expected}${row.read ? `  read=${JSON.stringify(row.expectedRead)}` : ''}`
+                + `\n  rendered: ${actual.html}${row.read ? `  read=${JSON.stringify(actual.read)}` : ''}`;
             if (row.owner) {
-                expect(same, `the paths now agree: remove owner #${row.owner}${detail}`).toBe(false);
+                expect(same, `the row now matches its expectation: remove owner #${row.owner}${detail}`).toBe(false);
             } else {
-                expect(template.html, 'the template path rendered nothing: the row measures nothing').not.toBe('');
-                expect(same, `the two paths differ and no issue owns it${detail}`).toBe(true);
+                expect(row.expected, 'an empty expectation: the row measures nothing').not.toBe('');
+                expect(same, `the row differs from its expectation and no issue owns it${detail}`).toBe(true);
             }
         });
     }
