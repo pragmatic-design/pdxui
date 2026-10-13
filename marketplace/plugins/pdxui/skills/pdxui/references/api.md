@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-444 value exports.
+448 value exports.
 
 ### `__adoptStyles`
 
@@ -826,7 +826,7 @@ which parses, allocates and drags a timezone in.
 ```ts
 import { component } from '@pdxui/core';
 
-function component(tag: string, options: ComponentOptions<P>): void
+function component(tag: string, options: ComponentOptions<P, E>): void
 ```
 
 Define a function-based Web Component.
@@ -1882,6 +1882,16 @@ function evaluateVisibility(condition: VisibilityCondition, values: Record<strin
 ```
 
 Evaluate a visibility condition against current form values.
+
+### `event`
+
+```ts
+import { event } from '@pdxui/core';
+
+function event(options?: { bubbles?: boolean }): EventSpec<D>
+```
+
+Declare an event: `event<number>()`, `event<void>({ bubbles: false })`.
 
 ### `exhaustSignal`
 
@@ -3307,6 +3317,16 @@ Length in JavaScript code units, so an emoji or an accented character composed o
 counts as two. For a "must be filled in" rule use {@link required} — this one passes on a value
 that is not a string at all.
 
+### `model`
+
+```ts
+import { model } from '@pdxui/core';
+
+function model(defaultValue: T): ModelSpec<T>
+```
+
+Declare a model: `model<string>('')`.
+
 ### `mount`
 
 ```ts
@@ -3798,6 +3818,16 @@ Track the previous value of a signal.
 Usage:
   const prev = previous(count);
   effect(() => console.log(`${prev()} → ${count()}`));
+
+### `prop`
+
+```ts
+import { prop } from '@pdxui/core';
+
+const prop: typeof propBuilder & { required: typeof requiredProp }
+```
+
+Declare a prop: `prop<T>(default, { type? })`, or `prop.required<T>({ type? })`.
 
 ### `provide`
 
@@ -4845,6 +4875,16 @@ Ignore source emissions until the gate signal becomes truthy.
 
 Usage:
   const gated = skipUntil(() => data(), () => isReady());
+
+### `slot`
+
+```ts
+import { slot } from '@pdxui/core';
+
+function slot(): SlotSpec<F>
+```
+
+Declare a slot: `slot<(o: Option) => Node>()`.
 
 ### `slotCarrier`
 

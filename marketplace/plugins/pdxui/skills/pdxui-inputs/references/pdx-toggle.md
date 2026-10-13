@@ -19,7 +19,7 @@ A pressable on/off button.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change`; `pdx-pressed-change` → `detail: { pressed }` — Fired when the pressed changes.; `pressedchange` → `detail: { pressed }` — Fired on `pressedchange`.
+**Events:** `pdx-change`; `pdx-pressed-change` → `detail: { pressed: boolean }` — Fired when the toggle is pressed or released.; `pressedchange` → `detail: { pressed: boolean }` — The legacy name of `pdx-pressed-change`, kept as an alias.
 
 
 #### Examples

@@ -6,7 +6,7 @@ import type { SFCDescriptor } from '../parser/sfc';
 import { generateInlineNodes } from './codegen-template-inline';
 import type { analyzeScript } from './script-analyzer';
 import type { PluginRunner } from '../plugin-system';
-import { buildSetupBody, buildPropsObject } from './codegen-setup';
+import { buildSetupBody, buildPropsObject, usesUntypedEmit } from './codegen-setup';
 import { liftStoreExports } from './store-exports';
 import type { CompileContext } from './compile-context';
 import { applyFormBindings, applyInjectedFormBindings } from './codegen-form-binding';
@@ -225,7 +225,8 @@ export function compileNewMode(
     // import, which a .pdx script never writes.
     if (!/\bhtml`/.test(finalRenderCode) && !/\bhtml\b/.test(setupParts)) imports.delete('html');
 
-    return assembleModule(imports, allUserImports, descriptor, filename, tag, propsCode, setupParts, finalRenderCode, analysis.route, production, ctx.warnings, ctx.importPathOf ?? undefined, ctx.mapOrigins, ctx.sourceFile, templateHoists.lines.length > 0);
+    return assembleModule(imports, allUserImports, descriptor, filename, tag, propsCode, setupParts, finalRenderCode, analysis.route, production, ctx.warnings, ctx.importPathOf ?? undefined, ctx.mapOrigins, ctx.sourceFile, templateHoists.lines.length > 0,
+        usesUntypedEmit(analysis, descriptor) ? [] : analysis.events.map(e => e.name));
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

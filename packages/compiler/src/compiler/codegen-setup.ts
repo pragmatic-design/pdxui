@@ -29,6 +29,23 @@ export function buildPropsObject(props: { name: string; runtimeType: string; def
     return `{\n${entries.join(',\n')}\n  }`;
 }
 
+/** The script code setup() runs: the body, the effects, the lifecycle hooks, the watches, the reactive fetch URLs. */
+function setupSourceText(analysis: ScriptAnalysis): string {
+    return analysis.body + analysis.effects.join(' ') +
+        analysis.lifecycle.onMount.join(' ') + analysis.lifecycle.onDestroy.join(' ') +
+        analysis.watches.map(w => `${w.source} ${w.callback} ${w.options ?? ''}`).join(' ') +
+        analysis.fetches.filter(f => f.hasReactiveParams).map(f => f.url).join(' ');
+}
+
+/**
+ * Whether the component dispatches with the untyped `$emit(name, detail)`, in its script or its
+ * template. Such a component has not closed the set of its events — `$emit` takes any name, a
+ * hyphenated one `@event` cannot declare — so its descriptor declares none (#123).
+ */
+export function usesUntypedEmit(analysis: ScriptAnalysis, descriptor?: SFCDescriptor): boolean {
+    return /\$emit\s*\(/.test(setupSourceText(analysis)) || /\$emit\s*\(/.test(descriptor?.template?.content ?? '');
+}
+
 /**
  * Build all parts of the setup() function body for new mode.
  * @param scriptOnly - When true, emit standalone effect()/cleanup instead of ctx.track()
@@ -62,10 +79,7 @@ export function buildSetupBody(
     // The watches count too: a prop read only in a `$watch` is rewritten to a call of the
     // accessor, and without the accessor declared, setup throws.
     // A reactive `@fetch` URL counts as well: `${userId}` is rewritten to a call of the accessor (#101).
-    const bodyText = analysis.body + analysis.effects.join(' ') +
-        analysis.lifecycle.onMount.join(' ') + analysis.lifecycle.onDestroy.join(' ') +
-        analysis.watches.map(w => `${w.source} ${w.callback} ${w.options ?? ''}`).join(' ') +
-        analysis.fetches.filter(f => f.hasReactiveParams).map(f => f.url).join(' ');
+    const bodyText = setupSourceText(analysis);
     for (const p of analysis.props) {
         // Always generate accessor if prop is used in body, signals, deriveds, or is a common pattern
         const namePattern = new RegExp(`\\b${p.name}\\b`);
@@ -93,7 +107,7 @@ export function buildSetupBody(
     // themselves keeps their own function. `$emit(event, detail)` is the untyped form of the same.
     const emitterNames = analysis.events.map(e => e.name).filter(n => !bodyLocalNames.has(n));
     for (const n of emitterNames) parts.push(`    const ${n} = (detail) => ctx.emit(${jsQuote(n)}, detail);`);
-    const usesEmit = /\$emit\s*\(/.test(bodyText) || /\$emit\s*\(/.test(descriptor?.template?.content ?? '');
+    const usesEmit = usesUntypedEmit(analysis, descriptor);
     if (usesEmit) parts.push(`    const $emit = (event, detail) => ctx.emit(event, detail);`);
 
     // Late signals: those reading a body-local, and those reading a late signal. They are

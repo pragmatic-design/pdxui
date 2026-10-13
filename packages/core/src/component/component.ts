@@ -48,26 +48,10 @@ export function __pdx_hmr_restore(tag: string): void {
 
 // ─── Types ─────────────────────────────────────────────────────────
 
-type PropType = typeof String | typeof Number | typeof Boolean | typeof Object | typeof Array | typeof Function;
-
-export interface PropDefinition {
-    type: PropType;
-    default?: unknown;
-}
-
-/**
- * Typed prop definition for non-primitive types (Object, Array, Function).
- * Use when you need precise TS inference instead of the default collapsed types.
- *
- * @example
- *   props: {
- *     items: { type: Array, default: null } as TypedProp<CarouselItem[] | null>,
- *     onRender: { type: Function, default: null } as TypedProp<((item: any) => string) | null>,
- *   }
- */
-export interface TypedProp<T> extends PropDefinition {
-    readonly __brand?: T;
-}
+// The prop and event shapes live with the descriptor's builders (#123); re-exported from here, where
+// they have always been imported from.
+import type { PropType, PropDefinition, TypedProp, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
+export type { PropType, PropDefinition, TypedProp } from './component-descriptor';
 
 /** Map PropType constructor to its JS type. */
 type PropTypeToJS<T extends PropType> =
@@ -117,9 +101,15 @@ export interface ComponentContextBase {
     slot(name: string, scope?: Record<string, unknown>, defaultFn?: () => Node | DocumentFragment): DocumentFragment;
 }
 
-/** Typed component context — provides autocomplete for declared props. */
-export type TypedComponentContext<P extends Record<string, PropDefinition>> =
-    ComponentContextBase & PropSignals<P>;
+/** The events a descriptor declares, by name. */
+export type EventMap = Record<string, EventSpec<unknown>>;
+
+/**
+ * Typed component context — its declared props as signals, and `emit` typed from its declared events
+ * (any name when it declares none).
+ */
+export type TypedComponentContext<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>> =
+    Omit<ComponentContextBase, 'emit'> & { emit: EmitOf<E> } & PropSignals<P>;
 
 /**
  * Untyped component context — legacy compat for components without explicit prop typing.
@@ -127,7 +117,25 @@ export type TypedComponentContext<P extends Record<string, PropDefinition>> =
  */
 export type ComponentContext = ComponentContextBase & Record<string, unknown>;
 
-export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>> {
+/**
+ * What a descriptor declares besides its props (#123), the TypeScript form of the `.pdx` runes. `events`
+ * type `ctx.emit`, and an undeclared name is reported in development. The others are part of the
+ * descriptor's type now and get their behaviour in their own issues: models #124, slots #131, states
+ * #132, parts #134, expose #140, host #133, variants #153.
+ */
+export interface ComponentDeclarations<E extends EventMap = EventMap> {
+    events?: E;
+    models?: Record<string, ModelSpec<unknown>>;
+    slots?: Record<string, SlotSpec<unknown>>;
+    states?: readonly string[];
+    parts?: readonly string[];
+    expose?: readonly string[];
+    host?: Record<string, string>;
+    variants?: Record<string, readonly string[]>;
+}
+
+export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>, E extends EventMap = Record<never, never>>
+    extends ComponentDeclarations<E> {
     props?: P;
     /** Use Shadow DOM instead of Light DOM. Default: false (Light DOM). */
     shadow?: boolean;
@@ -140,23 +148,24 @@ export interface ComponentOptions<P extends Record<string, PropDefinition> = Rec
      * in development builds only, and an unhandled runtime error names it.
      */
     file?: string;
-    setup?: (ctx: TypedComponentContext<P>) => Record<string, unknown> | void;
-    render: (ctx: TypedComponentContext<P>) => DocumentFragment | Node;
+    setup?: (ctx: TypedComponentContext<P, E>) => Record<string, unknown> | void;
+    render: (ctx: TypedComponentContext<P, E>) => DocumentFragment | Node;
 }
 
 /** Options with typed setup return — render ctx includes both props and setup exports. */
 export interface ComponentOptionsWithSetup<
     P extends Record<string, PropDefinition>,
-    S extends Record<string, unknown>
-> {
+    S extends Record<string, unknown>,
+    E extends EventMap = Record<never, never>
+> extends ComponentDeclarations<E> {
     props?: P;
     shadow?: boolean;
     static?: boolean;
     formAssociated?: boolean;
     /** See {@link ComponentOptions.file}. */
     file?: string;
-    setup: (ctx: TypedComponentContext<P>) => S;
-    render: (ctx: TypedComponentContext<P> & S) => DocumentFragment | Node;
+    setup: (ctx: TypedComponentContext<P, E>) => S;
+    render: (ctx: TypedComponentContext<P, E> & S) => DocumentFragment | Node;
 }
 
 // ─── component() ───────────────────────────────────────────────────
@@ -180,14 +189,16 @@ export interface ComponentOptionsWithSetup<
  *   });
  */
 /** Overload: setup returns a typed record → render ctx merges props + setup exports. */
-export function component<P extends Record<string, PropDefinition>, S extends Record<string, unknown>>(
-    tag: string, options: ComponentOptionsWithSetup<P, S>): void;
+export function component<P extends Record<string, PropDefinition>, S extends Record<string, unknown>, E extends EventMap = Record<never, never>>(
+    tag: string, options: ComponentOptionsWithSetup<P, S, E>): void;
 /** Overload: no setup or setup returns void → render ctx has only props. */
-export function component<P extends Record<string, PropDefinition>>(
-    tag: string, options: ComponentOptions<P>): void;
-export function component<P extends Record<string, PropDefinition>>(tag: string, options: ComponentOptions<P>): void {
+export function component<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>>(
+    tag: string, options: ComponentOptions<P, E>): void;
+export function component<P extends Record<string, PropDefinition>, E extends EventMap>(tag: string, options: ComponentOptions<P, E>): void {
     const propDefs = (options.props ?? {}) as Record<string, PropDefinition>;
     const propNames = Object.keys(propDefs);
+    // Declared events (#123): with any declared, a name that is not one is reported in development.
+    const declaredEvents = options.events ? new Set(Object.keys(options.events)) : null;
 
     // Track setup signals per-component for HMR state save/restore
     const _setupSignalRegistry = new WeakMap<HTMLElement, Map<string, Signal<unknown>>>();
@@ -276,7 +287,18 @@ export function component<P extends Record<string, PropDefinition>>(tag: string,
             const slotFns = this._slotFunctions;
             const ctx: Record<string, unknown> = {
                 el: this,
-                emit: (event: string, detail?: unknown, options?: EmitOptions) => this.emit(event, detail, options),
+                emit: (event: string, detail?: unknown, emitOptions?: EmitOptions) => {
+                    if (declaredEvents && !declaredEvents.has(event)) {
+                        if (DEV) console.warn(`[pdx] <${tag}> emitted '${event}', which its descriptor does not declare in \`events\` (declared: ${[...declaredEvents].join(', ') || 'none'}).`);
+                        return this.emit(event, detail, emitOptions);
+                    }
+                    // An event declared `event({ bubbles: false })` does not bubble unless the call says so.
+                    const declared = options.events?.[event];
+                    const resolved = declared?.bubbles === false && emitOptions?.bubbles === undefined
+                        ? { ...emitOptions, bubbles: false }
+                        : emitOptions;
+                    return this.emit(event, detail, resolved);
+                },
                 track: (fn: () => void | (() => void), options?: EffectOptions) => this.track(fn, options),
                 frame: (fn: () => void) => this.frame(fn),
                 expose: (api: Record<string, unknown>) => exposeOnElement(this, api),
@@ -395,6 +417,12 @@ export function component<P extends Record<string, PropDefinition>>(tag: string,
                 // Apply pre-upgrade value through the new setter
                 if (hasPreUpgrade && preUpgradeDesc.value !== undefined) {
                     (this as unknown as Record<string, unknown>)[name] = preUpgradeDesc.value;
+                }
+
+                // A required prop (`prop.required()`) the host did not set by the time it mounts (#123).
+                if (DEV && (def as PropSpec<unknown>).required && initialRaw === null && !carriedFromPrevMount
+                    && !(hasPreUpgrade && preUpgradeDesc.value !== undefined)) {
+                    console.warn(`[pdx] <${tag}> mounted without its required prop '${name}'.`);
                 }
 
                 ctx[name] = propSig;

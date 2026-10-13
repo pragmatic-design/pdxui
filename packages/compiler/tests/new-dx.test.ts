@@ -211,6 +211,40 @@ describe('compile new mode', () => {
         expect(code).toContain("computed(() => __count() * 2, { name: '");
     });
 
+    it('declares its @event names in the descriptor, the way a TypeScript component does (#123)', () => {
+        const { code } = compile(`
+<template><button @click="changed(1)">x</button></template>
+
+<script setup>
+  @event changed: number;
+  @event reset: void;
+</script>`, 'test.pdx');
+
+        expect(code).toContain("events: { 'changed': {}, 'reset': {} },");
+    });
+
+    it('a component that also dispatches with $emit declares none: $emit takes any name', () => {
+        const { code } = compile(`
+<template><button @click="$emit('pdx-change', 1)">x</button></template>
+
+<script setup>
+  @event changed: number;
+</script>`, 'test.pdx');
+
+        expect(code).not.toContain('events:');
+    });
+
+    it('the control: a component with no @event declares no events', () => {
+        const { code } = compile(`
+<template><span>x</span></template>
+
+<script setup>
+  @prop x: number = 0;
+</script>`, 'test.pdx');
+
+        expect(code).not.toContain('events:');
+    });
+
     it('compiles onMount lifecycle', () => {
         const { code } = compile(`
 <template><div>test</div></template>

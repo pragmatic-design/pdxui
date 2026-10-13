@@ -28,13 +28,14 @@ define components by hand with the runtime API (the same API the compiler target
 <my-counter start="3"></my-counter>
 
 <script>
-  const { component, html, signal } = Pragmatic;
+  const { component, html, signal, prop, event } = Pragmatic;
 
   component('my-counter', {
-    props: { start: { type: Number, default: 0 } },
+    props: { start: prop(0) },
+    events: { changed: event() },
     setup(ctx) {
       const count = signal(ctx.start());
-      return { count, inc: () => count.set(v => v + 1) };
+      return { count, inc: () => { count.set(v => v + 1); ctx.emit('changed', count()); } };
     },
     render: (ctx) => html`
       <button @click=${ctx.inc}>Clicked ${ctx.count} times</button>
@@ -44,6 +45,15 @@ define components by hand with the runtime API (the same API the compiler target
 ```
 
 That registers a real custom element `<my-counter>` you can use anywhere on the page.
+
+`prop(default)` declares a prop — an attribute is read as the type its default has, so `start="3"`
+is the number 3 — and `event()` an event the element dispatches. They are the same declarations a
+`.pdx` file compiles into. In TypeScript they also type the context: with
+`props: { size: prop<'sm' | 'md'>('md'), options: prop.required<Option[]>() }` and
+`events: { changed: event<number>() }`, `ctx.size()` is `'sm' | 'md'`, `ctx.emit('changed', 'x')` is a
+type error, and so is emitting an event the component does not declare. A required prop the page
+does not set, and an undeclared event emitted anyway, are reported in development. The older form,
+`props: { start: { type: Number, default: 0 } }`, still works.
 
 **The trade-off, honestly:** without the compiler you don't get the sugar. You write the runtime API
 explicitly — `signal()` instead of `$signal`, `count.set(v => v + 1)` instead of `count++`,
