@@ -6,8 +6,8 @@
 // The others went through `JSON.stringify`, which leaves `</script>` as it is — a module inlined in
 // a page ends at it — and U+2028/U+2029, which an older parser reads as line breaks.
 //
-// The checks, on both render paths (the template path the dev server uses, and the inline path a
-// production build uses by default):
+// The checks, on both render paths (the template path, which still generates a hoisted scoped slot,
+// and the inline path, every .pdx's render since #107):
 //   - the module parses;
 //   - the payload is TEXT: no identifier `__PWNED` exists in the parsed module;
 //   - the module contains no `</script` and no raw U+2028;
@@ -43,7 +43,8 @@ const cases: Case[] = [
 
 function module(template: string, inline: boolean): string {
     const src = `<template>\n  <div>${template}</div>\n</template>\n\n<script setup>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
-    const options = inline ? { production: true, inlineBindings: true } : { production: false };
+    // The template path named: since #107 a dev compile is inline too.
+    const options = inline ? { production: true, inlineBindings: true } : { production: false, inlineBindings: false };
     return compile(src, 'probe.pdx', [], undefined, options).code;
 }
 

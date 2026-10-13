@@ -76,7 +76,7 @@ describe('@for … @transition @stagger, compiled', () => {
             const name = `forstagger${inline ? 'i' : 't'}`;
             const src = "<template><ul>@for (items as it; track it) @transition('fade') @stagger(40) { <li>{{ it }}</li> }</ul>"
                 + "<button @click=\"items = ['a', 'b', 'c']\">go</button></template>\n<script setup>\nlet items = $signal([]);\n</script>\n";
-            const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : {});
+            const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
             const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
             new Function('__core', body)(core);
             const el = document.createElement(`pdx-${name}`);

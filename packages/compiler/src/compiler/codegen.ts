@@ -59,8 +59,8 @@ export function compileSFC(
     precomputedAnalysis?: ReturnType<typeof analyzeScript> | null,
 ): string {
     const production = options?.production ?? false;
-    // Default ON, the same default the plugin applies: a caller that compiles
-    // for production without saying anything gets what a production build gets.
+    // The one render path of a .pdx, in dev and in a build (#107). `false` is an internal switch for
+    // the tests that still measure the template path; the Vite plugin does not forward the option.
     const inlineBindings = options?.inlineBindings ?? true;
 
     // Build per-invocation compile context — replaces all module-level mutable state

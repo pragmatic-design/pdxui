@@ -105,18 +105,23 @@ describe('@raw does not break rewriting of multi-line statements', () => {
     });
 });
 
-describe('raw ${...} in a normal attribute is escaped, scope bindings stay live', () => {
-    it('escapes a component-level ${signal} attribute', () => {
+// The inline render (#107) writes the attribute as the text the author typed, in a loop or not:
+// `${…}` in an unbound attribute is never code, and PDX_RAW_INTERPOLATION says so. The template path
+// let a loop-scoped one run, the only place it did — a production build never had that.
+describe('raw ${...} in a normal attribute is written as text, never evaluated', () => {
+    it('a component-level ${signal} attribute', () => {
         const src = tpl('let count = $signal(0);', '<div title="${count}"></div>');
-        const { code } = compile(src, 'l127.pdx');
-        expect(code).toContain('title="\\${count}"');
+        const { code, warnings } = compile(src, 'l127.pdx');
+        expect(code).toContain('setAttribute("title", "${count}")');
+        expect(warnings.map(w => w.code)).toContain('PDX_RAW_INTERPOLATION');
     });
 
-    it('keeps a loop-scoped ${item.x} attribute live', () => {
+    it('a loop-scoped ${item.x} attribute too', () => {
         const src = tpl('let items = $signal([]);',
             '@for (items as item; track item.id) { <div title="${item.name}"></div> }');
-        const { code } = compile(src, 'l127b.pdx');
-        expect(code).toContain('title="${item.name}"'); // NOT escaped
+        const { code, warnings } = compile(src, 'l127b.pdx');
+        expect(code).toContain('setAttribute("title", "${item.name}")');
+        expect(warnings.map(w => w.code)).toContain('PDX_RAW_INTERPOLATION');
     });
 });
 

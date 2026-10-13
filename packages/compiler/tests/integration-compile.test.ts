@@ -37,12 +37,13 @@ describe('integration — all demos compile without error', () => {
 // ─── Imports correctness ───────────────────────────────────────────
 
 describe('integration — correct imports', () => {
-    it('counter.pdx imports signal, computed, when, component, html', () => {
+    it('counter.pdx imports signal, computed, component — and no html: it renders inline (#107)', () => {
         const { code } = compileDemo('counter.pdx');
         expect(code).toContain('signal');
         expect(code).toContain('computed');
         expect(code).toContain('component');
-        expect(code).toContain('html');
+        expect(code).not.toMatch(/import \{[^}]*\bhtml\b[^}]*\} from '@pdxui\/core'/);
+        expect(code).toContain('document.createElement(');
     });
 
     it('todo-list.pdx imports each for @for directive', () => {
@@ -170,14 +171,14 @@ describe('integration — template codegen', () => {
         const { code } = compileDemo('user-list.pdx');
         // Inside eachRow(), user is the loop callback param — a row getter —
         // and should NOT be ctx.user
-        expect(code).toContain('(user) =>');
+        expect(code).toContain('(user)=>');
         expect(code).toContain('user().name');
         expect(code).not.toMatch(/ctx\.user\b/); // ctx.user — not ctx.users / ctx.userData
     });
 
     it('todo-list.pdx: @for loop variable NOT prefixed with ctx.', () => {
         const { code } = compileDemo('todo-list.pdx');
-        expect(code).toContain('(item) =>');
+        expect(code).toContain('(item)=>');
         expect(code).toContain('item().text');
         expect(code).not.toMatch(/ctx\.item\b(?!s)/);
     });

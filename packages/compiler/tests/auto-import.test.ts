@@ -291,7 +291,7 @@ describe('a component only used inside @defer', () => {
         resolver.registerUiManifest();
         const { code } = compile(source, 'page.pdx', undefined, undefined, {
             importPathOf: (tag) => resolver.resolve(tag)?.importPath ?? null,
-            ...(inline ? { production: true, inlineBindings: true } : {}),
+            ...(inline ? { production: true, inlineBindings: true } : { inlineBindings: false }),
         });
         return injectComponentImports(code, 'page.pdx', source, resolver);
     };

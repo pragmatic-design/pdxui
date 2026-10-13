@@ -12,12 +12,13 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-/** Compile a template, in both binding modes: the template path and the inline-bindings one. */
+/** Compile a template, in both binding modes: the template path (named, since #107 made the inline
+ *  path every .pdx's) and the inline one. */
 function both(template: string): { template: string; inline: string } {
     const source = `<template>\n${template}\n</template>\n<script setup>\n  let on = $signal(1);\n</script>`;
     return {
-        template: compile(source, 'obj.pdx').code,
-        inline: compile(source, 'obj.pdx', [], undefined, { inlineBindings: true }).code,
+        template: compile(source, 'obj.pdx', [], undefined, { inlineBindings: false }).code,
+        inline: compile(source, 'obj.pdx').code,
     };
 }
 

@@ -183,7 +183,8 @@ function save() { throw new Error('nope'); }
 `;
 
     it('the template path: a handler, a binding, interpolations, @for and @if', () => {
-        const { code, map } = compile(TEMPLATE, 'tpl.pdx');
+        // Named: since #107 a dev compile takes the inline path, measured below.
+        const { code, map } = compile(TEMPLATE, 'tpl.pdx', [], undefined, { inlineBindings: false });
         expect(probe(TEMPLATE, code, map, [
             ['@click="save"', '@click=${|safeHandler(batchHandler(ctx.save'],
             [':value="name"', ':value=${|ctx.name}'],
@@ -194,17 +195,19 @@ function save() { throw new Error('nope'); }
         ])).toEqual([]);
     });
 
-    it('the inline path (a production build): the same six', () => {
-        const { code, map } = compile(TEMPLATE, 'tpl.pdx', [], undefined, { production: true, inlineBindings: true });
-        expect(probe(TEMPLATE, code, map, [
-            ['@click="save"', "__el1.addEventListener('click'"],
-            [':value="name"', 'let __el2w_value = {}; effect('],
-            ['label }}', 'bindInterpolation(__t4,'],
-            ['items as item', 'const __cf7=eachRow('],
-            ['item }}</li>', 'bindInterpolation(__t6,'],
-            ['show) {', 'const __cf9=when('],
-        ])).toEqual([]);
-    });
+    for (const [where, options] of [['a production build', { production: true, inlineBindings: true }], ['dev, every .pdx\'s since #107', {}]] as const) {
+        it(`the inline path (${where}): the same six`, () => {
+            const { code, map } = compile(TEMPLATE, 'tpl.pdx', [], undefined, options);
+            expect(probe(TEMPLATE, code, map, [
+                ['@click="save"', "__el1.addEventListener('click'"],
+                [':value="name"', 'let __el2w_value = {}; effect('],
+                ['label }}', 'bindInterpolation(__t4,'],
+                ['items as item', 'const __cf7=eachRow('],
+                ['item }}</li>', 'bindInterpolation(__t6,'],
+                ['show) {', 'const __cf9=when('],
+            ])).toEqual([]);
+        });
+    }
 
     // The marks are removed before the module leaves compile(): with or without a map, the module is
     // the same — in dev, in a production build, and on the production template path, whose binding

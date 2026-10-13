@@ -138,7 +138,7 @@ describe('$inline render-time blocks', () => {
         // render should be a block function, not arrow expression
         expect(code).toMatch(/render:\s*\(ctx\)\s*=>\s*\{/);
         expect(code).toContain('sorted = [');
-        expect(code).toContain('return html`');
+        expect(code).toContain('return (() => {');
     });
 });
 

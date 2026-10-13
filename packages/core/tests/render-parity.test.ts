@@ -1,10 +1,12 @@
 // What the two render paths of a .pdx template put in the DOM, row by row (#92).
 //
-// A template compiles two ways. Dev, and a build with `inlineBindings: false`, emit an html``
-// tagged template that core binds at runtime; a production build emits imperative DOM code by
-// default — the inline path. Nothing compared what the two actually render, so a feature that works
-// in dev and vanishes in a build went unnoticed until someone looked at the build: transitions,
-// `:class` with an object, `::value` on a component.
+// A template compiled two ways: the html`` tagged template that core binds at runtime, and
+// imperative DOM code — the inline path, which since #107 every .pdx takes, in dev and in a build.
+// Until then dev took the template path, and nothing compared what the two actually render, so a
+// feature that works in dev and vanished in a build went unnoticed until someone looked at the
+// build: transitions, `:class` with an object, `::value` on a component. The template path is
+// reached here through compile()'s internal `inlineBindings: false`, until this table records its
+// DOM as expectations (#237).
 //
 // Each row is compiled twice, mounted twice in happy-dom, acted on the same way, and its DOM
 // compared after normalising what is allowed to differ: the scope attribute, marker comments and
@@ -53,13 +55,19 @@ const mountName = (host: HTMLElement) => host.localName.slice(4);
 
 let seq = 0;
 
+/** The compile options of each path. The template path is NAMED: since #107 the default is inline. */
+const PATH_OPTIONS = {
+    template: { inlineBindings: false },
+    inline: { production: true, inlineBindings: true },
+} as const;
+
 /** The component compiled on one path, defined, and mounted in the document. */
 function mount(row: Row, inline: boolean): HTMLElement {
     const name = `parity${++seq}${inline ? 'i' : 't'}`;
     const src = `<template>${row.template}</template>\n<script setup>\n${row.script ?? ''}\n</script>\n`;
     // The one component a row may load lazily resolves to a specifier naming this mount.
     const importPathOf = (tag: string) => (tag === 'pdx-deferred-probe' ? `${DEFERRED_MODULE}?for=${name}` : null);
-    const options = inline ? { production: true, inlineBindings: true, importPathOf } : { importPathOf };
+    const options = { ...(inline ? PATH_OPTIONS.inline : PATH_OPTIONS.template), importPathOf };
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     // The module's one core import becomes a destructure of the core module this test runs on, and a
     // dynamic import becomes the recorder above.
@@ -280,6 +288,14 @@ const ROWS: Row[] = [
 ];
 
 describe('the two render paths put the same DOM in the page (#92)', () => {
+    it('the two mounts compile through two paths, or the table compares a path with itself', () => {
+        const src = '<template><p :title="t">{{ t }}</p></template>\n<script setup>\nlet t = $signal(\'x\');\n</script>\n';
+        const template = compile(src, 'probe-t.pdx', [], undefined, PATH_OPTIONS.template).code;
+        const inline = compile(src, 'probe-i.pdx', [], undefined, PATH_OPTIONS.inline).code;
+        expect(template, 'the template mount did not compile through the template path').toMatch(/\bhtml`/);
+        expect(inline, 'the inline mount did not compile through the inline path').not.toMatch(/\bhtml`/);
+    });
+
     for (const row of ROWS) {
         it(row.owner ? `${row.name} — differs, owned by #${row.owner}` : row.name, async () => {
             const template = await render(row, false);

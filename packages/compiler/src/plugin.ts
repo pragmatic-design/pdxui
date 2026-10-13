@@ -88,20 +88,13 @@ export interface PdxPluginOptions {
     /**
      * Build the DOM imperatively instead of through `html```. Production only, on by default.
      *
-     * This is the "direct property assignment inline" of the Dual Mode table. It replaces the
-     * tagged template — and with it the innerHTML parse, the placeholder scan and the
-     * `bindAttribute` dispatch — with `createElement`/`appendChild` and a direct assignment per
-     * binding. In dev it is ignored: there is no build, and the template path is what HMR reloads.
+     * Ignored, and reported as `PDX_INLINE_BINDINGS_IGNORED`: a .pdx compiles with one render path,
+     * the inline one — `createElement`/`appendChild` and a direct assignment per binding — in dev
+     * and in a build alike (#107), so a feature cannot exist in one and be missing from the other.
+     * The tagged template stays in core for hand-written components. The option itself is removed
+     * with the beta's other removed forms.
      *
-     * **On by default.** Measured: 3.5x on the mount of a 1500-row list (19 ms to 5.5 ms) for
-     * +0.4 KB gzipped, with every suite green with it on. The numbers are in
-     * `packages/showcase/tests/bundle-budget.spec.ts`.
-     *
-     * `pdx({ inlineBindings: false })` is the way back to the tagged template. The flag is kept
-     * rather than removed on purpose: an inlining that turns out to be wrong in some case needs a
-     * switch, and a render path nothing can select cannot be compared or fallen back to.
-     *
-     * In dev it is ignored either way: there is no build, and the template path is what HMR reloads.
+     * @deprecated It selects nothing; remove it.
      */
     inlineBindings?: boolean;
 
@@ -165,7 +158,6 @@ export function pdx(options?: PdxPluginOptions): Plugin {
     const componentDirs = options?.components ?? [];
     const devtools = options?.devtools ?? true;
     const autoAlias = options?.autoAlias ?? true;
-    const inlineBindings = options?.inlineBindings ?? true;
     const preloadRoutes = options?.preloadRoutes ?? ['/'];
     const design = options?.design ?? false;
     const defaultLayout = options?.defaultLayout;
@@ -298,6 +290,13 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             // precisely because it lost.
             for (const c of componentResolver.collisions) {
                 this.warn({ code: c.code, message: `${c.message}\n  Hint: ${c.hint}` });
+            }
+            // A .pdx has one render path, in dev and in a build (#107): the option selects nothing.
+            if (options?.inlineBindings !== undefined) {
+                this.warn({
+                    code: 'PDX_INLINE_BINDINGS_IGNORED',
+                    message: `pdx({ inlineBindings: ${String(options.inlineBindings)} }): the option no longer selects a render path; remove it.`,
+                });
             }
         },
 
@@ -452,7 +451,6 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design,
                     // The file a runtime error names, as the app knows it.
                     sourceFile: isDevMode ? relative(projectRoot, normalize(id)).replace(/\\/g, '/') : undefined,
-                    inlineBindings,
                     defaultLayout,
                     propsOf: (tag) => componentResolver.propsOf(tag),
                     enumValues: (tag, prop) => componentResolver.enumValues(tag, prop),

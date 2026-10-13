@@ -21,8 +21,8 @@ describe('@for row getters', () => {
         const code = tpl('@for (rows as r, i; track r.id) { <b>{{ i }} {{ r.name }}</b> }');
         parses(code);
         expect(code).toContain('eachRow(');
-        expect(code).toContain('${() => r().name}');
-        expect(code).toContain('${() => i()}');
+        expect(code).toContain('()=>r().name)');
+        expect(code).toContain('()=>i())');
     });
 
     it('a property with the same name as the loop variable is not a reference', () => {
@@ -50,17 +50,17 @@ describe('@for row getters', () => {
         // did) would leave the outer `r.name` below as `ctx.r`.
         const code = tpl('@for (rows as r; track r.id) { @for (r.kids as r; track r.id) { <i>{{ r.n }}</i> } <b>{{ r.name }}</b> }');
         parses(code);
-        expect(code).toContain('() => r().kids');
-        expect(code).toContain('${() => r().n}');
-        expect(code, 'the outer item lost its getter after the inner loop').toContain('${() => r().name}');
+        expect(code).toContain('()=>r().kids');
+        expect(code).toContain('()=>r().n)');
+        expect(code, 'the outer item lost its getter after the inner loop').toContain('()=>r().name)');
         expect(code).not.toMatch(/ctx\.r\b/);
     });
 
     it('a :ref inside a row gets the ref object, not an arrow — bindRef only accepts .set()', () => {
         const code = tpl('@for (rows as r; track r.id) { <b :ref="r.ref"></b> }');
         parses(code);
-        expect(code).toContain(':ref=${r().ref}');
-        expect(code).not.toContain(':ref=${() =>');
+        expect(code).toMatch(/bindRef\(__el\d+,r\(\)\.ref\)/);
+        expect(code).not.toMatch(/bindRef\(__el\d+,\(\)\s*=>/);
     });
 
     it('control — a destructured binding keeps each(), bound once', () => {

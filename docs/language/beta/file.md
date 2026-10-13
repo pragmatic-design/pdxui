@@ -122,7 +122,8 @@ beta (#121)
 
 ### Semantics
 
-A template is compiled by **one** code generator, in development and in a production build (#107):
+A template is compiled by **one** code generator, in development and in a production build (#107 —
+landed; the parity table's recorded expectations are #237, the template path's removal #238):
 the template becomes imperative DOM code — with its static parts cloned from a `<template>` built once
 (#109) — that binds each dynamic part in place. There is no second render path whose behaviour could
 differ: a construct means the same everywhere, and the render parity table

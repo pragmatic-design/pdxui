@@ -20,7 +20,7 @@ describe('@search', () => {
             const name = `searchrender${inline ? 'i' : 't'}`;
             const src = '<template><p class="t">{{ searchParams.page }} {{ searchParams.q }}</p><p class="s">{{ next }}</p></template>\n'
                 + "<script setup>\n@page '/s';\n@search { page: number = 1, q?: string }\nconst next = $derived(searchParams.page + 1);\n</script>\n";
-            const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : {});
+            const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
             const body = code
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/router';?\s*$/gm, 'const {$1} = __router;');

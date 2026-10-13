@@ -10,11 +10,11 @@ import { prefixCtx } from '../src/compiler/codegen-prefix';
 import { createCompileContext } from '../src/compiler/compile-context';
 
 function handlerOf(code: string, event: string): string {
-    const at = code.indexOf(`@${event}=`);
+    const at = code.indexOf(`addEventListener('${event}',`);
     expect(at, `no @${event} binding in:\n${code}`).toBeGreaterThanOrEqual(0);
-    // The handler is `@click=${safeHandler(() => …, tag, 'click')}`: cut at its closing marker,
-    // not at the first `>`, which is the arrow's.
-    const end = code.indexOf(`'${event}')`, at);
+    // The handler is `addEventListener('click', safeHandler(() => …, tag, 'click'))`: cut at its
+    // closing marker, not at the first `>`, which is the arrow's.
+    const end = code.indexOf(`'${event}')`, at + `addEventListener('${event}',`.length);
     expect(end, `no closing marker for @${event} in:\n${code}`).toBeGreaterThan(at);
     return code.slice(at, end);
 }

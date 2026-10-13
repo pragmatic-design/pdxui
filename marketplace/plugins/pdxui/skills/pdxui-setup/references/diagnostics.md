@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 72 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 73 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -385,13 +385,21 @@ let a = $signal(1);
 </script>
 ```
 
+### PDX_INLINE_BINDINGS_IGNORED
+
+*warn* — `pdx({ inlineBindings })` is given, and no longer selects a render path.
+
+A `.pdx` compiles with one render path, the inline one, in dev and in a build, so a feature cannot exist in one and be missing from the other. The option changes nothing; the warning says so once per build or dev server.
+
+**Fix.** Remove `inlineBindings` from the `pdx()` options.
+
 ### PDX_INLINE_NODE_UNSUPPORTED
 
 *warn* — A template node the inline render path cannot compile.
 
-The node would be left out of the production render. The warning makes a missing feature visible instead of silent.
+The node would be left out of the render, in dev and in a build — the inline path is the only one a `.pdx` compiles with. The warning makes a missing feature visible instead of silent.
 
-**Fix.** Build with `pdx({ inlineBindings: false })`, and report the node type.
+**Fix.** Open an issue naming the node type.
 
 ### PDX_INVALID_ENUM_VALUE
 

@@ -22,7 +22,7 @@ describe('bind() in a style', () => {
                 + "<script setup>\n@prop tone: string = 'red';\nlet w = $signal(40);\nconst half = $derived(w / 2 + 'px');\n</script>\n"
                 + '<style scoped>button { width: calc(bind(w) * 1px); height: bind(half); color: bind(tone); }</style>\n';
             const file = `${name}.pdx`;
-            const { code } = compile(src, file, [], undefined, inline ? { production: true, inlineBindings: true } : {});
+            const { code } = compile(src, file, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
             const body = code
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
                 .replace(/^\s*import\s*'virtual:pdx-style[^']*';?\s*$/gm, '');

@@ -37,8 +37,9 @@ let x = $signal(0);
 </script>`;
 
         const result = compile(source, 'panel.pdx');
-        // Without :bindings, slot stays as HTML (basic slot projection)
-        expect(result.code).toContain('<slot');
+        // Without :bindings, the slot stays an element (basic slot projection), with its name
+        expect(result.code).toMatch(/(__el\d+) = document\.createElement\('slot'\);\s*\1\.setAttribute\("name", "header"\)/);
+        expect(result.code).not.toContain('renderSlot');
     });
 
     it('imports renderSlot when scoped slot is used', () => {
