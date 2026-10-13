@@ -188,6 +188,14 @@ const ROWS: Row[] = [
     { name: '@if / @else', expected: '<p>no</p><button>t</button>', template: '@if (on) { <p>yes</p> } @else { <p>no</p> }<button @click="on = !on">t</button>', script: 'let on = $signal(true);', act: click('button') },
     { name: '@for with track', expected: '<ul><li>a</li><li>b</li></ul>', template: '<ul>@for (items as it; track it.id) { <li>{{ it.label }}</li> }</ul>', script: "let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);" },
     { name: '@for with @empty', expected: '<ul><li>none</li></ul>', template: '<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: 'let items = $signal([]);' },
+    // Whitespace between table-internal elements renders nothing and is not emitted (#111): the read
+    // counts the text nodes inside the table that are not in a cell.
+    {
+        name: '@for rows in a table, spaced', expected: '<table><tbody><tr><td>1</td><td>a</td></tr><tr><td>2</td><td>b</td></tr></tbody></table>', expectedRead: 0,
+        template: '<table>\n  <tbody>\n    @for (items as it; track it.id) {\n      <tr> <td>{{ it.id }}</td> <td>{{ it.label }}</td> </tr>\n    }\n  </tbody>\n</table>',
+        script: "let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);",
+        read: (h) => [...h.querySelectorAll('table, tbody, tr')].reduce((n, el) => n + [...el.childNodes].filter(c => c.nodeType === 3 && c.textContent !== '').length, 0),
+    },
     { name: '@switch', expected: '<p>B</p>', template: "@switch (mode) { @case ('a') { <p>A</p> } @case ('b') { <p>B</p> } @default { <p>?</p> } }", script: "let mode = $signal('b');" },
     {
         name: '::checked on a checkbox', expected: '<input type="checkbox"></input><p>true</p>', expectedRead: true,
