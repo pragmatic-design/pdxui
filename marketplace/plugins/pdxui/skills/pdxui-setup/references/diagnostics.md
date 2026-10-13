@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 79 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 81 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -25,6 +25,66 @@ The user sees nothing while the promise is pending.
 A cycle has no first value to compute; the runtime breaks it and the values are wrong.
 
 **Fix.** Make one of them a `$signal` that the other writes.
+
+### PDX_COMMAND_TARGET_MISSING
+
+*error* — A `commandfor` whose target id is not in the template.
+
+The browser finds the target of `commandfor="x"` by id when the button is pressed. With no `id="x"`, the button does nothing, and nothing says so.
+
+**Fix.** Give the element it controls the id `commandfor` names.
+
+Instead of:
+
+```html
+<template>
+  <button commandfor="d" command="--show">Open</button><pdx-dialog title="T">x</pdx-dialog>
+</template>
+<script setup>
+let a = $signal(1);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <button commandfor="d" command="--show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>
+</template>
+<script setup>
+let a = $signal(1);
+</script>
+```
+
+### PDX_COMMAND_UNKNOWN
+
+*error* — A command its target does not answer: a `--name` the component does not expose, or a built-in command for another element type.
+
+A custom command `--name` calls the method `name` the target component exposes; a built-in one (`show-modal`, `toggle-popover`, …) is the platform's, for a `<dialog>` or a popover. Any other pairing does nothing when the button is pressed.
+
+**Fix.** Use a method the component exposes (`command="--show"` on pdx-dialog), or point a built-in command at an element that has it.
+
+Instead of:
+
+```html
+<template>
+  <button commandfor="d" command="show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>
+</template>
+<script setup>
+let a = $signal(1);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <button commandfor="d" command="--show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>
+</template>
+<script setup>
+let a = $signal(1);
+</script>
+```
 
 ### PDX_DEFER_UNKNOWN_TRIGGER
 

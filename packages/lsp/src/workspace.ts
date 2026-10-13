@@ -111,7 +111,7 @@ export class Workspace {
         const tmplStart = tmpl ? source.indexOf(tmpl) : -1;
         const registry = this.registryOf(document.uri);
         const vf = buildVirtualFile(descriptor.script.content, descriptor.script.start, ast ?? null, tmpl, tmplStart,
-            (tag, attr) => resolvePropType(registry, tag, attr));
+            (tag, attr) => resolvePropType(registry, tag, attr), (tag) => this.exposedOf(registry, tag));
         this.vfCache.set(document.uri, { version: document.version, vf });
         return vf;
     }
@@ -123,7 +123,27 @@ export class Workspace {
         const tmpl = descriptor.template?.content ?? null;
         const registry = this.registryOf(uri);
         return buildVirtualFile(descriptor.script.content, descriptor.script.start, ast ?? null, tmpl, tmpl ? text.indexOf(tmpl) : -1,
-            (tag, attr) => resolvePropType(registry, tag, attr));
+            (tag, attr) => resolvePropType(registry, tag, attr), (tag) => this.exposedOf(registry, tag));
+    }
+
+    /**
+     * What a component tag exposes, for a `:ref` on it (#140): a library component's methods from its
+     * manifest, a project component's `@expose` names from its .pdx — the open text if it is open.
+     * Null for a tag that exposes nothing the editor can know.
+     */
+    private exposedOf(registry: ProjectRegistry, tag: string): readonly string[] | null {
+        const methods = registry.resolver.methodsOf(tag);
+        if (methods) return [...methods];
+        const entry = registry.resolver.resolve(tag);
+        if (entry?.source !== 'project' || !entry.importPath.endsWith('.pdx')) return null;
+        try {
+            const uri = pathToUri(entry.importPath);
+            const text = this.documents.get(uri)?.getText() ?? readFileSync(entry.importPath, 'utf-8');
+            const exposes = analyzeDocument(text, entry.importPath).analysis?.exposes;
+            return exposes && exposes.length > 0 ? exposes : null;
+        } catch {
+            return null; // a file that cannot be read: the ref stays untyped
+        }
     }
 
     /**
@@ -157,7 +177,12 @@ export class Workspace {
         setAnalyzeOptions((uri) => {
             try {
                 const { resolver } = this.registryOf(uri);
-                return { propsOf: (tag) => resolver.propsOf(tag), enumValues: (tag, prop) => resolver.enumValues(tag, prop) };
+                return {
+                    propsOf: (tag) => resolver.propsOf(tag),
+                    enumValues: (tag, prop) => resolver.enumValues(tag, prop),
+                    // The methods a library component exposes, for PDX_COMMAND_UNKNOWN (#140).
+                    methodsOf: (tag) => resolver.methodsOf(tag),
+                };
             } catch {
                 return {}; // a project whose packages cannot be read: the checks that need them stay off
             }

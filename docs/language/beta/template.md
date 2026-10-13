@@ -228,6 +228,10 @@ RefBinding ::= ":ref" "=" AttrValue
 As alpha, and typed from the target: an element ref is its element type, a component ref is the
 component's exposed type (#140). `ref=` without the colon is removed (#129).
 
+**Landed** for a component ref (#140): the element plus the component's exposed members. An element
+ref's own type (`HTMLInputElement` for `<input>`) is not inferred yet: it reads the tag from the
+template, which is the editor's template projection (#122).
+
 ### `@swipe`, `@longpress`, `@pinch` — unchanged, working
 
 ```ebnf

@@ -456,6 +456,16 @@ function close() { box?.close(); }
 </script>
 ```
 
+**Landed** (#140). Core listens for `command` on every host that exposes something, and calls the
+exposed method with no arguments; a built-in command (no `--`) is left to the platform. The editor
+types a `:ref` declared `$signal(null)` on a component as the element plus what the component exposes —
+manifest methods for a library component, `@expose` for a `.pdx` — so the element's own API
+(`focus()`) stays reachable and anything else is an error. The compiler reads a library component's
+methods from its manifest for `PDX_COMMAND_UNKNOWN`; a project component's commands are not checked at
+compile time. `PDX_COMMAND_TARGET_MISSING` is skipped when the template binds an `:id`. The
+descriptor's `expose` stays a declaration: a TypeScript component exposes with `ctx.expose`, which is
+what the manifest reads.
+
 ### Since
 
 alpha → beta (#140)

@@ -102,6 +102,8 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
     let searched: (() => readonly string[]) | undefined;
     // The manifest's enum values, for PDX_INVALID_ENUM_VALUE — the dev server's check.
     let enumValues: ((tag: string, prop: string) => readonly string[] | null) | undefined;
+    // The manifest's exposed methods, for PDX_COMMAND_UNKNOWN (#140).
+    let methodsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
     try {
         const resolver = new ComponentResolver();
         // The component packages the PROJECT depends on, read from its package.json — the
@@ -127,6 +129,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
         knownTags = () => resolver.tags;
         searched = () => resolver.searched;
         enumValues = (tag: string, prop: string) => resolver.enumValues(tag, prop);
+        methodsOf = (tag: string) => resolver.methodsOf(tag);
     } catch { /* no resolver → the check stays silent, which is the honest default */ }
 
     const result: CheckResult = { reports: [], checked: files.length, totalErrors: 0, totalWarnings: 0, totalFixed: 0, totalIgnored: 0 };
@@ -153,7 +156,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
                 continue;
             }
 
-            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, design: !!args.design };
+            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, methodsOf, design: !!args.design };
             let inspected = inspectFile(source, file, options);
             // --fix: apply what can be applied, then report the file as it is AFTER — what is
             // left, re-validated, and what was fixed — so an agent does not have to run again to

@@ -174,6 +174,20 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it first (`function close() { … }`), or remove it from `@expose`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_COMMAND_TARGET_MISSING: {
+        severity: 'error', category: 'defect',
+        summary: 'A `commandfor` whose target id is not in the template.',
+        explanation: 'The browser finds the target of `commandfor="x"` by id when the button is pressed. With no `id="x"`, the button does nothing, and nothing says so.',
+        fix: 'Give the element it controls the id `commandfor` names.',
+        example: { bad: pdx('<button commandfor="d" command="--show">Open</button><pdx-dialog title="T">x</pdx-dialog>', 'let a = $signal(1);'), good: pdx('<button commandfor="d" command="--show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>', 'let a = $signal(1);') },
+    },
+    PDX_COMMAND_UNKNOWN: {
+        severity: 'error', category: 'defect',
+        summary: 'A command its target does not answer: a `--name` the component does not expose, or a built-in command for another element type.',
+        explanation: 'A custom command `--name` calls the method `name` the target component exposes; a built-in one (`show-modal`, `toggle-popover`, …) is the platform\'s, for a `<dialog>` or a popover. Any other pairing does nothing when the button is pressed.',
+        fix: 'Use a method the component exposes (`command="--show"` on pdx-dialog), or point a built-in command at an element that has it.',
+        example: { bad: pdx('<button commandfor="d" command="show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>', 'let a = $signal(1);'), good: pdx('<button commandfor="d" command="--show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>', 'let a = $signal(1);') },
+    },
     PDX_PART_MISSING: {
         severity: 'error', category: 'defect',
         summary: 'A declared `@part` that no element of the template carries.',

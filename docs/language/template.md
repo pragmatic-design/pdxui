@@ -498,6 +498,9 @@ its scope is disposed, so they still read the element.
 
 - A value that is not a signal (no `.set`) is ignored without a word: declare the ref as
   `let box = $signal(null);`. Not checked today.
+- On a component, a ref declared `$signal(null)` is typed in the editor from what the component
+  exposes (#140): its manifest methods for a library component, its `@expose` for a `.pdx` — the
+  element plus those members, so calling one it does not expose is an error.
 
 #### Examples
 
@@ -515,7 +518,47 @@ function focus() { field?.focus(); }
 
 #### Since
 
-alpha
+alpha; typed on a component since beta (#140)
+
+### `commandfor`, `command` — invoker commands
+
+#### Syntax
+
+```ebnf
+CommandAttributes ::= 'commandfor="' Identifier '"' S 'command="' ( "--" Identifier | BuiltInCommand ) '"'
+```
+
+The platform's attributes, written on a `<button>`.
+
+#### Semantics
+
+The browser's Invoker Commands: pressing the button dispatches a `command` event on the element whose
+`id` is `commandfor`. A built-in command (`show-modal`, `close`, `toggle-popover`, …) is the platform's.
+A custom one, `--name`, calls the method `name` the target component exposes (`@expose`, or
+`ctx.expose` in TypeScript), with no arguments (#140): core listens for the event on every host that
+exposes something.
+
+#### Rules
+
+- A `commandfor` with no element of that `id` in the template raises `PDX_COMMAND_TARGET_MISSING`
+  (unless the template binds an `:id`, which may be it).
+- A `--name` the target does not expose — read from the manifest for a library component — and a
+  built-in command pointed at an element that does not have it (`show-modal` needs a `<dialog>`,
+  `toggle-popover` a `popover` element) raise `PDX_COMMAND_UNKNOWN`, as does a command that is neither
+  built-in nor `--`.
+
+#### Examples
+
+```pdx
+<template>
+  <button commandfor="shift" command="--show">Start shift</button>
+  <pdx-dialog id="shift" title="Start of shift">…</pdx-dialog>
+</template>
+```
+
+#### Since
+
+beta (#140)
 
 ### `@swipe`, `@longpress`, `@pinch`
 

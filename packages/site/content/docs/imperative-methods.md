@@ -7,8 +7,30 @@ order: 23
 # Refs & Methods
 
 Most of the time you drive a component **declaratively** — bind a prop and let the signal do the work.
-But sometimes you need to reach in and *do* something: focus an input, open a dialog, upload the queued
-files. PDX gives you two imperative handles, both through an element **ref**.
+When a **button** triggers an action, an **invoker command** does it with no script (below). For the
+rest — focus an input, scroll a list, upload the queued files from code — you reach the element through
+a **ref**.
+
+## A button that runs a method: invoker commands
+
+Every method a component exposes is also a command the platform's
+[Invoker Commands](https://developer.mozilla.org/docs/Web/API/Invoker_Commands_API) can send. Point the
+button at the component with `commandfor`, and name the method with `--`:
+
+```pdx
+<template>
+  <button commandfor="shift" command="--show">Start shift</button>
+  <pdx-dialog id="shift" title="Start of shift">
+    …
+    <button commandfor="shift" command="--close">Done</button>
+  </pdx-dialog>
+</template>
+```
+
+The button calls `show()` on the dialog, with no handler and no ref. The compiler checks the pair: a
+`commandfor` with no element of that `id` in the template is `PDX_COMMAND_TARGET_MISSING`, and a
+`--name` the target does not expose (`--open` on `pdx-dialog`) is `PDX_COMMAND_UNKNOWN`, as is a
+built-in command (`show-modal`, `toggle-popover`) pointed at an element that does not have it.
 
 ## Getting a ref
 
@@ -32,6 +54,10 @@ touch it. Start it at `null` — the element does not exist when setup runs.
 From then on `dlg` is the actual custom element: anything you can do to a DOM node, you can do to it.
 You write `dlg`, not `dlg()` — the compiler reads the signal for you, in the template and in the script
 alike.
+
+In the editor the ref is **typed from what the component exposes**: on a `pdx-dialog`, `dlg.show()` and
+`dlg.focus()` are fine, and `dlg.nope()` is an error. A library component's methods come from its
+manifest; your own component's from its `@expose`.
 
 ## 1. Set props reactively
 
@@ -81,7 +107,8 @@ ships today:
 | `pdx-autocomplete` | `open()`, `close()`, `clear()` |
 | `pdx-file-upload`  | `addFiles()`, `removeFile()`, `uploadAll()`, `clear()` |
 | `pdx-tag-input`    | `addTag()`, `removeTag()`, `clear()`, `getTags()` |
-| `pdx-dialog` / `pdx-drawer` | controlled via the `open` prop (set `dlg.open = true`) |
+| `pdx-dialog` | `show()`, `close()`, `toggle()` — or the `open` prop |
+| `pdx-drawer` | controlled via the `open` prop (set `dlg.open = true`) |
 | `pdx-fab` / `pdx-dropdown-menu` | `open()`, `close()`, `toggle()` |
 | `pdx-context-menu` | `open(anchorEl)`, `close()` |
 | `pdx-menu` | `closeAll()`, `closeSubmenu()` |
@@ -114,7 +141,8 @@ function close() { open = false; }
 ```
 
 The compiler wires `ctx.expose({ showModal, close })` for you — the methods appear on the element and
-in the generated `.d.ts`.
+in the generated `.d.ts`, a `:ref` on your component is typed with them, and each is a command:
+`<button commandfor="d" command="--showModal">`.
 
 ## Gotchas
 

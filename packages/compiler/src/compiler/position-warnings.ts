@@ -119,6 +119,16 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_EVENT_NAME_CASE':
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`)) : undefined;
+        case 'PDX_COMMAND_TARGET_MISSING': {
+            // Match: the `commandfor="…"` the message names (`commandfor 'x' names …`).
+            const id = /^commandfor '([^']+)'/.exec(w.message)?.[1];
+            return id ? find(source, template, new RegExp(`commandfor=["']${escape(id)}["']`)) : undefined;
+        }
+        case 'PDX_COMMAND_UNKNOWN': {
+            // Match: the `command="…"` the message names (`command '--open' …`).
+            const cmd = /^command '([^']+)'/.exec(w.message)?.[1];
+            return cmd ? find(source, template, new RegExp(`(?<![\\w-])command=["']${escape(cmd)}["']`)) : undefined;
+        }
         case 'PDX_PART_MISSING':
             // Match: the `@part` line that lists the name.
             return name ? find(source, script, new RegExp(`@part\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;

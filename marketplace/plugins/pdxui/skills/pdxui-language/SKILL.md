@@ -108,6 +108,13 @@ dispatched as `itemPicked` and listened for as `itempicked` — never heard. The
 `PDX_EVENT_NAME_CASE` on such a declaration. Not kebab-case either: the name is also the emitter's
 identifier.
 
+**A button that runs a component's method needs no script**: every `@expose`d method is an invoker
+command. `<button commandfor="d" command="--show">` calls `show()` on `<pdx-dialog id="d">`. The
+compiler checks it: no `id="d"` in the template is `PDX_COMMAND_TARGET_MISSING`, a `--name` the target
+does not expose is `PDX_COMMAND_UNKNOWN`. Prefer a prop for state, `commandfor` for an action a button
+triggers, a `:ref` for what neither expresses (`focus()`). A `:ref` declared `$signal(null)` on a
+component is typed in the editor by what it exposes: `dlg.nope()` is an error.
+
 **`@part trigger, popup;`** names a component's public inner elements: write `data-part="popup"` on
 exactly one element each. A page or theme styles a part as `my-menu [data-part="popup"]` — parts,
 `:state()` and the component's tokens are the public styling surface, its internal classes are not. In

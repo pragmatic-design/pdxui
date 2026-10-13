@@ -164,6 +164,17 @@
                 };
             },
 
+            // A button opens and closes a dialog with no script: invoker commands on its exposed
+            // methods (#140). `--open` names nothing pdx-dialog exposes.
+            'invoker-commands': () => {
+                const sec = show('case-invoker-commands');
+                const dlg = sec.querySelector('pdx-dialog');
+                api.read = () => ({
+                    open: !!dlg.open,
+                    panelPresent: !!document.querySelector('.pdx-dialog-backdrop[data-open]'),
+                });
+            },
+
             // A dialog the user must not be able to dismiss.
             'dialog-prevent-close': () => {
                 const sec = show('case-dialog-prevent-close');
@@ -963,6 +974,16 @@
         <pdx-drawer data-test="drawer" position="right" size="md" label="Edit" show-close>
             <p>panel content</p>
         </pdx-drawer>
+    </section>
+
+    <!-- Invoker commands (#140): the buttons call the dialog's exposed show() and close(). -->
+    <section id="case-invoker-commands" class="pad" hidden>
+        <button type="button" data-test="show" commandfor="cmd-dlg" command="--show">Open</button>
+        <button type="button" data-test="nope" commandfor="cmd-dlg" command="--open">Not a method</button>
+        <pdx-dialog id="cmd-dlg" data-test="dlg" title="Shift" size="md">
+            <p>details</p>
+            <button type="button" data-test="close" commandfor="cmd-dlg" command="--close">Done</button>
+        </pdx-dialog>
     </section>
 
     <!-- prevent-close: a dialog the user must not be able to dismiss. -->

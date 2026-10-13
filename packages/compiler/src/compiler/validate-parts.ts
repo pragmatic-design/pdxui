@@ -6,7 +6,7 @@ import type { ValidationWarning } from './validate';
 import { openingTagTexts } from '../text-scan';
 
 /** The markup of every html node in the template, `@raw` blocks left out: they are text. */
-function markupOf(nodes: unknown, out: string[] = []): string[] {
+export function markupOf(nodes: unknown, out: string[] = []): string[] {
     if (Array.isArray(nodes)) {
         for (const n of nodes) markupOf(n, out);
     } else if (nodes && typeof nodes === 'object') {
