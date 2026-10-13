@@ -4,7 +4,7 @@
 
 import type { GridContext, AnyColumn } from './grid-context';
 import { applyColSize, GRID_WIDGET } from './grid-context';
-import { getFieldValue, collectDisposers } from '@pdxui/core';
+import { getFieldValue, collectDisposers, DEV } from '@pdxui/core';
 import { renderCellNode } from './grid-cell';
 import { t } from './grid-i18n';
 
@@ -116,6 +116,8 @@ export function setupVirtualScroll(
             rowEl.style.height = `${rowHeight}px`;
             rowEl.setAttribute('role', 'row');
             rowEl.setAttribute('data-row-index', String(i));
+            // Data repetition, for `__PDX_DEVTOOLS__.outline()` (#271): as the non-virtual body.
+            if (DEV) rowEl.setAttribute('data-pdx-item', '');
             const rowId = row[idFieldName];
             if (rowId != null) rowEl.setAttribute('data-row-id', String(rowId));
 

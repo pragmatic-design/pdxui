@@ -11,7 +11,7 @@
 // Default: DESTROY component on navigate away (full mount/destroy lifecycle)
 // Opt-in: @page '/path' { keepAlive } -> freeze/resume pattern
 
-import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp } from '@pdxui/core';
+import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV } from '@pdxui/core';
 import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule, toRouteConfig } from './active';
 import type { RouteConfig, ResolvedRoute, NavigationHop } from './active';
 import { prefetchedLoad } from './prefetch';
@@ -903,6 +903,10 @@ class PdxRouterOutlet extends HTMLElement {
     }
 
     private _applyParams(element: HTMLElement, params: Record<string, string>): void {
+        // The route/shell boundary, as the router knows it: `__PDX_DEVTOOLS__.outline()` and `page()`
+        // describe the outermost routed element, never the layout around it (#271). Development
+        // only, like the rest of the devtools.
+        if (DEV) element.setAttribute('data-pdx-route', '');
         if (!params) return;
         for (const [k, v] of Object.entries(params)) {
             element.setAttribute(k, v);

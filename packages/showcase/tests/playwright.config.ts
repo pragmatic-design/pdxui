@@ -31,7 +31,8 @@ export default defineConfig({
     // `/src/pages/*.pdx` request exists there, so both fail on an empty list.
     // And the one that edits the mock server's roles, for the other reason: on this
     // shared server, a grant it revokes would race every spec that reads it.
-    testIgnore: ['dev-server.spec.ts', 'permissions-edit.spec.ts'],
+    // And `devtools-v2.spec.ts`: `__PDX_DEVTOOLS__` exists in development only (#271).
+    testIgnore: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'devtools-v2.spec.ts'],
     fullyParallel: true,
     workers: WORKERS,
     reporter: [['list']],

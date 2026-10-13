@@ -65,6 +65,19 @@ as with full snapshots — before any other member or any other agent work.
 the element's `data-test` when it has one, otherwise a selector the runtime derives from the
 component instance and the node's path in its template. Development only.
 
+**Landed** (#271): version 2 with `page()` and `outline({ maxItems })`; the members of version 1
+unchanged. The router marks the element it routes (`data-pdx-route`, development only) and the
+outline starts at the outermost one; `@for` rows and `pdx-data-grid` rows are marked `data-pdx-item`,
+development only. A selector is the element's unique `data-test`, id or component tag; else the
+shortest unique one under the nearest such ancestor — a telling attribute (`aria-label`, `name`,
+`placeholder`, `title`, `href`) or a path of tags, a path always starting at that ancestor; a
+component that wraps one clickable control answers for it. The card reads forms' `required` from
+`aria-required` and `required`, and leaves out the controls of a list of data or a navigation. Measured
+on the four pages (`packages/showcase/tests/devtools-v2.spec.ts`, against the snapshot agent-browser
+prints): cards 42–127 tokens, outlines 16–29%, every named control of `main` reachable. Not done: the
+other members of the table (`map`, `shell`, `delta`, `actions`/`run`, `sources`/`forms`), the
+behavioural test of decisions.md 32, and the four-page session criterion.
+
 ## Capabilities in production
 
 An `@action` is offered to agents only when it says so:
