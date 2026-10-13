@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-442 value exports.
+443 value exports.
 
 ### `__adoptStyles`
 
@@ -1609,6 +1609,17 @@ function delayTransport(options: DelayTransportOptions<T>): IDataTransport<T>
 ```
 
 Wrap any transport with artificial delay for loading state demos/testing.
+
+### `delegate`
+
+```ts
+import { delegate } from '@pdxui/core';
+
+function delegate(host: Element, el: Element, type: string, handler: (event: Event) => void): void
+```
+
+Store `handler` for events of `type` on `el`, an element `host` rendered, and make sure `host`
+listens to `type` once.
 
 ### `destroyAnnouncer`
 

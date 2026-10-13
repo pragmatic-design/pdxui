@@ -203,6 +203,11 @@ const ROWS: Row[] = [
         script: "let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);",
         read: (h) => [...h.querySelectorAll('table, tbody, tr')].reduce((n, el) => n + [...el.childNodes].filter(c => c.nodeType === 3 && c.textContent !== '').length, 0),
     },
+    // Events inside a @for are delegated to one listener per type (#113): a row's click, a row's .stop
+    // under a handler of the same type, and $event.currentTarget, which is the row, not the component.
+    { name: '@for row @click (delegated)', expected: '<p>2</p><ul><li>1</li><li>2</li></ul>', template: '<p>{{ n }}</p><ul>@for (items as it; track it) {<li @click="n = n + it">{{ it }}</li>}</ul>', script: 'let n = $signal(0); let items = $signal([1, 2]);', act: click('li:last-child') },
+    { name: '@for row @click.stop under a @click', expected: '<p>1</p><ul><li>1</li></ul>', template: '<p>{{ n }}</p><ul @click="n = n + 10">@for (items as it; track it) {<li @click.stop="n = n + 1">{{ it }}</li>}</ul>', script: 'let n = $signal(0); let items = $signal([1]);', act: click('li') },
+    { name: '@for row $event.currentTarget', expected: '<p>LI</p><ul><li><b>1</b></li></ul>', template: '<p>{{ tag }}</p><ul>@for (items as it; track it) {<li @click="tag = $event.currentTarget.tagName"><b>{{ it }}</b></li>}</ul>', script: "let tag = $signal(''); let items = $signal([1]);", act: click('b') },
     { name: '@switch', expected: '<p>B</p>', template: "@switch (mode) { @case ('a') { <p>A</p> } @case ('b') { <p>B</p> } @default { <p>?</p> } }", script: "let mode = $signal('b');" },
     {
         name: '::checked on a checkbox', expected: '<input type="checkbox"></input><p>true</p>', expectedRead: true,

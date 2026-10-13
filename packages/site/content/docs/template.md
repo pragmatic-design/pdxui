@@ -133,6 +133,14 @@ The `track` matters: it tells PDX how to **identify** each item, so when the lis
 the right nodes instead of rebuilding them (minimal reconciliation). Use a stable key (`todo.id`),
 not the index, if items can reorder.
 
+An event written in a row — `@click`, `@dblclick`, `@input`, `@change`, `@keydown`, `@keyup`,
+`@pointerdown`, `@pointerup`, `@contextmenu` — does not add a listener per row: the compiler stores
+the handler on the row's element, and the component listens once per event type (core's `delegate`).
+Nothing changes in how you write it: handlers run inner first, `.stop` still stops, and
+`$event.currentTarget` is still the element the handler is on. A handler with `.capture`, `.once`,
+`.passive` or `.self`, one on a component or inside one, and one in a `@portal` keep a listener of
+their own.
+
 For animated lists there are two modifiers, and both hang off `@transition(...)`: it names the
 animation, `@stagger(50)` adds a progressive delay between items (a cascade effect), and
 `@mode(...)` controls enter/leave sequencing. Without the `@transition` there is nothing for them
