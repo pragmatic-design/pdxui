@@ -7,7 +7,7 @@ parent: api
 
 # Debugging and devtools API
 
-The devtools entry point and overlay, the debug handle, telemetry and navigation recording. 7 exports, from `@pdxui/core` and `@pdxui/core/devtools`.
+The devtools entry point and overlay, the debug handle, telemetry and navigation recording. 8 exports, from `@pdxui/core` and `@pdxui/core/devtools`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -58,6 +58,16 @@ function recordDevtoolsNavigation(entry: Omit<DevtoolsNavigation, 'time'>): void
 ```
 
 The router records a navigation that finished — matched, refused, or not found.
+
+## `setDevtoolsMapSource`
+
+```ts
+import { setDevtoolsMapSource } from '@pdxui/core';
+
+function setDevtoolsMapSource(source: (() => DevtoolsMapRoute[]) | null): void
+```
+
+The router says where to read the route graph from; null removes it. One router at a time.
 
 ## `setDevtoolsRouteSource`
 

@@ -75,13 +75,16 @@ In Cursor, `.cursor/mcp.json` in the project:
 ## The running app
 
 In development the app answers too: `window.__PDX_DEVTOOLS__` is a versioned API whose every answer
-is JSON — the component tree, one component's props and state, the last errors, the route. Read a
-page with the two members built for an agent's budget before a full snapshot: `page()`, the page
-card in a couple of hundred tokens, and `outline()`, the route's content with data rows summarised and
-a selector on every control — a fifth to a third of the full snapshot on the showcase, with nothing
-it can act on left out.
+is JSON — the component tree, one component's props and state, the last errors, the route. Read the
+app once with `map()`, its routes with their params, guards and whether you may enter them, and
+`shell()`, the navigation every page shares. Then read each page with the two members built for an
+agent's budget before a full snapshot: `page()`, the page card in a couple of hundred tokens, and
+`outline()`, the route's content with data rows summarised and a selector on every control — a fifth
+to a third of the full snapshot on the showcase, with nothing it can act on left out.
 
 ```bash
+agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.map())"
+agent-browser eval "__PDX_DEVTOOLS__.shell()"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.page())"
 agent-browser eval "__PDX_DEVTOOLS__.outline()"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.inspect('pdx-login'))"

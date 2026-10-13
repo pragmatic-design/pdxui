@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-448 value exports.
+449 value exports.
 
 ### `__adoptStyles`
 
@@ -4605,6 +4605,16 @@ function setDefaultIconSet(name: string): void
 ```
 
 Set the default icon set by name.
+
+### `setDevtoolsMapSource`
+
+```ts
+import { setDevtoolsMapSource } from '@pdxui/core';
+
+function setDevtoolsMapSource(source: (() => DevtoolsMapRoute[]) | null): void
+```
+
+The router says where to read the route graph from; null removes it. One router at a time.
 
 ### `setDevtoolsRouteSource`
 

@@ -55,6 +55,16 @@ export function registerGuardChecker(checker: GuardChecker): void {
     _warnedNoChecker = false;
 }
 
+/**
+ * The guard's answer now, for the devtools map: denied with no checker, as a navigation is; null
+ * when the checker answers asynchronously.
+ */
+export function guardAnswer(guard: string): boolean | null {
+    if (!guardChecker) return false;
+    const answer = guardChecker(guard);
+    return typeof answer === 'boolean' ? answer : null;
+}
+
 // ─── Navigation Middleware ─────────────────────────────────────────
 
 type BeforeNavigateHook = (from: string, to: string, hop: NavigationHop) => boolean | Promise<boolean>;

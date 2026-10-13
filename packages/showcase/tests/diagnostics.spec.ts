@@ -72,8 +72,9 @@ test('the v2 description API is not in the production bundle: no outline, no pag
     // only: a `@for` row and a grid row are `data-pdx-item`, the routed element `data-pdx-route`. A
     // production row carries neither, and the code that reads them is not shipped.
     const js = bundle();
-    // Each probe is text only the v2 code writes: the two markers, and a selector of the page card.
-    const shipped = ['data-pdx-item', 'data-pdx-route', '[aria-sort]:not([aria-sort=none])']
+    // Each probe is text only the v2 code writes: the two markers, a selector of the page card, and
+    // the pattern `map()` reads a route's params with (#272).
+    const shipped = ['data-pdx-item', 'data-pdx-route', '[aria-sort]:not([aria-sort=none])', '(?:\\(([^)]*)\\))?|\\*']
         .filter((probe) => js.includes(probe));
     expect(shipped, 'devtools v2 code or markers in a production build: put them behind `if (DEV)`').toEqual([]);
 });

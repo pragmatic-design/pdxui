@@ -7,14 +7,15 @@
 // loaders and the breadcrumb, `address.ts` owns the address bar and the query, `route-table.ts`
 // holds the build's table.
 
-import { DEV, setDevtoolsRouteSource, recordDevtoolsNavigation } from '@pdxui/core';
+import { DEV, setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSource } from '@pdxui/core';
 import { saveScrollPosition as saveScroll } from '@pdxui/core';
 import { compileMatcher } from './matcher';
 import { clearLoaders } from './loaders';
 import { installRouteTable, toRouteConfig } from './route-table';
 import { isBrowser, _path, _params, _query, _route, _navError, _state } from './state';
 import { isWritingUrl, writeUrl, primaryOutlet } from './address';
-import { config, handleNavigation, stripBase, onAfterNavigate } from './navigation';
+import { config, handleNavigation, stripBase, onAfterNavigate, guardAnswer } from './navigation';
+import { routeMap } from './devtools-map';
 import type { RouteConfig, RouterOptions, RouteTable } from './types';
 
 export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute } from './types';
@@ -50,7 +51,10 @@ export function createRouter(routes: RouteConfig[], options?: string | RouterOpt
     config.basePath = '';
     config.guardFailRedirect = null;
     config.redirects = null;
-    if (DEV) reportToDevtools();
+    if (DEV) {
+        reportToDevtools();
+        _devtoolsRoutes = routes;
+    }
 
     // Backward compat: createRouter(routes, '/base') still works
     configureRouter(typeof options === 'string' ? { basePath: options } : options);
@@ -166,9 +170,12 @@ function isLinkClick(e: PdxNavigateEvent): boolean {
  * package declares this module free of load-time effects. Once, however many routers are created.
  */
 let _devtoolsReporting = false;
+/** The routes of the last `createRouter`, for `__PDX_DEVTOOLS__.map()`. Development only. */
+let _devtoolsRoutes: readonly RouteConfig[] = [];
 function reportToDevtools(): void {
     if (_devtoolsReporting) return;
     _devtoolsReporting = true;
+    setDevtoolsMapSource(() => routeMap(_devtoolsRoutes, config.matcher, guardAnswer));
     setDevtoolsRouteSource(() => ({
         path: _path.peek(),
         params: _params.peek(),

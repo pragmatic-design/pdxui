@@ -122,9 +122,12 @@ export function selectorOf(el: Element): string {
     return found ?? `${scope ? `${scope} > ` : ''}${steps.join(' > ')}`;
 }
 
-/** The outline nodes for `el`: one node if it has a kept role, its children's nodes otherwise. */
-function build(el: Element, parentName: string): Node[] {
-    if (!isPerceivable(el)) return [];
+/**
+ * The outline nodes for `el`: one node if it has a kept role, its children's nodes otherwise.
+ * `exclude` and everything under it is left out — the route, when the shell is outlined.
+ */
+function build(el: Element, parentName: string, exclude: Element | null): Node[] {
+    if (el === exclude || !isPerceivable(el)) return [];
     const role = roleOf(el);
     const name = role ? nameOf(el) : '';
     const kept = KEPT_ROLES.has(role) && !(KEPT_IF_NAMED.has(role) && !name);
@@ -142,7 +145,7 @@ function build(el: Element, parentName: string): Node[] {
             if (last && last.role === 'text') last.name = clean(`${last.name} ${text}`);
             else children.push({ role: 'text', name: text, el: null, item: false, children: [] });
         } else if (child.nodeType === 1) {
-            const sub = build(child as Element, ownName);
+            const sub = build(child as Element, ownName, exclude);
             children.push(...(skipText ? sub.filter((n) => n.role !== 'text') : sub));
         }
     }
@@ -259,9 +262,12 @@ export interface OutlineOptions {
     maxItems?: number;
 }
 
-/** The outline of `root`, one node per line, indented by nesting. */
-export function outlineOf(root: Element, options: OutlineOptions = {}): string {
+/**
+ * The outline of `root`, one node per line, indented by nesting. With `exclude`, that element and
+ * its subtree are left out: `shell()` is the body's outline without the route.
+ */
+export function outlineOf(root: Element, options: OutlineOptions = {}, exclude: Element | null = null): string {
     const out: string[] = [];
-    render(build(root, ''), 0, Math.max(2, options.maxItems ?? 5), out);
+    render(build(root, '', exclude), 0, Math.max(2, options.maxItems ?? 5), out);
     return out.join('\n');
 }

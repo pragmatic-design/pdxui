@@ -1,0 +1,75 @@
+// The router hands __PDX_DEVTOOLS__.map() its route graph (#272): each route's pattern, its params
+// and their types, its title, its guard, and whether the current user can enter it.
+
+import { describe, it, expect, beforeEach } from 'vitest';
+import { loadTranslations } from '@pdxui/core';
+import { createRouter, destroyRouter, registerGuardChecker } from '../src/runtime';
+import type { RouteConfig } from '../src/runtime';
+
+interface MapRoute { path: string; params?: { name: string; type: string }[]; title?: string; guard?: string; access?: boolean; redirect?: string }
+const map = (): MapRoute[] => (window as unknown as { __PDX_DEVTOOLS__: { map(): MapRoute[] } }).__PDX_DEVTOOLS__.map();
+
+const page = () => () => document.createElement('div');
+
+beforeEach(() => {
+    destroyRouter();
+    registerGuardChecker((name) => name !== 'billing');
+    history.replaceState(null, '', '/');
+});
+
+describe('__PDX_DEVTOOLS__.map()', () => {
+    it('lists every route with its params and their types', () => {
+        createRouter([
+            { path: '/', component: page() },
+            { path: '/users/:id(number)', component: page() },
+            { path: '/keys/:key(uuid)', component: page() },
+            { path: '/codes/:code([A-Z]{3})/:slug', component: page() },
+            { path: '/files/*', component: page() },
+        ]);
+        expect(map()).toEqual([
+            { path: '/' },
+            { path: '/users/:id(number)', params: [{ name: 'id', type: 'number' }] },
+            { path: '/keys/:key(uuid)', params: [{ name: 'key', type: 'uuid' }] },
+            { path: '/codes/:code([A-Z]{3})/:slug', params: [{ name: 'code', type: '[A-Z]{3}' }, { name: 'slug', type: 'string' }] },
+            { path: '/files/*', params: [{ name: '$rest', type: 'string' }] },
+        ]);
+    });
+
+    it('names a route by its crumb: a dictionary key translated, else a written label', () => {
+        loadTranslations('en', { devtoolsMap: { customers: 'Customers' } });
+        createRouter([
+            { path: '/customers', component: page(), labelKey: 'devtoolsMap.customers' },
+            // A key whose strings have not arrived is no title: the key is not a name.
+            { path: '/later', component: page(), labelKey: 'devtoolsMap.notLoaded' },
+            { path: '/about', component: page(), label: 'About us' },
+            // A function label needs the record it names: a map has none, so no title.
+            { path: '/tickets/:id', component: page(), label: (p) => `Ticket ${p.id}` },
+        ]);
+        expect(map().map((r) => r.title)).toEqual(['Customers', undefined, 'About us', undefined]);
+    });
+
+    it('a guarded route says whether the current user may enter it', () => {
+        createRouter([
+            { path: '/account', component: page(), guard: 'account' },
+            { path: '/billing', component: page(), guard: 'billing' },
+        ]);
+        expect(map()).toEqual([
+            { path: '/account', guard: 'account', access: true },
+            { path: '/billing', guard: 'billing', access: false },
+        ]);
+    });
+
+    it('a route inside a guarded parent is closed when the parent is', () => {
+        const routes: RouteConfig[] = [
+            { path: '/billing', component: page(), guard: 'billing', hasOutlet: true },
+            { path: '/billing/invoices', component: page() },
+        ];
+        createRouter(routes);
+        expect(map()[1]).toEqual({ path: '/billing/invoices', access: false });
+    });
+
+    it('a redirect says where it goes', () => {
+        createRouter([{ path: '/old', component: page(), redirect: '/new' }, { path: '/new', component: page() }]);
+        expect(map()[0]).toEqual({ path: '/old', redirect: '/new' });
+    });
+});
