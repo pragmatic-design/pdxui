@@ -15,6 +15,17 @@ export function placePartNode(parent: Node, node: Node, before: Node | null): vo
     parent.insertBefore(node, before);
 }
 
+/**
+ * Insert `nodes` before `before` in ONE operation — a fragment — each remembered as placed by a part.
+ * A list appending a thousand rows does one insertion, not a thousand (#118).
+ */
+export function placePartNodes(parent: Node, nodes: readonly Node[], before: Node | null): void {
+    if (nodes.length === 1) { placePartNode(parent, nodes[0], before); return; }
+    const frag = (parent.ownerDocument ?? document).createDocumentFragment();
+    for (const n of nodes) { partNodes.add(n); frag.appendChild(n); }
+    parent.insertBefore(frag, before);
+}
+
 /** Whether a template part placed `node` (see placePartNode). */
 export function isPartNode(node: Node): boolean {
     return partNodes.has(node);

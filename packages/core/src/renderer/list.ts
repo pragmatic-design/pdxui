@@ -5,7 +5,7 @@
 import { effect, collectDisposers, onDispose, signal, untracked } from '../reactivity/signal';
 import type { Signal } from '../utils/types';
 import { enterRow, exit, recordPositions, flipAnimate } from './transitions';
-import { placePartNode } from './part-nodes';
+import { placePartNode, placePartNodes } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
 import type { TransitionOptions } from './helpers';
@@ -150,12 +150,52 @@ function mountList<T>(
  */
 let reconcileCounter = 0;
 
+/**
+ * Render one row in its own ownership scope, so its effects can be disposed when the row is removed.
+ * The scope is detached: NOT owned by the list's driver effect, so surviving rows are never disposed
+ * when the driver re-runs.
+ */
+function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number): MappedItem<T> {
+    let row: RowSignals<T> | undefined;
+    let node: Node;
+    let dispose: () => void;
+    if (renderer.mode === 'getters') {
+        const r: RowSignals<T> = { item: signal(item), index: signal(i) };
+        row = r;
+        // Untracked: reading item() while the row is built must not subscribe the LIST
+        // driver to the row's own signal.
+        [node, dispose] = collectDisposers(() => untracked(() => renderer.render(r.item, r.index)));
+    } else {
+        [node, dispose] = collectDisposers(() => renderer.render(item, i));
+    }
+    const nodes = node instanceof DocumentFragment ? Array.from(node.childNodes) : [node];
+    return { key, item, nodes, dispose, row };
+}
+
+/**
+ * Remove everything between the list's two markers in one operation (#118). When the markers are their
+ * parent's first and last child — a `@for` alone in its `<tbody>` — the parent is emptied and the
+ * markers put back; otherwise one Range removes what lies between them.
+ */
+function clearBetween(parent: Node, startMarker: Comment, endMarker: Comment): void {
+    if (parent.firstChild === startMarker && parent.lastChild === endMarker) {
+        parent.textContent = '';
+        parent.appendChild(startMarker);
+        parent.appendChild(endMarker);
+        return;
+    }
+    const range = (parent.ownerDocument ?? document).createRange();
+    range.setStartAfter(startMarker);
+    range.setEndBefore(endMarker);
+    range.deleteContents();
+}
+
 function reconcile<T>(
     newItems: T[],
     keyFn: (item: T, index: number) => unknown,
     renderer: RowRenderer<T>,
     oldMapped: MappedItem<T>[],
-    _startMarker: Comment,
+    startMarker: Comment,
     endMarker: Comment,
     transitions?: TransitionOptions,
     precomputedKeys?: unknown[]
@@ -166,10 +206,6 @@ function reconcile<T>(
     const reconcileStart = trackingOn ? performance.now() : 0;
     const parent = endMarker.parentNode;
     if (!parent) return oldMapped;
-
-    // FLIP: record old positions before mutation
-    const allOldNodes = oldMapped.flatMap(m => m.nodes);
-    const oldPositions = transitions?.move ? recordPositions(allOldNodes) : null;
 
     // Pre-allocate with known sizes to reduce allocation overhead
     const newLen = newItems.length;
@@ -190,6 +226,48 @@ function reconcile<T>(
             seen.add(newKeys[i]);
         }
     }
+
+    // Fast path: CLEAR (#118). Every row goes, so every scope is disposed and the nodes are removed in
+    // one operation — not one by one. Not with an exit transition: each row then leaves on its own.
+    if (newLen === 0 && oldLen > 0 && !transitions?.exit && startMarker.parentNode === parent) {
+        for (const m of oldMapped) m.dispose?.();
+        clearBetween(parent, startMarker, endMarker);
+        if (trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: 0, reused: 0, added: 0, removed: oldLen, moved: 0, lisLength: 0, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
+        return [];
+    }
+
+    // Fast path: APPEND (#118) — the old keys are the new list's prefix, an empty list included. The
+    // rows kept are told their (possibly new) objects; only the new rows are created, and inserted in
+    // ONE operation. No map, no LIS. Not with a move transition, which wants the general path's FLIP.
+    if (newLen > oldLen && !transitions?.move) {
+        let prefix = true;
+        for (let i = 0; i < oldLen; i++) { if (oldMapped[i].key !== newKeys[i]) { prefix = false; break; } }
+        if (prefix) {
+            const result = oldMapped.slice();
+            for (let i = 0; i < oldLen; i++) {
+                const kept = result[i];
+                if (kept.item !== newItems[i]) { kept.item = newItems[i]; kept.row?.item.setRaw(newItems[i]); }
+            }
+            const added: Node[] = [];
+            for (let i = oldLen; i < newLen; i++) {
+                const row = createRow(renderer, newKeys[i], newItems[i], i);
+                result.push(row);
+                for (const n of row.nodes) added.push(n);
+            }
+            placePartNodes(parent, added, endMarker);
+            if (transitions?.enter) {
+                const stagger = transitions.stagger ?? 0;
+                for (let i = oldLen; i < newLen; i++) {
+                    for (const n of result[i].nodes) void enterRow(n, transitions.enter, stagger * (i - oldLen));
+                }
+            }
+            if (trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: newLen, reused: oldLen, added: newLen - oldLen, removed: 0, moved: 0, lisLength: oldLen, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
+            return result;
+        }
+    }
+
+    // FLIP: record old positions before mutation — only when a move transition will use them.
+    const oldPositions = transitions?.move ? recordPositions(oldMapped.flatMap(m => m.nodes)) : null;
 
     const oldMap = new Map<unknown, MappedItem<T>>();
     const oldKeyToIndex = new Map<unknown, number>();
@@ -219,27 +297,8 @@ function reconcile<T>(
             oldMap.delete(key);
             lisPositions[i] = oldKeyToIndex.get(key)!;
         } else {
-            // Render each item in its own ownership scope so its effects can be
-            // disposed when the item is removed (dispose is called at line below
-            // on removal, and on full teardown). Detached scope: NOT owned by the
-            // list driver effect, so surviving items are never disposed on re-run.
-            const item = newItems[i];
-            let row: RowSignals<T> | undefined;
-            let node: Node;
-            let dispose: () => void;
-            if (renderer.mode === 'getters') {
-                const r: RowSignals<T> = { item: signal(item), index: signal(i) };
-                row = r;
-                // Untracked: reading item() while the row is built must not subscribe the LIST
-                // driver to the row's own signal.
-                [node, dispose] = collectDisposers(() => untracked(() => renderer.render(r.item, r.index)));
-            } else {
-                [node, dispose] = collectDisposers(() => renderer.render(item, i));
-            }
-            const nodes = node instanceof DocumentFragment
-                ? Array.from(node.childNodes)
-                : [node];
-            newMapped[i] = { key, item, nodes, dispose, row };
+            // A new row, in its own ownership scope (createRow); disposed on removal and on teardown.
+            newMapped[i] = createRow(renderer, key, newItems[i], i);
             lisPositions[i] = -1; // New item, not in old list
         }
     }
