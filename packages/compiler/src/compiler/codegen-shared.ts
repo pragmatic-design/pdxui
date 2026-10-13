@@ -174,6 +174,21 @@ export function hoistLoader(setupBody: string, name: string):
 
 // ─── Module assembly ───────────────────────────────────────────────
 
+/**
+ * The line `assembleModule` reserves for the render's module-level declarations (#109), filled by
+ * {@link insertModuleHoists} once the script's types are erased: the declarations are generated code
+ * with no TypeScript, and a large template would otherwise double the module a TypeScript parse reads.
+ */
+const MODULE_HOISTS_SLOT = '/*__pdx_module_hoists__*/';
+
+/** `code` with its reserved line replaced by `hoists`, one declaration per line. */
+export function insertModuleHoists(code: string, hoists: readonly string[]): string {
+    if (hoists.length === 0) return code;
+    const at = code.indexOf(MODULE_HOISTS_SLOT);
+    if (at === -1) throw new Error('[pdx] the module has block declarations and no line reserved for them');
+    return code.slice(0, at) + hoists.join('\n') + code.slice(at + MODULE_HOISTS_SLOT.length);
+}
+
 /** Assemble the final JS module string. */
 export function assembleModule(
     imports: Set<string>,
@@ -205,6 +220,8 @@ export function assembleModule(
     mapOrigins?: boolean,
     /** The .pdx relative to the app root, registered with the component — dev builds. */
     sourceFile?: string | null,
+    /** Whether the render has module-level declarations (#109): their line is reserved here. */
+    hasModuleHoists = false,
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -278,6 +295,7 @@ export function assembleModule(
     code += '\n';
     code += generateStyles(descriptor, filename, production);
     code += hoistedLoader;
+    if (hasModuleHoists) code += MODULE_HOISTS_SLOT + '\n';
     code += `component(${jsQuote(tag)}, {\n`;
     code += `  props: ${propsCode},\n`;
     code += sourceFileOption(sourceFile);

@@ -125,8 +125,8 @@ beta (#121)
 A template is compiled by **one** code generator, in development and in a production build (#107 —
 landed; the parity table's recorded expectations, #237 — landed; the template path's removal, #238 —
 landed, but for a scoped slot's body, #364):
-the template becomes imperative DOM code — with its static parts cloned from a `<template>` built once
-(#109) — that binds each dynamic part in place. There is no second render path whose behaviour could
+the template becomes imperative DOM code — with its static parts copied from a `<template>` built once
+(#109 — landed) — that binds each dynamic part in place. There is no second render path whose behaviour could
 differ: a construct means the same everywhere, and the render parity table
 (`packages/core/tests/render-parity.test.ts`) asserts the single path against recorded expectations.
 `html\`\`` remains in `@pdxui/core` for hand-written TypeScript components (#107); the script

@@ -39,7 +39,7 @@ describe('pdx({ inlineBindings }) is ignored', () => {
             expect(warnings.find(w => w.code === 'PDX_INLINE_BINDINGS_IGNORED')!.message).toMatch(/no longer selects a render path/);
             const out = plugin.transform(SFC, join(root, 'src', 'card.pdx'))!;
             expect(out.code).not.toMatch(/\bhtml`/);
-            expect(out.code).toMatch(/document\.createElement\('p'\)/);
+            expect(out.code).toMatch(/__d\.createElement\('p'\)/);
         });
     }
 

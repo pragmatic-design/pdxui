@@ -13,6 +13,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { ComponentResolver } from '../src/component-resolver';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
+import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 import { parseTemplate } from '../src/parser/template';
 // The inline module imports it from core; the harness hands it the real one.
 import { assignBoundProperty } from '../../core/src/renderer/template';
@@ -102,10 +103,13 @@ describe('the inline build binds a component prop the same way', () => {
         expect(() => { (new Unconnected('PROBE-X') as unknown as Record<string, unknown>).offsetTop = 1; }, 'the premise').toThrow();
 
         const iife = generateInlineNodes(parseTemplate('<probe-x :offset-top="top"></probe-x>'), new Set());
-        const document = { createDocumentFragment: () => new Unconnected('#fragment'), createElement: (t: string) => new Unconnected(t.toUpperCase()) };
+        const document = withBlockCopies(
+            { createDocumentFragment: () => new Unconnected('#fragment'), createElement: (t: string) => new Unconnected(t.toUpperCase()) },
+            (n) => new Unconnected((n as Unconnected).tagName),
+        );
         const effect = (fn: () => void) => fn();
         const ctx = { top: () => 5 };
-        const frag = new Function('document', 'effect', 'ctx', 'assignBoundProperty', `return ${iife};`)(document, effect, ctx, assignBoundProperty) as Unconnected;
+        const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'assignBoundProperty', `return ${iife};`)(document, stubStaticBlock(document), effect, ctx, assignBoundProperty) as Unconnected;
         expect((frag.children[0] as unknown as { offsetTop: number }).offsetTop).toBe(5);
     });
 });

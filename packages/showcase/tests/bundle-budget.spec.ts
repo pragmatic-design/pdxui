@@ -168,7 +168,14 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // whole now — its child components frozen with it, by an ancestor walk in core's element (#268),
 // and the least recently used frozen page destroyed past `keep-alive-max` (#270). A few hundred
 // bytes; the showcase keeps no page alive, so it pays them and uses none. 36.1 KB measured.
-const BUDGET_KB = { entry: 37, js: 459, css: 59, blocking: 91 };
+// js 459 → 467, blocking 91 → 92: each block's static markup is built once and copied per render
+// (#109), which took the script time of creating 1k rows from 13.7 to 11.1 ms and of 10k from 147 to
+// 117 (js-framework-benchmark, before and after in one run, median of three). The builders cost what the render's
+// static DOM calls cost before; what is new is the walk to the bound nodes, one statement per node
+// on a path, and a marker where each dynamic block goes. Same machine, same day: main 458.6 → 466.3
+// KB in all, 90.6 → 91.2 before the first paint; 2.5 KB of the first try went back by moving each
+// block's template-and-import boilerplate into core's `staticBlock`.
+const BUDGET_KB = { entry: 37, js: 467, css: 59, blocking: 92 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

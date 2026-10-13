@@ -20,6 +20,6 @@ describe('a directive with no handler', () => {
 
     it('is the same comment on the inline path, not nothing', () => {
         expect(generateInlineNodes(nodes(), new Set(), createCompileContext()))
-            .toContain('document.createComment(" unknown directive @tooltip ")');
+            .toContain('__d.createComment(" unknown directive @tooltip ")');
     });
 });

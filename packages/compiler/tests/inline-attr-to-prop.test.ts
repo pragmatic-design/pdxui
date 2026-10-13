@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { compile } from '../src/plugin';
 import { parseTemplate } from '../src/parser/template';
 import { generateInlineNodes, ATTR_TO_PROP } from '../src/compiler/codegen-template-inline';
+import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 // The generated code imports them from core; the harness hands it the real ones, so the stub cases
 // measure the rule both builds share, not a copy of it.
 import { clearBoundProperty, assignBoundProperty } from '../../core/src/renderer/template';
@@ -95,16 +96,16 @@ function live(template: string, values: Record<string, unknown>): { el: StubElem
     let reading: Set<string> | null = null;
     const ctx = Object.fromEntries(Object.keys(values).map(k => [k, () => { reading?.add(k); return current[k]; }]));
     const iife = generateInlineNodes(parseTemplate(template), new Set());
-    const document = {
+    const document = withBlockCopies({
         createDocumentFragment: () => new StubElement('#fragment'),
         createElement: (t: string) => new StubElement(t.toUpperCase()),
         createElementNS: (_ns: string, t: string) => new StubElement(t),
         createTextNode: (t: string) => ({ data: t }),
-    };
+    }, (n) => (n instanceof StubElement ? Object.assign(new StubElement(n.tagName), { attrs: new Map(n.attrs) }) : { ...n }));
     const effects: { fn: () => void; deps: Set<string> }[] = [];
     const run = (e: { fn: () => void; deps: Set<string> }) => { reading = e.deps; try { e.fn(); } finally { reading = null; } };
     const effect = (fn: () => void) => { const e = { fn, deps: new Set<string>() }; effects.push(e); run(e); };
-    const frag = new Function('document', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', `return ${iife};`)(document, effect, ctx, clearBoundProperty, assignBoundProperty) as StubElement;
+    const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', `return ${iife};`)(document, stubStaticBlock(document), effect, ctx, clearBoundProperty, assignBoundProperty) as StubElement;
     return {
         el: frag.children[0],
         set(next) {

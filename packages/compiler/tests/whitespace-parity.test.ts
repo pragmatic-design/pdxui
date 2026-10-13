@@ -12,23 +12,24 @@ import { describe, it, expect } from 'vitest';
 import { minifyHTML } from '../src/compiler/minify';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
 import { parseTemplate } from '../src/parser/template';
+import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 
 interface FakeNode { tag?: string; data?: string; children: FakeNode[]; appendChild(c: FakeNode): FakeNode }
 const node = (extra: Partial<FakeNode> = {}): FakeNode => {
     const n: FakeNode = { children: [], appendChild(c) { n.children.push(c); return c; }, ...extra };
     return n;
 };
-const document = {
+const document = withBlockCopies({
     createDocumentFragment: () => node(),
     createElement: (tag: string) => node({ tag }),
     createTextNode: (data: string) => node({ data }),
-};
+}, (n) => node({ tag: (n as FakeNode).tag, data: (n as FakeNode).data }));
 const textOf = (n: FakeNode): string => (n.data ?? '') + n.children.map(textOf).join('');
 
 /** Render static markup on the INLINE path, the production default, and read its text. */
 function renderInline(markup: string): string {
     const iife = generateInlineNodes(parseTemplate(markup), new Set<string>());
-    return textOf(new Function('document', `return ${iife};`)(document) as FakeNode);
+    return textOf(new Function('document', 'staticBlock', `return ${iife};`)(document, stubStaticBlock(document)) as FakeNode);
 }
 
 describe('whitespace between two tags, in a build', () => {

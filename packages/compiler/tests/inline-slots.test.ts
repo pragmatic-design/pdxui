@@ -61,8 +61,9 @@ describe('a scoped slot survives the inline path', () => {
     });
 
     it('and it is attached to something, not created and forgotten', () => {
-        expect(emitted(SLOTTED), 'the carrier was built and never appended')
-            .toMatch(/appendChild\(slotCarrier\('item'/);
+        // It takes the place of its marker in the block's copied markup (#109).
+        expect(emitted(SLOTTED), 'the carrier was built and never put in place')
+            .toMatch(/__m\d+\.replaceWith\(slotCarrier\('item'/);
     });
 });
 
