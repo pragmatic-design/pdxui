@@ -1,4 +1,5 @@
-// __PDX_DEVTOOLS__ v1 — what an agent driving a browser can ask a running app.
+// __PDX_DEVTOOLS__ v2 — what an agent driving a browser can ask a running app. v2 adds `page()`
+// and `outline()` (#271, page-card.ts and outline.ts); the v1 members are unchanged.
 //
 // The inspector (inspector.ts) is built for a person in the console: its component tree holds live
 // DOM nodes, nothing maps a component to its state, and errors are only counted. This is the
@@ -11,6 +12,8 @@
 
 import { DEV } from '../utils/env';
 import { __pdx_debug, connectDevTools } from './inspector';
+import { outlineOf, type OutlineOptions } from './outline';
+import { pageCard, routeRoot, type PageCard } from './page-card';
 
 // ─── Serialisation ────────────────────────────────────────────────
 
@@ -228,10 +231,32 @@ export function recordDevtoolsNavigation(entry: Omit<DevtoolsNavigation, 'time'>
 
 // ─── The global ───────────────────────────────────────────────────
 
+/** The current route for the page card: its path, the pattern it matched, and its params when it has some. */
+function cardRoute(): PageCard['route'] | null {
+    const r = routeSource?.();
+    if (!r) return null;
+    return Object.keys(r.params).length ? { path: r.path, matched: r.matched, params: r.params } : { path: r.path, matched: r.matched };
+}
+
 /** The object installed as `window.__PDX_DEVTOOLS__` in development. */
 export const devtoolsApi = {
-    /** The API's version: what an agent checks before it relies on a shape. */
-    v: 1 as const,
+    /**
+     * The API's version: what an agent checks before it relies on a shape. 2 adds `page()` and
+     * `outline()` (#271); every member of 1 is unchanged.
+     */
+    v: 2 as const,
+    /**
+     * The page card: the route, the title, the lists shown with their counts, the forms with their
+     * required and invalid fields, live messages, errors, the actions available now and the routes
+     * the page links to. A couple of hundred tokens, read from the routed element.
+     */
+    page: (): PageCard => pageCard(cardRoute(), errorLog.map((e) => e.message)),
+    /**
+     * The outline of the routed content — the router's boundary, not the shell around it: the
+     * accessibility tree with data repetition summarised above `maxItems` and a selector on every
+     * actionable node.
+     */
+    outline: (options?: OutlineOptions): string => (typeof document === 'undefined' ? '' : outlineOf(routeRoot(), options)),
     /** PDX components on the page, nested as they are: `[{ id, tag, file, children }]`. */
     tree: (): DevtoolsTreeNode[] => (typeof document === 'undefined' ? [] : treeUnder(document.body)),
     /** One instance — by id, element or CSS selector — with its props, state and deriveds. */

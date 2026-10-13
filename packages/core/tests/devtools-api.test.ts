@@ -51,8 +51,11 @@ function find(nodes: TreeNode[], tag: string): TreeNode[] {
 }
 
 describe('__PDX_DEVTOOLS__ v1', () => {
-    it('says its version', () => {
-        expect(api().v).toBe(1);
+    it('says its version: 2, which keeps every member of 1 and adds page() and outline() (#271)', () => {
+        expect(api().v).toBe(2);
+        for (const member of ['tree', 'inspect', 'errors', 'route', 'navigations', 'stores', 'connect']) {
+            expect(typeof (api() as unknown as Record<string, unknown>)[member], member).toBe('function');
+        }
     });
 
     it('tree() lists each instance with its own id, its tag and its file', () => {

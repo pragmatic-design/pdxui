@@ -169,6 +169,10 @@ function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number
         [node, dispose] = collectDisposers(() => renderer.render(item, i));
     }
     const nodes = node instanceof DocumentFragment ? Array.from(node.childNodes) : [node];
+    // Data repetition, marked for `__PDX_DEVTOOLS__.outline()` (#271): a row's elements are items
+    // of a list, which the outline may summarise — controls that merely share a role are not.
+    // Development only: a production row carries no marker.
+    if (DEV) for (const n of nodes) if (n.nodeType === 1) (n as Element).setAttribute('data-pdx-item', '');
     return { key, item, nodes, dispose, row };
 }
 

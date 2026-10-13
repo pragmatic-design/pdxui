@@ -2,7 +2,7 @@
 
 import type { GridContext, AnyColumn } from './grid-context';
 import { applyColSize, GRID_WIDGET } from './grid-context';
-import { getFieldValue } from '@pdxui/core';
+import { getFieldValue, DEV } from '@pdxui/core';
 import { renderExpandCell, renderDetailRow } from './grid-detail';
 import { renderCellNode } from './grid-cell';
 import { t } from './grid-i18n';
@@ -43,6 +43,9 @@ export function renderRows(
         if (rowClass) rowEl.classList.add(...rowClass.split(' ').filter(Boolean));
         rowEl.setAttribute('role', 'row');
         rowEl.setAttribute('data-row-index', String(i));
+        // A row of the grid's data source is data repetition, which `__PDX_DEVTOOLS__.outline()`
+        // summarises (#271). Development only, as core's `@for` marker.
+        if (DEV) rowEl.setAttribute('data-pdx-item', '');
         const rowId = row[idFieldName];
         if (rowId != null) rowEl.setAttribute('data-row-id', String(rowId));
 

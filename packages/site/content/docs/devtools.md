@@ -43,14 +43,48 @@ d.traceLog()       // [{ trigger, oldValue, newValue, effect, timestamp }, …]
 Handy when you want to script a check or grab state at a breakpoint. The same object is the
 `__pdx_debug` export of `@pdxui/core`, for code that imports it.
 
-## For agents: `__PDX_DEVTOOLS__` v1
+## For agents: `__PDX_DEVTOOLS__` v2
 
 An agent driving a browser asks the running app what it is showing through the global itself — a
 versioned API whose every answer is JSON. It is there from page load in development, with no level
 to set, and absent from a production build.
 
+Start with the two members made for an agent's budget:
+
 ```js
-__PDX_DEVTOOLS__.v                 // 1 — check it before relying on a shape
+__PDX_DEVTOOLS__.page()            // the page card, JSON, a couple of hundred tokens
+__PDX_DEVTOOLS__.outline()         // the outline of the route's content, a fraction of a full snapshot
+__PDX_DEVTOOLS__.outline({ maxItems: 10 })   // show more rows before summarising them
+```
+
+**`page()`** is the page card: the route and its params, the title, the lists shown (how many rows,
+with the total, the sort and the filter where the page says them), the forms (their fields, the
+`required` and the `invalid` ones), live messages, errors, the actions available now (the buttons,
+and apart the row actions), and the routes the page links to. Everything is read from the routed
+element and its ARIA — what the user is shown — and an empty member is left out.
+
+**`outline()`** is the accessibility tree of the route's content — the router's boundary, never the
+shell around it — compressed for an agent:
+
+- what a reader cannot perceive (`hidden`, `aria-hidden`, `display: none`) is left out;
+- a wrapper with no role or name gives way to its children, and text that repeats its parent's name
+  is dropped;
+- a table row is one line, cells separated by `|`;
+- a run of controls sharing a role — a toolbar, a pager — is one line that keeps every name;
+- only **data** repetition is summarised: the rows of an `@for` or of a data grid, which the runtime
+  marks in development. Above `maxItems` (5) they show two samples, then `… N more`, with the
+  selectors of the next ones;
+- every control carries a **selector** in brackets: its `data-test` or id when unique, else the
+  shortest path that stays unique from the nearest component or `data-test` — the same DOM gives the
+  same selector, call after call.
+
+On the showcase the card is 40–130 tokens and the outline 16–29% of agent-browser's full snapshot of
+the page, measured in `packages/showcase/tests/devtools-v2.spec.ts`.
+
+The members of version 1 are unchanged:
+
+```js
+__PDX_DEVTOOLS__.v                 // 2 — check it before relying on a shape
 __PDX_DEVTOOLS__.tree()            // [{ id, tag, file, children }] — the PDX components, nested
 __PDX_DEVTOOLS__.inspect('pdx-login')
 // { id, tag, file, props: { … }, state: { … }, deriveds: { … } } — by id, element or CSS selector
@@ -70,6 +104,8 @@ node as `<tag#id>`.
 With `agent-browser`:
 
 ```bash
+agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.page())"
+agent-browser eval "__PDX_DEVTOOLS__.outline()"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.inspect('pdx-login'))"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.errors())"
 ```

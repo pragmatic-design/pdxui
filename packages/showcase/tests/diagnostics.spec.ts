@@ -67,6 +67,17 @@ test('the devtools global, and the agent API behind it, are not in the productio
     expect(js, 'the devtools global is installed by a production build').not.toContain('__PDX_DEVTOOLS__');
 });
 
+test('the v2 description API is not in the production bundle: no outline, no page card, no markers', () => {
+    // `page()` and `outline()` (#271) read the DOM through markers the runtime writes in development
+    // only: a `@for` row and a grid row are `data-pdx-item`, the routed element `data-pdx-route`. A
+    // production row carries neither, and the code that reads them is not shipped.
+    const js = bundle();
+    // Each probe is text only the v2 code writes: the two markers, and a selector of the page card.
+    const shipped = ['data-pdx-item', 'data-pdx-route', '[aria-sort]:not([aria-sort=none])']
+        .filter((probe) => js.includes(probe));
+    expect(shipped, 'devtools v2 code or markers in a production build: put them behind `if (DEV)`').toEqual([]);
+});
+
 test('control — the failures the app reports about itself are still there', () => {
     // Without this, the test above is satisfied by a build that says nothing at all, which is the
     // version where a loader that never answers leaves no trace in a console.

@@ -378,7 +378,7 @@ export type { TC39State, TC39Computed } from './reactivity/tc39-compat';
 // Debug & Telemetry
 export { __pdx_debug, setTelemetryLevel, getTelemetryLevel } from './debug/inspector';
 export type { TelemetryLevel, TraceEntry, ReconcileMetrics, PerfSummary } from './debug/inspector';
-// __PDX_DEVTOOLS__ v1: the router reports its route and navigations through these.
+// __PDX_DEVTOOLS__: the router reports its route and navigations through these.
 export { setDevtoolsRouteSource, recordDevtoolsNavigation } from './debug/devtools-api';
 export type { DevtoolsRoute, DevtoolsNavigation, DevtoolsTreeNode, DevtoolsInspection, DevtoolsError } from './debug/devtools-api';
 
