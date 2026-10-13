@@ -251,6 +251,58 @@ function hide() { open = false; }
 
 alpha
 
+### @state
+
+#### Syntax
+
+```ebnf
+StateDecl ::= "@state" S Identifier S? "=" S? Expression S? ";"?
+```
+
+The analyzer's form: `@state name = booleanExpression;`
+
+#### Semantics
+
+A visual state of the host, held in the platform's custom states (`ElementInternals.states`): the
+descriptor declares it (`states: ['name']`), the host attaches its internals once, and an effect sets
+the state from the expression whenever what the expression reads changes
+(`ctx.track(() => { ctx.state('name', …); })`). CSS matches it with `:state(name)` — a theme, a page or
+the component itself — instead of a class or an attribute each component names its own way. The
+manifest lists a component's states.
+
+#### Rules
+
+- The expression is a boolean. A non-boolean literal, a `$signal(…)` or `$store(…)`, or a `$signal`
+  that starts as a non-boolean literal raises `PDX_STATE_NOT_BOOLEAN`. `@state` is not Svelte's
+  `$state`: reactive data is a `$signal`.
+- A `@state` without `= expression` raises `PDX_MALFORMED_STATE`.
+- Inside the component's own `<style scoped>`, the host is not reachable yet (the scoping writes every
+  selector under the host, #152); `:state()` is written from outside it — a theme or the page.
+- Under `target: 'baseline-2024'` the state will also be mirrored as a `data-state-<name>` attribute;
+  that comes with the target option (#121).
+
+#### Examples
+
+```pdx
+<template>
+  <button @click="open = !open">Menu</button>
+</template>
+
+<script setup>
+let open = $signal(false);
+@state expanded = open;
+</script>
+```
+
+```css
+/* A theme, or the page: the menu while it is open. */
+x-menu:state(expanded) button { font-weight: 600; }
+```
+
+#### Since
+
+beta (#132)
+
 ### @provide, @inject
 
 #### Syntax

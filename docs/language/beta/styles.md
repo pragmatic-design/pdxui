@@ -172,6 +172,9 @@ beta (#154)
 `:state(name)` styles a state the component declares with `@state` ([components.md](components.md),
 #132); under `baseline-2024` the design build also emits `[data-state-name]`.
 
+**Landed** (#132) for `:state(name)` written in a theme or a page. The `baseline-2024` selector comes
+with the `target` option (#121), and `:scope:state(…)` inside a `<style scoped>` with #152.
+
 ## Design CSS extensions (the `@pdxui/design` themes)
 
 ### `@pdx-theme`

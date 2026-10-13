@@ -174,6 +174,20 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it first (`function close() { … }`), or remove it from `@expose`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_MALFORMED_STATE: {
+        severity: 'error', category: 'defect',
+        summary: '`@state` written in a shape the compiler does not recognise.',
+        explanation: 'A state is a name and the condition it is on for. Without both, nothing is declared and nothing sets it.',
+        fix: 'Write `@state name = condition;`, for example `@state expanded = open;`.',
+        reproducedIn: `${T}state-rune.test.ts`,
+    },
+    PDX_STATE_NOT_BOOLEAN: {
+        severity: 'error', category: 'defect',
+        summary: '`@state` given something that is not a boolean.',
+        explanation: 'A state is on or off: CSS matches it with `:state(name)`, and a number, a string or a `$signal(…)` is data, not a condition. `@state` is not Svelte\'s `$state`, which declares a reactive variable.',
+        fix: 'Give it the condition it is on for (`@state busy = count > 0;`); for reactive data, use `$signal`.',
+        example: { bad: pdx('<p>x</p>', '@state count = 0;'), good: pdx('<p>x</p>', 'let count = $signal(0);\n@state busy = count > 0;') },
+    },
     PDX_CIRCULAR_DERIVED: {
         severity: 'error', category: 'defect',
         summary: '`$derived` values that depend on each other in a cycle.',

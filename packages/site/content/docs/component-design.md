@@ -251,8 +251,9 @@ several pieces read: the rhythm tokens, and the breakpoints that move several re
 
 ### CD-C2 — A page does not style a library component's internals
 
-Style a library element through its props, its variants and its documented `--pdx-*` properties
-([Theming](/docs/theming)). An internal class such as `.pdx-dg-row` or `.pdx-nav-item` is not an API:
+Style a library element through its props, its variants, its documented `--pdx-*` properties
+([Theming](/docs/theming)) and its states, with `:state(name)` — a component declares a state with
+[`@state`](/docs/components#state-a-visual-state-of-the-host), and the manifest lists them. An internal class such as `.pdx-dg-row` or `.pdx-nav-item` is not an API:
 it can be renamed, and every page that reached it breaks without a sound. When several pages need the
 same override, the element needs a prop.
 

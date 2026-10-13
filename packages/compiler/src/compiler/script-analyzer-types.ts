@@ -17,6 +17,13 @@ export interface EventInfo {
     payloadType: string;  // '{ value: number }', 'void', etc.
 }
 
+/** `@state name = expression;` — a visual state of the host, a custom state (#132). */
+export interface StateDecl {
+    name: string;
+    /** The boolean expression, as written. */
+    expr: string;
+}
+
 export interface SlotInfo {
     name: string;
     /** Scope type for scoped slots: '{ row: Item, column: string }' or undefined. */
@@ -210,7 +217,8 @@ export interface ScriptAnalysis {
     fetches: FetchDecl[];    // @fetch declarations
     forms: FormDecl[];       // @form declarations
     exposes: string[];       // names declared via @expose
-    route: RouteInfo;        // route metadata from @page/@guard/etc.
+    states: StateDecl[];     // @state name = expr;
+    route: RouteInfo;       // route metadata from @page/@guard/etc.
     globalStore?: GlobalStoreDirective;  // @store rune (file = store module)
     customTag?: string;      // @tag 'pdx-custom-name' — overrides file-derived tag
     i18n?: I18nInfo;         // @i18n configuration block

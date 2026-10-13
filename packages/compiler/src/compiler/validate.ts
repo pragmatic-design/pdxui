@@ -17,6 +17,7 @@ import { skipNonCode, findClosing } from './tokenizer';
 import { openingTagTexts, routeParams } from '../text-scan';
 import { escapeForRegExp } from './regexp-escape';
 import { bindingNames } from './codegen-prefix';
+import { stateExprIsNotBoolean } from './validate-state';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -461,6 +462,18 @@ export function validate(
                 hint: `Declare it first: let ${name} = $signal(...); or function ${name}() { ... }`,
             });
         }
+    }
+
+    // ─── Check 10b: @state holds a boolean (#132) ─────────────────
+
+    for (const s of analysis.states) {
+        if (!stateExprIsNotBoolean(s.expr, analysis)) continue;
+        warnings.push({
+            code: 'PDX_STATE_NOT_BOOLEAN',
+            severity: 'error',
+            message: `@state '${s.name}' is '${s.expr}', which is not a boolean: a state is on or off.`,
+            hint: `Write the condition it is on for (@state ${s.name} = count > 0;). For reactive data, use $signal.`,
+        });
     }
 
     // ─── Check 11: @prop default type mismatch ──────────────────

@@ -38,6 +38,8 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_DUP_EVENT` | error | The same `@event` declared twice. | `@event`, [script.md](script.md) |
 | `PDX_EVENT_NAME_CASE` | warn | An `@event` name with an uppercase letter. | `@event`, [script.md](script.md) |
 | `PDX_EXPOSE_UNDECLARED` | error | `@expose` names something the component does not declare. | `@expose`, [script.md](script.md) |
+| `PDX_MALFORMED_STATE` | error | `@state` written in a shape the compiler does not recognise. | `@state`, [script.md](script.md) |
+| `PDX_STATE_NOT_BOOLEAN` | error | `@state` given something that is not a boolean. | `@state`, [script.md](script.md) |
 | `PDX_UNUSED_REACTIVE` | info | A `$signal` or `$derived` that nothing reads. | `$signal`, `$derived`, [script.md](script.md) |
 | `PDX_VERSION_COUNTER` | warn | A `$signal` only ever bumped, and read only to be discarded (CD-S3, a heuristic). *(design)* | `$signal`, [script.md](script.md) |
 | `PDX_CIRCULAR_DERIVED` | error | `$derived` values that depend on each other in a cycle. | `$derived`, [script.md](script.md) |

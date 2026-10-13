@@ -9,8 +9,9 @@
 //
 // A builder returns what `component()` already reads at runtime — a prop is a PropDefinition, with the
 // runtime type an attribute is coerced to — and carries the TypeScript type the context is typed from.
-// `models`, `slots`, `states`, `parts`, `expose`, `host` and `variants` are part of the descriptor's
-// type now; each gets its behaviour in its own issue (docs/language/beta/components.md).
+// `states` are the host's custom states, set with `ctx.state` (#132). `models`, `slots`, `parts`,
+// `expose`, `host` and `variants` are part of the descriptor's type now; each gets its behaviour in its
+// own issue (docs/language/beta/components.md).
 
 /** The runtime type an attribute value is coerced to. Object, Array and Function are property-only. */
 export type PropType = typeof String | typeof Number | typeof Boolean | typeof Object | typeof Array | typeof Function;
