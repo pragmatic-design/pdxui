@@ -45,6 +45,11 @@ export function refTargets(ast: TemplateNode[] | null, resolveExposed?: ResolveE
     return out;
 }
 
+/** `text` as a regular expression that matches it literally: every special character escaped. */
+function escapeRegExp(text: string): string {
+    return text.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+}
+
 /** The type a ref holds: the element, with the members its component exposes. */
 function refType(exposed: readonly string[]): string {
     const members = exposed.filter(n => /^[A-Za-z_$][\w$]*$/.test(n)).map(n => `${n}: any;`).join(' ');
@@ -63,7 +68,7 @@ export function typeRefs(projected: string, refs: Map<string, readonly string[]>
         if (n > 99) break; // `_r00`…`_r99`: four characters, as long as `null`
         // Match: `let dlg = $signal(null` / `var  dlg = $signal( null` (the projection may have padded
         // the keyword). Groups: [1]=everything up to the argument
-        const decl = new RegExp(`(\\b(?:let|const|var)\\s+${name.replace(/\$/g, '\\$')}\\s*=\\s*\\$signal\\s*\\(\\s*)null\\b`);
+        const decl = new RegExp(`(\\b(?:let|const|var)\\s+${escapeRegExp(name)}\\s*=\\s*\\$signal\\s*\\(\\s*)null\\b`);
         const m = decl.exec(script);
         if (!m) continue;
         const id = `_r${String(n++).padStart(2, '0')}`;
