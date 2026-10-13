@@ -136,6 +136,7 @@ export { html, clearBoundProperty, assignBoundProperty, bindTwoWay, bindInterpol
 export { repeat } from './renderer/list';
 export { repeatWithSlot } from './renderer/slot-repeat';
 export { setProp, bindGesture, insert, remove, text, marker, staticBlock, __staticHTML } from './renderer/dom';
+export { delegate } from './renderer/delegate';
 
 // Error Boundary
 export { errorBoundary } from './renderer/error-boundary';

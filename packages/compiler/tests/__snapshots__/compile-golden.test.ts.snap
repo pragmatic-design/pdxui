@@ -1490,7 +1490,7 @@ exports[`compile golden — demo corpus > infra/demo-positioning.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, shift, signal, staticBlock, when } from '@pdxui/core';
+import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, delegate, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, shift, signal, staticBlock, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-cpxaos");
@@ -1700,7 +1700,7 @@ const placements = [
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m13,__el14,__el15,__el18,__t21,__el27,__el29,__el31,__el36,__t38,__el42]=__walk3(__frag);
-    const __cf12=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m11]=__walk2(__frag);const __cf10=when(()=>p(),()=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);__el7.addEventListener('click', safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.currentPlacement() === p());__el7.classList.toggle("active",__c);});bindInterpolation(__t8,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m11.replaceWith(__cf10);return __frag;});
+    const __cf12=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m11]=__walk2(__frag);const __cf10=when(()=>p(),()=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);delegate(ctx.el,__el7,'click',safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.currentPlacement() === p());__el7.classList.toggle("active",__c);});bindInterpolation(__t8,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m11.replaceWith(__cf10);return __frag;});
     __m13.replaceWith(__cf12);
     bindRef(__el14,ctx.arenaEl);
     bindRef(__el15,ctx.arenaScrollEl);
@@ -1723,7 +1723,7 @@ exports[`compile golden — demo corpus > infra/demo-scrollbar.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, bindRef, component, eachRow, effect, onDestroy, onMount, safeHandler, signal, staticBlock, useScrollbar } from '@pdxui/core';
+import { batchHandler, bindInterpolation, bindRef, component, delegate, eachRow, effect, onDestroy, onMount, safeHandler, signal, staticBlock, useScrollbar } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4mmvf3");
@@ -1795,13 +1795,13 @@ const options = [
     const [__el6,__t25,__el30,__el31,__el32,__el33,__el56,__el68,__m72,__t75]=__walk1(__frag);
     bindRef(__el6,ctx.box1Ref);
     bindInterpolation(__t25,()=>ctx.scrollTop1());
-    __el30.addEventListener('click', safeHandler(batchHandler(ctx.scrollToTop), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el31.addEventListener('click', safeHandler(batchHandler(ctx.scrollToBottom), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el32.addEventListener('click', safeHandler(batchHandler(ctx.scrollToItem10), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el30,'click',safeHandler(batchHandler(ctx.scrollToTop), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el31,'click',safeHandler(batchHandler(ctx.scrollToBottom), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el32,'click',safeHandler(batchHandler(ctx.scrollToItem10), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindRef(__el33,ctx.box2Ref);
     bindRef(__el56,ctx.box3Ref);
     bindRef(__el68,ctx.box4Ref);
-    const __cf71=eachRow(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t70]=__walk0(__frag);__el69.addEventListener('click', safeHandler(batchHandler(() => ctx.selectOption(opt())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.selected() === opt());__el69.classList.toggle("active",__c);});bindInterpolation(__t70,()=>opt(),true);return __frag;});
+    const __cf71=eachRow(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t70]=__walk0(__frag);delegate(ctx.el,__el69,'click',safeHandler(batchHandler(() => ctx.selectOption(opt())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.selected() === opt());__el69.classList.toggle("active",__c);});bindInterpolation(__t70,()=>opt(),true);return __frag;});
     __m72.replaceWith(__cf71);
     bindInterpolation(__t75,()=>ctx.selected());
     return __frag;
@@ -1814,7 +1814,7 @@ exports[`compile golden — demo corpus > infra/demo-selection.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, clearBoundProperty, component, createSelection, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { batchHandler, bindInterpolation, clearBoundProperty, component, createSelection, delegate, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-wzxjxl");
@@ -1932,16 +1932,16 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m11,__t13,__m23,__el25,__el26,__t28,__el35,__m52,__t54]=__walk3(__frag);
-    const __cf10=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el8,__t9]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el8.classList.remove(__t); for (const __t of __n) __el8.classList.add(__t); __w = __n; }); }__el8.addEventListener('click', safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t9,()=>fruit(),true);return __frag;});
+    const __cf10=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el8,__t9]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el8.classList.remove(__t); for (const __t of __n) __el8.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el8,'click',safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t9,()=>fruit(),true);return __frag;});
     __m11.replaceWith(__cf10);
     bindInterpolation(__t13,()=>ctx.singleInfo());
-    const __cf22=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk1();const [__el20,__t21]=__walk1(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el20.classList.remove(__t); for (const __t of __n) __el20.classList.add(__t); __w = __n; }); }__el20.addEventListener('click', safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t21,()=>fruit(),true);return __frag;});
+    const __cf22=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk1();const [__el20,__t21]=__walk1(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el20.classList.remove(__t); for (const __t of __n) __el20.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el20,'click',safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t21,()=>fruit(),true);return __frag;});
     __m23.replaceWith(__cf22);
-    __el25.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits)), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el26.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.clear()), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el25,'click',safeHandler(batchHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits)), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el26,'click',safeHandler(batchHandler(() => ctx.multiSel.clear()), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t28,()=>ctx.multiInfo());
     __el35.addEventListener('change', safeHandler(batchHandler(ctx.handleCheckAll), ctx.el?.tagName?.toLowerCase(), 'change'));
-    const __cf51=eachRow(()=>ctx.people,'id',(p)=>{const __frag=__blk2();const [__el42,__el44,__t46,__t48,__t50]=__walk2(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el42.classList.remove(__t); for (const __t of __n) __el42.classList.add(__t); __w = __n; }); }__el42.addEventListener('click', safeHandler(batchHandler(ctx.handleGridClick), ctx.el?.tagName?.toLowerCase(), 'click'));let __el44w_checked = {}; effect(() => { const __b = ctx.gridIsSelected(p().id); if (Object.is(__b, __el44w_checked)) return; __el44w_checked = __b; if ("checked" in __el44) { const __v = __b; if (__v == null) clearBoundProperty(__el44, "checked", "checked"); else __el44["checked"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el44.removeAttribute("checked"); else { __el44.setAttribute("checked", __v === true ? '' : String(__v)); } } });bindInterpolation(__t46,()=>p().name);bindInterpolation(__t48,()=>p().role);bindInterpolation(__t50,()=>p().status);return __frag;});
+    const __cf51=eachRow(()=>ctx.people,'id',(p)=>{const __frag=__blk2();const [__el42,__el44,__t46,__t48,__t50]=__walk2(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el42.classList.remove(__t); for (const __t of __n) __el42.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el42,'click',safeHandler(batchHandler(ctx.handleGridClick), ctx.el?.tagName?.toLowerCase(), 'click'));let __el44w_checked = {}; effect(() => { const __b = ctx.gridIsSelected(p().id); if (Object.is(__b, __el44w_checked)) return; __el44w_checked = __b; if ("checked" in __el44) { const __v = __b; if (__v == null) clearBoundProperty(__el44, "checked", "checked"); else __el44["checked"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el44.removeAttribute("checked"); else { __el44.setAttribute("checked", __v === true ? '' : String(__v)); } } });bindInterpolation(__t46,()=>p().name);bindInterpolation(__t48,()=>p().role);bindInterpolation(__t50,()=>p().status);return __frag;});
     __m52.replaceWith(__cf51);
     bindInterpolation(__t54,()=>ctx.gridInfo());
     return __frag;
@@ -2217,7 +2217,7 @@ exports[`compile golden — demo corpus > infra/demo-utilities.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, bindRef, component, createToastQueue, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock, useClipboard, useResizeHandle } from '@pdxui/core';
+import { batchHandler, bindInterpolation, bindRef, component, createToastQueue, delegate, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock, useClipboard, useResizeHandle } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-drx6xh");
@@ -2318,20 +2318,20 @@ component('pdx-demo-utilities', {
     const __frag=__blk1();
     const [__el7,__el8,__el9,__t13,__t16,__t19,__el24,__t26,__el27,__el34,__el35,__el36,__el37,__el38,__m46,__t49]=__walk1(__frag);
     bindRef(__el7,ctx.clipInputRef);
-    __el8.addEventListener('click', safeHandler(batchHandler(ctx.doCopy), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el9.addEventListener('click', safeHandler(batchHandler(ctx.doPaste), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el8,'click',safeHandler(batchHandler(ctx.doCopy), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el9,'click',safeHandler(batchHandler(ctx.doPaste), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t13,()=>ctx.clipCopied());
     bindInterpolation(__t16,()=>ctx.clipPasted());
     bindInterpolation(__t19,()=>ctx.clipSupported());
     bindRef(__el24,ctx.panelRef);
     bindInterpolation(__t26,()=>ctx.panelSize());
     bindRef(__el27,ctx.handleRef);
-    __el34.addEventListener('click', safeHandler(batchHandler(ctx.addSuccess), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el35.addEventListener('click', safeHandler(batchHandler(ctx.addInfo), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el36.addEventListener('click', safeHandler(batchHandler(ctx.addWarning), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el37.addEventListener('click', safeHandler(batchHandler(ctx.addError), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el38.addEventListener('click', safeHandler(batchHandler(ctx.clearToasts), ctx.el?.tagName?.toLowerCase(), 'click'));
-    const __cf45=eachRow(()=>ctx.toasts(),'id',(t)=>{const __frag=__blk0();const [__el40,__t42,__t43,__el44]=__walk0(__frag);{ const __s = new Set(["toast-item"]); let __w = []; effect(() => { const __n = interpolationText('toast-' + t().type).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el40.classList.remove(__t); for (const __t of __n) __el40.classList.add(__t); __w = __n; }); }bindInterpolation(__t42,()=>t().type.toUpperCase());bindInterpolation(__t43,()=>t().message);__el44.addEventListener('click', safeHandler(batchHandler(() => ctx.dismissToast(t().id)), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;});
+    delegate(ctx.el,__el34,'click',safeHandler(batchHandler(ctx.addSuccess), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el35,'click',safeHandler(batchHandler(ctx.addInfo), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el36,'click',safeHandler(batchHandler(ctx.addWarning), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el37,'click',safeHandler(batchHandler(ctx.addError), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el38,'click',safeHandler(batchHandler(ctx.clearToasts), ctx.el?.tagName?.toLowerCase(), 'click'));
+    const __cf45=eachRow(()=>ctx.toasts(),'id',(t)=>{const __frag=__blk0();const [__el40,__t42,__t43,__el44]=__walk0(__frag);{ const __s = new Set(["toast-item"]); let __w = []; effect(() => { const __n = interpolationText('toast-' + t().type).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el40.classList.remove(__t); for (const __t of __n) __el40.classList.add(__t); __w = __n; }); }bindInterpolation(__t42,()=>t().type.toUpperCase());bindInterpolation(__t43,()=>t().message);delegate(ctx.el,__el44,'click',safeHandler(batchHandler(() => ctx.dismissToast(t().id)), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;});
     __m46.replaceWith(__cf45);
     bindInterpolation(__t49,()=>ctx.toastCount());
     return __frag;
@@ -3355,7 +3355,7 @@ exports[`compile golden — demo corpus > showcase/task-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, clearBoundProperty, component, computed, eachRow, effect, linkedSignal, safeHandler, staticBlock, when } from '@pdxui/core';
+import { batchHandler, bindInterpolation, clearBoundProperty, component, computed, delegate, eachRow, effect, linkedSignal, safeHandler, staticBlock, when } from '@pdxui/core';
 import { useTasks } from './task-store.pdx';
 
 {
@@ -3410,12 +3410,12 @@ const store = useTasks();
     let __el10w_selected = {}; effect(() => { const __b = ctx.store.filter() === 'pending'; if (Object.is(__b, __el10w_selected)) return; __el10w_selected = __b; if ("selected" in __el10) { const __v = __b; if (__v == null) clearBoundProperty(__el10, "selected", "selected"); else __el10["selected"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el10.removeAttribute("selected"); else { __el10.setAttribute("selected", __v === true ? '' : String(__v)); } } });
     let __el11w_selected = {}; effect(() => { const __b = ctx.store.filter() === 'done'; if (Object.is(__b, __el11w_selected)) return; __el11w_selected = __b; if ("selected" in __el11) { const __v = __b; if (__v == null) clearBoundProperty(__el11, "selected", "selected"); else __el11["selected"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el11.removeAttribute("selected"); else { __el11.setAttribute("selected", __v === true ? '' : String(__v)); } } });
     bindInterpolation(__t13,()=>ctx.page());
-    __el14.addEventListener('click', safeHandler(batchHandler(ctx.prevPage), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el14,'click',safeHandler(batchHandler(ctx.prevPage), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el14w_disabled = {}; effect(() => { const __b = ctx.page() <= 1; if (Object.is(__b, __el14w_disabled)) return; __el14w_disabled = __b; if ("disabled" in __el14) { const __v = __b; if (__v == null) clearBoundProperty(__el14, "disabled", "disabled"); else __el14["disabled"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el14.removeAttribute("disabled"); else { __el14.setAttribute("disabled", __v === true ? '' : String(__v)); } } });
-    __el15.addEventListener('click', safeHandler(batchHandler(ctx.nextPage), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el15,'click',safeHandler(batchHandler(ctx.nextPage), ctx.el?.tagName?.toLowerCase(), 'click'));
     const __cf17=when(()=>ctx.store.filtered().length === 0,()=>{const __frag=__blk0();return __frag;},null);
     __m18.replaceWith(__cf17);
-    const __cf28=eachRow(()=>ctx.store.filtered(),'id',(task)=>{const __frag=__blk3();const [__el19,__el20,__m22,__t24,__t26,__el27]=__walk3(__frag);effect(()=>{const __c=!!(task().done);__el19.classList.toggle("done",__c);});__el20.addEventListener('click', safeHandler(batchHandler(() => ctx.toggleTask(task().id)), ctx.el?.tagName?.toLowerCase(), 'click'));const __cf21=when(()=>task().done,()=>{const __frag=__blk1();return __frag;},()=>{const __frag=__blk2();return __frag;});__m22.replaceWith(__cf21);bindInterpolation(__t24,()=>task().text);bindInterpolation(__t26,()=>task().category);__el27.addEventListener('click', safeHandler(batchHandler(() => ctx.removeTask(task().id)), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;});
+    const __cf28=eachRow(()=>ctx.store.filtered(),'id',(task)=>{const __frag=__blk3();const [__el19,__el20,__m22,__t24,__t26,__el27]=__walk3(__frag);effect(()=>{const __c=!!(task().done);__el19.classList.toggle("done",__c);});delegate(ctx.el,__el20,'click',safeHandler(batchHandler(() => ctx.toggleTask(task().id)), ctx.el?.tagName?.toLowerCase(), 'click'));const __cf21=when(()=>task().done,()=>{const __frag=__blk1();return __frag;},()=>{const __frag=__blk2();return __frag;});__m22.replaceWith(__cf21);bindInterpolation(__t24,()=>task().text);bindInterpolation(__t26,()=>task().category);delegate(ctx.el,__el27,'click',safeHandler(batchHandler(() => ctx.removeTask(task().id)), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;});
     __m29.replaceWith(__cf28);
     return __frag;
   })(),
@@ -44685,7 +44685,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-posi
 "// 0 warning(s)
 
 ============================================================
-import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, shift, signal, staticBlock, when } from '@pdxui/core';
+import { autoUpdate, batchHandler, bindInterpolation, bindRef, component, computeFloatingPosition, delegate, eachRow, effect, flip, hideMiddleware, offset, onDestroy, onMount, safeHandler, shift, signal, staticBlock, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-y9fn6i");
@@ -44816,7 +44816,7 @@ const placements = [
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m10,__el11,__el12,__el15,__t18,__el24,__el26,__el28]=__walk3(__frag);
-    const __cf9=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m8]=__walk2(__frag);const __cf7=when(()=>p(),()=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);__el4.addEventListener('click', safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.currentPlacement() === p());__el4.classList.toggle("active",__c);});bindInterpolation(__t5,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m8.replaceWith(__cf7);return __frag;});
+    const __cf9=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __frag=__blk2();const [__m8]=__walk2(__frag);const __cf7=when(()=>p(),()=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);delegate(ctx.el,__el4,'click',safeHandler(batchHandler(() => ctx.setPlacement(p())), ctx.el?.tagName?.toLowerCase(), 'click'));effect(()=>{const __c=!!(ctx.currentPlacement() === p());__el4.classList.toggle("active",__c);});bindInterpolation(__t5,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});__m8.replaceWith(__cf7);return __frag;});
     __m10.replaceWith(__cf9);
     bindRef(__el11,ctx.arenaEl);
     bindRef(__el12,ctx.arenaScrollEl);
@@ -44897,7 +44897,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-sele
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, clearBoundProperty, component, createSelection, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { batchHandler, bindInterpolation, clearBoundProperty, component, createSelection, delegate, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-8i2p4t");
@@ -44973,7 +44973,7 @@ const people = [
     const __frag=__blk1();
     const [__el6,__m23,__t25]=__walk1(__frag);
     __el6.addEventListener('change', safeHandler(batchHandler(ctx.handleCheckAll), ctx.el?.tagName?.toLowerCase(), 'change'));
-    const __cf22=eachRow(()=>ctx.people,'id',(p)=>{const __frag=__blk0();const [__el13,__el15,__t17,__t19,__t21]=__walk0(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el13.classList.remove(__t); for (const __t of __n) __el13.classList.add(__t); __w = __n; }); }__el13.addEventListener('click', safeHandler(batchHandler(ctx.handleGridClick), ctx.el?.tagName?.toLowerCase(), 'click'));let __el15w_checked = {}; effect(() => { const __b = ctx.gridIsSelected(p().id); if (Object.is(__b, __el15w_checked)) return; __el15w_checked = __b; if ("checked" in __el15) { const __v = __b; if (__v == null) clearBoundProperty(__el15, "checked", "checked"); else __el15["checked"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("checked"); else { __el15.setAttribute("checked", __v === true ? '' : String(__v)); } } });bindInterpolation(__t17,()=>p().name);bindInterpolation(__t19,()=>p().role);bindInterpolation(__t21,()=>p().status);return __frag;});
+    const __cf22=eachRow(()=>ctx.people,'id',(p)=>{const __frag=__blk0();const [__el13,__el15,__t17,__t19,__t21]=__walk0(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el13.classList.remove(__t); for (const __t of __n) __el13.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el13,'click',safeHandler(batchHandler(ctx.handleGridClick), ctx.el?.tagName?.toLowerCase(), 'click'));let __el15w_checked = {}; effect(() => { const __b = ctx.gridIsSelected(p().id); if (Object.is(__b, __el15w_checked)) return; __el15w_checked = __b; if ("checked" in __el15) { const __v = __b; if (__v == null) clearBoundProperty(__el15, "checked", "checked"); else __el15["checked"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("checked"); else { __el15.setAttribute("checked", __v === true ? '' : String(__v)); } } });bindInterpolation(__t17,()=>p().name);bindInterpolation(__t19,()=>p().role);bindInterpolation(__t21,()=>p().status);return __frag;});
     __m23.replaceWith(__cf22);
     bindInterpolation(__t25,()=>ctx.gridInfo());
     return __frag;
@@ -44986,7 +44986,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-sele
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, component, createSelection, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { batchHandler, bindInterpolation, component, createSelection, delegate, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qyfzev");
@@ -45053,10 +45053,10 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m9,__el11,__el12,__t14]=__walk1(__frag);
-    const __cf8=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el6,__t7]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el6.classList.remove(__t); for (const __t of __n) __el6.classList.add(__t); __w = __n; }); }__el6.addEventListener('click', safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t7,()=>fruit(),true);return __frag;});
+    const __cf8=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el6,__t7]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el6.classList.remove(__t); for (const __t of __n) __el6.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el6,'click',safeHandler(batchHandler(ctx.handleMultiClick), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t7,()=>fruit(),true);return __frag;});
     __m9.replaceWith(__cf8);
-    __el11.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits)), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el12.addEventListener('click', safeHandler(batchHandler(() => ctx.multiSel.clear()), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el11,'click',safeHandler(batchHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits)), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el12,'click',safeHandler(batchHandler(() => ctx.multiSel.clear()), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t14,()=>ctx.multiInfo());
     return __frag;
   })(),
@@ -45068,7 +45068,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-sele
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, component, createSelection, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { batchHandler, bindInterpolation, component, createSelection, delegate, eachRow, effect, interpolationText, onDestroy, onMount, safeHandler, signal, staticBlock } from '@pdxui/core';
 
 const __blk0=staticBlock((__frag,__d)=>{__frag.appendChild(__d.createTextNode(" "));const __el5=__d.createElement('div');__frag.appendChild(__el5);__el5.setAttribute("class", "item");const __t6=__d.createTextNode('');__el5.appendChild(__t6);__frag.appendChild(__d.createTextNode(" "));});
 const __walk0=(r)=>{const __el5=r.firstChild.nextSibling;const __t6=__el5.firstChild;return [__el5,__t6];};
@@ -45104,7 +45104,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m8,__t10]=__walk1(__frag);
-    const __cf7=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el5.classList.remove(__t); for (const __t of __n) __el5.classList.add(__t); __w = __n; }); }__el5.addEventListener('click', safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t6,()=>fruit(),true);return __frag;});
+    const __cf7=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el5.classList.remove(__t); for (const __t of __n) __el5.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el5,'click',safeHandler(batchHandler(() => ctx.singleSel.select(fruit())), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t6,()=>fruit(),true);return __frag;});
     __m8.replaceWith(__cf7);
     bindInterpolation(__t10,()=>ctx.singleInfo());
     return __frag;
@@ -45257,7 +45257,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/showcase-settings.p
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, eachRow, effect, safeHandler, signal, staticBlock } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, delegate, eachRow, effect, safeHandler, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-mwg9c1");
@@ -45388,21 +45388,21 @@ component('pdx-showcase-settings', {
     let __el2w_label = {}; effect(() => { const __b = ctx.densityLabel(); if (Object.is(__b, __el2w_label)) return; __el2w_label = __b; assignBoundProperty(__el2, "label", __b); });
     let __el2w_items = {}; effect(() => { const __b = ctx.densityItems; if (Object.is(__b, __el2w_items)) return; __el2w_items = __b; assignBoundProperty(__el2, "items", __b); });
     __el2.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onDensitySelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
-    __el3.addEventListener('click', safeHandler(batchHandler(ctx.toggleMode), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el3,'click',safeHandler(batchHandler(ctx.toggleMode), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el4w_name = {}; effect(() => { const __b = ctx.modeIcon(); if (Object.is(__b, __el4w_name)) return; __el4w_name = __b; assignBoundProperty(__el4, "name", __b); });
-    __el5.addEventListener('click', safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el5,'click',safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el7.classList.add("settings-panel");effect(()=>{const __c=!!(ctx.settingsOpen());__el7.classList.toggle("open",__c);});
-    __el10.addEventListener('click', safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
-    const __cf17=eachRow(()=>ctx.themeItems,'key',(opt)=>{const __frag=__blk0();const [__el15,__t16]=__walk0(__frag);__el15.classList.add("settings-chip");effect(()=>{const __c=!!(opt().key === ctx.theme());__el15.classList.toggle("active",__c);});__el15.addEventListener('click', safeHandler(batchHandler(() => ctx.setTheme(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t16,()=>opt().label);return __frag;});
+    delegate(ctx.el,__el10,'click',safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
+    const __cf17=eachRow(()=>ctx.themeItems,'key',(opt)=>{const __frag=__blk0();const [__el15,__t16]=__walk0(__frag);__el15.classList.add("settings-chip");effect(()=>{const __c=!!(opt().key === ctx.theme());__el15.classList.toggle("active",__c);});delegate(ctx.el,__el15,'click',safeHandler(batchHandler(() => ctx.setTheme(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t16,()=>opt().label);return __frag;});
     __m18.replaceWith(__cf17);
-    const __cf24=eachRow(()=>ctx.densityItems,'key',(opt)=>{const __frag=__blk1();const [__el22,__t23]=__walk1(__frag);__el22.classList.add("settings-chip");effect(()=>{const __c=!!(opt().key === ctx.density());__el22.classList.toggle("active",__c);});__el22.addEventListener('click', safeHandler(batchHandler(() => ctx.setDensity(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t23,()=>opt().label);return __frag;});
+    const __cf24=eachRow(()=>ctx.densityItems,'key',(opt)=>{const __frag=__blk1();const [__el22,__t23]=__walk1(__frag);__el22.classList.add("settings-chip");effect(()=>{const __c=!!(opt().key === ctx.density());__el22.classList.toggle("active",__c);});delegate(ctx.el,__el22,'click',safeHandler(batchHandler(() => ctx.setDensity(opt().key)), ctx.el?.tagName?.toLowerCase(), 'click'));bindInterpolation(__t23,()=>opt().label);return __frag;});
     __m25.replaceWith(__cf24);
     __el29.classList.add("settings-chip");effect(()=>{const __c=!!(ctx.dark());__el29.classList.toggle("active",!__c);});
-    __el29.addEventListener('click', safeHandler(batchHandler(() => ctx.setDark(false)), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el29,'click',safeHandler(batchHandler(() => ctx.setDark(false)), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el30.classList.add("settings-chip");effect(()=>{const __c=!!(ctx.dark());__el30.classList.toggle("active",__c);});
-    __el30.addEventListener('click', safeHandler(batchHandler(() => ctx.setDark(true)), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el30,'click',safeHandler(batchHandler(() => ctx.setDark(true)), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el31.classList.add("settings-overlay");effect(()=>{const __c=!!(ctx.settingsOpen());__el31.classList.toggle("open",__c);});
-    __el31.addEventListener('click', safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el31,'click',safeHandler(batchHandler(ctx.toggleSettings), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
   })(),
 });
@@ -45452,7 +45452,7 @@ exports[`compile golden — demo corpus > todo-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, bindTwoWay, component, computed, eachRow, safeHandler, signal, staticBlock, when } from '@pdxui/core';
+import { batchHandler, bindInterpolation, bindTwoWay, component, computed, delegate, eachRow, safeHandler, signal, staticBlock, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-9864yt");
@@ -45500,9 +45500,9 @@ let nextId = 4;
     bindInterpolation(__t2,()=>ctx.title());
     bindTwoWay(__el4, 'value', ctx.newItem);
     __el4.addEventListener('keydown',(e)=>{if(e instanceof KeyboardEvent&&!["Enter"].includes(e.key))return;(safeHandler(batchHandler(ctx.addItem), ctx.el?.tagName?.toLowerCase(), 'keydown'))(e);});
-    __el5.addEventListener('click', safeHandler(batchHandler(ctx.addItem), ctx.el?.tagName?.toLowerCase(), 'click'));
+    delegate(ctx.el,__el5,'click',safeHandler(batchHandler(ctx.addItem), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t7,()=>ctx.remaining());
-    const __cf12=eachRow(()=>ctx.items(),'id',(item)=>{const __frag=__blk0();const [__t10,__el11]=__walk0(__frag);bindInterpolation(__t10,()=>item().text);__el11.addEventListener('click', safeHandler(batchHandler(() => ctx.remove(item().id)), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;});
+    const __cf12=eachRow(()=>ctx.items(),'id',(item)=>{const __frag=__blk0();const [__t10,__el11]=__walk0(__frag);bindInterpolation(__t10,()=>item().text);delegate(ctx.el,__el11,'click',safeHandler(batchHandler(() => ctx.remove(item().id)), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;});
     __m13.replaceWith(__cf12);
     const __cf15=when(()=>ctx.items().length === 0,()=>{const __frag=__blk1();return __frag;},null);
     __m16.replaceWith(__cf15);

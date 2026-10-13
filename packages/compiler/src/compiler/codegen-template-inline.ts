@@ -22,6 +22,7 @@ import { jsQuote, jsString } from './js-literal';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
 import { specialisedClassBinding } from './inline-class-binding';
+import { delegableHandler } from './inline-event-delegation';
 
 // ─── Constants ────────────────────────────────────────────────────
 
@@ -177,6 +178,10 @@ class InlineGen {
     private tableStack: boolean[] = [];
     /** Whether the top level of this generator is placed in a table-internal element (a row's body). */
     private readonly baseTable: boolean;
+    /** Parallel to the open elements: whether that element is, or is under, a component. */
+    private opaqueStack: boolean[] = [];
+    /** Whether this generator's top level is under a component or in a @portal: its events stay direct (#113). */
+    private readonly baseOpaque: boolean;
     private imports: Set<string>;
     private ctx: CompileContext;
     /** Loop-invariant reads already hoisted in THIS block: signal name to the computed holding it. */
@@ -184,11 +189,12 @@ class InlineGen {
     /** The top-level generator's binding deduplication; a block body's generator has none. */
     dedup: BindingDedup | null = null;
 
-    constructor(imports: Set<string>, startIdx: number, ctx: CompileContext | undefined, baseSvg: boolean, hoists: TemplateHoists, baseTable = false) {
+    constructor(imports: Set<string>, startIdx: number, ctx: CompileContext | undefined, baseSvg: boolean, hoists: TemplateHoists, baseTable = false, baseOpaque = false) {
         this.imports = imports;
         this.idx = startIdx;
         this.baseSvg = baseSvg;
         this.baseTable = baseTable;
+        this.baseOpaque = baseOpaque;
         this.hoists = hoists;
         // Fallback context for backward compat (tests that don't pass ctx). Built by the factory
         // rather than spelled out: an inline literal would silently go stale every time
@@ -221,6 +227,8 @@ class InlineGen {
     private childrenSvg(): boolean { return this.svgStack[this.svgStack.length - 1] ?? this.baseSvg; }
     /** Is the current parent table-internal, where whitespace-only text renders nothing? */
     private inTable(): boolean { return this.tableStack[this.tableStack.length - 1] ?? this.baseTable; }
+    /** Is the current parent a component, under one, or in a @portal? */
+    private opaque(): boolean { return this.opaqueStack[this.opaqueStack.length - 1] ?? this.baseOpaque; }
     private read(expr: string): string { return callSignals(prefixCtx(expr, this.ctx), this.ctx); }
     /** A binding's value as written: shared with its repeats when this generator deduplicates. */
     private shared(value: string): string { return this.dedup ? this.dedup.share(value) : value; }
@@ -306,7 +314,7 @@ class InlineGen {
             }
             if (content[i + 1] === '/') {
                 const end = content.indexOf('>', i);
-                if (this.tree.depth() > 0) { this.tree.close(); this.svgStack.pop(); this.tableStack.pop(); }
+                if (this.tree.depth() > 0) { this.tree.close(); this.svgStack.pop(); this.tableStack.pop(); this.opaqueStack.pop(); }
                 i = end === -1 ? content.length : end + 1;
             } else if (content[i + 1] === '!') {
                 const end = content.indexOf('-->', i);
@@ -359,6 +367,7 @@ class InlineGen {
                 this.tree.openSink();
                 this.svgStack.push(false);
                 this.tableStack.push(false);
+                this.opaqueStack.push(true);
             }
             return;
         }
@@ -380,6 +389,7 @@ class InlineGen {
         if (!isVoid) {
             this.svgStack.push(svg && name !== 'foreignObject');
             this.tableStack.push(!svg && TABLE_INTERNAL.has(kind.tag));
+            this.opaqueStack.push(this.opaque() || name.includes('-'));
         }
     }
 
@@ -448,7 +458,7 @@ class InlineGen {
             else if (n === ':class')          this.classBind(el, val, staticClassValue, preRewritten, toggled, kind);
             else if (n.startsWith(':'))       this.propBind(el, n.slice(1), val, kind, preRewritten);
             else if (gestureOf(n))            this.gestureBind(el, gestureOf(n)!, val, preRewritten);
-            else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten);
+            else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten, kind.custom || this.opaque());
             else if (n === 'class')           continue; // written first, above
             else if (val)                     this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(decodeEntities(val))});`);
             else                              this.tree.statement(`${el}.setAttribute(${jsString(n)}, '');`);
@@ -584,9 +594,17 @@ class InlineGen {
         this.out(`bindGesture(${el}, ${jsQuote(gesture.name)}, ${gestureValue(gesture, handler)});`);
     }
 
-    private eventBind(el: string, desc: string, expr: string, preRewritten = false): void {
+    /** `opaque`: the element is a component, under one, or in a @portal — never delegated (#113). */
+    private eventBind(el: string, desc: string, expr: string, preRewritten = false, opaque = false): void {
         const parts = desc.split('.');
         const ev = parts[0], mods = new Set(parts.slice(1));
+        // A type this component delegates (inline-event-delegation.ts): stored on the element, called by
+        // core's one listener per type, in DOM order.
+        const delegated = this.ctx.delegatedEvents.has(ev) && delegableHandler(ev, [...mods], opaque);
+        if (delegated) this.imports.add('delegate');
+        const listen = (fn: string, options: string): string => (delegated
+            ? `delegate(ctx.el,${el},${jsQuote(ev)},${fn});`
+            : `${el}.addEventListener(${jsQuote(ev)}, ${fn}${options});`);
         // The SAME builder the template path uses, so every handler form the docs promise compiles
         // the same here: `$event` bound, `count++` and `open = !open` rewritten
         // as signal writes, and two statements kept as two statements.
@@ -608,7 +626,7 @@ class InlineGen {
         rt.delete('once'); rt.delete('capture'); rt.delete('passive');
 
         if (rt.size === 0) {
-            this.out(`${el}.addEventListener(${jsQuote(ev)}, ${handler}${opts});`);
+            this.out(listen(handler, opts));
         } else {
             const w: string[] = [];
             if (rt.has('self')) w.push('if(e.target!==e.currentTarget)return;');
@@ -623,7 +641,9 @@ class InlineGen {
             if (rt.has('prevent')) w.push('e.preventDefault();');
             if (rt.has('stop')) w.push('e.stopPropagation();');
             w.push(`(${handler})(e);`);
-            this.out(`${el}.addEventListener(${jsQuote(ev)},(e)=>{${w.join('')}}${opts});`);
+            this.out(delegated
+                ? listen(`(e)=>{${w.join('')}}`, opts)
+                : `${el}.addEventListener(${jsQuote(ev)},(e)=>{${w.join('')}}${opts});`);
         }
     }
 
@@ -689,10 +709,11 @@ class InlineGen {
     // ─── Control Flow ─────────────────────────────────────────
 
     /** A block's body — its render, cloning its own static markup — and the tags it creates. */
-    private block(nodes: TemplateNode[]): { code: string; tags: Set<string> } {
+    /** `opaque`: a @portal's body, whose events do not reach the component — never delegated (#113). */
+    private block(nodes: TemplateNode[], opaque = false): { code: string; tags: Set<string> } {
         // A block inside an <svg> builds SVG elements too.
         // A block placed in a table-internal element — a @for row in <tbody> — is table-internal too.
-        const g = new InlineGen(this.imports, this.idx, this.ctx, this.childrenSvg(), this.hoists, this.inTable());
+        const g = new InlineGen(this.imports, this.idx, this.ctx, this.childrenSvg(), this.hoists, this.inTable(), opaque || this.opaque());
         g.walk(nodes);
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);
@@ -820,7 +841,7 @@ class InlineGen {
 
     portalN(node: PortalNode): void {
         this.imports.add('portal');
-        const body = this.sub(node.body);
+        const body = this.block(node.body, true).code;
         const cf = this.v('cf');
         this.out(`const ${cf}=portal(()=>(()=>{${body}})(),${jsQuote(node.target)});`);
         this.place(cf);

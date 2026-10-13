@@ -27,6 +27,9 @@ export interface CompileContext {
     /** The script's top-level `const`s whose value is literals only: constant in the template (#110). */
     literalConsts: Set<string>;
 
+    /** The event types this component delegates to one listener each (#113; inline-event-delegation). */
+    delegatedEvents: Set<string>;
+
     /** Names that are NOT signals — form refs, resources, functions. callSignals() skips adding (). */
     nonSignalNames: Set<string> | null;
 
@@ -129,6 +132,7 @@ export function createCompileContext(options?: {
         rowVars: new Set(),
         rowKeys: [],
         literalConsts: new Set(),
+        delegatedEvents: new Set(),
         nonSignalNames: null,
         stateSignalNames: null,
         declaredNames: null,

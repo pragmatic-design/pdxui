@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 47 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 48 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -228,6 +228,17 @@ Simple usage (no dynamic import):
   ${defer({ trigger: 'viewport' },
     null,
     () => html`<div class="heavy">Loaded!</div>`)}
+
+## `delegate`
+
+```ts
+import { delegate } from '@pdxui/core';
+
+function delegate(host: Element, el: Element, type: string, handler: (event: Event) => void): void
+```
+
+Store `handler` for events of `type` on `el`, an element `host` rendered, and make sure `host`
+listens to `type` once.
 
 ## `dynamic`
 
