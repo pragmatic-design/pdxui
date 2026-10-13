@@ -175,7 +175,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // on a path, and a marker where each dynamic block goes. Same machine, same day: main 458.6 → 466.3
 // KB in all, 90.6 → 91.2 before the first paint; 2.5 KB of the first try went back by moving each
 // block's template-and-import boilerplate into core's `staticBlock`.
-const BUDGET_KB = { entry: 37, js: 467, css: 59, blocking: 92 };
+// js 467 → 468: a component's visual states are custom states (#132) — `ctx.state`, the internals a
+// host attaches for its declared states, and the Demo panel's `@state expanded`, the showcase's first.
+// A few hundred bytes on top of the typed descriptor (#123), which had left the total on the ceiling:
+// 467.0 KB measured locally, 467.1 in CI.
+const BUDGET_KB = { entry: 37, js: 468, css: 59, blocking: 92 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
