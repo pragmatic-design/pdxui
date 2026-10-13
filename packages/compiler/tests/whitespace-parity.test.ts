@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { minifyHTML } from '../src/compiler/minify';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
 import { parseTemplate } from '../src/parser/template';
+import { compile } from '../src/plugin';
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 
 interface FakeNode { tag?: string; data?: string; children: FakeNode[]; appendChild(c: FakeNode): FakeNode }
@@ -51,5 +52,45 @@ describe('whitespace between two tags, in a build', () => {
 
     it('the control: text between tags was never the problem', () => {
         expect(renderInline('<p><b>a</b>, <i>b</i></p>')).toBe('a, b');
+    });
+});
+
+/** The rendered tree as markup, a text node written as its text in quotes: `tr[td["a"],td["b"]]`. */
+const shape = (n: FakeNode): string =>
+    n.tag ? `${n.tag}[${n.children.map(shape).join(',')}]` : JSON.stringify(n.data ?? '');
+
+function renderTree(markup: string): string {
+    const iife = generateInlineNodes(parseTemplate(markup), new Set<string>());
+    const frag = new Function('document', 'staticBlock', `return ${iife};`)(document, stubStaticBlock(document)) as FakeNode;
+    return frag.children.map(shape).join(',');
+}
+
+// CSS ignores whitespace-only text between table-internal boxes (CSS 2.1 §17.2.1, anonymous table
+// objects), so a node there renders nothing and costs a node per gap, on every row (#111).
+describe('whitespace inside a table is not emitted', () => {
+    it('a <tr> with spaced <td>s has no text node between its cells', () => {
+        expect(renderTree('<table><tbody> <tr> <td>a</td> <td>b</td> </tr> </tbody></table>'))
+            .toBe('table[tbody[tr[td["a"],td["b"]]]]');
+    });
+
+    it('thead, tfoot and colgroup are table-internal too', () => {
+        expect(renderTree('<table> <colgroup> <col> </colgroup> <thead> <tr> <th>h</th> </tr> </thead> <tfoot> </tfoot> </table>'))
+            .toBe('table[colgroup[col[]],thead[tr[th["h"]]],tfoot[]]');
+    });
+
+    it('inside a cell the whitespace rule is unchanged: a cell is not table-internal', () => {
+        expect(renderTree('<table><tr><td><b>a</b> <i>b</i></td></tr></table>'))
+            .toBe('table[tr[td[b["a"]," ",i["b"]]]]');
+    });
+
+    it('a @for row inside <tbody>: the block takes the table context of where it is placed', () => {
+        const src = '<template><table><tbody>\n  @for (rows as r; track r.id) {\n    <tr> <td>{{ r.id }}</td> </tr>\n  }\n</tbody></table></template>\n<script setup>\nlet rows = $signal([]);\n</script>\n';
+        const { code } = compile(src, 'rows.pdx', [], undefined, { production: true });
+        // Every whitespace text node of the module is gone: the row's builder writes none either.
+        expect(code).not.toContain('__d.createTextNode(" ")');
+    });
+
+    it('the control: a <p> with spaced <b>s keeps its spaces', () => {
+        expect(renderTree('<p> <b>a</b> <b>b</b> </p>')).toBe('p[" ",b["a"]," ",b["b"]," "]');
     });
 });

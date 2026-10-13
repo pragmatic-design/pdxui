@@ -61,6 +61,12 @@ export const ATTR_TO_PROP: Record<string, string> = {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /**
+ * Elements whose whitespace-only text CSS ignores: between table-internal boxes it generates no box
+ * (CSS 2.1 §17.2.1, anonymous table objects). A cell, `<td>` or `<th>`, is not one: its text is content.
+ */
+const TABLE_INTERNAL = new Set(['table', 'thead', 'tbody', 'tfoot', 'tr', 'colgroup']);
+
+/**
  * Properties an SVG element can ASSIGN. Its other DOM properties of the same name as an attribute —
  * `width`, `x`, `href`, `className` — are read-only SVGAnimated* views, so a bound name on SVG is
  * written as the attribute, as core's `bindProperty` does.
@@ -166,6 +172,10 @@ class InlineGen {
     private svgStack: boolean[] = [];
     /** Whether the top level of this generator is inside an <svg> (a block body within one). */
     private readonly baseSvg: boolean;
+    /** Parallel to the open elements: whether that element is table-internal (`TABLE_INTERNAL`). */
+    private tableStack: boolean[] = [];
+    /** Whether the top level of this generator is placed in a table-internal element (a row's body). */
+    private readonly baseTable: boolean;
     private imports: Set<string>;
     private ctx: CompileContext;
     /** Loop-invariant reads already hoisted in THIS block: signal name to the computed holding it. */
@@ -173,10 +183,11 @@ class InlineGen {
     /** The top-level generator's binding deduplication; a block body's generator has none. */
     dedup: BindingDedup | null = null;
 
-    constructor(imports: Set<string>, startIdx: number, ctx: CompileContext | undefined, baseSvg: boolean, hoists: TemplateHoists) {
+    constructor(imports: Set<string>, startIdx: number, ctx: CompileContext | undefined, baseSvg: boolean, hoists: TemplateHoists, baseTable = false) {
         this.imports = imports;
         this.idx = startIdx;
         this.baseSvg = baseSvg;
+        this.baseTable = baseTable;
         this.hoists = hoists;
         // Fallback context for backward compat (tests that don't pass ctx). Built by the factory
         // rather than spelled out: an inline literal would silently go stale every time
@@ -207,6 +218,8 @@ class InlineGen {
     }
     /** Are the elements created here, under the current parent, SVG? */
     private childrenSvg(): boolean { return this.svgStack[this.svgStack.length - 1] ?? this.baseSvg; }
+    /** Is the current parent table-internal, where whitespace-only text renders nothing? */
+    private inTable(): boolean { return this.tableStack[this.tableStack.length - 1] ?? this.baseTable; }
     private read(expr: string): string { return callSignals(prefixCtx(expr, this.ctx), this.ctx); }
     /** A binding's value as written: shared with its repeats when this generator deduplicates. */
     private shared(value: string): string { return this.dedup ? this.dedup.share(value) : value; }
@@ -280,17 +293,19 @@ class InlineGen {
                 const next = content.indexOf('<', i);
                 const text = content.slice(i, next === -1 ? content.length : next);
                 // Whitespace-only text is one space, as the browser's parser keeps it in dev: emitting
-                // nothing would make two inline siblings run together in a build.
-                if (text) {
-                    const data = /^\s+$/.test(text) ? ' ' : decodeEntities(text);
-                    this.tree.text(jsString(data));
+                // nothing would make two inline siblings run together in a build. Inside a
+                // table-internal element it renders nothing at all — CSS 2.1 §17.2.1 — and is not
+                // emitted: a node per gap on every row of a table (#111).
+                const blank = /^\s+$/.test(text);
+                if (text && !(blank && this.inTable())) {
+                    this.tree.text(jsString(blank ? ' ' : decodeEntities(text)));
                 }
                 i = next === -1 ? content.length : next;
                 continue;
             }
             if (content[i + 1] === '/') {
                 const end = content.indexOf('>', i);
-                if (this.tree.depth() > 0) { this.tree.close(); this.svgStack.pop(); }
+                if (this.tree.depth() > 0) { this.tree.close(); this.svgStack.pop(); this.tableStack.pop(); }
                 i = end === -1 ? content.length : end + 1;
             } else if (content[i + 1] === '!') {
                 const end = content.indexOf('-->', i);
@@ -342,6 +357,7 @@ class InlineGen {
             if (!isVoid) {
                 this.tree.openSink();
                 this.svgStack.push(false);
+                this.tableStack.push(false);
             }
             return;
         }
@@ -360,7 +376,10 @@ class InlineGen {
         const before = this.lines.length;
         this.attrs(tag, el, kind, at ? attributeOrigins(tag, at) : null, raw);
         if (this.lines.length > before) this.tree.target(el);
-        if (!isVoid) this.svgStack.push(svg && name !== 'foreignObject');
+        if (!isVoid) {
+            this.svgStack.push(svg && name !== 'foreignObject');
+            this.tableStack.push(!svg && TABLE_INTERNAL.has(kind.tag));
+        }
     }
 
     // ─── Attribute Processing ─────────────────────────────────
@@ -655,7 +674,8 @@ class InlineGen {
     /** A block's body — its render, cloning its own static markup — and the tags it creates. */
     private block(nodes: TemplateNode[]): { code: string; tags: Set<string> } {
         // A block inside an <svg> builds SVG elements too.
-        const g = new InlineGen(this.imports, this.idx, this.ctx, this.childrenSvg(), this.hoists);
+        // A block placed in a table-internal element — a @for row in <tbody> — is table-internal too.
+        const g = new InlineGen(this.imports, this.idx, this.ctx, this.childrenSvg(), this.hoists, this.inTable());
         g.walk(nodes);
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);
