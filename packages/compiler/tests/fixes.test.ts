@@ -382,10 +382,12 @@ function go() {}
     });
 });
 
-describe('HTML comments are copied verbatim, never rewritten — the template path', () => {
-    // The template generator, named (`inlineBindings: false`): it keeps the comment in its markup,
-    // and still generates a hoisted scoped slot's.
-    const compileTemplatePath = (source: string, name: string) => compile(source, name, [], undefined, { inlineBindings: false });
+describe('HTML comments are copied verbatim, never rewritten — a scoped slot body', () => {
+    // A scoped slot's body is the one place the template generator still writes (#107): it keeps the
+    // comment in its html`` markup. Each case puts its template inside one.
+    const compileTemplatePath = (source: string, name: string) => compile(
+        source.replace(/<template>([\s\S]*)<\/template>/, '<template><pdx-list><slot name="item" let:row>$1</slot></pdx-list></template>'),
+        name);
 
     it('does not rewrite a directive mentioned inside a comment', () => {
         const out = compileTemplatePath(`

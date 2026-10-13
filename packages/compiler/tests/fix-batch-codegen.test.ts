@@ -1,10 +1,6 @@
 // Regression tests for the verified codegen/plugin bug-fix batch.
-// Covers the production-only critical fixes (#1, #2, #3) plus #5, #6, #7, #11.
-// ⚠️ `inlineBindings: false` throughout, and it is not a workaround: it names the path this
-// file measures. A production build takes the INLINE path, and that path applies the
-// loop-invariant hoist too — the transform both paths share is asserted on both,
-// in `loop-invariant-both-paths.test.ts`. What is the template path's own is the binding
-// deduplication and the escaping of the tagged template, which is what the flag pins here.
+// Covers the production-only critical fixes (#1, #2, #3) plus #5, #6, #7, #11, on the one render
+// path, the inline one (#107); binding deduplication is the inline path's since #236.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
@@ -20,14 +16,14 @@ let items = $signal([]);
 let count = $signal(0);
 function save() {}
 </script>`;
-        const { code } = compile(source, 'hoist.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'hoist.pdx', [], undefined, { production: true });
         // The signal read IS hoisted.
-        expect(code).toContain('__li_count');
+        expect(code).toMatch(/__li\d+_count=computed\(\(\)=>ctx\.count\(\)\)/);
         // ctx.el is never wrapped in a computed.
-        expect(code).not.toContain('computed(() => ctx.el())');
-        expect(code).not.toContain('__li_el');
+        expect(code).not.toContain('ctx.el()');
+        expect(code).not.toMatch(/__li\d+_el\b/);
         // The handler is never hoisted/invoked at render.
-        expect(code).not.toContain('__li_save');
+        expect(code).not.toMatch(/__li\d+_save\b/);
         expect(code).toContain('safeHandler');
     });
 
@@ -48,12 +44,12 @@ function save() {}
 let groups = $signal([]);
 let sel = $signal(null);
 </script>`;
-        const { code } = compile(source, 'nested-hoist.pdx', [], undefined, { production: true, inlineBindings: false });
-        // sel is hoisted exactly once (by the inner loop), reading ctx.sel() — never itself.
-        expect(code).toContain('const __li_sel = computed(() => ctx.sel())');
-        expect(code).not.toContain('computed(() => __li_sel())');
-        // Exactly one __li_sel declaration (no duplicate outer hoist).
-        expect(code.match(/const __li_sel =/g)?.length).toBe(1);
+        const { code } = compile(source, 'nested-hoist.pdx', [], undefined, { production: true });
+        // sel is hoisted exactly once, reading ctx.sel() — never itself.
+        const decls = code.match(/const (__li\d+_sel)=computed\(\(\)=>([^)]*\(\))\)/g) ?? [];
+        expect(decls, code).toHaveLength(1);
+        expect(decls[0]).toContain('=>ctx.sel()');
+        expect(code).not.toMatch(/computed\(\(\)=>__li\d+_sel\(\)\)/);
     });
 });
 
@@ -67,7 +63,7 @@ describe('#2 binding dedup (production)', () => {
 <script setup>
 let items = $signal([]);
 </script>`;
-        const { code } = compile(source, 'dedup-loop.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'dedup-loop.pdx', [], undefined, { production: true });
         // entry is loop-local → must not be hoisted into a top-level computed.
         expect(code).not.toContain('__bd_');
         // The original interpolations remain in the row body — read through the row getter.
@@ -81,7 +77,7 @@ let items = $signal([]);
 <script setup>
 let count = $signal(0);
 </script>`;
-        const { code } = compile(source, 'dedup-ok.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'dedup-ok.pdx', [], undefined, { production: true });
         expect(code).toContain('__bd_0');
     });
 });
@@ -96,10 +92,17 @@ describe('#3 template-literal escaping', () => {
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
     });
 
-    it('escapes in production too', () => {
+    it('in production too', () => {
         const source = '<template><p>a ` b ${y}</p></template>\n<script setup>\nlet y = $signal(2);\n</script>';
-        const { code } = compile(source, 'esc-prod.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'esc-prod.pdx', [], undefined, { production: true });
+        expect(code).toContain('document.createTextNode("a ` b ${y}")');
+    });
+
+    it('a scoped slot body, which the template generator still writes, escapes them in its html``', () => {
+        const source = '<template><pdx-list><slot name="item" let:row><p>a ` b ${y}</p></slot></pdx-list></template>\n<script setup>\nlet y = $signal(2);\n</script>';
+        const { code } = compile(source, 'esc-slot.pdx', [], undefined, { production: true });
         expect(code).toContain('a \\` b \\${y}');
+        expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
     });
 });
 

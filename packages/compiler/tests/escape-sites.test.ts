@@ -21,17 +21,20 @@ function templateText(code: string): string {
     return out.join('');
 }
 
+/** The same template inside a scoped slot's body — the one place the template generator still writes (#107). */
+const inSlot = (src: string) => src.replace(/<template>([\s\S]*)<\/template>/, '<template><pdx-list><slot name="item" let:row>$1</slot></pdx-list></template>');
+
 describe('@raw keeps its text as written', () => {
     // A backslash went into the template literal unescaped: `\n` became a line break, `\d` a `d`,
     // and a backslash before the backtick the parser escaped ended the literal.
     const RAW = 'C:\\new \\d a`b ${x} \\`';
-    for (const inline of [false, true]) {
-        it(inline ? 'inline path' : 'template path', () => {
-            const src = `<template>\n<pre>@raw {${RAW}}</pre>\n</template>\n<script setup>\nlet a = $signal(0);\n</script>\n`;
-            const { code } = compile(src, 'raw.pdx', [], undefined, inline ? { production: true, inlineBindings: true } : { production: false, inlineBindings: false });
-            expect(templateText(code)).toContain(RAW);
-        });
-    }
+    const src = `<template>\n<pre>@raw {${RAW}}</pre>\n</template>\n<script setup>\nlet a = $signal(0);\n</script>\n`;
+    it('the render', () => {
+        expect(templateText(compile(src, 'raw.pdx', [], undefined, { production: true }).code)).toContain(RAW);
+    });
+    it('a scoped slot body', () => {
+        expect(templateText(compile(inSlot(src), 'raw.pdx', [], undefined, { production: true }).code)).toContain(RAW);
+    });
 });
 
 describe('@raw inside a loop binds nothing', () => {
@@ -39,13 +42,13 @@ describe('@raw inside a loop binds nothing', () => {
     // the inline path read it as a value the compiler had pre-rewritten — a live binding to `item`.
     const src = `<template>\n@for (items as item; track item) { @raw {<span title=\${item}>x</span>} }\n</template>\n<script setup>\nlet items = $signal([1]);\n</script>\n`;
 
-    it('inline path: the attribute is the text', () => {
-        const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: true, inlineBindings: true });
+    it('the render: the attribute is the text', () => {
+        const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: true });
         expect(code).toContain('.setAttribute("title", "${item}")');
     });
 
-    it('template path: the markup carries the text', () => {
-        const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: false, inlineBindings: false });
+    it('a scoped slot body: the markup carries the text', () => {
+        const { code } = compile(inSlot(src), 'raw-loop.pdx', [], undefined, { production: true });
         expect(templateText(code)).toContain('<span title=${item}>');
     });
 });

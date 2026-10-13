@@ -6,23 +6,20 @@
 // disappears. It is the one class of defect a dev-only verification cannot see: only re-measuring
 // on the build shows it.
 //
-// The dev server compiles with `{}`, the build with `{ production: true, minify, inlineBindings: false }` — plugin.ts, the
+// The dev server compiles with `{}`, the build with `{ production: true, minify }` — plugin.ts, the
 // `compile(…, { minify, componentDirs, production: !isDevMode })` call. Those are the two option sets
 // compared here, and for every identifier kind the template can name inside a loop: a constant, a
 // signal, a signal's method, a function call.
 
-// ⚠️ `inlineBindings: false` throughout, and it is not a workaround: it names the path this
-// file measures. A production build takes the INLINE path, and that path applies the
-// loop-invariant hoist too — the transform both paths share is asserted on both,
-// in `loop-invariant-both-paths.test.ts`. What is the template path's own is the binding
-// deduplication and the escaping of the tagged template, which is what the flag pins here.
+// Since #107 both option sets take the one render path, the inline one; what differs is what a
+// production build adds on top of it — the loop-invariant hoist among them.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const MODES = {
     dev: {},
-    build: { production: true, minify: false, inlineBindings: false },
-    'build, minified': { production: true, minify: true, inlineBindings: false },
+    build: { production: true, minify: false },
+    'build, minified': { production: true, minify: true },
 } as const;
 
 const SETUP = [
@@ -62,14 +59,12 @@ for (const [mode, opts] of Object.entries(MODES)) {
         });
 
         if (mode !== 'dev') {
-            // Build only. The dev server passes a signal to an attribute BY REFERENCE —
-            // `:value=${ctx.picked}` — and the runtime unwraps it; the build hoists and calls it. Both
-            // are correct. What matters is that the build still hoists real signals after the fix,
-            // so "hoist nothing" cannot pass the constant test above.
+            // Build only: the hoist is a production transform. What matters is that the build still
+            // hoists real signals after the fix, so "hoist nothing" cannot pass the constant test above.
             it('a signal IS hoisted and called — the control', () => {
                 const code = compileWith(inLoop('<pdx-select :value="picked"></pdx-select>'), opts);
                 expect(code, `picked is a signal and was not hoisted:\n    ${around(code, 'picked')}`)
-                    .toMatch(/__li_picked\s*=\s*computed\(\s*\(\)\s*=>\s*ctx\.picked\(\)\s*\)/);
+                    .toMatch(/__li\d+_picked\s*=\s*computed\(\s*\(\)\s*=>\s*ctx\.picked\(\)\s*\)/);
             });
         }
 

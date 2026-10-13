@@ -23,10 +23,10 @@ const VALUES: [string, unknown][] = [
 let seq = 0;
 const settle = async () => { for (let i = 0; i < 3; i++) await new Promise((r) => setTimeout(r, 0)); };
 
-async function render(template: string, literal: string, inline: boolean): Promise<string> {
-    const name = `interptext${++seq}${inline ? 'i' : 't'}`;
+async function render(template: string, literal: string, build: boolean): Promise<string> {
+    const name = `interptext${++seq}${build ? 'b' : 'd'}`;
     const src = `<template>${template}</template>\n<script setup>\nlet v = $signal(${literal});\nfunction same(x) { return x; }\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
+    const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
     const el = document.createElement(`pdx-${name}`);
@@ -36,14 +36,14 @@ async function render(template: string, literal: string, inline: boolean): Promi
 }
 
 describe('a text interpolation reads the same in dev and in a build', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+    for (const build of [false, true]) {
+        const path = build ? 'build' : 'dev';
         for (const [literal, v] of VALUES) {
             it(`{{ v }} with v = ${literal} (${path})`, async () => {
-                expect(await render('<p>{{ v }}</p>', literal, inline)).toBe(documented(v));
+                expect(await render('<p>{{ v }}</p>', literal, build)).toBe(documented(v));
             });
             it(`{{ v | same }} with v = ${literal} — the piped branch too (${path})`, async () => {
-                expect(await render('<p>{{ v | same }}</p>', literal, inline)).toBe(documented(v));
+                expect(await render('<p>{{ v | same }}</p>', literal, build)).toBe(documented(v));
             });
         }
     }

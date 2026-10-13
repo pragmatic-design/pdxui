@@ -1,8 +1,6 @@
-// ⚠️ `inlineBindings: false` throughout, and it is not a workaround: it names the path this
-// file measures. A production build takes the INLINE path, and that path applies the
-// loop-invariant hoist too — the transform both paths share is asserted on both,
-// in `loop-invariant-both-paths.test.ts`. What is still the template path's own is the binding
-// deduplication and the escaping of the tagged template, which is what the flag pins here.
+// What a production build does to a .pdx, on its one render path, the inline one (#107). The
+// optimisations the template path had — binding deduplication, constant condition elimination,
+// loop-invariant hoisting — are asserted here on the inline path, which carries them since #236.
 import { describe, it, expect } from 'vitest';
 import { minifyCSS } from '../src/compiler/codegen-styles';
 import { compileSFC } from '../src/compiler/codegen';
@@ -69,7 +67,7 @@ let x = $signal(0);
         const ast = parseTemplate(descriptor.template!.content);
 
         const devCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: false });
-        const prodCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: true, inlineBindings: false });
+        const prodCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: true });
 
         // Production should have minified CSS (shorter)
         const devStyle = devCode.match(/textContent = "([^"]*)"/)?.[1] ?? '';
@@ -104,7 +102,7 @@ let count = $signal(0);
         const descriptor = parseSFC(source);
         const ast = parseTemplate(descriptor.template!.content);
 
-        const prodCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: true, inlineBindings: false });
+        const prodCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: true });
         expect(prodCode).not.toContain("name: 'test:count'");
         expect(prodCode).toContain('signal(0)');
 
@@ -125,21 +123,16 @@ let count = $signal(0);
         const descriptor = parseSFC(source);
         const ast = parseTemplate(descriptor.template!.content);
 
-        // Both paths: the hoist is the one transform they share, and the inline path
-        // — the default — is what a build actually takes, so pinning this to the other one would
-        // assert it of nothing shipped. The inline name carries the generator's counter.
-        for (const inlineBindings of [false, true]) {
-            const prodCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: true, inlineBindings });
-            expect(prodCode, `inlineBindings: ${inlineBindings}`).toMatch(/__li\d*_count/);
-            expect(prodCode).toContain('computed(');
-        }
+        // The inline name carries the generator's counter.
+        const prodCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: true });
+        expect(prodCode).toMatch(/__li\d+_count=computed\(\(\)=>ctx\.count\(\)\)/);
 
         const devCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: false });
         // In dev, no hoisting — direct ctx.count() read inside loop
         expect(devCode).not.toContain('__li');
     });
 
-    it('production marks static components with static:true', () => {
+    it('a static component renders with nothing reactive: no effect, no binding helper', () => {
         const source = `<template><div>About Page</div></template>
 <script setup>
 @page '/about';
@@ -147,23 +140,9 @@ let count = $signal(0);
         const descriptor = parseSFC(source);
         const ast = parseTemplate(descriptor.template!.content);
 
-        const prodCode = compileSFC(descriptor, ast, 'about.pdx', null, { production: true, inlineBindings: false });
-        expect(prodCode).toContain('static: true');
-
-        const devCode = compileSFC(descriptor, ast, 'about.pdx', null, { production: false });
-        expect(devCode).not.toContain('static: true');
-    });
-
-    it('production does NOT mark dynamic components as static', () => {
-        const source = `<template><div>{{ count }}</div></template>
-<script setup>
-let count = $signal(0);
-</script>`;
-        const descriptor = parseSFC(source);
-        const ast = parseTemplate(descriptor.template!.content);
-
-        const prodCode = compileSFC(descriptor, ast, 'test.pdx', null, { production: true, inlineBindings: false });
-        expect(prodCode).not.toContain('static: true');
+        const prodCode = compileSFC(descriptor, ast, 'about.pdx', null, { production: true });
+        expect(prodCode).toMatch(/^import \{ component \} from '@pdxui\/core';/);
+        expect(prodCode).not.toMatch(/effect\(|bindInterpolation\(/);
     });
 });
 
@@ -178,7 +157,7 @@ describe('dead signal elimination', () => {
 let count = $signal(0);
 let name = $signal('world');
 </script>`;
-        const { code } = compile(source, 'dead-sig.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'dead-sig.pdx', [], undefined, { production: true });
         expect(code).not.toContain('signal(0)');
         expect(code).not.toContain("signal('world')");
     });
@@ -189,7 +168,7 @@ let name = $signal('world');
 let count = $signal(0);
 let unused = $signal(99);
 </script>`;
-        const { code } = compile(source, 'keep-sig.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'keep-sig.pdx', [], undefined, { production: true });
         expect(code).toContain('signal(0)');    // count is used in template
         expect(code).not.toContain('signal(99)'); // unused is dead
     });
@@ -200,7 +179,7 @@ let unused = $signal(99);
 let count = $signal(0);
 $effect(() => console.log(count));
 </script>`;
-        const { code } = compile(source, 'effect-sig.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'effect-sig.pdx', [], undefined, { production: true });
         expect(code).toContain('signal(0)');
     });
 
@@ -210,7 +189,7 @@ $effect(() => console.log(count));
 let count = $signal(0);
 const doubled = $derived(count * 2);
 </script>`;
-        const { code } = compile(source, 'derived-sig.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'derived-sig.pdx', [], undefined, { production: true });
         expect(code).toContain('signal(0)');
     });
 
@@ -220,7 +199,7 @@ const doubled = $derived(count * 2);
 let count = $signal(0);
 function increment() { count++; }
 </script>`;
-        const { code } = compile(source, 'body-sig.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'body-sig.pdx', [], undefined, { production: true });
         expect(code).toContain('signal(0)'); // used in body (count++)
     });
 
@@ -230,7 +209,7 @@ function increment() { count++; }
 let a = $signal(1);
 let b = $signal(a);
 </script>`;
-        const { code } = compile(source, 'cross-sig.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'cross-sig.pdx', [], undefined, { production: true });
         // a is used in b's initializer → not dead
         expect(code).toContain('signal(1)');
     });
@@ -251,7 +230,7 @@ let count = $signal(0);
 let kept = $signal('yes');
 let dead = $signal('no');
 </script>`;
-        const { code } = compile(source, 'ret.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'ret.pdx', [], undefined, { production: true });
         expect(code).toContain('kept: __kept');
         expect(code).not.toContain('dead');
     });
@@ -267,7 +246,7 @@ describe('constant condition elimination', () => {
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'const-if.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'const-if.pdx', [], undefined, { production: true });
         expect(code).toContain('Always visible');
         expect(code).not.toContain('when(');
     });
@@ -283,7 +262,7 @@ describe('constant condition elimination', () => {
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'const-if-false.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'const-if-false.pdx', [], undefined, { production: true });
         expect(code).not.toContain('Never visible');
         expect(code).not.toContain('when(');
         expect(code).toContain('Before');
@@ -301,7 +280,7 @@ describe('constant condition elimination', () => {
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'const-else.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'const-else.pdx', [], undefined, { production: true });
         expect(code).not.toContain('Hidden');
         expect(code).toContain('Fallback');
         expect(code).not.toContain('when(');
@@ -316,7 +295,7 @@ describe('constant condition elimination', () => {
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'const-show-true.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'const-show-true.pdx', [], undefined, { production: true });
         expect(code).toContain('Visible');
         expect(code).not.toContain('show(');
     });
@@ -330,7 +309,7 @@ describe('constant condition elimination', () => {
 <script setup>
 @prop label: string = '';
 </script>`;
-        const { code } = compile(source, 'const-show-false.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'const-show-false.pdx', [], undefined, { production: true });
         expect(code).not.toContain('Hidden');
         expect(code).not.toContain('show(');
     });
@@ -357,7 +336,7 @@ describe('constant condition elimination', () => {
 <script setup>
 let visible = $signal(true);
 </script>`;
-        const { code } = compile(source, 'dyn-if.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'dyn-if.pdx', [], undefined, { production: true });
         expect(code).toContain('when(');
     });
 });
@@ -370,7 +349,7 @@ describe('binding deduplication', () => {
 <script setup>
 let count = $signal(0);
 </script>`;
-        const { code } = compile(source, 'dedup.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'dedup.pdx', [], undefined, { production: true });
         // Should have a shared computed for the duplicated expression
         expect(code).toContain('__bd_0');
         expect(code).toContain('computed(');
@@ -384,7 +363,7 @@ let count = $signal(0);
 let loading = $signal(false);
 let active = $signal(true);
 </script>`;
-        const { code } = compile(source, 'no-dedup.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'no-dedup.pdx', [], undefined, { production: true });
         expect(code).not.toContain('__bd_');
     });
 
@@ -406,7 +385,7 @@ let count = $signal(0);
 <script setup>
 let items = $signal([]);
 </script>`;
-        const { code } = compile(source, 'dedup-iife.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'dedup-iife.pdx', [], undefined, { production: true });
         // The IIFE pattern: (() => { const __bd_0 = ...; return html`...`; })()
         expect(code).toContain('(() => {');
         expect(code).toContain('__bd_0');
@@ -420,7 +399,7 @@ let items = $signal([]);
 let x = $signal(0);
 let y = $signal(0);
 </script>`;
-        const { code } = compile(source, 'multi-dedup.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'multi-dedup.pdx', [], undefined, { production: true });
         expect(code).toContain('__bd_0');
         expect(code).toContain('__bd_1');
     });
@@ -436,7 +415,7 @@ describe('prop narrowing — _skipAttrSync removed (dev/prod parity)', () => {
 <script setup>
 @prop label: string = 'Hello';
 </script>`;
-        const { code } = compile(source, 'prop-narrow.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'prop-narrow.pdx', [], undefined, { production: true });
         expect(code).not.toContain('_skipAttrSync');
     });
 
@@ -450,37 +429,18 @@ describe('prop narrowing — _skipAttrSync removed (dev/prod parity)', () => {
     });
 });
 
-describe('static template pre-compilation', () => {
-    it('production uses __staticHTML for fully static components', () => {
-        const source = `<template><div>About Page</div></template>
-<script setup>
-@page '/about';
-</script>`;
-        const { code } = compile(source, 'about.pdx', [], undefined, { production: true, inlineBindings: false });
-        expect(code).toContain('__staticHTML');
-        expect(code).not.toContain("html\`");
-        expect(code).toContain('static: true');
-    });
-
-    it('production imports __staticHTML instead of html for static components', () => {
+// The template path pre-compiled a fully static template into `__staticHTML`. The inline path
+// builds the same DOM directly; its own pre-compiled form — a <template> cloned per mount — is #109.
+describe('static templates', () => {
+    it('a build renders a static component inline: no __staticHTML, no html``', () => {
         const source = `<template><div>Static</div></template>
 <script setup>
 @page '/static';
 </script>`;
-        const { code } = compile(source, 'static.pdx', [], undefined, { production: true, inlineBindings: false });
-        // Should import __staticHTML, not html
-        expect(code).toMatch(/import.*__staticHTML.*from '@pdxui\/core'/);
-        expect(code).not.toMatch(/import.*\bhtml\b.*from '@pdxui\/core'/);
-    });
-
-    it('production keeps html`` for dynamic components', () => {
-        const source = `<template><div>{{ count }}</div></template>
-<script setup>
-let count = $signal(0);
-</script>`;
-        const { code } = compile(source, 'dynamic.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code } = compile(source, 'static.pdx', [], undefined, { production: true });
         expect(code).not.toContain('__staticHTML');
-        expect(code).toContain("html\`");
+        expect(code).not.toMatch(/import.*\bhtml\b.*from '@pdxui\/core'/);
+        expect(code).toContain("document.createElement('div')");
     });
 
     it('dev mode renders a static component inline, as a build does (#107)', () => {
@@ -492,16 +452,6 @@ let count = $signal(0);
         expect(code).not.toContain('__staticHTML');
         expect(code).not.toContain("html\`");
         expect(code).toContain("document.createElement('div')");
-    });
-
-    it('static render uses arrow without ctx parameter', () => {
-        const source = `<template><div>No bindings</div></template>
-<script setup>
-@page '/plain';
-</script>`;
-        const { code } = compile(source, 'plain.pdx', [], undefined, { production: true, inlineBindings: false });
-        expect(code).toContain('render: () =>');
-        expect(code).not.toContain('render: (ctx)');
     });
 });
 
@@ -670,16 +620,6 @@ let isActive = $signal(false);
         expect(code).toContain('"active"');
     });
 
-    it('disabled by default (only with inlineBindings flag)', () => {
-        const source = `<template><div>Hello</div></template>
-<script setup>
-@prop label: string = '';
-</script>`;
-        const { code } = compile(source, 'no-inline.pdx', [], undefined, { production: true, inlineBindings: false });
-        expect(code).not.toContain('createDocumentFragment');
-        // Without flag, uses standard html`` or __staticHTML
-    });
-
     it('dead signal elimination still works with inline bindings', () => {
         const source = `<template><div>Hello</div></template>
 <script setup>
@@ -814,33 +754,22 @@ describe('production output size benchmarks', () => {
 
     it('production output is smaller than dev output', () => {
         const { code: devCode } = compile(counterSrc, 'counter.pdx', [], undefined, { production: false });
-        const { code: prodCode } = compile(counterSrc, 'counter.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code: prodCode } = compile(counterSrc, 'counter.pdx', [], undefined, { production: true });
         // Production strips debug names, minifies CSS → smaller
         expect(prodCode.length).toBeLessThan(devCode.length);
     });
 
-    it('inline bindings produce output without html`` overhead', () => {
-        const { code: prodCode } = compile(counterSrc, 'counter.pdx', [], undefined, { production: true, inlineBindings: false });
-        const { code: inlineCode } = compile(counterSrc, 'counter.pdx', [], undefined, { production: true, inlineBindings: true });
-        // Inline doesn't use html`` tagged template
-        expect(inlineCode).not.toContain("html\`");
-        expect(inlineCode).toContain('createElement');
-        // Both should produce valid output (not crash)
-        expect(prodCode.length).toBeGreaterThan(0);
-        expect(inlineCode.length).toBeGreaterThan(0);
+    it('a build produces output without html`` overhead', () => {
+        const { code: prodCode } = compile(counterSrc, 'counter.pdx', [], undefined, { production: true });
+        expect(prodCode).not.toContain("html\`");
+        expect(prodCode).toContain('createElement');
     });
 
-    it('static component uses __staticHTML (faster runtime, skips template engine)', () => {
+    it('a static component is smaller in a build than in dev, and imports nothing reactive', () => {
         const { code: devCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: false });
-        const { code: prodCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: true, inlineBindings: false });
-        // Dev renders inline, the one render path of a .pdx (#107); __staticHTML is the template path's
-        expect(devCode).not.toContain("html\`");
-        expect(devCode).not.toContain('__staticHTML');
-        expect(devCode).toContain('document.createElement(');
-        // Prod uses __staticHTML (pre-compiled, cloneNode — faster runtime)
-        expect(prodCode).toContain('__staticHTML');
-        expect(prodCode).not.toContain("html\`");
-        expect(prodCode).toContain('static: true');
+        const { code: prodCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: true });
+        expect(prodCode.length).toBeLessThanOrEqual(devCode.length);
+        expect(prodCode).toMatch(/^import \{ component \} from '@pdxui\/core';/);
     });
 
     it('dead signal elimination reduces output size', () => {
@@ -852,7 +781,7 @@ let dead2 = $signal('nope');
 let dead3 = $signal([]);
 </script>`;
         const { code: devCode } = compile(srcWithDead, 'dead.pdx', [], undefined, { production: false });
-        const { code: prodCode } = compile(srcWithDead, 'dead.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code: prodCode } = compile(srcWithDead, 'dead.pdx', [], undefined, { production: true });
         // 3 dead signals eliminated → significantly shorter
         expect(prodCode.length).toBeLessThan(devCode.length);
         // Only 'used' signal should survive
@@ -874,7 +803,7 @@ let dead3 = $signal([]);
 @prop label: string = '';
 </script>`;
         const { code: devCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: false });
-        const { code: prodCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: true, inlineBindings: false });
+        const { code: prodCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: true });
         // Dev has when() and show() calls; prod inlines/eliminates them
         expect(devCode).toContain('when(');
         expect(devCode).toContain('show(');

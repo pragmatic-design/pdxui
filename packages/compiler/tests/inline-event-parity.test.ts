@@ -38,7 +38,8 @@ const FORMS = [
     'a(); b()',                         // multi-statement
 ];
 
-const SOURCE = (handler: string): string => `<template><button @click="${handler}">x</button></template>
+// The template generator writes only a scoped slot's body since #107: its button sits inside one.
+const SOURCE = (handler: string, inline = true): string => `<template>${inline ? '' : '<pdx-list><slot name="item" let:row>'}<button @click="${handler}">x</button>${inline ? '' : '</slot></pdx-list>'}</template>
 <script setup>
 let count = $signal(0); let open = $signal(false); let name = $signal('');
 const item = 1;
@@ -49,13 +50,13 @@ function save(x) {} function a() {} function b() {} function onClick() {} functi
  * The handler expression each path hands to `safeHandler`, inside the `batchHandler(…)` every
  * compiled handler is wrapped in (#114) — required here, so a path that stopped batching fails.
  */
-function handlerOf(handler: string, inlineBindings: boolean): string {
-    const { code } = compile(SOURCE(handler), 'p.pdx', [], undefined, { production: true, inlineBindings });
-    const re = inlineBindings
+function handlerOf(handler: string, inline: boolean): string {
+    const { code } = compile(SOURCE(handler, inline), 'p.pdx', [], undefined, { production: true });
+    const re = inline
         ? /addEventListener\('click', safeHandler\(batchHandler\(([\s\S]*?)\), ctx\.el/
         : /@click=\$\{safeHandler\(batchHandler\(([\s\S]*?)\), ctx\.el/;
     const m = re.exec(code);
-    if (!m) throw new Error(`no click handler found in the ${inlineBindings ? 'inline' : 'template'} output for ${handler}`);
+    if (!m) throw new Error(`no click handler found in the ${inline ? 'inline' : 'template'} output for ${handler}`);
     return m[1];
 }
 

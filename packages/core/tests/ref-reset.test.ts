@@ -15,10 +15,10 @@ import { compile } from '../../compiler/src/plugin';
 let seq = 0;
 
 /** The component compiled on one path, defined, and mounted in the document. */
-function mount(template: string, script: string, inline: boolean): HTMLElement {
-    const name = `refreset${++seq}${inline ? 'i' : 't'}`;
+function mount(template: string, script: string, build: boolean): HTMLElement {
+    const name = `refreset${++seq}${build ? 'b' : 'd'}`;
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const options = inline ? { production: true, inlineBindings: true } : { inlineBindings: false };
+    const options = build ? { production: true } : {};
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
@@ -31,7 +31,7 @@ const settle = () => new Promise(r => setTimeout(r, 0));
 const shown = (host: HTMLElement) => host.querySelector('.ref')!.textContent;
 const click = (host: HTMLElement, sel: string) => (host.querySelector(sel) as HTMLElement).click();
 
-for (const [path, inline] of [['template path', false], ['inline path', true]] as const) {
+for (const [path, build] of [['dev', false], ['build', true]] as const) {
     describe(`:ref — ${path}`, () => {
         beforeEach(() => { document.body.innerHTML = ''; });
 
@@ -41,7 +41,7 @@ for (const [path, inline] of [['template path', false], ['inline path', true]] a
                 + '<p class="ref">{{ field ? field.className : \'none\' }}</p>'
                 + '<button class="close" @click="editing = false">x</button>',
                 'let editing = $signal(true); let field = $signal(null);',
-                inline,
+                build,
             );
             await settle();
             expect(shown(host), 'control: the ref did not receive its element').toBe('field');
@@ -57,7 +57,7 @@ for (const [path, inline] of [['template path', false], ['inline path', true]] a
                 + '<p class="ref">{{ field ? field.className : \'none\' }}</p>'
                 + '<button class="swap" @click="a = !a">x</button>',
                 'let a = $signal(true); let field = $signal(null);',
-                inline,
+                build,
             );
             await settle();
             expect(shown(host)).toBe('first');
@@ -77,7 +77,7 @@ for (const [path, inline] of [['template path', false], ['inline path', true]] a
                 'let field = $signal(null);'
                 + ' onMount(() => { globalThis.__readRef = () => field; });'
                 + " onDestroy(() => { globalThis.__refSeen = field ? field.className : 'none'; });",
-                inline,
+                build,
             );
             await settle();
             expect(shown(host)).toBe('own');
@@ -93,7 +93,7 @@ for (const [path, inline] of [['template path', false], ['inline path', true]] a
                 + '<p class="ref">{{ field ? field.className : \'none\' }}</p>'
                 + '<button class="clear" @click="rows = []">x</button>',
                 "let rows = $signal(['row']); let field = $signal(null);",
-                inline,
+                build,
             );
             await settle();
             expect(shown(host)).toBe('row');

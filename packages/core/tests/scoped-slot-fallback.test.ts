@@ -16,9 +16,9 @@ import { compile } from '../../compiler/src/plugin';
 let seq = 0;
 
 /** Compile `src` as `pdx-<name>` on one path and define it. */
-function define(name: string, template: string, script: string, inline: boolean): void {
+function define(name: string, template: string, script: string, build: boolean): void {
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const options = inline ? { production: true, inlineBindings: true } : { inlineBindings: false };
+    const options = build ? { production: true } : {};
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
@@ -39,15 +39,15 @@ const FALLBACKS: { name: string; fallback: string; shown: string }[] = [
     { name: 'a block', fallback: '@if (first) { <b>x {{ first }}</b> }', shown: 'x Ada' },
 ];
 
-for (const [path, inline] of [['template path', false], ['inline path', true]] as const) {
+for (const [path, build] of [['dev', false], ['build', true]] as const) {
     describe(`a scoped slot outlet's fallback — ${path}`, () => {
         beforeEach(() => { document.body.innerHTML = ''; });
 
         for (const f of FALLBACKS) {
             it(`${f.name}: rendered once when the slot is not filled`, async () => {
-                const child = `sfchild${++seq}${inline ? 'i' : 't'}`;
+                const child = `sfchild${++seq}${build ? 'b' : 'd'}`;
                 define(child, `<div class="box"><slot name="row" :item="first">${f.fallback}</slot></div>`,
-                    "let first = $signal('Ada');", inline);
+                    "let first = $signal('Ada');", build);
                 const el = document.createElement(`pdx-${child}`);
                 document.body.appendChild(el);
                 await settle();
@@ -58,11 +58,11 @@ for (const [path, inline] of [['template path', false], ['inline path', true]] a
             });
 
             it(`${f.name}: not rendered when the parent fills the slot`, async () => {
-                const child = `sfchild${++seq}${inline ? 'i' : 't'}`;
+                const child = `sfchild${++seq}${build ? 'b' : 'd'}`;
                 define(child, `<div class="box"><slot name="row" :item="first">${f.fallback}</slot></div>`,
-                    "let first = $signal('Ada');", inline);
-                const parent = `sfparent${seq}${inline ? 'i' : 't'}`;
-                define(parent, `<pdx-${child}><slot name="row" let:item><em>filled {{ item }}</em></slot></pdx-${child}>`, '', inline);
+                    "let first = $signal('Ada');", build);
+                const parent = `sfparent${seq}${build ? 'b' : 'd'}`;
+                define(parent, `<pdx-${child}><slot name="row" let:item><em>filled {{ item }}</em></slot></pdx-${child}>`, '', build);
                 const el = document.createElement(`pdx-${parent}`);
                 document.body.appendChild(el);
                 await settle();

@@ -12,6 +12,7 @@ import type {
 import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope, trackKeyArg, pipeChain } from './codegen-prefix';
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
+import { BindingDedup } from './inline-dedup';
 import { buildEventHandler, dynamicComponentCall, scopedSlotCall } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { hoistSlotTemplate } from './codegen-template';
@@ -135,6 +136,8 @@ const KEY_MAP: Record<string, string | string[]> = {
 /** Generate imperative DOM construction code from template AST. Returns an IIFE. */
 export function generateInlineNodes(nodes: TemplateNode[], imports: Set<string>, ctx?: CompileContext): string {
     const gen = new InlineGen(imports, 0, ctx);
+    // A production build shares a binding repeated at the top level of the render (inline-dedup.ts).
+    if (ctx?.production) gen.dedup = new BindingDedup();
     gen.walk(nodes);
     return gen.build();
 }
@@ -153,6 +156,8 @@ class InlineGen {
     private ctx: CompileContext;
     /** Loop-invariant reads already hoisted in THIS block: signal name to the computed holding it. */
     private li = new Map<string, string>();
+    /** The top-level generator's binding deduplication; a block body's generator has none. */
+    dedup: BindingDedup | null = null;
 
     constructor(imports: Set<string>, startIdx = 0, ctx?: CompileContext, baseSvg = false) {
         this.imports = imports;
@@ -172,6 +177,8 @@ class InlineGen {
     /** Are the elements created here, under the current parent, SVG? */
     private childrenSvg(): boolean { return this.svgStack[this.svgStack.length - 1] ?? this.baseSvg; }
     private read(expr: string): string { return callSignals(prefixCtx(expr, this.ctx), this.ctx); }
+    /** A binding's value as written: shared with its repeats when this generator deduplicates. */
+    private shared(value: string): string { return this.dedup ? this.dedup.share(value) : value; }
 
     walk(nodes: TemplateNode[]): void {
         for (const node of nodes) {
@@ -408,7 +415,7 @@ class InlineGen {
     private propBind(el: string, prop: string, expr: string, kind: ElementKind, preRewritten = false): void {
         this.imports.add('effect');
         // Pre-rewritten values are already final JS (often a `() => …` getter from form-binding).
-        const value = preRewritten ? `(${expr})()` : this.read(expr);
+        const value = preRewritten ? `(${expr})()` : this.shared(this.read(expr));
         // The value this binding wrote last, as core's binding keeps it (`template.ts`): the effect
         // re-runs when anything it READ changes — the row object a field comes from, replaced after
         // another field's save — and writing the same value again would put it back over what the
@@ -563,17 +570,17 @@ class InlineGen {
 
     private classToggle(el: string, cls: string, expr: string): void {
         this.imports.add('effect');
-        this.out(`effect(()=>{${el}.classList.toggle(${jsString(cls)},!!(${callSignals(prefixCtx(expr, this.ctx), this.ctx)}));});`);
+        this.out(`effect(()=>{${el}.classList.toggle(${jsString(cls)},!!(${this.shared(this.read(expr))}));});`);
     }
 
     private styleProp(el: string, prop: string, expr: string): void {
         this.imports.add('effect');
-        this.out(`effect(()=>{${el}.style.setProperty(${jsString(prop)},String(${callSignals(prefixCtx(expr, this.ctx), this.ctx)}??''));});`);
+        this.out(`effect(()=>{${el}.style.setProperty(${jsString(prop)},String(${this.shared(this.read(expr))}??''));});`);
     }
 
     private showBind(el: string, expr: string): void {
         this.imports.add('effect');
-        this.out(`effect(()=>{${el}.style.display=(${callSignals(prefixCtx(expr, this.ctx), this.ctx)})?'':'none';});`);
+        this.out(`effect(()=>{${el}.style.display=(${this.shared(this.read(expr))})?'':'none';});`);
     }
 
     private refBind(el: string, expr: string): void {
@@ -600,7 +607,7 @@ class InlineGen {
             this.imports.add('templatePipe');
             this.out(`bindInterpolation(${t},()=>${pipeChain(expr, node.pipes, this.ctx)});`);
         } else {
-            this.out(`bindInterpolation(${t},()=>${expr});`);
+            this.out(`bindInterpolation(${t},()=>${this.shared(expr)});`);
         }
     }
 
@@ -823,7 +830,13 @@ class InlineGen {
     // ─── Build Output ─────────────────────────────────────────
 
     build(): string {
-        const body = this.lines.map(l => '    ' + l).join('\n');
+        let lines = this.lines;
+        if (this.dedup) {
+            const shared = this.dedup.finish(lines);
+            if (shared.decls.length > 0) this.imports.add('computed');
+            lines = [...shared.decls, ...shared.lines];
+        }
+        const body = lines.map(l => '    ' + l).join('\n');
         return `(() => {\n    const __frag = document.createDocumentFragment();\n${body}\n    return __frag;\n  })()`;
     }
 }

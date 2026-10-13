@@ -14,13 +14,13 @@ import { compile } from '../../compiler/src/plugin';
 const settle = async () => { for (let i = 0; i < 3; i++) await new Promise((r) => setTimeout(r, 0)); };
 
 describe('@search', () => {
-    for (const inline of [false, true]) {
-        it(`searchParams reads the query, typed, in the template and the script (${inline ? 'inline path' : 'template path'})`, async () => {
+    for (const build of [false, true]) {
+        it(`searchParams reads the query, typed, in the template and the script (${build ? 'build' : 'dev'})`, async () => {
             const query = core.signal('?page=3&q=ink');
-            const name = `searchrender${inline ? 'i' : 't'}`;
+            const name = `searchrender${build ? 'b' : 'd'}`;
             const src = '<template><p class="t">{{ searchParams.page }} {{ searchParams.q }}</p><p class="s">{{ next }}</p></template>\n'
                 + "<script setup>\n@page '/s';\n@search { page: number = 1, q?: string }\nconst next = $derived(searchParams.page + 1);\n</script>\n";
-            const { code } = compile(src, `${name}.pdx`, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
+            const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
             const body = code
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/router';?\s*$/gm, 'const {$1} = __router;');

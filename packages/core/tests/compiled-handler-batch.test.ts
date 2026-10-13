@@ -13,10 +13,10 @@ import { compile } from '../../compiler/src/plugin';
 let seq = 0;
 
 /** Compile `template` + `script` on one path, define it, mount it, and return the host. */
-function mount(template: string, script: string, inline: boolean): HTMLElement {
-    const name = `batchprobe${++seq}${inline ? 'i' : 't'}`;
+function mount(template: string, script: string, build: boolean): HTMLElement {
+    const name = `batchprobe${++seq}${build ? 'b' : 'd'}`;
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const options = inline ? { production: true, inlineBindings: true } : { inlineBindings: false };
+    const options = build ? { production: true } : {};
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
@@ -30,8 +30,8 @@ const settle = () => new Promise(r => setTimeout(r, 0));
 afterEach(() => { document.body.innerHTML = ''; });
 
 describe('a compiled handler writing three signals', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'inline path' : 'template path';
+    for (const build of [false, true]) {
+        const path = build ? 'build' : 'dev';
 
         it(`runs an effect reading all three once, and it never sees them half written — ${path}`, async () => {
             const runs: string[] = [];
@@ -39,7 +39,7 @@ describe('a compiled handler writing three signals', () => {
             const el = mount(
                 '<button @click="a = 1; b = 1; c = 1">go</button>',
                 `let a = $signal(0);\nlet b = $signal(0);\nlet c = $signal(0);\n$effect(() => { globalThis.__batchRuns.push(a + ',' + b + ',' + c); });`,
-                inline,
+                build,
             );
             await settle();
             runs.length = 0;
@@ -54,7 +54,7 @@ describe('a compiled handler writing three signals', () => {
             const el = mount(
                 '<button @click="fail">go</button>',
                 "async function fail() { throw new Error('async boom'); }",
-                inline,
+                build,
             );
             await settle();
             (el.querySelector('button') as HTMLButtonElement).click();

@@ -8,7 +8,8 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const PATHS = { 'template path': {}, 'inline path': { production: true, inlineBindings: true } } as const;
+// One render path since #107: what differs is dev and a production build.
+const PATHS = { dev: {}, production: { production: true } } as const;
 const IMPORT = /import \{[^}]*\bnavigation\b[^}]*\} from '@pdxui\/router';/;
 
 const sfc = (template: string, script = 'let n = $signal(0);') =>

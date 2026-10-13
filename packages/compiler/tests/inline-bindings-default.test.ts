@@ -3,8 +3,8 @@
 // `inlineBindings` replaces the tagged template — and with it the innerHTML parse, the placeholder
 // scan and the `bindAttribute` dispatch — with `createElement`/`appendChild` and a direct
 // assignment per binding: **3.5x on the mount** of a 1500-row list (19 ms → 5.5 ms) for
-// **+0.4 KB** gzipped. It is the one render path; `compile()`'s internal `inlineBindings: false`
-// stays for the tests that still measure the template path, until it is removed (#238).
+// **+0.4 KB** gzipped. It is the one render path; `compile()`'s internal switch stays only for the
+// render parity table (#237) until it is removed (#238).
 //
 // What this file holds is the DEFAULT: many tests of the inline path pass `inlineBindings: true`
 // explicitly, so all of them would go on passing if the default silently went back to false.
@@ -32,12 +32,5 @@ describe('inlineBindings is what a .pdx compiles with, dev and build', () => {
     it('a production compile inlines its bindings with nothing asked for', () => {
         const { code } = compile(SOURCE, 'probe.pdx', [], undefined, { production: true });
         expect(isInline(code), 'production still compiled through the tagged template').toBe(true);
-    });
-
-    it('and compile()\'s internal switch still reaches the template path, for the tests that pin it', () => {
-        // Not an app's option any more — the Vite plugin ignores it (PDX_INLINE_BINDINGS_IGNORED);
-        // `compile()` keeps it until the template path is removed (#238).
-        const { code } = compile(SOURCE, 'probe.pdx', [], undefined, { production: true, inlineBindings: false });
-        expect(isInline(code), 'inlineBindings: false did not reach the code generator').toBe(false);
     });
 });

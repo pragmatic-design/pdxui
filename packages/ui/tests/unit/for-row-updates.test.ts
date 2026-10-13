@@ -43,9 +43,6 @@ function swap() { docs = [docs[1], docs[0]]; }
 const PATHS = [
     { name: 'dev', file: 'fr-list.pdx', tag: 'pdx-fr-list', opts: {} },
     { name: 'build', file: 'fr-list-build.pdx', tag: 'pdx-fr-list-build', opts: { production: true } },
-    { name: 'production inline', file: 'fr-list-inline.pdx', tag: 'pdx-fr-list-inline', opts: { production: true, inlineBindings: true } },
-    // Named: since #107 dev compiles inline too, and the template path is reached only this way.
-    { name: 'template path', file: 'fr-list-template.pdx', tag: 'pdx-fr-list-template', opts: { inlineBindings: false } },
 ];
 
 beforeAll(() => {

@@ -182,10 +182,10 @@ function save() { throw new Error('nope'); }
 </script>
 `;
 
-    it('the template path: a handler, a binding, interpolations, @for and @if', () => {
-        // Named: since #107 a dev compile takes the inline path, measured below.
-        const { code, map } = compile(TEMPLATE, 'tpl.pdx', [], undefined, { inlineBindings: false });
-        expect(probe(TEMPLATE, code, map, [
+    it('a scoped slot body, the template generator\'s since #107: the same six', () => {
+        const SLOT = TEMPLATE.replace('<section>', '<pdx-list><slot name="item" let:row><section>').replace('</section>', '</section></slot></pdx-list>');
+        const { code, map } = compile(SLOT, 'tpl.pdx', [], undefined, {});
+        expect(probe(SLOT, code, map, [
             ['@click="save"', '@click=${|safeHandler(batchHandler(ctx.save'],
             [':value="name"', ':value=${|ctx.name}'],
             ['label }}', '<p>${|ctx.label}'],
@@ -210,8 +210,8 @@ function save() { throw new Error('nope'); }
     }
 
     // The marks are removed before the module leaves compile(): with or without a map, the module is
-    // the same — in dev, in a production build, and on the production template path, whose binding
-    // dedup compares expressions that carry their marks.
+    // the same — in dev and in a production build, whose binding dedup (#236) shares expressions
+    // that carry their marks.
     it('the module is the same with a map and without one, in every mode', () => {
         const DEDUP = `<template>
   <button :disabled="count > 0" :hidden="count > 0">Save</button>
@@ -223,15 +223,15 @@ const rows = [1, 2];
 </script>
 `;
         for (const source of [TEMPLATE, DEDUP]) {
-            for (const mode of [{}, { production: true, inlineBindings: true }, { production: true, inlineBindings: false }]) {
+            for (const mode of [{}, { production: true }]) {
                 const mapped = compile(source, 'same.pdx', [], undefined, mode).code;
                 const d = parseSFC(source);
                 const plain = compileSFC(d, parseTemplate(d.template!.content, 1), 'same.pdx', null, mode);
                 expect(mapped, `mode ${JSON.stringify(mode)}`).toBe(plain);
             }
         }
-        // The dedup ran on the template path, marks and all.
-        expect(compile(DEDUP, 'same.pdx', [], undefined, { production: true, inlineBindings: false }).code).toContain('__bd_0');
+        // The dedup ran, marks and all.
+        expect(compile(DEDUP, 'same.pdx', [], undefined, { production: true }).code).toContain('__bd_0');
     });
 
     // ─── Script modules ─────────────────────────────────────

@@ -5,15 +5,11 @@
 // `Cannot read properties of null (reading 'nome')` on every close — production only, a clean
 // console in dev.
 
-// ⚠️ `inlineBindings: false` throughout, and it is not a workaround: it names the path this
-// file measures. A production build takes the INLINE path, and that path applies the
-// loop-invariant hoist too — the transform both paths share is asserted on both,
-// in `loop-invariant-both-paths.test.ts`. What is the template path's own is the binding
-// deduplication and the escaping of the tagged template, which is what the flag pins here.
+// The deduplication is the inline path's since #236 (`inline-dedup.ts`), with the same rule.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const prod = (src: string) => compile(src, 'dedup-guard.pdx', [], undefined, { production: true, inlineBindings: false }).code;
+const prod = (src: string) => compile(src, 'dedup-guard.pdx', [], undefined, { production: true }).code;
 
 describe('binding dedup respects control flow', () => {
     it('does not hoist a binding that only occurs inside an @if', () => {

@@ -15,14 +15,14 @@ import { hash } from '../../compiler/src/compiler/codegen-styles';
 const settle = async () => { for (let i = 0; i < 3; i++) await new Promise((r) => setTimeout(r, 0)); };
 
 describe('bind() in a style', () => {
-    for (const inline of [false, true]) {
-        it(`follows a $signal, a $derived and a @prop (${inline ? 'inline path' : 'template path'})`, async () => {
-            const name = `cssbind${inline ? 'i' : 't'}`;
+    for (const build of [false, true]) {
+        it(`follows a $signal, a $derived and a @prop (${build ? 'build' : 'dev'})`, async () => {
+            const name = `cssbind${build ? 'b' : 'd'}`;
             const src = '<template><button @click="w = w + 10">+</button></template>\n'
                 + "<script setup>\n@prop tone: string = 'red';\nlet w = $signal(40);\nconst half = $derived(w / 2 + 'px');\n</script>\n"
                 + '<style scoped>button { width: calc(bind(w) * 1px); height: bind(half); color: bind(tone); }</style>\n';
             const file = `${name}.pdx`;
-            const { code } = compile(src, file, [], undefined, inline ? { production: true, inlineBindings: true } : { inlineBindings: false });
+            const { code } = compile(src, file, [], undefined, build ? { production: true } : {});
             const body = code
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
                 .replace(/^\s*import\s*'virtual:pdx-style[^']*';?\s*$/gm, '');

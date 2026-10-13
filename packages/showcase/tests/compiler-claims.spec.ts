@@ -115,7 +115,7 @@ test.describe('the claims this app cannot settle', () => {
      *
      *  - "Template: pre-compiled DOM factory" — since #107 every .pdx builds its DOM directly, in
      *    dev and in a build; the template path's own factory (`isStaticAssembly` → `__staticHTML`)
-     *    is reached only through compile()'s internal `inlineBindings: false`, which no app sets.
+     *    is reached only through compile()'s internal switch, which no app sets (#238 removes it).
      *  - "Component flattening" — withdrawn, with "Signals: the call chain inlined": both were
      *    measured as worth too little for what they cost.
      *

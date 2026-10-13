@@ -13,6 +13,7 @@ import type { CompileContext } from './compile-context';
 import { applyFormBindings, applyInjectedFormBindings } from './codegen-form-binding';
 import { maskNonCode } from './tokenizer';
 import { navigationIsRouter, templateReadsNavigation, setupReadsNavigation } from './navigation-import';
+import { foldConstantConditions } from './fold-constant-conditions';
 
 /** The script calls `useForm()` or `tryUseForm()`: the component is a section of a form above it. */
 function declaresFormSection(script: string): boolean {
@@ -123,6 +124,8 @@ export function compileNewMode(
     // One render path, in dev and in a build (#107): the inline path. `inlineBindings: false` is an
     // internal switch kept for the tests that still measure the template path (#236) until it is
     // removed (#238); the plugin no longer forwards the option.
+    // A literal `@if (true)` / `@show (false)` is folded away in a production build (#236).
+    if (production) ast = foldConstantConditions(ast);
     let renderCode: string;
     if (inlineBindings !== false) {
         renderCode = generateInlineNodes(ast, imports, ctx);
@@ -212,20 +215,10 @@ export function compileNewMode(
         }
     }
 
-    // Production: binding deduplication — shared computed for repeated reactive expressions.
-    //
-    // Not applicable to inline bindings, and that is a property of the TRANSFORM rather than a gap:
-    // it works by finding repeated `${() => expr}` interpolations in a tagged template, and the
-    // inline path writes `effect(() => { el.title = expr })` instead — there is no interpolation to
-    // count. On `<p :title="name + '!'">{{ name + '!' }}</p><span :title="name + '!'">`, neither
-    // path deduplicates (the template path's own transform does not fire there either), and the
-    // inline path emits 1139 bytes of render against 164.
-    //
-    // ⚠️ The EQUIVALENT optimisation does exist and is not implemented: two effects reading the
-    // same expression could share one computed, the way loop-invariant hoisting works on both
-    // paths. What the measurement says about it: on the showcase's whole bundle the difference
-    // between the two paths is +0.4 KB raw and 0 KB gzipped, so it is a subscription-count
-    // argument, not a payload one.
+    // Production: binding deduplication on the TEMPLATE path — shared computed for repeated
+    // `${() => expr}` interpolations of a tagged template. The inline path, every .pdx's render
+    // since #107, does the same with its own generator (`inline-dedup.ts`, #236): this branch is
+    // reached only through the internal `inlineBindings: false`, and goes with it (#238).
     if (production && !inlineBindings) {
         const dedup = deduplicateBindings(finalRenderCode);
         if (dedup.computeds.length > 0) {

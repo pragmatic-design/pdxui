@@ -12,8 +12,8 @@ import { compile } from '../src/plugin';
 const src = (decl: string) =>
     `<template>\n  <i :a="NAME"></i>\n</template>\n<script setup lang="ts">\n${decl}\n</script>`;
 
-const build = (decl: string, inlineBindings: boolean) =>
-    compile(src(decl), 'C:/x/typed.pdx', [], undefined, { production: true, inlineBindings }).code;
+const build = (decl: string) =>
+    compile(src(decl), 'C:/x/typed.pdx', [], undefined, { production: true }).code;
 
 describe('a typed top-level declaration is returned to the template', () => {
     for (const decl of [
@@ -22,17 +22,17 @@ describe('a typed top-level declaration is returned to the template', () => {
         "const NAME: Record<string, (a: number) => void> = {};",
     ]) {
         it(`${decl} — in the setup's return`, () => {
-            expect(build(decl, false)).toMatch(/return \{[^}]*\bNAME\b/);
+            expect(build(decl)).toMatch(/return \{[^}]*\bNAME\b/);
         });
 
-        it(`${decl} — read as a value on the inline path, not called`, () => {
-            const code = build(decl, true);
+        it(`${decl} — read as a value in the render, not called`, () => {
+            const code = build(decl);
             expect(code).toContain('ctx.NAME;');
             expect(code).not.toContain('ctx.NAME()');
         });
     }
 
     it('control — an untyped const was already returned', () => {
-        expect(build("const NAME = ['x'];", false)).toMatch(/return \{[^}]*\bNAME\b/);
+        expect(build("const NAME = ['x'];")).toMatch(/return \{[^}]*\bNAME\b/);
     });
 });
