@@ -96,7 +96,11 @@ since a row scrolling into view is not arriving either. Measured in Chromium
 - the last item is reached and the scroll height is the whole list;
 - a paged source loads once per page.
 
-The **Accessible** row is #284.
+**Landed** (#284): the **Accessible** row, as written, measured with `getByRole` and the keyboard in
+the same spec. One addition: a container under a role without keys, whose rows hold nothing
+focusable, takes `tabindex="0"` while it scrolls. axe, run on the harness, found that region
+unreachable from the keyboard (`scrollable-region-focusable`). The same check made a listbox scrolled
+away from its active option give the tab stop to its first rendered option.
 
 **Acceptance criteria**
 
@@ -104,7 +108,7 @@ The **Accessible** row is #284.
 |---|---|
 | 10 000 items → at most the visible items + 2 × overscan in the DOM | DOM count, Chromium — holds since #283 |
 | **Variable heights** without code: each rendered item is measured by a `ResizeObserver` and the offsets corrected; scrolling to index *n* lands on it ±1 px | geometry, Chromium. Since #252 every element handed to `measureElement` is observed, a size change above the viewport keeps the visible content in place, and `scrollTo` lands on the item ±1 px (`responsive/…/virtualizer-heights.spec.ts`, 2 000 items of 24–120 px). Since #283, `@virtual` hands each rendered row to `measureElement` itself: no code |
-| **Accessible**, by the role the template gives the container: `list`/`listbox`/`tree` items carry `aria-setsize` and `aria-posinset`; `grid`/`table` rows carry `aria-rowindex` and the container `aria-rowcount`. Keys belong to the composite roles only — in a `listbox`, `tree` or `grid`, arrow keys and Home/End move focus to an item not yet rendered by rendering it first; a plain `list` has no arrow keys (Tab moves through its focusable content). A focused item scrolled away is kept in the DOM | Playwright `getByRole`, keyboard |
+| **Accessible**, by the role the template gives the container: `list`/`listbox`/`tree` items carry `aria-setsize` and `aria-posinset`; `grid`/`table` rows carry `aria-rowindex` and the container `aria-rowcount`. Keys belong to the composite roles only — in a `listbox`, `tree` or `grid`, arrow keys and Home/End move focus to an item not yet rendered by rendering it first; a plain `list` has no arrow keys (Tab moves through its focusable content). A focused item scrolled away is kept in the DOM | Playwright `getByRole`, keyboard — holds since #284 (`responsive/…/virtual-list.spec.ts`, with axe on a list, a listbox and a table) |
 | **Progressive pagination**: over a `DataSource` (`core/src/data/data-source.ts`, `loadMore()` / `hasMore()`), reaching the last rendered item calls `loadMore()` once while `hasMore()`; `@empty` renders only when the source is settled and empty | request count — holds since #283 (3 pages of 50: two `loadMore()`, none after) |
 | Stated limits: find-in-page and print see only rendered items; the docs say so | — the site's template page and `docs/language/template.md` say so (#283) |
 

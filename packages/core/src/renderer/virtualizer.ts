@@ -47,6 +47,8 @@ export interface VirtualizerReturn {
      * change of size is measured again (for dynamic sizes).
      */
     measureElement: (el: HTMLElement | null) => void;
+    /** Where any item is, rendered or not: its start and size, measured or estimated (#284). */
+    itemRect: (index: number) => { start: number; size: number };
     /** Cleanup. */
     dispose: Dispose;
 }
@@ -359,6 +361,7 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
         totalSize: _totalSize,
         scrollTo,
         measureElement,
+        itemRect: (index) => ({ start: getCumulativeOffset(index), size: getItemSize(index) }),
         dispose: () => {
             if (isBrowser) _disposeEffect?.();
             scrollCleanup?.();
