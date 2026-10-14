@@ -58,10 +58,14 @@ test.describe('hovering a link to a split route', () => {
     });
 
     test('and then the click renders it with no further request', async ({ page }) => {
+        const chunks = watchChunks(page);
         await open(page, '/');
         await page.locator('[data-test="to-customers"]').hover();
-        await expect.poll(() => page.evaluate(() => performance.getEntriesByType('resource').length))
-            .toBeGreaterThan(0);
+        // Until the prefetch has asked for the chunk: it is queued and starts when the browser is
+        // idle (#250). The wait this replaced — any resource entry at all — was already true at
+        // page load, so it waited for nothing, and on a slow runner the click took the load over.
+        await expect.poll(() => hasPage(chunks, 'customers'), { message: 'hovering the link fetched no chunk' })
+            .toBe(true);
 
         // Count only what happens from HERE: the prefetch is already done.
         const after: string[] = [];
