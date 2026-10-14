@@ -1,0 +1,17 @@
+{
+  "measured": null,
+  "ratio": {
+    "01_run1k script": null,
+    "02_replace1k script": null,
+    "03_update10th1k_x16 script": null,
+    "04_select1k script": null,
+    "05_swap1k script": null,
+    "06_remove-one-1k script": null,
+    "07_create10k script": null,
+    "08_create1k-after1k_x2 script": null,
+    "09_clear1k_x8 script": null
+  },
+  "memoryMB": {
+    "22_run-memory": null
+  }
+}

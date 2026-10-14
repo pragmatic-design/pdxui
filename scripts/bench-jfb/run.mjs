@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // pnpm bench:jfb [--with vanillajs svelte …] [--runs N] [--only 01_,07_] [--port 8080]
-//                [--chrome <path>] [--headless]
+//                [--chrome <path>] [--headless] [--json <file>]
 //
 // Runs js-framework-benchmark with PDX and the reference frameworks in ONE run, and prints a markdown
 // table of the medians with their ratio to vanillajs. Totals vary between runs on the same machine, so
@@ -11,6 +11,9 @@
 // The benchmark is cloned at a pinned commit into the OS temp directory, never into this repository,
 // and its dependencies stay there. The clone is reused by the next run; delete the folder to start
 // clean. PDX is built from this checkout: core and compiler first, then the app in this folder.
+//
+// --json <file> also writes the combined medians of every framework of the run to that file, which
+// thresholds.mjs holds to thresholds in the nightly job (#248).
 
 import { spawn, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -32,7 +35,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..', '..');
 
 function parseArgs(argv) {
-    const options = { with: DEFAULT_WITH, runs: 1, only: [], port: 8080, chrome: null, headless: false };
+    const options = { with: DEFAULT_WITH, runs: 1, only: [], port: 8080, chrome: null, headless: false, json: null };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
         if (arg === '--with') {
@@ -49,6 +52,9 @@ function parseArgs(argv) {
             options.chrome = argv[++i];
         } else if (arg === '--headless') {
             options.headless = true;
+        } else if (arg === '--json') {
+            options.json = argv[++i];
+            if (!options.json) throw new Error('--json takes a file path');
         } else {
             throw new Error(`unknown argument ${arg}`);
         }
@@ -281,7 +287,12 @@ async function main() {
 
     const title = options.runs > 1 ? `median of ${options.runs} runs` : 'one run';
     console.log(`\n## js-framework-benchmark, ${title} (benchmark ${JFB_COMMIT.slice(0, 12)})\n`);
-    console.log(toMarkdown(combineRuns(runs), frameworks));
+    const combined = combineRuns(runs);
+    console.log(toMarkdown(combined, frameworks));
+    if (options.json) {
+        writeFileSync(resolve(options.json), JSON.stringify(combined, null, 2));
+        console.log(`\n[bench:jfb] the combined medians are in ${resolve(options.json)}`);
+    }
     // A local check, measured on the same builds after the runs, and kept apart from them (#117).
     console.log('\n## Local check, not part of js-framework-benchmark\n');
     console.log(select10kMarkdown(select10k));
