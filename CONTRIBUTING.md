@@ -221,6 +221,13 @@ benchmark's published, windowed results. In a Docker container, run as a user ot
 with `--security-opt seccomp=unconfined`: Chrome needs that to build its sandbox, and the benchmark
 does not start it without one.
 
+### An agent driving the showcase
+
+A change to `__PDX_DEVTOOLS__` v2 (`map`, `shell`, `page`, `outline`) runs
+`node scripts/agent-behaviour/run.mjs`, and puts its JSON result in the pull request. The script has
+a model complete showcase tasks with the description API and with full snapshots, and the API must
+do at least as well; [its README](scripts/agent-behaviour/README.md) says what it needs.
+
 ## Commits and pull requests
 
 - **Before you start on an issue, comment on it and ask to be assigned.** The maintainers work
