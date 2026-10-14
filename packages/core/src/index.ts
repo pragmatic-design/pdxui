@@ -172,6 +172,8 @@ export type { TweenConfig, TweenSignal } from './renderer/tween';
 // Defer (lazy loading)
 export { defer } from './renderer/defer';
 export type { DeferOptions, DeferState } from './renderer/defer';
+// The one queue prefetches wait in (#250): the router queues route chunks here.
+export { queuePrefetch, trackUrgentLoad, takePrefetch, cancelPrefetches } from './renderer/load-queue';
 
 // Component
 export { PdxElement, moveMounted } from './component/element';

@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 48 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 52 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -153,6 +153,17 @@ The inline build calls this too, so the two builds listen the same way: a compon
 `pdx-input`/`pdx-change` and their `detail`, a `<select>` and a checkbox through `change`. The
 inline path had its own copy that listened to `input` on everything, and `::value` was one-way
 on a component in a production build (#97).
+
+## `cancelPrefetches`
+
+```ts
+import { cancelPrefetches } from '@pdxui/core';
+
+function cancelPrefetches(except?: string): string[]
+```
+
+Drop every queued prefetch except `except`'s. What is running finishes. Returns the keys dropped,
+so their owner can forget them and queue them again later.
 
 ## `captureRect`
 
@@ -494,6 +505,17 @@ reason to use this rather than `document.body.appendChild`.
 
 `enter`/`exit` name CSS classes for the transitions.
 
+## `queuePrefetch`
+
+```ts
+import { queuePrefetch } from '@pdxui/core';
+
+function queuePrefetch(key: string, load: () => Promise<unknown>): boolean
+```
+
+Queue a prefetch under `key` (a route pattern, a deferred block). Returns whether it was queued:
+false when the same key is already queued or running.
+
 ## `recordPositions`
 
 ```ts
@@ -635,6 +657,18 @@ document has no custom-element registry and loads nothing, so no component const
 image is fetched while it is built. Each call returns `importNode` of it, which brings the copy into
 the page and upgrades its components, as `createElement` did.
 
+## `takePrefetch`
+
+```ts
+import { takePrefetch } from '@pdxui/core';
+
+function takePrefetch(key: string): Promise<unknown> | undefined
+```
+
+The prefetch a navigation needs, handed over: a queued one starts at once, as an urgent load; a
+running one is returned as it is, for the navigation to await rather than start a second load.
+Undefined when there is none, and the navigation loads on its own.
+
 ## `templatePipe`
 
 ```ts
@@ -658,6 +692,17 @@ function text(value: string): Text
 ```
 
 Create a text node. SSR returns null-safe stub.
+
+## `trackUrgentLoad`
+
+```ts
+import { trackUrgentLoad } from '@pdxui/core';
+
+function trackUrgentLoad(load: Promise<T>): Promise<T>
+```
+
+A load the visitor is waiting for: while it is in flight, no queued prefetch starts. It is never
+queued itself. Returns the same promise.
 
 ## `tween`
 

@@ -4,6 +4,7 @@
 import { signal, effect, collectDisposers } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
+import { trackUrgentLoad } from './load-queue';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -66,7 +67,8 @@ export function defer(
         cleanupTriggers();
 
         if (loadFn) {
-            loadFn()
+            // The block is on screen and waiting: queued prefetches hold back until it has loaded.
+            trackUrgentLoad(loadFn())
                 .then(mod => {
                     loadedModule.set(mod);
                     state.set('loaded');

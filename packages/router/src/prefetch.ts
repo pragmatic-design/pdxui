@@ -11,7 +11,12 @@
 //
 // What actually prefetches a route is calling its `import()` early. The module cache does the
 // deduplication, so the load the outlet performs on the click finds it already resolved.
+//
+// Early, but not all at once (#250): a prefetch goes through core's load queue, which runs two at a
+// time and none while the visitor is waiting for a navigation. The outlet takes the target's
+// prefetch when it navigates (`takeRoutePrefetch`) and drops the rest (`cancelOtherPrefetches`).
 
+import { queuePrefetch, takePrefetch, cancelPrefetches } from '@pdxui/core';
 import { routeTable, pageModule } from './active';
 
 /**
@@ -37,8 +42,9 @@ interface PrefetchableRoute {
 const started = new Set<string>();
 
 /**
- * The load each prefetch started, by route pattern, for the outlet to WAIT ON rather than start a
- * second one.
+ * The load a prefetch queued or started for this route, handed to the navigation that needs it: a
+ * queued one starts at once, a running one is awaited rather than repeated. Undefined when there is
+ * none, and the outlet loads on its own.
  *
  * A second `import()` of a route is not the same as the first. Vite's preload helper remembers the
  * files it has already asked for, and the second caller does not wait for them: it gets the module
@@ -46,17 +52,22 @@ const started = new Set<string>();
  * still on the wire. The page would be painted unstyled and then move — a 0.0385 layout shift on
  * the landing route when the shell prefetches it at boot.
  */
-const inflight = new Map<string, Promise<unknown>>();
+export function takeRoutePrefetch(path: string): Promise<unknown> | undefined {
+    return takePrefetch(path);
+}
 
-/** The load a prefetch already started for this route, if one did; the outlet awaits it. */
-export function prefetchedLoad(path: string): Promise<unknown> | undefined {
-    return inflight.get(path);
+/**
+ * A navigation to `path` drops every other queued prefetch: they would only compete with it. A
+ * dropped route is forgotten, so a later hover queues it again.
+ */
+export function cancelOtherPrefetches(path: string): void {
+    for (const dropped of cancelPrefetches(path)) started.delete(dropped);
 }
 
 /** Test seam: the module cache is per-process and a suite needs a clean one between cases. */
 export function resetPrefetch(): void {
     started.clear();
-    inflight.clear();
+    cancelPrefetches();
 }
 
 /** The routes this build knows about — the build-time table first, as the outlet reads it. */
@@ -139,9 +150,9 @@ export function prefetchAllowed(): boolean {
 }
 
 /**
- * Fetch the chunk this URL will need, if there is one and it is wanted.
+ * Queue a fetch of the chunk this URL will need, if there is one and it is wanted.
  *
- * Returns whether a fetch was STARTED, which is what a test can assert on; a caller has nothing to
+ * Returns whether a fetch was QUEUED, which is what a test can assert on; a caller has nothing to
  * do with the answer. Failure is swallowed on purpose: a prefetch that cannot reach the network is
  * a click that will load normally, not an error the visitor should be shown — the outlet reports
  * the real one when the navigation happens.
@@ -161,9 +172,7 @@ export function prefetchRoute(url: string | null | undefined): boolean {
     started.add(route.path);
     if (!load) return false;
 
-    const pending = load();
-    inflight.set(route.path, pending);
-    // A failed prefetch is a normal load later: forgotten, so the outlet starts its own.
-    pending.catch(() => { inflight.delete(route.path); });
-    return true;
+    // A failed prefetch is a normal load later: the queue forgets it once it settles, so the outlet
+    // starts its own. The queue handles the settled promise, so a failure is not reported unhandled.
+    return queuePrefetch(route.path, load);
 }

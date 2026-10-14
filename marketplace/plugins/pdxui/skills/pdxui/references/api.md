@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-449 value exports.
+453 value exports.
 
 ### `__adoptStyles`
 
@@ -561,6 +561,17 @@ Render a boolean as a check or a cross, with an accessible label for each.
 
 The labels are not decoration: an icon alone tells a screen reader nothing, so `trueLabel` /
 `falseLabel` are what the cell actually announces.
+
+### `cancelPrefetches`
+
+```ts
+import { cancelPrefetches } from '@pdxui/core';
+
+function cancelPrefetches(except?: string): string[]
+```
+
+Drop every queued prefetch except `except`'s. What is running finishes. Returns the keys dropped,
+so their owner can forget them and queue them again later.
 
 ### `captureRect`
 
@@ -3921,6 +3932,17 @@ function queryByText(container: HTMLElement, text: string | RegExp): HTMLElement
 
 Find element by text content. Returns null if not found.
 
+### `queuePrefetch`
+
+```ts
+import { queuePrefetch } from '@pdxui/core';
+
+function queuePrefetch(key: string, load: () => Promise<unknown>): boolean
+```
+
+Queue a prefetch under `key` (a route pattern, a deferred block). Returns whether it was queued:
+false when the same key is already queued or running.
+
 ### `recordDevtoolsNavigation`
 
 ```ts
@@ -5037,6 +5059,18 @@ function take(count: number): SignalOperator<T, T>
 
 Take only the first N emissions (changes), then freeze. Initial value doesn't count.
 
+### `takePrefetch`
+
+```ts
+import { takePrefetch } from '@pdxui/core';
+
+function takePrefetch(key: string): Promise<unknown> | undefined
+```
+
+The prefetch a navigation needs, handed over: a queued one starts at once, as an urgent load; a
+running one is returned as it is, for the navigation to await rather than start a second load.
+Undefined when there is none, and the navigation loads on its own.
+
 ### `takeUntil`
 
 ```ts
@@ -5306,6 +5340,17 @@ as the column's `format` shows it.
 
 Which rows is the caller's, as for `toCsv`: the selection when there is one, otherwise what the
 filter selects.
+
+### `trackUrgentLoad`
+
+```ts
+import { trackUrgentLoad } from '@pdxui/core';
+
+function trackUrgentLoad(load: Promise<T>): Promise<T>
+```
+
+A load the visitor is waiting for: while it is in flight, no queued prefetch starts. It is never
+queued itself. Returns the same promise.
 
 ### `tryInject`
 
@@ -6304,9 +6349,9 @@ import { prefetchRoute } from '@pdxui/router';
 function prefetchRoute(url: string | null | undefined): boolean
 ```
 
-Fetch the chunk this URL will need, if there is one and it is wanted.
+Queue a fetch of the chunk this URL will need, if there is one and it is wanted.
 
-Returns whether a fetch was STARTED, which is what a test can assert on; a caller has nothing to
+Returns whether a fetch was QUEUED, which is what a test can assert on; a caller has nothing to
 do with the answer. Failure is swallowed on purpose: a prefetch that cannot reach the network is
 a click that will load normally, not an error the visitor should be shown — the outlet reports
 the real one when the navigation happens.

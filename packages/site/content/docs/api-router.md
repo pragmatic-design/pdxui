@@ -254,9 +254,9 @@ import { prefetchRoute } from '@pdxui/router';
 function prefetchRoute(url: string | null | undefined): boolean
 ```
 
-Fetch the chunk this URL will need, if there is one and it is wanted.
+Queue a fetch of the chunk this URL will need, if there is one and it is wanted.
 
-Returns whether a fetch was STARTED, which is what a test can assert on; a caller has nothing to
+Returns whether a fetch was QUEUED, which is what a test can assert on; a caller has nothing to
 do with the answer. Failure is swallowed on purpose: a prefetch that cannot reach the network is
 a click that will load normally, not an error the visitor should be shown — the outlet reports
 the real one when the navigation happens.
