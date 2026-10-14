@@ -7,7 +7,7 @@ parent: api
 
 # Security and utilities API
 
-URL sanitising and the development flag. 4 exports, from `@pdxui/core`.
+URL sanitising and the development flag. 5 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -24,6 +24,18 @@ True in a development build, false in a production one — a constant, folded by
 Guard a message that teaches the author something with it, and the branch leaves the production
 bundle with its string: `if (DEV) console.warn('…')`. Never guard BEHAVIOUR with it — behaviour
 that only happens in dev is a difference between what you tested and what you shipped.
+
+## `processInSlices`
+
+```ts
+import { processInSlices } from '@pdxui/core';
+
+function processInSlices(items: ArrayLike<T>, work: (item: T, index: number) => void, options: SliceOptions = {}): Promise<void>
+```
+
+Call `work(item, index)` for every item, in order, yielding to input after each slice of about
+5 ms. Resolves when every item has been processed; rejects with the signal's reason when
+`options.signal` aborts (no later item is processed), or with the error `work` throws.
 
 ## `sanitizeBoundUrl`
 

@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-454 value exports.
+455 value exports.
 
 ### `__adoptStyles`
 
@@ -3842,6 +3842,18 @@ Track the previous value of a signal.
 Usage:
   const prev = previous(count);
   effect(() => console.log(`${prev()} → ${count()}`));
+
+### `processInSlices`
+
+```ts
+import { processInSlices } from '@pdxui/core';
+
+function processInSlices(items: ArrayLike<T>, work: (item: T, index: number) => void, options: SliceOptions = {}): Promise<void>
+```
+
+Call `work(item, index)` for every item, in order, yielding to input after each slice of about
+5 ms. Resolves when every item has been processed; rejects with the signal's reason when
+`options.signal` aborts (no later item is processed), or with the error `work` throws.
 
 ### `prop`
 

@@ -174,6 +174,9 @@ export { defer } from './renderer/defer';
 export type { DeferOptions, DeferState } from './renderer/defer';
 // The one queue prefetches wait in (#250): the router queues route chunks here.
 export { queuePrefetch, trackUrgentLoad, takePrefetch, cancelPrefetches } from './renderer/load-queue';
+// A long loop over data in slices that yield to input (#240).
+export { processInSlices } from './utils/slices';
+export type { SliceOptions } from './utils/slices';
 
 // Component
 export { PdxElement, moveMounted } from './component/element';
