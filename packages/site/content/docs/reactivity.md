@@ -136,6 +136,51 @@ let boxRef = $signal(null);
 `boxRef` will hold the element once mounted. Read it inside `onMount`/`effect` (not right away in
 setup: on the first pass it's still `null`).
 
+## Heavy work
+
+Signals are synchronous, and so is a loop over your data. A handler that filters, groups or formats
+100 000 items does it in one task, and the page does not answer a click until the loop ends.
+`processInSlices(items, work, { signal })` runs the same loop in slices of about 5 ms. Between two
+slices the browser handles input and paints. It calls `work(item, index)` for every item, in order,
+and returns a promise that resolves when the last one is done:
+
+```pdx
+import { processInSlices } from '@pdxui/core';
+
+let rows = $signal([]);
+let totals = $signal(new Map());
+let running = null;
+
+async function regroup() {
+  running?.abort();                       // a newer request replaces the one in flight
+  running = new AbortController();
+  const next = new Map();
+  try {
+    await processInSlices(rows, (row) => {
+      next.set(row.region, (next.get(row.region) ?? 0) + row.amount);
+    }, { signal: running.signal });
+    totals = next;                        // one write, once the work is done
+  } catch (e) {
+    if (e.name !== 'AbortError') throw e;
+  }
+}
+```
+
+- **Cancel** with an `AbortSignal`. The job stops before the next item, and the promise rejects with
+  the signal's reason (an `AbortError` by default). A signal that is already aborted processes
+  nothing.
+- **Signal writes are ordinary writes.** A `set` inside `work` flushes at once, like any write
+  outside a handler (see [batch](#batch)). Collect into a plain value and write the signal once at
+  the end, as above.
+- **It splits your loop, not the reactive graph.** The effects and deriveds stay synchronous.
+- **It yields through a macrotask**, a `MessageChannel` message, not `setTimeout`, whose 4 ms
+  clamping adds up over thousands of slices. It does not use `scheduler.yield()`: its continuation
+  runs ahead of rendering, and measured in Chromium it held a frame for about 100 ms while the page
+  had something to paint.
+
+Work that is pure computation over data the page does not need meanwhile can also move to a Worker.
+That is your choice; the framework adds no Worker syntax.
+
 ## Ownership scope (advanced)
 
 This is the mechanism that prevents memory leaks. `collectDisposers(fn)` runs `fn` and captures all
@@ -155,4 +200,5 @@ turns false.
 | `batch` | group mutations |
 | `$watch` | react to a change with prev/next |
 | `:ref` + `$signal(null)` | access to the mounted DOM |
+| `processInSlices` | a long loop over data that does not block input |
 | `collectDisposers` / `onDispose` | cleanup scope (under the hood) |

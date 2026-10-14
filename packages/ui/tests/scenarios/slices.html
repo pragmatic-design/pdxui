@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Slices Harness</title>
+    <style>
+        body { font-family: system-ui; padding: 16px; }
+    </style>
+    <script type="module">
+        // `processInSlices` over 100 000 items (#240). Each item is a fixed amount of arithmetic, so
+        // the same job run in a plain loop is one long task. The page asserts nothing: the spec runs
+        // the job both ways through `window.__job` and reads the long frames the browser reports.
+        import { processInSlices } from '@pdxui/core';
+
+        const COUNT = 100_000;
+        const items = Array.from({ length: COUNT }, (_, i) => i);
+        let sink = 0;
+
+        const progress = document.createElement('p');
+        progress.setAttribute('data-test', 'progress');
+        document.body.appendChild(progress);
+        const out = document.createElement('output');
+        out.setAttribute('data-test', 'result');
+        document.body.appendChild(out);
+
+        // About a microsecond of arithmetic per item: the plain loop takes well over 50 ms. The
+        // progress line changes as the job runs, as an app's would, so there is always a frame to
+        // paint: a way of yielding that holds rendering back shows as a long frame.
+        const work = (item) => {
+            let x = item;
+            for (let k = 0; k < 400; k++) x = Math.sqrt(x + k) * 1.0001;
+            sink += x;
+            if (item % 1000 === 0) progress.textContent = `${item} of ${COUNT}`;
+        };
+
+        window.__job = {
+            async sliced() {
+                sink = 0;
+                await processInSlices(items, work);
+                out.textContent = String(sink);
+            },
+            plain() {
+                sink = 0;
+                for (let i = 0; i < items.length; i++) work(items[i], i);
+                out.textContent = String(sink);
+            },
+        };
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-pdx-ready', '');
+        }));
+    </script>
+</head>
+<body>
+</body>
+</html>
