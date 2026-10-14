@@ -39,6 +39,17 @@ function realDirectives(): string[] {
     return [...block[1].matchAll(/'([a-z]+)'/g)].map(m => m[1]);
 }
 
+/**
+ * Every template `@`-word: the block directives and the words written beside a block — `@transition`,
+ * `@stagger`, `@mode`, `@move`, `@virtual` (#283), `@keepAlive` — read from `TEMPLATE_AT_DIRECTIVES`.
+ */
+function realTemplateWords(): string[] {
+    const src = readFileSync(TEMPLATE_DIRECTIVES_FILE, 'utf8');
+    const all = src.match(/const TEMPLATE_AT_DIRECTIVES = \[\.\.\.BLOCK_DIRECTIVES, ([^\]]*)\] as const;/);
+    if (!all) throw new Error('TEMPLATE_AT_DIRECTIVES list not found — this check would be vacuous');
+    return [...realDirectives(), ...[...all[1].matchAll(/'([a-zA-Z]+)'/g)].map(m => m[1])];
+}
+
 describe('the language page matches the compiler', () => {
     it('has a page to check', () => {
         expect(page().length, 'language.md is empty or missing').toBeGreaterThan(2000);
@@ -67,10 +78,11 @@ describe('the language page matches the compiler', () => {
     });
 
     it('invents no declaration', () => {
-        // Every `@thing` the page presents as a declaration must appear in the analyzer. Block
-        // directives are excluded — they share the `@` sigil and live in the template, not the script.
+        // Every `@thing` the page presents as a declaration must appear in the analyzer. Template
+        // words are excluded — block directives and the modifiers beside a block share the `@` sigil
+        // and live in the template, not the script.
         const analyzer = readFileSync(ANALYZER, 'utf8');
-        const directives = new Set(realDirectives());
+        const directives = new Set(realTemplateWords());
         const taught = [...new Set([...page().matchAll(/`(@[a-z0-9]+)`/gi)].map(m => m[1]))]
             .filter(d => !directives.has(d.slice(1)));
         const unknown = taught.filter(d => !analyzer.includes(d));
