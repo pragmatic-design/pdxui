@@ -1,5 +1,5 @@
 {
-  "check": { "ms": 2600, "measured": "2026-10-14: 2127 ms (2138, 2127, 2100)", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04 20261004.327.1)" },
-  "analyze": { "ms": 900, "measured": "2026-10-14: 741 ms (749, 741, 734)", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04 20261004.327.1)" },
-  "build": { "ms": 7200, "measured": "2026-10-14: 5957 ms (5957, 5979, 5942)", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04 20261004.327.1)" }
+  "check": { "ms": 2700, "measured": "2026-10-14, three CI runs, medians 2127, 1860, 2236 ms; budget = the slowest + 20%", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04; westus3, westus3, eastus2)" },
+  "analyze": { "ms": 1000, "measured": "2026-10-14, three CI runs, medians 741, 686, 773 ms; budget = the slowest + 20%", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04; westus3, westus3, eastus2)" },
+  "build": { "ms": 7500, "measured": "2026-10-14, three CI runs, medians 5957, 5239, 6248 ms; budget = the slowest + 20%", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04; westus3, westus3, eastus2)" }
 }

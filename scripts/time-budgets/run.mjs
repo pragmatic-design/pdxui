@@ -8,8 +8,10 @@
 // script exits non-zero when a median is over its budget or a command fails.
 //
 // A budget of null is not measured against: it prints the median, so the first CI run can set it.
-// A budget is the first CI measurement + 20%, rounded up to 100 ms. It is raised only in a commit
-// that says why the pass got slower, and lowered when a measurement is more than 20% under it.
+// A budget is the CI measurement + 20%, rounded up to 100 ms. The first three CI runs, on one tree,
+// put the same pass's median up to 20% apart from one runner to the next, so the measurement is
+// the slowest of them. A budget is raised only in a commit that says why the pass got slower, and
+// lowered when a measurement is more than 20% under it.
 
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, readFileSync, rmSync } from 'node:fs';
