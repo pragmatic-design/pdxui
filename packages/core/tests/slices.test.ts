@@ -52,6 +52,15 @@ describe('processInSlices', () => {
         expect(timeout).not.toHaveBeenCalled();
     });
 
+    it('takes a longer slice with sliceMs', async () => {
+        const clock = fakeClock();
+        const yields: number[] = [];
+        let processed = 0;
+        countYields(() => yields.push(processed));
+        await processInSlices(Array.from({ length: 50 }, (_, i) => i), () => { processed++; clock.advance(1); }, { sliceMs: 20 });
+        expect(yields).toEqual([20, 40]);
+    });
+
     it('does not use scheduler.yield where it exists', async () => {
         const clock = fakeClock();
         const schedulerYield = vi.fn(async () => {});

@@ -139,7 +139,7 @@ What can be split is work the developer marks as heavy, never the reactive graph
 | Criterion | Measured by |
 |---|---|
 | A runtime helper processes a large array in slices, yielding to input between slices; it is cancellable with an `AbortSignal` (**landed**: `processInSlices`, `core/src/utils/slices.ts`). It yields through a `MessageChannel` macrotask, not `scheduler.yield()`: measured in Chromium, a `scheduler.yield()` continuation runs ahead of rendering and held a frame for 100–105 ms while the page had something to paint | the longest frame while it runs a 100 000-item job: < 50 ms (Long Animation Frames), `packages/responsive/tests/integration/ui-components/slices-long-task.spec.ts` |
-| A `@for` that inserts more than a threshold of new items at once renders them in slices, the first slice in the same frame; `@for` with `@virtual` does not need it | INP while appending 10 000 rows |
+| A `@for` that inserts more than a threshold of new items at once renders them in slices, the first slice in the same frame; `@for` with `@virtual` does not need it (**landed**: above 1 000 rows, a first slice of 250 rows and then slices of 40 ms, `core/src/renderer/list-slices.ts`, for an append and a replace with no row in common; a destructured `@for` is #398) | INP while appending 10 000 rows: under 200 ms, `packages/responsive/tests/integration/ui-components/append-slices.spec.ts` |
 | Moving a pure computation to a Worker is the developer's choice and is documented with a pattern; the beta adds no Worker syntax | — |
 
 `processInSlices` is the runtime's one scheduling primitive for this; there is no `postTask` or

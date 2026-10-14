@@ -831,6 +831,19 @@ bound once from the object the row was created with. `track item.field` is passe
 any other key is a function, `(item, i) => …`. Rows are moved, not rebuilt, by a keyed
 reconciliation. `@empty` wraps the loop in `when(() => items?.length > 0, …, () => html\`…\`)`.
 
+A change that adds more than 1 000 rows at once (`LIST_SLICE_THRESHOLD`) renders the first 250 in
+the same task (`LIST_FIRST_SLICE`), so they are painted in the next frame, and after that frame the
+rest in slices of about 40 ms that yield to input (#242, through `processInSlices`). The numbers were
+set against js-framework-benchmark and the INP of a 10 000-row append; the measurements are in
+`core/src/renderer/list-slices.ts`. This holds when the rows are appended, the first render included,
+and when the list is replaced by one with no row in common. Until the slices settle the rows still to
+come are not in the DOM. A newer list replaces the slices pending, and the list's teardown stops
+them. A single pass is kept by:
+- a `@for` with `@transition`, whose timing is the transition's;
+- a destructured binding, which compiles to `each` (#398);
+- a hand-written `repeat()`;
+- a change that keeps some rows and adds many between them.
+
 `@virtual` renders only the rows in view (#283). The element written around the `@for` is the scroll
 container, and it compiles to `eachVirtual(() => ctx.items(), 'id', (item, i) => …, { estimate, tag,
 getters, empty })` placed where the `@for` was: the rows in the window stay that element's own

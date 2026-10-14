@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Append Slices Harness</title>
+    <style>
+        body { font-family: system-ui; padding: 16px; }
+        .row { display: flex; gap: 8px; padding: 2px 0; border-bottom: 1px solid #ddd; }
+        .row span:first-child { width: 64px; color: #555; }
+    </style>
+    <script type="module">
+        // A `@for` that receives many rows from one click (#242). `eachRow` is what `@for` compiles
+        // to. "Append" adds `?n=` rows (10 000 by default) to the list; "Control" builds the same
+        // number of rows with the same row render in one loop, outside the list. The page asserts
+        // nothing: the spec clicks and reads Event Timing.
+        import { eachRow, signal, effect } from '@pdxui/core';
+
+        const n = Number(new URLSearchParams(location.search).get('n') ?? 10000);
+        const rows = signal([]);
+        let next = 1;
+        const make = (count) => Array.from({ length: count }, () => {
+            const id = next++;
+            return { id, label: `Row ${id}`, amount: (id * 37) % 1000 };
+        });
+
+        // The row: six cells of a business grid, each bound as a compiled row binds it.
+        const cells = [
+            (r) => String(r.id),
+            (r) => r.label,
+            (r) => r.amount.toFixed(2),
+            (r) => (r.amount > 500 ? 'High' : 'Low'),
+            (r) => `${r.id % 28 + 1}/10/2026`,
+            (r) => (r.id % 3 === 0 ? 'Open' : 'Closed'),
+        ];
+        const renderRow = (item) => {
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.setAttribute('data-test', 'row');
+            for (const text of cells) {
+                const cell = document.createElement('span');
+                effect(() => { cell.textContent = text(item()); });
+                row.appendChild(cell);
+            }
+            return row;
+        };
+
+        const append = document.createElement('button');
+        append.textContent = 'Append';
+        append.setAttribute('data-test', 'append');
+        append.addEventListener('click', () => rows.set([...rows(), ...make(n)]));
+
+        const control = document.createElement('button');
+        control.textContent = 'Control';
+        control.setAttribute('data-test', 'control');
+        const controlBox = document.createElement('div');
+        controlBox.setAttribute('data-test', 'control-box');
+        control.addEventListener('click', () => {
+            const frag = document.createDocumentFragment();
+            for (const item of make(n)) frag.appendChild(renderRow(() => item));
+            controlBox.appendChild(frag);
+        });
+
+        const list = document.createElement('div');
+        list.setAttribute('data-test', 'list');
+        list.appendChild(eachRow(() => rows(), 'id', renderRow));
+
+        document.body.append(append, control, list, controlBox);
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-pdx-ready', '');
+        }));
+    </script>
+</head>
+<body>
+</body>
+</html>

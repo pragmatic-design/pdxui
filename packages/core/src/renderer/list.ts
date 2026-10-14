@@ -9,6 +9,9 @@ import { placePartNode, placePartNodes } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
 import type { TransitionOptions } from './helpers';
+import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
+
+export { LIST_SLICE_THRESHOLD };
 
 let _warnedStableKeyMutation = false;
 
@@ -84,6 +87,14 @@ function mountList<T>(
 
     let mapped: MappedItem<T>[] = [];
     let prevKeys: unknown[] = [];
+    // The slices of a large append still to run (#242); `mapped` holds only the rows made so far.
+    let pending: AbortController | null = null;
+    // Only what `@for` compiles to slices: a hand-written repeat()'s caller may read the DOM at once.
+    const slice: SliceRest<T> | undefined = renderer.mode === 'getters'
+        ? (rows, from, to, create) => {
+            pending = appendInSlices(rows, from, to, create, endMarker, () => { pending = null; });
+        }
+        : undefined;
 
     effect(() => {
         const list = items();
@@ -95,7 +106,8 @@ function mountList<T>(
         const n = list.length;
         const keys: unknown[] = new Array(n);
         for (let i = 0; i < n; i++) keys[i] = keyFn(list[i], i);
-        if (mapped.length > 0 && n === prevKeys.length) {
+        // While slices are pending `mapped` is shorter than the keys: the list always reconciles.
+        if (mapped.length > 0 && n === prevKeys.length && !pending) {
             let same = true;
             for (let i = 0; i < n; i++) { if (keys[i] !== prevKeys[i]) { same = false; break; } }
             if (same && renderer.mode === 'getters') {
@@ -129,14 +141,20 @@ function mountList<T>(
                 return;
             }
         }
+        // A newer list replaces the slices still pending: it reconciles from the rows made so far,
+        // and the ones never made are simply new rows of this pass.
+        pending?.abort();
+        pending = null;
         prevKeys = keys;
-        mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, options?.transitions, keys);
+        mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, options?.transitions, keys, slice);
     });
 
     // Teardown: dispose every surviving item's effects when the enclosing scope
     // is torn down. Removed items are disposed during reconcile; this covers the
     // items still present at unmount. Runs only on scope teardown, not per re-run.
     onDispose(() => {
+        pending?.abort();
+        pending = null;
         for (const m of mapped) m.dispose?.();
         mapped = [];
     });
@@ -194,6 +212,9 @@ function clearBetween(parent: Node, startMarker: Comment, endMarker: Comment): v
     range.deleteContents();
 }
 
+/** Hands the rows past the first slice of a large append to the slicer (#242). */
+type SliceRest<T> = (rows: MappedItem<T>[], from: number, to: number, create: (index: number) => MappedItem<T>) => void;
+
 function reconcile<T>(
     newItems: T[],
     keyFn: (item: T, index: number) => unknown,
@@ -202,7 +223,8 @@ function reconcile<T>(
     startMarker: Comment,
     endMarker: Comment,
     transitions?: TransitionOptions,
-    precomputedKeys?: unknown[]
+    precomputedKeys?: unknown[],
+    slice?: SliceRest<T>
 ): MappedItem<T>[] {
     // Telemetry only when tracking is on — it avoids 2× performance.now()
     // + a filter and allocations for every reconciliation in production.
@@ -252,13 +274,19 @@ function reconcile<T>(
                 const kept = result[i];
                 if (kept.item !== newItems[i]) { kept.item = newItems[i]; kept.row?.item.setRaw(newItems[i]); }
             }
+            // More new rows than one task should make (#242): a first slice now, the rest in slices
+            // that yield to input. Not under a transition, whose timing is its own.
+            const sliced = !!slice && !transitions?.enter && !transitions?.exit
+                && newLen - oldLen > LIST_SLICE_THRESHOLD;
+            const firstEnd = sliced ? oldLen + LIST_FIRST_SLICE : newLen;
             const added: Node[] = [];
-            for (let i = oldLen; i < newLen; i++) {
+            for (let i = oldLen; i < firstEnd; i++) {
                 const row = createRow(renderer, newKeys[i], newItems[i], i);
                 result.push(row);
                 for (const n of row.nodes) added.push(n);
             }
             placePartNodes(parent, added, endMarker);
+            if (firstEnd < newLen) slice!(result, firstEnd, newLen, (i) => createRow(renderer, newKeys[i], newItems[i], i));
             if (transitions?.enter) {
                 const stagger = transitions.stagger ?? 0;
                 for (let i = oldLen; i < newLen; i++) {
@@ -267,6 +295,21 @@ function reconcile<T>(
             }
             if (trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: newLen, reused: oldLen, added: newLen - oldLen, removed: 0, moved: 0, lisLength: oldLen, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
             return result;
+        }
+    }
+
+    // Fast path: REPLACE with many rows (#242) — no old row is kept, so this is a clear followed by an
+    // append, and the append slices. Not under a transition, whose timing is its own.
+    if (slice && newLen > LIST_SLICE_THRESHOLD && oldLen > 0 && !transitions?.enter && !transitions?.exit
+        && !transitions?.move && startMarker.parentNode === parent) {
+        const oldKeys = new Set<unknown>();
+        for (const m of oldMapped) oldKeys.add(m.key);
+        let shared = false;
+        for (let i = 0; i < newLen; i++) { if (oldKeys.has(newKeys[i])) { shared = true; break; } }
+        if (!shared) {
+            for (const m of oldMapped) m.dispose?.();
+            clearBetween(parent, startMarker, endMarker);
+            return reconcile(newItems, keyFn, renderer, [], startMarker, endMarker, transitions, newKeys, slice);
         }
     }
 

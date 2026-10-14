@@ -169,6 +169,9 @@ async function regroup() {
 - **Cancel** with an `AbortSignal`. The job stops before the next item, and the promise rejects with
   the signal's reason (an `AbortError` by default). A signal that is already aborted processes
   nothing.
+- **The slice length** is 5 ms by default; `{ sliceMs: 40 }` takes longer slices. Each yield lets the
+  browser paint, so work that grows the DOM paints less often, and finishes sooner, with longer
+  slices; above 50 ms a slice is a long task. A `@for` that receives many rows uses 40 ms.
 - **Signal writes are ordinary writes.** A `set` inside `work` flushes at once, like any write
   outside a handler (see [batch](#batch)). Collect into a plain value and write the signal once at
   the end, as above.

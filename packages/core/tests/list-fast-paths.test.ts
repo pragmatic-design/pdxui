@@ -6,8 +6,9 @@
 // records cannot be the measure).
 
 import { describe, it, expect } from 'vitest';
-import { repeatRows, repeat } from '../src/renderer/list';
+import { repeatRows, repeat, LIST_SLICE_THRESHOLD } from '../src/renderer/list';
 import { signal, effect, collectDisposers } from '../src/reactivity/signal';
+import { waitUntil } from './wait-until';
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
@@ -80,8 +81,8 @@ async function records(parent: Node, act: () => void): Promise<string[]> {
 describe('clearing a list', () => {
     it('removes 1,000 rows in one bulk operation when the list is its parent\'s only content', async () => {
         const list = mount(true, rows(1, 1000));
-        await tick();
-        expect(list.ul.querySelectorAll('li')).toHaveLength(1000);
+        // 1,000 rows are more than one task renders (#242): the rest arrives in slices.
+        await waitUntil(() => list.ul.querySelectorAll('li').length === 1000, '1,000 rows', 1000);
         const changes = await records(list.ul, () => list.items.set([]));
         expect(list.ul.querySelectorAll('li')).toHaveLength(0);
         expect(changes.length, 'DOM calls for clearing 1,000 rows').toBeLessThanOrEqual(3);
@@ -116,16 +117,19 @@ describe('clearing a list', () => {
 });
 
 describe('appending to a list', () => {
-    it('inserts 1,000 new rows in one operation and keeps the old ones', async () => {
-        const list = mount(true, rows(1, 1000));
+    // As many rows as one task renders: above that the list slices them (#242, list-slices.test.ts),
+    // one insertion per chunk.
+    it(`inserts ${LIST_SLICE_THRESHOLD} new rows in one operation and keeps the old ones`, async () => {
+        const n = LIST_SLICE_THRESHOLD;
+        const list = mount(true, rows(1, n));
         await tick();
         const first = list.ul.querySelector('li');
-        const changes = await records(list.ul, () => list.items.set([...list.items(), ...rows(1001, 1000)]));
-        expect(list.ul.querySelectorAll('li')).toHaveLength(2000);
+        const changes = await records(list.ul, () => list.items.set([...list.items(), ...rows(n + 1, n)]));
+        expect(list.ul.querySelectorAll('li')).toHaveLength(2 * n);
         expect(list.ul.querySelector('li'), 'an old row was re-created').toBe(first);
-        expect(list.ul.querySelectorAll('li')[1999].textContent).toBe('r2000');
-        expect(changes.length, 'DOM calls for appending 1,000 rows').toBeLessThanOrEqual(2);
-        expect(list.live()).toBe(2000);
+        expect(list.ul.querySelectorAll('li')[2 * n - 1].textContent).toBe(`r${2 * n}`);
+        expect(changes.length, `DOM calls for appending ${n} rows`).toBeLessThanOrEqual(2);
+        expect(list.live()).toBe(2 * n);
         list.ul.remove();
     });
 

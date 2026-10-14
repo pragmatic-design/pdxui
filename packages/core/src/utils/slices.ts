@@ -15,6 +15,8 @@ const SLICE_MS = 5;
 export interface SliceOptions {
     /** Stops the job before the next item: the promise rejects with the signal's reason. */
     signal?: AbortSignal;
+    /** The work done between two yields, in ms. 5 by default; above 50 a slice is a long task. */
+    sliceMs?: number;
 }
 
 /**
@@ -24,7 +26,7 @@ export interface SliceOptions {
  * job that yields that way while the page has something to paint holds the frame for about 100 ms,
  * and a timer waits for the whole job; through a MessageChannel no frame reaches 50 ms.
  */
-function yieldToBrowser(): Promise<void> {
+export function yieldToBrowser(): Promise<void> {
     return new Promise((resolve) => {
         const channel = new MessageChannel();
         channel.port1.onmessage = () => {
@@ -49,7 +51,7 @@ export async function processInSlices<T>(
     work: (item: T, index: number) => void,
     options: SliceOptions = {},
 ): Promise<void> {
-    const { signal } = options;
+    const { signal, sliceMs = SLICE_MS } = options;
     const length = items.length;
     let index = 0;
     while (index < length) {
@@ -59,7 +61,7 @@ export async function processInSlices<T>(
             work(items[index], index);
             index++;
             if (signal?.aborted) throw abortReason(signal);
-        } while (index < length && performance.now() - sliceStart < SLICE_MS);
+        } while (index < length && performance.now() - sliceStart < sliceMs);
         if (index < length) await yieldToBrowser();
     }
 }
