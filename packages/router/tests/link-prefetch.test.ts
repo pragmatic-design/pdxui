@@ -27,6 +27,10 @@ vi.mock('../src/active', async () => {
 
 await import('../src/link');
 const { resetPrefetch } = await import('../src/prefetch');
+const { resetLoadQueue } = await import('../../core/src/renderer/load-queue');
+
+/** A prefetch is queued (#250) and starts when the browser is idle: let it. */
+const idle = () => new Promise((r) => setTimeout(r, 5));
 
 const TABLE = [
     { path: '/', tag: 'pdx-home' },
@@ -83,6 +87,7 @@ beforeEach(() => {
     document.body.innerHTML = '';
     loaded.length = 0;
     resetPrefetch();
+    resetLoadQueue();
     for (const o of observers) o.watched.clear();
 });
 
@@ -91,139 +96,156 @@ afterEach(() => {
 });
 
 describe('the signals that a navigation is about to happen', () => {
-    it('the pointer arriving fetches the chunk', () => {
+    it('the pointer arriving fetches the chunk', async () => {
         const el = link({ to: '/dest' });
         el.dispatchEvent(new Event('pointerenter'));
+        await idle();
         expect(loaded, 'hovering the link fetched nothing').toEqual(['/dest']);
     });
 
-    it('focus fetches it too, which is the keyboard path', () => {
+    it('focus fetches it too, which is the keyboard path', async () => {
         const el = link({ to: '/dest' });
         el.dispatchEvent(new Event('focusin', { bubbles: true }));
+        await idle();
         expect(loaded, 'tabbing to the link fetched nothing').toEqual(['/dest']);
     });
 
-    it('and pointerdown, which is all a touch device gives you', () => {
+    it('and pointerdown, which is all a touch device gives you', async () => {
         // A finger produces no hover and no focus before the tap. `pointerdown` fires before
         // `click`, so the fetch starts while the tap is still happening.
         const el = link({ to: '/dest' });
         el.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+        await idle();
         expect(loaded).toEqual(['/dest']);
     });
 
-    it('and three of them together still fetch once', () => {
+    it('and three of them together still fetch once', async () => {
         const el = link({ to: '/dest' });
         el.dispatchEvent(new Event('pointerenter'));
         el.dispatchEvent(new Event('focusin', { bubbles: true }));
         el.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+        await idle();
         expect(loaded).toEqual(['/dest']);
     });
 });
 
 describe('what the route says', () => {
-    it("`@prefetch 'eager'` fetches as soon as a link to it is on the page", () => {
+    it("`@prefetch 'eager'` fetches as soon as a link to it is on the page", async () => {
         link({ to: '/eagerly' });
+        await idle();
         expect(loaded, 'an eager route waited for a hover').toEqual(['/eagerly']);
     });
 
-    it("`@prefetch 'never'` is not fetched, hover or not", () => {
+    it("`@prefetch 'never'` is not fetched, hover or not", async () => {
         const el = link({ to: '/admin' });
         el.dispatchEvent(new Event('pointerenter'));
         el.dispatchEvent(new Event('focusin', { bubbles: true }));
+        await idle();
         expect(loaded).toEqual([]);
     });
 
-    it("`@prefetch 'viewport'` fetches when the link scrolls into view, and not before", () => {
+    it("`@prefetch 'viewport'` fetches when the link scrolls into view, and not before", async () => {
         const el = link({ to: '/below' });
+        await idle();
         expect(loaded, 'a viewport route was fetched before its link was seen').toEqual([]);
         scrollInto(el);
+        await idle();
         expect(loaded, 'the link came into view and nothing was fetched').toEqual(['/below']);
     });
 
-    it("`@prefetch 'viewport'` watches the anchor, which has a box, not the `display: contents` host", () => {
+    it("`@prefetch 'viewport'` watches the anchor, which has a box, not the `display: contents` host", async () => {
         const el = link({ to: '/below' });
         const watched = observers.flatMap((o) => [...o.watched]);
         expect(watched, 'the host was watched: an element with no box never intersects').toEqual([el.querySelector('a')]);
     });
 
-    it("`@prefetch 'viewport'` is fetched once, and the link is no longer watched", () => {
+    it("`@prefetch 'viewport'` is fetched once, and the link is no longer watched", async () => {
         const el = link({ to: '/below' });
         scrollInto(el);
         scrollInto(el, false);
         scrollInto(el);
+        await idle();
         expect(loaded).toEqual(['/below']);
         expect(watchedCount(), 'the link is still observed after its fetch').toBe(0);
     });
 
-    it("`@prefetch 'viewport'` still fetches on hover, before it was seen", () => {
+    it("`@prefetch 'viewport'` still fetches on hover, before it was seen", async () => {
         const el = link({ to: '/below' });
         el.dispatchEvent(new Event('pointerenter'));
+        await idle();
         expect(loaded).toEqual(['/below']);
     });
 
-    it("a link whose `to` is bound — written after it connects — is watched too", () => {
+    it("a link whose `to` is bound — written after it connects — is watched too", async () => {
         // `:to="'/assets/' + id"` sets the property once the element is in the page: the policy read
         // at connect time saw no `to` and was `hover`, so a bound viewport link was never watched.
         const el = link({});
         (el as unknown as { to: string }).to = '/below';
         expect(watchedCount(), 'the bound link was not watched').toBe(1);
         scrollInto(el);
+        await idle();
         expect(loaded).toEqual(['/below']);
     });
 
-    it("and an `eager` route behind a bound `to` is fetched once `to` arrives", () => {
+    it("and an `eager` route behind a bound `to` is fetched once `to` arrives", async () => {
         const el = link({});
+        await idle();
         expect(loaded).toEqual([]);
         (el as unknown as { to: string }).to = '/eagerly';
+        await idle();
         expect(loaded, 'an eager route behind a bound link waited for a hover').toEqual(['/eagerly']);
     });
 
-    it('control — a hover route is not watched at all', () => {
+    it('control — a hover route is not watched at all', async () => {
         link({ to: '/dest' });
         expect(watchedCount(), 'a hover route was observed for the viewport').toBe(0);
     });
 
-    it('one observer serves every viewport link, not one each', () => {
+    it('one observer serves every viewport link, not one each', async () => {
         link({ to: '/below' });
         link({ to: '/below' });
         link({ to: '/below' });
         expect(observers.filter((o) => o.watched.size > 0).length).toBe(1);
     });
 
-    it('a removed viewport link is no longer watched', () => {
+    it('a removed viewport link is no longer watched', async () => {
         const el = link({ to: '/below' });
         el.remove();
         expect(watchedCount()).toBe(0);
     });
 
-    it('and a link can opt out locally', () => {
+    it('and a link can opt out locally', async () => {
         // The route decides the policy; a link may still refuse for its own reason — a "log out"
         // in a menu of fifty, a link the page renders a hundred times.
         const el = link({ to: '/dest', prefetch: 'never' });
         el.dispatchEvent(new Event('pointerenter'));
+        await idle();
         expect(loaded).toEqual([]);
     });
 });
 
 describe('what must never be fetched', () => {
-    it('a destination the sanitiser rejects', () => {
+    it('a destination the sanitiser rejects', async () => {
         const el = link({ to: 'javascript:alert(1)' });
         el.dispatchEvent(new Event('pointerenter'));
+        await idle();
         expect(loaded).toEqual([]);
     });
 
-    it('and an external URL, which is not this router\'s to load', () => {
+    it('and an external URL, which is not this router\'s to load', async () => {
         const el = link({ to: 'https://example.com/dest' });
         el.dispatchEvent(new Event('pointerenter'));
+        await idle();
         expect(loaded).toEqual([]);
     });
 });
 
 describe('and it stops when the link goes', () => {
-    it('a removed link does not fetch on a late event', () => {
+    it('a removed link does not fetch on a late event', async () => {
         const el = link({ to: '/dest' });
         el.remove();
         el.dispatchEvent(new Event('pointerenter'));
+        await idle();
         expect(loaded, 'a disconnected link still listened').toEqual([]);
     });
 });

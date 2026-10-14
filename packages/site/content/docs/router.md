@@ -410,7 +410,18 @@ Two things happen without being asked:
 - **nothing is prefetched on a connection that is paying for it.** `navigator.connection.saveData`
   is the visitor asking you not to, and `2g`/`slow-2g` is a connection where a speculative download
   competes with the page they are reading. Both turn it off;
-- **once per route, not per link or per URL.** `/tickets/1` and `/tickets/2` are one chunk.
+- **once per route, not per link or per URL.** `/tickets/1` and `/tickets/2` are one chunk;
+- **two at a time, and never in the way.** A prefetch is queued: at most two download at once,
+  and a queued one starts only when the browser is idle and nothing the visitor is waiting for is
+  loading. A navigation's chunk and a `@defer` block on screen are such loads. A navigation takes
+  its own route's prefetch (a queued one starts at once, a running one is awaited) and drops the
+  other queued ones, which a later hover queues again. Fifty `viewport` rows scrolling in are fifty
+  queued fetches, not fifty downloads in front of the click.
+
+The queue is core's, so code of your own can wait in it too. `queuePrefetch(key, load)` queues a
+load, `trackUrgentLoad(promise)` holds the queue back while a load the visitor waits for is in
+flight, `takePrefetch(key)` hands a queued or running load to whoever needs it now, and
+`cancelPrefetches(except)` drops what is still queued. All four are imported from `@pdxui/core`.
 
 The same call is yours when nothing is hovered. An app that holds its outlet back — until a route's
 strings are in, say — would otherwise ask for the route's chunk only once the outlet renders, a
@@ -422,8 +433,9 @@ import { prefetchRoute, currentPath } from '@pdxui/router';
 prefetchRoute(currentPath());   // the route's chunk, in the same wave as whatever the shell awaits
 ```
 
-It follows the same rules as the link — the route's policy, the connection, once per route — and
-answers whether a fetch was started.
+It follows the same rules as the link — the route's policy, the connection, once per route, the
+queue — and answers whether a fetch was queued. The outlet takes it when it shows the route, so a
+queued one starts then at the latest.
 
 > **This is not `<link rel="prefetch">`.** That asks the server for a *document*, and in a
 > single-page app the document for `/tickets/1` is `index.html` — which the router will never

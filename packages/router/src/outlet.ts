@@ -11,10 +11,10 @@
 // Default: DESTROY component on navigate away (full mount/destroy lifecycle)
 // Opt-in: @page '/path' { keepAlive } -> freeze/resume pattern
 
-import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV } from '@pdxui/core';
+import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV, trackUrgentLoad } from '@pdxui/core';
 import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule, toRouteConfig } from './active';
 import type { RouteConfig, ResolvedRoute, NavigationHop } from './active';
-import { prefetchedLoad } from './prefetch';
+import { takeRoutePrefetch, cancelOtherPrefetches } from './prefetch';
 
 // The router paints two things a user reads — the loading placeholder and the error page — so their
 // text is registered strings, not literals: an app in another language can replace
@@ -842,11 +842,16 @@ class PdxRouterOutlet extends HTMLElement {
             // A load a prefetch already started is AWAITED, not repeated: a second `import()` does
             // not wait for the stylesheet the first one is fetching, and the page would paint
             // unstyled and then move (`prefetchedLoad`).
-            const prefetched = prefetchedLoad(route.path);
+            //
+            // The navigation is what the visitor waits for (#250): its prefetch is taken — a queued
+            // one starts now — every other queued prefetch is dropped, and its own load holds the
+            // queue back until it lands.
+            const prefetched = takeRoutePrefetch(route.path);
+            cancelOtherPrefetches(route.path);
             const load = prefetched
                 ? () => prefetched
                 : tableLoad ?? (() => import(/* @vite-ignore */ config.file!));
-            load().then(async () => {
+            trackUrgentLoad(load()).then(async () => {
                 clearTimeout(reveal);
                 // Superseded while importing: drop the result. Don't mount, don't clobber
                 // activeElement (a newer page now owns it). Remove our stale placeholder.
