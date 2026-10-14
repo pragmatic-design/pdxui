@@ -196,6 +196,11 @@ describe('the tracked source carries no COMMON Italian', () => {
 import { scan as strictScan, trackedSource, proseOf, ITALIAN_STRICT as STRICT } from '../../../tools/lang/italian-scan.mjs';
 
 describe('and no uncommon Italian either', () => {
+    // Scanned while the suite is collected, as the scans above are, not inside the test: it reads
+    // every published text file, about 1 s alone and over the 5 s test timeout once, in a pre-push
+    // gate with every package's suite running beside it (measured while doing #248).
+    const strictHits = strictScan();
+
     it('the stricter scan finds the source it is meant to read', () => {
         // The same control as everywhere above: a scan over nothing satisfies the zero below.
         expect(trackedSource().length, 'the strict scan reads no files at all').toBeGreaterThan(1000);
@@ -206,7 +211,7 @@ describe('and no uncommon Italian either', () => {
         // comment and the multi-line block comment, the pre-push hook, the Dockerfile, web.config,
         // CI, the architecture pages — with the strict words and the two-function-word rule. A
         // quotation is a marked translation: the published repository carries no Italian.
-        const named = strictScan().map(([file, line, text]) => `${file}:${line}  ${text.slice(0, 80)}`);
+        const named = strictHits.map(([file, line, text]) => `${file}:${line}  ${text.slice(0, 80)}`);
         expect(named, 'these lines are Italian').toEqual([]);
     });
 
