@@ -246,6 +246,9 @@ export type { Selection, SelectionOptions, SelectionMode, SelectionBehavior } fr
 
 // Virtualization (efficient large list/grid rendering)
 export { createVirtualizer } from './renderer/virtualizer';
+// What `@for … @virtual` compiles to (#283).
+export { eachVirtual } from './renderer/virtual-list';
+export type { VirtualListOptions } from './renderer/virtual-list';
 export type { VirtualItem, VirtualizerOptions, VirtualizerReturn } from './renderer/virtualizer';
 
 // Custom Scrollbar (cross-browser consistent, controllable)

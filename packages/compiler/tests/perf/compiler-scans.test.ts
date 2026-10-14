@@ -14,6 +14,8 @@ import { extractLegacyScript } from '../../src/compiler/codegen-legacy';
 import { elementContent } from '../../src/text-scan';
 import { routeFieldQuotedFix } from '../../src/compiler/fix-builders';
 import { parseRouteParams } from '../../src/compiler/script-analyzer-helpers';
+import { checkVirtualFor } from '../../src/compiler/validate-virtual';
+import { parseTemplate, type TemplateNode } from '../../src/parser/template';
 
 /** How long `fn` takes, and how it ended: a malformed input may be refused, and refusing it is timed too. */
 function elapsed(fn: () => void): { ms: number; outcome: string } {
@@ -62,6 +64,12 @@ const cases: [string, () => void][] = [
         { code: 'PDX_ROUTE_FIELD_INVALID', severity: 'error', message: '', line: 1, column: 1 })],
     // Measured on the machine it was written on: 11.7 s for 100,000 characters before the rewrite (#266).
     ['@params: a run of 0 with no colon (alert #157)', () => parseRouteParams('{ ' + '0'.repeat(N) + ' }')],
+    // The regex it replaced took 1.7 s for 200,000 characters (#283).
+    ['@for … @virtual shape: an open <ul> and <!-- repeated', () => checkVirtualFor([
+        { type: 'html', content: `<ul><!--${'<!--'.repeat(N / 4)}` },
+        ...parseTemplate('@for (xs as x; track x) @virtual { <li>{{ x }}</li> }'),
+        { type: 'html', content: '</ul>' },
+    ] as TemplateNode[])],
 ];
 
 describe('linear scans in the compiler', () => {

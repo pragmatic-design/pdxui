@@ -348,7 +348,9 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
         if (!el) return;
         const index = Number(el.dataset.virtualIndex);
         if (isNaN(index)) return;
-        applySize(index, sizeOf(el));
+        // An element not in the document has no size yet: read now, it would be measured at 0. It is
+        // observed, and the observer measures it once it is laid out (#283).
+        if (el.isConnected) applySize(index, sizeOf(el));
         observeItem(el);
     }
 

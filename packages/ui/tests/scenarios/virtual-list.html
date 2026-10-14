@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Virtual List Harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { font-family: system-ui; padding: 16px; }
+        ul { height: 400px; width: 320px; overflow: auto; margin: 0; padding: 0; list-style: none; border: 1px solid #999; }
+        li { height: 40px; box-sizing: border-box; border-bottom: 1px solid #ddd; }
+    </style>
+    <script type="module">
+        // `eachVirtual` — what `@for … @virtual(40)` compiles to (#283) — inside a 400 px `<ul>`.
+        //
+        // `?source=array` (the default) renders 10 000 items. `paged` is a source of 3 pages of 50
+        // that counts its `loadMore()` calls; `empty` is a source with no data that is not loading;
+        // `loading` is one with no data that is. The page asserts nothing: the spec reads the DOM.
+        import { eachVirtual, signal } from '@pdxui/core';
+
+        const mode = new URLSearchParams(location.search).get('source') ?? 'array';
+        const ul = document.createElement('ul');
+        ul.setAttribute('data-test', 'list');
+        document.body.appendChild(ul);
+
+        let items;
+        if (mode === 'array') {
+            const all = Array.from({ length: 10000 }, (_, i) => ({ id: i, label: 'Item ' + i }));
+            items = () => all;
+        } else {
+            const data = signal(mode === 'paged' ? page(0) : []);
+            const isLoading = signal(mode === 'loading');
+            let pages = 1;
+            window.__loadMoreCalls = 0;
+            const source = {
+                data,
+                isLoading,
+                hasMore: () => mode === 'paged' && pages < 3,
+                loadMore: () => {
+                    window.__loadMoreCalls++;
+                    isLoading.set(true);
+                    return new Promise((resolve) => setTimeout(() => {
+                        data.set([...data.peek(), ...page(pages)]);
+                        pages++;
+                        isLoading.set(false);
+                        resolve();
+                    }, 30));
+                },
+            };
+            items = () => source;
+        }
+
+        function page(n) {
+            return Array.from({ length: 50 }, (_, i) => ({ id: n * 50 + i, label: 'Item ' + (n * 50 + i) }));
+        }
+
+        ul.appendChild(eachVirtual(items, (r) => r.id, (r) => {
+            const li = document.createElement('li');
+            li.textContent = r.label;
+            return li;
+        }, {
+            estimate: 40,
+            tag: 'li',
+            empty: () => {
+                const li = document.createElement('li');
+                li.setAttribute('data-test', 'empty');
+                li.textContent = 'Nothing here';
+                return li;
+            },
+        }));
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-pdx-ready', '');
+        }));
+    </script>
+</head>
+<body>
+</body>
+</html>

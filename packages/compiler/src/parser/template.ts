@@ -103,6 +103,11 @@ export interface ForNode {
     /** Content shown when the array is empty. Syntax: @for (...) { } @empty { } */
     emptyBody?: TemplateNode[];
     transition?: TransitionConfig;
+    /**
+     * `@virtual` / `@virtual(48)` (#283): only the rows in view are rendered. `estimate` is the
+     * number written, the estimated row size in px; without one the first rendered row is measured.
+     */
+    virtual?: { estimate?: number };
     loc?: SourceLoc;
 }
 
@@ -734,6 +739,8 @@ function parseFor(ctx: ParseContext, loc: SourceLoc): ForNode {
     skipWhitespace(ctx);
     const transition = tryParseTransition(ctx);
     skipWhitespace(ctx);
+    const virtual = tryParseVirtual(ctx);
+    skipWhitespace(ctx);
 
     // Supports (with nested destructuring like `{ id, user: { name } }`):
     //   @for (items as item; track key)
@@ -764,7 +771,21 @@ function parseFor(ctx: ParseContext, loc: SourceLoc): ForNode {
         emptyBody = parseBlock(ctx);
     }
 
-    return { type: 'for', items: items.trim(), exprOffset, item, index: indexVar, track: track.trim(), body, emptyBody, transition, loc };
+    return { type: 'for', items: items.trim(), exprOffset, item, index: indexVar, track: track.trim(), body, emptyBody, transition, ...(virtual ? { virtual } : {}), loc };
+}
+
+/** `@virtual` or `@virtual(48)`, after a `@for` header and its transition modifiers (#283). */
+function tryParseVirtual(ctx: ParseContext): { estimate?: number } | undefined {
+    if (!lookAhead(ctx, '@virtual')) return undefined;
+    advance(ctx, 8); // skip @virtual
+    skipWhitespace(ctx);
+    if (ctx.source[ctx.pos] !== '(') return {};
+    const raw = parseParenthesized(ctx).trim();
+    const n = Number(raw);
+    if (raw === '' || !Number.isFinite(n) || n <= 0) {
+        throw new Error(`Invalid @virtual(${raw}) at line ${ctx.line}: the number is the estimated row size in px, e.g. @virtual(48). Write @virtual alone to measure the first row.`);
+    }
+    return { estimate: n };
 }
 
 // ─── @switch ───────────────────────────────────────────────────────

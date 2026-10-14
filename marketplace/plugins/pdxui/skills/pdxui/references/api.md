@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-453 value exports.
+454 value exports.
 
 ### `__adoptStyles`
 
@@ -1797,6 +1797,17 @@ same key keeps its DOM node, and its getters move to the new object and position
 update (`rows.map(r => r.id === id ? { ...r, done: true } : r)`) reaches the row's bindings. With
 `each()` the row's closures keep the object it was created with. Read the getters
 inside a binding (`${() => item().name}`) — a read while the row is built is a snapshot.
+
+### `eachVirtual`
+
+```ts
+import { eachVirtual } from '@pdxui/core';
+
+function eachVirtual(items: () => T[] | PagedSource<T> | null | undefined, key: string | ((item: T, index: number) => unknown), render: ((item: T, index: number) => Node) | ((item: () => T, index: () => number) => Node), options: VirtualListOptions = {}): DocumentFragment
+```
+
+Render a keyed list virtually inside the element it is placed in. Returns the nodes to place: two
+markers, and between them the spacers and the rows of the window.
 
 ### `easings`
 

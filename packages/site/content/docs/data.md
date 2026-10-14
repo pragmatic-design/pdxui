@@ -604,8 +604,10 @@ here than discovered:
 - **The row count a screen reader announces** is the number of rendered rows unless the grid says
   otherwise: check what your own set needs before promising accessibility over a windowed list.
 
-**A list that is not a grid** — a card feed, a picker, anything with its own markup — uses the
-primitive directly. `<pdx-select>` is the library's own caller of it:
+**A list that is not a grid** — a card feed, a picker, anything with its own markup — is a `@for`
+with `@virtual` ([Lists](/docs/template)). Its runtime, `eachVirtual`, puts the rows in view inside
+the element around the `@for`, between two spacers. Under both is the virtualizer itself, which code
+of your own can use directly. `<pdx-select>` is the library's own caller of it:
 
 ```ts
 import { createVirtualizer } from '@pdxui/core';

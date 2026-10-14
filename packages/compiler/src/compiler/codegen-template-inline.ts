@@ -3,7 +3,7 @@
 // placeholder regex, no bindAttribute dispatch. Each block's static markup is built once and cloned,
 // and the render binds the nodes a compile-time walk reaches (inline-static-tree.ts, #109).
 
-import { deferLoadFn, extractLoopInvariants, generateTransition } from './codegen-template';
+import { deferLoadFn, extractLoopInvariants, generateTransition, virtualOptions } from './codegen-template';
 import type {
     TemplateNode, IfNode, ForNode, SwitchNode, RequireNode,
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
@@ -745,7 +745,26 @@ class InlineGen {
         this.place(cf);
     }
 
+    /**
+     * `@for … @virtual` (#283): core's `eachVirtual`, placed where the `@for` was — the element around
+     * it is the scroll container. Its options: the estimate written, the rows' tag for the spacers,
+     * getters for a plain item, and `@empty`, which the list itself renders (a source may be loading).
+     */
+    private virtualForN(node: ForNode): void {
+        const rows = isRowBinding(node);
+        this.imports.add('eachVirtual');
+        const items = callSignals(prefixCtx(node.items, this.ctx), this.ctx);
+        const keyArg = trackKeyArg(node, this.ctx);
+        const body = withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx, () => this.sub(node.body)));
+        const params = node.index ? `${node.item},${node.index}` : node.item;
+        const cf = this.v('cf');
+        this.pending = templateMark(this.ctx, node.exprOffset);
+        this.out(`const ${cf}=eachVirtual(()=>${items},${keyArg},(${params})=>{${body}},${virtualOptions(node, rows, node.emptyBody ? `()=>{${this.sub(node.emptyBody)}}` : null)});`);
+        this.place(cf);
+    }
+
     forN(node: ForNode): void {
+        if (node.virtual) { this.virtualForN(node); return; }
         // Row getters for a plain item, as in codegen-template.ts.
         const rows = isRowBinding(node);
         const helper = rows ? 'eachRow' : 'each';

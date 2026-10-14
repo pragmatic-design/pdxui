@@ -30,6 +30,22 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use one of `immediate`, `viewport`, `idle`, `idle(ms)`, `interaction`, `hover`, `timer(ms)`; write `immediate` to load at once.',
         example: { bad: pdx('@defer (viewprt) { <p>chart</p> }', ''), good: pdx('@defer (viewport) { <p>chart</p> }', '') },
     },
+    PDX_VIRTUAL_SHAPE: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@for … @virtual` without the shape it needs: alone in a native element, with one root element per row.',
+        explanation: 'The element written around a virtual `@for` is the scroll container, and the rows stay its own children between two spacers. Another child beside the `@for` would scroll with the rows and break their offsets; a component tag projects its children elsewhere; a row of two elements cannot be measured as one.',
+        fix: 'Write the `@for` as the only content of a native element, `<ul class="feed">@for (…) @virtual { <li>…</li> }</ul>`, with one root element in the body.',
+        example: { bad: pdx('<ul><li>Header</li>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>', 'let rows = $signal([]);'), good: pdx('<ul>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>', 'let rows = $signal([]);') },
+        reproducedIn: `${T}for-virtual.test.ts`,
+    },
+    PDX_VIRTUAL_TRANSITION: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@for … @virtual` with `@transition`, `@stagger`, `@mode` or `@move`.',
+        explanation: 'A virtual list adds and removes rows as they scroll in and out of view. A row that scrolls out is not leaving the list, and one that scrolls in is not arriving: an enter or exit animation, a stagger or a move would play on every scroll.',
+        fix: 'Remove the transition modifiers from the virtual `@for`, or remove `@virtual` to animate the whole list.',
+        example: { bad: pdx("<ul>@for (rows as r; track r.id) @transition('fade') @virtual { <li>{{ r.name }}</li> }</ul>", 'let rows = $signal([]);'), good: pdx('<ul>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>', 'let rows = $signal([]);') },
+        reproducedIn: `${T}for-virtual.test.ts`,
+    },
     PDX_KEEPALIVE_MAX: {
         severity: 'error', category: 'defect',
         summary: 'A `<component :is @keepAlive(n)>` whose maximum is not a whole number of at least 1.',

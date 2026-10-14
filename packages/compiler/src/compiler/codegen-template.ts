@@ -15,6 +15,7 @@ import { rewriteHtmlBindings, isSimpleAccess, scopedSlotCall } from './codegen-t
 import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
 import { escapeForTemplateLiteral } from './codegen-shared';
+import { virtualRowTag } from './validate-virtual';
 
 /** `${…}` with an origin mark just inside its `${`, where it is part of the expression, not the HTML. */
 function markInterpolation(code: string, mark: string): string {
@@ -177,7 +178,31 @@ function generateIf(node: IfNode, imports: Set<string>, ctx: CompileContext): st
     return `\${when(() => ${condition}, () => ${thenCode}, ${elseCode}${transition})}`;
 }
 
+/**
+ * The options object of an `eachVirtual` call (#283), the same on both render paths: the estimate
+ * written in `@virtual(n)`, the rows' tag for the spacers, getters for a plain item, and `@empty`.
+ */
+export function virtualOptions(node: ForNode, getters: boolean, empty: string | null): string {
+    const parts = [
+        node.virtual?.estimate !== undefined ? `estimate:${node.virtual.estimate}` : '',
+        `tag:${jsString(virtualRowTag(node))}`,
+        getters ? 'getters:true' : '',
+        empty ? `empty:${empty}` : '',
+    ].filter(Boolean);
+    return `{${parts.join(',')}}`;
+}
+
 function generateFor(node: ForNode, imports: Set<string>, ctx: CompileContext): string {
+    if (node.virtual) {
+        // `@for … @virtual` (#283): the call the inline path emits, for a scoped slot's body.
+        const rows = isRowBinding(node);
+        imports.add('eachVirtual');
+        const itemsExpr = callSignals(prefixCtx(node.items, ctx), ctx);
+        const body = withLoopScope(node, rows, ctx, () => generateNodes(node.body, imports, ctx));
+        const params = node.index ? `${node.item}, ${node.index}` : node.item;
+        const empty = node.emptyBody ? `() => ${generateNodes(node.emptyBody, imports, ctx)}` : null;
+        return `\${eachVirtual(() => ${itemsExpr}, ${trackKeyArg(node, ctx)}, (${params}) => ${body}, ${virtualOptions(node, rows, empty)})}`;
+    }
     // A plain `item` becomes a row getter (eachRow): a row reused for the same key reads its
     // current item and index. A destructured binding keeps each(): its names are
     // bound once, from the object the row was created with.

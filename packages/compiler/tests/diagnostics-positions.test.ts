@@ -56,6 +56,8 @@ const ROWS: Record<string, Row> = {
     PDX_CIRCULAR_DERIVED: { src: pdx('<p>{{ a }}</p>', 'const a = $derived(b + 1);\nconst b = $derived(a + 1);'), at: 'const a = $derived' },
     PDX_UNUSED_REACTIVE: { src: pdx('<p>{{ shown }}</p>', 'let shown = $signal(1);\nlet unused = $signal(0);'), at: 'let unused' },
     PDX_EMPTY_FOR: { src: pdx('@for (items as item; track item) {}', 'let items = $signal([1]);'), at: '@for (items' },
+    PDX_VIRTUAL_SHAPE: { src: pdx('<p>x</p>\n  <ul><li>Header</li>@for (items as item; track item) @virtual { <li>{{ item }}</li> }</ul>', 'let items = $signal([1]);'), at: '@virtual {' },
+    PDX_VIRTUAL_TRANSITION: { src: pdx("<p>x</p>\n  <ul>@for (items as item; track item) @move(200) @virtual { <li>{{ item }}</li> }</ul>", 'let items = $signal([1]);'), at: '@move(200)' },
     PDX_AWAIT_NO_LOADING: { src: pdx('@await (ready) { <p>ok</p> }', 'let ready = $signal(Promise.resolve());'), at: '@await (ready)' },
     PDX_FETCH_INVALID: { src: pdx('<p>x</p>', "let a = $signal(1);\n@fetch users: 'nomethod';"), at: '@fetch users' },
     PDX_FETCH_NO_ERROR_UI: { src: pdx('<p>{{ users.data() }}</p>', "@fetch users: 'GET /api/users' as string[];"), at: '@fetch users' },
