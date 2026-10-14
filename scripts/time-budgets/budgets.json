@@ -1,5 +1,5 @@
 {
-  "check": { "ms": null, "measured": null, "runner": null },
-  "analyze": { "ms": null, "measured": null, "runner": null },
-  "build": { "ms": null, "measured": null, "runner": null }
+  "check": { "ms": 1000, "measured": "2026-10-14: 2127 ms (2138, 2127, 2100)", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04 20261004.327.1)" },
+  "analyze": { "ms": 900, "measured": "2026-10-14: 741 ms (749, 741, 734)", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04 20261004.327.1)" },
+  "build": { "ms": 7200, "measured": "2026-10-14: 5957 ms (5957, 5979, 5942)", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04 20261004.327.1)" }
 }
