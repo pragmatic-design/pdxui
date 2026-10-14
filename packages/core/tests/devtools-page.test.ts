@@ -50,6 +50,18 @@ describe('the page card', () => {
         expect(card.rowActions).toEqual(['Open']);
     });
 
+    it('a grid\'s total counts its data, not its header rows', () => {
+        // `aria-rowcount` counts every row of the grid — the header row and a row of filters
+        // included — so the 24 customers of the showcase read as 26 in the customer picker.
+        const items = Array.from({ length: 3 }, (_, i) => `<div role="row" data-pdx-item><div role="gridcell">C-${i}</div></div>`).join('');
+        routed(`<div role="grid" aria-label="Customers" aria-rowcount="26">
+            <div role="row"><div role="columnheader">Customer</div></div>
+            <div role="row"><div role="gridcell"><input aria-label="Filter Customer"></div></div>
+            <div role="rowgroup">${items}</div>
+        </div>`);
+        expect(pageCard(null, []).lists).toEqual([{ name: 'Customers', shown: 3, total: 24 }]);
+    });
+
     it('the route, the title, the links and the errors; empty members are left out', () => {
         document.title = 'Tickets';
         routed('<a href="/tickets/new">New</a><a href="https://example.com">Out</a>');

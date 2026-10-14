@@ -122,12 +122,34 @@ export function selectorOf(el: Element): string {
     return found ?? `${scope ? `${scope} > ` : ''}${steps.join(' > ')}`;
 }
 
+/** What opens over the page: a dialog, a listbox, a menu, a tooltip, a popover. */
+const OVERLAY = '[role=dialog], [role=alertdialog], [role=listbox], [role=menu], [role=tooltip], [popover]';
+
+/** `el` and every ancestor up to the body are perceivable: an ancestor's `display: none` is not in `el`'s style. */
+function shown(el: Element): boolean {
+    for (let cur: Element | null = el; cur && cur.localName !== 'body'; cur = cur.parentElement) {
+        if (!isPerceivable(cur)) return false;
+    }
+    return true;
+}
+
+/**
+ * The overlays open outside `route`, outermost only: a filter's popover, a select's listbox, a menu
+ * the route opened and the runtime mounted on the body. The user is looking at them now, so they
+ * belong to the outline; the shell, read once per session, leaves them out.
+ */
+export function overlaysOutside(route: Element): Element[] {
+    return Array.from(route.ownerDocument.querySelectorAll(OVERLAY))
+        .filter((el) => !route.contains(el) && !el.parentElement?.closest(OVERLAY) && shown(el));
+}
+
 /**
  * The outline nodes for `el`: one node if it has a kept role, its children's nodes otherwise.
- * `exclude` and everything under it is left out — the route, when the shell is outlined.
+ * What `exclude` holds is left out with everything under it — the route and the open overlays, when
+ * the shell is outlined.
  */
-function build(el: Element, parentName: string, exclude: Element | null): Node[] {
-    if (el === exclude || !isPerceivable(el)) return [];
+function build(el: Element, parentName: string, exclude: readonly Element[]): Node[] {
+    if (exclude.includes(el) || !isPerceivable(el)) return [];
     const role = roleOf(el);
     const name = role ? nameOf(el) : '';
     const kept = KEPT_ROLES.has(role) && !(KEPT_IF_NAMED.has(role) && !name);
@@ -211,8 +233,10 @@ function render(nodes: Node[], depth: number, maxItems: number, out: string[]): 
     const pad = '  '.repeat(depth);
     for (let i = 0; i < nodes.length;) {
         const n = nodes[i];
-        // A label written as text right before the control it names says nothing the control does not.
-        if (n.role === 'text' && nodes[i + 1] && CONTROL_ROLES.has(nodes[i + 1].role) && nodes[i + 1].name === n.name) {
+        // A label written as text right before or right after the control it names says nothing the
+        // control does not: `<label><input> Active</label>` is the checkbox "Active".
+        const names = (m: Node | undefined): boolean => !!m && CONTROL_ROLES.has(m.role) && m.name === n.name;
+        if (n.role === 'text' && (names(nodes[i + 1]) || names(nodes[i - 1]))) {
             i++;
             continue;
         }
@@ -263,10 +287,10 @@ export interface OutlineOptions {
 }
 
 /**
- * The outline of `root`, one node per line, indented by nesting. With `exclude`, that element and
- * its subtree are left out: `shell()` is the body's outline without the route.
+ * The outline of `root`, one node per line, indented by nesting. The elements in `exclude` are left
+ * out with their subtrees: `shell()` is the body's outline without the route and the open overlays.
  */
-export function outlineOf(root: Element, options: OutlineOptions = {}, exclude: Element | null = null): string {
+export function outlineOf(root: Element, options: OutlineOptions = {}, exclude: readonly Element[] = []): string {
     const out: string[] = [];
     render(build(root, '', exclude), 0, Math.max(2, options.maxItems ?? 5), out);
     return out.join('\n');
