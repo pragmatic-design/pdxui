@@ -85,8 +85,21 @@ guards of the routes it renders inside, and is left out when the checker answers
 `shell()` is the outline of the body without the outermost `data-pdx-route`, empty when there is none.
 Measured on the showcase: every `@page` route listed with its params, `/tickets/:id/billing` closed to
 the suite's admin; the shell holds the sidebar's links and no ref inside the route; the four-page
-session costs 25% of the four full snapshots. Not done: `delta`, `actions`/`run`, `sources`/`forms`, and
-the behavioural test of decisions.md 32.
+session costs 25% of the four full snapshots. Not done: `delta`, `actions`/`run`, `sources`/`forms`.
+
+**Landed** (#273): the behavioural test of decisions.md 32, `scripts/agent-behaviour/run.mjs`, local
+and on demand. Ten tasks on the four pages, each once with the description API and once with full
+snapshots, decided by a check the script runs on the page. With `sonnet` over two runs: **20/20
+with the description API, 20/20 with snapshots, at 30% of the characters.**
+
+Driving the showcase this way found three defects of the API, fixed with it:
+- An overlay mounted outside the route (a filter's popover) was in `shell()` only. It now belongs
+  to `outline()`, and `shell()` leaves it out.
+- `page()` counted header rows in a list's total.
+- A label written after its control was repeated as text.
+
+A fourth is open as #391: an id a component generates from a counter is used as a selector, and it
+changes between sessions.
 
 ## Capabilities in production
 
@@ -128,5 +141,6 @@ Baselines from the prototype (four pages of the showcase, 2026-10-11, ~4 charact
 | a session of four pages costs ≤ 40% of four full snapshots (shell once + outlines + cards) | 3008 / 8750 = 34% (since #272: 25%) |
 | every rule A1–A6 holds on the showcase, in all 13 themes where it is visual | A1 fails today |
 
-The next measurement is behavioural: an agent given only `map`, `shell`, `page` and `outline`
-completes a set of tasks as often as with full snapshots.
+The behavioural measurement: an agent given only `map`, `shell`, `page` and `outline` completes a
+set of tasks as often as with full snapshots. Since #273 that is `scripts/agent-behaviour/run.mjs`:
+20/20 against 20/20 over two runs, at 30% of the characters.

@@ -74,7 +74,8 @@ that declares a guard, or renders inside one that does: whether the current user
 asked of the same guard checker a navigation asks. A route without it is open.
 
 **`shell()`** is `outline()` applied to everything outside the routed element, with the same rules
-and selectors. It is empty when no router marks a route.
+and selectors. It leaves out an open overlay, which belongs to the outline. It is empty when no
+router marks a route.
 
 **`page()`** is the page card: the route and its params, the title, the lists shown (how many rows,
 with the total, the sort and the filter where the page says them), the forms (their fields, the
@@ -83,11 +84,13 @@ and apart the row actions), and the routes the page links to. Everything is read
 element and its ARIA — what the user is shown — and an empty member is left out.
 
 **`outline()`** is the accessibility tree of the route's content — the router's boundary, never the
-shell around it — compressed for an agent:
+shell around it — compressed for an agent. An overlay open over the page is part of it even when it
+is mounted outside the route: a filter's popover, a select's list, a menu. The user is looking at
+it now. The rules:
 
 - what a reader cannot perceive (`hidden`, `aria-hidden`, `display: none`) is left out;
-- a wrapper with no role or name gives way to its children, and text that repeats its parent's name
-  is dropped;
+- a wrapper with no role or name gives way to its children, and text that repeats its parent's name,
+  or the name of the control it labels, is dropped;
 - a table row is one line, cells separated by `|`;
 - a run of controls sharing a role — a toolbar, a pager — is one line that keeps every name;
 - only **data** repetition is summarised: the rows of an `@for` or of a data grid, which the runtime
