@@ -1429,8 +1429,10 @@ function createVirtualizer(options: VirtualizerOptions): VirtualizerReturn
 Render only the rows that are on screen: given a count and a size estimate, it returns the window
 to draw and the total height to reserve.
 
-`estimateSize` may be wrong — `measureElement` corrects it from the DOM as rows render, which is
-what makes variable-height content work without measuring everything up front.
+`estimateSize` may be wrong — `measureElement` corrects it from the DOM as rows render, and keeps
+observing each row it measured, which is what makes variable-height content work without
+measuring everything up front. A row above the viewport that changes size moves the scroll
+position with it, and `scrollTo` corrects itself once the rows it lands on are measured.
 
 `overscan` (3) is how many rows to draw beyond the viewport: too few and fast scrolling shows
 blank space, too many and the saving disappears.

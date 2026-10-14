@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createVirtualizer } from '../src/renderer/virtualizer';
 import { signal } from '../src/reactivity/signal';
 
@@ -190,5 +190,84 @@ describe('virtualizer measureElement', () => {
 
         expect(virt.totalSize()).toBe(140);
         virt.dispose();
+    });
+});
+
+// #252: an item measured once and then resized — an image that loads, a row that wraps — kept its
+// first size. measureElement now observes what it measures.
+
+/** A ResizeObserver the test drives: every instance, what it watches, and a way to fire it. */
+class FakeResizeObserver {
+    static all: FakeResizeObserver[] = [];
+    readonly watched = new Set<Element>();
+    disconnected = false;
+    constructor(private readonly cb: ResizeObserverCallback) { FakeResizeObserver.all.push(this); }
+    observe(el: Element): void { this.watched.add(el); }
+    unobserve(el: Element): void { this.watched.delete(el); }
+    disconnect(): void { this.watched.clear(); this.disconnected = true; }
+    fire(el: Element): void {
+        this.cb([{ target: el } as unknown as ResizeObserverEntry], this as unknown as ResizeObserver);
+    }
+}
+
+describe('virtualizer: measured items stay measured', () => {
+    const original = globalThis.ResizeObserver;
+    beforeEach(() => {
+        FakeResizeObserver.all = [];
+        (globalThis as { ResizeObserver: unknown }).ResizeObserver = FakeResizeObserver;
+    });
+    afterEach(() => {
+        (globalThis as { ResizeObserver: unknown }).ResizeObserver = original;
+    });
+
+    /** A rendered item: its index, and a height the test can change. */
+    function item(index: number, height: number): HTMLElement & { setHeight(h: number): void } {
+        let h = height;
+        const el = Object.assign(document.createElement('div'), { setHeight: (next: number) => { h = next; } });
+        el.dataset.virtualIndex = String(index);
+        Object.defineProperty(el, 'offsetHeight', { get: () => h });
+        document.body.appendChild(el);
+        return el;
+    }
+
+    /** The observer that watches items — not the one on the scroll container. */
+    const itemObserver = (el: Element) => FakeResizeObserver.all.find((o) => o.watched.has(el));
+
+    it('an element handed to measureElement and then resized updates totalSize', () => {
+        const virt = createVirtualizer({ count: () => 10, estimateSize: () => 10, getScrollElement: () => null });
+        const el = item(0, 50);
+        virt.measureElement(el);
+        expect(virt.totalSize()).toBe(140);
+
+        const observer = itemObserver(el);
+        expect(observer, 'the measured element is not observed').toBeDefined();
+        el.setHeight(80);
+        observer!.fire(el);
+        expect(virt.totalSize(), 'a resize after the first measurement was not taken').toBe(170);
+        virt.dispose();
+        el.remove();
+    });
+
+    it('a disconnected element is unobserved instead of measured', () => {
+        const virt = createVirtualizer({ count: () => 10, estimateSize: () => 10, getScrollElement: () => null });
+        const el = item(0, 50);
+        virt.measureElement(el);
+        const observer = itemObserver(el)!;
+        el.remove();
+        el.setHeight(0);
+        observer.fire(el);
+        expect(observer.watched.has(el), 'a removed element is still observed').toBe(false);
+        expect(virt.totalSize(), 'a removed element was measured at 0').toBe(140);
+        virt.dispose();
+    });
+
+    it('dispose() disconnects the observer', () => {
+        const virt = createVirtualizer({ count: () => 10, estimateSize: () => 10, getScrollElement: () => null });
+        const el = item(0, 50);
+        virt.measureElement(el);
+        const observer = itemObserver(el)!;
+        virt.dispose();
+        expect(observer.disconnected).toBe(true);
+        el.remove();
     });
 });
