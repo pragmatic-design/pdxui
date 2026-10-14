@@ -32,7 +32,8 @@ export default defineConfig({
     // And the one that edits the mock server's roles, for the other reason: on this
     // shared server, a grant it revokes would race every spec that reads it.
     // And `devtools-v2.spec.ts`: `__PDX_DEVTOOLS__` exists in development only (#271).
-    testIgnore: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'devtools-v2.spec.ts'],
+    // And `hmr.spec.ts`, which saves a `.pdx` while a dev server runs: `playwright.hmr.config.ts` (#246).
+    testIgnore: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'devtools-v2.spec.ts', 'hmr.spec.ts'],
     fullyParallel: true,
     workers: WORKERS,
     reporter: [['list']],

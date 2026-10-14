@@ -9,9 +9,10 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
-        "test": "npm run test:build && npm run test:dev",
+        "test": "npm run test:build && npm run test:dev && npm run test:hmr",
         "test:build": "playwright test --config tests/playwright.config.ts",
         "test:dev": "playwright test --config tests/playwright.dev.config.ts",
+        "test:hmr": "playwright test --config tests/playwright.hmr.config.ts",
         "review": "playwright test --config tests/review/review.config.ts",
         "typecheck": "tsc --noEmit"
     },

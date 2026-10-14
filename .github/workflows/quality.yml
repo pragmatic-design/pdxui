@@ -117,7 +117,8 @@ jobs:
           - { suite: site, shard: 2/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=2/3 --workers=2' }
           - { suite: site, shard: 3/3, run: 'pnpm --filter @pdxui/site exec playwright test --config tests/playwright.config.ts --shard=3/3 --workers=2' }
           # The dev-server config is five tests against its own server: once, with the first shard.
-          - { suite: showcase, shard: 1/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=1/2 --workers=2 && pnpm --filter @pdxui/showcase run test:dev' }
+          # So is the HMR config (#246), which saves a .pdx while its own dev server runs.
+          - { suite: showcase, shard: 1/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=1/2 --workers=2 && pnpm --filter @pdxui/showcase run test:dev && pnpm --filter @pdxui/showcase run test:hmr' }
           - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2' }
     steps:
       - uses: actions/checkout@v7
