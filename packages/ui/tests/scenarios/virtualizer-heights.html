@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Virtualizer Heights Harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { font-family: system-ui; padding: 16px; }
+        #scroller { height: 400px; width: 320px; overflow: auto; position: relative; border: 1px solid #999; }
+        #inner { position: relative; width: 100%; }
+        .item { position: absolute; left: 0; right: 0; box-sizing: border-box; border-bottom: 1px solid #ccc; overflow: hidden; }
+    </style>
+    <script type="module">
+        // `createVirtualizer` over 2 000 items of VARIABLE height (#252): heights drawn from a fixed
+        // seed between 24 and 120 px, an estimate of 48. Every rendered item goes through
+        // `measureElement`, as a caller is told to do. The page asserts nothing: the spec scrolls,
+        // resizes items through `window.__heights`, and measures where things land.
+        import { createVirtualizer, effect } from '@pdxui/core';
+
+        const COUNT = 2000;
+        // mulberry32: the same 2 000 heights on every run.
+        let seed = 252;
+        const random = () => {
+            seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+            let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+        const heights = Array.from({ length: COUNT }, () => 24 + Math.floor(random() * 97));
+
+        const scroller = document.createElement('div');
+        scroller.id = 'scroller';
+        scroller.setAttribute('data-test', 'scroller');
+        const inner = document.createElement('div');
+        inner.id = 'inner';
+        scroller.appendChild(inner);
+        document.body.appendChild(scroller);
+
+        const virt = createVirtualizer({
+            count: () => COUNT,
+            estimateSize: () => 48,
+            getScrollElement: () => scroller,
+            overscan: 3,
+        });
+
+        // Keyed by index: an item that stays in the window keeps its element, so it stays observed.
+        const rendered = new Map();
+        effect(() => {
+            inner.style.height = virt.totalSize() + 'px';
+            const items = virt.items();
+            const keep = new Set(items.map((it) => it.index));
+            for (const [index, el] of rendered) {
+                if (!keep.has(index)) { el.remove(); rendered.delete(index); }
+            }
+            for (const it of items) {
+                let el = rendered.get(it.index);
+                if (!el) {
+                    el = document.createElement('div');
+                    el.className = 'item';
+                    el.dataset.virtualIndex = String(it.index);
+                    el.dataset.test = 'item-' + it.index;
+                    el.textContent = 'Item ' + it.index;
+                    el.style.height = heights[it.index] + 'px';
+                    inner.appendChild(el);
+                    rendered.set(it.index, el);
+                    virt.measureElement(el);
+                }
+                el.style.top = it.start + 'px';
+            }
+        });
+
+        // What the spec drives: scroll to an index, and change an item's height after it rendered.
+        window.__virt = virt;
+        window.__heights = {
+            set(index, height) {
+                heights[index] = height;
+                const el = rendered.get(index);
+                if (el) el.style.height = height + 'px';
+            },
+        };
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-pdx-ready', '');
+        }));
+    </script>
+</head>
+<body>
+</body>
+</html>

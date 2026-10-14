@@ -42,7 +42,10 @@ export interface VirtualizerReturn {
     totalSize: ReadonlySignal<number>;
     /** Scroll to a specific item index. */
     scrollTo: (index: number, options?: { align?: 'start' | 'center' | 'end' }) => void;
-    /** Callback for measuring a rendered element (for dynamic sizes). */
+    /**
+     * Measure a rendered element (it carries `data-virtual-index`), and keep observing it: a later
+     * change of size is measured again (for dynamic sizes).
+     */
     measureElement: (el: HTMLElement | null) => void;
     /** Cleanup. */
     dispose: Dispose;
@@ -54,8 +57,10 @@ export interface VirtualizerReturn {
  * Render only the rows that are on screen: given a count and a size estimate, it returns the window
  * to draw and the total height to reserve.
  *
- * `estimateSize` may be wrong — `measureElement` corrects it from the DOM as rows render, which is
- * what makes variable-height content work without measuring everything up front.
+ * `estimateSize` may be wrong — `measureElement` corrects it from the DOM as rows render, and keeps
+ * observing each row it measured, which is what makes variable-height content work without
+ * measuring everything up front. A row above the viewport that changes size moves the scroll
+ * position with it, and `scrollTo` corrects itself once the rows it lands on are measured.
  *
  * `overscan` (3) is how many rows to draw beyond the viewport: too few and fast scrolling shows
  * blank space, too many and the saving disappears.
@@ -72,7 +77,8 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
 
     // ── Size cache: 3 tiers ──
     // Tier 1: estimated (from estimateSize)
-    // Tier 2: measured (from ResizeObserver on rendered items)
+    // Tier 2: measured — what `measureElement` read off a rendered item, and what the ResizeObserver
+    //         it puts on that item reads again whenever the item changes size (#252)
     // Tier 3: cumulative offsets (binary search-ready)
     const measuredSizes = new Map<number, number>();
 
@@ -244,47 +250,106 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
     }
 
     // ── scrollTo ──
-    function scrollTo(index: number, opts?: { align?: 'start' | 'center' | 'end' }): void {
-        const scrollEl = getScrollElement();
-        if (!scrollEl) return;
+    function getScrollPos(scrollEl: HTMLElement): number {
+        return horizontal ? scrollEl.scrollLeft : scrollEl.scrollTop;
+    }
 
+    function setScrollPos(scrollEl: HTMLElement, pos: number): void {
+        if (horizontal) scrollEl.scrollLeft = Math.max(0, pos);
+        else scrollEl.scrollTop = Math.max(0, pos);
+    }
+
+    function targetOf(index: number, align: 'start' | 'center' | 'end' | undefined): number {
         const itemOffset = getCumulativeOffset(index);
         const itemSize = getItemSize(index);
         const vpSize = _viewportSize.peek();
-
-        let target: number;
-        switch (opts?.align) {
-            case 'center':
-                target = itemOffset - vpSize / 2 + itemSize / 2;
-                break;
-            case 'end':
-                target = itemOffset - vpSize + itemSize;
-                break;
-            default: // 'start'
-                target = itemOffset;
-                break;
-        }
-
-        if (horizontal) {
-            scrollEl.scrollLeft = Math.max(0, target);
-        } else {
-            scrollEl.scrollTop = Math.max(0, target);
+        switch (align) {
+            case 'center': return itemOffset - vpSize / 2 + itemSize / 2;
+            case 'end': return itemOffset - vpSize + itemSize;
+            default: return itemOffset;
         }
     }
 
+    /** How many times `scrollTo` scrolls again once the items around the target are measured. */
+    const SCROLL_CORRECTIONS = 3;
+    let scrollToRun = 0;
+
+    /**
+     * Scroll to an item. The first jump goes where the estimates put it; the items rendered there
+     * are then measured, which can move the target, so after each frame it scrolls again to where
+     * the target now is — at most `SCROLL_CORRECTIONS` times, and only while it is more than 1 px off.
+     * A newer `scrollTo` takes over from an older one still correcting.
+     */
+    function scrollTo(index: number, opts?: { align?: 'start' | 'center' | 'end' }): void {
+        const scrollEl = getScrollElement();
+        if (!scrollEl) return;
+        const run = ++scrollToRun;
+        setScrollPos(scrollEl, targetOf(index, opts?.align));
+        if (typeof requestAnimationFrame === 'undefined') return;
+        let passes = 0;
+        const correct = (): void => {
+            if (run !== scrollToRun || passes++ >= SCROLL_CORRECTIONS) return;
+            const target = Math.max(0, targetOf(index, opts?.align));
+            if (Math.abs(getScrollPos(scrollEl) - target) <= 1) return;
+            setScrollPos(scrollEl, target);
+            requestAnimationFrame(correct);
+        };
+        requestAnimationFrame(correct);
+    }
+
     // ── measureElement ──
+
+    /**
+     * Take a measurement of item `index`. When the item is above the first visible one, the scroll
+     * position moves by the same amount: the content the reader is looking at stays where it is,
+     * instead of being pushed down by an image that loaded far above it.
+     */
+    function applySize(index: number, size: number): void {
+        const prev = getItemSize(index);
+        if (measuredSizes.get(index) === size) return;
+        const scrollEl = getScrollElement();
+        const above = scrollEl !== null && index < findStartIndex(getScrollPos(scrollEl), count());
+        measuredSizes.set(index, size);
+        invalidateOffsets(); // measured size changed → prefix sum is stale
+        _measureVersion.set(v => v + 1); // notifies _items/_totalSize
+        if (above && size !== prev) {
+            setScrollPos(scrollEl!, getScrollPos(scrollEl!) + (size - prev));
+            _scrollOffset.set(getScrollPos(scrollEl!));
+        }
+    }
+
+    function sizeOf(el: HTMLElement): number {
+        return horizontal ? el.offsetWidth : el.offsetHeight;
+    }
+
+    /**
+     * One observer for every item handed to `measureElement`: an item measured once and resized
+     * later — an image that loads, a row that wraps — is measured again. A target that has left the
+     * document is unobserved, not measured at 0.
+     */
+    let itemObserver: ResizeObserver | null = null;
+    function observeItem(el: HTMLElement): void {
+        if (typeof ResizeObserver === 'undefined') return;
+        itemObserver ??= new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const target = entry.target as HTMLElement;
+                if (!target.isConnected) {
+                    itemObserver?.unobserve(target);
+                    continue;
+                }
+                const index = Number(target.dataset.virtualIndex);
+                if (!isNaN(index)) applySize(index, sizeOf(target));
+            }
+        });
+        itemObserver.observe(el);
+    }
+
     function measureElement(el: HTMLElement | null): void {
         if (!el) return;
         const index = Number(el.dataset.virtualIndex);
         if (isNaN(index)) return;
-
-        const size = horizontal ? el.offsetWidth : el.offsetHeight;
-        const prev = measuredSizes.get(index);
-        if (prev !== size) {
-            measuredSizes.set(index, size);
-            invalidateOffsets(); // measured size changed → prefix sum is stale
-            _measureVersion.set(v => v + 1); // notifies _items/_totalSize
-        }
+        applySize(index, sizeOf(el));
+        observeItem(el);
     }
 
     return {
@@ -296,6 +361,9 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
             if (isBrowser) _disposeEffect?.();
             scrollCleanup?.();
             resizeCleanup?.();
+            itemObserver?.disconnect();
+            itemObserver = null;
+            scrollToRun++;
             measuredSizes.clear();
         },
     };

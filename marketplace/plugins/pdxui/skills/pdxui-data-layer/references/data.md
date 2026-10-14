@@ -618,17 +618,21 @@ const virt = createVirtualizer({
 virt.items();          // the visible slice, reactive: { index, start, size } each
 virt.totalSize();      // the height the inner spacer needs, in px
 virt.scrollTo(4_200, { align: 'center' });
-virt.measureElement(el);   // hand it a rendered row and its real size replaces the estimate
+virt.measureElement(el);   // hand it a rendered row: its real size replaces the estimate, and stays current
 virt.dispose();
 ```
 
-**The honest limits.** `estimateSize` is a guess and `measureElement` is how it stops being one:
-the virtualizer keeps three tiers — estimated, then measured from a `ResizeObserver` on what was
-actually rendered — so variable heights work *if you call `measureElement`*, and jump slightly if
-you do not. **Horizontal virtualisation is the same code with `horizontal: true`**, and windows one
-axis: a grid with both thousands of rows and hundreds of columns is not something this handles
-today. And `dispose()` is not optional — the observer and the scroll listener outlive the component
-that made them.
+**The honest limits.** `estimateSize` is a guess and `measureElement` is how it stops being one.
+Hand it each row you render, with `data-virtual-index` on it. It measures the row and keeps a
+`ResizeObserver` on it, so a row that changes size later — an image that loads, text that wraps on
+resize — is measured again and the rows after it move. A row above the viewport that changes size
+moves the scroll position by the same amount, so what the reader is looking at stays put. And
+`scrollTo` corrects itself once the rows it lands on are measured, to within a pixel; measured in
+Chromium on 2 000 rows of 24 to 120 px (`virtualizer-heights.spec.ts`). Variable heights work *if you
+call `measureElement`*, and jump if you do not. **Horizontal virtualisation is the same code with
+`horizontal: true`**, and windows one axis: a grid with both thousands of rows and hundreds of
+columns is not something this handles today. And `dispose()` is not optional — the observers and
+the scroll listener outlive the component that made them.
 
 ## The primitives underneath
 
