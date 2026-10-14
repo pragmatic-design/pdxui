@@ -165,15 +165,22 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
  * says so instead of passing.
  *
  * A budget of null is reported and not held: that is how the first CI run measured. Each budget is
- * that measurement + 10%, rounded up to 50 ms.
+ * the highest measurement + 10%, rounded up to 50 ms. Highest of the first CI run and the local ones,
+ * because this spec runs in the pre-push gate too, where a laptop measured about 5% over the runner.
+ * Measured 2026-10-14, slow 4G, cold:
+ *
+ *                 CI (one run)    local (three runs, and the pre-push gate)    budget
+ *   /                 908 ms          952, 956, 952, 948 ms                    1100 ms
+ *   /tickets         3700 ms          3908, 3952, 3916, 3872 ms                4350 ms
+ *   /tickets/1       1776 ms          1852, 1876, 1864, 1884 ms                2100 ms
  *
  * `/tickets` paints three seconds after the app is ready: its route's ~60 modules share the slow
  * link before the page mounts. Its budget holds that number from growing, and #407 is what lowers it.
  */
 const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
-    { route: '/', root: 'dashboard', budgetMs: null },
-    { route: '/tickets', root: 'tickets', budgetMs: null },
-    { route: '/tickets/1', root: 'ticket', budgetMs: null },
+    { route: '/', root: 'dashboard', budgetMs: 1100 },
+    { route: '/tickets', root: 'tickets', budgetMs: 4350 },
+    { route: '/tickets/1', root: 'ticket', budgetMs: 2100 },
 ];
 
 interface Lcp {
