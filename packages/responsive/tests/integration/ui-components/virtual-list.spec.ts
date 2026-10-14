@@ -4,6 +4,7 @@
 //
 // The harness renders 40 px items in a 400 px `<ul>`: ten in view, three of overscan on each side.
 import { test, expect, type Page } from './contracts/fixture';
+import AxeBuilder from '@axe-core/playwright';
 import { openPage } from './contracts/measure';
 
 /** The list's rows — its `<li>`, the spacers and the @empty row aside. */
@@ -56,6 +57,115 @@ test.describe('10 000 items in a 400 px list', () => {
     test('the scroll height still describes the whole list', async ({ page }) => {
         const height = await page.locator('[data-test="list"]').evaluate((el) => el.scrollHeight);
         expect(Math.abs(height - 10000 * 40), `scroll height ${height}`).toBeLessThanOrEqual(2);
+    });
+});
+
+// #284: what a screen reader and a keyboard get from a list that renders a window. Measured with
+// Playwright's role queries and the keyboard, by the role the template gives the container.
+test.describe('accessible by its container\'s role', () => {
+    test('a list: every rendered item says the total and its own place', async ({ page }) => {
+        await openPage(page, '/virtual-list.html');
+        await rows(page).first().waitFor();
+        const items = page.getByRole('listitem');
+        const n = await items.count();
+        expect(n).toBeGreaterThan(5);
+        for (let i = 0; i < n; i++) {
+            await expect(items.nth(i)).toHaveAttribute('aria-setsize', '10000');
+            await expect(items.nth(i)).toHaveAttribute('aria-posinset', String(i + 1));
+        }
+    });
+
+    test('a listbox: End reaches the last option, rendered and focused; ArrowUp the one before', async ({ page }) => {
+        await openPage(page, '/virtual-list.html?shape=listbox');
+        const first = page.getByRole('option', { name: 'Item 0', exact: true });
+        await first.waitFor();
+        await first.focus();
+        await page.keyboard.press('End');
+        const last = page.getByRole('option', { name: 'Item 9999', exact: true });
+        await expect(last).toBeFocused();
+        await expect(last).toHaveAttribute('aria-posinset', '10000');
+        await page.keyboard.press('ArrowUp');
+        await expect(page.getByRole('option', { name: 'Item 9998', exact: true })).toBeFocused();
+        await expect(page.locator(':focus')).toHaveAttribute('aria-posinset', '9999');
+    });
+
+    test('a listbox: ArrowDown, Home, and the roving tabindex', async ({ page }) => {
+        await openPage(page, '/virtual-list.html?shape=listbox');
+        const first = page.getByRole('option', { name: 'Item 0', exact: true });
+        await first.waitFor();
+        await expect(first, 'the first option is the one Tab reaches').toHaveAttribute('tabindex', '0');
+        await expect(page.getByRole('option', { name: 'Item 1', exact: true })).toHaveAttribute('tabindex', '-1');
+        await first.focus();
+        await page.keyboard.press('ArrowDown');
+        await expect(page.getByRole('option', { name: 'Item 1', exact: true })).toBeFocused();
+        await page.keyboard.press('PageDown');
+        await expect(page.locator(':focus'), 'PageDown moved by a page of items').toHaveAttribute('aria-posinset', /^(1[0-2])$/);
+        await page.keyboard.press('Home');
+        await expect(first).toBeFocused();
+    });
+
+    test('a table with a header row: the count and each body row\'s index include it', async ({ page }) => {
+        await openPage(page, '/virtual-list.html?shape=table');
+        await page.locator('[data-test="list"] tr:not([aria-hidden])').first().waitFor();
+        await expect(page.getByRole('table')).toHaveAttribute('aria-rowcount', '10001');
+        const bodyRows = page.locator('[data-test="list"] tr:not([aria-hidden])');
+        await expect(bodyRows.first()).toHaveAttribute('aria-rowindex', '2');
+        await expect(bodyRows.nth(1)).toHaveAttribute('aria-rowindex', '3');
+        // Its rows hold nothing focusable, so the region that scrolls is the tab stop.
+        await expect(page.locator('[data-test="list"]')).toHaveAttribute('tabindex', '0');
+    });
+
+    test('a focused item scrolled out of the window stays, focused; it leaves when focus does', async ({ page }) => {
+        await openPage(page, '/virtual-list.html');
+        const button = page.getByRole('button', { name: 'Item 2', exact: true });
+        await button.waitFor();
+        await button.focus();
+        await page.locator('[data-test="list"]').evaluate((el) => { el.scrollTop += 5000; });
+        await frames(page);
+        await expect(button, 'the focused item was removed with the window').toBeAttached();
+        await expect(button).toBeFocused();
+        // Still where it was: between the leading spacers, above the window.
+        const place = await page.locator('[data-test="list"]').evaluate((ul) => {
+            const lis = [...ul.children];
+            const at = lis.findIndex((li) => li.textContent === 'Item 2');
+            return { at, before: lis[at - 1]?.getAttribute('aria-hidden'), after: lis[at + 1]?.getAttribute('aria-hidden') };
+        });
+        expect(place, 'the focused item is not between two spacers').toMatchObject({ before: 'true', after: 'true' });
+        await page.getByRole('button', { name: 'After the list' }).focus();
+        await frames(page);
+        await expect(button, 'the item stayed after focus left it').not.toBeAttached();
+    });
+
+    // The axe runner of `pnpm certify` measures the manifests' scenarios, not this harness: it is run
+    // here, with that runner's tags, on each container and after a scroll that renders a window far
+    // from the top.
+    for (const shape of ['list', 'listbox', 'table']) {
+        test(`axe finds nothing on a ${shape}, at the top and scrolled`, async ({ page }) => {
+            await openPage(page, `/virtual-list.html?shape=${shape}`);
+            const list = page.locator('[data-test="list"]');
+            await list.locator('[data-virtual-index]').first().waitFor();
+            const axe = async () => (await new AxeBuilder({ page })
+                .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+                .include(shape === 'table' ? '[data-test="table"]' : '[data-test="list"]')
+                .disableRules(['color-contrast'])
+                .analyze()).violations.map((v) => `${v.id} (${v.nodes.length})`);
+            expect(await axe()).toEqual([]);
+            await list.evaluate((el) => { el.scrollTop = 200_000; });
+            await frames(page);
+            expect(await axe()).toEqual([]);
+        });
+    }
+
+    test('a list gets no keys: ArrowDown does not move focus', async ({ page }) => {
+        await openPage(page, '/virtual-list.html');
+        const button = page.getByRole('button', { name: 'Item 0', exact: true });
+        await button.waitFor();
+        await button.focus();
+        await page.keyboard.press('ArrowDown');
+        await expect(button).toBeFocused();
+        await expect(page.getByRole('listitem').first(), 'a list item was made a tab stop').not.toHaveAttribute('tabindex');
+        // Its rows hold buttons, so the container needs no tab stop of its own.
+        await expect(page.locator('[data-test="list"]')).not.toHaveAttribute('tabindex');
     });
 });
 

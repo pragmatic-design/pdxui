@@ -842,6 +842,23 @@ rendered, and when its last row is in view, `hasMore()` is true and no load runs
 called once. `@empty` is the list's own: it renders for an empty array, or a source with no data that
 is not loading.
 
+What a virtual list says to assistive technology follows the container's role (#284): its `role`, or
+the implicit role of a `ul`/`ol` (`list`) or a table (`table`, read from a `tbody` too).
+- **Set roles.** Under `list`, `listbox` and `tree`, each rendered item root carries `aria-setsize` and
+  `aria-posinset`.
+- **Row roles.** Under `table`, `grid` and `treegrid`, each rendered row carries `aria-rowindex`, and
+  the element with the role carries `aria-rowcount`; both count the rows outside the list, such as a
+  header row.
+- **The total.** It is the array's length, or a `DataSource`'s `total()` when it reports one, else -1
+  while `hasMore()`.
+- **Keys.** Under `listbox`, `tree`, `grid` and `treegrid` the list keeps a roving tabindex. It
+  answers ArrowUp and ArrowDown, Home and End, PageUp and PageDown, scrolling to and rendering an
+  item before focusing it.
+- **Focus.** A focused item outside the window stays in place, between the spacers, until focus
+  leaves it.
+- **Reaching the container.** Under a role without keys, a container that scrolls and whose rendered
+  rows hold nothing focusable takes `tabindex="0"`, unless the template wrote one.
+
 #### Rules
 
 - `as` and `; track` are required: `Invalid @for syntax` stops the compile.

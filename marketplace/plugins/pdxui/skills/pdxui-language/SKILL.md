@@ -210,7 +210,13 @@ first row is measured. The shape is fixed, and the compiler checks it (`PDX_VIRT
 Example: `<ul class="feed">@for (…) @virtual { <li>…</li> }</ul>`, and the same for
 `<tbody>` with `<tr>` and `<div>` with `<div>`. No `@transition`, `@stagger`, `@mode` or `@move` on it
 (`PDX_VIRTUAL_TRANSITION`). A `DataSource` works as the collection: reaching its last row calls
-`loadMore()`. Find-in-page and print see only the rendered rows.
+`loadMore()`. Find-in-page and print see only the rendered rows. Accessibility follows the
+container's role:
+- `aria-setsize`/`aria-posinset` under list, listbox and tree, and `aria-rowindex`/`aria-rowcount`
+  under table and grid;
+- arrow keys and a roving tabindex under listbox, tree and grid — a `listbox` still needs
+  `aria-selected` from the template;
+- a focused row that scrolls away is kept.
 
 **`@await` waits for a promise** — `@loading` while it is pending, the body once it resolves, `@error`
 if it rejects (a boolean works too: the body when true). Two things it needs:

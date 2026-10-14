@@ -211,6 +211,25 @@ children are projected elsewhere), and each row must be one element. Anything el
 [`PDX_VIRTUAL_SHAPE`](/docs/diagnostics). A row scrolling out of view is not leaving the list, so
 `@transition`, `@stagger`, `@mode` and `@move` are refused: [`PDX_VIRTUAL_TRANSITION`](/docs/diagnostics).
 
+**Accessible by the container's role.** What is not rendered is not in the accessibility tree, so
+the list says it itself. Which role the container has decides what it says: its `role` attribute,
+or a `ul`/`ol` (a list) or a table.
+
+- **`list`, `listbox`, `tree`**: each rendered item carries `aria-setsize` (the total) and
+  `aria-posinset` (its place). A screen reader says «3 of 10 000», not «3 of 23».
+- **`table`, `grid`, `treegrid`**: each rendered row carries `aria-rowindex`, and the table
+  `aria-rowcount`, both counting a header row.
+- **The total of a `DataSource`** is its `total()` when the server reports one, and `-1` (unknown)
+  while it has more.
+- **Composite roles (`listbox`, `tree`, `grid`, `treegrid`)**: the list owns a roving tabindex and
+  the keys. ArrowUp and ArrowDown, Home and End, PageUp and PageDown move focus; an item not yet
+  rendered is scrolled to, rendered, then focused. A `listbox` still needs `aria-selected` on its
+  options from your template, as any listbox does.
+- **`list` and `table`** get no keys: Tab moves through what the rows contain.
+- **A focused item that scrolls out of view stays in the DOM, in its place**, until focus leaves it.
+- **A container whose rows hold nothing focusable**, under a role without keys, takes `tabindex="0"`
+  itself while it scrolls, so the keyboard can reach it.
+
 Three limits come with it:
 
 - **The container needs a bounded height.** One that grows with its rows renders all of them, and
