@@ -13,7 +13,7 @@
 
 import { DEV } from '../utils/env';
 import { __pdx_debug, connectDevTools } from './inspector';
-import { outlineOf, type OutlineOptions } from './outline';
+import { outlineOf, overlaysOutside, type OutlineOptions } from './outline';
 import { pageCard, routeRoot, type PageCard } from './page-card';
 
 // ─── Serialisation ────────────────────────────────────────────────
@@ -282,15 +282,21 @@ export const devtoolsApi = {
      * accessibility tree with data repetition summarised above `maxItems` and a selector on every
      * actionable node.
      */
-    outline: (options?: OutlineOptions): string => (typeof document === 'undefined' ? '' : outlineOf(routeRoot(), options)),
+    outline: (options?: OutlineOptions): string => {
+        if (typeof document === 'undefined') return '';
+        // And what the route opened over the page, mounted outside it (#273): a popover, a listbox.
+        const route = routeRoot();
+        return [route, ...overlaysOutside(route)].map((el) => outlineOf(el, options)).filter(Boolean).join('\n');
+    },
     /**
      * The outline of everything outside the route — the navigation, the top bar — with the same
-     * rules and selectors: what every page shares, read once per session (#272). Empty when no
-     * router marks a route, since there is then no boundary to draw.
+     * rules and selectors: what every page shares, read once per session (#272). An open overlay is
+     * the outline's, not the shell's. Empty when no router marks a route, since there is then no
+     * boundary to draw.
      */
     shell: (options?: OutlineOptions): string => {
         const route = typeof document === 'undefined' ? null : document.querySelector('[data-pdx-route]');
-        return route ? outlineOf(document.body, options, route) : '';
+        return route ? outlineOf(document.body, options, [route, ...overlaysOutside(route)]) : '';
     },
     /**
      * The route graph (#272): each route's pattern, its params and their types, its title, its

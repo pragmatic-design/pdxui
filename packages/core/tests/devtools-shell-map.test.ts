@@ -36,6 +36,33 @@ describe('shell()', () => {
         expect(devtoolsApi.shell()).toContain('button "Theme" [[data-test="theme"]]');
     });
 
+    it('an overlay the route opened outside it — a filter\'s popover — is the outline\'s, not the shell\'s', () => {
+        // A popover, a listbox or a menu is mounted on the body, outside the route. The user is
+        // looking at it now; the shell is read once per session and would never show it.
+        add('<nav aria-label="Sections"><a href="/a">A</a></nav>');
+        add('<x-page data-pdx-route><button>Status</button></x-page>');
+        add('<div role="dialog" aria-label="Status filter"><input type="checkbox" aria-label="Onboarding"><button>Apply</button></div>');
+        add('<div role="listbox" aria-label="Closed list" hidden><div role="option">Gone</div></div>');
+        const outline = devtoolsApi.outline();
+        const shell = devtoolsApi.shell();
+        expect(outline).toContain('dialog "Status filter"');
+        expect(outline).toContain('checkbox "Onboarding"');
+        expect(shell).not.toContain('Status filter');
+        expect(shell).toContain('navigation "Sections"');
+        // A closed overlay is in neither.
+        expect(outline + shell).not.toContain('Gone');
+    });
+
+    it('a label written after the control it names is dropped, as one written before it is', () => {
+        add('<x-page data-pdx-route><label><input type="checkbox" aria-label="Active"> Active</label></x-page>');
+        expect(devtoolsApi.outline()).toBe('- checkbox "Active" [x-page input]');
+    });
+
+    it('an overlay inside the route stays where it is, and is not listed twice', () => {
+        add('<x-page data-pdx-route><div role="dialog" aria-label="Edit"><button>Save</button></div></x-page>');
+        expect(devtoolsApi.outline().match(/dialog "Edit"/g)).toHaveLength(1);
+    });
+
     it('without a routed element there is no boundary, and so no shell', () => {
         add('<nav aria-label="Sections"><a href="/a">A</a></nav>');
         expect(devtoolsApi.shell()).toBe('');

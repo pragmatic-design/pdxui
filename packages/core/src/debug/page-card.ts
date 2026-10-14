@@ -74,6 +74,24 @@ function formsIn(nodes: Element[]): PageCardForm[] {
     });
 }
 
+/**
+ * How many items the source holds, when the page says it. `aria-rowcount` counts every row of the
+ * grid, its header row and a row of filters included: those are the grid's rows that are not data,
+ * and they are taken off. `aria-setsize` counts items only.
+ */
+function totalOf(parent: Element): number | null {
+    const grid = parent.closest('[aria-rowcount]');
+    if (grid) {
+        const rows = Number(grid.getAttribute('aria-rowcount'));
+        const notData = Array.from(grid.querySelectorAll('[role=row], tr'))
+            .filter((r) => !r.closest('[data-pdx-item]')).length;
+        const total = rows - notData;
+        return Number.isFinite(total) && total > 0 ? total : null;
+    }
+    const size = Number(parent.querySelector('[aria-setsize]')?.getAttribute('aria-setsize'));
+    return Number.isFinite(size) && size > 0 ? size : null;
+}
+
 /** The lists of data on the page: each parent of rows the runtime marked, with its counts. */
 function listsIn(nodes: Element[]): PageCardList[] {
     const parents = new Map<Element, number>();
@@ -84,9 +102,8 @@ function listsIn(nodes: Element[]): PageCardList[] {
     return [...parents].map(([parent, shown]) => {
         const named = parent.closest('[aria-label], [aria-labelledby], [data-test]') ?? parent;
         const list: PageCardList = { name: nameOf(named) || named.getAttribute('data-test') || roleOf(parent) || parent.localName, shown };
-        const total = Number(parent.closest('[aria-rowcount]')?.getAttribute('aria-rowcount')
-            ?? parent.querySelector('[aria-setsize]')?.getAttribute('aria-setsize'));
-        if (Number.isFinite(total) && total > 0) list.total = total;
+        const total = totalOf(parent);
+        if (total !== null) list.total = total;
         const table = parent.closest('table, [role=grid], [role=table], [role=treegrid]') ?? parent;
         const sorted = table.querySelector('[aria-sort]:not([aria-sort=none])');
         if (sorted) list.sort = `${nameOf(sorted)} ${sorted.getAttribute('aria-sort')}`;
