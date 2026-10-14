@@ -21,6 +21,7 @@ import { locateBoundName } from './compiler/codegen-prop-names';
 import { positionWarnings } from './compiler/position-warnings';
 import { parseIgnores, exemptionFor, applyIgnores } from './compiler/ignores';
 import { styleCssFor, parseStyleModuleId, STYLE_MODULE_PREFIX } from './compiler/codegen-styles';
+import { styleOnlyUpdate, styleSwapListener, STYLE_EVENT } from './hmr-style';
 import type { ValidationWarning } from './compiler/validate';
 import { collectOrigins, mapFromOrigins, insertMapLines } from './compiler/sourcemap';
 import type { SourceMapJSON } from './compiler/sourcemap';
@@ -189,6 +190,9 @@ export function pdx(options?: PdxPluginOptions): Plugin {
     const componentResolver = new ComponentResolver();
     // Tag registry: detects collisions between .pdx files that derive the same CE tag
     const tagRegistry = new Map<string, string>(); // tag → first filePath
+    // Development: the source each .pdx module was last compiled from, which a save is compared with
+    // to tell a style-only change (#246).
+    const compiledSources = new Map<string, string>(); // module id → source
 
     return {
         name: 'pragmatic-pdx',
@@ -492,9 +496,11 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     tagRegistry.set(tag, id);
                 }
 
-                // HMR: inject hot module replacement for dev mode
+                // HMR: inject hot module replacement for dev mode, and keep the source this module
+                // was compiled from, which a save is compared with (#246).
                 if (isDevMode) {
                     if (tagMatch) output = injectHMR(output, tagMatch[1]);
+                    compiledSources.set(id, code);
                 }
 
                 // 'no-treeshake': compiled .pdx modules register Custom Elements globally
@@ -543,11 +549,25 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             });
         },
 
-        handleHotUpdate(ctx) {
+        async handleHotUpdate(ctx) {
             if (extensions.some(ext => ctx.file.endsWith(ext))) {
                 const mod = ctx.server.moduleGraph.getModuleById(ctx.file);
                 if (mod) {
                     ctx.server.moduleGraph.invalidateModule(mod);
+                    // A save that changes only style blocks (#246): rewrite the style elements in the
+                    // page and run no module update, so nothing re-renders. The module stays
+                    // invalidated above, so a reload compiles the new CSS.
+                    const id = mod.id ?? ctx.file;
+                    const before = compiledSources.get(id);
+                    if (before !== undefined) {
+                        const next = await ctx.read();
+                        const swaps = styleOnlyUpdate(before, next, id);
+                        if (swaps) {
+                            compiledSources.set(id, next);
+                            if (swaps.length > 0) ctx.server.ws.send({ type: 'custom', event: STYLE_EVENT, data: { styles: swaps } });
+                            return [];
+                        }
+                    }
                     // Let Vite's default HMR handle the update.
                     // The injected import.meta.hot.accept() in each module will:
                     //   1. Save signal state
@@ -987,9 +1007,9 @@ function compileScriptOnly(
  */
 function injectHMR(code: string, tag: string): string {
     return code + `
-// HMR — prototype swapping (no full reload)
+// HMR — prototype swapping (no full reload); a style-only save rewrites the style element instead
 if (import.meta.hot) {
-  import.meta.hot.accept(() => {
+${styleSwapListener()}  import.meta.hot.accept(() => {
     import('@pdxui/core').then(({ __pdx_hmr_save, __pdx_hmr_swap, __pdx_hmr_rerender, __pdx_hmr_restore }) => {
       __pdx_hmr_save(${jsQuote(tag)});
       __pdx_hmr_swap(${jsQuote(tag)});

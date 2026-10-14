@@ -130,7 +130,7 @@ the template becomes imperative DOM code — with its static parts copied from a
 differ: a construct means the same everywhere, and the render parity table
 (`packages/core/tests/render-parity.test.ts`) asserts the single path against recorded expectations.
 `html\`\`` remains in `@pdxui/core` for hand-written TypeScript components (#107); the script
-`@snippet` body is a template, compiled like any other (decisions.md 9). Hot reload replaces the component's prototype and re-renders, whatever the render code is.
+`@snippet` body is a template, compiled like any other (decisions.md 9). Hot reload replaces the component's prototype and re-renders, whatever the render code is; a save that changes only `<style>` blocks rewrites their style elements instead and re-renders nothing (#246).
 
 What the compiler guarantees about the emitted code, as observable rules:
 

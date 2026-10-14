@@ -73,6 +73,8 @@ describe('every Playwright suite decides how much of the machine it takes', () =
             // server, which can fail on its own — `pdx dev` answering 404 on every route while the
             // build is fine.
             'showcase/tests/playwright.dev.config.ts',
+            // And a third, on a dev server of its own: a save reaching the open page (#246).
+            'showcase/tests/playwright.hmr.config.ts',
             'site/tests/playwright.config.ts',
         ]);
     });

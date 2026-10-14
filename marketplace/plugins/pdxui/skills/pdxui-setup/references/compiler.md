@@ -90,7 +90,9 @@ both: one render path, the inline one above, so nothing the dev server shows can
 shipped app.
 
 - **Dev** — no build to wait for: `pdx dev` compiles each `.pdx` when it is requested, with HMR.
-  Optimized for the feedback loop.
+  Optimized for the feedback loop: a save reaches the open page in tens of milliseconds, the
+  component's signals kept. A save that changes only a `<style>` block rewrites the style in place
+  and re-renders nothing, so focus, scroll and what is typed in an input stay as they were.
 - **Prod** — the compiler has **global knowledge** of the project (all routes, components, bindings,
   communication) and generates code to measure.
 
