@@ -12,8 +12,23 @@ import type { ForNode, TemplateNode } from '../parser/template';
 import type { ValidationWarning } from './validate';
 import { VOID_ELEMENTS } from './codegen-template-inline';
 
-/** Markup with its comments taken out: they are not content. */
-const withoutComments = (s: string): string => s.replace(/<!--[\s\S]*?-->/g, '');
+/**
+ * Markup with its comments taken out: they are not content. One left-to-right scan: a regex over
+ * repeated `<!--` runs in polynomial time. An unclosed comment runs to the end, as the browser reads it.
+ */
+function withoutComments(s: string): string {
+    let out = '';
+    let i = 0;
+    while (i < s.length) {
+        const open = s.indexOf('<!--', i);
+        if (open === -1) return out + s.slice(i);
+        out += s.slice(i, open);
+        const close = s.indexOf('-->', open + 4);
+        if (close === -1) return out;
+        i = close + 3;
+    }
+    return out;
+}
 
 // Match: an opening tag at the end of the markup (not `</x>`, not `<x/>`). Groups: [1]=tag name
 const TRAILING_OPEN_TAG = /<([a-zA-Z][\w-]*)(?:\s(?:[^>"']|"[^"]*"|'[^']*')*)?>\s*$/;

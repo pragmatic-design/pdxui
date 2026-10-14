@@ -59,13 +59,21 @@ test.describe('hovering a link to a split route', () => {
 
     test('and then the click renders it with no further request', async ({ page }) => {
         const chunks = watchChunks(page);
+        // The script requests in flight, and when the last one started: a prefetch is the page's
+        // chunk and then its imports, which the browser asks for once it has parsed the chunk.
+        const inFlight = new Set<unknown>();
+        let lastStart = Date.now();
+        page.on('request', (r) => { if (r.url().endsWith('.js')) { inFlight.add(r); lastStart = Date.now(); } });
+        page.on('requestfinished', (r) => inFlight.delete(r));
+        page.on('requestfailed', (r) => inFlight.delete(r));
         await open(page, '/');
         await page.locator('[data-test="to-customers"]').hover();
-        // Until the prefetch has asked for the chunk: it is queued and starts when the browser is
-        // idle (#250). The wait this replaced — any resource entry at all — was already true at
-        // page load, so it waited for nothing, and on a slow runner the click took the load over.
-        await expect.poll(() => hasPage(chunks, 'customers'), { message: 'hovering the link fetched no chunk' })
-            .toBe(true);
+        // Until the prefetch is DONE: it is queued and starts when the browser is idle (#250), and
+        // it is the chunk and the 40-odd modules it imports. Waiting for the first request only, a
+        // slow runner had the rest still arriving when the click came, and counted them as the
+        // click's. Done is: the chunk asked for, nothing in flight, and nothing new for 300 ms.
+        await expect.poll(() => hasPage(chunks, 'customers') && inFlight.size === 0 && Date.now() - lastStart > 300,
+            { message: 'the hover\'s prefetch did not finish', timeout: 15_000 }).toBe(true);
 
         // Count only what happens from HERE: the prefetch is already done.
         const after: string[] = [];

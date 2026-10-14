@@ -6,8 +6,9 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
-import { parseTemplate } from '../src/parser/template';
+import { parseTemplate, type TemplateNode } from '../src/parser/template';
 import type { ValidationWarning } from '../src/compiler/validate';
+import { checkVirtualFor } from '../src/compiler/validate-virtual';
 
 const sfc = (template: string, script = 'let posts = $signal([]);') =>
     `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
@@ -86,6 +87,17 @@ describe('PDX_VIRTUAL_SHAPE: the container is the element around the @for', () =
 
     it('control — whitespace and comments beside the @for are not content', () => {
         const { warnings } = compile(sfc('<ul>\n  <!-- the feed -->\n  @for (posts as p; track p.id) @virtual { <li>{{ p.title }}</li> }\n</ul>'), 'x.pdx');
+        expect(codes(warnings, 'PDX_VIRTUAL_SHAPE')).toEqual([]);
+    });
+
+    it('a hostile run of comment openers is read in linear time', () => {
+        // CodeQL: a regex over repeated `<!--` is polynomial. The check is run on the markup itself.
+        const [node] = parseTemplate('@for (posts as p; track p.id) @virtual { <li>{{ p.title }}</li> }');
+        const hostile = `<ul><!--${'<!--'.repeat(50_000)}`;
+        const started = performance.now();
+        const warnings = checkVirtualFor([{ type: 'html', content: hostile }, node, { type: 'html', content: '</ul>' }] as TemplateNode[]);
+        expect(performance.now() - started).toBeLessThan(200);
+        // A comment is not content: what is left before the @for is the open <ul>, and the shape holds.
         expect(codes(warnings, 'PDX_VIRTUAL_SHAPE')).toEqual([]);
     });
 
