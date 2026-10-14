@@ -13,7 +13,6 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
   `go`, and an imported signal is read with its parentheses, `{{ shared().name }}`, which follows it. In the script,
   `const user = $derived(shared())` follows it too; `const user = shared()` does not — it is a snapshot that never
   updates. (Measured: `packages/ui/tests/unit/import-in-template.test.ts`.)
-- **The name `error` is forbidden** for a signal (the compiler does not rewrite it) → use `errMsg`.
 
 ## Binding & DOM
 - 🔴 **`pdx-app-layout` knows exactly four regions**: `data-region="header" | "navbar" | "aside" | "footer"`.

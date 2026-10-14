@@ -79,8 +79,11 @@ describe('the pdx examples the site publishes', () => {
                 continue; // the compile failure is reported above
             }
             // Strip the module syntax `new Function` cannot take. The compiler emits one import per
-            // line, so this is exact, not a guess.
-            const body = code.split('\n').filter(l => !/^\s*(import|export)\s/.test(l)).join('\n');
+            // line, so this is exact, not a guess. `import.meta` is the other module-only syntax: an
+            // expression, so an object in its place parses the same (the Worker pattern's
+            // `new URL('./x.worker.ts', import.meta.url)`, #241).
+            const body = code.split('\n').filter(l => !/^\s*(import|export)\s/.test(l)).join('\n')
+                .replace(/\bimport\.meta\b/g, '({ url: "" })');
             try {
                 new Function(body);
             } catch (e) {

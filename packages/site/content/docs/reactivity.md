@@ -136,10 +136,20 @@ let boxRef = $signal(null);
 `boxRef` will hold the element once mounted. Read it inside `onMount`/`effect` (not right away in
 setup: on the first pass it's still `null`).
 
-## Heavy work
+## Work that would block input
 
-Signals are synchronous, and so is a loop over your data. A handler that filters, groups or formats
-100 000 items does it in one task, and the page does not answer a click until the loop ends.
+Signals stay **synchronous**: a write is seen by the next read, and nothing in the reactive graph
+waits. So is a loop over your data: a handler that filters, groups or formats 100 000 items does it
+in one task, and the page does not answer a click until the loop ends. There are two ways out, and
+neither changes the signals:
+
+- a **long loop** over data the page uses goes through `processInSlices`, which splits it into slices
+  that yield to input;
+- a **pure computation** (input in, output out, no DOM and no signals) can move to a Worker, a second
+  thread. The framework adds no Worker syntax: the pattern below is the whole of it.
+
+### A long loop: `processInSlices`
+
 `processInSlices(items, work, { signal })` runs the same loop in slices of about 5 ms. Between two
 slices the browser handles input and paints. It calls `work(item, index)` for every item, in order,
 and returns a promise that resolves when the last one is done:
@@ -181,8 +191,69 @@ async function regroup() {
   runs ahead of rendering, and measured in Chromium it held a frame for about 100 ms while the page
   had something to paint.
 
-Work that is pure computation over data the page does not need meanwhile can also move to a Worker.
-That is your choice; the framework adds no Worker syntax.
+### A pure computation: a Worker
+
+Parsing a large file or computing over a big dataset does not need the page at all, so it can run on
+another thread and leave the main thread free. The worker is a module of its own, in TypeScript; it
+sees no DOM and no signals:
+
+```ts
+// parse.worker.ts
+self.addEventListener('message', (e: MessageEvent<ArrayBuffer>) => {
+  const lines = new TextDecoder().decode(e.data).split('\n').filter(Boolean);
+  let total = 0;
+  for (const line of lines) total += Number(line.split(',')[2]) || 0;
+  self.postMessage({ rows: lines.length, total });
+});
+```
+
+The component creates it, posts the work, and writes what comes back into signals:
+
+```pdx
+<template>
+  <input type="file" accept=".csv" @change="load($event)" />
+  @if (error) { <p role="alert">{{ error }}</p> }
+  @if (summary) { <p>{{ summary?.rows }} rows, {{ summary?.total }} in all</p> }
+</template>
+
+<script setup>
+import { onDestroy } from '@pdxui/core';
+
+let summary = $signal<{ rows: number; total: number } | null>(null);
+let error = $signal('');
+
+const worker = new Worker(new URL('./parse.worker.ts', import.meta.url), { type: 'module' });
+worker.addEventListener('message', (e: MessageEvent<{ rows: number; total: number }>) => {
+  summary = e.data;
+  error = '';
+});
+worker.addEventListener('error', (e: ErrorEvent) => {
+  error = e.message;
+});
+onDestroy(() => worker.terminate());
+
+async function load(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  const buffer = await file.arrayBuffer();
+  worker.postMessage(buffer, [buffer]);   // transferred, not copied
+}
+</script>
+```
+
+- **`new Worker(new URL('./parse.worker.ts', import.meta.url), { type: 'module' })`** is the form Vite
+  finds and bundles: the worker becomes a chunk of its own, in development and in a build. A string
+  path is not bundled.
+- **The result and the error each go into a signal**, in the `message` and `error` listeners. Those
+  are writes outside a template handler, so each flushes at once (see [batch](#batch)).
+- **End the worker with the component**: `onDestroy(() => worker.terminate())`. A worker left running
+  keeps its thread and its memory after the page has moved on.
+- **What crosses is copied.** `postMessage` sends a structured clone, so functions, DOM nodes and
+  signals cannot cross: send the plain values they hold. An `ArrayBuffer` named in the second argument
+  is **transferred** instead of copied, which costs nothing whatever its size; the sender can no
+  longer read it afterwards.
+- A worker that answers more than one request at a time needs an id in each message, to match a reply
+  to its request. With one request in flight, as here, it does not.
 
 ## Ownership scope (advanced)
 
@@ -204,4 +275,5 @@ turns false.
 | `$watch` | react to a change with prev/next |
 | `:ref` + `$signal(null)` | access to the mounted DOM |
 | `processInSlices` | a long loop over data that does not block input |
+| a module `Worker` | a pure computation on another thread |
 | `collectDisposers` / `onDispose` | cleanup scope (under the hood) |

@@ -758,3 +758,41 @@ describe('the data page says what a long list costs', () => {
         }
     });
 });
+
+// Work too heavy for the main thread (#241): the beta promises a documented Worker pattern and no
+// Worker syntax. The section is an h2, so it is in the page's "On this page" list, and it carries the
+// parts a reader copies: the module worker in the form Vite bundles, the result and the error each
+// into a signal, the worker ended with the component, and what may cross.
+describe('the reactivity page says what to do with work that would block input', () => {
+    const page = readFileSync(join(ROOT, 'site', 'content', 'docs', 'reactivity.md'), 'utf8');
+    const flat = page.replace(/\s+/g, ' ');
+
+    it('has the section as a heading the table of contents lists', () => {
+        expect(page).toMatch(/^## Work that would block input$/m);
+    });
+
+    it('names the slicing helper for a long loop, and a Worker for a pure computation', () => {
+        expect(flat).toContain('processInSlices');
+        expect(flat).toMatch(/pure computation/i);
+    });
+
+    it('shows the Worker pattern whole', () => {
+        for (const [what, needle] of [
+            ['the module worker, in the form Vite bundles', "new Worker(new URL('./"],
+            ['a module worker', "type: 'module'"],
+            ['the request', 'postMessage('],
+            ['the reply', "addEventListener('message'"],
+            ['the error', "addEventListener('error'"],
+            ['the worker ended with the component', 'onDestroy('],
+            ['the end itself', '.terminate()'],
+        ] as const) {
+            expect(flat, `the pattern no longer shows ${what}`).toContain(needle);
+        }
+    });
+
+    it('says what must not cross, and what crosses cheaply', () => {
+        expect(flat).toMatch(/functions, DOM nodes (and|or) signals/i);
+        expect(flat).toMatch(/transfer/i);
+        expect(flat).toContain('ArrayBuffer');
+    });
+});
