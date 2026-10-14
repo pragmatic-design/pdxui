@@ -1,17 +1,17 @@
 {
-  "measured": null,
+  "measured": "2026-10-14, the first run of bench-nightly.yml (pull request #403, ubuntu-latest, Google Chrome 155.0.8059.39, three runs against vanillajs); each threshold is that median + 15%, rounded up",
   "ratio": {
-    "01_run1k script": null,
-    "02_replace1k script": null,
-    "03_update10th1k_x16 script": null,
-    "04_select1k script": null,
-    "05_swap1k script": null,
-    "06_remove-one-1k script": null,
-    "07_create10k script": null,
-    "08_create1k-after1k_x2 script": null,
-    "09_clear1k_x8 script": null
+    "01_run1k script": 4.19,
+    "02_replace1k script": 3.5,
+    "03_update10th1k_x16 script": 6.28,
+    "04_select1k script": 1.0,
+    "05_swap1k script": 9.66,
+    "06_remove-one-1k script": 2.72,
+    "07_create10k script": 0.5,
+    "08_create1k-after1k_x2 script": 4.09,
+    "09_clear1k_x8 script": 1.63
   },
   "memoryMB": {
-    "22_run-memory": null
+    "22_run-memory": 5.2
   }
 }
