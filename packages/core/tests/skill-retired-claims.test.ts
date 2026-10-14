@@ -57,6 +57,12 @@ const RETIRED: [string, string][] = [
         'the open panel already rests at transform: none; clearing it by hand is not needed'],
     ['means RESTARTING the dev server',
         'the dev server picks up a new .pdx by itself, and announces it'],
+    // Measured while doing #241: `let error = $signal('')` compiles to `__error`, `error = x` to
+    // `__error.setRaw(x)`, `{{ error }}` to `ctx.error()`, with no warning.
+    ['forbidden name for a signal',
+        'a $signal named `error` is rewritten like any other; no name is reserved'],
+    ['The name `error` is forbidden',
+        'a $signal named `error` is rewritten like any other; no name is reserved'],
     // ⚠️ The five below are the SAME retired claims in the wording a summary of them takes. The
     // guard matches literal sentences, so a paraphrase two files away would sail through — and the
     // summary would go on teaching the workarounds after the page retired them. A check on exact

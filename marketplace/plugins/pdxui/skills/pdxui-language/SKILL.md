@@ -81,14 +81,25 @@ it doing five things.
 | `$emit(event, payload)` | dispatch a `CustomEvent` from this component — the untyped form; prefer an `@event` |
 | `onMount(fn)` / `onDestroy(fn)` | lifecycle. `onMount` is **one-shot**, not reactive |
 
-⚠️ **`error` is a forbidden name for a signal** — the compiler does not rewrite it. Use `errMsg`.
-
 ⚠️ **A `$signal`'s value is replaced, never changed in place.** `items.push(x)` or `user.name = v` sets
 nothing, so nothing on screen updates. Write `items = [...items, x]` and `user = { ...user, name: v }`.
 The compiler reports the in-place form as `PDX_SIGNAL_MUTATED_IN_PLACE` — in the script and in a
 template handler (`@click="items.push(x)"`) — and `pdx check --fix` rewrites
 a push and a field. A list or object you want to mutate in place is a `$store`; a `:ref` target (an
 element) is not reported.
+
+**Work that would block input.** Signals stay synchronous, and so does a loop: 100 000 items filtered
+in a handler is one task, and the page answers no click until it ends. Two ways out, no new syntax:
+- a long loop over data the page uses: `await processInSlices(items, work, { signal })` from
+  `@pdxui/core`, which yields to input every 5 ms; collect into a plain value and write the signal
+  once at the end;
+- a pure computation (no DOM, no signals): a module Worker.
+  `const worker = new Worker(new URL('./parse.worker.ts', import.meta.url), { type: 'module' })` (the
+  form Vite bundles), `worker.postMessage(buffer, [buffer])` to send (an `ArrayBuffer` in the second
+  argument is transferred, not copied), the reply written into a `$signal` in
+  `worker.addEventListener('message', …)`, the failure into another in `'error'`, and
+  `onDestroy(() => worker.terminate())`. Functions, DOM nodes and signals cannot cross; send plain
+  values. The whole example is on the site's reactivity page, "Work that would block input".
 
 ## Declarations
 
