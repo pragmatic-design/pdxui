@@ -10,9 +10,10 @@
 // - A threshold of null is reported and not held: that is how the first nightly measures. A metric
 //   the run does not have fails, whatever its threshold, rather than passing in silence.
 //
-// The thresholds are in thresholds.json: each is the first nightly's median plus 15%. One is
-// lowered when a render-path change improves the number, never raised without a commit that says
-// why. PDX's absolute numbers are printed beside the specification's targets on every run, so the
+// The thresholds are in thresholds.json: each is the measured median plus 15%, the higher of the
+// first two runs, since a ratio moved by up to 40% between them. One is lowered when a render-path
+// change improves the number, never raised without a commit that says why; a night that goes red
+// on an unchanged tree is the signal that a margin is too narrow. PDX's absolute numbers are printed beside the specification's targets on every run, so the
 // distance to them stays visible (docs/language/beta/performance.md, O1/O2 and «Bounded memory»).
 
 import { appendFileSync, readFileSync } from 'node:fs';
