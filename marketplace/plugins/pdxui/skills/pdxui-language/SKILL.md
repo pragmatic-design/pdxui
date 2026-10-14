@@ -200,6 +200,18 @@ says so, with the line and column.
 update, same id, new fields — keeps its DOM and shows the new values. The key is the identity, not
 the content: do not put changing fields in it, that recreates the row on every update.
 
+**A long list is `@for … @virtual`.** `@for (posts as p; track p.id) @virtual(64) { <li>…</li> }`
+renders only the rows in view; the number is the estimated row height in px, and without it the
+first row is measured. The shape is fixed, and the compiler checks it (`PDX_VIRTUAL_SHAPE`):
+- the `@for` is the **only** content of a **native** element — that element scrolls, so give it a
+  height and `overflow: auto`;
+- each row is **one** element.
+
+Example: `<ul class="feed">@for (…) @virtual { <li>…</li> }</ul>`, and the same for
+`<tbody>` with `<tr>` and `<div>` with `<div>`. No `@transition`, `@stagger`, `@mode` or `@move` on it
+(`PDX_VIRTUAL_TRANSITION`). A `DataSource` works as the collection: reaching its last row calls
+`loadMore()`. Find-in-page and print see only the rendered rows.
+
 **`@await` waits for a promise** — `@loading` while it is pending, the body once it resolves, `@error`
 if it rejects (a boolean works too: the body when true). Two things it needs:
 - **the same promise on every evaluation.** `@await (loadUser())` makes a new promise each time the

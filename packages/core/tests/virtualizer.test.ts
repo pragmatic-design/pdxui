@@ -186,10 +186,13 @@ describe('virtualizer measureElement', () => {
         const el = document.createElement('div');
         el.dataset.virtualIndex = '0';
         Object.defineProperty(el, 'offsetHeight', { value: 50 });
+        // In the document, as a rendered row is: a detached element has no size to measure (#283).
+        document.body.appendChild(el);
         virt.measureElement(el);
 
         expect(virt.totalSize()).toBe(140);
         virt.dispose();
+        el.remove();
     });
 });
 
@@ -258,6 +261,19 @@ describe('virtualizer: measured items stay measured', () => {
         observer.fire(el);
         expect(observer.watched.has(el), 'a removed element is still observed').toBe(false);
         expect(virt.totalSize(), 'a removed element was measured at 0').toBe(140);
+        virt.dispose();
+    });
+
+    it('an element not yet in the document is observed, not measured at 0', () => {
+        // A row built in a fragment, before the fragment is placed: read then, its height is 0, and
+        // a list measured that way lost 100 rows' worth of height (#283).
+        const virt = createVirtualizer({ count: () => 10, estimateSize: () => 10, getScrollElement: () => null });
+        const el = item(0, 50);
+        el.remove();
+        el.setHeight(0);
+        virt.measureElement(el);
+        expect(virt.totalSize(), 'a detached element was measured at 0').toBe(100);
+        expect(itemObserver(el), 'the detached element is not observed for when it is placed').toBeDefined();
         virt.dispose();
     });
 

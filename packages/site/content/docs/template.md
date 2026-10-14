@@ -177,6 +177,47 @@ compose when you want both — `@transition('fade') @move(200)`.
 This is what makes a drag-sorted list ([`useSortable`](/docs/composables)) or a re-sorting table look
 like one movement instead of a repaint.
 
+### A long list: `@virtual`
+
+A `@for` over 10 000 items creates 10 000 rows. With `@virtual`, it creates the ones in view:
+
+```pdx
+<ul class="feed">
+  @for (posts as post; track post.id) @virtual(64) {
+    <li>{{ post.title }}</li>
+  } @empty {
+    <li>No posts yet.</li>
+  }
+</ul>
+
+<style scoped>
+.feed { height: 400px; overflow: auto; }
+</style>
+```
+
+The element around the `@for` is what scrolls, and the rows stay its own children: `<li>` of the
+`<ul>`, `<tr>` of a `<tbody>`, `<div>` of a `<div>`. Two spacers of the same tag stand in for the
+rows above and below the window; they are empty and `aria-hidden`, so the list keeps its real height
+and the scrollbar its real length. `@virtual(64)` is the estimated row height in px. Without a
+number the first row is measured, and every row is measured as it renders and again when its size
+changes, so rows of different heights land where they are.
+
+The collection can also be a `DataSource`: the list renders its `data()`, and when its last row
+scrolls into view, it calls `loadMore()` once while `hasMore()` is true. `@empty` shows for an empty
+list, and for a source that has no data and is not loading.
+
+The shape is checked. The `@for` must be the only content of a native element (a component's
+children are projected elsewhere), and each row must be one element. Anything else is
+[`PDX_VIRTUAL_SHAPE`](/docs/diagnostics). A row scrolling out of view is not leaving the list, so
+`@transition`, `@stagger`, `@mode` and `@move` are refused: [`PDX_VIRTUAL_TRANSITION`](/docs/diagnostics).
+
+Three limits come with it:
+
+- **The container needs a bounded height.** One that grows with its rows renders all of them, and
+  in development a warning names it.
+- **Find-in-page sees only the rows in view.**
+- **Printing gets only the rows in view.**
+
 ## Animating a value yourself
 
 `@transition` covers a subtree appearing and disappearing, and CSS does the work. When the thing that

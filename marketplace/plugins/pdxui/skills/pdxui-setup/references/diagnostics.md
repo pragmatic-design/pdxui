@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 81 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 83 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1135,6 +1135,66 @@ The custom element is never registered: it renders as an empty unknown element, 
 Reactive state no template, effect or function reads costs a subscription and says nothing.
 
 **Fix.** Remove it, or prefix it with `_` if it is kept on purpose.
+
+### PDX_VIRTUAL_SHAPE
+
+*error* — A `@for … @virtual` without the shape it needs: alone in a native element, with one root element per row.
+
+The element written around a virtual `@for` is the scroll container, and the rows stay its own children between two spacers. Another child beside the `@for` would scroll with the rows and break their offsets; a component tag projects its children elsewhere; a row of two elements cannot be measured as one.
+
+**Fix.** Write the `@for` as the only content of a native element, `<ul class="feed">@for (…) @virtual { <li>…</li> }</ul>`, with one root element in the body.
+
+Instead of:
+
+```html
+<template>
+  <ul><li>Header</li>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>
+</template>
+<script setup>
+let rows = $signal([]);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <ul>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>
+</template>
+<script setup>
+let rows = $signal([]);
+</script>
+```
+
+### PDX_VIRTUAL_TRANSITION
+
+*error* — A `@for … @virtual` with `@transition`, `@stagger`, `@mode` or `@move`.
+
+A virtual list adds and removes rows as they scroll in and out of view. A row that scrolls out is not leaving the list, and one that scrolls in is not arriving: an enter or exit animation, a stagger or a move would play on every scroll.
+
+**Fix.** Remove the transition modifiers from the virtual `@for`, or remove `@virtual` to animate the whole list.
+
+Instead of:
+
+```html
+<template>
+  <ul>@for (rows as r; track r.id) @transition('fade') @virtual { <li>{{ r.name }}</li> }</ul>
+</template>
+<script setup>
+let rows = $signal([]);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <ul>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>
+</template>
+<script setup>
+let rows = $signal([]);
+</script>
+```
 
 ## Design questions
 

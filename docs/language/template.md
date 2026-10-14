@@ -816,8 +816,9 @@ alpha
 
 ```ebnf
 ForBlock       ::= "@for" S? "(" S? Expression S "as" S Binding ( S? "," S? Identifier )? S? ";" S? "track" S Expression S? ")"
-                   S? BlockTransition? Block ( S? "@empty" Block )?
+                   S? BlockTransition? ( S? Virtual )? Block ( S? "@empty" Block )?
 Binding        ::= Identifier | /* an object or array destructuring pattern */
+Virtual        ::= "@virtual" ( S? "(" S? Number S? ")" )?
 ```
 
 #### Semantics
@@ -830,6 +831,17 @@ bound once from the object the row was created with. `track item.field` is passe
 any other key is a function, `(item, i) => …`. Rows are moved, not rebuilt, by a keyed
 reconciliation. `@empty` wraps the loop in `when(() => items?.length > 0, …, () => html\`…\`)`.
 
+`@virtual` renders only the rows in view (#283). The element written around the `@for` is the scroll
+container, and it compiles to `eachVirtual(() => ctx.items(), 'id', (item, i) => …, { estimate, tag,
+getters, empty })` placed where the `@for` was: the rows in the window stay that element's own
+children, between two spacers of the rows' tag (`li` in a `ul`, `tr` in a `tbody`) that are
+`aria-hidden` and sized to the rows above and below. `@virtual(48)` is the estimated row size in px;
+without a number the first rendered row is measured. Each row is measured as it renders, and again
+when its size changes. The collection may be an array or a `DataSource`: of a source, `data()` is
+rendered, and when its last row is in view, `hasMore()` is true and no load runs, `loadMore()` is
+called once. `@empty` is the list's own: it renders for an empty array, or a source with no data that
+is not loading.
+
 #### Rules
 
 - `as` and `; track` are required: `Invalid @for syntax` stops the compile.
@@ -840,6 +852,16 @@ reconciliation. `@empty` wraps the loop in `when(() => items?.length > 0, …, (
 - On the template path — in a `.pdx`, only a scoped slot's body (#364) — in a production build, a
   loop whose body reads a signal that does not depend on the row has that read hoisted into one
   `computed`, and then its `@empty` is dropped. Not checked today. The inline path keeps it.
+- **`@virtual` has a shape.** The `@for` is the only content of the element around it (whitespace and
+  comments aside), that element is native (a component's children are projected elsewhere), and the
+  body has exactly one root element. Anything else is `PDX_VIRTUAL_SHAPE` (error), naming the rule it
+  broke. A `@virtual` with `@transition`, `@stagger`, `@mode` or `@move` is `PDX_VIRTUAL_TRANSITION`
+  (error): a row scrolling in or out is not arriving or leaving. `@virtual(n)` takes a positive number;
+  anything else stops the compile.
+- **`@virtual` needs a bounded container**: a height (`height`, `max-height`, a flex or grid track) and
+  `overflow: auto`. A container that grows with its rows renders every row; in development it logs
+  one warning naming the element. Not checked at compile time.
+- **What a virtual list does not show**: find-in-page and print see only the rendered rows.
 
 #### Examples
 
@@ -859,9 +881,42 @@ let todos = $signal([{ id: 1, text: 'Write', done: false }]);
 </script>
 ```
 
+A virtual list, in a `ul`, a `tbody` and a `div`:
+
+```pdx
+<template>
+  <ul class="feed">
+    @for (posts as post; track post.id) @virtual(64) {
+      <li>{{ post.title }}</li>
+    } @empty {
+      <li>No posts yet.</li>
+    }
+  </ul>
+  <table>
+    <tbody class="rows">
+      @for (rows as row; track row.id) @virtual { <tr><td>{{ row.name }}</td></tr> }
+    </tbody>
+  </table>
+  <div class="cards">
+    @for (cards as card; track card.id) @virtual(120) { <article>{{ card.body }}</article> }
+  </div>
+</template>
+
+<script setup>
+let posts = $signal([]);
+let rows = $signal([]);
+let cards = $signal([]);
+</script>
+
+<style scoped>
+.feed, .cards { height: 400px; overflow: auto; }
+.rows { display: block; height: 400px; overflow: auto; }
+</style>
+```
+
 #### Since
 
-alpha
+alpha; `@virtual` since #283
 
 ### `@transition`, `@stagger`, `@mode`, `@move`
 

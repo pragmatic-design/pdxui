@@ -20,6 +20,7 @@ import { bindingNames } from './codegen-prefix';
 import { stateExprIsNotBoolean } from './validate-state';
 import { invalidHostAttribute } from './host-block';
 import { checkParts } from './validate-parts';
+import { checkVirtualFor } from './validate-virtual';
 import { checkCommands, type MethodsLookup } from './validate-commands';
 
 /**
@@ -510,6 +511,10 @@ export function validate(
     // ─── Check 10e: invoker commands reach a target that answers them (#140) ──
 
     warnings.push(...checkCommands(ast, options?.methodsOf));
+
+    // ─── Check 10f: a @for … @virtual has the shape it needs (#283) ──
+
+    warnings.push(...checkVirtualFor(ast));
 
     // ─── Check 11: @prop default type mismatch ──────────────────
 
