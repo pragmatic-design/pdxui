@@ -200,6 +200,11 @@ says so, with the line and column.
 update, same id, new fields — keeps its DOM and shows the new values. The key is the identity, not
 the content: do not put changing fields in it, that recreates the row on every update.
 
+**Many rows at once arrive in slices.** A `@for` that appends more than 1 000 rows, or replaces the
+list with one sharing no row, renders 250 in the same task and the rest in slices that yield to
+input. Do not read the DOM for the last row right after the write: wait for it. A `@for` with
+`@transition`, or with a destructured binding, keeps a single pass.
+
 **A long list is `@for … @virtual`.** `@for (posts as p; track p.id) @virtual(64) { <li>…</li> }`
 renders only the rows in view; the number is the estimated row height in px, and without it the
 first row is measured. The shape is fixed, and the compiler checks it (`PDX_VIRTUAL_SHAPE`):

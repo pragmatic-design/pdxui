@@ -177,9 +177,23 @@ compose when you want both — `@transition('fade') @move(200)`.
 This is what makes a drag-sorted list ([`useSortable`](/docs/composables)) or a re-sorting table look
 like one movement instead of a repaint.
 
+### Many rows at once
+
+A `@for` that receives more than 1 000 new rows at once draws the first 250 in the same task and,
+once they are painted, the rest in slices of about 40 ms, so a click that appended 10 000 rows is answered in the next frame
+and the page keeps answering while the rest arrive. This holds when rows are appended (the first
+render included) and when the list is replaced by one with no row in common. Until the slices settle
+the rows still to come are not in the DOM. Writing a newer list replaces the slices still pending.
+
+Some lists keep the single pass:
+- a list with `@transition`, whose timing is the transition's;
+- a destructured `@for (pairs as { key, value }; …)`;
+- a change that keeps some rows and adds many between them.
+
 ### A long list: `@virtual`
 
-A `@for` over 10 000 items creates 10 000 rows. With `@virtual`, it creates the ones in view:
+A `@for` over 10 000 items creates 10 000 rows, in slices or not. With `@virtual`, it creates the
+ones in view:
 
 ```pdx
 <ul class="feed">

@@ -183,7 +183,9 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // (#140) — `exposeOnElement`, in the entry since every component may expose — on top of `@host`
 // (#133) and `@part` (#134) in the compiled pages. Measured locally: entry 37.0, blocking 92.1, js
 // 467.4; CI has measured 0.1 KB above local before, and the entry sat on its ceiling.
-const BUDGET_KB = { entry: 38, js: 468, css: 59, blocking: 93 };
+// js 468 → 469: a `@for` that receives many rows renders them in slices (#242) — the list's slicer
+// and `processInSlices` (#240), which every keyed list now reaches. Measured locally: js 468.4.
+const BUDGET_KB = { entry: 38, js: 469, css: 59, blocking: 93 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
