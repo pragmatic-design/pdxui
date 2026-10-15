@@ -27,8 +27,25 @@ async function icons(...names: string[]): Promise<HTMLElement[]> {
         document.body.appendChild(el);
         return el;
     });
-    await tick(50);
+    // A frame: enough to draw an icon the page has. One that loads is awaited by the test (#380).
+    await tick();
     return els;
+}
+
+/**
+ * Spy on a name's loader and slow it by 200 ms, longer than any fixed wait would cover: a test
+ * waits for the load it asserts on, not for a time (#380). The calls' promises are kept, so a
+ * test can await the load itself.
+ */
+function slowLoader(name: string) {
+    const real = PRAGMATIC_LOADERS[name];
+    const loads: Promise<unknown>[] = [];
+    const spy = vi.spyOn(PRAGMATIC_LOADERS, name).mockImplementation(() => {
+        const load = new Promise<void>(r => setTimeout(r, 200)).then(real);
+        loads.push(load);
+        return load;
+    });
+    return { spy, loads };
 }
 
 const drawn = (el: HTMLElement): string => el.querySelector('svg path, svg line, svg circle, svg rect, svg polyline, svg polygon')?.outerHTML ?? '';
@@ -51,9 +68,11 @@ describe('pdx-icon and the icons of the set', () => {
 
     it('loads a name it does not have once, however many icons draw it, and draws every one', async () => {
         expect(definedIcon('archive')).toBeUndefined();
-        const load = vi.spyOn(PRAGMATIC_LOADERS, 'archive');
+        const { spy: load, loads } = slowLoader('archive');
         const els = await icons('archive', 'archive', 'archive');
         expect(load).toHaveBeenCalledTimes(1);
+        await Promise.all(loads);
+        await tick();
         for (const el of els) expect(drawn(el), 'an icon loaded on demand was not drawn').not.toBe('');
         expect(definedIcon('archive')).toBeDefined();
     });
@@ -67,12 +86,18 @@ describe('pdx-icon and the icons of the set', () => {
 
     it('an icon that arrives after the name changed is not drawn over the new one', async () => {
         expect(definedIcon('bell')).toBeUndefined();
+        const { spy: load, loads } = slowLoader('bell');
         const el = document.createElement('pdx-icon');
         el.setAttribute('name', 'bell');
         document.body.appendChild(el);
         // Before `bell` has loaded, the name becomes an icon the page already has.
         el.setAttribute('name', 'check');
-        await tick(50);
+        await tick();
+        expect(load, 'bell was never asked for, so nothing could arrive late').toHaveBeenCalledTimes(1);
+        // Wait for `bell` to arrive, then for what it would draw: only then is "not drawn over" seen.
+        await Promise.all(loads);
+        await tick();
+        expect(definedIcon('bell'), 'bell has not arrived yet').toBeDefined();
         expect(drawn(el)).toContain('M20 6L9 17l-5-5');
     });
 });
