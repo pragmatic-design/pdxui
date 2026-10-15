@@ -157,6 +157,85 @@ async function load(page: Page): Promise<Timings> {
 
 const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 
+/**
+ * When each route's main content paints (#251). «App ready» says when the splash leaves; a page whose
+ * largest element is a list or a record can be ready and still have its content arrive later. So
+ * three routes, cold, under the same slow 4G, read the Largest Contentful Paint, and the LCP element
+ * has to be inside the route's own page: an LCP that is the shell's measures the shell, and the test
+ * says so instead of passing.
+ *
+ * A budget of null is reported and not held: that is how the first CI run measured. Each budget is
+ * the highest measurement + 10%, rounded up to 50 ms. Highest of the first CI run and the local ones,
+ * because this spec runs in the pre-push gate too, where a laptop measured about 5% over the runner.
+ * Measured 2026-10-14, slow 4G, cold:
+ *
+ *                 CI (one run)    local (three runs, and the pre-push gate)    budget
+ *   /                 908 ms          952, 956, 952, 948 ms                    1100 ms
+ *   /tickets         3700 ms          3908, 3952, 3916, 3872 ms                4350 ms
+ *   /tickets/1       1776 ms          1852, 1876, 1864, 1884 ms                2100 ms
+ *
+ * `/tickets` paints three seconds after the app is ready: its route's ~60 modules share the slow
+ * link before the page mounts. Its budget holds that number from growing, and #407 is what lowers it.
+ */
+const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
+    { route: '/', root: 'dashboard', budgetMs: 1100 },
+    { route: '/tickets', root: 'tickets', budgetMs: 4350 },
+    { route: '/tickets/1', root: 'ticket', budgetMs: 2100 },
+];
+
+interface Lcp {
+    /** The last `largest-contentful-paint` entry's time, before any input. */
+    ms: number;
+    /** What the element is, for the log and the failure. */
+    element: string;
+    /** Whether the element is inside the route's page root. */
+    insidePage: boolean;
+}
+
+/** A cold load of `route`, throttled, and its LCP once the page has settled. */
+async function lcpOf(page: Page, route: string, root: string): Promise<Lcp> {
+    await page.addInitScript(() => {
+        const w = window as unknown as { __lcp?: { startTime: number; element: Element | null } };
+        new PerformanceObserver((list) => {
+            const entries = list.getEntries() as (PerformanceEntry & { element: Element | null })[];
+            const last = entries[entries.length - 1];
+            if (last) w.__lcp = { startTime: last.startTime, element: last.element };
+        }).observe({ type: 'largest-contentful-paint', buffered: true });
+    });
+    await throttle(page);
+    await page.goto(route, { waitUntil: 'load' });
+    await expect(page.locator(`[data-test="${root}"]`)).toBeVisible({ timeout: 30_000 });
+    // Settled: a later, larger paint replaces the entry, and LCP stops at the first input.
+    await page.waitForTimeout(1_500);
+    return page.evaluate((rootTest) => {
+        const lcp = (window as unknown as { __lcp?: { startTime: number; element: Element | null } }).__lcp;
+        if (!lcp) return { ms: -1, element: 'none', insidePage: false };
+        const el = lcp.element;
+        const pageRoot = document.querySelector(`[data-test="${rootTest}"]`);
+        const describe = (e: Element | null): string => {
+            if (!e) return 'an element no longer in the page';
+            const test = e.closest('[data-test]')?.getAttribute('data-test');
+            return `<${e.tagName.toLowerCase()}>${test ? ` in [data-test="${test}"]` : ''} "${(e.textContent ?? '').trim().slice(0, 40)}"`;
+        };
+        return { ms: Math.round(lcp.startTime), element: describe(el), insidePage: !!(el && pageRoot && pageRoot.contains(el)) };
+    }, root);
+}
+
+test.describe('each route\'s main content paints within its budget', () => {
+    for (const { route, root, budgetMs } of LCP_ROUTES) {
+        test(`LCP of ${route} is inside its page, and within its budget`, async ({ page }) => {
+            const lcp = await lcpOf(page, route, root);
+            console.log(`[first-paint] slow 4G LCP ${route}: ${lcp.ms}ms (${lcp.element})${budgetMs === null ? ' — no budget yet' : ` against ${budgetMs}ms`}`);
+            expect(lcp.ms, `no largest-contentful-paint entry for ${route}`).toBeGreaterThan(0);
+            expect(lcp.insidePage, `the LCP of ${route} is ${lcp.element}, not inside [data-test="${root}"]: it measures the shell, not the page`)
+                .toBe(true);
+            if (budgetMs !== null) {
+                expect(lcp.ms, `the LCP of ${route} is ${lcp.ms}ms against a ${budgetMs}ms budget`).toBeLessThanOrEqual(budgetMs);
+            }
+        });
+    }
+});
+
 test.describe('the first paint, on a network that is not localhost', () => {
     test('the stylesheet is not what the paint is waiting for', async ({ page }) => {
         await throttle(page);

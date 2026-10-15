@@ -14,7 +14,8 @@
 // lowered when a measurement is more than 20% under it.
 
 import { spawnSync } from 'node:child_process';
-import { appendFileSync, existsSync, readFileSync, rmSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -42,11 +43,18 @@ function coldStart() {
     rmSync(join(showcase, 'node_modules', '.vite'), { recursive: true, force: true });
 }
 
+/**
+ * Where `pdx analyze` writes its manifest: a temporary folder. Its default is `pdx-manifest.json` in
+ * the working directory, and a run here left one, untracked, in the showcase.
+ */
+const scratch = mkdtempSync(join(tmpdir(), 'pdx-time-budgets-'));
+const ARGS = { analyze: ['--out', join(scratch, 'pdx-manifest.json')] };
+
 /** One run of `pdx <command>` in the showcase: its wall time, or the output that says why it failed. */
 function runOnce(command) {
     if (command === 'build') coldStart();
     const start = performance.now();
-    const r = spawnSync(process.execPath, [cli, command], { cwd: showcase, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const r = spawnSync(process.execPath, [cli, command, ...(ARGS[command] ?? [])], { cwd: showcase, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     const ms = performance.now() - start;
     if (r.status !== 0) {
         const output = `${r.stdout ?? ''}\n${r.stderr ?? ''}`.trim().split('\n').slice(-40).join('\n');
