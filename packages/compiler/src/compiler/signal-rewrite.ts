@@ -1,8 +1,6 @@
 // Signal declaration helpers — emit the const __name = signal(…) / computed(…) declarations
-// and the auto-return object. The actual mutation/read rewriting of setup bodies moved to the
-// AST rewriter in signal-rewrite-ast.ts (rewriteAst). Derived expressions still get their reads
-// rewritten with a small inline regex here (they are single $derived(EXPR) expressions, not
-// arbitrary statement bodies).
+// and the auto-return object. The mutation/read rewriting is the AST rewriter's, rewriteAst in
+// signal-rewrite-ast.ts: setup bodies and $derived expressions alike go through it.
 
 import ts from 'typescript';
 import type { SignalDecl } from './script-analyzer';
