@@ -48,8 +48,6 @@ component('pdx-split-button', {
         let _primaryEl: HTMLButtonElement | null = null;
         let _arrowEl: HTMLButtonElement | null = null;
         let _outsideHandler: ((e: MouseEvent) => void) | null = null;
-        // The pending attach of _outsideHandler: a close inside those 10ms cancels it.
-        let _outsideTimer: ReturnType<typeof setTimeout> | null = null;
         let _escHandler: ((e: KeyboardEvent) => void) | null = null;
         let _focusDispose: Dispose | null = null;
         let _scrollHandler: (() => void) | null = null;
@@ -182,14 +180,15 @@ component('pdx-split-button', {
             window.addEventListener('scroll', _scrollHandler, { capture: true, passive: true });
             window.addEventListener('resize', _scrollHandler, { passive: true });
 
-            _outsideTimer = setTimeout(() => {
-                _outsideTimer = null;
-                _outsideHandler = (ev: MouseEvent) => {
-                    if (ctx.el.contains(ev.target as Node) || _panelEl?.contains(ev.target as Node)) return;
-                    close();
-                };
-                document.addEventListener('mousedown', _outsideHandler);
-            }, 10);
+            // Attached now, not after a timer: the menu opens on a click, whose mousedown has already
+            // been dispatched, and a mousedown inside the split button is ignored anyway. A timer
+            // outlived a split button left open when its test file ended, and fired with no
+            // document (#382).
+            _outsideHandler = (ev: MouseEvent) => {
+                if (ctx.el.contains(ev.target as Node) || _panelEl?.contains(ev.target as Node)) return;
+                close();
+            };
+            document.addEventListener('mousedown', _outsideHandler);
 
             _escHandler = (ev: KeyboardEvent) => {
                 if (ev.key === 'Escape') { ev.preventDefault(); close(); }
@@ -201,7 +200,6 @@ component('pdx-split-button', {
             if (!_open.peek()) return;
             setOpen(false);
             if (_panelEl) { _panelEl.style.display = 'none'; _panelEl.remove(); }
-            if (_outsideTimer) { clearTimeout(_outsideTimer); _outsideTimer = null; }
             if (_outsideHandler) { document.removeEventListener('mousedown', _outsideHandler); _outsideHandler = null; }
             if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
             if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
