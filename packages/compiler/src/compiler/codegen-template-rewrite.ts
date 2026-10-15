@@ -53,6 +53,16 @@ export function buildEventHandler(expr: string, ctx: CompileContext): string {
     return `batchHandler(${unbatchedHandler(expr, ctx)})`;
 }
 
+/**
+ * A @for row's handler, declared once for every row (#375): the same handler, taking after the event
+ * the scope the row stores with it — `names`, the names in scope where it is written, as one value
+ * when there is one and as an array when there are more. Core's `delegate` passes it.
+ */
+export function buildScopedEventHandler(expr: string, ctx: CompileContext, names: string[]): string {
+    const scope = names.length === 1 ? names[0] : `[${names.join(',')}]`;
+    return `batchHandler((__e,${scope})=>(${unbatchedHandler(expr, ctx)})(__e))`;
+}
+
 /** The handler itself, before `buildEventHandler` puts it inside `batch()`. */
 function unbatchedHandler(expr: string, ctx: CompileContext): string {
     const e = expr.trim();

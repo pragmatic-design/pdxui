@@ -43,6 +43,31 @@ describe('delegate', () => {
         expect(reachedHost, 'the event went on past the component').toBe(false);
     });
 
+    it('one handler shared by many rows is called with the scope each row stored (#375)', () => {
+        const h = host();
+        const rows = ['a', 'b'].map((id) => {
+            const li = document.createElement('li');
+            h.appendChild(li);
+            return { id, li };
+        });
+        const calls: unknown[][] = [];
+        const shared = (...args: unknown[]) => { calls.push(args.slice(1)); };
+        for (const { id, li } of rows) delegate(h, li, 'click', shared, () => id);
+        rows[1].li.click();
+        expect(calls).toHaveLength(1);
+        expect((calls[0][0] as () => string)()).toBe('b');
+    });
+
+    it('a handler stored without a scope is called with the event alone', () => {
+        const h = host();
+        const button = document.createElement('button');
+        h.appendChild(button);
+        const lengths: number[] = [];
+        delegate(h, button, 'click', (...args: unknown[]) => { lengths.push(args.length); });
+        button.click();
+        expect(lengths).toEqual([1]);
+    });
+
     it('currentTarget is the element the handler is on, while it runs', () => {
         const h = host();
         const row = document.createElement('li');

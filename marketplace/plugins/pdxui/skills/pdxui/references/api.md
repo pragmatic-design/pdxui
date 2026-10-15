@@ -1628,11 +1628,12 @@ Wrap any transport with artificial delay for loading state demos/testing.
 ```ts
 import { delegate } from '@pdxui/core';
 
-function delegate(host: Element, el: Element, type: string, handler: (event: Event) => void): void
+function delegate(host: Element, el: Element, type: string, handler: (event: Event, scope?: unknown) => void, scope?: unknown): void
 ```
 
 Store `handler` for events of `type` on `el`, an element `host` rendered, and make sure `host`
-listens to `type` once.
+listens to `type` once. With a `scope`, the handler is called with it after the event: a row's
+handler, shared by every row, reads the row from it (#375).
 
 ### `destroyAnnouncer`
 

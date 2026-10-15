@@ -213,6 +213,22 @@ const ROWS: Row[] = [
     { name: '@for row @click (delegated)', expected: '<p>2</p><ul><li>1</li><li>2</li></ul>', template: '<p>{{ n }}</p><ul>@for (items as it; track it) {<li @click="n = n + it">{{ it }}</li>}</ul>', script: 'let n = $signal(0); let items = $signal([1, 2]);', act: click('li:last-child') },
     { name: '@for row @click.stop under a @click', expected: '<p>1</p><ul><li>1</li></ul>', template: '<p>{{ n }}</p><ul @click="n = n + 10">@for (items as it; track it) {<li @click.stop="n = n + 1">{{ it }}</li>}</ul>', script: 'let n = $signal(0); let items = $signal([1]);', act: click('li') },
     { name: '@for row $event.currentTarget', expected: '<p>LI</p><ul><li><b>1</b></li></ul>', template: '<p>{{ tag }}</p><ul>@for (items as it; track it) {<li @click="tag = $event.currentTarget.tagName"><b>{{ it }}</b></li>}</ul>', script: "let tag = $signal(''); let items = $signal([1]);", act: click('b') },
+    // A row's handler is declared once per @for and reads the row from the scope it stores (#375): an
+    // inner row's handler still reaches the outer row and the index, a destructured row its names, and
+    // a row whose item was replaced reads the new item, as its own closure did.
+    {
+        name: '@for nested row @click reads the outer row and the index', expected: '<p>b:y:1</p><div><ul><li>x</li></ul></div><div><ul><li>x</li><li>y</li></ul></div>',
+        template: "<p>{{ out }}</p>@for (groups as g; track g.id) {<div><ul>@for (g.kids as k, i; track k) {<li @click=\"out = g.id + ':' + k + ':' + i\">{{ k }}</li>}</ul></div>}",
+        script: "let out = $signal(''); let groups = $signal([{ id: 'a', kids: ['x'] }, { id: 'b', kids: ['x', 'y'] }]);",
+        act: click('div:last-of-type li:last-child'),
+    },
+    { name: '@for destructured row @click', expected: '<p>2</p><ul><li>a</li><li>b</li></ul>', template: '<p>{{ out }}</p><ul>@for (items as { id, label }; track id) {<li @click="out = id">{{ label }}</li>}</ul>', script: "let out = $signal(0); let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);", act: click('li:last-child') },
+    {
+        name: '@for row @click after its item is replaced', expected: '<p>new</p><ul><li>new</li></ul><button>replace</button>',
+        template: "<p>{{ out }}</p><ul>@for (items as it; track it.id) {<li @click=\"out = it.label\">{{ it.label }}</li>}</ul><button @click=\"items = [{ id: 1, label: 'new' }]\">replace</button>",
+        script: "let out = $signal(''); let items = $signal([{ id: 1, label: 'old' }]);",
+        act: (h) => { click('button')(h); click('li')(h); },
+    },
     // `key === sig` in a @for reads a keyed selector (#117): the selection moves, the rows follow.
     { name: '@for row selected by a keyed selector, after a change', expected: '<ul><li class="">1</li><li class="">2</li><li class="on">3</li></ul>', template: "<ul>@for (items as it; track it) {<li :class=\"it === sel ? 'on' : ''\" @click=\"sel = it\">{{ it }}</li>}</ul>", script: 'let sel = $signal(1); let items = $signal([1, 2, 3]);', act: click('li:last-child') },
     { name: '@switch', expected: '<p>B</p>', template: "@switch (mode) { @case ('a') { <p>A</p> } @case ('b') { <p>B</p> } @default { <p>?</p> } }", script: "let mode = $signal('b');" },

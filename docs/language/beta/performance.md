@@ -28,7 +28,7 @@ held to the benchmark (`pnpm bench:jfb`):
 | O2 | An expression that reads no signal creates **no effect**; a `track` key is not reactive (#110) | memory per 1 000 rows ≤ 3.5 MB (4.8 MB measured) |
 | O3 | Whitespace HTML ignores is not emitted (`table`, `tr`, between cells), except where it renders | node count of the benchmark table |
 | O4 | `:class` compiles to the cheapest DOM write its shape allows (`className`, `classList.toggle`) | select benchmark |
-| O5 | Events inside an `@for` are **delegated**: one listener per type on the component's host (#113) | memory, create |
+| O5 | Events inside an `@for` are **delegated**: one listener per type on the component's host (#113), and a row's handler is declared once per `@for`, not once per row (#375) | memory, create |
 | O6 | `item === selected` in an `@for` updates two rows, not N | select with 10 000 rows |
 | O7 | Clearing and appending a list take their fast paths (#118) | clear, append |
 | O8 | A handler's writes flush once (`batch()` in compiled handlers, #114 — **landed**); an unchanged computed does not rerun what reads it (#115 — **landed**); tracking allocates nothing per run (#116 — **landed**) | the reactivity probes |

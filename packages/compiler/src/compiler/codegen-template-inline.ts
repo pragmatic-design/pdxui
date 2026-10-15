@@ -13,7 +13,7 @@ import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope,
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { BindingDedup } from './inline-dedup';
-import { buildEventHandler, dynamicComponentCall, scopedSlotCall } from './codegen-template-rewrite';
+import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, scopedSlotCall } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { hoistSlotFunction } from './codegen-template';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
@@ -612,15 +612,27 @@ class InlineGen {
         // core's one listener per type, in DOM order.
         const delegated = this.ctx.delegatedEvents.has(ev) && delegableHandler(ev, [...mods], opaque);
         if (delegated) this.imports.add('delegate');
-        const listen = (fn: string, options: string): string => (delegated
-            ? `delegate(ctx.el,${el},${jsQuote(ev)},${fn});`
-            : `${el}.addEventListener(${jsQuote(ev)}, ${fn}${options});`);
+        // A delegated handler in a @for row is declared once, before the outermost @for, and the row
+        // stores with it the names in scope where it is written (#375): built per row, it was three
+        // closures a row. A `${…}` value is an expression already, and stays where it is.
+        const scopeNames = [...this.ctx.scopeVars];
+        const hoisted = delegated && !preRewritten && this.ctx.rowHandlers !== null && scopeNames.length > 0;
+        const scopeArg = scopeNames.length === 1 ? scopeNames[0] : `[${scopeNames.join(',')}]`;
+        const listen = (fn: string, options: string): string => {
+            if (!delegated) return `${el}.addEventListener(${jsQuote(ev)}, ${fn}${options});`;
+            if (!hoisted) return `delegate(ctx.el,${el},${jsQuote(ev)},${fn});`;
+            const name = this.v('rh');
+            this.ctx.rowHandlers!.push(`const ${name}=${fn};`);
+            return `delegate(ctx.el,${el},${jsQuote(ev)},${name},${scopeArg});`;
+        };
         // The SAME builder the template path uses, so every handler form the docs promise compiles
         // the same here: `$event` bound, `count++` and `open = !open` rewritten
         // as signal writes, and two statements kept as two statements.
         //
         // A `${…}` value arrives already rewritten by the caller and is passed through untouched.
-        const rawHandler = preRewritten ? expr : buildEventHandler(expr, this.ctx);
+        const rawHandler = preRewritten ? expr
+            : hoisted ? buildScopedEventHandler(expr, this.ctx, scopeNames)
+            : buildEventHandler(expr, this.ctx);
         if (!preRewritten) this.imports.add('batchHandler');
         // Wrap with safeHandler for global error interception
         this.imports.add('safeHandler');
@@ -650,6 +662,14 @@ class InlineGen {
             }
             if (rt.has('prevent')) w.push('e.preventDefault();');
             if (rt.has('stop')) w.push('e.stopPropagation();');
+            if (hoisted) {
+                // The handler once, and the modifiers around it once, passing the row's scope on.
+                const inner = this.v('rh');
+                this.ctx.rowHandlers!.push(`const ${inner}=${handler};`);
+                w.push(`${inner}(e,__s);`);
+                this.out(listen(`(e,__s)=>{${w.join('')}}`, opts));
+                return;
+            }
             w.push(`(${handler})(e);`);
             this.out(delegated
                 ? listen(`(e)=>{${w.join('')}}`, opts)
@@ -753,12 +773,31 @@ class InlineGen {
         this.imports.add('eachVirtual');
         const items = callSignals(prefixCtx(node.items, this.ctx), this.ctx);
         const keyArg = trackKeyArg(node, this.ctx);
-        const body = withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx, () => this.sub(node.body)));
+        const body = this.rowBody(() => withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx, () => this.sub(node.body))));
         const params = node.index ? `${node.item},${node.index}` : node.item;
         const cf = this.v('cf');
         this.pending = templateMark(this.ctx, node.exprOffset);
         this.out(`const ${cf}=eachVirtual(()=>${items},${keyArg},(${params})=>{${body}},${virtualOptions(node, rows, node.emptyBody ? `()=>{${this.sub(node.emptyBody)}}` : null)});`);
         this.place(cf);
+    }
+
+    /**
+     * Generate a @for's rows. The outermost @for collects the declarations of the delegated handlers
+     * its rows — and the rows of every @for inside them — would otherwise build per row (#375), and
+     * writes them here, before the list: once per render of the list, not once per row.
+     */
+    private rowBody(generate: () => string): string {
+        if (this.ctx.rowHandlers !== null) return generate();
+        const handlers: string[] = [];
+        this.ctx.rowHandlers = handlers;
+        let body: string;
+        try {
+            body = generate();
+        } finally {
+            this.ctx.rowHandlers = null;
+        }
+        for (const line of handlers) this.out(line);
+        return body;
     }
 
     forN(node: ForNode): void {
@@ -769,7 +808,7 @@ class InlineGen {
         this.imports.add(helper);
         const items = callSignals(prefixCtx(node.items, this.ctx), this.ctx);
         const keyArg = trackKeyArg(node, this.ctx);
-        let body = withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx, () => this.sub(node.body)));
+        let body = this.rowBody(() => withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx, () => this.sub(node.body))));
         const params = node.index ? `${node.item},${node.index}` : node.item;
         const transition = generateTransition(node.transition);
         const cf = this.v('cf');
