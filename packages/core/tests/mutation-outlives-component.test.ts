@@ -5,8 +5,9 @@
 // call runs to its end, `invalidate` drops what it made stale, `onSuccess` runs, and writing the
 // mutation's signals — which nothing observes any more — raises nothing. A call queued behind it runs
 // too. `mutation()` has no dispose path, so this is expected to hold; the test is what says it does.
-// What the mutation's `state()` reads after the destroy is not asserted here: its computeds are
-// disposed with the component and answer their last value (#342).
+// What the mutation's `state()` reads after the destroy is asserted in
+// computed-read-after-dispose.test.ts: its computeds are disposed with the component and still
+// answer the current value (#342).
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { html } from '../src/renderer/template';
