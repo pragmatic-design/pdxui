@@ -193,7 +193,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // shell's two slot fills (the rail's item and actions) are in its preloaded chunk, and imperative DOM
 // code is longer than the template string it replaces, as #107 measured. Measured locally: blocking
 // 93.3, js 469.8.
-const BUDGET_KB = { entry: 38, js: 470, css: 59, blocking: 94 };
+// js 470 → 456, blocking 94 → 93: a block's static markup is an HTML string the parser reads once,
+// not a builder of DOM calls (#369), where the parser keeps the tree exactly — 120 of the
+// showcase's 123 blocks. Measured locally: js 455.0, blocking 92.3, entry 37.7.
+const BUDGET_KB = { entry: 38, js: 456, css: 59, blocking: 93 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

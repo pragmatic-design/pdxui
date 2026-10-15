@@ -4,6 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { builds } from './static-markup-of';
 
 const SFC = `<template>
   <p :title="label" :class.active="on">{{ count }}</p>
@@ -22,7 +23,8 @@ describe('one render path', () => {
     it('a dev compile renders with DOM calls, not a tagged template', () => {
         const { code } = compile(SFC, 'one.pdx');
         expect(code, 'the dev render is still the tagged template').not.toMatch(/\bhtml`/);
-        expect(code).toMatch(/__d\.createElement\('p'\)/);
+        // The block's static markup, written as HTML where the parser keeps it (#369).
+        expect(builds(code, 'p')).toBe(true);
         expect(code).not.toMatch(/import \{[^}]*\bhtml\b[^}]*\} from '@pdxui\/core'/);
     });
 

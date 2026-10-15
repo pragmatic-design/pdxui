@@ -5,6 +5,7 @@ import ts from 'typescript';
 import { compile } from '../src/plugin';
 import { parseObjectLiteralToJson } from '../src/compiler/script-analyzer-helpers';
 import { templateGenerator } from './template-generator';
+import { markup } from './static-markup-of';
 
 /** Every template's cooked text in the module, joined: what the markup holds at runtime. */
 function templateText(code: string): string {
@@ -43,14 +44,15 @@ describe('@raw inside a loop binds nothing', () => {
     // the inline path read it as a value the compiler had pre-rewritten — a live binding to `item`.
     const src = `<template>\n@for (items as item; track item) { @raw {<span title=\${item}>x</span>} }\n</template>\n<script setup>\nlet items = $signal([1]);\n</script>\n`;
 
+    // The row's static markup is HTML (#369): the attribute value is in it, as text.
     it('the render: the attribute is the text', () => {
         const { code } = compile(src, 'raw-loop.pdx', [], undefined, { production: true });
-        expect(code).toContain('.setAttribute("title", "${item}")');
+        expect(markup(code).join('')).toContain('<span title="${item}">x</span>');
     });
 
     it('a scoped slot body, built inline since #364: the attribute is the text', () => {
         const { code } = compile(inSlot(src), 'raw-loop.pdx', [], undefined, { production: true });
-        expect(code).toContain('.setAttribute("title", "${item}")');
+        expect(markup(code).join('')).toContain('<span title="${item}">x</span>');
     });
 
     it('the template generator: the markup carries the text', () => {

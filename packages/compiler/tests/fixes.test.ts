@@ -5,6 +5,7 @@ import { compile } from '../src/plugin';
 import { generateNodes } from '../src/compiler/codegen-template';
 import { createCompileContext } from '../src/compiler/compile-context';
 import { parseTemplate } from '../src/parser/template';
+import { markup, builds } from './static-markup-of';
 
 describe('scoped styles fix', () => {
     it('scopes selectors as descendant: [scope] .btn:hover', () => {
@@ -223,7 +224,8 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
   let show = $signal(true);
 </script>`, 'test.pdx');
 
-        expect(code).toContain("You'd think this would work.");
+        // The block's HTML (#369) holds the text, read back from its literal.
+        expect(markup(code).join('')).toContain("You'd think this would work.");
     });
 
     it('does not break @try block with apostrophe', () => {
@@ -239,8 +241,8 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
   let x = $signal(0);
 </script>`, 'test.pdx');
 
-        expect(code).toContain("It's working fine.");
-        expect(code).toContain("Error occurred");
+        expect(markup(code).join('')).toContain("It's working fine.");
+        expect(markup(code).join('')).toContain("Error occurred");
     });
 
     it('does not break @for block with quotes in text', () => {
@@ -254,7 +256,7 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
   let items = $signal([{id: 1}]);
 </script>`, 'test.pdx');
 
-        expect(code).toContain("aren't always obvious");
+        expect(markup(code).join('')).toContain(`The "best" items aren't always obvious.`);
     });
 
     it('still handles attribute quotes correctly', () => {
@@ -268,9 +270,7 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
   let show = $signal(true);
 </script>`, 'test.pdx');
 
-        expect(code).toContain('__el0.setAttribute("class", "test");');
-        expect(code).toContain(`__el0.setAttribute("title", "it's fine");`);
-        expect(code).toContain("Content");
+        expect(markup(code).join('')).toContain(`<div class="test" title="it's fine">Content</div>`);
     });
 });
 
@@ -383,7 +383,7 @@ function go() {}
         expect(render.match(/bindInterpolation\(/g) ?? []).toHaveLength(1);
         // The static markup is built by the block's module-level builder (#109): the comment is not there either.
         const builder = out.slice(0, out.indexOf("component('"));
-        expect(builder).toMatch(/createElement\('span'\)/);
+        expect(builds(builder, 'span')).toBe(true);
         expect(builder).not.toContain('draft');
         expect(builder).not.toContain('go');
     });

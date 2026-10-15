@@ -136,6 +136,26 @@ export function staticBlock(build: (frag: DocumentFragment, doc: Document) => vo
     };
 }
 
+/**
+ * A block's static markup written as HTML (#369): the builder `staticBlock` runs. Far shorter than
+ * one DOM call per node, and the compiler emits it only for a block the HTML parser keeps exactly as
+ * its own tree. Parsed once, in the inert document `staticBlock` builds in.
+ *
+ * An empty comment `<!---->` stands for an empty text node — an anchor the render binds, which no
+ * parse can produce — and is replaced by one. A comment the markup really holds is never empty.
+ */
+export function staticMarkup(html: string): (frag: DocumentFragment, doc: Document) => void {
+    return (frag, doc) => {
+        const tpl = doc.createElement('template');
+        tpl.innerHTML = html;
+        const walker = doc.createTreeWalker(tpl.content, 128 /* NodeFilter.SHOW_COMMENT */);
+        const anchors: Node[] = [];
+        while (walker.nextNode()) if ((walker.currentNode as Comment).data === '') anchors.push(walker.currentNode);
+        for (const a of anchors) a.parentNode!.replaceChild(doc.createTextNode(''), a);
+        frag.appendChild(tpl.content);
+    };
+}
+
 // ─── Static HTML Pre-compilation ──────────────────────────────────
 
 const staticTplCache = new Map<string, HTMLTemplateElement>();

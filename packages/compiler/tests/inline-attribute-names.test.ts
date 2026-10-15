@@ -16,9 +16,14 @@ import { compile } from '../src/plugin';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+/**
+ * DOM calls, not the HTML form (#369): what is measured here is the namespace each DOM call creates
+ * an element in — what a block the parser would not keep is built with. In the HTML form the parser
+ * gives SVG its namespace, which responsive's static-markup-parse.spec.ts measures in Chromium.
+ */
 function inline(template: string, script = "let label = $signal('x');\nlet id = $signal(1);\nlet url = $signal('#t');\nfunction go() {}"): string {
     const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
-    return compile(source, 'inline-names.pdx', [], undefined, { production: true }).code;
+    return compile(source, 'inline-names.pdx', [], undefined, { production: true, staticMarkup: false }).code;
 }
 
 /** The emitted module must parse: a generator that writes broken JS is the defect itself. */

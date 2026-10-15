@@ -11,6 +11,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { builds } from './static-markup-of';
 
 const SOURCE = `<template>
   <div class="row" :title="label">{{ label }}</div>
@@ -20,8 +21,11 @@ const SOURCE = `<template>
 @prop label: string = 'Hello';
 </script>`;
 
-/** The inline path builds the DOM; the template path hands a string to core's html``. */
-const isInline = (code: string) => code.includes('createElement') && !code.includes('html`');
+/**
+ * The inline path builds the block's static markup — written as HTML since #369 — and binds the
+ * render's nodes itself; the template path hands a string to core's html``.
+ */
+const isInline = (code: string) => builds(code, 'div') && !code.includes('html`');
 
 describe('inlineBindings is what a .pdx compiles with, dev and build', () => {
     it('dev compiles inline too: one render path (#107)', () => {

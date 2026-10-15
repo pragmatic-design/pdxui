@@ -7,6 +7,7 @@ import { compileSFC } from '../src/compiler/codegen';
 import { compile } from '../src/plugin';
 import { parseSFC } from '../src/parser/sfc';
 import { parseTemplate } from '../src/parser/template';
+import { markup, builds, elementsBuilt } from './static-markup-of';
 
 describe('CSS minification', () => {
     it('collapses whitespace', () => {
@@ -141,8 +142,9 @@ let count = $signal(0);
         const ast = parseTemplate(descriptor.template!.content);
 
         const prodCode = compileSFC(descriptor, ast, 'about.pdx', null, { production: true });
-        // staticBlock is the markup built once and copied (#109): nothing reactive.
-        expect(prodCode).toMatch(/^import \{ component, staticBlock \} from '@pdxui\/core';/);
+        // staticBlock is the markup built once and copied (#109), staticMarkup the HTML it is
+        // written as (#369): nothing reactive.
+        expect(prodCode).toMatch(/^import \{ component, staticBlock, staticMarkup \} from '@pdxui\/core';/);
         expect(prodCode).not.toMatch(/effect\(|bindInterpolation\(/);
     });
 });
@@ -441,7 +443,7 @@ describe('static templates', () => {
         const { code } = compile(source, 'static.pdx', [], undefined, { production: true });
         expect(code).not.toContain('__staticHTML');
         expect(code).not.toMatch(/import.*\bhtml\b.*from '@pdxui\/core'/);
-        expect(code).toContain("__d.createElement('div')");
+        expect(builds(code, 'div')).toBe(true);
     });
 
     it('dev mode renders a static component inline, as a build does (#107)', () => {
@@ -452,7 +454,7 @@ describe('static templates', () => {
         const { code } = compile(source, 'dev-about.pdx', [], undefined, { production: false });
         expect(code).not.toContain('__staticHTML');
         expect(code).not.toContain("html\`");
-        expect(code).toContain("__d.createElement('div')");
+        expect(builds(code, 'div')).toBe(true);
     });
 });
 
@@ -461,13 +463,13 @@ describe('static templates', () => {
 // ═══════════════════════════════════════════════════════════════
 
 describe('inline bindings (Phase 3)', () => {
-    it('generates createElement instead of html``', () => {
+    it('builds its static markup instead of html``', () => {
         const source = `<template><div class="card">Hello</div></template>
 <script setup>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline.pdx', [], undefined, { production: true });
-        expect(code).toContain('__d.createElement');
+        expect(builds(code, 'div')).toBe(true);
         // The static markup is built once and copied per render (#109).
         expect(code).toContain('staticBlock(');
         expect(code).not.toContain("html\`");
@@ -481,7 +483,7 @@ describe('inline bindings (Phase 3)', () => {
 let loading = $signal(false);
 </script>`;
         const { code } = compile(source, 'inline-prop.pdx', [], undefined, { production: true });
-        expect(code).toContain('createElement');
+        expect(builds(code, 'button')).toBe(true);
         expect(code).toContain("effect(");
         expect(code).toContain('disabled');
     });
@@ -519,7 +521,9 @@ function save() {}
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'inline-text.pdx', [], undefined, { production: true });
-        expect(code).toContain('createTextNode');
+        // The text node the interpolation binds: an empty comment in the HTML, which staticMarkup
+        // turns into an empty text node (#369).
+        expect(markup(code).join('')).toContain('<span><!----></span>');
         // core's bindInterpolation follows the signal, as the template path's interpolation does (#100).
         expect(code).toContain('bindInterpolation(__t1,()=>ctx.count())');
     });
@@ -535,7 +539,7 @@ let visible = $signal(true);
 </script>`;
         const { code } = compile(source, 'inline-if.pdx', [], undefined, { production: true });
         expect(code).toContain('when(');
-        expect(code).toContain('createElement');
+        expect(builds(code, 'div')).toBe(true);
     });
 
     it('handles @for with the eachRow() helper', () => {
@@ -549,7 +553,7 @@ let items = $signal([]);
 </script>`;
         const { code } = compile(source, 'inline-for.pdx', [], undefined, { production: true });
         expect(code).toContain('eachRow(');
-        expect(code).toContain('createElement');
+        expect(builds(code, 'div')).toBe(true);
     });
 
     it('does not call scoped loop properties as signals in inline mode', () => {
@@ -590,10 +594,8 @@ const helper = 'ok';
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline-nest.pdx', [], undefined, { production: true });
-        // Should have nested appendChild calls
-        expect(code).toContain("createElement('div')");
-        expect(code).toContain("createElement('span')");
-        expect(code).toContain('appendChild');
+        // The span is built inside the div.
+        expect(markup(code).join('')).toContain('<div class="outer"><span class="inner">Text</span></div>');
     });
 
     it('handles ::twoWay bindings', () => {
@@ -641,9 +643,11 @@ let unused = $signal(0);
 let off = $signal(false);
 </script>`;
         const { code } = compile(source, 'inline-void.pdx', [], undefined, { production: true });
-        expect(code).toContain("createElement('input')");
-        expect(code).toContain("createElement('br')");
-        expect(code).toContain("createElement('img')");
+        expect(builds(code, 'input')).toBe(true);
+        expect(builds(code, 'br')).toBe(true);
+        expect(builds(code, 'img')).toBe(true);
+        // Void: no closing tag, and the next element is a sibling.
+        expect(markup(code).join('')).not.toMatch(/<\/(input|br|img)>/);
     });
 
     it('handles :style.x and :show bindings', () => {
@@ -680,11 +684,9 @@ let visible = $signal(true);
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline-deep.pdx', [], undefined, { production: true });
-        // 4 createElement calls (div, div, div, span) in the block's builder + correct nesting via appendChild
-        const createCount = (code.match(/__d\.createElement/g) || []).length;
-        expect(createCount).toBe(4);
-        const appendCount = (code.match(/appendChild/g) || []).length;
-        expect(appendCount).toBeGreaterThanOrEqual(4); // 4 elements + frag
+        // 4 elements (div, div, div, span) in the block's builder, each inside the one before.
+        expect(elementsBuilt(code)).toBe(4);
+        expect(markup(code).join('')).toContain('<div class="l1"><div class="l2"><div class="l3"><span>Deep</span></div></div></div>');
     });
 
     it('handles multiple interpolations in sequence', () => {
@@ -715,7 +717,7 @@ let status = $signal('active');
 </script>`;
         const { code } = compile(source, 'inline-switch.pdx', [], undefined, { production: true });
         expect(code).toContain('match(');
-        expect(code).toContain('createElement');
+        expect(builds(code, 'span')).toBe(true);
     });
 });
 
@@ -764,14 +766,14 @@ describe('production output size benchmarks', () => {
     it('a build produces output without html`` overhead', () => {
         const { code: prodCode } = compile(counterSrc, 'counter.pdx', [], undefined, { production: true });
         expect(prodCode).not.toContain("html\`");
-        expect(prodCode).toContain('createElement');
+        expect(builds(prodCode)).toBe(true);
     });
 
     it('a static component is smaller in a build than in dev, and imports nothing reactive', () => {
         const { code: devCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: false });
         const { code: prodCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: true });
         expect(prodCode.length).toBeLessThanOrEqual(devCode.length);
-        expect(prodCode).toMatch(/^import \{ component, staticBlock \} from '@pdxui\/core';/);
+        expect(prodCode).toMatch(/^import \{ component, staticBlock, staticMarkup \} from '@pdxui\/core';/);
     });
 
     it('dead signal elimination reduces output size', () => {

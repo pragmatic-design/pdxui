@@ -113,6 +113,7 @@ async function evaluateRoutes(code: string): Promise<Record<string, unknown>[]> 
         computed: (fn: () => unknown) => fn,
         // A block's static markup is declared at module level (#109); only the render builds it.
         staticBlock: (build: unknown) => () => build,
+        staticMarkup: (html: string) => html,
     };
     // The page also imports from `@pdxui/router`: declaring `@loader` auto-imports
     // currentLoaderData/currentLoaderState so the page can read its own data. ESM cannot

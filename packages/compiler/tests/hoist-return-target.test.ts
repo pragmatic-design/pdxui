@@ -19,6 +19,7 @@
 // bindings are declared inside the render's own block (#236).
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { markup } from './static-markup-of';
 
 /** A page that documents a function — so the template text contains the word `return `. */
 const SOURCE = `
@@ -58,7 +59,7 @@ describe('hoisted declarations target the render return', () => {
 
     it('leaves the documented snippet exactly as the author wrote it', () => {
         const { code } = compile(SOURCE, 'hoist-probe.pdx', undefined, undefined, { production: true });
-        // A string literal now, with `<` and `>` written as escapes: the text is the author's, intact.
-        expect(code, 'the hoisting rewrote the page content').toContain("//   return '\\u003Cb\\u003E' + item + '\\u003C/b\\u003E';");
+        // In the block's HTML (#369), read back from its literal: the text is the author's, intact.
+        expect(markup(code).join(''), 'the hoisting rewrote the page content').toContain("//   return '&lt;b&gt;' + item + '&lt;/b&gt;';");
     });
 });
