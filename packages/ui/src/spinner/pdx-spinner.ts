@@ -42,8 +42,10 @@ component('pdx-spinner', {
         function containerStyle(): string { return 'display:inline-flex;align-items:center;justify-content:center;width:' + px() + ';height:' + px(); }
         return { px, svgStyle, containerStyle };
     },
+    // `pdx-spinner-status` has no rule of its own: a pdx- class is how pdx.reset sees the element and
+    // what is inside it, and keeps a page's bare `span { border }` off them (#413).
     render: (ctx) => html`
-        <span role="status" aria-live="polite" :aria-label="${() => (ctx.label() as string) || uiString('spinner', 'loading')}" style="display:inline-flex;align-items:center;gap:var(--pdx-space-xs,6px);flex-direction:column">
+        <span class="pdx-spinner-status" role="status" aria-live="polite" :aria-label="${() => (ctx.label() as string) || uiString('spinner', 'loading')}" style="display:inline-flex;align-items:center;gap:var(--pdx-space-xs,6px);flex-direction:column">
             <span :style="${ctx.containerStyle}">
                 ${() => {
                     const v = ctx.variant();
