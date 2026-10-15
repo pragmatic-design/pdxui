@@ -49,6 +49,10 @@ A dynamic segment is written `:name`, with an optional constraint:
 @page '/users/:id(number)';
 ```
 
+The constraints are `number` (digits), `uuid`, `slug` (lowercase words joined by single hyphens, as in
+`/posts/hello-world`) and `string` (any segment, the same as none). A URL whose segment fails the
+constraint does not match the route.
+
 Inside the page, declare the params you read with `@params`, each with its type. Each one is a name the
 template and the script read, like a `$derived`, and it follows the URL: going from `/users/1` to
 `/users/2` updates it without remounting the page.

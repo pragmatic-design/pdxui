@@ -150,6 +150,9 @@ const ROUTES: ParityRoute[] = [
     // Two DYNAMIC routes that both match `/pages/12`: among dynamic routes the declared order holds.
     { path: '/pages/:slug', file: 'page.pdx', tag: 'pdx-page' },
     { path: '/pages/:n(number)', file: 'page-n.pdx', tag: 'pdx-page-n' },
+    // The other two named constraints of the grammar (#305).
+    { path: '/posts/:id(slug)', file: 'blog-post.pdx', tag: 'pdx-blog-post' },
+    { path: '/tags/:t(string)', file: 'tag.pdx', tag: 'pdx-tag' },
     // A static path with a regex metacharacter in it: the dot is a dot.
     { path: '/feed.xml', file: 'feed.pdx', tag: 'pdx-feed' },
     // Two params in ONE segment: not a whole-segment pattern, so the matcher keeps a regex for it.
@@ -897,6 +900,29 @@ const PARITY: Row[] = [
             // And the param is named `oid`, not `oid(number)` — the constraint is a rule about the
             // value, never part of the name a component reads.
             expect(r.params()).toEqual({ oid: '12' });
+        },
+    },
+    {
+        name: 'matches a slug param, and nothing that is not a slug',
+        run: async (r) => {
+            r.navigate('/posts/hello-world');
+            await settle();
+            expect(r.matched()).toBe('/posts/:id(slug)');
+            expect(r.params()).toEqual({ id: 'hello-world' });
+
+            r.navigate('/posts/Hello_World');
+            await settle();
+            expect(r.matched(), ':id(slug) must not match capitals or underscores').toBeNull();
+            expect(r.navError()).toBe('404');
+        },
+    },
+    {
+        name: 'matches a string param as any one segment',
+        run: async (r) => {
+            r.navigate('/tags/Any_Thing.v2');
+            await settle();
+            expect(r.matched()).toBe('/tags/:t(string)');
+            expect(r.params()).toEqual({ t: 'Any_Thing.v2' });
         },
     },
     {

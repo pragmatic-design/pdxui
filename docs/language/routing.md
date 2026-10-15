@@ -21,7 +21,15 @@ Digits      ::= [0-9]+
 ```
 
 A `Path` is a `StringLiteral` that starts with `/`. A segment `:name` is a param, `:name(c)` a param
-with a constraint `c`, one of `string`, `number`, `uuid`, `slug`.
+with a constraint `c`, one of `string`, `number`, `uuid`, `slug`. The value is one non-empty
+segment, and each constraint narrows it:
+
+| Constraint | Matches |
+|---|---|
+| `string` | any segment (the same as no constraint) |
+| `number` | digits, `[0-9]+` |
+| `uuid` | `8-4-4-4-12` hexadecimal digits, either case |
+| `slug` | lowercase letters and digits in words joined by single hyphens, `[a-z0-9]+(?:-[a-z0-9]+)*` |
 
 ## Declaring a page
 
