@@ -56,6 +56,20 @@ describe('compileMatcher', () => {
         expect(m.match('/orders/abc'), 'the constraint was not applied').toBeNull();
     });
 
+    it('knows the four named constraints of the grammar', () => {
+        // `slug` and `string` were accepted by the compiler and read here as patterns of their own:
+        // the route matched only the literal `/posts/slug` (#305).
+        const c = compileMatcher([{ path: '/posts/:id(slug)' }, { path: '/tags/:t(string)' }]);
+        expect(c.match('/posts/hello-world')?.params).toEqual({ id: 'hello-world' });
+        expect(c.match('/posts/post-2')?.params).toEqual({ id: 'post-2' });
+        for (const bad of ['/posts/Hello_World', '/posts/-x', '/posts/slug-', '/posts/a--b']) {
+            expect(c.match(bad), `${bad} is not a slug`).toBeNull();
+        }
+        expect(c.match('/tags/anything')?.params).toEqual({ t: 'anything' });
+        expect(c.match('/tags/Any_Thing.v2')?.params).toEqual({ t: 'Any_Thing.v2' });
+        expect(c.match('/tags/'), 'a string param is still one non-empty segment').toBeNull();
+    });
+
     it('keeps a regex for a pattern that is not made of whole segments', () => {
         expect(m.match('/docs/guide.pdf')).toEqual({ route: ROUTES[6], params: { name: 'guide', ext: 'pdf' } });
     });

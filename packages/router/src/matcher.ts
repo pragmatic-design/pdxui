@@ -203,13 +203,20 @@ function wholeParam(s: string): Segment | null {
         }
     }
     if (end !== s.length) return null;
-    return { param: name, test: constraint ? new RegExp(`^(?:${constraintSource(constraint)})$`) : null };
+    // `string` is any one non-empty segment, which a param already is: no regex to run.
+    const test = constraint && constraint !== 'string' ? new RegExp(`^(?:${constraintSource(constraint)})$`) : null;
+    return { param: name, test };
 }
 
-/** The two named constraints, or the developer's own pattern. */
+/**
+ * The four named constraints of the grammar (`docs/language/beta/routing.md`), or the developer's own
+ * pattern. A name missing here is read as a pattern that matches only itself (#305).
+ */
 function constraintSource(constraint: string): string {
     return constraint === 'number' ? '[0-9]+'
         : constraint === 'uuid' ? '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+        : constraint === 'slug' ? '[a-z0-9]+(?:-[a-z0-9]+)*'
+        : constraint === 'string' ? '[^/]+'
         : constraint;
 }
 

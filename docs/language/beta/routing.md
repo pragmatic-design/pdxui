@@ -11,6 +11,10 @@ PathSegment ::= "/" ( Word | ":" Identifier ( "(" Constraint ")" )? | "*" )
 Constraint  ::= "string" | "number" | "uuid" | "slug"
 ```
 
+A constraint narrows the one non-empty segment a param takes: `string` is any segment, `number`
+`[0-9]+`, `uuid` `8-4-4-4-12` hexadecimal digits, and `slug` lowercase words joined by single hyphens,
+`[a-z0-9]+(?:-[a-z0-9]+)*` (the table in `docs/language/routing.md`).
+
 ## Pages
 
 ### @page — alpha → beta
