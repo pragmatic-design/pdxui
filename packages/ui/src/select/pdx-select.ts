@@ -608,6 +608,13 @@ component('pdx-select', {
             el?.scrollIntoView({ block: 'nearest' });
         }
 
+        // A mousedown in the list would move focus out of the select — the options are not
+        // focusable, so it lands on body — and Escape, handled by the trigger, would no longer close
+        // a multiple list that stays open after a pick (#379). Focus stays on the trigger.
+        function onListMousedown(e: Event) {
+            e.preventDefault();
+        }
+
         function onOptionClick(e: Event, item: NormalisedOption) {
             e.preventDefault();
             e.stopPropagation();
@@ -793,7 +800,7 @@ component('pdx-select', {
             triggerClass, getSelectedLabel, getSelectedItems, getSelectedItem, isItemSelected, isLoading,
             inputInTrigger, activeId,
             renderItemContent, renderSelectedContent,
-            onTriggerClick, onTriggerKeydown, onSearchInput, onOptionClick,
+            onTriggerClick, onTriggerKeydown, onSearchInput, onOptionClick, onListMousedown,
             removeTag, clearSelection, open, close,
             showCreateOption, createOption,
         };
@@ -943,6 +950,7 @@ component('pdx-select', {
                 :id="${() => ctx.listboxId}"
                 :aria-label="${() => (ctx.label() as string) || uiString('select', 'listbox')}"
                 :aria-multiselectable="${() => ctx.multiple() ? 'true' : null}"
+                @mousedown="${ctx.onListMousedown}"
                 :style="${() => ctx.useVirtual() ? 'height:' + Math.min(ctx.virtualTotalSize(), 240) + 'px' : ''}">
                 ${() => {
                     const items = ctx.displayItems();
