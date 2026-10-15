@@ -100,7 +100,9 @@ export function parseFetchDecl(trimmed: string): {
     // Optional: as TypeAnnotation — or `: Type`, the form TypeScript would suggest, which is read the
     // same way so that neither the type nor the options after it are dropped (the caller reports it).
     // Can't use findAtDepthZero for `{` since it's also a depth opener.
-    // Scan manually: type ends at `{` or `;` at bracket depth 0.
+    // Scan manually: type ends at `{` or `;` at bracket depth 0 — except a `{` where a type is still
+    // expected, which opens an object-literal type (#312): at the start (`as { name: string }`) or
+    // after a type operator (`as A | { b: 1 }`). Anywhere else it opens the options block.
     let type: string | undefined;
     const typeAfterColon = rest.startsWith(':');
     if (rest.startsWith('as ') || typeAfterColon) {
@@ -115,6 +117,11 @@ export function parseFetchDecl(trimmed: string): {
             else if (ch === ')' || ch === ']') depth--;
             else if (ch === '<') depth++;
             else if (ch === '>' && depth > 0) depth--;
+            else if (ch === '{' && depth === 0 && expectsType(rest.slice(0, i))) {
+                const close = findClosing(rest, i);
+                if (close === -1) break;
+                i = close;
+            }
             // `{` or `;` at depth 0 terminates the type annotation
             else if ((ch === '{' || ch === ';') && depth === 0) {
                 typeEnd = i;
@@ -138,6 +145,12 @@ export function parseFetchDecl(trimmed: string): {
     }
 
     return { name, method, url, type: type || undefined, options, typeAfterColon: typeAfterColon || undefined };
+}
+
+/** Whether a type written so far still needs an operand: nothing yet, or a trailing `|`, `&` or `=>`. */
+function expectsType(written: string): boolean {
+    const t = written.trimEnd();
+    return t === '' || t.endsWith('|') || t.endsWith('&') || t.endsWith('=>');
 }
 
 /**
