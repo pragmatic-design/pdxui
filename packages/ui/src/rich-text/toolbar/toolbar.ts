@@ -19,6 +19,9 @@ import iconCode from '../../icon/pragmatic/code';
 import iconLink from '../../icon/pragmatic/link';
 import iconHighlighter from '../../icon/pragmatic/highlighter';
 import iconHeading from '../../icon/pragmatic/heading';
+import iconHeading1 from '../../icon/pragmatic/heading-1';
+import iconHeading2 from '../../icon/pragmatic/heading-2';
+import iconHeading3 from '../../icon/pragmatic/heading-3';
 import iconQuote from '../../icon/pragmatic/quote';
 import iconFileCode from '../../icon/pragmatic/file-code';
 import iconList from '../../icon/pragmatic/list';
@@ -33,7 +36,8 @@ import iconRedo from '../../icon/pragmatic/redo';
 function defineToolbarIcons(): void {
   defineIcons({
     bold: iconBold, italic: iconItalic, underline: iconUnderline, strikethrough: iconStrikethrough, code: iconCode,
-    link: iconLink, highlighter: iconHighlighter, heading: iconHeading, quote: iconQuote, 'file-code': iconFileCode,
+    link: iconLink, highlighter: iconHighlighter, heading: iconHeading, 'heading-1': iconHeading1,
+    'heading-2': iconHeading2, 'heading-3': iconHeading3, quote: iconQuote, 'file-code': iconFileCode,
     list: iconList, 'list-ordered': iconListOrdered, 'list-checks': iconListChecks, image: iconImage, minus: iconMinus,
     undo: iconUndo, redo: iconRedo,
   });
