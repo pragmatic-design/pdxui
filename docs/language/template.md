@@ -827,8 +827,8 @@ Virtual        ::= "@virtual" ( S? "(" S? Number S? ")" )?
 `@for (items as item, i; track item.id)` renders the body once per element of the collection, keyed by
 the `track` expression. A plain `item` compiles to `eachRow(() => ctx.items(), 'id', (item, i) => …)`:
 `item` and `i` are getters, so a row reused for the same key reads the current object and position
-(`{{ item.name }}` is `() => item().name`). A destructured binding compiles to `each(…)`, its names
-bound once from the object the row was created with. `track item.field` is passed as the field name;
+(`{{ item.name }}` is `() => item().name`). A destructured binding compiles to `eachDestructured(…)`,
+its names bound once from the object the row was created with. `track item.field` is passed as the field name;
 any other key is a function, `(item, i) => …`. Rows are moved, not rebuilt, by a keyed
 reconciliation. `@empty` wraps the loop in `when(() => items?.length > 0, …, () => html\`…\`)`.
 
@@ -839,10 +839,9 @@ set against js-framework-benchmark and the INP of a 10 000-row append; the measu
 `core/src/renderer/list-slices.ts`. This holds when the rows are appended, the first render included,
 and when the list is replaced by one with no row in common. Until the slices settle the rows still to
 come are not in the DOM. A newer list replaces the slices pending, and the list's teardown stops
-them. A single pass is kept by:
+them. A destructured binding slices the same way (#398). A single pass is kept by:
 - a `@for` with `@transition`, whose timing is the transition's;
-- a destructured binding, which compiles to `each` (#398);
-- a hand-written `repeat()`;
+- a hand-written `repeat()` or `each()`, whose caller may read the DOM right after the write;
 - a change that keeps some rows and adds many between them.
 
 `@virtual` renders only the rows in view (#283). The element written around the `@for` is the scroll

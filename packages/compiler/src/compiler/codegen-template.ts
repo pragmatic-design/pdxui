@@ -207,10 +207,11 @@ function generateFor(node: ForNode, imports: Set<string>, ctx: CompileContext): 
         return `\${eachVirtual(() => ${itemsExpr}, ${trackKeyArg(node, ctx)}, (${params}) => ${body}, ${virtualOptions(node, rows, empty)})}`;
     }
     // A plain `item` becomes a row getter (eachRow): a row reused for the same key reads its
-    // current item and index. A destructured binding keeps each(): its names are
-    // bound once, from the object the row was created with.
+    // current item and index. A destructured binding keeps value rows, `eachDestructured`: its names
+    // are bound once, from the object the row was created with, and a large append is sliced as
+    // eachRow's is (#398).
     const rows = isRowBinding(node);
-    const helper = rows ? 'eachRow' : 'each';
+    const helper = rows ? 'eachRow' : 'eachDestructured';
     imports.add(helper);
     const itemsExpr = callSignals(prefixCtx(node.items, ctx), ctx);
 

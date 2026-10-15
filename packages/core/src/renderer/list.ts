@@ -38,6 +38,11 @@ type RowRenderer<T> =
 /** Options for repeat rendering. */
 export interface RepeatOptions {
     transitions?: TransitionOptions;
+    /**
+     * Render a large append in slices (#242) in value mode too: what a destructured `@for` compiles
+     * to (#398). Off for a hand-written `repeat()`, whose caller may read the DOM right after.
+     */
+    slices?: boolean;
 }
 
 /**
@@ -89,8 +94,9 @@ function mountList<T>(
     let prevKeys: unknown[] = [];
     // The slices of a large append still to run (#242); `mapped` holds only the rows made so far.
     let pending: AbortController | null = null;
-    // Only what `@for` compiles to slices: a hand-written repeat()'s caller may read the DOM at once.
-    const slice: SliceRest<T> | undefined = renderer.mode === 'getters'
+    // Only what `@for` compiles to slices — row getters, or value rows that asked for it (#398): a
+    // hand-written repeat()'s caller may read the DOM at once.
+    const slice: SliceRest<T> | undefined = renderer.mode === 'getters' || options?.slices
         ? (rows, from, to, create) => {
             pending = appendInSlices(rows, from, to, create, endMarker, () => { pending = null; });
         }

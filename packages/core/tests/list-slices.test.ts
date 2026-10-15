@@ -12,6 +12,7 @@ import { LIST_FIRST_SLICE } from '../src/renderer/list-slices';
 import { signal, effect, collectDisposers } from '../src/reactivity/signal';
 import { yieldToBrowser } from '../src/utils/slices';
 import { waitUntil } from './wait-until';
+import { each, eachDestructured } from '../src/renderer/helpers';
 
 interface Row { id: number; label: string }
 const rows = (from: number, n: number): Row[] => Array.from({ length: n }, (_, i) => ({ id: from + i, label: `r${from + i}` }));
@@ -194,5 +195,40 @@ describe('what keeps the single pass', () => {
         await Promise.resolve();
         expect(ul.querySelectorAll('li').length).toBe(1200);
         dispose();
+    });
+});
+
+// A destructured `@for` — `@for (rows as { id, label }; track id)` — compiles to the value-mode list,
+// which the slices did not reach: the two forms of one block behaved differently (#398).
+describe('a destructured @for receives many rows at once', () => {
+    /** A list of value-mode rows in a <ul>, built by `build`. */
+    function valueList(build: typeof each) {
+        const items = signal<Row[]>([]);
+        const ul = document.createElement('ul');
+        const [frag, dispose] = collectDisposers(() => build(() => items(), 'id', ({ label }) => {
+            now += 1;
+            const li = document.createElement('li'); li.textContent = label; return li;
+        }));
+        ul.appendChild(frag);
+        document.body.appendChild(ul);
+        return { items, ul, dispose: () => { dispose(); ul.remove(); } };
+    }
+
+    it('renders the first slice in the same task and all of them once the slices settle', async () => {
+        const list = valueList(eachDestructured);
+        list.items.set(rows(1, 2000));
+        await Promise.resolve();
+        expect(list.ul.querySelectorAll('li').length, 'rows in the same task').toBe(FIRST);
+        await settled(list.ul, 2000);
+        expect([...list.ul.querySelectorAll('li')].map((li) => li.textContent)).toEqual(rows(1, 2000).map((r) => r.label));
+        list.dispose();
+    });
+
+    it('control — a hand-written each() renders all of them at once', async () => {
+        const list = valueList(each);
+        list.items.set(rows(1, 2000));
+        await Promise.resolve();
+        expect(list.ul.querySelectorAll('li').length).toBe(2000);
+        list.dispose();
     });
 });
