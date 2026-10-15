@@ -11,8 +11,8 @@ A template compiles along one **render path**, in the dev server and in a produc
 `pdx({ inlineBindings })` no longer selects anything (`PDX_INLINE_BINDINGS_IGNORED`), and nothing else
 does (#238). The **template path** — an `html\`…\`` tagged template that core parses and binds at
 runtime (`codegen-template.ts`) — generates nothing in a `.pdx` in the new mode: the body of a scoped
-slot fill was the last part it built, until #364. Only the legacy mode still renders through it, until
-#238; where a construct behaves differently there, its Rules say so.
+slot fill was the last part it built, until #364. Only the legacy mode still renders through it; where
+a construct behaves differently there, its Rules say so.
 
 ```ebnf
 Template       ::= ( Text | Comment | AtEscape | Element | Interpolation | Directive )*
