@@ -56,8 +56,13 @@ export function devRouteTableModule(): string {
  *
  * No early return for a project without routes: the seam imports this module in every build, and an
  * app can legitimately have no `@page` yet.
+ *
+ * `devtools`: the table is the dev server's, where `__PDX_DEVTOOLS__.map()` runs and reads a page's
+ * `title`/`titleKey` (#389). A build leaves them out: nothing in production reads them.
  */
-export function generateRouteTable(routes: ScannedRoute[], specifierOf: ModuleSpecifier = buildSpecifier): string {
+export function generateRouteTable(
+    routes: ScannedRoute[], specifierOf: ModuleSpecifier = buildSpecifier, { devtools = false }: { devtools?: boolean } = {},
+): string {
     const imp = (file: string) => `() => import(${jsString(specifierOf(file))})`;
 
     // Field by field, in the order `RouteConfig` and the outlet read them. A field dropped here is
@@ -78,6 +83,8 @@ export function generateRouteTable(routes: ScannedRoute[], specifierOf: ModuleSp
             r.scroll ? `scroll: ${jsString(r.scroll)}` : '',
             r.label ? `label: ${jsString(r.label)}` : '',
             r.labelKey ? `labelKey: ${jsString(r.labelKey)}` : '',
+            devtools && r.title ? `title: ${jsString(r.title)}` : '',
+            devtools && r.titleKey ? `titleKey: ${jsString(r.titleKey)}` : '',
             r.outlets && r.outlets.length > 0 ? `outlets: ${jsString(r.outlets)}` : '',
             r.layouts && r.layouts.length > 0 ? `layouts: ${jsString(r.layouts)}` : '',
             // No `file`: the page's `import()` is in `pageModules`, and in a build the specifier is

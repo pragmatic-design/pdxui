@@ -62,6 +62,18 @@ describe('__PDX_DEVTOOLS__.map()', () => {
         expect(map().map((r) => r.title)).toEqual(['Customers', undefined, 'About us', undefined]);
     });
 
+    it('a route with no crumb is named by its page title: a key once its strings are loaded, or a string (#389)', () => {
+        loadTranslations('en', { devtoolsMap: { intake: 'New ticket', crumb: 'Crumb' } });
+        createRouter([
+            { path: '/intake', component: page(), titleKey: 'devtoolsMap.intake' },
+            { path: '/unloaded', component: page(), titleKey: 'devtoolsMap.titleNotLoaded' },
+            { path: '/board', component: page(), title: 'Board' },
+            // The crumb wins: it is what the route is called where the app names it.
+            { path: '/both', component: page(), labelKey: 'devtoolsMap.crumb', titleKey: 'devtoolsMap.intake' },
+        ]);
+        expect(map().map((r) => r.title)).toEqual(['New ticket', undefined, 'Board', 'Crumb']);
+    });
+
     it('a guarded route says whether the current user may enter it', () => {
         createRouter([
             { path: '/account', component: page(), guard: 'account' },

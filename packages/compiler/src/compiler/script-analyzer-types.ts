@@ -206,6 +206,8 @@ export interface RouteInfo {
                           // page declares, hoisted and registered by reference
     labelKey?: string;    // @page '/customers' { label: $t('customers.title') } — a dictionary key,
                           // carried as data in every route table and translated by the router
+    title?: string;       // @title 'Board' — the page's title, when it is a string literal (#389)
+    titleKey?: string;    // @title $t('intake.title') — the page's title as a dictionary key (#389)
     redirectTo?: string;  // @redirect '/target'; (page-level)
     redirects?: { from: string; to: string }[];  // @redirect '/from' -> '/to';
     aliases?: string[];   // @alias '/people'; or @page '/users', '/people';

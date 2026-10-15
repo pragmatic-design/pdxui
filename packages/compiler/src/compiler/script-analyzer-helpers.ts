@@ -672,6 +672,22 @@ function skipRegexLiteral(s: string, start: number): number {
 }
 
 /**
+ * A page's `@title` as data a route table can carry (#389), or nothing when reading it needs the
+ * page: `$t('key')` with a literal key and no params is `titleKey`, one string literal is `title`.
+ * `$t('ticket.title', { id })`, `record?.name` and a concatenation stay in the page's module. A string
+ * with a backslash is left there too: what it holds is the source between the quotes, escapes
+ * included, not the text it reads as.
+ */
+export function routeTitleOf(title: HeadInfo['title']): { title?: string; titleKey?: string } {
+    if (!title) return {};
+    if (!title.isDynamic) return title.value.includes('\\') ? {} : { title: title.value };
+    // Match: $t( 'key' ) or $t( "key" ) — the key alone, as a crumb's labelKey is read.
+    // Groups: [1]=quote [2]=key
+    const keyCall = title.value.match(/^\$t\(\s*(['"])([^'"]+)\1\s*\)$/);
+    return keyCall ? { titleKey: keyCall[2] } : {};
+}
+
+/**
  * Parse an @head { ... } block into HeadInfo.
  * Supports: title (static string), meta (array of { name/property, content }).
  *

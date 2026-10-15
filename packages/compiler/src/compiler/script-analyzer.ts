@@ -15,6 +15,7 @@ import {
     parseInlineFormSchema, parseFormOptions, parsePageOptions, parseSearchParams, normalizeStatementsWithOrigins,
     extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, PREFETCH_POLICIES, extractSearchBlock, parseHeadBlock,
     parseRouteBlock, parseRouteParams, parseObjectLiteralToJson, splitAtTopLevelCommas, invalidRouteFields,
+    routeTitleOf,
 } from './script-analyzer-helpers';
 import { maskNonCode, skipNonCode } from './tokenizer';
 import { importedLocalNames } from './import-names';
@@ -1113,6 +1114,9 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             hint: `Use one of: ${PREFETCH_POLICIES.map((p) => `'${p}'`).join(', ')}.`,
         });
     }
+
+    // A page's title as data the route tables can carry (#389): read without importing the page.
+    if (route.page) Object.assign(route, routeTitleOf(head.title));
 
     const analysis: ScriptAnalysis = {
         mode: isNewMode ? 'new' : 'legacy',

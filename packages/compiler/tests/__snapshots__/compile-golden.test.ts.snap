@@ -259,7 +259,7 @@ component('pdx-head-test', {
 // Auto-route: @page '/products'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/products",tag:"pdx-head-test",scroll:"preserve",lazy:true,file:'./head-test.pdx'});
+__pdx_pushRoute({path:"/products",tag:"pdx-head-test",scroll:"preserve",title:"Products — TaskMgr",lazy:true,file:'./head-test.pdx'});
 "
 `;
 
@@ -2627,7 +2627,7 @@ function increment() { __badgeCount.set(__v => __v + 1); }
 // Auto-route: @page '/badge'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/badge",tag:"pdx-page-badge",lazy:true,file:'./page-badge.pdx'});
+__pdx_pushRoute({path:"/badge",tag:"pdx-page-badge",title:"Badge — PDX Components",lazy:true,file:'./page-badge.pdx'});
 "
 `;
 
@@ -2712,7 +2712,7 @@ function flash(e) {
 // Auto-route: @page '/button'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/button",tag:"pdx-page-button",lazy:true,file:'./page-button.pdx'});
+__pdx_pushRoute({path:"/button",tag:"pdx-page-button",title:"Button — PDX Components",lazy:true,file:'./page-button.pdx'});
 "
 `;
 
@@ -2773,7 +2773,7 @@ function openConfirm() {
 // Auto-route: @page '/dialog'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/dialog",tag:"pdx-page-dialog",lazy:true,file:'./page-dialog.pdx'});
+__pdx_pushRoute({path:"/dialog",tag:"pdx-page-dialog",title:"Dialog — PDX Components",lazy:true,file:'./page-dialog.pdx'});
 "
 `;
 
@@ -2852,7 +2852,7 @@ function onNameInput(e) { __name.setRaw(e.target.value); }
 // Auto-route: @page '/input'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/input",tag:"pdx-page-input",lazy:true,file:'./page-input.pdx'});
+__pdx_pushRoute({path:"/input",tag:"pdx-page-input",title:"Input — PDX Components",lazy:true,file:'./page-input.pdx'});
 "
 `;
 
@@ -3002,7 +3002,7 @@ component('pdx-admin-page', {
 // Auto-route: @page '/admin'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/admin",tag:"pdx-admin-page",guard:"admin",preload:true,meta:{"permissions":["admin"],"breadcrumb":"Admin"}});
+__pdx_pushRoute({path:"/admin",tag:"pdx-admin-page",guard:"admin",preload:true,title:"Admin — TaskMgr",meta:{"permissions":["admin"],"breadcrumb":"Admin"}});
 "
 `;
 
@@ -3190,7 +3190,7 @@ function flashBtn(e) {
 // Auto-route: @page '/components'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components",tag:"pdx-components-page",lazy:true,file:'./components-page.pdx'});
+__pdx_pushRoute({path:"/components",tag:"pdx-components-page",title:"Components — PDX Showcase",lazy:true,file:'./components-page.pdx'});
 "
 `;
 
@@ -3230,7 +3230,7 @@ const store = useTasks();
 // Auto-route: @page '/dashboard'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/dashboard",tag:"pdx-dashboard-page",keepAlive:true,preload:true,transition:"fade"});
+__pdx_pushRoute({path:"/dashboard",tag:"pdx-dashboard-page",keepAlive:true,preload:true,transition:"fade",title:"Dashboard — TaskMgr"});
 "
 `;
 
@@ -3355,7 +3355,7 @@ const store = useTasks();
 // Auto-route: @page '/create'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/create",tag:"pdx-task-form",preload:true,transition:"slide-right"});
+__pdx_pushRoute({path:"/create",tag:"pdx-task-form",preload:true,transition:"slide-right",title:"New Task — TaskMgr"});
 "
 `;
 
@@ -3565,7 +3565,7 @@ const _debouncedSearch = debounced(() => __searchRaw(), 300);
 // Auto-route: @page '/settings'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/settings",tag:"pdx-theme-picker",preload:true,transition:"slide-left"});
+__pdx_pushRoute({path:"/settings",tag:"pdx-theme-picker",preload:true,transition:"slide-left",title:"Settings — TaskMgr"});
 "
 `;
 
@@ -3617,7 +3617,7 @@ function goBack() { navigate('/dashboard'); }
 // Auto-route: @page '/users/:id(number)'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/users/:id(number)",tag:"pdx-user-detail",transition:"slide-right",meta:{"section":"users","permissions":["users.view"]},paramConstraints:{id:"number"},lazy:true,file:'./user-detail.pdx'});
+__pdx_pushRoute({path:"/users/:id(number)",tag:"pdx-user-detail",transition:"slide-right",title:"User Detail — TaskMgr",meta:{"section":"users","permissions":["users.view"]},paramConstraints:{id:"number"},lazy:true,file:'./user-detail.pdx'});
 "
 `;
 
@@ -4031,7 +4031,7 @@ component('pdx-comp-accordion', {
 // Auto-route: @page '/components/accordion'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/accordion",tag:"pdx-comp-accordion",lazy:true,file:'./comp-accordion.pdx'});
+__pdx_pushRoute({path:"/components/accordion",tag:"pdx-comp-accordion",title:"Accordion",lazy:true,file:'./comp-accordion.pdx'});
 "
 `;
 
@@ -4064,7 +4064,7 @@ component('pdx-comp-affix', {
 // Auto-route: @page '/components/affix'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/affix",tag:"pdx-comp-affix",lazy:true,file:'./comp-affix.pdx'});
+__pdx_pushRoute({path:"/components/affix",tag:"pdx-comp-affix",title:"Affix — PDX Components",lazy:true,file:'./comp-affix.pdx'});
 "
 `;
 
@@ -4097,7 +4097,7 @@ component('pdx-comp-alert-dialog', {
 // Auto-route: @page '/components/alert-dialog'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/alert-dialog",tag:"pdx-comp-alert-dialog",lazy:true,file:'./comp-alert-dialog.pdx'});
+__pdx_pushRoute({path:"/components/alert-dialog",tag:"pdx-comp-alert-dialog",title:"AlertDialog",lazy:true,file:'./comp-alert-dialog.pdx'});
 "
 `;
 
@@ -4130,7 +4130,7 @@ component('pdx-comp-app-layout', {
 // Auto-route: @page '/components/app-layout'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/app-layout",tag:"pdx-comp-app-layout",lazy:true,file:'./comp-app-layout.pdx'});
+__pdx_pushRoute({path:"/components/app-layout",tag:"pdx-comp-app-layout",title:"AppLayout — PDX Components",lazy:true,file:'./comp-app-layout.pdx'});
 "
 `;
 
@@ -4163,7 +4163,7 @@ component('pdx-comp-aspect-ratio', {
 // Auto-route: @page '/components/aspect-ratio'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/aspect-ratio",tag:"pdx-comp-aspect-ratio",lazy:true,file:'./comp-aspect-ratio.pdx'});
+__pdx_pushRoute({path:"/components/aspect-ratio",tag:"pdx-comp-aspect-ratio",title:"AspectRatio — PDX Components",lazy:true,file:'./comp-aspect-ratio.pdx'});
 "
 `;
 
@@ -4196,7 +4196,7 @@ component('pdx-comp-auto-form', {
 // Auto-route: @page '/components/auto-form'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/auto-form",tag:"pdx-comp-auto-form",lazy:true,file:'./comp-auto-form.pdx'});
+__pdx_pushRoute({path:"/components/auto-form",tag:"pdx-comp-auto-form",title:"Auto Form",lazy:true,file:'./comp-auto-form.pdx'});
 "
 `;
 
@@ -4231,7 +4231,7 @@ component('pdx-comp-autocomplete', {
 // Auto-route: @page '/components/autocomplete'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/autocomplete",tag:"pdx-comp-autocomplete",lazy:true,file:'./comp-autocomplete.pdx'});
+__pdx_pushRoute({path:"/components/autocomplete",tag:"pdx-comp-autocomplete",title:"Autocomplete — PDX UI",lazy:true,file:'./comp-autocomplete.pdx'});
 "
 `;
 
@@ -4267,7 +4267,7 @@ component('pdx-comp-avatar', {
 // Auto-route: @page '/components/avatar'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/avatar",tag:"pdx-comp-avatar",lazy:true,file:'./comp-avatar.pdx'});
+__pdx_pushRoute({path:"/components/avatar",tag:"pdx-comp-avatar",title:"Avatar Component",lazy:true,file:'./comp-avatar.pdx'});
 "
 `;
 
@@ -4300,7 +4300,7 @@ component('pdx-comp-avatar-group', {
 // Auto-route: @page '/components/avatar-group'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/avatar-group",tag:"pdx-comp-avatar-group",lazy:true,file:'./comp-avatar-group.pdx'});
+__pdx_pushRoute({path:"/components/avatar-group",tag:"pdx-comp-avatar-group",title:"AvatarGroup — PDX Components",lazy:true,file:'./comp-avatar-group.pdx'});
 "
 `;
 
@@ -4333,7 +4333,7 @@ component('pdx-comp-badge', {
 // Auto-route: @page '/components/badge'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/badge",tag:"pdx-comp-badge",lazy:true,file:'./comp-badge.pdx'});
+__pdx_pushRoute({path:"/components/badge",tag:"pdx-comp-badge",title:"Badge Component",lazy:true,file:'./comp-badge.pdx'});
 "
 `;
 
@@ -4366,7 +4366,7 @@ component('pdx-comp-banner', {
 // Auto-route: @page '/components/banner'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/banner",tag:"pdx-comp-banner",lazy:true,file:'./comp-banner.pdx'});
+__pdx_pushRoute({path:"/components/banner",tag:"pdx-comp-banner",title:"Banner / Alert",lazy:true,file:'./comp-banner.pdx'});
 "
 `;
 
@@ -4399,7 +4399,7 @@ component('pdx-comp-block-ui', {
 // Auto-route: @page '/components/block-ui'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/block-ui",tag:"pdx-comp-block-ui",lazy:true,file:'./comp-block-ui.pdx'});
+__pdx_pushRoute({path:"/components/block-ui",tag:"pdx-comp-block-ui",title:"BlockUI — PDX Components",lazy:true,file:'./comp-block-ui.pdx'});
 "
 `;
 
@@ -4432,7 +4432,7 @@ component('pdx-comp-bottom-nav', {
 // Auto-route: @page '/components/bottom-nav'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/bottom-nav",tag:"pdx-comp-bottom-nav",lazy:true,file:'./comp-bottom-nav.pdx'});
+__pdx_pushRoute({path:"/components/bottom-nav",tag:"pdx-comp-bottom-nav",title:"BottomNav — PDX Components",lazy:true,file:'./comp-bottom-nav.pdx'});
 "
 `;
 
@@ -4469,7 +4469,7 @@ component('pdx-comp-bottom-sheet', {
 // Auto-route: @page '/components/bottom-sheet'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/bottom-sheet",tag:"pdx-comp-bottom-sheet",lazy:true,file:'./comp-bottom-sheet.pdx'});
+__pdx_pushRoute({path:"/components/bottom-sheet",tag:"pdx-comp-bottom-sheet",title:"Bottom Sheet",lazy:true,file:'./comp-bottom-sheet.pdx'});
 "
 `;
 
@@ -4502,7 +4502,7 @@ component('pdx-comp-breadcrumb', {
 // Auto-route: @page '/components/breadcrumb'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/breadcrumb",tag:"pdx-comp-breadcrumb",lazy:true,file:'./comp-breadcrumb.pdx'});
+__pdx_pushRoute({path:"/components/breadcrumb",tag:"pdx-comp-breadcrumb",title:"Breadcrumb — PDX Components",lazy:true,file:'./comp-breadcrumb.pdx'});
 "
 `;
 
@@ -4535,7 +4535,7 @@ component('pdx-comp-bulk-actions', {
 // Auto-route: @page '/components/bulk-actions'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/bulk-actions",tag:"pdx-comp-bulk-actions",lazy:true,file:'./comp-bulk-actions.pdx'});
+__pdx_pushRoute({path:"/components/bulk-actions",tag:"pdx-comp-bulk-actions",title:"Bulk Actions — PDX Components",lazy:true,file:'./comp-bulk-actions.pdx'});
 "
 `;
 
@@ -4588,7 +4588,7 @@ component('pdx-comp-button', {
 // Auto-route: @page '/components/button'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/button",tag:"pdx-comp-button",lazy:true,file:'./comp-button.pdx'});
+__pdx_pushRoute({path:"/components/button",tag:"pdx-comp-button",title:"Button Component",lazy:true,file:'./comp-button.pdx'});
 "
 `;
 
@@ -4641,7 +4641,7 @@ component('pdx-comp-button-group', {
 // Auto-route: @page '/components/button-group'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/button-group",tag:"pdx-comp-button-group",lazy:true,file:'./comp-button-group.pdx'});
+__pdx_pushRoute({path:"/components/button-group",tag:"pdx-comp-button-group",title:"ButtonGroup Component",lazy:true,file:'./comp-button-group.pdx'});
 "
 `;
 
@@ -4674,7 +4674,7 @@ component('pdx-comp-card', {
 // Auto-route: @page '/components/card'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/card",tag:"pdx-comp-card",lazy:true,file:'./comp-card.pdx'});
+__pdx_pushRoute({path:"/components/card",tag:"pdx-comp-card",title:"Card",lazy:true,file:'./comp-card.pdx'});
 "
 `;
 
@@ -4707,7 +4707,7 @@ component('pdx-comp-carousel', {
 // Auto-route: @page '/components/carousel'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/carousel",tag:"pdx-comp-carousel",lazy:true,file:'./comp-carousel.pdx'});
+__pdx_pushRoute({path:"/components/carousel",tag:"pdx-comp-carousel",title:"Carousel",lazy:true,file:'./comp-carousel.pdx'});
 "
 `;
 
@@ -4740,7 +4740,7 @@ component('pdx-comp-cascader', {
 // Auto-route: @page '/components/cascader'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/cascader",tag:"pdx-comp-cascader",lazy:true,file:'./comp-cascader.pdx'});
+__pdx_pushRoute({path:"/components/cascader",tag:"pdx-comp-cascader",title:"Cascader Component",lazy:true,file:'./comp-cascader.pdx'});
 "
 `;
 
@@ -4773,7 +4773,7 @@ component('pdx-comp-chart', {
 // Auto-route: @page '/components/chart'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/chart",tag:"pdx-comp-chart",lazy:true,file:'./comp-chart.pdx'});
+__pdx_pushRoute({path:"/components/chart",tag:"pdx-comp-chart",title:"Chart",lazy:true,file:'./comp-chart.pdx'});
 "
 `;
 
@@ -4806,7 +4806,7 @@ component('pdx-comp-chart-advanced', {
 // Auto-route: @page '/components/chart-advanced'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/chart-advanced",tag:"pdx-comp-chart-advanced",lazy:true,file:'./comp-chart-advanced.pdx'});
+__pdx_pushRoute({path:"/components/chart-advanced",tag:"pdx-comp-chart-advanced",title:"Chart — Advanced",lazy:true,file:'./comp-chart-advanced.pdx'});
 "
 `;
 
@@ -4839,7 +4839,7 @@ component('pdx-comp-chart-specialized', {
 // Auto-route: @page '/components/chart-specialized'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/chart-specialized",tag:"pdx-comp-chart-specialized",lazy:true,file:'./comp-chart-specialized.pdx'});
+__pdx_pushRoute({path:"/components/chart-specialized",tag:"pdx-comp-chart-specialized",title:"Chart — Specialized",lazy:true,file:'./comp-chart-specialized.pdx'});
 "
 `;
 
@@ -4872,7 +4872,7 @@ component('pdx-comp-checkbox', {
 // Auto-route: @page '/components/checkbox'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/checkbox",tag:"pdx-comp-checkbox",lazy:true,file:'./comp-checkbox.pdx'});
+__pdx_pushRoute({path:"/components/checkbox",tag:"pdx-comp-checkbox",title:"Checkbox Component",lazy:true,file:'./comp-checkbox.pdx'});
 "
 `;
 
@@ -4905,7 +4905,7 @@ component('pdx-comp-checkbox-group', {
 // Auto-route: @page '/components/checkbox-group'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/checkbox-group",tag:"pdx-comp-checkbox-group",lazy:true,file:'./comp-checkbox-group.pdx'});
+__pdx_pushRoute({path:"/components/checkbox-group",tag:"pdx-comp-checkbox-group",title:"Checkbox Group",lazy:true,file:'./comp-checkbox-group.pdx'});
 "
 `;
 
@@ -4956,7 +4956,7 @@ component('pdx-comp-chip', {
 // Auto-route: @page '/components/chip'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/chip",tag:"pdx-comp-chip",lazy:true,file:'./comp-chip.pdx'});
+__pdx_pushRoute({path:"/components/chip",tag:"pdx-comp-chip",title:"Chip Component",lazy:true,file:'./comp-chip.pdx'});
 "
 `;
 
@@ -4989,7 +4989,7 @@ component('pdx-comp-color-picker', {
 // Auto-route: @page '/components/color-picker'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/color-picker",tag:"pdx-comp-color-picker",lazy:true,file:'./comp-color-picker.pdx'});
+__pdx_pushRoute({path:"/components/color-picker",tag:"pdx-comp-color-picker",title:"Color Picker — PDX UI",lazy:true,file:'./comp-color-picker.pdx'});
 "
 `;
 
@@ -5022,7 +5022,7 @@ component('pdx-comp-command', {
 // Auto-route: @page '/components/command'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/command",tag:"pdx-comp-command",lazy:true,file:'./comp-command.pdx'});
+__pdx_pushRoute({path:"/components/command",tag:"pdx-comp-command",title:"Command",lazy:true,file:'./comp-command.pdx'});
 "
 `;
 
@@ -5055,7 +5055,7 @@ component('pdx-comp-context-menu', {
 // Auto-route: @page '/components/context-menu'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/context-menu",tag:"pdx-comp-context-menu",lazy:true,file:'./comp-context-menu.pdx'});
+__pdx_pushRoute({path:"/components/context-menu",tag:"pdx-comp-context-menu",title:"ContextMenu — PDX Components",lazy:true,file:'./comp-context-menu.pdx'});
 "
 `;
 
@@ -5088,7 +5088,7 @@ component('pdx-comp-data-grid', {
 // Auto-route: @page '/components/data-grid'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-grid",tag:"pdx-comp-data-grid",lazy:true,file:'./comp-data-grid.pdx'});
+__pdx_pushRoute({path:"/components/data-grid",tag:"pdx-comp-data-grid",title:"Data Grid — PDX Components",lazy:true,file:'./comp-data-grid.pdx'});
 "
 `;
 
@@ -5121,7 +5121,7 @@ component('pdx-comp-data-grid-editing', {
 // Auto-route: @page '/components/data-grid-editing'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-grid-editing",tag:"pdx-comp-data-grid-editing",lazy:true,file:'./comp-data-grid-editing.pdx'});
+__pdx_pushRoute({path:"/components/data-grid-editing",tag:"pdx-comp-data-grid-editing",title:"Data Grid Editing — PDX Components",lazy:true,file:'./comp-data-grid-editing.pdx'});
 "
 `;
 
@@ -5154,7 +5154,7 @@ component('pdx-comp-data-grid-filtering', {
 // Auto-route: @page '/components/data-grid-filtering'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-grid-filtering",tag:"pdx-comp-data-grid-filtering",lazy:true,file:'./comp-data-grid-filtering.pdx'});
+__pdx_pushRoute({path:"/components/data-grid-filtering",tag:"pdx-comp-data-grid-filtering",title:"Data Grid Filtering — PDX Components",lazy:true,file:'./comp-data-grid-filtering.pdx'});
 "
 `;
 
@@ -5187,7 +5187,7 @@ component('pdx-comp-data-grid-grouping', {
 // Auto-route: @page '/components/data-grid-grouping'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-grid-grouping",tag:"pdx-comp-data-grid-grouping",lazy:true,file:'./comp-data-grid-grouping.pdx'});
+__pdx_pushRoute({path:"/components/data-grid-grouping",tag:"pdx-comp-data-grid-grouping",title:"Data Grid Grouping — PDX Components",lazy:true,file:'./comp-data-grid-grouping.pdx'});
 "
 `;
 
@@ -5220,7 +5220,7 @@ component('pdx-comp-data-grid-selection', {
 // Auto-route: @page '/components/data-grid-selection'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-grid-selection",tag:"pdx-comp-data-grid-selection",lazy:true,file:'./comp-data-grid-selection.pdx'});
+__pdx_pushRoute({path:"/components/data-grid-selection",tag:"pdx-comp-data-grid-selection",title:"Data Grid Selection — PDX Components",lazy:true,file:'./comp-data-grid-selection.pdx'});
 "
 `;
 
@@ -5253,7 +5253,7 @@ component('pdx-comp-data-grid-toolbar', {
 // Auto-route: @page '/components/data-grid-toolbar'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-grid-toolbar",tag:"pdx-comp-data-grid-toolbar",lazy:true,file:'./comp-data-grid-toolbar.pdx'});
+__pdx_pushRoute({path:"/components/data-grid-toolbar",tag:"pdx-comp-data-grid-toolbar",title:"Data Grid Toolbar & Filters — PDX Components",lazy:true,file:'./comp-data-grid-toolbar.pdx'});
 "
 `;
 
@@ -5286,7 +5286,7 @@ component('pdx-comp-data-grid-virtual', {
 // Auto-route: @page '/components/data-grid-virtual'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-grid-virtual",tag:"pdx-comp-data-grid-virtual",lazy:true,file:'./comp-data-grid-virtual.pdx'});
+__pdx_pushRoute({path:"/components/data-grid-virtual",tag:"pdx-comp-data-grid-virtual",title:"Data Grid Virtual Scroll — PDX Components",lazy:true,file:'./comp-data-grid-virtual.pdx'});
 "
 `;
 
@@ -5320,7 +5320,7 @@ component('pdx-comp-data-source', {
 // Auto-route: @page '/components/data-source'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/data-source",tag:"pdx-comp-data-source",lazy:true,file:'./comp-data-source.pdx'});
+__pdx_pushRoute({path:"/components/data-source",tag:"pdx-comp-data-source",title:"DataSource — PDX UI",lazy:true,file:'./comp-data-source.pdx'});
 "
 `;
 
@@ -5353,7 +5353,7 @@ component('pdx-comp-date-picker', {
 // Auto-route: @page '/components/date-picker'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/date-picker",tag:"pdx-comp-date-picker",lazy:true,file:'./comp-date-picker.pdx'});
+__pdx_pushRoute({path:"/components/date-picker",tag:"pdx-comp-date-picker",title:"Date Picker Component",lazy:true,file:'./comp-date-picker.pdx'});
 "
 `;
 
@@ -5386,7 +5386,7 @@ component('pdx-comp-description-list', {
 // Auto-route: @page '/components/description-list'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/description-list",tag:"pdx-comp-description-list",lazy:true,file:'./comp-description-list.pdx'});
+__pdx_pushRoute({path:"/components/description-list",tag:"pdx-comp-description-list",title:"DescriptionList — PDX Components",lazy:true,file:'./comp-description-list.pdx'});
 "
 `;
 
@@ -5419,7 +5419,7 @@ component('pdx-comp-dialog', {
 // Auto-route: @page '/components/dialog'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/dialog",tag:"pdx-comp-dialog",lazy:true,file:'./comp-dialog.pdx'});
+__pdx_pushRoute({path:"/components/dialog",tag:"pdx-comp-dialog",title:"Dialog",lazy:true,file:'./comp-dialog.pdx'});
 "
 `;
 
@@ -5453,7 +5453,7 @@ component('pdx-comp-divider', {
 // Auto-route: @page '/components/divider'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/divider",tag:"pdx-comp-divider",lazy:true,file:'./comp-divider.pdx'});
+__pdx_pushRoute({path:"/components/divider",tag:"pdx-comp-divider",title:"Divider Component",lazy:true,file:'./comp-divider.pdx'});
 "
 `;
 
@@ -5486,7 +5486,7 @@ component('pdx-comp-drawer', {
 // Auto-route: @page '/components/drawer'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/drawer",tag:"pdx-comp-drawer",lazy:true,file:'./comp-drawer.pdx'});
+__pdx_pushRoute({path:"/components/drawer",tag:"pdx-comp-drawer",title:"Drawer",lazy:true,file:'./comp-drawer.pdx'});
 "
 `;
 
@@ -5519,7 +5519,7 @@ component('pdx-comp-dropdown-menu', {
 // Auto-route: @page '/components/dropdown-menu'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/dropdown-menu",tag:"pdx-comp-dropdown-menu",lazy:true,file:'./comp-dropdown-menu.pdx'});
+__pdx_pushRoute({path:"/components/dropdown-menu",tag:"pdx-comp-dropdown-menu",title:"Dropdown Menu",lazy:true,file:'./comp-dropdown-menu.pdx'});
 "
 `;
 
@@ -5552,7 +5552,7 @@ component('pdx-comp-edit-drawer', {
 // Auto-route: @page '/components/edit-drawer'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/edit-drawer",tag:"pdx-comp-edit-drawer",lazy:true,file:'./comp-edit-drawer.pdx'});
+__pdx_pushRoute({path:"/components/edit-drawer",tag:"pdx-comp-edit-drawer",title:"Edit Drawer — PDX Components",lazy:true,file:'./comp-edit-drawer.pdx'});
 "
 `;
 
@@ -5585,7 +5585,7 @@ component('pdx-comp-empty-state', {
 // Auto-route: @page '/components/empty-state'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/empty-state",tag:"pdx-comp-empty-state",lazy:true,file:'./comp-empty-state.pdx'});
+__pdx_pushRoute({path:"/components/empty-state",tag:"pdx-comp-empty-state",title:"EmptyState — PDX Components",lazy:true,file:'./comp-empty-state.pdx'});
 "
 `;
 
@@ -5618,7 +5618,7 @@ component('pdx-comp-entity-grid', {
 // Auto-route: @page '/components/entity-grid'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/entity-grid",tag:"pdx-comp-entity-grid",lazy:true,file:'./comp-entity-grid.pdx'});
+__pdx_pushRoute({path:"/components/entity-grid",tag:"pdx-comp-entity-grid",title:"Entity Grid — PDX Components",lazy:true,file:'./comp-entity-grid.pdx'});
 "
 `;
 
@@ -5651,7 +5651,7 @@ component('pdx-comp-error-boundary', {
 // Auto-route: @page '/components/error-boundary'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/error-boundary",tag:"pdx-comp-error-boundary",lazy:true,file:'./comp-error-boundary.pdx'});
+__pdx_pushRoute({path:"/components/error-boundary",tag:"pdx-comp-error-boundary",title:"ErrorBoundary — PDX UI",lazy:true,file:'./comp-error-boundary.pdx'});
 "
 `;
 
@@ -5684,7 +5684,7 @@ component('pdx-comp-fab', {
 // Auto-route: @page '/components/fab'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/fab",tag:"pdx-comp-fab",lazy:true,file:'./comp-fab.pdx'});
+__pdx_pushRoute({path:"/components/fab",tag:"pdx-comp-fab",title:"FAB — PDX Components",lazy:true,file:'./comp-fab.pdx'});
 "
 `;
 
@@ -5717,7 +5717,7 @@ component('pdx-comp-field-group', {
 // Auto-route: @page '/components/field-group'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/field-group",tag:"pdx-comp-field-group",lazy:true,file:'./comp-field-group.pdx'});
+__pdx_pushRoute({path:"/components/field-group",tag:"pdx-comp-field-group",title:"Field Group Component",lazy:true,file:'./comp-field-group.pdx'});
 "
 `;
 
@@ -5750,7 +5750,7 @@ component('pdx-comp-field-list', {
 // Auto-route: @page '/components/field-list'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/field-list",tag:"pdx-comp-field-list",lazy:true,file:'./comp-field-list.pdx'});
+__pdx_pushRoute({path:"/components/field-list",tag:"pdx-comp-field-list",title:"Field List Component",lazy:true,file:'./comp-field-list.pdx'});
 "
 `;
 
@@ -5783,7 +5783,7 @@ component('pdx-comp-fieldset', {
 // Auto-route: @page '/components/fieldset'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/fieldset",tag:"pdx-comp-fieldset",lazy:true,file:'./comp-fieldset.pdx'});
+__pdx_pushRoute({path:"/components/fieldset",tag:"pdx-comp-fieldset",title:"Fieldset",lazy:true,file:'./comp-fieldset.pdx'});
 "
 `;
 
@@ -5817,7 +5817,7 @@ component('pdx-comp-file-upload', {
 // Auto-route: @page '/components/file-upload'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/file-upload",tag:"pdx-comp-file-upload",lazy:true,file:'./comp-file-upload.pdx'});
+__pdx_pushRoute({path:"/components/file-upload",tag:"pdx-comp-file-upload",title:"File Upload — PDX UI",lazy:true,file:'./comp-file-upload.pdx'});
 "
 `;
 
@@ -5850,7 +5850,7 @@ component('pdx-comp-filter-builder', {
 // Auto-route: @page '/components/filter-builder'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/filter-builder",tag:"pdx-comp-filter-builder",lazy:true,file:'./comp-filter-builder.pdx'});
+__pdx_pushRoute({path:"/components/filter-builder",tag:"pdx-comp-filter-builder",title:"Filter Builder",lazy:true,file:'./comp-filter-builder.pdx'});
 "
 `;
 
@@ -5883,7 +5883,7 @@ component('pdx-comp-form', {
 // Auto-route: @page '/components/form'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/form",tag:"pdx-comp-form",lazy:true,file:'./comp-form.pdx'});
+__pdx_pushRoute({path:"/components/form",tag:"pdx-comp-form",title:"Form System",lazy:true,file:'./comp-form.pdx'});
 "
 `;
 
@@ -5917,7 +5917,7 @@ component('pdx-comp-form-actions', {
 // Auto-route: @page '/components/form-actions'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/form-actions",tag:"pdx-comp-form-actions",lazy:true,file:'./comp-form-actions.pdx'});
+__pdx_pushRoute({path:"/components/form-actions",tag:"pdx-comp-form-actions",title:"Form Actions",lazy:true,file:'./comp-form-actions.pdx'});
 "
 `;
 
@@ -5950,7 +5950,7 @@ component('pdx-comp-form-advanced', {
 // Auto-route: @page '/components/form-advanced'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/form-advanced",tag:"pdx-comp-form-advanced",lazy:true,file:'./comp-form-advanced.pdx'});
+__pdx_pushRoute({path:"/components/form-advanced",tag:"pdx-comp-form-advanced",title:"Form Advanced",lazy:true,file:'./comp-form-advanced.pdx'});
 "
 `;
 
@@ -5983,7 +5983,7 @@ component('pdx-comp-form-composition', {
 // Auto-route: @page '/components/form-composition'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/form-composition",tag:"pdx-comp-form-composition",lazy:true,file:'./comp-form-composition.pdx'});
+__pdx_pushRoute({path:"/components/form-composition",tag:"pdx-comp-form-composition",title:"Form Composition",lazy:true,file:'./comp-form-composition.pdx'});
 "
 `;
 
@@ -6016,7 +6016,7 @@ component('pdx-comp-form-field', {
 // Auto-route: @page '/components/form-field'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/form-field",tag:"pdx-comp-form-field",lazy:true,file:'./comp-form-field.pdx'});
+__pdx_pushRoute({path:"/components/form-field",tag:"pdx-comp-form-field",title:"FormField Component",lazy:true,file:'./comp-form-field.pdx'});
 "
 `;
 
@@ -6049,7 +6049,7 @@ component('pdx-comp-form-section', {
 // Auto-route: @page '/components/form-section'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/form-section",tag:"pdx-comp-form-section",lazy:true,file:'./comp-form-section.pdx'});
+__pdx_pushRoute({path:"/components/form-section",tag:"pdx-comp-form-section",title:"Form Section",lazy:true,file:'./comp-form-section.pdx'});
 "
 `;
 
@@ -6082,7 +6082,7 @@ component('pdx-comp-form-template', {
 // Auto-route: @page '/components/form-template'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/form-template",tag:"pdx-comp-form-template",lazy:true,file:'./comp-form-template.pdx'});
+__pdx_pushRoute({path:"/components/form-template",tag:"pdx-comp-form-template",title:"Form Template",lazy:true,file:'./comp-form-template.pdx'});
 "
 `;
 
@@ -6117,7 +6117,7 @@ registerPragmaticIcons();
 // Auto-route: @page '/components/icon'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/icon",tag:"pdx-comp-icon",lazy:true,file:'./comp-icon.pdx'});
+__pdx_pushRoute({path:"/components/icon",tag:"pdx-comp-icon",title:"Icon Component",lazy:true,file:'./comp-icon.pdx'});
 "
 `;
 
@@ -6150,7 +6150,7 @@ component('pdx-comp-image', {
 // Auto-route: @page '/components/image'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/image",tag:"pdx-comp-image",lazy:true,file:'./comp-image.pdx'});
+__pdx_pushRoute({path:"/components/image",tag:"pdx-comp-image",title:"Image — PDX Components",lazy:true,file:'./comp-image.pdx'});
 "
 `;
 
@@ -6183,7 +6183,7 @@ component('pdx-comp-infinite-scroll', {
 // Auto-route: @page '/components/infinite-scroll'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/infinite-scroll",tag:"pdx-comp-infinite-scroll",lazy:true,file:'./comp-infinite-scroll.pdx'});
+__pdx_pushRoute({path:"/components/infinite-scroll",tag:"pdx-comp-infinite-scroll",title:"InfiniteScroll — PDX Components",lazy:true,file:'./comp-infinite-scroll.pdx'});
 "
 `;
 
@@ -6216,7 +6216,7 @@ component('pdx-comp-inline-edit', {
 // Auto-route: @page '/components/inline-edit'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/inline-edit",tag:"pdx-comp-inline-edit",lazy:true,file:'./comp-inline-edit.pdx'});
+__pdx_pushRoute({path:"/components/inline-edit",tag:"pdx-comp-inline-edit",title:"InlineEdit Component",lazy:true,file:'./comp-inline-edit.pdx'});
 "
 `;
 
@@ -6249,7 +6249,7 @@ component('pdx-comp-input', {
 // Auto-route: @page '/components/input'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/input",tag:"pdx-comp-input",lazy:true,file:'./comp-input.pdx'});
+__pdx_pushRoute({path:"/components/input",tag:"pdx-comp-input",title:"Input Component",lazy:true,file:'./comp-input.pdx'});
 "
 `;
 
@@ -6282,7 +6282,7 @@ component('pdx-comp-input-group', {
 // Auto-route: @page '/components/input-group'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/input-group",tag:"pdx-comp-input-group",lazy:true,file:'./comp-input-group.pdx'});
+__pdx_pushRoute({path:"/components/input-group",tag:"pdx-comp-input-group",title:"Input Group Component",lazy:true,file:'./comp-input-group.pdx'});
 "
 `;
 
@@ -6316,7 +6316,7 @@ component('pdx-comp-kbd', {
 // Auto-route: @page '/components/kbd'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/kbd",tag:"pdx-comp-kbd",lazy:true,file:'./comp-kbd.pdx'});
+__pdx_pushRoute({path:"/components/kbd",tag:"pdx-comp-kbd",title:"Kbd Component",lazy:true,file:'./comp-kbd.pdx'});
 "
 `;
 
@@ -6349,7 +6349,7 @@ component('pdx-comp-label', {
 // Auto-route: @page '/components/label'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/label",tag:"pdx-comp-label",lazy:true,file:'./comp-label.pdx'});
+__pdx_pushRoute({path:"/components/label",tag:"pdx-comp-label",title:"Label Component",lazy:true,file:'./comp-label.pdx'});
 "
 `;
 
@@ -6382,7 +6382,7 @@ component('pdx-comp-list', {
 // Auto-route: @page '/components/list'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/list",tag:"pdx-comp-list",lazy:true,file:'./comp-list.pdx'});
+__pdx_pushRoute({path:"/components/list",tag:"pdx-comp-list",title:"List — PDX Components",lazy:true,file:'./comp-list.pdx'});
 "
 `;
 
@@ -6415,7 +6415,7 @@ component('pdx-comp-masked-input', {
 // Auto-route: @page '/components/masked-input'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/masked-input",tag:"pdx-comp-masked-input",lazy:true,file:'./comp-masked-input.pdx'});
+__pdx_pushRoute({path:"/components/masked-input",tag:"pdx-comp-masked-input",title:"Masked Input",lazy:true,file:'./comp-masked-input.pdx'});
 "
 `;
 
@@ -6448,7 +6448,7 @@ component('pdx-comp-masonry', {
 // Auto-route: @page '/components/masonry'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/masonry",tag:"pdx-comp-masonry",lazy:true,file:'./comp-masonry.pdx'});
+__pdx_pushRoute({path:"/components/masonry",tag:"pdx-comp-masonry",title:"Masonry — PDX Components",lazy:true,file:'./comp-masonry.pdx'});
 "
 `;
 
@@ -6481,7 +6481,7 @@ component('pdx-comp-mention', {
 // Auto-route: @page '/components/mention'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/mention",tag:"pdx-comp-mention",lazy:true,file:'./comp-mention.pdx'});
+__pdx_pushRoute({path:"/components/mention",tag:"pdx-comp-mention",title:"Mention Component",lazy:true,file:'./comp-mention.pdx'});
 "
 `;
 
@@ -6514,7 +6514,7 @@ component('pdx-comp-menu', {
 // Auto-route: @page '/components/menu'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/menu",tag:"pdx-comp-menu",lazy:true,file:'./comp-menu.pdx'});
+__pdx_pushRoute({path:"/components/menu",tag:"pdx-comp-menu",title:"Menu — PDX Components",lazy:true,file:'./comp-menu.pdx'});
 "
 `;
 
@@ -6547,7 +6547,7 @@ component('pdx-comp-menubar', {
 // Auto-route: @page '/components/menubar'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/menubar",tag:"pdx-comp-menubar",lazy:true,file:'./comp-menubar.pdx'});
+__pdx_pushRoute({path:"/components/menubar",tag:"pdx-comp-menubar",title:"Menubar — PDX Components",lazy:true,file:'./comp-menubar.pdx'});
 "
 `;
 
@@ -6580,7 +6580,7 @@ component('pdx-comp-nav-menu', {
 // Auto-route: @page '/components/nav-menu'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/nav-menu",tag:"pdx-comp-nav-menu",lazy:true,file:'./comp-nav-menu.pdx'});
+__pdx_pushRoute({path:"/components/nav-menu",tag:"pdx-comp-nav-menu",title:"NavMenu — PDX Components",lazy:true,file:'./comp-nav-menu.pdx'});
 "
 `;
 
@@ -6613,7 +6613,7 @@ component('pdx-comp-navbar', {
 // Auto-route: @page '/components/navbar'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/navbar",tag:"pdx-comp-navbar",lazy:true,file:'./comp-navbar.pdx'});
+__pdx_pushRoute({path:"/components/navbar",tag:"pdx-comp-navbar",title:"Navbar — PDX Components",lazy:true,file:'./comp-navbar.pdx'});
 "
 `;
 
@@ -6646,7 +6646,7 @@ component('pdx-comp-number-input', {
 // Auto-route: @page '/components/number-input'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/number-input",tag:"pdx-comp-number-input",lazy:true,file:'./comp-number-input.pdx'});
+__pdx_pushRoute({path:"/components/number-input",tag:"pdx-comp-number-input",title:"Number Input",lazy:true,file:'./comp-number-input.pdx'});
 "
 `;
 
@@ -6679,7 +6679,7 @@ component('pdx-comp-number-masked', {
 // Auto-route: @page '/components/number-masked'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/number-masked",tag:"pdx-comp-number-masked",lazy:true,file:'./comp-number-masked.pdx'});
+__pdx_pushRoute({path:"/components/number-masked",tag:"pdx-comp-number-masked",title:"Number & Masked Input",lazy:true,file:'./comp-number-masked.pdx'});
 "
 `;
 
@@ -6712,7 +6712,7 @@ component('pdx-comp-otp', {
 // Auto-route: @page '/components/otp'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/otp",tag:"pdx-comp-otp",lazy:true,file:'./comp-otp.pdx'});
+__pdx_pushRoute({path:"/components/otp",tag:"pdx-comp-otp",title:"OTP Input",lazy:true,file:'./comp-otp.pdx'});
 "
 `;
 
@@ -6745,7 +6745,7 @@ component('pdx-comp-otp-pin', {
 // Auto-route: @page '/components/otp-pin'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/otp-pin",tag:"pdx-comp-otp-pin",lazy:true,file:'./comp-otp-pin.pdx'});
+__pdx_pushRoute({path:"/components/otp-pin",tag:"pdx-comp-otp-pin",title:"OTP & PIN Input",lazy:true,file:'./comp-otp-pin.pdx'});
 "
 `;
 
@@ -6778,7 +6778,7 @@ component('pdx-comp-overlay-outlet', {
 // Auto-route: @page '/components/overlay-outlet'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/overlay-outlet",tag:"pdx-comp-overlay-outlet",lazy:true,file:'./comp-overlay-outlet.pdx'});
+__pdx_pushRoute({path:"/components/overlay-outlet",tag:"pdx-comp-overlay-outlet",title:"Overlay Outlet Component",lazy:true,file:'./comp-overlay-outlet.pdx'});
 "
 `;
 
@@ -6811,7 +6811,7 @@ component('pdx-comp-overlay-stack', {
 // Auto-route: @page '/components/overlay-stack'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/overlay-stack",tag:"pdx-comp-overlay-stack",lazy:true,file:'./comp-overlay-stack.pdx'});
+__pdx_pushRoute({path:"/components/overlay-stack",tag:"pdx-comp-overlay-stack",title:"Overlay Stack",lazy:true,file:'./comp-overlay-stack.pdx'});
 "
 `;
 
@@ -6844,7 +6844,7 @@ component('pdx-comp-pagination', {
 // Auto-route: @page '/components/pagination'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/pagination",tag:"pdx-comp-pagination",lazy:true,file:'./comp-pagination.pdx'});
+__pdx_pushRoute({path:"/components/pagination",tag:"pdx-comp-pagination",title:"Pagination — PDX Components",lazy:true,file:'./comp-pagination.pdx'});
 "
 `;
 
@@ -6877,7 +6877,7 @@ component('pdx-comp-password', {
 // Auto-route: @page '/components/password'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/password",tag:"pdx-comp-password",lazy:true,file:'./comp-password.pdx'});
+__pdx_pushRoute({path:"/components/password",tag:"pdx-comp-password",title:"Password Input",lazy:true,file:'./comp-password.pdx'});
 "
 `;
 
@@ -6910,7 +6910,7 @@ component('pdx-comp-password-search', {
 // Auto-route: @page '/components/password-search'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/password-search",tag:"pdx-comp-password-search",lazy:true,file:'./comp-password-search.pdx'});
+__pdx_pushRoute({path:"/components/password-search",tag:"pdx-comp-password-search",title:"Password & Search Input",lazy:true,file:'./comp-password-search.pdx'});
 "
 `;
 
@@ -6943,7 +6943,7 @@ component('pdx-comp-pin', {
 // Auto-route: @page '/components/pin'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/pin",tag:"pdx-comp-pin",lazy:true,file:'./comp-pin.pdx'});
+__pdx_pushRoute({path:"/components/pin",tag:"pdx-comp-pin",title:"PIN Input",lazy:true,file:'./comp-pin.pdx'});
 "
 `;
 
@@ -6976,7 +6976,7 @@ component('pdx-comp-popover', {
 // Auto-route: @page '/components/popover'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/popover",tag:"pdx-comp-popover",lazy:true,file:'./comp-popover.pdx'});
+__pdx_pushRoute({path:"/components/popover",tag:"pdx-comp-popover",title:"Popover",lazy:true,file:'./comp-popover.pdx'});
 "
 `;
 
@@ -7009,7 +7009,7 @@ component('pdx-comp-progress', {
 // Auto-route: @page '/components/progress'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/progress",tag:"pdx-comp-progress",lazy:true,file:'./comp-progress.pdx'});
+__pdx_pushRoute({path:"/components/progress",tag:"pdx-comp-progress",title:"Progress",lazy:true,file:'./comp-progress.pdx'});
 "
 `;
 
@@ -7041,7 +7041,7 @@ component('pdx-comp-provide', {
 // Auto-route: @page '/components/provide'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/provide",tag:"pdx-comp-provide",lazy:true,file:'./comp-provide.pdx'});
+__pdx_pushRoute({path:"/components/provide",tag:"pdx-comp-provide",title:"Provide — PDX UI",lazy:true,file:'./comp-provide.pdx'});
 "
 `;
 
@@ -7074,7 +7074,7 @@ component('pdx-comp-radio', {
 // Auto-route: @page '/components/radio'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/radio",tag:"pdx-comp-radio",lazy:true,file:'./comp-radio.pdx'});
+__pdx_pushRoute({path:"/components/radio",tag:"pdx-comp-radio",title:"Radio & Groups",lazy:true,file:'./comp-radio.pdx'});
 "
 `;
 
@@ -7107,7 +7107,7 @@ component('pdx-comp-rating', {
 // Auto-route: @page '/components/rating'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/rating",tag:"pdx-comp-rating",lazy:true,file:'./comp-rating.pdx'});
+__pdx_pushRoute({path:"/components/rating",tag:"pdx-comp-rating",title:"Rating Component",lazy:true,file:'./comp-rating.pdx'});
 "
 `;
 
@@ -7140,7 +7140,7 @@ component('pdx-comp-relative-time', {
 // Auto-route: @page '/components/relative-time'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/relative-time",tag:"pdx-comp-relative-time",lazy:true,file:'./comp-relative-time.pdx'});
+__pdx_pushRoute({path:"/components/relative-time",tag:"pdx-comp-relative-time",title:"RelativeTime",lazy:true,file:'./comp-relative-time.pdx'});
 "
 `;
 
@@ -7173,7 +7173,7 @@ component('pdx-comp-rich-text', {
 // Auto-route: @page '/components/rich-text'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/rich-text",tag:"pdx-comp-rich-text",lazy:true,file:'./comp-rich-text.pdx'});
+__pdx_pushRoute({path:"/components/rich-text",tag:"pdx-comp-rich-text",title:"Rich Text Editor",lazy:true,file:'./comp-rich-text.pdx'});
 "
 `;
 
@@ -7206,7 +7206,7 @@ component('pdx-comp-row-col', {
 // Auto-route: @page '/components/row-col'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/row-col",tag:"pdx-comp-row-col",lazy:true,file:'./comp-row-col.pdx'});
+__pdx_pushRoute({path:"/components/row-col",tag:"pdx-comp-row-col",title:"Row & Col",lazy:true,file:'./comp-row-col.pdx'});
 "
 `;
 
@@ -7239,7 +7239,7 @@ component('pdx-comp-scroll-area', {
 // Auto-route: @page '/components/scroll-area'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/scroll-area",tag:"pdx-comp-scroll-area",lazy:true,file:'./comp-scroll-area.pdx'});
+__pdx_pushRoute({path:"/components/scroll-area",tag:"pdx-comp-scroll-area",title:"ScrollArea — PDX Components",lazy:true,file:'./comp-scroll-area.pdx'});
 "
 `;
 
@@ -7272,7 +7272,7 @@ component('pdx-comp-scroll-spy', {
 // Auto-route: @page '/components/scroll-spy'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/scroll-spy",tag:"pdx-comp-scroll-spy",lazy:true,file:'./comp-scroll-spy.pdx'});
+__pdx_pushRoute({path:"/components/scroll-spy",tag:"pdx-comp-scroll-spy",title:"ScrollSpy — PDX Components",lazy:true,file:'./comp-scroll-spy.pdx'});
 "
 `;
 
@@ -7305,7 +7305,7 @@ component('pdx-comp-search', {
 // Auto-route: @page '/components/search'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/search",tag:"pdx-comp-search",lazy:true,file:'./comp-search.pdx'});
+__pdx_pushRoute({path:"/components/search",tag:"pdx-comp-search",title:"Search Input",lazy:true,file:'./comp-search.pdx'});
 "
 `;
 
@@ -7338,7 +7338,7 @@ component('pdx-comp-segmented', {
 // Auto-route: @page '/components/segmented'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/segmented",tag:"pdx-comp-segmented",lazy:true,file:'./comp-segmented.pdx'});
+__pdx_pushRoute({path:"/components/segmented",tag:"pdx-comp-segmented",title:"Segmented Control",lazy:true,file:'./comp-segmented.pdx'});
 "
 `;
 
@@ -7372,7 +7372,7 @@ component('pdx-comp-select', {
 // Auto-route: @page '/components/select'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/select",tag:"pdx-comp-select",lazy:true,file:'./comp-select.pdx'});
+__pdx_pushRoute({path:"/components/select",tag:"pdx-comp-select",title:"Select — PDX UI",lazy:true,file:'./comp-select.pdx'});
 "
 `;
 
@@ -7405,7 +7405,7 @@ component('pdx-comp-sidebar', {
 // Auto-route: @page '/components/sidebar'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/sidebar",tag:"pdx-comp-sidebar",lazy:true,file:'./comp-sidebar.pdx'});
+__pdx_pushRoute({path:"/components/sidebar",tag:"pdx-comp-sidebar",title:"Sidebar — PDX Components",lazy:true,file:'./comp-sidebar.pdx'});
 "
 `;
 
@@ -7439,7 +7439,7 @@ component('pdx-comp-skeleton', {
 // Auto-route: @page '/components/skeleton'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/skeleton",tag:"pdx-comp-skeleton",lazy:true,file:'./comp-skeleton.pdx'});
+__pdx_pushRoute({path:"/components/skeleton",tag:"pdx-comp-skeleton",title:"Skeleton",lazy:true,file:'./comp-skeleton.pdx'});
 "
 `;
 
@@ -7472,7 +7472,7 @@ component('pdx-comp-slider', {
 // Auto-route: @page '/components/slider'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/slider",tag:"pdx-comp-slider",lazy:true,file:'./comp-slider.pdx'});
+__pdx_pushRoute({path:"/components/slider",tag:"pdx-comp-slider",title:"Slider",lazy:true,file:'./comp-slider.pdx'});
 "
 `;
 
@@ -7505,7 +7505,7 @@ component('pdx-comp-sortable-list', {
 // Auto-route: @page '/components/sortable-list'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/sortable-list",tag:"pdx-comp-sortable-list",lazy:true,file:'./comp-sortable-list.pdx'});
+__pdx_pushRoute({path:"/components/sortable-list",tag:"pdx-comp-sortable-list",title:"Sortable List Component",lazy:true,file:'./comp-sortable-list.pdx'});
 "
 `;
 
@@ -7539,7 +7539,7 @@ component('pdx-comp-sparkline', {
 // Auto-route: @page '/components/sparkline'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/sparkline",tag:"pdx-comp-sparkline",lazy:true,file:'./comp-sparkline.pdx'});
+__pdx_pushRoute({path:"/components/sparkline",tag:"pdx-comp-sparkline",title:"Sparkline",lazy:true,file:'./comp-sparkline.pdx'});
 "
 `;
 
@@ -7573,7 +7573,7 @@ component('pdx-comp-spinner', {
 // Auto-route: @page '/components/spinner'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/spinner",tag:"pdx-comp-spinner",lazy:true,file:'./comp-spinner.pdx'});
+__pdx_pushRoute({path:"/components/spinner",tag:"pdx-comp-spinner",title:"Spinner Component",lazy:true,file:'./comp-spinner.pdx'});
 "
 `;
 
@@ -7606,7 +7606,7 @@ component('pdx-comp-split-button', {
 // Auto-route: @page '/components/split-button'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/split-button",tag:"pdx-comp-split-button",lazy:true,file:'./comp-split-button.pdx'});
+__pdx_pushRoute({path:"/components/split-button",tag:"pdx-comp-split-button",title:"SplitButton — PDX Components",lazy:true,file:'./comp-split-button.pdx'});
 "
 `;
 
@@ -7639,7 +7639,7 @@ component('pdx-comp-splitter', {
 // Auto-route: @page '/components/splitter'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/splitter",tag:"pdx-comp-splitter",lazy:true,file:'./comp-splitter.pdx'});
+__pdx_pushRoute({path:"/components/splitter",tag:"pdx-comp-splitter",title:"Splitter — PDX Components",lazy:true,file:'./comp-splitter.pdx'});
 "
 `;
 
@@ -7672,7 +7672,7 @@ component('pdx-comp-statistic', {
 // Auto-route: @page '/components/statistic'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/statistic",tag:"pdx-comp-statistic",lazy:true,file:'./comp-statistic.pdx'});
+__pdx_pushRoute({path:"/components/statistic",tag:"pdx-comp-statistic",title:"Statistic — PDX Components",lazy:true,file:'./comp-statistic.pdx'});
 "
 `;
 
@@ -7705,7 +7705,7 @@ component('pdx-comp-switch', {
 // Auto-route: @page '/components/switch'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/switch",tag:"pdx-comp-switch",lazy:true,file:'./comp-switch.pdx'});
+__pdx_pushRoute({path:"/components/switch",tag:"pdx-comp-switch",title:"Switch Component",lazy:true,file:'./comp-switch.pdx'});
 "
 `;
 
@@ -7738,7 +7738,7 @@ component('pdx-comp-tabs', {
 // Auto-route: @page '/components/tabs'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/tabs",tag:"pdx-comp-tabs",lazy:true,file:'./comp-tabs.pdx'});
+__pdx_pushRoute({path:"/components/tabs",tag:"pdx-comp-tabs",title:"Tabs",lazy:true,file:'./comp-tabs.pdx'});
 "
 `;
 
@@ -7789,7 +7789,7 @@ component('pdx-comp-tag-input', {
 // Auto-route: @page '/components/tag-input'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/tag-input",tag:"pdx-comp-tag-input",lazy:true,file:'./comp-tag-input.pdx'});
+__pdx_pushRoute({path:"/components/tag-input",tag:"pdx-comp-tag-input",title:"Tag Input — PDX UI",lazy:true,file:'./comp-tag-input.pdx'});
 "
 `;
 
@@ -7822,7 +7822,7 @@ component('pdx-comp-textarea', {
 // Auto-route: @page '/components/textarea'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/textarea",tag:"pdx-comp-textarea",lazy:true,file:'./comp-textarea.pdx'});
+__pdx_pushRoute({path:"/components/textarea",tag:"pdx-comp-textarea",title:"Textarea Component",lazy:true,file:'./comp-textarea.pdx'});
 "
 `;
 
@@ -7855,7 +7855,7 @@ component('pdx-comp-time-picker', {
 // Auto-route: @page '/components/time-picker'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/time-picker",tag:"pdx-comp-time-picker",lazy:true,file:'./comp-time-picker.pdx'});
+__pdx_pushRoute({path:"/components/time-picker",tag:"pdx-comp-time-picker",title:"Time Picker Component",lazy:true,file:'./comp-time-picker.pdx'});
 "
 `;
 
@@ -7888,7 +7888,7 @@ component('pdx-comp-timeline', {
 // Auto-route: @page '/components/timeline'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/timeline",tag:"pdx-comp-timeline",lazy:true,file:'./comp-timeline.pdx'});
+__pdx_pushRoute({path:"/components/timeline",tag:"pdx-comp-timeline",title:"Timeline — PDX Components",lazy:true,file:'./comp-timeline.pdx'});
 "
 `;
 
@@ -7921,7 +7921,7 @@ component('pdx-comp-toast', {
 // Auto-route: @page '/components/toast'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/toast",tag:"pdx-comp-toast",lazy:true,file:'./comp-toast.pdx'});
+__pdx_pushRoute({path:"/components/toast",tag:"pdx-comp-toast",title:"Toast",lazy:true,file:'./comp-toast.pdx'});
 "
 `;
 
@@ -7954,7 +7954,7 @@ component('pdx-comp-toggle', {
 // Auto-route: @page '/components/toggle'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/toggle",tag:"pdx-comp-toggle",lazy:true,file:'./comp-toggle.pdx'});
+__pdx_pushRoute({path:"/components/toggle",tag:"pdx-comp-toggle",title:"Toggle Button",lazy:true,file:'./comp-toggle.pdx'});
 "
 `;
 
@@ -7987,7 +7987,7 @@ component('pdx-comp-toggle-group', {
 // Auto-route: @page '/components/toggle-group'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/toggle-group",tag:"pdx-comp-toggle-group",lazy:true,file:'./comp-toggle-group.pdx'});
+__pdx_pushRoute({path:"/components/toggle-group",tag:"pdx-comp-toggle-group",title:"Toggle Group Component",lazy:true,file:'./comp-toggle-group.pdx'});
 "
 `;
 
@@ -8038,7 +8038,7 @@ component('pdx-comp-toolbar', {
 // Auto-route: @page '/components/toolbar'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/toolbar",tag:"pdx-comp-toolbar",lazy:true,file:'./comp-toolbar.pdx'});
+__pdx_pushRoute({path:"/components/toolbar",tag:"pdx-comp-toolbar",title:"Toolbar — PDX Components",lazy:true,file:'./comp-toolbar.pdx'});
 "
 `;
 
@@ -8071,7 +8071,7 @@ component('pdx-comp-tooltip', {
 // Auto-route: @page '/components/tooltip'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/tooltip",tag:"pdx-comp-tooltip",lazy:true,file:'./comp-tooltip.pdx'});
+__pdx_pushRoute({path:"/components/tooltip",tag:"pdx-comp-tooltip",title:"Tooltip",lazy:true,file:'./comp-tooltip.pdx'});
 "
 `;
 
@@ -8104,7 +8104,7 @@ component('pdx-comp-transfer', {
 // Auto-route: @page '/components/transfer'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/transfer",tag:"pdx-comp-transfer",lazy:true,file:'./comp-transfer.pdx'});
+__pdx_pushRoute({path:"/components/transfer",tag:"pdx-comp-transfer",title:"Transfer Component",lazy:true,file:'./comp-transfer.pdx'});
 "
 `;
 
@@ -8137,7 +8137,7 @@ component('pdx-comp-tree', {
 // Auto-route: @page '/components/tree'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/tree",tag:"pdx-comp-tree",lazy:true,file:'./comp-tree.pdx'});
+__pdx_pushRoute({path:"/components/tree",tag:"pdx-comp-tree",title:"Tree Component",lazy:true,file:'./comp-tree.pdx'});
 "
 `;
 
@@ -8170,7 +8170,7 @@ component('pdx-comp-tree-select', {
 // Auto-route: @page '/components/tree-select'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/tree-select",tag:"pdx-comp-tree-select",lazy:true,file:'./comp-tree-select.pdx'});
+__pdx_pushRoute({path:"/components/tree-select",tag:"pdx-comp-tree-select",title:"TreeSelect Component",lazy:true,file:'./comp-tree-select.pdx'});
 "
 `;
 
@@ -8203,7 +8203,7 @@ component('pdx-comp-wizard', {
 // Auto-route: @page '/components/wizard'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/wizard",tag:"pdx-comp-wizard",lazy:true,file:'./comp-wizard.pdx'});
+__pdx_pushRoute({path:"/components/wizard",tag:"pdx-comp-wizard",title:"Wizard — PDX Components",lazy:true,file:'./comp-wizard.pdx'});
 "
 `;
 
@@ -8236,7 +8236,7 @@ component('pdx-design-accordion', {
 // Auto-route: @page '/design/accordion'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/accordion",tag:"pdx-design-accordion",lazy:true,file:'./design-accordion.pdx'});
+__pdx_pushRoute({path:"/design/accordion",tag:"pdx-design-accordion",title:"Accordion",lazy:true,file:'./design-accordion.pdx'});
 "
 `;
 
@@ -8269,7 +8269,7 @@ component('pdx-design-animations', {
 // Auto-route: @page '/design/animations'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/animations",tag:"pdx-design-animations",lazy:true,file:'./design-animations.pdx'});
+__pdx_pushRoute({path:"/design/animations",tag:"pdx-design-animations",title:"Animations",lazy:true,file:'./design-animations.pdx'});
 "
 `;
 
@@ -8302,7 +8302,7 @@ component('pdx-design-banner', {
 // Auto-route: @page '/design/banner'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/banner",tag:"pdx-design-banner",lazy:true,file:'./design-banner.pdx'});
+__pdx_pushRoute({path:"/design/banner",tag:"pdx-design-banner",title:"Banners",lazy:true,file:'./design-banner.pdx'});
 "
 `;
 
@@ -8335,7 +8335,7 @@ component('pdx-design-buttons', {
 // Auto-route: @page '/design/buttons'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/buttons",tag:"pdx-design-buttons",lazy:true,file:'./design-buttons.pdx'});
+__pdx_pushRoute({path:"/design/buttons",tag:"pdx-design-buttons",title:"Buttons",lazy:true,file:'./design-buttons.pdx'});
 "
 `;
 
@@ -8368,7 +8368,7 @@ component('pdx-design-chips', {
 // Auto-route: @page '/design/chips'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/chips",tag:"pdx-design-chips",lazy:true,file:'./design-chips.pdx'});
+__pdx_pushRoute({path:"/design/chips",tag:"pdx-design-chips",title:"Chips",lazy:true,file:'./design-chips.pdx'});
 "
 `;
 
@@ -8401,7 +8401,7 @@ component('pdx-design-colors', {
 // Auto-route: @page '/design/colors'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/colors",tag:"pdx-design-colors",lazy:true,file:'./design-colors.pdx'});
+__pdx_pushRoute({path:"/design/colors",tag:"pdx-design-colors",title:"Colors & Tokens",lazy:true,file:'./design-colors.pdx'});
 "
 `;
 
@@ -8434,7 +8434,7 @@ component('pdx-design-dialog', {
 // Auto-route: @page '/design/dialog-css'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/dialog-css",tag:"pdx-design-dialog",lazy:true,file:'./design-dialog.pdx'});
+__pdx_pushRoute({path:"/design/dialog-css",tag:"pdx-design-dialog",title:"Dialog (CSS)",lazy:true,file:'./design-dialog.pdx'});
 "
 `;
 
@@ -8467,7 +8467,7 @@ component('pdx-design-drawer', {
 // Auto-route: @page '/design/drawer-css'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/drawer-css",tag:"pdx-design-drawer",lazy:true,file:'./design-drawer.pdx'});
+__pdx_pushRoute({path:"/design/drawer-css",tag:"pdx-design-drawer",title:"Drawer (CSS)",lazy:true,file:'./design-drawer.pdx'});
 "
 `;
 
@@ -8500,7 +8500,7 @@ component('pdx-design-feedback', {
 // Auto-route: @page '/design/feedback'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/feedback",tag:"pdx-design-feedback",lazy:true,file:'./design-feedback.pdx'});
+__pdx_pushRoute({path:"/design/feedback",tag:"pdx-design-feedback",title:"Badges, Dots & Alerts",lazy:true,file:'./design-feedback.pdx'});
 "
 `;
 
@@ -8533,7 +8533,7 @@ component('pdx-design-forms', {
 // Auto-route: @page '/design/forms'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/forms",tag:"pdx-design-forms",lazy:true,file:'./design-forms.pdx'});
+__pdx_pushRoute({path:"/design/forms",tag:"pdx-design-forms",title:"Forms",lazy:true,file:'./design-forms.pdx'});
 "
 `;
 
@@ -8566,7 +8566,7 @@ component('pdx-design-inputs', {
 // Auto-route: @page '/design/inputs'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/inputs",tag:"pdx-design-inputs",lazy:true,file:'./design-inputs.pdx'});
+__pdx_pushRoute({path:"/design/inputs",tag:"pdx-design-inputs",title:"Inputs",lazy:true,file:'./design-inputs.pdx'});
 "
 `;
 
@@ -8599,7 +8599,7 @@ component('pdx-design-kbd', {
 // Auto-route: @page '/design/kbd'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/kbd",tag:"pdx-design-kbd",lazy:true,file:'./design-kbd.pdx'});
+__pdx_pushRoute({path:"/design/kbd",tag:"pdx-design-kbd",title:"Kbd",lazy:true,file:'./design-kbd.pdx'});
 "
 `;
 
@@ -8632,7 +8632,7 @@ component('pdx-design-layout', {
 // Auto-route: @page '/design/layout'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/layout",tag:"pdx-design-layout",lazy:true,file:'./design-layout.pdx'});
+__pdx_pushRoute({path:"/design/layout",tag:"pdx-design-layout",title:"Layout",lazy:true,file:'./design-layout.pdx'});
 "
 `;
 
@@ -8665,7 +8665,7 @@ component('pdx-design-menu', {
 // Auto-route: @page '/design/menu'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/menu",tag:"pdx-design-menu",lazy:true,file:'./design-menu.pdx'});
+__pdx_pushRoute({path:"/design/menu",tag:"pdx-design-menu",title:"Menu",lazy:true,file:'./design-menu.pdx'});
 "
 `;
 
@@ -8698,7 +8698,7 @@ component('pdx-design-nav', {
 // Auto-route: @page '/design/nav'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/nav",tag:"pdx-design-nav",lazy:true,file:'./design-nav.pdx'});
+__pdx_pushRoute({path:"/design/nav",tag:"pdx-design-nav",title:"Navigation",lazy:true,file:'./design-nav.pdx'});
 "
 `;
 
@@ -8731,7 +8731,7 @@ component('pdx-design-pagination', {
 // Auto-route: @page '/design/pagination'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/pagination",tag:"pdx-design-pagination",lazy:true,file:'./design-pagination.pdx'});
+__pdx_pushRoute({path:"/design/pagination",tag:"pdx-design-pagination",title:"Pagination",lazy:true,file:'./design-pagination.pdx'});
 "
 `;
 
@@ -8764,7 +8764,7 @@ component('pdx-design-popover', {
 // Auto-route: @page '/design/popover-css'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/popover-css",tag:"pdx-design-popover",lazy:true,file:'./design-popover.pdx'});
+__pdx_pushRoute({path:"/design/popover-css",tag:"pdx-design-popover",title:"Popover (CSS)",lazy:true,file:'./design-popover.pdx'});
 "
 `;
 
@@ -8797,7 +8797,7 @@ component('pdx-design-progress', {
 // Auto-route: @page '/design/progress'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/progress",tag:"pdx-design-progress",lazy:true,file:'./design-progress.pdx'});
+__pdx_pushRoute({path:"/design/progress",tag:"pdx-design-progress",title:"Progress",lazy:true,file:'./design-progress.pdx'});
 "
 `;
 
@@ -8830,7 +8830,7 @@ component('pdx-design-segmented', {
 // Auto-route: @page '/design/segmented'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/segmented",tag:"pdx-design-segmented",lazy:true,file:'./design-segmented.pdx'});
+__pdx_pushRoute({path:"/design/segmented",tag:"pdx-design-segmented",title:"Segmented Control",lazy:true,file:'./design-segmented.pdx'});
 "
 `;
 
@@ -8863,7 +8863,7 @@ component('pdx-design-spacing', {
 // Auto-route: @page '/design/spacing'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/spacing",tag:"pdx-design-spacing",lazy:true,file:'./design-spacing.pdx'});
+__pdx_pushRoute({path:"/design/spacing",tag:"pdx-design-spacing",title:"Spacing & Sizing",lazy:true,file:'./design-spacing.pdx'});
 "
 `;
 
@@ -8896,7 +8896,7 @@ component('pdx-design-surfaces', {
 // Auto-route: @page '/design/surfaces'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/surfaces",tag:"pdx-design-surfaces",lazy:true,file:'./design-surfaces.pdx'});
+__pdx_pushRoute({path:"/design/surfaces",tag:"pdx-design-surfaces",title:"Surfaces & Cards",lazy:true,file:'./design-surfaces.pdx'});
 "
 `;
 
@@ -8929,7 +8929,7 @@ component('pdx-design-tables', {
 // Auto-route: @page '/design/tables'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/tables",tag:"pdx-design-tables",lazy:true,file:'./design-tables.pdx'});
+__pdx_pushRoute({path:"/design/tables",tag:"pdx-design-tables",title:"Tables",lazy:true,file:'./design-tables.pdx'});
 "
 `;
 
@@ -8962,7 +8962,7 @@ component('pdx-design-tabs', {
 // Auto-route: @page '/design/tabs'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/tabs",tag:"pdx-design-tabs",lazy:true,file:'./design-tabs.pdx'});
+__pdx_pushRoute({path:"/design/tabs",tag:"pdx-design-tabs",title:"Tabs",lazy:true,file:'./design-tabs.pdx'});
 "
 `;
 
@@ -9007,7 +9007,7 @@ component('pdx-design-themes', {
 // Auto-route: @page '/design/themes'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/themes",tag:"pdx-design-themes",lazy:true,file:'./design-themes.pdx'});
+__pdx_pushRoute({path:"/design/themes",tag:"pdx-design-themes",title:"Themes & Tokens — PDX UI",lazy:true,file:'./design-themes.pdx'});
 "
 `;
 
@@ -9040,7 +9040,7 @@ component('pdx-design-toast', {
 // Auto-route: @page '/design/toast-css'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/toast-css",tag:"pdx-design-toast",lazy:true,file:'./design-toast.pdx'});
+__pdx_pushRoute({path:"/design/toast-css",tag:"pdx-design-toast",title:"Toast (CSS)",lazy:true,file:'./design-toast.pdx'});
 "
 `;
 
@@ -9073,7 +9073,7 @@ component('pdx-design-toolbar', {
 // Auto-route: @page '/design/toolbar'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/toolbar",tag:"pdx-design-toolbar",lazy:true,file:'./design-toolbar.pdx'});
+__pdx_pushRoute({path:"/design/toolbar",tag:"pdx-design-toolbar",title:"Toolbar",lazy:true,file:'./design-toolbar.pdx'});
 "
 `;
 
@@ -9106,7 +9106,7 @@ component('pdx-design-typography', {
 // Auto-route: @page '/design/typography'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/design/typography",tag:"pdx-design-typography",lazy:true,file:'./design-typography.pdx'});
+__pdx_pushRoute({path:"/design/typography",tag:"pdx-design-typography",title:"Typography",lazy:true,file:'./design-typography.pdx'});
 "
 `;
 
@@ -9139,7 +9139,7 @@ component('pdx-infra-container', {
 // Auto-route: @page '/infra/container'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/infra/container",tag:"pdx-infra-container",lazy:true,file:'./infra-container.pdx'});
+__pdx_pushRoute({path:"/infra/container",tag:"pdx-infra-container",title:"Container Size",lazy:true,file:'./infra-container.pdx'});
 "
 `;
 
@@ -9172,7 +9172,7 @@ component('pdx-infra-drag', {
 // Auto-route: @page '/infra/drag'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/infra/drag",tag:"pdx-infra-drag",lazy:true,file:'./infra-drag.pdx'});
+__pdx_pushRoute({path:"/infra/drag",tag:"pdx-infra-drag",title:"Drag & Drop",lazy:true,file:'./infra-drag.pdx'});
 "
 `;
 
@@ -9205,7 +9205,7 @@ component('pdx-infra-focus', {
 // Auto-route: @page '/infra/focus'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/infra/focus",tag:"pdx-infra-focus",lazy:true,file:'./infra-focus.pdx'});
+__pdx_pushRoute({path:"/infra/focus",tag:"pdx-infra-focus",title:"Focus Management",lazy:true,file:'./infra-focus.pdx'});
 "
 `;
 
@@ -9238,7 +9238,7 @@ component('pdx-infra-overlay', {
 // Auto-route: @page '/infra/overlay'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/infra/overlay",tag:"pdx-infra-overlay",lazy:true,file:'./infra-overlay.pdx'});
+__pdx_pushRoute({path:"/infra/overlay",tag:"pdx-infra-overlay",title:"Overlay System",lazy:true,file:'./infra-overlay.pdx'});
 "
 `;
 
@@ -9271,7 +9271,7 @@ component('pdx-infra-positioning', {
 // Auto-route: @page '/infra/positioning'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/infra/positioning",tag:"pdx-infra-positioning",lazy:true,file:'./infra-positioning.pdx'});
+__pdx_pushRoute({path:"/infra/positioning",tag:"pdx-infra-positioning",title:"Positioning Engine",lazy:true,file:'./infra-positioning.pdx'});
 "
 `;
 
@@ -9304,7 +9304,7 @@ component('pdx-infra-selection', {
 // Auto-route: @page '/infra/selection'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/infra/selection",tag:"pdx-infra-selection",lazy:true,file:'./infra-selection.pdx'});
+__pdx_pushRoute({path:"/infra/selection",tag:"pdx-infra-selection",title:"Selection Model",lazy:true,file:'./infra-selection.pdx'});
 "
 `;
 
@@ -9343,7 +9343,7 @@ component('pdx-infra-virtualizer', {
 // Auto-route: @page '/infra/virtualizer'
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/infra/virtualizer",tag:"pdx-infra-virtualizer",lazy:true,file:'./infra-virtualizer.pdx'});
+__pdx_pushRoute({path:"/infra/virtualizer",tag:"pdx-infra-virtualizer",title:"Virtualization",lazy:true,file:'./infra-virtualizer.pdx'});
 "
 `;
 

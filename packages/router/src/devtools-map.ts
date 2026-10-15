@@ -48,18 +48,24 @@ export function paramsOf(path: string): DevtoolsMapParam[] {
     return params;
 }
 
+/** A dictionary key translated, or nothing while its strings have not arrived (`$t` hands the key back). */
+function translated(key: string): string | undefined {
+    const text = $t(key);
+    return text === key ? undefined : text;
+}
+
 /**
  * What the route is called: its crumb's dictionary key translated, else a label written as a
- * string. A function label names a record — `Ticket 42` — and a map has no record to give it. A key
- * whose dictionary has not arrived yet (`$t` hands the key back) is no title either: an app that
- * loads its strings by section has not loaded the ones of a route nobody opened.
+ * string; a route with no crumb, by its page's title, a key or a string the compiler read off
+ * `@title` (#389). A function label names a record — `Ticket 42` — and a map has no record to give
+ * it. A key whose dictionary has not arrived yet is no title either: an app that loads its strings
+ * by section has not loaded the ones of a route nobody opened.
  */
 function titleOf(route: RouteConfig): string | undefined {
-    if (route.labelKey !== undefined) {
-        const title = $t(route.labelKey);
-        return title === route.labelKey ? undefined : title;
-    }
-    return typeof route.label === 'string' ? route.label : undefined;
+    if (route.labelKey !== undefined) return translated(route.labelKey);
+    if (route.label !== undefined) return typeof route.label === 'string' ? route.label : undefined;
+    if (route.titleKey !== undefined) return translated(route.titleKey);
+    return route.title;
 }
 
 /**

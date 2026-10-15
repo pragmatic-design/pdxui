@@ -69,7 +69,10 @@ route table:
 
 A param's `type` is its constraint — `number`, `uuid`, or the pattern written — and `string` without
 one. The `title` is the route's crumb: its `label`, or its dictionary key translated; a label that is a
-function of the record, or a key whose strings have not loaded yet, gives none. `access` is on a route
+function of the record, or a key whose strings have not loaded yet, gives none. A route with no crumb
+is named by its page's `@title` when the compiler can read it without the page: a string, or
+`$t('key')` with nothing but the key. A title that needs the params or a record —
+`$t('ticket.title', { id })`, `record?.name` — gives none. `access` is on a route
 that declares a guard, or renders inside one that does: whether the current user would be let in,
 asked of the same guard checker a navigation asks. A route without it is open.
 

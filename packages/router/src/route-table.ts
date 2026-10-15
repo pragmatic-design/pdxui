@@ -64,5 +64,7 @@ export function toRouteConfig(r: TableRoute): RouteConfig {
         hasOutlet: r.hasOutlet,
         label: r.label,
         labelKey: r.labelKey,
+        title: r.title,
+        titleKey: r.titleKey,
     };
 }
