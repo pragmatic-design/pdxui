@@ -5,6 +5,7 @@ import type { FilterOperator, FilterDescriptor, CompositeFilter, FilterOptionsLo
 import { opsForType, RELATIVE_DATE_OPS } from '@pdxui/core';
 import type { FieldType } from '@pdxui/core';
 import { uiString } from './i18n';
+import { onPressOutside } from './press-outside';
 
 /** Operators that take NO value input: empties + relative-date presets. */
 const NO_VALUE_OPS = new Set<string>(['isnull', 'isnotnull', ...RELATIVE_DATE_OPS]);
@@ -643,32 +644,29 @@ export function openFilterPopoverFor(
     // in a rAF registered BEFORE this one, and focus does not land in a hidden subtree.
     requestAnimationFrame(() => { if (popover.isConnected) place(); });
 
-    // Close on outside click or scroll. Attached a tick later, so the click that opened the popover
-    // does not close it; every close — these two, Apply, Clear, Escape, a reopen, the grid's own —
-    // goes through closeFilterPopover, which detaches them.
+    // Close on a press outside or a scroll, listened for from now (#427): the press that opened the
+    // popover is older than the opening, and onPressOutside lets it pass. Every close — these two,
+    // Apply, Clear, Escape, a reopen, the grid's own — goes through closeFilterPopover, which
+    // detaches them.
     // A click outside puts focus where it clicked, so it is not sent back to the opener.
-    const onClickOutside = (e: MouseEvent) => {
-        if (!popover.contains(e.target as Node)) {
+    const offPress = onPressOutside({
+        type: 'pointerdown',
+        capture: true,
+        inside: (t) => popover.contains(t),
+        outside: () => {
             closeFilterPopover();
             callbacks.onClose();
-        }
-    };
+        },
+    });
     const onScroll = (e: Event) => {
         if (popover.contains(e.target as Node)) return;
         closeFilterPopover();
         callbacks.onClose();
     };
+    window.addEventListener('scroll', onScroll, true);
 
-    let attached = false;
-    const attach = setTimeout(() => {
-        attached = true;
-        document.addEventListener('pointerdown', onClickOutside, true);
-        window.addEventListener('scroll', onScroll, true);
-    }, 0);
     _detach = () => {
-        clearTimeout(attach);
-        if (!attached) return;
-        document.removeEventListener('pointerdown', onClickOutside, true);
+        offPress();
         window.removeEventListener('scroll', onScroll, true);
     };
 }

@@ -13,6 +13,7 @@ import { sanitizeSVG } from '../shared/sanitize';
 import { anchorControl } from '../shared/anchor-control';
 import { uiString, uiAttr} from '../shared/i18n';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
+import { onPressOutside } from '../shared/press-outside';
 
 /** The pdx-menu this component opens: its props and its API, as the dropdown uses them. */
 interface MenuHost extends HTMLElement {
@@ -57,9 +58,8 @@ component('pdx-dropdown-menu', {
         let _slotted = false;
         let _menuEl: MenuHost | null = null;
         let _scrollHandler: (() => void) | null = null;
-        let _outsideHandler: ((e: MouseEvent) => void) | null = null;
-        /** The pending timer that adds `_outsideHandler`: close() cancels it, or it adds the listener after the close (#163). */
-        let _outsideTimer: ReturnType<typeof setTimeout> | null = null;
+        /** Removes the press-outside listener, added when the menu opens (#427). */
+        let _outsideDispose: (() => void) | null = null;
         let _escHandler: ((e: KeyboardEvent) => void) | null = null;
 
         // ─── The menu ────────────────────────────────────────
@@ -138,16 +138,10 @@ component('pdx-dropdown-menu', {
             }));
 
             // Click-outside
-            _outsideTimer = setTimeout(() => {
-                _outsideTimer = null;
-                _outsideHandler = (e: MouseEvent) => {
-                    const t = e.target as Node;
-                    if (_triggerEl?.contains(t) || _menuEl?.contains(t)) return;
-                    if ((t as Element).closest?.('[data-submenu-key]')) return;
-                    close();
-                };
-                document.addEventListener('mousedown', _outsideHandler);
-            }, 10);
+            _outsideDispose = onPressOutside({
+                inside: (t) => !!(_triggerEl?.contains(t) || _menuEl?.contains(t) || (t as Element).closest?.('[data-submenu-key]')),
+                outside: () => close(),
+            });
 
             // Escape closes. Tab closes too (APG menu button) and is NOT prevented: close() puts focus
             // back on the trigger first, so the browser's Tab moves on from the menu button. Escape
@@ -166,8 +160,7 @@ component('pdx-dropdown-menu', {
 
             if (_triggerEl) { _triggerEl.setAttribute('aria-expanded', 'false'); _triggerEl.removeAttribute('aria-controls'); }
             if (_menuEl) { _menuEl.closeSubmenu?.(); _menuEl.remove(); _menuEl = null; }
-            if (_outsideTimer) { clearTimeout(_outsideTimer); _outsideTimer = null; }
-            if (_outsideHandler) { document.removeEventListener('mousedown', _outsideHandler); _outsideHandler = null; }
+            _outsideDispose?.(); _outsideDispose = null;
             if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
             if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
             _triggerEl?.focus();
