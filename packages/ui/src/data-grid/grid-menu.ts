@@ -6,7 +6,7 @@
 // follow (pdx-split-button): role="menu", focusGroup for the arrows, Home/End, type-ahead and
 // Enter/Space, Escape back to the button, a click outside to close.
 
-import { focusGroup, sanitizeUrl } from '@pdxui/core';
+import { focusGroup, sanitizeUrl, generatedId } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 
 /** `pdx-icon` the first time a menu item names an icon: a use that draws none never pays for the icon set. */
@@ -61,9 +61,6 @@ export interface GridMenuOptions {
 const HIDDEN_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;'
     + 'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
 
-/** One per menu on the page, so two menus' reasons cannot share an id. */
-let menuSeq = 0;
-
 let openMenu: { anchor: HTMLElement; close(returnFocus: boolean): void } | null = null;
 
 /** Close the open grid menu, if any, leaving focus where it is. */
@@ -91,7 +88,7 @@ export function openGridMenu(anchor: HTMLElement, items: GridMenuItem[], opts: G
     }
 
     const role = opts.radio ? 'menuitemradio' : 'menuitem';
-    const menuId = `pdx-dg-menu-${++menuSeq}`;
+    const menuId = generatedId('pdx-dg-menu');
     const reasonEls: HTMLElement[] = [];
     const itemEls = items.map((item, i) => {
         // A link is an <a>: the element is what a middle click, a copy and a screen reader go by.

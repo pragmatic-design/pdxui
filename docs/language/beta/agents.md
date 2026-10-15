@@ -98,8 +98,15 @@ Driving the showcase this way found three defects of the API, fixed with it:
 - `page()` counted header rows in a list's total.
 - A label written after its control was repeated as text.
 
-A fourth is open as #391: an id a component generates from a counter is used as a selector, and it
-changes between sessions.
+A fourth was fixed in #391. The outline used, as a selector, an id that a component generates from a
+counter: `pdx-ff-1-input` on `/intake` opened directly, `pdx-ff-20-input` after a visit to `/tickets`.
+Components now make those ids with `generatedId(prefix)` from core. In development it records them,
+and the outline never uses as a selector:
+- an id it recorded;
+- an id built from one;
+- a recorded value in a telling attribute, such as an unnamed radio group's `name`.
+
+The selector then falls to the next candidate.
 
 ## Capabilities in production
 

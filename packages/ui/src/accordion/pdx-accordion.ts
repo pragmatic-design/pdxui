@@ -3,13 +3,11 @@
 // Uses focusGroup for keyboard nav between triggers.
 // mode="single" (one open at a time) or mode="multiple" (free).
 
-import { component, html, focusGroup } from '@pdxui/core';
+import { component, html, focusGroup, generatedId } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/accordion';
-
-let _accCounter = 0;
 
 /**
  * Expandable sections with animated height, opened one at a time or several together, and navigated
@@ -30,7 +28,7 @@ component('pdx-accordion', {
         // in a second accordion on the page, and its aria-controls would point into the first.
         // `seq` numbers items as they are wired, not by
         // position, so an item added later cannot reuse an id either.
-        const uid = 'pdx-acc-' + (++_accCounter);
+        const uid = generatedId('pdx-acc');
         let seq = 0;
         const wired = new WeakSet<HTMLElement>();
 

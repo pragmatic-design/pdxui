@@ -1,11 +1,9 @@
 // pdx-password-input — Input with toggle visibility and optional strength meter.
 // Uses pdx-input wrapper pattern. Toggle button in suffix position.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, generatedId } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 import { setOwnProp } from '../shared/own-prop';
-
-let _pwSeq = 0;
 
 /**
  * A password field the user can reveal or hide, with an optional strength meter below it.
@@ -92,7 +90,7 @@ component('pdx-password-input', {
 
         // The meter's text describes the input, and is announced politely as it changes, not
         // visual only.
-        const strengthId = 'pdx-pw-strength-' + (++_pwSeq);
+        const strengthId = generatedId('pdx-pw-strength');
         const describedBy = (): string | null => (ctx.showStrength() && strength() > 0 ? strengthId : null);
 
         function strengthColor(): string {

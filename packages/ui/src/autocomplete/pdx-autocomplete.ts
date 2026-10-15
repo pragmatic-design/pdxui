@@ -1,7 +1,7 @@
 // pdx-autocomplete — Text input with suggestions.
 // Value is FREE TEXT. Supports local array, DataSource, debounce, forceSelection, highlight.
 
-import { signal, computed, effect, html, component, isDataSource, tryInject, useFormAssociated, untracked } from '@pdxui/core';
+import { signal, computed, effect, html, component, isDataSource, tryInject, useFormAssociated, untracked, generatedId } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
@@ -9,8 +9,6 @@ import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/autocomplete';
-
-let _acCounter = 0;
 
 interface NormalisedOption { label: string; value: unknown; _raw: unknown; }
 
@@ -79,7 +77,7 @@ component('pdx-autocomplete', {
         warning: { type: Boolean, default: false },
     },
     setup(ctx) {
-        const uid = 'pdx-ac-' + (++_acCounter);
+        const uid = generatedId('pdx-ac');
         const listboxId = uid + '-lb';
 
         const _open = signal(false);

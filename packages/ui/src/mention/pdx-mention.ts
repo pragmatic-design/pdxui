@@ -3,7 +3,7 @@
 // Mentions tracked as ranges — textarea shows clean text, mirror highlights mentions.
 // For persistence: getMentionMarkup() returns @[Label](id) format.
 
-import { component, html, signal, useFormAssociated } from '@pdxui/core';
+import { component, html, signal, useFormAssociated, generatedId } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { computeFloatingPosition, autoUpdate, offset, flip, shift } from '@pdxui/core';
 import type { SlotFunction, VirtualElement } from '@pdxui/core';
@@ -20,9 +20,6 @@ registerComponentStrings('mention', {
     // Announced when the suggestions change.
     suggestions: '{n, plural, one {# suggestion} other {# suggestions}}',
 });
-
-/** Instance counter for the ids that tie the textarea to its list and options. */
-let _mentionSeq = 0;
 
 export interface MentionItem {
     value: string;
@@ -104,7 +101,7 @@ component('pdx-mention', {
         let _mirrorEl: HTMLElement | null = null;
         let _dropdownEl: HTMLElement | null = null;
         let _statusEl: HTMLElement | null = null;
-        const _listId = `pdx-mention-${++_mentionSeq}-list`;
+        const _listId = `${generatedId('pdx-mention')}-list`;
         let _debounceTimer: ReturnType<typeof setTimeout> | null = null;
         // Timers cancelled on destroy
         ctx.track(() => () => { if (_debounceTimer) { clearTimeout(_debounceTimer); _debounceTimer = null; } });

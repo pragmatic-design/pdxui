@@ -2,7 +2,7 @@
 // Provides: click/hover/manual trigger, positioning, hover relay, outside click, Escape.
 // Uses core primitive for all logic — no reimplementation.
 
-import { component, html } from '@pdxui/core';
+import { component, html, generatedId } from '@pdxui/core';
 import { usePopover, overlayStack, focusFirst } from '@pdxui/core';
 import type { PopoverTrigger, PopoverPlacement } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -34,7 +34,7 @@ component('pdx-popover', {
     setup(ctx) {
         let overlayId = '';
         let popover: ReturnType<typeof usePopover> | null = null;
-        const floatId = 'pdx-popover-float-' + (++_popoverCounter);
+        const floatId = generatedId('pdx-popover-float');
 
         function getTrigger(): HTMLElement | null {
             const parent = ctx.el.parentElement;

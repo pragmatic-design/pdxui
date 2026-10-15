@@ -2,7 +2,7 @@
 // Props for brand + nav. Discovers existing children for actions area.
 // Responsive: hamburger + drawer on mobile breakpoint.
 
-import { component, html, signal, sanitizeUrl } from '@pdxui/core';
+import { component, html, signal, sanitizeUrl, generatedId } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -19,9 +19,6 @@ export interface NavbarItem {
     icon?: string;
     active?: boolean;
 }
-
-/** Instance counter for the id that ties the menu toggle to its menu. */
-let _navbarSeq = 0;
 
 /**
  * A responsive app header holding the brand, the navigation links and the user's avatar with its
@@ -50,7 +47,7 @@ component('pdx-navbar', {
         let _built = false;
         let _hamburgerEl: HTMLButtonElement | null = null;
         let _drawerEl: HTMLElement | null = null;
-        const _menuId = `pdx-navbar-${++_navbarSeq}-menu`;
+        const _menuId = `${generatedId('pdx-navbar')}-menu`;
 
         function setMobile(open: boolean): void {
             _mobileOpen.set(open);

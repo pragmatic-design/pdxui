@@ -2,10 +2,7 @@
 // Maps to .pdx-field-label, .pdx-field-required, .pdx-field-optional,
 // .pdx-field-hint, .pdx-field-description CSS classes.
 
-import { component, html, signal } from '@pdxui/core';
-
-/** Instance counter for the ids a label gives its control, or itself, to be tied together. */
-let _labelSeq = 0;
+import { component, html, signal, generatedId } from '@pdxui/core';
 
 /**
  * An accessible form label, with a required or optional indicator, a hint and a description.
@@ -35,7 +32,8 @@ component('pdx-label', {
         // With no `for`, the label ties itself to the control that follows it: rendered as for="" —
         // an empty string is written as an attribute — a label would name nothing. A single control gets `for` (and an id if it has none); a group (a radio or
         // checkbox group) is labelled by the label's id, since `for` would name only its first input.
-        const uid = ++_labelSeq;
+        // The ids it gives are made up: an agent's selector must not use them (#391).
+        const uid = generatedId('pdx-label');
         const autoFor = signal('');
         ctx.frame(() => {
             if (ctx.for()) return;
@@ -57,10 +55,10 @@ component('pdx-label', {
             if (sliders.length) {
                 const label = ctx.el.querySelector('label');
                 if (!label) return;
-                if (!label.id) label.id = `pdx-label-${uid}`;
+                if (!label.id) label.id = uid;
                 sliders.forEach((thumb, i) => {
                     if (thumb.hasAttribute('aria-labelledby')) return;
-                    if (!thumb.id) thumb.id = `pdx-label-${uid}-thumb-${i}`;
+                    if (!thumb.id) thumb.id = `${uid}-thumb-${i}`;
                     thumb.setAttribute('aria-labelledby', sliders.length > 1 ? `${label.id} ${thumb.id}` : label.id);
                 });
                 return;
@@ -68,14 +66,14 @@ component('pdx-label', {
             if (byId) {
                 const label = ctx.el.querySelector('label');
                 if (!label) return;
-                if (!label.id) label.id = `pdx-label-${uid}`;
+                if (!label.id) label.id = uid;
                 if (!byId.hasAttribute('aria-labelledby') && !byId.hasAttribute('aria-label')) {
                     byId.setAttribute('aria-labelledby', label.id);
                 }
                 return;
             }
             if (!control) return;
-            if (!control.id) control.id = `pdx-label-${uid}-control`;
+            if (!control.id) control.id = `${uid}-control`;
             autoFor.set(control.id);
         });
         /** The label's `for`: the prop, else the control found after it, else no attribute at all. */

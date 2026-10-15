@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-455 value exports.
+456 value exports.
 
 ### `__adoptStyles`
 
@@ -2296,6 +2296,17 @@ function fromTC39State(tc39: TC39State<T>): Signal<T>
 
 Create a Pragmatic signal from a TC39-compatible State signal.
 Useful for consuming signals from other frameworks.
+
+### `generatedId`
+
+```ts
+import { generatedId } from '@pdxui/core';
+
+function generatedId(prefix: string): string
+```
+
+A new id `<prefix>-<n>`, where `n` counts the ids made with this prefix: `generatedId('pdx-ff')`
+gives `pdx-ff-1`, then `pdx-ff-2`. An id built from it — `${id}-input` — is generated as well.
 
 ### `generateMonthGrid`
 

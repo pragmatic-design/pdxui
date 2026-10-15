@@ -3,7 +3,7 @@
 // pdx-checkbox-group, pdx-radio-group and pdx-segmented are named by `label`, or by the pdx-label put
 // right before them; without either, a screen reader announces an unnamed group.
 
-let _seq = 0;
+import { generatedId } from '@pdxui/core';
 
 /**
  * Names `target` (the element with the group role): `label` as aria-label; else, when `host`'s
@@ -21,7 +21,7 @@ export function nameGroup(host: Element, target: Element, label: string): void {
     const prev = host.previousElementSibling;
     const labelEl = prev && prev.tagName === 'PDX-LABEL' ? prev.querySelector('label') : null;
     if (!labelEl) { target.removeAttribute('aria-labelledby'); return; }
-    if (!labelEl.id) labelEl.id = `pdx-group-label-${++_seq}`;
+    if (!labelEl.id) labelEl.id = generatedId('pdx-group-label');
     target.setAttribute('aria-labelledby', labelEl.id);
 }
 

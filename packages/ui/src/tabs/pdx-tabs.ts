@@ -2,7 +2,7 @@
 // Compound: discovers [data-tab] and [data-tab-panel] children linked by value.
 // Supports: vertical, lazy mount, closable tabs, scroll overflow.
 
-import { component, html, focusGroup } from '@pdxui/core';
+import { component, html, focusGroup, generatedId } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -10,8 +10,6 @@ import { setOwnProp } from '../shared/own-prop';
 import '@pdxui/design/components/tabs';
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-let _tabsCounter = 0;
 
 /**
  * Tabs the user switches between, each showing its own panel, with keyboard navigation, lazy
@@ -39,7 +37,7 @@ component('pdx-tabs', {
     setup(ctx) {
         // Generated ids carry a per-instance uid: as `pdx-tab-${value}`, two tabs on a page with a
         // shared value would repeat them, and one's tabs would control the other's panels.
-        const uid = 'pdx-tabs-' + (++_tabsCounter);
+        const uid = generatedId('pdx-tabs');
         let activeValue = '';
         let focusGroupDispose: Dispose | null = null;
         let indicatorEl: HTMLElement | null = null;

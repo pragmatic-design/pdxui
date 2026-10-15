@@ -3,7 +3,7 @@
 // `multiple` enables multi-select with chip tags.
 // Consumes DataSource or plain arrays. Virtual scroll auto-activates for >100 items.
 
-import { component, html, signal, computed, effect, prop, event } from '@pdxui/core';
+import { component, html, signal, computed, effect, prop, event, generatedId } from '@pdxui/core';
 import { createDataSource, isDataSource, tryInject } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { createVirtualizer } from '@pdxui/core';
@@ -14,8 +14,6 @@ import { uiString, format } from '../shared/i18n';
 import '@pdxui/design/components/select';
 // The multi-select's tags are drawn with .pdx-chip, which chip.css owns.
 import '@pdxui/design/components/chip';
-
-let _selectCounter = 0;
 
 // ─── Normalisation helpers ───────────────────────────────────
 
@@ -112,7 +110,7 @@ component('pdx-select', {
         'pdx-create': event<{ value: string; label: string }>(),
     },
     setup(ctx) {
-        const uid = 'pdx-sel-' + (++_selectCounter);
+        const uid = generatedId('pdx-sel');
         const listboxId = uid + '-lb';
 
         // ── Internal state ──

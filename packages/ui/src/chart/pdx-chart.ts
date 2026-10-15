@@ -2,7 +2,7 @@
 // Zero dependencies. Canvas-rendered. Design-token native.
 // Auto-resize, animated transitions, DataSource binding.
 
-import { component, html } from '@pdxui/core';
+import { component, html, generatedId } from '@pdxui/core';
 import { ChartEngine, type ChartConfig } from './core/engine';
 import { chartDataTable, chartSeries, gaugeReading, pointText, type ChartDataTable } from './core/describe';
 import { chartNumbers } from './core/numbers';
@@ -11,8 +11,6 @@ import { resolveLocale } from '../shared/locale';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/chart';
-
-let _chartSeq = 0;
 
 /**
  * A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.
@@ -77,7 +75,7 @@ component('pdx-chart', {
     setup(ctx) {
         let engine: ChartEngine | null = null;
         let canvasHost: HTMLElement | null = null;
-        const dataId = `pdx-chart-data-${++_chartSeq}`;
+        const dataId = generatedId('pdx-chart-data');
         /** Series the legend has hidden: out of the drawing and out of the data table. */
         const hidden = new Set<string>();
         let table: ChartDataTable | null = null;

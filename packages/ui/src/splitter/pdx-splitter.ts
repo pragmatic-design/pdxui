@@ -3,7 +3,7 @@
 // Supports: H/V orientation, min/max per pane, collapsible, keyboard resize,
 // autoSaveId persistence, double-click to collapse/reset, nested splits.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, generatedId } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -21,9 +21,6 @@ export interface SplitterPane {
     /** Collapsed size in % when collapsed (default: 0) */
     collapsedSize?: number;
 }
-
-/** Per-instance id prefix for the panes the separators control. */
-let _splitterSeq = 0;
 
 /**
  * A layout of resizable panes the user resizes by dragging the handles between them or from the
@@ -43,7 +40,7 @@ component('pdx-splitter', {
         keyboardStep: { type: Number, default: 2 },
     },
     setup(ctx) {
-        const _uid = 'pdx-splitter-' + (++_splitterSeq);
+        const _uid = generatedId('pdx-splitter');
         const _sizes = signal<number[]>([]);
         const _dragging = signal(false);
         let _paneEls: HTMLElement[] = [];

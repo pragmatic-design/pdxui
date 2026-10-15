@@ -177,6 +177,8 @@ export { queuePrefetch, trackUrgentLoad, takePrefetch, cancelPrefetches } from '
 // A long loop over data in slices that yield to input (#240).
 export { processInSlices } from './utils/slices';
 export type { SliceOptions } from './utils/slices';
+// The id a component makes up for its own elements; never a selector the outline gives (#391).
+export { generatedId } from './utils/generated-id';
 
 // Component
 export { PdxElement, moveMounted } from './component/element';

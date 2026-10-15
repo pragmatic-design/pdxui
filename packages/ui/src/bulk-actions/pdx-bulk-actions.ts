@@ -2,7 +2,7 @@
 // Visible while `count > 0`; renders "{count} selected" + one button per action + a clear button.
 // Event-driven and standalone: the parent feeds `count`/`actions` and reacts to pdx-action/pdx-clear.
 
-import { component, html } from '@pdxui/core';
+import { component, html, generatedId } from '@pdxui/core';
 
 /** An action's icon, loading `pdx-icon` the first time one is named: a bar of labels never pays for the set. */
 function actionIcon(name: string) {
@@ -45,9 +45,6 @@ export interface BulkAction {
 const HIDDEN_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;'
     + 'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
 
-/** One per bar on the page, so two bars' reasons cannot share an id. */
-let barSeq = 0;
-
 /**
  * The bar's look. Its `display` is bound on its own, from `count`: a fixed inline `display:inline-flex`
  * would beat the `[hidden]` rule, and a bar at count 0 would stay on screen with "0 selected".
@@ -74,7 +71,7 @@ component('pdx-bulk-actions', {
         clearable: { type: Boolean, default: true },
     },
     setup(ctx) {
-        const barId = `pdx-bulk-${++barSeq}`;
+        const barId = generatedId('pdx-bulk');
 
         // The default is `bulk-actions.selected`, in the registry rather than an English literal, which
         // a locale can pluralise with an ICU block.

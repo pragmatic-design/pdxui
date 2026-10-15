@@ -101,6 +101,41 @@ test('page() on /intake lists the requester and the email as required', async ({
     expect(required).toEqual(expect.arrayContaining(['requester', 'email']));
 });
 
+/** The ref the outline gives the requester field of /intake. */
+async function requesterRef(page: Page): Promise<string> {
+    await expect(page.locator('[data-test="form-intake"] form')).toBeVisible();
+    const outline = await page.evaluate(() => (window as unknown as { __PDX_DEVTOOLS__: Devtools }).__PDX_DEVTOOLS__.outline());
+    const line = outline.split('\n').find((l) => /textbox "Requester/.test(l));
+    expect(line, `no requester field in the outline:\n${outline}`).toBeTruthy();
+    return refsIn(line!)[0];
+}
+
+// A component's generated id counts the components mounted before it, so it changes with the
+// navigation that led to the page: the outline must not give one as a selector (#391).
+test('the requester field has the same selector on /intake opened directly and reached after /tickets', async ({ page }) => {
+    await page.goto('/intake');
+    const direct = await requesterRef(page);
+
+    await page.goto('/tickets');
+    // The record drawer mounts its own form fields, which the counters used to count.
+    const firstRow = page.locator('[data-test="grid"] [role="row"]').filter({ has: page.locator('[role="gridcell"]') }).first();
+    await firstRow.getByRole('button', { name: /open/i }).click();
+    const drawer = page.getByRole('dialog', { name: 'Edit' });
+    await expect(drawer).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    // Inside the app, with no reload: a reload would start the counters again.
+    await page.evaluate(() => {
+        history.pushState(null, '', '/intake');
+        dispatchEvent(new PopStateEvent('popstate'));
+    });
+    const reached = await requesterRef(page);
+
+    expect(reached, 'the selector changed with the navigation').toBe(direct);
+    expect(direct, 'the selector is a generated id').not.toMatch(/pdx-ff-\d/);
+    expect(await page.locator(direct).count(), `${direct} does not find one element`).toBe(1);
+});
+
 // ─── map() and shell() (#272) ─────────────────────────────────────
 
 type MapRoute = { path: string; params?: { name: string; type: string }[]; title?: string; guard?: string; access?: boolean };

@@ -2,7 +2,7 @@
 // Compound: discovers [data-wizard-step] children. Auto-generates stepper + footer.
 // Supports: linear/free navigation, vertical/horizontal, validation guard, i18n.
 
-import { component, html, signal, focusGroup, registerComponentStrings } from '@pdxui/core';
+import { component, html, signal, focusGroup, registerComponentStrings, generatedId } from '@pdxui/core';
 import { watchStepLabels, refreshStepMeta, applyStepLabels, stepName, type StepMeta } from './wizard-step-labels';
 import type { Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -22,8 +22,6 @@ registerComponentStrings('wizard', {
     complete: 'Complete',
     stepOf: 'Step {current} of {total}',
 });
-
-let _wizardCounter = 0;
 
 /**
  * A multi-step wizard with a stepper header, back/next navigation in linear or free mode, and a
@@ -61,7 +59,7 @@ component('pdx-wizard', {
         // Generated ids carry a per-instance uid: as `pdx-wizard-panel-${i}` by index, two wizards
         // on one page would repeat them and the second one's step buttons would control the first
         // one's panels.
-        const uid = 'pdx-wizard-' + (++_wizardCounter);
+        const uid = generatedId('pdx-wizard');
 
         // ─── Step discovery ──────────────────────────────────
         /**

@@ -1,11 +1,8 @@
 // pdx-fieldset — Semantic form group with native <fieldset>+<legend>.
 // Bordered/filled/plain variants, collapsible, disabled propagation, invalid+error.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, generatedId } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
-
-/** Instance counter for the ids that tie the toggle to the legend and the content. */
-let _fieldsetSeq = 0;
 
 /**
  * A semantic form group on the native fieldset and legend, collapsible, with disabled propagation
@@ -33,9 +30,9 @@ component('pdx-fieldset', {
         // The toggle is a chevron with no text. It is named by the legend and points at the content
         // it shows and hides; with no legend it takes the registered string. Without either, a
         // screen reader would say only "button, expanded".
-        const uid = ++_fieldsetSeq;
-        const legendId = `pdx-fieldset-${uid}-legend`;
-        const contentId = `pdx-fieldset-${uid}-content`;
+        const uid = generatedId('pdx-fieldset');
+        const legendId = `${uid}-legend`;
+        const contentId = `${uid}-content`;
 
         ctx.track(() => {
             const ext = ctx.collapsed() as boolean;

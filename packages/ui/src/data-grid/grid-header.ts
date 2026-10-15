@@ -3,6 +3,7 @@
 // the header renders as a two-row stack (group labels on top, leaf headers below). Columns
 // WITHOUT a group render identically to the flat single-row header (feature-detected).
 
+import { generatedId } from '@pdxui/core';
 import type { GridContext, AnyColumn } from './grid-context';
 import { applyColSize, GRID_WIDGET, canFilter, canResize, canReorder } from './grid-context';
 import { openFilterPopover, isColumnFiltered } from './grid-filter-popover';
@@ -65,9 +66,6 @@ function buildLeadingCells(gc: GridContext, target: HTMLElement, rowSpan = 1, la
         target.appendChild(checkCell);
     }
 }
-
-/** The ids of the header labels, which name their columnheader through aria-labelledby. */
-let labelSeq = 0;
 
 /** Build a single leaf column header cell (sort caret, filter icon, resize handle, drag reorder). */
 function buildColumnTh(gc: GridContext, col: AnyColumn, root: HTMLElement): HTMLElement {
@@ -143,7 +141,7 @@ function buildColumnTh(gc: GridContext, col: AnyColumn, root: HTMLElement): HTML
     // their own names for when they are focused.
     const label = document.createElement('span');
     label.className = 'pdx-dg-th-label';
-    label.id = `pdx-dg-th-label-${++labelSeq}`;
+    label.id = generatedId('pdx-dg-th-label');
     const headerSlot = gc.getSlot(`header:${col.field}`);
     if (headerSlot) {
         label.appendChild(headerSlot({ col, field: col.field, header: col.header }));

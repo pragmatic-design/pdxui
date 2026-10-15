@@ -12,6 +12,7 @@
 // Development only: reached through the devtools global, which a production build does not have.
 
 import { CONTROL_ROLES, clean, isPerceivable, nameOf, roleOf } from './a11y-tree';
+import { isGeneratedId } from '../utils/generated-id';
 
 /** The roles a line is written for. Anything else is a wrapper, and its children rise to its place. */
 const KEPT_ROLES = new Set([
@@ -33,7 +34,11 @@ const NEXT_REFS = 5;
 
 interface Node { role: string; name: string; el: Element | null; item: boolean; children: Node[] }
 
-/** A CSS selector `el` alone matches: its `data-test` or `id` when unique, a component tag when unique. */
+/**
+ * A CSS selector `el` alone matches: its `data-test` or `id` when unique, a component tag when unique.
+ * Not an id a component generated from a counter: it changes with the navigation that led to the page,
+ * so a selector built on it would be wrong in the next session (#391).
+ */
 function anchorOf(el: Element): string | null {
     const doc = el.ownerDocument;
     const test = el.getAttribute('data-test');
@@ -41,7 +46,7 @@ function anchorOf(el: Element): string | null {
         const sel = `[data-test="${CSS.escape(test)}"]`;
         if (doc.querySelectorAll(sel).length === 1) return sel;
     }
-    if (el.id) {
+    if (el.id && !isGeneratedId(el.id)) {
         const sel = `#${CSS.escape(el.id)}`;
         if (doc.querySelectorAll(sel).length === 1) return sel;
     }
@@ -108,7 +113,8 @@ export function selectorOf(el: Element): string {
     const candidates: string[] = [];
     for (const attr of TELLING) {
         const value = el.getAttribute(attr);
-        if (!value) continue;
+        // A generated value — an unnamed radio group's `name` — changes like a generated id (#391).
+        if (!value || isGeneratedId(value)) continue;
         for (const p of prefixes) candidates.push(`${p}[${attr}="${attrValue(value)}"]`, `${p}${el.localName}[${attr}="${attrValue(value)}"]`);
     }
     // A path is positional: unscoped, the next button added anywhere on the page would break it, so a

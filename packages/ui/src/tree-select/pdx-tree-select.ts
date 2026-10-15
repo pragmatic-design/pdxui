@@ -2,16 +2,13 @@
 // Renders a hierarchical tree inside the dropdown panel.
 // Supports single/multi select, search filter, lazy children, checkboxes.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tree-select';
-
-// Unique ids for the tree (aria-controls from the combobox trigger).
-let _tsSeq = 0;
 
 registerComponentStrings('tree-select', {
     placeholder: 'Select...',
@@ -76,7 +73,7 @@ component('pdx-tree-select', {
         // Internal value: string for single, string[] for multiple
         const _internalValue = signal<string | string[] | null>(null);
 
-        const _treeId = 'pdx-tree-select-tree-' + (++_tsSeq);
+        const _treeId = generatedId('pdx-tree-select-tree');
         let _triggerEl: HTMLElement | null = null;
         let _textEl: HTMLElement | null = null;
         let _panelEl: HTMLElement | null = null;

@@ -11,15 +11,12 @@
 //   - panel: collapsible fieldset; the legend holds a disclosure button (not a
 //     <legend role="button"> with no tabindex, which Tab would skip)
 
-import { component, html, signal, provideFieldGroupPath, useFieldGroupPath } from '@pdxui/core';
+import { component, html, signal, provideFieldGroupPath, useFieldGroupPath, generatedId } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
 import '@pdxui/design/components/form';
 import '../dialog/pdx-dialog'; // rendered by this component, and registered by nobody else
-
-/** Instance counter for the id that ties a panel's toggle to its content. */
-let _fieldGroupCounter = 0;
 
 /**
  * Scopes the fields inside it to a nested object of the form, rendered inline, as a collapsible
@@ -59,7 +56,7 @@ component('pdx-field-group', {
 
         // Panel: collapsible state, and the content id the toggle's aria-controls names.
         const _expanded = signal(!(ctx.collapsed() as boolean));
-        const contentId = `pdx-field-group-${++_fieldGroupCounter}-content`;
+        const contentId = `${generatedId('pdx-field-group')}-content`;
 
         function togglePanel(): void {
             _expanded.set(v => !v);

@@ -2,7 +2,7 @@
 // Each selection opens the next column of children (Country → Region → City).
 // Supports lazy loading, search, disabled nodes, clearable.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -10,9 +10,6 @@ import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/cascader';
-
-// Unique ids for the panel (aria-controls from the combobox trigger).
-let _csSeq = 0;
 
 registerComponentStrings('cascader', {
     placeholder: 'Select...',
@@ -88,7 +85,7 @@ component('pdx-cascader', {
         // DOM refs
         let _triggerEl: HTMLElement | null = null;
         let _textEl: HTMLElement | null = null;
-        const _panelId = 'pdx-cascader-panel-' + (++_csSeq);
+        const _panelId = generatedId('pdx-cascader-panel');
         let _panelEl: HTMLElement | null = null;
         function getOptionSlot(): SlotFunction | undefined {
             return (ctx as any).__slots?.['option'] as SlotFunction | undefined;
