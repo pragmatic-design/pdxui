@@ -1,9 +1,9 @@
 // What is written between `<component :is>` and `</component>` (#358).
 //
 // `dynamic()` takes no children, so that content has nowhere to go. The two render paths disagreed
-// about it: the template path — which built a scoped slot's body until #364, and the legacy mode's
-// render until #238 — copied the content and a stray `</component>` after the outlet, and the inline
-// path built it into a fragment nothing appended. Both now consume the tag, its content and its
+// about it: the template path — which built a scoped slot's body until #364, and still renders the
+// legacy mode — copied the content and a stray `</component>` after the outlet, and the inline path
+// built it into a fragment nothing appended. Both now consume the tag, its content and its
 // closing tag as one unit and emit only the `dynamic(…)` call, and content that is not whitespace is
 // PDX_DYNAMIC_CONTENT, once.
 import { describe, it, expect } from 'vitest';

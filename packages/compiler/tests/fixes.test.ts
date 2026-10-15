@@ -392,7 +392,7 @@ function go() {}
 describe('HTML comments are copied verbatim, never rewritten — the template generator', () => {
     // The template generator keeps the comment in its html`` markup. A .pdx in the new mode no longer
     // reaches it — a scoped slot's body was the last part it wrote, until #364 — so each case calls it
-    // directly, with the names the script declared; the legacy mode renders through it until #238.
+    // directly, with the names the script declared; the legacy mode still renders through it.
     const compileTemplatePath = (source: string, _name: string) => {
         const template = /<template>([\s\S]*)<\/template>/.exec(source)![1];
         const ctx = createCompileContext();

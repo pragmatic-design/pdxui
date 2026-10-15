@@ -7,7 +7,7 @@
 
 // The first block measures the template generator, which expands the tag in its markup. A .pdx in
 // the new mode no longer reaches it — a scoped slot's body was the last part it wrote, until #364 —
-// so it is called directly: the legacy mode still renders through it, until #238. The second block
+// so it is called directly: the legacy mode still renders through it. The second block
 // measures the tree the inline path — every .pdx's render — builds from the parsed template.
 import { describe, it, expect } from 'vitest';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
