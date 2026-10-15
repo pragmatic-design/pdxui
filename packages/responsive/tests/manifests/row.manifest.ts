@@ -183,7 +183,7 @@ export const row: ComponentManifest = {
     isolation: {
         scenario: 'row-cols',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="row"]', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="row"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 

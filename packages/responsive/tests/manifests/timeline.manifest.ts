@@ -161,7 +161,7 @@ export const timeline: ComponentManifest = {
         scenario: 'timeline-basic',
         targets: [
             // A content-driven container (events): skip height, assert width/radius/border.
-            { selector: 'section:not([hidden]) [data-test="tl"] .pdx-tl', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="tl"] .pdx-tl', tolerancePx: 12, skipHeight: true },
         ],
     },
 

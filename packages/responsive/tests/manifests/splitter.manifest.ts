@@ -258,7 +258,7 @@ export const splitter: ComponentManifest = {
     isolation: {
         scenario: 'splitter-horizontal',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="splitter"] .pdx-splitter-handle', tolerancePx: 4, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="splitter"] .pdx-splitter-handle', tolerancePx: 4, skipHeight: true },
         ],
     },
 

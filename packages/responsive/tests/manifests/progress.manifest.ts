@@ -130,7 +130,7 @@ export const progress: ComponentManifest = {
     isolation: {
         scenario: 'progress-determinate',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="progress"] .pdx-progress', tolerancePx: 10, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="progress"] .pdx-progress', tolerancePx: 10 },
         ],
     },
 

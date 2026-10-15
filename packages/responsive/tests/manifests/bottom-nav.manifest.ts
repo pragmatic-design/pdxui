@@ -127,7 +127,7 @@ export const bottomNav: ComponentManifest = {
     isolation: {
         scenario: 'bottom-nav-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="bottom-nav"] .pdx-bottom-nav-bar', tolerancePx: 12, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="bottom-nav"] .pdx-bottom-nav-bar', tolerancePx: 12 },
         ],
     },
 

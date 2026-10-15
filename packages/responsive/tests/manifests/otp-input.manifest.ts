@@ -124,7 +124,7 @@ export const otpInput: ComponentManifest = {
     isolation: {
         scenario: 'otp-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="otp"] .pdx-otp-wrap', tolerancePx: 10, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="otp"] .pdx-otp-wrap', tolerancePx: 10 },
         ],
     },
 

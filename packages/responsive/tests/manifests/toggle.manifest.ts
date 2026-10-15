@@ -83,7 +83,7 @@ export const toggle: ComponentManifest = {
     isolation: {
         scenario: 'toggle-basic',
         targets: [
-            { selector: '[data-test="toggle-off"]', tolerancePx: 6, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: '[data-test="toggle-off"]', tolerancePx: 6 },
         ],
     },
 

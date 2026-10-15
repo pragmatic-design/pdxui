@@ -230,7 +230,7 @@ export const carousel: ComponentManifest = {
     isolation: {
         scenario: 'carousel-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="carousel"] .pdx-carousel-root', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="carousel"] .pdx-carousel-root', tolerancePx: 10, skipHeight: true },
         ],
     },
 

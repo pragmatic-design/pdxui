@@ -162,7 +162,7 @@ export const popover: ComponentManifest = {
         targets: [
             // The component's own element. The trigger beside it is the application's `<button>`: a
             // host rule styling it is the host styling its own markup, not a leak of the popover.
-            { selector: 'section:not([hidden]) pdx-popover', tolerancePx: 10, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) pdx-popover', tolerancePx: 10 },
         ],
     },
 

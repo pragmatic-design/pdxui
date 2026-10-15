@@ -89,7 +89,11 @@ function changed(before: Style, after: Style, followed: Record<(typeof INHERITED
     tolerancePx: number, skipHeight: boolean): IsolatedProperty[] {
     const followsContainer = (k: (typeof EXACT)[number]) =>
         (INHERITED as readonly string[]).includes(k) && after[k] === followed[k as (typeof INHERITED)[number]];
-    const out: IsolatedProperty[] = EXACT.filter((k) => before[k] !== after[k] && !followsContainer(k));
+    // The colour of a border that is not drawn is `currentColor` following the text colour: nothing
+    // visible changes with it (#319).
+    const undrawn = after.borderTopWidth === '0px' || after.borderTopStyle === 'none' || after.borderTopStyle === 'hidden';
+    const out: IsolatedProperty[] = EXACT.filter((k) => before[k] !== after[k] && !followsContainer(k)
+        && !(k === 'borderTopColor' && undrawn));
     if (!skipHeight && Math.abs(after.height - before.height) > tolerancePx) out.push('height');
     if (before.radius.some((r, i) => Math.abs(after.radius[i] - r) > tolerancePx)) out.push('radius');
     return out;

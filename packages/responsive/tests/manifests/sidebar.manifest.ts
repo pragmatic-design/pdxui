@@ -215,7 +215,7 @@ export const sidebar: ComponentManifest = {
     isolation: {
         scenario: 'sidebar-expanded',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="sidebar"]', tolerancePx: 2, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="sidebar"]', tolerancePx: 2, skipHeight: true },
         ],
     },
 

@@ -220,7 +220,7 @@ export const scrollArea: ComponentManifest = {
     isolation: {
         scenario: 'scroll-area-vertical',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="scroll-area"]', tolerancePx: 2, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="scroll-area"]', tolerancePx: 2, skipHeight: true },
         ],
     },
 

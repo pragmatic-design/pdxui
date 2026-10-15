@@ -284,7 +284,7 @@ export const wizard: ComponentManifest = {
         scenario: 'wizard-basic',
         targets: [
             { selector: 'section:not([hidden]) [data-test="wizard"] [data-step-btn="1"] .pdx-step-number', tolerancePx: 8 },
-            { selector: 'section:not([hidden]) [data-test="wizard"]', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="wizard"]', tolerancePx: 12, skipHeight: true },
         ],
     },
 
