@@ -79,8 +79,10 @@ component('pdx-avatar', {
     },
     // With a name, an image named by it; without one, decorative — hidden, no role. An unnamed
     // role="img" showing "?" fails axe's role-img-alt.
+    // `pdx-avatar-box` has no rule of its own: a pdx- class is how pdx.reset sees the element, and
+    // keeps a page's bare `span { border }` off it (#413). `.pdx-avatar` is the CSS-only avatar.
     render: (ctx) => html`
-        <span :style="${ctx.baseStyle}"
+        <span class="pdx-avatar-box" :style="${ctx.baseStyle}"
             :role="${() => ctx.alt() ? 'img' : null}"
             :aria-label="${() => ctx.alt() || null}"
             :aria-hidden="${() => ctx.alt() ? null : 'true'}">

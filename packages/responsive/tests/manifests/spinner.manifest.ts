@@ -134,7 +134,7 @@ export const spinner: ComponentManifest = {
         scenario: 'spinner-variants',
         targets: [
             // The size is inline (24px) → it must resist hostile global CSS.
-            { selector: 'section:not([hidden]) [data-test="spin-default"] [role="status"] > span', tolerancePx: 8, leaks: [{ issue: 413, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="spin-default"] [role="status"] > span', tolerancePx: 8 },
         ],
     },
 
