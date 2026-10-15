@@ -2,6 +2,9 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { generateNodes } from '../src/compiler/codegen-template';
+import { createCompileContext } from '../src/compiler/compile-context';
+import { parseTemplate } from '../src/parser/template';
 
 describe('scoped styles fix', () => {
     it('scopes selectors as descendant: [scope] .btn:hover', () => {
@@ -386,12 +389,16 @@ function go() {}
     });
 });
 
-describe('HTML comments are copied verbatim, never rewritten — a scoped slot body', () => {
-    // A scoped slot's body is the one place the template generator still writes (#107): it keeps the
-    // comment in its html`` markup. Each case puts its template inside one.
-    const compileTemplatePath = (source: string, name: string) => compile(
-        source.replace(/<template>([\s\S]*)<\/template>/, '<template><pdx-list><slot name="item" let:row>$1</slot></pdx-list></template>'),
-        name);
+describe('HTML comments are copied verbatim, never rewritten — the template generator', () => {
+    // The template generator keeps the comment in its html`` markup. A .pdx in the new mode no longer
+    // reaches it — a scoped slot's body was the last part it wrote, until #364 — so each case calls it
+    // directly, with the names the script declared; the legacy mode renders through it until #238.
+    const compileTemplatePath = (source: string, _name: string) => {
+        const template = /<template>([\s\S]*)<\/template>/.exec(source)![1];
+        const ctx = createCompileContext();
+        ctx.declaredNames = new Set([...source.matchAll(/(?:let|function)\s+(\w+)/g)].map((m) => m[1]));
+        return { code: generateNodes(parseTemplate(template), new Set(), ctx) };
+    };
 
     it('does not rewrite a directive mentioned inside a comment', () => {
         const out = compileTemplatePath(`

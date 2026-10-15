@@ -94,7 +94,8 @@ function collect(nodes: TemplateNode[]): { handlers: Handler[]; twoWay: boolean 
                 case 'show': case 'custom-directive': case 'scoped-slot':
                     walk(node.body, inFor, inPortal);
                     break;
-                // A slot template's body is rendered by the template path, into another component.
+                // A slot template's body is rendered into another component: opaque, its events stay
+                // on its elements (#113, #364).
                 default: break;
             }
         }

@@ -51,13 +51,17 @@ describe('the controls', () => {
         expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*const __v = __b; if \(__v == null\) clearBoundProperty\(\w+, "value", "value"\); else \w+\["value"\] = __v;/);
         expect(code).not.toContain('sanitizeBoundUrl');
     });
+});
 
-    it('a scoped slot body binds through html``, which sanitises at runtime', () => {
-        // The template generator writes only a scoped slot's body since #107: core's html`` binds it.
+describe('a scoped slot body, built inline since #364', () => {
+    it(':href goes through sanitizeBoundUrl there too', () => {
+        // It was an html`` template, which core's bindProperty sanitised at runtime.
         const source = "<template>\n<pdx-list><slot name=\"item\" let:row><a :href=\"url\">Go</a></slot></pdx-list>\n</template>\n<script setup>\nlet url = $signal('/');\n</script>";
         const code = compile(source, 'slot-url.pdx', [], undefined, { production: true }).code;
-        expect(code).toMatch(/html`<a :href=\$\{[^}]*ctx\.url[^}]*\}>Go<\/a>`/);
-        expect(code).not.toContain('sanitizeBoundUrl');
+        const slot = code.slice(code.indexOf('const __pdxSlot_item_0'));
+        expect(slot).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "href", __b\)/);
+        expect(slot, 'the raw value must not be assigned').not.toMatch(/\["href"\] = (ctx\.|__b)/);
+        expect(code).not.toMatch(/html`/);
     });
 });
 

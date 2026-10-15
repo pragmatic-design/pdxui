@@ -14,24 +14,24 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { jsString } from '../src/compiler/js-literal';
+import { templateGenerator } from './template-generator';
 
-/** The render of `template`; with `inline` false, inside a scoped slot's body — the one place the
- *  template generator still writes since #107. */
-const emitted = (template: string, inline: boolean): string =>
-    compile(`<template>${inline ? template : `<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>`}</template>\n<script setup>\nlet _x = $signal(0);\n</script>`,
+/** The render of `template`; with `inSlot`, inside a scoped slot's body, which is built inline too since #364. */
+const emitted = (template: string, inSlot = false): string =>
+    compile(`<template>${inSlot ? `<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>` : template}</template>\n<script setup>\nlet _x = $signal(0);\n</script>`,
         'e.pdx', [], undefined, { production: true }).code;
 
 describe('text a reader sees', () => {
     it('a numeric entity becomes its character', () => {
         // `&#64;` is how a source block writes `@` without the compiler reading a directive.
-        expect(emitted('<pre><code>&#64;for (items as item) {</code></pre>', true))
+        expect(emitted('<pre><code>&#64;for (items as item) {</code></pre>'))
             .toContain('@for (items as item) {');
     });
 
     it('the named ones too, in the order that matters', () => {
         // `&amp;lt;` must come out as the TEXT `&lt;`, not as `<`: decoding `&amp;` first and then
         // rescanning would turn an escaped entity into a tag, which is the classic double-decode.
-        const code = emitted('<p>&lt;div&gt; &amp; &quot;q&quot; &#39;a&#39; &amp;lt;</p>', true);
+        const code = emitted('<p>&lt;div&gt; &amp; &quot;q&quot; &#39;a&#39; &amp;lt;</p>');
         // jsString, because the module carries the text as a JS string literal written by it: its
         // quotes are escaped there, and so are `<` and `>` (#69). Comparing the bare form matched
         // nothing and reported the decoding as broken when it was not.
@@ -39,20 +39,20 @@ describe('text a reader sees', () => {
     });
 
     it('and a lone ampersand is left alone', () => {
-        expect(emitted('<p>Tom & Jerry</p>', true)).toContain('Tom & Jerry');
+        expect(emitted('<p>Tom & Jerry</p>')).toContain('Tom & Jerry');
     });
 });
 
 describe('a static attribute value', () => {
     it('is decoded as well', () => {
-        expect(emitted('<p title="a &amp; b">x</p>', true)).toContain('"a & b"');
+        expect(emitted('<p title="a &amp; b">x</p>')).toContain('"a & b"');
     });
 });
 
 describe('and the two generators agree', () => {
-    // The template generator — a scoped slot's body — is the reference: whatever the browser would
-    // do with innerHTML is what the inline path has to produce. This is the assertion that keeps them
-    // from drifting again.
+    // The template generator is the reference: whatever the browser would do with innerHTML is what
+    // the inline path has to produce. It is called directly — no .pdx in the new mode reaches it since
+    // #364, when a scoped slot's body moved to the inline path, which is measured here as well.
     const CASES = [
         '<pre><code>&#64;for (x as y) {</code></pre>',
         '<p>&lt;div&gt; &amp; &quot;q&quot;</p>',
@@ -61,13 +61,12 @@ describe('and the two generators agree', () => {
 
     for (const markup of CASES) {
         it(`${markup.slice(0, 40)}…`, () => {
-            const inline = emitted(markup, true);
-            const template = emitted(markup, false);
             // What the template path ships is the markup verbatim — the browser decodes it later.
             // So the comparison is: every entity the template path passes through, the inline path
             // has already resolved, and nothing is left encoded in the inline output.
-            expect(inline, 'an entity survived into the inline output').not.toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
-            expect(template, 'the template path stopped carrying the markup — re-read this test')
+            expect(emitted(markup), 'an entity survived into the inline output').not.toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
+            expect(emitted(markup, true), 'an entity survived into a scoped slot body').not.toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
+            expect(templateGenerator(markup), 'the template path stopped carrying the markup — re-read this test')
                 .toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
         });
     }

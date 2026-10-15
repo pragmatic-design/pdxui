@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest';
 import ts from 'typescript';
 import { compile } from '../src/plugin';
 import { parseObjectLiteralToJson } from '../src/compiler/script-analyzer-helpers';
+import { templateGenerator } from './template-generator';
 
 /** Every template's cooked text in the module, joined: what the markup holds at runtime. */
 function templateText(code: string): string {
@@ -21,7 +22,7 @@ function templateText(code: string): string {
     return out.join('');
 }
 
-/** The same template inside a scoped slot's body — the one place the template generator still writes (#107). */
+/** The same template inside a scoped slot's body, which the inline path builds since #364. */
 const inSlot = (src: string) => src.replace(/<template>([\s\S]*)<\/template>/, '<template><pdx-list><slot name="item" let:row>$1</slot></pdx-list></template>');
 
 describe('@raw keeps its text as written', () => {
@@ -47,9 +48,14 @@ describe('@raw inside a loop binds nothing', () => {
         expect(code).toContain('.setAttribute("title", "${item}")');
     });
 
-    it('a scoped slot body: the markup carries the text', () => {
+    it('a scoped slot body, built inline since #364: the attribute is the text', () => {
         const { code } = compile(inSlot(src), 'raw-loop.pdx', [], undefined, { production: true });
-        expect(templateText(code)).toContain('<span title=${item}>');
+        expect(code).toContain('.setAttribute("title", "${item}")');
+    });
+
+    it('the template generator: the markup carries the text', () => {
+        const template = /<template>([\s\S]*)<\/template>/.exec(src)![1];
+        expect(templateText(templateGenerator(template, ['items']))).toContain('<span title=${item}>');
     });
 });
 

@@ -1,12 +1,14 @@
 // What is written between `<component :is>` and `</component>` (#358).
 //
 // `dynamic()` takes no children, so that content has nowhere to go. The two render paths disagreed
-// about it: the template path — which still builds a scoped slot's body (#364) — copied the content
-// and a stray `</component>` after the outlet, and the inline path built it into a fragment nothing
-// appended. Both now consume the tag, its content and its closing tag as one unit and emit only the
-// `dynamic(…)` call, and content that is not whitespace is PDX_DYNAMIC_CONTENT, once.
+// about it: the template path — which built a scoped slot's body until #364, and the legacy mode's
+// render until #238 — copied the content and a stray `</component>` after the outlet, and the inline
+// path built it into a fragment nothing appended. Both now consume the tag, its content and its
+// closing tag as one unit and emit only the `dynamic(…)` call, and content that is not whitespace is
+// PDX_DYNAMIC_CONTENT, once.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { templateGenerator } from './template-generator';
 
 const SCRIPT = "<script setup>\nlet view = $signal('pdx-home');\n</script>\n";
 const build = (template: string) => compile(`<template>${template}</template>\n${SCRIPT}`, 'host.pdx', [], undefined, { production: true });
@@ -25,12 +27,20 @@ describe('content inside <component :is>', () => {
         expect(w.line, 'the warning has no place in the file').toBeGreaterThan(0);
     });
 
-    it('in a scoped slot body, built by the template path, the same', () => {
+    it('in a scoped slot body, the same', () => {
         const r = build('<pdx-select :options="[]"><slot name="item" let:label>'
             + '<component :is="view"><p>inside</p></component></slot></pdx-select>');
         expect(r.code).toContain('dynamic(');
-        expect(r.code, 'the template path emitted the content').not.toContain('inside');
-        expect(r.code, 'the template path emitted a stray </component>').not.toContain('</component>');
+        expect(r.code, 'the slot body emitted the content').not.toContain('inside');
+        expect(r.code, 'the slot body emitted a stray </component>').not.toContain('</component>');
+    });
+
+    it('on the template generator, the same — content spanning an interpolation included', () => {
+        const code = templateGenerator('<component :is="view"><p>in {{ view }} side</p></component><p>after</p>', ['view']);
+        expect(code).toContain('dynamic(');
+        expect(code, 'the template path emitted the content').not.toContain('side');
+        expect(code, 'the template path emitted a stray </component>').not.toContain('</component>');
+        expect(code, 'what follows the closing tag was dropped too').toContain('<p>after</p>');
     });
 
     it('control — empty, whitespace-only or self-closed is not reported, and leaves nothing behind', () => {

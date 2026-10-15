@@ -182,16 +182,16 @@ function save() { throw new Error('nope'); }
 </script>
 `;
 
-    it('a scoped slot body, the template generator\'s since #107: the same six', () => {
+    it('a scoped slot body, built by the inline path since #364: the same six', () => {
         const SLOT = TEMPLATE.replace('<section>', '<pdx-list><slot name="item" let:row><section>').replace('</section>', '</section></slot></pdx-list>');
         const { code, map } = compile(SLOT, 'tpl.pdx', [], undefined, {});
         expect(probe(SLOT, code, map, [
-            ['@click="save"', '@click=${|safeHandler(batchHandler(ctx.save'],
-            [':value="name"', ':value=${|ctx.name}'],
-            ['label }}', '<p>${|ctx.label}'],
-            ['items as item', '${|eachRow('],
-            ['item }}</li>', '<li>${|() => item()}'],
-            ['show) {', '${|when('],
+            ['@click="save"', "__el2.addEventListener('click'"],
+            [':value="name"', 'let __el3w_value = {}; effect('],
+            ['label }}', 'bindInterpolation(__t5,'],
+            ['items as item', 'const __cf8=eachRow('],
+            ['item }}</li>', 'bindInterpolation(__t7,'],
+            ['show) {', 'const __cf11=when('],
         ])).toEqual([]);
     });
 
