@@ -6,6 +6,7 @@ import { marksAtSelection } from '../model/selection.js';
 import type { EditorView } from '../view/view.js';
 import type { Mark } from '../model/types.js';
 import { uiString, uiAttr} from '../../shared/i18n';
+import { openGridMenu } from '../../data-grid/grid-menu';
 // Every button is a <pdx-icon>, so the toolbar registers it: nothing else in the editor did, and on a
 // page where the editor drew the only icons every button stayed empty. With it, the icons of the
 // buttons below, which are on screen with the editor (#47).
@@ -215,6 +216,7 @@ function moveToolbarFocus(container: HTMLElement, e: KeyboardEvent): void {
 }
 
 function createToolbarButton(item: ToolbarItem, view: EditorView): HTMLElement {
+  if (item.type === 'dropdown' && item.children?.length) return createMenuButton(item, item.children, view);
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.classList.add('pdx-rt-toolbar-btn');
@@ -239,6 +241,64 @@ function createToolbarButton(item: ToolbarItem, view: EditorView): HTMLElement {
   // mouse click (detail ≥ 1) already ran the command on mousedown.
   btn.addEventListener('click', (e) => {
     if (e.detail === 0) view.execCommand(item.command);
+  });
+
+  return btn;
+}
+
+/**
+ * A dropdown item as a WAI-ARIA menu button (#417): the trigger opens a `role="menu"` of its
+ * children, each running its own command. It was a plain button running the item's own command,
+ * so `heading` always made an H1 and `list` always a bullet list.
+ *
+ * The menu is the one the data grid's buttons open (`openGridMenu`): arrows, Home/End and
+ * type-ahead between the items, Enter or Space to choose, Escape back to the trigger, a click
+ * outside to close. A choice returns the focus to the editor, where the user goes on typing.
+ */
+function createMenuButton(item: ToolbarItem, children: ToolbarItem[], view: EditorView): HTMLElement {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.classList.add('pdx-rt-toolbar-btn');
+  const name = itemName(item);
+  btn.title = name;
+  // No data-command: the trigger runs none, and updateToolbarState gives a command's button its
+  // aria-pressed, which a menu button does not have.
+  btn.dataset.menu = item.name;
+  btn.setAttribute('aria-label', name);
+  btn.setAttribute('aria-haspopup', 'menu');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.tabIndex = -1;
+
+  const icon = document.createElement('pdx-icon');
+  icon.setAttribute('name', item.icon);
+  icon.setAttribute('size', '16');
+  btn.appendChild(icon);
+
+  const open = (): void => openGridMenu(btn, children.map(child => ({
+    label: uiString('rich-text', child.label),
+    icon: child.icon,
+    select: () => {
+      view.execCommand(child.command);
+      view.focus();
+    },
+  })), {
+    label: name,
+    menuClass: 'pdx-menu pdx-rt-menu',
+    itemClass: 'pdx-menu-item',
+    place: (menu, rect) => {
+      menu.style.top = `${rect.bottom + 4}px`;
+      menu.style.left = `${rect.left}px`;
+    },
+  });
+
+  // A mouse press does not take the focus from the editor, as on the other buttons; the click opens.
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+  btn.addEventListener('click', open);
+  // ArrowDown opens the menu as well (WAI-ARIA menu button); Enter and Space click.
+  btn.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    if (btn.getAttribute('aria-expanded') !== 'true') open();
   });
 
   return btn;

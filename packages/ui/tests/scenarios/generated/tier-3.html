@@ -128,6 +128,10 @@
                     host.__menubar.openMenu('file');
                 }
                 await new Promise(r => requestAnimationFrame(r)); },
+        "rich-text-menu": async function () { 
+                const trigger = document.querySelector('section:not([hidden]) [data-test="rt-menu"] .pdx-rt-toolbar-btn[data-menu="heading"]');
+                if (trigger) trigger.click();
+                await new Promise(r => requestAnimationFrame(r)); },
         "splitter-horizontal": async function () { 
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
  },
@@ -527,6 +531,18 @@
                     <pdx-rich-text
                         data-test="rt"
                         toolbar="minimal"
+                        value="{&quot;type&quot;:&quot;doc&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;paragraph&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;Hello world&quot;}]}]}"
+                        aria-label="Article body"
+                    ></pdx-rich-text>
+                </div>
+    </section>
+
+    <section data-scenario="rich-text-menu">
+        <h3>Rich text — the heading menu of the toolbar, open</h3>
+        <div style="width: 560px; max-width: 100%; min-height: 260px;">
+                    <pdx-rich-text
+                        data-test="rt-menu"
+                        toolbar="heading list"
                         value="{&quot;type&quot;:&quot;doc&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;paragraph&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;Hello world&quot;}]}]}"
                         aria-label="Article body"
                     ></pdx-rich-text>
