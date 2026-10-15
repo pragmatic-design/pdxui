@@ -74,6 +74,9 @@ interface RegisteredRoute {
     label?: string | ((params: Record<string, string>) => string);
     /** The crumb as a dictionary key, translated with the params. */
     labelKey?: string;
+    /** The page's `@title` as a string, or as a dictionary key (#389). */
+    title?: string;
+    titleKey?: string;
     meta?: Record<string, unknown>;  // route metadata
     /**
      * The @loader function. A FUNCTION, not its name: the module the compiler generates hoists the

@@ -204,6 +204,16 @@ test('map() names a route by its crumb once its strings are in', async ({ page }
     expect(map.filter((r) => r.title && /^[a-z]+(\.[A-Za-z]+)+$/.test(r.title)).map((r) => r.title)).toEqual([]);
 });
 
+test('map() names a route with no crumb by its page\'s @title (#389)', async ({ page }) => {
+    // /intake declares `@title $t('intake.title')` and no label: the compiler carries the key.
+    await page.goto('/intake');
+    await expect(page.locator('[data-test="intake"]')).toBeVisible();
+    const pageTitle = await page.title();
+    expect(pageTitle, 'the page set no title — this compares nothing').not.toBe('');
+    const map = await page.evaluate(() => (window as unknown as { __PDX_DEVTOOLS__: { map(): MapRoute[] } }).__PDX_DEVTOOLS__.map());
+    expect(map.find((r) => r.path === '/intake')?.title).toBe(pageTitle);
+});
+
 test('shell() holds the sidebar\'s links and nothing of the route', async ({ page }) => {
     await page.goto('/customers');
     await expect(page.locator('[data-test="customers"] [role="row"]').first()).toBeVisible();

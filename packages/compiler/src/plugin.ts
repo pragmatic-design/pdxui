@@ -319,7 +319,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             if (id === RESOLVED_ROUTE_TABLE_ID) {
                 // The two producers differ only in how a page's module is named.
                 return generateRouteTable(scannedRoutes,
-                    isDevMode ? devSpecifier(viteRoot ?? process.cwd()) : buildSpecifier);
+                    isDevMode ? devSpecifier(viteRoot ?? process.cwd()) : buildSpecifier, { devtools: isDevMode });
             }
             if (id === RESOLVED_ROUTES_DEV_ID) return devRouteTableModule();
             if (id.startsWith('\0' + STYLE_MODULE_PREFIX)) {

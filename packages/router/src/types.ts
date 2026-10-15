@@ -33,6 +33,13 @@ export interface RouteConfig {
      * ancestor a deep link never loads still names itself, in the page's language. Wins over `label`.
      */
     labelKey?: string;
+    /**
+     * The page's own title, `@title 'Board'`, when the compiler can read it without the page (#389).
+     * No crumb: `__PDX_DEVTOOLS__.map()` names a route that has no label by it.
+     */
+    title?: string;
+    /** The page's title as a dictionary key, `@title $t('intake.title')`. Wins over `title`. */
+    titleKey?: string;
 }
 
 export interface ResolvedRoute {
@@ -101,6 +108,8 @@ export interface TableRoute {
     /** A string in a table the compiler wrote; a page module's own registration may carry a function. */
     label?: string | ((params: Record<string, string>) => string);
     labelKey?: string;
+    title?: string;
+    titleKey?: string;
     // The outlet reads more of a table route — keepAlive, transition, layouts, outlets, file — and
     // types them itself (`RegisteredRoute` in outlet.ts).
 }

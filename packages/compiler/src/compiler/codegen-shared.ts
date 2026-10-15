@@ -205,6 +205,8 @@ export function assembleModule(
         label?: string;
         labelFn?: string;
         labelKey?: string;
+        title?: string;
+        titleKey?: string;
         loader?: string;
         redirectTo?: string; redirects?: { from: string; to: string }[];
         meta?: Record<string, unknown>; aliases?: string[];
@@ -373,6 +375,11 @@ export function assembleModule(
         else if (route.label) routeParts.push(`label:${jsString(route.label)}`);
         // A dictionary key: data, like the scanned table's, so the two agree.
         if (route.labelKey) routeParts.push(`labelKey:${jsString(route.labelKey)}`);
+        // The page's title as data, for the same reason (#389): the scanned table carries it. Only
+        // `__PDX_DEVTOOLS__.map()` reads it, and that exists in development only, so a production
+        // build leaves it out, as it leaves out the diagnostics.
+        if (!production && route.title) routeParts.push(`title:${jsString(route.title)}`);
+        if (!production && route.titleKey) routeParts.push(`titleKey:${jsString(route.titleKey)}`);
         if (route.redirectTo) routeParts.push(`redirect:${jsString(route.redirectTo)}`);
         if (route.meta) routeParts.push(`meta:${jsString(route.meta)}`);
         if (route.outlets && route.outlets.length > 0) {

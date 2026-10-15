@@ -175,6 +175,12 @@ export interface ScannedRoute {
      * page's language. The router translates it with the route's params.
      */
     labelKey?: string;
+    /**
+     * The page's `@title` when it is a string literal, and `titleKey` when it is `$t('key')` (#389):
+     * what `__PDX_DEVTOOLS__.map()` names a route with no crumb by, without importing the page.
+     */
+    title?: string;
+    titleKey?: string;
     /** `@prefetch 'hover' | 'eager' | 'viewport' | 'never'` — when to fetch the chunk. */
     prefetch?: string;
     /** `@transition 'fade'` — the enter/exit animation between this page and the previous one. */
@@ -269,6 +275,8 @@ export function scanForRoutes(rootDir: string, routes: ScannedRoute[],
                             // breadcrumb's last level IS the page on screen.
                             label: route.label,
                             labelKey: route.labelKey,
+                            title: route.title,
+                            titleKey: route.titleKey,
                             outlets: route.outlets,
                             // `@layout 'admin'` → ['pdx-admin-layout']. The same call the page's own
                             // registration makes, so the two modes resolve a name identically.
