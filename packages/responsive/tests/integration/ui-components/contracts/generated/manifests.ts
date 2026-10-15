@@ -316,6 +316,7 @@ export const scenarioPage: Record<string, string> = {
     "relation-picker-searchable": "tier-5b",
     "relative-time-past": "tier-5b",
     "rich-text-basic": "tier-3",
+    "rich-text-menu": "tier-3",
     "row-cols": "tier-3",
     "scroll-area-vertical": "tier-6",
     "scroll-spy-basic": "tier-6",

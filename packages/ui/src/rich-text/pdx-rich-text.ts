@@ -24,6 +24,8 @@ import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/rich-text';
+// The toolbar's heading and list menus are drawn with the menu's classes (#417).
+import '@pdxui/design/components/menu';
 
 /**
  * A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.

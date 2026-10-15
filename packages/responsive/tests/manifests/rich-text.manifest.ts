@@ -113,6 +113,25 @@ export const richText: ComponentManifest = {
                     ></pdx-rich-text>
                 </div>`,
         },
+        {
+            // The heading and list items are menu buttons (#417): the heading menu, open. Its three
+            // items each draw their own icon and name, and axe reads the menu's roles.
+            id: 'rich-text-menu',
+            title: 'Rich text — the heading menu of the toolbar, open',
+            html: `
+                <div style="width: 560px; max-width: 100%; min-height: 260px;">
+                    <pdx-rich-text
+                        data-test="rt-menu"
+                        toolbar="heading list"
+                        value="${VALUE}"
+                        aria-label="Article body"
+                    ></pdx-rich-text>
+                </div>`,
+            setup: `
+                const trigger = document.querySelector('section:not([hidden]) [data-test="rt-menu"] .pdx-rt-toolbar-btn[data-menu="heading"]');
+                if (trigger) trigger.click();
+                await new Promise(r => requestAnimationFrame(r));`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
@@ -214,7 +233,7 @@ export const richText: ComponentManifest = {
     // .pdx-rt-content is a role=textbox, so it needs a name: pdx-rich-text sets aria-label
     // on it (from label/placeholder, falling back to 'Rich text editor'). No disableRule.
     a11y: {
-        scenarios: ['rich-text-basic'],
+        scenarios: ['rich-text-basic', 'rich-text-menu'],
     },
 
     // ── Dim. 3: style isolation ──
@@ -254,7 +273,7 @@ export const richText: ComponentManifest = {
     // One scenario: the whole layout (the toolbar plus the editor with fixed content) per theme.
     // A MASK on the editable area: the contenteditable caret blinks → not deterministic.
     visual: {
-        scenarios: ['rich-text-basic'],
+        scenarios: ['rich-text-basic', 'rich-text-menu'],
         mask: ['section:not([hidden]) [data-test="rt"] .pdx-rt-content'],
     },
 };

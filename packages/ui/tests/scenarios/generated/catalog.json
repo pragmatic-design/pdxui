@@ -1664,6 +1664,10 @@
         {
           "id": "rich-text-basic",
           "title": "Rich text — toolbar (top) + contenteditable editor"
+        },
+        {
+          "id": "rich-text-menu",
+          "title": "Rich text — the heading menu of the toolbar, open"
         }
       ]
     },

@@ -29,12 +29,16 @@ the translatable `rich-text.label` string.
 | `compact` | `bold italic \| link \| undo redo` |
 | `minimal` | `bold italic code` |
 
-Other names: `code`, `highlight`, `heading1`–`heading3`, `bulletList`, `orderedList`, `taskList`.
-An unknown name is skipped. `toolbarMode="bubble"` replaces the top bar with a floating one over the
+`heading` and `list` are menu buttons. `heading` opens H1, H2 and H3; `list` opens bullet, ordered
+and task. Each item runs its own command, and a choice returns the focus to the text. Other names:
+`code`, `highlight`, `heading1`–`heading3`, `bulletList`, `orderedList`, `taskList`, one button
+each. An unknown name is skipped. `toolbarMode="bubble"` replaces the top bar with a floating one over the
 selection, with its own fixed set (`bold italic underline strike | link highlight code`).
 
 The toolbar is one tab stop: Tab reaches its first button, ←/→ move between buttons (wrapping),
-Home/End jump to the ends, Enter/Space run the button, Tab leaves into the text. Every button's name
+Home/End jump to the ends, Enter/Space run the button, Tab leaves into the text. On a menu button,
+Enter, Space or ↓ open the menu on its first item, ↑/↓ move between items, and Escape closes it and
+returns the focus to the button. Every button's name
 is a `rich-text` component string named like the button (`rich-text.bold`, `rich-text.image`, …) —
 translate those, not the DOM. The shortcut is appended outside the string: `bold: 'Grassetto'`
 reads «Grassetto (Ctrl+B)».
