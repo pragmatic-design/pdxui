@@ -89,3 +89,19 @@ describe('and the forms that were silently broken are right on their own terms',
         expect(handlerOf('a(); b()', true)).toBe('($event) => { ctx.a(); ctx.b() }');
     });
 });
+
+describe('an event with modifiers and no handler', () => {
+    // `<a @click.stop>` stops the click and does nothing else. The inline path wrote
+    // `batchHandler(() => )`, a module that does not parse: the showcase's shell has one, in a slot.
+    for (const [where, template] of [
+        ['the top level', '<a href="/x" @click.stop>x</a>'],
+        ['a scoped slot body', '<pdx-list><slot name="item" let:row><a href="/x" @click.stop>x</a></slot></pdx-list>'],
+    ] as const) {
+        it(`${where}: the module parses, and the click still stops`, () => {
+            const { code } = compile(`<template>${template}</template>\n<script setup>\nlet n = $signal(0);\n</script>`, 'p.pdx', [], undefined, { production: true });
+            expect(() => new Function(code.replace(/^\s*import\b.*$/gm, '')), 'the module does not parse').not.toThrow();
+            expect(code).toContain('e.stopPropagation();');
+            expect(code).toContain('batchHandler(() => {})');
+        });
+    }
+});

@@ -57,6 +57,10 @@ export function buildEventHandler(expr: string, ctx: CompileContext): string {
 function unbatchedHandler(expr: string, ctx: CompileContext): string {
     const e = expr.trim();
 
+    // 0. No handler: `@click.stop` is there for its modifiers, and does nothing else. Written as
+    //    `() => ` it was a module that did not parse.
+    if (e === '') return '() => {}';
+
     // 1. Bare reference → function reference (the event is passed as the first argument).
     if (BARE_REF.test(e)) return prefixCtx(e, ctx);
 
