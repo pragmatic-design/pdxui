@@ -70,7 +70,6 @@
       "src/component/viewport.ts",
       "src/debug/inspector.ts",
       "src/debug/devtools-api.ts",
-      "src/form/form-registry.ts",
       "src/i18n/rtl.ts",
       "dist/pragmatic-core.es.js",
       "dist/pragmatic-core.cjs",

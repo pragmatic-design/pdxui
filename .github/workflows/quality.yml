@@ -119,7 +119,8 @@ jobs:
           # The dev-server config is five tests against its own server: once, with the first shard.
           # So is the HMR config (#246), which saves a .pdx while its own dev server runs.
           - { suite: showcase, shard: 1/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=1/2 --workers=2 && pnpm --filter @pdxui/showcase run test:dev && pnpm --filter @pdxui/showcase run test:hmr' }
-          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2' }
+          # The scenario apps' budgets (#244) build two small apps and weigh them: once, with the second.
+          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2 && pnpm --filter @pdxui/showcase run test:scenarios' }
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6

@@ -1,0 +1,5 @@
+<script setup>
+let count = $signal(0);
+</script>
+
+<button @click="count++">Clicked {count} times</button>
