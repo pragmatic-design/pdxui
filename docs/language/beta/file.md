@@ -141,7 +141,9 @@ What the compiler guarantees about the emitted code, as observable rules:
   `colgroup`) is not emitted (#111).
 - Bubbling events inside a `@for` body — `click`, `dblclick`, `input`, `change`, `keydown`, `keyup`,
   `pointerdown`, `pointerup`, `contextmenu`, without `.capture`, `.once`, `.passive`, `.self` — are
-  delegated to one listener per type on the component's host (#113).
+  delegated to one listener per type on the component's host (#113). The handler is declared once,
+  before the outermost `@for`, and a row stores with it the names in scope — its item and index, an
+  outer row's — which `delegate` passes to it after the event (#375).
 - `row.key === sig` inside a `@for` keyed by `row.key` compiles to a keyed selector: a change of `sig`
   updates two rows, not all (#117).
 - Every compiled event handler runs inside `batch()`; outside handlers, a write flushes at once

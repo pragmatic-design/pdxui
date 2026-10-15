@@ -28,8 +28,13 @@ describe('a @for row\'s bubbling event is delegated', () => {
 
     it('a key filter and .stop/.prevent stay inside the stored handler', () => {
         const out = render(ROW('@keydown.enter.prevent="pick(r.id)" @click.stop="n++"'));
-        expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'keydown',\(e\)=>\{if\(e instanceof KeyboardEvent/);
-        expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',\(e\)=>\{e\.stopPropagation\(\);/);
+        // Declared once for the rows (#375), the stored handler is the modifiers' wrapper.
+        const keydown = /const (__rh\d+)=\(e,__s\)=>\{if\(e instanceof KeyboardEvent[^\n]*e\.preventDefault\(\);/.exec(out);
+        const click = /const (__rh\d+)=\(e,__s\)=>\{e\.stopPropagation\(\);/.exec(out);
+        expect(keydown, 'no keydown handler with its filter').not.toBeNull();
+        expect(click, 'no click handler with its .stop').not.toBeNull();
+        expect(out).toContain(`delegate(ctx.el,__el1,'keydown',${keydown![1]},r);`);
+        expect(out).toContain(`delegate(ctx.el,__el1,'click',${click![1]},r);`);
     });
 
     it('once a type is delegated, a handler of that type outside the @for is delegated too', () => {
@@ -42,6 +47,47 @@ describe('a @for row\'s bubbling event is delegated', () => {
         const out = render(`<button @click="n++">+</button>${ROW('@dblclick="pick(r.id)"')}`);
         expect(out).toContain("addEventListener('click'");
         expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'dblclick',/);
+    });
+});
+
+// A row's handler was three closures per row — the arrow, batchHandler's, safeHandler's (#375). It is
+// declared once, outside the @for, and reads the row's names from the scope the row stores with it.
+describe('a delegated row handler is declared once per @for, not once per row', () => {
+    /** The row's render function: from the list call to the end. */
+    const rowOf = (out: string, helper = 'eachRow') => out.slice(out.indexOf(`${helper}(`));
+
+    it('the row stores its getter with a handler declared before the list', () => {
+        const out = render(ROW('@click="pick(r.id)"'));
+        const row = rowOf(out);
+        expect(row, 'the row still builds its own handler').not.toContain('batchHandler(');
+        expect(row).toMatch(/delegate\(ctx\.el,__el\d+,'click',__rh\d+,r\);/);
+        const declared = out.slice(0, out.indexOf('eachRow('));
+        expect(declared.match(/const __rh\d+=safeHandler\(batchHandler\(/g)).toHaveLength(1);
+    });
+
+    it('a nested loop\'s handler takes the outer row and the index too, and is declared outside both', () => {
+        const out = render('@for (rows as r; track r.id) { <ul>@for (r.kids as k, i; track k) {<li @click="pick(r.id + k + i)">x</li>}</ul> }');
+        const outer = out.indexOf('eachRow(');
+        expect(out.slice(outer), 'a handler is still built inside a row').not.toContain('batchHandler(');
+        expect(out.slice(0, outer)).toMatch(/const __rh\d+=safeHandler\(batchHandler\(/);
+        expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',__rh\d+,\[r,k,i\]\);/);
+    });
+
+    it('a handler with modifiers is hoisted with them', () => {
+        const out = render(ROW('@keydown.enter.prevent="pick(r.id)"'));
+        expect(rowOf(out)).not.toContain('KeyboardEvent');
+        expect(out.slice(0, out.indexOf('eachRow('))).toMatch(/const __rh\d+=\(e,__s\)=>\{if\(e instanceof KeyboardEvent/);
+    });
+
+    it('a destructured @for passes its names', () => {
+        const out = render('<ul>@for (rows as { id, label }; track id) {<li @click="pick(id)">{{ label }}</li>}</ul>');
+        expect(rowOf(out, 'each')).not.toContain('batchHandler(');
+        expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',__rh\d+,\[id,label\]\);/);
+    });
+
+    it('a handler outside any @for is not hoisted: it is built once already', () => {
+        const out = render(`<div @click="n++">${ROW('@click="pick(r.id)"')}</div>`);
+        expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',safeHandler\(batchHandler\(\(\) => ctx\.n\.set/);
     });
 });
 

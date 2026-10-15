@@ -141,6 +141,8 @@ round; anything else is read as written.
 An event written in a row — `@click`, `@dblclick`, `@input`, `@change`, `@keydown`, `@keyup`,
 `@pointerdown`, `@pointerup`, `@contextmenu` — does not add a listener per row: the compiler stores
 the handler on the row's element, and the component listens once per event type (core's `delegate`).
+The handler itself is built once for the whole `@for`, not once per row: each row stores only what it
+names — its item, its index, an outer row's item — and the shared handler reads them from there.
 Nothing changes in how you write it: handlers run inner first, `.stop` still stops, and
 `$event.currentTarget` is still the element the handler is on. A handler with `.capture`, `.once`,
 `.passive` or `.self`, one on a component or inside one, and one in a `@portal` keep a listener of

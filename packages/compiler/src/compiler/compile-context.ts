@@ -30,6 +30,12 @@ export interface CompileContext {
     /** The event types this component delegates to one listener each (#113; inline-event-delegation). */
     delegatedEvents: Set<string>;
 
+    /**
+     * Inside a @for: the declarations of its rows' delegated handlers, written once before the
+     * outermost @for instead of once per row (#375). Null outside every @for.
+     */
+    rowHandlers: string[] | null;
+
     /** The parts the script declares with `@part` (#134): a literal `data-part` naming one binds it as a ref. */
     parts: Set<string>;
 
@@ -146,6 +152,7 @@ export function createCompileContext(options?: {
         rowKeys: [],
         literalConsts: new Set(),
         delegatedEvents: new Set(),
+        rowHandlers: null,
         parts: new Set(),
         selectors: new Set(),
         nonSignalNames: null,
