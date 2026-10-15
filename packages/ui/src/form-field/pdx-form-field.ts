@@ -4,10 +4,9 @@
 // validates onChange.
 // ZERO validation built-in — validation lives in @form rune or dev code.
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 
-let fieldIdCounter = 0;
 
 /** The controls a field marked aria-required: only those are unmarked when `required` goes, so a
  *  control that says `required` itself (pdx-input's own prop) keeps it. */
@@ -58,7 +57,7 @@ component('pdx-form-field', {
         a11yLabel: { type: String, default: '' },
     },
     setup(ctx) {
-        const fieldId = 'pdx-ff-' + (++fieldIdCounter);
+        const fieldId = generatedId('pdx-ff');
         const inputId = fieldId + '-input';
         const labelId = fieldId + '-label';
         const hintId = fieldId + '-hint';

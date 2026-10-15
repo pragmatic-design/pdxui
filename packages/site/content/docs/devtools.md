@@ -102,7 +102,10 @@ it now. The rules:
   selectors of the next ones;
 - every control carries a **selector** in brackets: its `data-test` or id when unique, else the
   shortest path that stays unique from the nearest component or `data-test` — the same DOM gives the
-  same selector, call after call.
+  same selector, call after call. The outline never uses an id that a component made with
+  `generatedId(prefix)`, or an id built from one. Such an id comes from a counter, so the same field
+  can be `pdx-ff-1` on one visit and `pdx-ff-20` on the next. A component you write that makes up
+  ids for `aria-controls` or `for` should make them with `generatedId` too.
 
 On the showcase the card is 40–130 tokens and the outline 16–29% of agent-browser's full snapshot of
 the page. A session over four pages — the shell once, then a card and an outline per page — costs a

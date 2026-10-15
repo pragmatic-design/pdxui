@@ -9,7 +9,7 @@
 //   <pdx-json-editor :schema="${schema}" :value="${obj}"></pdx-json-editor>
 //   el.addEventListener('pdx-change', e => save(e.detail.value));
 
-import { component, html, focusTrap, focusFirst } from '@pdxui/core';
+import { component, html, focusTrap, focusFirst, generatedId } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -31,9 +31,6 @@ type Ctrl = { el: HTMLElement; read: () => unknown };
  */
 type OnEdit = () => void;
 const inModal: OnEdit = () => {};
-
-/** Instance counter for the ids that name the sub-modals. */
-let _modalSeq = 0;
 
 interface FieldDef {
     k?: string;
@@ -77,7 +74,7 @@ function runModal(title: string, buildRoot: () => Promise<Ctrl>, opener: HTMLEle
     return new Promise((resolve) => {
         const back = document.createElement('div'); back.className = 'jed-back';
         const box = document.createElement('div'); box.className = 'jed-box';
-        const headId = `jed-head-${++_modalSeq}`;
+        const headId = generatedId('jed-head');
         box.setAttribute('role', 'dialog');
         box.setAttribute('aria-modal', 'true');
         box.setAttribute('aria-labelledby', headId);

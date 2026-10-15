@@ -5,6 +5,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { outlineOf, selectorOf } from '../src/debug/outline';
 import { eachRow } from '../src/renderer/helpers';
+import { generatedId, isGeneratedId } from '../src/utils/generated-id';
 
 const roots: HTMLElement[] = [];
 afterEach(() => { for (const r of roots.splice(0)) r.remove(); });
@@ -92,5 +93,42 @@ describe('addressing', () => {
         const sel = selectorOf(second);
         expect(sel).toBe('[data-test="pager"] button:nth-of-type(2)');
         expect(document.querySelector(sel)).toBe(second);
+    });
+
+    // A generated id counts the components mounted before: it changes with the navigation that led to
+    // the page, so a selector built on it is wrong in the next session (#391).
+    it('an id a component generated is never the selector, nor an id built from one', () => {
+        const field = generatedId('pdx-test-ff');
+        const root = page(`<div data-test="profile"><label for="${field}-input">Email</label><input id="${field}-input" name="email"></div>`);
+        const input = root.querySelector('input')!;
+        const sel = selectorOf(input);
+        expect(sel, 'the selector names the generated id').not.toContain(field);
+        expect(document.querySelector(sel)).toBe(input);
+    });
+
+    it('a generated value in a telling attribute is not used either: an unnamed radio group\'s name', () => {
+        const name = generatedId('pdx-test-rg');
+        // Unique on the page, `[name="…"]` would be the shortest candidate.
+        const root = page(`<div data-test="plan"><input type="radio" name="${name}"></div>`);
+        const radio = root.querySelector('input')!;
+        const sel = selectorOf(radio);
+        expect(sel).not.toContain(name);
+        expect(document.querySelector(sel)).toBe(radio);
+    });
+
+    it('the control: an author\'s own unique id is still the selector', () => {
+        const root = page('<div data-test="profile"><input id="email" name="email"></div>');
+        expect(selectorOf(root.querySelector('input')!)).toBe('#email');
+    });
+
+    it('generatedId counts per prefix, and records what it made and what is built from it', () => {
+        const a = generatedId('pdx-test-x');
+        const b = generatedId('pdx-test-x');
+        expect(b).not.toBe(a);
+        expect(a).toMatch(/^pdx-test-x-\d+$/);
+        expect(isGeneratedId(a)).toBe(true);
+        expect(isGeneratedId(`${a}-step-0`)).toBe(true);
+        expect(isGeneratedId('pdx-test-x')).toBe(false);
+        expect(isGeneratedId('email')).toBe(false);
     });
 });

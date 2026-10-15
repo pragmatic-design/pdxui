@@ -1,7 +1,7 @@
 // pdx-file-upload — Drag-and-drop file upload with validation, preview, and XHR upload.
 // Supports accept filter, size/count limits, image thumbnails, progress tracking.
 
-import { component, html, signal, computed } from '@pdxui/core';
+import { component, html, signal, computed, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -24,8 +24,7 @@ interface FileEntry {
     xhr?: XMLHttpRequest;
 }
 
-let _idCounter = 0;
-function uid(): string { return 'fu-' + (++_idCounter); }
+function uid(): string { return generatedId('fu'); }
 
 function formatSize(bytes: number): string {
     if (bytes < 1024) return bytes + ' B';

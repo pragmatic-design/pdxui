@@ -22,14 +22,12 @@
 // the app's language, the strings come from `uiString`, and `labelOf` reads the ITEM rather than
 // the row's text. Those travel as `a11y` options; the state machine does not.
 
-import { component, html, useSortable, useRovingTabindex, onDestroy } from '@pdxui/core';
+import { component, html, useSortable, useRovingTabindex, onDestroy, generatedId } from '@pdxui/core';
 import type { SlotFunction, Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/sortable-list';
-
-let _uid = 0;
 
 /**
  * A list the user can put in another order, by dragging a row's handle or from the keyboard alone.
@@ -56,7 +54,7 @@ component('pdx-sortable-list', {
     setup(ctx) {
         let built = false;
         let listEl: HTMLElement | null = null;
-        const helpId = `pdx-sortable-help-${++_uid}`;
+        const helpId = generatedId('pdx-sortable-help');
         // Kept so they can be disposed. useSortable puts listeners on the DOCUMENT for the duration
         // of a gesture: a host destroyed mid-drag would leave them there, moving nothing, forever.
         const teardown: Dispose[] = [];

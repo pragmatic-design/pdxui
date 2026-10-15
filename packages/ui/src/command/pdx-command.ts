@@ -3,7 +3,7 @@
 // Features: fuzzy filter, grouped items, keyboard shortcuts display, empty state, focus trap.
 // Uses overlayStack for z-index coordination + Escape handling.
 
-import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked } from '@pdxui/core';
+import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked, generatedId } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 
 /** A command's icon, loading `pdx-icon` the first time one is named: a list of labels never pays for the set. */
@@ -15,9 +15,6 @@ import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/command';
-
-/** Counts palettes: the id is also the palette's key in the overlay stack, so it never repeats (#68). */
-let _cmdCounter = 0;
 
 export interface CommandItem {
     id: string;
@@ -56,7 +53,7 @@ component('pdx-command', {
         const _activeIndex = signal(0);
 
         let _trapDispose: Dispose | null = null;
-        const _uid = 'pdx-cmd-' + (++_cmdCounter);
+        const _uid = generatedId('pdx-cmd');
 
         // Filtered items — simple case-insensitive substring match. A disabled command is listed
         // (aria-disabled) and skipped by the arrows and Enter, not dropped.

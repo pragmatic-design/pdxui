@@ -6,16 +6,13 @@
 
 import '@pdxui/design/components/menu'; // the dropdown's rules live in the MENU's file
 import '../menu/pdx-menu';
-import { component, html, signal, onDestroy } from '@pdxui/core';
+import { component, html, signal, onDestroy, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
 import { anchorControl } from '../shared/anchor-control';
 import { uiString, uiAttr} from '../shared/i18n';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
-
-// Ids for the menus: the trigger's aria-controls points at the one it opens.
-let _ddSeq = 0;
 
 /** The pdx-menu this component opens: its props and its API, as the dropdown uses them. */
 interface MenuHost extends HTMLElement {
@@ -51,7 +48,7 @@ component('pdx-dropdown-menu', {
     },
     setup(ctx) {
         const _open = signal(false);
-        const _menuId = 'pdx-dropdown-menu-' + (++_ddSeq);
+        const _menuId = generatedId('pdx-dropdown-menu');
         function getItemSlot(): SlotFunction | null {
             return ((ctx as any).__slots?.['item'] as SlotFunction | undefined) ?? null;
         }

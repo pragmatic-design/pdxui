@@ -2,7 +2,7 @@
 // Modes: date | datetime | daterange | datetimerange | time | week | month | year | quarter
 // Structure: input trigger + popover → calendar panel + optional time + presets sidebar.
 
-import { component, html, signal, usePopover, registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
+import { component, html, signal, usePopover, registerComponentStrings, getComponentString, registerFormControl, generatedId } from '@pdxui/core';
 import type { PopoverReturn } from '@pdxui/core';
 import { formatWithCalendar, today, parseISO, getMonthNames, getFiscalQuarter, getFiscalYear } from '@pdxui/core';
 import type { CalendarSystem } from '@pdxui/core';
@@ -23,9 +23,6 @@ import '@pdxui/design/components/date-picker';
  * time, the stylesheet below this width and the popover above it.
  */
 export const DATE_PICKER_SHEET_QUERY = '(max-width: 640px)';
-
-// A counter for the panel's unique ids (needed by `aria-controls` on the role=combobox trigger).
-let _dpPanelSeq = 0;
 
 registerComponentStrings('date-picker', {
     today: 'Today',
@@ -706,7 +703,7 @@ component('pdx-date-picker', {
                 // Panel
                 _panelEl = document.createElement('div');
                 _panelEl.className = 'pdx-date-picker-panel';
-                _panelEl.id = 'pdx-dp-panel-' + (++_dpPanelSeq);
+                _panelEl.id = generatedId('pdx-dp-panel');
                 _panelEl.style.display = 'none';
                 // The dialog the trigger's aria-haspopup announces, with a role and a name.
                 _panelEl.setAttribute('role', 'dialog');

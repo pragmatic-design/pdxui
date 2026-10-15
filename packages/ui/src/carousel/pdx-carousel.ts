@@ -3,7 +3,7 @@
 // multiple slides per view, dot indicators, keyboard navigation.
 // Slot: "slide" — custom slide template (priority: slot > renderSlide > default)
 
-import { component, html } from '@pdxui/core';
+import { component, html, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -26,8 +26,6 @@ export interface CarouselItem {
     content?: string;
     caption?: string;
 }
-
-let _carouselCounter = 0;
 
 /**
  * A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.
@@ -53,7 +51,7 @@ component('pdx-carousel', {
     },
     setup(ctx) {
         let built = false;
-        const uid = `pdx-carousel-${++_carouselCounter}`;
+        const uid = generatedId('pdx-carousel');
         let prevBtn: HTMLButtonElement | null = null;
         let nextBtn: HTMLButtonElement | null = null;
         let rotationBtn: HTMLButtonElement | null = null;

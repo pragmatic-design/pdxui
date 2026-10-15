@@ -3,7 +3,7 @@
 // Cannot close via backdrop or Escape by default. Auto-focuses cancel button.
 // Supports: danger variant, type-to-confirm, timer-gated confirm, loading state.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, generatedId } from '@pdxui/core';
 // The stylesheet of the dialog classes this renders, as pdx-dialog imports it. Without it, a page
 // with no pdx-dialog of its own would draw a CLOSED confirmation inline.
 import '@pdxui/design/components/dialog';
@@ -13,7 +13,6 @@ import { uiString, aroundPlaceholder } from '../shared/i18n';
 import { holdModalFocus } from '../shared/modal-focus';
 
 let _alertCounter = 0;
-let _alertUid = 0;
 
 /**
  * A confirmation dialog that requires the user to act: the backdrop and Escape do not close it, and
@@ -47,7 +46,7 @@ component('pdx-alert-dialog', {
         let countdownInterval: ReturnType<typeof setInterval> | null = null;
         // The message describes the dialog: the APG alertdialog points aria-describedby at it, so it is
         // read with the title.
-        const messageId = 'pdx-alert-msg-' + (++_alertUid);
+        const messageId = generatedId('pdx-alert-msg');
 
         function confirm() {
             if (!isConfirmEnabled()) return;

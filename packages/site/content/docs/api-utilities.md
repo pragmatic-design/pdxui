@@ -7,7 +7,7 @@ parent: api
 
 # Security and utilities API
 
-URL sanitising and the development flag. 5 exports, from `@pdxui/core`.
+URL sanitising and the development flag. 6 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -24,6 +24,17 @@ True in a development build, false in a production one — a constant, folded by
 Guard a message that teaches the author something with it, and the branch leaves the production
 bundle with its string: `if (DEV) console.warn('…')`. Never guard BEHAVIOUR with it — behaviour
 that only happens in dev is a difference between what you tested and what you shipped.
+
+## `generatedId`
+
+```ts
+import { generatedId } from '@pdxui/core';
+
+function generatedId(prefix: string): string
+```
+
+A new id `<prefix>-<n>`, where `n` counts the ids made with this prefix: `generatedId('pdx-ff')`
+gives `pdx-ff-1`, then `pdx-ff-2`. An id built from it — `${id}-input` — is generated as well.
 
 ## `processInSlices`
 

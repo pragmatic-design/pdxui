@@ -2,15 +2,13 @@
 // Popup mode (default): swatch triggers floating panel. Inline mode: panel always visible.
 // Internal state in HSV for natural spectrum mapping. Output in hex/rgb/hsl.
 
-import { component, html, signal, computed, effect, useFormAssociated } from '@pdxui/core';
+import { component, html, signal, computed, effect, useFormAssociated, generatedId } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/color-picker';
-
-let _pickerCounter = 0;
 
 // ─── Color math (all internal, zero deps) ───────────────────
 
@@ -112,7 +110,7 @@ component('pdx-color-picker', {
         clearable: { type: Boolean, default: false },
     },
     setup(ctx) {
-        const uid = 'pdx-cp-' + (++_pickerCounter);
+        const uid = generatedId('pdx-cp');
         const hue = signal(0), sat = signal(0), val = signal(100), alpha = signal(1);
         const _open = signal(false);
         // `value` is the live colour: the picker writes it on every change. The string

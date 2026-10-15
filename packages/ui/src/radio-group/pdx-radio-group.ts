@@ -13,12 +13,9 @@
 // arrow keys that move AND check. A focusGroup() on the <pdx-radio> hosts would fight that: it finds
 // no current item while focus sits on the inner input, and sends ArrowDown back to the first radio.
 
-import { component, html, useFormAssociated, untracked } from '@pdxui/core';
+import { component, html, useFormAssociated, untracked, generatedId } from '@pdxui/core';
 import { interceptChildEvent } from '../shared/child-event';
 import { nameGroup, authoredName } from '../shared/group-name';
-
-/** Counts unnamed groups: two sharing a radio `name` would be one radio group to the browser (#68). */
-let _rgCounter = 0;
 
 /**
  * Single selection across the `<pdx-radio>` elements it holds, with one tab stop and arrow keys that
@@ -37,7 +34,7 @@ component('pdx-radio-group', {
         label: { type: String, default: '' },
     },
     setup(ctx) {
-        const _fallbackName = 'pdx-rg-' + (++_rgCounter);
+        const _fallbackName = generatedId('pdx-rg');
 
         function getRadios(): HTMLElement[] {
             return Array.from(ctx.el.querySelectorAll('pdx-radio'));

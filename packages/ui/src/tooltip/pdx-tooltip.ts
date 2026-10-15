@@ -2,7 +2,7 @@
 // Uses manual trigger mode + explicit hover/focus handling for disabled/overflowOnly veto.
 // ARIA: aria-describedby on trigger → floating element with role="tooltip" (WAI).
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, generatedId } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { PopoverPlacement } from '@pdxui/core';
 import { anchorControl } from '../shared/anchor-control';
@@ -32,7 +32,7 @@ component('pdx-tooltip', {
         let overlayId = '';
         let showTimer: ReturnType<typeof setTimeout> | null = null;
         let hideTimer: ReturnType<typeof setTimeout> | null = null;
-        const tooltipId = 'pdx-tt-float-' + (++_ttCounter);
+        const tooltipId = generatedId('pdx-tt-float');
 
         function getTrigger(): HTMLElement | null {
             const parent = ctx.el.parentElement;
