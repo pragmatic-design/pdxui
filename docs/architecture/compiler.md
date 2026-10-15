@@ -113,29 +113,50 @@ The two modes cannot be mixed in one file.
 
 ### Stage 4 — signal rewrite
 
-**File**: `compiler/signal-rewrite.ts` (625 lines)
+**Files**: `compiler/signal-rewrite-ast.ts` (the rewrite), `compiler/signal-rewrite.ts` (the declarations)
 
 This stage turns natural JavaScript syntax into calls to the signal API. The point is that the developer writes ordinary code and the compiler generates the reactive version:
 
 ```javascript
 // The dev writes:             // The compiler generates:
 let count = $signal(0);        const __count = signal(0);
-count++;                       __count.set(v => v + 1);
-count--;                       __count.set(v => v - 1);
-count += 5;                    __count.set(v => v + 5);
+count++;                       __count.set(__v => __v + 1);
+count--;                       __count.set(__v => __v - 1);
+count += 5;                    __count.set(__v => __v + 5);
 count = 10;                    __count.setRaw(10);      // an assignment stores its value as it is
 console.log(count);            console.log(__count());
 ```
 
-The rewrite uses ordered regexes, not an AST parser. That is a deliberate choice: regexes are 10x faster than an AST walk, and JS mutation patterns are finite and predictable. The order of the 6 regexes is **critical**, because a more general pattern would match before a specific one:
+`rewriteAst` in `signal-rewrite-ast.ts` parses the code with the TypeScript parser and rewrites it in **one walk**. The walk covers:
 
-1. `count++` / `++count` → increment (first, or a bare `count` would match)
-2. `count--` / `--count` → decrement
-3. `count += expr` → compound assignment (before `=`, or `+=` would match `=`)
-4. `count = expr` → simple assignment
-5. `count` (read) → a getter call (LAST — after every mutation has been rewritten)
+- **reads**: `count` → `__count()`;
+- **updates**: `++`, `--` and the compound operators → `set` with an updater;
+- **assignments**: `=`, `||=`, `&&=`, `??=` → `setRaw`, so a function is stored as it is;
+- **the signal's own methods**: `count.peek()`, `count.setRaw(v)`;
+- **a `$signal` that is called**: `handler(a)` → `__handler()(a)`;
+- **callable reads**: a prop, a `$derived` or a typed route param → `total()`.
 
-The rewriter is "string-safe": it recognises strings, comments and template literals, so it does not rewrite occurrences inside code that never runs.
+The full table, with the self-read that an assignment makes untracked, is in [docs/language/script.md](../language/script.md#the-script-and-its-rewrite). The walk visits:
+
+- the setup body;
+- the bodies of `$effect`, `$watch`, `onMount` and `onDestroy`;
+- every `$derived` expression;
+- every `@provide` value.
+
+Being an AST walk is what makes it correct where a pattern would not be:
+
+- a parameter or a local of the same name shadows the signal and is left alone;
+- a property name (`row.count`) and a shorthand property (`{ count }`, which becomes `{ count: __count() }`) are told apart;
+- generics, multiline expressions, optional chaining and code inside strings, comments and template literals need no special case.
+
+Mutations add only a prefix and a suffix around the expression. Their right side is rewritten by the same walk, so no two edits overlap.
+
+Two cases leave code as written:
+
+- **`/*@raw*/` lines** (the `@raw` declaration) are protected ranges. The body is still parsed as a whole, so a statement that spans lines parses correctly, but no edit lands inside them. A body with `@raw` that does not parse as a whole is rewritten line by line instead, the raw lines left out.
+- **A fragment that does not parse**, or whose edits would overlap, is returned unchanged rather than guessed. The compiler reports `PDX_REWRITE_FALLBACK` with the fragment, because the generated code then reads a signal raw.
+
+`signal-rewrite.ts` emits the declarations: `const __count = signal(…)`, the `computed(…)` of each `$derived` (whose expression goes through `rewriteAst`), and the auto-return object.
 
 ### Stage 5 — code generation
 
