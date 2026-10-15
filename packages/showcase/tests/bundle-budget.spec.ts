@@ -185,7 +185,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // 467.4; CI has measured 0.1 KB above local before, and the entry sat on its ceiling.
 // js 468 → 469: a `@for` that receives many rows renders them in slices (#242) — the list's slicer
 // and `processInSlices` (#240), which every keyed list now reaches. Measured locally: js 468.4.
-const BUDGET_KB = { entry: 38, js: 469, css: 59, blocking: 93 };
+// js 469 → 470: the set has heading-1, heading-2 and heading-3, the rich-text toolbar's numbered
+// headings that drew nothing (#332). Three chunks of their own, each loaded only by a page that draws
+// it; the entry and the first paint did not move. Measured locally: js 469.2.
+const BUDGET_KB = { entry: 38, js: 470, css: 59, blocking: 93 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
