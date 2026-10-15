@@ -201,7 +201,10 @@ It is not part of `pnpm test`. It needs Chrome, opens a browser window, and take
 per framework. The benchmark is cloned at a pinned commit into the OS temp directory, with its own
 dependencies; the next run reuses it. PDX is built from your checkout: core, compiler, then the app
 in `scripts/bench-jfb/`. A PDX build that is not keyed stops the run before anything is measured.
-`node --test scripts/bench-jfb/summarize.test.mjs` tests the table.
+With `--runs N`, a run that fails loses only itself: each completed run is saved to disk as it
+completes, the table says how many runs it is the median of, the failed runs are listed under it,
+and the command exits 1. `node --test scripts/bench-jfb/summarize.test.mjs` tests the table, and
+`runs.test.mjs` the runs.
 
 ### How signals flush
 
