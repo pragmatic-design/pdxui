@@ -76,8 +76,8 @@ component('pdx-counter', {
 
 Three things to read off it. The variable you declared is now `__count` and every **read** of it —
 including the one you wrote as a bare argument — became a call; the **template** became markup
-parsed once and copied per render (a block the HTML parser would not keep exactly, a table row for
-one, is built with one DOM call per node instead), and the render does only what changes — binds what reads through
+parsed once and copied per render (a block the HTML parser would not keep exactly, a `<select>` or a
+`<tr>` written straight in a `<table>` for two, is built with one DOM call per node instead), and the render does only what changes — binds what reads through
 `ctx`, which is why you never write `count()` in markup; and `$store` is the one
 that is *not* rewritten, because a store is a proxy and its keys are properties, not signals.
 

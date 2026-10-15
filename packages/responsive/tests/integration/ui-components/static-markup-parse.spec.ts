@@ -18,8 +18,8 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from '../../../../compiler/src/plugin';
-import { writeHtml, type MarkupNode } from '../../../../compiler/src/compiler/static-markup-html';
-import { EXCLUDED_CASES } from '../../../../compiler/tests/fixtures/static-markup-cases';
+import { blockHtml, writeHtml, type MarkupNode } from '../../../../compiler/src/compiler/static-markup-html';
+import { EXCLUDED_CASES, KEPT_TABLE_CASES } from '../../../../compiler/tests/fixtures/static-markup-cases';
 
 const PACKAGES = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 
@@ -134,5 +134,45 @@ test.describe('static markup written as HTML', () => {
             return out;
         }, fixtures);
         expect(same, 'excluded as "differs", yet the parse gives the same tree').toEqual([]);
+    });
+
+    // Table content written as HTML (#435), in the shapes the corpus may not have: each parsed by core's
+    // staticMarkup gives back the tree its DOM calls build.
+    test('the table shapes the rule keeps parse into the tree their DOM calls build', async ({ page }) => {
+        await goToScenario(page, 'button-variants', 'neutral', { page: scenarioPage['button-variants'] });
+        const kept = KEPT_TABLE_CASES.map((c) => ({ name: c.name, tree: c.tree, html: blockHtml(c.tree) }));
+        expect(kept.filter((c) => c.html === null).map((c) => c.name), 'the rule no longer keeps these').toEqual([]);
+        const domModule = `/@fs/${join(PACKAGES, 'core/src/renderer/dom.ts').replace(/\\/g, '/')}`;
+        const differ = await page.evaluate(async ({ kept, domModule }) => {
+            const { staticMarkup } = await import(/* @vite-ignore */ domModule);
+            const build = (n: MarkupNode, parent: Node, d: Document): void => {
+                if (n.kind === 'text') { parent.appendChild(d.createTextNode(n.data ?? '')); return; }
+                if (n.kind === 'anchor') { parent.appendChild(d.createTextNode('')); return; }
+                if (n.kind === 'comment') { parent.appendChild(d.createComment(n.data ?? '')); return; }
+                if (n.kind !== 'element') { for (const k of n.kids) build(k, parent, d); return; }
+                const e = d.createElement(n.tag!);
+                for (const [name, value] of n.attrs ?? []) e.setAttribute(name, value);
+                parent.appendChild(e);
+                for (const k of n.kids) build(k, e, d);
+            };
+            const shape = (n: Node): unknown => {
+                if (n.nodeType === 3 || n.nodeType === 8) return [n.nodeType, (n as CharacterData).data];
+                const e = n as Element;
+                const attrs = e.attributes ? Array.from(e.attributes).map((a) => [a.namespaceURI, a.name, a.value]) : [];
+                return [n.nodeType, n.nodeName, e.namespaceURI ?? null, attrs, Array.from(n.childNodes).map(shape)];
+            };
+            const out: string[] = [];
+            for (const c of kept) {
+                const a = document.createElement('template');
+                build(c.tree, a.content, a.content.ownerDocument);
+                const b = document.createElement('template');
+                staticMarkup(c.html!)(b.content, b.content.ownerDocument);
+                const sa = JSON.stringify(shape(a.content));
+                const sb = JSON.stringify(shape(b.content));
+                if (sa !== sb) out.push(`${c.name}\n  DOM : ${sa}\n  HTML: ${sb}`);
+            }
+            return out;
+        }, { kept, domModule });
+        expect(differ, 'kept as HTML, yet the parse gives another tree').toEqual([]);
     });
 });
