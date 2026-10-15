@@ -266,6 +266,12 @@ const ROWS: Row[] = [
         script: "let tag = $signal('x-probe');",
         act: click('button'),
     },
+    // A template literal's `${…}` read a bare name the render does not have: `ReferenceError` at mount (#371).
+    {
+        name: 'a template literal with a signal in ${…}, after a change', expected: '<p lang="it">x-it</p><button>it</button>',
+        template: '<p :lang="`${label}`">{{ `x-${label}` }}</p><button @click="label = `i${\'t\'}`">it</button>',
+        script: "let label = $signal('en');", act: click('button'),
+    },
     // What `<component :is>` encloses is not rendered, and what follows its closing tag is (#358): the
     // template path put the content beside the component, the inline path dropped it. Recorded as decided.
     {
