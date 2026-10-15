@@ -75,10 +75,11 @@ describe('sideEffects declarations', () => {
     // known. If this number moves, read the list before trusting anything else in this file.
     it('the scanner finds exactly the eight side-effectful modules of core', () => {
         // Each was opened and confirmed to run something at load: two resize listeners, an effect
-        // on document.body, a window global, five form-control registrations, an RTL watcher, the
-        // online listener, the style injector, the Context Protocol listener, the start-up splash's
-        // DOMContentLoaded listener, and the `__PDX_DEVTOOLS__` global with its error
-        // listeners, installed in development by debug/devtools-api.ts.
+        // on document.body, a window global, an RTL watcher, the online listener, the style
+        // injector, the Context Protocol listener, the start-up splash's DOMContentLoaded listener,
+        // and the `__PDX_DEVTOOLS__` global with its error listeners, installed in development by
+        // debug/devtools-api.ts. `form/form-registry.ts` left the list in #244: its built-in
+        // controls are the registry's initial value now, not registrations run at load.
         const found = sideEffectful(join(PACKAGES, 'core', 'src'));
         expect(found).toEqual([
             'browser/online.ts',
@@ -90,7 +91,6 @@ describe('sideEffects declarations', () => {
             'component/viewport.ts',
             'debug/devtools-api.ts',
             'debug/inspector.ts',
-            'form/form-registry.ts',
             'i18n/rtl.ts',
         ]);
     });

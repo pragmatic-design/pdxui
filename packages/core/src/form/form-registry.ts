@@ -40,7 +40,27 @@ export interface CustomValidatorDef {
 
 // ─── Registry ───────────────────────────────────────────────
 
-const _formControls = new Map<string, FormControlConfig>();
+/**
+ * The built-in controls, as the registry's initial contents rather than calls at load: a module that
+ * runs nothing at load is one a bundler may drop when no export of it is used, so an app with no form
+ * does not carry the registry (#244, the hello scenario).
+ */
+const BUILT_IN_CONTROLS: [string, FormControlConfig][] = [
+    // Text inputs — skip reactive :value, use pdx-input event
+    ...['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']
+        .map((tag): [string, FormControlConfig] => [tag, { textInput: true, valueEvent: 'pdx-input' }]),
+    // Checked controls
+    ['pdx-checkbox', { checked: true }],
+    ['pdx-switch', { checked: true }],
+    // Standard controls
+    ...['pdx-radio', 'pdx-radio-group', 'pdx-checkbox-group', 'pdx-select', 'pdx-slider', 'pdx-rating', 'pdx-number-input', 'pdx-otp-input', 'pdx-pin-input', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']
+        .map((tag): [string, FormControlConfig] => [tag, {}]),
+    // Special event names
+    ['pdx-segmented', { valueEvent: 'change' }],
+    ['pdx-toggle', { valueEvent: 'pressedchange', valueExpr: 'e.detail?.pressed' }],
+];
+
+const _formControls = new Map<string, FormControlConfig>(BUILT_IN_CONTROLS);
 const _formFieldTypes = new Map<string, string>(); // schema type → tag name
 
 /**
@@ -80,23 +100,3 @@ export function getFieldTypeTag(typeName: string): string | undefined {
 export function getRegisteredFormControls(): string[] {
     return Array.from(_formControls.keys());
 }
-
-// ─── Built-in registrations ─────────────────────────────────
-
-// Text inputs — skip reactive :value, use pdx-input event
-for (const tag of ['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']) {
-    registerFormControl(tag, { textInput: true, valueEvent: 'pdx-input' });
-}
-
-// Checked controls
-registerFormControl('pdx-checkbox', { checked: true });
-registerFormControl('pdx-switch', { checked: true });
-
-// Standard controls
-for (const tag of ['pdx-radio', 'pdx-radio-group', 'pdx-checkbox-group', 'pdx-select', 'pdx-slider', 'pdx-rating', 'pdx-number-input', 'pdx-otp-input', 'pdx-pin-input', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']) {
-    registerFormControl(tag);
-}
-
-// Special event names
-registerFormControl('pdx-segmented', { valueEvent: 'change' });
-registerFormControl('pdx-toggle', { valueEvent: 'pressedchange', valueExpr: 'e.detail?.pressed' });
