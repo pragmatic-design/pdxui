@@ -37,13 +37,12 @@ const PARSER_VOID = new Set([
 ]);
 
 /**
- * Elements whose content or position the parser handles in its own way: table content (implicit
- * <tbody>, foster parenting), selects and options, raw-text and escapable raw-text elements, the
- * document structure, <template> (its children go to its content), <image> (renamed <img>), MathML,
- * and the elements a nested start tag closes.
+ * Elements whose content or position the parser handles in its own way: selects and options,
+ * raw-text and escapable raw-text elements, the document structure, <template> (its children go to
+ * its content), <image> (renamed <img>), MathML, and the elements a nested start tag closes. Table
+ * content has rules of its own, below.
  */
 const EXCLUDED = new Set([
-    'table', 'caption', 'colgroup', 'col', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th',
     'select', 'option', 'optgroup', 'datalist',
     'script', 'style', 'textarea', 'title', 'xmp', 'iframe', 'noembed', 'noframes', 'noscript', 'plaintext',
     'html', 'head', 'body', 'frameset', 'frame', 'template', 'image', 'math', 'nobr',
@@ -109,6 +108,54 @@ const SCOPE_END: Record<string, Set<string>> = {
     dt: new Set(['dl']),
 };
 
+// Table content (#435). The parser keeps a table exactly when every table element sits under the
+// parent its content model asks for and holds only what it allows; otherwise it adds a <tbody> (a <tr>
+// straight in a <table>), moves content out of the table (foster parenting: text or a <div> in a
+// <tr>), or drops a tag (a <td> outside a row). Whitespace, comments and anchors stay where they are.
+
+const SECTIONS = new Set(['thead', 'tbody', 'tfoot']);
+const TABLE_PARTS = new Set(['caption', 'colgroup', 'thead', 'tbody', 'tfoot']);
+const CELLS = new Set(['td', 'th']);
+
+/** The parent a table element must have. */
+const TABLE_PARENT: Record<string, Set<string>> = {
+    caption: new Set(['table']), colgroup: new Set(['table']),
+    thead: new Set(['table']), tbody: new Set(['table']), tfoot: new Set(['table']),
+    tr: SECTIONS, td: new Set(['tr']), th: new Set(['tr']), col: new Set(['colgroup']),
+};
+
+/** The only elements a table element whose content is not flow content may hold. */
+const TABLE_KIDS: Record<string, Set<string>> = {
+    table: TABLE_PARTS, thead: new Set(['tr']), tbody: new Set(['tr']), tfoot: new Set(['tr']),
+    tr: CELLS, colgroup: new Set(['col']),
+};
+
+/** HTML's whitespace, the text table content may hold where it holds no flow content. */
+const WHITESPACE = /^[ \t\n\f]*$/;
+
+/** Whether `kid` may stand inside `tag`, one of TABLE_KIDS's elements. */
+function tableKidKeeps(tag: string, kid: MarkupNode): boolean {
+    if (kid.kind === 'anchor' || kid.kind === 'comment') return true;
+    if (kid.kind === 'text') return WHITESPACE.test(kid.data ?? '');
+    return kid.kind === 'element' && !kid.svg && TABLE_KIDS[tag].has(kid.tag!.toLowerCase());
+}
+
+/**
+ * Whether the block's top level keeps its table elements. A <template>'s content takes its mode from
+ * its first start tag: a <tr> first puts it in a table body, a cell in a row, a section in a table,
+ * and from then on only that kind of element stands at the top. A table element after another
+ * element is dropped.
+ */
+function rootKeepsTable(root: MarkupNode): boolean {
+    const elements = root.kids.filter((k) => k.kind === 'element' && !k.svg);
+    const tags = elements.map((k) => k.tag!.toLowerCase());
+    if (!tags.some((t) => TABLE_PARENT[t])) return true;
+    const first = tags[0];
+    const group = first === 'tr' ? new Set(['tr']) : CELLS.has(first) ? CELLS : TABLE_PARTS.has(first) ? TABLE_PARTS : null;
+    if (!group || !tags.every((t) => group.has(t))) return false;
+    return root.kids.every((k) => k.kind !== 'text' || WHITESPACE.test(k.data ?? '')) && !root.kids.some((k) => k.kind === 'element' && k.svg);
+}
+
 /** The descendant elements of `n`, in HTML (an <svg> subtree is its own content), not past `stop`. */
 function htmlDescendants(n: MarkupNode, stop: Set<string> | undefined, out: string[] = []): string[] {
     for (const k of n.kids) {
@@ -120,8 +167,11 @@ function htmlDescendants(n: MarkupNode, stop: Set<string> | undefined, out: stri
     return out;
 }
 
-/** Whether the parser keeps `n` and everything under it exactly as written. */
-function keeps(n: MarkupNode): boolean {
+/**
+ * Whether the parser keeps `n` and everything under it exactly as written. `parent` is the HTML
+ * element `n` stands in, lowercase, or null at the block's top level.
+ */
+function keeps(n: MarkupNode, parent: string | null = null): boolean {
     if (n.kind === 'sink') return false;
     if (n.kind === 'comment') {
         const d = n.data ?? '';
@@ -144,6 +194,11 @@ function keeps(n: MarkupNode): boolean {
             }
         } else {
             if (EXCLUDED.has(lower)) return false;
+            // A table element under the wrong parent (the top level is rootKeepsTable's), or holding
+            // what its content model moves out.
+            const wanted = TABLE_PARENT[lower];
+            if (wanted && parent !== null && !wanted.has(parent)) return false;
+            if (TABLE_KIDS[lower] && !n.kids.every((k) => tableKidKeeps(lower, k))) return false;
             // A parser-void element the compiler gave content, or a non-void one it left open.
             if (PARSER_VOID.has(lower) && (!n.isVoid || n.kids.length > 0)) return false;
             const forbidden = NOT_NESTED[lower];
@@ -164,7 +219,10 @@ function keeps(n: MarkupNode): boolean {
     for (let i = 1; i < n.kids.length; i++) {
         if (n.kids[i].kind === 'text' && n.kids[i - 1].kind === 'text') return false;
     }
-    return n.kids.every(keeps);
+    // What the kids stand in: this element, or for the root and anything that is not an HTML element,
+    // a context no table element belongs in (an SVG element's kids are its own content).
+    const context = n.kind === 'root' ? null : n.kind === 'element' ? (n.svg ? '#svg' : n.tag!.toLowerCase()) : '#other';
+    return n.kids.every((k) => keeps(k, context));
 }
 
 const escapeText = (s: string): string => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -197,7 +255,7 @@ function write(n: MarkupNode): string {
 
 /** The block's markup as HTML the parser keeps exactly, or null when the block keeps its DOM calls. */
 export function blockHtml(root: MarkupNode): string | null {
-    return keeps(root) ? write(root) : null;
+    return keeps(root) && rootKeepsTable(root) ? write(root) : null;
 }
 
 /** U+2028 and U+2029, line terminators to an older JavaScript parser. Built, not written, here. */

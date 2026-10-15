@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { blockHtml, htmlLiteral } from '../src/compiler/static-markup-html';
-import { EXCLUDED_CASES, el, text, anchor, comment, root } from './fixtures/static-markup-cases';
+import { EXCLUDED_CASES, KEPT_TABLE_CASES, el, text, anchor, comment, root } from './fixtures/static-markup-cases';
 
 describe('a block written as HTML', () => {
     it('elements, attributes, text and anchors', () => {
@@ -41,6 +41,12 @@ describe('a block written as HTML', () => {
     it('a comment with text is kept', () => {
         expect(blockHtml(root(comment(' unknown directive @x ')))).toBe('<!-- unknown directive @x -->');
     });
+});
+
+describe('table content the parser keeps is written as HTML (#435)', () => {
+    for (const c of KEPT_TABLE_CASES) {
+        it(c.name, () => expect(blockHtml(c.tree)).not.toBeNull());
+    }
 });
 
 describe('a block that keeps its DOM calls', () => {

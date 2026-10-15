@@ -15,6 +15,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { builds } from './static-markup-of';
 
 const ROW = `<template>
   <table><tbody>
@@ -39,10 +40,11 @@ describe('a block clones its static DOM', () => {
         expect(render(code), 'the render still builds static elements one by one').not.toMatch(/createElement\('(td|span|tr)'\)/);
         expect(render(code)).not.toContain('"col-md-1"');
         expect(render(code)).toMatch(/const __frag=__blk\d+\(\);/);
-        // The builder lives at module level, handed to core's staticBlock, and holds the static markup.
-        expect(hoisted(code)).toMatch(/const __blk\d+=staticBlock\(\(__frag,__d\)=>\{/);
-        expect(hoisted(code)).toMatch(/__d\.createElement\('td'\)/);
-        expect(hoisted(code)).toContain('"col-md-1"');
+        // The builder lives at module level, handed to core's staticBlock, and holds the static markup:
+        // as HTML, since a row is table content the parser keeps (#435), or as DOM calls.
+        expect(hoisted(code)).toMatch(/const __blk\d+=staticBlock\(/);
+        expect(builds(hoisted(code), 'td')).toBe(true);
+        expect(hoisted(code)).toContain('col-md-1');
     });
 
     it('a dynamic block is put in place of a marker the static markup holds', () => {

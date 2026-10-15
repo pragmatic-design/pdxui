@@ -16,7 +16,13 @@ export const root = (...kids: MarkupNode[]): MarkupNode => ({ kind: 'root', kids
 export interface ExcludedCase { name: string; tree: MarkupNode; parses: 'differs' | 'conservative' }
 
 export const EXCLUDED_CASES: ExcludedCase[] = [
-    { name: 'table content (implicit tbody, foster parenting)', tree: root(el('table', [el('tr', [el('td', [text('x')])])])), parses: 'differs' },
+    { name: 'a <tr> straight in a <table>: the parser adds a <tbody>', tree: root(el('table', [el('tr', [el('td', [text('x')])])])), parses: 'differs' },
+    { name: 'text in a <tbody>: the parser moves it out of the table', tree: root(el('table', [el('tbody', [text('x')])])), parses: 'differs' },
+    { name: 'a <div> in a <tr>: the parser moves it out of the table', tree: root(el('table', [el('tbody', [el('tr', [el('div')])])])), parses: 'differs' },
+    { name: 'a <td> outside a row: the parser drops the tag', tree: root(el('div', [el('td', [text('x')])])), parses: 'differs' },
+    { name: 'a <tr> at the root after another element: the parser drops the tag', tree: root(el('div'), el('tr', [el('td', [text('x')])])), parses: 'differs' },
+    { name: 'a <tr> at the root before another element', tree: root(el('tr', [el('td', [text('x')])]), el('div')), parses: 'conservative' },
+    { name: 'a <col> at the root', tree: root(el('col', [], [], { isVoid: true })), parses: 'conservative' },
     { name: 'a <p> holding a block element', tree: root(el('p', [el('div', [text('x')])])), parses: 'differs' },
     { name: 'a <p> holding a block element deeper down', tree: root(el('p', [el('span', [el('div')])])), parses: 'differs' },
     { name: 'an <a> inside an <a>', tree: root(el('a', [el('span', [el('a')])])), parses: 'differs' },
@@ -42,4 +48,24 @@ export const EXCLUDED_CASES: ExcludedCase[] = [
     { name: 'a carriage return in text', tree: root(el('p', [text('a\r\nb')])), parses: 'differs' },
     { name: 'a comment the parser ends early', tree: root(comment('a--!>b')), parses: 'differs' },
     { name: 'content of <component :is>', tree: root({ kind: 'sink', kids: [] }), parses: 'conservative' },
+];
+
+/**
+ * Table content the parser keeps, written as HTML (#435): each element under the parent its content
+ * model asks for, nothing but whitespace, comments and anchors beside them. The browser test parses
+ * each with core's `staticMarkup` and compares it with the tree its DOM calls build.
+ */
+export const KEPT_TABLE_CASES: Array<{ name: string; tree: MarkupNode }> = [
+    { name: 'a @for row: a <tr> at the root', tree: root(el('tr', [el('td', [anchor()]), el('td', [el('a', [anchor()])])])) },
+    { name: 'a row with whitespace around and between its cells', tree: root(text(' '), el('tr', [text(' '), el('td', [text('a')]), text(' '), el('th', [text('b')]), text(' ')]), text(' ')) },
+    { name: 'cells at the root', tree: root(el('td', [text('a')]), el('th', [anchor()])) },
+    { name: 'sections at the root', tree: root(el('thead', [el('tr', [el('th', [text('h')])])]), el('tbody', [anchor()])) },
+    { name: 'a table with its sections and the anchor of its rows', tree: root(el('div', [el('table', [
+        text(' '), el('thead', [el('tr', [el('th', [text('Name')])])]), text(' '), el('tbody', [anchor()]), text(' '),
+    ], [['class', 't']])])) },
+    { name: 'a caption, a column group and a comment in a section', tree: root(el('table', [
+        el('caption', [text('c')]), el('colgroup', [el('col', [], [['span', '2']], { isVoid: true })]),
+        el('tbody', [comment(' rows '), el('tr', [el('td', [text('1')])])]),
+    ])) },
+    { name: 'a table inside a cell', tree: root(el('tr', [el('td', [el('table', [el('tbody', [el('tr', [el('td', [text('x')])])])])])])) },
 ];
