@@ -28,6 +28,7 @@ their issues are #286–#293.
 | Host | host attributes and listeners are declared with `@host` | #133 |
 | Variants and tokens | variants are recipes (`@variants`); per-component tokens follow `--pdx-<component>-<property>[-state]` and are in the manifest | #153, #154 |
 | Text | its text follows its container (decisions.md 38); hostile host CSS on bare elements reaches it only through that container | #170 |
+| Borders | a host's bare element rule draws no border on an element the component does not border itself | #319, #413 |
 | Events | its events do not bubble unless declared `(bubbles)` | #138 |
 
 ## Accessibility, for people and for agents

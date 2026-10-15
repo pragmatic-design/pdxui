@@ -233,7 +233,7 @@ export const menubar: ComponentManifest = {
     isolation: {
         scenario: 'menubar-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="mb"] .pdx-menubar-bar', tolerancePx: 10, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="mb"] .pdx-menubar-bar', tolerancePx: 10, skipHeight: true },
         ],
     },
 

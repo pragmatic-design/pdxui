@@ -101,7 +101,7 @@ export const affix: ComponentManifest = {
         targets: [
             // A content-driven wrapper (height = the content): skip the height, there is no box
             // styling of its own.
-            { selector: 'section:not([hidden]) [data-test="affix"]', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="affix"]', tolerancePx: 12, skipHeight: true },
         ],
     },
 

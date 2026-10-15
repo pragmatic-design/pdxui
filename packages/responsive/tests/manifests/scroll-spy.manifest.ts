@@ -208,7 +208,7 @@ export const scrollSpy: ComponentManifest = {
     isolation: {
         scenario: 'scroll-spy-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="scroll-spy"]', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="scroll-spy"]', tolerancePx: 12, skipHeight: true },
         ],
     },
 

@@ -158,7 +158,7 @@ export const rating: ComponentManifest = {
         scenario: 'rating-basic',
         targets: [
             // An atom with SVG icons: a generous tolerance for a pathological host.
-            { selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating', tolerancePx: 12, leaks: [{ issue: 319, properties: ['borderTopWidth', 'borderTopStyle', 'borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating', tolerancePx: 12 },
         ],
     },
 

@@ -252,7 +252,7 @@ export const infiniteScroll: ComponentManifest = {
     isolation: {
         scenario: 'infinite-scroll-idle',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="infinite-scroll"]', tolerancePx: 12, skipHeight: true, leaks: [{ issue: 319, properties: ['borderTopColor'] }] },
+            { selector: 'section:not([hidden]) [data-test="infinite-scroll"]', tolerancePx: 12, skipHeight: true },
         ],
     },
 

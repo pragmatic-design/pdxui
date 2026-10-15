@@ -29,13 +29,18 @@ body {
    element rule (#170). Most of them declare no colour, font or spacing and inherit them; a host's
    `div { color: … }` or `span { font-family: … }` is a direct declaration, which beats inheritance —
    even from a layer declared before `pdx`, as the design system asks a host to load its CSS. Saying
-   `inherit` here, in the lowest pdx layer, wins over that layer and loses to every component rule. */
+   `inherit` here, in the lowest pdx layer, wins over that layer and loses to every component rule.
+   The same holds for a host's `div { border: … }` on an element that draws no border (#319): no
+   border here, and `solid` rather than `none`, so a component rule that sets only a width or a colour
+   still draws the border it means. */
 :where([class*="pdx-"], [class*="pdx-"] *) {
     color: inherit;
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
     letter-spacing: inherit;
+    border-width: 0;
+    border-style: solid;
 }
 
 h1, h2, h3, h4, h5, h6 {
