@@ -1001,14 +1001,22 @@ function walkNodes(
     }
 }
 
-function extractIdentifiers(expr: string, ids: Set<string>): void {
+/** `outerLocals`: the names an enclosing expression binds, for a template literal's `${…}`. */
+function extractIdentifiers(expr: string, ids: Set<string>, outerLocals?: Set<string>): void {
     let pos = 0;
-    const localVars = new Set<string>();
+    const localVars = new Set<string>(outerLocals);
 
     while (pos < expr.length) {
         const ch = expr[pos];
 
-        // Skip strings, template literals, comments using shared tokenizer
+        // A template literal's substitutions are reads like the expression around them (#371): a
+        // signal read only in `${…}` was reported unused.
+        if (ch === '`') {
+            pos = templateLiteralIdentifiers(expr, pos, ids, localVars);
+            continue;
+        }
+
+        // Skip strings, comments using shared tokenizer
         const skip = skipNonCode(expr, pos);
         if (skip !== null) { pos = skip; continue; }
 
@@ -1046,6 +1054,25 @@ function extractIdentifiers(expr: string, ids: Set<string>): void {
 
         pos++;
     }
+}
+
+/** The identifiers each `${…}` of the template literal opening at `start` reads; the index past it. */
+function templateLiteralIdentifiers(expr: string, start: number, ids: Set<string>, locals: Set<string>): number {
+    let i = start + 1;
+    while (i < expr.length) {
+        const c = expr[i];
+        if (c === '\\') { i += 2; continue; }
+        if (c === '`') return i + 1;
+        if (c === '$' && expr[i + 1] === '{') {
+            const close = findClosing(expr, i + 1);
+            if (close === -1) return expr.length;
+            extractIdentifiers(expr.slice(i + 2, close), ids, locals);
+            i = close + 1;
+            continue;
+        }
+        i++;
+    }
+    return expr.length;
 }
 
 function extractHtmlBindingIds(html: string, ids: Set<string>): void {

@@ -139,17 +139,20 @@ export function withBoundaryScope<T>(errorVar: string, retryVar: string, ctx: Co
 /**
  * Prefix bare identifiers with ctx. — token-aware.
  * Walks the expression character by character, understanding:
- * - String/template literals (skipped entirely)
+ * - String literals and comments (skipped entirely)
+ * - Template literals: the text as written, each `${…}` prefixed as an expression (#371)
  * - Arrow function params (tracked as local vars, not prefixed)
  * - Property access after . (not prefixed)
  * - JS keywords and known globals (not prefixed)
+ *
+ * `outerLocals`: the names an enclosing expression binds, for a template literal's `${…}`.
  */
-export function prefixCtx(expr: string, ctx: CompileContext): string {
+export function prefixCtx(expr: string, ctx: CompileContext, outerLocals?: Set<string>): string {
     if (expr.startsWith('ctx.')) return expr;
 
     let result = '';
     let pos = 0;
-    const localVars = new Set<string>();
+    const localVars = new Set<string>(outerLocals);
     // Per bracket-depth count of pending ternary `?`. A `:` at a depth with a pending
     // `?` is the ternary's colon, NOT an object-key colon — so the identifier before
     // it (the `then` branch) must still be prefixed.
@@ -162,7 +165,16 @@ export function prefixCtx(expr: string, ctx: CompileContext): string {
     while (pos < expr.length) {
         const ch = expr[pos];
 
-        // Skip string/template literals/comments entirely (using shared tokenizer)
+        // A template literal: its text as written, its substitutions read like the expression
+        // around them (#371). Skipped whole, `${label}` read a bare name the render does not have.
+        if (ch === '`') {
+            const end = prefixTemplateLiteral(expr, pos, ctx, localVars);
+            result += end.text;
+            pos = end.pos;
+            continue;
+        }
+
+        // Skip strings/comments entirely (using shared tokenizer)
         const nonCodeEnd = skipNonCode(expr, pos);
         if (nonCodeEnd !== null) {
             result += expr.slice(pos, nonCodeEnd);
@@ -285,6 +297,31 @@ export function prefixCtx(expr: string, ctx: CompileContext): string {
     }
 
     return result;
+}
+
+/**
+ * The template literal opening at `start` (a backtick), with each `${…}` prefixed as an expression
+ * that sees `locals`, and the index past its closing backtick. An unterminated literal is copied to
+ * the end of `expr`, as the tokenizer reads it.
+ */
+function prefixTemplateLiteral(expr: string, start: number, ctx: CompileContext, locals: Set<string>): { text: string; pos: number } {
+    let text = '`';
+    let i = start + 1;
+    while (i < expr.length) {
+        const c = expr[i];
+        if (c === '\\') { text += expr.slice(i, i + 2); i += 2; continue; }
+        if (c === '`') return { text: text + '`', pos: i + 1 };
+        if (c === '$' && expr[i + 1] === '{') {
+            const close = findClosing(expr, i + 1);
+            if (close === -1) break;
+            text += '${' + prefixCtx(expr.slice(i + 2, close), ctx, locals) + '}';
+            i = close + 1;
+            continue;
+        }
+        text += c;
+        i++;
+    }
+    return { text: text + expr.slice(i), pos: expr.length };
 }
 
 /**
