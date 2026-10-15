@@ -57,11 +57,14 @@ describe('checkThresholds', () => {
 
 // The run's own summary — reading the results, combining runs, the table — has node:test tests of
 // its own beside it, which no gate ran: found while doing #248. They run here, so `pnpm test` does.
-describe('scripts/bench-jfb/summarize.test.mjs', () => {
-    it('passes under node --test', () => {
-        const file = join(__dirname, '..', '..', '..', 'scripts', 'bench-jfb', 'summarize.test.mjs');
-        const out = execFileSync(process.execPath, ['--test', file], { encoding: 'utf8' });
-        expect(out).toMatch(/^# fail 0$/m);
-        expect(out).toMatch(/^# pass [1-9]/m);
+// And the runs of a comparison, kept as they complete when a later one fails (#374).
+for (const name of ['summarize.test.mjs', 'runs.test.mjs']) {
+    describe(`scripts/bench-jfb/${name}`, () => {
+        it('passes under node --test', () => {
+            const file = join(__dirname, '..', '..', '..', 'scripts', 'bench-jfb', name);
+            const out = execFileSync(process.execPath, ['--test', file], { encoding: 'utf8' });
+            expect(out).toMatch(/^# fail 0$/m);
+            expect(out).toMatch(/^# pass [1-9]/m);
+        });
     });
-});
+}

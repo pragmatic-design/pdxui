@@ -14,6 +14,22 @@
 //
 // --json <file> also writes the combined medians of every framework of the run to that file, which
 // thresholds.mjs holds to thresholds in the nightly job (#248).
+//
+// A run that fails does not lose the others (runs.mjs, #374): each completed run's medians are written
+// to <clone>/pdx-runs/<start time>/run-<i>.json as it completes, the table is the median of the runs
+// that completed and says how many, the failed runs are listed under it, and the command exits 1.
+//
+// The failure that made this necessary, and what is known of it (#374, 2026-10-15). On 2026-10-13, 4
+// of 9 `--runs 3` comparisons on one Windows machine failed with `ProtocolError:
+// Runtime.callFunctionOn timed out` in select1k or clear1k, each framework hit at least once. The
+// driver at the pinned commit is puppeteer-core 25.3.0, launched with no `protocolTimeout`, so the
+// default applies: 180 s. The call is one the benchmark makes on the page after its click (`page.$`,
+// `elem.evaluate`), so the page did not answer for three minutes — not a slow measurement. The
+// benchmark's own `Cannot compute stats on empty array` follows from it: that benchmark has no sample.
+// Not reproduced: 18 runs in the nightly job (Linux, headless) and 5 runs of select1k and clear1k on a
+// Windows machine with nothing else running (headless) completed. The failures were on a loaded
+// machine, and whether its Chrome was headless is not recorded; neither has been ruled out as the
+// cause, and the cause is not known.
 
 import { spawn, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -23,6 +39,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { combineRuns, readRun, toMarkdown } from './summarize.mjs';
 import { measureSelect10k, select10kMarkdown } from './select10k.mjs';
+import { collectRuns, runsTitle } from './runs.mjs';
 
 const JFB_REPO = 'https://github.com/krausest/js-framework-benchmark.git';
 // The commit the procedure was first run against by hand (2026-10-10). Moving it is a change to
@@ -257,22 +274,32 @@ async function main() {
 
     step(`starting the benchmark server on ${options.port}`);
     const server = await startServer(jfb, options.port);
-    const runs = [];
+    let runs = [];
+    let failures = [];
     let select10k = null;
     try {
         step('checking that the PDX implementation is keyed');
         checkKeyed(webdriver, env, browserArgs);
-        for (let i = 1; i <= options.runs; i++) {
-            step(`run ${i} of ${options.runs}: ${frameworks.join(', ')}`);
-            const results = join(webdriver, 'results');
-            rmSync(results, { recursive: true, force: true });
-            const args = ['dist/benchmarkRunner.js', ...browserArgs, '--framework', ...frameworks.map(f => `keyed/${f}`)];
-            if (options.only.length) args.push('--benchmark', ...options.only);
-            run(process.execPath, args, webdriver, env);
-            const measured = readRun(results);
-            const missing = frameworks.filter(f => !measured[f]);
-            if (missing.length) throw new Error(`run ${i} has no results for ${missing.join(', ')}`);
-            runs.push(measured);
+        // Each completed run's medians on disk as it completes, beside the clone (#374).
+        const saveDir = join(jfb, 'pdx-runs', new Date().toISOString().replace(/[:.]/g, '-'));
+        ({ runs, failures } = collectRuns({
+            total: options.runs,
+            saveDir,
+            runOnce: (i) => {
+                step(`run ${i} of ${options.runs}: ${frameworks.join(', ')}`);
+                const results = join(webdriver, 'results');
+                rmSync(results, { recursive: true, force: true });
+                const args = ['dist/benchmarkRunner.js', ...browserArgs, '--framework', ...frameworks.map(f => `keyed/${f}`)];
+                if (options.only.length) args.push('--benchmark', ...options.only);
+                run(process.execPath, args, webdriver, env);
+                const measured = readRun(results);
+                const missing = frameworks.filter(f => !measured[f]);
+                if (missing.length) throw new Error(`run ${i} has no results for ${missing.join(', ')}`);
+                return measured;
+            },
+        }));
+        if (runs.length === 0) {
+            throw new Error(`no run completed: ${failures.map(f => `run ${f.run}: ${f.message}`).join('; ')}`);
         }
         step('selecting a row among 10,000 (not one of the benchmark\'s results)');
         select10k = await measureSelect10k({ jfb, port: options.port, frameworks, chrome: options.chrome, headless: options.headless });
@@ -285,10 +312,16 @@ async function main() {
         }
     }
 
-    const title = options.runs > 1 ? `median of ${options.runs} runs` : 'one run';
-    console.log(`\n## js-framework-benchmark, ${title} (benchmark ${JFB_COMMIT.slice(0, 12)})\n`);
+    console.log(`\n## js-framework-benchmark, ${runsTitle(runs.length, options.runs)} (benchmark ${JFB_COMMIT.slice(0, 12)})\n`);
     const combined = combineRuns(runs);
     console.log(toMarkdown(combined, frameworks));
+    // A failed run is reported beside the table it is missing from, and the command fails: the table
+    // stands for the runs it has, and says how many.
+    if (failures.length) {
+        console.log(`\n${failures.length} of ${options.runs} runs failed and are not in the table:`);
+        for (const f of failures) console.log(`- run ${f.run}: ${f.message}`);
+        process.exitCode = 1;
+    }
     if (options.json) {
         writeFileSync(resolve(options.json), JSON.stringify(combined, null, 2));
         console.log(`\n[bench:jfb] the combined medians are in ${resolve(options.json)}`);
