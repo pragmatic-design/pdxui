@@ -446,13 +446,14 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
         // What this computed reads is its own dependency, not the effect's that read it.
         const prevComputedReads = currentComputedReads;
         // Once disposed, it recomputes WITHOUT re-subscribing to the sources — a late
-        // read must not bring the computed back to life.
+        // read must not bring the computed back to life — and stays dirty, since nothing will
+        // tell it that a source changed: every read recomputes, as a plain getter would (#342).
         currentEffect = disposed ? null : markDirty;
         currentTracker = disposed ? null : tracker;
         if (!disposed) beginTracking(tracker);
         currentComputedReads = null;
         _insideComputed = true;
-        try { cached = fn(); dirty = false; initialized = true; }
+        try { cached = fn(); dirty = disposed; initialized = true; }
         finally {
             currentEffect = prev; currentTracker = prevTracker; _insideComputed = prevInsideComputed;
             currentComputedReads = prevComputedReads;
@@ -523,11 +524,13 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
      *
      * The ownership scope below does this when a subtree unmounts; this is the same thing by hand,
      * for a computed created outside a scope — and it is what makes «a disposed computed stops
-     * being a subscriber» something a test can state.
+     * being a subscriber» something a test can state. A read afterwards still answers: it
+     * recomputes, untracked, every time (#342).
      */
     read.dispose = () => {
         if (disposed) return;
         disposed = true;
+        dirty = true;
         for (let i = 0; i < tracker.deps.length; i++) tracker.deps[i].delete(markDirty);
         tracker.deps.length = 0;
         subscribers.clear();
@@ -542,15 +545,7 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
     // then unmounted stays subscribed to its sources forever (a retention leak) and — with
     // `equals` — keeps recomputing eagerly on every source change. Computeds
     // created outside a scope (modules/singletons) stay permanent.
-    if (currentOwner) {
-        currentOwner.push(() => {
-            if (disposed) return;
-            disposed = true;
-            for (let i = 0; i < tracker.deps.length; i++) tracker.deps[i].delete(markDirty);
-            tracker.deps.length = 0;
-            subscribers.clear();
-        });
-    }
+    if (currentOwner) currentOwner.push(read.dispose);
 
     return read as ReadonlySignal<T>;
 }
