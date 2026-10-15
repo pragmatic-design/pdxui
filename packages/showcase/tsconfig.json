@@ -39,5 +39,5 @@
     // `_keepAlive does not exist on HTMLElement`, `PdxNavigateEvent` unknown — which are the
     // router's own globals, declared in that file and read by its own project. They are errors
     // about a package this one only imports, and they would drown the ones that are ours.
-    "include": ["src/**/*.ts", "tests/**/*.ts", "*.ts", "../router/src/pdx-globals.d.ts"]
+    "include": ["src/**/*.ts", "tests/**/*.ts", "*.ts", "scenarios/*/*.ts", "../router/src/pdx-globals.d.ts"]
 }

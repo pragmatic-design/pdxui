@@ -75,6 +75,8 @@ describe('every Playwright suite decides how much of the machine it takes', () =
             'showcase/tests/playwright.dev.config.ts',
             // And a third, on a dev server of its own: a save reaching the open page (#246).
             'showcase/tests/playwright.hmr.config.ts',
+            // And a fourth, on no server at all: the scenario apps' builds, weighed (#244).
+            'showcase/tests/playwright.scenarios.config.ts',
             'site/tests/playwright.config.ts',
         ]);
     });
