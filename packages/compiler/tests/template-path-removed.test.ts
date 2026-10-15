@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { compile } from '../src/plugin';
+import { builds } from './static-markup-of';
 
 const SRC = '<template><p :title="t">{{ t }}</p></template>\n<script setup>\nlet t = $signal(\'x\');\n</script>\n';
 
@@ -15,7 +16,7 @@ describe('the template path is removed from new-mode compilation', () => {
         const options: Record<string, unknown> = { production: true, inlineBindings: false };
         const { code } = compile(SRC, 'removed.pdx', [], undefined, options);
         expect(code, 'inlineBindings: false still reached the template path').not.toMatch(/\bhtml`/);
-        expect(code).toContain("__d.createElement('p')");
+        expect(builds(code, 'p')).toBe(true);
     });
 
     it('the code generator does not carry the switch', () => {

@@ -114,6 +114,12 @@ export interface CompileContext {
      * a runtime error names it. Development builds only; null otherwise.
      */
     readonly sourceFile: string | null;
+
+    /**
+     * Write a block's static markup as HTML where the parser keeps it exactly (#369). On by default;
+     * off keeps one DOM call per node — what the test that proves the two equal compares it with.
+     */
+    readonly staticMarkup: boolean;
 }
 
 /** tag → the props a binding can set on it, or null when the tag is unknown. */
@@ -131,6 +137,7 @@ export function createCompileContext(options?: {
     mapOrigins?: boolean;
     templateOrigin?: number | null;
     sourceFile?: string | null;
+    staticMarkup?: boolean;
 }): CompileContext {
     return {
         production: options?.production ?? false,
@@ -155,5 +162,6 @@ export function createCompileContext(options?: {
         mapOrigins: options?.mapOrigins ?? false,
         templateOrigin: options?.templateOrigin ?? null,
         sourceFile: options?.sourceFile ?? null,
+        staticMarkup: options?.staticMarkup ?? true,
     };
 }

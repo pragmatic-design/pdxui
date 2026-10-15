@@ -4,6 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { templateGenerator } from './template-generator';
+import { markup } from './static-markup-of';
 
 describe('#1 loop-invariant hoisting (production)', () => {
     it('hoists a real signal read but never ctx.el or an event handler', () => {
@@ -89,8 +90,9 @@ describe('#3 template-literal escaping', () => {
     it('author backticks and ${ in literal text stay text (no execution)', () => {
         const source = '<template><p>premi ` e ${x}</p></template>\n<script setup>\nlet x = $signal(1);\n</script>';
         const { code } = compile(source, 'esc.pdx', [], undefined, { production: false });
-        // The inline render (#107) writes the text as a string literal: nothing in it is code.
-        expect(code).toContain('__d.createTextNode("premi ` e ${x}")');
+        // The inline render (#107) writes the text into a string literal — the block's HTML (#369):
+        // nothing in it is code.
+        expect(markup(code).join('')).toContain('<p>premi ` e ${x}</p>');
         // The module body parses without throwing (no stray template break).
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
     });
@@ -98,13 +100,13 @@ describe('#3 template-literal escaping', () => {
     it('in production too', () => {
         const source = '<template><p>a ` b ${y}</p></template>\n<script setup>\nlet y = $signal(2);\n</script>';
         const { code } = compile(source, 'esc-prod.pdx', [], undefined, { production: true });
-        expect(code).toContain('__d.createTextNode("a ` b ${y}")');
+        expect(markup(code).join('')).toContain('<p>a ` b ${y}</p>');
     });
 
     it('a scoped slot body, built inline since #364, writes them as text too', () => {
         const source = '<template><pdx-list><slot name="item" let:row><p>a ` b ${y}</p></slot></pdx-list></template>\n<script setup>\nlet y = $signal(2);\n</script>';
         const { code } = compile(source, 'esc-slot.pdx', [], undefined, { production: true });
-        expect(code).toContain('__d.createTextNode("a ` b ${y}")');
+        expect(markup(code).join('')).toContain('<p>a ` b ${y}</p>');
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
     });
 

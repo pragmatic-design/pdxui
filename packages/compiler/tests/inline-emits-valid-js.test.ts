@@ -20,6 +20,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { builds } from './static-markup-of';
 
 const FORM = `<template>
   <pdx-form :form="orderForm">
@@ -57,7 +58,7 @@ describe('the inline path emits a module a bundler can read', () => {
     it('control — and the module renders something: the form is built', () => {
         // Without this, a change that made the render emit nothing would pass the test above.
         const { code } = compile(FORM, 'order.pdx', [], undefined, { production: true });
-        expect(code).toMatch(/__d\.createElement\('pdx-form'\)/);
+        expect(builds(code, 'pdx-form')).toBe(true);
     });
 
     // Each emitted `batchHandler(() => )`, `const __b = ;` or a literal <slot> element (#200).

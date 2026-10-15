@@ -1,7 +1,7 @@
 // core's staticBlock: a compiled block's static markup, built once and copied per render (#109).
 
 import { describe, it, expect } from 'vitest';
-import { staticBlock } from '../src/renderer/dom';
+import { staticBlock, staticMarkup } from '../src/renderer/dom';
 
 describe('staticBlock', () => {
     it('builds nothing until the first copy is asked for (#93), then builds once', () => {
@@ -37,6 +37,25 @@ describe('staticBlock', () => {
         // A copy changed by its render does not reach the next one.
         (one.firstChild as Element).setAttribute('class', 'changed');
         expect((block().firstChild as Element).getAttribute('class')).toBe('a');
+    });
+
+    it('staticMarkup builds the same block from HTML, an empty comment standing for an empty text node (#369)', () => {
+        const block = staticBlock(staticMarkup('<p class="a">hi<!----><b>x</b><!----></p><!---->'));
+        const frag = block();
+        const p = frag.firstChild as Element;
+        expect(p.outerHTML).toBe('<p class="a">hi<b>x</b></p>');
+        // The anchors the render reaches: empty TEXT nodes, where the comments were.
+        expect(Array.from(p.childNodes).map((n) => [n.nodeType, n.nodeValue])).toEqual([
+            [3, 'hi'], [3, ''], [1, null], [3, ''],
+        ]);
+        expect(frag.childNodes).toHaveLength(2);
+        expect([frag.lastChild!.nodeType, frag.lastChild!.nodeValue]).toEqual([3, '']);
+        expect(frag.ownerDocument).toBe(document);
+    });
+
+    it('the control: a comment with text is kept as a comment', () => {
+        const frag = staticBlock(staticMarkup('<i></i><!-- note -->'))();
+        expect([frag.lastChild!.nodeType, frag.lastChild!.nodeValue]).toEqual([8, ' note ']);
     });
 
     it('a component in the markup is the defined component in the copy', () => {

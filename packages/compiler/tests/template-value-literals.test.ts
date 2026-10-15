@@ -75,6 +75,15 @@ function walk(sf: ts.SourceFile): { identifiers: Set<string>; strings: string[];
     return { identifiers, strings, templateText };
 }
 
+/**
+ * The attribute values a string of HTML holds, decoded as the parser decodes the escapes the compiler
+ * writes (`&amp;`, `&quot;`, `&lt;`). In Chromium the parse itself is measured by responsive's
+ * static-markup-parse.spec.ts.
+ */
+function attributeValues(html: string): string[] {
+    return [...html.matchAll(/\s[\w-]+="([^"]*)"/g)].map((m) => m[1].replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&amp;/g, '&'));
+}
+
 describe('template values become string literals in the generated module (#69)', () => {
     for (const path of ['the render', 'a scoped slot body', 'the template generator'] as const) {
         for (const c of cases) {
@@ -88,6 +97,12 @@ describe('template values become string literals in the generated module (#69)',
                 }
                 expect(code.includes('</script'), 'a `</script` ends an inlined module').toBe(false);
                 expect(code.includes('\u2028'), 'a raw U+2028 is a line break to an older parser').toBe(false);
+                if (c.markup && c.value) {
+                    // The attribute is in the block's static markup, written as HTML (#369): the value
+                    // is in a string literal, escaped for HTML, and the parser decodes it.
+                    expect(strings.map(attributeValues).flat(), 'the value does not come back as written').toContain(c.value);
+                    return;
+                }
                 if (c.value) expect(strings, 'the value does not come back as written').toContain(c.value);
             });
         }

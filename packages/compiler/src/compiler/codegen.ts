@@ -55,6 +55,8 @@ export function compileSFC(
         templateOrigin?: number | null;
         /** The .pdx relative to the app root, for `component()`'s `file` — dev builds. */
         sourceFile?: string | null;
+        /** A block's static markup as HTML where the parser keeps it (#369); default true. */
+        staticMarkup?: boolean;
     },
     precomputedAnalysis?: ReturnType<typeof analyzeScript> | null,
 ): string {
@@ -70,7 +72,7 @@ export function compileSFC(
             for (const name of directives.keys()) customDirectives.add(name);
         }
     }
-    const ctx = createCompileContext({ production, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile });
+    const ctx = createCompileContext({ production, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup });
 
     if (descriptor.script) {
         // Reuse pre-computed analysis from compile() validation pass if available

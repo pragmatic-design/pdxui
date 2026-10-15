@@ -13,6 +13,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { ComponentResolver } from '../src/component-resolver';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
+import { createCompileContext } from '../src/compiler/compile-context';
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 import { parseTemplate } from '../src/parser/template';
 // The inline module imports it from core; the harness hands it the real one.
@@ -102,7 +103,8 @@ describe('the inline build binds a component prop the same way', () => {
         }
         expect(() => { (new Unconnected('PROBE-X') as unknown as Record<string, unknown>).offsetTop = 1; }, 'the premise').toThrow();
 
-        const iife = generateInlineNodes(parseTemplate('<probe-x :offset-top="top"></probe-x>'), new Set());
+        // DOM calls, not the HTML form (#369): these stub nodes cannot parse markup.
+        const iife = generateInlineNodes(parseTemplate('<probe-x :offset-top="top"></probe-x>'), new Set(), createCompileContext({ staticMarkup: false }));
         const document = withBlockCopies(
             { createDocumentFragment: () => new Unconnected('#fragment'), createElement: (t: string) => new Unconnected(t.toUpperCase()) },
             (n) => new Unconnected((n as Unconnected).tagName),

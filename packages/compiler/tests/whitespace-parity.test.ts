@@ -13,6 +13,7 @@ import { minifyHTML } from '../src/compiler/minify';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
 import { parseTemplate } from '../src/parser/template';
 import { compile } from '../src/plugin';
+import { createCompileContext } from '../src/compiler/compile-context';
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 
 interface FakeNode { tag?: string; data?: string; children: FakeNode[]; appendChild(c: FakeNode): FakeNode }
@@ -27,9 +28,15 @@ const document = withBlockCopies({
 }, (n) => node({ tag: (n as FakeNode).tag, data: (n as FakeNode).data }));
 const textOf = (n: FakeNode): string => (n.data ?? '') + n.children.map(textOf).join('');
 
+/**
+ * DOM calls, not the HTML form (#369): the stub cannot parse markup. The HTML form keeps the same
+ * whitespace text, which responsive's static-markup-parse.spec.ts measures in Chromium.
+ */
+const domCalls = () => createCompileContext({ staticMarkup: false });
+
 /** Render static markup on the INLINE path, the production default, and read its text. */
 function renderInline(markup: string): string {
-    const iife = generateInlineNodes(parseTemplate(markup), new Set<string>());
+    const iife = generateInlineNodes(parseTemplate(markup), new Set<string>(), domCalls());
     return textOf(new Function('document', 'staticBlock', `return ${iife};`)(document, stubStaticBlock(document)) as FakeNode);
 }
 
@@ -60,7 +67,7 @@ const shape = (n: FakeNode): string =>
     n.tag ? `${n.tag}[${n.children.map(shape).join(',')}]` : JSON.stringify(n.data ?? '');
 
 function renderTree(markup: string): string {
-    const iife = generateInlineNodes(parseTemplate(markup), new Set<string>());
+    const iife = generateInlineNodes(parseTemplate(markup), new Set<string>(), domCalls());
     const frag = new Function('document', 'staticBlock', `return ${iife};`)(document, stubStaticBlock(document)) as FakeNode;
     return frag.children.map(shape).join(',');
 }

@@ -2,6 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { markup } from './static-markup-of';
 
 describe('scoped slot compilation', () => {
     it('compiles <slot> with :bindings to renderSlot()', () => {
@@ -37,9 +38,9 @@ let x = $signal(0);
 </script>`;
 
         const result = compile(source, 'panel.pdx');
-        // Without :bindings, the slot stays an element (basic slot projection), with its name
-        // Built by the block's builder (#109): created, put in its parent, then named.
-        expect(result.code).toMatch(/const (__el\d+)=__d\.createElement\('slot'\);__el\d+\.appendChild\(\1\);\1\.setAttribute\("name", "header"\)/);
+        // Without :bindings, the slot stays an element (basic slot projection), with its name, and
+        // its default content inside it: in the block's static markup (#109), written as HTML (#369).
+        expect(markup(result.code).join('')).toContain('<slot name="header">Default Header</slot>');
         expect(result.code).not.toContain('renderSlot');
     });
 

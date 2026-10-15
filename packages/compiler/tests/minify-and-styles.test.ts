@@ -5,6 +5,7 @@ import { minifyHTML } from '../src/compiler/minify';
 import { minifyCSS, hash, extractCSSBindings, styleModuleId, parseStyleModuleId, styleCssFor } from '../src/compiler/codegen-styles';
 import { compile } from '../src/plugin';
 import { parseSFC } from '../src/parser/sfc';
+import { markup } from './static-markup-of';
 
 // ─── HTML Minification ──────────────────────────────────────────
 
@@ -68,24 +69,23 @@ describe('a production compile keeps the text the author wrote', () => {
     const SOURCE = '<template>\n  <button>clicked {{ count }} times</button>\n</template>\n'
         + '\n<script setup>\nlet count = $signal(0);\n</script>\n';
 
-    // The whole emitted module. The inline render (#107) writes the text around an interpolation as
-    // text nodes of their own: `clicked `, the bound value, ` times`.
+    // The block's static markup. The inline render (#107) writes the text around an interpolation as
+    // text nodes of their own — `clicked `, the bound value, ` times` — in the block's HTML (#369),
+    // where the bound value's text node is written `<!---->`.
     function render(minify: boolean): string {
-        return compile(SOURCE, 'C:/tmp/probe.pdx', undefined, undefined, { minify }).code;
+        return markup(compile(SOURCE, 'C:/tmp/probe.pdx', undefined, undefined, { minify }).code).join('');
     }
-    const VISIBLE = ['__d.createTextNode("clicked ")', '__d.createTextNode(" times")'];
+    const VISIBLE = '<button>clicked <!----> times</button>';
 
     it('emits both spaces with minification on', () => {
-        for (const text of VISIBLE) expect(render(true)).toContain(text);
+        expect(render(true)).toContain(VISIBLE);
     });
 
     it('and the two modes agree', () => {
         // The claim is about the TEXT a reader sees. Minification collapsing whitespace BETWEEN TAGS
         // is correct and expected; the spaces inside the sentence must not differ.
-        for (const text of VISIBLE) {
-            expect(render(false), 'dev').toContain(text);
-            expect(render(true), 'prod').toContain(text);
-        }
+        expect(render(false), 'dev').toContain(VISIBLE);
+        expect(render(true), 'prod').toContain(VISIBLE);
     });
 });
 

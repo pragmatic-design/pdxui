@@ -619,6 +619,11 @@ export interface CompileOptions {
     /** Production mode: enables CSS minification and optimizations. Default: false. */
     production?: boolean;
     /**
+     * Write a block's static markup as HTML where the parser keeps it exactly (#369). Default: true.
+     * False keeps one DOM call per node: what the test that proves the two equal compares it with.
+     */
+    staticMarkup?: boolean;
+    /**
      * The .pdx as the app knows it, relative to its root (`src/pages/login.pdx`). Registered with the
      * component so a runtime error names its file. The dev server passes it; a production
      * build ignores it.
@@ -841,7 +846,7 @@ export function compile(
     let code = compileSFC(
         descriptor, ast, filename, runner,
         { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
-          sourceFile: options?.sourceFile,
+          sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.
           templateOrigin: descriptor.template && !descriptor.template.src && !options?.minify ? descriptor.template.start : null },

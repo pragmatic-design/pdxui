@@ -7,6 +7,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pdx } from '../src/plugin';
+import { builds } from './static-markup-of';
 
 type Hooks = {
     config: (c: object, e: { command: string }) => unknown;
@@ -39,7 +40,7 @@ describe('pdx({ inlineBindings }) is ignored', () => {
             expect(warnings.find(w => w.code === 'PDX_INLINE_BINDINGS_IGNORED')!.message).toMatch(/no longer selects a render path/);
             const out = plugin.transform(SFC, join(root, 'src', 'card.pdx'))!;
             expect(out.code).not.toMatch(/\bhtml`/);
-            expect(out.code).toMatch(/__d\.createElement\('p'\)/);
+            expect(builds(out.code, 'p')).toBe(true);
         });
     }
 

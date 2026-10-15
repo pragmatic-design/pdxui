@@ -12,6 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { markup, builds } from './static-markup-of';
 
 const OPTS = { production: true };
 
@@ -120,9 +121,10 @@ describe('the markup details the inline path has to get right on its own', () =>
         // The runtime path gets this from the HTML parser; the inline path has its own list.
         const code = inline('<div><br><img src="x.png"><input></div>');
         parses(code);
-        expect(code).toContain("createElement('br')");
-        expect(code).toContain("createElement('img')");
-        expect(code).toContain("createElement('input')");
+        // In the block's HTML (#369): no closing tag, which would be an end tag the parser ignores at
+        // best and an element at worst.
+        expect(builds(code, 'br') && builds(code, 'img') && builds(code, 'input')).toBe(true);
+        expect(markup(code).join('').trim()).toBe('<div><br><img src="x.png"><input></div>');
     });
 
     it('an HTML comment produces no node', () => {
@@ -136,9 +138,9 @@ describe('the markup details the inline path has to get right on its own', () =>
         // Four runs of whitespace here: around the <div> at the template's root, and inside it.
         const code = inline('<div>\n    <span>x</span>\n</div>');
         parses(code);
-        expect(code.match(/createTextNode\(" "\)/g) ?? []).toHaveLength(4);
-        expect(code.match(/createTextNode\("x"\)/g) ?? []).toHaveLength(1);
-        expect(code, 'a run of whitespace is kept as one space, not as typed').not.toMatch(/createTextNode\("\\n/);
+        // In the block's HTML (#369): one space each, where the parser keeps them.
+        // A run of whitespace is kept as one space, not as typed.
+        expect(markup(code).join('')).toBe(' <div> <span>x</span> </div> ');
     });
 
     it('a named key modifier becomes the key the browser reports', () => {

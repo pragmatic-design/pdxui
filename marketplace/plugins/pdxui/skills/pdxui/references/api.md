@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-456 value exports.
+457 value exports.
 
 ### `__adoptStyles`
 
@@ -5023,6 +5023,21 @@ The markup is built on the first call, not at import (#93), into a `<template>`'
 document has no custom-element registry and loads nothing, so no component constructor runs and no
 image is fetched while it is built. Each call returns `importNode` of it, which brings the copy into
 the page and upgrades its components, as `createElement` did.
+
+### `staticMarkup`
+
+```ts
+import { staticMarkup } from '@pdxui/core';
+
+function staticMarkup(html: string): (frag: DocumentFragment, doc: Document) => void
+```
+
+A block's static markup written as HTML (#369): the builder `staticBlock` runs. Far shorter than
+one DOM call per node, and the compiler emits it only for a block the HTML parser keeps exactly as
+its own tree. Parsed once, in the inert document `staticBlock` builds in.
+
+An empty comment `<!---->` stands for an empty text node — an anchor the render binds, which no
+parse can produce — and is replaced by one. A comment the markup really holds is never empty.
 
 ### `status`
 

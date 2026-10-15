@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { compile } from '../src/plugin';
 import { parseTemplate } from '../src/parser/template';
 import { generateInlineNodes, ATTR_TO_PROP } from '../src/compiler/codegen-template-inline';
+import { createCompileContext } from '../src/compiler/compile-context';
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 // The generated code imports them from core; the harness hands it the real ones, so the stub cases
 // measure the rule both builds share, not a copy of it.
@@ -104,7 +105,8 @@ function live(template: string, values: Record<string, unknown>): { el: StubElem
     const current = { ...values };
     let reading: Set<string> | null = null;
     const ctx = Object.fromEntries(Object.keys(values).map(k => [k, () => { reading?.add(k); return current[k]; }]));
-    const iife = generateInlineNodes(parseTemplate(template), new Set());
+    // DOM calls, not the HTML form (#369): the stub elements cannot parse markup.
+    const iife = generateInlineNodes(parseTemplate(template), new Set(), createCompileContext({ staticMarkup: false }));
     const document = withBlockCopies({
         createDocumentFragment: () => new StubElement('#fragment'),
         createElement: (t: string) => new StubElement(t.toUpperCase()),

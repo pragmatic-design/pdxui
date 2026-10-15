@@ -19,7 +19,8 @@ describe('a directive with no handler', () => {
     });
 
     it('is the same comment on the inline path, not nothing', () => {
+        // In the block's static markup, written as HTML (#369).
         expect(generateInlineNodes(nodes(), new Set(), createCompileContext()))
-            .toContain('__d.createComment(" unknown directive @tooltip ")');
+            .toContain('<!-- unknown directive @tooltip -->');
     });
 });

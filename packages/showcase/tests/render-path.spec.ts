@@ -23,10 +23,15 @@ test('the app\'s own pages are compiled through the inline render path', () => {
     expect(chunks, 'no chunk carries the intervention page — this measures nothing').toHaveLength(1);
     const code = readFileSync(join(DIST, chunks[0]), 'utf8');
 
-    // The template path keeps the page's markup as a string an `html` tag parses at runtime.
-    expect(code, 'the page is a template literal: the build ran the template path')
-        .not.toContain(`data-test="${MARKER}"`);
-    // The inline path builds the same element with DOM calls.
-    expect(code, 'the page builds no DOM: the build did not run the inline path')
-        .toContain('createElement(');
+    // Both paths carry the page's markup as a string since #369, so the string alone says nothing:
+    // what differs is where a binding goes. The template path writes it into the markup, `${…}`,
+    // for an `html` tag to turn into a placeholder at runtime; the inline path writes an empty
+    // anchor, `<!---->`, that the render's walk reaches and binds.
+    const at = code.indexOf(`data-test="${MARKER}"`);
+    expect(at, 'the marker is not in the page\'s markup').toBeGreaterThan(-1);
+    const element = code.slice(at, code.indexOf('</span>', at));
+    expect(element, 'the page binds inside a template literal: the build ran the template path')
+        .not.toContain('${');
+    expect(element, 'the page has no anchor for its binding: the build did not run the inline path')
+        .toContain('<!---->');
 });

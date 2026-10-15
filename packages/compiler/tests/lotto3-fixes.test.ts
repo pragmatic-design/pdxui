@@ -3,6 +3,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { markup } from './static-markup-of';
 
 const tpl = (script: string, template = '<div></div>') =>
     `<template>${template}</template>\n<script setup>\n${script}\n</script>`;
@@ -112,7 +113,8 @@ describe('raw ${...} in a normal attribute is written as text, never evaluated',
     it('a component-level ${signal} attribute', () => {
         const src = tpl('let count = $signal(0);', '<div title="${count}"></div>');
         const { code, warnings } = compile(src, 'l127.pdx');
-        expect(code).toContain('setAttribute("title", "${count}")');
+        // In the block's HTML (#369), as text.
+        expect(markup(code).join('')).toContain('<div title="${count}"></div>');
         expect(warnings.map(w => w.code)).toContain('PDX_RAW_INTERPOLATION');
     });
 
@@ -120,7 +122,7 @@ describe('raw ${...} in a normal attribute is written as text, never evaluated',
         const src = tpl('let items = $signal([]);',
             '@for (items as item; track item.id) { <div title="${item.name}"></div> }');
         const { code, warnings } = compile(src, 'l127b.pdx');
-        expect(code).toContain('setAttribute("title", "${item.name}")');
+        expect(markup(code).join('')).toContain('<div title="${item.name}"></div>');
         expect(warnings.map(w => w.code)).toContain('PDX_RAW_INTERPOLATION');
     });
 });

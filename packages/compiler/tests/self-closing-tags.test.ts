@@ -33,7 +33,9 @@ function inlineTree(template: string): Node {
         addEventListener(): void { /* idem */ }
         appendChild(c: Node): Node { this.children.push(c); return c; }
     }
-    const iife = generateInlineNodes(parseTemplate(template), new Set());
+    // DOM calls, not the HTML form (#369): the stub cannot parse markup. The HTML form's parse is
+    // measured in Chromium (responsive's static-markup-parse.spec.ts).
+    const iife = generateInlineNodes(parseTemplate(template), new Set(), createCompileContext({ staticMarkup: false }));
     const document = withBlockCopies({
         createDocumentFragment: () => new Stub('#fragment'),
         createElement: (t: string) => new Stub(t),

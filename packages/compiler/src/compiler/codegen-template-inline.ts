@@ -312,7 +312,7 @@ class InlineGen {
                 // emitted: a node per gap on every row of a table (#111).
                 const blank = /^\s+$/.test(text);
                 if (text && !(blank && this.inTable())) {
-                    this.tree.text(jsString(blank ? ' ' : decodeEntities(text)));
+                    this.tree.text(blank ? ' ' : decodeEntities(text));
                 }
                 i = next === -1 ? content.length : next;
                 continue;
@@ -385,7 +385,7 @@ class InlineGen {
         if (!this.tree.discarding()) this.tags.add(kind.tag);
         this.tree.element(el, svg
             ? `__d.createElementNS(${jsString(SVG_NS)}, ${jsQuote(name)})`
-            : `__d.createElement(${jsQuote(name)})`, isVoid);
+            : `__d.createElement(${jsQuote(name)})`, isVoid, name, svg);
         // An element the render binds — an attribute that became a statement of the render — is one
         // the walk reaches.
         const before = this.lines.length;
@@ -429,7 +429,7 @@ class InlineGen {
         const staticClassValue = staticClass ? (staticClass[1] ?? staticClass[2]) : '';
         // Match: a `:class.x` binding, after the object expansion above. Groups: [1]=the class
         const toggled = [...s.matchAll(/\s:class\.([\w-]+)/g)].map(t => t[1]);
-        if (staticClass) this.tree.statement(`${el}.setAttribute("class", ${jsString(staticClassValue)});`);
+        if (staticClass) this.tree.attribute(el, 'class', staticClassValue);
         let m;
         while ((m = re.exec(s)) !== null) {
             const n = m[1];
@@ -446,7 +446,7 @@ class InlineGen {
                 if (raw) {
                     // In @raw it is what the author wrote, and the browser reads it as a plain value:
                     // the template path's markup shows `${x}`, and so does this (#71).
-                    this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(s.slice(open, close + 1))});`);
+                    this.tree.attribute(el, n, s.slice(open, close + 1));
                     continue;
                 }
                 val = s.slice(open + 2, close);
@@ -467,11 +467,11 @@ class InlineGen {
             else if (n === 'class')           continue; // written first, above
             else if (val && n === 'data-part' && this.ctx.parts.has(val)) {
                 // A declared part (#134): the attribute is written, and the element is the part's ref.
-                this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(val)});`);
+                this.tree.attribute(el, n, val);
                 this.refBind(el, val);
             }
-            else if (val)                     this.tree.statement(`${el}.setAttribute(${jsString(n)}, ${jsString(decodeEntities(val))});`);
-            else                              this.tree.statement(`${el}.setAttribute(${jsString(n)}, '');`);
+            else if (val)                     this.tree.attribute(el, n, decodeEntities(val));
+            else                              this.tree.attribute(el, n, '');
             this.pending = '';
         }
     }
@@ -727,7 +727,7 @@ class InlineGen {
         g.walk(nodes);
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);
-        return { code: `${g.tree.prologue(this.hoists, this.imports).join('')}${g.lines.join('')}return __frag;`, tags: g.tags };
+        return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup).join('')}${g.lines.join('')}return __frag;`, tags: g.tags };
     }
 
     private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
@@ -952,7 +952,7 @@ class InlineGen {
         // A directive the parser read with no handler to generate it: the comment the template path
         // writes, not nothing (#100). compile() cannot reach it — the parser reads exactly the names
         // that have a handler — but a caller of generateInlineNodes with its own context can.
-        this.tree.comment(jsString(` unknown directive @${node.name} `));
+        this.tree.comment(` unknown directive @${node.name} `);
     }
 
     // ─── Build Output ─────────────────────────────────────────
@@ -965,7 +965,7 @@ class InlineGen {
             if (shared.decls.length > 0) this.imports.add('computed');
             lines = [...shared.decls, ...shared.lines];
         }
-        const prologue = this.tree.prologue(this.hoists, this.imports);
+        const prologue = this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup);
         // One keyed selector per signal a @for compares its key with (#117), owned by the render.
         const selectors = [...this.ctx.selectors].map(n => `const ${selectorName(n)}=selector(()=>ctx.${n}());`);
         if (selectors.length > 0) this.imports.add('selector');

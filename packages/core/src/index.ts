@@ -137,7 +137,7 @@ export { DEV } from './utils/env';
 export { html, clearBoundProperty, assignBoundProperty, bindTwoWay, bindInterpolation, bindRef, interpolationText } from './renderer/template';
 export { repeat } from './renderer/list';
 export { repeatWithSlot } from './renderer/slot-repeat';
-export { setProp, bindGesture, insert, remove, text, marker, staticBlock, __staticHTML } from './renderer/dom';
+export { setProp, bindGesture, insert, remove, text, marker, staticBlock, staticMarkup, __staticHTML } from './renderer/dom';
 export { delegate } from './renderer/delegate';
 
 // Error Boundary

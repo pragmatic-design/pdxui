@@ -54,26 +54,29 @@ beforeAll(() => {
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
 describe('what a vite.config.ts gets', () => {
-    // The marker is the component's own MARKUP, `<p class="line"`, not the string `html\``: the
-    // bundle contains the whole of `@pdxui/core`, and core's renderer uses `html\`` itself. An
-    // assertion on that string is red on the inline build for a reason that has nothing to do with
-    // the component — measured, not guessed.
-    const MARKUP = '<p class="line"';
+    // The markers are the component's own MARKUP, not the string `html\``: the bundle contains the
+    // whole of `@pdxui/core`, and core's renderer uses `html\`` itself. An assertion on that string
+    // is red on the inline build for a reason that has nothing to do with the component — measured,
+    // not guessed.
+    //
+    // The inline path writes the block's STATIC markup as HTML (#369): `:title` is a binding of the
+    // render, so the element is `<p class="line">` and its bound text an empty comment. The template
+    // path carried the binding inside the tag: `<p class="line" :title=…`.
+    const INLINE = '<p class="line"><!----></p>';
+    const TEMPLATE = /<p class="line"\s+:?title/;
 
-    it('by default: a production build builds its DOM imperatively, and says nothing', async () => {
+    it('by default: a production build builds its DOM inline, and says nothing', async () => {
         const { code, warnings } = await buildWith({ devtools: false });
 
-        expect(code, 'a default production build did not take the inline path')
-            .toContain('__d.createElement("p")');
-        expect(code, 'the markup string is in the bundle: the template path was taken')
-            .not.toContain(MARKUP);
+        expect(code, 'a default production build did not take the inline path').toContain(INLINE);
+        expect(code, 'the bound markup is in the bundle: the template path was taken').not.toMatch(TEMPLATE);
         expect(warnings).not.toContain('PDX_INLINE_BINDINGS_IGNORED');
     }, 120_000);
 
     it('pdx({ inlineBindings: false }) is reported and changes nothing: the build is still inline', async () => {
         const { code, warnings } = await buildWith({ devtools: false, inlineBindings: false });
         expect(warnings).toContain('PDX_INLINE_BINDINGS_IGNORED');
-        expect(code, 'inlineBindings: false still reached the compiler').not.toContain(MARKUP);
-        expect(code).toContain('__d.createElement("p")');
+        expect(code, 'inlineBindings: false still reached the compiler').not.toMatch(TEMPLATE);
+        expect(code).toContain(INLINE);
     }, 120_000);
 });

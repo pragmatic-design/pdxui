@@ -16,10 +16,17 @@ import { compile } from '../src/plugin';
 import { jsString } from '../src/compiler/js-literal';
 import { templateGenerator } from './template-generator';
 
-/** The render of `template`; with `inSlot`, inside a scoped slot's body, which is built inline too since #364. */
+/**
+ * The render of `template`; with `inSlot`, inside a scoped slot's body, which is built inline too since #364.
+ *
+ * With DOM calls (#369): what is measured is the decoding into the static markup's text and values,
+ * which both forms of the builder share. The HTML form writes them escaped again and the parser
+ * decodes them: static-markup-html.test.ts holds the escaping, and responsive's
+ * static-markup-parse.spec.ts the parse, in Chromium.
+ */
 const emitted = (template: string, inSlot = false): string =>
     compile(`<template>${inSlot ? `<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>` : template}</template>\n<script setup>\nlet _x = $signal(0);\n</script>`,
-        'e.pdx', [], undefined, { production: true }).code;
+        'e.pdx', [], undefined, { production: true, staticMarkup: false }).code;
 
 describe('text a reader sees', () => {
     it('a numeric entity becomes its character', () => {

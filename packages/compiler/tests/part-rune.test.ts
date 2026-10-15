@@ -4,6 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { markup } from './static-markup-of';
 import { analyzeScript } from '../src/compiler/script-analyzer';
 import { validate } from '../src/compiler/validate';
 import { parseTemplate } from '../src/parser/template';
@@ -19,7 +20,8 @@ function codes(template: string, script: string, code: string) {
 describe('@part compiles into a ref and the descriptor', () => {
     it('the element is the part\'s ref, and keeps its data-part', () => {
         const { code } = compile(pdx('<button data-part="trigger">x</button>', '@part trigger;'), 'test.pdx');
-        expect(code).toContain(`setAttribute("data-part", "trigger")`);
+        // Kept in the block's static markup, written as HTML (#369).
+        expect(markup(code).join('')).toContain('<button data-part="trigger">x</button>');
         expect(code).toMatch(/bindRef\(__el\d+,ctx\.trigger\)/);
         expect(code).toContain(`const __trigger = signal(null`);
         expect(code).toContain(`parts: ['trigger'],`);
