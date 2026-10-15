@@ -15,6 +15,7 @@ import { validateStyles } from './compiler/validate-styles';
 import { validateDesign } from './compiler/validate-design';
 import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
+import { validateDynamicContent } from './compiler/dynamic-content';
 import { routeLayout } from './compiler/codegen-shared';
 import { minifyHTML } from './compiler/minify';
 import { locateBoundName } from './compiler/codegen-prop-names';
@@ -804,6 +805,8 @@ export function compile(
     allWarnings.push(...validateDeclarations(descriptor, source));
     // A $signal's value changed in place: the signal is never set, and nothing updates.
     allWarnings.push(...validateSignalMutation(descriptor, cachedAnalysis, source, ast));
+    // Content inside `<component :is>`: no render path renders it (#358).
+    if (descriptor.template) allWarnings.push(...validateDynamicContent(descriptor.template.content, descriptor.template.start, source));
 
     // A `${` inside a bound value would be written into the module as it is, and the module would not
     // parse: the build would die in rollup, far from the line at fault. Stop here, at the line.

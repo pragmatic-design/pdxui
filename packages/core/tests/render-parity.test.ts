@@ -266,6 +266,12 @@ const ROWS: Row[] = [
         script: "let tag = $signal('x-probe');",
         act: click('button'),
     },
+    // What `<component :is>` encloses is not rendered, and what follows its closing tag is (#358): the
+    // template path put the content beside the component, the inline path dropped it. Recorded as decided.
+    {
+        name: 'content inside <component :is>', expected: '<x-probe></x-probe><p>after</p>',
+        template: '<component :is="tag"><b>inside</b></component><p>after</p>', script: "let tag = $signal('x-probe');",
+    },
     // The inline path emitted `const __b = ;` for a binding with no value (#200).
     { name: ':name shorthand', expected: '<input></input>', expectedRead: 'a', template: '<input :value>', script: "let value = $signal('a');", read: (h) => h.querySelector('input')!.value },
     // The inline path wrote a literal <slot> element, with a `row` property, around its default (#200).

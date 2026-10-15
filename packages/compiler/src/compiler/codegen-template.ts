@@ -16,6 +16,7 @@ import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
 import { escapeForTemplateLiteral } from './codegen-shared';
 import { virtualRowTag } from './validate-virtual';
+import { dropDynamicContent } from './dynamic-content';
 
 /** `${…}` with an origin mark just inside its `${`, where it is part of the expression, not the HTML. */
 function markInterpolation(code: string, mark: string): string {
@@ -30,6 +31,8 @@ function markInterpolation(code: string, mark: string): string {
  * Tracks which @pdxui/core imports are needed (when, each, match, etc).
  */
 export function generateNodes(nodes: TemplateNode[], imports: Set<string>, ctx: CompileContext): string {
+    // What a `<component :is>` encloses renders nowhere: no content, no stray `</component>` (#358).
+    nodes = dropDynamicContent(nodes);
     if (nodes.length === 0) return 'html``';
 
     const parts: string[] = [];

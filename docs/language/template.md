@@ -627,9 +627,9 @@ back; the cache keeps at most 10, least recently used first out — `@keepAlive(
 
 #### Rules
 
-- Both render paths compile it to the same `dynamic(…)` call; what is written between
-  `<component>` and `</component>` is dropped on the inline path and rendered beside the component
-  on the template path (#358).
+- Both render paths compile it to the same `dynamic(…)` call. The component it becomes takes no
+  children: what is written between `<component :is>` and `</component>` is not rendered on either
+  path, and anything but whitespace there is `PDX_DYNAMIC_CONTENT` (warn) (#358).
 - `@keepAlive(n)` takes a whole number of at least 1; anything else is `PDX_KEEPALIVE_MAX` (error),
   and the default of 10 applies.
 - Only `:is`, `:prop` bindings and the three options are read; an `@event`, a `::` binding or a plain

@@ -350,6 +350,10 @@ When the component to show is decided at runtime (a tab router, swappable views)
 With `@keepAlive` the compiler generates an LRU cache: visited views stay "frozen" instead of being
 rebuilt every time you come back.
 
+The component it becomes takes no children: write the tag self-closed, and pass what the view needs
+as props (`<component :is="view" :title="t" />`). Content between `<component :is>` and
+`</component>` is not rendered, and the compiler says so (`PDX_DYNAMIC_CONTENT`).
+
 ## Handle errors: `@try` / `@catch`
 
 A subtree can fail (a component that throws, malformed data). `@try` isolates it:
