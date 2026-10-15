@@ -1,10 +1,10 @@
-// A popup that adds its click-outside listener on a timer must cancel the timer when it closes (#163).
+// A popup closed — or removed — at once leaves no click-outside listener on the document (#163).
 //
-// pdx-dropdown-menu, pdx-context-menu and pdx-menubar add a `mousedown` listener on `document` 10 ms
-// after they open, pdx-inline-edit on the next task after it starts editing. Closed — or removed —
-// before that, they got the listener anyway: added after the close ran, nothing removed it. In a
-// test whose environment was gone the timer reached for a `document` that no longer existed, which
-// is how it surfaced. pdx-split-button had the same defect and was fixed the same way before.
+// pdx-dropdown-menu, pdx-context-menu and pdx-menubar added a `mousedown` listener on `document` 10 ms
+// after they opened, pdx-inline-edit on the next task after it started editing. Closed before that,
+// they got the listener anyway: added after the close ran, nothing removed it. #163 cancelled the
+// timer on close; #427 removed the timer, so the listener is added when the popup opens and the close
+// removes it. Either way, what is measured is the listener left behind.
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
@@ -69,15 +69,22 @@ const POPUPS: Popup[] = [
     },
 ];
 
-/** The mousedown listeners added to `document` while `fn` runs and for `ms` after it. */
+/**
+ * The mousedown listeners left on `document` by `fn` and the `ms` after it: added minus removed.
+ * Since #427 the listener is added when the popup opens, not by a timer, so a close removes one that
+ * was added; what must hold is that none is left.
+ */
 async function mousedownsAdded(fn: () => void, ms: number): Promise<number> {
-    const spy = vi.spyOn(document, 'addEventListener');
+    const add = vi.spyOn(document, 'addEventListener');
+    const remove = vi.spyOn(document, 'removeEventListener');
     try {
         fn();
         await tick(ms);
-        return spy.mock.calls.filter((c) => c[0] === 'mousedown').length;
+        const count = (calls: unknown[][]) => calls.filter((c) => c[0] === 'mousedown').length;
+        return count(add.mock.calls) - count(remove.mock.calls);
     } finally {
-        spy.mockRestore();
+        add.mockRestore();
+        remove.mockRestore();
     }
 }
 

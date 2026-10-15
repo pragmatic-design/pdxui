@@ -6,6 +6,7 @@ import { component, html, signal, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { setOwnProp } from '../shared/own-prop';
+import { onPressOutside } from '../shared/press-outside';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tree-select';
@@ -85,7 +86,8 @@ component('pdx-tree-select', {
         let _clearEl: HTMLButtonElement | null = null;
         let _hiddenEl: HTMLInputElement | null = null;
         let _popover: ReturnType<typeof usePopover> | null = null;
-        let _outsideHandler: ((e: MouseEvent) => void) | null = null;
+        /** Removes the press-outside listener, added when the panel opens (#427). */
+        let _outsideDispose: (() => void) | null = null;
 
         // ─── Keyboard: the APG tree, driven from the trigger ──────
         // Focus stays on the trigger (or the search field), and aria-activedescendant names the
@@ -163,25 +165,19 @@ component('pdx-tree-select', {
                 walk(getOptions());
                 _expanded.set(all);
             }
-            // Close on click outside (guard: a destroy is possible inside the timeout's window)
-            setTimeout(() => {
-                if (!_open.peek()) return;
-                _outsideHandler = (e: MouseEvent) => {
-                    const el = ctx.el;
-                    if (!el.contains(e.target as Node)) closePopover();
-                };
-                document.addEventListener('mousedown', _outsideHandler);
-            }, 0);
+            // Close on a press outside, listened for from now (#427). A reopen replaces the listener.
+            _outsideDispose?.();
+            _outsideDispose = onPressOutside({
+                inside: (t) => ctx.el.contains(t),
+                outside: () => closePopover(),
+            });
             ctx.emit('pdx-open', undefined, { bubbles: false });
         }
 
         // Teardown on destroy: without it, an unmount with the popover open would leave the
         // mousedown on document orphaned forever.
         ctx.track(() => () => {
-            if (_outsideHandler) {
-                document.removeEventListener('mousedown', _outsideHandler);
-                _outsideHandler = null;
-            }
+            _outsideDispose?.(); _outsideDispose = null;
             // Its scroll/resize listeners and ResizeObserver go with the component.
             _popover?.dispose();
             _popover = null;
@@ -192,10 +188,7 @@ component('pdx-tree-select', {
             _open.set(false);
             _search.set('');
             if (_searchInputEl) _searchInputEl.value = '';
-            if (_outsideHandler) {
-                document.removeEventListener('mousedown', _outsideHandler);
-                _outsideHandler = null;
-            }
+            _outsideDispose?.(); _outsideDispose = null;
             _activeValue = null;
             applyActive();
             // The search field goes away with the panel: focus back on the trigger, not <body>.

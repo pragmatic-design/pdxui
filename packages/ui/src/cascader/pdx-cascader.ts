@@ -7,6 +7,7 @@ import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 import { setOwnProp } from '../shared/own-prop';
+import { onPressOutside } from '../shared/press-outside';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/cascader';
@@ -96,7 +97,8 @@ component('pdx-cascader', {
         let _iconEl: HTMLElement | null = null;
         let _hiddenEl: HTMLInputElement | null = null;
         let _popover: ReturnType<typeof usePopover> | null = null;
-        let _outsideHandler: ((e: MouseEvent) => void) | null = null;
+        /** Removes the press-outside listener, added when the panel opens (#427). */
+        let _outsideDispose: (() => void) | null = null;
 
         function getOptions(): CascaderNode[] {
             return (ctx.options() as CascaderNode[]) || [];
@@ -263,26 +265,19 @@ component('pdx-cascader', {
             _searchCursor.set(-1);
             _kbd.set(fromKeyboard);
             _open.set(true);
-            // Close on click outside (guard: the component may be destroyed
-            // inside the setTimeout's window)
-            setTimeout(() => {
-                if (!_open.peek()) return;
-                _outsideHandler = (e: MouseEvent) => {
-                    const el = ctx.el;
-                    if (!el.contains(e.target as Node)) closePopover();
-                };
-                document.addEventListener('mousedown', _outsideHandler);
-            }, 0);
+            // Close on a press outside, listened for from now (#427). A reopen replaces the listener.
+            _outsideDispose?.();
+            _outsideDispose = onPressOutside({
+                inside: (t) => ctx.el.contains(t),
+                outside: () => closePopover(),
+            });
             ctx.emit('pdx-open', undefined, { bubbles: false });
         }
 
         // Teardown on destroy: otherwise an unmount with the popover open would
         // leave the mousedown on document orphaned forever.
         ctx.track(() => () => {
-            if (_outsideHandler) {
-                document.removeEventListener('mousedown', _outsideHandler);
-                _outsideHandler = null;
-            }
+            _outsideDispose?.(); _outsideDispose = null;
             // Its scroll/resize listeners and ResizeObserver go with the component.
             _popover?.dispose();
             _popover = null;
@@ -292,10 +287,7 @@ component('pdx-cascader', {
             _open.set(false);
             _search.set('');
             if (_searchInputEl) _searchInputEl.value = '';
-            if (_outsideHandler) {
-                document.removeEventListener('mousedown', _outsideHandler);
-                _outsideHandler = null;
-            }
+            _outsideDispose?.(); _outsideDispose = null;
             ctx.emit('pdx-close', undefined, { bubbles: false });
         }
 

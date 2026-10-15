@@ -1,8 +1,7 @@
-// The column chooser and the filter popover attach their outside-click and scroll listeners a tick
-// after they open, so the click that opened them does not close them. Closing them through their
-// exported close — what the grid, its toolbar and a reopen call — must take those listeners away,
-// whether they are already attached or still pending; otherwise they stay on the document and
-// window with nothing to remove them, and a pending one fires into a torn-down environment.
+// The column chooser and the filter popover attach their outside-click and scroll listeners when
+// they open (#427; a tick later before it). Closing them through their exported close — what the
+// grid, its toolbar and a reopen call — must take those listeners away; otherwise they stay on the
+// document and window with nothing to remove them.
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';

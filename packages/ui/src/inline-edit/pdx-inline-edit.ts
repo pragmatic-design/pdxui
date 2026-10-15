@@ -7,6 +7,7 @@ import { component, html, signal, untracked } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 import { setOwnProp } from '../shared/own-prop';
+import { onPressOutside } from '../shared/press-outside';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -84,9 +85,8 @@ component('pdx-inline-edit', {
         // _actionsEl reserved for future use (action buttons container)
         let _hiddenEl: HTMLInputElement | null = null;
         let _rootEl: HTMLElement | null = null;
-        let _outsideHandler: ((e: MouseEvent) => void) | null = null;
-        /** The pending timer that adds `_outsideHandler`: removeOutsideHandler() cancels it too (#163). */
-        let _outsideTimer: ReturnType<typeof setTimeout> | null = null;
+        /** Removes the press-outside listener, added when editing starts (#427). */
+        let _outsideDispose: (() => void) | null = null;
 
         function getType(): string {
             return (ctx.type() as string) || 'text';
@@ -185,23 +185,18 @@ component('pdx-inline-edit', {
             // Rating: show editor inline (no separate edit mode needed)
             _editing.set(true);
             // Click outside → auto-confirm (unless action mode)
+            // listened for from now (#427); a second start replaces the listener.
             if ((ctx.saveOn() as string) !== 'action') {
-                _outsideTimer = setTimeout(() => {
-                    _outsideTimer = null;
-                    _outsideHandler = (e: MouseEvent) => {
-                        if (!ctx.el.contains(e.target as Node)) confirmEdit();
-                    };
-                    document.addEventListener('mousedown', _outsideHandler);
-                }, 0);
+                removeOutsideHandler();
+                _outsideDispose = onPressOutside({
+                    inside: (t) => ctx.el.contains(t),
+                    outside: () => confirmEdit(),
+                });
             }
         }
 
         function removeOutsideHandler(): void {
-            if (_outsideTimer) { clearTimeout(_outsideTimer); _outsideTimer = null; }
-            if (_outsideHandler) {
-                document.removeEventListener('mousedown', _outsideHandler);
-                _outsideHandler = null;
-            }
+            _outsideDispose?.(); _outsideDispose = null;
         }
 
         // Teardown on destroy: otherwise unmounting while editing would leave the

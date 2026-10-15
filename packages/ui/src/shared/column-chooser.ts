@@ -4,6 +4,7 @@
 // ─── Types ─────────────────────────────────────────────────
 
 import { uiString } from './i18n';
+import { onPressOutside } from './press-outside';
 
 export interface ColumnChooserItem {
     field: string;
@@ -148,28 +149,24 @@ export function openColumnChooser(
 
     document.body.appendChild(menu);
 
-    // Close on outside click or scroll. Attached a tick later, so the click that opened the menu
-    // does not close it; every close — these two, a reopen, the grid's own — goes through
-    // closeColumnChooser, which detaches them.
-    const onClickOutside = (e: MouseEvent) => {
-        if (!menu.contains(e.target as Node) && e.target !== anchorEl) closeColumnChooser();
-    };
+    // Close on a press outside or a scroll, listened for from now (#427): the press that opened the
+    // menu is older than the opening, and onPressOutside lets it pass. Every close — these two, a
+    // reopen, the grid's own — goes through closeColumnChooser, which detaches them.
+    const offPress = onPressOutside({
+        type: 'pointerdown',
+        capture: true,
+        inside: (t) => menu.contains(t) || t === anchorEl,
+        outside: () => closeColumnChooser(),
+    });
 
     const onScroll = (e: Event) => {
         if (menu.contains(e.target as Node)) return;
         closeColumnChooser();
     };
+    window.addEventListener('scroll', onScroll, true);
 
-    let attached = false;
-    const attach = setTimeout(() => {
-        attached = true;
-        document.addEventListener('pointerdown', onClickOutside, true);
-        window.addEventListener('scroll', onScroll, true);
-    }, 0);
     _detach = () => {
-        clearTimeout(attach);
-        if (!attached) return;
-        document.removeEventListener('pointerdown', onClickOutside, true);
+        offPress();
         window.removeEventListener('scroll', onScroll, true);
     };
 }
