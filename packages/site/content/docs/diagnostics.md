@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 83 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 84 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -221,6 +221,37 @@ A `.pdx` has one `<script>`. The parser reads the first; a second would be dropp
 A `.pdx` has one `<template>`; the parser reads the first, and the markup of a second would never render. So the compile stops at it, naming its line.
 
 **Fix.** Move its markup into the first `<template>`.
+
+### PDX_DYNAMIC_CONTENT
+
+*warn* — Content between `<component :is>` and `</component>`.
+
+The dynamic component takes no children: what is written between the tags is not rendered, in dev or in a build. Whitespace alone is not reported.
+
+**Fix.** Move the content beside the tag, or pass what the component needs as a prop: `<component :is="view" :title="t" />`.
+
+Instead of:
+
+```html
+<template>
+  <component :is="view"><p>Welcome</p></component>
+</template>
+<script setup>
+let view = $signal('pdx-home');
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>Welcome</p>
+  <component :is="view" />
+</template>
+<script setup>
+let view = $signal('pdx-home');
+</script>
+```
 
 ### PDX_EMPTY_FOR
 

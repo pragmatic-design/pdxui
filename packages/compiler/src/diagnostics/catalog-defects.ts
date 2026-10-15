@@ -38,6 +38,14 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         example: { bad: pdx('<ul><li>Header</li>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>', 'let rows = $signal([]);'), good: pdx('<ul>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>', 'let rows = $signal([]);') },
         reproducedIn: `${T}for-virtual.test.ts`,
     },
+    PDX_DYNAMIC_CONTENT: {
+        severity: 'warn', category: 'defect',
+        summary: 'Content between `<component :is>` and `</component>`.',
+        explanation: 'The dynamic component takes no children: what is written between the tags is not rendered, in dev or in a build. Whitespace alone is not reported.',
+        fix: 'Move the content beside the tag, or pass what the component needs as a prop: `<component :is="view" :title="t" />`.',
+        example: { bad: pdx('<component :is="view"><p>Welcome</p></component>', "let view = $signal('pdx-home');"), good: pdx('<p>Welcome</p>\n  <component :is="view" />', "let view = $signal('pdx-home');") },
+        reproducedIn: `${T}dynamic-component-content.test.ts`,
+    },
     PDX_VIRTUAL_TRANSITION: {
         severity: 'error', category: 'defect',
         summary: 'A `@for … @virtual` with `@transition`, `@stagger`, `@mode` or `@move`.',

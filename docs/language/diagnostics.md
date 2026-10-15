@@ -75,6 +75,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_AWAIT_NO_LOADING` | info | `@await` without a `@loading` block. | `@await`, [template.md](template.md) |
 | `PDX_DEFER_UNKNOWN_TRIGGER` | error | A `@defer` trigger the runtime does not know (`@defer (viewprt)`). | `@defer`, [template.md](template.md) |
 | `PDX_KEEPALIVE_MAX` | error | A `<component :is @keepAlive(n)>` whose maximum is not a whole number of at least 1. | `<component :is>`, [template.md](template.md) |
+| `PDX_DYNAMIC_CONTENT` | warn | Content between `<component :is>` and `</component>`, which is not rendered. | `<component :is>`, [template.md](template.md) |
 | `PDX_UNKNOWN_DIRECTIVE` | warn | A `@word (…)` or `@word { … }` in the template that is no directive and no plugin's: left as text, reported once per name. | any `@`-word, [template.md](template.md) |
 | `PDX_INLINE_NODE_UNSUPPORTED` | warn | A template node the inline render path cannot compile. | the compiled template, [template.md](template.md) |
 | `PDX_INLINE_BINDINGS_IGNORED` | warn | `pdx({ inlineBindings })` is given; a `.pdx` has one render path, and the option selects nothing. | the plugin's options, [template.md](template.md) |

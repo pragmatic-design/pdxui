@@ -32,6 +32,7 @@ const ROWS: Record<string, Row> = {
     PDX_RAW_INTERPOLATION: { src: pdx('<p title="${n}">x</p>', 'let n = $signal(1);'), at: 'title="${n}"' },
     PDX_DEFER_UNKNOWN_TRIGGER: { src: pdx('@defer (viewprt) { <p>x</p> }', ''), at: '@defer (viewprt)' },
     PDX_KEEPALIVE_MAX: { src: pdx('<p>x</p>\n  <component :is="view" @keepAlive(0)></component>', "let view = $signal('pdx-a');"), at: '@keepAlive(0)' },
+    PDX_DYNAMIC_CONTENT: { src: pdx('<p>x</p>\n  <component :is="view"><b>lost</b></component>', "let view = $signal('pdx-a');"), at: '<b>lost</b>' },
     PDX_UNKNOWN_DIRECTIVE: { src: pdx("<p>first</p>\n  <p>@tooltip ('a') { x }</p>", ''), at: '@tooltip' },
     PDX_NON_REACTIVE: { src: pdx('<p>{{ count }}</p>', 'let count = 0;\nfunction bump() { count = count + 1; }'), at: 'let count = 0;' },
     PDX_SCRIPT_SYNTAX_ERROR: { src: pdx('<p>x</p>', 'let a = $signal(1);\nlet b = ;'), at: 'let b = ;' },
