@@ -3,6 +3,7 @@
 // path, the inline one (#107); binding deduplication is the inline path's since #236.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { templateGenerator } from './template-generator';
 
 describe('#1 loop-invariant hoisting (production)', () => {
     it('hoists a real signal read but never ctx.el or an event handler', () => {
@@ -100,11 +101,17 @@ describe('#3 template-literal escaping', () => {
         expect(code).toContain('__d.createTextNode("a ` b ${y}")');
     });
 
-    it('a scoped slot body, which the template generator still writes, escapes them in its html``', () => {
+    it('a scoped slot body, built inline since #364, writes them as text too', () => {
         const source = '<template><pdx-list><slot name="item" let:row><p>a ` b ${y}</p></slot></pdx-list></template>\n<script setup>\nlet y = $signal(2);\n</script>';
         const { code } = compile(source, 'esc-slot.pdx', [], undefined, { production: true });
-        expect(code).toContain('a \\` b \\${y}');
+        expect(code).toContain('__d.createTextNode("a ` b ${y}")');
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
+    });
+
+    it('the template generator escapes them in its html``', () => {
+        const code = templateGenerator('<p>a ` b ${y}</p>', ['y']);
+        expect(code).toContain('a \\` b \\${y}');
+        expect(() => new Function(code)).not.toThrow();
     });
 });
 

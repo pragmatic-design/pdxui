@@ -188,7 +188,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 469 → 470: the set has heading-1, heading-2 and heading-3, the rich-text toolbar's numbered
 // headings that drew nothing (#332). Three chunks of their own, each loaded only by a page that draws
 // it; the entry and the first paint did not move. Measured locally: js 469.2.
-const BUDGET_KB = { entry: 38, js: 470, css: 59, blocking: 93 };
+// blocking 93 → 94: a scoped slot's body is built by the inline path (#364), as the rest of a .pdx
+// is since #107 — no html`` parsed at runtime, and `${…}` and comments read as everywhere else. The
+// shell's two slot fills (the rail's item and actions) are in its preloaded chunk, and imperative DOM
+// code is longer than the template string it replaces, as #107 measured. Measured locally: blocking
+// 93.3, js 469.8.
+const BUDGET_KB = { entry: 38, js: 470, css: 59, blocking: 94 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

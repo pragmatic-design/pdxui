@@ -1,9 +1,9 @@
 // What is written between `<component :is>` and `</component>` (#358).
 //
 // `dynamic()` takes no children, so that content has nowhere to go. One scanner says where it is,
-// for the two places that need it: the template path drops it from the nodes it generates (the
-// inline path discards it on its own, in a sink of its static tree), and validation reports it once,
-// read off the template's text, as PDX_DYNAMIC_CONTENT.
+// for the two places that need it: the template path — the legacy mode's — drops it from the nodes
+// it generates (the inline path discards it on its own, in a sink of its static tree), and
+// validation reports it once, read off the template's text, as PDX_DYNAMIC_CONTENT.
 
 import type { HtmlNode, TemplateNode } from '../parser/template';
 import type { ValidationWarning } from './validate';

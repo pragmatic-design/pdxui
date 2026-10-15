@@ -5,20 +5,22 @@
 // rendering its own content — drops it. It is the form JSX and Vue write by habit; Vue and Svelte
 // expand it, and so does the compiler. Void elements (<input />, <br />) keep their form.
 
-// The first block measures the template generator, which expands the tag in its markup; since #107
-// it writes only a scoped slot's body, so each case sits inside one. The second measures the tree
-// the inline path — every other part of a .pdx's render — builds from the parsed template.
+// The first block measures the template generator, which expands the tag in its markup. A .pdx in
+// the new mode no longer reaches it — a scoped slot's body was the last part it wrote, until #364 —
+// so it is called directly: the legacy mode still renders through it, until #238. The second block
+// measures the tree the inline path — every .pdx's render — builds from the parsed template.
 import { describe, it, expect } from 'vitest';
-import { compile } from '../src/plugin';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
+import { generateNodes } from '../src/compiler/codegen-template';
+import { createCompileContext } from '../src/compiler/compile-context';
 import { parseTemplate } from '../src/parser/template';
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 
-/** The render of `template` placed in a scoped slot's body, the template generator's. */
-function render(template: string, opts: Parameters<typeof compile>[4] = {}): string {
-    const source = `<template>\n<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>\n</template>\n<script setup>\n  let v = $signal('x');\n</script>`;
-    const code = compile(source, 'self-closing.pdx', [], undefined, { ...opts }).code;
-    return code.slice(code.indexOf('render:'));
+/** The template generator's html`` for `template`, with `v` declared by the script as the cases read it. */
+function render(template: string, opts: { production?: boolean } = {}): string {
+    const ctx = createCompileContext(opts);
+    ctx.declaredNames = new Set(['v']);
+    return generateNodes(parseTemplate(template), new Set(), ctx);
 }
 
 type Node = { tagName: string; children: Node[] };

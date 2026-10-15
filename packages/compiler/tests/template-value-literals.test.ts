@@ -6,8 +6,8 @@
 // The others went through `JSON.stringify`, which leaves `</script>` as it is — a module inlined in
 // a page ends at it — and U+2028/U+2029, which an older parser reads as line breaks.
 //
-// The checks, on both render paths (the template path, which still generates a hoisted scoped slot,
-// and the inline path, every .pdx's render since #107):
+// The checks, on the inline path — every .pdx's render since #107, and a scoped slot's body since
+// #364 — and on the template generator, called directly (the legacy mode still renders through it):
 //   - the module parses;
 //   - the payload is TEXT: no identifier `__PWNED` exists in the parsed module;
 //   - the module contains no `</script` and no raw U+2028;
@@ -17,6 +17,7 @@ import { describe, it, expect } from 'vitest';
 import ts from 'typescript';
 import { compile } from '../src/plugin';
 import { jsString } from '../src/compiler/js-literal';
+import { templateGenerator } from './template-generator';
 
 const BREAKOUT = `'+(globalThis.__PWNED=1)+'`;
 const NASTY = `a"b\`c\\d\${e}</script><b>\u2028f`;
@@ -41,9 +42,11 @@ const cases: Case[] = [
     { site: 'static attribute value', template: `<p title="${ATTR}">x</p>`, value: ATTR, markup: true },
 ];
 
-function module(template: string, inline: boolean): string {
-    // The template generator writes only a scoped slot's body since #107: its cases sit inside one.
-    const body = inline ? `<div>${template}</div>` : `<pdx-list><slot name="item" let:row><div>${template}</div></slot></pdx-list>`;
+type Path = 'the render' | 'a scoped slot body' | 'the template generator';
+
+function module(template: string, path: Path): string {
+    if (path === 'the template generator') return templateGenerator(`<div>${template}</div>`, ['on', 'mode'], { production: true });
+    const body = path === 'the render' ? `<div>${template}</div>` : `<pdx-list><slot name="item" let:row><div>${template}</div></slot></pdx-list>`;
     const src = `<template>\n  ${body}\n</template>\n\n<script setup>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
     return compile(src, 'probe.pdx', [], undefined, { production: true }).code;
 }
@@ -73,14 +76,13 @@ function walk(sf: ts.SourceFile): { identifiers: Set<string>; strings: string[];
 }
 
 describe('template values become string literals in the generated module (#69)', () => {
-    for (const inline of [false, true]) {
-        const path = inline ? 'the render' : 'a scoped slot body';
+    for (const path of ['the render', 'a scoped slot body', 'the template generator'] as const) {
         for (const c of cases) {
             it(`${c.site}, ${path}: parses, and the value stays text`, () => {
-                const code = module(c.template, inline);
+                const code = module(c.template, path);
                 const { identifiers, strings, templateText } = walk(parsed(code));
                 expect(identifiers.has('__PWNED'), `the value ran as code:\n${code}`).toBe(false);
-                if (c.markup && !inline) {
+                if (c.markup && path === 'the template generator') {
                     expect(templateText.some((t) => t.includes(c.value!)), `the markup does not carry the value as written:\n${code}`).toBe(true);
                     return;
                 }

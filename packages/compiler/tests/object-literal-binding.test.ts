@@ -11,13 +11,14 @@
 // why arrays alone do not show it.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { templateGenerator } from './template-generator';
 
-/** Compile a template on both generators: the template generator — which since #107 writes only a
- *  scoped slot's body, so the template goes inside one — and the inline one, the rest of a render. */
+/** Compile a template on both generators: the template generator, called directly — no .pdx in the
+ *  new mode reaches it since #364 — and the inline one, every render's. */
 function both(template: string): { template: string; inline: string } {
     const source = (body: string) => `<template>\n${body}\n</template>\n<script setup>\n  let on = $signal(1);\n</script>`;
     return {
-        template: compile(source(`<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>`), 'obj.pdx').code,
+        template: templateGenerator(template, ['on']),
         inline: compile(source(template), 'obj.pdx').code,
     };
 }

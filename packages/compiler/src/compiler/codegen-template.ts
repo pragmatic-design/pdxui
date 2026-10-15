@@ -197,7 +197,7 @@ export function virtualOptions(node: ForNode, getters: boolean, empty: string | 
 
 function generateFor(node: ForNode, imports: Set<string>, ctx: CompileContext): string {
     if (node.virtual) {
-        // `@for … @virtual` (#283): the call the inline path emits, for a scoped slot's body.
+        // `@for … @virtual` (#283): the call the inline path emits, for the legacy mode's template.
         const rows = isRowBinding(node);
         imports.add('eachVirtual');
         const itemsExpr = callSignals(prefixCtx(node.items, ctx), ctx);
@@ -458,16 +458,31 @@ function generateSlotTemplate(node: SlotTemplateNode, imports: Set<string>, ctx:
  * implementation of the hoisting is exactly the kind of copy that drifts — a slot name that is not
  * an identifier is one of the cases it has to get right.
  */
-export function hoistSlotTemplate(node: SlotTemplateNode, imports: Set<string>, ctx: CompileContext): string {
+function hoistSlotTemplate(node: SlotTemplateNode, imports: Set<string>, ctx: CompileContext): string {
+    return hoistSlotFunction(node, imports, ctx, () => `return ${generateNodes(node.body, imports, ctx)};`);
+}
+
+/**
+ * Hoist a scoped slot's function, whose statements `body` generates with the slot's scope variables
+ * in scope as plain locals, and return the EXPRESSION that carries it. The template path and the
+ * inline path (#364) differ only in how they build the body.
+ */
+export function hoistSlotFunction(node: SlotTemplateNode, imports: Set<string>, ctx: CompileContext, body: () => string): string {
     imports.add('slotCarrier');
 
-    // Add scope vars so they don't get ctx. prefix inside the slot body
-    for (const v of node.scopeVars) ctx.scopeVars.add(v);
-
-    const bodyCode = generateNodes(node.body, imports, ctx);
-
-    // Remove scope vars after processing
-    for (const v of node.scopeVars) ctx.scopeVars.delete(v);
+    // The scope vars are locals inside the slot body: no ctx. prefix, and not a @for's row getters.
+    // Membership is restored afterwards, as a loop's is.
+    const before = node.scopeVars.map(n => ({ n, scope: ctx.scopeVars.has(n), row: ctx.rowVars.has(n) }));
+    for (const v of node.scopeVars) { ctx.scopeVars.add(v); ctx.rowVars.delete(v); }
+    let bodyCode: string;
+    try {
+        bodyCode = body();
+    } finally {
+        for (const { n, scope, row } of before) {
+            if (scope) ctx.scopeVars.add(n); else ctx.scopeVars.delete(n);
+            if (row) ctx.rowVars.add(n); else ctx.rowVars.delete(n);
+        }
+    }
 
     // Unique variable name for hoisted slot function. The slot name is not always an identifier —
     // the data grid's cell slots are `col:{field}` / `header:{field}`, others use a hyphen — and
@@ -475,13 +490,9 @@ export function hoistSlotTemplate(node: SlotTemplateNode, imports: Set<string>, 
     // the carrier below keeps the real name, and the index keeps `col:a` and `col-a` apart.
     const varName = `__pdxSlot_${node.name.replace(/[^\w$]/g, '_')}_${ctx.hoistedSlots.length}`;
 
-    let fnCode: string;
-    if (node.scopeVars.length === 0) {
-        fnCode = `const ${varName} = () => ${bodyCode};`;
-    } else {
-        const destructure = `{ ${node.scopeVars.join(', ')} }`;
-        fnCode = `const ${varName} = (__scope) => { const ${destructure} = __scope; return ${bodyCode}; };`;
-    }
+    const fnCode = node.scopeVars.length === 0
+        ? `const ${varName} = () => { ${bodyCode} };`
+        : `const ${varName} = (__scope) => { const { ${node.scopeVars.join(', ')} } = __scope; ${bodyCode} };`;
 
     ctx.hoistedSlots.push([varName, fnCode]);
 
