@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { analyzeScript } from '../src/compiler/script-analyzer';
 import { compile } from '../src/plugin';
-import { FETCH_OPTION_KEYS } from '../src/compiler/script-analyzer-helpers';
+import { FETCH_OPTION_KEYS, parseFetchDecl } from '../src/compiler/script-analyzer-helpers';
 
 const codes = (script: string): string[] => analyzeScript(script, 'test.pdx').warnings.map((w) => w.code);
 const finding = (script: string, code: string) => analyzeScript(script, 'test.pdx').warnings.find((w) => w.code === code);
@@ -31,6 +31,35 @@ describe('@fetch reads, and says so when asked to write', () => {
     it('control — GET, in any case, is what @fetch is for', () => {
         expect(codes(`@fetch x: 'GET /api/x';`)).not.toContain('PDX_FETCH_METHOD');
         expect(codes(`@fetch x: 'get /api/x';`)).not.toContain('PDX_FETCH_METHOD');
+    });
+});
+
+describe('an object-literal type after `as` (#312)', () => {
+    // Its braces were read as the options block: no type, `{ name: string }` passed to resource().
+    it('is the type, not the options', () => {
+        const f = parseFetchDecl(`@fetch user: 'GET /api/u' as { name: string };`);
+        expect(f?.type).toBe('{ name: string }');
+        expect(f?.options).toBeUndefined();
+        expect(codes(`@fetch user: 'GET /api/u' as { name: string };`)).not.toContain('PDX_FETCH_UNKNOWN_OPTION');
+    });
+
+    it('is followed by the options block when there is one', () => {
+        const f = parseFetchDecl(`@fetch user: 'GET /api/u' as { name: string } { staleTime: 1000 };`);
+        expect(f?.type).toBe('{ name: string }');
+        expect(f?.options).toBe('{ staleTime: 1000 }');
+    });
+
+    it('keeps what follows it that is still type: an array, a union', () => {
+        expect(parseFetchDecl(`@fetch users: 'GET /api/u' as { name: string }[];`)?.type).toBe('{ name: string }[]');
+        const u = parseFetchDecl(`@fetch r: 'GET /api/r' as { ok: true } | { error: string } { retry: 2 };`);
+        expect(u?.type).toBe('{ ok: true } | { error: string }');
+        expect(u?.options).toBe('{ retry: 2 }');
+    });
+
+    it('control — a named type and its options are read as before', () => {
+        const f = parseFetchDecl(`@fetch users: 'GET /api/u' as User[] { staleTime: 1000 };`);
+        expect(f?.type).toBe('User[]');
+        expect(f?.options).toBe('{ staleTime: 1000 }');
     });
 });
 
