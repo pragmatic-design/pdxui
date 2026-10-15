@@ -148,7 +148,7 @@ export { renderSlot, slotCarrier } from './renderer/slot';
 export type { SlotFunction } from './renderer/slot';
 
 // Helpers
-export { when, awaitTimed, awaitReady, each, eachRow, match, pipe as templatePipe, show, portal, dynamic } from './renderer/helpers';
+export { when, awaitTimed, awaitReady, each, eachDestructured, eachRow, match, pipe as templatePipe, show, portal, dynamic } from './renderer/helpers';
 export type { TransitionOptions, DynamicOptions, PortalOptions } from './renderer/helpers';
 
 // Pages (keep-alive page switching)

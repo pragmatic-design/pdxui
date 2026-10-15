@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-457 value exports.
+458 value exports.
 
 ### `__adoptStyles`
 
@@ -1782,6 +1782,18 @@ Thin wrapper over repeat() with friendlier API.
 Usage:
   ${each(() => items(), 'id', (item) => html`<div>${item.name}</div>`)}
   ${each(() => items(), (item) => item.id, (item) => html`<div>${item.name}</div>`)}
+
+### `eachDestructured`
+
+```ts
+import { eachDestructured } from '@pdxui/core';
+
+function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions): DocumentFragment
+```
+
+{@link each}, as a destructured `@for` — `@for (rows as { id, label }; track id)` — compiles to:
+a large append renders in slices, as a plain `@for`'s `eachRow` does (#242, #398). A hand-written
+`each()` keeps the single pass, because its caller may read the DOM right after the write.
 
 ### `eachRow`
 

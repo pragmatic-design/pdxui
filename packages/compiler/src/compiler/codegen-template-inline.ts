@@ -804,7 +804,8 @@ class InlineGen {
         if (node.virtual) { this.virtualForN(node); return; }
         // Row getters for a plain item, as in codegen-template.ts.
         const rows = isRowBinding(node);
-        const helper = rows ? 'eachRow' : 'each';
+        // A destructured binding: value rows, sliced as eachRow's are (#398).
+        const helper = rows ? 'eachRow' : 'eachDestructured';
         this.imports.add(helper);
         const items = callSignals(prefixCtx(node.items, this.ctx), this.ctx);
         const keyArg = trackKeyArg(node, this.ctx);

@@ -64,9 +64,9 @@ describe('@for with index variable', () => {
 @prop entries: { key: string; value: string }[] = [];
 </script>`;
         const { code } = compile(source, 'for-destr-idx.pdx');
-        // A destructured binding keeps each(): its names are bound once (the row getter covers a
-        // plain item only).
-        expect(code).toContain('each(');
+        // A destructured binding keeps value rows, eachDestructured (#398): its names are bound once
+        // (the row getter covers a plain item only).
+        expect(code).toContain('eachDestructured(');
         expect(code).not.toContain('eachRow(');
         expect(code).toMatch(/\(\{ key, value \}, i\)\s*=>/);
     });

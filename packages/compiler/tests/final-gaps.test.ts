@@ -13,7 +13,7 @@ describe('gap 4: @for with destructuring', () => {
 @prop entries: { key: string; value: string }[] = [];
 </script>`;
         const { code } = compile(source, 'destr-for.pdx');
-        expect(code).toContain('each(');
+        expect(code).toContain('eachDestructured(');
         expect(code).toContain('{ key, value }');
     });
 
@@ -26,7 +26,7 @@ describe('gap 4: @for with destructuring', () => {
 @prop pairs: [string, number][] = [];
 </script>`;
         const { code } = compile(source, 'arr-destr.pdx');
-        expect(code).toContain('each(');
+        expect(code).toContain('eachDestructured(');
         expect(code).toContain('[k, v]');
     });
 });

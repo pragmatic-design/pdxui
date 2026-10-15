@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 54 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 55 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -283,6 +283,18 @@ Thin wrapper over repeat() with friendlier API.
 Usage:
   ${each(() => items(), 'id', (item) => html`<div>${item.name}</div>`)}
   ${each(() => items(), (item) => item.id, (item) => html`<div>${item.name}</div>`)}
+
+## `eachDestructured`
+
+```ts
+import { eachDestructured } from '@pdxui/core';
+
+function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions): DocumentFragment
+```
+
+{@link each}, as a destructured `@for` — `@for (rows as { id, label }; track id)` — compiles to:
+a large append renders in slices, as a plain `@for`'s `eachRow` does (#242, #398). A hand-written
+`each()` keeps the single pass, because its caller may read the DOM right after the write.
 
 ## `eachRow`
 

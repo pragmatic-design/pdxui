@@ -63,10 +63,11 @@ describe('@for row getters', () => {
         expect(code).not.toMatch(/bindRef\(__el\d+,\(\)\s*=>/);
     });
 
-    it('control — a destructured binding keeps each(), bound once', () => {
+    it('control — a destructured binding keeps value rows, bound once, and slices a large append (#398)', () => {
         const code = tpl('@for (rows as { id, name }; track id) { <b>{{ name }}</b> }');
         parses(code);
-        expect(code).toContain('each(');
+        expect(code).toContain('eachDestructured(');
+        expect(code, 'the hand-written each(), which does not slice').not.toMatch(/\beach\(/);
         expect(code).not.toContain('eachRow(');
     });
 

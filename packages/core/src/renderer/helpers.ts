@@ -232,6 +232,23 @@ export function each<T>(
 }
 
 /**
+ * {@link each}, as a destructured `@for` — `@for (rows as { id, label }; track id)` — compiles to:
+ * a large append renders in slices, as a plain `@for`'s `eachRow` does (#242, #398). A hand-written
+ * `each()` keeps the single pass, because its caller may read the DOM right after the write.
+ */
+export function eachDestructured<T>(
+    items: () => T[],
+    key: string | ((item: T, index: number) => unknown),
+    renderFn: (item: T, index: number) => Node,
+    options?: TransitionOptions
+): DocumentFragment {
+    const keyFn = typeof key === 'string'
+        ? (item: T) => (item as Record<string, unknown>)[key]
+        : key;
+    return repeat(items, keyFn, renderFn, { transitions: options, slices: true });
+}
+
+/**
  * Keyed list whose rows see their CURRENT item — what `@for` compiles to.
  *
  * Like {@link each}, but `renderFn` receives getters: `item()` and `index()`. A row reused for the

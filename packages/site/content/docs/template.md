@@ -186,10 +186,12 @@ once they are painted, the rest in slices of about 40 ms, so a click that append
 and the page keeps answering while the rest arrive. This holds when rows are appended (the first
 render included) and when the list is replaced by one with no row in common. Until the slices settle
 the rows still to come are not in the DOM. Writing a newer list replaces the slices still pending.
+A destructured `@for (pairs as { key, value }; …)` does the same: it compiles to `eachDestructured`,
+which slices where a hand-written `each()` keeps the single pass, since its caller may read the DOM
+right after the write.
 
 Some lists keep the single pass:
 - a list with `@transition`, whose timing is the transition's;
-- a destructured `@for (pairs as { key, value }; …)`;
 - a change that keeps some rows and adds many between them.
 
 ### A long list: `@virtual`
