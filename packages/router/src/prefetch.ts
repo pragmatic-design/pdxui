@@ -18,6 +18,8 @@
 
 import { queuePrefetch, takePrefetch, cancelPrefetches } from '@pdxui/core';
 import { routeTable, pageModule } from './active';
+import { config, chainAllowed } from './navigation';
+import { loaderIdentity, prefetchLoaderCall } from './loader-prefetch';
 
 /**
  * What a route says about being fetched ahead of time: on a hover, focus or press of a link to it
@@ -161,6 +163,10 @@ export function prefetchRoute(url: string | null | undefined): boolean {
     if (!url) return false;
     if (!prefetchAllowed()) return false;
 
+    // The data first: it does not depend on whether the chunk is already in.
+    const policy = policyFor(url);
+    if (policy === 'hover' || policy === 'viewport') void prefetchData(url);
+
     const route = routeFor(url);
     if (!route || route.prefetch === 'never') return false;
     if (started.has(route.path)) return false;
@@ -175,4 +181,21 @@ export function prefetchRoute(url: string | null | undefined): boolean {
     // A failed prefetch is a normal load later: the queue forgets it once it settles, so the outlet
     // starts its own. The queue handles the settled promise, so a failure is not reported unhandled.
     return queuePrefetch(route.path, load);
+}
+
+/**
+ * Start the loader of the route `url` leads to, for the navigation a hover or a link in view
+ * announces (#119). Matched by the router's own matcher, constraints included: a call is keyed by
+ * the params it receives. Every guard of the chain is asked first, and a route the visitor may not
+ * enter has its loader left alone. Returns whether a call was started.
+ */
+async function prefetchData(url: string): Promise<boolean> {
+    const cut = url.search(/[?#]/);
+    const path = cut >= 0 ? url.slice(0, cut) : url;
+    const search = url.indexOf('?') >= 0 ? url.slice(url.indexOf('?')) : '';
+    const match = config.matcher.match(path);
+    if (!match?.route.loader || match.route.redirect) return false;
+    const loader = match.route.loader;
+    if (!await chainAllowed(config.matcher.chain(match.route))) return false;
+    return prefetchLoaderCall(loaderIdentity(match.route.path, match.params, search), loader);
 }

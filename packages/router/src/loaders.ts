@@ -1,6 +1,9 @@
-// Loaders, one per level of the matched chain.
+// Loaders, one per level of the matched chain, each beside its level's chunk (#119).
 
+import { queuePrefetch, takePrefetch } from '@pdxui/core';
 import { _loaderData, _loaderState, _loaderFocus, type LoaderState } from './state';
+import { pageModule } from './route-table';
+import { loaderIdentity, ownParamNames, takePrefetchedLoaderCall } from './loader-prefetch';
 import type { RouteConfig } from './types';
 
 /**
@@ -11,11 +14,6 @@ import type { RouteConfig } from './types';
  * flicker. Change `:id` and it does.
  */
 let _loaderKeys: Record<string, string> = {};
-
-/** The params a level declares in its OWN pattern. `/tickets/:id/notes/:n` at the parent → ['id']. */
-function ownParamNames(pattern: string): string[] {
-    return [...pattern.matchAll(/:([A-Za-z0-9_]+)/g)].map(m => m[1]);
-}
 
 /** A level's identity for this navigation: its own params, with their values. */
 function loaderKey(pattern: string, params: Record<string, string>): string {
@@ -72,15 +70,45 @@ export function planLoaders(
 }
 
 /**
- * Run the planned loaders in order, outermost first — the order the data depends in, and the order
- * the guards already run in. Returns false when a newer navigation superseded this one, which
- * `isCurrent` answers.
+ * Start the chunk of every level of the chain, all at once, and return them by level path.
+ *
+ * Chunks do not depend on each other, so none waits for another, nor for a loader. Each goes through
+ * core's load queue under the level's pattern, as a prefetch would (`takePrefetch`): the outlet then
+ * takes this same load when it renders the level and awaits it, rather than calling `import()` a
+ * second time — a second call does not wait for the stylesheet the first one is fetching, and the
+ * page would paint unstyled. A level with no chunk of its own (in the entry, or no table) has none.
  */
-export async function runLoaders(pending: RouteConfig[], isCurrent: () => boolean): Promise<boolean> {
+export function startChunks(chain: RouteConfig[]): Map<string, Promise<unknown>> {
+    const chunks = new Map<string, Promise<unknown>>();
+    for (const level of chain) {
+        let load = takePrefetch(level.path);
+        if (!load) {
+            const importPage = pageModule(level.path);
+            if (importPage && queuePrefetch(level.path, importPage)) load = takePrefetch(level.path);
+        }
+        if (load) chunks.set(level.path, load);
+    }
+    return chunks;
+}
+
+/**
+ * Run the planned loaders in order, outermost first — the order the data depends in, and the order
+ * the guards already run in. Each level settles when its loader AND its chunk have: the chunk is
+ * already on its way (`startChunks`), and a failure of the chunk is the outlet's to report, not the
+ * loader's. A call a prefetch started for the same identity is taken instead of calling the loader.
+ * Returns false when a newer navigation superseded this one, which `isCurrent` answers.
+ */
+export async function runLoaders(
+    pending: RouteConfig[], isCurrent: () => boolean,
+    { chunks, params = {}, search = '' }: { chunks?: Map<string, Promise<unknown>>; params?: Record<string, string>; search?: string } = {},
+): Promise<boolean> {
     for (const level of pending) {
         if (!level.loader) continue;
         try {
-            const result = await level.loader();
+            const call = takePrefetchedLoaderCall(loaderIdentity(level.path, params, search)) ?? level.loader();
+            const [data] = await Promise.allSettled([call, chunks?.get(level.path)]);
+            if (data.status === 'rejected') throw data.reason;
+            const result = data.value;
             if (!isCurrent()) return false; // a newer navigation won — drop this stale result
             _loaderData.set({ ..._loaderData.peek(), [level.path]: result });
             _loaderState.set({ ..._loaderState.peek(), [level.path]: 'done' });

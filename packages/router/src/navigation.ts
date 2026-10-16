@@ -2,7 +2,7 @@
 
 import { saveScrollPosition as saveScroll, restoreScrollPosition as restoreScroll } from '@pdxui/core';
 import { compileMatcher, type Matcher } from './matcher';
-import { clearLoaders, planLoaders, runLoaders } from './loaders';
+import { clearLoaders, planLoaders, runLoaders, startChunks } from './loaders';
 import { publishTrail } from './trail';
 import { tableRedirect } from './route-table';
 import {
@@ -63,6 +63,19 @@ export function guardAnswer(guard: string): boolean | null {
     if (!guardChecker) return false;
     const answer = guardChecker(guard);
     return typeof answer === 'boolean' ? answer : null;
+}
+
+/**
+ * Whether every level of `chain` may be entered — what a navigation's guards would answer, asked
+ * ahead of one. A prefetch asks before it runs a loader (#119): a declared guard with nothing to
+ * evaluate it is a no, as it is for a navigation.
+ */
+export async function chainAllowed(chain: RouteConfig[]): Promise<boolean> {
+    for (const level of chain) {
+        if (!level.guard) continue;
+        if (!guardChecker || !await guardChecker(level.guard)) return false;
+    }
+    return true;
 }
 
 // ─── Navigation Middleware ─────────────────────────────────────────
@@ -302,12 +315,15 @@ async function resolveNavigation(navId: number, fullPath: string, isBack: boolea
         return publishDenied(path, query, params, chain, level, prevPath);
     }
 
-    // Every level's loader, outermost first — the same rule as the guards above. The focus is set
-    // first so `currentLoaderState()` reads 'loading' for the page that is about to render. The
-    // planning is synchronous and the await happens only when something actually has to load.
+    // Every level's chunk starts now, all at once, and beside it every level's loader, outermost
+    // first — the same rule as the guards above (#119). The focus is set first so
+    // `currentLoaderState()` reads 'loading' for the page that is about to render. The planning is
+    // synchronous and the await happens only when something actually has to load.
+    const chunks = startChunks(chain);
     _loaderFocus.set(route.path);
     const pendingLoaders = planLoaders(chain, params);
-    if (pendingLoaders.length > 0 && !await runLoaders(pendingLoaders, isCurrent)) return;
+    if (pendingLoaders.length > 0
+        && !await runLoaders(pendingLoaders, isCurrent, { chunks, params, search: _search.peek() })) return;
 
     _path.set(path);
     _params.set(params);

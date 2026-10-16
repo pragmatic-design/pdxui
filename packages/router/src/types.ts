@@ -101,7 +101,10 @@ export interface TableRoute {
     guard?: string;
     redirect?: string;
     meta?: Record<string, unknown>;
-    /** A bridge to the page's `@loader`: imports the page, then calls the function it registered. */
+    /**
+     * A bridge to the page's `@loader`: the function the page registered, else the loader's own
+     * module (#119), else the page imported for it — then called.
+     */
     loader?: () => Promise<unknown>;
     scroll?: ScrollRestoration;
     hasOutlet?: boolean;

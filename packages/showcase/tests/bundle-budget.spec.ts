@@ -209,7 +209,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // modal…), and each gzipped alone loses the dictionary they shared. Same machine, same day, chunk by
 // chunk: js 456.4 → 462.4 KB over 454 → 462 files, css 58.4 → 59.1 over 52 → 56. Merging small chunks
 // back is #407's next step, in pdx() for every app.
-const BUDGET_KB = { entry: 38, js: 463, css: 60, blocking: 93 };
+// entry 38 → 39, js 463 → 464, blocking 93 → 94: a navigation starts every level's chunk beside its
+// loader, and a hover prefetches a route's data as well as its code (#119) — the router's navigation,
+// in the entry. Same machine, same day: main entry 37.9 → 38.4, js 462.4 → 463.1, blocking
+// 92.6 → 93.1. The showcase declares no @loader, so it pays for the router code and gains nothing yet.
+const BUDGET_KB = { entry: 39, js: 464, css: 60, blocking: 94 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
