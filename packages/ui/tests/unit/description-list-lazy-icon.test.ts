@@ -27,7 +27,7 @@ describe('pdx-description-list and pdx-icon', () => {
     it('control — a term that names an icon loads it', async () => {
         const el = await mount([{ label: 'Status', value: 'Open', icon: 'info' }]);
         expect(el.querySelector('pdx-icon')?.getAttribute('name')).toBe('info');
-        await tick(100);
-        expect(customElements.get('pdx-icon')).toBeDefined();
+        // The load it asserts on, not a time: a cold transform took longer than 100 ms (#457).
+        await customElements.whenDefined('pdx-icon');
     });
 });

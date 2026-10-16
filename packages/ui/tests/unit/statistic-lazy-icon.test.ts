@@ -27,7 +27,7 @@ describe('pdx-statistic and pdx-icon', () => {
     it('control — a trend draws its arrow, and loads it', async () => {
         const el = await mount({ title: 'Open tickets', value: '12', trend: 'up', trendValue: '+2' });
         expect(el.querySelector('pdx-icon')?.getAttribute('name')).toBe('trending-up');
-        await tick(100);
-        expect(customElements.get('pdx-icon')).toBeDefined();
+        // The load it asserts on, not a time: a cold transform took longer than 100 ms (#457).
+        await customElements.whenDefined('pdx-icon');
     });
 });

@@ -27,7 +27,7 @@ describe('pdx-segmented and pdx-icon', () => {
     it('control — an option that names an icon loads it', async () => {
         const el = await mount([{ value: 'a', label: 'List', icon: 'list' }, { value: 'b', label: 'Board' }]);
         expect(el.querySelector('pdx-icon')).not.toBeNull();
-        await tick(100);
-        expect(customElements.get('pdx-icon')).toBeDefined();
+        // The load it asserts on, not a time: a cold transform took longer than 100 ms (#457).
+        await customElements.whenDefined('pdx-icon');
     });
 });

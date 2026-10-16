@@ -27,7 +27,7 @@ describe('pdx-navbar and pdx-icon', () => {
     it('control — an item that names an icon loads it', async () => {
         const el = await mount({ brand: 'Acme', items: [{ key: 'home', label: 'Home', href: '/', icon: 'home' }] });
         expect(el.querySelector('pdx-icon')?.getAttribute('name')).toBe('home');
-        await tick(100);
-        expect(customElements.get('pdx-icon')).toBeDefined();
+        // The load it asserts on, not a time: a cold transform took longer than 100 ms (#457).
+        await customElements.whenDefined('pdx-icon');
     });
 });

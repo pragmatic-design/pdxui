@@ -27,7 +27,7 @@ describe('pdx-bulk-actions and pdx-icon', () => {
     it('control — an action that names an icon loads it', async () => {
         const el = await mount([{ key: 'archive', label: 'Archive', icon: 'trash' }]);
         expect(el.querySelector('pdx-icon')?.getAttribute('name')).toBe('trash');
-        await tick(100);
-        expect(customElements.get('pdx-icon')).toBeDefined();
+        // The load it asserts on, not a time: a cold transform took longer than 100 ms (#457).
+        await customElements.whenDefined('pdx-icon');
     });
 });
