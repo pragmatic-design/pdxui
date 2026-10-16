@@ -227,10 +227,16 @@ test('a cold load of a route that is not the landing one fetches in two waves, n
     // The first thing a link someone was sent lands on. The shell holds the outlet for the route's
     // strings, and the outlet is what imports the route: the strings, THEN the chunk, would be a
     // wave of its own — 3 on this counter. The chunk starts alongside the strings.
-    const { waves, files } = await jsWaves(page, '/tickets');
+    // Counted up to the page's mount, as the first screen is: what the page defers until it is idle —
+    // the create modal and the record drawer (#449) — is asked for after, on purpose.
+    const { waves, files, after } = await jsWaves(page, '/tickets', 'pdx-tickets');
     expect(files.some((f) => /^tickets-/.test(f)), 'the tickets chunk was not fetched — nothing is being measured')
         .toBe(true);
-    expect(waves, `a cold /tickets costs ${waves} round-trips: ${files.join(', ')}`).toBeLessThanOrEqual(2);
+    expect(waves, `a cold /tickets costs ${waves} round-trips: ${files.join(', ')} (after the mount: ${after.join(', ')})`)
+        .toBeLessThanOrEqual(2);
+    // The control that the mark splits anything: the deferred overlays come after it.
+    expect(after.some((f) => /^pdx-edit-drawer-/.test(f)),
+        `the record drawer was not loaded after the page mounted: ${after.join(', ')}`).toBe(true);
 });
 
 test('control — a route the visitor navigates to still fetches in one wave', async ({ page }) => {
@@ -238,7 +244,7 @@ test('control — a route the visitor navigates to still fetches in one wave', a
     // the chunk on hover, and the outlet imports it on the click. If this ever needed a preload
     // too, the preload above would be hiding a regression rather than fixing anything.
     await page.goto('/');
-    const { waves, files } = await jsWaves(page, '/tickets');
+    const { waves, files } = await jsWaves(page, '/tickets', 'pdx-tickets');
     expect(files.length, 'the navigation fetched no JavaScript at all — nothing is being measured')
         .toBeGreaterThan(0);
     expect(waves, `${waves} round-trips for a navigation: ${files.join(', ')}`).toBeLessThanOrEqual(2);

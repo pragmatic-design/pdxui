@@ -202,7 +202,14 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // loaders beside them. Same machine, same day: main 455.4 → 456.6 KB in all, entry 37.7 → 37.8,
 // blocking 92.4 → 92.5. The showcase's own pages still import the editors for their forms, which is
 // what #407 takes on next.
-const BUDGET_KB = { entry: 38, js: 457, css: 59, blocking: 93 };
+// js 457 → 463, css 59 → 60: /tickets defers what an action opens (#449), and its LCP on slow 4G went
+// from ~3.9 s to ~3.0 s. No byte is added: on main, the modules the page imported for its forms
+// shared one chunk named after pdx-auto-form (15.1 KB); with the page no longer importing them, Rollup
+// splits them into eight (pdx-form-template, color-picker, inline-edit, rating, textarea, the create
+// modal…), and each gzipped alone loses the dictionary they shared. Same machine, same day, chunk by
+// chunk: js 456.4 → 462.4 KB over 454 → 462 files, css 58.4 → 59.1 over 52 → 56. Merging small chunks
+// back is #407's next step, in pdx() for every app.
+const BUDGET_KB = { entry: 38, js: 463, css: 60, blocking: 93 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
