@@ -197,12 +197,7 @@ export function compileNewMode(
         autoImportRouter(allUserImports, ['navigation']);
     }
 
-    // $inline blocks: wrap render function to include render-time code
     let finalRenderCode = renderCode;
-    if (analysis.inlineBlocks && analysis.inlineBlocks.length > 0) {
-        const inlineCode = analysis.inlineBlocks.map(b => `    ${b}`).join('\n');
-        finalRenderCode = `{\n${inlineCode}\n    return ${renderCode};\n  }`;
-    }
 
     // Hoisted slot functions: emit OUTSIDE html`` to avoid nested template literal issues
     if (ctx.hoistedSlots.length > 0) {

@@ -205,7 +205,6 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const mountOrigins: (number | null)[][] = [];
     const destroyOrigins: (number | null)[][] = [];
     const RAW_MARKER = '/*@raw*/'; // marker prepended to raw lines to skip rewriting
-    const inlineBlocks: string[] = []; // $inline {} blocks for render path
     const warnings: ValidationWarning[] = [];
 
     // Detect mode. The legacy mode is recognised by its OWN markers — defineProps/defineEmits, or a
@@ -976,25 +975,24 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             continue;
         }
 
-        // ─── $inline { ... } — code that runs in render path, not setup ───
-        if (trimmed.startsWith('$inline') && trimmed.includes('{')) {
+        // ─── $inline { ... } — not part of the language (#361) ───
+        // It copied its body into the render, where the template could not reach what it declared
+        // and its signals were not rewritten: a ReferenceError at render. The block is read to its
+        // closing brace and dropped, so none of it reaches the module, and the compile says what to
+        // write instead.
+        if (codeLines[i].trim().startsWith('$inline') && trimmed.includes('{')) {
             let depth = 0;
-            const inlineLines: string[] = [];
-            for (const ch of trimmed) { if (ch === '{') depth++; if (ch === '}') depth--; }
-            const first = trimmed.replace(/^\$inline\s*\{/, '').trim();
-            if (first && depth > 0) inlineLines.push(first);
+            for (const ch of codeLines[i]) { if (ch === '{') depth++; if (ch === '}') depth--; }
             while (depth > 0 && i + 1 < lines.length) {
                 i++;
-                const inlineLine = lines[i].trim();
-                for (const ch of inlineLine) { if (ch === '{') depth++; if (ch === '}') depth--; }
-                if (depth <= 0) {
-                    const last = inlineLine.replace(/\}\s*$/, '');
-                    if (last) inlineLines.push(last);
-                } else {
-                    inlineLines.push(lines[i]);
-                }
+                for (const ch of codeLines[i]) { if (ch === '{') depth++; if (ch === '}') depth--; }
             }
-            inlineBlocks.push(inlineLines.join('\n'));
+            warnings.push({
+                code: 'PDX_UNKNOWN_DECLARATION',
+                severity: 'error' as const,
+                message: '`$inline { … }` is not part of the language: the block was dropped — nothing is generated for it.',
+                hint: 'Declare what the template reads as a derived value: const sorted = $derived([...items].sort(…));',
+            });
             continue;
         }
 
@@ -1100,7 +1098,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     // a second copy that can drift. Strings are blanked first, so `const msg = "call pipe()"` is
     // prose and not a use — the line-by-line pass has no such guard, and needs none, because a
     // `const` line is swallowed too.
-    detectCoreApis(maskNonCode([...bodyLines, ...effects, ...onMountBodies, ...onDestroyBodies, ...inlineBlocks].join('\n')), usedFeatures);
+    detectCoreApis(maskNonCode([...bodyLines, ...effects, ...onMountBodies, ...onDestroyBodies].join('\n')), usedFeatures);
 
     dropLocallyDeclared(usedFeatures, lines, setupDepthAt);
 
@@ -1147,7 +1145,6 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         ...bodyWithOrigins(bodyLines.join('\n'), originBase === undefined ? undefined : bodyLineOrigins),
         ...(originBase === undefined ? {} : { origins: { effects: effectOrigins, watches: watchOrigins, onMount: mountOrigins, onDestroy: destroyOrigins } }),
         ...(options.lineBase === undefined ? {} : { runeLines: { effects: effectLines, watches: watchLines } }),
-        inlineBlocks,
         userImports,
         coreImportNames,
         importedNames,

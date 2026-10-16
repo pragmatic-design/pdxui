@@ -487,7 +487,6 @@ export function detectDeadSignals(
         if (analysis.lifecycle.onDestroy.some(d => re.test(d))) continue;
         if (analysis.signals.some(s => s !== sig && re.test(s.initialExpr))) continue;
         if (analysis.stores.some(s => re.test(s.initialExpr))) continue;
-        if (analysis.inlineBlocks?.some(b => re.test(b))) continue;
 
         dead.add(name);
     }

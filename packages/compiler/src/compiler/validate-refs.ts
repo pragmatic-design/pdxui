@@ -49,7 +49,7 @@ export function declaredNames(analysis: ScriptAnalysis): Set<string> {
  */
 export function checkUndeclaredRefs(analysis: ScriptAnalysis, templateIds: ReadonlySet<string>, warnings: ValidationWarning[]): void {
     const declared = declaredNames(analysis);
-    const script = [analysis.body, ...analysis.userImports, ...(analysis.inlineBlocks ?? []),
+    const script = [analysis.body, ...analysis.userImports,
         ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy, ...analysis.effects].join('\n');
     for (const id of templateIds) {
         if (declared.has(id) || AMBIENT.has(id) || ROUTER_READS.has(id) || id.startsWith('$')) continue;

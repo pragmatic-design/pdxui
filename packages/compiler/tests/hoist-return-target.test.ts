@@ -36,9 +36,6 @@ const SOURCE = `
 <script setup>
 let keep = $signal(0);
 let rows = $signal([1, 2]);
-$inline {
-  const unused = keep;
-}
 </script>`;
 
 describe('hoisted declarations target the render return', () => {

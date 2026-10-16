@@ -191,32 +191,6 @@ describe('integration: @fetch + @form', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// INTEGRATION: $inline + @for
-// ═══════════════════════════════════════════════════════════════
-
-describe('integration: $inline + @for', () => {
-    it('inline block available in render with @for', () => {
-        const source = `
-<template>
-  @for (sorted as item; track item.id) {
-    <div>{{ item.name }}</div>
-  }
-</template>
-<script setup>
-  let items = $signal([]);
-  $inline {
-    const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name));
-  }
-</script>`;
-        const { code } = compile(source, 'inline-for.pdx');
-        // render should be a block (not arrow)
-        expect(code).toMatch(/render:\s*\(ctx\)\s*=>\s*\{/);
-        expect(code).toContain('sorted =');
-        expect(code).toContain('return (() => {');
-    });
-});
-
-// ═══════════════════════════════════════════════════════════════
 // INTEGRATION: @raw INSIDE FUNCTION WITH $signal
 // ═══════════════════════════════════════════════════════════════
 
@@ -265,30 +239,5 @@ describe('integration: shadow DOM + CSS', () => {
         expect(code).toContain('.widget { padding: 1rem; }');
         expect(code).not.toContain('data-pdx-');
         expect(code).not.toContain('document.head.appendChild');
-    });
-});
-
-// ═══════════════════════════════════════════════════════════════
-// MULTIPLE $inline BLOCKS
-// ═══════════════════════════════════════════════════════════════
-
-describe('multiple $inline blocks', () => {
-    it('merges multiple $inline blocks in order', () => {
-        const source = `
-<template><div>{{ a }} {{ b }}</div></template>
-<script setup>
-  let x = $signal(1);
-  $inline {
-    const a = x * 2;
-  }
-  $inline {
-    const b = x * 3;
-  }
-</script>`;
-        const { code } = compile(source, 'multi-inline.pdx');
-        expect(code).toMatch(/render:\s*\(ctx\)\s*=>\s*\{/);
-        // Both should be present in render
-        expect(code).toContain('a = x * 2');
-        expect(code).toContain('b = x * 3');
     });
 });
