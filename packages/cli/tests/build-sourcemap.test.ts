@@ -3,10 +3,11 @@
 // output has no `.map` anywhere.
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync, rmSync } from 'fs';
+import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import buildCmd from '../src/commands/build';
+import { removeTree } from './remove-tree';
 
 const COUNTER = '<template><button @click="count++">{{ count }}</button></template>\n' +
     '<script setup>\nlet count = $signal(0);\n</script>\n';
@@ -47,10 +48,9 @@ describe('pdx build --sourcemap', () => {
     afterEach(() => {
         process.chdir(prevCwd);
         exitSpy.mockRestore();
-        // maxRetries: on Windows, under the load of the gate, something still holds a freshly built file
-        // when this runs and rmdir fails with EBUSY (#165). Node's option for exactly that case retries;
-        // the build's assertions above are untouched.
-        rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+        // On Windows, under the gate's load, this has failed with EBUSY now and then (#165, #384): if it
+        // does, the error names the files that were held.
+        removeTree(root);
     });
 
     describe('standalone', () => {
