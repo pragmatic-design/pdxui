@@ -15,6 +15,7 @@ import { validateStyles } from './compiler/validate-styles';
 import { validateDesign } from './compiler/validate-design';
 import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
+import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
 import { validateDynamicContent } from './compiler/dynamic-content';
 import { routeLayout } from './compiler/codegen-shared';
 import { minifyHTML } from './compiler/minify';
@@ -810,6 +811,8 @@ export function compile(
     allWarnings.push(...validateDeclarations(descriptor, source));
     // A $signal's value changed in place: the signal is never set, and nothing updates.
     allWarnings.push(...validateSignalMutation(descriptor, cachedAnalysis, source, ast));
+    // A signal()/computed() written by hand and read bare by the template: it shows the function (#362).
+    allWarnings.push(...validateHandWrittenSignals(descriptor, cachedAnalysis, source));
     // Content inside `<component :is>`: no render path renders it (#358).
     if (descriptor.template) allWarnings.push(...validateDynamicContent(descriptor.template.content, descriptor.template.start, source));
 

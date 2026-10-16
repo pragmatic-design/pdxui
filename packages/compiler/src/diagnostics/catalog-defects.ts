@@ -77,6 +77,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it with `$signal`: `let count = $signal(0);`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_HAND_WRITTEN_SIGNAL: {
+        severity: 'error', category: 'defect',
+        summary: 'A `signal()` or `computed()` written by hand in `<script setup>` and read bare by the template (`{{ name }}`, `:title="name"`).',
+        explanation: 'The template reads the names the runes declare as values. A signal created by hand is a function, and the template shows the function itself — its source text in the page, or the function assigned to a property. Calling it in the template (`{{ name() }}`) shows the value, and a hand-written signal the template does not read is not reported.',
+        fix: 'Declare it with the rune: `let name = $signal(\'World\');` for `signal()`, `const total = $derived(a + b);` for `computed()` — the expression, not a function.',
+        reproducedIn: `${T}hand-written-signal.test.ts`,
+    },
     PDX_SIGNAL_MUTATED_IN_PLACE: {
         severity: 'warn', category: 'defect', fixable: true,
         summary: "A `$signal`'s value changed in place: a mutating method (`push`, `splice`, `set`, `add`…) or a write to a member (`user.name = …`, `items[0] = …`).",
