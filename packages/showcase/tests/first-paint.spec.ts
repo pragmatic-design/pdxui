@@ -37,15 +37,7 @@
  * true, and the layout stability that a deferral would break.
  */
 import { test, expect, type Page } from './fixture';
-
-/** Slow 4G, the profile Lighthouse throttles to: 1.6 Mbps down, 150 ms RTT. */
-const SLOW_4G = {
-    offline: false,
-    downloadThroughput: (1.6 * 1024 * 1024) / 8,
-    uploadThroughput: (750 * 1024) / 8,
-    latency: 150,
-    connectionType: 'cellular4g' as const,
-};
+import { throttle, lcpOf } from './lcp';
 
 /**
  * An alarm, not an instrument. What it catches is a DOUBLED ENTRY — the kind of regression that comes
@@ -70,12 +62,6 @@ const SLOW_4G = {
  * differ, and this is where it will say so first.
  */
 const APP_READY_CEILING_MS = 1_000;
-
-async function throttle(page: Page): Promise<void> {
-    const cdp = await page.context().newCDPSession(page);
-    await cdp.send('Network.enable');
-    await cdp.send('Network.emulateNetworkConditions', SLOW_4G);
-}
 
 interface Timings {
     /** The first contentful paint — the SPLASH's, before any JavaScript has run. */
@@ -177,51 +163,17 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
  * `/tickets` painted three seconds after the app was ready: its route's ~60 modules shared the slow
  * link before the page mounted. Since #449 the page defers what an action opens — the create modal,
  * the record drawer and its question, the inline editor — to the first idle moment after it mounts,
- * and it paints at 2924, 2944, 2956, 2960 ms locally (2960 + 10% → 3300). #407 goes on lowering it.
+ * and it paints at 2924, 2944, 2956, 2960 ms locally (2960 + 10% → 3300).
+ *
+ * These are the HTTP/1.1 numbers: the preview server's six connections are most of what is left
+ * on `/tickets`. The same routes over HTTP/2, the number a real host gives and #407's target, are
+ * held in `first-paint-http2.spec.ts`; these stay as the second, looser number.
  */
 const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
     { route: '/', root: 'dashboard', budgetMs: 1100 },
     { route: '/tickets', root: 'tickets', budgetMs: 3300 },
     { route: '/tickets/1', root: 'ticket', budgetMs: 2100 },
 ];
-
-interface Lcp {
-    /** The last `largest-contentful-paint` entry's time, before any input. */
-    ms: number;
-    /** What the element is, for the log and the failure. */
-    element: string;
-    /** Whether the element is inside the route's page root. */
-    insidePage: boolean;
-}
-
-/** A cold load of `route`, throttled, and its LCP once the page has settled. */
-async function lcpOf(page: Page, route: string, root: string): Promise<Lcp> {
-    await page.addInitScript(() => {
-        const w = window as unknown as { __lcp?: { startTime: number; element: Element | null } };
-        new PerformanceObserver((list) => {
-            const entries = list.getEntries() as (PerformanceEntry & { element: Element | null })[];
-            const last = entries[entries.length - 1];
-            if (last) w.__lcp = { startTime: last.startTime, element: last.element };
-        }).observe({ type: 'largest-contentful-paint', buffered: true });
-    });
-    await throttle(page);
-    await page.goto(route, { waitUntil: 'load' });
-    await expect(page.locator(`[data-test="${root}"]`)).toBeVisible({ timeout: 30_000 });
-    // Settled: a later, larger paint replaces the entry, and LCP stops at the first input.
-    await page.waitForTimeout(1_500);
-    return page.evaluate((rootTest) => {
-        const lcp = (window as unknown as { __lcp?: { startTime: number; element: Element | null } }).__lcp;
-        if (!lcp) return { ms: -1, element: 'none', insidePage: false };
-        const el = lcp.element;
-        const pageRoot = document.querySelector(`[data-test="${rootTest}"]`);
-        const describe = (e: Element | null): string => {
-            if (!e) return 'an element no longer in the page';
-            const test = e.closest('[data-test]')?.getAttribute('data-test');
-            return `<${e.tagName.toLowerCase()}>${test ? ` in [data-test="${test}"]` : ''} "${(e.textContent ?? '').trim().slice(0, 40)}"`;
-        };
-        return { ms: Math.round(lcp.startTime), element: describe(el), insidePage: !!(el && pageRoot && pageRoot.contains(el)) };
-    }, root);
-}
 
 test.describe('each route\'s main content paints within its budget', () => {
     for (const { route, root, budgetMs } of LCP_ROUTES) {
