@@ -1,4 +1,13 @@
 // Compiler benchmark — measures compilation speed of .pdx files.
+//
+// Each case states one budget and asserts it (#347): a compile takes under 5 ms, the median of its
+// runs. What it is for is the dev server's HMR, where a component is compiled on save and 5 ms is a
+// third of a frame. The median, not the mean: a garbage collection in one run moved the mean of a
+// case from 3.4 to 5.7 ms between two runs on the same machine, while its median and best did not.
+// Measured 2026-10-16 on a development machine, three runs, medians: counter 2.26-2.29, todo
+// 3.10-3.53, counter in production 1.55-1.66, the complex page 3.07-3.21 ms; the batch of 10,
+// 17.8-18.9 ms. The cases used to state «>500 compilations/sec» and assert 100, which a compiler
+// five times slower would pass.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../../src/plugin';
@@ -59,9 +68,13 @@ const todoPdx = `
   .item:hover { background: #f5f5f5; }
 </style>`;
 
-function measure(label: string, fn: () => void, iterations = 100): { best: number; avg: number; ops: number } {
-    // Warm up
-    for (let i = 0; i < 10; i++) fn();
+/** One compile's budget, in ms: the median of a case's runs must be under it. */
+const COMPILE_BUDGET_MS = 5;
+
+function measure(label: string, fn: () => void, iterations = 100): { best: number; median: number; avg: number } {
+    // Warm up: 10 runs left the JIT still settling on the complex page, whose median then read
+    // 4.6 ms against 3.3 after 20.
+    for (let i = 0; i < 30; i++) fn();
 
     const times: number[] = [];
     for (let i = 0; i < iterations; i++) {
@@ -70,45 +83,47 @@ function measure(label: string, fn: () => void, iterations = 100): { best: numbe
         times.push(performance.now() - start);
     }
 
-    const best = Math.min(...times);
+    const sorted = [...times].sort((a, b) => a - b);
+    const best = sorted[0];
+    const median = sorted[Math.floor(sorted.length / 2)];
     const avg = times.reduce((a, b) => a + b, 0) / times.length;
-    const ops = Math.round(1000 / avg);
-    console.log(`  ⏱ ${label}: best=${best.toFixed(3)}ms avg=${avg.toFixed(3)}ms (${ops} compilations/sec)`);
-    return { best, avg, ops };
+    console.log(`  ⏱ ${label}: best=${best.toFixed(3)}ms median=${median.toFixed(3)}ms avg=${avg.toFixed(3)}ms`);
+    return { best, median, avg };
 }
 
 describe('compiler benchmarks', () => {
     it('compile counter.pdx — new mode (decorator+rune)', () => {
-        const { ops } = measure('counter.pdx compile', () => {
+        const { median } = measure('counter.pdx compile', () => {
             compile(counterPdx, 'counter.pdx');
         });
-        // Target: >500 compilations/sec for fast HMR
-        expect(ops).toBeGreaterThan(100);
+        // A compile under 5 ms: the component saved, compiled again for HMR.
+        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
     });
 
     it('compile todo.pdx — new mode with @for + signals', () => {
-        const { ops } = measure('todo.pdx compile', () => {
+        const { median } = measure('todo.pdx compile', () => {
             compile(todoPdx, 'todo.pdx');
         });
-        expect(ops).toBeGreaterThan(100);
+        // A compile under 5 ms, with a @for and two-way binding.
+        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
     });
 
     it('compile 10 components sequentially', () => {
-        const { avg } = measure('10 components batch', () => {
+        const { median } = measure('10 components batch', () => {
             for (let i = 0; i < 10; i++) {
                 compile(counterPdx, `comp-${i}.pdx`);
             }
         }, 20);
-        // 10 components should compile in <50ms for fast build
-        expect(avg).toBeLessThan(50);
+        // 10 compiles under 50 ms: the same 5 ms each, back to back, as a build does them.
+        expect(median).toBeLessThan(10 * COMPILE_BUDGET_MS);
     });
 
     it('compile counter.pdx — production mode', () => {
-        const { ops } = measure('counter.pdx prod', () => {
+        const { median } = measure('counter.pdx prod', () => {
             compile(counterPdx, 'counter.pdx', undefined, undefined, { production: true, minify: true });
         });
-        // Prod has extra passes (minify, hoisting) — still fast
-        expect(ops).toBeGreaterThan(100);
+        // A compile under 5 ms with the production passes (minify, hoisting) on.
+        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
     });
 
     it('compile complex page with @fetch + @form + routing', () => {
@@ -146,10 +161,10 @@ describe('compiler benchmarks', () => {
   .user:hover { background: #f9f9f9; }
 </style>`;
 
-        const { ops } = measure('complex page compile', () => {
+        const { median } = measure('complex page compile', () => {
             compile(complexPdx, 'users.pdx');
         });
-        // Complex page: still >500 ops/sec for responsive HMR
-        expect(ops).toBeGreaterThan(100);
+        // A compile under 5 ms for a page with @page, @guard, @fetch, @await and a form.
+        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
     });
 });
