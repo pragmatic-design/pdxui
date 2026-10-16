@@ -115,6 +115,9 @@
     </div>
 
     <!-- The one field worth editing in place: no drawer, no form, no save button. -->
+    <!-- Shown once a row is current, and its inline editor brings a colour picker, a rating and a
+         switch with it: loaded after the list, as the overlays below are (#407). -->
+    @defer (idle) {
     <div class="detail" :show="current !== null" data-test="detail">
       <span class="pdx-txt-small pdx-ink-muted">{{ $t('tickets.subjectOf', { reference: currentReference }) }}</span>
       <pdx-inline-edit
@@ -123,7 +126,17 @@
         @pdx-change="onInlineSubject"
         data-test="inline-subject"></pdx-inline-edit>
     </div>
+    }
 
+    <!-- WHAT AN ACTION OPENS, LOADED AFTER THE LIST (#407). The create modal, the record drawer and
+         the drawer's question are needed only once a row is opened or "New" is pressed, but their
+         modules — the auto form, its date picker, file upload, relation pickers and the records
+         they pick from — are most of this route's graph, and the route mounts only once its whole
+         static graph has arrived: on slow 4G the list painted at 3.9 s, three seconds after the app
+         was ready, with the access request measured as not the cause. Deferred to the first idle
+         moment, they load beside the painted list; each reads the page's state when it renders, so
+         one opened before they arrive opens when they do. -->
+    @defer (idle) {
     <!-- CREATE IN A MODAL: `src/tickets/create-dialog.pdx`. The page owns
          whether it is open and what a create does; the modal says what was filled in. -->
     <pdx-create-dialog
@@ -166,6 +179,7 @@
       @pdx-confirm="list.discardAndClose()"
       @pdx-cancel="list.keepEditing()"
       data-test="drawer-confirm"></pdx-alert-dialog>
+    }
     <!-- Rule 1's host. On the SCREEN, not in the shell, and that is measured rather
          than tidy: in `app.pdx` it joins the entry chunk, and the entry is what a visitor waits
          for before anything is painted — 81 KB against a budget of 78. A toast answers an action

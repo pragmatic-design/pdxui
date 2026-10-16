@@ -174,12 +174,14 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
  *   /tickets         3700 ms          3908, 3952, 3916, 3872 ms                4350 ms
  *   /tickets/1       1776 ms          1852, 1876, 1864, 1884 ms                2100 ms
  *
- * `/tickets` paints three seconds after the app is ready: its route's ~60 modules share the slow
- * link before the page mounts. Its budget holds that number from growing, and #407 is what lowers it.
+ * `/tickets` painted three seconds after the app was ready: its route's ~60 modules shared the slow
+ * link before the page mounted. Since #449 the page defers what an action opens — the create modal,
+ * the record drawer and its question, the inline editor — to the first idle moment after it mounts,
+ * and it paints at 2924, 2944, 2956, 2960 ms locally (2960 + 10% → 3300). #407 goes on lowering it.
  */
 const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
     { route: '/', root: 'dashboard', budgetMs: 1100 },
-    { route: '/tickets', root: 'tickets', budgetMs: 4350 },
+    { route: '/tickets', root: 'tickets', budgetMs: 3300 },
     { route: '/tickets/1', root: 'ticket', budgetMs: 2100 },
 ];
 
