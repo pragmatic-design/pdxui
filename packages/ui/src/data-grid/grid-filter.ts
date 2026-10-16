@@ -9,6 +9,7 @@ import { buildEnumSelect } from '../shared/filter-popover';
 import type { FilterFieldInfo } from '../shared/filter-popover';
 import { RELATIVE_DATE_OPS } from '@pdxui/core';
 import { openGridMenu } from './grid-menu';
+import { createLazy } from '../shared/lazy-tags';
 
 // ─── Filter state (per-grid via gc.inlineFilterValues) ─────
 
@@ -135,7 +136,7 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
 
     switch (col.type) {
         case 'boolean': {
-            const sel = nameFilterControl(document.createElement('pdx-select') as any, col);
+            const sel = nameFilterControl(createLazy('pdx-select') as any, col);
             sel.size = 'sm';
             sel.placeholder = t('filter.all');
             sel.clearable = true;
@@ -159,7 +160,7 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
             return sel;
         }
         case 'number': case 'currency': {
-            const input = nameFilterControl(document.createElement('pdx-number-input') as any, col);
+            const input = nameFilterControl(createLazy('pdx-number-input') as any, col);
             input.size = 'sm';
             input.placeholder = t('filter.minPlaceholder');
             input.controls = 'none';
@@ -177,7 +178,7 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
             return wrapWithOpDropdown(gc, col, input);
         }
         case 'date': {
-            const picker = nameFilterControl(document.createElement('pdx-date-picker') as any, col);
+            const picker = nameFilterControl(createLazy('pdx-date-picker') as any, col);
             picker.size = 'sm';
             picker.placeholder = t('filter.fromPlaceholder');
             picker.clearable = true;
@@ -195,7 +196,7 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
             return wrapWithOpDropdown(gc, col, picker);
         }
         default: {
-            const input = nameFilterControl(document.createElement('pdx-input') as any, col);
+            const input = nameFilterControl(createLazy('pdx-input') as any, col);
             input.size = 'sm';
             input.placeholder = t('filter.placeholder');
             input.clearable = true;

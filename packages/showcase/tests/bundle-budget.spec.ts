@@ -196,7 +196,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 470 → 456, blocking 94 → 93: a block's static markup is an HTML string the parser reads once,
 // not a builder of DOM calls (#369), where the parser keeps the tree exactly — 120 of the
 // showcase's 123 blocks. Measured locally: js 455.0, blocking 92.3, entry 37.7.
-const BUDGET_KB = { entry: 38, js: 456, css: 59, blocking: 93 };
+// js 456 → 457: pdx-data-grid loads its editors and edit dialog on first use, and pdx-pagination its
+// page-size select (#447). A list that never edits stops fetching them before its first screen; the
+// cost is in the total, where each now has a chunk of its own behind a dynamic import, with the
+// loaders beside them. Same machine, same day: main 455.4 → 456.6 KB in all, entry 37.7 → 37.8,
+// blocking 92.4 → 92.5. The showcase's own pages still import the editors for their forms, which is
+// what #407 takes on next.
+const BUDGET_KB = { entry: 38, js: 457, css: 59, blocking: 93 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

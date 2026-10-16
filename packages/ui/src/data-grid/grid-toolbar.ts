@@ -264,7 +264,7 @@ export function updateToolbar(gc: GridContext, bar: HTMLElement): void {
     if (!gc.grid) return;
 
     // The chrome's names, re-read: the grid's effect calls this after a tracked read of
-    // `componentStringsChanged()`, so a dictionary that lands later reaches the toolbar the same
+    // `gridStringsChanged()`, so a dictionary that lands later reaches the toolbar the same
     // way it reaches the header and the rows.
     applyChromeStrings(bar);
 

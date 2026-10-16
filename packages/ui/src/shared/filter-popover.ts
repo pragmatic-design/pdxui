@@ -6,6 +6,7 @@ import { opsForType, RELATIVE_DATE_OPS } from '@pdxui/core';
 import type { FieldType } from '@pdxui/core';
 import { uiString } from './i18n';
 import { onPressOutside } from './press-outside';
+import { createLazy, loadTag, type LazyTag } from './lazy-tags';
 
 /** Operators that take NO value input: empties + relative-date presets. */
 const NO_VALUE_OPS = new Set<string>(['isnull', 'isnotnull', ...RELATIVE_DATE_OPS]);
@@ -159,7 +160,7 @@ function buildConditionRow(
     const row = document.createElement('div');
     row.className = 'pdx-dg-fp-condition';
 
-    const opSelect = document.createElement('pdx-select') as any;
+    const opSelect = createLazy('pdx-select') as any;
     opSelect.size = 'sm';
     opSelect.style.flex = '1';
     opSelect.style.minWidth = '0';
@@ -176,12 +177,12 @@ function buildConditionRow(
     const mkInput = (placeholder: string): any => {
         let el: any;
         if (colType === 'number' || colType === 'currency') {
-            el = document.createElement('pdx-number-input');
+            el = createLazy('pdx-number-input');
             el.controls = 'none';
         } else if (colType === 'date') {
-            el = document.createElement('pdx-date-picker');
+            el = createLazy('pdx-date-picker');
         } else {
-            el = document.createElement('pdx-input');
+            el = createLazy('pdx-input');
         }
         el.size = 'sm';
         el.placeholder = placeholder;
@@ -389,7 +390,7 @@ export function buildEnumSelect(
     currentValues: string[],
     onChange: (values: string[]) => void,
 ): HTMLElement {
-    const sel = document.createElement('pdx-select') as any;
+    const sel = createLazy('pdx-select') as any;
     sel.size = 'sm';
     sel.multiple = true;
     sel.clearable = true;
@@ -586,12 +587,25 @@ let _activePopover: HTMLElement | null = null;
 /** Takes the open popover's outside-click and scroll listeners away, attached or still pending. */
 let _detach: (() => void) | null = null;
 
+/** Counts openings: an opening still waiting for its controls is dropped once a later one or a close happens. */
+let _opening = 0;
+
 export function closeFilterPopover(): void {
+    _opening++;
     if (_activePopover) { _activePopover.remove(); _activePopover = null; }
     if (_detach) { _detach(); _detach = null; }
 }
 
-/** Open a filter popover anchored to an element. */
+/** The controls a condition is edited with, loaded on first use (lazy-tags.ts). */
+const CONTROLS: readonly LazyTag[] = ['pdx-select', 'pdx-input', 'pdx-number-input', 'pdx-date-picker'];
+
+/**
+ * Open a filter popover anchored to an element.
+ *
+ * At once when its controls are defined; otherwise once they are. The popover is placed by its
+ * measured width, and controls that have not been upgraded yet measure nothing: opened before
+ * them, it would sit tens of pixels off the funnel and grow under the pointer.
+ */
 export function openFilterPopoverFor(
     field: FilterFieldInfo,
     state: FilterConditionState,
@@ -600,11 +614,54 @@ export function openFilterPopoverFor(
     options: FilterPopoverOptions = {},
 ): void {
     closeFilterPopover();
+    const opening = _opening;
 
     const popover = document.createElement('div');
     popover.className = 'pdx-dg-filter-popover';
     _activePopover = popover;
 
+    // Close on a press outside or a scroll, listened for from now (#427) — while the controls are
+    // still on their way too, so a press elsewhere in that moment drops the opening. The press that
+    // opened the popover is older than the opening, and onPressOutside lets it pass. Every close —
+    // these two, Apply, Clear, Escape, a reopen, the grid's own — goes through closeFilterPopover,
+    // which detaches them.
+    // A click outside puts focus where it clicked, so it is not sent back to the opener.
+    const offPress = onPressOutside({
+        type: 'pointerdown',
+        capture: true,
+        inside: (t) => popover.contains(t),
+        outside: () => {
+            closeFilterPopover();
+            callbacks.onClose();
+        },
+    });
+    const onScroll = (e: Event) => {
+        if (popover.contains(e.target as Node)) return;
+        closeFilterPopover();
+        callbacks.onClose();
+    };
+    window.addEventListener('scroll', onScroll, true);
+    _detach = () => {
+        offPress();
+        window.removeEventListener('scroll', onScroll, true);
+    };
+
+    const missing = CONTROLS.filter((tag) => !customElements.get(tag));
+    if (missing.length === 0) { show(popover, field, state, anchorEl, callbacks, options); return; }
+    void Promise.all(missing.map(loadTag)).then(() => {
+        if (opening === _opening) show(popover, field, state, anchorEl, callbacks, options);
+    });
+}
+
+/** Build the popover's content, put it in the page and place it under its anchor. */
+function show(
+    popover: HTMLElement,
+    field: FilterFieldInfo,
+    state: FilterConditionState,
+    anchorEl: HTMLElement | { getBoundingClientRect: () => DOMRect },
+    callbacks: FilterPopoverCallbacks,
+    options: FilterPopoverOptions,
+): void {
     const opener: FilterPopoverOpener = options.opener !== undefined ? options.opener
         : anchorEl instanceof HTMLElement ? anchorEl : (document.activeElement as HTMLElement | null);
     const dismiss = () => dialog.closing(() => { closeFilterPopover(); callbacks.onClose(); });
@@ -643,32 +700,6 @@ export function openFilterPopoverFor(
     // would put the popover 34px off the funnel. Hiding it until then is not an option: the dialog takes focus
     // in a rAF registered BEFORE this one, and focus does not land in a hidden subtree.
     requestAnimationFrame(() => { if (popover.isConnected) place(); });
-
-    // Close on a press outside or a scroll, listened for from now (#427): the press that opened the
-    // popover is older than the opening, and onPressOutside lets it pass. Every close — these two,
-    // Apply, Clear, Escape, a reopen, the grid's own — goes through closeFilterPopover, which
-    // detaches them.
-    // A click outside puts focus where it clicked, so it is not sent back to the opener.
-    const offPress = onPressOutside({
-        type: 'pointerdown',
-        capture: true,
-        inside: (t) => popover.contains(t),
-        outside: () => {
-            closeFilterPopover();
-            callbacks.onClose();
-        },
-    });
-    const onScroll = (e: Event) => {
-        if (popover.contains(e.target as Node)) return;
-        closeFilterPopover();
-        callbacks.onClose();
-    };
-    window.addEventListener('scroll', onScroll, true);
-
-    _detach = () => {
-        offPress();
-        window.removeEventListener('scroll', onScroll, true);
-    };
 }
 
 // ─── Convert state to FilterDescriptor/CompositeFilter ─────

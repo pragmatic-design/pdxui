@@ -10,8 +10,6 @@ import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/pagination';
-// The rows-per-page control.
-import '../select/pdx-select';
 
 type SizeSelect = HTMLElement & { options: { value: string; label: string }[]; value: string | null };
 
@@ -234,6 +232,9 @@ component('pdx-pagination', {
          */
         let sizeSelect: SizeSelect | null = null;
         function createSizeSelect(): SizeSelect {
+            // Loaded the first time a pager offers sizes: one that offers none never fetches it.
+            // The element is upgraded when it arrives, keeping what is set on it below.
+            if (!customElements.get('pdx-select')) void import('../select/pdx-select');
             const select = document.createElement('pdx-select') as SizeSelect;
             select.className = 'pdx-pagination-size';
             select.setAttribute('size', 'sm');
