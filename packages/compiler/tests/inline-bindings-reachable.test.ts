@@ -74,7 +74,9 @@ describe('what a vite.config.ts gets', () => {
     }, 120_000);
 
     it('pdx({ inlineBindings: false }) is reported and changes nothing: the build is still inline', async () => {
-        const { code, warnings } = await buildWith({ devtools: false, inlineBindings: false });
+        // As an untyped vite.config.js passes it: the option has left the type (#121).
+        const untyped = { devtools: false, inlineBindings: false };
+        const { code, warnings } = await buildWith(untyped);
         expect(warnings).toContain('PDX_INLINE_BINDINGS_IGNORED');
         expect(code, 'inlineBindings: false still reached the compiler').not.toMatch(TEMPLATE);
         expect(code).toContain(INLINE);

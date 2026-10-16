@@ -90,7 +90,8 @@ showcase, site, examples and skills first — and the full list is migration.md.
 
 ### Since
 
-beta (#121)
+beta (#121 — **landed**: the registry, `PDX_REMOVED_FORM` and `pdx migrate`; each removal adds its
+entry in its own issue)
 
 ## Browser targets
 
@@ -116,7 +117,8 @@ it without per-element attributes.
 
 ### Since
 
-beta (#121)
+beta (#121 — **landed**: the option and `ctx.target`; the outputs in the table above land with #152,
+#132, #153 and #156)
 
 ## The render model
 

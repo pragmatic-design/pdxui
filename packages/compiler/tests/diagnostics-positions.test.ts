@@ -118,6 +118,7 @@ const ELSEWHERE: Record<string, string> = {
     PDX_TAG_COLLISION_RESOLVER: 'about two files, not a line in one',
     PDX_TAG_COLLISION: 'about two files, not a line in one',
     PDX_INLINE_BINDINGS_IGNORED: 'about the vite.config.ts, not a .pdx — inline-bindings-ignored.test.ts',
+    PDX_REMOVED_FORM: 'no form is removed yet: its line is asserted with a test entry — language-changes.test.ts',
     PDX_EMPTY_SOURCE: 'an empty file has no line',
     PDX_I18N_MISSING_KEY: 'a key in a JSON locale file, not a .pdx',
     PDX_TS: 'TypeScript\'s position, mapped by the language server — packages/cli/tests/check-types.test.ts asserts the line',

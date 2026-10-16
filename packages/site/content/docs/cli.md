@@ -29,6 +29,7 @@ npx pdx builder   # component tester + theme builder, on your own components
 npx pdx theme     # generate a WCAG-AA theme from a brand color
 npx pdx i18n      # extract keys, generate typed keys, validate dictionaries
 npx pdx extract   # translation keys → template JSON
+npx pdx migrate   # rewrite the forms the beta removed, list the ones to rewrite by hand
 ```
 
 ## pdx dev — develop without a build
@@ -142,6 +143,22 @@ npx pdx explain PDX_RAW_INTERPOLATION --json   # the same entry, for an agent
 Prints the catalog entry for a code: its severity, what it means, what to write instead, and its
 address on [Diagnostics](/docs/diagnostics). A misspelt code exits 1 and names the closest one. In
 `pdx check --json`, every finding carries the same address as `url`.
+
+## pdx migrate — move code to the beta
+
+```bash
+npx pdx migrate              # the current folder: rewrite, write, report
+npx pdx migrate src --dry    # print what it would change, write nothing
+```
+
+The beta replaces the alpha, and every form it removes or changes is registered once in the compiler.
+A removed form is an error, [`PDX_REMOVED_FORM`](/docs/diagnostics), whose message names what to
+write instead. `pdx migrate` reads the same list: it rewrites every form that has a mechanical
+rewrite, writes the files, and lists each place a person has to rewrite — a form with no mechanical
+rewrite, and every *fix*, a behaviour that changed because the old one was a defect (an arrow function
+assigned to a `$signal` is now stored, not called with the previous value). It reads `.pdx` files,
+scripts and `vite.config.*`, where the plugin's options are, and leaves `node_modules` and `dist`
+alone. A second run changes nothing.
 
 ## pdx new — start fast
 

@@ -34,7 +34,9 @@ function start(options: Parameters<typeof pdx>[0], command: 'build' | 'serve') {
 describe('pdx({ inlineBindings }) is ignored', () => {
     for (const command of ['build', 'serve'] as const) {
         it(`${command}: inlineBindings: false is reported and the module still compiles inline`, () => {
-            const { plugin, warnings } = start({ inlineBindings: false }, command);
+            // As an untyped vite.config.js passes it: the option has left the type (#121).
+            const untyped = { devtools: false, inlineBindings: false };
+            const { plugin, warnings } = start(untyped, command);
             const codes = warnings.map(w => w.code);
             expect(codes).toContain('PDX_INLINE_BINDINGS_IGNORED');
             expect(warnings.find(w => w.code === 'PDX_INLINE_BINDINGS_IGNORED')!.message).toMatch(/no longer selects a render path/);

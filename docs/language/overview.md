@@ -32,7 +32,7 @@ Every construct has the same five parts:
 - **Rules** — what is an error or a warning, with its `PDX_*` code. A rule with no code is one the
   compiler does not check today; it says so.
 - **Examples** — each a complete `.pdx` file.
-- **Since** — the language level the construct belongs to (see [Language levels](#language-levels)).
+- **Since** — the release the construct appeared in, `alpha` or `beta` (see [Removed forms and browser targets](#removed-forms-and-browser-targets)).
 
 ## Shared productions
 
@@ -115,9 +115,34 @@ let count = $signal(0);
 </style>
 ```
 
-## Language levels
+## Removed forms and browser targets
 
-A language level names a version of the forms the compiler accepts. Today there is **one level,
-`alpha`**: every construct in this reference is `alpha`, and the compiler has no option to choose
-another. The `beta` level is planned work: each change that introduces a `beta` form updates the
-section of the construct it changes, in the same pull request, and marks it `beta` under **Since**.
+There are **no language levels**: the beta replaces the alpha, and the compiler has no option that
+keeps an old form compiling (decision 36 of `beta/decisions.md`). **Since** names the release a
+construct appeared in, `alpha` or `beta`, not a level to choose.
+
+**Removed forms.** Every form the beta removes or changes is registered once in the compiler
+(`packages/compiler/src/language/changes.ts`), with how to find it, what to write instead and, when
+there is one, the mechanical rewrite. Each entry is one of four kinds, `beta/migration.md`'s:
+
+- `removed` — a language change: the old form is an error, `PDX_REMOVED_FORM`, whose message names
+  the beta form and `pdx migrate`. A form that already has a code of its own (an unknown `@defer`
+  trigger, `PDX_DEFER_UNKNOWN_TRIGGER`) keeps it. A removed export of a `@pdxui/*` package leaves the
+  package; an import of it in a `.pdx` script is `PDX_REMOVED_FORM`, naming its replacement;
+- `changed` — still valid source with a new meaning: the compiler says nothing;
+- `fix` — a behaviour that changed because the old one was a defect: nothing is an error;
+- `target` — compiled output that depends on the browser target, with nothing to rewrite.
+
+`pdx migrate [paths] [--dry]` reads the same registry. It rewrites every `removed` and `changed` form
+that has a mechanical rewrite, writes the files, and lists each place a person has to rewrite: a form
+with no mechanical rewrite, and every `fix`. It reads `.pdx` files, scripts and `vite.config.*`. It is
+idempotent; `--dry` writes nothing.
+
+**Browser targets.** `pdx({ target: 'baseline-2026' | 'baseline-2024' })` selects which platform
+features the compiled output may rely on; the default is `'baseline-2026'`. Where the beta's output
+needs a 2026 feature, `'baseline-2024'` emits today's mechanism instead (`beta/file.md` → «Browser
+targets» lists them). No output depends on the target yet: the changes that add one bring it.
+
+`'baseline-2024'` is a support target, and is maintained **frozen**: it is fixed, not developed. It is
+certified by a reduced run, built with the first output that depends on it, and it is retired when
+`@scope` is Baseline widely available, September 2028.

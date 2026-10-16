@@ -22,6 +22,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_TEMPLATE_NAME_NOT_PROVIDED` | error | A legacy-mode template reads a name its script does not provide. | [The two script modes](overview.md#the-two-script-modes) |
 | `PDX_TAG_COLLISION` | error | Two compiled `.pdx` files register the same tag (build error). | [The tag](overview.md#the-tag) |
 | `PDX_TAG_COLLISION_RESOLVER` | warn | Two component files derive the same tag; the second is not auto-importable. | [The tag](overview.md#the-tag) |
+| `PDX_REMOVED_FORM` | error | A form the beta removed from the language, with the form that replaces it. | [Removed forms and browser targets](overview.md#removed-forms-and-browser-targets) |
 
 ## Script declarations and runes
 

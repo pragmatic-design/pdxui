@@ -56,6 +56,7 @@ const main = defineCommand({
         theme: () => import('./commands/theme').then(m => m.default),
         extract: () => import('./commands/extract').then(m => m.default),
         i18n: () => import('./commands/i18n').then(m => m.default),
+        migrate: () => import('./commands/migrate').then(m => m.default),
     },
 });
 

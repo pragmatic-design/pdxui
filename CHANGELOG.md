@@ -11,6 +11,17 @@ semver.
 
 ### Features
 
+- `pdx migrate [paths] [--dry]` moves code written in alpha to the beta. Every form the beta removes or
+  changes is registered once in the compiler; a removed form is an error, `PDX_REMOVED_FORM`, whose
+  message names what to write instead. `pdx migrate` rewrites every form that has a mechanical
+  rewrite and lists each place a person has to rewrite — among them, where an arrow function is
+  assigned to a `$signal` not typed as a function (#187 changed what that does), a `??=`/`||=`/`&&=`
+  with a function on the right, `pdx({ inlineBindings })` in `vite.config`, and an unknown `@defer`
+  trigger. A second run changes nothing; `--dry` writes nothing. (#121)
+- `pdx({ target: 'baseline-2026' | 'baseline-2024' })` names the browsers the compiled output may rely
+  on; `'baseline-2026'` by default. No output depends on it yet. `'baseline-2024'` is a support target
+  for apps whose users run older browsers: maintained frozen — fixed, not developed — and retired when
+  `@scope` is Baseline widely available, in September 2028. (#121)
 - A navigation in progress is visible: `navigation.pending()` from `@pdxui/router` is true from the
   moment the before-hooks accept a navigation until its page is shown, refused, denied or replaced,
   and `navigation.to()` is its target. A `.pdx` that reads `navigation` gets the import from the
@@ -89,6 +100,8 @@ semver.
 
 ### Changed
 
+- `inlineBindings` is no longer in the type of `pdx()`'s options: a typed `vite.config.ts` that still
+  sets it does not compile. An untyped config is still told, `PDX_INLINE_BINDINGS_IGNORED`. (#121)
 - A `.pdx` renders through one path, in dev as in a build: the dev server compiles a template to the
   same DOM code a production build ships, so nothing it shows can be missing from the built app.
   `pdx({ inlineBindings })` no longer selects a render path; a value given is reported as

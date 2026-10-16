@@ -2,6 +2,11 @@
 
 export { pdx, compile } from './plugin';
 export type { PdxPluginOptions, CompileResult, CompileOptions } from './plugin';
+export type { BrowserTarget } from './compiler/compile-context';
+
+// The registry of language changes (#121): what `pdx migrate` applies and PDX_REMOVED_FORM reports.
+export { LANGUAGE_CHANGES, languageChanges, removedExport, setLanguageChangesForTests } from './language/changes';
+export type { LanguageChange, LanguageChangeKind, LanguageChangeScope, LanguageChangeFinding } from './language/changes';
 export { generateDts } from './compiler/dts-generator';
 export { SourceMapBuilder } from './compiler/sourcemap';
 export type { SourceMapJSON } from './compiler/sourcemap';
