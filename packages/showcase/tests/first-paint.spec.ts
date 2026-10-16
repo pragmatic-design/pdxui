@@ -37,7 +37,7 @@
  * true, and the layout stability that a deferral would break.
  */
 import { test, expect, type Page } from './fixture';
-import { throttle, lcpOf } from './lcp';
+import { throttle, lcpOf, medianLcp } from './lcp';
 
 /**
  * An alarm, not an instrument. What it catches is a DOUBLED ENTRY — the kind of regression that comes
@@ -165,6 +165,11 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
  * the record drawer and its question, the inline editor — to the first idle moment after it mounts,
  * and it paints at 2924, 2944, 2956, 2960 ms locally (2960 + 10% → 3300).
  *
+ * Since #464 a route is judged on the median of three cold loads (`medianLcp`): one load on a shared
+ * runner was a sample, and the HTTP/2 spec failed `/` on one at 1128 ms where the same code measured
+ * 948 and 1000. The budgets are the ones above, set against single loads: the median only takes the
+ * outliers out.
+ *
  * These are the HTTP/1.1 numbers: the preview server's six connections are most of what is left
  * on `/tickets`. The same routes over HTTP/2, the number a real host gives and #407's target, are
  * held in `first-paint-http2.spec.ts`; these stay as the second, looser number.
@@ -177,14 +182,23 @@ const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
 
 test.describe('each route\'s main content paints within its budget', () => {
     for (const { route, root, budgetMs } of LCP_ROUTES) {
-        test(`LCP of ${route} is inside its page, and within its budget`, async ({ page }) => {
-            const lcp = await lcpOf(page, route, root);
-            console.log(`[first-paint] slow 4G LCP ${route}: ${lcp.ms}ms (${lcp.element})${budgetMs === null ? ' — no budget yet' : ` against ${budgetMs}ms`}`);
-            expect(lcp.ms, `no largest-contentful-paint entry for ${route}`).toBeGreaterThan(0);
-            expect(lcp.insidePage, `the LCP of ${route} is ${lcp.element}, not inside [data-test="${root}"]: it measures the shell, not the page`)
-                .toBe(true);
+        test(`LCP of ${route} is inside its page, and within its budget`, async ({ browser, baseURL, storageState, locale }) => {
+            // Judged on the median of LCP_RUNS cold loads (#464), each in a context of its own, signed in
+            // as the suite's are: the fixture's context keeps its connections between tests, and a load
+            // that reuses them is not cold.
+            const { median: lcp, all } = await medianLcp(async () => {
+                const context = await browser.newContext({ baseURL, storageState, locale });
+                const run = await lcpOf(await context.newPage(), route, root);
+                await context.close();
+                expect(run.ms, `no largest-contentful-paint entry for ${route}`).toBeGreaterThan(0);
+                expect(run.insidePage, `the LCP of ${route} is ${run.element}, not inside [data-test="${root}"]: it measures the shell, not the page`)
+                    .toBe(true);
+                return run;
+            });
+            console.log(`[first-paint] slow 4G LCP ${route}: median ${lcp.ms}ms — runs ${all.map((r) => r.ms).join(' ')} (${lcp.element})${budgetMs === null ? ' — no budget yet' : ` against ${budgetMs}ms`}`);
             if (budgetMs !== null) {
-                expect(lcp.ms, `the LCP of ${route} is ${lcp.ms}ms against a ${budgetMs}ms budget`).toBeLessThanOrEqual(budgetMs);
+                expect(lcp.ms, `the median LCP of ${route} is ${lcp.ms}ms (runs ${all.map((r) => r.ms).join(', ')}) against a ${budgetMs}ms budget`)
+                    .toBeLessThanOrEqual(budgetMs);
             }
         });
     }

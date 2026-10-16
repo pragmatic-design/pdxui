@@ -28,6 +28,24 @@ export interface Lcp {
     insidePage: boolean;
 }
 
+/**
+ * How many cold loads a route is judged on. One load on a shared CI runner is a sample: `/` over
+ * HTTP/2 measured 948 ms, then 1128 ms, then 1000 ms on the same code (#464), and a budget set from the
+ * usual value failed on the slow one. The median of three takes one outlier out.
+ */
+export const LCP_RUNS = 3;
+
+/**
+ * `measure` run `runs` times — each a cold load in a context of its own — and the run with the median
+ * time, with all of them for the log. A run that fails throws, as a single load did.
+ */
+export async function medianLcp(measure: () => Promise<Lcp>, runs = LCP_RUNS): Promise<{ median: Lcp; all: Lcp[] }> {
+    const all: Lcp[] = [];
+    for (let i = 0; i < runs; i++) all.push(await measure());
+    const sorted = [...all].sort((a, b) => a.ms - b.ms);
+    return { median: sorted[Math.floor(sorted.length / 2)], all };
+}
+
 /** A cold load of `route`, throttled, and its LCP once the page has settled. */
 export async function lcpOf(page: Page, route: string, root: string): Promise<Lcp> {
     await page.addInitScript(() => {

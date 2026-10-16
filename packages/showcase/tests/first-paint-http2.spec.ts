@@ -20,7 +20,7 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { preview, type PreviewServer } from 'vite';
-import { lcpOf } from './lcp';
+import { lcpOf, medianLcp } from './lcp';
 
 const PORT = 5313;
 const ORIGIN = `https://localhost:${PORT}`;
@@ -40,6 +40,10 @@ const CERT_DIR = join(PACKAGE, 'test-results', '.h2-cert');
  *
  * `/tickets` meets #407's 2.0 s on its own; the budget leaves room for the gate's load, as the
  * HTTP/1.1 ones do.
+ *
+ * Judged since #464 on the median of three cold loads: one load on a shared CI runner measured `/` at
+ * 1128 ms where the same code measured 948 and 1000. The budgets stay: the median takes the outliers
+ * out, it does not move the usual value.
  */
 const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
     { route: '/', root: 'dashboard', budgetMs: 1050 },
@@ -93,20 +97,25 @@ test.describe('each route\'s main content paints within its budget, over HTTP/2'
 
     for (const { route, root, budgetMs } of LCP_ROUTES) {
         test(`LCP of ${route} over HTTP/2 is inside its page, and within its budget`, async ({ browser }) => {
-            const context = await signedIn(browser);
-            const page = await context.newPage();
-            const lcp = await lcpOf(page, route, root);
-            const protocols = await page.evaluate(() => [...new Set(
-                (performance.getEntriesByType('resource') as PerformanceResourceTiming[]).map((e) => e.nextHopProtocol))]);
-            await context.close();
+            // Judged on the median of LCP_RUNS cold loads, each in a context of its own (#464).
+            const { median: lcp, all } = await medianLcp(async () => {
+                const context = await signedIn(browser);
+                const page = await context.newPage();
+                const run = await lcpOf(page, route, root);
+                const protocols = await page.evaluate(() => [...new Set(
+                    (performance.getEntriesByType('resource') as PerformanceResourceTiming[]).map((e) => e.nextHopProtocol))]);
+                await context.close();
+                expect(protocols, `the resources did not all come over HTTP/2: ${protocols.join(', ')}`).toEqual(['h2']);
+                expect(run.ms, `no largest-contentful-paint entry for ${route}`).toBeGreaterThan(0);
+                expect(run.insidePage, `the LCP of ${route} is ${run.element}, not inside [data-test="${root}"]: it measures the shell, not the page`)
+                    .toBe(true);
+                return run;
+            });
 
-            console.log(`[first-paint] slow 4G, HTTP/2, LCP ${route}: ${lcp.ms}ms (${lcp.element})${budgetMs === null ? ' — no budget yet' : ` against ${budgetMs}ms`}`);
-            expect(protocols, `the resources did not all come over HTTP/2: ${protocols.join(', ')}`).toEqual(['h2']);
-            expect(lcp.ms, `no largest-contentful-paint entry for ${route}`).toBeGreaterThan(0);
-            expect(lcp.insidePage, `the LCP of ${route} is ${lcp.element}, not inside [data-test="${root}"]: it measures the shell, not the page`)
-                .toBe(true);
+            console.log(`[first-paint] slow 4G, HTTP/2, LCP ${route}: median ${lcp.ms}ms — runs ${all.map((r) => r.ms).join(' ')} (${lcp.element})${budgetMs === null ? ' — no budget yet' : ` against ${budgetMs}ms`}`);
             if (budgetMs !== null) {
-                expect(lcp.ms, `the LCP of ${route} over HTTP/2 is ${lcp.ms}ms against a ${budgetMs}ms budget`).toBeLessThanOrEqual(budgetMs);
+                expect(lcp.ms, `the median LCP of ${route} over HTTP/2 is ${lcp.ms}ms (runs ${all.map((r) => r.ms).join(', ')}) against a ${budgetMs}ms budget`)
+                    .toBeLessThanOrEqual(budgetMs);
             }
         });
     }
