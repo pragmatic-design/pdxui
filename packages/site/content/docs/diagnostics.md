@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 84 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 85 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -431,6 +431,14 @@ function shout() { return (v) => (v === String(v).toUpperCase() ? null : 'Shout 
 `:global()` is not CSS, and the browser drops the whole rule. A scoped style already reaches the descendants a child component renders.
 
 **Fix.** Remove the wrapper: `:global(.x) .y` → `.x .y`.
+
+### PDX_HAND_WRITTEN_SIGNAL
+
+*error* — A `signal()` or `computed()` written by hand in `<script setup>` and read bare by the template (`{{ name }}`, `:title="name"`).
+
+The template reads the names the runes declare as values. A signal created by hand is a function, and the template shows the function itself — its source text in the page, or the function assigned to a property. Calling it in the template (`{{ name() }}`) shows the value, and a hand-written signal the template does not read is not reported.
+
+**Fix.** Declare it with the rune: `let name = $signal('World');` for `signal()`, `const total = $derived(a + b);` for `computed()` — the expression, not a function.
 
 ### PDX_HOST_INVALID_ATTRIBUTE
 

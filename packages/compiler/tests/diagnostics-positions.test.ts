@@ -85,6 +85,7 @@ const ROWS: Record<string, Row> = {
     PDX_LISTENER_LEAK: { src: pdx('<p>{{ a }}</p>', "let a = $signal(1);\nwindow.addEventListener('resize', () => {});"), at: 'window.addEventListener' },
     PDX_DERIVED_WRITE: { src: pdx('<p @click="f">{{ d.x }}</p>', 'let s = $signal(1);\nconst d = $derived({ x: s });\nfunction f() { d.x = 2; }'), at: 'd.x = 2' },
     PDX_SIGNAL_MUTATED_IN_PLACE: { src: pdx('<p @click="f">{{ items.length }}</p>', 'let items = $signal([1]);\nfunction f() { items.push(2); }'), at: 'items.push(2)' },
+    PDX_HAND_WRITTEN_SIGNAL: { src: pdx('<p>{{ name }}</p>', "let a = $signal(1);\nconst name = signal('World');"), at: "name = signal('World')" },
     PDX_UNKNOWN_PROP: { src: pdx('<pdx-button :variantt="v">b</pdx-button>', "let v = $signal('a');"), at: ':variantt' },
     PDX_PROP_NAME_CASE: { src: pdx('<pdx-button :maxitems="v">b</pdx-button>', 'let v = $signal(1);'), at: ':maxitems' },
     PDX_IGNORE_WITHOUT_REASON: { src: pdx('<p>x</p>\n  <!-- pdx-ignore PDX_RAW_INTERPOLATION -->', 'let a = $signal(1);'), at: 'pdx-ignore PDX_RAW' },
