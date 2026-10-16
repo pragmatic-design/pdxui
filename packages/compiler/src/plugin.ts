@@ -16,6 +16,7 @@ import { validateDesign } from './compiler/validate-design';
 import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
 import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
+import { checkRemovedForms } from './language/removed-forms';
 import { validateDynamicContent } from './compiler/dynamic-content';
 import { routeLayout } from './compiler/codegen-shared';
 import { minifyHTML } from './compiler/minify';
@@ -36,7 +37,7 @@ import { FormControlRegistry } from './compiler/codegen-form-binding';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
 import { injectSplash, type SplashOptions } from './splash';
-import type { PropsLookup } from './compiler/compile-context';
+import type { PropsLookup, BrowserTarget } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
 import type { MethodsLookup } from './compiler/validate-commands';
 import { jsQuote } from './compiler/js-literal';
@@ -90,18 +91,14 @@ export interface PdxPluginOptions {
      * }
      */
     formControls?: Record<string, { valueEvent?: string; valueExpr?: string; checked?: boolean; textInput?: boolean }>;
+
     /**
-     * Build the DOM imperatively instead of through `html```. Production only, on by default.
-     *
-     * Ignored, and reported as `PDX_INLINE_BINDINGS_IGNORED`: a .pdx compiles with one render path,
-     * the inline one — `createElement`/`appendChild` and a direct assignment per binding — in dev
-     * and in a build alike (#107), so a feature cannot exist in one and be missing from the other.
-     * The tagged template stays in core for hand-written components. The option itself is removed
-     * with the beta's other removed forms.
-     *
-     * @deprecated It selects nothing; remove it.
+     * Which platform features the compiled output relies on (#121). `'baseline-2026'` by default;
+     * `'baseline-2024'` emits today's mechanisms where the beta's output needs a 2026 feature, for an
+     * app whose users run older browsers. That target is maintained frozen — fixed, not developed —
+     * and retired when `@scope` is Baseline widely available (September 2028).
      */
-    inlineBindings?: boolean;
+    target?: BrowserTarget;
 
     /**
      * The routes whose chunks the built `index.html` announces with `<link rel="modulepreload">`.
@@ -167,6 +164,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
     const design = options?.design ?? false;
     const defaultLayout = options?.defaultLayout;
     const splash = options?.splash === false ? null : (options?.splash ?? {});
+    const target = options?.target ?? 'baseline-2026';
     let isDevMode = false;
     // Vite's `base`, for the preload hrefs: an app served under a sub-path has to name its chunks
     // the way the browser will ask for them.
@@ -299,11 +297,14 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             for (const c of componentResolver.collisions) {
                 this.warn({ code: c.code, message: `${c.message}\n  Hint: ${c.hint}` });
             }
-            // A .pdx has one render path, in dev and in a build (#107): the option selects nothing.
-            if (options?.inlineBindings !== undefined) {
+            // A .pdx has one render path, in dev and in a build (#107): the option selects nothing. It
+            // has left the options' type (#121), so a typed config no longer compiles with it; an
+            // untyped one still passes it, and is told.
+            const inlineBindings = (options as { inlineBindings?: unknown } | undefined)?.inlineBindings;
+            if (inlineBindings !== undefined) {
                 this.warn({
                     code: 'PDX_INLINE_BINDINGS_IGNORED',
-                    message: `pdx({ inlineBindings: ${String(options.inlineBindings)} }): the option no longer selects a render path; remove it.`,
+                    message: `pdx({ inlineBindings: ${String(inlineBindings)} }): the option no longer selects a render path; remove it.`,
                 });
             }
         },
@@ -467,7 +468,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 // Determine minify: explicit option wins, otherwise auto-detect from build mode
                 const minify = shouldMinify !== undefined ? shouldMinify : !isDevMode;
                 const result = compile(code, id, compilerPlugins, resolver, {
-                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design,
+                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target,
                     // The file a runtime error names, as the app knows it.
                     sourceFile: isDevMode ? relative(projectRoot, normalize(id)).replace(/\\/g, '/') : undefined,
                     defaultLayout,
@@ -636,6 +637,8 @@ export interface CompileOptions {
      * False keeps one DOM call per node: what the test that proves the two equal compares it with.
      */
     staticMarkup?: boolean;
+    /** The browser target the output relies on, `pdx({ target })` (#121). Default: 'baseline-2026'. */
+    target?: BrowserTarget;
     /**
      * The .pdx as the app knows it, relative to its root (`src/pages/login.pdx`). Registered with the
      * component so a runtime error names its file. The dev server passes it; a production
@@ -827,6 +830,8 @@ export function compile(
     allWarnings.push(...validateHandWrittenSignals(descriptor, cachedAnalysis, source));
     // Content inside `<component :is>`: no render path renders it (#358).
     if (descriptor.template) allWarnings.push(...validateDynamicContent(descriptor.template.content, descriptor.template.start, source));
+    // A form the beta removed, from the registry of language changes (#121).
+    allWarnings.push(...checkRemovedForms(descriptor, source));
 
     // A `${` inside a bound value would be written into the module as it is, and the module would not
     // parse: the build would die in rollup, far from the line at fault. Stop here, at the line.
@@ -861,7 +866,7 @@ export function compile(
     let code = compileSFC(
         descriptor, ast, filename, runner,
         { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
-          sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup,
+          sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.
           templateOrigin: descriptor.template && !descriptor.template.src && !options?.minify ? descriptor.template.start : null },

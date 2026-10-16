@@ -77,6 +77,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it with `$signal`: `let count = $signal(0);`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_REMOVED_FORM: {
+        severity: 'error', category: 'defect',
+        summary: 'A form the beta removed from the language, with the form that replaces it.',
+        explanation: 'The beta replaces the alpha: there is no language level that keeps an old form compiling. Each removed form is registered once in the compiler (`packages/compiler/src/language/changes.ts`) with how to find it, what replaces it and, when there is one, the mechanical rewrite. The message names the beta form. A form whose meaning changed but which is still valid is not an error: `pdx migrate` reports it.',
+        fix: 'Run `pdx migrate` (with `--dry` to see first): it rewrites every form it can and lists the places a person has to rewrite. Or write the beta form the message names.',
+        reproducedIn: `${T}language-changes.test.ts`,
+    },
     PDX_HAND_WRITTEN_SIGNAL: {
         severity: 'error', category: 'defect',
         summary: 'A `signal()` or `computed()` written by hand in `<script setup>` and read bare by the template (`{{ name }}`, `:title="name"`).',

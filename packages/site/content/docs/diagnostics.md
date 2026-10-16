@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 85 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 86 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -923,6 +923,14 @@ write:
 let n = $signal(1);
 </script>
 ```
+
+### PDX_REMOVED_FORM
+
+*error* — A form the beta removed from the language, with the form that replaces it.
+
+The beta replaces the alpha: there is no language level that keeps an old form compiling. Each removed form is registered once in the compiler (`packages/compiler/src/language/changes.ts`) with how to find it, what replaces it and, when there is one, the mechanical rewrite. The message names the beta form. A form whose meaning changed but which is still valid is not an error: `pdx migrate` reports it.
+
+**Fix.** Run `pdx migrate` (with `--dry` to see first): it rewrites every form it can and lists the places a person has to rewrite. Or write the beta form the message names.
 
 ### PDX_REWRITE_FALLBACK
 

@@ -119,8 +119,15 @@ the DOM, which is not worth it.
 
 `pdx({ inlineBindings })`, which used to select the tagged template instead, no longer selects
 anything: a build or a dev server given it says so once, as `PDX_INLINE_BINDINGS_IGNORED`. Remove it.
-The tagged template, `html`, stays in `@pdxui/core` for components written by hand in TypeScript,
-where a bound value still goes through `setProp()`'s dispatch.
+It has left the type of the options, so a typed `vite.config.ts` that still sets it does not compile,
+and `pdx migrate` lists it ([CLI](cli.md)). The tagged template, `html`, stays in `@pdxui/core`
+for components written by hand in TypeScript, where a bound value still goes through `setProp()`'s
+dispatch.
+
+`pdx({ target })` names the browsers the output may rely on: `'baseline-2026'`, the default, or
+`'baseline-2024'` for an app whose users run older browsers, where the beta's output needs a 2026
+feature. No output depends on it yet. `'baseline-2024'` is maintained frozen — fixed, not developed —
+and retired when `@scope` is Baseline widely available, in September 2028.
 
 ## The first screen, in one round-trip less
 

@@ -126,7 +126,20 @@ export interface CompileContext {
      * off keeps one DOM call per node — what the test that proves the two equal compares it with.
      */
     readonly staticMarkup: boolean;
+
+    /**
+     * The browser target the output relies on, `pdx({ target })` (#121): which platform features a
+     * code generator may emit. `'baseline-2026'` unless the app says otherwise.
+     */
+    readonly target: BrowserTarget;
 }
+
+/**
+ * What the compiled output may rely on in the browser (`docs/language/beta/file.md` → «Browser
+ * targets»). `'baseline-2024'` emits today's mechanisms where the beta's output needs a 2026 feature;
+ * it is maintained frozen and retired when `@scope` is Baseline widely available.
+ */
+export type BrowserTarget = 'baseline-2026' | 'baseline-2024';
 
 /** tag → the props a binding can set on it, or null when the tag is unknown. */
 export type PropsLookup = (tag: string) => ReadonlySet<string> | null | undefined;
@@ -144,6 +157,7 @@ export function createCompileContext(options?: {
     templateOrigin?: number | null;
     sourceFile?: string | null;
     staticMarkup?: boolean;
+    target?: BrowserTarget;
 }): CompileContext {
     return {
         production: options?.production ?? false,
@@ -170,5 +184,6 @@ export function createCompileContext(options?: {
         templateOrigin: options?.templateOrigin ?? null,
         sourceFile: options?.sourceFile ?? null,
         staticMarkup: options?.staticMarkup ?? true,
+        target: options?.target ?? 'baseline-2026',
     };
 }
