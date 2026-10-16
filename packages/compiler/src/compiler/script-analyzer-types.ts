@@ -260,7 +260,6 @@ export interface ScriptAnalysis {
      * was given `lineBase`. A development build names the effect after it.
      */
     runeLines?: { effects: (number | null)[]; watches: (number | null)[] };
-    inlineBlocks?: string[]; // $inline {} blocks for render path
     userImports: string[];   // non-framework imports
     coreImportNames: string[]; // framework imports to merge
     /** Every local name the script's value imports bind — the template reaches them as they are. */

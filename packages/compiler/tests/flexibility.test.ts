@@ -1,4 +1,5 @@
-// Tests for flexibility features: @raw, complex props, shadow DOM, @use, @mixin, $inline.
+// Tests for flexibility features: @raw, complex props, shadow DOM, @use, @mixin. ($inline was
+// removed, #361: inline-block-removed.test.ts.)
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
@@ -117,28 +118,6 @@ describe('@mixin component composition', () => {
         const { code } = compile(source, 'mixin.pdx');
         expect(code).toContain("import { setup as __mixin_pagination }");
         expect(code).toContain('const pagination = __mixin_pagination(ctx)');
-    });
-});
-
-describe('$inline render-time blocks', () => {
-    it('puts inline code in render function', () => {
-        const source = `
-<template>
-  @for (sorted as item; track item.id) {
-    <div>{{ item.name }}</div>
-  }
-</template>
-<script setup>
-  let items = $signal([]);
-  $inline {
-    const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name));
-  }
-</script>`;
-        const { code } = compile(source, 'inline.pdx');
-        // render should be a block function, not arrow expression
-        expect(code).toMatch(/render:\s*\(ctx\)\s*=>\s*\{/);
-        expect(code).toContain('sorted = [');
-        expect(code).toContain('return (() => {');
     });
 });
 

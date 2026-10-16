@@ -106,7 +106,6 @@ function reactiveSurfaces(analysis: ScriptAnalysis, exclude: string): string[] {
     for (const ef of analysis.effects) block(ef);
     for (const m of analysis.lifecycle.onMount) block(m);
     for (const d of analysis.lifecycle.onDestroy) block(d);
-    for (const b of analysis.inlineBlocks ?? []) block(b);
     if (analysis.head.title && analysis.head.title.isDynamic) expr(analysis.head.title.value);
     // A @state's condition (#132) and a @host binding's value or handler (#133) read the script too.
     for (const s of analysis.states) expr(s.expr);
@@ -397,7 +396,7 @@ export function validate(
         // A tag the file's own script registers is known: a string literal passed first to
         // customElements.define / defineComponent / component. A name held in a variable
         // is not guessed.
-        const selfDefined = selfDefinedTags([analysis.body, ...(analysis.inlineBlocks ?? []),
+        const selfDefined = selfDefinedTags([analysis.body,
             ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy, ...analysis.effects].join('\n'));
         for (const tag of findComponentTags(ast).filter(t => !options.isKnownTag!(t) && !selfDefined.has(t))) {
             const meant = options.knownTags ? onlyNear(tag, options.knownTags(), 2) : undefined;

@@ -1107,11 +1107,11 @@ let count = $signal(0);
 
 ### PDX_UNKNOWN_DECLARATION
 
-*error* — A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise.
+*error* — A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; or a `$inline { … }` block, which is not part of the language.
 
-The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds.
+The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds. A `$inline` block is dropped whole: it used to be copied into the render, where the template could not reach what it declared and its signals were not rewritten (#361).
 
-**Fix.** Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`.
+**Fix.** Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`. For a `$inline` block, declare what the template reads with `$derived`.
 
 ### PDX_UNKNOWN_DIRECTIVE
 
