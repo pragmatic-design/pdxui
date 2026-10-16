@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
         with: { version: 10.8.1 }
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
@@ -64,7 +64,7 @@ jobs:
       - name: Behavior suite
         if: matrix.project == 'contracts'
         run: pnpm --filter @pdxui/responsive exec playwright test --config tests/playwright-behavior.config.ts
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: contracts-report-${{ matrix.project }}-${{ matrix.shard }}
@@ -77,7 +77,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { lfs: true } # the PNG baselines are in Git LFS
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with: { node-version: 22 }
       # Through run.mjs, NOT a docker command spelled out here.
       #
@@ -93,7 +93,7 @@ jobs:
       # that this job goes through it — so the two cannot drift apart.
       - name: Visual regression + font guard (compare with the baselines, no update)
         run: node packages/responsive/tests/docker/run.mjs
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: visual-diffs
