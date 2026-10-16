@@ -64,6 +64,10 @@ const cases: [string, () => void][] = [
         { code: 'PDX_ROUTE_FIELD_INVALID', severity: 'error', message: '', line: 1, column: 1 })],
     // Measured on the machine it was written on: 11.7 s for 100,000 characters before the rewrite (#266).
     ['@params: a run of 0 with no colon (alert #157)', () => parseRouteParams('{ ' + '0'.repeat(N) + ' }')],
+    // Linear before their rewrite too (#461: 160,000 tabs in 0.2 ms, the regex alone): CodeQL could
+    // not see it, and these keep the rewrite as fast.
+    ['handler arrow: $=> and a run of tabs (alert #159)', () => compile(pdx(`<button @click="$=>${'\t'.repeat(N)}">x</button>`), 'h.pdx')],
+    ['handler assignment: a -= and a run of tabs (alert #160)', () => compile(pdx(`<button @click="a-=${'\t'.repeat(N)}">x</button>`), 'h.pdx')],
     // The regex it replaced took 1.7 s for 200,000 characters (#283).
     ['@for … @virtual shape: an open <ul> and <!-- repeated', () => checkVirtualFor([
         { type: 'html', content: `<ul><!--${'<!--'.repeat(N / 4)}` },
