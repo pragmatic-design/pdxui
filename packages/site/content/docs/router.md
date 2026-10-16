@@ -141,6 +141,17 @@ route can call it. It therefore runs **before the component exists**: it cannot 
 signals, and takes what it needs from the URL. A `@loader` naming a function that is not declared
 is reported as `PDX_LOADER_NOT_FOUND` rather than silently registering nothing.
 
+The data does not wait for the page's code. The compiler gives the loader a small module of its
+own, and a navigation starts it together with the page's chunk: on a real network that is one round
+trip for both, not one for the code and then one for the data. The page appears when both are in. A
+loader that reads something the script declares beside it — a constant, a helper — has to stay with
+its page, and then the page's chunk comes first; keep what a loader needs in an import, and it moves.
+
+A link that prefetches its route on hover or in view starts the loader too, so the data is often in
+before the click. The result waits ten seconds for the navigation, under the route, its params and
+its query — `?a=1&b=2` and `?b=2&a=1` are one call — and a route the visitor may not enter is never
+asked for its data: its guards answer first.
+
 ## Shared layouts: @layout
 
 A **shell around a group of pages** — a rail, a topbar, whatever every screen in a section has —
@@ -397,6 +408,9 @@ You write nothing for the common case. What you can write is the exception:
 @page '/assets/:id' { prefetch: 'viewport' }; // fetch it once a link to it scrolls into view
 @page '/admin'   { prefetch: 'never' };     // never speculatively
 ```
+
+With `hover` (the default) and `viewport`, a route with a `@loader` has its data prefetched as well
+(«Data before the page», above); `eager` fetches the code only.
 
 `viewport` sits between the two: a link far down a long page costs nothing until the visitor
 scrolls to it, and then its chunk is on its way before any hover. One `IntersectionObserver` watches

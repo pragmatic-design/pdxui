@@ -31,6 +31,7 @@ import { PluginRunner } from './plugin-system';
 import type { CompilerPlugin } from './plugin-system';
 import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
 import { generateRouteTable, routerSeamModule, devRouteTableModule, buildSpecifier, devSpecifier, ROUTE_TABLE_ID } from './route-table';
+import { generateLoaderModule, LOADER_MODULE_PREFIX } from './loader-module';
 import { FormControlRegistry } from './compiler/codegen-form-binding';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
@@ -315,6 +316,8 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             // its `.css` ending through the `\0` prefix, which is what makes Vite run its CSS
             // pipeline on what `load` returns instead of treating it as a JS module.
             if (id.startsWith(STYLE_MODULE_PREFIX)) return '\0' + id;
+            // A page's `@loader` in a module of its own, named after the page's tag (#119).
+            if (id.startsWith(LOADER_MODULE_PREFIX)) return '\0' + id;
         },
         load(id: string) {
             if (id === RESOLVED_ROUTE_TABLE_ID) {
@@ -323,6 +326,15 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     isDevMode ? devSpecifier(viteRoot ?? process.cwd()) : buildSpecifier, { devtools: isDevMode });
             }
             if (id === RESOLVED_ROUTES_DEV_ID) return devRouteTableModule();
+            if (id.startsWith('\0' + LOADER_MODULE_PREFIX)) {
+                // The page is found in the scan, by the tag the table named it by; its source is read
+                // again, so an edit to the loader reaches this module as it reaches the page's.
+                const tag = id.slice(1 + LOADER_MODULE_PREFIX.length);
+                const route = scannedRoutes.find(r => r.tag === tag && r.loader);
+                if (!route?.loader) return 'export default null;\n';
+                this.addWatchFile(route.file);
+                return generateLoaderModule(readFileSync(route.file, 'utf-8'), route.file, route.loader);
+            }
             if (id.startsWith('\0' + STYLE_MODULE_PREFIX)) {
                 // The source file and the block index are in the id, read back by the inverse of
                 // the function that wrote it; the CSS is produced by the SAME function the dev-mode

@@ -11,6 +11,7 @@
 
 import { relative } from 'path';
 import { jsString } from './compiler/js-literal';
+import { loaderModuleId } from './loader-module';
 import type { ScannedRoute } from './plugin-utils';
 
 /** How the table names a page's module in an `import()`. */
@@ -91,9 +92,12 @@ export function generateRouteTable(
             // the file's absolute path on the machine that built it.
             r.lazy ? 'lazy: true' : '',
             // The FUNCTION lives in the page's module, which this table must not import statically —
-            // that would put every page in the entry. The bridge imports the page and calls the
-            // loader its registration published.
-            r.loader ? `loader: () => __load(${jsString(r.path)}, ${imp(r.file)}, ${jsString(r.loader)})` : '',
+            // that would put every page in the entry. The bridge imports the loader's own module
+            // (#119), so the data does not wait for the page's chunk, and the page's when the
+            // loader cannot stand alone.
+            r.loader
+                ? `loader: () => __load(${jsString(r.path)}, ${imp(r.file)}, ${jsString(r.loader)}, () => import(${jsString(loaderModuleId(r.tag))}))`
+                : '',
         ].filter(Boolean).join(', ')
         + ' }',
     ).join(',\n');
@@ -119,9 +123,13 @@ function __registered(path) {
   return hit && typeof hit.loader === 'function' ? hit.loader : null;
 }
 
-/** Import the page when its loader has not registered yet, then call it. */
-async function __load(path, page, name) {
+/**
+ * The loader: as its page registered it, or from its own module, or — when it cannot stand alone —
+ * from the page, imported first. Then call it.
+ */
+async function __load(path, page, name, own) {
   let fn = __registered(path);
+  if (!fn) fn = (await own()).default;
   if (!fn) { await page(); fn = __registered(path); }
   if (!fn) {
     throw new Error('@loader "' + name + '" is declared on ' + path + ' but the page module '

@@ -5,9 +5,12 @@
 // exists to keep. So a function declared in a page cannot be written into it.
 //
 // The answer: the table carries a BRIDGE per route that declares a loader. It takes the function
-// from the registration the page module publishes into `globalThis.__pdx_routes` when it is
-// imported; for a lazily loaded route that registration does not exist yet on the first visit, so
-// the bridge imports the page first — through a literal `import()` the bundler can see and split.
+// from the registration the page module publishes into `globalThis.__pdx_routes` when it has been
+// imported. On the first visit it has not, and the bridge imports the loader's OWN module
+// (`virtual:pdx-loader/<tag>`, #119), so the data does not wait for the page's chunk; only when the
+// loader cannot stand alone — it reads a name its script declares beside it — does that module hold
+// nothing, and the bridge imports the page instead. Both through literal `import()`s the bundler can
+// see and split.
 //
 // The behaviour suite (packages/router/tests/parity.test.ts) runs the loader rows against the table.
 // This file pins what is emitted and the paths those rows do not take: the lazy first visit, and a
@@ -38,6 +41,10 @@ function evaluate(routes: ScannedRoute[], importer: (spec: string) => Promise<un
 
 const neverImported = (spec: string): Promise<unknown> => Promise.reject(new Error(`imported ${spec}`));
 
+/** The loader's own module holds nothing (it needs its page); every other import is `page`. */
+const noOwnModule = (page: (spec: string) => Promise<unknown>) => (spec: string): Promise<unknown> =>
+    spec.startsWith('virtual:pdx-loader/') ? Promise.resolve({ default: null }) : page(spec);
+
 afterEach(() => {
     delete (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes;
 });
@@ -46,7 +53,8 @@ describe('what the table carries', () => {
     it('carries a bridge on the route, never the name as a value to call', () => {
         const code = generateRouteTable([DATA]);
 
-        expect(code, 'the bridge did not reach the route entry').toContain('loader: () => __load("/data", () => import("/app/pages/data.pdx"), "loadRows")');
+        expect(code, 'the bridge did not reach the route entry').toContain(
+            'loader: () => __load("/data", () => import("/app/pages/data.pdx"), "loadRows", () => import("virtual:pdx-loader/pdx-data"))');
         // A string where the router expects a function is a call on a string.
         expect(code).not.toContain('loader: "loadRows"');
     });
@@ -74,13 +82,25 @@ describe('how the function is found', () => {
         expect(await route.loader!()).toEqual({ rows: 2 });
     });
 
-    it('imports the page module when nothing has registered yet — the lazy first visit', async () => {
+    it('imports the loader\'s own module when nothing has registered yet, and not the page', async () => {
         const imported: string[] = [];
         const [route] = evaluate([DATA], async (spec) => {
             imported.push(spec);
+            if (spec.startsWith('virtual:pdx-loader/')) return { default: async () => 'own' };
+            throw new Error(`imported ${spec}`);
+        });
+
+        expect(await route.loader!()).toBe('own');
+        expect(imported, 'the data waited for the page module').toEqual(['virtual:pdx-loader/pdx-data']);
+    });
+
+    it('imports the page module when the loader has no module of its own — the lazy first visit', async () => {
+        const imported: string[] = [];
+        const [route] = evaluate([DATA], noOwnModule(async (spec) => {
+            imported.push(spec);
             // What a compiled page module does when it loads.
             (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/data', loader: async () => 'fresh' }];
-        });
+        }));
 
         expect(await route.loader!()).toBe('fresh');
         expect(imported).toEqual(['/app/pages/data.pdx']);
@@ -89,14 +109,14 @@ describe('how the function is found', () => {
     it('ignores a registration whose loader is not callable', async () => {
         // A loader emitted as a STRING and called anyway is a call on a string. The bridge goes on to
         // import the page instead — which, here, is the rejection that proves it did.
-        const [route] = evaluate([DATA], neverImported);
+        const [route] = evaluate([DATA], noOwnModule(neverImported));
         (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/data', loader: 'loadRows' }];
 
         await expect(route.loader!()).rejects.toThrow('imported /app/pages/data.pdx');
     });
 
     it('names the loader when the page module registered none', async () => {
-        const [route] = evaluate([DATA], async () => { /* a page that registers nothing */ });
+        const [route] = evaluate([DATA], noOwnModule(async () => { /* a page that registers nothing */ }));
 
         await expect(route.loader!()).rejects.toThrow('@loader "loadRows" is declared on /data but the page module registered none');
     });

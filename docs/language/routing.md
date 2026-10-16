@@ -254,6 +254,16 @@ state (`'loading'`, `'done'`, `'error'`) is `currentLoaderState()`; the compiler
 `@pdxui/router` into the module. Because it runs before the component exists, a loader cannot read
 the page's props or signals.
 
+The loader also gets a module of its own, `virtual:pdx-loader/<tag>`: its declaration, the script
+imports it reads, its types erased. The route table imports that module, and a navigation starts it
+together with the chunk of every level of the match; a level is shown when its loader and its chunk
+have both settled (#119). A loader that reads a name the script declares beside it — a constant, a
+helper, a rune — is not moved: its module exports `null`, and the route table imports the page to
+reach it, as before. A link that prefetches its route under the `hover` or `viewport` policy starts
+the loader too, once every guard of the route has allowed it; the result is kept for ten seconds
+under the route's pattern, its own params and its query in a canonical order, and a navigation with
+the same key takes it instead of calling the loader.
+
 #### Rules
 
 - A name no function of the script declares raises `PDX_LOADER_NOT_FOUND` (a warning); the route is

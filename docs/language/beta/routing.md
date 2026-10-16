@@ -28,7 +28,7 @@ Each string must be a `Path` (`PDX_PAGE_INVALID_PATH`, alpha).
 `@page` is the **one home of every route field** (decisions.md 1, 2, 7, 8, 19 — proposed): its
 paths (an alias is a further path), and its options `keepAlive`, `preload`, `prefetch`, `label`,
 `transition` (the page transition) and `meta` (route data). A page is its own chunk; loading it and
-running its loader start together (#119, below).
+running its loader start together (#119 — landed, below).
 
 ```pdx
 <script>
@@ -38,7 +38,7 @@ running its loader start together (#119, below).
 
 The `prefetch` policy `'hover'` or `'viewport'` prefetches the route's **data** too — its loader is
 started and its promise kept for the navigation that follows within 10 seconds — and a prefetch never
-runs a loader of a route the user may not enter (#119).
+runs a loader of a route the user may not enter (#119 — landed).
 
 ### @guard, @layout, @outlet, @scroll, @redirect — unchanged
 
