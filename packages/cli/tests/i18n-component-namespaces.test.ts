@@ -11,20 +11,18 @@
 // component that registers strings under a new namespace fails here by name.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, globSync } from 'node:fs';
 import { join } from 'node:path';
-import fg from 'fast-glob';
 import { COMPONENT_STRING_NAMESPACES } from '../src/i18n/keys';
 
 const PACKAGES = join(__dirname, '..', '..');
 
 /** Every `registerComponentStrings('<ns>'` in the workspace's sources. */
 function declaredNamespaces(): string[] {
-    const files = fg.sync(['*/src/**/*.ts'], {
+    const files = globSync(['*/src/**/*.ts'], {
         cwd: PACKAGES,
-        absolute: true,
-        ignore: ['**/node_modules/**', '**/dist/**', '**/*.d.ts'],
-    });
+        exclude: ['**/node_modules/**', '**/dist/**', '**/*.d.ts'],
+    }).map(file => join(PACKAGES, file));
     const found = new Set<string>();
     for (const file of files) {
         const src = readFileSync(file, 'utf-8');

@@ -1,9 +1,9 @@
 // Shared i18n tooling helpers: scan source for $t() keys, load/flatten locale dictionaries.
 // Used by the `pdx i18n` subcommands (extract / types / validate).
 
-import fg from 'fast-glob';
 import { readFileSync } from 'fs';
 import { basename } from 'path';
+import { findFiles } from '../find-files';
 
 /**
  * Match a `$t(` call whose first argument STARTS with a string literal.
@@ -43,9 +43,8 @@ export const COMPONENT_STRING_NAMESPACES: readonly string[] = [
 
 /** Scan .pdx/.ts/.tsx under root for $t() arguments. */
 export async function scanUsedKeys(root: string): Promise<UsedKeys> {
-    const files = await fg(['**/*.{pdx,ts,tsx}'], {
+    const files = await findFiles(['**/*.{pdx,ts,tsx}'], {
         cwd: root,
-        absolute: true,
         ignore: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/*.d.ts'],
     });
     const keys = new Map<string, Set<string>>();
@@ -148,7 +147,7 @@ export async function loadDictionaries(
     const seen = new Set<string>();
     for (const root of roots) {
         for (const glob of globs) searched.push(`${root}/${glob}`);
-        const files = await fg([...globs], { cwd: root, absolute: true, ignore: ['**/node_modules/**'] });
+        const files = await findFiles([...globs], { cwd: root, ignore: ['**/node_modules/**'] });
         for (const file of files) {
             if (seen.has(file)) continue;
             seen.add(file);

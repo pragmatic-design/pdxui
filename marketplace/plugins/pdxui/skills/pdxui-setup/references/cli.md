@@ -10,6 +10,7 @@ there's no compilation to wait for, in prod there's a build that optimizes with 
 
 The CLI is its own package and a **dev dependency**: `@pdxui/framework` does not include it, and
 without the install `npx pdx` asks the public registry for a package called `pdx` and gets a 404.
+It needs Node 22.17 or later, the first release where Node's own `fs.glob` is stable.
 
 ```bash
 npm i -D @pdxui/cli   # once per app
