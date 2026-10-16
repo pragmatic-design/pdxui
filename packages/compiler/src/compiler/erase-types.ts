@@ -14,6 +14,37 @@ import ts from 'typescript';
 
 type Range = [number, number];
 
+/** Nodes with no children and no type syntax: a name, a literal, a keyword value, a punctuation token. */
+const LEAF_KINDS = new Set<ts.SyntaxKind>([
+    ts.SyntaxKind.Identifier, ts.SyntaxKind.PrivateIdentifier,
+    ts.SyntaxKind.StringLiteral, ts.SyntaxKind.NumericLiteral, ts.SyntaxKind.BigIntLiteral,
+    ts.SyntaxKind.NoSubstitutionTemplateLiteral, ts.SyntaxKind.RegularExpressionLiteral,
+    ts.SyntaxKind.TemplateHead, ts.SyntaxKind.TemplateMiddle, ts.SyntaxKind.TemplateTail,
+    ts.SyntaxKind.ThisKeyword, ts.SyntaxKind.SuperKeyword, ts.SyntaxKind.TrueKeyword,
+    ts.SyntaxKind.FalseKeyword, ts.SyntaxKind.NullKeyword, ts.SyntaxKind.EndOfFileToken,
+    ts.SyntaxKind.DotToken, ts.SyntaxKind.QuestionDotToken, ts.SyntaxKind.DotDotDotToken,
+    ts.SyntaxKind.EqualsGreaterThanToken, ts.SyntaxKind.EqualsToken, ts.SyntaxKind.CommaToken,
+    ts.SyntaxKind.EqualsEqualsEqualsToken, ts.SyntaxKind.ExclamationEqualsEqualsToken,
+    ts.SyntaxKind.EqualsEqualsToken, ts.SyntaxKind.ExclamationEqualsToken,
+    ts.SyntaxKind.AmpersandAmpersandToken, ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken,
+    ts.SyntaxKind.PlusToken, ts.SyntaxKind.MinusToken, ts.SyntaxKind.LessThanToken, ts.SyntaxKind.GreaterThanToken,
+]);
+
+/**
+ * Nodes that are no type syntax themselves, take no modifiers and are not function- or class-like:
+ * only their children can hold types. A call is not one (its type arguments), nor a declaration.
+ */
+const WALK_ONLY_KINDS = new Set<ts.SyntaxKind>([
+    ts.SyntaxKind.Block, ts.SyntaxKind.ExpressionStatement, ts.SyntaxKind.ReturnStatement,
+    ts.SyntaxKind.IfStatement, ts.SyntaxKind.VariableDeclarationList,
+    ts.SyntaxKind.PropertyAccessExpression, ts.SyntaxKind.ElementAccessExpression,
+    ts.SyntaxKind.BinaryExpression, ts.SyntaxKind.ConditionalExpression, ts.SyntaxKind.ParenthesizedExpression,
+    ts.SyntaxKind.PrefixUnaryExpression, ts.SyntaxKind.PostfixUnaryExpression,
+    ts.SyntaxKind.ObjectLiteralExpression, ts.SyntaxKind.PropertyAssignment,
+    ts.SyntaxKind.ShorthandPropertyAssignment, ts.SyntaxKind.ArrayLiteralExpression, ts.SyntaxKind.SpreadElement,
+    ts.SyntaxKind.TemplateExpression, ts.SyntaxKind.TemplateSpan,
+]);
+
 /** The type syntax of `code`, as ranges to blank, and the constructs that cannot be erased. */
 function collect(code: string, sf: ts.SourceFile): { ranges: Range[]; unsupported: ts.Node[] } {
     const ranges: Range[] = [];
@@ -33,23 +64,31 @@ function collect(code: string, sf: ts.SourceFile): { ranges: Range[]; unsupporte
         const colon = code.lastIndexOf(':', type.getStart(sf));
         if (colon >= 0) blank(colon, type.end);
     };
-    const hasModifier = (n: ts.Node, kind: ts.SyntaxKind) =>
-        ts.canHaveModifiers(n) && (ts.getModifiers(n) ?? []).some(m => m.kind === kind);
     const TYPE_ONLY_MODIFIERS = new Set([
         ts.SyntaxKind.PublicKeyword, ts.SyntaxKind.PrivateKeyword, ts.SyntaxKind.ProtectedKeyword,
         ts.SyntaxKind.ReadonlyKeyword, ts.SyntaxKind.OverrideKeyword, ts.SyntaxKind.AbstractKeyword,
     ]);
 
     const visit = (n: ts.Node): void => {
+        // A leaf has no type syntax and nothing to walk into. Most of a compiled render is leaves: since
+        // the inline path (#363) it is statements, not one template literal, and the checks below, run
+        // on every node, cost more than its parse did (#454).
+        if (LEAF_KINDS.has(n.kind)) return;
+        if (WALK_ONLY_KINDS.has(n.kind)) { ts.forEachChild(n, visit); return; }
+        // Read once, as the parser stored them: `ts.getModifiers` allocates for every node. The
+        // decorators in the list are never one of the kinds looked for.
+        const modifiers = ts.canHaveModifiers(n) ? n.modifiers : undefined;
+        const hasModifier = (kind: ts.SyntaxKind) => !!modifiers && modifiers.some(m => m.kind === kind);
+
         // Whole statements that are types only.
-        if (ts.isInterfaceDeclaration(n) || ts.isTypeAliasDeclaration(n) || hasModifier(n, ts.SyntaxKind.DeclareKeyword)) { whole(n); return; }
+        if (ts.isInterfaceDeclaration(n) || ts.isTypeAliasDeclaration(n) || hasModifier(ts.SyntaxKind.DeclareKeyword)) { whole(n); return; }
         if (ts.isImportDeclaration(n) && n.importClause?.isTypeOnly) { whole(n); return; }
         if (ts.isExportDeclaration(n) && n.isTypeOnly) { whole(n); return; }
         if (ts.isImportEqualsDeclaration(n)) { if (n.isTypeOnly) whole(n); else unsupported.push(n); return; }
         if (ts.isEnumDeclaration(n) || ts.isModuleDeclaration(n)) { unsupported.push(n); return; }
         // An overload signature, an abstract member, an index signature: a body-less declaration.
         if ((ts.isFunctionDeclaration(n) || ts.isMethodDeclaration(n)) && !n.body) { whole(n); return; }
-        if (ts.isIndexSignatureDeclaration(n) || (ts.isPropertyDeclaration(n) && hasModifier(n, ts.SyntaxKind.AbstractKeyword))) { whole(n); return; }
+        if (ts.isIndexSignatureDeclaration(n) || (ts.isPropertyDeclaration(n) && hasModifier(ts.SyntaxKind.AbstractKeyword))) { whole(n); return; }
 
         // `import { a, type B }` / `export { a, type B }`: the type-only specifiers, with their comma.
         if (ts.isNamedImports(n) || ts.isNamedExports(n)) {
@@ -63,15 +102,15 @@ function collect(code: string, sf: ts.SourceFile): { ranges: Range[]; unsupporte
         }
 
         if (ts.isParameter(n)) {
-            if ((ts.getModifiers(n) ?? []).some(m => TYPE_ONLY_MODIFIERS.has(m.kind))) { unsupported.push(n); return; }
+            if (modifiers?.some(m => TYPE_ONLY_MODIFIERS.has(m.kind))) { unsupported.push(n); return; }
             if (n.questionToken) blank(n.questionToken.getStart(sf), n.questionToken.end);
         }
         if ((ts.isVariableDeclaration(n) || ts.isPropertyDeclaration(n)) && n.exclamationToken) blank(n.exclamationToken.getStart(sf), n.exclamationToken.end);
         if (ts.isPropertyDeclaration(n) && n.questionToken) blank(n.questionToken.getStart(sf), n.questionToken.end);
 
         // Modifiers that exist only for the checker.
-        if (ts.canHaveModifiers(n) && !ts.isParameter(n)) {
-            for (const m of ts.getModifiers(n) ?? []) if (TYPE_ONLY_MODIFIERS.has(m.kind)) blank(m.getStart(sf), m.end);
+        if (modifiers && !ts.isParameter(n)) {
+            for (const m of modifiers) if (TYPE_ONLY_MODIFIERS.has(m.kind)) blank(m.getStart(sf), m.end);
         }
         if (ts.isHeritageClause(n) && n.token === ts.SyntaxKind.ImplementsKeyword) { whole(n); return; }
 
@@ -112,7 +151,9 @@ function blankOut(code: string, ranges: Range[]): string {
  * does not parse (a return type that broke a line before `=>`).
  */
 export function eraseTypes(code: string, filename: string): string {
-    const sf = ts.createSourceFile('__pdx_module.ts', code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    // No parent links: every position is read with the source file passed, and setting them was a
+    // third of the parse (#454).
+    const sf = ts.createSourceFile('__pdx_module.ts', code, ts.ScriptTarget.Latest, false, ts.ScriptKind.TS);
     if (parseDiagnostics(sf).length > 0) return code;
     const { ranges, unsupported } = collect(code, sf);
     if (unsupported.length > 0) {
@@ -121,7 +162,7 @@ export function eraseTypes(code: string, filename: string): string {
     }
     if (ranges.length === 0) return code;
     const out = blankOut(code, ranges);
-    const check = ts.createSourceFile('__pdx_module.ts', out, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const check = ts.createSourceFile('__pdx_module.ts', out, ts.ScriptTarget.Latest, false, ts.ScriptKind.TS);
     const left = collect(out, check).ranges.length;
     if (parseDiagnostics(check).length > 0 || left > 0) {
         throw new Error(`[PDX_TS_UNSUPPORTED] ${filename} — erasing the TypeScript of this script left code that does not parse${left ? ' or types that remain' : ''}. A return type written on its own line before \`=>\` is the usual cause.\n  Hint: keep an arrow function's return type on the line of its parameters.`);

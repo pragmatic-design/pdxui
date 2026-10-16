@@ -80,6 +80,24 @@ describe('TypeScript in a .pdx script', () => {
         expect(out).toContain('const x         = f   (1)          ;');
     });
 
+    it('erases the types inside any expression or statement, not only at the top of one (#454)', () => {
+        // The walk passes through a member access, an operator, an object or a block without
+        // checking them: what it must not pass through is a call, an `as` or a `!` they hold.
+        const typed = [
+            'o.a = (x as T).b[(i as number)];',
+            'y = cond ? <T>a : f<T>(b!);',
+            'z = { k: v as T, ...(w as T) };',
+            'u = [(a as T), ...(b as T[])];',
+            't = `${(a as T).b}`;',
+            'function h() { if (x!) { return g<T>(); } }',
+            'n = -(x as number) + (y!)++;',
+        ].join('\n');
+        const out = eraseTypes(typed, 'x.pdx');
+        expect(out.length).toBe(typed.length);
+        expect(out).not.toMatch(/\bas\b|<T>|<number>|!(?!=)/);
+        parses(out);
+    });
+
     it('a finding after a typed line keeps its position in the file', () => {
         const source = TYPED.replace('</script>', 'let unused = $signal(0);\n</script>');
         const w = compile(source, 'typed.pdx').warnings.find(x => x.code === 'PDX_UNUSED_REACTIVE');
