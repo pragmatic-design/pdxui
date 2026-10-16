@@ -55,7 +55,7 @@ held to the benchmark (`pnpm bench:jfb`):
 | R2 | Nothing moves after the first paint: CLS < 0.02 | `first-paint.spec.ts:186-193` | **landed** |
 | R3 | The stylesheet is not what the paint waits for | `first-paint.spec.ts:161-174` | **landed** |
 | R4 | The bytes before first paint are budgeted (entry 36 KB, blocking 90 KB gzip) | `showcase/tests/bundle-budget.spec.ts:159` | **landed** |
-| R5 | **LCP** has its own budget, separate from «app ready»: a page whose largest element is a list or an image is not ready when the shell is | Playwright `largest-contentful-paint` on three showcase routes | proposed |
+| R5 | **LCP** has its own budget, separate from «app ready»: a page whose largest element is a list or an image is not ready when the shell is | Playwright `largest-contentful-paint` on three showcase routes, over HTTP/1.1 (`first-paint.spec.ts`) and over HTTP/2 (`first-paint-http2.spec.ts`, the number a real host gives) | **landed** (#251, #407) |
 | R6 | A route rendered at build time paints its content **before any script runs** (server.md) | the SSG build's HTML and `first-paint.spec.ts` on it | proposed (#160) |
 | R7 | A long list that is not virtualized skips its off-screen rows with `content-visibility: auto` and `contain-intrinsic-size: auto <h>` — per component, on div-based rows only (not table rows), after reading what each component draws outside a row (decisions.md 46; #285). On `pdx-list` (the rows it writes itself, not the `item` slot's), `pdx-tree` and `pdx-transfer`; their focus ring is drawn inside the row, which the paint containment would otherwise clip. Layout of the first render: 7.5 ms against 30 ms with the rule off, 2 000 rows of each | `responsive/tests/integration/ui-components/long-rows.spec.ts` | **landed** |
 
