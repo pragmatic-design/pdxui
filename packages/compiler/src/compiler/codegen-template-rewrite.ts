@@ -29,12 +29,15 @@ import { camelToKebab, expandAttributeForms, gestureOf, gestureValue } from './c
 const BARE_REF = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/;
 // An arrow function: `(a, b) => …`, `e => …`, `() => …`. Groups: [1]=params (with/without parens) [2]=body
 // One level of nested parentheses in the params is supported (a default with a call).
-const ARROW = /^(\((?:[^()]|\([^()]*\))*\)|[A-Za-z_$][\w$]*)\s*=>\s*([\s\S]+)$/;
+// The body starts at a non-space, so it cannot share the spaces before it with `\s*` (#461, CodeQL
+// js/polynomial-redos): every caller trims, so the captures are the ones `\s*([\s\S]+)` gave.
+const ARROW = /^(\((?:[^()]|\([^()]*\))*\)|[A-Za-z_$][\w$]*)\s*=>\s*(\S[\s\S]*)$/;
 // count++ / ++count / count-- / --count
 const INC_DEC = /^(?:(\+\+|--)\s*([A-Za-z_$][\w$]*)|([A-Za-z_$][\w$]*)\s*(\+\+|--))$/;
 // count = x | count += x | count -= x | count *= x | count /= x | count %= x  (= not ==)
-// | count ||= x | count &&= x | count ??= x.  Groups: [1]=name [2]=operator [3]=right side
-const ASSIGN = /^([A-Za-z_$][\w$]*)\s*(=(?!=)|\+=|-=|\*=|\/=|%=|\|\|=|&&=|\?\?=)\s*([\s\S]+)$/;
+// | count ||= x | count &&= x | count ??= x.  Groups: [1]=name [2]=operator [3]=right side,
+// from its first non-space, as ARROW's body.
+const ASSIGN = /^([A-Za-z_$][\w$]*)\s*(=(?!=)|\+=|-=|\*=|\/=|%=|\|\|=|&&=|\?\?=)\s*(\S[\s\S]*)$/;
 
 /**
  * Build the JS for an @event handler value (see the table above). Falls into one of:
