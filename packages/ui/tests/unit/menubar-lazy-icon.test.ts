@@ -32,7 +32,7 @@ describe('pdx-menubar and pdx-icon', () => {
     it('control — an item that names an icon loads it', async () => {
         await openWith([{ key: 'new', label: 'New', icon: 'plus' }]);
         expect(document.querySelector('pdx-icon')?.getAttribute('name')).toBe('plus');
-        await tick(100);
-        expect(customElements.get('pdx-icon')).toBeDefined();
+        // The load it asserts on, not a time: a cold transform took longer than 100 ms (#457).
+        await customElements.whenDefined('pdx-icon');
     });
 });
