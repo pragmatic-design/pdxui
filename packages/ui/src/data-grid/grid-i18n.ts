@@ -1,7 +1,7 @@
 // Grid i18n — translatable strings via @pdxui/core component string registry.
 // All grid modules use t() instead of hardcoded strings.
 
-import { registerComponentStrings, getComponentString } from '@pdxui/core';
+import { registerComponentStrings, getComponentString, getComponentStrings, computed } from '@pdxui/core';
 
 // Register English defaults
 registerComponentStrings('data-grid', {
@@ -102,3 +102,19 @@ registerComponentStrings('data-grid', {
 export function t(key: string): string {
     return getComponentString('data-grid', key)();
 }
+
+const gridStrings = getComponentStrings('data-grid');
+const sameStrings = (a: Record<string, string>, b: Record<string, string>): boolean => {
+    const keys = Object.keys(a);
+    return keys.length === Object.keys(b).length && keys.every((k) => a[k] === b[k]);
+};
+
+/**
+ * Changes when the grid's own strings change: a dictionary for `data-grid` installed or replaced.
+ *
+ * Not core's `componentStringsChanged`, which changes whenever ANY component registers its
+ * defaults — and a component registers them when its module is imported. Tracked by the grid's
+ * build, that rebuilt every grid on the page each time a lazy chunk or an editor loaded on first
+ * use arrived (#407): the header was replaced under the pointer and an open filter popover closed.
+ */
+export const gridStringsChanged = computed(() => gridStrings(), { equals: sameStrings, name: 'data-grid:strings' });

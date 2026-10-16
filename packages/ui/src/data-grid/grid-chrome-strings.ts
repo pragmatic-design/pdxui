@@ -8,7 +8,7 @@
 // `uiAttr` is the mechanism the rest of @pdxui/ui uses and it is deliberately not used here: this
 // grid writes a name per ROW, and a virtualised list would push thousands of WeakRef entries into
 // that registry on every scroll. The grid already has one effect that reads
-// `componentStringsChanged()` and redraws its chrome; what it needs is the chrome saying which
+// `gridStringsChanged()` and redraws its chrome; what it needs is the chrome saying which
 // string each of its elements holds, so that redraw can re-read them.
 //
 // So the key lives ON the element, greppable in the DOM and in the source:

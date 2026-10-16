@@ -10,7 +10,7 @@
 //   grid-selection.ts — checkbox, select-all, range
 //   grid-footer.ts   — pdx-pagination integration
 
-import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, componentStringsChanged, DEV } from '@pdxui/core';
+import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, DEV } from '@pdxui/core';
 import type { SlotFunction, DataSource, ColumnDef, Dispose, GridState } from '@pdxui/core';
 import type { GridContext, AnyColumn } from './grid-context';
 import { buildHeader } from './grid-header';
@@ -30,7 +30,7 @@ import { toggleRowDetail as toggleRowDetailFn } from './grid-detail';
 import { addRow as addRowFn, deleteRow as deleteRowFn, openEditDialog, startRowEdit as startRowEditFn, commitBatch, revertBatch, setupGridKeyboard } from './grid-edit';
 import { applyGridAria, applyRoving, setupGridNav } from './grid-a11y';
 import { trackInputModality } from './grid-input-modality';
-import { t } from './grid-i18n'; // also registers the default strings
+import { t, gridStringsChanged } from './grid-i18n'; // also registers the default strings
 import { defineIcons } from '../icon/icon-map';
 import iconInbox from '../icon/pragmatic/inbox';
 
@@ -42,12 +42,9 @@ import '../button/pdx-button';
 function loadIcon(): void {
     if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
 }
-import '../input/pdx-input';
-import '../number-input/pdx-number-input';
-import '../select/pdx-select';
-import '../date-picker/pdx-date-picker';
-import '../form-field/pdx-form-field';
-import '../dialog/pdx-dialog';
+// The editors, the filter controls and the edit dialog are created only when someone edits or
+// filters: they load then (shared/lazy-tags.ts), or when the browser is idle in a grid that can.
+import { prefetchTags } from '../shared/lazy-tags';
 import '../pagination/pdx-pagination';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -518,8 +515,9 @@ component('pdx-data-grid', {
                 // Read here and not through `uiAttr`, which is what the rest of @pdxui/ui
                 // uses: this grid writes a name per ROW, and a virtualised list would push
                 // thousands of entries into that registry on every scroll. One tracked read
-                // rebuilds the header and the rows, which is where the names are.
-                componentStringsChanged();
+                // rebuilds the header and the rows, which is where the names are. The grid's own
+                // strings only: another component's arriving is no reason to rebuild (#407).
+                gridStringsChanged();
                 const newRows = g.rows();
                 const newCols = g.columns();
                 const newLoading = g.isLoading();
@@ -644,6 +642,11 @@ component('pdx-data-grid', {
                     ctx.el.appendChild(rootEl);
                 }
                 buildGrid();
+                // A grid that edits or filters will create its editors: have them before the
+                // first double-click or filter asks, without holding up the first screen.
+                if (ctx.editable() || resolveFilterMode() !== 'none') {
+                    prefetchTags(['pdx-input', 'pdx-number-input', 'pdx-select', 'pdx-date-picker', 'pdx-form-field', 'pdx-dialog']);
+                }
                 if (!isReady) {
                     isReady = true;
                     resolveReady();

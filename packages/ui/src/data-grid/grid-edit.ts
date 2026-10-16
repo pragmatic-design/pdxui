@@ -6,6 +6,7 @@ import type { GridContext, AnyColumn } from './grid-context';
 import { columnsToFormFields, createEditForm } from '@pdxui/core';
 import { getFieldValue } from '@pdxui/core';
 import { t } from './grid-i18n';
+import { createLazy } from '../shared/lazy-tags';
 
 // ─── Edit Cell State ───────────────────────────────────────
 
@@ -144,7 +145,7 @@ export function openEditDialog(gc: GridContext, rowId: unknown): void {
     const form = createEditForm(cols, row);
 
     // Build dialog DOM
-    const dialog = document.createElement('pdx-dialog') as any;
+    const dialog = createLazy('pdx-dialog') as any;
     dialog.setAttribute('title', t('edit.dialogTitle'));
     dialog.setAttribute('size', 'md');
 
@@ -157,7 +158,7 @@ export function openEditDialog(gc: GridContext, rowId: unknown): void {
     // Build form fields from columns
     const editableFields = columnsToFormFields(cols);
     for (const fieldSchema of editableFields) {
-        const formField = document.createElement('pdx-form-field') as any;
+        const formField = createLazy('pdx-form-field') as any;
         formField.setAttribute('label', fieldSchema.label || fieldSchema.name);
         if (fieldSchema.required) formField.setAttribute('required', '');
 
@@ -322,7 +323,7 @@ export function createDefaultEditor(
         wrap.appendChild(cb);
         editor = wrap;
     } else if (colType === 'number' || colType === 'currency') {
-        const input = document.createElement('pdx-number-input') as any;
+        const input = createLazy('pdx-number-input') as any;
         input.size = 'sm';
         input.controls = 'none';
         if (col.def.editorProps) {
@@ -334,13 +335,13 @@ export function createDefaultEditor(
         input.addEventListener('pdx-change', (e: any) => onChange(e.detail?.value));
         editor = input;
     } else if (colType === 'date') {
-        const input = document.createElement('pdx-date-picker') as any;
+        const input = createLazy('pdx-date-picker') as any;
         input.size = 'sm';
         requestAnimationFrame(() => { if (value) input.value = value; });
         input.addEventListener('pdx-change', (e: any) => onChange(e.detail?.value));
         editor = input;
     } else if (colType === 'enum' && col.def.filterOptions) {
-        const select = document.createElement('pdx-select') as any;
+        const select = createLazy('pdx-select') as any;
         select.size = 'sm';
         requestAnimationFrame(() => {
             select.options = col.def.filterOptions;
@@ -350,7 +351,7 @@ export function createDefaultEditor(
         editor = select;
     } else {
         // Default: text input
-        const input = document.createElement('pdx-input') as any;
+        const input = createLazy('pdx-input') as any;
         input.size = 'sm';
         requestAnimationFrame(() => { input.value = value != null ? String(value) : ''; });
         input.addEventListener('pdx-input', (e: any) => onChange(e.detail?.value ?? input.value));

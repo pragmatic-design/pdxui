@@ -6,6 +6,7 @@ import { getFieldValue, DEV } from '@pdxui/core';
 import { renderExpandCell, renderDetailRow } from './grid-detail';
 import { renderCellNode } from './grid-cell';
 import { t } from './grid-i18n';
+import { loadTag, type LazyTag } from '../shared/lazy-tags';
 import { startCellEdit, commitCellEdit, cancelCellEdit, createDefaultEditor, startRowEdit, commitRowEdit, cancelRowEdit, deleteRow, openEditDialog, readCellEditorValue } from './grid-edit';
 
 // A per-grid identity token used by the row reorder: the drag's dataTransfer
@@ -153,11 +154,15 @@ export function renderRows(
                     ));
                 }
                 td.classList.add('pdx-dg-cell-editing');
-                // Auto-focus editor
-                requestAnimationFrame(() => {
+                // Auto-focus the editor, once its module is in: a pdx-input that has not been
+                // upgraded yet has no <input> to focus (shared/lazy-tags.ts).
+                const focusEditor = () => requestAnimationFrame(() => {
                     const input = td.querySelector('input, pdx-input, pdx-number-input, pdx-select, pdx-date-picker') as HTMLElement | null;
                     if (input) (input.querySelector?.('input') ?? input).focus?.();
                 });
+                const pending = td.querySelector('pdx-input, pdx-number-input, pdx-select, pdx-date-picker');
+                if (pending) void loadTag(pending.localName as LazyTag).then(focusEditor);
+                else focusEditor();
             } else if (isRowEditing && isColEditable) {
                 // Row edit mode — all editable cells become editors
                 const fieldObj = gc.editForm?.fields?.[col.field];
