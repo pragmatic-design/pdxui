@@ -12,6 +12,7 @@
 import type { SFCDescriptor } from '../parser/sfc';
 import type { ScriptAnalysis } from './script-analyzer-types';
 import type { ValidationWarning } from './validate';
+import { escapeForRegExp } from './regexp-escape';
 
 // Match: `const name = signal(` / `let label: T = computed<T>(` at the start of a statement.
 // Groups: [1]=the name [2]=signal or computed
@@ -29,8 +30,7 @@ function valueExpressions(template: string): string[] {
 
 /** Whether `name` appears in `expr` as a value: not called, not a property of something, not followed by a property. */
 function readsBare(expr: string, name: string): boolean {
-    const escaped = name.replace(/\$/g, '\\$');
-    return new RegExp(`(?<![\\w$.])${escaped}(?![\\w$])(?!\\s*[(.])`).test(expr);
+    return new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])(?!\\s*[(.])`).test(expr);
 }
 
 /** The hand-written signals and computeds that the template reads bare, each placed at its declaration. */
