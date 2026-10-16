@@ -6,9 +6,10 @@
 // at load and rendered nothing. The CLI now adds its plugin only when the project's config has none.
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync, rmSync } from 'fs';
+import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import buildCmd from '../src/commands/build';
+import { removeTree } from './remove-tree';
 
 const APP = '<template><p>{{ title }}</p></template>\n<script setup>\nlet title = $signal("hi");\n</script>\n';
 
@@ -42,7 +43,7 @@ describe('pdx build with the project\'s own pdx()', () => {
     afterEach(() => {
         process.chdir(prevCwd);
         exitSpy.mockRestore();
-        rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+        removeTree(root);
     });
 
     /** The built JavaScript, all chunks. */
