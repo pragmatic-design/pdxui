@@ -233,6 +233,29 @@ test('create adds a row the list then reads back from the server', async ({ page
         .toHaveText('37 matching');
 });
 
+test('New pressed before the create modal has arrived opens it when it does', async ({ page }) => {
+    // The modal is deferred until the page is idle (#449), so a visitor can press New before its
+    // module is in. Held on purpose here: the press must not be lost, and must not open an empty
+    // shell either — the modal opens, whole, when its module lands.
+    let release!: () => void;
+    const held = new Promise<void>((r) => { release = r; });
+    let asked = false;
+    await page.route(/\/assets\/create-dialog-[^/]+\.js$/, async (route) => {
+        asked = true;
+        await held;
+        await route.fallback();
+    });
+    await openTickets(page);
+    await page.locator('[data-test="new"] button').click();
+    const dialog = page.locator('[data-test="create-dialog"] .pdx-dialog-panel');
+    await expect.poll(() => asked, { message: 'the create modal\'s chunk was never asked for: nothing is held' }).toBe(true);
+    await expect(dialog, 'a modal opened while its module was still held').toHaveCount(0);
+
+    release();
+    await expect(dialog, 'New was pressed before the modal arrived, and it never opened').toBeVisible();
+    await expect(dialog.locator('input[name="subject"]')).toBeVisible();
+});
+
 test('a row opens in a drawer, filled, without navigating', async ({ page }) => {
     // The way in is the row itself — no SELECTION and toolbar button, no panel under the list. What
     // is asserted: no navigation, not the create modal, the form arrives filled, the row behind it
