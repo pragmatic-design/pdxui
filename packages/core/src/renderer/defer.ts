@@ -1,7 +1,7 @@
 // Lazy loading with composite triggers and permission integration.
 // Innovation: viewport | idle(2000) composite triggers + @require permission-aware.
 
-import { signal, effect, collectDisposers } from '../reactivity/signal';
+import { signal, effect, collectDisposers, untracked } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
 import { trackUrgentLoad } from './load-queue';
@@ -126,6 +126,15 @@ export function defer(
         for (const n of currentNodes) n.parentNode?.removeChild(n);
         currentNodes = [];
 
+        // Built and placed UNTRACKED: this effect follows the block's state and nothing else. Tracked,
+        // every signal the body read while it was built — and every one a component it mounted read in
+        // its setup — rebuilt the whole body when it changed, and a form in it lost what had been typed
+        // (#450). The body's own bindings are effects of their own, and keep reacting.
+        return untracked(() => renderState(s, parent));
+    });
+
+    /** One state's nodes, built and put before the end marker; returns what disposes them. */
+    function renderState(s: DeferState, parent: Node): () => void {
         // Each state renders in its own scope, disposed when the state changes and when the block is
         // removed (#261). A later run — the body once the load has resolved — happens in a flush, where
         // no scope is current: without its own, what the body created belonged to nobody.
@@ -152,7 +161,7 @@ export function defer(
             currentNodes = nodes;
         }
         return disposeState;
-    });
+    }
 
     return frag;
 }
