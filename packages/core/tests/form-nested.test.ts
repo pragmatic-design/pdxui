@@ -251,7 +251,7 @@ describe('createForm — nested initialValues', () => {
         const form = createForm({
             initialValues: {
                 customer: { name: 'Jane', email: 'jane@test.com' },
-            } as any,
+            },
         });
         expect(form.fields['customer.name']).toBeDefined();
         expect(form.fields['customer.email']).toBeDefined();
@@ -263,7 +263,7 @@ describe('createForm — nested initialValues', () => {
         const form = createForm({
             initialValues: {
                 billing: { address: { city: 'NYC' } },
-            } as any,
+            },
         });
         expect(form.fields['billing.address.city']).toBeDefined();
         expect(form.fields['billing.address.city'].value()).toBe('NYC');
@@ -273,7 +273,7 @@ describe('createForm — nested initialValues', () => {
         const form = createForm({
             initialValues: {
                 items: [{ product: 'Widget', qty: 2 }],
-            } as any,
+            },
         });
         expect(form.fields['items.0.product']).toBeDefined();
         expect(form.fields['items.0.product'].value()).toBe('Widget');
@@ -286,7 +286,7 @@ describe('createForm — nested initialValues', () => {
             customer: { name: 'Jane', email: 'jane@test.com' },
             shipping: { city: 'NYC', zip: '10001' },
         };
-        const form = createForm({ initialValues: initial as any });
+        const form = createForm({ initialValues: initial });
 
         expect(form.getValues()).toEqual(initial);
     });
@@ -298,13 +298,13 @@ describe('createForm — nested initialValues', () => {
                 { product: 'Gadget', qty: 1 },
             ],
         };
-        const form = createForm({ initialValues: initial as any });
+        const form = createForm({ initialValues: initial });
         expect(form.getValues()).toEqual(initial);
     });
 
     it('onChange updates nested field and tracks dirty', () => {
         const form = createForm({
-            initialValues: { customer: { name: 'Jane' } } as any,
+            initialValues: { customer: { name: 'Jane' } },
         });
         const field = form.fields['customer.name'];
         field.onChange('John');
@@ -314,7 +314,7 @@ describe('createForm — nested initialValues', () => {
 
     it('reset() restores nested values', () => {
         const form = createForm({
-            initialValues: { customer: { name: 'Jane' } } as any,
+            initialValues: { customer: { name: 'Jane' } },
         });
         form.fields['customer.name'].onChange('John');
         expect(form.fields['customer.name'].value()).toBe('John');
@@ -326,9 +326,9 @@ describe('createForm — nested initialValues', () => {
 
     it('reset(newValues) updates with flattened new values', () => {
         const form = createForm({
-            initialValues: { customer: { name: 'Jane' } } as any,
+            initialValues: { customer: { name: 'Jane' } },
         });
-        form.reset({ customer: { name: 'Alice' } } as any);
+        form.reset({ customer: { name: 'Alice' } });
         expect(form.fields['customer.name'].value()).toBe('Alice');
     });
 
@@ -336,19 +336,19 @@ describe('createForm — nested initialValues', () => {
         const form = createForm({
             initialValues: {
                 customer: { name: 'Jane', email: 'jane@test.com' },
-            } as any,
+            },
         });
-        form.setValues({ customer: { name: 'John' } } as any);
+        form.setValues({ customer: { name: 'John' } });
         expect(form.fields['customer.name'].value()).toBe('John');
         // email unchanged because setValues only updates matching keys
     });
 
     it('validates fields with dotted-path validators', async () => {
         const form = createForm({
-            initialValues: { customer: { name: '' } } as any,
+            initialValues: { customer: { name: '' } },
             validators: {
                 'customer.name': [(v: unknown) => (!v ? 'Required' : undefined)],
-            } as any,
+            },
         });
         const valid = await form.validate();
         expect(valid).toBe(false);
@@ -357,10 +357,10 @@ describe('createForm — nested initialValues', () => {
 
     it('form.valid is reactive to nested field errors', () => {
         const form = createForm({
-            initialValues: { customer: { name: '' } } as any,
+            initialValues: { customer: { name: '' } },
             validators: {
                 'customer.name': [(v: unknown) => (!v ? 'Required' : undefined)],
-            } as any,
+            },
             validateOn: 'onChange',
         });
         // Trigger validation via onChange
@@ -443,7 +443,7 @@ describe('FORM_INTERNALS', () => {
         const form = createForm({
             initialValues: {
                 items: [{ product: 'Widget', qty: 2 }],
-            } as any,
+            },
         });
         const internals = (form as any)[FORM_INTERNALS] as FormInternals;
         expect(form.fields['items.0.product']).toBeDefined();
@@ -460,7 +460,7 @@ describe('FORM_INTERNALS', () => {
                     { product: 'A', qty: 1 },
                     { product: 'B', qty: 2 },
                 ],
-            } as any,
+            },
         });
         const internals = (form as any)[FORM_INTERNALS] as FormInternals;
 
@@ -478,7 +478,7 @@ describe('FORM_INTERNALS', () => {
             initialValues: {
                 customer: { name: 'Jane' },
                 notes: '',
-            } as any,
+            },
         });
         const internals = (form as any)[FORM_INTERNALS] as FormInternals;
         const paths = internals.getFieldPaths();

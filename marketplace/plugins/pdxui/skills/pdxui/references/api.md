@@ -1171,7 +1171,8 @@ object and a set of validators.
 
 Nested initial values are FLATTENED into dotted paths — `{ customer: { name } }` becomes
 `'customer.name'` — so a field addresses itself the same way however deep it sits, and validators
-are declared against one flat key space.
+are declared against one flat key space. The types follow it: `fields`, `errors` and `warnings` are
+keyed by those names (a row's by its index, `'lines.0.qty'`), each field typed by the value it holds.
 
 `validateOn` decides when errors appear: `onBlur` by default, because validating while someone is
 still typing shows them an error for a value they have not finished writing. Async validators are
