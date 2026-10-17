@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 89 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 90 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -905,6 +905,14 @@ write:
 @prop label: string = 'Hello';
 </script>
 ```
+
+### PDX_PROP_REQUIRED
+
+*error* — A component used without a prop it requires (#130).
+
+A `@prop name: T;` with no default and no `?` is required, TypeScript's rule: the component cannot render without it. A use that sets it with neither an attribute nor a binding would leave it `undefined` and fail later, far from the cause. Checked for project components and for library components whose manifest marks the prop required (`prop.required<T>()`).
+
+**Fix.** Set it, `:name="…"`, or declare it optional in the child: `@prop name?: T;` or a default.
 
 ### PDX_PROP_TYPE_MISMATCH
 

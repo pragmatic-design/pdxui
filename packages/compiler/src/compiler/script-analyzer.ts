@@ -372,14 +372,16 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             continue;
         }
 
-        // ─── @prop name: Type = default · @model name: Type = default ───
+        // ─── @prop name: Type = default · @prop name?: Type · @model name: Type = default ───
         // Tokenizer-based: handles generics (Map<K,V>), unions, function types, template literals.
-        // A model (#124) is a prop the component may write, marked as such.
-        // Match: `@prop name:` or `@model name:`. Groups: [1]=rune [2]=name
-        const propPrefix = trimmed.match(/^@(prop|model)\s+(\w+)\s*:/);
+        // A model (#124) is a prop the component may write, marked as such. A `@prop` with no default
+        // and no `?` is required (#130), TypeScript's rule.
+        // Match: `@prop name:`, `@prop name?:` or `@model name:`. Groups: [1]=rune [2]=name [3]=`?`
+        const propPrefix = trimmed.match(/^@(prop|model)\s+(\w+)\s*(\?)?\s*:/);
         if (propPrefix) {
             const rune = propPrefix[1];
             const name = propPrefix[2];
+            const optional = propPrefix[3] === '?';
             const colonPos = propPrefix[0].length - 1; // position of `:` in trimmed
             const { type: tsType, rest } = extractTypeAnnotation(trimmed, colonPos);
             if (tsType) {
@@ -401,6 +403,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                     runtimeType: tsToRuntimeType(tsType),
                     default: defaultVal,
                     ...(rune === 'model' ? { model: true } : {}),
+                    ...(rune === 'prop' && !optional && defaultVal === undefined ? { required: true } : {}),
                 });
                 continue;
             }

@@ -150,6 +150,12 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const m = /^'::([\w-]+)' on <([\w-]+)>/.exec(w.message);
             return m ? find(source, template, new RegExp(`(?<=<${escape(m[2])}\\b[^>]*)::${escape(m[1])}\\b`, 'i')) : undefined;
         }
+        case 'PDX_PROP_REQUIRED': {
+            // Match: the use the message names (`<app-card> (its 2nd use) is missing …`), the nth tag.
+            // Groups: [1]=the tag [2]=which use, when the template has more than one
+            const m = /^<([\w-]+)> (?:\(its (\d+)(?:st|nd|rd|th) use\) )?is missing/.exec(w.message);
+            return m ? find(source, template, new RegExp(`<${escape(m[1])}(?=[\\s/>])`, 'i'), m[2] ? Number(m[2]) - 1 : 0) : undefined;
+        }
         case 'PDX_PART_MISSING':
             // Match: the `@part` line that lists the name.
             return name ? find(source, script, new RegExp(`@part\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;

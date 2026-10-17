@@ -233,6 +233,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare `@model x` in the child, or bind it one way with `:x`.',
         reproducedIn: `${T}model-rune.test.ts`,
     },
+    PDX_PROP_REQUIRED: {
+        severity: 'error', category: 'defect',
+        summary: 'A component used without a prop it requires (#130).',
+        explanation: 'A `@prop name: T;` with no default and no `?` is required, TypeScript\'s rule: the component cannot render without it. A use that sets it with neither an attribute nor a binding would leave it `undefined` and fail later, far from the cause. Checked for project components and for library components whose manifest marks the prop required (`prop.required<T>()`).',
+        fix: 'Set it, `:name="…"`, or declare it optional in the child: `@prop name?: T;` or a default.',
+        reproducedIn: `${T}required-props.test.ts`,
+    },
     PDX_PIPE_SINGLE: {
         severity: 'info', category: 'defect',
         summary: 'A template interpolation with exactly one pipe (#129).',

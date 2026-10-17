@@ -221,13 +221,18 @@ function modelEventName(name) {
     return `${name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}-change`;
 }
 
-/** `prop(…)`, `prop.required(…)` or `model(…)`: the builders a typed descriptor declares a prop with (#123, #124). */
+/**
+ * `prop(…)`, `prop.required(…)`, `prop.optional(…)` or `model(…)`: the builders a typed descriptor
+ * declares a prop with (#123, #124, #130). `noDefault`: the call takes its options first.
+ */
 function propBuilderCall(node) {
     if (!ts.isCallExpression(node)) return null;
     const callee = node.expression;
-    if (ts.isIdentifier(callee) && (callee.text === 'prop' || callee.text === 'model')) return { call: node, required: false };
-    if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression)
-        && callee.expression.text === 'prop' && callee.name.text === 'required') return { call: node, required: true };
+    if (ts.isIdentifier(callee) && (callee.text === 'prop' || callee.text === 'model')) return { call: node, required: false, noDefault: false };
+    if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression) && callee.expression.text === 'prop') {
+        if (callee.name.text === 'required') return { call: node, required: true, noDefault: true };
+        if (callee.name.text === 'optional') return { call: node, required: false, noDefault: true };
+    }
     return null;
 }
 
@@ -264,13 +269,13 @@ function optionsRuntime(arg, sourceFile) {
 function builtProp(initializer, sourceFile) {
     const found = propBuilderCall(initializer);
     if (!found) return null;
-    const { call, required } = found;
+    const { call, required, noDefault } = found;
     const typeArg = call.typeArguments?.[0]?.getText(sourceFile);
     const [first, second] = call.arguments;
-    const runtime = required
+    const runtime = noDefault
         ? (optionsRuntime(first, sourceFile) ?? 'object')
         : (optionsRuntime(second, sourceFile) ?? inferredRuntime(first));
-    const def = required || !first ? undefined : first.getText(sourceFile);
+    const def = noDefault || !first ? undefined : first.getText(sourceFile);
     return { type: typeArg || runtime, runtime, default: def, ...(required ? { required: true } : {}) };
 }
 
@@ -878,6 +883,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
         type: { text: p.type }, ...(p.default !== undefined ? { default: p.default } : {}),
         ...(PROP_ONLY.has(p.runtime) ? {} : { attribute: p.name.toLowerCase() }),
         ...(p.iconName ? { iconName: true } : {}),
+        // A prop the host must set (`prop.required<T>()`): a use without it is PDX_PROP_REQUIRED (#130).
+        ...(p.required ? { required: true } : {}),
     }));
     // What ctx.expose({...}) puts on the element: methods to call through a ref, and getters to read
     // (a read-only field in the Custom Elements Manifest schema, with no attribute).

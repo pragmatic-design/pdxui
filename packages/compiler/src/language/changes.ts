@@ -21,6 +21,7 @@ import { DEFER_TRIGGERS, unknownDeferTriggers } from '../compiler/defer-triggers
 import { escapeForRegExp } from '../compiler/regexp-escape';
 import { bindsModel, type ModelsLookup } from '../compiler/validate-two-way';
 import { refAttribute, showAttribute, classDot, styleDot } from './template-forms';
+import { propRequired } from './prop-required';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -269,6 +270,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     showAttribute,
     classDot,
     styleDot,
+    // #130: a `@prop` with no default is required (./prop-required).
+    propRequired,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

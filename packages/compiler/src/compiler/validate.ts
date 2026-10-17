@@ -24,6 +24,7 @@ import { checkVirtualFor } from './validate-virtual';
 import { checkCommands, type MethodsLookup } from './validate-commands';
 import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validate-two-way';
 import { checkSinglePipes } from './validate-pipes';
+import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -211,6 +212,12 @@ export interface ValidateOptions {
      * PDX_TWO_WAY_NOT_MODEL (#124); without it, a two-way binding is not checked.
      */
     modelsOf?: ModelsLookup;
+    /**
+     * The props a component requires — the resolver's `requiredPropsOf`: a project .pdx's `@prop`s with
+     * no default and no `?`, a library component's from its manifest. With it, a use that leaves one
+     * unset is PDX_PROP_REQUIRED (#130); without it, required props are not checked.
+     */
+    requiredPropsOf?: RequiredPropsLookup;
     /**
      * Where the caller looked for components — the resolver's `searched`: its component packages,
      * then its project folders. PDX_UNRESOLVED_COMPONENT's hint names them, so a package that was
@@ -519,6 +526,7 @@ export function validate(
 
     warnings.push(...checkCommands(ast, options?.methodsOf));
     warnings.push(...checkTwoWay(ast, options?.modelsOf));
+    warnings.push(...checkRequiredProps(ast, options?.requiredPropsOf));
     warnings.push(...checkBindingModifiers(ast));
     warnings.push(...checkSinglePipes(ast));
 

@@ -32,7 +32,8 @@ export function generateDts(input: DtsInput): string {
     // Props interface
     lines.push(`export interface ${pascalTag}Props {`);
     for (const p of input.props) {
-        lines.push(`  ${p.name}?: ${p.tsType};`);
+        // A required prop (#130) is a required member: a parent that omits it does not type-check.
+        lines.push(`  ${p.name}${p.required ? '' : '?'}: ${p.tsType};`);
     }
     lines.push('}');
     lines.push('');

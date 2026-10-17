@@ -74,8 +74,17 @@ function requiredProp<T>(options?: PropOptions): PropSpec<T> {
     return { type: options?.type ?? Object, required: true };
 }
 
-/** Declare a prop: `prop<T>(default, { type? })`, or `prop.required<T>({ type? })`. */
-export const prop: typeof propBuilder & { required: typeof requiredProp } = Object.assign(propBuilder, { required: requiredProp });
+/**
+ * A prop of type `T` with no default that the host may leave unset (#130): it then holds its runtime
+ * type's empty value (`''`, `0`, `false`, `null`, `[]`), and is not reported.
+ */
+function optionalProp<T>(options?: PropOptions): PropSpec<T | undefined> {
+    return { type: options?.type ?? Object };
+}
+
+/** Declare a prop: `prop<T>(default, { type? })`, `prop.required<T>({ type? })` or `prop.optional<T>({ type? })`. */
+export const prop: typeof propBuilder & { required: typeof requiredProp; optional: typeof optionalProp } =
+    Object.assign(propBuilder, { required: requiredProp, optional: optionalProp });
 
 /** An event whose `detail` is of type `D`; `void` for an event that carries none. */
 export interface EventSpec<D> {

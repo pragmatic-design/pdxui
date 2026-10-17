@@ -17,6 +17,7 @@ const SOURCE = [
     '        source: prop<DataSource | null>(null),',
     '        max: prop.required<number>({ type: Number }),',
     '        options: prop.required<Option[]>(),',
+    '        hint: prop.optional<string>({ type: String }),',
     '    },',
     '    events: {',
     '        /** Fired when the widget opens. */',
@@ -54,6 +55,19 @@ describe('gen-manifest reads a typed descriptor', () => {
     it('a required prop has no default', () => {
         expect(field('max')).toMatchObject({ type: { text: 'number' } });
         expect(field('max').default).toBeUndefined();
+    });
+
+    it('a required prop is marked required, which the compiler reads to check a use (#130)', () => {
+        expect(field('max').required).toBe(true);
+        expect(field('options').required).toBe(true);
+        expect(field('size').required).toBeUndefined();
+    });
+
+    it('an optional prop has no default, its options first, and is not required (#130)', () => {
+        expect(field('hint')).toMatchObject({ type: { text: 'string' } });
+        expect(field('hint').default).toBeUndefined();
+        expect(field('hint').required).toBeUndefined();
+        expect(attribute('hint')).toBeDefined();
     });
 
     it('an event\'s detail is its type argument; a void event has none', () => {
