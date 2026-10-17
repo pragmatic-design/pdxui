@@ -114,6 +114,54 @@ let clicks = $signal(start);
 
 alpha
 
+### @model
+
+#### Syntax
+
+```ebnf
+ModelDecl ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? S? ";"?
+```
+
+The analyzer's form: `@model name: Type = default;`
+
+#### Semantics
+
+Declares a prop the component writes, which a parent binds both ways with `::name`
+([template.md](template.md)). It is a prop — the same attribute, property, coercion and `.d.ts`
+entry — declared in the descriptor's `models` instead of `props`: `models: { name: { type: T,
+default: d } }`. In the script the name is a signal: the setup declares `const __name = ctx.name;`,
+a read is `__name()` and an assignment `__name.set(…)`. Core's model signal writes the prop and
+dispatches `<kebab-name>-change` with `detail: { value }`, not bubbling — `selectedId` dispatches
+`selected-id-change`. A write that does not change the value dispatches nothing, and the parent
+setting the property dispatches nothing either, so a value is never echoed back. The `.d.ts`
+`Events` interface gets `'<kebab-name>-change': { value: Type }`, and the project manifest lists the
+component's `models`.
+
+#### Rules
+
+- The rules of `@prop` apply: `PDX_PROP_NO_TYPE`, `PDX_PROP_INVALID_TYPE`, `PDX_PROP_TYPE_MISMATCH`,
+  `PDX_DUP_PROP`, `PDX_DUP_DECLARATION`.
+- Assigning a model is the point of it: it never raises `PDX_PROP_WRITE`.
+- `{ form }` (form association, #135) is not read yet.
+
+#### Examples
+
+```pdx
+<template>
+  <input ::value="value" />
+  <button @click="clear()">Clear</button>
+</template>
+
+<script setup>
+@model value: string = '';
+function clear() { value = ''; }
+</script>
+```
+
+#### Since
+
+beta (#124)
+
 ### @event
 
 #### Syntax

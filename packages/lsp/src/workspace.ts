@@ -55,6 +55,26 @@ export function resolvePropType(registry: Pick<ProjectRegistry, 'describe'>, tag
     return t && SAFE_PROP_TYPE.test(t) ? t : null;
 }
 
+/**
+ * The type a `::name` binding is checked against (#124): the prop's type, when the component declares
+ * it `@model`; null otherwise — a plain prop, or a component whose models are not known, is not
+ * checked here (PDX_TWO_WAY_NOT_MODEL is the compiler's).
+ */
+export function resolveModelType(
+    registry: Pick<ProjectRegistry, 'describe'> & { resolver: Pick<ProjectRegistry['resolver'], 'modelsOf'> },
+    tag: string, name: string,
+): string | null {
+    const models = registry.resolver.modelsOf(tag);
+    const flat = (s: string) => s.replace(/-/g, '').toLowerCase();
+    const model = models && [...models].find(m => flat(m) === flat(name));
+    return model ? resolvePropType(registry, tag, model) : null;
+}
+
+/** A project's `ResolveType`: a `::name` asks for its model's type, anything else for the prop's. */
+function projectResolveType(registry: ProjectRegistry): (tag: string, attr: string) => string | null {
+    return (tag, attr) => attr.startsWith('::') ? resolveModelType(registry, tag, attr.slice(2)) : resolvePropType(registry, tag, attr);
+}
+
 /** What the workspace needs of the editor's document store: the open text of a URI, if any. */
 export interface OpenDocuments {
     get(uri: string): TextDocument | undefined;
@@ -122,7 +142,7 @@ export class Workspace {
         const tmplStart = tmpl ? source.indexOf(tmpl) : -1;
         const registry = this.registryOf(document.uri);
         const vf = buildVirtualFile(descriptor.script.content, descriptor.script.start, ast ?? null, tmpl, tmplStart,
-            (tag, attr) => resolvePropType(registry, tag, attr), (tag) => this.exposedOf(registry, tag));
+            projectResolveType(registry), (tag) => this.exposedOf(registry, tag));
         this.vfCache.set(document.uri, { version: document.version, vf });
         return vf;
     }
@@ -134,7 +154,7 @@ export class Workspace {
         const tmpl = descriptor.template?.content ?? null;
         const registry = this.registryOf(uri);
         return buildVirtualFile(descriptor.script.content, descriptor.script.start, ast ?? null, tmpl, tmpl ? text.indexOf(tmpl) : -1,
-            (tag, attr) => resolvePropType(registry, tag, attr), (tag) => this.exposedOf(registry, tag));
+            projectResolveType(registry), (tag) => this.exposedOf(registry, tag));
     }
 
     /**
@@ -193,6 +213,8 @@ export class Workspace {
                     enumValues: (tag, prop) => resolver.enumValues(tag, prop),
                     // The methods a library component exposes, for PDX_COMMAND_UNKNOWN (#140).
                     methodsOf: (tag) => resolver.methodsOf(tag),
+                    // The models a component declares, for PDX_TWO_WAY_NOT_MODEL (#124).
+                    modelsOf: (tag) => resolver.modelsOf(tag),
                 };
             } catch {
                 return {}; // a project whose packages cannot be read: the checks that need them stay off

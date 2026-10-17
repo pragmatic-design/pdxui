@@ -37,7 +37,7 @@ function atLineStart(s: string, idx: number): boolean {
 }
 
 /** Projects the .pdx script into valid TS, with the length and the offsets unchanged.
- *  - `@prop name: T = d` → `let  name…` (a TYPED prop; `@prop`=5 → `let  `=5).
+ *  - `@prop name: T = d` → `var  name…` (a TYPED prop; `@prop`=5 → `var  `=5), `@model` the same (6 → 6).
  *  - the other @… runes → blanked out (from the keyword to a `;` at depth 0, or to the
  *    balanced `{…}`), preserving the newlines. The names of @fetch/@form are declared at
  *    the end, typed (their lines are blanked) → the references resolve.
@@ -54,9 +54,10 @@ export function projectScript(scriptContent: string): string {
     while ((m = RUNE_KW.exec(s))) {
         if (!atLineStart(s, m.index)) continue;
         const kw = m[1];
-        if (kw === 'prop') {
-            // `var`, not `let`: the compiler declares props before anything reads them.
-            'var  '.split('').forEach((ch, o) => { out[m!.index + o] = ch; });
+        if (kw === 'prop' || kw === 'model') {
+            // `var`, not `let`: the compiler declares props before anything reads them. A `@model`
+            // (#124) is a prop the script writes, so it is the same typed name: `@model` → `var   `.
+            `var${' '.repeat(kw.length - 2)}`.split('').forEach((ch, o) => { out[m!.index + o] = ch; });
             continue;
         }
         if (NAME_INTRO.has(kw)) {

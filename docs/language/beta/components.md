@@ -79,7 +79,7 @@ ModelDecl    ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? 
 
 ### Semantics
 
-Declares a prop **that can be bound both ways** (#124). It creates the prop, an event
+Declares a prop **that can be bound both ways** (#124 — landed; `{ form }` is #135). It creates the prop, an event
 `<kebab-name>-change` carrying `CustomEvent<{ value: T }>` (not bubbling), and makes an assignment to
 the name inside the component write the prop and dispatch the event. A parent binds it with
 `::name="sig"` ([template.md](template.md)). The value properties of native form elements (`value`,
@@ -570,7 +570,7 @@ types `ctx.emit` — the name is a declared one and the detail its type — and 
 dispatched. A `.pdx` compiles its `@event` names into `events`, except one that also dispatches with
 `$emit`, which takes any name. The manifest reads a prop's type and an event's detail type from the
 type arguments; `pdx-select` and `pdx-toggle` are written this way. The other fields are typed and do
-nothing yet: `models` #124, `slots` #131, the rest in their own issues (`states` landed since, #132).
+nothing yet: `slots` #131, the rest in their own issues (`states` landed since, #132; `models`, #124).
 The constructor form is still accepted.
 
 ### Since

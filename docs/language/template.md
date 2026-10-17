@@ -312,20 +312,30 @@ TwoWayBinding  ::= "::" BoundName ( "." TwoWayModifier )* "=" AttrValue
 TwoWayModifier ::= "trim" | "number" | "lazy"
 ```
 
-The quoted value is the name of a `$signal` (or a prop).
+The quoted value is the name of a `$signal` (or a prop, or a `@model`).
 
 #### Semantics
+
+Two-way binding is a contract (#124): `::name` is valid on a component's `@model`
+([script.md](script.md)) and on the value properties of native form elements (`value`, `checked`,
+`files` of `<input>`, `<textarea>`, `<select>`), which are the platform's models.
 
 `::value="name"` compiles to `::value=${ctx.name}` — the signal itself, not its value — and core's
 `bindTwoWay(el, 'value', signal)` binds it, on both paths. Signal to element: an `effect` assigns the
 property. Element to signal: on an `<input>` or `<textarea>` the `input` event (`change` for
-`checked`), on a `<select>` `change`, on a custom element its `pdx-input` and `pdx-change` events,
+`checked`), on a `<select>` `change`; on a custom element that declares the prop as a model, its
+`<kebab-name>-change` event and `detail.value`, and nothing else. On a library component that
+declares no model yet (#125) the alpha listening stays: its `pdx-input` and `pdx-change` events,
 whose value is the `detail` field named like the bound property, else `detail.value`, else the
-element's property. `.lazy` listens
-to `change` / `pdx-change` only; `.trim` trims a string; `.number` writes `Number(value) || 0`.
+element's property. `.lazy` listens to `change` / `pdx-change` only; `.trim` trims a string;
+`.number` writes `Number(value) || 0`.
 
 #### Rules
 
+- `::x` on a component prop that is not a model raises `PDX_TWO_WAY_NOT_MODEL` (error), for a project
+  component and for a library component whose manifest lists its models; `pdx migrate` flags each
+  one. A library component that lists no model is not checked.
+- In the editor, the value bound to a model is checked against the model's type.
 - A value that is not a signal (no `.set`) falls back to a one-way `:name` binding. Not checked
   today.
 - A modifier other than the three is ignored. Not checked today.

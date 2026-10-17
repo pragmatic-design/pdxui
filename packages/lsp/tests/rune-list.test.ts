@@ -19,6 +19,7 @@ const decorators = RUNES.filter(r => r.kind === 'decorator');
 /** A statement written the way the rune's shape shows it, with concrete types where it has placeholders. */
 function statement(name: string, shape: string): string {
     if (name === 'prop') return "@prop label: string = 'x';";
+    if (name === 'model') return "@model value: string = '';";
     if (name === 'event') return '@event changed: number;';
     return shape.replace(/\s{2,}\/\/.*$/, '');
 }

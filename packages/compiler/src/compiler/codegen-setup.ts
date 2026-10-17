@@ -80,7 +80,11 @@ export function buildSetupBody(
     // accessor, and without the accessor declared, setup throws.
     // A reactive `@fetch` URL counts as well: `${userId}` is rewritten to a call of the accessor (#101).
     const bodyText = setupSourceText(analysis);
+    // A `@model` (#124) is a signal of the script, as a `$signal` is: reads are calls and an
+    // assignment is `.set()`, on the context's model signal, whose writes dispatch `<name>-change`.
+    for (const p of analysis.props) if (p.model) parts.push(`    const __${p.name} = ctx.${p.name};`);
     for (const p of analysis.props) {
+        if (p.model) continue;
         // Always generate accessor if prop is used in body, signals, deriveds, or is a common pattern
         const namePattern = new RegExp(`\\b${p.name}\\b`);
         if (namePattern.test(bodyText) || analysis.signals.some(s => namePattern.test(s.initialExpr)) ||
@@ -189,8 +193,9 @@ export function buildSetupBody(
 
     // Callable names: props + derived + route params — need () appended in body/effect/lifecycle
     const signalNames = new Set(analysis.signals.map(s => s.name));
+    for (const p of analysis.props) if (p.model) signalNames.add(p.name);
     const callableNames = new Set<string>();
-    for (const p of analysis.props) callableNames.add(p.name);
+    for (const p of analysis.props) if (!p.model) callableNames.add(p.name);
     for (const d of analysis.deriveds) callableNames.add(d.name);
     // @params: typed route params are generated as computed() → need () reads
     if (analysis.route.params) {

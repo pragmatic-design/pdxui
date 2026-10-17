@@ -10,9 +10,9 @@
 // A builder returns what `component()` already reads at runtime — a prop is a PropDefinition, with the
 // runtime type an attribute is coerced to — and carries the TypeScript type the context is typed from.
 // `states` are the host's custom states, set with `ctx.state` (#132); `host` its attributes and
-// listeners (#133); `parts` its public elements, for the manifest (#134). `models`, `slots`, `expose`
-// and `variants` are part of the descriptor's type now; each gets its behaviour in its own issue
-// (docs/language/beta/components.md).
+// listeners (#133); `parts` its public elements, for the manifest (#134); `models` the props it may
+// write, which `::name` binds both ways (#124). `slots`, `expose` and `variants` are part of the
+// descriptor's type now; each gets its behaviour in its own issue (docs/language/beta/components.md).
 
 /** The runtime type an attribute value is coerced to. Object, Array and Function are property-only. */
 export type PropType = typeof String | typeof Number | typeof Boolean | typeof Object | typeof Array | typeof Function;
@@ -89,16 +89,21 @@ export function event<D = void>(options?: { bubbles?: boolean }): EventSpec<D> {
     return options?.bubbles === false ? { bubbles: false } : {};
 }
 
-/** A two-way bound value of type `T` (`::name`): typed now, wired by its own issue (#124). */
-export interface ModelSpec<T> {
-    readonly default: T;
-    readonly __model?: T;
+/**
+ * A prop of type `T` the component may write, and the parent bind both ways with `::name` (#124).
+ * It is a prop — an attribute and a property, coerced the same way — and writing it inside the
+ * component dispatches `<kebab-name>-change` with `{ value }`, which does not bubble.
+ */
+export interface ModelSpec<T> extends PropSpec<T> {
+    readonly model: true;
 }
 
-/** Declare a model: `model<string>('')`. */
-export function model<T>(defaultValue: T): ModelSpec<T> {
-    return { default: defaultValue };
+/** Declare a model: `model<string>('')`, `model<Item[]>(() => [])`; the options are {@link prop}'s. */
+export function model<T>(defaultValue?: T | (() => T), options?: PropOptions): ModelSpec<T> {
+    return { ...propBuilder(defaultValue, options), model: true };
 }
+
+export { modelEvent } from '../utils/model-event';
 
 /** A slot whose content the parent passes as `F`: typed now, wired by its own issue (#131). */
 export interface SlotSpec<F> {

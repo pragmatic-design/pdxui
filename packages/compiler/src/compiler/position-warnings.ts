@@ -109,12 +109,13 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
     const name = quotedName(w.message);
     const text = quotedText(w.message);
     switch (w.code) {
+        // A `@model` is a prop (#124): its findings are found the same way.
         case 'PDX_PROP_INVALID_TYPE':
         case 'PDX_PROP_TYPE_MISMATCH':
-            return name ? find(source, script, new RegExp(`@prop\\s+${escape(name)}\\b`)) : undefined;
+            return name ? find(source, script, new RegExp(`@(?:prop|model)\\s+${escape(name)}\\b`)) : undefined;
         // The second declaration is the one the author adds by mistake; the first was there.
         case 'PDX_DUP_PROP':
-            return name ? find(source, script, new RegExp(`@prop\\s+${escape(name)}\\b`), 1) : undefined;
+            return name ? find(source, script, new RegExp(`@(?:prop|model)\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_DUP_EVENT':
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_EVENT_NAME_CASE':
@@ -128,6 +129,11 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             // Match: the `command="…"` the message names (`command '--open' …`).
             const cmd = /^command '([^']+)'/.exec(w.message)?.[1];
             return cmd ? find(source, template, new RegExp(`(?<![\\w-])command=["']${escape(cmd)}["']`)) : undefined;
+        }
+        case 'PDX_TWO_WAY_NOT_MODEL': {
+            // Match: the binding the message names (`'::label' on <app-field>: …`), in that tag.
+            const m = /^'::([\w-]+)' on <([\w-]+)>/.exec(w.message);
+            return m ? find(source, template, new RegExp(`(?<=<${escape(m[2])}\\b[^>]*)::${escape(m[1])}\\b`, 'i')) : undefined;
         }
         case 'PDX_PART_MISSING':
             // Match: the `@part` line that lists the name.

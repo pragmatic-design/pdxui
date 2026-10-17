@@ -197,11 +197,35 @@ function extractProps(optionsObj, sourceFile, tag) {
     return props;
 }
 
-/** `prop(…)` or `prop.required(…)`: the builder a typed descriptor declares a prop with (#123). */
+/**
+ * The models a typed descriptor declares, `models: { value: model<T>(default, options?) }` (#124) →
+ * the same shape as a prop, plus `model: true`. `model()` takes `prop()`'s arguments.
+ */
+function extractModels(optionsObj, sourceFile) {
+    const modelsProp = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'models');
+    if (!modelsProp || !ts.isObjectLiteralExpression(modelsProp.initializer)) return [];
+    const models = [];
+    for (const decl of modelsProp.initializer.properties) {
+        if (!ts.isPropertyAssignment(decl)) continue;
+        const built = builtProp(decl.initializer, sourceFile);
+        if (!built) continue;
+        const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
+        models.push({ name, ...built, iconName: false, model: true, description: jsdocDescription(decl) || describeProp(name) });
+    }
+    return models;
+}
+
+/** The event a model dispatches, as core names it: `selectedId` → `selected-id-change`. */
+function modelEventName(name) {
+    return `${name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}-change`;
+}
+
+/** `prop(…)`, `prop.required(…)` or `model(…)`: the builders a typed descriptor declares a prop with (#123, #124). */
 function propBuilderCall(node) {
     if (!ts.isCallExpression(node)) return null;
     const callee = node.expression;
-    if (ts.isIdentifier(callee) && callee.text === 'prop') return { call: node, required: false };
+    if (ts.isIdentifier(callee) && (callee.text === 'prop' || callee.text === 'model')) return { call: node, required: false };
     if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression)
         && callee.expression.text === 'prop' && callee.name.text === 'required') return { call: node, required: true };
     return null;
@@ -776,7 +800,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     const scanText = shared ? statement.getText(sourceFile) : text;
     const scanNode = shared ? statement : sourceFile;
     const cat = categories[tag] || { category: 'Other', order: 999 };
-    const props = extractProps(optionsObj, sourceFile, tag);
+    const models = extractModels(optionsObj, sourceFile);
+    const props = [...extractProps(optionsObj, sourceFile, tag), ...models];
     const tags = jsdocTags(statement);
 
     // Events: JSDoc @fires (authoritative) merged with heuristic emit() scan.
@@ -811,6 +836,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     };
     // The descriptor's `events` first: its type argument is the detail's declared type (#123).
     for (const [name, d] of declaredEvents) addEvent(name, d.description, d.detail);
+    // Each model's event (#124): dispatched when the component writes it, never bubbling.
+    for (const m of models) addEvent(modelEventName(m.name), `Fired when the component writes \`${m.name}\`. Does not bubble.`, `{ value: ${m.type} }`);
     for (const t of tags.filter(t => t.tag === 'fires' || t.tag === 'event')) {
         const { name, type, description } = parseFires(t.text);
         addEvent(name, description, type);
@@ -888,6 +915,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             category: cat.category, order: cat.order,
             ...(summary ? { summary } : {}), ...(description ? { description } : {}),
             members,
+            // The props `::x` may bind (#124): the compiler's resolver reads them from here.
+            ...(models.length ? { models: models.map(m => m.name) } : {}),
             ...(events.length ? { events } : {}),
             ...(roles.length ? { roles } : {}),
             attributes,

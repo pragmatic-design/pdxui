@@ -41,6 +41,10 @@ export class ComponentResolver {
     private iconProps = new Map<string, Set<string>>();
     /** tag → the methods the component exposes (manifest members of kind `method`). */
     private methods = new Map<string, Set<string>>();
+    /** tag → the models a library component's manifest lists (#124); only components that list some. */
+    private libraryModels = new Map<string, Set<string>>();
+    /** A project file's `@model`s, with the modification time they were read at. */
+    private projectModels = new Map<string, { mtimeMs: number; models: Set<string> }>();
     /** The icons a component package publishes one module each (`./icons/*`): name → import path. */
     private icons = new Map<string, string>();
     private _collisions: ValidationWarning[] = [];
@@ -136,6 +140,27 @@ export class ComponentResolver {
      */
     methodsOf(tag: string): ReadonlySet<string> | null {
         return this.methods.get(tag) ?? null;
+    }
+
+    /**
+     * The models a component declares (#124) — what `::x` may bind — or null when they are not known.
+     * A project `.pdx` is read for its `@model`s, again whenever the file changes, and a component that
+     * declares none answers an empty set. A library component answers what its manifest lists, and null
+     * while it lists none: those keep the alpha two-way listening until #125 gives them their models.
+     */
+    modelsOf(tag: string): ReadonlySet<string> | null {
+        const entry = this.map.get(tag);
+        if (!entry) return null;
+        if (entry.source === 'ui') return this.libraryModels.get(tag) ?? null;
+        try {
+            const { mtimeMs } = statSync(entry.importPath);
+            const cached = this.projectModels.get(entry.importPath);
+            if (cached && cached.mtimeMs === mtimeMs) return cached.models;
+            // Match: a `@model name` line of the script. Groups: [1]=the name
+            const models = new Set([...readFileSync(entry.importPath, 'utf-8').matchAll(/^[ \t]*@model\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]));
+            this.projectModels.set(entry.importPath, { mtimeMs, models });
+            return models;
+        } catch { return null; } // unreadable: its models are not known
     }
 
     /** The props of a manifest component whose value names an icon, by declared (camelCase) name. */
@@ -236,6 +261,8 @@ export class ComponentResolver {
             }
             if (propEnums.size) this.enums.set(decl.tagName, propEnums);
             if (iconProps.size) this.iconProps.set(decl.tagName, iconProps);
+            // The models the component declares (#124), as the manifest generator lists them.
+            if (decl.models && decl.models.length > 0) this.libraryModels.set(decl.tagName, new Set(decl.models));
             this.props.set(decl.tagName, settable);
             this.methods.set(decl.tagName, methods);
             count++;
@@ -484,7 +511,7 @@ function isAlreadyImported(existingImports: string, importPath: string): boolean
 // ─── Manifest-driven resolution helpers ──────────────────────────────────────
 
 interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; type?: { text?: string } }
-interface ManifestDeclaration { tagName?: string; members?: ManifestMember[] }
+interface ManifestDeclaration { tagName?: string; members?: ManifestMember[]; models?: string[] }
 interface ManifestModule { path?: string; declarations?: ManifestDeclaration[] }
 
 /** Collect every string leaf (file target) of a package.json `exports` entry. */

@@ -128,7 +128,7 @@ TwoWayValue    ::= Identifier ( "." Identifier )*
 
 #### Semantics
 
-Two-way binding is a **contract** (#124): `::name` is valid on a `@model` of a component and on the
+Two-way binding is a **contract** (#124 — landed; the modifiers and `{ get, set }` are #126): `::name` is valid on a `@model` of a component and on the
 value properties of native form elements (`value`, `checked`, `files`). The value is a signal, a form
 field (`f.email`, #128), or the **general form** `{ get, set }` (#126), of which every modifier is
 defined as sugar:

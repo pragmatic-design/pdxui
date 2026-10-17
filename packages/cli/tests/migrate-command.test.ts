@@ -151,6 +151,15 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
         expect(report.flagged.map((f) => [f.file, f.line]).sort()).toEqual([['src/a.pdx', 3], ['src/util.ts', 1]]);
     });
 
+    it('flags ::x on a prop the child does not declare @model, reading the child\'s file (#124)', async () => {
+        file('src/name-field.pdx', "<template><input ::value=\"value\" /></template>\n<script setup>\n@model value: string = '';\n@prop label: string = '';\n</script>\n");
+        file('src/page.pdx', "<template>\n  <pdx-name-field ::value=\"name\" ::label=\"title\"></pdx-name-field>\n  <input ::value=\"name\" />\n</template>\n<script setup>\nlet name = $signal('');\nlet title = $signal('');\n</script>\n");
+        const report = await migrate(['.'], { cwd: root, dry: true });
+        expect(report.flagged.map((f) => [f.file, f.line, f.id, f.found])).toEqual([['src/page.pdx', 2, 'two-way-not-model', '::label']]);
+        // The registry's message is one per change; the place and the name are the finding's.
+        expect(report.flagged[0].message).toContain('`@model x`');
+    });
+
     it('control — a project written today has nothing to change or flag', async () => {
         file('src/a.pdx', '<template><p>{{ n }}</p></template>\n<script setup>\nlet n = $signal(0);\nfunction f() { n = n + 1; }\n</script>\n');
         file('vite.config.ts', "export default { plugins: [pdx()] };\n");

@@ -10,6 +10,8 @@ export interface PropInfo {
     tsType: string;       // 'string', 'number', 'boolean', 'Item[]', etc.
     runtimeType: string;  // 'String', 'Number', 'Boolean', 'Array', 'Object'
     default?: string;     // default value expression as string
+    /** `@model` (#124): a prop the component may write, which dispatches `<name>-change`. */
+    model?: true;
 }
 
 export interface EventInfo {

@@ -89,6 +89,39 @@ describe('gen-manifest reads the descriptor\'s parts (#134)', () => {
     });
 });
 
+describe('gen-manifest reads the descriptor\'s models (#124)', () => {
+    const source = [
+        "component('pdx-widget', {",
+        "    props: { label: prop('') },",
+        '    models: {',
+        '        /** The chosen value. */',
+        "        selectedId: model<string | null>(null, { type: String }),",
+        '    },',
+        '    render: () => html`<div></div>`,',
+        '});',
+    ].join('\n');
+    const decl = () => analyzeFile('src/widget/pdx-widget.ts', source, {})[0].declarations[0];
+
+    it('lists them by name, which is what the compiler reads to check ::x', () => {
+        expect(decl().models).toEqual(['selectedId']);
+    });
+
+    it('a model is a field and an attribute, like a prop', () => {
+        expect(decl().members.find((m: { name: string }) => m.name === 'selectedId'))
+            .toMatchObject({ kind: 'field', type: { text: 'string | null' }, default: 'null', description: 'The chosen value.', attribute: 'selectedid' });
+    });
+
+    it('its <kebab-name>-change event carries { value: T } and does not bubble', () => {
+        expect(decl().events).toEqual([expect.objectContaining({
+            name: 'selected-id-change', detail: '{ value: string | null }', description: expect.stringMatching(/Does not bubble\.$/),
+        })]);
+    });
+
+    it('the control: a component with no models lists none', () => {
+        expect(declaration().models).toBeUndefined();
+    });
+});
+
 describe('gen-manifest reads the descriptor\'s states (#132)', () => {
     const source = [
         '/**',

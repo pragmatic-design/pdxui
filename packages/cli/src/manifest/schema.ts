@@ -16,8 +16,10 @@ export interface ComponentManifest {
     file: string;
     /** Declared props with types and defaults. */
     props: { name: string; type: string; default?: string; required: boolean }[];
-    /** Declared events with payload types. */
+    /** Declared events with payload types, each model's `<name>-change` included. */
     events: { name: string; payloadType: string }[];
+    /** The props declared `@model`, which a parent may bind both ways with `::name` (#124). */
+    models?: string[];
     /** Declared slots, with scoped data type if applicable. */
     slots: { name: string; scoped: boolean; scopeType?: string }[];
     /** Exposed imperative API methods. */

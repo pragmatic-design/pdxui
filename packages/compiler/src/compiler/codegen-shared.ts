@@ -232,6 +232,8 @@ export function assembleModule(
     hostCode = '',
     /** The parts the script declares with `@part`, written into the descriptor (#134). */
     parts: readonly string[] = [],
+    /** The descriptor's `models: { … }` from `@model` (#124), already built; '' for none. */
+    modelsCode = '',
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -308,6 +310,8 @@ export function assembleModule(
     if (hasModuleHoists) code += MODULE_HOISTS_SLOT + '\n';
     code += `component(${jsQuote(tag)}, {\n`;
     code += `  props: ${propsCode},\n`;
+    // The descriptor's `models` (#124): props the component writes, each with its `<name>-change`.
+    if (modelsCode) code += `  models: ${modelsCode},\n`;
     // The descriptor's `events` (#123): what `event()` returns for each, so a .pdx and a TypeScript
     // component declare their events the same way.
     if (events.length > 0) code += `  events: { ${events.map(e => `${jsQuote(e)}: {}`).join(', ')} },\n`;

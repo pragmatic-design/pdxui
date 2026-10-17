@@ -192,7 +192,7 @@ Clear all global providers (for testing).
 ```ts
 import { component } from '@pdxui/core';
 
-function component(tag: string, options: ComponentOptions<P, E>): void
+function component(tag: string, options: ComponentOptions<P, E, M>): void
 ```
 
 Define a function-based Web Component.
@@ -685,10 +685,10 @@ Measure the relative position between two elements.
 ```ts
 import { model } from '@pdxui/core';
 
-function model(defaultValue: T): ModelSpec<T>
+function model(defaultValue?: T | (() => T), options?: PropOptions): ModelSpec<T>
 ```
 
-Declare a model: `model<string>('')`.
+Declare a model: `model<string>('')`, `model<Item[]>(() => [])`; the options are {@link prop}'s.
 
 ## `moveMounted`
 

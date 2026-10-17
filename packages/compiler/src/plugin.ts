@@ -40,6 +40,7 @@ import { injectSplash, type SplashOptions } from './splash';
 import type { PropsLookup, BrowserTarget } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
 import type { MethodsLookup } from './compiler/validate-commands';
+import type { ModelsLookup } from './compiler/validate-two-way';
 import { jsQuote } from './compiler/js-literal';
 /** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
 const RESOLVED_ROUTE_TABLE_ID = '\0' + ROUTE_TABLE_ID;
@@ -475,6 +476,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     propsOf: (tag) => componentResolver.propsOf(tag),
                     enumValues: (tag, prop) => componentResolver.enumValues(tag, prop),
                     methodsOf: (tag) => componentResolver.methodsOf(tag),
+                    modelsOf: (tag) => componentResolver.modelsOf(tag),
                     importPathOf: (tag) => componentResolver.resolve(tag)?.importPath ?? null,
                 });
                 let output = result.code;
@@ -669,6 +671,11 @@ export interface CompileOptions {
      */
     methodsOf?: MethodsLookup;
     /**
+     * Models components declare (the plugin passes the resolver's: project .pdx files and the UI
+     * manifest). With it, `::x` on a component prop that is not a model is PDX_TWO_WAY_NOT_MODEL (#124).
+     */
+    modelsOf?: ModelsLookup;
+    /**
      * Where a `<pdx-…>` tag's module lives, for the components a `@defer` block renders.
      *
      * The tag scan auto-imports a component with a STATIC import at the top of the module, and a
@@ -812,7 +819,7 @@ export function compile(
         // Collect structural warnings from analyzer (@prop without type, etc.)
         allWarnings.push(...cachedAnalysis.warnings);
         // Cross-check template identifiers against script declarations
-        allWarnings.push(...validate(cachedAnalysis, ast, filename, { enumValues: options?.enumValues, methodsOf: options?.methodsOf }));
+        allWarnings.push(...validate(cachedAnalysis, ast, filename, { enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf }));
         // The app's default layout, or none for `@layout 'none'`.
         if (cachedAnalysis.route?.page) {
             cachedAnalysis.route.layout = routeLayout(cachedAnalysis.route.layout, options?.defaultLayout);

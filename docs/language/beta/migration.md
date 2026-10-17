@@ -49,7 +49,7 @@ proposals the implementing issue may change.
 
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
-| `::x` on a component prop that is not two-way | `@model x` in the child | flagged (the child is another file, maybe another package) | #124 (flagging †) |
+| `::x` on a component prop that is not two-way | `@model x` in the child | flagged (the child is another file, maybe another package) — landed: `two-way-not-model` | #124 (flagging †) |
 | `@await (x as T)`, where `as T` was a TypeScript assertion (alpha has no `as` binding) | `@await ((x as T))`: in the beta a trailing `as Name` binds the value | mechanical: parenthesises every `@await` whose expression ends in `as <Identifier>` | † (decision 18) |
 | `<pdx-pin-input>` | `<pdx-otp-input mask numeric length="4">` — pin-input defaulted to 4 cells and `numeric`, otp-input to 6; an explicit `length` or `:numeric` is carried over | mechanical | † (decision 48) |
 | `<pdx-button toggle :pressed="p">` | `<pdx-toggle variant="solid" ::pressed="p">` (an explicit outline or ghost variant is kept) | mechanical | † (decisions 49, 53) |

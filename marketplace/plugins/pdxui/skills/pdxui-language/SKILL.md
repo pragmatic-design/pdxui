@@ -107,6 +107,7 @@ Written at the top of `<script setup>`, one per line, ending in `;`.
 
 ```js
 @prop label: string = 'Hello';     // a prop: signal + attribute sync + generated type
+@model value: string = '';         // a prop the component writes: value = x dispatches 'value-change'
 @event changed: number;            // an emitter: changed(n) dispatches 'changed' with detail n
 @page '/jobs/:id';                 // this component is a route
 @tag 'pdx-something-else';         // override the tag derived from the filename
@@ -118,6 +119,14 @@ lowercase: the listener is an HTML attribute, lowercased when parsed, so `@event
 dispatched as `itemPicked` and listened for as `itempicked` — never heard. The compiler warns
 `PDX_EVENT_NAME_CASE` on such a declaration. Not kebab-case either: the name is also the emitter's
 identifier.
+
+**A value the component edits for its parent is a `@model`, not a `@prop`.** A prop is the parent's:
+writing it is `PDX_PROP_WRITE`. `@model value: string = '';` is a prop the component may assign —
+`value = x`, or an inner `<input ::value="value">` — and each change dispatches `value-change` with
+`{ value }` (the model's name in kebab-case: `selectedId` → `selected-id-change`; it does not bubble).
+The parent binds it with `<app-field ::value="name">`. `::x` is a contract: valid on a model and on
+native `value`/`checked`/`files`; on any other component prop it is `PDX_TWO_WAY_NOT_MODEL`, «declare
+`@model x` in the child». A TypeScript component declares `models: { value: model<string>('') }`.
 
 **A button that runs a component's method needs no script**: every `@expose`d method is an invoker
 command. `<button commandfor="d" command="--show">` calls `show()` on `<pdx-dialog id="d">`. The
@@ -147,7 +156,7 @@ A TypeScript component declares `states: ['open']` and calls `ctx.state('open', 
 
 The full vocabulary the analyzer accepts:
 
-`@prop` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
+`@prop` `@model` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
 `@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@part` `@host` `@state` `@scroll`
 `@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use` `@mixin`
 
@@ -167,7 +176,7 @@ Types map to the runtime as: `T[]` → Array, the primitives → their counterpa
 | `{{ expr }}` | text interpolation |
 | `:prop="expr"` | bind a property (**never** `${…}` in an attribute — the compiler warns `PDX_RAW_INTERPOLATION`). Write the prop's name — `:withBorder` or `:with-border`, not the attribute form `:withborder`: on a `pdx-*` component the compiler maps it and warns `PDX_PROP_NAME_CASE`, a name it does not declare warns `PDX_UNKNOWN_PROP` |
 | `@event="expr"` | a handler: a reference, an inline mutation (`count++`), a call, a lambda, or several statements |
-| `::twoWay="sig"` | two-way binding |
+| `::name="sig"` | two-way binding: on native `value`/`checked`/`files`, and on a component's `@model name` |
 | `:class.x` / `:style.x` | conditional class / style |
 | `:ref="name"` | a DOM reference — the way to reach an element, never `getElementById` |
 

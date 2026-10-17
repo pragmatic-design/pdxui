@@ -210,6 +210,43 @@ them with `name="..."`). `Object`/`Array`/`Function` props can't live in an attr
 as **properties**, i.e. with the `:items="list"` binding from another PDX template. A
 `<pdx-list items="[...]">` as a string **won't** work; you need `:items`.
 
+## @model — a value the parent binds both ways
+
+A prop belongs to the parent: the component reads it and does not write it. When the component
+*edits* a value its parent owns — a field, a picker, a stepper — declare it with `@model` instead:
+
+```pdx
+<template>
+  <input ::value="value" />
+  <button @click="clear()">Clear</button>
+</template>
+
+<script setup>
+@model value: string = '';
+function clear() { value = ''; }
+</script>
+```
+
+A model is a prop — the same attribute, property and type — that the component may assign.
+Assigning it (here, the inner input through `::value`, and `clear()`) sets it and dispatches
+`value-change` with `{ value }`; the event does not bubble. The parent binds it with `::`:
+
+```pdx
+<template>
+  <app-name-field ::value="name"></app-name-field>
+  <p>Hello, {{ name }}</p>
+</template>
+
+<script setup>
+let name = $signal('Ada');
+</script>
+```
+
+The event is the model's name in kebab-case: `@model selectedId` dispatches `selected-id-change`, and
+a parent that wants to listen without binding writes `@selected-id-change="…"`. `::x` on a prop the
+child does not declare `@model x` is an error, `PDX_TWO_WAY_NOT_MODEL`: nothing would bring the value
+back.
+
 ## @event — what a component communicates
 
 A component shouldn't know *what* the parent does when something happens: it just **emits an event**.

@@ -50,6 +50,14 @@ describe('the rune declarations', () => {
         expect(projectScript(script)).not.toMatch(/role|aria-expanded|expanded =/);
     });
 
+    it('a @model is a typed name the script reads and writes (#124)', () => {
+        const script = "@model value: string = '';\nfunction clear() { value = ''; }\nfunction len() { return value.length; }\nclear; len;\n";
+        expect(diagnose(script)).toEqual([]);
+        expect(projectScript(script)).toHaveLength(script.length);
+        const wrong = "@model value: string = '';\nfunction set() { value = 3; }\nset;\n";
+        expect(diagnose(wrong).some(d => /number.*not assignable.*string/.test(d)), JSON.stringify(diagnose(wrong))).toBe(true);
+    });
+
     it('a @part is its element in the script (#134)', () => {
         const script = '@part trigger, popup;\nfunction f() { trigger?.focus(); popup?.remove(); }\nf;\n';
         expect(diagnose(script)).toEqual([]);
