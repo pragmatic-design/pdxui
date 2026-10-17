@@ -76,6 +76,16 @@ Modifiers shape the value on its way back — the list is closed, and anything e
 <p :title.once="label">…</p>             <!-- a plain binding assigned once, never updated -->
 ```
 
+A group of checkboxes binds to an array, and a group of radios to one value, with `::group` — each
+input says its own `value`:
+
+```pdx
+<input type="checkbox" value="cheese" ::group="toppings" />  <!-- checked while toppings holds 'cheese' -->
+<input type="checkbox" value="ham" ::group="toppings" />
+<input type="radio" value="small" ::group="size" />          <!-- checked while size is 'small' -->
+<input type="radio" value="large" ::group="size" />
+```
+
 When the value needs converting both ways — money shown as `12.50` and kept in cents — write the
 general form, of which every modifier is a shorthand:
 

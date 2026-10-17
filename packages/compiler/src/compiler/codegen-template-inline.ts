@@ -838,11 +838,16 @@ class InlineGen {
             if (invariants.length > 0) {
                 this.imports.add('computed');
                 for (const name of invariants) {
-                    const alias = this.hoist(name);
-                    body = body.replace(new RegExp(`ctx\\.${name}\\(\\)`, 'g'), `${alias}()`);
                     // Match: `ctx.NAME` passed by reference — not followed by a word char, `(` or
-                    // `.` (a member of the signal object is never a read of its value).
-                    body = body.replace(new RegExp(`ctx\\.${name}(?!\\w|\\(|\\.)`, 'g'), `${alias}()`);
+                    // `.` (a member of the signal object is never a read of its value) — and not the
+                    // signal a two-way binding writes (`bindTwoWay(el, 'value', ctx.NAME)`): that one
+                    // needs the signal itself, and its value made the binding one-way in a build.
+                    const byReference = new RegExp(`(?<!bindTwoWay\\(\\w+, '[^']*', )ctx\\.${name}(?!\\w|\\(|\\.)`, 'g');
+                    const read = new RegExp(`ctx\\.${name}\\(\\)`, 'g');
+                    if (!read.test(body) && !byReference.test(body)) continue; // only a two-way target
+                    const alias = this.hoist(name);
+                    body = body.replace(read, `${alias}()`);
+                    body = body.replace(byReference, `${alias}()`);
                 }
             }
         }

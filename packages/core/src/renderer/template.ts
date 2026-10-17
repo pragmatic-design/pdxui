@@ -9,7 +9,7 @@ import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
 import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
-import { parseTwoWay, twoWayAccessor, twoWayWriter } from './two-way-value';
+import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup } from './two-way-value';
 
 // Properties whose value becomes a navigable/fetchable URL — a runtime-controlled value
 // (API/user data) must never be assigned raw (`javascript:`, `//evil.com`). Lowercased.
@@ -681,11 +681,22 @@ function bindStyleProp(el: HTMLElement, prop: string, value: TemplateValue): voi
  * everything, and `::value` was one-way on a component in a production build (#97).
  */
 export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void {
-    const { name, mods } = parseTwoWay(descriptor);
+    const parsed = parseTwoWay(descriptor);
+    const { mods } = parsed;
+    let { name } = parsed;
     const accessor = twoWayAccessor(value);
     if (!accessor) {
         bindProperty(el, name, value);
         return;
+    }
+    // `::group` (#127): on a checkbox or a radio, the group binding; on a component, its one model.
+    if (name === 'group') {
+        if (el instanceof HTMLInputElement && (el.type === 'checkbox' || el.type === 'radio')) {
+            bindGroup(el, accessor, (fn) => { effect(fn); });
+            return;
+        }
+        const models = (customElements.get(el.tagName.toLowerCase()) as { models?: ReadonlySet<string> } | undefined)?.models;
+        if (models && models.size === 1) name = [...models][0];
     }
     // Convert kebab-case prop to camelCase for JS property access
     const prop = kebabToCamel(name);

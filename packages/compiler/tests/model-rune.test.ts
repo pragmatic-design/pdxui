@@ -95,6 +95,19 @@ describe('PDX_TWO_WAY_NOT_MODEL', () => {
         expect(codes('<input ::value="name" /><input type="checkbox" ::checked="name" /><textarea ::value="name"></textarea><select ::value="name"></select>')).toEqual([]);
     });
 
+    it('::group binds a component\'s one model: valid with one, an error with none or several (#127)', () => {
+        const groupCodes = (template: string, models: Record<string, string[]>) => {
+            const analysis = analyzeScript("let name = $signal('');", 'parent.pdx');
+            const lookup = (tag: string) => (models[tag] ? new Set(models[tag]) : null);
+            return validate(analysis, parseTemplate(template), 'parent.pdx', { modelsOf: lookup })
+                .filter(w => w.code === 'PDX_TWO_WAY_NOT_MODEL').map(w => w.message);
+        };
+        expect(groupCodes('<app-tags ::group="name"></app-tags>', { 'app-tags': ['value'] })).toEqual([]);
+        expect(groupCodes('<app-pair ::group="name"></app-pair>', { 'app-pair': ['from', 'to'] })).toHaveLength(1);
+        expect(groupCodes('<app-none ::group="name"></app-none>', { 'app-none': [] })[0]).toContain('::group');
+        expect(groupCodes('<input type="checkbox" value="a" ::group="name" />', {}), 'native: the platform group').toEqual([]);
+    });
+
     it('a component whose models are not known (no manifest entry, none listed) is left as it was', () => {
         expect(codes('<pdx-input ::value="name"></pdx-input><other-thing ::open="name"></other-thing>')).toEqual([]);
     });
