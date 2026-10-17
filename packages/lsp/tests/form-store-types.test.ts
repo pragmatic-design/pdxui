@@ -72,6 +72,14 @@ describe('an inline @form', () => {
         expect(diagnose(helper + PROFILE + 'keep(profile);')).toEqual([]);
     });
 
+    it('a nested form can be handed to a helper typed with core\'s Form of its values (#470)', () => {
+        // Core's Form keys its fields as createForm flattens them, as the editor does: the two agree.
+        const helper = "import type { Form } from '@pdxui/core';\n"
+            + 'function keep(form: Form<{ name: string; address: { street: string }; lines: { qty: number }[] }>) { return form; }\n';
+        const form = '@form o: { name: string, address: { street: string }, lines: [{ qty: number }] };\n';
+        expect(diagnose(helper + form + 'keep(o);')).toEqual([]);
+    });
+
     it('a nested object: dotted fields, nested values', () => {
         const form = '@form f: { address: { street: string, zip: number } };\n';
         expect(diagnose(form + 'function g() { const s: string = f.fields["address.street"].value(); const z: number = f.getValues().address.zip; return [s, z]; }'))

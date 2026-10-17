@@ -67,14 +67,51 @@ export interface FieldSaveConfig {
 }
 
 /**
+ * Whether `createForm` enters a value to make fields of its keys: an object, not an array or a Date
+ * (`isPlainObject` in ./form-path). Tuple-wrapped so an optional object, `{…} | undefined`, is not
+ * split: its field starts undefined, and a leaf is what the runtime makes of it.
+ */
+type IsFieldGroup<V> = [V] extends [readonly unknown[]] ? false
+    : [V] extends [Date | ((...args: never[]) => unknown)] ? false
+    : [V] extends [object] ? true : false;
+
+/**
  * The dotted path of each nested field, as `createForm` flattens the values into fields:
  * `{ customer: { name: string } }` → `'customer.name'`. An array is a field array (`form.array()`),
  * not a group of fields, so it is not entered.
  */
 type NestedFieldPath<T> = {
     [K in keyof T & string]: T[K] extends readonly unknown[] ? never
-        : T[K] extends Record<string, unknown> ? `${K}.${keyof T[K] & string}` | `${K}.${NestedFieldPath<T[K]>}` : never;
+        : IsFieldGroup<T[K]> extends true ? `${K}.${keyof T[K] & string}` | `${K}.${NestedFieldPath<T[K]>}` : never;
 }[keyof T & string];
+
+/**
+ * The name of each field `createForm` makes from `T`: a leaf by its key, a nested object's leaves
+ * by their dotted path, and each row of an array of objects by its index (`lines.${number}.qty`).
+ * The array itself is a field as well: it is one while it is empty. This is what `fields`,
+ * `errors` and `warnings` are keyed by.
+ */
+export type FormFieldName<T, Pre extends string = ''> = {
+    [K in keyof T & string]-?: [T[K]] extends [readonly (infer U)[]]
+        ? `${Pre}${K}` | (IsFieldGroup<U> extends true ? FormFieldName<U, `${Pre}${K}.${number}.`> : never)
+        : IsFieldGroup<T[K]> extends true ? FormFieldName<T[K], `${Pre}${K}.`>
+        : `${Pre}${K}`;
+}[keyof T & string];
+
+/** The value of the field named `P`: a dotted path, whose segment after an array is a row index. */
+type FieldValue<T, P extends string> = P extends keyof T ? T[P]
+    : P extends `${infer H}.${infer R}`
+        ? (H extends keyof T ? FieldValue<T[H], R> : T extends readonly (infer U)[] ? FieldValue<U, R> : never)
+        : never;
+
+/**
+ * What `setValues` and `reset` take: any subset of the values, at any depth. Both flatten it and
+ * set only the fields it names, so `{ customer: { name } }` leaves `customer.email` as it was.
+ */
+export type FormValuesPatch<T> = { [K in keyof T]?: IsFieldGroup<T[K]> extends true ? FormValuesPatch<T[K]> : T[K] };
+
+/** A form's fields, keyed as `createForm` flattens the values (`'customer.name'`, `'lines.0.qty'`). */
+export type FormFields<T> = { [P in FormFieldName<T>]: FormField<FieldValue<T, P>> };
 
 /** The value at a dotted path of `T`. */
 type PathValue<T, P extends string> = P extends `${infer H}.${infer R}`
@@ -171,8 +208,8 @@ export function getCoordinator(parentForm: Form<any>): FormCoordinator {
 let _anonFormSeq = 0;
 
 export interface Form<T extends Record<string, unknown>> {
-    /** Individual field accessors. */
-    readonly fields: { [K in keyof T]: FormField<T[K]> };
+    /** Individual field accessors, keyed by the flattened name: `fields['customer.name']`. */
+    readonly fields: FormFields<T>;
     /** Whether all fields pass validation. */
     readonly valid: ReadonlySignal<boolean>;
     /** Whether any field has been modified. */
@@ -184,9 +221,9 @@ export interface Form<T extends Record<string, unknown>> {
     /** Whether form was submitted at least once. */
     readonly submitted: ReadonlySignal<boolean>;
     /** All current errors keyed by field name. */
-    readonly errors: ReadonlySignal<Partial<Record<keyof T, string>>>;
+    readonly errors: ReadonlySignal<Partial<Record<FormFieldName<T>, string>>>;
     /** All current warnings keyed by field name (non-blocking). */
-    readonly warnings: ReadonlySignal<Partial<Record<keyof T, string>>>;
+    readonly warnings: ReadonlySignal<Partial<Record<FormFieldName<T>, string>>>;
     /** Configured save mode. */
     readonly saveMode: SaveMode;
     /** Configured validation mode. */
@@ -215,14 +252,18 @@ export interface Form<T extends Record<string, unknown>> {
      * was loaded with an entity, and loading a second entity keeps the fields the first one had and
      * the second lacks. To start from the defaults again, create a new form.
      */
-    reset(newValues?: Partial<T>): void;
+    reset(newValues?: FormValuesPatch<T>): void;
     /** Set multiple field values at once. */
-    setValues(values: Partial<T>): void;
+    setValues(values: FormValuesPatch<T>): void;
     /** Run validation on all fields, return true if valid. */
     validate(): Promise<boolean>;
 
-    /** Access a field array (for array-typed fields). */
-    array<K extends keyof T>(name: K): FieldArray<T[K] extends (infer U)[] ? U : never>;
+    /**
+     * Access a field array (for array-typed fields). A key whose value is `unknown`, as in a form
+     * typed by a record, may hold one: its rows are `unknown`, not `never`. That is also what keeps
+     * a typed form assignable to `Form<Record<string, unknown>>`, which is compared member by member.
+     */
+    array<K extends keyof T>(name: K): FieldArray<T[K] extends (infer U)[] ? U : unknown extends T[K] ? unknown : never>;
     /** Dotted path into a nested array ('order.items'), which `array()` resolves the same way. */
     array<U = unknown>(name: string): FieldArray<U>;
 
@@ -266,7 +307,8 @@ export interface FormInternals {
  *
  * Nested initial values are FLATTENED into dotted paths — `{ customer: { name } }` becomes
  * `'customer.name'` — so a field addresses itself the same way however deep it sits, and validators
- * are declared against one flat key space.
+ * are declared against one flat key space. The types follow it: `fields`, `errors` and `warnings` are
+ * keyed by those names (a row's by its index, `'lines.0.qty'`), each field typed by the value it holds.
  *
  * `validateOn` decides when errors appear: `onBlur` by default, because validating while someone is
  * still typing shows them an error for a value they have not finished writing. Async validators are
@@ -796,8 +838,8 @@ export function createForm<T extends Record<string, unknown>>(
         touched: touched as ReadonlySignal<boolean>,
         submitting: computed(() => _state() === 'submitting') as ReadonlySignal<boolean>,
         submitted: computed(() => _submitted()) as ReadonlySignal<boolean>,
-        errors: errors as ReadonlySignal<Partial<Record<keyof T, string>>>,
-        warnings: formWarnings as ReadonlySignal<Partial<Record<keyof T, string>>>,
+        errors: errors as Form<T>['errors'],
+        warnings: formWarnings as Form<T>['warnings'],
         saveMode,
         validateOn,
         state: computed(() => _state()) as ReadonlySignal<FormState>,
@@ -850,7 +892,7 @@ export function createForm<T extends Record<string, unknown>>(
             }
         },
 
-        reset(newValues?: Partial<T>): void {
+        reset(newValues?: FormValuesPatch<T>): void {
             if (newValues) {
                 const flatNew = flattenValues(newValues as Record<string, unknown>);
                 Object.assign(flatSnapshot, flatNew);
@@ -873,7 +915,7 @@ export function createForm<T extends Record<string, unknown>>(
             for (const [, arr] of fieldArrays) arr.reset();
         },
 
-        setValues(values: Partial<T>): void {
+        setValues(values: FormValuesPatch<T>): void {
             // Flatten nested values before applying to field signals
             const flat = flattenValues(values as Record<string, unknown>);
             batch(() => {
@@ -944,7 +986,7 @@ export function createForm<T extends Record<string, unknown>>(
         const id = (config.initialValues as Record<string, unknown>)[idField];
         const bridge: FormBridge = {
             getValues: () => getValues() as Record<string, unknown>,
-            setValues: (values) => form.setValues(values as Partial<T>),
+            setValues: (values) => form.setValues(values as FormValuesPatch<T>),
             state: {
                 dirty: dirty as ReadonlySignal<boolean>,
                 // getValues() reads with .peek() (non-reactive) — so subscribe to the field

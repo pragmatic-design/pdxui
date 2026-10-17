@@ -161,7 +161,7 @@ describe('dirty, touched and reset', () => {
 
     it('setValues ignores a key that is not a field', () => {
         const form = createForm<Record<string, unknown>>({ initialValues: { a: 'x' } });
-        expect(() => form.setValues({ ghost: 1 } as never)).not.toThrow();
+        expect(() => form.setValues({ ghost: 1 })).not.toThrow();
         expect(form.getValues()).toEqual({ a: 'x' });
     });
 
@@ -328,7 +328,7 @@ describe('nested values', () => {
         const form = createForm({
             initialValues: { customer: { name: '' } },
             validators: { 'customer.name': [(v: string) => (v ? undefined : 'Required')] },
-        } as never);
+        });
         expect(await form.validate()).toBe(false);
         expect(form.errors()['customer.name']).toBe('Required');
     });

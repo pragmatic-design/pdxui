@@ -23,8 +23,8 @@ describe('validators keyed by a dotted path', () => {
             },
         });
         expect(await form.validate()).toBe(false);
-        // Read whole: `errors()` is still typed by the top-level keys (its nested typing is #470).
-        expect(form.errors()).toMatchObject({ 'customer.name': expect.any(String), 'customer.address.city': 'City' });
+        expect(form.errors()['customer.name']).toEqual(expect.any(String));
+        expect(form.errors()['customer.address.city']).toBe('City');
     });
 
     it('type each path by the value it reaches, and know no other', () => {
