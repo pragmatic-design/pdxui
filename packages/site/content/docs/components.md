@@ -211,7 +211,7 @@ compile, `PDX_PROP_REQUIRED`, at the tag. A default makes it optional; so does `
 that is absent holds its type's empty value (`''`, `0`, `false`, `[]`, `null`):
 
 ```pdx
-@prop user: User;              // required: <pdx-user-card> without :user is an error
+@prop userId: string;          // required: <pdx-user-card> without user-id is an error
 @prop label: string = 'Owner'; // optional, with a default
 @prop hint?: string;           // optional
 ```
