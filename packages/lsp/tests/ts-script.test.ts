@@ -2,6 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { join } from 'path';
+import ts from 'typescript';
 import { projectScript, PdxTsService } from '../src/utils/ts-service';
 import { getTsDiagnostics } from '../src/capabilities/ts-diagnostics';
 import { buildVirtualFile } from '../src/utils/virtual-file';
@@ -58,6 +59,16 @@ describe('getScriptDiagnostics', () => {
         const start = src.indexOf('<script setup>') + '<script setup>'.length;
         return getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src);
     };
+
+    it('an optional @prop (#130), `@prop hint?: string;`, is valid TypeScript in the projection', () => {
+        const sc = "\n@prop hint?: string;\n@prop id: string;\nfunction f() { return (hint ?? '') + id; }\n";
+        const src = '<template></template>\n<script setup>' + sc + '</script>';
+        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        expect(projectScript(sc)).toHaveLength(sc.length);
+        const syntax = ts.transpileModule(projectScript(sc), { reportDiagnostics: true }).diagnostics ?? [];
+        expect(syntax.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([]);
+        expect(getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src).map((d: { message: string }) => d.message)).toEqual([]);
+    });
 
     it('no diagnostics at all on a script that calls its own @event', () => {
         expect(withEvent('function f() { changed(1); }').map((d: { message: string }) => d.message)).toEqual([]);

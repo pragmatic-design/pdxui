@@ -69,22 +69,39 @@ as written.
 #### Syntax
 
 ```ebnf
-PropDecl ::= "@prop" S Identifier S? ":" S? Type ( S? "=" S? Expression )? S? ";"?
+PropDecl ::= "@prop" S Identifier S? "?"? S? ":" S? Type ( S? "=" S? Expression )? S? ";"?
 ```
 
-The analyzer's form: `@prop name: Type = default;`
+The analyzer's forms: `@prop name: Type;`, `@prop name: Type = default;`, `@prop name?: Type;`
 
 #### Semantics
 
-Declares a prop: an attribute-synced signal on the element. It becomes an entry of the component's
-`props` object, `name: { type: T, default: d }`, where `T` is `String`, `Number` or `Boolean` for
-`string`, `number`, `boolean`, `Array` for a type ending in `[]`, and `Object` for every other type
-(unions included); the default is emitted as written. Where the setup reads the name, it declares
-`const name = ctx.name;` and the rewrite turns each read into `name()`; in a `$signal` or `$store`
-initialiser the read is `ctx.name.peek()`, the value at setup time. The `.d.ts` gets `name?: Type`.
+Declares a prop: an attribute-synced signal on the element, with TypeScript's rule (#130):
+
+| Written | Meaning |
+|---|---|
+| `@prop id: string;` | required — a parent that omits it does not compile |
+| `@prop label: string = '';` | optional, with a default |
+| `@prop hint?: string;` | optional; when absent it holds its runtime type's empty value |
+
+It becomes an entry of the component's `props` object, `name: { type: T, default: d }`, where `T`
+is `String`, `Number` or `Boolean` for `string`, `number`, `boolean`, `Array` for a type ending in
+`[]`, and `Object` for every other type (unions included); the default is emitted as written, and a
+required prop carries `required: true`, which core reports in development when the host does not
+set it. A prop with no default that is absent holds the empty value of `T`: `''`, `0`, `false`,
+`[]`, or `null` for `Object`. Where the setup reads the name, it declares `const name = ctx.name;`
+and the rewrite turns each read into `name()`; in a `$signal` or `$store` initialiser the read is
+`ctx.name.peek()`, the value at setup time. The `.d.ts` gets `name: Type` for a required prop and
+`name?: Type` for the others. The descriptor's builders are `prop.required<T>()`, `prop<T>(d)` and
+`prop.optional<T>()`.
 
 #### Rules
 
+- A parent template that uses the component without a required prop — no attribute, no binding,
+  in camelCase or kebab-case — raises `PDX_PROP_REQUIRED` (error), at the tag. Checked for project
+  components and for library components whose manifest marks the prop `required`.
+- `pdx migrate` adds `?` to every `@prop` with no default: in alpha such a prop was optional, and
+  the `?` keeps that meaning (#130).
 - The type annotation is required: `@prop name;` raises `PDX_PROP_NO_TYPE` and nothing is generated.
 - A type with unbalanced brackets or a trailing `|`, `&`, `,` raises `PDX_PROP_INVALID_TYPE`.
 - A default that does not look like its type (`@prop n: number = 'x'`) raises `PDX_PROP_TYPE_MISMATCH`.
@@ -106,13 +123,15 @@ initialiser the read is `ctx.name.peek()`, the value at setup time. The `.d.ts` 
 @prop start: number = 0;
 @prop tags: string[] = [];
 @prop size: 'sm' | 'md' | 'lg' = 'md';
+@prop id: string;
+@prop hint?: string;
 let clicks = $signal(start);
 </script>
 ```
 
 #### Since
 
-alpha
+alpha; required props and `?` since beta (#130)
 
 ### @model
 

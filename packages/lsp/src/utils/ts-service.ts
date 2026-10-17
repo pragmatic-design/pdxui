@@ -37,7 +37,8 @@ function atLineStart(s: string, idx: number): boolean {
 }
 
 /** Projects the .pdx script into valid TS, with the length and the offsets unchanged.
- *  - `@prop name: T = d` → `var  name…` (a TYPED prop; `@prop`=5 → `var  `=5), `@model` the same (6 → 6).
+ *  - `@prop name: T = d` → `var  name…` (a TYPED prop; `@prop`=5 → `var  `=5), `@model` the same (6 → 6);
+ *    the `?` of an optional `@prop name?: T` is blanked.
  *  - the other @… runes → blanked out (from the keyword to a `;` at depth 0, or to the
  *    balanced `{…}`), preserving the newlines. The names of @fetch/@form are declared at
  *    the end, typed (their lines are blanked) → the references resolve.
@@ -58,6 +59,10 @@ export function projectScript(scriptContent: string): string {
             // `var`, not `let`: the compiler declares props before anything reads them. A `@model`
             // (#124) is a prop the script writes, so it is the same typed name: `@model` → `var   `.
             `var${' '.repeat(kw.length - 2)}`.split('').forEach((ch, o) => { out[m!.index + o] = ch; });
+            // `@prop hint?: T` (#130): a variable takes no `?`, so it is blanked — the name keeps its type.
+            // Match: the name and the `?` after it. Groups: [1]=up to the `?`
+            const optional = /^(\s+[A-Za-z_$][\w$]*\s*)\?/.exec(s.slice(m.index + 1 + kw.length));
+            if (optional) out[m.index + 1 + kw.length + optional[1].length] = ' ';
             continue;
         }
         if (NAME_INTRO.has(kw)) {

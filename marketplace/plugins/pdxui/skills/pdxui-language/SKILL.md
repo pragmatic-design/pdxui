@@ -107,6 +107,8 @@ Written at the top of `<script setup>`, one per line, ending in `;`.
 
 ```js
 @prop label: string = 'Hello';     // a prop: signal + attribute sync + generated type
+@prop userId: string;              // no default: REQUIRED — a parent without user-id is PDX_PROP_REQUIRED
+@prop hint?: string;               // `?`: optional, its type's empty value ('' here) when absent
 @model value: string = '';         // a prop the component writes: value = x dispatches 'value-change'
 @event changed: number;            // an emitter: changed(n) dispatches 'changed' with detail n
 @page '/jobs/:id';                 // this component is a route

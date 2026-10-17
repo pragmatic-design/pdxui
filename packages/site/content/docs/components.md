@@ -205,6 +205,20 @@ the type. You read them in the template as normal values:
 
 From the outside: `<pdx-user-card name="Ada" role="Engineer" verified>`.
 
+**Required, defaulted, optional.** The rule is TypeScript's. A prop with no default is
+**required**: a parent that uses the component without it — no attribute, no binding — does not
+compile, `PDX_PROP_REQUIRED`, at the tag. A default makes it optional; so does `?`, and then a prop
+that is absent holds its type's empty value (`''`, `0`, `false`, `[]`, `null`):
+
+```pdx
+@prop userId: string;          // required: <pdx-user-card> without user-id is an error
+@prop label: string = 'Owner'; // optional, with a default
+@prop hint?: string;           // optional
+```
+
+Code written before required props existed meant "optional" by a `@prop` with no default:
+`pdx migrate` adds the `?` that keeps it so.
+
 **Gotcha about types.** `string`/`number`/`boolean` props reflect as HTML **attributes** (so you set
 them with `name="..."`). `Object`/`Array`/`Function` props can't live in an attribute: they're passed
 as **properties**, i.e. with the `:items="list"` binding from another PDX template. A

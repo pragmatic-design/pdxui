@@ -13,6 +13,8 @@ import { scanNoImportTags } from './no-import-tags';
 import { componentPackages, type ComponentPackage } from './component-packages';
 import type { ValidationWarning } from './compiler/validate';
 import { jsQuote } from './compiler/js-literal';
+import { parseSFC } from './parser/sfc';
+import { analyzeScript } from './compiler/script-analyzer';
 
 /** Resolved component: tag name → import path */
 export interface ComponentEntry {
@@ -45,6 +47,10 @@ export class ComponentResolver {
     private libraryModels = new Map<string, Set<string>>();
     /** A project file's `@model`s, with the modification time they were read at. */
     private projectModels = new Map<string, { mtimeMs: number; models: Set<string> }>();
+    /** tag → the props a library component's manifest marks required (#130); only components that mark some. */
+    private libraryRequired = new Map<string, Set<string>>();
+    /** A project file's required `@prop`s, with the modification time they were read at. */
+    private projectRequired = new Map<string, { mtimeMs: number; props: Set<string> }>();
     /** The icons a component package publishes one module each (`./icons/*`): name → import path. */
     private icons = new Map<string, string>();
     private _collisions: ValidationWarning[] = [];
@@ -163,6 +169,26 @@ export class ComponentResolver {
         } catch { return null; } // unreadable: its models are not known
     }
 
+    /**
+     * The props a component requires (#130), or null when they are not known. A project `.pdx` is read
+     * for its `@prop`s with no default and no `?`, again whenever the file changes; a library component
+     * answers the fields its manifest marks `required` (`prop.required<T>()`).
+     */
+    requiredPropsOf(tag: string): ReadonlySet<string> | null {
+        const entry = this.map.get(tag);
+        if (!entry) return null;
+        if (entry.source === 'ui') return this.libraryRequired.get(tag) ?? null;
+        try {
+            const { mtimeMs } = statSync(entry.importPath);
+            const cached = this.projectRequired.get(entry.importPath);
+            if (cached && cached.mtimeMs === mtimeMs) return cached.props;
+            const props = new Set(analyzeScript(parseSFC(readFileSync(entry.importPath, 'utf-8')).script?.content ?? '', entry.importPath)
+                .props.filter(p => p.required).map(p => p.name));
+            this.projectRequired.set(entry.importPath, { mtimeMs, props });
+            return props;
+        } catch { return null; } // unreadable: its props are not known
+    }
+
     /** The props of a manifest component whose value names an icon, by declared (camelCase) name. */
     iconPropsOf(tag: string): ReadonlySet<string> | null {
         return this.iconProps.get(tag) ?? null;
@@ -250,17 +276,20 @@ export class ComponentResolver {
             const settable = new Set<string>();
             const iconProps = new Set<string>();
             const methods = new Set<string>();
+            const required = new Set<string>();
             for (const member of decl.members || []) {
                 // What the component exposes to be called (#140): its invoker commands.
                 if (member.kind === 'method') methods.add(member.name);
                 if (member.kind !== 'field') continue;
                 if (!member.readonly) settable.add(member.name);
+                if (member.required) required.add(member.name);
                 if (member.iconName) iconProps.add(member.name);
                 const vals = parseEnumUnion(member.type?.text);
                 if (vals) propEnums.set(member.name, vals);
             }
             if (propEnums.size) this.enums.set(decl.tagName, propEnums);
             if (iconProps.size) this.iconProps.set(decl.tagName, iconProps);
+            if (required.size) this.libraryRequired.set(decl.tagName, required);
             // The models the component declares (#124), as the manifest generator lists them.
             if (decl.models && decl.models.length > 0) this.libraryModels.set(decl.tagName, new Set(decl.models));
             this.props.set(decl.tagName, settable);
@@ -510,7 +539,7 @@ function isAlreadyImported(existingImports: string, importPath: string): boolean
 
 // ─── Manifest-driven resolution helpers ──────────────────────────────────────
 
-interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; type?: { text?: string } }
+interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; required?: boolean; type?: { text?: string } }
 interface ManifestDeclaration { tagName?: string; members?: ManifestMember[]; models?: string[] }
 interface ManifestModule { path?: string; declarations?: ManifestDeclaration[] }
 

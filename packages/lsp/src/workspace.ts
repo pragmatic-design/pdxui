@@ -215,6 +215,7 @@ export class Workspace {
                     methodsOf: (tag) => resolver.methodsOf(tag),
                     // The models a component declares, for PDX_TWO_WAY_NOT_MODEL (#124).
                     modelsOf: (tag) => resolver.modelsOf(tag),
+                    requiredPropsOf: (tag) => resolver.requiredPropsOf(tag),
                 };
             } catch {
                 return {}; // a project whose packages cannot be read: the checks that need them stay off

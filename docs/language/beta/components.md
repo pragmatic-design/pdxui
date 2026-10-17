@@ -31,15 +31,20 @@ PropDecl ::= "@prop" S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? 
 
 ### Semantics
 
-Declares a prop, as in alpha. The beta adds **required props** with TypeScript's rule (#130):
+Declares a prop, as in alpha. The beta adds **required props** with TypeScript's rule (#130 — landed):
 
 | Written | Meaning |
 |---|---|
 | `@prop id: string;` | required — a parent that omits it does not compile |
 | `@prop label: string = '';` | optional, with a default |
-| `@prop hint?: string;` | optional, `undefined` when absent |
+| `@prop hint?: string;` | optional; when absent it holds its runtime type's empty value, as an alpha prop with no default did |
 
 Descriptor: `prop.required<T>()`, `prop<T>(default)`, `prop.optional<T>()`.
+
+The empty value is `''`, `0`, `false`, `[]`, or `null` for an `Object` prop — what an alpha prop with no
+default held, which this specification first wrote as `undefined`. Keeping it is what lets `pdx
+migrate`'s `?` preserve the meaning of existing code exactly; TypeScript still types the read as
+`T | undefined`, the wider type.
 
 ### Rules
 

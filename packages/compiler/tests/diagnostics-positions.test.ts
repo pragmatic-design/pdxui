@@ -51,6 +51,7 @@ const ROWS: Record<string, Row> = {
     PDX_PIPE_SINGLE: { src: pdx('<p>{{ a }}</p>\n<p>{{ a | up }}</p>', 'let a = $signal(1);\nfunction up(v) { return v; }'), at: '{{ a | up }}' },
     PDX_BINDING_MODIFIER: { src: pdx('<p>{{ a }}</p>\n<input ::value.lazzy="a" />', 'let a = $signal(1);'), at: '::value.lazzy' },
     PDX_TWO_WAY_NOT_MODEL: { src: pdx('<p>{{ a }}</p>\n<app-field\n  ::label="a"></app-field>', 'let a = $signal(1);'), at: '::label="a"' },
+    PDX_PROP_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-card :id="a"></app-card>\n  <app-card></app-card>', 'let a = $signal(1);'), at: '<app-card></app-card>' },
     PDX_PART_MISSING: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@part trigger;'), at: '@part trigger;' },
     PDX_PART_DUPLICATE: { src: pdx('<b data-part="x">1</b><i data-part="x">2</i>', '@part x;'), at: 'data-part="x">2' },
     PDX_PART_UNDECLARED: { src: pdx('<p data-part="popup">{{ a }}</p>', 'let a = $signal(1);'), at: 'data-part="popup"' },
@@ -138,6 +139,7 @@ function produce(code: string, row: Row): ValidationWarning | undefined {
         propsOf: (tag) => (tag === 'pdx-button' ? BUTTON_PROPS : null),
         enumValues: (tag, prop) => (tag === 'pdx-button' && prop === 'size' ? ['sm', 'md', 'lg'] : null),
         modelsOf: (tag) => (tag === 'app-field' ? new Set(['value']) : null),
+        requiredPropsOf: (tag) => (tag === 'app-card' ? new Set(['id']) : null),
     });
     return r.warnings.find((w) => w.code === code);
 }

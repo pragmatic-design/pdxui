@@ -948,10 +948,10 @@ Base class for PDX UI Web Components.
 ```ts
 import { prop } from '@pdxui/core';
 
-const prop: typeof propBuilder & { required: typeof requiredProp }
+const prop: typeof propBuilder & { required: typeof requiredProp; optional: typeof optionalProp }
 ```
 
-Declare a prop: `prop<T>(default, { type? })`, or `prop.required<T>({ type? })`.
+Declare a prop: `prop<T>(default, { type? })`, `prop.required<T>({ type? })` or `prop.optional<T>({ type? })`.
 
 ## `provide`
 

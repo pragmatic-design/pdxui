@@ -12,6 +12,8 @@ export interface PropInfo {
     default?: string;     // default value expression as string
     /** `@model` (#124): a prop the component may write, which dispatches `<name>-change`. */
     model?: true;
+    /** `@prop name: T;` with no default and no `?` (#130): a parent must set it. */
+    required?: true;
 }
 
 export interface EventInfo {

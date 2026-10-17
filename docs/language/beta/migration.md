@@ -31,7 +31,7 @@ proposals the implementing issue may change.
 
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
-| `@prop x: T;` (optional, `undefined`) | `@prop x?: T;` — without `?` it is required | mechanical: adds `?` to every `@prop` without a default | #130 |
+| `@prop x: T;` (optional, its type's empty value) | `@prop x?: T;` — without `?` it is required | mechanical: adds `?` to every `@prop` without a default — landed: `prop-required` | #130 |
 | `$emit('saved', v)` | `saved(v)`, with `@event saved: …;` | mechanical; adds `@event saved: unknown;` when missing | #138 |
 | `@event saved: T;` (bubbles) | `@event(bubbles) saved: T;` keeps that; `@event saved` no longer bubbles | mechanical: adds `(bubbles)` to every existing `@event`; `PDX_EVENT_BUBBLES_UNUSED` lists the removable ones | #138 |
 | `@provide user = v;` / `@inject user;` / `@inject user as me;` | `@provide User = v;` / `@inject user from User;` / `@inject me from User;` | mechanical: generates `contexts.ts`, one token per key | #139 |

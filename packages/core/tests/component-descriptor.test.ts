@@ -128,6 +128,17 @@ describe('the descriptor at runtime', () => {
         expect(warn.mock.calls.flat().join(' ')).not.toContain('required prop');
     });
 
+    it('an optional prop (#130) the host does not set holds its type\'s empty value, and is not reported', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const name = tag();
+        let seen: unknown = 'unread';
+        component(name, { props: { hint: prop.optional<string>({ type: String }) }, setup(ctx) { seen = ctx.hint(); }, render: () => html`<p>x</p>` });
+        mount(name);
+        expect(seen).toBe('');
+        expect(warn.mock.calls.flat().join(' ')).not.toContain('required prop');
+        expect(prop.optional<number[]>()).toEqual({ type: Object });
+    });
+
     it('emitting an event the descriptor does not declare is reported, and still dispatched', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
         const name = tag();

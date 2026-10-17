@@ -12,7 +12,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_SETUP_REDUNDANT` | info | `<script setup>`: `setup` has no meaning in the beta. | the file | #158 |
 | `PDX_TAG_RESERVED` | error | An application tag that starts with `pdx-`. | the tag | #136 |
 | `PDX_INLINE_BINDINGS_IGNORED` | warn | `pdx({ inlineBindings })` no longer selects a render path. | configuration | #107 |
-| `PDX_PROP_REQUIRED` | error | A required prop the parent does not give. | `@prop` | #130 |
+| `PDX_PROP_REQUIRED` | error | A required prop the parent does not give. | `@prop` | #130 (landed) |
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not a `@model`. | `::name`, `@model` | #124 |
 | `PDX_BINDING_MODIFIER` | error | A binding modifier outside the closed list. | `::name`, `:name.once` | #126 |
 | `PDX_FORM_REQUIRED_IN_MARKUP` | warn | `required` on a control bound to a form field; it belongs in the schema. | `@form` | #128 |
