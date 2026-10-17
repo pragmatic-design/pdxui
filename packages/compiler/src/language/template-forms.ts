@@ -123,9 +123,14 @@ function rewriteTags(text: string, rewrite: (text: string, tag: Tag) => string |
     return text;
 }
 
+/** `text` as a single-quoted JavaScript string: its backslashes and quotes escaped. */
+function singleQuoted(text: string): string {
+    return `'${text.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+}
+
 /** An object key as written in a template expression: an identifier bare, anything else quoted. */
 function key(name: string): string {
-    return /^[A-Za-z_$][\w$]*$/.test(name) ? name : `'${name.replace(/'/g, "\\'")}'`;
+    return /^[A-Za-z_$][\w$]*$/.test(name) ? name : singleQuoted(name);
 }
 
 /**
@@ -145,8 +150,7 @@ function mergeDotted(base: 'class' | 'style') {
         let value: string;
         if (existing && !isObject) {
             if (base === 'style') return null;
-            const quoted = (name: string) => `'${name.replace(/'/g, "\\'")}'`;
-            value = `[${[inner, ...parts.map(p => `${p.value} && ${quoted(p.name.slice(base.length + 2))}`)].join(', ')}].filter(Boolean).join(' ')`;
+            value = `[${[inner, ...parts.map(p => `${p.value} && ${singleQuoted(p.name.slice(base.length + 2))}`)].join(', ')}].filter(Boolean).join(' ')`;
         } else {
             const entries = [
                 ...(inner ? [inner.slice(1, -1).trim()].filter(Boolean) : []),

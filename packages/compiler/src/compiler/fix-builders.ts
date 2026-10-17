@@ -44,9 +44,10 @@ function closingBrace(source: string, open: number): number {
 export function singlePipeFix(source: string, w: ValidationWarning): FixProposal | undefined {
     const open = at(source, w);
     if (open === undefined || source.slice(open, open + 2) !== '{{') return undefined;
-    // Match: the call the message proposes (`… '{{ money(price) }}' says the same as a call.`).
-    // Groups: [1]=the call
-    const call = /: '\{\{ ([\s\S]+) \}\}' says the same as a call\.$/.exec(w.message)?.[1];
+    // The call the message proposes, between its last `: '{{ ` and ` }}' says the same as a call.`
+    const tail = " }}' says the same as a call.";
+    const lead = w.message.lastIndexOf(": '{{ ");
+    const call = lead >= 0 && w.message.endsWith(tail) ? w.message.slice(lead + 6, w.message.length - tail.length) : '';
     const close = source.indexOf('}}', open + 2);
     if (!call || close < 0) return undefined;
     return { title: `Write the call: {{ ${call} }}`, edits: [{ start: open, end: close + 2, newText: `{{ ${call} }}` }] };

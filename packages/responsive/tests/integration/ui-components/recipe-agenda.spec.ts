@@ -105,7 +105,7 @@ test.describe('recipe: day agenda per resource', () => {
         }
         expect(text, 'under 30 minutes the second line is not rendered').toContain('@if (a.minutes >= 30)');
         expect(text, 'the block carries the whole appointment in its accessible name').toContain(':aria-label="label(a)"');
-        expect(text, 'placed by its start and duration').toMatch(/:style\.grid-row="row\(a\.start\) \+ ' \/ span ' \+ a\.minutes \/ 5"/);
+        expect(text, 'placed by its start and duration').toMatch(/:style="\{[^"]*gridRow: row\(a\.start\) \+ ' \/ span ' \+ a\.minutes \/ 5 \}"/);
     });
 
     test('a 15-minute appointment shows one line, and it fits', async ({ page }) => {

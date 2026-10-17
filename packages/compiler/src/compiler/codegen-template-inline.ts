@@ -16,7 +16,7 @@ import { BindingDedup } from './inline-dedup';
 import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, scopedSlotCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { hoistSlotFunction } from './codegen-template';
-import { isSingleElementBody } from './show-single-element';
+import { isSingleElementBody, withoutEdgeWhitespace } from './show-single-element';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
@@ -926,7 +926,7 @@ class InlineGen {
         // One element: built here, in this block, its display bound as it is (#129).
         if (isSingleElementBody(node.body)) {
             this.showNext = node.condition;
-            this.walk(node.body);
+            this.walk(withoutEdgeWhitespace(node.body));
             return;
         }
         this.imports.add('show');

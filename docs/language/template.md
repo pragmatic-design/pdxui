@@ -1175,7 +1175,9 @@ swapped for a placeholder comment while hidden and put back in its place when sh
 - Hiding does not pause: effects and components in the body keep running while it is hidden. Code
   that must stop while hidden belongs in an `@if`.
 - A body that is exactly one element is built where the block stands, its `display` bound on it:
-  no `show()` block, the cost the removed `:show` attribute had (#129).
+  no `show()` block, the cost the removed `:show` attribute had (#129). The whitespace between the
+  braces and that element is the block's, not markup: `@show (c) { <b>x</b> }` builds what
+  `<b :show="c">x</b>` built.
 - `@show` is the one form of hiding an element in place: the `:show="cond"` attribute is removed
   (#129), `PDX_REMOVED_FORM`. `pdx migrate` wraps the element, `<section :show="open">…</section>`
   becoming `@show (open) { <section>…</section> }`.

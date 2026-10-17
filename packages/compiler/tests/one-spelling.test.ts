@@ -66,6 +66,9 @@ describe('@show over one element costs what the :show attribute cost', () => {
         expect(code).toMatch(/effect\(\(\)=>\{__el\d+\.style\.display=\(ctx\.on\(\)\)\?'':'none';\}\);/);
         expect(code).not.toMatch(/\bshow\(/);
     });
+    it('the whitespace inside the braces is not markup: what pdx migrate writes builds what :show built', () => {
+        expect(build('<div>a @show (on) { <b>x</b> } c</div>')).toContain("staticMarkup(' <div>a <b>x</b> c</div> ')");
+    });
     it('more than one element, or a text node beside it, keeps show()', () => {
         expect(build('@show (on) { <p>a</p><p>b</p> }')).toMatch(/\bshow\(\(\)=>ctx\.on\(\),/);
         expect(build('@show (on) { Total: <b>{{ n }}</b> }')).toMatch(/\bshow\(\(\)=>ctx\.on\(\),/);

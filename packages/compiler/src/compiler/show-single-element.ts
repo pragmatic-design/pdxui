@@ -5,9 +5,40 @@
 // it — its display bound where the element is built is the same effect, and costs what the removed
 // `:show` attribute cost. This file only recognises that body; the inline generator binds it.
 
-import type { TemplateNode } from '../parser/template';
+import type { HtmlNode, TemplateNode } from '../parser/template';
 
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+
+/**
+ * A one-element body without the whitespace between the braces and the element: it belongs to the
+ * block, not to the markup around it, and built in place it would be text beside the element —
+ * `@show (c) { <b>x</b> }`, as `pdx migrate` writes it, builds what `<b :show="c">x</b>` built. The
+ * first node's location and `@@` shifts move with what is cut from its start.
+ */
+export function withoutEdgeWhitespace(body: TemplateNode[]): TemplateNode[] {
+    const out = [...body];
+    const first = out[0] as HtmlNode;
+    const cut = first.content.length - first.content.trimStart().length;
+    if (cut > 0) {
+        const lead = first.content.slice(0, cut);
+        const newlines = lead.split('\n').length - 1;
+        const loc = first.loc && {
+            line: first.loc.line + newlines,
+            column: newlines ? cut - lead.lastIndexOf('\n') - 1 : first.loc.column + cut,
+            ...(first.loc.offset != null ? { offset: first.loc.offset + cut } : {}),
+        };
+        out[0] = {
+            ...first,
+            content: first.content.slice(cut),
+            ...(loc ? { loc } : {}),
+            ...(first.shifts ? { shifts: first.shifts.filter(s => s >= cut).map(s => s - cut) } : {}),
+        };
+    }
+    const lastIndex = out.length - 1;
+    const last = out[lastIndex] as HtmlNode;
+    out[lastIndex] = { ...last, content: last.content.trimEnd() };
+    return out;
+}
 
 /**
  * Whether a `@show` body is one element and nothing beside it but whitespace: it opens with the

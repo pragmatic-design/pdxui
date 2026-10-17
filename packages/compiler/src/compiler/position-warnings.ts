@@ -131,10 +131,14 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return cmd ? find(source, template, new RegExp(`(?<![\\w-])command=["']${escape(cmd)}["']`)) : undefined;
         }
         case 'PDX_PIPE_SINGLE': {
-            // Match: the interpolation the message quotes (`'{{ price | money }}' has one pipe: …`).
-            // Groups: [1]=the value [2]=the pipe
-            const m = /^'\{\{ ([\s\S]+?) \| ([\s\S]+?) \}\}' has one pipe/.exec(w.message);
-            return m ? find(source, template, new RegExp(`\\{\\{\\s*${escape(m[1])}\\s*\\|\\s*${escape(m[2])}\\s*\\}\\}`)) : undefined;
+            // The interpolation the message quotes (`'{{ price | money }}' has one pipe: …`), split
+            // at its last ` | ` into the value and the pipe.
+            const end = w.message.indexOf(" }}' has one pipe");
+            const quoted = w.message.startsWith("'{{ ") && end > 0 ? w.message.slice(4, end) : '';
+            const bar = quoted.lastIndexOf(' | ');
+            if (bar < 0) return undefined;
+            const [value, pipe] = [quoted.slice(0, bar), quoted.slice(bar + 3)];
+            return find(source, template, new RegExp(`\\{\\{\\s*${escape(value)}\\s*\\|\\s*${escape(pipe)}\\s*\\}\\}`));
         }
         case 'PDX_BINDING_MODIFIER': {
             // Match: the binding the message names (`'.lazzy' on '::value': …`), with that modifier.
