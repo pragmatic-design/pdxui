@@ -17,9 +17,11 @@ const TWO_WAY = /(?<=\s)::([A-Za-z][\w-]*)(?:\.[\w()]+)*=/g;
 /** `selected-id`, `selectedId` and `selectedid` are one name: HTML lowercases what it is given. */
 const sameName = (a: string, b: string): boolean => a.replace(/-/g, '').toLowerCase() === b.replace(/-/g, '').toLowerCase();
 
-/** Whether `::name` binds one of `models` — `::group` is a directive of its own (#127), not a model. */
+/** Whether `::name` binds one of `models`. `::group` (#127) binds the component's model, so it needs exactly one. */
 export function bindsModel(models: Iterable<string>, name: string): boolean {
-    return name === 'group' || [...models].some(model => sameName(model, name));
+    const list = [...models];
+    if (name === 'group') return list.length === 1;
+    return list.some(model => sameName(model, name));
 }
 
 // Match: a binding with modifiers in an opening tag — `::value.trim=`, `:title.once=`. Groups:
@@ -67,7 +69,11 @@ export function checkTwoWay(ast: TemplateNode[], modelsOf?: ModelsLookup): Valid
         for (const m of text.matchAll(TWO_WAY)) {
             const name = m[1];
             if (bindsModel(models, name)) continue;
-            warnings.push({
+            warnings.push(name === 'group' ? {
+                code: 'PDX_TWO_WAY_NOT_MODEL', severity: 'error',
+                message: `'::group' on <${tag}>: it binds the component's one model, and <${tag}> declares ${models.length ? `${models.length} (${models.join(', ')})` : 'none'}.`,
+                hint: models.length ? `Bind the model you mean: ${models.map(m => `::${m}`).join(' or ')}.` : 'declare `@model value` in the child.',
+            } : {
                 code: 'PDX_TWO_WAY_NOT_MODEL', severity: 'error',
                 message: `'::${name}' on <${tag}>: '${name}' is not one of its models${models.length ? ` (its models: ${models.join(', ')})` : ' (it declares none)'}, so nothing would bring the value back.`,
                 hint: `declare \`@model ${name}\` in the child, or bind it one way with ':${name}'.`,

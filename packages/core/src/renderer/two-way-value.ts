@@ -52,6 +52,34 @@ export function twoWayAccessor(value: unknown): TwoWayAccessor | null {
     return null;
 }
 
+/**
+ * `::group` on a native checkbox or radio (#127): a checkbox is checked when the accessor's array
+ * holds its value, and toggling it writes a new array with the value added or removed; a radio is
+ * checked when the accessor's value is its value, and selecting it writes that value. The value is
+ * read at each sync, and synced again after the binding's own task: a `:value` written after
+ * `::group` — a `@for` row's — is the one the group compares.
+ */
+export function bindGroup(el: HTMLInputElement, accessor: TwoWayAccessor, effect: (fn: () => void) => void): void {
+    const checkbox = el.type === 'checkbox';
+    const sync = (): void => {
+        const current = accessor.get();
+        el.checked = checkbox ? Array.isArray(current) && current.some(v => String(v) === el.value) : String(current) === el.value;
+    };
+    effect(sync);
+    queueMicrotask(sync);
+    el.addEventListener('change', () => {
+        if (!checkbox) {
+            if (el.checked) accessor.set(el.value);
+            return;
+        }
+        const current = accessor.get();
+        const list = Array.isArray(current) ? current : [];
+        accessor.set(el.checked
+            ? (list.some(v => String(v) === el.value) ? [...list] : [...list, el.value])
+            : list.filter(v => String(v) !== el.value));
+    });
+}
+
 /** An element that reports its own validity: an input, a textarea, a select, a form-associated element. */
 interface Validatable { setCustomValidity(message: string): void }
 

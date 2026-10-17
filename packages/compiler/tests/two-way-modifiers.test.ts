@@ -47,6 +47,12 @@ for (const [path, opts] of Object.entries({ dev: {}, build: { production: true }
             expect(code).not.toContain('(300)=');
         });
 
+        it('a two-way binding inside a @for gets the signal itself, not its hoisted value', () => {
+            const { code } = compile(sfc('@for (rows as r; track r) {\n  <input ::value="name" /><input type="checkbox" :value="r" ::group="picked" />\n}', "let name = $signal('');\nlet rows = $signal(['a']);\nlet picked = $signal([]);"), 'm.pdx', [], undefined, opts);
+            expect(code).toMatch(/bindTwoWay\(__el\d+, 'value', ctx\.name\)/);
+            expect(code).toMatch(/bindTwoWay\(__el\d+, 'group', ctx\.picked\)/);
+        });
+
         it(':title.once is assigned once, untracked, with no effect of its own', () => {
             const { code } = compile(sfc('<p :title.once="name">x</p>'), 'm.pdx', [], undefined, opts);
             expect(code).toContain('untracked(');

@@ -178,6 +178,7 @@ Types map to the runtime as: `T[]` → Array, the primitives → their counterpa
 | `@event="expr"` | a handler: a reference, an inline mutation (`count++`), a call, a lambda, or several statements |
 | `::name="sig"` | two-way binding: on native `value`/`checked`/`files`, and on a component's `@model name`. Modifiers, a closed list (`PDX_BINDING_MODIFIER` otherwise): `.lazy`, `.trim`, `.number` (empty → `null`, invalid → nothing written and `aria-invalid`), `.debounce(300)` (flushed on blur and submit). The general form `::value="{ get: () => fmt(c), set: (s) => c = parse(s) }"` converts both ways |
 | `:name.once="expr"` | a binding assigned once, with no effect |
+| `::group="sig"` | a checkbox group bound to an array of the checked values, or a radio group to the selected value; each input gives its own `value` (`:value` in a `@for`). On a component, it binds its one `@model` |
 | `:class.x` / `:style.x` | conditional class / style |
 | `:ref="name"` | a DOM reference — the way to reach an element, never `getElementById` |
 

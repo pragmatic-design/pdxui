@@ -392,6 +392,54 @@ let country = $signal('it');
 
 alpha
 
+### `::group`
+
+#### Syntax
+
+```ebnf
+GroupBinding ::= "::group" "=" AttrValue
+```
+
+#### Semantics
+
+Binds a group of inputs to one signal (#127), through core's `bindTwoWay(el, 'group', signal)`. On
+`<input type="checkbox" value="v">` the signal is an array: the box is checked when the array holds
+`v`, and toggling it writes a new array with `v` added or removed. On `<input type="radio"
+value="v">` the signal is the selected value: the radio is checked when it equals `v`, and selecting
+it writes `v`. The value is the input's `value`, compared as a string; a `:value` a `@for` row writes
+after the binding is the one compared. A group is the inputs bound to the same signal in one
+component. On a component, `::group` binds its one `@model` — an array for a checkbox-group-like
+component, a single value for a radio-group-like one.
+
+#### Rules
+
+- On a component whose models are known, `::group` with none or several models raises
+  `PDX_TWO_WAY_NOT_MODEL` (error), naming them.
+- A two-way binding inside a `@for` receives the signal itself in a build too: the loop-invariant
+  hoisting of the build leaves a two-way target alone.
+
+#### Examples
+
+```pdx
+<template>
+  @for (options as t; track t) {
+    <label><input type="checkbox" :value="t" ::group="toppings" /> {{ t }}</label>
+  }
+  <label><input type="radio" value="small" ::group="size" /> Small</label>
+  <label><input type="radio" value="large" ::group="size" /> Large</label>
+</template>
+
+<script setup>
+let options = $signal(['cheese', 'ham', 'olives']);
+let toppings = $signal<string[]>([]);
+let size = $signal('small');
+</script>
+```
+
+#### Since
+
+beta (#127)
+
 ### `@name` event listeners
 
 #### Syntax

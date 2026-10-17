@@ -78,6 +78,18 @@ function save(values) { /* already validated */ }
 </script>
 ```
 
+**A group of checkboxes or radios outside a form** binds to one signal with `::group`: checkboxes to
+an array of the values that are checked, radios to the value of the one selected — no handler per
+input:
+
+```pdx
+@for (options as t; track t) {
+  <label><input type="checkbox" :value="t" ::group="toppings" /> {{ t }}</label>
+}
+<label><input type="radio" value="small" ::group="size" /> Small</label>
+<label><input type="radio" value="large" ::group="size" /> Large</label>
+```
+
 On submit `<pdx-form>` validates every field and emits `pdx-submit` with the clean values **only if**
 the form is valid; otherwise it scrolls to the first error. Never a value it did not validate: a field
 edited while the submit waits for an async validator (a «username is free» check) cancels that

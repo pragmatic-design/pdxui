@@ -181,7 +181,7 @@ GroupBinding ::= "::group" "=" AttrValue
 
 #### Semantics
 
-Binds a group of inputs to one signal (#127): on `<input type="checkbox" value="v">` the signal is an
+Binds a group of inputs to one signal (#127 — landed): on `<input type="checkbox" value="v">` the signal is an
 array and the box is checked when it includes `v` (toggling writes a new array); on
 `<input type="radio" value="v">` the signal is the selected value. On a component, valid only on a
 `@model` of array type (checkbox-group-like) or single value (radio-group-like). A group is the inputs
