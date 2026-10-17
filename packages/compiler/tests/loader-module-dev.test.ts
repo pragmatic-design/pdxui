@@ -43,9 +43,9 @@ afterAll(async () => {
 describe('a @loader through the dev server', () => {
     it('the route table imports the loader\'s module, and the server answers for it', async () => {
         const table = (await server.transformRequest('virtual:pdx-routes'))?.code ?? '';
-        expect(table, 'the route table names no loader module').toMatch(/virtual:pdx-loader\/pdx-rows/);
+        expect(table, 'the route table names no loader module').toMatch(/virtual:pdx-loader\/app-rows/);
 
-        const loader = (await server.transformRequest('virtual:pdx-loader/pdx-rows'))?.code ?? '';
+        const loader = (await server.transformRequest('virtual:pdx-loader/app-rows'))?.code ?? '';
         expect(loader, 'the server returned no loader').toContain('async function loadRows()');
         expect(loader).not.toContain('Promise<number[]>');
         // Its relative import, resolved from the page's folder to the URL the server serves.

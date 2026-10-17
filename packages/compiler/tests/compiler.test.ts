@@ -10,7 +10,7 @@ describe('compile (end-to-end)', () => {
 
         const { code } = compile(source, 'hello.pdx');
         expect(code).toContain("import { component, html } from '@pdxui/core'");
-        expect(code).toContain("component('pdx-hello'");
+        expect(code).toContain("component('app-hello'");
         expect(code).toContain('<div>Hello World</div>');
     });
 
@@ -151,9 +151,9 @@ describe('compile (end-to-end)', () => {
         expect(code).toContain('data-pdx-');
     });
 
-    it('preserves pdx- prefix if already present', () => {
+    it('drops the reserved pdx- prefix of a file name for the app prefix (#136)', () => {
         const { code } = compile('<template><div>test</div></template>', 'pdx-drawer.pdx');
-        expect(code).toContain("component('pdx-drawer'");
+        expect(code).toContain("component('app-drawer'");
     });
 
     it('compiles script-only file (template optional)', () => {
@@ -187,7 +187,7 @@ describe('compile (end-to-end)', () => {
 </script>`;
 
         const { code } = compile(source, 'drawer.pdx');
-        expect(code).toContain("component('pdx-drawer'");
+        expect(code).toContain("component('app-drawer'");
         expect(code).toContain('when');
         expect(code).toContain("enter: 'slide-right'");
         expect(code).toContain('close');
@@ -201,12 +201,12 @@ describe('@tag decorator', () => {
     it('overrides file-derived tag name', () => {
         const source = `<template><div>{{ label }}</div></template>
 <script setup>
-@tag 'pdx-my-widget';
+@tag 'app-my-widget';
 @prop label: string = 'Hello';
 </script>`;
         const { code } = compile(source, 'index.pdx');
-        expect(code).toContain("component('pdx-my-widget'");
-        expect(code).not.toContain("component('pdx-index'");
+        expect(code).toContain("component('app-my-widget'");
+        expect(code).not.toContain("component('app-index'");
     });
 
     it('uses file-derived tag when @tag is absent', () => {
@@ -215,16 +215,16 @@ describe('@tag decorator', () => {
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'counter.pdx');
-        expect(code).toContain("component('pdx-counter'");
+        expect(code).toContain("component('app-counter'");
     });
 
     it('works with double quotes', () => {
         const source = `<template><div>test</div></template>
 <script setup>
-@tag "pdx-special-component";
+@tag "app-special-component";
 </script>`;
         const { code } = compile(source, 'generic.pdx');
-        expect(code).toContain("component('pdx-special-component'");
+        expect(code).toContain("component('app-special-component'");
     });
 });
 
@@ -238,27 +238,27 @@ let x = $signal(0);
 
     it('uses filename only, ignores parent dirs', () => {
         const { code } = compile(source, 'admin/index.pdx');
-        expect(code).toContain("component('pdx-index'");
+        expect(code).toContain("component('app-index'");
     });
 
     it('uses filename only for any path depth', () => {
         const { code } = compile(source, 'admin/button.pdx');
-        expect(code).toContain("component('pdx-button'");
+        expect(code).toContain("component('app-button'");
     });
 
     it('uses filename only for generic dirs (src/, pages/)', () => {
         const { code } = compile(source, 'src/dashboard.pdx');
-        expect(code).toContain("component('pdx-dashboard'");
+        expect(code).toContain("component('app-dashboard'");
     });
 
     it('uses filename only for root-level files', () => {
         const { code } = compile(source, 'dashboard.pdx');
-        expect(code).toContain("component('pdx-dashboard'");
+        expect(code).toContain("component('app-dashboard'");
     });
 
     it('handles absolute paths gracefully', () => {
         const { code } = compile(source, 'C:/Projects/my-app/src/pages/counter.pdx');
-        expect(code).toContain("component('pdx-counter'");
+        expect(code).toContain("component('app-counter'");
     });
 
     it('respects @tag override', () => {
@@ -272,19 +272,19 @@ let x = $signal(0);
     });
 
     it('two files with same name derive same tag (collision detected by plugin)', () => {
-        // Both derive pdx-button — the Vite plugin's tagRegistry catches this at transform time
+        // Both derive app-button — the Vite plugin's tagRegistry catches this at transform time
         const { code: a } = compile(source, 'admin/button.pdx');
         const { code: b } = compile(source, 'settings/button.pdx');
-        expect(a).toContain("component('pdx-button'");
-        expect(b).toContain("component('pdx-button'");
+        expect(a).toContain("component('app-button'");
+        expect(b).toContain("component('app-button'");
     });
 
     it('special files (_layout) include parent dir', () => {
         const { code: a } = compile(source, 'admin/_layout.pdx');
-        expect(a).toContain("component('pdx-admin-layout'");
+        expect(a).toContain("component('app-admin-layout'");
         const { code: b } = compile(source, 'pages/_layout.pdx');
         // pages/ is generic — no parent included
-        expect(b).toContain("component('pdx-layout'");
+        expect(b).toContain("component('app-layout'");
     });
 });
 

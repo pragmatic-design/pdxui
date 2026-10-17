@@ -7,34 +7,34 @@
     </p>
 
     <!-- ═══ 1. Text ═══ -->
-    <pdx-demo-comp-inline-edit-text class="demo-section"></pdx-demo-comp-inline-edit-text>
+    <app-demo-comp-inline-edit-text class="demo-section"></app-demo-comp-inline-edit-text>
 
     <!-- ═══ 2. Number & Currency ═══ -->
-    <pdx-demo-comp-inline-edit-number-currency class="demo-section"></pdx-demo-comp-inline-edit-number-currency>
+    <app-demo-comp-inline-edit-number-currency class="demo-section"></app-demo-comp-inline-edit-number-currency>
 
     <!-- ═══ 3. Date & DateTime ═══ -->
-    <pdx-demo-comp-inline-edit-date class="demo-section"></pdx-demo-comp-inline-edit-date>
+    <app-demo-comp-inline-edit-date class="demo-section"></app-demo-comp-inline-edit-date>
 
     <!-- ═══ 4. Boolean ═══ -->
-    <pdx-demo-comp-inline-edit-boolean class="demo-section"></pdx-demo-comp-inline-edit-boolean>
+    <app-demo-comp-inline-edit-boolean class="demo-section"></app-demo-comp-inline-edit-boolean>
 
     <!-- ═══ 5. Select & MultiSelect ═══ -->
-    <pdx-demo-comp-inline-edit-select class="demo-section"></pdx-demo-comp-inline-edit-select>
+    <app-demo-comp-inline-edit-select class="demo-section"></app-demo-comp-inline-edit-select>
 
     <!-- ═══ 6. Color & Rating ═══ -->
-    <pdx-demo-comp-inline-edit-color-rating class="demo-section"></pdx-demo-comp-inline-edit-color-rating>
+    <app-demo-comp-inline-edit-color-rating class="demo-section"></app-demo-comp-inline-edit-color-rating>
 
     <!-- ═══ 7. Textarea ═══ -->
-    <pdx-demo-comp-inline-edit-textarea class="demo-section"></pdx-demo-comp-inline-edit-textarea>
+    <app-demo-comp-inline-edit-textarea class="demo-section"></app-demo-comp-inline-edit-textarea>
 
     <!-- ═══ 8. Action mode (buttons) ═══ -->
-    <pdx-demo-comp-inline-edit-action-mode class="demo-section"></pdx-demo-comp-inline-edit-action-mode>
+    <app-demo-comp-inline-edit-action-mode class="demo-section"></app-demo-comp-inline-edit-action-mode>
 
     <!-- ═══ 9. Disabled & Readonly ═══ -->
-    <pdx-demo-comp-inline-edit-disabled-readonly class="demo-section"></pdx-demo-comp-inline-edit-disabled-readonly>
+    <app-demo-comp-inline-edit-disabled-readonly class="demo-section"></app-demo-comp-inline-edit-disabled-readonly>
 
     <!-- ═══ 10. Real-world: Editable table row ═══ -->
-    <pdx-demo-comp-inline-edit-editable-record class="demo-section"></pdx-demo-comp-inline-edit-editable-record>
+    <app-demo-comp-inline-edit-editable-record class="demo-section"></app-demo-comp-inline-edit-editable-record>
 
     <!-- ═══ Reference ═══ -->
     <section>

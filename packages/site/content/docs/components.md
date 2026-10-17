@@ -9,7 +9,7 @@ order: 5
 > **Formal reference:** [docs/language/overview.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/overview.md) and [docs/language/script.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/script.md) define the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
 
 A component is the brick you build with. In PDX a component is a `.pdx` file, and it becomes a
-**standard Web Component** (a `<pdx-name>` custom element). That means once defined you use it
+**standard Web Component** (an `<app-name>` custom element). That means once defined you use it
 anywhere — in another `.pdx`, in plain HTML, inside React or Vue — with no adapters.
 
 A file has three blocks:
@@ -21,8 +21,11 @@ A file has three blocks:
 <style scoped>  /* isolated styles */ </style>
 ```
 
-The file name determines the tag: `user-card.pdx` → `<pdx-user-card>`. To force a different tag use
-`@tag 'pdx-other-name'`.
+The file name determines the tag, behind the application prefix: `user-card.pdx` → `<app-user-card>`.
+The prefix is `app` unless the project names its own, `pdx({ prefix: 'shop' })` (or `prefix` in
+`pdx.config.ts`). To force a different tag use `@tag 'app-other-name'`. The `pdx-` prefix belongs to the
+`@pdxui/*` packages: `@tag 'pdx-…'` is an error, `PDX_TAG_RESERVED`, and `pdx migrate` renames an
+alpha project's `pdx-` tags.
 
 Each block is optional — a `.pdx` with just a `<template>` is a valid component — and one
 `<template>` and one `<script>` is the limit. **`<style>` you may write more than once**, which is how
@@ -35,7 +38,7 @@ two words after the block names actually do; if you want to start writing,
 ### `<template>` — the markup
 
 Everything inside is [template syntax](/docs/template): bindings, `@if`, `@for`, slots. The component
-renders into **light DOM** by default: its elements are ordinary children of `<pdx-user-card>` in the
+renders into **light DOM** by default: its elements are ordinary children of `<app-user-card>` in the
 page, visible to `querySelector`, stylable by the page, inspectable in devtools.
 
 `<template shadow>` opts into Shadow DOM instead — the markup goes into a shadow root and the page's
@@ -203,7 +206,7 @@ the type. You read them in the template as normal values:
 </template>
 ```
 
-From the outside: `<pdx-user-card name="Ada" role="Engineer" verified>`.
+From the outside: `<app-user-card name="Ada" role="Engineer" verified>`.
 
 **Required, defaulted, optional.** The rule is TypeScript's. A prop with no default is
 **required**: a parent that uses the component without it — no attribute, no binding — does not
@@ -211,7 +214,7 @@ compile, `PDX_PROP_REQUIRED`, at the tag. A default makes it optional; so does `
 that is absent holds its type's empty value (`''`, `0`, `false`, `[]`, `null`):
 
 ```pdx
-@prop userId: string;          // required: <pdx-user-card> without user-id is an error
+@prop userId: string;          // required: <app-user-card> without user-id is an error
 @prop label: string = 'Owner'; // optional, with a default
 @prop hint?: string;           // optional
 ```
@@ -276,7 +279,7 @@ The compiler generates the `selected(payload)` function and the dispatch of a ty
 The consumer listens like any DOM event:
 
 ```pdx
-<pdx-user-card @selected="onSelect" />
+<app-user-card @selected="onSelect" />
 ```
 
 Convention: library-component events use the `pdx-` prefix (e.g. `pdx-change`). For your own app
@@ -302,11 +305,11 @@ are "holes" the parent fills:
 Usage:
 
 ```pdx
-<pdx-user-card>
+<app-user-card>
   <h3 slot="header">Ada Lovelace</h3>
   <p>First programmer.</p>
   <button slot="footer">Contact</button>
-</pdx-user-card>
+</app-user-card>
 ```
 
 ### Scoped slots (data from the component to the content)

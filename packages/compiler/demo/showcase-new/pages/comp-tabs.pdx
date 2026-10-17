@@ -6,25 +6,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-tabs-basic class="demo-section"></pdx-demo-comp-tabs-basic>
+    <app-demo-comp-tabs-basic class="demo-section"></app-demo-comp-tabs-basic>
 
     <!-- ═══ Bordered ═══ -->
-    <pdx-demo-comp-tabs-bordered class="demo-section"></pdx-demo-comp-tabs-bordered>
+    <app-demo-comp-tabs-bordered class="demo-section"></app-demo-comp-tabs-bordered>
 
     <!-- ═══ Card Variant ═══ -->
-    <pdx-demo-comp-tabs-card class="demo-section"></pdx-demo-comp-tabs-card>
+    <app-demo-comp-tabs-card class="demo-section"></app-demo-comp-tabs-card>
 
     <!-- ═══ Pills Variant ═══ -->
-    <pdx-demo-comp-tabs-pills class="demo-section"></pdx-demo-comp-tabs-pills>
+    <app-demo-comp-tabs-pills class="demo-section"></app-demo-comp-tabs-pills>
 
     <!-- ═══ With Icons ═══ -->
-    <pdx-demo-comp-tabs-icons class="demo-section"></pdx-demo-comp-tabs-icons>
+    <app-demo-comp-tabs-icons class="demo-section"></app-demo-comp-tabs-icons>
 
     <!-- ═══ Closable ═══ -->
-    <pdx-demo-comp-tabs-closable class="demo-section"></pdx-demo-comp-tabs-closable>
+    <app-demo-comp-tabs-closable class="demo-section"></app-demo-comp-tabs-closable>
 
     <!-- ═══ Vertical ═══ -->
-    <pdx-demo-comp-tabs-vertical class="demo-section"></pdx-demo-comp-tabs-vertical>
+    <app-demo-comp-tabs-vertical class="demo-section"></app-demo-comp-tabs-vertical>
 
     <!-- ═══ Keyboard ═══ -->
     <section>

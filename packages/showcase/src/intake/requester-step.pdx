@@ -26,7 +26,7 @@
     @show (customerName !== '') { <p class="pdx-txt-small picked" data-test="customer-picked">{{ customerName }}</p> }
 
     <!-- What the request is about: the picked customer's assets, and only theirs. -->
-    <pdx-asset-picker :customer-id="customerId" @picked="e => assetpicked(e.detail.id)" data-test="asset-picker"></pdx-asset-picker>
+    <app-asset-picker :customer-id="customerId" @picked="e => assetpicked(e.detail.id)" data-test="asset-picker"></app-asset-picker>
   </div>
 </template>
 

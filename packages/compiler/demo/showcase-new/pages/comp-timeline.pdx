@@ -6,21 +6,21 @@
       Supports left/right/alternate/horizontal modes, status colors, icons, pending state, clickable items.
     </p>
 
-    <pdx-demo-comp-timeline-basic class="demo-section"></pdx-demo-comp-timeline-basic>
+    <app-demo-comp-timeline-basic class="demo-section"></app-demo-comp-timeline-basic>
 
-    <pdx-demo-comp-timeline-icons class="demo-section"></pdx-demo-comp-timeline-icons>
+    <app-demo-comp-timeline-icons class="demo-section"></app-demo-comp-timeline-icons>
 
-    <pdx-demo-comp-timeline-alternate class="demo-section"></pdx-demo-comp-timeline-alternate>
+    <app-demo-comp-timeline-alternate class="demo-section"></app-demo-comp-timeline-alternate>
 
-    <pdx-demo-comp-timeline-horizontal class="demo-section"></pdx-demo-comp-timeline-horizontal>
+    <app-demo-comp-timeline-horizontal class="demo-section"></app-demo-comp-timeline-horizontal>
 
-    <pdx-demo-comp-timeline-clickable class="demo-section"></pdx-demo-comp-timeline-clickable>
+    <app-demo-comp-timeline-clickable class="demo-section"></app-demo-comp-timeline-clickable>
 
-    <pdx-demo-comp-timeline-pending class="demo-section"></pdx-demo-comp-timeline-pending>
+    <app-demo-comp-timeline-pending class="demo-section"></app-demo-comp-timeline-pending>
 
-    <pdx-demo-comp-timeline-dashed class="demo-section"></pdx-demo-comp-timeline-dashed>
+    <app-demo-comp-timeline-dashed class="demo-section"></app-demo-comp-timeline-dashed>
 
-    <pdx-demo-comp-timeline-slot class="demo-section"></pdx-demo-comp-timeline-slot>
+    <app-demo-comp-timeline-slot class="demo-section"></app-demo-comp-timeline-slot>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Slots</h2>

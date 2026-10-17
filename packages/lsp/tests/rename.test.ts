@@ -21,8 +21,8 @@ const counter = [
 
 const app = [
     '<template>',
-    '  <pdx-counter :label="title" @changed="onChange" />',
-    '  <pdx-counter label="static" />',
+    '  <app-counter :label="title" @changed="onChange" />',
+    '  <app-counter label="static" />',
     '</template>',
     '<script setup>',
     "let title = $signal('x');",
@@ -49,7 +49,7 @@ describe('prepareRename', () => {
     });
 
     it('allows a component tag (now renamable)', () => {
-        expect(prepareRename({ word: 'pdx-counter', source: app, descriptor: null, analysis: null, wordRange: dummyRange }))
+        expect(prepareRename({ word: 'app-counter', source: app, descriptor: null, analysis: null, wordRange: dummyRange }))
             .toEqual(dummyRange);
     });
 
@@ -94,7 +94,7 @@ describe('rename — @prop / @event cross-file', () => {
 describe('rename — component tag + source file', () => {
     it('renames every usage and renames the defining file', () => {
         const edit = getRenameEdits({
-            word: 'pdx-counter', newName: 'pdx-tally', source: app, descriptor: null, analysis: null,
+            word: 'app-counter', newName: 'app-tally', source: app, descriptor: null, analysis: null,
             uri: APP_URI, files, index,
         })!;
         expect(edit.documentChanges).toBeDefined();
@@ -111,7 +111,7 @@ describe('rename — component tag + source file', () => {
 
     it('rejects an invalid tag name', () => {
         expect(() => getRenameEdits({
-            word: 'pdx-counter', newName: 'Tally', source: app, descriptor: null, analysis: null,
+            word: 'app-counter', newName: 'Tally', source: app, descriptor: null, analysis: null,
             uri: APP_URI, files, index,
         })).toThrow(InvalidRenameError);
     });

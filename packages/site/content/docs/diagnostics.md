@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 90 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 91 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1131,7 +1131,7 @@ A `@store` module's exports are emitted at module level, outside the store's fac
 
 A custom element can be defined once; the second definition would throw in the browser.
 
-**Fix.** Add `@tag 'pdx-unique-name';` to one of the files.
+**Fix.** Add `@tag 'app-unique-name';` to one of the files.
 
 ### PDX_TAG_COLLISION_RESOLVER
 
@@ -1139,7 +1139,39 @@ A custom element can be defined once; the second definition would throw in the b
 
 Only one of the two is registered by auto-import, and which one depends on scan order.
 
-**Fix.** Rename one of the files, or give one an explicit `@tag 'pdx-other-name';`.
+**Fix.** Rename one of the files, or give one an explicit `@tag 'app-other-name';`.
+
+### PDX_TAG_RESERVED
+
+*error* — An application component's tag starts with `pdx-`, the prefix the @pdxui packages own (#136).
+
+An application's components are named with its own prefix, `app-` by default (`pdx({ prefix })`): `button.pdx` is `<app-button>`. A `pdx-` tag would take the library's name — `<pdx-button>` is the library's button — or collide with one it adds later.
+
+**Fix.** Use the app's prefix: `@tag 'app-button';`.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ a }}</p>
+</template>
+<script setup>
+@tag 'pdx-badge';
+let a = $signal(1);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ a }}</p>
+</template>
+<script setup>
+@tag 'app-badge';
+let a = $signal(1);
+</script>
+```
 
 ### PDX_TEMPLATE_NAME_NOT_PROVIDED
 

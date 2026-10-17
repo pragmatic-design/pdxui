@@ -122,11 +122,11 @@ describe('the resolver knows the models', () => {
             writeFileSync(file, "<template><input ::value=\"value\" /></template>\n<script setup>\n@model value: string = '';\n@prop label: string = '';\n</script>\n");
             const r = new ComponentResolver();
             r.registerProjectComponents(root);
-            expect([...r.modelsOf('pdx-name-field')!]).toEqual(['value']);
+            expect([...r.modelsOf('app-name-field')!]).toEqual(['value']);
             writeFileSync(file, "<template><p/></template>\n<script setup>\n@prop label: string = '';\n</script>\n");
             // A later modification time, as an edit gives it: the cache is read again.
             utimesSync(file, new Date(), new Date(Date.now() + 5000));
-            expect([...r.modelsOf('pdx-name-field')!], 'a component that declares none answers an empty set').toEqual([]);
+            expect([...r.modelsOf('app-name-field')!], 'a component that declares none answers an empty set').toEqual([]);
         } finally {
             rmSync(root, { recursive: true, force: true });
         }

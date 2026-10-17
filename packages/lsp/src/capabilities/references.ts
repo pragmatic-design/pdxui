@@ -7,6 +7,7 @@ import type { ScriptAnalysis, SFCDescriptor } from '@pdxui/compiler';
 import { findLocalOccurrences, findTagUses, findAttributeOccurrences } from '../utils/occurrences';
 import { findDeclarationRange, DECL_KEYWORDS } from '../utils/positions';
 import { tagFromUri } from '../utils/component-index';
+import { isComponentTag } from '../utils/tag-names';
 
 /** Names a .pdx declares as addressable symbols (props, events, signals, …). */
 export function collectDeclaredNames(analysis: ScriptAnalysis): Set<string> {
@@ -47,7 +48,7 @@ export function getReferences(q: ReferenceQuery): Location[] {
 
     // Component tag → cross-file scan of every workspace .pdx, and of the .ts/.js/.html that name
     // it (a querySelector, an index.html).
-    if (q.word.startsWith('pdx-')) {
+    if (isComponentTag(q.word)) {
         const locations: Location[] = [];
         for (const file of q.files) {
             for (const range of findTagUses(file.uri, file.content, q.word)) {

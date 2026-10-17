@@ -102,8 +102,8 @@ describe('pdx mcp', () => {
     });
 
     it('component: a project component, from its .pdx', async () => {
-        const { data } = await call('component', { tag: 'pdx-profile-card' });
-        expect(data).toMatchObject({ tag: 'pdx-profile-card', file: expect.stringContaining('profile-card.pdx') });
+        const { data } = await call('component', { tag: 'app-profile-card' });
+        expect(data).toMatchObject({ tag: 'app-profile-card', file: expect.stringContaining('profile-card.pdx') });
     });
 
     it('component: an unknown tag is an error that says so', async () => {
@@ -123,8 +123,8 @@ describe('pdx mcp', () => {
     it('project: the analyze manifest, with the route', async () => {
         const { data } = await call('project');
         const manifest = data as { components: { tag: string }[]; routes: { path: string; tag: string }[] };
-        expect(manifest.components.map(c => c.tag).sort()).toEqual(['pdx-home', 'pdx-profile-card']);
-        expect(manifest.routes).toEqual([expect.objectContaining({ path: '/', tag: 'pdx-home' })]);
+        expect(manifest.components.map(c => c.tag).sort()).toEqual(['app-home', 'app-profile-card']);
+        expect(manifest.routes).toEqual([expect.objectContaining({ path: '/', tag: 'app-home' })]);
     });
 
     it('docs: the best-matching sections, with their URLs', async () => {

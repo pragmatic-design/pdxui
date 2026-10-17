@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-switch-basic class="demo-section"></pdx-demo-comp-switch-basic>
+    <app-demo-comp-switch-basic class="demo-section"></app-demo-comp-switch-basic>
 
     <!-- ═══ With Description ═══ -->
-    <pdx-demo-comp-switch-description class="demo-section"></pdx-demo-comp-switch-description>
+    <app-demo-comp-switch-description class="demo-section"></app-demo-comp-switch-description>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-switch-sizes class="demo-section"></pdx-demo-comp-switch-sizes>
+    <app-demo-comp-switch-sizes class="demo-section"></app-demo-comp-switch-sizes>
 
     <!-- ═══ Label Position ═══ -->
-    <pdx-demo-comp-switch-label-position class="demo-section"></pdx-demo-comp-switch-label-position>
+    <app-demo-comp-switch-label-position class="demo-section"></app-demo-comp-switch-label-position>
 
     <!-- ═══ Loading ═══ -->
-    <pdx-demo-comp-switch-loading class="demo-section"></pdx-demo-comp-switch-loading>
+    <app-demo-comp-switch-loading class="demo-section"></app-demo-comp-switch-loading>
 
     <!-- ═══ Error ═══ -->
-    <pdx-demo-comp-switch-error class="demo-section"></pdx-demo-comp-switch-error>
+    <app-demo-comp-switch-error class="demo-section"></app-demo-comp-switch-error>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-switch-composition class="demo-section"></pdx-demo-comp-switch-composition>
+    <app-demo-comp-switch-composition class="demo-section"></app-demo-comp-switch-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

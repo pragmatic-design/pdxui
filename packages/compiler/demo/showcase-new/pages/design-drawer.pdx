@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Drawer Structure ═══ -->
-    <pdx-demo-design-drawer-structure class="demo-section"></pdx-demo-design-drawer-structure>
+    <app-demo-design-drawer-structure class="demo-section"></app-demo-design-drawer-structure>
 
     <!-- ═══ Positions ═══ -->
-    <pdx-demo-design-drawer-positions class="demo-section"></pdx-demo-design-drawer-positions>
+    <app-demo-design-drawer-positions class="demo-section"></app-demo-design-drawer-positions>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-design-drawer-sizes class="demo-section"></pdx-demo-design-drawer-sizes>
+    <app-demo-design-drawer-sizes class="demo-section"></app-demo-design-drawer-sizes>
 
     <!-- ═══ Header, Body, Footer ═══ -->
-    <pdx-demo-design-drawer-regions class="demo-section"></pdx-demo-design-drawer-regions>
+    <app-demo-design-drawer-regions class="demo-section"></app-demo-design-drawer-regions>
 
     <!-- ═══ Composition: Settings Drawer ═══ -->
-    <pdx-demo-design-drawer-composition class="demo-section"></pdx-demo-design-drawer-composition>
+    <app-demo-design-drawer-composition class="demo-section"></app-demo-design-drawer-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

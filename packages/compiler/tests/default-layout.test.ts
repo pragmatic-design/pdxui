@@ -24,7 +24,7 @@ ${directives}
 describe("a page's own registration", () => {
     it('takes the default layout when it declares none', () => {
         const { code } = compile(page(''), 'p.pdx', undefined, undefined, { defaultLayout: 'shell' });
-        expect(code, 'the default layout did not reach the route').toContain('layouts:["pdx-shell-layout"]');
+        expect(code, 'the default layout did not reach the route').toContain('layouts:["app-shell-layout"]');
     });
 
     it("and none at all with @layout 'none'", () => {
@@ -34,7 +34,7 @@ describe("a page's own registration", () => {
 
     it('control — a page that names its own layout keeps it', () => {
         const { code } = compile(page("@layout 'admin';"), 'p.pdx', undefined, undefined, { defaultLayout: 'shell' });
-        expect(code).toContain('layouts:["pdx-admin-layout"]');
+        expect(code).toContain('layouts:["app-admin-layout"]');
     });
 
     it('control — with no default, a page with no @layout has none, as before', () => {
@@ -57,7 +57,7 @@ function scan(source: string, defaultLayout?: string): ScannedRoute[] {
 
 describe('the route table the compiler emits', () => {
     it('takes the default layout when the page declares none', () => {
-        expect(scan(page(''), 'shell')[0].layouts).toEqual(['pdx-shell-layout']);
+        expect(scan(page(''), 'shell')[0].layouts).toEqual(['app-shell-layout']);
     });
 
     it("and none with @layout 'none'", () => {
@@ -65,6 +65,6 @@ describe('the route table the compiler emits', () => {
     });
 
     it('control — an explicit layout wins over the default', () => {
-        expect(scan(page("@layout 'admin';"), 'shell')[0].layouts).toEqual(['pdx-admin-layout']);
+        expect(scan(page("@layout 'admin';"), 'shell')[0].layouts).toEqual(['app-admin-layout']);
     });
 });

@@ -53,7 +53,7 @@ describe('a @page that declares more than one path', () => {
 
         expect(routes).toHaveLength(2);
         for (const r of routes) {
-            expect(r.tag).toBe('pdx-docs');
+            expect(r.tag).toBe('app-docs');
             expect(r.guard).toBe('docs.read');
         }
     });

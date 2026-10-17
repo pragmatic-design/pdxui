@@ -27,7 +27,7 @@ function mountSwitcher(prefix: string, keepAlive: string, build: boolean): (i: n
     const src = `<template><component :is="view" ${keepAlive}></component></template>\n<script setup>\nlet view = $signal('${prefix}-0');\nwindow.__show_${name} = (t) => { view = t; };\n</script>\n`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     new Function('__core', code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;'))(core);
-    document.body.appendChild(document.createElement(`pdx-${name}`));
+    document.body.appendChild(document.createElement(`app-${name}`));
     const show = (window as unknown as Record<string, (t: string) => void>)[`__show_${name}`];
     return async (i: number) => { show(`${prefix}-${i}`); await new Promise((r) => setTimeout(r, 0)); };
 }

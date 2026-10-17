@@ -23,7 +23,7 @@ proposals the implementing issue may change.
 | `defineEmits(['e'])` | `@event e: unknown;` | mechanical | #158 |
 | a top-level `return { … }` | removed: every top-level name reaches the template | mechanical | #158 |
 | a legacy form `pdx migrate` cannot convert | — | flagged | #158 |
-| application tag `pdx-<file>` | `app-<file>` (or `pdx({ prefix })`) | mechanical in templates, app CSS and `@tag`; flagged inside strings | #136 |
+| application tag `pdx-<file>` | `app-<file>` (or `pdx({ prefix })`) | mechanical in templates, app CSS and `@tag`; flagged inside strings — landed: `app-prefix`, `app-prefix-string` | #136 |
 | `pdx({ inlineBindings })` | removed | `PDX_INLINE_BINDINGS_IGNORED`; flagged | #107 (flagging †) |
 | `:scope` in a scoped block under `target: 'baseline-2024'` | the host, as under `'baseline-2026'` | **target change**: nothing to rewrite | † (decision 20) |
 

@@ -19,7 +19,7 @@ export function compileLegacyMode(descriptor: SFCDescriptor, ast: TemplateNode[]
     const imports = new Set<string>(['html', 'component']);
     applyFormBindings(ast);
     const renderCode = generateNodes(ast, imports, ctx);
-    const tag = extractTag(filename);
+    const tag = extractTag(filename, ctx.tagPrefix);
 
     let setupBody = '';
     let propsCode = '{}';

@@ -7,7 +7,7 @@
       it validates and emits <code>pdx-save</code> with the values; <code>value=null</code> → create.
     </p>
 
-    <pdx-demo-comp-edit-drawer-create-edit class="demo-section"></pdx-demo-comp-edit-drawer-create-edit>
+    <app-demo-comp-edit-drawer-create-edit class="demo-section"></app-demo-comp-edit-drawer-create-edit>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props &amp; Events</h2>

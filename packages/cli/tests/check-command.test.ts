@@ -376,7 +376,7 @@ describe('pdx check — the project’s own components resolve', () => {
         writeFileSync(join(root, 'src', 'components', 'room-rows.pdx'),
             '<template><div>rows</div></template>\n<script>\nlet n = $signal(0);\n</script>\n');
         writeFileSync(join(root, 'src', 'routes', 'edit.pdx'),
-            '<template><pdx-room-rows></pdx-room-rows></template>\n<script>\nlet m = $signal(0);\n</script>\n');
+            '<template><app-room-rows></app-room-rows></template>\n<script>\nlet m = $signal(0);\n</script>\n');
 
         process.chdir(root);
         await (checkCmd as any).run({ args: { json: true, fix: false, severity: 'warn', i18n: false } });

@@ -162,7 +162,7 @@ let x = $signal($t('hello'));
 
         expect(code).toContain('transition:"fade"');
         // The chain the outlet reads, not the name: the compiler resolves it at build time.
-        expect(code).toContain('layouts:["pdx-admin-layout"]');
+        expect(code).toContain('layouts:["app-admin-layout"]');
     });
 });
 

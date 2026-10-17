@@ -35,7 +35,7 @@
           </div>
           <details class="demo-src">
             <summary>Source</summary>
-            <pdx-code :code="demoCode"></pdx-code>
+            <app-code :code="demoCode"></app-code>
           </details>
         </div>
       </div>
@@ -47,21 +47,21 @@
       <div class="gen-grid">
         <div class="glass gen-card">
           <span class="gen-tag">You write — .pdx</span>
-          <pdx-code :code="srcCode"></pdx-code>
+          <app-code :code="srcCode"></app-code>
         </div>
         <div class="glass gen-card">
           <span class="gen-tag">The compiler generates</span>
-          <pdx-code :code="genCode"></pdx-code>
+          <app-code :code="genCode"></app-code>
         </div>
       </div>
     </section>
 
-    <pdx-landing-features></pdx-landing-features>
+    <app-landing-features></app-landing-features>
 
     <section class="cta shell-wrap">
       <div class="glass cta-card">
         <h2 class="section-title">Ready to try it?</h2>
-        <pdx-code :code="installCode"></pdx-code>
+        <app-code :code="installCode"></app-code>
         <div class="hero-actions cta-actions">
           <a href="/docs" @click="followLink"><pdx-button variant="primary">Read the docs</pdx-button></a>
         </div>
@@ -89,7 +89,7 @@ let installCode = $signal('pnpm add @pdxui/core @pdxui/compiler\npnpm add -D @pd
 <style scoped>
 .landing { width: 100%; }
 /* The "Why PDX" section lays out as the page's own. */
-.landing > pdx-landing-features { display: contents; }
+.landing > app-landing-features { display: contents; }
 section { padding-top: 5.5rem; }
 
 .hero {
@@ -132,7 +132,7 @@ section { padding-top: 5.5rem; }
 .cta-card { max-width: 680px; margin: 0 auto; padding: 2.6rem; border-radius: 18px; text-align: center; box-shadow: var(--glow-gold); }
 .cta-actions { justify-content: center; margin-top: 1.6rem; }
 /* The card centres its text; a code block of more than one line must not inherit that. */
-.cta-card pdx-code { text-align: left; }
+.cta-card app-code { text-align: left; }
 
 @media (max-width: 880px) {
   .hero { grid-template-columns: 1fr; text-align: center; }

@@ -26,31 +26,31 @@
     </div>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-tag-input-basic class="demo-section"></pdx-demo-comp-tag-input-basic>
+    <app-demo-comp-tag-input-basic class="demo-section"></app-demo-comp-tag-input-basic>
 
     <!-- ═══ With Initial Values ═══ -->
-    <pdx-demo-comp-tag-input-initial class="demo-section"></pdx-demo-comp-tag-input-initial>
+    <app-demo-comp-tag-input-initial class="demo-section"></app-demo-comp-tag-input-initial>
 
     <!-- ═══ Max Tags ═══ -->
-    <pdx-demo-comp-tag-input-max-tags class="demo-section"></pdx-demo-comp-tag-input-max-tags>
+    <app-demo-comp-tag-input-max-tags class="demo-section"></app-demo-comp-tag-input-max-tags>
 
     <!-- ═══ Custom Separator ═══ -->
-    <pdx-demo-comp-tag-input-separator class="demo-section"></pdx-demo-comp-tag-input-separator>
+    <app-demo-comp-tag-input-separator class="demo-section"></app-demo-comp-tag-input-separator>
 
     <!-- ═══ No Duplicates ═══ -->
-    <pdx-demo-comp-tag-input-no-duplicates class="demo-section"></pdx-demo-comp-tag-input-no-duplicates>
+    <app-demo-comp-tag-input-no-duplicates class="demo-section"></app-demo-comp-tag-input-no-duplicates>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-tag-input-sizes class="demo-section"></pdx-demo-comp-tag-input-sizes>
+    <app-demo-comp-tag-input-sizes class="demo-section"></app-demo-comp-tag-input-sizes>
 
     <!-- ═══ States ═══ -->
-    <pdx-demo-comp-tag-input-states class="demo-section"></pdx-demo-comp-tag-input-states>
+    <app-demo-comp-tag-input-states class="demo-section"></app-demo-comp-tag-input-states>
 
     <!-- ═══ Paste Support ═══ -->
-    <pdx-demo-comp-tag-input-paste class="demo-section"></pdx-demo-comp-tag-input-paste>
+    <app-demo-comp-tag-input-paste class="demo-section"></app-demo-comp-tag-input-paste>
 
     <!-- ═══ Slot Template ═══ -->
-    <pdx-demo-comp-tag-input-slot class="demo-section"></pdx-demo-comp-tag-input-slot>
+    <app-demo-comp-tag-input-slot class="demo-section"></app-demo-comp-tag-input-slot>
 
     <!-- ═══ Slots Reference ═══ -->
     <section>

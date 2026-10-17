@@ -6,13 +6,13 @@
       Icon + title + description + optional action button.
     </p>
 
-    <pdx-demo-comp-empty-state-basic class="demo-section"></pdx-demo-comp-empty-state-basic>
+    <app-demo-comp-empty-state-basic class="demo-section"></app-demo-comp-empty-state-basic>
 
-    <pdx-demo-comp-empty-state-with-action class="demo-section"></pdx-demo-comp-empty-state-with-action>
+    <app-demo-comp-empty-state-with-action class="demo-section"></app-demo-comp-empty-state-with-action>
 
-    <pdx-demo-comp-empty-state-search class="demo-section"></pdx-demo-comp-empty-state-search>
+    <app-demo-comp-empty-state-search class="demo-section"></app-demo-comp-empty-state-search>
 
-    <pdx-demo-comp-empty-state-error class="demo-section"></pdx-demo-comp-empty-state-error>
+    <app-demo-comp-empty-state-error class="demo-section"></app-demo-comp-empty-state-error>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

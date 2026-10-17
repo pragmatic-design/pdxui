@@ -7,17 +7,17 @@
       disabled entries. Keyboard navigable, closes on outside click / <kbd>Esc</kbd>.
     </p>
 
-    <pdx-demo-comp-dropdown-menu-basic class="demo-section"></pdx-demo-comp-dropdown-menu-basic>
+    <app-demo-comp-dropdown-menu-basic class="demo-section"></app-demo-comp-dropdown-menu-basic>
 
-    <pdx-demo-comp-dropdown-menu-variants-placement class="demo-section"></pdx-demo-comp-dropdown-menu-variants-placement>
+    <app-demo-comp-dropdown-menu-variants-placement class="demo-section"></app-demo-comp-dropdown-menu-variants-placement>
 
-    <pdx-demo-comp-dropdown-menu-checkbox-radio class="demo-section"></pdx-demo-comp-dropdown-menu-checkbox-radio>
+    <app-demo-comp-dropdown-menu-checkbox-radio class="demo-section"></app-demo-comp-dropdown-menu-checkbox-radio>
 
-    <pdx-demo-comp-dropdown-menu-submenus class="demo-section"></pdx-demo-comp-dropdown-menu-submenus>
+    <app-demo-comp-dropdown-menu-submenus class="demo-section"></app-demo-comp-dropdown-menu-submenus>
 
-    <pdx-demo-comp-dropdown-menu-custom-trigger class="demo-section"></pdx-demo-comp-dropdown-menu-custom-trigger>
+    <app-demo-comp-dropdown-menu-custom-trigger class="demo-section"></app-demo-comp-dropdown-menu-custom-trigger>
 
-    <pdx-demo-comp-dropdown-menu-keyboard class="demo-section"></pdx-demo-comp-dropdown-menu-keyboard>
+    <app-demo-comp-dropdown-menu-keyboard class="demo-section"></app-demo-comp-dropdown-menu-keyboard>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>

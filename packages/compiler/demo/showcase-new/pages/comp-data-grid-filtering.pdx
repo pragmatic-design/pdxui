@@ -7,25 +7,25 @@
     </p>
 
     <!-- Inline Filter Row -->
-    <pdx-demo-comp-data-grid-filtering-inline-row class="demo-section"></pdx-demo-comp-data-grid-filtering-inline-row>
+    <app-demo-comp-data-grid-filtering-inline-row class="demo-section"></app-demo-comp-data-grid-filtering-inline-row>
 
     <!-- Toolbar Filter Mode -->
-    <pdx-demo-comp-data-grid-filtering-toolbar-mode class="demo-section"></pdx-demo-comp-data-grid-filtering-toolbar-mode>
+    <app-demo-comp-data-grid-filtering-toolbar-mode class="demo-section"></app-demo-comp-data-grid-filtering-toolbar-mode>
 
     <!-- Enum Filter -->
-    <pdx-demo-comp-data-grid-filtering-enum-multi class="demo-section"></pdx-demo-comp-data-grid-filtering-enum-multi>
+    <app-demo-comp-data-grid-filtering-enum-multi class="demo-section"></app-demo-comp-data-grid-filtering-enum-multi>
 
     <!-- Server-side enum -->
-    <pdx-demo-comp-data-grid-filtering-enum-server class="demo-section"></pdx-demo-comp-data-grid-filtering-enum-server>
+    <app-demo-comp-data-grid-filtering-enum-server class="demo-section"></app-demo-comp-data-grid-filtering-enum-server>
 
     <!-- Set / Excel Filter -->
-    <pdx-demo-comp-data-grid-filtering-set-filter class="demo-section"></pdx-demo-comp-data-grid-filtering-set-filter>
+    <app-demo-comp-data-grid-filtering-set-filter class="demo-section"></app-demo-comp-data-grid-filtering-set-filter>
 
     <!-- Relative Date Filters -->
-    <pdx-demo-comp-data-grid-filtering-relative-date class="demo-section"></pdx-demo-comp-data-grid-filtering-relative-date>
+    <app-demo-comp-data-grid-filtering-relative-date class="demo-section"></app-demo-comp-data-grid-filtering-relative-date>
 
     <!-- Custom Operators -->
-    <pdx-demo-comp-data-grid-filtering-custom-operators class="demo-section"></pdx-demo-comp-data-grid-filtering-custom-operators>
+    <app-demo-comp-data-grid-filtering-custom-operators class="demo-section"></app-demo-comp-data-grid-filtering-custom-operators>
 
     <!-- Reference -->
     <section>

@@ -5,6 +5,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { dirname, join, relative } from 'path';
 import { deriveTag } from './compiler/codegen';
 import { layoutChain, routeLayout } from './compiler/codegen-shared';
+import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './compiler/tag-prefix';
 import { analyzeScript } from './compiler/script-analyzer';
 import { parseSFC } from './parser/sfc';
 import { moduleDir } from './module-dir';
@@ -205,7 +206,7 @@ export interface ScannedRoute {
  * Populates the routes array at build start for virtual router module.
  */
 export function scanForRoutes(rootDir: string, routes: ScannedRoute[],
-    knowsTag?: (tag: string) => boolean, defaultLayout?: string): void {
+    knowsTag?: (tag: string) => boolean, defaultLayout?: string, prefix: string = DEFAULT_TAG_PREFIX): void {
     function scan(dir: string, depth = 0): void {
         if (depth > 5) return;
         try {
@@ -241,7 +242,7 @@ export function scanForRoutes(rootDir: string, routes: ScannedRoute[],
                     const route = analysis.route;
                     if (!route.page) continue;
 
-                    const tag = analysis.customTag ?? deriveTag(normalizePath(fullPath));
+                    const tag = analysis.customTag ?? deriveTag(normalizePath(fullPath), prefix);
                     // Every path this component answers to, in declaration order — the analyser
                     // puts the first in `page` and the rest in `aliases`, and the codegen registers
                     // one route per alias. A scan that produced fewer is a production build with
@@ -282,8 +283,8 @@ export function scanForRoutes(rootDir: string, routes: ScannedRoute[],
                             // registration makes, so the two modes resolve a name identically.
                             // The app's default when the page declares none, none for `@layout 'none'`
                             // — `routeLayout`, the same call the page's registration makes.
-                            layouts: layoutChain(routeLayout(route.layout, defaultLayout), knowsTag).length > 0
-                                ? layoutChain(routeLayout(route.layout, defaultLayout), knowsTag) : undefined,
+                            layouts: layoutChain(routeLayout(route.layout, defaultLayout), knowsTag, prefix).length > 0
+                                ? layoutChain(routeLayout(route.layout, defaultLayout), knowsTag, prefix) : undefined,
                             // `@page` implies lazy loading unless the page opts out with preload.
                             // The file is the import specifier the outlet hands to `import()`.
                             lazy: !route.preload,
@@ -607,16 +608,17 @@ export function injectComponentImports(
 
     if (usedTags.size === 0) return compiledCode;
 
-    // PDX_UNRESOLVED_COMPONENT: a pdx-* tag the resolver does not know
+    // PDX_UNRESOLVED_COMPONENT: a pdx-* or app-* tag the resolver does not know
     // almost always means a missing export in packages/ui/package.json, or a component
     // file that does not exist — otherwise a silent failure (the CE is never registered,
     // zero console errors). We exclude the current file's own tag (self-reference).
-    const ownTag = deriveTag(currentFile);
+    const ownTag = deriveTag(currentFile, resolver.prefix);
     for (const tag of usedTags) {
         if (tag === ownTag) continue;
-        // Only the library's prefix is a claim this warning can check: another prefix may be an
-        // element the page gets elsewhere (a CDN script), which validate() reports with its evidence.
-        if (!tag.startsWith('pdx-')) continue;
+        // The library's prefix and the app's own (#136) are claims this warning can check: another
+        // prefix may be an element the page gets elsewhere (a CDN script), which validate() reports
+        // with its evidence.
+        if (!tag.startsWith(RESERVED_TAG_PREFIX) && !tag.startsWith(`${resolver.prefix}-`)) continue;
         // `knownWithoutImport`, not `has`: a tag can be legitimate with nothing to import — the
         // design system styles pdx-split/center/container/cluster/stack/grid/spacer as element
         // selectors, @pdxui/router defines pdx-router-outlet, and pdx-toggle-group is a second

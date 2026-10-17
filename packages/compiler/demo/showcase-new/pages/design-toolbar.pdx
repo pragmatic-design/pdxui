@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic Toolbar ═══ -->
-    <pdx-demo-design-toolbar-basic class="demo-section"></pdx-demo-design-toolbar-basic>
+    <app-demo-design-toolbar-basic class="demo-section"></app-demo-design-toolbar-basic>
 
     <!-- ═══ Bordered ═══ -->
-    <pdx-demo-design-toolbar-bordered class="demo-section"></pdx-demo-design-toolbar-bordered>
+    <app-demo-design-toolbar-bordered class="demo-section"></app-demo-design-toolbar-bordered>
 
     <!-- ═══ Separator and Spacer ═══ -->
-    <pdx-demo-design-toolbar-separator class="demo-section"></pdx-demo-design-toolbar-separator>
+    <app-demo-design-toolbar-separator class="demo-section"></app-demo-design-toolbar-separator>
 
     <!-- ═══ Button Groups ═══ -->
-    <pdx-demo-design-toolbar-groups class="demo-section"></pdx-demo-design-toolbar-groups>
+    <app-demo-design-toolbar-groups class="demo-section"></app-demo-design-toolbar-groups>
 
     <!-- ═══ With Label ═══ -->
-    <pdx-demo-design-toolbar-label class="demo-section"></pdx-demo-design-toolbar-label>
+    <app-demo-design-toolbar-label class="demo-section"></app-demo-design-toolbar-label>
 
     <!-- ═══ Compact ═══ -->
-    <pdx-demo-design-toolbar-compact class="demo-section"></pdx-demo-design-toolbar-compact>
+    <app-demo-design-toolbar-compact class="demo-section"></app-demo-design-toolbar-compact>
 
     <!-- ═══ Composition: Text Editor ═══ -->
-    <pdx-demo-design-toolbar-composition class="demo-section"></pdx-demo-design-toolbar-composition>
+    <app-demo-design-toolbar-composition class="demo-section"></app-demo-design-toolbar-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic Menu ═══ -->
-    <pdx-demo-design-menu-basic class="demo-section"></pdx-demo-design-menu-basic>
+    <app-demo-design-menu-basic class="demo-section"></app-demo-design-menu-basic>
 
     <!-- ═══ With Icons ═══ -->
-    <pdx-demo-design-menu-icons class="demo-section"></pdx-demo-design-menu-icons>
+    <app-demo-design-menu-icons class="demo-section"></app-demo-design-menu-icons>
 
     <!-- ═══ With Shortcuts ═══ -->
-    <pdx-demo-design-menu-shortcuts class="demo-section"></pdx-demo-design-menu-shortcuts>
+    <app-demo-design-menu-shortcuts class="demo-section"></app-demo-design-menu-shortcuts>
 
     <!-- ═══ Separator and Labels ═══ -->
-    <pdx-demo-design-menu-separator class="demo-section"></pdx-demo-design-menu-separator>
+    <app-demo-design-menu-separator class="demo-section"></app-demo-design-menu-separator>
 
     <!-- ═══ Danger Item ═══ -->
-    <pdx-demo-design-menu-danger class="demo-section"></pdx-demo-design-menu-danger>
+    <app-demo-design-menu-danger class="demo-section"></app-demo-design-menu-danger>
 
     <!-- ═══ Checkable Items ═══ -->
-    <pdx-demo-design-menu-checkable class="demo-section"></pdx-demo-design-menu-checkable>
+    <app-demo-design-menu-checkable class="demo-section"></app-demo-design-menu-checkable>
 
     <!-- ═══ Composition: Context Menu ═══ -->
-    <pdx-demo-design-menu-composition class="demo-section"></pdx-demo-design-menu-composition>
+    <app-demo-design-menu-composition class="demo-section"></app-demo-design-menu-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

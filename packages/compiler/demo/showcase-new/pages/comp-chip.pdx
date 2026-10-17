@@ -26,34 +26,34 @@
     </div>
 
     <!-- ═══ Outline Variants ═══ -->
-    <pdx-demo-comp-chip-outline class="demo-section"></pdx-demo-comp-chip-outline>
+    <app-demo-comp-chip-outline class="demo-section"></app-demo-comp-chip-outline>
 
     <!-- ═══ Tonal Variants ═══ -->
-    <pdx-demo-comp-chip-tonal class="demo-section"></pdx-demo-comp-chip-tonal>
+    <app-demo-comp-chip-tonal class="demo-section"></app-demo-comp-chip-tonal>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-chip-sizes class="demo-section"></pdx-demo-comp-chip-sizes>
+    <app-demo-comp-chip-sizes class="demo-section"></app-demo-comp-chip-sizes>
 
     <!-- ═══ With Avatar ═══ -->
-    <pdx-demo-comp-chip-avatar class="demo-section"></pdx-demo-comp-chip-avatar>
+    <app-demo-comp-chip-avatar class="demo-section"></app-demo-comp-chip-avatar>
 
     <!-- ═══ With Icon ═══ -->
-    <pdx-demo-comp-chip-icon class="demo-section"></pdx-demo-comp-chip-icon>
+    <app-demo-comp-chip-icon class="demo-section"></app-demo-comp-chip-icon>
 
     <!-- ═══ Removable ═══ -->
-    <pdx-demo-comp-chip-removable class="demo-section"></pdx-demo-comp-chip-removable>
+    <app-demo-comp-chip-removable class="demo-section"></app-demo-comp-chip-removable>
 
     <!-- ═══ Selectable ═══ -->
-    <pdx-demo-comp-chip-selectable class="demo-section"></pdx-demo-comp-chip-selectable>
+    <app-demo-comp-chip-selectable class="demo-section"></app-demo-comp-chip-selectable>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-chip-disabled class="demo-section"></pdx-demo-comp-chip-disabled>
+    <app-demo-comp-chip-disabled class="demo-section"></app-demo-comp-chip-disabled>
 
     <!-- ═══ CSS Only ═══ -->
-    <pdx-demo-comp-chip-css-only class="demo-section"></pdx-demo-comp-chip-css-only>
+    <app-demo-comp-chip-css-only class="demo-section"></app-demo-comp-chip-css-only>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-chip-composition class="demo-section"></pdx-demo-comp-chip-composition>
+    <app-demo-comp-chip-composition class="demo-section"></app-demo-comp-chip-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

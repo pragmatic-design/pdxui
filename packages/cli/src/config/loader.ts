@@ -4,6 +4,7 @@ import { resolve } from 'pathe';
 import { existsSync } from 'fs';
 import type { PdxConfig, ResolvedConfig } from './schema';
 import { logger } from '../utils/logger';
+import { DEFAULT_TAG_PREFIX } from '@pdxui/compiler';
 
 /** A config file that is there and cannot be used. Carries the path and what went wrong. */
 export class ConfigLoadError extends Error {
@@ -70,6 +71,7 @@ export function resolveConfig(raw: PdxConfig, cwd: string): ResolvedConfig {
         root: resolve(cwd, raw.root ?? defaultRoot),
         routes: resolve(cwd, raw.routes ?? 'src/routes'),
         components: resolve(cwd, raw.components ?? 'src/components'),
+        prefix: raw.prefix ?? DEFAULT_TAG_PREFIX,
         outDir: resolve(cwd, raw.build?.outDir ?? 'dist'),
         minify: raw.build?.minify ?? true,
         target: raw.build?.target ?? 'es2022',

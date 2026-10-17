@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-design-buttons-variants class="demo-section"></pdx-demo-design-buttons-variants>
+    <app-demo-design-buttons-variants class="demo-section"></app-demo-design-buttons-variants>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-design-buttons-sizes class="demo-section"></pdx-demo-design-buttons-sizes>
+    <app-demo-design-buttons-sizes class="demo-section"></app-demo-design-buttons-sizes>
 
     <!-- ═══ States ═══ -->
-    <pdx-demo-design-buttons-states class="demo-section"></pdx-demo-design-buttons-states>
+    <app-demo-design-buttons-states class="demo-section"></app-demo-design-buttons-states>
 
     <!-- ═══ Full Width ═══ -->
-    <pdx-demo-design-buttons-full-width class="demo-section"></pdx-demo-design-buttons-full-width>
+    <app-demo-design-buttons-full-width class="demo-section"></app-demo-design-buttons-full-width>
 
     <!-- ═══ Button Groups ═══ -->
-    <pdx-demo-design-buttons-groups class="demo-section"></pdx-demo-design-buttons-groups>
+    <app-demo-design-buttons-groups class="demo-section"></app-demo-design-buttons-groups>
 
     <!-- ═══ Links as Buttons ═══ -->
-    <pdx-demo-design-buttons-links class="demo-section"></pdx-demo-design-buttons-links>
+    <app-demo-design-buttons-links class="demo-section"></app-demo-design-buttons-links>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-buttons-composition class="demo-section"></pdx-demo-design-buttons-composition>
+    <app-demo-design-buttons-composition class="demo-section"></app-demo-design-buttons-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

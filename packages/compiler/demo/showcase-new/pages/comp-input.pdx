@@ -7,43 +7,43 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-input-basic class="demo-section"></pdx-demo-comp-input-basic>
+    <app-demo-comp-input-basic class="demo-section"></app-demo-comp-input-basic>
 
     <!-- ═══ Prefix & Suffix ═══ -->
-    <pdx-demo-comp-input-prefix-suffix class="demo-section"></pdx-demo-comp-input-prefix-suffix>
+    <app-demo-comp-input-prefix-suffix class="demo-section"></app-demo-comp-input-prefix-suffix>
 
     <!-- ═══ Clearable ═══ -->
-    <pdx-demo-comp-input-clearable class="demo-section"></pdx-demo-comp-input-clearable>
+    <app-demo-comp-input-clearable class="demo-section"></app-demo-comp-input-clearable>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-input-sizes class="demo-section"></pdx-demo-comp-input-sizes>
+    <app-demo-comp-input-sizes class="demo-section"></app-demo-comp-input-sizes>
 
     <!-- ═══ States ═══ -->
-    <pdx-demo-comp-input-validation class="demo-section"></pdx-demo-comp-input-validation>
+    <app-demo-comp-input-validation class="demo-section"></app-demo-comp-input-validation>
 
     <!-- ═══ Loading ═══ -->
-    <pdx-demo-comp-input-loading class="demo-section"></pdx-demo-comp-input-loading>
+    <app-demo-comp-input-loading class="demo-section"></app-demo-comp-input-loading>
 
     <!-- ═══ Character Count ═══ -->
-    <pdx-demo-comp-input-char-count class="demo-section"></pdx-demo-comp-input-char-count>
+    <app-demo-comp-input-char-count class="demo-section"></app-demo-comp-input-char-count>
 
     <!-- ═══ Input Types ═══ -->
-    <pdx-demo-comp-input-types class="demo-section"></pdx-demo-comp-input-types>
+    <app-demo-comp-input-types class="demo-section"></app-demo-comp-input-types>
 
     <!-- ═══ Input Group (CSS) ═══ -->
-    <pdx-demo-comp-input-input-group class="demo-section"></pdx-demo-comp-input-input-group>
+    <app-demo-comp-input-input-group class="demo-section"></app-demo-comp-input-input-group>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-input-composition class="demo-section"></pdx-demo-comp-input-composition>
+    <app-demo-comp-input-composition class="demo-section"></app-demo-comp-input-composition>
 
     <!-- ═══ Input + Button Composition ═══ -->
-    <pdx-demo-comp-input-input-button class="demo-section"></pdx-demo-comp-input-input-button>
+    <app-demo-comp-input-input-button class="demo-section"></app-demo-comp-input-input-button>
 
     <!-- ═══ Mobile Behavior ═══ -->
-    <pdx-demo-comp-input-mobile class="demo-section"></pdx-demo-comp-input-mobile>
+    <app-demo-comp-input-mobile class="demo-section"></app-demo-comp-input-mobile>
 
     <!-- ═══ Specialized inputs built on this wrapper ═══ -->
-    <pdx-demo-comp-input-specialized class="demo-section"></pdx-demo-comp-input-specialized>
+    <app-demo-comp-input-specialized class="demo-section"></app-demo-comp-input-specialized>
 
     <!-- ═══ Reference ═══ -->
     <section>

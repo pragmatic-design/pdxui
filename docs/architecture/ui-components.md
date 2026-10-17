@@ -163,7 +163,7 @@ The base structure:
 Each demo section is its own component, and the page composes them. A section of `pages/comp-{name}.pdx` lives in `pages/sections/comp-{name}/demo-comp-{name}-{slug}.pdx`, holds the whole `<section>` (heading, demo, source block) and the styles only it uses, and the page places it with a class:
 
 ```html
-<pdx-demo-comp-{name}-basic class="demo-section"></pdx-demo-comp-{name}-basic>
+<app-demo-comp-{name}-basic class="demo-section"></app-demo-comp-{name}-basic>
 ```
 
 The Reference table can stay inline. State that more than one section reads — the button page's event console, for instance — goes in `sections/comp-{name}/state.pdx.ts` as a `@store`, which each section imports (`import { useButtonConsole } from './state.pdx'`); data several sections show goes in the same module as an exported constant (`export const teamItems = […]`). A page that needs both puts the data in `sections/comp-{name}/data.pdx.ts`: a `@store` module cannot also export. A section that owns its state keeps it in its own script. `packages/compiler/tests/showcase-warnings.test.ts` holds the pages not yet migrated: a new page is written in this form from the start, and a migrated page leaves that list.

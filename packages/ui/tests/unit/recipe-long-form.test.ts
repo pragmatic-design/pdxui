@@ -29,7 +29,7 @@ beforeAll(() => {
     const block = recipeBlock();
     if (!block) return;
     const { code } = compile(block, 'shipment-form.pdx', [], undefined, {});
-    tag = 'pdx-shipment-form';
+    tag = 'app-shipment-form';
     const body = code
         .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/g, 'const {$1} = __core;')
         .replace(/^import\s+'@pdxui\/ui[^']*';?$/gm, ''); // the components are registered above

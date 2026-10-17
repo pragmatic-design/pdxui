@@ -22,7 +22,7 @@
   fallback-message="Dashboard widget crashed."
   :max-retries="3"
   @pdx-error="onError"&gt;
-  &lt;pdx-dashboard-widget /&gt;
+  &lt;app-dashboard-widget /&gt;
 &lt;/pdx-error-boundary&gt;</code></pre></details>}
   </section>
 </template>

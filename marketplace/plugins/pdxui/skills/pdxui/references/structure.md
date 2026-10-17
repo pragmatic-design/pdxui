@@ -30,7 +30,7 @@ src/
 ```
 
 A `.pdx` anywhere under `src/` is registered automatically, and its tag comes from the filename:
-`src/components/job-row.pdx` → `<pdx-job-row>`. Nothing to declare, nothing to import — use the tag
+`src/components/job-row.pdx` → `<app-job-row>`. Nothing to declare, nothing to import — use the tag
 and the compiler adds the import.
 
 **Routes stay thin.** A route loads what the screen needs and composes; the pieces know how to render

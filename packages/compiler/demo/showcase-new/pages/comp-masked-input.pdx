@@ -8,10 +8,10 @@
     </p>
 
     <!-- Presets -->
-    <pdx-demo-comp-masked-input-presets class="demo-section"></pdx-demo-comp-masked-input-presets>
+    <app-demo-comp-masked-input-presets class="demo-section"></app-demo-comp-masked-input-presets>
 
     <!-- Custom Pattern -->
-    <pdx-demo-comp-masked-input-custom-pattern class="demo-section"></pdx-demo-comp-masked-input-custom-pattern>
+    <app-demo-comp-masked-input-custom-pattern class="demo-section"></app-demo-comp-masked-input-custom-pattern>
 
     <!-- Reference -->
     <section>

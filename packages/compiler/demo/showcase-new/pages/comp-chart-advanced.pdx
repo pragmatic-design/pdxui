@@ -6,22 +6,22 @@
     </p>
 
     <!-- ═══ Dual Y-Axis ═══ -->
-    <pdx-demo-comp-chart-advanced-dual-axis class="demo-section"></pdx-demo-comp-chart-advanced-dual-axis>
+    <app-demo-comp-chart-advanced-dual-axis class="demo-section"></app-demo-comp-chart-advanced-dual-axis>
 
     <!-- ═══ Zoom & Pan ═══ -->
-    <pdx-demo-comp-chart-advanced-zoom class="demo-section"></pdx-demo-comp-chart-advanced-zoom>
+    <app-demo-comp-chart-advanced-zoom class="demo-section"></app-demo-comp-chart-advanced-zoom>
 
     <!-- ═══ Legend Positions ═══ -->
-    <pdx-demo-comp-chart-advanced-legend class="demo-section"></pdx-demo-comp-chart-advanced-legend>
+    <app-demo-comp-chart-advanced-legend class="demo-section"></app-demo-comp-chart-advanced-legend>
 
     <!-- ═══ Axis Formatting ═══ -->
-    <pdx-demo-comp-chart-advanced-axis-format class="demo-section"></pdx-demo-comp-chart-advanced-axis-format>
+    <app-demo-comp-chart-advanced-axis-format class="demo-section"></app-demo-comp-chart-advanced-axis-format>
 
     <!-- ═══ Dynamic Data ═══ -->
-    <pdx-demo-comp-chart-advanced-dynamic class="demo-section"></pdx-demo-comp-chart-advanced-dynamic>
+    <app-demo-comp-chart-advanced-dynamic class="demo-section"></app-demo-comp-chart-advanced-dynamic>
 
     <!-- ═══ Dark Mode ═══ -->
-    <pdx-demo-comp-chart-advanced-theme class="demo-section"></pdx-demo-comp-chart-advanced-theme>
+    <app-demo-comp-chart-advanced-theme class="demo-section"></app-demo-comp-chart-advanced-theme>
   </div>
 </template>
 

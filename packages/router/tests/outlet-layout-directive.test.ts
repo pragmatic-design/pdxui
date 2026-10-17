@@ -22,7 +22,7 @@ class AdminLayout extends HTMLElement {
         if (!this.querySelector('slot')) this.appendChild(document.createElement('slot'));
     }
 }
-customElements.define('pdx-admin-layout', AdminLayout);
+customElements.define('app-admin-layout', AdminLayout);
 customElements.define('pdx-ld-users', class extends HTMLElement {});
 customElements.define('pdx-ld-bare', class extends HTMLElement {});
 
@@ -35,7 +35,7 @@ customElements.define('pdx-ld-bare', class extends HTMLElement {});
  */
 function registrationOf(source: string, file: string): Record<string, unknown> {
     const { code } = compile(source, file, undefined, undefined, {
-        importPathOf: (tag) => (tag === 'pdx-admin-layout' ? './admin/_layout.pdx' : null),
+        importPathOf: (tag) => (tag === 'app-admin-layout' ? './admin/_layout.pdx' : null),
     });
     const literal = code.match(/__pdx_pushRoute\((\{.*?\})\);/s);
     expect(literal, `no route registration in the output of ${file} — this test is reading nothing`)
@@ -77,14 +77,14 @@ describe('a page that declares @layout', () => {
     it('renders inside the layout it named', () => {
         const el = document.querySelector('pdx-ld-users');
         expect(el, 'the page did not render at all').not.toBeNull();
-        expect(el!.closest('pdx-admin-layout'),
+        expect(el!.closest('app-admin-layout'),
             '@layout is parsed, emitted and read by nobody: the page rendered with no shell around it')
             .not.toBeNull();
     });
 
     it('mounts the layout once, upgraded, not as an empty element', () => {
         expect(layoutMounts, 'the layout element never connected').toBe(1);
-        expect(document.querySelector('pdx-admin-layout')).toBeInstanceOf(AdminLayout);
+        expect(document.querySelector('app-admin-layout')).toBeInstanceOf(AdminLayout);
     });
 
     it('control — a page that declares none renders in the outlet itself', async () => {
@@ -93,7 +93,7 @@ describe('a page that declares @layout', () => {
 
         const el = document.querySelector('pdx-ld-bare')!;
         expect(el.parentElement, 'a layout was built for a page that declared none').toBe(outlet);
-        expect(document.querySelector('pdx-admin-layout'), 'the shell survived the route that had one')
+        expect(document.querySelector('app-admin-layout'), 'the shell survived the route that had one')
             .toBeNull();
     });
 });

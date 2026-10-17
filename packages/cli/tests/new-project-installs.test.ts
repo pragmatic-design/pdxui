@@ -3,7 +3,7 @@
 // Each part can break it: a version range no published release matches installs nothing; scripts
 // that call `pdx` without `@pdxui/cli` among the dependencies leave `npm run check` — the command
 // its own AGENTS.md tells an agent to run — without a CLI; a missing stylesheet import renders
-// unstyled; and an index.html that loads App.pdx without placing `<pdx-app>` is a blank page.
+// unstyled; and an index.html that loads App.pdx without placing its element is a blank page.
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
@@ -53,8 +53,9 @@ describe('pdx new project', () => {
         expect(html).toContain("import '@pdxui/design/themes/neutral';");
         expect(html).not.toContain('@pdxui/framework/css');
         expect(html).not.toMatch(/<html[^>]*pdx-theme=/);
-        // App.pdx is <pdx-app>: loaded and never placed, it rendered nothing.
-        expect(html).toContain('<pdx-app></pdx-app>');
+        // App.pdx declares <app-root> (#136): loaded and never placed, it rendered nothing.
+        expect(html).toContain('<app-root></app-root>');
+        expect(readFileSync(join(sandbox, 'shop', 'src', 'App.pdx'), 'utf-8')).toContain("@tag 'app-root';");
         expect(html).toContain("import './src/App.pdx';");
         // The tokens' light-dark() needs a scheme on <html> to resolve.
         expect(html).toMatch(/<html[^>]*pdx-scheme="light"/);

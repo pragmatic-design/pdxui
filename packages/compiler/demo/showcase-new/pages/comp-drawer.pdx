@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Positions ═══ -->
-    <pdx-demo-comp-drawer-positions class="demo-section"></pdx-demo-comp-drawer-positions>
+    <app-demo-comp-drawer-positions class="demo-section"></app-demo-comp-drawer-positions>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-drawer-sizes class="demo-section"></pdx-demo-comp-drawer-sizes>
+    <app-demo-comp-drawer-sizes class="demo-section"></app-demo-comp-drawer-sizes>
 
     <!-- ═══ Form Drawer ═══ -->
-    <pdx-demo-comp-drawer-form-drawer class="demo-section"></pdx-demo-comp-drawer-form-drawer>
+    <app-demo-comp-drawer-form-drawer class="demo-section"></app-demo-comp-drawer-form-drawer>
 
     <!-- ═══ Keyboard ═══ -->
-    <pdx-demo-comp-drawer-keyboard class="demo-section"></pdx-demo-comp-drawer-keyboard>
+    <app-demo-comp-drawer-keyboard class="demo-section"></app-demo-comp-drawer-keyboard>
 
     <!-- ═══ Reference ═══ -->
     <section>

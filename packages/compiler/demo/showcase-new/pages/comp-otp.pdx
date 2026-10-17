@@ -7,16 +7,16 @@
     </p>
 
     <!-- Basic -->
-    <pdx-demo-comp-otp-basic class="demo-section"></pdx-demo-comp-otp-basic>
+    <app-demo-comp-otp-basic class="demo-section"></app-demo-comp-otp-basic>
 
     <!-- Separator -->
-    <pdx-demo-comp-otp-separator class="demo-section"></pdx-demo-comp-otp-separator>
+    <app-demo-comp-otp-separator class="demo-section"></app-demo-comp-otp-separator>
 
     <!-- States -->
-    <pdx-demo-comp-otp-states class="demo-section"></pdx-demo-comp-otp-states>
+    <app-demo-comp-otp-states class="demo-section"></app-demo-comp-otp-states>
 
     <!-- Sizes -->
-    <pdx-demo-comp-otp-sizes class="demo-section"></pdx-demo-comp-otp-sizes>
+    <app-demo-comp-otp-sizes class="demo-section"></app-demo-comp-otp-sizes>
 
     <!-- Reference -->
     <section>

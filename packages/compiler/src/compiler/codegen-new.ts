@@ -161,7 +161,7 @@ export function compileNewMode(
     if (renderCode.includes('$d(')) imports.add('$d');
     if (renderCode.includes('$r(')) imports.add('$r');
 
-    const tag = analysis.customTag ?? extractTag(filename);
+    const tag = analysis.customTag ?? extractTag(filename, ctx.tagPrefix);
 
     // A `@model` is a prop the component writes (#124): the descriptor declares it under `models`.
     const propsCode = buildPropsObject(analysis.props.filter(p => !p.model));
@@ -230,7 +230,8 @@ export function compileNewMode(
         analysis.states.map(s => s.name),
         analysis.host ? hostDescriptor(analysis.host, ctx, imports) : '',
         analysis.parts,
-        modelsCode);
+        modelsCode,
+        ctx.tagPrefix);
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

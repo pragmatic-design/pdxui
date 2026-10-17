@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Single Mode (default) ═══ -->
-    <pdx-demo-comp-accordion-single class="demo-section"></pdx-demo-comp-accordion-single>
+    <app-demo-comp-accordion-single class="demo-section"></app-demo-comp-accordion-single>
 
     <!-- ═══ Multiple Mode ═══ -->
-    <pdx-demo-comp-accordion-multiple class="demo-section"></pdx-demo-comp-accordion-multiple>
+    <app-demo-comp-accordion-multiple class="demo-section"></app-demo-comp-accordion-multiple>
 
     <!-- ═══ Single Item (Collapsible) ═══ -->
-    <pdx-demo-comp-accordion-single-item class="demo-section"></pdx-demo-comp-accordion-single-item>
+    <app-demo-comp-accordion-single-item class="demo-section"></app-demo-comp-accordion-single-item>
 
     <!-- ═══ Keyboard ═══ -->
-    <pdx-demo-comp-accordion-keyboard class="demo-section"></pdx-demo-comp-accordion-keyboard>
+    <app-demo-comp-accordion-keyboard class="demo-section"></app-demo-comp-accordion-keyboard>
 
     <!-- ═══ Reference ═══ -->
     <section>

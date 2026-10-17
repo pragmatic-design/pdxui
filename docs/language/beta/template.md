@@ -455,9 +455,9 @@ Trigger    ::= /* the alpha triggers */ | "when" S? "(" S? Expression S? ")"    
 
 The components only its body uses are loaded lazily on every build (#98 — landed). What `@defer`
 loads is **code**: the `import()` of the body's components (`compiler/src/compiler/codegen-template.ts:350-357`).
-The scan that finds them matches `pdx-` tags only (`codegen-template.ts:322-326`); with application
-tags prefixed `app-` (#136) it must read the project's components instead, or an application
-component in a `@defer` body is no longer lazy — a dependency of #136.
+The scan that finds them takes every custom-element tag the body renders and imports the ones the
+project resolves, the library's and the application's `app-` ones alike (#136 — landed), so an
+application component in a `@defer` body stays lazy.
 
 **Two phases** (proposed, decisions.md point 27). *Prefetch* loads the code without rendering;
 *render* mounts the body. The triggers before `;` start the render — and the load, if it has not

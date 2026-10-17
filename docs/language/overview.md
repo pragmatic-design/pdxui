@@ -79,11 +79,15 @@ StyleBlock     ::= "<style" ( S "scoped" )? ( S "src=" StringLiteral S? "/>" | "
 
 ### The tag
 
-The file name is the tag, lowercased, with `pdx-` in front unless it already starts with it:
-`user-card.pdx` → `<pdx-user-card>`, `App.pdx` → `<pdx-app>`. A file whose name starts with `_` keeps
-its parent folder for uniqueness: `admin/_layout.pdx` → `<pdx-admin-layout>` (but `pages/_layout.pdx`,
-`src/…`, `routes/…` and `components/…` → `<pdx-layout>`). `@tag` ([script.md](script.md)) names
-another tag. Two files that derive the same tag raise `PDX_TAG_COLLISION`.
+The file name is the tag, lowercased, with the application prefix in front (#136): `pdx({ prefix })`,
+`app` by default. `user-card.pdx` → `<app-user-card>`, `App.pdx` → `<app-app>`. A name that already
+starts with the prefix keeps it; one that starts with `pdx-` drops it (`pdx-code.pdx` → `<app-code>`).
+A file whose name starts with `_` keeps its parent folder for uniqueness: `admin/_layout.pdx` →
+`<app-admin-layout>` (but `pages/_layout.pdx`, `src/…`, `routes/…` and `components/…` →
+`<app-layout>`). `@tag` ([script.md](script.md)) names another tag. The `pdx-` prefix is the
+`@pdxui/*` packages': an application tag that starts with it raises `PDX_TAG_RESERVED`. Two files that
+derive the same tag raise `PDX_TAG_COLLISION`. `pdx migrate` renames an application's alpha `pdx-`
+tags in its templates, its style selectors and its `@tag` lines, and flags one written in a string.
 
 ### The two script modes
 

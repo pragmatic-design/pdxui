@@ -99,7 +99,7 @@ describe('one scan rule for the editor and the build', () => {
         const editor = buildRegistry(root).components.map(c => c.tag).sort();
 
         expect(editor).toEqual(fromCompiler);
-        expect(editor).toEqual(['pdx-home', 'pdx-page', 'pdx-user-card']);
+        expect(editor).toEqual(['app-home', 'app-page', 'app-user-card']);
     });
 });
 

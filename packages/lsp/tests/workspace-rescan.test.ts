@@ -25,16 +25,16 @@ describe('workspace rescan',() => {
         const registries = new ProjectRegistries();
         const tags = () => registries.forRoot(root).components.map(c => c.tag);
         const before = scanWorkspace(root);
-        expect(tags()).toContain('pdx-first');
-        expect(tags()).not.toContain('pdx-second');
+        expect(tags()).toContain('app-first');
+        expect(tags()).not.toContain('app-second');
 
         // Simulate a file created after startup.
         writeFileSync(join(root, 'src', 'second.pdx'), COMP);
         registries.clear();
 
         const after = scanWorkspace(root);
-        expect(tags()).toContain('pdx-first');
-        expect(tags()).toContain('pdx-second'); // newly discovered
+        expect(tags()).toContain('app-first');
+        expect(tags()).toContain('app-second'); // newly discovered
         expect(after.pdxFiles.length).toBe(before.pdxFiles.length + 1);
     });
 });

@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Basic Label ═══ -->
-    <pdx-demo-comp-label-basic class="demo-section"></pdx-demo-comp-label-basic>
+    <app-demo-comp-label-basic class="demo-section"></app-demo-comp-label-basic>
 
     <!-- ═══ Required & Optional ═══ -->
-    <pdx-demo-comp-label-required-optional class="demo-section"></pdx-demo-comp-label-required-optional>
+    <app-demo-comp-label-required-optional class="demo-section"></app-demo-comp-label-required-optional>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-label-sizes class="demo-section"></pdx-demo-comp-label-sizes>
+    <app-demo-comp-label-sizes class="demo-section"></app-demo-comp-label-sizes>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-label-disabled class="demo-section"></pdx-demo-comp-label-disabled>
+    <app-demo-comp-label-disabled class="demo-section"></app-demo-comp-label-disabled>
 
     <!-- ═══ Hint & Description ═══ -->
-    <pdx-demo-comp-label-hint class="demo-section"></pdx-demo-comp-label-hint>
+    <app-demo-comp-label-hint class="demo-section"></app-demo-comp-label-hint>
 
     <!-- ═══ With pdx-field Wrapper ═══ -->
-    <pdx-demo-comp-label-field-wrapper class="demo-section"></pdx-demo-comp-label-field-wrapper>
+    <app-demo-comp-label-field-wrapper class="demo-section"></app-demo-comp-label-field-wrapper>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-label-composition class="demo-section"></pdx-demo-comp-label-composition>
+    <app-demo-comp-label-composition class="demo-section"></app-demo-comp-label-composition>
 
     <!-- ═══ CSS-only Label ═══ -->
-    <pdx-demo-comp-label-css-only class="demo-section"></pdx-demo-comp-label-css-only>
+    <app-demo-comp-label-css-only class="demo-section"></app-demo-comp-label-css-only>
 
     <!-- ═══ Reference ═══ -->
     <section>

@@ -6,28 +6,28 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-dialog-basic class="demo-section"></pdx-demo-comp-dialog-basic>
+    <app-demo-comp-dialog-basic class="demo-section"></app-demo-comp-dialog-basic>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-dialog-sizes class="demo-section"></pdx-demo-comp-dialog-sizes>
+    <app-demo-comp-dialog-sizes class="demo-section"></app-demo-comp-dialog-sizes>
 
     <!-- ═══ With Footer ═══ -->
-    <pdx-demo-comp-dialog-footer-actions class="demo-section"></pdx-demo-comp-dialog-footer-actions>
+    <app-demo-comp-dialog-footer-actions class="demo-section"></app-demo-comp-dialog-footer-actions>
 
     <!-- ═══ Scrollable Content ═══ -->
-    <pdx-demo-comp-dialog-scrollable class="demo-section"></pdx-demo-comp-dialog-scrollable>
+    <app-demo-comp-dialog-scrollable class="demo-section"></app-demo-comp-dialog-scrollable>
 
     <!-- ═══ Prevent Close ═══ -->
-    <pdx-demo-comp-dialog-prevent-close class="demo-section"></pdx-demo-comp-dialog-prevent-close>
+    <app-demo-comp-dialog-prevent-close class="demo-section"></app-demo-comp-dialog-prevent-close>
 
     <!-- ═══ No Close Button ═══ -->
-    <pdx-demo-comp-dialog-no-close-button class="demo-section"></pdx-demo-comp-dialog-no-close-button>
+    <app-demo-comp-dialog-no-close-button class="demo-section"></app-demo-comp-dialog-no-close-button>
 
     <!-- ═══ Nested Dialogs ═══ -->
-    <pdx-demo-comp-dialog-nested class="demo-section"></pdx-demo-comp-dialog-nested>
+    <app-demo-comp-dialog-nested class="demo-section"></app-demo-comp-dialog-nested>
 
     <!-- ═══ Initial Focus ═══ -->
-    <pdx-demo-comp-dialog-initial-focus class="demo-section"></pdx-demo-comp-dialog-initial-focus>
+    <app-demo-comp-dialog-initial-focus class="demo-section"></app-demo-comp-dialog-initial-focus>
 
     <!-- ═══ Reference ═══ -->
     <section>

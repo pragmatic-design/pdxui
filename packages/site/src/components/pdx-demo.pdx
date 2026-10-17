@@ -7,7 +7,7 @@
     <div class="pdx-demo-preview" :ref="previewRef"></div>
     <details class="pdx-demo-source">
       <summary>Source</summary>
-      <pdx-code :code="code"></pdx-code>
+      <app-code :code="code"></app-code>
     </details>
   </div>
 </template>
@@ -51,5 +51,5 @@ effect(() => {
 .pdx-demo-source > summary::-webkit-details-marker { display: none; }
 .pdx-demo-source > summary::before { content: '‹ ›  '; color: var(--gold); }
 .pdx-demo-source[open] > summary { color: var(--gold); }
-.pdx-demo-source pdx-code { display: block; padding: 0.75rem 1rem 1rem; }
+.pdx-demo-source app-code { display: block; padding: 0.75rem 1rem 1rem; }
 </style>

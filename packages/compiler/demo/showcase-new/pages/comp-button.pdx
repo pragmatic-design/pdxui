@@ -28,28 +28,28 @@
     </div>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-comp-button-variants class="demo-section"></pdx-demo-comp-button-variants>
+    <app-demo-comp-button-variants class="demo-section"></app-demo-comp-button-variants>
 
     <!-- ═══ With Icons ═══ -->
-    <pdx-demo-comp-button-icons class="demo-section"></pdx-demo-comp-button-icons>
+    <app-demo-comp-button-icons class="demo-section"></app-demo-comp-button-icons>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-button-sizes class="demo-section"></pdx-demo-comp-button-sizes>
+    <app-demo-comp-button-sizes class="demo-section"></app-demo-comp-button-sizes>
 
     <!-- ═══ Toggle Button ═══ -->
-    <pdx-demo-comp-button-toggle class="demo-section"></pdx-demo-comp-button-toggle>
+    <app-demo-comp-button-toggle class="demo-section"></app-demo-comp-button-toggle>
 
     <!-- ═══ Loading ═══ -->
-    <pdx-demo-comp-button-loading class="demo-section"></pdx-demo-comp-button-loading>
+    <app-demo-comp-button-loading class="demo-section"></app-demo-comp-button-loading>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-button-disabled class="demo-section"></pdx-demo-comp-button-disabled>
+    <app-demo-comp-button-disabled class="demo-section"></app-demo-comp-button-disabled>
 
     <!-- ═══ Full Width ═══ -->
-    <pdx-demo-comp-button-full-width class="demo-section"></pdx-demo-comp-button-full-width>
+    <app-demo-comp-button-full-width class="demo-section"></app-demo-comp-button-full-width>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-button-composition class="demo-section"></pdx-demo-comp-button-composition>
+    <app-demo-comp-button-composition class="demo-section"></app-demo-comp-button-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

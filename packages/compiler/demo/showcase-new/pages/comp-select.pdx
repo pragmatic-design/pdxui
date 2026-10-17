@@ -7,58 +7,58 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-select-basic class="demo-section"></pdx-demo-comp-select-basic>
+    <app-demo-comp-select-basic class="demo-section"></app-demo-comp-select-basic>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-select-sizes class="demo-section"></pdx-demo-comp-select-sizes>
+    <app-demo-comp-select-sizes class="demo-section"></app-demo-comp-select-sizes>
 
     <!-- ═══ States ═══ -->
-    <pdx-demo-comp-select-states class="demo-section"></pdx-demo-comp-select-states>
+    <app-demo-comp-select-states class="demo-section"></app-demo-comp-select-states>
 
     <!-- ═══ Clearable ═══ -->
-    <pdx-demo-comp-select-clearable class="demo-section"></pdx-demo-comp-select-clearable>
+    <app-demo-comp-select-clearable class="demo-section"></app-demo-comp-select-clearable>
 
     <!-- ═══ Searchable (Combobox) ═══ -->
-    <pdx-demo-comp-select-searchable class="demo-section"></pdx-demo-comp-select-searchable>
+    <app-demo-comp-select-searchable class="demo-section"></app-demo-comp-select-searchable>
 
     <!-- ═══ Search in Dropdown ═══ -->
-    <pdx-demo-comp-select-search-dropdown class="demo-section"></pdx-demo-comp-select-search-dropdown>
+    <app-demo-comp-select-search-dropdown class="demo-section"></app-demo-comp-select-search-dropdown>
 
     <!-- ═══ Multiple ═══ -->
-    <pdx-demo-comp-select-multiple class="demo-section"></pdx-demo-comp-select-multiple>
+    <app-demo-comp-select-multiple class="demo-section"></app-demo-comp-select-multiple>
 
     <!-- ═══ Object Data ═══ -->
-    <pdx-demo-comp-select-object-data class="demo-section"></pdx-demo-comp-select-object-data>
+    <app-demo-comp-select-object-data class="demo-section"></app-demo-comp-select-object-data>
 
     <!-- ═══ Grouped ═══ -->
-    <pdx-demo-comp-select-grouped class="demo-section"></pdx-demo-comp-select-grouped>
+    <app-demo-comp-select-grouped class="demo-section"></app-demo-comp-select-grouped>
 
     <!-- ═══ Large List (Virtual Scroll) ═══ -->
-    <pdx-demo-comp-select-large-list class="demo-section"></pdx-demo-comp-select-large-list>
+    <app-demo-comp-select-large-list class="demo-section"></app-demo-comp-select-large-list>
 
     <!-- ═══ Loading (Remote Simulation) ═══ -->
-    <pdx-demo-comp-select-loading class="demo-section"></pdx-demo-comp-select-loading>
+    <app-demo-comp-select-loading class="demo-section"></app-demo-comp-select-loading>
 
     <!-- ═══ DataSource (source prop) ═══ -->
-    <pdx-demo-comp-select-datasource class="demo-section"></pdx-demo-comp-select-datasource>
+    <app-demo-comp-select-datasource class="demo-section"></app-demo-comp-select-datasource>
 
     <!-- ═══ Cascading Selects ═══ -->
-    <pdx-demo-comp-select-cascading class="demo-section"></pdx-demo-comp-select-cascading>
+    <app-demo-comp-select-cascading class="demo-section"></app-demo-comp-select-cascading>
 
     <!-- ═══ pdx-data-source Component ═══ -->
-    <pdx-demo-comp-select-data-source-provider class="demo-section"></pdx-demo-comp-select-data-source-provider>
+    <app-demo-comp-select-data-source-provider class="demo-section"></app-demo-comp-select-data-source-provider>
 
     <!-- ═══ Custom Item Template (Function Prop) ═══ -->
-    <pdx-demo-comp-select-template-function class="demo-section"></pdx-demo-comp-select-template-function>
+    <app-demo-comp-select-template-function class="demo-section"></app-demo-comp-select-template-function>
 
     <!-- ═══ Scoped Slot ═══ -->
-    <pdx-demo-comp-select-template-slot class="demo-section"></pdx-demo-comp-select-template-slot>
+    <app-demo-comp-select-template-slot class="demo-section"></app-demo-comp-select-template-slot>
 
     <!-- ═══ Width / Sizing ═══ -->
-    <pdx-demo-comp-select-width class="demo-section"></pdx-demo-comp-select-width>
+    <app-demo-comp-select-width class="demo-section"></app-demo-comp-select-width>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-select-composition class="demo-section"></pdx-demo-comp-select-composition>
+    <app-demo-comp-select-composition class="demo-section"></app-demo-comp-select-composition>
 
   </div>
 </template>

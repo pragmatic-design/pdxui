@@ -7,19 +7,19 @@
     </p>
 
     <!-- Basic -->
-    <pdx-demo-comp-number-input-basic class="demo-section"></pdx-demo-comp-number-input-basic>
+    <app-demo-comp-number-input-basic class="demo-section"></app-demo-comp-number-input-basic>
 
     <!-- Controls -->
-    <pdx-demo-comp-number-input-control-styles class="demo-section"></pdx-demo-comp-number-input-control-styles>
+    <app-demo-comp-number-input-control-styles class="demo-section"></app-demo-comp-number-input-control-styles>
 
     <!-- Step mode -->
-    <pdx-demo-comp-number-input-digit-step class="demo-section"></pdx-demo-comp-number-input-digit-step>
+    <app-demo-comp-number-input-digit-step class="demo-section"></app-demo-comp-number-input-digit-step>
 
     <!-- Sign Toggle -->
-    <pdx-demo-comp-number-input-sign-toggle class="demo-section"></pdx-demo-comp-number-input-sign-toggle>
+    <app-demo-comp-number-input-sign-toggle class="demo-section"></app-demo-comp-number-input-sign-toggle>
 
     <!-- Locale -->
-    <pdx-demo-comp-number-input-locale class="demo-section"></pdx-demo-comp-number-input-locale>
+    <app-demo-comp-number-input-locale class="demo-section"></app-demo-comp-number-input-locale>
 
     <!-- Reference -->
     <section>

@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Pagination ═══ -->
-    <pdx-demo-design-pagination-pagination class="demo-section"></pdx-demo-design-pagination-pagination>
+    <app-demo-design-pagination-pagination class="demo-section"></app-demo-design-pagination-pagination>
 
     <!-- ═══ Stepper Horizontal ═══ -->
-    <pdx-demo-design-pagination-stepper-horizontal class="demo-section"></pdx-demo-design-pagination-stepper-horizontal>
+    <app-demo-design-pagination-stepper-horizontal class="demo-section"></app-demo-design-pagination-stepper-horizontal>
 
     <!-- ═══ Stepper Vertical ═══ -->
-    <pdx-demo-design-pagination-stepper-vertical class="demo-section"></pdx-demo-design-pagination-stepper-vertical>
+    <app-demo-design-pagination-stepper-vertical class="demo-section"></app-demo-design-pagination-stepper-vertical>
 
     <!-- ═══ Compact Stepper ═══ -->
-    <pdx-demo-design-pagination-stepper-compact class="demo-section"></pdx-demo-design-pagination-stepper-compact>
+    <app-demo-design-pagination-stepper-compact class="demo-section"></app-demo-design-pagination-stepper-compact>
 
     <!-- ═══ Reference ═══ -->
     <section>

@@ -7,9 +7,9 @@
       fieldsets, and <code>size</code> drives a 12-column grid. One JSON, a full form.
     </p>
 
-    <pdx-demo-comp-form-template-schema-driven class="demo-section"></pdx-demo-comp-form-template-schema-driven>
+    <app-demo-comp-form-template-schema-driven class="demo-section"></app-demo-comp-form-template-schema-driven>
 
-    <pdx-demo-comp-form-template-sections class="demo-section"></pdx-demo-comp-form-template-sections>
+    <app-demo-comp-form-template-sections class="demo-section"></app-demo-comp-form-template-sections>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>

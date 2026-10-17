@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Render Error Caught ═══ -->
-    <pdx-demo-comp-error-boundary-render-error class="demo-section"></pdx-demo-comp-error-boundary-render-error>
+    <app-demo-comp-error-boundary-render-error class="demo-section"></app-demo-comp-error-boundary-render-error>
 
     <!-- ═══ Healthy Content ═══ -->
-    <pdx-demo-comp-error-boundary-healthy class="demo-section"></pdx-demo-comp-error-boundary-healthy>
+    <app-demo-comp-error-boundary-healthy class="demo-section"></app-demo-comp-error-boundary-healthy>
 
     <!-- ═══ pdx-error-boundary Component ═══ -->
-    <pdx-demo-comp-error-boundary-wrapper class="demo-section"></pdx-demo-comp-error-boundary-wrapper>
+    <app-demo-comp-error-boundary-wrapper class="demo-section"></app-demo-comp-error-boundary-wrapper>
 
     <!-- ═══ Network Fetch Simulation ═══ -->
-    <pdx-demo-comp-error-boundary-network-fetch class="demo-section"></pdx-demo-comp-error-boundary-network-fetch>
+    <app-demo-comp-error-boundary-network-fetch class="demo-section"></app-demo-comp-error-boundary-network-fetch>
 
     <!-- ═══ Async Action Simulation ═══ -->
-    <pdx-demo-comp-error-boundary-async-action class="demo-section"></pdx-demo-comp-error-boundary-async-action>
+    <app-demo-comp-error-boundary-async-action class="demo-section"></app-demo-comp-error-boundary-async-action>
 
     <!-- ═══ Global Error Interceptor ═══ -->
-    <pdx-demo-comp-error-boundary-global-error class="demo-section"></pdx-demo-comp-error-boundary-global-error>
+    <app-demo-comp-error-boundary-global-error class="demo-section"></app-demo-comp-error-boundary-global-error>
 
     <!-- ═══ Known Limitation ═══ -->
-    <pdx-demo-comp-error-boundary-scope class="demo-section"></pdx-demo-comp-error-boundary-scope>
+    <app-demo-comp-error-boundary-scope class="demo-section"></app-demo-comp-error-boundary-scope>
 
     <!-- ═══ Props Reference ═══ -->
     <section>

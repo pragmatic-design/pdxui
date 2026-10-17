@@ -10,7 +10,7 @@ import { test, expect, type Page } from '@playwright/test';
 
 const control = (page: Page, name: string) =>
     page.locator('.pp-control').filter({ has: page.locator('.pp-label', { hasText: new RegExp(`^${name}$`) }) });
-const source = (page: Page) => page.locator('.pp-source pdx-code');
+const source = (page: Page) => page.locator('.pp-source app-code');
 
 test('the badge playground seeds its value field with what the preview shows', async ({ page }) => {
     await page.goto('/components/pdx-badge', { waitUntil: 'networkidle' });

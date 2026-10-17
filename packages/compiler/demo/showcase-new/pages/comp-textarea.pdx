@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-textarea-basic class="demo-section"></pdx-demo-comp-textarea-basic>
+    <app-demo-comp-textarea-basic class="demo-section"></app-demo-comp-textarea-basic>
 
     <!-- ═══ Auto-resize ═══ -->
-    <pdx-demo-comp-textarea-auto-resize class="demo-section"></pdx-demo-comp-textarea-auto-resize>
+    <app-demo-comp-textarea-auto-resize class="demo-section"></app-demo-comp-textarea-auto-resize>
 
     <!-- ═══ Character & Word Count ═══ -->
-    <pdx-demo-comp-textarea-count class="demo-section"></pdx-demo-comp-textarea-count>
+    <app-demo-comp-textarea-count class="demo-section"></app-demo-comp-textarea-count>
 
     <!-- ═══ Resize Control ═══ -->
-    <pdx-demo-comp-textarea-resize class="demo-section"></pdx-demo-comp-textarea-resize>
+    <app-demo-comp-textarea-resize class="demo-section"></app-demo-comp-textarea-resize>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-textarea-sizes class="demo-section"></pdx-demo-comp-textarea-sizes>
+    <app-demo-comp-textarea-sizes class="demo-section"></app-demo-comp-textarea-sizes>
 
     <!-- ═══ States ═══ -->
-    <pdx-demo-comp-textarea-validation class="demo-section"></pdx-demo-comp-textarea-validation>
+    <app-demo-comp-textarea-validation class="demo-section"></app-demo-comp-textarea-validation>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-textarea-composition class="demo-section"></pdx-demo-comp-textarea-composition>
+    <app-demo-comp-textarea-composition class="demo-section"></app-demo-comp-textarea-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

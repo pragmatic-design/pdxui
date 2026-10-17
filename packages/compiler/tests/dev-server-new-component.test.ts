@@ -1,7 +1,7 @@
 // A `.pdx` created while the dev server is running has to become usable without a restart.
 //
 // `ComponentResolver` builds the tag → module map at `buildStart`, and the auto-import that turns
-// `<pdx-late-widget>` in a template into an import of the module that declares it consults that map.
+// `<app-late-widget>` in a template into an import of the module that declares it consults that map.
 // A tag declared afterwards and never taught to the resolver resolves to nothing, so the element
 // upgrades to nothing and renders EMPTY — with no error, no warning, and nothing in the console.
 //
@@ -48,12 +48,12 @@ describe('rescanning the project is safe to repeat', () => {
     it('learns the components on the first pass', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
-        expect(r.has('pdx-first'), 'the existing component is known').toBe(true);
+        expect(r.has('app-first'), 'the existing component is known').toBe(true);
     });
 
     it('reports no collision when the same file is scanned twice', () => {
         // The scan skipped a tag already in the map by REPORTING a collision — which, on a second
-        // pass, means the file colliding with itself: `"pdx-first" is taken by src/first.pdx, so
+        // pass, means the file colliding with itself: `"app-first" is taken by src/first.pdx, so
         // src/first.pdx is not auto-importable`. Nonsense, and loud: one such warning per component
         // per new file. Any fix built on rescanning had to fix this first.
         const r = new ComponentResolver();
@@ -66,11 +66,11 @@ describe('rescanning the project is safe to repeat', () => {
         // The guard must not be "never report": two files claiming one tag is a genuine problem, and
         // the second one silently losing its auto-import is exactly what the diagnostic exists for.
         mkdirSync(join(root, 'src', 'nested'), { recursive: true });
-        writeFileSync(join(root, 'src', 'nested', 'other.pdx'), `<template>\n  <b>x</b>\n</template>\n\n<script setup>\n// @tag 'pdx-first'\nlet n = $signal(1);\n</script>\n`);
+        writeFileSync(join(root, 'src', 'nested', 'other.pdx'), `<template>\n  <b>x</b>\n</template>\n\n<script setup>\n// @tag 'app-first'\nlet n = $signal(1);\n</script>\n`);
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
         r.registerProjectComponents(root);
-        const real = r.collisions.filter(c => c.message.includes('pdx-first'));
+        const real = r.collisions.filter(c => c.message.includes('app-first'));
         expect(real.length, 'two files, one tag: still reported').toBeGreaterThan(0);
         // And reported ONCE, not once per rescan.
         expect(real.length, 'and not multiplied by the number of scans').toBe(1);
@@ -79,11 +79,11 @@ describe('rescanning the project is safe to repeat', () => {
     it('picks up a component created after the first scan', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
-        expect(r.has('pdx-late'), 'not there yet').toBe(false);
+        expect(r.has('app-late'), 'not there yet').toBe(false);
 
         writeFileSync(join(root, 'src', 'late.pdx'), COMPONENT);
         r.registerProjectComponents(root);
-        expect(r.has('pdx-late'), 'a rescan finds it').toBe(true);
+        expect(r.has('app-late'), 'a rescan finds it').toBe(true);
         expect(r.collisions, 'and says nothing about the ones it already knew').toEqual([]);
     });
 });

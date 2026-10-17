@@ -14,7 +14,7 @@
         </button>
       </div>
       <div class="spacer"></div>
-      <pdx-showcase-settings></pdx-showcase-settings>
+      <app-showcase-settings></app-showcase-settings>
     </header>
 
     <div :class="menuOpen ? 'sidebar open' : 'sidebar'" :ref="sidebarEl">
@@ -422,7 +422,7 @@ function rebuildToc() {
   .section-label { display: inline; }
 
   /* Theme, density and scheme: their own component, laid out by the topbar like its other items. */
-  .topbar pdx-showcase-settings { display: contents; }
+  .topbar app-showcase-settings { display: contents; }
 
   .sidebar {
     overflow-y: auto;

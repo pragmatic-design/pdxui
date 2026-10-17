@@ -27,7 +27,7 @@ describe('bind() in a style', () => {
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
                 .replace(/^\s*import\s*'virtual:pdx-style[^']*';?\s*$/gm, '');
             new Function('__core', body)(core);
-            const el = document.createElement(`pdx-${name}`);
+            const el = document.createElement(`app-${name}`);
             document.body.appendChild(el);
             await settle();
             const prop = (n: string) => el.style.getPropertyValue(`--pdx-${hash(file)}-${n}`);

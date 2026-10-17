@@ -7,22 +7,22 @@
     </p>
 
     <!-- ═══ Vertical Navigation ═══ -->
-    <pdx-demo-design-nav-vertical class="demo-section"></pdx-demo-design-nav-vertical>
+    <app-demo-design-nav-vertical class="demo-section"></app-demo-design-nav-vertical>
 
     <!-- ═══ With Headings ═══ -->
-    <pdx-demo-design-nav-headings class="demo-section"></pdx-demo-design-nav-headings>
+    <app-demo-design-nav-headings class="demo-section"></app-demo-design-nav-headings>
 
     <!-- ═══ Nested Navigation ═══ -->
-    <pdx-demo-design-nav-nested class="demo-section"></pdx-demo-design-nav-nested>
+    <app-demo-design-nav-nested class="demo-section"></app-demo-design-nav-nested>
 
     <!-- ═══ Breadcrumb ═══ -->
-    <pdx-demo-design-nav-breadcrumb class="demo-section"></pdx-demo-design-nav-breadcrumb>
+    <app-demo-design-nav-breadcrumb class="demo-section"></app-demo-design-nav-breadcrumb>
 
     <!-- ═══ Disabled Items ═══ -->
-    <pdx-demo-design-nav-disabled class="demo-section"></pdx-demo-design-nav-disabled>
+    <app-demo-design-nav-disabled class="demo-section"></app-demo-design-nav-disabled>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-nav-composition class="demo-section"></pdx-demo-design-nav-composition>
+    <app-demo-design-nav-composition class="demo-section"></app-demo-design-nav-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

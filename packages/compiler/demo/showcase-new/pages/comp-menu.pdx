@@ -9,19 +9,19 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-menu-basic class="demo-section"></pdx-demo-comp-menu-basic>
+    <app-demo-comp-menu-basic class="demo-section"></app-demo-comp-menu-basic>
 
     <!-- ═══ Icons & Shortcuts ═══ -->
-    <pdx-demo-comp-menu-icons-shortcuts class="demo-section"></pdx-demo-comp-menu-icons-shortcuts>
+    <app-demo-comp-menu-icons-shortcuts class="demo-section"></app-demo-comp-menu-icons-shortcuts>
 
     <!-- ═══ Checkbox & Radio ═══ -->
-    <pdx-demo-comp-menu-checkbox-radio class="demo-section"></pdx-demo-comp-menu-checkbox-radio>
+    <app-demo-comp-menu-checkbox-radio class="demo-section"></app-demo-comp-menu-checkbox-radio>
 
     <!-- ═══ Submenus ═══ -->
-    <pdx-demo-comp-menu-submenus class="demo-section"></pdx-demo-comp-menu-submenus>
+    <app-demo-comp-menu-submenus class="demo-section"></app-demo-comp-menu-submenus>
 
     <!-- ═══ Danger & Disabled ═══ -->
-    <pdx-demo-comp-menu-danger-disabled class="demo-section"></pdx-demo-comp-menu-danger-disabled>
+    <app-demo-comp-menu-danger-disabled class="demo-section"></app-demo-comp-menu-danger-disabled>
 
     <!-- ═══ Props Reference ═══ -->
     <section>
@@ -85,7 +85,7 @@
     </section>
 
     <!-- ═══ Keyboard ═══ -->
-    <pdx-demo-comp-menu-keyboard class="demo-section"></pdx-demo-comp-menu-keyboard>
+    <app-demo-comp-menu-keyboard class="demo-section"></app-demo-comp-menu-keyboard>
   </div>
 </template>
 

@@ -19,8 +19,8 @@ interface SourceFile { uri: string; content: string; }
 
 /**
  * Default custom-element tag from a .pdx URI — the compiler's own rule, so the editor names a
- * component as the build registers it (`App.pdx` → `pdx-app`, `admin/_layout.pdx` →
- * `pdx-admin-layout`). A copy of it here would drift.
+ * component as the build registers it (`App.pdx` → `app-app`, `admin/_layout.pdx` →
+ * `app-admin-layout`, with the default app prefix, #136). A copy of it here would drift.
  */
 export function tagFromUri(uri: string): string {
     return deriveTag(uri);

@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Alerts ═══ -->
-    <pdx-demo-design-feedback-alerts class="demo-section"></pdx-demo-design-feedback-alerts>
+    <app-demo-design-feedback-alerts class="demo-section"></app-demo-design-feedback-alerts>
 
     <!-- ═══ Badges ═══ -->
-    <pdx-demo-design-feedback-badges class="demo-section"></pdx-demo-design-feedback-badges>
+    <app-demo-design-feedback-badges class="demo-section"></app-demo-design-feedback-badges>
 
     <!-- ═══ Status Dots ═══ -->
-    <pdx-demo-design-feedback-status-dots class="demo-section"></pdx-demo-design-feedback-status-dots>
+    <app-demo-design-feedback-status-dots class="demo-section"></app-demo-design-feedback-status-dots>
 
     <!-- ═══ Callouts ═══ -->
-    <pdx-demo-design-feedback-callouts class="demo-section"></pdx-demo-design-feedback-callouts>
+    <app-demo-design-feedback-callouts class="demo-section"></app-demo-design-feedback-callouts>
 
     <!-- ═══ Tooltips ═══ -->
-    <pdx-demo-design-feedback-tooltips class="demo-section"></pdx-demo-design-feedback-tooltips>
+    <app-demo-design-feedback-tooltips class="demo-section"></app-demo-design-feedback-tooltips>
 
     <!-- ═══ Skeleton ═══ -->
-    <pdx-demo-design-feedback-skeleton class="demo-section"></pdx-demo-design-feedback-skeleton>
+    <app-demo-design-feedback-skeleton class="demo-section"></app-demo-design-feedback-skeleton>
 
     <!-- ═══ Empty State ═══ -->
-    <pdx-demo-design-feedback-empty-state class="demo-section"></pdx-demo-design-feedback-empty-state>
+    <app-demo-design-feedback-empty-state class="demo-section"></app-demo-design-feedback-empty-state>
 
     <!-- ═══ Timeline ═══ -->
-    <pdx-demo-design-feedback-timeline class="demo-section"></pdx-demo-design-feedback-timeline>
+    <app-demo-design-feedback-timeline class="demo-section"></app-demo-design-feedback-timeline>
 
     <!-- ═══ Reference ═══ -->
     <section>

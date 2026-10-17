@@ -79,7 +79,7 @@ function press() { count.set(count() + 1); }
 
 const PAGE = `<template>
     <h1>{{ title }}</h1>
-    <pdx-button :label="title" @pressed="onPressed"></pdx-button>
+    <app-button :label="title" @pressed="onPressed"></app-button>
     <p>{{ missingThing }}</p>
 </template>
 <script>
@@ -240,7 +240,7 @@ describe('diagnostics on change', () => {
         const unresolved = (sent.diagnostics as { code?: string; message: string }[])
             .filter((d) => d.code === 'PDX_UNRESOLVED_COMPONENT');
         expect(unresolved.map((d) => d.message).join(''),
-            'a component that exists in the workspace was reported missing').not.toContain('pdx-button');
+            'a component that exists in the workspace was reported missing').not.toContain('app-button');
     });
 
     it('ignores a file that is not a .pdx', () => {
@@ -314,7 +314,7 @@ describe('completion', () => {
         const items = stub.on.completion(at(doc.uri, positionOf(text, '\n<\n', 2)));
 
         expect(labels(items), 'the component the workspace defines was not offered')
-            .toContain('pdx-button');
+            .toContain('app-button');
     });
 
     it('offers a manifest component attributes inside its tag', () => {
@@ -352,7 +352,7 @@ describe('go to definition', () => {
     });
 
     it('jumps from a tag to the file that defines it', () => {
-        const loc = stub.on.definition(at(pageDoc.uri, positionOf(PAGE, '<pdx-button', 3))) as
+        const loc = stub.on.definition(at(pageDoc.uri, positionOf(PAGE, '<app-button', 3))) as
             { uri: string } | { uri: string }[] | null;
 
         expect(loc, 'a tag in the template led nowhere').not.toBeNull();
@@ -568,7 +568,7 @@ describe('the workspace index', () => {
         const items = stub.on.completion(at(doc.uri, positionOf(text, '\n<\n', 2))) as { label: string }[];
 
         expect(items.map((i) => i.label), 'a file created after startup stayed invisible')
-            .toContain('pdx-later');
+            .toContain('app-later');
     });
 
     it('rescans when a .pdx not yet in the index is opened', () => {
@@ -581,7 +581,7 @@ describe('the workspace index', () => {
         const probe = open('probe.pdx', text);
         const items = stub.on.completion(at(probe.uri, positionOf(text, '\n<\n', 2))) as { label: string }[];
 
-        expect(items.map((i) => i.label)).toContain('pdx-fresh');
+        expect(items.map((i) => i.label)).toContain('app-fresh');
     });
 
     it('opening a file that is not a .pdx does not trigger a rescan', () => {
@@ -608,11 +608,11 @@ describe('rename scope', () => {
     });
 
     it('renaming a project tag also updates a .ts selector and an .html page', () => {
-        writeFileSync(join(root, 'src', 'util.ts'), "export const card = () => document.querySelector('pdx-button');\n");
-        writeFileSync(join(root, 'index.html'), '<!doctype html><body><pdx-button></pdx-button></body>\n');
+        writeFileSync(join(root, 'src', 'util.ts'), "export const card = () => document.querySelector('app-button');\n");
+        writeFileSync(join(root, 'index.html'), '<!doctype html><body><app-button></app-button></body>\n');
         stub.on.watchedFiles({ changes: [] });
 
-        const edit = stub.on.rename({ ...at(pageDoc.uri, positionOf(PAGE, '<pdx-button', 3)), newName: 'pdx-action' }) as
+        const edit = stub.on.rename({ ...at(pageDoc.uri, positionOf(PAGE, '<app-button', 3)), newName: 'app-action' }) as
             { changes?: Record<string, unknown[]>; documentChanges?: { textDocument?: { uri: string } }[] };
         const files = editedFiles(edit);
         expect(files.some(f => f.endsWith('src/util.ts')), 'the querySelector in a .ts file was left behind').toBe(true);

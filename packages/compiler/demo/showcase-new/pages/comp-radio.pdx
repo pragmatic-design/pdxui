@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic Radio ═══ -->
-    <pdx-demo-comp-radio-basic class="demo-section"></pdx-demo-comp-radio-basic>
+    <app-demo-comp-radio-basic class="demo-section"></app-demo-comp-radio-basic>
 
     <!-- ═══ With Description ═══ -->
-    <pdx-demo-comp-radio-description class="demo-section"></pdx-demo-comp-radio-description>
+    <app-demo-comp-radio-description class="demo-section"></app-demo-comp-radio-description>
 
     <!-- ═══ Radio Group ═══ -->
-    <pdx-demo-comp-radio-group class="demo-section"></pdx-demo-comp-radio-group>
+    <app-demo-comp-radio-group class="demo-section"></app-demo-comp-radio-group>
 
     <!-- ═══ Horizontal ═══ -->
-    <pdx-demo-comp-radio-horizontal class="demo-section"></pdx-demo-comp-radio-horizontal>
+    <app-demo-comp-radio-horizontal class="demo-section"></app-demo-comp-radio-horizontal>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-radio-size-propagation class="demo-section"></pdx-demo-comp-radio-size-propagation>
+    <app-demo-comp-radio-size-propagation class="demo-section"></app-demo-comp-radio-size-propagation>
 
     <!-- ═══ Error on Group ═══ -->
-    <pdx-demo-comp-radio-error class="demo-section"></pdx-demo-comp-radio-error>
+    <app-demo-comp-radio-error class="demo-section"></app-demo-comp-radio-error>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-radio-composition class="demo-section"></pdx-demo-comp-radio-composition>
+    <app-demo-comp-radio-composition class="demo-section"></app-demo-comp-radio-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

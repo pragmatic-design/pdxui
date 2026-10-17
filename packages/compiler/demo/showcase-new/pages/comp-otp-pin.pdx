@@ -7,13 +7,13 @@
     </p>
 
     <!-- ═══ OTP ═══ -->
-    <pdx-demo-comp-otp-pin-otp class="demo-section"></pdx-demo-comp-otp-pin-otp>
+    <app-demo-comp-otp-pin-otp class="demo-section"></app-demo-comp-otp-pin-otp>
 
     <!-- ═══ PIN ═══ -->
-    <pdx-demo-comp-otp-pin-pin class="demo-section"></pdx-demo-comp-otp-pin-pin>
+    <app-demo-comp-otp-pin-pin class="demo-section"></app-demo-comp-otp-pin-pin>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-otp-pin-sizes class="demo-section"></pdx-demo-comp-otp-pin-sizes>
+    <app-demo-comp-otp-pin-sizes class="demo-section"></app-demo-comp-otp-pin-sizes>
 
     <!-- ═══ Reference ═══ -->
     <section>

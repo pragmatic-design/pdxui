@@ -6,9 +6,9 @@
       long-press mobile, Shift+F10 keyboard, icons, shortcuts, disabled items.
     </p>
 
-    <pdx-demo-comp-context-menu-right-click class="demo-section"></pdx-demo-comp-context-menu-right-click>
+    <app-demo-comp-context-menu-right-click class="demo-section"></app-demo-comp-context-menu-right-click>
 
-    <pdx-demo-comp-context-menu-disabled-items class="demo-section"></pdx-demo-comp-context-menu-disabled-items>
+    <app-demo-comp-context-menu-disabled-items class="demo-section"></app-demo-comp-context-menu-disabled-items>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Slots</h2>

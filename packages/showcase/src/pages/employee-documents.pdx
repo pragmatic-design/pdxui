@@ -7,7 +7,7 @@
 
     <!-- ADD: the ticket's upload, keyed by the employee — the progress, the cancel, the refused
          types and the server's name behave as they do there, because it is the same component. -->
-    <pdx-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></pdx-attachment-upload>
+    <app-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></app-attachment-upload>
 
     <!-- VOID: an invitation, under the drop zone it points at. -->
     @show (loaded && documents.length === 0 && !editing) {

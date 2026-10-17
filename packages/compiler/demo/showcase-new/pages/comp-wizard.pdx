@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Basic Wizard ═══ -->
-    <pdx-demo-comp-wizard-basic class="demo-section"></pdx-demo-comp-wizard-basic>
+    <app-demo-comp-wizard-basic class="demo-section"></app-demo-comp-wizard-basic>
 
     <!-- ═══ Free Navigation ═══ -->
-    <pdx-demo-comp-wizard-free-navigation class="demo-section"></pdx-demo-comp-wizard-free-navigation>
+    <app-demo-comp-wizard-free-navigation class="demo-section"></app-demo-comp-wizard-free-navigation>
 
     <!-- ═══ Vertical Stepper ═══ -->
-    <pdx-demo-comp-wizard-vertical class="demo-section"></pdx-demo-comp-wizard-vertical>
+    <app-demo-comp-wizard-vertical class="demo-section"></app-demo-comp-wizard-vertical>
 
     <!-- ═══ Small Size ═══ -->
-    <pdx-demo-comp-wizard-small class="demo-section"></pdx-demo-comp-wizard-small>
+    <app-demo-comp-wizard-small class="demo-section"></app-demo-comp-wizard-small>
 
     <!-- ═══ Without Nav Footer ═══ -->
-    <pdx-demo-comp-wizard-custom-navigation class="demo-section"></pdx-demo-comp-wizard-custom-navigation>
+    <app-demo-comp-wizard-custom-navigation class="demo-section"></app-demo-comp-wizard-custom-navigation>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-wizard-disabled class="demo-section"></pdx-demo-comp-wizard-disabled>
+    <app-demo-comp-wizard-disabled class="demo-section"></app-demo-comp-wizard-disabled>
 
     <!-- ═══ Events ═══ -->
-    <pdx-demo-comp-wizard-events class="demo-section"></pdx-demo-comp-wizard-events>
+    <app-demo-comp-wizard-events class="demo-section"></app-demo-comp-wizard-events>
 
     <!-- ═══ With Icons ═══ -->
-    <pdx-demo-comp-wizard-custom-icons class="demo-section"></pdx-demo-comp-wizard-custom-icons>
+    <app-demo-comp-wizard-custom-icons class="demo-section"></app-demo-comp-wizard-custom-icons>
 
     <!-- ═══ Props Reference ═══ -->
     <section>

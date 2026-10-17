@@ -6,21 +6,21 @@
       custom item templates, loading overlay, empty state, clickable items, dividers.
     </p>
 
-    <pdx-demo-comp-list-basic class="demo-section"></pdx-demo-comp-list-basic>
+    <app-demo-comp-list-basic class="demo-section"></app-demo-comp-list-basic>
 
-    <pdx-demo-comp-list-data-source class="demo-section"></pdx-demo-comp-list-data-source>
+    <app-demo-comp-list-data-source class="demo-section"></app-demo-comp-list-data-source>
 
-    <pdx-demo-comp-list-empty class="demo-section"></pdx-demo-comp-list-empty>
+    <app-demo-comp-list-empty class="demo-section"></app-demo-comp-list-empty>
 
-    <pdx-demo-comp-list-slot-template class="demo-section"></pdx-demo-comp-list-slot-template>
+    <app-demo-comp-list-slot-template class="demo-section"></app-demo-comp-list-slot-template>
 
-    <pdx-demo-comp-list-custom-empty class="demo-section"></pdx-demo-comp-list-custom-empty>
+    <app-demo-comp-list-custom-empty class="demo-section"></app-demo-comp-list-custom-empty>
 
-    <pdx-demo-comp-list-rich-item class="demo-section"></pdx-demo-comp-list-rich-item>
+    <app-demo-comp-list-rich-item class="demo-section"></app-demo-comp-list-rich-item>
 
-    <pdx-demo-comp-list-pagination class="demo-section"></pdx-demo-comp-list-pagination>
+    <app-demo-comp-list-pagination class="demo-section"></app-demo-comp-list-pagination>
 
-    <pdx-demo-comp-list-data-source-wrapper class="demo-section"></pdx-demo-comp-list-data-source-wrapper>
+    <app-demo-comp-list-data-source-wrapper class="demo-section"></app-demo-comp-list-data-source-wrapper>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

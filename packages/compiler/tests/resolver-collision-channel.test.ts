@@ -53,7 +53,7 @@ describe('a resolver collision is a structured diagnostic', () => {
         r.registerProjectComponents(root);
         const [c] = r.collisions;
 
-        expect(c.message).toContain('pdx-widget');
+        expect(c.message).toContain('app-widget');
         expect(c.message, 'the winning file is not named').toContain('a/widget.pdx');
         expect(c.message, 'the losing file is not named').toContain('b/widget.pdx');
     });
@@ -124,6 +124,6 @@ describe('a resolver collision is a structured diagnostic', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
 
-        expect(r.resolve('pdx-widget')!.importPath).toContain('/a/widget.pdx');
+        expect(r.resolve('app-widget')!.importPath).toContain('/a/widget.pdx');
     });
 });

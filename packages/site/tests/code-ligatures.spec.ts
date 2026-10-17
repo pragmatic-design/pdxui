@@ -22,11 +22,11 @@ test('a gallery code sample draws no ligatures', async ({ page }) => {
     expect((await ligatures(page, '.cmp-gallery pre code')).variant).toBe('none');
 });
 
-test('a pdx-code block draws no ligatures', async ({ page }) => {
+test('an app-code block draws no ligatures', async ({ page }) => {
     // The landing page's samples are pdx-code blocks. (Every component page has a gallery, so no
     // component page shows one in its hero.)
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    expect((await ligatures(page, 'pdx-code pre')).variant).toBe('none');
+    expect((await ligatures(page, 'app-code pre')).variant).toBe('none');
 });
 
 test('a docs code block draws no ligatures', async ({ page }) => {

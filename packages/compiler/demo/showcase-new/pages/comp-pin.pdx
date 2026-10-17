@@ -7,10 +7,10 @@
     </p>
 
     <!-- Basic -->
-    <pdx-demo-comp-pin-basic class="demo-section"></pdx-demo-comp-pin-basic>
+    <app-demo-comp-pin-basic class="demo-section"></app-demo-comp-pin-basic>
 
     <!-- States -->
-    <pdx-demo-comp-pin-states class="demo-section"></pdx-demo-comp-pin-states>
+    <app-demo-comp-pin-states class="demo-section"></app-demo-comp-pin-states>
 
     <!-- Reference -->
     <section>

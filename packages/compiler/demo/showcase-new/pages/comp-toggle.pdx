@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Standalone ═══ -->
-    <pdx-demo-comp-toggle-standalone class="demo-section"></pdx-demo-comp-toggle-standalone>
+    <app-demo-comp-toggle-standalone class="demo-section"></app-demo-comp-toggle-standalone>
 
     <!-- ═══ Group Multiple ═══ -->
-    <pdx-demo-comp-toggle-in-group-multiple class="demo-section"></pdx-demo-comp-toggle-in-group-multiple>
+    <app-demo-comp-toggle-in-group-multiple class="demo-section"></app-demo-comp-toggle-in-group-multiple>
 
     <!-- ═══ Group Single ═══ -->
-    <pdx-demo-comp-toggle-in-group-single class="demo-section"></pdx-demo-comp-toggle-in-group-single>
+    <app-demo-comp-toggle-in-group-single class="demo-section"></app-demo-comp-toggle-in-group-single>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-comp-toggle-variants class="demo-section"></pdx-demo-comp-toggle-variants>
+    <app-demo-comp-toggle-variants class="demo-section"></app-demo-comp-toggle-variants>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-toggle-disabled class="demo-section"></pdx-demo-comp-toggle-disabled>
+    <app-demo-comp-toggle-disabled class="demo-section"></app-demo-comp-toggle-disabled>
 
     <!-- ═══ Reference ═══ -->
     <section>

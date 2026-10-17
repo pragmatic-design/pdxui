@@ -6,15 +6,15 @@
       keyboard resize, collapsible, persistence, nested.
     </p>
 
-    <pdx-demo-comp-splitter-horizontal class="demo-section"></pdx-demo-comp-splitter-horizontal>
+    <app-demo-comp-splitter-horizontal class="demo-section"></app-demo-comp-splitter-horizontal>
 
-    <pdx-demo-comp-splitter-vertical class="demo-section"></pdx-demo-comp-splitter-vertical>
+    <app-demo-comp-splitter-vertical class="demo-section"></app-demo-comp-splitter-vertical>
 
-    <pdx-demo-comp-splitter-three-panes class="demo-section"></pdx-demo-comp-splitter-three-panes>
+    <app-demo-comp-splitter-three-panes class="demo-section"></app-demo-comp-splitter-three-panes>
 
-    <pdx-demo-comp-splitter-collapsible class="demo-section"></pdx-demo-comp-splitter-collapsible>
+    <app-demo-comp-splitter-collapsible class="demo-section"></app-demo-comp-splitter-collapsible>
 
-    <pdx-demo-comp-splitter-nested class="demo-section"></pdx-demo-comp-splitter-nested>
+    <app-demo-comp-splitter-nested class="demo-section"></app-demo-comp-splitter-nested>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

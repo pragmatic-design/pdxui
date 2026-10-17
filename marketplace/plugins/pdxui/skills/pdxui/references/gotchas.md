@@ -29,8 +29,8 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
 - 🔴 **Two components that declare the same `@event` name corrupt the parent's state, in silence.**
   Component events bubble, so a child's `changed` reaches a listener put on its grandparent for a
   DIFFERENT `changed`. Measured: `pdx-unit-field` declares `@event changed: number`,
-  `pdx-room-rows` declares `@event changed: any`, the parent listens for `@changed` on
-  `<pdx-room-rows>` — and the field's number lands in `rooms`, giving
+  `app-room-rows` declares `@event changed: any`, the parent listens for `@changed` on
+  `<app-room-rows>` — and the field's number lands in `rooms`, giving
   `TypeError: (rooms ?? []).reduce is not a function` from inside the framework, a section that
   empties itself, and an acceptance check failing with "cannot type into the fields" because the
   fields are gone. **Nothing warns, and nothing should**: two components declaring the same event
@@ -114,7 +114,7 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
 
 ## A project's own reusable `.pdx` components
 - A `.pdx` under `src/**` is registered automatically as a component; its **tag** comes from `@tag 'name'` or from the filename
-  (`list-header.pdx` → `<pdx-list-header>`). Props come from the **`@prop name: type = default`** rune (read bare in the template).
+  (`list-header.pdx` → `<app-list-header>`). Props come from the **`@prop name: type = default`** rune (read bare in the template).
   Types map to the runtime like this: `T[]`→Array, the primitives→their counterparts, **everything else (any, object, functions)→Object**.
 - The robust pattern for reuse: a partial is **pure markup** with `data-*` hooks; the logic (the events, the buttons) is wired by a
   **TS service** in `onMount` (`querySelector` plus `addEventListener`) — which avoids function props, `.pdx` events, and the

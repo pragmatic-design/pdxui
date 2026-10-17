@@ -10,7 +10,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 |---|---|---|---|---|
 | `PDX_REMOVED_FORM` | error | A form the beta removes; the message names the beta form and `pdx migrate`. | every language change, [migration.md](migration.md) | #121 (decisions.md 36) |
 | `PDX_SETUP_REDUNDANT` | info | `<script setup>`: `setup` has no meaning in the beta. | the file | #158 |
-| `PDX_TAG_RESERVED` | error | An application tag that starts with `pdx-`. | the tag | #136 |
+| `PDX_TAG_RESERVED` | error | An application tag that starts with `pdx-`. | the tag | #136 (landed) |
 | `PDX_INLINE_BINDINGS_IGNORED` | warn | `pdx({ inlineBindings })` no longer selects a render path. | configuration | #107 |
 | `PDX_PROP_REQUIRED` | error | A required prop the parent does not give. | `@prop` | #130 (landed) |
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not a `@model`. | `::name`, `@model` | #124 |

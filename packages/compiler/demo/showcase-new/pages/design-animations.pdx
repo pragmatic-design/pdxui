@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Entrance Animations ═══ -->
-    <pdx-demo-design-animations-entrance class="demo-section"></pdx-demo-design-animations-entrance>
+    <app-demo-design-animations-entrance class="demo-section"></app-demo-design-animations-entrance>
 
     <!-- ═══ Stagger ═══ -->
-    <pdx-demo-design-animations-stagger class="demo-section"></pdx-demo-design-animations-stagger>
+    <app-demo-design-animations-stagger class="demo-section"></app-demo-design-animations-stagger>
 
     <!-- ═══ Hover Effects ═══ -->
-    <pdx-demo-design-animations-hover class="demo-section"></pdx-demo-design-animations-hover>
+    <app-demo-design-animations-hover class="demo-section"></app-demo-design-animations-hover>
 
     <!-- ═══ Motion Tokens ═══ -->
-    <pdx-demo-design-animations-tokens class="demo-section"></pdx-demo-design-animations-tokens>
+    <app-demo-design-animations-tokens class="demo-section"></app-demo-design-animations-tokens>
 
     <!-- ═══ Reference ═══ -->
     <section>

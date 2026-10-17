@@ -31,7 +31,7 @@
 
       <!-- Fallback (no gallery): curated hero, or a placeholder for data-driven/empty ones -->
       @if (showFallback) {
-        <pdx-cmp-fallback :tag="tag" :placeholder="showPlaceholder"></pdx-cmp-fallback>
+        <app-cmp-fallback :tag="tag" :placeholder="showPlaceholder"></app-cmp-fallback>
       }
 
       <!-- Playground (skipped for data-driven components) -->
@@ -39,19 +39,19 @@
         <section id="playground" class="cmp-section">
           <h2 class="cmp-h2">Props playground</h2>
           <p class="cmp-lead">Toggle props live — the source below updates with you.</p>
-          <pdx-props-playground :tag="tag"></pdx-props-playground>
+          <app-props-playground :tag="tag"></app-props-playground>
         </section>
       }
 
       <!-- API -->
       <section id="api" class="cmp-section">
         <h2 class="cmp-h2">API</h2>
-        <pdx-api-tables :tag="tag"></pdx-api-tables>
+        <app-api-tables :tag="tag"></app-api-tables>
       </section>
 
       <!-- Accessibility -->
       @if (hasA11y) {
-        <pdx-cmp-a11y :tag="tag"></pdx-cmp-a11y>
+        <app-cmp-a11y :tag="tag"></app-cmp-a11y>
       }
     </article>
 
@@ -165,7 +165,7 @@ const activeTab = $derived(galleryTabs.some(t => t.name === _picked)
   : (galleryTabs.length ? galleryTabs[0].name : _base));
 function selectTab(name) { _picked = name; }
 
-// Gallery: render the ported showcase page (<pdx-comp-NAME>) when one exists for this tag.
+// Gallery: render the ported showcase page (<app-comp-NAME>) when one exists for this tag.
 let galleryRef = $signal(null);
 const _galleryName = $derived(activeTab || _base);
 const _galleryKey = $derived(_PFX + _galleryName + '.pdx');
@@ -209,7 +209,7 @@ effect(() => {
   _galleryMods[_key]().then(() => {
     if (_stale()) return; // navigated, tab-switched away, or superseded
     galleryRef.innerHTML = '';
-    const _el = document.createElement('pdx-comp-' + _name);
+    const _el = document.createElement('app-comp-' + _name);
     galleryRef.appendChild(_el);
     // Build the on-this-page list from the gallery's section headings (assign ids to anchor).
     const _buildToc = () => {
@@ -252,7 +252,7 @@ effect(() => {
 /* The ported demo host fills the centre column so its inner .page/.demo-container can too. */
 .cmp-gallery > * { display: block; width: 100%; }
 /* The sections these pieces render lay out as the page's own. */
-.cmp-body > pdx-cmp-fallback, .cmp-body > pdx-cmp-a11y { display: contents; }
+.cmp-body > app-cmp-fallback, .cmp-body > app-cmp-a11y { display: contents; }
 
 /* Feature examples (Overview · Filtering · Grouping…) — DevExpress-style demo splitting,
    in the right rail above the on-this-page TOC. */

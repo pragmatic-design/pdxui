@@ -4,13 +4,13 @@
     <p class="desc">Middleware chain: offset, flip, shift, arrow, size. Pure math. autoUpdate on scroll/resize.</p>
 
     <!-- Placement picker -->
-    <pdx-demo-infra-positioning-placement class="demo-section"></pdx-demo-infra-positioning-placement>
+    <app-demo-infra-positioning-placement class="demo-section"></app-demo-infra-positioning-placement>
 
     <!-- Iframe positioning -->
-    <pdx-demo-infra-positioning-iframe class="demo-section"></pdx-demo-infra-positioning-iframe>
+    <app-demo-infra-positioning-iframe class="demo-section"></app-demo-infra-positioning-iframe>
 
     <!-- Virtual element -->
-    <pdx-demo-infra-positioning-virtual class="demo-section"></pdx-demo-infra-positioning-virtual>
+    <app-demo-infra-positioning-virtual class="demo-section"></app-demo-infra-positioning-virtual>
   </div>
 </template>
 

@@ -7,34 +7,34 @@
     </p>
 
     <!-- ═══ 1. Basic ═══ -->
-    <pdx-demo-comp-transfer-basic class="demo-section"></pdx-demo-comp-transfer-basic>
+    <app-demo-comp-transfer-basic class="demo-section"></app-demo-comp-transfer-basic>
 
     <!-- ═══ 2. Searchable ═══ -->
-    <pdx-demo-comp-transfer-searchable class="demo-section"></pdx-demo-comp-transfer-searchable>
+    <app-demo-comp-transfer-searchable class="demo-section"></app-demo-comp-transfer-searchable>
 
     <!-- ═══ 3. With titles & move-all ═══ -->
-    <pdx-demo-comp-transfer-custom-titles class="demo-section"></pdx-demo-comp-transfer-custom-titles>
+    <app-demo-comp-transfer-custom-titles class="demo-section"></app-demo-comp-transfer-custom-titles>
 
     <!-- ═══ 4. Disabled items ═══ -->
-    <pdx-demo-comp-transfer-disabled-items class="demo-section"></pdx-demo-comp-transfer-disabled-items>
+    <app-demo-comp-transfer-disabled-items class="demo-section"></app-demo-comp-transfer-disabled-items>
 
     <!-- ═══ 5. Direct mode (click to move) ═══ -->
-    <pdx-demo-comp-transfer-direct class="demo-section"></pdx-demo-comp-transfer-direct>
+    <app-demo-comp-transfer-direct class="demo-section"></app-demo-comp-transfer-direct>
 
     <!-- ═══ 6. Simple selection (no checkboxes) ═══ -->
-    <pdx-demo-comp-transfer-simple class="demo-section"></pdx-demo-comp-transfer-simple>
+    <app-demo-comp-transfer-simple class="demo-section"></app-demo-comp-transfer-simple>
 
     <!-- ═══ 7. Drag and Drop ═══ -->
-    <pdx-demo-comp-transfer-drag class="demo-section"></pdx-demo-comp-transfer-drag>
+    <app-demo-comp-transfer-drag class="demo-section"></app-demo-comp-transfer-drag>
 
     <!-- ═══ 8. Disabled state ═══ -->
-    <pdx-demo-comp-transfer-disabled class="demo-section"></pdx-demo-comp-transfer-disabled>
+    <app-demo-comp-transfer-disabled class="demo-section"></app-demo-comp-transfer-disabled>
 
     <!-- ═══ 6. DataSource mode (assignedField) ═══ -->
-    <pdx-demo-comp-transfer-datasource class="demo-section"></pdx-demo-comp-transfer-datasource>
+    <app-demo-comp-transfer-datasource class="demo-section"></app-demo-comp-transfer-datasource>
 
     <!-- ═══ 7. DataSource mode (assignedValue) ═══ -->
-    <pdx-demo-comp-transfer-assigned-value class="demo-section"></pdx-demo-comp-transfer-assigned-value>
+    <app-demo-comp-transfer-assigned-value class="demo-section"></app-demo-comp-transfer-assigned-value>
 
     <!-- ═══ Reference ═══ -->
     <section>

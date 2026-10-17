@@ -65,7 +65,7 @@ thirteen themes instead — for a page that does not know what it will render
 
 A `.pdx` file has three blocks: `<template>` (what you see), `<script setup>` (state and logic),
 `<style scoped>` (styles that apply inside this component). The file name becomes the tag:
-`counter.pdx` → `<pdx-counter>`. All three are optional, and the two extra words are worth knowing
+`counter.pdx` → `<app-counter>`. All three are optional, and the two extra words are worth knowing
 exactly: `setup` is intent — the *runes* are what the compiler reads — and `scoped` decides whether the
 CSS is confined to the component or lands in the page globally.
 [The three blocks, precisely](/docs/components#the-three-blocks-precisely) spells both out.
@@ -97,7 +97,7 @@ function inc() { count++; }
 </script>
 ```
 
-Now `<pdx-counter start="10">` starts at 10. Primitive props sync with the HTML attribute
+Now `<app-counter start="10">` starts at 10. Primitive props sync with the HTML attribute
 automatically.
 
 **Layer 3 — an event going out.** Let the parent know when it changes:
@@ -112,7 +112,7 @@ function inc() { count++; changed(count); }
 </script>
 ```
 
-From the consumer: `<pdx-counter @changed="onChanged">`. `@event changed: number` generates the emit
+From the consumer: `<app-counter @changed="onChanged">`. `@event changed: number` generates the emit
 function and the typed `CustomEvent`.
 
 You've just seen PDX's central pattern: every feature is a **declaration** (`@prop`, `@event`,

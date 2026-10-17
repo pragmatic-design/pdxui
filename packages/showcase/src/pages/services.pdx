@@ -1,7 +1,7 @@
 <template>
   <section class="page" data-test="services">
     <!-- The list's header, the tickets': views of this list's own. -->
-    <pdx-list-header
+    <app-list-header
       :title="$t('services.title')"
       store-key="services"
       :default-name="$t('services.views.default')"
@@ -10,7 +10,7 @@
       :base-page-size="20">
       <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('services.matching', { count: total }) }}</span>
       <pdx-button variant="primary" @click="openCreate" data-test="new">{{ $t('services.new') }}</pdx-button>
-    </pdx-list-header>
+    </app-list-header>
     <p class="pdx-txt-small pdx-ink-muted">{{ $t('services.intro') }}</p>
 
     <!-- A row is the way into the service. No selection and no bulk bar: a service is withdrawn from

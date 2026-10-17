@@ -135,7 +135,7 @@ the compiler, or directly in render code:
 import { requirePermission, html } from '@pdxui/core';
 
 requirePermission('billing.read',
-  () => html`<pdx-invoice-list />`,
+  () => html`<app-invoice-list />`,
   () => html`<p class="muted">You don't have access to billing.</p>`,
 );
 ```

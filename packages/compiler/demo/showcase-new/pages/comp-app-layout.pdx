@@ -6,11 +6,11 @@
       aside (right sidebar), main content, and footer. CSS Grid layout, responsive collapse, semantic HTML.
     </p>
 
-    <pdx-demo-comp-app-layout-full class="demo-section"></pdx-demo-comp-app-layout-full>
+    <app-demo-comp-app-layout-full class="demo-section"></app-demo-comp-app-layout-full>
 
-    <pdx-demo-comp-app-layout-header-navbar class="demo-section"></pdx-demo-comp-app-layout-header-navbar>
+    <app-demo-comp-app-layout-header-navbar class="demo-section"></app-demo-comp-app-layout-header-navbar>
 
-    <pdx-demo-comp-app-layout-without-border class="demo-section"></pdx-demo-comp-app-layout-without-border>
+    <app-demo-comp-app-layout-without-border class="demo-section"></app-demo-comp-app-layout-without-border>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

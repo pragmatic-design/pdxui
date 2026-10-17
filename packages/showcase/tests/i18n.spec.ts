@@ -16,7 +16,7 @@ import { pickLocale } from './locale';
 
 async function open(page: Page, path: string): Promise<void> {
     await page.goto(path);
-    await expect(page.locator('pdx-app .app-bar')).toBeVisible();
+    await expect(page.locator('app-app .app-bar')).toBeVisible();
 }
 
 /** Pick a language, as a signed-in person does: the profile menu's Settings. */

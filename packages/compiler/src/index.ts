@@ -6,6 +6,7 @@ export type { BrowserTarget } from './compiler/compile-context';
 
 // The registry of language changes (#121): what `pdx migrate` applies and PDX_REMOVED_FORM reports.
 export { LANGUAGE_CHANGES, languageChanges, removedExport, setLanguageChangesForTests } from './language/changes';
+export { projectTagRenames } from './language/app-prefix';
 export type { LanguageChange, LanguageChangeKind, LanguageChangeScope, LanguageChangeFinding, LanguageChangeContext } from './language/changes';
 export { generateDts, modelEventName } from './compiler/dts-generator';
 export { SourceMapBuilder } from './compiler/sourcemap';
@@ -24,6 +25,7 @@ export type {
 export { compileSFC } from './compiler/codegen';
 /** The filename → custom element tag rule. The one rule: the CLI and the LSP call it. */
 export { deriveTag } from './compiler/codegen-shared';
+export { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './compiler/tag-prefix';
 export { analyzeScript, inlineFormFields } from './compiler/script-analyzer';
 export type {
     ScriptAnalysis, PropInfo, EventInfo, SlotInfo, FormFieldDecl,

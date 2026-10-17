@@ -75,7 +75,7 @@ function findings(): { pages: number; blocks: number; tags: number; bad: Finding
             for (const b of examples.matchAll(/^```html\n([\s\S]*?)^```$/gm)) {
                 blocks++;
                 for (const { tag, attrs } of openingTags(b[1])) {
-                    // Not a library component: an example's own (`pdx-my-widget`), whose props are its own.
+                    // Not a library component: an example's own (`app-my-widget`), whose props are its own.
                     if (!decls.has(tag)) continue;
                     tags++;
                     const s = surface(tag);

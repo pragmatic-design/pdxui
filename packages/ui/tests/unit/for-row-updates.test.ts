@@ -30,7 +30,7 @@ const LIST = (tag: string) => `<template>
 <button class="swap" @click="swap()">swap</button>
 <ul>
 @for (docs as doc, i; track doc.id) {
-  <li class="row"><span class="txt">{{ i }}:{{ doc.name }}={{ doc.progress }}</span><pdx-fr-bar :value="doc.progress"></pdx-fr-bar></li>
+  <li class="row"><span class="txt">{{ i }}:{{ doc.name }}={{ doc.progress }}</span><app-fr-bar :value="doc.progress"></app-fr-bar></li>
 }
 </ul>
 </template>
@@ -38,11 +38,11 @@ const LIST = (tag: string) => `<template>
 let docs = $signal([{ id: 1, name: 'a', progress: 10 }, { id: 2, name: 'b', progress: 20 }]);
 function finish() { docs = docs.map(d => ({ ...d, progress: 100 })); }
 function swap() { docs = [docs[1], docs[0]]; }
-</script>`.replace('pdx-fr-list', tag);
+</script>`.replace('app-fr-list', tag);
 
 const PATHS = [
-    { name: 'dev', file: 'fr-list.pdx', tag: 'pdx-fr-list', opts: {} },
-    { name: 'build', file: 'fr-list-build.pdx', tag: 'pdx-fr-list-build', opts: { production: true } },
+    { name: 'dev', file: 'fr-list.pdx', tag: 'app-fr-list', opts: {} },
+    { name: 'build', file: 'fr-list-build.pdx', tag: 'app-fr-list-build', opts: { production: true } },
 ];
 
 beforeAll(() => {

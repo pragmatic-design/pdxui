@@ -5,7 +5,7 @@
 
     <!-- Identity on top, sections on the LEFT, no right panel — the record detail's
          shell, written once. -->
-    <pdx-record-detail :label="$t('customers.sections')">
+    <app-record-detail :label="$t('customers.sections')">
         <span slot="identity" class="portrait" aria-hidden="true">{{ monogram }}</span>
         <p slot="identity" class="pdx-txt-heading identity-name" data-test="identity-name">{{ record?.reference ?? '' }}</p>
         <p slot="identity" class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ record?.sector ?? '' }}</p>
@@ -112,7 +112,7 @@
             </ul>
           </section>
         }
-    </pdx-record-detail>
+    </app-record-detail>
 
     <!-- ADD, in a modal: an active service the customer does not have now, and the day it starts. -->
     <pdx-dialog
@@ -246,7 +246,7 @@ async function restoreSubscription(index) {
 
 <style scoped>
   .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
-  /* The shell — identity, section menu — is <pdx-record-detail>'s. */
+  /* The shell — identity, section menu — is <app-record-detail>'s. */
 
   .facts { display: grid; grid-template-columns: auto 1fr; gap: var(--pdx-space-xs) var(--pdx-space-md); }
   .facts dt { color: var(--pdx-color-muted); }

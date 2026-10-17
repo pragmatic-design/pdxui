@@ -11,7 +11,7 @@
               <td>@if (a.attribute) {<code>{{ a.attribute }}</code>}</td>
               <td><code>{{ a.type ? a.type.text : '' }}</code></td>
               <td><code>{{ a.default }}</code></td>
-              <td><pdx-api-desc :text="a.description || ''"></pdx-api-desc></td>
+              <td><app-api-desc :text="a.description || ''"></app-api-desc></td>
             </tr>
           }
         </tbody>
@@ -27,7 +27,7 @@
             <tr>
               <td><code>{{ e.name }}</code></td>
               <td>@if (e.detail) {<code>{{ e.detail }}</code>}</td>
-              <td><pdx-api-desc :text="e.description || ''"></pdx-api-desc></td>
+              <td><app-api-desc :text="e.description || ''"></app-api-desc></td>
             </tr>
           }
         </tbody>
@@ -40,7 +40,7 @@
         <thead><tr><th>Name</th><th>Description</th></tr></thead>
         <tbody>
           @for (methods as m; track m.name) {
-            <tr><td><code>{{ signature(m) }}</code></td><td><pdx-api-desc :text="m.description || ''"></pdx-api-desc></td></tr>
+            <tr><td><code>{{ signature(m) }}</code></td><td><app-api-desc :text="m.description || ''"></app-api-desc></td></tr>
           }
         </tbody>
       </table>
@@ -52,7 +52,7 @@
         <thead><tr><th>Name</th><th>Description</th></tr></thead>
         <tbody>
           @for (readonly as r; track r.name) {
-            <tr><td><code>{{ r.name }}</code></td><td><pdx-api-desc :text="r.description || ''"></pdx-api-desc></td></tr>
+            <tr><td><code>{{ r.name }}</code></td><td><app-api-desc :text="r.description || ''"></app-api-desc></td></tr>
           }
         </tbody>
       </table>
@@ -64,7 +64,7 @@
         <thead><tr><th>Name</th><th>Description</th></tr></thead>
         <tbody>
           @for (slots as s; track s.name) {
-            <tr><td><code>{{ s.name ? s.name : '(default)' }}</code></td><td><pdx-api-desc :text="s.description || ''"></pdx-api-desc></td></tr>
+            <tr><td><code>{{ s.name ? s.name : '(default)' }}</code></td><td><app-api-desc :text="s.description || ''"></app-api-desc></td></tr>
           }
         </tbody>
       </table>
@@ -76,7 +76,7 @@
         <thead><tr><th>Name</th><th>Default</th><th>Description</th></tr></thead>
         <tbody>
           @for (cssProps as p; track p.name) {
-            <tr><td><code>{{ p.name }}</code></td><td><code>{{ p.default }}</code></td><td><pdx-api-desc :text="p.description || ''"></pdx-api-desc></td></tr>
+            <tr><td><code>{{ p.name }}</code></td><td><code>{{ p.default }}</code></td><td><app-api-desc :text="p.description || ''"></app-api-desc></td></tr>
           }
         </tbody>
       </table>

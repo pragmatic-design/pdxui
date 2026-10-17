@@ -352,7 +352,8 @@ function generatePortal(node: PortalNode, imports: Set<string>, ctx: CompileCont
 }
 
 /**
- * The `<pdx-…>` tags a deferred body renders, in source order and without repeats.
+ * The custom-element tags a deferred body renders, in source order and without repeats: the
+ * library's and the app's alike (#136), as `deferLoadFn` imports whichever `importPathOf` resolves.
  *
  * Read from the generated code rather than walked on the AST: the body has already been through
  * every other generator here, so whatever tag survives into it is a tag that will be rendered —
@@ -360,7 +361,8 @@ function generatePortal(node: PortalNode, imports: Set<string>, ctx: CompileCont
  */
 function deferredTags(bodyCode: string): string[] {
     const seen = new Set<string>();
-    for (const m of bodyCode.matchAll(/<(pdx-[\w-]+)/gi)) seen.add(m[1].toLowerCase());
+    // Match: an opening tag whose name has a hyphen, a custom element. Groups: [1]=the name
+    for (const m of bodyCode.matchAll(/<([a-z][\w]*-[\w-]+)/gi)) seen.add(m[1].toLowerCase());
     return [...seen];
 }
 

@@ -20,7 +20,7 @@ function mount(): HTMLElement & { rows: unknown[] } {
     expect(code).toMatch(/bindInterpolation\(__t\d+,\(\)=>row\(\)\.id,true\)/);
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
-    const el = document.createElement(`pdx-${name}`) as HTMLElement & { rows: unknown[] };
+    const el = document.createElement(`app-${name}`) as HTMLElement & { rows: unknown[] };
     document.body.appendChild(el);
     return el;
 }

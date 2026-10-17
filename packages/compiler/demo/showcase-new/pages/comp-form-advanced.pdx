@@ -6,25 +6,25 @@
     </p>
 
     <!-- ═══ 1. Prefill / Update Mode ═══ -->
-    <pdx-demo-comp-form-advanced-prefill class="demo-section"></pdx-demo-comp-form-advanced-prefill>
+    <app-demo-comp-form-advanced-prefill class="demo-section"></app-demo-comp-form-advanced-prefill>
 
     <!-- ═══ 2. Validation i18n ═══ -->
-    <pdx-demo-comp-form-advanced-validation-i18n class="demo-section"></pdx-demo-comp-form-advanced-validation-i18n>
+    <app-demo-comp-form-advanced-validation-i18n class="demo-section"></app-demo-comp-form-advanced-validation-i18n>
 
     <!-- ═══ 3. Tab / Wizard Form ═══ -->
-    <pdx-demo-comp-form-advanced-tab-wizard class="demo-section"></pdx-demo-comp-form-advanced-tab-wizard>
+    <app-demo-comp-form-advanced-tab-wizard class="demo-section"></app-demo-comp-form-advanced-tab-wizard>
 
     <!-- ═══ 4. Field Arrays ═══ -->
-    <pdx-demo-comp-form-advanced-field-arrays class="demo-section"></pdx-demo-comp-form-advanced-field-arrays>
+    <app-demo-comp-form-advanced-field-arrays class="demo-section"></app-demo-comp-form-advanced-field-arrays>
 
     <!-- ═══ 5. Async Validation ═══ -->
-    <pdx-demo-comp-form-advanced-async-validation class="demo-section"></pdx-demo-comp-form-advanced-async-validation>
+    <app-demo-comp-form-advanced-async-validation class="demo-section"></app-demo-comp-form-advanced-async-validation>
 
     <!-- ═══ 6. Cross-Field Validation ═══ -->
-    <pdx-demo-comp-form-advanced-cross-field class="demo-section"></pdx-demo-comp-form-advanced-cross-field>
+    <app-demo-comp-form-advanced-cross-field class="demo-section"></app-demo-comp-form-advanced-cross-field>
 
     <!-- ═══ 7. Nested Forms (Coordinator) ═══ -->
-    <pdx-demo-comp-form-advanced-nested-forms class="demo-section"></pdx-demo-comp-form-advanced-nested-forms>
+    <app-demo-comp-form-advanced-nested-forms class="demo-section"></app-demo-comp-form-advanced-nested-forms>
 
   </div>
 </template>

@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-design-toast-variants class="demo-section"></pdx-demo-design-toast-variants>
+    <app-demo-design-toast-variants class="demo-section"></app-demo-design-toast-variants>
 
     <!-- ═══ Title + Message ═══ -->
-    <pdx-demo-design-toast-title-message class="demo-section"></pdx-demo-design-toast-title-message>
+    <app-demo-design-toast-title-message class="demo-section"></app-demo-design-toast-title-message>
 
     <!-- ═══ Progress Bar ═══ -->
-    <pdx-demo-design-toast-progress class="demo-section"></pdx-demo-design-toast-progress>
+    <app-demo-design-toast-progress class="demo-section"></app-demo-design-toast-progress>
 
     <!-- ═══ Close Button ═══ -->
-    <pdx-demo-design-toast-close class="demo-section"></pdx-demo-design-toast-close>
+    <app-demo-design-toast-close class="demo-section"></app-demo-design-toast-close>
 
     <!-- ═══ Container Positions ═══ -->
-    <pdx-demo-design-toast-positions class="demo-section"></pdx-demo-design-toast-positions>
+    <app-demo-design-toast-positions class="demo-section"></app-demo-design-toast-positions>
 
     <!-- ═══ Reference ═══ -->
     <section>

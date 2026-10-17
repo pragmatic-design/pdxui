@@ -32,7 +32,7 @@ afterEach(() => cleanup());
 type Parts = { trigger: Element | null; popup: Element | null };
 
 async function mount(): Promise<HTMLElement & { parts(): Parts }> {
-    const el = document.createElement('pdx-part-menu') as HTMLElement & { parts(): Parts };
+    const el = document.createElement('app-part-menu') as HTMLElement & { parts(): Parts };
     document.body.appendChild(el);
     await tick();
     return el;

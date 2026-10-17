@@ -6,25 +6,25 @@
     </p>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-comp-card-variants class="demo-section"></pdx-demo-comp-card-variants>
+    <app-demo-comp-card-variants class="demo-section"></app-demo-comp-card-variants>
 
     <!-- ═══ Elevation ═══ -->
-    <pdx-demo-comp-card-elevation class="demo-section"></pdx-demo-comp-card-elevation>
+    <app-demo-comp-card-elevation class="demo-section"></app-demo-comp-card-elevation>
 
     <!-- ═══ Product Cards ═══ -->
-    <pdx-demo-comp-card-product class="demo-section"></pdx-demo-comp-card-product>
+    <app-demo-comp-card-product class="demo-section"></app-demo-comp-card-product>
 
     <!-- ═══ Horizontal / Article ═══ -->
-    <pdx-demo-comp-card-horizontal class="demo-section"></pdx-demo-comp-card-horizontal>
+    <app-demo-comp-card-horizontal class="demo-section"></app-demo-comp-card-horizontal>
 
     <!-- ═══ Interactive States ═══ -->
-    <pdx-demo-comp-card-interactive class="demo-section"></pdx-demo-comp-card-interactive>
+    <app-demo-comp-card-interactive class="demo-section"></app-demo-comp-card-interactive>
 
     <!-- ═══ Loading Skeleton ═══ -->
-    <pdx-demo-comp-card-skeleton class="demo-section"></pdx-demo-comp-card-skeleton>
+    <app-demo-comp-card-skeleton class="demo-section"></app-demo-comp-card-skeleton>
 
     <!-- ═══ Compact Stats ═══ -->
-    <pdx-demo-comp-card-compact class="demo-section"></pdx-demo-comp-card-compact>
+    <app-demo-comp-card-compact class="demo-section"></app-demo-comp-card-compact>
   </div>
 </template>
 

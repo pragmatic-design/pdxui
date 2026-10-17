@@ -43,14 +43,14 @@ describe('pdx check — PDX_PROP_REQUIRED', () => {
 
     it('a page that uses the card without :user is reported, at the tag', async () => {
         writeFileSync(join(root, 'src', 'user-card.pdx'), card);
-        writeFileSync(join(root, 'src', 'page.pdx'), "<template>\n  <pdx-user-card></pdx-user-card>\n</template>\n<script setup>\n</script>\n");
+        writeFileSync(join(root, 'src', 'page.pdx'), "<template>\n  <app-user-card></app-user-card>\n</template>\n<script setup>\n</script>\n");
         const found = (await check()).files.flatMap(f => f.warnings).filter(w => w.code === 'PDX_PROP_REQUIRED');
-        expect(found.map(w => [w.message, w.line])).toEqual([["<pdx-user-card> is missing its required prop 'user'.", 2]]);
+        expect(found.map(w => [w.message, w.line])).toEqual([["<app-user-card> is missing its required prop 'user'.", 2]]);
     });
 
     it('the control: a page that sets it raises nothing', async () => {
         writeFileSync(join(root, 'src', 'user-card.pdx'), card);
-        writeFileSync(join(root, 'src', 'page.pdx'), "<template>\n  <pdx-user-card user=\"Ada\"></pdx-user-card>\n</template>\n<script setup>\n</script>\n");
+        writeFileSync(join(root, 'src', 'page.pdx'), "<template>\n  <app-user-card user=\"Ada\"></app-user-card>\n</template>\n<script setup>\n</script>\n");
         expect((await check()).files.flatMap(f => f.warnings).filter(w => w.code === 'PDX_PROP_REQUIRED')).toEqual([]);
     });
 });

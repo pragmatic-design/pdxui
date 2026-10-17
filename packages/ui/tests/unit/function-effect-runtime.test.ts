@@ -32,7 +32,7 @@ afterEach(() => cleanup());
 
 describe('$effect(function () { … }), compiled and mounted', () => {
     it('runs again when the signal it reads changes', async () => {
-        const el = document.createElement('pdx-function-effect-mirror');
+        const el = document.createElement('app-function-effect-mirror');
         document.body.appendChild(el);
         await tick();
         const seen = () => el.querySelector('.seen')!.textContent!.trim();

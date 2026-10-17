@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Dialog Structure ═══ -->
-    <pdx-demo-design-dialog-structure class="demo-section"></pdx-demo-design-dialog-structure>
+    <app-demo-design-dialog-structure class="demo-section"></app-demo-design-dialog-structure>
 
     <!-- ═══ Size Variants ═══ -->
-    <pdx-demo-design-dialog-sizes class="demo-section"></pdx-demo-design-dialog-sizes>
+    <app-demo-design-dialog-sizes class="demo-section"></app-demo-design-dialog-sizes>
 
     <!-- ═══ Header, Body, Footer ═══ -->
-    <pdx-demo-design-dialog-sections class="demo-section"></pdx-demo-design-dialog-sections>
+    <app-demo-design-dialog-sections class="demo-section"></app-demo-design-dialog-sections>
 
     <!-- ═══ Close Button ═══ -->
-    <pdx-demo-design-dialog-close class="demo-section"></pdx-demo-design-dialog-close>
+    <app-demo-design-dialog-close class="demo-section"></app-demo-design-dialog-close>
 
     <!-- ═══ Composition: Confirmation ═══ -->
-    <pdx-demo-design-dialog-composition class="demo-section"></pdx-demo-design-dialog-composition>
+    <app-demo-design-dialog-composition class="demo-section"></app-demo-design-dialog-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

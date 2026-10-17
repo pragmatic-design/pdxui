@@ -3,9 +3,9 @@
     <h2>Virtualization</h2>
     <p class="desc">Render only visible items. 10,000 items, binary search, GPU transforms.</p>
 
-    <pdx-demo-infra-virtualizer-fixed class="demo-section"></pdx-demo-infra-virtualizer-fixed>
+    <app-demo-infra-virtualizer-fixed class="demo-section"></app-demo-infra-virtualizer-fixed>
 
-    <pdx-demo-infra-virtualizer-variable class="demo-section"></pdx-demo-infra-virtualizer-variable>
+    <app-demo-infra-virtualizer-variable class="demo-section"></app-demo-infra-virtualizer-variable>
   </div>
 </template>
 

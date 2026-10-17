@@ -7,31 +7,31 @@
     </p>
 
     <!-- ═══ Surface Types ═══ -->
-    <pdx-demo-design-surfaces-types class="demo-section"></pdx-demo-design-surfaces-types>
+    <app-demo-design-surfaces-types class="demo-section"></app-demo-design-surfaces-types>
 
     <!-- ═══ Card Sections ═══ -->
-    <pdx-demo-design-surfaces-card-sections class="demo-section"></pdx-demo-design-surfaces-card-sections>
+    <app-demo-design-surfaces-card-sections class="demo-section"></app-demo-design-surfaces-card-sections>
 
     <!-- ═══ Card Accents ═══ -->
-    <pdx-demo-design-surfaces-accents class="demo-section"></pdx-demo-design-surfaces-accents>
+    <app-demo-design-surfaces-accents class="demo-section"></app-demo-design-surfaces-accents>
 
     <!-- ═══ Elevation Levels ═══ -->
-    <pdx-demo-design-surfaces-elevation class="demo-section"></pdx-demo-design-surfaces-elevation>
+    <app-demo-design-surfaces-elevation class="demo-section"></app-demo-design-surfaces-elevation>
 
     <!-- ═══ Interactive Card ═══ -->
-    <pdx-demo-design-surfaces-interactive class="demo-section"></pdx-demo-design-surfaces-interactive>
+    <app-demo-design-surfaces-interactive class="demo-section"></app-demo-design-surfaces-interactive>
 
     <!-- ═══ Selected Card ═══ -->
-    <pdx-demo-design-surfaces-selected class="demo-section"></pdx-demo-design-surfaces-selected>
+    <app-demo-design-surfaces-selected class="demo-section"></app-demo-design-surfaces-selected>
 
     <!-- ═══ Compact Card ═══ -->
-    <pdx-demo-design-surfaces-compact class="demo-section"></pdx-demo-design-surfaces-compact>
+    <app-demo-design-surfaces-compact class="demo-section"></app-demo-design-surfaces-compact>
 
     <!-- ═══ Horizontal Card ═══ -->
-    <pdx-demo-design-surfaces-horizontal class="demo-section"></pdx-demo-design-surfaces-horizontal>
+    <app-demo-design-surfaces-horizontal class="demo-section"></app-demo-design-surfaces-horizontal>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-surfaces-composition class="demo-section"></pdx-demo-design-surfaces-composition>
+    <app-demo-design-surfaces-composition class="demo-section"></app-demo-design-surfaces-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

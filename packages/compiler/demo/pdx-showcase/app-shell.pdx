@@ -32,13 +32,13 @@
 
     <main class="content">
       @if (activePage === 'button') {
-        <pdx-page-button></pdx-page-button>
+        <app-page-button></app-page-button>
       } @else if (activePage === 'badge') {
-        <pdx-page-badge></pdx-page-badge>
+        <app-page-badge></app-page-badge>
       } @else if (activePage === 'input') {
-        <pdx-page-input></pdx-page-input>
+        <app-page-input></app-page-input>
       } @else if (activePage === 'dialog') {
-        <pdx-page-dialog></pdx-page-dialog>
+        <app-page-dialog></app-page-dialog>
       }
     </main>
   </div>

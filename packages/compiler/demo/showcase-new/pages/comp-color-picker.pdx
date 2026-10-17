@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-color-picker-basic class="demo-section"></pdx-demo-comp-color-picker-basic>
+    <app-demo-comp-color-picker-basic class="demo-section"></app-demo-comp-color-picker-basic>
 
     <!-- ═══ Inline ═══ -->
-    <pdx-demo-comp-color-picker-inline class="demo-section"></pdx-demo-comp-color-picker-inline>
+    <app-demo-comp-color-picker-inline class="demo-section"></app-demo-comp-color-picker-inline>
 
     <!-- ═══ With Alpha ═══ -->
-    <pdx-demo-comp-color-picker-alpha class="demo-section"></pdx-demo-comp-color-picker-alpha>
+    <app-demo-comp-color-picker-alpha class="demo-section"></app-demo-comp-color-picker-alpha>
 
     <!-- ═══ Presets / Swatches ═══ -->
-    <pdx-demo-comp-color-picker-presets class="demo-section"></pdx-demo-comp-color-picker-presets>
+    <app-demo-comp-color-picker-presets class="demo-section"></app-demo-comp-color-picker-presets>
 
     <!-- ═══ Formats ═══ -->
-    <pdx-demo-comp-color-picker-formats class="demo-section"></pdx-demo-comp-color-picker-formats>
+    <app-demo-comp-color-picker-formats class="demo-section"></app-demo-comp-color-picker-formats>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-color-picker-sizes class="demo-section"></pdx-demo-comp-color-picker-sizes>
+    <app-demo-comp-color-picker-sizes class="demo-section"></app-demo-comp-color-picker-sizes>
 
     <!-- ═══ Disabled & Readonly ═══ -->
-    <pdx-demo-comp-color-picker-disabled class="demo-section"></pdx-demo-comp-color-picker-disabled>
+    <app-demo-comp-color-picker-disabled class="demo-section"></app-demo-comp-color-picker-disabled>
 
     <!-- ═══ Props Reference ═══ -->
     <section>

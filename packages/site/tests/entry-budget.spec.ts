@@ -62,13 +62,13 @@ test('no docs page is a chunk over the budget', () => {
 });
 
 test('no route is in the entry chunk — the route table loads each one', () => {
-    // A route in the entry is a component registered there: `component("pdx-docs", { … })`, which
-    // minifies to `("pdx-docs",{props:` or `{setup:`. The route TABLE names every route too, as
-    // `tag:"pdx-docs"`, and that is meant to be in the entry: it is how the router knows a route
+    // A route in the entry is a component registered there: `component("app-docs", { … })`, which
+    // minifies to `("app-docs",{props:` or `{setup:`. The route TABLE names every route too, as
+    // `tag:"app-docs"`, and that is meant to be in the entry: it is how the router knows a route
     // it has not loaded. An eager `import.meta.glob` of the routes in index.html put all eight in
     // the entry, the lazy `import()`s of the table bought nothing, and Vite said so in a warning.
     const routes = readdirSync(fileURLToPath(new URL('../src/routes/', import.meta.url)))
-        .filter(f => f.endsWith('.pdx')).map(f => `pdx-${f.replace(/\.pdx$/, '')}`);
+        .filter(f => f.endsWith('.pdx')).map(f => `app-${f.replace(/\.pdx$/, '')}`);
     expect(routes.length, 'no routes found: the folder this test reads has moved').toBeGreaterThan(5);
     const html = readFileSync(join(dist, 'index.html'), 'utf8');
     const src = html.match(/<script[^>]+type="module"[^>]+src="\/?([^"]+\.js)"/)![1];

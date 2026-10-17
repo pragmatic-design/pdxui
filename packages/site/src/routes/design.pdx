@@ -91,7 +91,7 @@ import { followLink } from '../lib/follow-link';
 import { onMount, effect } from '@pdxui/core';
 import _topics from '../demos/design-index.json';
 
-// Ported pure-CSS design pages (<pdx-design-NAME>), loaded lazily per topic.
+// Ported pure-CSS design pages (<app-design-NAME>), loaded lazily per topic.
 const _designMods = import.meta.glob('../demos/design-*.pdx');
 // Local const so the template recognises it as a (non-signal) iterable, not a callable signal.
 const topics = _topics;
@@ -135,7 +135,7 @@ effect(() => {
   _designMods[_key]().then(() => {
     if (currentParams().topic !== _t || !galleryRef) return;
     galleryRef.innerHTML = '';
-    galleryRef.appendChild(document.createElement('pdx-design-' + _t));
+    galleryRef.appendChild(document.createElement('app-design-' + _t));
   });
 });
 </script>

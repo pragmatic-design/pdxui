@@ -26,7 +26,7 @@ async function signIn(page: Page, username = 'admin'): Promise<void> {
 test('signed out, a deep link lands on the login with the address it asked for, and signing in goes there', async ({ page }) => {
     await page.goto('/tickets?status=closed');
     await expect(page).toHaveURL(/\/login\?next=%2Ftickets%3Fstatus%3Dclosed$/);
-    await expect(page.locator('pdx-app .app-bar'), 'the shell was drawn for a guest').toHaveCount(0);
+    await expect(page.locator('app-app .app-bar'), 'the shell was drawn for a guest').toHaveCount(0);
 
     await signIn(page);
     await expect(page).toHaveURL(/\/tickets\?status=closed$/);
@@ -46,7 +46,7 @@ test('a next that leaves this origin is ignored: signing in lands on the dashboa
     await page.goto('/login?next=https%3A%2F%2Fevil.example%2F');
     await signIn(page);
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.locator('pdx-app .app-bar')).toBeVisible();
+    await expect(page.locator('app-app .app-bar')).toBeVisible();
 });
 
 test('signing out lands on the login, and the page it left is where signing in again returns', async ({ page }) => {

@@ -7,10 +7,10 @@
     </p>
 
     <!-- Group Bar -->
-    <pdx-demo-comp-data-grid-grouping-group-bar class="demo-section"></pdx-demo-comp-data-grid-grouping-group-bar>
+    <app-demo-comp-data-grid-grouping-group-bar class="demo-section"></app-demo-comp-data-grid-grouping-group-bar>
 
     <!-- Programmatic Grouping -->
-    <pdx-demo-comp-data-grid-grouping-programmatic class="demo-section"></pdx-demo-comp-data-grid-grouping-programmatic>
+    <app-demo-comp-data-grid-grouping-programmatic class="demo-section"></app-demo-comp-data-grid-grouping-programmatic>
 
     <!-- Reference -->
     <section>

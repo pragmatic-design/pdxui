@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Basic: Programmatic DataSource ═══ -->
-    <pdx-demo-comp-data-source-programmatic class="demo-section"></pdx-demo-comp-data-source-programmatic>
+    <app-demo-comp-data-source-programmatic class="demo-section"></app-demo-comp-data-source-programmatic>
 
     <!-- ═══ Declarative: pdx-data-source ═══ -->
-    <pdx-demo-comp-data-source-declarative class="demo-section"></pdx-demo-comp-data-source-declarative>
+    <app-demo-comp-data-source-declarative class="demo-section"></app-demo-comp-data-source-declarative>
 
     <!-- ═══ Wrapping Children ═══ -->
-    <pdx-demo-comp-data-source-provider class="demo-section"></pdx-demo-comp-data-source-provider>
+    <app-demo-comp-data-source-provider class="demo-section"></app-demo-comp-data-source-provider>
 
     <!-- ═══ Remote Simulation ═══ -->
-    <pdx-demo-comp-data-source-remote class="demo-section"></pdx-demo-comp-data-source-remote>
+    <app-demo-comp-data-source-remote class="demo-section"></app-demo-comp-data-source-remote>
 
     <!-- ═══ Cascading DataSources ═══ -->
-    <pdx-demo-comp-data-source-cascading class="demo-section"></pdx-demo-comp-data-source-cascading>
+    <app-demo-comp-data-source-cascading class="demo-section"></app-demo-comp-data-source-cascading>
 
     <!-- ═══ Props Reference ═══ -->
     <section>

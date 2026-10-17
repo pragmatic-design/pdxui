@@ -10,6 +10,7 @@ import { tsDefinition } from './ts-features';
 import { getTagContext, positionToOffset } from '../utils/tag-context';
 import { pdxToVirtual } from '../utils/virtual-file';
 import type { Workspace } from '../workspace';
+import { isComponentTag } from '../utils/tag-names';
 
 /** Where the symbol under the cursor of `document` is defined, or null. */
 export function definitionAt(ws: Workspace, document: TextDocument, params: DefinitionParams): Definition | LocationLink[] | null {
@@ -32,8 +33,8 @@ export function definitionAt(ws: Workspace, document: TextDocument, params: Defi
     const word = getWordAtPosition(source, params.position);
     if (!word) return null;
 
-    // 3. A pdx- tag (outside a tag context) → the component's file.
-    if (word.startsWith('pdx-')) {
+    // 3. A component tag, pdx- or app- (outside a tag context) → the component's file.
+    if (isComponentTag(word)) {
         const loc = resolveComponentDefinition(word, manifest, components) ?? resolveTagDefinition(word, components);
         if (loc) return loc;
     }

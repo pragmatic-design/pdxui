@@ -74,7 +74,7 @@ async function buildSpa(
 
     await vite.build({
         root: cwd,
-        plugins: own ? [] : [pdx({ plugins: resolved.plugins, minify: true, components: [resolved.components] })],
+        plugins: own ? [] : [pdx({ plugins: resolved.plugins, minify: true, components: [resolved.components], prefix: resolved.prefix })],
         build: {
             outDir,
             minify: 'esbuild',
@@ -114,7 +114,7 @@ async function buildStandalone(
             const name = basename(file, '.pdx');
 
             // Compile to JS
-            const result = compile(source, file, resolved.plugins, fileResolver, { minify });
+            const result = compile(source, file, resolved.plugins, fileResolver, { minify, prefix: resolved.prefix });
             if (sourcemap) {
                 // The compiler names the source by its basename; beside the .js it is named
                 // relative to the map, so a debugger finds the .pdx on disk.
@@ -128,7 +128,7 @@ async function buildStandalone(
             const descriptor = parseSFC(source);
             const analysis = analyzeScript(descriptor.script?.content ?? '', file, { setup: descriptor.script?.setup });
             // The tag the compiled module registers: `@tag`, else the compiler's rule.
-            const tag = analysis.customTag ?? deriveTag(file);
+            const tag = analysis.customTag ?? deriveTag(file, resolved.prefix);
             const dts = generateDts({
                 tag,
                 props: analysis.props,
@@ -138,7 +138,7 @@ async function buildStandalone(
             writeFileSync(join(outDir, `${name}.d.ts`), dts);
 
             // Generate manifest
-            const manifest = analyzeComponent(file, resolved.cwd);
+            const manifest = analyzeComponent(file, resolved.cwd, resolved.prefix);
             writeFileSync(join(outDir, `${name}.manifest.json`), JSON.stringify(manifest, null, 2));
 
             compiled++;

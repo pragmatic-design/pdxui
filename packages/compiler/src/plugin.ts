@@ -8,6 +8,7 @@ import { parseSFC } from './parser/sfc';
 import { parseTemplate, templateStartInFile } from './parser/template';
 import type { SourceLoc } from './parser/template';
 import { compileSFC, deriveTag } from './compiler/codegen';
+import { DEFAULT_TAG_PREFIX } from './compiler/tag-prefix';
 import { analyzeScript } from './compiler/script-analyzer';
 import { validate } from './compiler/validate';
 import { diagnosticUrl, DIAGNOSTICS } from './diagnostics/catalog';
@@ -103,6 +104,12 @@ export interface PdxPluginOptions {
     target?: BrowserTarget;
 
     /**
+     * The prefix of the app's component tags (#136): `button.pdx` → `<app-button>` by default. `pdx-`
+     * is reserved for the `@pdxui/*` packages; `@tag` still names one component.
+     */
+    prefix?: string;
+
+    /**
      * The routes whose chunks the built `index.html` announces with `<link rel="modulepreload">`.
      *
      * Without it a cold first screen fetches its JavaScript in three waves — the entry, then the
@@ -167,6 +174,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
     const defaultLayout = options?.defaultLayout;
     const splash = options?.splash === false ? null : (options?.splash ?? {});
     const target = options?.target ?? 'baseline-2026';
+    const prefix = options?.prefix ?? DEFAULT_TAG_PREFIX;
     let isDevMode = false;
     // Vite's `base`, for the preload hrefs: an app served under a sub-path has to name its chunks
     // the way the browser will ask for them.
@@ -283,12 +291,12 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             // BEFORE the route scan, and that order is load-bearing: `@layout 'admin'` resolves to
             // `pdx-admin-layout` or to `pdx-admin` depending on which of the two the project has,
             // and a scan that runs first can only guess. Nothing here reads routes.
-            componentResolver.registerProjectComponents(root, componentDirs);
+            componentResolver.registerProjectComponents(root, componentDirs, prefix);
 
             for (const sub of ['src', 'pages']) {
                 const dir = resolve(root, sub);
                 scanForStores(dir, storeRegistry);
-                scanForRoutes(dir, scannedRoutes, (tag) => componentResolver.has(tag), defaultLayout);
+                scanForRoutes(dir, scannedRoutes, (tag) => componentResolver.has(tag), defaultLayout, prefix);
             }
 
             // Tag collisions found by the SCAN are reported here, through Rollup's warning channel,
@@ -470,7 +478,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 // Determine minify: explicit option wins, otherwise auto-detect from build mode
                 const minify = shouldMinify !== undefined ? shouldMinify : !isDevMode;
                 const result = compile(code, id, compilerPlugins, resolver, {
-                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target,
+                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target, prefix,
                     // The file a runtime error names, as the app knows it.
                     sourceFile: isDevMode ? relative(projectRoot, normalize(id)).replace(/\\/g, '/') : undefined,
                     defaultLayout,
@@ -551,7 +559,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
 
                 const root = viteRoot ?? process.cwd();
                 const before = componentResolver.size;
-                componentResolver.registerProjectComponents(root, componentDirs);
+                componentResolver.registerProjectComponents(root, componentDirs, prefix);
                 if (componentResolver.size === before) return;   // nothing new to tell anyone about
 
                 // Every module that USES the new tag was already transformed without its import, so
@@ -643,6 +651,8 @@ export interface CompileOptions {
     staticMarkup?: boolean;
     /** The browser target the output relies on, `pdx({ target })` (#121). Default: 'baseline-2026'. */
     target?: BrowserTarget;
+    /** The app's component tag prefix, `pdx({ prefix })` (#136). Default: 'app'. */
+    prefix?: string;
     /**
      * The .pdx as the app knows it, relative to its root (`src/pages/login.pdx`). Registered with the
      * component so a runtime error names its file. The dev server passes it; a production
@@ -767,7 +777,7 @@ export function compile(
     }
 
     const templateLineOffset = countLines(source, 0, descriptor.template!.start);
-    const tag = deriveTag(filename);
+    const tag = deriveTag(filename, options?.prefix);
 
     const runner = plugins?.length ? new PluginRunner(plugins, filename, tag) : null;
 
@@ -880,7 +890,7 @@ export function compile(
     let code = compileSFC(
         descriptor, ast, filename, runner,
         { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
-          sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target,
+          sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.prefix,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.
           templateOrigin: descriptor.template && !descriptor.template.src && !options?.minify ? descriptor.template.start : null },
@@ -943,7 +953,7 @@ function compileScriptOnly(
     plugins?: CompilerPlugin[],
     options?: CompileOptions,
 ): CompileResult {
-    const tag = deriveTag(filename);
+    const tag = deriveTag(filename, options?.prefix);
     const runner = plugins?.length ? new PluginRunner(plugins, filename, tag) : null;
 
     // A .pdx routed here may still carry <script> tags (a no-<template> SFC, e.g. @store files):

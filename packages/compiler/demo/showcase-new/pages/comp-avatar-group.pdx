@@ -6,19 +6,19 @@
       Pass an array of items and a max count.
     </p>
 
-    <pdx-demo-comp-avatar-group-basic class="demo-section"></pdx-demo-comp-avatar-group-basic>
+    <app-demo-comp-avatar-group-basic class="demo-section"></app-demo-comp-avatar-group-basic>
 
-    <pdx-demo-comp-avatar-group-with-images class="demo-section"></pdx-demo-comp-avatar-group-with-images>
+    <app-demo-comp-avatar-group-with-images class="demo-section"></app-demo-comp-avatar-group-with-images>
 
-    <pdx-demo-comp-avatar-group-sizes class="demo-section"></pdx-demo-comp-avatar-group-sizes>
+    <app-demo-comp-avatar-group-sizes class="demo-section"></app-demo-comp-avatar-group-sizes>
 
-    <pdx-demo-comp-avatar-group-clickable class="demo-section"></pdx-demo-comp-avatar-group-clickable>
+    <app-demo-comp-avatar-group-clickable class="demo-section"></app-demo-comp-avatar-group-clickable>
 
-    <pdx-demo-comp-avatar-group-reversed class="demo-section"></pdx-demo-comp-avatar-group-reversed>
+    <app-demo-comp-avatar-group-reversed class="demo-section"></app-demo-comp-avatar-group-reversed>
 
-    <pdx-demo-comp-avatar-group-custom-max class="demo-section"></pdx-demo-comp-avatar-group-custom-max>
+    <app-demo-comp-avatar-group-custom-max class="demo-section"></app-demo-comp-avatar-group-custom-max>
 
-    <pdx-demo-comp-avatar-group-without-border class="demo-section"></pdx-demo-comp-avatar-group-without-border>
+    <app-demo-comp-avatar-group-without-border class="demo-section"></app-demo-comp-avatar-group-without-border>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

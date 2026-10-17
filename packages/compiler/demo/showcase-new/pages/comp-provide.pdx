@@ -8,16 +8,16 @@
     </p>
 
     <!-- ═══ Single Value ═══ -->
-    <pdx-demo-comp-provide-single class="demo-section"></pdx-demo-comp-provide-single>
+    <app-demo-comp-provide-single class="demo-section"></app-demo-comp-provide-single>
 
     <!-- ═══ Multiple Values ═══ -->
-    <pdx-demo-comp-provide-multiple class="demo-section"></pdx-demo-comp-provide-multiple>
+    <app-demo-comp-provide-multiple class="demo-section"></app-demo-comp-provide-multiple>
 
     <!-- ═══ Scoped Override ═══ -->
-    <pdx-demo-comp-provide-scoped class="demo-section"></pdx-demo-comp-provide-scoped>
+    <app-demo-comp-provide-scoped class="demo-section"></app-demo-comp-provide-scoped>
 
     <!-- ═══ Future Patterns ═══ -->
-    <pdx-demo-comp-provide-patterns class="demo-section"></pdx-demo-comp-provide-patterns>
+    <app-demo-comp-provide-patterns class="demo-section"></app-demo-comp-provide-patterns>
 
     <!-- ═══ API Reference ═══ -->
     <section>

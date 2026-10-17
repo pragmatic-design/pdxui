@@ -15,7 +15,7 @@
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide :values="appConfig"&gt;
   &lt;!-- inject('theme'), inject('locale'), inject('debug') --&gt;
-  &lt;pdx-dashboard /&gt;
+  &lt;app-dashboard /&gt;
 &lt;/pdx-provide&gt;
 
 const appConfig = {

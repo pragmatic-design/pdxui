@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-pagination-basic class="demo-section"></pdx-demo-comp-pagination-basic>
+    <app-demo-comp-pagination-basic class="demo-section"></app-demo-comp-pagination-basic>
 
     <!-- ═══ Many Pages ═══ -->
-    <pdx-demo-comp-pagination-many-pages class="demo-section"></pdx-demo-comp-pagination-many-pages>
+    <app-demo-comp-pagination-many-pages class="demo-section"></app-demo-comp-pagination-many-pages>
 
     <!-- ═══ Start / End ═══ -->
-    <pdx-demo-comp-pagination-start-end class="demo-section"></pdx-demo-comp-pagination-start-end>
+    <app-demo-comp-pagination-start-end class="demo-section"></app-demo-comp-pagination-start-end>
 
     <!-- ═══ Simple Mode ═══ -->
-    <pdx-demo-comp-pagination-simple class="demo-section"></pdx-demo-comp-pagination-simple>
+    <app-demo-comp-pagination-simple class="demo-section"></app-demo-comp-pagination-simple>
 
     <!-- ═══ With Total Info ═══ -->
-    <pdx-demo-comp-pagination-total-info class="demo-section"></pdx-demo-comp-pagination-total-info>
+    <app-demo-comp-pagination-total-info class="demo-section"></app-demo-comp-pagination-total-info>
 
     <!-- ═══ Without First/Last ═══ -->
-    <pdx-demo-comp-pagination-no-first-last class="demo-section"></pdx-demo-comp-pagination-no-first-last>
+    <app-demo-comp-pagination-no-first-last class="demo-section"></app-demo-comp-pagination-no-first-last>
 
     <!-- ═══ Few Pages ═══ -->
-    <pdx-demo-comp-pagination-few-pages class="demo-section"></pdx-demo-comp-pagination-few-pages>
+    <app-demo-comp-pagination-few-pages class="demo-section"></app-demo-comp-pagination-few-pages>
 
     <!-- ═══ Slots ═══ -->
-    <pdx-demo-comp-pagination-slots class="demo-section"></pdx-demo-comp-pagination-slots>
+    <app-demo-comp-pagination-slots class="demo-section"></app-demo-comp-pagination-slots>
 
     <!-- ═══ Props ═══ -->
     <section>

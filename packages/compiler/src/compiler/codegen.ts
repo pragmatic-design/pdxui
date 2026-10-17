@@ -59,6 +59,8 @@ export function compileSFC(
         staticMarkup?: boolean;
         /** The browser target the output relies on (#121); default 'baseline-2026'. */
         target?: import('./compile-context').BrowserTarget;
+        /** The app's component tag prefix (#136); default 'app'. */
+        tagPrefix?: string;
     },
     precomputedAnalysis?: ReturnType<typeof analyzeScript> | null,
 ): string {
@@ -74,7 +76,7 @@ export function compileSFC(
             for (const name of directives.keys()) customDirectives.add(name);
         }
     }
-    const ctx = createCompileContext({ production, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target });
+    const ctx = createCompileContext({ production, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.tagPrefix });
 
     if (descriptor.script) {
         // Reuse pre-computed analysis from compile() validation pass if available

@@ -2,6 +2,7 @@
 // and generates import statements for corresponding .pdx files.
 
 import type { TemplateNode } from '../parser/template';
+import { DEFAULT_TAG_PREFIX } from './tag-prefix';
 
 /** Optional child-bearing fields across template node variants (structural view
  *  for the generic walker, instead of `any` per access). */
@@ -81,19 +82,21 @@ function walkNodes(nodes: TemplateNode[], found: Set<string>): void {
 
 /**
  * Generate import statements for discovered component tags.
- * Maps tag to file path: 'pdx-header' → './header.pdx'
+ * Maps tag to file path: 'app-header' → './header.pdx' (the app's prefix, or the alpha `pdx-`)
  *
  * @param tags - Tags to import
  * @param componentDirs - Directories to search (relative to .pdx file)
+ * @param prefix - The app's component tag prefix (#136)
  * @returns Array of import statements
  */
 export function generateComponentImports(
     tags: string[],
-    componentDirs: string[] = ['./']
+    componentDirs: string[] = ['./'],
+    prefix: string = DEFAULT_TAG_PREFIX,
 ): string[] {
     return tags.map(tag => {
-        // pdx-header → header, pdx-user-card → user-card
-        const name = tag.replace(/^pdx-/, '');
+        // app-header → header, app-user-card → user-card
+        const name = tag.startsWith(`${prefix}-`) ? tag.slice(prefix.length + 1) : tag.replace(/^pdx-/, '');
         const dir = componentDirs[0] ?? './';
         const dirPrefix = dir.endsWith('/') ? dir : dir + '/';
         return `import '${dirPrefix}${name}.pdx';`;

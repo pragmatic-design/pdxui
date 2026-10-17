@@ -7,11 +7,11 @@
       <code>pdx-load-more</code> events for manual control.
     </p>
 
-    <pdx-demo-comp-infinite-scroll-basic class="demo-section"></pdx-demo-comp-infinite-scroll-basic>
+    <app-demo-comp-infinite-scroll-basic class="demo-section"></app-demo-comp-infinite-scroll-basic>
 
-    <pdx-demo-comp-infinite-scroll-end-message class="demo-section"></pdx-demo-comp-infinite-scroll-end-message>
+    <app-demo-comp-infinite-scroll-end-message class="demo-section"></app-demo-comp-infinite-scroll-end-message>
 
-    <pdx-demo-comp-infinite-scroll-manual class="demo-section"></pdx-demo-comp-infinite-scroll-manual>
+    <app-demo-comp-infinite-scroll-manual class="demo-section"></app-demo-comp-infinite-scroll-manual>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

@@ -39,14 +39,17 @@ alpha → beta (#158)
 
 ### Semantics
 
-The file name is the tag, lowercased, prefixed with the **application prefix** (#136):
+The file name is the tag, lowercased, prefixed with the **application prefix** (#136 — landed):
 `pdx({ prefix })`, default `'app'`. `user-card.pdx` → `<app-user-card>`; `admin/_layout.pdx` →
 `<app-admin-layout>` (the folder rule of alpha is unchanged). `@tag 'x-y'` names the tag explicitly.
 The prefix `pdx-` is reserved for the `@pdxui/*` packages.
 
 ### Rules
 
-- An application tag that starts with `pdx-` (derived or written with `@tag`) is `PDX_TAG_RESERVED`.
+- An application tag written with `@tag` that starts with `pdx-` is `PDX_TAG_RESERVED`. A file whose
+  name starts with `pdx-` does not derive one: the reserved prefix is dropped, `pdx-code.pdx` →
+  `<app-code>` (landed so, rather than as an error, so an alpha file named that way keeps compiling
+  and only its tag changes).
 - Two files that derive one tag are `PDX_TAG_COLLISION`, as in alpha.
 - `pdx migrate` renames an existing application's `pdx-` tags in its templates, its CSS selectors and
   its `@tag` lines, and reports a tag it finds inside a string.

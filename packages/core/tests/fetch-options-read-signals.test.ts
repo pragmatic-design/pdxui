@@ -26,7 +26,7 @@ describe('@fetch options', () => {
             const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
             const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
             new Function('__core', body)(core);
-            const el = document.createElement(`pdx-${name}`);
+            const el = document.createElement(`app-${name}`);
             document.body.appendChild(el);
             await settle();
             expect(fetch).not.toHaveBeenCalled();
@@ -50,7 +50,7 @@ describe('@fetch options', () => {
             new Function('__core', body)(core);
             // A setup that throws is caught by core and reported on the console, not on window.
             const reported = vi.spyOn(console, 'error').mockImplementation(() => {});
-            const el = document.createElement(`pdx-${name}`);
+            const el = document.createElement(`app-${name}`);
             document.body.appendChild(el);
             await settle();
             const setupFailures = reported.mock.calls.filter((c) => String(c[0]).includes('setup failed'));

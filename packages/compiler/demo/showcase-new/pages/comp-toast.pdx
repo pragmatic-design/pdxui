@@ -6,28 +6,28 @@
     </p>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-comp-toast-types class="demo-section"></pdx-demo-comp-toast-types>
+    <app-demo-comp-toast-types class="demo-section"></app-demo-comp-toast-types>
 
     <!-- ═══ Visual Variants ═══ -->
-    <pdx-demo-comp-toast-variants class="demo-section"></pdx-demo-comp-toast-variants>
+    <app-demo-comp-toast-variants class="demo-section"></app-demo-comp-toast-variants>
 
     <!-- ═══ Rich (Title + Description) ═══ -->
-    <pdx-demo-comp-toast-title-description class="demo-section"></pdx-demo-comp-toast-title-description>
+    <app-demo-comp-toast-title-description class="demo-section"></app-demo-comp-toast-title-description>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-toast-sizes class="demo-section"></pdx-demo-comp-toast-sizes>
+    <app-demo-comp-toast-sizes class="demo-section"></app-demo-comp-toast-sizes>
 
     <!-- ═══ With Action ═══ -->
-    <pdx-demo-comp-toast-action class="demo-section"></pdx-demo-comp-toast-action>
+    <app-demo-comp-toast-action class="demo-section"></app-demo-comp-toast-action>
 
     <!-- ═══ Custom Icon ═══ -->
-    <pdx-demo-comp-toast-custom-icon class="demo-section"></pdx-demo-comp-toast-custom-icon>
+    <app-demo-comp-toast-custom-icon class="demo-section"></app-demo-comp-toast-custom-icon>
 
     <!-- ═══ Promise API ═══ -->
-    <pdx-demo-comp-toast-promise class="demo-section"></pdx-demo-comp-toast-promise>
+    <app-demo-comp-toast-promise class="demo-section"></app-demo-comp-toast-promise>
 
     <!-- ═══ Persistent + Hover Pause ═══ -->
-    <pdx-demo-comp-toast-persistent class="demo-section"></pdx-demo-comp-toast-persistent>
+    <app-demo-comp-toast-persistent class="demo-section"></app-demo-comp-toast-persistent>
 
     <!-- ═══ Reference ═══ -->
     <section>

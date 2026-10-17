@@ -6,9 +6,9 @@
       items, keyboard shortcuts, arrow-key navigation, focus trap and an empty state.
     </p>
 
-    <pdx-demo-comp-command-basic class="demo-section"></pdx-demo-comp-command-basic>
+    <app-demo-comp-command-basic class="demo-section"></app-demo-comp-command-basic>
 
-    <pdx-demo-comp-command-custom class="demo-section"></pdx-demo-comp-command-custom>
+    <app-demo-comp-command-custom class="demo-section"></app-demo-comp-command-custom>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>

@@ -4,19 +4,19 @@
     <p class="desc">Focus trap, focus group (arrow nav + type-ahead), focus restore, tab order.</p>
 
     <!-- Focus Trap -->
-    <pdx-demo-infra-focus-trap class="demo-section"></pdx-demo-infra-focus-trap>
+    <app-demo-infra-focus-trap class="demo-section"></app-demo-infra-focus-trap>
 
     <!-- Focus Group Vertical -->
-    <pdx-demo-infra-focus-group-vertical class="demo-section"></pdx-demo-infra-focus-group-vertical>
+    <app-demo-infra-focus-group-vertical class="demo-section"></app-demo-infra-focus-group-vertical>
 
     <!-- Focus Group Horizontal -->
-    <pdx-demo-infra-focus-group-horizontal class="demo-section"></pdx-demo-infra-focus-group-horizontal>
+    <app-demo-infra-focus-group-horizontal class="demo-section"></app-demo-infra-focus-group-horizontal>
 
     <!-- Type-Ahead -->
-    <pdx-demo-infra-focus-typeahead class="demo-section"></pdx-demo-infra-focus-typeahead>
+    <app-demo-infra-focus-typeahead class="demo-section"></app-demo-infra-focus-typeahead>
 
     <!-- Focus Restore -->
-    <pdx-demo-infra-focus-restore class="demo-section"></pdx-demo-infra-focus-restore>
+    <app-demo-infra-focus-restore class="demo-section"></app-demo-infra-focus-restore>
   </div>
 </template>
 

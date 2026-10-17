@@ -844,7 +844,7 @@ function component(tag: string, options: ComponentOptions<P, E, M>): void
 Define a function-based Web Component.
 
 Usage:
-  component('pdx-counter', {
+  component('app-counter', {
     props: {
       initial: { type: Number, default: 0 },
     },
@@ -2178,7 +2178,7 @@ Forward slots from outer host to inner component.
 Used when a compound component wraps another compound component.
 
 @example
-// <pdx-fancy-dialog> wraps <pdx-dialog>
+// <app-fancy-dialog> wraps <pdx-dialog>
 // Forward 'header' and 'footer' slots to inner dialog
 forwardSlots(outerHost, innerHost, ['header', 'footer']);
 
@@ -4305,7 +4305,7 @@ Creates a responsive signal that updates when viewport breakpoints change.
 
 Usage:
   const cols = responsive({ sm: 1, md: 2, lg: 3, xl: 4 });
-  html`<pdx-grid :cols=${cols}>...</pdx-grid>`
+  html`<app-grid :cols=${cols}>...</app-grid>`
 
 @param map - Breakpoint → value mapping
 @param base - Fallback value when no breakpoint matches (below smallest defined)

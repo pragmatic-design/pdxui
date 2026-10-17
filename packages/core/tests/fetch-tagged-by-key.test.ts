@@ -37,7 +37,7 @@ describe('an @fetch is tagged with its own key', () => {
         const fetch = stubFetch();
         defineCompiled('tagkeyplain', "<template><p>{{ users.data()?.length ?? 0 }}</p></template>\n"
             + "<script setup>\n@fetch users: 'GET /api/tag-plain' as string[];\n</script>\n");
-        document.body.appendChild(document.createElement('pdx-tagkeyplain'));
+        document.body.appendChild(document.createElement('app-tagkeyplain'));
         await settle();
         expect(tagsOf('GET:/api/tag-plain'), 'the @fetch entry is not tagged with its key').toContain('GET:/api/tag-plain');
 
@@ -51,7 +51,7 @@ describe('an @fetch is tagged with its own key', () => {
         stubFetch();
         defineCompiled('tagkeyauthor', "<template><p>{{ users.data()?.length ?? 0 }}</p></template>\n"
             + "<script setup>\n@fetch users: 'GET /api/tag-author' as string[] { tags: ['users'] };\n</script>\n");
-        document.body.appendChild(document.createElement('pdx-tagkeyauthor'));
+        document.body.appendChild(document.createElement('app-tagkeyauthor'));
         await settle();
         expect(tagsOf('GET:/api/tag-author')).toEqual(expect.arrayContaining(['GET:/api/tag-author', 'users']));
     });
@@ -60,7 +60,7 @@ describe('an @fetch is tagged with its own key', () => {
         stubFetch();
         defineCompiled('tagkeyreactive', "<template><p>{{ user.data()?.length ?? 0 }}</p><button @click=\"id = 2\">2</button></template>\n"
             + "<script setup>\nlet id = $signal(1);\n@fetch user: 'GET /api/tag-r/${id}' as string[];\n</script>\n");
-        const el = document.createElement('pdx-tagkeyreactive');
+        const el = document.createElement('app-tagkeyreactive');
         document.body.appendChild(el);
         await settle();
         expect(tagsOf('GET:/api/tag-r/1')).toContain('GET:/api/tag-r/1');

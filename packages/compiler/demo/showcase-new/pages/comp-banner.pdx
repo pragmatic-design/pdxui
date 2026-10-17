@@ -5,15 +5,15 @@
       Inline alert banners with auto icon, closable, auto-dismiss, and action slots.
     </p>
 
-    <pdx-demo-comp-banner-variants class="demo-section"></pdx-demo-comp-banner-variants>
+    <app-demo-comp-banner-variants class="demo-section"></app-demo-comp-banner-variants>
 
-    <pdx-demo-comp-banner-closable class="demo-section"></pdx-demo-comp-banner-closable>
+    <app-demo-comp-banner-closable class="demo-section"></app-demo-comp-banner-closable>
 
-    <pdx-demo-comp-banner-subtle class="demo-section"></pdx-demo-comp-banner-subtle>
+    <app-demo-comp-banner-subtle class="demo-section"></app-demo-comp-banner-subtle>
 
-    <pdx-demo-comp-banner-auto-dismiss class="demo-section"></pdx-demo-comp-banner-auto-dismiss>
+    <app-demo-comp-banner-auto-dismiss class="demo-section"></app-demo-comp-banner-auto-dismiss>
 
-    <pdx-demo-comp-banner-without-icon class="demo-section"></pdx-demo-comp-banner-without-icon>
+    <app-demo-comp-banner-without-icon class="demo-section"></app-demo-comp-banner-without-icon>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>

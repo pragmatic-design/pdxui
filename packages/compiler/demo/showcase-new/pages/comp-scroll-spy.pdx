@@ -6,7 +6,7 @@
       is currently visible. Uses IntersectionObserver.
     </p>
 
-    <pdx-demo-comp-scroll-spy-live class="demo-section"></pdx-demo-comp-scroll-spy-live>
+    <app-demo-comp-scroll-spy-live class="demo-section"></app-demo-comp-scroll-spy-live>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

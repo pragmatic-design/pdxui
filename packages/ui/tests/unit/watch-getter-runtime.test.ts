@@ -33,7 +33,7 @@ beforeAll(() => {
 afterEach(() => cleanup());
 
 describe('$watch over a @prop, compiled and mounted', () => {
-    for (const [spelling, tag] of [['() => open', 'pdx-watch-getter-panel'], ['open', 'pdx-watch-name-panel']] as const) {
+    for (const [spelling, tag] of [['() => open', 'app-watch-getter-panel'], ['open', 'app-watch-name-panel']] as const) {
         it(`$watch(${spelling}, cb) calls back when the prop changes`, async () => {
             const el = document.createElement(tag) as HTMLElement & { open: boolean };
             document.body.appendChild(el);

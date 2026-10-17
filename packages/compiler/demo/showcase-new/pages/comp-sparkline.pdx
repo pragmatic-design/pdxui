@@ -8,13 +8,13 @@
       <code>width</code>/<code>height</code>.
     </p>
 
-    <pdx-demo-comp-sparkline-types class="demo-section"></pdx-demo-comp-sparkline-types>
+    <app-demo-comp-sparkline-types class="demo-section"></app-demo-comp-sparkline-types>
 
-    <pdx-demo-comp-sparkline-kpi-cards class="demo-section"></pdx-demo-comp-sparkline-kpi-cards>
+    <app-demo-comp-sparkline-kpi-cards class="demo-section"></app-demo-comp-sparkline-kpi-cards>
 
-    <pdx-demo-comp-sparkline-table-rows class="demo-section"></pdx-demo-comp-sparkline-table-rows>
+    <app-demo-comp-sparkline-table-rows class="demo-section"></app-demo-comp-sparkline-table-rows>
 
-    <pdx-demo-comp-sparkline-color-smoothing class="demo-section"></pdx-demo-comp-sparkline-color-smoothing>
+    <app-demo-comp-sparkline-color-smoothing class="demo-section"></app-demo-comp-sparkline-color-smoothing>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>

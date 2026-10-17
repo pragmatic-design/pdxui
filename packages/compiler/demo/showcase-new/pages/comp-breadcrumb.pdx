@@ -5,15 +5,15 @@
       <code>&lt;pdx-breadcrumb&gt;</code> — navigation breadcrumbs with overflow collapse and custom separators.
     </p>
 
-    <pdx-demo-comp-breadcrumb-basic class="demo-section"></pdx-demo-comp-breadcrumb-basic>
+    <app-demo-comp-breadcrumb-basic class="demo-section"></app-demo-comp-breadcrumb-basic>
 
-    <pdx-demo-comp-breadcrumb-with-icons class="demo-section"></pdx-demo-comp-breadcrumb-with-icons>
+    <app-demo-comp-breadcrumb-with-icons class="demo-section"></app-demo-comp-breadcrumb-with-icons>
 
-    <pdx-demo-comp-breadcrumb-custom-separator class="demo-section"></pdx-demo-comp-breadcrumb-custom-separator>
+    <app-demo-comp-breadcrumb-custom-separator class="demo-section"></app-demo-comp-breadcrumb-custom-separator>
 
-    <pdx-demo-comp-breadcrumb-overflow class="demo-section"></pdx-demo-comp-breadcrumb-overflow>
+    <app-demo-comp-breadcrumb-overflow class="demo-section"></app-demo-comp-breadcrumb-overflow>
 
-    <pdx-demo-comp-breadcrumb-slot-template class="demo-section"></pdx-demo-comp-breadcrumb-slot-template>
+    <app-demo-comp-breadcrumb-slot-template class="demo-section"></app-demo-comp-breadcrumb-slot-template>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Slots</h2>

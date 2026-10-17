@@ -7,25 +7,25 @@
       Values can be plain strings or custom HTML via a <code>render-value</code> callback.
     </p>
 
-    <pdx-demo-comp-description-list-basic class="demo-section"></pdx-demo-comp-description-list-basic>
+    <app-demo-comp-description-list-basic class="demo-section"></app-demo-comp-description-list-basic>
 
-    <pdx-demo-comp-description-list-horizontal class="demo-section"></pdx-demo-comp-description-list-horizontal>
+    <app-demo-comp-description-list-horizontal class="demo-section"></app-demo-comp-description-list-horizontal>
 
-    <pdx-demo-comp-description-list-vertical class="demo-section"></pdx-demo-comp-description-list-vertical>
+    <app-demo-comp-description-list-vertical class="demo-section"></app-demo-comp-description-list-vertical>
 
-    <pdx-demo-comp-description-list-multi-column class="demo-section"></pdx-demo-comp-description-list-multi-column>
+    <app-demo-comp-description-list-multi-column class="demo-section"></app-demo-comp-description-list-multi-column>
 
-    <pdx-demo-comp-description-list-bordered class="demo-section"></pdx-demo-comp-description-list-bordered>
+    <app-demo-comp-description-list-bordered class="demo-section"></app-demo-comp-description-list-bordered>
 
-    <pdx-demo-comp-description-list-bordered-striped class="demo-section"></pdx-demo-comp-description-list-bordered-striped>
+    <app-demo-comp-description-list-bordered-striped class="demo-section"></app-demo-comp-description-list-bordered-striped>
 
-    <pdx-demo-comp-description-list-icons class="demo-section"></pdx-demo-comp-description-list-icons>
+    <app-demo-comp-description-list-icons class="demo-section"></app-demo-comp-description-list-icons>
 
-    <pdx-demo-comp-description-list-custom-value class="demo-section"></pdx-demo-comp-description-list-custom-value>
+    <app-demo-comp-description-list-custom-value class="demo-section"></app-demo-comp-description-list-custom-value>
 
-    <pdx-demo-comp-description-list-sizes class="demo-section"></pdx-demo-comp-description-list-sizes>
+    <app-demo-comp-description-list-sizes class="demo-section"></app-demo-comp-description-list-sizes>
 
-    <pdx-demo-comp-description-list-slot-template class="demo-section"></pdx-demo-comp-description-list-slot-template>
+    <app-demo-comp-description-list-slot-template class="demo-section"></app-demo-comp-description-list-slot-template>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Slots</h2>

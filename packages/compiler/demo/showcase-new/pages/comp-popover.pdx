@@ -6,16 +6,16 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-popover-basic class="demo-section"></pdx-demo-comp-popover-basic>
+    <app-demo-comp-popover-basic class="demo-section"></app-demo-comp-popover-basic>
 
     <!-- ═══ Placements ═══ -->
-    <pdx-demo-comp-popover-placements class="demo-section"></pdx-demo-comp-popover-placements>
+    <app-demo-comp-popover-placements class="demo-section"></app-demo-comp-popover-placements>
 
     <!-- ═══ Hover Trigger ═══ -->
-    <pdx-demo-comp-popover-hover class="demo-section"></pdx-demo-comp-popover-hover>
+    <app-demo-comp-popover-hover class="demo-section"></app-demo-comp-popover-hover>
 
     <!-- ═══ Rich Content ═══ -->
-    <pdx-demo-comp-popover-rich-content class="demo-section"></pdx-demo-comp-popover-rich-content>
+    <app-demo-comp-popover-rich-content class="demo-section"></app-demo-comp-popover-rich-content>
 
     <!-- ═══ Reference ═══ -->
     <section>

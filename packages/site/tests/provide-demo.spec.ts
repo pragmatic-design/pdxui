@@ -12,7 +12,7 @@ import { test, expect } from '@playwright/test';
 
 test('pdx-provide: the Multiple Values box names the value of debug', async ({ page }) => {
     await page.goto('/components/pdx-provide', { waitUntil: 'networkidle' });
-    const box = page.locator('pdx-demo-comp-provide-multiple .demo-child');
+    const box = page.locator('app-demo-comp-provide-multiple .demo-child');
     await expect(box).toHaveCount(1);
     await expect(box).toHaveText(/theme:\s*dark,\s*locale:\s*en,\s*debug:\s*false/);
 });

@@ -28,25 +28,25 @@
     </div>
 
     <!-- ═══ Action Group ═══ -->
-    <pdx-demo-comp-button-group-action class="demo-section"></pdx-demo-comp-button-group-action>
+    <app-demo-comp-button-group-action class="demo-section"></app-demo-comp-button-group-action>
 
     <!-- ═══ Single Toggle ═══ -->
-    <pdx-demo-comp-button-group-single-toggle class="demo-section"></pdx-demo-comp-button-group-single-toggle>
+    <app-demo-comp-button-group-single-toggle class="demo-section"></app-demo-comp-button-group-single-toggle>
 
     <!-- ═══ Multiple Toggle ═══ -->
-    <pdx-demo-comp-button-group-multiple-toggle class="demo-section"></pdx-demo-comp-button-group-multiple-toggle>
+    <app-demo-comp-button-group-multiple-toggle class="demo-section"></app-demo-comp-button-group-multiple-toggle>
 
     <!-- ═══ Orientation ═══ -->
-    <pdx-demo-comp-button-group-orientation class="demo-section"></pdx-demo-comp-button-group-orientation>
+    <app-demo-comp-button-group-orientation class="demo-section"></app-demo-comp-button-group-orientation>
 
     <!-- ═══ Variant & Size Propagation ═══ -->
-    <pdx-demo-comp-button-group-propagation class="demo-section"></pdx-demo-comp-button-group-propagation>
+    <app-demo-comp-button-group-propagation class="demo-section"></app-demo-comp-button-group-propagation>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-button-group-disabled class="demo-section"></pdx-demo-comp-button-group-disabled>
+    <app-demo-comp-button-group-disabled class="demo-section"></app-demo-comp-button-group-disabled>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-button-group-composition class="demo-section"></pdx-demo-comp-button-group-composition>
+    <app-demo-comp-button-group-composition class="demo-section"></app-demo-comp-button-group-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

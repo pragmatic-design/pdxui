@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Appearance ═══ -->
-    <pdx-demo-design-popover-appearance class="demo-section"></pdx-demo-design-popover-appearance>
+    <app-demo-design-popover-appearance class="demo-section"></app-demo-design-popover-appearance>
 
     <!-- ═══ Bare Variant ═══ -->
-    <pdx-demo-design-popover-bare class="demo-section"></pdx-demo-design-popover-bare>
+    <app-demo-design-popover-bare class="demo-section"></app-demo-design-popover-bare>
 
     <!-- ═══ Placements ═══ -->
-    <pdx-demo-design-popover-placements class="demo-section"></pdx-demo-design-popover-placements>
+    <app-demo-design-popover-placements class="demo-section"></app-demo-design-popover-placements>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-popover-composition class="demo-section"></pdx-demo-design-popover-composition>
+    <app-demo-design-popover-composition class="demo-section"></app-demo-design-popover-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

@@ -6,17 +6,17 @@
       with auto-update. Uses <code>Intl.RelativeTimeFormat</code> for locale-aware output.
     </p>
 
-    <pdx-demo-comp-relative-time-past class="demo-section"></pdx-demo-comp-relative-time-past>
+    <app-demo-comp-relative-time-past class="demo-section"></app-demo-comp-relative-time-past>
 
-    <pdx-demo-comp-relative-time-future class="demo-section"></pdx-demo-comp-relative-time-future>
+    <app-demo-comp-relative-time-future class="demo-section"></app-demo-comp-relative-time-future>
 
-    <pdx-demo-comp-relative-time-styles class="demo-section"></pdx-demo-comp-relative-time-styles>
+    <app-demo-comp-relative-time-styles class="demo-section"></app-demo-comp-relative-time-styles>
 
-    <pdx-demo-comp-relative-time-auto-update class="demo-section"></pdx-demo-comp-relative-time-auto-update>
+    <app-demo-comp-relative-time-auto-update class="demo-section"></app-demo-comp-relative-time-auto-update>
 
-    <pdx-demo-comp-relative-time-locales class="demo-section"></pdx-demo-comp-relative-time-locales>
+    <app-demo-comp-relative-time-locales class="demo-section"></app-demo-comp-relative-time-locales>
 
-    <pdx-demo-comp-relative-time-tooltip class="demo-section"></pdx-demo-comp-relative-time-tooltip>
+    <app-demo-comp-relative-time-tooltip class="demo-section"></app-demo-comp-relative-time-tooltip>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

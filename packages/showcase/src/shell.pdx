@@ -96,7 +96,7 @@
     <!-- ── The rail's SECOND LEVEL, the catalogue: `src/shell/catalog.pdx` ──
          The shell owns whether it is open (the Escape order is between it and the drawer) and
          the pins it shares with the rail. -->
-    <pdx-catalog :open="catalogOpen" :favourites="favourites" @dismiss="closeCatalog()" @picked="catalogOpen = false"></pdx-catalog>
+    <app-catalog :open="catalogOpen" :favourites="favourites" @dismiss="closeCatalog()" @picked="catalogOpen = false"></app-catalog>
 
     <!-- `inert` while the drawer is open: the page behind a MODAL drawer takes no focus and no
          click, natively, as `<dialog>.showModal()` does to the rest of a document. -->
@@ -114,7 +114,7 @@
         @click="toggleSide">{{ effectiveSide === 'collapsed' ? '›' : '‹' }}</button>
       <!-- ── The topbar, a SERVICE bar: `src/shell/topbar.pdx`. The shell keeps the drawer's
            state; the ☰ asks for it, and gets the focus back when it closes. -->
-      <pdx-topbar :menu-open="menuOpen" @openmenu="openMenu()"></pdx-topbar>
+      <app-topbar :menu-open="menuOpen" @openmenu="openMenu()"></app-topbar>
 
       <main>
         <!-- The breadcrumb is NOT here, and that is measured rather than preferred: the shell is in

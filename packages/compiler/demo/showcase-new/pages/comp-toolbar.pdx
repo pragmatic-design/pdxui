@@ -7,11 +7,11 @@
       and Tab comes back to the last one used. Name it with <code>label</code>, and every icon-only button with <code>aria-label</code>.
     </p>
 
-    <pdx-demo-comp-toolbar-text-editor class="demo-section"></pdx-demo-comp-toolbar-text-editor>
+    <app-demo-comp-toolbar-text-editor class="demo-section"></app-demo-comp-toolbar-text-editor>
 
-    <pdx-demo-comp-toolbar-file-actions class="demo-section"></pdx-demo-comp-toolbar-file-actions>
+    <app-demo-comp-toolbar-file-actions class="demo-section"></app-demo-comp-toolbar-file-actions>
 
-    <pdx-demo-comp-toolbar-compact class="demo-section"></pdx-demo-comp-toolbar-compact>
+    <app-demo-comp-toolbar-compact class="demo-section"></app-demo-comp-toolbar-compact>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

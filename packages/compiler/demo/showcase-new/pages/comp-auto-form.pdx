@@ -7,13 +7,13 @@
     </p>
 
     <!-- From FieldDefinition -->
-    <pdx-demo-comp-auto-form-field-definitions class="demo-section"></pdx-demo-comp-auto-form-field-definitions>
+    <app-demo-comp-auto-form-field-definitions class="demo-section"></app-demo-comp-auto-form-field-definitions>
 
     <!-- Server-side lookup -->
-    <pdx-demo-comp-auto-form-server-lookup class="demo-section"></pdx-demo-comp-auto-form-server-lookup>
+    <app-demo-comp-auto-form-server-lookup class="demo-section"></app-demo-comp-auto-form-server-lookup>
 
     <!-- Same JSON for Grid + Form -->
-    <pdx-demo-comp-auto-form-one-json class="demo-section"></pdx-demo-comp-auto-form-one-json>
+    <app-demo-comp-auto-form-one-json class="demo-section"></app-demo-comp-auto-form-one-json>
 
     <!-- Reference -->
     <section>

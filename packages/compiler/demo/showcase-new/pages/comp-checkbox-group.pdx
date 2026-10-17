@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-checkbox-group-basic class="demo-section"></pdx-demo-comp-checkbox-group-basic>
+    <app-demo-comp-checkbox-group-basic class="demo-section"></app-demo-comp-checkbox-group-basic>
 
     <!-- ═══ Horizontal ═══ -->
-    <pdx-demo-comp-checkbox-group-horizontal class="demo-section"></pdx-demo-comp-checkbox-group-horizontal>
+    <app-demo-comp-checkbox-group-horizontal class="demo-section"></app-demo-comp-checkbox-group-horizontal>
 
     <!-- ═══ Sizes, disabled, error ═══ -->
-    <pdx-demo-comp-checkbox-group-size-disabled-error class="demo-section"></pdx-demo-comp-checkbox-group-size-disabled-error>
+    <app-demo-comp-checkbox-group-size-disabled-error class="demo-section"></app-demo-comp-checkbox-group-size-disabled-error>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-checkbox-group-composition class="demo-section"></pdx-demo-comp-checkbox-group-composition>
+    <app-demo-comp-checkbox-group-composition class="demo-section"></app-demo-comp-checkbox-group-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

@@ -8,25 +8,25 @@
     </p>
 
     <!-- ═══ Single ═══ -->
-    <pdx-demo-comp-toggle-group-single class="demo-section"></pdx-demo-comp-toggle-group-single>
+    <app-demo-comp-toggle-group-single class="demo-section"></app-demo-comp-toggle-group-single>
 
     <!-- ═══ Multiple ═══ -->
-    <pdx-demo-comp-toggle-group-multiple class="demo-section"></pdx-demo-comp-toggle-group-multiple>
+    <app-demo-comp-toggle-group-multiple class="demo-section"></app-demo-comp-toggle-group-multiple>
 
     <!-- ═══ Disabled item ═══ -->
-    <pdx-demo-comp-toggle-group-disabled-item class="demo-section"></pdx-demo-comp-toggle-group-disabled-item>
+    <app-demo-comp-toggle-group-disabled-item class="demo-section"></app-demo-comp-toggle-group-disabled-item>
 
     <!-- ═══ Disabled group ═══ -->
-    <pdx-demo-comp-toggle-group-disabled-group class="demo-section"></pdx-demo-comp-toggle-group-disabled-group>
+    <app-demo-comp-toggle-group-disabled-group class="demo-section"></app-demo-comp-toggle-group-disabled-group>
 
     <!-- ═══ Variants and sizes ═══ -->
-    <pdx-demo-comp-toggle-group-variants class="demo-section"></pdx-demo-comp-toggle-group-variants>
+    <app-demo-comp-toggle-group-variants class="demo-section"></app-demo-comp-toggle-group-variants>
 
     <!-- ═══ Vertical ═══ -->
-    <pdx-demo-comp-toggle-group-vertical class="demo-section"></pdx-demo-comp-toggle-group-vertical>
+    <app-demo-comp-toggle-group-vertical class="demo-section"></app-demo-comp-toggle-group-vertical>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-toggle-group-composition class="demo-section"></pdx-demo-comp-toggle-group-composition>
+    <app-demo-comp-toggle-group-composition class="demo-section"></app-demo-comp-toggle-group-composition>
 
     <!-- ═══ Keyboard ═══ -->
     <section>

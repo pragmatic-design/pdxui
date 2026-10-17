@@ -54,11 +54,11 @@ test('the gutter around a surface and the inset inside it are two values, not on
     // shell's bar reads both, `main` reads the gutter — and a page that used one padding everywhere
     // would show the same number twice here.
     await page.goto('/');
-    const bar = await page.locator('pdx-app .app-bar').evaluate((el) => {
+    const bar = await page.locator('app-app .app-bar').evaluate((el) => {
         const cs = getComputedStyle(el);
         return { x: parseFloat(cs.paddingLeft), y: parseFloat(cs.paddingTop) };
     });
-    const main = await page.locator('pdx-app main').evaluate((el) => parseFloat(getComputedStyle(el).padding));
+    const main = await page.locator('app-app main').evaluate((el) => parseFloat(getComputedStyle(el).padding));
 
     expect(bar.x, 'the bar does not use the stated gutter').toBe(STATED.gutter);
     expect(bar.y, 'the bar does not use the stated inset').toBe(STATED.inset);
@@ -80,7 +80,7 @@ test('control — the design system leaves the row to its CONTENT, and the app s
     await page.goto('/');
     const fromRoot = await page.evaluate(() =>
         getComputedStyle(document.documentElement).getPropertyValue('--pdx-row-height').trim());
-    const fromShell = await page.locator('pdx-app .app').evaluate((el) =>
+    const fromShell = await page.locator('app-app .app').evaluate((el) =>
         getComputedStyle(el).getPropertyValue('--pdx-row-cell-height').trim());
 
     expect(fromRoot, 'the design system no longer leaves the row to its content').toBe('auto');

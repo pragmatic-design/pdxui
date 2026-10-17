@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ 1. Basic Form — Compiler Binding ═══ -->
-    <pdx-demo-comp-form-basic class="demo-section"></pdx-demo-comp-form-basic>
+    <app-demo-comp-form-basic class="demo-section"></app-demo-comp-form-basic>
 
     <!-- ═══ 2. Nested DTO — Field Groups ═══ -->
-    <pdx-demo-comp-form-nested-dto class="demo-section"></pdx-demo-comp-form-nested-dto>
+    <app-demo-comp-form-nested-dto class="demo-section"></app-demo-comp-form-nested-dto>
 
     <!-- ═══ 3. Validation Modes ═══ -->
-    <pdx-demo-comp-form-validation-modes class="demo-section"></pdx-demo-comp-form-validation-modes>
+    <app-demo-comp-form-validation-modes class="demo-section"></app-demo-comp-form-validation-modes>
 
     <!-- ═══ 4. Warning Rules ═══ -->
-    <pdx-demo-comp-form-warning-rules class="demo-section"></pdx-demo-comp-form-warning-rules>
+    <app-demo-comp-form-warning-rules class="demo-section"></app-demo-comp-form-warning-rules>
 
     <!-- ═══ 5. Programmatic Form (Code) ═══ -->
-    <pdx-demo-comp-form-programmatic class="demo-section"></pdx-demo-comp-form-programmatic>
+    <app-demo-comp-form-programmatic class="demo-section"></app-demo-comp-form-programmatic>
 
     <!-- ═══ 6. DataSource Integration ═══ -->
-    <pdx-demo-comp-form-data-source class="demo-section"></pdx-demo-comp-form-data-source>
+    <app-demo-comp-form-data-source class="demo-section"></app-demo-comp-form-data-source>
 
     <!-- ═══ 7. Schema-Driven Form Template ═══ -->
-    <pdx-demo-comp-form-form-template class="demo-section"></pdx-demo-comp-form-form-template>
+    <app-demo-comp-form-form-template class="demo-section"></app-demo-comp-form-form-template>
 
     <!-- ═══ 8. Multiple Control Types ═══ -->
-    <pdx-demo-comp-form-all-controls class="demo-section"></pdx-demo-comp-form-all-controls>
+    <app-demo-comp-form-all-controls class="demo-section"></app-demo-comp-form-all-controls>
 
     <!-- ═══ Reference ═══ -->
     <section>

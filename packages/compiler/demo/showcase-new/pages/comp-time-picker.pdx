@@ -8,25 +8,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-time-picker-basic class="demo-section"></pdx-demo-comp-time-picker-basic>
+    <app-demo-comp-time-picker-basic class="demo-section"></app-demo-comp-time-picker-basic>
 
     <!-- ═══ 12h / 24h ═══ -->
-    <pdx-demo-comp-time-picker-clock class="demo-section"></pdx-demo-comp-time-picker-clock>
+    <app-demo-comp-time-picker-clock class="demo-section"></app-demo-comp-time-picker-clock>
 
     <!-- ═══ Seconds and step ═══ -->
-    <pdx-demo-comp-time-picker-seconds class="demo-section"></pdx-demo-comp-time-picker-seconds>
+    <app-demo-comp-time-picker-seconds class="demo-section"></app-demo-comp-time-picker-seconds>
 
     <!-- ═══ Min / max ═══ -->
-    <pdx-demo-comp-time-picker-min-max class="demo-section"></pdx-demo-comp-time-picker-min-max>
+    <app-demo-comp-time-picker-min-max class="demo-section"></app-demo-comp-time-picker-min-max>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-time-picker-sizes class="demo-section"></pdx-demo-comp-time-picker-sizes>
+    <app-demo-comp-time-picker-sizes class="demo-section"></app-demo-comp-time-picker-sizes>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-time-picker-disabled class="demo-section"></pdx-demo-comp-time-picker-disabled>
+    <app-demo-comp-time-picker-disabled class="demo-section"></app-demo-comp-time-picker-disabled>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-time-picker-composition class="demo-section"></pdx-demo-comp-time-picker-composition>
+    <app-demo-comp-time-picker-composition class="demo-section"></app-demo-comp-time-picker-composition>
 
     <!-- ═══ Keyboard ═══ -->
     <section>

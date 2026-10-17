@@ -6,7 +6,7 @@
       Smooth scrolling — scales to 10K+ in production builds.
     </p>
 
-    <pdx-demo-comp-data-grid-virtual-thousand-rows class="demo-section"></pdx-demo-comp-data-grid-virtual-thousand-rows>
+    <app-demo-comp-data-grid-virtual-thousand-rows class="demo-section"></app-demo-comp-data-grid-virtual-thousand-rows>
   </div>
 </template>
 
