@@ -40,15 +40,6 @@ function setupSourceText(analysis: ScriptAnalysis): string {
 }
 
 /**
- * Whether the component dispatches with the untyped `$emit(name, detail)`, in its script or its
- * template. Such a component has not closed the set of its events — `$emit` takes any name, a
- * hyphenated one `@event` cannot declare — so its descriptor declares none (#123).
- */
-export function usesUntypedEmit(analysis: ScriptAnalysis, descriptor?: SFCDescriptor): boolean {
-    return /\$emit\s*\(/.test(setupSourceText(analysis)) || /\$emit\s*\(/.test(descriptor?.template?.content ?? '');
-}
-
-/**
  * Build all parts of the setup() function body for new mode.
  * @param scriptOnly - When true, emit standalone effect()/cleanup instead of ctx.track()
  */
@@ -108,13 +99,13 @@ export function buildSetupBody(
     // Such signals must wait for that declaration. Conversely a derived used in the body
     // must emit BEFORE the body. We compute body-local declared names and partition.
     const bodyLocalNames = collectBodyLocalNames(analysis.body);
-    // @event name: T → `name(detail)` dispatches it from the host. Declared before
-    // everything else, so the body can call it at setup time. An author who declares the name
-    // themselves keeps their own function. `$emit(event, detail)` is the untyped form of the same.
-    const emitterNames = analysis.events.map(e => e.name).filter(n => !bodyLocalNames.has(n));
-    for (const n of emitterNames) parts.push(`    const ${n} = (detail) => ctx.emit(${jsQuote(n)}, detail);`);
-    const usesEmit = usesUntypedEmit(analysis, descriptor);
-    if (usesEmit) parts.push(`    const $emit = (event, detail) => ctx.emit(event, detail);`);
+    // @event name: T → `name(detail)` dispatches it from the host; it stays there unless declared
+    // `@event(bubbles)` (#138). Declared before everything else, so the body can call it at setup
+    // time. An author who declares the name themselves keeps their own function.
+    const emitters = analysis.events.filter(e => !bodyLocalNames.has(e.name));
+    for (const e of emitters) {
+        parts.push(`    const ${e.name} = (detail) => ctx.emit(${jsQuote(e.name)}, detail${e.bubbles ? ', { bubbles: true }' : ''});`);
+    }
 
     // Late signals: those reading a body-local, and those reading a late signal. They are
     // declared inside the body, after the statement that declares what they read.
@@ -629,10 +620,9 @@ export function buildSetupBody(
 
     // Auto-return (no manual return needed). The emitters go too: the template calls ctx.<name>.
     const returned = [...analysis.exports];
-    for (const n of emitterNames) {
-        if (!returned.some(e => e.name === n)) returned.push({ name: n, kind: 'function' });
+    for (const { name } of emitters) {
+        if (!returned.some(e => e.name === name)) returned.push({ name, kind: 'function' });
     }
-    if (usesEmit) returned.push({ name: '$emit', kind: 'function' });
     parts.push(generateAutoReturn(returned));
 
     return parts.join('\n');

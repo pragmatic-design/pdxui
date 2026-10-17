@@ -19,6 +19,8 @@ export interface PropInfo {
 export interface EventInfo {
     name: string;
     payloadType: string;  // '{ value: number }', 'void', etc.
+    /** `@event(bubbles) name`: the event bubbles and is composed; absent, it stays on the host (#138). */
+    bubbles?: true;
 }
 
 /** `@state name = expression;` — a visual state of the host, a custom state (#132). */
@@ -237,7 +239,7 @@ export interface ScriptAnalysis {
     parts: string[];         // @part trigger, popup;
     route: RouteInfo;       // route metadata from @page/@guard/etc.
     globalStore?: GlobalStoreDirective;  // @store rune (file = store module)
-    customTag?: string;      // @tag 'pdx-custom-name' — overrides file-derived tag
+    customTag?: string;      // @tag 'app-custom-name' — overrides file-derived tag
     i18n?: I18nInfo;         // @i18n configuration block
     head: HeadInfo;          // @title/@meta head management
     provides: ProvideDecl[];  // @provide key = expr;

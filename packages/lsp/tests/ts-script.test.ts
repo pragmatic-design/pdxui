@@ -91,6 +91,16 @@ describe('getScriptDiagnostics', () => {
         expect(withEvent('function f() { changed(1); }').map((d: { message: string }) => d.message)).toEqual([]);
     });
 
+    it('@event(bubbles) (#138) declares its function as @event does: blanked, typed by its payload', () => {
+        const sc = "\n@event(bubbles) saved: number;\nfunction f() { saved('one'); saved(2); }\n";
+        const src = '<template></template>\n<script setup>' + sc + '</script>';
+        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        expect(projectScript(sc).slice(0, sc.length)).not.toContain('bubbles');
+        const d = getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src) as { message: string }[];
+        expect(d.map((x) => x.message).filter((m) => /Cannot find name/.test(m)), 'saved() was not declared').toEqual([]);
+        expect(d.some((x) => /string/i.test(x.message) && /number/i.test(x.message)), 'the payload was not typed').toBe(true);
+    });
+
     it('the @event payload is typed: a string where a number belongs is an error', () => {
         const d = withEvent("function f() { changed('one'); }");
         expect(d.some((x: { message: string }) => /string/i.test(x.message) && /number/i.test(x.message))).toBe(true);

@@ -4,8 +4,9 @@
        reactive, and the rows a `<pdx-field-list>` adds are not in `fields` until they exist. A
        native `input` bubbles out of every `<pdx-input>` in light DOM, which is what this rides.
        A `<pdx-date-picker editable>` is the exception: its value lands on blur, AFTER the native
-       `change` of its text box, so it is `pdx-change` that carries a typed date. -->
-  <section class="page" data-test="intake" @input="touchDraft" @change="touchDraft" @pdx-change="touchDraft">
+       `change` of its text box, so it is `pdx-change` that carries a typed date — and a component's
+       event stays on it (#138), so the page watches the two date fields of the form instead. -->
+  <section class="page" data-test="intake" @input="touchDraft" @change="touchDraft">
     <h1 class="pdx-txt-title">{{ $t('intake.title') }}</h1>
     <!-- For the reader of the source: a four-step wizard — two forms, one Save, a rule
          that reads two fields, and a guard on leaving. -->
@@ -160,6 +161,10 @@ function touchDraft() {
   }, step);
 }
 
+// A typed date lands on blur, after its text box's native `change`, and the picker's `pdx-change`
+// stays on the picker (#138): the draft follows the two date fields of the form instead.
+$watch(() => [intake.fields.starts.value(), intake.fields.ends.value()], touchDraft);
+
 function resumeDraft() {
   const found = draftOffer;
   draftOffer = null;
@@ -224,10 +229,10 @@ function onBeforeStep(e) {
 /**
  * The wizard's own step change — and ONLY its own.
  *
- * `pdx-change` is not the wizard's private name: `<pdx-input>` emits it too, it bubbles, and the
- * listener is on an ancestor of every field on every step. Without a guard, typing one character
- * delivers `{ value: 'A' }` here (`target=pdx-input detail={"value":"A"}`), `step` becomes the
- * string, and the wizard's `:value` coerces it to NaN.
+ * `pdx-change` is not the wizard's private name: `<pdx-input>` emits it too, and the listener is on
+ * an ancestor of every field on every step. When it bubbled (before #138), typing one character
+ * delivered `{ value: 'A' }` here (`target=pdx-input detail={"value":"A"}`), `step` became the
+ * string, and the wizard's `:value` coerced it to NaN. It no longer bubbles; the guard stays.
  *
  * So the listener says `.self`, which is the modifier for exactly this and the one `gotchas.md` names — an event
  * belongs to the element it was dispatched on, and a name is not private to a component.

@@ -154,7 +154,7 @@ EventDecl ::= "@event" ( "(" S? "bubbles" S? ")" )? S Identifier ( S? ":" S? Typ
 ### Semantics
 
 Declares an event and the function of the same name that dispatches it, as in alpha — but **events
-do not bubble by default** (#138): `@event saved: Item;` dispatches `CustomEvent('saved', { detail })`
+do not bubble by default** (#138 — landed): `@event saved: Item;` dispatches `CustomEvent('saved', { detail })`
 with `bubbles: false, composed: false`. `@event(bubbles) saved: Item;` opts in (`bubbles: true,
 composed: true`). The function is the only way to dispatch from a `.pdx` (`$emit` is removed). A
 parent listens with `@saved="…"`, and the editor types `$event` as `CustomEvent<Item>`. Descriptor:
@@ -163,9 +163,15 @@ parent listens with `@saved="…"`, and the editor types `$event` as `CustomEven
 ### Rules
 
 - The alpha rules stay (`PDX_MALFORMED_EVENT`, `PDX_DUP_EVENT`, `PDX_EVENT_NAME_CASE`).
+- `@event(…)` with any option but `bubbles` is `PDX_UNKNOWN_DECLARATION`, its hint the form.
 - `pdx migrate` rewrites every existing `@event` as `@event(bubbles)`, preserving behaviour;
   `PDX_EVENT_BUBBLES_UNUSED` (info) then lists the events marked `bubbles` that no ancestor in the
-  project listens to.
+  project listens to. "Listens" is read off the project's templates: a listener written on any element
+  other than the component's own tag. One added with `addEventListener` in a `.ts` is not read.
+- Library components wrapping another one (`pdx-form-template`, `pdx-pin-input`, `pdx-toggle-group`)
+  listen to the inner element and dispatch its events again from their host; no library event is
+  declared `bubbles`. Consumers that listened above a library component — a form or a section hearing
+  every field's `pdx-change` — listen on the component itself.
 
 ### Examples
 
@@ -570,10 +576,10 @@ hatch, `.pdx` becomes the default for the library.
 **Landed** (#123): the builders `prop`, `prop.required`, `event`, `model` and `slot` (`@pdxui/core`),
 every field above in the descriptor's type, and the behaviour of two of them. `props` types `ctx`
 from each type argument; a `prop.required` the host does not set is reported in development. `events`
-types `ctx.emit` — the name is a declared one and the detail its type — and an event declared with
-`{ bubbles: false }` does not bubble; emitting an undeclared one is reported in development and still
-dispatched. A `.pdx` compiles its `@event` names into `events`, except one that also dispatches with
-`$emit`, which takes any name. The manifest reads a prop's type and an event's detail type from the
+types `ctx.emit` — the name is a declared one and the detail its type — and, since #138, an event
+bubbles only when declared `{ bubbles: true }`; emitting an undeclared one is reported in development
+and still dispatched. A `.pdx` compiles its `@event` names into `events`, `(bubbles)` as
+`{ bubbles: true }`. The manifest reads a prop's type and an event's detail type from the
 type arguments; `pdx-select` and `pdx-toggle` are written this way. The other fields are typed and do
 nothing yet: `slots` #131, the rest in their own issues (`states` landed since, #132; `models`, #124).
 The constructor form is still accepted.

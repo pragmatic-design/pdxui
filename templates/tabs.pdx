@@ -33,7 +33,7 @@
 
   function selectTab(id) {
     activeTab = id;
-    $emit('tabchanged', id);
+    tabchanged(id);
   }
 
   function handleKeydown(e) {

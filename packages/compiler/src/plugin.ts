@@ -487,6 +487,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     methodsOf: (tag) => componentResolver.methodsOf(tag),
                     modelsOf: (tag) => componentResolver.modelsOf(tag),
                     requiredPropsOf: (tag) => componentResolver.requiredPropsOf(tag),
+                    eventHeardAbove: (event, tag) => componentResolver.eventHeardAbove(event, tag),
                     importPathOf: (tag) => componentResolver.resolve(tag)?.importPath ?? null,
                 });
                 let output = result.code;
@@ -517,7 +518,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                         throw new Error(
                             `PDX_TAG_COLLISION: "${tag}" is already registered by "${shortPath(existingFile)}".\n` +
                             `  Conflicting file: ${shortPath(id)}\n` +
-                            `  Fix: add @tag 'pdx-unique-name'; in one of the files to disambiguate.`
+                            `  Fix: add @tag '${prefix}-unique-name'; in one of the files to disambiguate.`
                         );
                     }
                     tagRegistry.set(tag, id);
@@ -693,6 +694,12 @@ export interface CompileOptions {
      */
     requiredPropsOf?: RequiredPropsLookup;
     /**
+     * Whether the project listens to an event above a component (the plugin passes the resolver's
+     * `eventHeardAbove`: the project's templates). With it, an `@event(bubbles)` nothing hears above
+     * the component is PDX_EVENT_BUBBLES_UNUSED (#138).
+     */
+    eventHeardAbove?: (event: string, tag: string) => boolean;
+    /**
      * Where a `<pdx-…>` tag's module lives, for the components a `@defer` block renders.
      *
      * The tag scan auto-imports a component with a STATIC import at the top of the module, and a
@@ -836,7 +843,13 @@ export function compile(
         // Collect structural warnings from analyzer (@prop without type, etc.)
         allWarnings.push(...cachedAnalysis.warnings);
         // Cross-check template identifiers against script declarations
-        allWarnings.push(...validate(cachedAnalysis, ast, filename, { enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf }));
+        // The tag this file registers, which a listener above it is written on another tag than.
+        const ownTag = cachedAnalysis.customTag ?? tag;
+        const heard = options?.eventHeardAbove;
+        allWarnings.push(...validate(cachedAnalysis, ast, filename, {
+            enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf,
+            eventHeardAbove: heard ? (event) => heard(event, ownTag) : undefined,
+        }));
         // The app's default layout, or none for `@layout 'none'`.
         if (cachedAnalysis.route?.page) {
             cachedAnalysis.route.layout = routeLayout(cachedAnalysis.route.layout, options?.defaultLayout);

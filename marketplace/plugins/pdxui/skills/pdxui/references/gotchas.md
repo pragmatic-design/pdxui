@@ -26,17 +26,15 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
   "A long form filled in more than one sitting".
 - **Props that collide with a read-only DOM property**: do NOT use `:prefix` on a custom element
   (`Element.prefix` is read-only → a TypeError). Put the value somewhere else (in the `value`, for instance).
-- 🔴 **Two components that declare the same `@event` name corrupt the parent's state, in silence.**
-  Component events bubble, so a child's `changed` reaches a listener put on its grandparent for a
-  DIFFERENT `changed`. Measured: `pdx-unit-field` declares `@event changed: number`,
-  `app-room-rows` declares `@event changed: any`, the parent listens for `@changed` on
-  `<app-room-rows>` — and the field's number lands in `rooms`, giving
-  `TypeError: (rooms ?? []).reduce is not a function` from inside the framework, a section that
-  empties itself, and an acceptance check failing with "cannot type into the fields" because the
-  fields are gone. **Nothing warns, and nothing should**: two components declaring the same event
-  name is legal. `changed` is the most natural name there is, which makes it the collision that
-  does the most damage. Name events so they are greppable and cannot collide —
-  `valuechanged`, `roomschanged` — the same rule this repository applies to its own identifiers.
+- 🔴 **An `@event(bubbles)` can corrupt an ancestor's state, in silence.** Component events stay on
+  the component unless declared `@event(bubbles)` (#138) — the default exists because of this. Measured
+  when every event bubbled: `app-unit-field` declared `@event changed: number`, `app-room-rows`
+  declared `@event changed: any`, the parent listened for `@changed` on `<app-room-rows>` — and the
+  field's number landed in `rooms`, giving `TypeError: (rooms ?? []).reduce is not a function` from
+  inside the framework, a section that emptied itself, and fields that were gone. A bubbling event
+  still does this to any ancestor listening for the same name. Mark `(bubbles)` only on an event an
+  ancestor must hear, and name it so it cannot collide — `valuechanged`, `roomschanged`, the same rule
+  this repository applies to its own identifiers.
   `.self` on the listener stops the bubble, but only once you know to suspect it.
 - **A bound `:src` with a `data:image/svg+xml` URL is dropped, by design** — an SVG opened as a
   document runs its script. `sanitizeMediaUrl` accepts http(s), relative URLs, `blob:` and

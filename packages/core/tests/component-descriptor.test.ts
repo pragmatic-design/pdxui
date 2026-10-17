@@ -156,11 +156,11 @@ describe('the descriptor at runtime', () => {
         expect(warn.mock.calls.flat().join(' ')).toContain(`emitted 'other', which its descriptor does not declare`);
     });
 
-    it('an event declared with bubbles: false does not bubble', () => {
+    it('an event bubbles only when declared with bubbles: true (#138)', () => {
         const name = tag();
         let fire: () => void = () => {};
         component(name, {
-            events: { done: event<number>({ bubbles: false }), up: event<void>() },
+            events: { done: event<number>(), up: event<void>({ bubbles: true }) },
             setup(ctx) { fire = () => { ctx.emit('done', 1); ctx.emit('up'); }; },
             render: () => html`<p>x</p>`,
         });

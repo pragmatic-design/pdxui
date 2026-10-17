@@ -36,7 +36,7 @@ import { tryUseForm } from '@pdxui/core';
 /** What the server said when it refused, or ''. */
 @prop serverError: string = '';
 /** Save was pressed. */
-@event submit: void;
+@event(bubbles) submit: void;
 
 tryUseForm();
 </script>

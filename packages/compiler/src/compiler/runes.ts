@@ -27,7 +27,7 @@ const f = (name: string, doc: string, shape: string, snippet: string): RuneInfo 
 export const RUNES: readonly RuneInfo[] = [
     d('prop', 'Declare a component prop: a signal synced with its attribute.', '@prop name: Type = default;', "@prop ${1:name}: ${2:string} = ${3:'default'};"),
     d('model', 'Declare a prop the component writes: assigning it dispatches `<name>-change` with `{ value }`, and the parent binds it with `::name`.', '@model name: Type = default;', "@model ${1:value}: ${2:string} = ${3:''};"),
-    d('event', 'Declare an event; `name(payload)` dispatches it from the host.', '@event name: PayloadType;', '@event ${1:name}: ${2:void};'),
+    d('event', 'Declare an event; `name(payload)` dispatches it from the host, where it stays unless declared `@event(bubbles)`.', '@event name: PayloadType;   // @event(bubbles) name: … to bubble', '@event ${1:name}: ${2:void};'),
     d('slot', 'Declare a named slot, with an optional scope type.', '@slot name: { row: Item };', '@slot ${1:name};'),
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),
     d('part', 'Declare named, public parts: `data-part="name"` on one element each, and `name` is its ref.', '@part trigger, popup;', '@part ${1:name};'),
@@ -68,7 +68,6 @@ export const RUNES: readonly RuneInfo[] = [
     f('effect', 'A side effect that re-runs when what it reads changes.', '$effect(() => { … });', '\\$effect(() => {\n  $1\n})'),
     f('store', 'A deep reactive object, through a Proxy.', 'let state = $store({ items: [] });', '\\$store(${1:{}})'),
     f('watch', 'Run a callback when one source changes.', '$watch(source, (value, previous) => { … });', '\\$watch(${1:source}, (${2:value}) => {\n  $3\n})'),
-    f('emit', 'Dispatch an event by name, untyped; prefer the function `@event` declares.', "$emit('name', payload);", "\\$emit('${1:name}', ${2:payload})"),
     f('t', 'Translate a key; reactive to the locale.', "$t('key', params?)", "\\$t('${1:key}')"),
     f('n', 'Format a number for the locale.', '$n(value, options?)', '\\$n(${1:value})'),
     f('d', 'Format a date for the locale.', '$d(value, options?)', '\\$d(${1:value})'),

@@ -44,11 +44,11 @@ describe('an @event name that is not an identifier', () => {
         expect(code).not.toContain("ctx.emit('pdx'");
     });
 
-    it('the hint names $emit, which dispatches a hyphenated name', () => {
+    it('the hint says the name is the function that dispatches it, and names no removed form (#138)', () => {
         const { warnings } = compile(pdx('@event pdx-change: number;'), 'evt3.pdx');
-        expect(warnings.find((w) => w.code === 'PDX_MALFORMED_EVENT')?.hint).toContain("$emit('pdx-change'");
-        const { code } = compile(pdx("function pick(v) { $emit('pdx-change', v); }"), 'evt4.pdx');
-        expect(code).toContain('const $emit = (event, detail) => ctx.emit(event, detail);');
+        const hint = warnings.find((w) => w.code === 'PDX_MALFORMED_EVENT')?.hint ?? '';
+        expect(hint).toContain('change(value)');
+        expect(hint).not.toContain('$emit');
     });
 
     it('control — an identifier name declares its emitter', () => {

@@ -31,11 +31,11 @@
   @slot body;
 
   function close() {
-    $emit('closed');
+    closed();
   }
 
   function confirm() {
-    $emit('confirmed');
+    confirmed();
   }
 
   function handleBackdrop() {

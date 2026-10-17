@@ -45,6 +45,7 @@ const ROWS: Record<string, Row> = {
     PDX_MALFORMED_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event (saved): number;'), at: '@event (saved)' },
     PDX_DUP_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event changed: number;\n@event changed: string;'), at: '@event changed: string;' },
     PDX_EVENT_NAME_CASE: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event savedItem: number;'), at: '@event savedItem' },
+    PDX_EVENT_BUBBLES_UNUSED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event(bubbles) saved: number;'), at: '@event(bubbles) saved' },
     PDX_EXPOSE_UNDECLARED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@expose close;'), at: '@expose close;' },
     PDX_COMMAND_TARGET_MISSING: { src: pdx('<p>{{ a }}</p>\n<button commandfor="gone" command="close">x</button>', 'let a = $signal(1);'), at: 'commandfor="gone"' },
     PDX_COMMAND_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<button commandfor="d" command="show">x</button><dialog id="d"></dialog>', 'let a = $signal(1);'), at: 'command="show"' },
@@ -141,6 +142,7 @@ function produce(code: string, row: Row): ValidationWarning | undefined {
         enumValues: (tag, prop) => (tag === 'pdx-button' && prop === 'size' ? ['sm', 'md', 'lg'] : null),
         modelsOf: (tag) => (tag === 'app-field' ? new Set(['value']) : null),
         requiredPropsOf: (tag) => (tag === 'app-card' ? new Set(['id']) : null),
+        eventHeardAbove: () => false,
     });
     return r.warnings.find((w) => w.code === code);
 }

@@ -276,16 +276,28 @@ function pick(id: string) { selected({ id }); }
 ```
 
 The compiler generates the `selected(payload)` function and the dispatch of a typed `CustomEvent`.
-The consumer listens like any DOM event:
+That function is the only way to dispatch: there is no `$emit`. The consumer listens on the
+component, like any DOM event:
 
 ```pdx
 <app-user-card @selected="onSelect" />
 ```
 
+**The event stays on the component.** It does not bubble, so a `<section @selected>` around the card
+hears nothing — and an event named `change` or `close` is never confused, further up, with the
+native one of an input inside. When ancestors do need to hear it, say so:
+
+```pdx
+@event(bubbles) selected: { id: string };   // bubbles, and crosses shadow roots
+```
+
+The library's components follow the same rule: `pdx-change` stays on the `<pdx-input>` that sent
+it. `pdx migrate` writes `(bubbles)` on the `@event`s of an alpha project, which keeps what they did;
+`PDX_EVENT_BUBBLES_UNUSED` then lists the ones nothing hears above the component.
+
 Convention: library-component events use the `pdx-` prefix (e.g. `pdx-change`). For your own app
 components, pick meaningful names. An `@event` name is a JavaScript identifier, since it is also the
-function that emits it: `@event pdx-change` is an error. To dispatch a hyphenated name, call
-`$emit('pdx-change', value)`.
+function that emits it: `@event pdx-change` is an error.
 
 ## Slots — content decided by the parent
 

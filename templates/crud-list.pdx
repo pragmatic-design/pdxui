@@ -48,12 +48,12 @@
     items = [...items, { id: nextId, text: newItemText }];
     nextId++;
     newItemText = '';
-    $emit('itemschanged', items.length);
+    itemschanged(items.length);
   }
 
   function removeItem(id) {
     items = items.filter(i => i.id !== id);
-    $emit('itemschanged', items.length);
+    itemschanged(items.length);
   }
 
   function startEdit(item) {

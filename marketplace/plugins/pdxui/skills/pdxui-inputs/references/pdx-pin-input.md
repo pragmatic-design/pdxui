@@ -20,7 +20,7 @@ Segmented PIN entry.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-input` → `detail: { value }` — Fired on each input as the user types.
+**Events:** `pdx-complete` → `detail: { value }` — When every cell is filled: the whole PIN.; `pdx-input` → `detail: { value }` — On every character typed or deleted: the PIN so far.
 
 
 #### Examples

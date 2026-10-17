@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 91 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 92 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -320,6 +320,14 @@ let items = $signal([1, 2]);
 An empty file would compile to a component that registers and renders nothing — indistinguishable from a working one. Usually a file read while it was being saved.
 
 **Fix.** Save the file again; if it really is empty, write its template.
+
+### PDX_EVENT_BUBBLES_UNUSED
+
+*info* — An `@event(bubbles)` no template in the project listens to above the component (#138).
+
+A component's event stays on its host unless declared `@event(bubbles)`. `pdx migrate` marks every alpha `@event` that way, which keeps what it did; most are heard only on the component itself (`<app-card @saved>`), where bubbling adds nothing but the chance of reaching an ancestor's listener of the same name. A listener written in a template on any other element counts; one added with `addEventListener` in a `.ts` is not read, which is why this is an info.
+
+**Fix.** If nothing outside the templates listens either, remove the marker: `@event saved: Item;`.
 
 ### PDX_EVENT_NAME_CASE
 

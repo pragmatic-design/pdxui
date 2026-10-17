@@ -77,8 +77,9 @@ export function projectScript(scriptContent: string): string {
             if (declared) names.set(declared, 'any');
         }
         if (kw === 'event') {
-            // Match: @event name: PayloadType;   Groups: [1]=name [2]=payload type (optional)
-            const ev = /^\s+([A-Za-z_$][\w$]*)\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            // Match: @event name: PayloadType;  or  @event(bubbles) name: PayloadType; (#138)
+            // Groups: [1]=name [2]=payload type (optional)
+            const ev = /^(?:\(\s*bubbles\s*\))?\s+([A-Za-z_$][\w$]*)\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
             if (ev) emitters.push(ev[2] ? `var ${ev[1]}: (detail: ${ev[2]}) => void;` : `var ${ev[1]}: (detail?: unknown) => void;`);
         }
         if (kw === 'part') {

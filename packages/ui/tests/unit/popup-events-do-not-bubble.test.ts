@@ -4,7 +4,8 @@
 // the select would reach the dialog's @pdx-close, which is there to learn that the USER closed the
 // dialog. A test that listens on the component itself never nests one popup in another, so this one
 // does. These three describe the component's own popup state and do not bubble, like the native
-// close of <dialog> and toggle of <details>; pdx-change keeps bubbling, like change.
+// close of <dialog> and toggle of <details>. Since #138 no library event bubbles unless declared to,
+// pdx-change included; the three keep their explicit `bubbles: false`, which the guard below holds.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -74,7 +75,7 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
         expect(drawerCloses(), 'the drawer heard the picker close').toBe(0);
     });
 
-    it('control — a pdx-change from a pdx-input still reaches a listener on the pdx-form around it', async () => {
+    it('a pdx-change from a pdx-input stays on the input: the pdx-form around it does not hear it (#138)', async () => {
         const form = document.createElement('pdx-form') as HTMLElement & { form: unknown };
         form.form = createForm({ initialValues: { name: '' } });
         const input = document.createElement('pdx-input');
@@ -82,13 +83,15 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
         document.body.appendChild(form);
         await tick(50);
         const formChanges = count(form, 'pdx-change');
+        const inputChanges = count(input, 'pdx-change');
 
         const native = input.querySelector('input') as HTMLInputElement;
         native.value = 'Rex';
         native.dispatchEvent(new Event('change', { bubbles: true }));
         await tick(10);
 
-        expect(formChanges(), 'pdx-change must keep bubbling, like the native change').toBe(1);
+        expect(inputChanges(), 'the input did not announce its change').toBe(1);
+        expect(formChanges(), 'an undeclared bubble reached the form').toBe(0);
     });
 });
 

@@ -74,7 +74,7 @@ import type { Favourites } from './favourites';
 /** Asked to close by its own close button; `true`: give the focus back to the opener. */
 @event dismiss: boolean;
 /** An entry was chosen: the panel has navigated, and the shell puts it away. */
-@event picked: string;
+@event(bubbles) picked: string;
 
 let catalogEl = $signal(null);
 let catalogSearchEl = $signal(null);

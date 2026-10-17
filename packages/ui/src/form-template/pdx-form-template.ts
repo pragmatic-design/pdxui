@@ -86,7 +86,7 @@ const CHECKED_TYPES = new Set(['checkbox', 'switch']);
  * Renders a complete form from a FormSchema: each field type gets its control, validators run from
  * the schema and sections become fieldsets.
  *
- * @fires pdx-submit {{ values }} - Bubbles up from the inner `pdx-form` once the values validate; an invalid submit fires nothing and scrolls to the first error.
+ * @fires pdx-submit {{ values }} - Dispatched from the template when the inner `pdx-form` submits and the values validate; an invalid submit fires nothing and scrolls to the first error.
  * @slot actions - Replaces the default actions (the `pdx-form-actions` shown when `showActions`). Not rendered in the wizard layout, which has its own navigation.
  */
 component('pdx-form-template', {
@@ -409,12 +409,18 @@ component('pdx-form-template', {
         (ctx.el as any).wizardPrev = wizardPrev;
         (ctx.el as any).wizardGoTo = wizardGoTo;
 
-        return { _form, layoutStyle, getFieldsBySection, _wizardStep, wizardNext, wizardPrev, wizardGoTo };
+        // The inner pdx-form's submit stays on it (#138): the template dispatches it again from its
+        // host, which is where the app listens.
+        function relaySubmit(e: Event) { ctx.emit(e.type, (e as CustomEvent).detail); }
+
+        return { _form, layoutStyle, getFieldsBySection, _wizardStep, wizardNext, wizardPrev, wizardGoTo, relaySubmit };
     },
     render: (ctx) => html`
         <pdx-form :form="${() => ctx._form?.() ?? ctx.form()}"
                    :autocomplete="${ctx.autocomplete}"
-                   :formClass="${ctx.formClass}">
+                   :formClass="${ctx.formClass}"
+                   @pdx-submit="${ctx.relaySubmit}"
+                   @pdx-submit-error="${ctx.relaySubmit}">
             <div class="pdx-form-template-content"></div>
             ${() => {
                 const schema = ctx.schema() as FormSchema | null;

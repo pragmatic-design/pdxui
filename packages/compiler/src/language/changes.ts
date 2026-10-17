@@ -23,6 +23,7 @@ import { bindsModel, type ModelsLookup } from '../compiler/validate-two-way';
 import { refAttribute, showAttribute, classDot, styleDot } from './template-forms';
 import { propRequired } from './prop-required';
 import { appPrefix, appPrefixHtml, appPrefixString } from './app-prefix';
+import { eventBubbles, emitRemoved } from './event-bubbles';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -280,6 +281,10 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     appPrefix,
     appPrefixHtml,
     appPrefixString,
+    // #138: $emit is removed, and events do not bubble by default (./event-bubbles). In this order:
+    // the `@event` the first declares for a `$emit` gets the second's `(bubbles)`, as `$emit` bubbled.
+    emitRemoved,
+    eventBubbles,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

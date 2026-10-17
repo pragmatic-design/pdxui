@@ -51,7 +51,7 @@
 
   function navigate(item) {
     menuOpen = false;
-    $emit('navigated', item);
+    navigated(item);
   }
 </script>
 

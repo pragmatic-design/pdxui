@@ -67,6 +67,8 @@ describe('a resolver collision is a structured diagnostic', () => {
         r.registerProjectComponents(root);
 
         expect(r.collisions[0].hint, 'the diagnostic offers no fix').toMatch(/@tag/);
+        // The tag it suggests takes the application prefix: a `pdx-` one is PDX_TAG_RESERVED (#136).
+        expect(r.collisions[0].hint).toContain("@tag 'app-unique-name'");
     });
 
     it('still prints the console line — a terminal build is a real consumer', () => {

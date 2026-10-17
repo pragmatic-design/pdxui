@@ -13,7 +13,7 @@ import { DEV } from '../utils/env';
 
 /** Options of `emit()`. */
 export interface EmitOptions {
-    /** Default true. False keeps the event on the component: its ancestors do not see it. */
+    /** Default false: the event stays on the component. True lets its ancestors see it (#138). */
     bubbles?: boolean;
     /**
      * Default false. True lets a listener `preventDefault()` it, and `emit` then answers false: the
@@ -395,16 +395,16 @@ export abstract class PdxElement extends HTMLElementBase {
     disconnected(): void {}
 
     /**
-     * Dispatch a custom event with optional detail payload. It bubbles unless `bubbles: false`: an
-     * event that describes the component's own popup state (pdx-open, pdx-close, pdx-toggle) stays
-     * on it, like the native close of <dialog> — bubbling, a select's close would close the dialog
-     * around it. `composed` follows `bubbles`.
+     * Dispatch a custom event with optional detail payload. It stays on the component unless
+     * `bubbles: true` (#138), like Angular's `output()`: bubbling by default, an event named `change`
+     * was, on an ancestor, the native `change` of every input inside, and a select's close closed the
+     * dialog around it. `composed` follows `bubbles`.
      *
      * Answers what `dispatchEvent` answers: false when the event was `cancelable` and a listener
      * prevented it.
      */
     emit(event: string, detail?: unknown, options?: EmitOptions): boolean {
-        const bubbles = options?.bubbles ?? true;
+        const bubbles = options?.bubbles ?? false;
         return this.dispatchEvent(new CustomEvent(event, {
             detail,
             bubbles,

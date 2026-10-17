@@ -16,6 +16,7 @@ import type { ValidationWarning } from './compiler/validate';
 import { jsQuote } from './compiler/js-literal';
 import { parseSFC } from './parser/sfc';
 import { analyzeScript } from './compiler/script-analyzer';
+import { ProjectListeners } from './project-listeners';
 
 /** Resolved component: tag name → import path */
 export interface ComponentEntry {
@@ -52,6 +53,8 @@ export class ComponentResolver {
     private libraryRequired = new Map<string, Set<string>>();
     /** A project file's required `@prop`s, with the modification time they were read at. */
     private projectRequired = new Map<string, { mtimeMs: number; props: Set<string> }>();
+    /** The project templates' listeners, for `eventHeardAbove` (#138). */
+    private listeners = new ProjectListeners();
     /** The icons a component package publishes one module each (`./icons/*`): name → import path. */
     private icons = new Map<string, string>();
     private _collisions: ValidationWarning[] = [];
@@ -213,6 +216,14 @@ export class ComponentResolver {
             this.projectRequired.set(entry.importPath, { mtimeMs, props });
             return props;
         } catch { return null; } // unreadable: its props are not known
+    }
+
+    /**
+     * Whether a project template listens to `event` on an element other than `tag` (#138): what an
+     * `@event(bubbles)` of `tag` is for. Each project file is read again whenever it changes.
+     */
+    eventHeardAbove(event: string, tag: string): boolean {
+        return this.listeners.heardAbove(event, tag, this.projectComponents().map(c => c.file));
     }
 
     /** The props of a manifest component whose value names an icon, by declared (camelCase) name. */
@@ -482,7 +493,7 @@ export class ComponentResolver {
             code: 'PDX_TAG_COLLISION_RESOLVER',
             severity: 'warn',
             message,
-            hint: `Add @tag 'pdx-unique-name'; to one of the two files. Until then, <${tag}> `
+            hint: `Add @tag '${this._prefix}-unique-name'; to one of the two files. Until then, <${tag}> `
                 + `anywhere in the project resolves to ${winner}.`,
         });
     }

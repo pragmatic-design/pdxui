@@ -169,20 +169,18 @@ component('pdx-toggle-group', {
             });
         });
 
-        // Listen for child toggle events
+        // Listen for child toggle events. A toggle's event stays on it (#138), so the group hears it on
+        // the way down, in the capture phase, which passes through the host whether or not it bubbles.
         ctx.track(() => {
             const el = ctx.el;
             function onChildToggle(e: Event) {
                 const toggle = (e.target as HTMLElement).closest('pdx-toggle');
-                if (!toggle) return;
+                if (!toggle || toggle === el) return;
                 const val = toggle.getAttribute('value') || '';
-                if (val) {
-                    e.stopPropagation();
-                    handleToggle(val);
-                }
+                if (val) handleToggle(val);
             }
-            el.addEventListener('pressedchange', onChildToggle);
-            return () => el.removeEventListener('pressedchange', onChildToggle);
+            el.addEventListener('pressedchange', onChildToggle, true);
+            return () => el.removeEventListener('pressedchange', onChildToggle, true);
         });
 
         // Keyboard navigation (roving tabindex)

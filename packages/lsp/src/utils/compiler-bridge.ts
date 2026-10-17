@@ -23,6 +23,8 @@ export interface AnalyzeOptions {
     modelsOf?: (tag: string) => ReadonlySet<string> | null;
     /** The props components require, for PDX_PROP_REQUIRED. */
     requiredPropsOf?: (tag: string) => ReadonlySet<string> | null;
+    /** Whether the project listens to an event above a component, for PDX_EVENT_BUBBLES_UNUSED (#138). */
+    eventHeardAbove?: (event: string, tag: string) => boolean;
 }
 
 /** Parse and analyze a .pdx source string. Never throws. */
@@ -74,7 +76,7 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
     if (result.descriptor.template) {
         try {
             const listed = new Map(result.warnings.map((w, i) => [`${w.code}: ${w.message}`, i]));
-            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf, applyIgnores: false }).warnings) {
+            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf, eventHeardAbove: options?.eventHeardAbove, applyIgnores: false }).warnings) {
                 const key = `${w.code}: ${w.message}`;
                 const at = listed.get(key);
                 if (at !== undefined) { result.warnings[at] = w; continue; }

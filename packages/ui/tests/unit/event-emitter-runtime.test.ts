@@ -20,13 +20,13 @@ function load(filename: string, source: string): void {
 const CHILD = `<template>
 <button class="pick" @click="picked('a')">pick</button>
 <button class="choose" @click="choose('b')">choose</button>
-<button class="emit" @click="go('c')">emit</button>
+<button class="emit" @click="chosen('c')">emit</button>
 </template>
 <script setup>
 @event picked: string;
+@event(bubbles) chosen: string;
 let clicks = $signal(0);
 function choose(v) { clicks++; picked(v); }
-function go(v) { $emit('chosen', v); }
 </script>`;
 
 const PARENT = `<template>
@@ -71,21 +71,27 @@ describe('@event, compiled and mounted', () => {
         expect(parent.querySelector('.got')?.textContent).toBe('b');
     });
 
-    it('$emit dispatches the same way', async () => {
+    it('a declared event does not reach the grandparent: it stays on the component (#138)', async () => {
         const parent = await mountParent();
+        let above = 0;
+        const count = () => { above++; };
+        document.body.addEventListener('picked', count);
+        parent.querySelector<HTMLButtonElement>('.pick')!.click();
+        await tick();
+        document.body.removeEventListener('picked', count);
+        expect(parent.querySelector('.got')?.textContent, 'the parent listening on the component missed it').toBe('a');
+        expect(above, 'the event climbed past the component').toBe(0);
+    });
+
+    it('@event(bubbles) reaches the grandparent, and crosses shadow roots', async () => {
+        const parent = await mountParent();
+        let seen: CustomEvent | null = null;
+        document.body.addEventListener('chosen', (e) => { seen = e as CustomEvent; }, { once: true });
         parent.querySelector<HTMLButtonElement>('.emit')!.click();
         await tick();
         expect(parent.querySelector('.chose')?.textContent).toBe('c');
-    });
-
-    it('the event bubbles and crosses shadow roots, like every event a pdx component emits', async () => {
-        const parent = await mountParent();
-        let seen: CustomEvent | null = null;
-        document.body.addEventListener('picked', (e) => { seen = e as CustomEvent; }, { once: true });
-        parent.querySelector<HTMLButtonElement>('.pick')!.click();
-        await tick();
         expect(seen, 'the event did not reach the document body').not.toBeNull();
-        expect(seen!.detail).toBe('a');
+        expect(seen!.detail).toBe('c');
         expect(seen!.composed).toBe(true);
     });
 });

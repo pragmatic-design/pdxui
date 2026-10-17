@@ -205,6 +205,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use a lowercase name: `@event saveditem: Item;`. The fix renames it in the script; when the template uses the name, the rename is left to you.',
         reproducedIn: `${T}event-name-case.test.ts`,
     },
+    PDX_EVENT_BUBBLES_UNUSED: {
+        severity: 'info', category: 'defect',
+        summary: 'An `@event(bubbles)` no template in the project listens to above the component (#138).',
+        explanation: 'A component\'s event stays on its host unless declared `@event(bubbles)`. `pdx migrate` marks every alpha `@event` that way, which keeps what it did; most are heard only on the component itself (`<app-card @saved>`), where bubbling adds nothing but the chance of reaching an ancestor\'s listener of the same name. A listener written in a template on any other element counts; one added with `addEventListener` in a `.ts` is not read, which is why this is an info.',
+        fix: 'If nothing outside the templates listens either, remove the marker: `@event saved: Item;`.',
+        reproducedIn: `${T}event-bubbles.test.ts`,
+    },
     PDX_EXPOSE_UNDECLARED: {
         severity: 'error', category: 'defect',
         summary: '`@expose` names something the component does not declare.',

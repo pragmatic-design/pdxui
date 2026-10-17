@@ -1,5 +1,5 @@
 // Script Analyzer — parses <script setup> with decorator+rune syntax.
-// Extracts: @prop, @event, @slot, $signal, $derived, $effect, $emit, lifecycle hooks.
+// Extracts: @prop, @event, @slot, $signal, $derived, $effect, lifecycle hooks.
 // Scans top-level declarations for auto-expose.
 // Also detects malformed declarations and emits warnings.
 
@@ -218,7 +218,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const hasLegacyMarkers = legacyMarkerAt !== -1;
     const isNewMode = (options.setup === true && !hasLegacyMarkers) || codeLines.some(l => {
         const t = l.trim();
-        return t.startsWith('@prop ') || t.startsWith('@model ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) ||
+        return t.startsWith('@prop ') || t.startsWith('@model ') || t.startsWith('@event ') || t.startsWith('@event(') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) ||
                t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||
                t.startsWith('@search ') || t.startsWith('@prefetch ') || t.startsWith('@layout ') ||
                t.startsWith('@fetch ') || t.startsWith('@form ') ||
@@ -427,22 +427,31 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             continue; // Don't push to bodyLines — it's a recognized (but malformed) decorator
         }
 
-        // ─── @event name: PayloadType ───
+        // ─── @event name: PayloadType  /  @event(bubbles) name: PayloadType ───
         // Tokenizer-based for complex types like { old: T, new: T }
-        // Match: `@event name`, then `:`, `;` or the end — the whole name, an identifier. Without the
-        // lookahead `@event pdx-change: number;` declared an event named `pdx` (#202).
-        // Groups: [1]=name
-        const eventPrefix = trimmed.match(/^@event\s+(\w+)\s*(?=:|;|$)(?::\s*)?/);
-        if (eventPrefix && trimmed.startsWith('@event ')) {
-            const name = eventPrefix[1];
-            const hasType = trimmed.indexOf(':') > trimmed.indexOf(name);
-            if (hasType) {
-                const colonPos = trimmed.indexOf(':', trimmed.indexOf(name) + name.length);
-                const { type } = extractTypeAnnotation(trimmed, colonPos);
-                events.push({ name, payloadType: type || 'void' });
-            } else {
-                events.push({ name, payloadType: 'void' });
-            }
+        // Match: `@event` or `@event(bubbles)`, then the name, then `:`, `;` or the end — the whole
+        // name, an identifier. Without the lookahead `@event pdx-change: number;` declared an event
+        // named `pdx` (#202). Groups: [1]=`(bubbles)` when written [2]=name
+        const eventPrefix = trimmed.match(/^@event(\(\s*bubbles\s*\))?\s+(\w+)\s*(?=:|;|$)(?::\s*)?/);
+        if (eventPrefix) {
+            const name = eventPrefix[2];
+            const nameEnd = trimmed.indexOf(name, '@event'.length + (eventPrefix[1]?.length ?? 0)) + name.length;
+            const colonPos = trimmed.indexOf(':', nameEnd);
+            const payloadType = colonPos >= 0 ? (extractTypeAnnotation(trimmed, colonPos).type || 'void') : 'void';
+            events.push(eventPrefix[1] ? { name, payloadType, bubbles: true } : { name, payloadType });
+            continue;
+        }
+
+        // `@event(…)` with an option that is not `bubbles` (#138): a known keyword in an unknown shape.
+        if (trimmed.startsWith('@event(')) {
+            // Match: the name after the parenthesis, to say the form with it. Groups: [1]=name
+            const named = /\)\s*(\w+)/.exec(trimmed)?.[1] ?? 'name';
+            warnings.push({
+                code: 'PDX_UNKNOWN_DECLARATION',
+                severity: 'error' as const,
+                message: `\`${trimmed}\` is not a form of @event: the only option is \`(bubbles)\`.`,
+                hint: `Use: @event(bubbles) ${named}: PayloadType; — or @event ${named}: PayloadType; for an event that stays on the component.`,
+            });
             continue;
         }
 
@@ -454,7 +463,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                 message: `Invalid @event declaration: "${trimmed}".`,
                 hint: /^@event\s+[\w-]+-/.test(trimmed)
                     ? 'The name is an identifier, and it is both the emitter and the event: @event change: number; '
-                        + 'dispatches `change`. For a hyphenated event name, call $emit(\'pdx-change\', value).'
+                        + 'dispatches `change`, and the function `change(value)` is how the component sends it.'
                     : `Use: @event eventName: PayloadType;`,
             });
             continue;
