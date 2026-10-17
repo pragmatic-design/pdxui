@@ -38,6 +38,22 @@ function closingBrace(source: string, open: number): number {
 }
 
 /**
+ * PDX_PIPE_SINGLE (#129). `{{ price | money }}` → `{{ money(price) }}`: the call the message names,
+ * from the `{{` the finding points at to its `}}`.
+ */
+export function singlePipeFix(source: string, w: ValidationWarning): FixProposal | undefined {
+    const open = at(source, w);
+    if (open === undefined || source.slice(open, open + 2) !== '{{') return undefined;
+    // The call the message proposes, between its last `: '{{ ` and ` }}' says the same as a call.`
+    const tail = " }}' says the same as a call.";
+    const lead = w.message.lastIndexOf(": '{{ ");
+    const call = lead >= 0 && w.message.endsWith(tail) ? w.message.slice(lead + 6, w.message.length - tail.length) : '';
+    const close = source.indexOf('}}', open + 2);
+    if (!call || close < 0) return undefined;
+    return { title: `Write the call: {{ ${call} }}`, edits: [{ start: open, end: close + 2, newText: `{{ ${call} }}` }] };
+}
+
+/**
  * PDX_RAW_INTERPOLATION. An attribute whose whole value is `${x}` → `:attr="x"`; `${x}` in text →
  * `{{ x }}`. A value that mixes text and `${}` has more than one right answer, and gets no fix.
  */

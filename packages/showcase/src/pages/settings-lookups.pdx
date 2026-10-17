@@ -28,54 +28,58 @@
 
       <!-- Categories: edited in place, added in a modal, deactivated and never deleted. A label is
            saved when its field is left; a deactivated one stays on its records, muted. -->
-      <div class="values" :show="current === 'categories'" role="table" :aria-label="$t('settings.lookups.sets.categories')" data-test="lookup-categories">
-        <div class="values-head">
-          <h2 class="pdx-txt-heading">{{ $t('settings.lookups.sets.categories') }}</h2>
-          <pdx-button size="sm" variant="primary" @click="openAdd" data-test="category-add">{{ $t('settings.categories.add') }}</pdx-button>
-        </div>
-        <div class="row cats head" role="row">
-          <span role="columnheader">{{ $t('settings.lookups.code') }}</span>
-          <span role="columnheader">{{ $t('settings.categories.en') }}</span>
-          <span role="columnheader">{{ $t('settings.categories.it') }}</span>
-          <span role="columnheader">{{ $t('settings.categories.appliesTo') }}</span>
-          <span role="columnheader" class="num" :title="$t('settings.categories.usageHint')">{{ $t('settings.lookups.inUse') }}</span>
-          <span role="columnheader"></span>
-        </div>
-        @for (cats as c; track c.code) {
-          <div class="row cats" role="row" data-test="category" :data-code="c.code" :data-active="c.active ? 'true' : 'false'">
-            <span role="cell"><span :class="'pdx-dg-badge pdx-dg-badge-' + (c.active ? c.color : 'muted')">{{ c.code }}</span></span>
-            <pdx-input role="cell" size="sm" :value="c.label.en" :aria-label="$t('settings.categories.en') + ' — ' + c.code"
-              @pdx-change="e => rename(c, 'en', e.detail.value)" data-test="label-en"></pdx-input>
-            <pdx-input role="cell" size="sm" :value="c.label.it" :aria-label="$t('settings.categories.it') + ' — ' + c.code"
-              @pdx-change="e => rename(c, 'it', e.detail.value)" data-test="label-it"></pdx-input>
-            <span role="cell" class="pdx-txt-small">{{ c.appliesTo.map(a => $t('settings.lookups.owner.' + a)).join(', ') }}</span>
-            <span role="cell" class="num pdx-txt-small" data-test="usage">{{ usageOf(c.code) }}</span>
-            <span role="cell">
-              <pdx-button size="sm" variant="ghost" @click="toggle(c)" data-test="category-toggle">{{ c.active ? $t('settings.categories.deactivate') : $t('settings.categories.reactivate') }}</pdx-button>
-            </span>
-          </div>
-        }
-      </div>
-
-      @for (sets as set; track set.key) {
-        <div class="values" :show="current === set.key" role="table" :aria-label="$t('settings.lookups.sets.' + set.key)" :data-test="'lookup-' + set.key">
+      @show (current === 'categories') {
+        <div class="values" role="table" :aria-label="$t('settings.lookups.sets.categories')" data-test="lookup-categories">
           <div class="values-head">
-            <h2 class="pdx-txt-heading">{{ $t('settings.lookups.sets.' + set.key) }}</h2>
-            <span class="pdx-txt-small pdx-ink-muted">{{ $t('settings.lookups.field', { field: set.field }) }}</span>
+            <h2 class="pdx-txt-heading">{{ $t('settings.lookups.sets.categories') }}</h2>
+            <pdx-button size="sm" variant="primary" @click="openAdd" data-test="category-add">{{ $t('settings.categories.add') }}</pdx-button>
           </div>
-          <div class="row head" role="row">
+          <div class="row cats head" role="row">
             <span role="columnheader">{{ $t('settings.lookups.code') }}</span>
-            <span role="columnheader">{{ $t('settings.lookups.label') }}</span>
-            <span role="columnheader" class="num">{{ $t('settings.lookups.inUse') }}</span>
+            <span role="columnheader">{{ $t('settings.categories.en') }}</span>
+            <span role="columnheader">{{ $t('settings.categories.it') }}</span>
+            <span role="columnheader">{{ $t('settings.categories.appliesTo') }}</span>
+            <span role="columnheader" class="num" :title="$t('settings.categories.usageHint')">{{ $t('settings.lookups.inUse') }}</span>
+            <span role="columnheader"></span>
           </div>
-          @for (set.codes as code; track code) {
-            <div class="row" role="row">
-              <code role="cell" data-test="code">{{ code }}</code>
-              <span role="cell" data-test="label">{{ $t(set.labels + '.' + code) }}</span>
-              <span role="cell" class="num" data-test="in-use">{{ usage[set.key + ':' + code] ?? '' }}</span>
+          @for (cats as c; track c.code) {
+            <div class="row cats" role="row" data-test="category" :data-code="c.code" :data-active="c.active ? 'true' : 'false'">
+              <span role="cell"><span :class="'pdx-dg-badge pdx-dg-badge-' + (c.active ? c.color : 'muted')">{{ c.code }}</span></span>
+              <pdx-input role="cell" size="sm" :value="c.label.en" :aria-label="$t('settings.categories.en') + ' — ' + c.code"
+                @pdx-change="e => rename(c, 'en', e.detail.value)" data-test="label-en"></pdx-input>
+              <pdx-input role="cell" size="sm" :value="c.label.it" :aria-label="$t('settings.categories.it') + ' — ' + c.code"
+                @pdx-change="e => rename(c, 'it', e.detail.value)" data-test="label-it"></pdx-input>
+              <span role="cell" class="pdx-txt-small">{{ c.appliesTo.map(a => $t('settings.lookups.owner.' + a)).join(', ') }}</span>
+              <span role="cell" class="num pdx-txt-small" data-test="usage">{{ usageOf(c.code) }}</span>
+              <span role="cell">
+                <pdx-button size="sm" variant="ghost" @click="toggle(c)" data-test="category-toggle">{{ c.active ? $t('settings.categories.deactivate') : $t('settings.categories.reactivate') }}</pdx-button>
+              </span>
             </div>
           }
         </div>
+      }
+
+      @for (sets as set; track set.key) {
+        @show (current === set.key) {
+          <div class="values" role="table" :aria-label="$t('settings.lookups.sets.' + set.key)" :data-test="'lookup-' + set.key">
+            <div class="values-head">
+              <h2 class="pdx-txt-heading">{{ $t('settings.lookups.sets.' + set.key) }}</h2>
+              <span class="pdx-txt-small pdx-ink-muted">{{ $t('settings.lookups.field', { field: set.field }) }}</span>
+            </div>
+            <div class="row head" role="row">
+              <span role="columnheader">{{ $t('settings.lookups.code') }}</span>
+              <span role="columnheader">{{ $t('settings.lookups.label') }}</span>
+              <span role="columnheader" class="num">{{ $t('settings.lookups.inUse') }}</span>
+            </div>
+            @for (set.codes as code; track code) {
+              <div class="row" role="row">
+                <code role="cell" data-test="code">{{ code }}</code>
+                <span role="cell" data-test="label">{{ $t(set.labels + '.' + code) }}</span>
+                <span role="cell" class="num" data-test="in-use">{{ usage[set.key + ':' + code] ?? '' }}</span>
+              </div>
+            }
+          </div>
+        }
       }
     </div>
 

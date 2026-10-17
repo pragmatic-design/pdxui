@@ -33,7 +33,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_RUNE_POSITION` | error | A `$` rune outside the position the compiler reads it in. | `$signal`, `$derived`, `$store`, `$effect`, `$watch` | this specification (proposed, decisions.md 12) |
 | `PDX_HOST_INVALID_ATTRIBUTE` | error | On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument. | `@host` | #133 (landed; decisions.md 21) |
 | `PDX_FORM_FIELD_RESERVED` | error | A form field named like a form member (`valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array`). | `@form` | this specification (proposed, decisions.md 13) |
-| `PDX_PIPE_SINGLE` | info | A single template pipe; the hint is the function call. | `\|` pipes | this specification (proposed, decisions.md 4) |
+| `PDX_PIPE_SINGLE` | info | A single template pipe; the hint is the function call. | `\|` pipes | #129 (landed) |
 | `PDX_DEFER_UNKNOWN_TRIGGER` | error | A `@defer` trigger outside the grammar (alpha fires it at once). | `@defer` | this specification (proposed, decisions.md 27) |
 | `PDX_AGENT_ACTION_UNBOUND` | error | An `@action` with `agent` that no control in the template runs: a capability only an agent would have. | `@action`, [agents.md](agents.md) | this specification (proposed, decisions.md 31) |
 | `PDX_AWAIT_TIMING` | error | `maxMs` not greater than `minMs`. | `@await` | this specification (proposed, decisions.md 26) |

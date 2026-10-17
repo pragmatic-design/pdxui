@@ -23,13 +23,13 @@
              badge: a colour alone tells a screen reader nothing. -->
         <div class="pdx-tabs" role="tablist">
           <button class="pdx-tab" type="button" data-tab="personal" :aria-label="tabName('personal')">
-            {{ $t('employees.personal.tabs.personal') }}<span class="tab-errors" :show="refusedIn.personal > 0" data-test="tab-errors-personal" aria-hidden="true">{{ refusedIn.personal || '' }}</span>
+            {{ $t('employees.personal.tabs.personal') }}@show (refusedIn.personal > 0) { <span class="tab-errors" data-test="tab-errors-personal" aria-hidden="true">{{ refusedIn.personal || '' }}</span> }
           </button>
           <button class="pdx-tab" type="button" data-tab="contacts" :aria-label="tabName('contacts')">
-            {{ $t('employees.personal.tabs.contacts') }}<span class="tab-errors" :show="refusedIn.contacts > 0" data-test="tab-errors-contacts" aria-hidden="true">{{ refusedIn.contacts || '' }}</span>
+            {{ $t('employees.personal.tabs.contacts') }}@show (refusedIn.contacts > 0) { <span class="tab-errors" data-test="tab-errors-contacts" aria-hidden="true">{{ refusedIn.contacts || '' }}</span> }
           </button>
           <button class="pdx-tab" type="button" data-tab="additional" :aria-label="tabName('additional')">
-            {{ $t('employees.personal.tabs.additional') }}<span class="tab-errors" :show="refusedIn.additional > 0" data-test="tab-errors-additional" aria-hidden="true">{{ refusedIn.additional || '' }}</span>
+            {{ $t('employees.personal.tabs.additional') }}@show (refusedIn.additional > 0) { <span class="tab-errors" data-test="tab-errors-additional" aria-hidden="true">{{ refusedIn.additional || '' }}</span> }
           </button>
         </div>
 

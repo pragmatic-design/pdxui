@@ -99,7 +99,7 @@ the parentheses.
 
 ```pdx
 <template>
-  <header class="bar" :class.hidden="direction === 'down' && !atTop">…</header>
+  <header class="bar" :class="{ hidden: direction === 'down' && !atTop }">…</header>
   @if (y > 600) {
     <button class="to-top" @click="scrollTo(0)">↑</button>
   }

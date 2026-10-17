@@ -9,7 +9,7 @@
       :columns="columns"
       @pdx-pick="onPick"
       data-test="asset-picker-grid"></pdx-relation-picker>
-    <p class="pdx-txt-small" :show="pickedText !== ''" role="status" data-test="asset-picked">{{ pickedText }}</p>
+    @show (pickedText !== '') { <p class="pdx-txt-small" role="status" data-test="asset-picked">{{ pickedText }}</p> }
   </div>
 </template>
 

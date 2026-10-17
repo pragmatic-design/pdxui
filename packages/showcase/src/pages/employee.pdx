@@ -11,11 +11,13 @@
         <p class="pdx-txt-small record-status" :data-active="status.active ? 'true' : 'false'" data-test="record-status">{{ statusText }}</p>
       </div>
       <div class="record-tools">
-        <div class="record-pager" :show="position >= 0" data-test="record-pager">
-          <button class="pager-btn" type="button" :aria-label="$t('employees.record.previous')" :disabled="position <= 0" @click="step(-1)">‹</button>
-          <span class="pdx-txt-small pager-position">{{ $t('employees.record.position', { n: position + 1, total: order.length }) }}</span>
-          <button class="pager-btn" type="button" :aria-label="$t('employees.record.next')" :disabled="position < 0 || position >= order.length - 1" @click="step(1)">›</button>
-        </div>
+        @show (position >= 0) {
+          <div class="record-pager" data-test="record-pager">
+            <button class="pager-btn" type="button" :aria-label="$t('employees.record.previous')" :disabled="position <= 0" @click="step(-1)">‹</button>
+            <span class="pdx-txt-small pager-position">{{ $t('employees.record.position', { n: position + 1, total: order.length }) }}</span>
+            <button class="pager-btn" type="button" :aria-label="$t('employees.record.next')" :disabled="position < 0 || position >= order.length - 1" @click="step(1)">›</button>
+          </div>
+        }
         <!-- Outlined, each with its icon: as ghost buttons they read as text beside the
              title, not as actions. -->
         <pdx-button size="sm" variant="outline" :disabled="!hasOpenContract" @click="askEnd" data-test="end-employment"><pdx-icon name="user-minus" aria-hidden="true"></pdx-icon>{{ $t('employees.record.endEmployment') }}</pdx-button>

@@ -7,7 +7,7 @@ import { compile } from '../src/plugin';
 import { builds } from './static-markup-of';
 
 const SFC = `<template>
-  <p :title="label" :class.active="on">{{ count }}</p>
+  <p :title="label" :class="{ active: on }">{{ count }}</p>
   @if (on) { <span>on</span> }
   @for (items as item; track item) { <i>{{ item }}</i> }
 </template>

@@ -12,19 +12,21 @@
 
     <!-- A refusal belongs where the user is looking, not in the console. The component lists it
          too; this line is the one an assistive technology announces. -->
-    <p class="pdx-txt-small rejected" :show="rejected !== ''" role="alert" data-test="rejected">{{ rejected }}</p>
+    @show (rejected !== '') { <p class="pdx-txt-small rejected" role="alert" data-test="rejected">{{ rejected }}</p> }
 
     <!-- The transfer in flight, and the whole handle on screen: the percentage is `progress()`,
          the bytes are `loaded()` of `total()`, and Cancel is `abort()`. -->
-    <div class="transfer" :show="transferName !== ''" data-test="transfer">
-      <span class="pdx-txt-small">{{ $t('attachments.uploading', { name: transferName }) }}</span>
-      <pdx-progress :value="progress" show-label data-test="progress"></pdx-progress>
-      <span class="pdx-txt-small pdx-ink-muted" data-test="progress-value">{{ progress }}</span>
-      <span class="pdx-txt-small pdx-ink-muted" data-test="bytes">{{ $t('attachments.bytes', { loaded: loaded, total: totalBytes }) }}</span>
-      <pdx-button size="sm" variant="ghost" @click="cancelTransfer" data-test="cancel">{{ $t('attachments.cancel') }}</pdx-button>
-    </div>
+    @show (transferName !== '') {
+      <div class="transfer" data-test="transfer">
+        <span class="pdx-txt-small">{{ $t('attachments.uploading', { name: transferName }) }}</span>
+        <pdx-progress :value="progress" show-label data-test="progress"></pdx-progress>
+        <span class="pdx-txt-small pdx-ink-muted" data-test="progress-value">{{ progress }}</span>
+        <span class="pdx-txt-small pdx-ink-muted" data-test="bytes">{{ $t('attachments.bytes', { loaded: loaded, total: totalBytes }) }}</span>
+        <pdx-button size="sm" variant="ghost" @click="cancelTransfer" data-test="cancel">{{ $t('attachments.cancel') }}</pdx-button>
+      </div>
+    }
 
-    <p class="pdx-txt-small pdx-ink-muted" :show="cancelled" role="status" data-test="cancelled">{{ $t('attachments.cancelled') }}</p>
+    @show (cancelled) { <p class="pdx-txt-small pdx-ink-muted" role="status" data-test="cancelled">{{ $t('attachments.cancelled') }}</p> }
   </div>
 </template>
 

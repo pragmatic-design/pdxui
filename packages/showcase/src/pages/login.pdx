@@ -37,7 +37,7 @@
 
     <!-- The server's own message, where the person is looking and where a screen reader hears it.
          `role="alert"`: a refusal that only appears in the console is a refusal nobody gets. -->
-    <p class="pdx-txt-small failed" :show="failure !== ''" role="alert" data-test="login-error">{{ failure }}</p>
+    @show (failure !== '') { <p class="pdx-txt-small failed" role="alert" data-test="login-error">{{ failure }}</p> }
 
     <!-- A showcase has to say how to get in. The mock server holds these two and nothing else. -->
     <div class="hint pdx-txt-small pdx-ink-muted">

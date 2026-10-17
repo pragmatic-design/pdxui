@@ -23,72 +23,78 @@
 
         <!-- Details: the form IS the section, always editable, each field saved after its pause
              (the employee's personal data's shape). -->
-        <section :show="section === 'details'" data-test="details">
-          <div class="section-head">
-            <h2 class="pdx-txt-heading">{{ $t('sites.sectionNames.details') }}</h2>
-            <span class="save-status pdx-txt-small" role="status" aria-live="polite" data-test="save-status"
-              :data-state="saveState" :title="savedTitle">{{ statusText }}</span>
-          </div>
-          <pdx-form :form="details" data-test="details-form">
-            <div class="grid two">
-              <pdx-form-field name="name" :label="$t('sites.fields.name')">
-                <pdx-input name="name" data-test="name"></pdx-input>
-              </pdx-form-field>
-              <pdx-form-field name="status" :label="$t('sites.fields.status')">
-                <pdx-segmented name="status" :options="statuses" data-test="status"></pdx-segmented>
-              </pdx-form-field>
-              <pdx-form-field class="wide" name="address" :label="$t('sites.fields.address')">
-                <pdx-input name="address" data-test="address"></pdx-input>
-              </pdx-form-field>
-              <pdx-form-field name="city" :label="$t('sites.fields.city')">
-                <pdx-input name="city" data-test="city"></pdx-input>
-              </pdx-form-field>
-              <pdx-form-field name="postcode" :label="$t('sites.fields.postcode')">
-                <pdx-masked-input name="postcode" mask="#####" data-test="postcode"></pdx-masked-input>
-              </pdx-form-field>
-              <pdx-form-field name="province" :label="$t('sites.fields.province')">
-                <pdx-masked-input name="province" mask="AA" data-test="province"></pdx-masked-input>
-              </pdx-form-field>
-              <pdx-form-field name="phone" :label="$t('sites.fields.phone')">
-                <pdx-input name="phone" type="tel" data-test="phone"></pdx-input>
-              </pdx-form-field>
+        @show (section === 'details') {
+          <section data-test="details">
+            <div class="section-head">
+              <h2 class="pdx-txt-heading">{{ $t('sites.sectionNames.details') }}</h2>
+              <span class="save-status pdx-txt-small" role="status" aria-live="polite" data-test="save-status"
+                :data-state="saveState" :title="savedTitle">{{ statusText }}</span>
             </div>
-          </pdx-form>
-        </section>
+            <pdx-form :form="details" data-test="details-form">
+              <div class="grid two">
+                <pdx-form-field name="name" :label="$t('sites.fields.name')">
+                  <pdx-input name="name" data-test="name"></pdx-input>
+                </pdx-form-field>
+                <pdx-form-field name="status" :label="$t('sites.fields.status')">
+                  <pdx-segmented name="status" :options="statuses" data-test="status"></pdx-segmented>
+                </pdx-form-field>
+                <pdx-form-field class="wide" name="address" :label="$t('sites.fields.address')">
+                  <pdx-input name="address" data-test="address"></pdx-input>
+                </pdx-form-field>
+                <pdx-form-field name="city" :label="$t('sites.fields.city')">
+                  <pdx-input name="city" data-test="city"></pdx-input>
+                </pdx-form-field>
+                <pdx-form-field name="postcode" :label="$t('sites.fields.postcode')">
+                  <pdx-masked-input name="postcode" mask="#####" data-test="postcode"></pdx-masked-input>
+                </pdx-form-field>
+                <pdx-form-field name="province" :label="$t('sites.fields.province')">
+                  <pdx-masked-input name="province" mask="AA" data-test="province"></pdx-masked-input>
+                </pdx-form-field>
+                <pdx-form-field name="phone" :label="$t('sites.fields.phone')">
+                  <pdx-input name="phone" type="tel" data-test="phone"></pdx-input>
+                </pdx-form-field>
+              </div>
+            </pdx-form>
+          </section>
+        }
 
         <!-- People: who has a current assignment here. Assigned from their own record. -->
-        <section :show="section === 'people'" data-test="people">
-          <h2 class="pdx-txt-heading">{{ $t('sites.sectionNames.people') }}</h2>
-          <ul class="rows">
-            @for (people as person; track person.id) {
-              <li>
-                <pdx-link :to="'/employees/' + person.id + '/personal'" data-test="person">{{ person.firstName }} {{ person.lastName }}</pdx-link>
-                <span class="pdx-txt-small pdx-ink-muted">{{ roleHere(person) }}</span>
-              </li>
-            } @empty {
-              <li data-test="no-people">
-                <pdx-empty-state icon="user" :title="$t('sites.people.emptyTitle')" :description="$t('sites.people.emptyBody')"></pdx-empty-state>
-              </li>
-            }
-          </ul>
-        </section>
+        @show (section === 'people') {
+          <section data-test="people">
+            <h2 class="pdx-txt-heading">{{ $t('sites.sectionNames.people') }}</h2>
+            <ul class="rows">
+              @for (people as person; track person.id) {
+                <li>
+                  <pdx-link :to="'/employees/' + person.id + '/personal'" data-test="person">{{ person.firstName }} {{ person.lastName }}</pdx-link>
+                  <span class="pdx-txt-small pdx-ink-muted">{{ roleHere(person) }}</span>
+                </li>
+              } @empty {
+                <li data-test="no-people">
+                  <pdx-empty-state icon="user" :title="$t('sites.people.emptyTitle')" :description="$t('sites.people.emptyBody')"></pdx-empty-state>
+                </li>
+              }
+            </ul>
+          </section>
+        }
 
         <!-- Tickets: those opened at this site. -->
-        <section :show="section === 'tickets'" data-test="tickets">
-          <h2 class="pdx-txt-heading">{{ $t('sites.sectionNames.tickets') }}</h2>
-          <ul class="rows">
-            @for (tickets as ticket; track ticket.id) {
-              <li>
-                <pdx-link :to="'/tickets/' + ticket.id" data-test="site-ticket">{{ ticket.reference }} · {{ ticket.subject }}</pdx-link>
-                <span class="pdx-txt-small pdx-ink-muted">{{ ticket.customer }}</span>
-              </li>
-            } @empty {
-              <li data-test="no-tickets">
-                <pdx-empty-state icon="inbox" :title="$t('sites.tickets.emptyTitle')" :description="$t('sites.tickets.emptyBody')"></pdx-empty-state>
-              </li>
-            }
-          </ul>
-        </section>
+        @show (section === 'tickets') {
+          <section data-test="tickets">
+            <h2 class="pdx-txt-heading">{{ $t('sites.sectionNames.tickets') }}</h2>
+            <ul class="rows">
+              @for (tickets as ticket; track ticket.id) {
+                <li>
+                  <pdx-link :to="'/tickets/' + ticket.id" data-test="site-ticket">{{ ticket.reference }} · {{ ticket.subject }}</pdx-link>
+                  <span class="pdx-txt-small pdx-ink-muted">{{ ticket.customer }}</span>
+                </li>
+              } @empty {
+                <li data-test="no-tickets">
+                  <pdx-empty-state icon="inbox" :title="$t('sites.tickets.emptyTitle')" :description="$t('sites.tickets.emptyBody')"></pdx-empty-state>
+                </li>
+              }
+            </ul>
+          </section>
+        }
     </pdx-record-detail>
   </section>
 </template>

@@ -201,7 +201,7 @@ Block          ::= S? "{" Template "}"
 
 ```ebnf
 Interpolation  ::= "{{" S? Expression ( S? Pipe )* S? "}}"
-Pipe           ::= "|" S? Identifier ( "(" Expression ( S? "," S? Expression )* ")" )?                  († a single pipe is PDX_PIPE_SINGLE, info — decisions.md 4)
+Pipe           ::= "|" S? Identifier ( "(" Expression ( S? "," S? Expression )* ")" )?                  (β #129: a single pipe is PDX_PIPE_SINGLE, info — decisions.md 4)
 ```
 
 ### Attributes
@@ -218,7 +218,7 @@ BoundName      ::= [A-Za-z_] [A-Za-z0-9_-]*
 PropBinding    ::= ":" BoundName ( "=" AttrValue )?
 OnceBinding    ::= ":" BoundName ".once" "=" AttrValue                                                 (β #126)
 ClassBinding   ::= ":class" "=" AttrValue                                                              (β #129: object or string; no `:class.x`)
-StyleBinding   ::= ":style" "=" AttrValue                                                             († `:style.prop` removed — decisions.md 5)
+StyleBinding   ::= ":style" "=" AttrValue                                                             (β #129: `:style.prop` removed — decisions.md 5)
 TwoWayBinding  ::= "::" BoundName ( "." TwoWayModifier )* "=" AttrValue                                (β #124, #126)
 TwoWayModifier ::= "lazy" | "trim" | "number" | "debounce(" Digits ")"
 GroupBinding   ::= "::group" "=" AttrValue                                                             (β #127)

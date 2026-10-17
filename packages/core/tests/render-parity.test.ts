@@ -155,7 +155,7 @@ const ROWS: Row[] = [
     { name: ':class with a string', expected: '<p class="yes">x</p>', template: "<p :class=\"on ? 'yes' : 'no'\">x</p>", script: 'let on = $signal(true);' },
     // The inline path wrote class="[object Object]" (#96).
     { name: ':class with an object', expected: '<p class="active">x</p>', template: '<p :class="{ active: on, off: !on }">x</p>', script: 'let on = $signal(true);' },
-    { name: ':class.x', expected: '<p class="active base">x</p>', template: '<p class="base" :class.active="on">x</p>', script: 'let on = $signal(true);' },
+    { name: ':class with an object beside a static class', expected: '<p class="active base">x</p>', template: '<p class="base" :class="{ active: on }">x</p>', script: 'let on = $signal(true);' },
     // The specialised forms (#112), each after a change, so the update is measured, not the first write.
     { name: ':class conditional, after a change', expected: '<p class="no">x</p><button>t</button>', template: "<p :class=\"on ? 'yes' : 'no'\">x</p><button @click=\"on = !on\">t</button>", script: 'let on = $signal(true);', act: click('button') },
     { name: ':class with &&, after a change', expected: '<p class="">x</p><button>t</button>', template: "<p :class=\"on && 'danger'\">x</p><button @click=\"on = !on\">t</button>", script: 'let on = $signal(true);', act: click('button') },
@@ -165,8 +165,8 @@ const ROWS: Row[] = [
     { name: ':class beside a static class, after a change', expected: '<p class="b base">x</p><button>t</button>', template: "<p class=\"base\" :class=\"name\">x</p><button @click=\"name = 'b'\">t</button>", script: "let name = $signal('a');", act: click('button') },
     // The inline path assigned the object to el.style, which keeps no colour (#96).
     { name: ':style with an object', expected: '<p style="color: red;">x</p>', template: "<p :style=\"{ color: 'red' }\">x</p>" },
-    { name: ':style.x', expected: '<p style="color: blue;">x</p>', template: '<p :style.color="c">x</p>', script: "let c = $signal('blue');" },
-    { name: ':show', expected: '<p>x</p><p style="display: none;">y</p>', template: '<p :show="on">x</p><p :show="!on">y</p>', script: 'let on = $signal(true);' },
+    { name: ':style with an object over a signal', expected: '<p style="color: blue;">x</p>', template: '<p :style="{ color: c }">x</p>', script: "let c = $signal('blue');" },
+    { name: '@show over an element', expected: '<p>x</p><p style="display: none;">y</p>', template: '@show (on) { <p>x</p> }@show (!on) { <p>y</p> }', script: 'let on = $signal(true);' },
     { name: '@click', expected: '<p>1</p><button>+</button>', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
     { name: '@click.once', expected: '<p>1</p><button>+</button>', template: '<p>{{ n }}</p><button @click.once="n++">+</button>', script: 'let n = $signal(0);', act: (h) => { click('button')(h); click('button')(h); } },
     { name: '@click.self', expected: '<p>0</p><div><button>in</button></div>', template: '<p>{{ n }}</p><div @click.self="n++"><button>in</button></div>', script: 'let n = $signal(0);', act: click('button') },

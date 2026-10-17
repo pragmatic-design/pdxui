@@ -91,7 +91,7 @@ describe('parser: @defer', () => {
 // ─── Compiler Tests ────────────────────────────────────────────────
 
 describe('compile: @show', () => {
-    it('compiles @show to show() call', () => {
+    it('compiles @show over one element to a display binding on it (#129)', () => {
         const { code } = compile(`
 <template>
   @show (visible) { <div>Content</div> }
@@ -100,8 +100,7 @@ describe('compile: @show', () => {
   @prop visible: boolean = true;
 </script>`, 'test.pdx');
 
-        expect(code).toContain('show');
-        expect(code).toContain('ctx.visible');
+        expect(code).toMatch(/\.style\.display=\(ctx\.visible\(\)\)\?'':'none'/);
     });
 });
 

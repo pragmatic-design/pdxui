@@ -34,7 +34,7 @@ Pipe ::= "|" S? Identifier ( "(" Expression ( S? "," S? Expression )* ")" )?
 A pipe is a function call written left to right: `{{ price | money }}` is `{{ money(price) }}`. The
 beta keeps pipes for **chains** of two or more formatters, where left to right reads better than
 nested calls (`{{ total | round(2) | money('EUR') }}`). A single pipe is `PDX_PIPE_SINGLE` (info),
-whose hint is the call (decisions.md 4 — proposed). Since: alpha → beta.
+whose fix is the call, applied by `pdx check --fix` (decisions.md 4 — landed, #129). Since: alpha → beta.
 
 ## Attributes
 
@@ -86,7 +86,7 @@ is a string; the merging routine otherwise.
 
 #### Rules
 
-- `:class.name="cond"` is removed (language change); `pdx migrate` merges every `:class.x` of an
+- `:class.name="cond"` is removed (language change, #129 — landed); `pdx migrate` merges every `:class.x` of an
   element into one object, added to an existing object when there is one.
 
 #### Since
@@ -108,7 +108,7 @@ as quoted keys) or a string (`cssText`). The object form works everywhere (#96).
 
 #### Rules
 
-- `:style.prop="v"` is removed, like `:class.name` (decisions.md 5 — proposed; language change):
+- `:style.prop="v"` is removed, like `:class.name` (decisions.md 5; language change, #129 — landed):
   `pdx migrate` merges every `:style.x` of an element into one object, quoting custom-property keys.
 
 #### Since
@@ -226,7 +226,7 @@ RefBinding ::= ":ref" "=" AttrValue
 ```
 
 As alpha, and typed from the target: an element ref is its element type, a component ref is the
-component's exposed type (#140). `ref=` without the colon is removed (#129).
+component's exposed type (#140). `ref=` without the colon is removed (#129 — landed).
 
 **Landed** for a component ref (#140): the element plus the component's exposed members. An element
 ref's own type (`HTMLInputElement` for `<input>`) is not inferred yet: it reads the tag from the
@@ -284,7 +284,7 @@ A literal `data-part="name"` on the element of a declared `@part` ([components.m
 
 ### `:show` — removed
 
-The `:show` attribute is removed (#129): `@show (cond) { … }` is the form. `pdx migrate` wraps the
+The `:show` attribute is removed (#129 — landed): `@show (cond) { … }` is the form. `pdx migrate` wraps the
 element in an `@show` block.
 
 ## Components

@@ -349,17 +349,17 @@ lines stacked in a 32px block under `overflow: hidden` cut the name.
 ```html
 <template>
   <pdx-segmented class="agenda-pick" :options="resourceOptions" :value="shown" @pdx-change="e => shown = e.detail.value"></pdx-segmented>
-  <div class="agenda" :style.--agenda-cols="String(resources.length)">
+  <div class="agenda" :style="{ '--agenda-cols': String(resources.length) }">
     <div class="agenda-corner"></div>
     @for (resources as r; track r.id) {
-      <div class="agenda-res" :class.agenda-hidden="!isShown(r.id)" :style.grid-column="String(col(r.id))">{{ r.name }}</div>
+      <div class="agenda-res" :class="{ 'agenda-hidden': !isShown(r.id) }" :style="{ gridColumn: String(col(r.id)) }">{{ r.name }}</div>
     }
     @for (hours as h; track h) {
-      <div class="agenda-time" :style.grid-row="row(h) + ' / span 12'">{{ h }}</div>
+      <div class="agenda-time" :style="{ gridRow: row(h) + ' / span 12' }">{{ h }}</div>
     }
     @for (appointments as a; track a.id) {
-      <div class="agenda-cell" :class.agenda-hidden="!isShown(a.resource)" :style.grid-column="String(col(a.resource))" :style.grid-row="row(a.start) + ' / span ' + a.minutes / 5">
-        <button type="button" class="agenda-appt" :class.agenda-short="a.minutes < 30" :aria-label="label(a)" @click="open(a)">
+      <div class="agenda-cell" :class="{ 'agenda-hidden': !isShown(a.resource) }" :style="{ gridColumn: String(col(a.resource)), gridRow: row(a.start) + ' / span ' + a.minutes / 5 }">
+        <button type="button" class="agenda-appt" :class="{ 'agenda-short': a.minutes < 30 }" :aria-label="label(a)" @click="open(a)">
           <span class="agenda-line">{{ a.start }} · {{ a.patient }}</span>
           @if (a.minutes >= 30) { <span class="agenda-line agenda-more">{{ a.animal }} — {{ a.reason }}</span> }
         </button>

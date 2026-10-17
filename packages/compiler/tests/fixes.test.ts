@@ -117,10 +117,10 @@ describe('rewriteHtmlBindings fix', () => {
         expect(code).toContain('ctx.remove(item.id)');
     });
 
-    it('rewrites ref="name" to :ref=${ctx.name}', () => {
+    it('rewrites :ref="name" to :ref=${ctx.name}', () => {
         const { code } = compile(`
 <template>
-  <canvas ref="canvasEl"></canvas>
+  <canvas :ref="canvasEl"></canvas>
 </template>`, 'test.pdx');
 
         expect(code).toContain(':ref=${ctx.canvasEl}');

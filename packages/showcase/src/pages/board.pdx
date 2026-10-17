@@ -6,7 +6,7 @@
     <p class="pdx-txt-body pdx-ink-muted">{{ $t('board.intro') }}</p>
 
     <div class="toolbar">
-      <span class="pdx-txt-small pdx-ink-muted" :show="lifted !== null" role="status" data-test="lifted">{{ $t('board.lifted', { reference: liftedReference }) }}</span>
+      @show (lifted !== null) { <span class="pdx-txt-small pdx-ink-muted" role="status" data-test="lifted">{{ $t('board.lifted', { reference: liftedReference }) }}</span> }
     </div>
 
     <!-- One `:ref` on the whole board, not one per card: `@for` renders the cards and a ref inside

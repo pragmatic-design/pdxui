@@ -5,43 +5,47 @@
       <p class="pdx-txt-body pdx-ink-muted">{{ $t('settings.views.intro') }}</p>
     </header>
 
-    <div :show="saved.length === 0" data-test="views-empty">
-      <pdx-empty-state icon="list" :title="$t('settings.views.emptyTitle')" :description="$t('settings.views.emptyBody')"></pdx-empty-state>
-    </div>
+    @show (saved.length === 0) {
+      <div data-test="views-empty">
+        <pdx-empty-state icon="list" :title="$t('settings.views.emptyTitle')" :description="$t('settings.views.emptyBody')"></pdx-empty-state>
+      </div>
+    }
 
     <!-- What each view IS, not only its name: the filter, the sort and the page size it opens the
          list with, and a link that opens it there. A div grid with the table's roles («Bug noti»). -->
-    <div class="table" role="table" :aria-label="$t('settings.tiles.views')" :show="saved.length > 0">
-      <div class="row head" role="row">
-        <span role="columnheader">{{ $t('settings.views.name') }}</span>
-        <span role="columnheader">{{ $t('settings.views.filter') }}</span>
-        <span role="columnheader">{{ $t('settings.views.sort') }}</span>
-        <span role="columnheader" class="num">{{ $t('settings.views.pageSize') }}</span>
-        <span role="columnheader"><span class="sr-only">{{ $t('settings.views.actions') }}</span></span>
-      </div>
-      @for (saved as view; track view.key) {
-        <div class="row" role="row" data-test="view-row">
-          <span role="cell" class="name-cell">
-            @if (renaming === view.key) {
-              <form class="rename" @submit="commitRename($event, view.key)">
-                <pdx-input :value="draft" :aria-label="$t('settings.views.name')" autofocus @pdx-input="e => draft = e.detail.value" data-test="rename-input"></pdx-input>
-                <pdx-button size="sm" variant="primary" type="submit">{{ $t('settings.views.save') }}</pdx-button>
-                <pdx-button size="sm" variant="ghost" @click="renaming = ''">{{ $t('settings.views.cancel') }}</pdx-button>
-              </form>
-            } @else {
-              <a class="name" :href="'/tickets?view=' + view.key" @click="followLink($event, '/tickets?view=' + view.key)">{{ view.name }}</a>
-            }
-          </span>
-          <span role="cell" class="summary">{{ filterSummary(view.state) }}</span>
-          <span role="cell" class="summary">{{ sortSummary(view.state) }}</span>
-          <span role="cell" class="num">{{ view.state.pageSize || '—' }}</span>
-          <span role="cell" class="actions">
-            <pdx-button size="sm" variant="ghost" @click="startRename(view)">{{ $t('settings.views.rename') }}</pdx-button>
-            <pdx-button size="sm" variant="ghost" @click="askDelete(view)">{{ $t('settings.views.delete') }}</pdx-button>
-          </span>
+    @show (saved.length > 0) {
+      <div class="table" role="table" :aria-label="$t('settings.tiles.views')">
+        <div class="row head" role="row">
+          <span role="columnheader">{{ $t('settings.views.name') }}</span>
+          <span role="columnheader">{{ $t('settings.views.filter') }}</span>
+          <span role="columnheader">{{ $t('settings.views.sort') }}</span>
+          <span role="columnheader" class="num">{{ $t('settings.views.pageSize') }}</span>
+          <span role="columnheader"><span class="sr-only">{{ $t('settings.views.actions') }}</span></span>
         </div>
-      }
-    </div>
+        @for (saved as view; track view.key) {
+          <div class="row" role="row" data-test="view-row">
+            <span role="cell" class="name-cell">
+              @if (renaming === view.key) {
+                <form class="rename" @submit="commitRename($event, view.key)">
+                  <pdx-input :value="draft" :aria-label="$t('settings.views.name')" autofocus @pdx-input="e => draft = e.detail.value" data-test="rename-input"></pdx-input>
+                  <pdx-button size="sm" variant="primary" type="submit">{{ $t('settings.views.save') }}</pdx-button>
+                  <pdx-button size="sm" variant="ghost" @click="renaming = ''">{{ $t('settings.views.cancel') }}</pdx-button>
+                </form>
+              } @else {
+                <a class="name" :href="'/tickets?view=' + view.key" @click="followLink($event, '/tickets?view=' + view.key)">{{ view.name }}</a>
+              }
+            </span>
+            <span role="cell" class="summary">{{ filterSummary(view.state) }}</span>
+            <span role="cell" class="summary">{{ sortSummary(view.state) }}</span>
+            <span role="cell" class="num">{{ view.state.pageSize || '—' }}</span>
+            <span role="cell" class="actions">
+              <pdx-button size="sm" variant="ghost" @click="startRename(view)">{{ $t('settings.views.rename') }}</pdx-button>
+              <pdx-button size="sm" variant="ghost" @click="askDelete(view)">{{ $t('settings.views.delete') }}</pdx-button>
+            </span>
+          </div>
+        }
+      </div>
+    }
 
     <!-- A delete asks first: the view is someone's arrangement, and it does not come back. -->
     <pdx-alert-dialog

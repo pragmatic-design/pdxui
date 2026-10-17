@@ -3,62 +3,63 @@
        it, with every screen and record the showcase has, grouped, which can be pinned into the rail.
        A panel over the content, not modal: Escape, a click outside or a choice closes it, and the
        focus goes back to its opener. The same `pdx-nav-menu` as the rail, so it is walked with the
-       same keys. `:show`, not `@if`: the menu projects its item slot.
+       same keys. `@show`, not `@if`: the menu projects its item slot.
        Its head is a search, as the reference's is: with every entity in one list, finding one by
        name is the quicker way. Where it sits and how wide it is is the shell's layout;
        what is inside is this component's. -->
-  <aside
-    id="catalog"
-    class="catalog"
-    role="dialog"
-    aria-modal="false"
-    :aria-label="$t('app.rail.all')"
-    :show="open"
-    :ref="catalogEl"
-    data-test="catalog">
-    <div class="catalog-head">
-      <input
-        class="pdx-input catalog-search"
-        type="search"
-        :value="catalogQuery"
-        :placeholder="$t('app.rail.search')"
-        :aria-label="$t('app.rail.search')"
-        @input="e => catalogQuery = e.target.value"
-        @keydown="onCatalogSearchKey"
-        :ref="catalogSearchEl"
-        data-test="catalog-search" />
-      <button class="catalog-close" type="button" :aria-label="$t('app.rail.closeAll')" @click="dismiss(true)" data-test="catalog-close">×</button>
-    </div>
-    <p class="catalog-empty pdx-txt-small pdx-ink-muted" :show="catalogItems.length === 0" data-test="catalog-empty">{{ $t('app.rail.noMatch', { query: catalogQuery }) }}</p>
-    <pdx-nav-menu
-      class="rail-nav catalog-nav"
-      :items="catalogItems"
-      :active-key="activeCatalogKey"
-      :indent="24"
-      chevron="end"
-      actions="overlay"
-      @pdx-select="onCatalogSelect"
-      data-test="catalog-nav">
-      <slot name="item" let:item>
-        <span class="pdx-nav-icon rail-icon" aria-hidden="true">{{ item.glyph }}</span>
-        <span class="pdx-nav-label rail-label">{{ item.label }}</span>
-      </slot>
-      <!-- The pin, beside the entry's link and not inside it. -->
-      <slot name="actions" let:item>
-        @if (item.href) {
-          <span class="rail-tools catalog-tools">
-            <button
-              class="rail-tool"
-              type="button"
-              :aria-pressed="favourites.isPinned(item.pin) ? 'true' : 'false'"
-              :aria-label="$t('app.rail.pin', { name: item.label })"
-              :data-test="item.data.test + '-pin'"
-              @click.prevent.stop="favourites.togglePin(item.pin)"><svg class="pushpin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pushpin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
-          </span>
-        }
-      </slot>
-    </pdx-nav-menu>
-  </aside>
+  @show (open) {
+    <aside
+      id="catalog"
+      class="catalog"
+      role="dialog"
+      aria-modal="false"
+      :aria-label="$t('app.rail.all')"
+      :ref="catalogEl"
+      data-test="catalog">
+      <div class="catalog-head">
+        <input
+          class="pdx-input catalog-search"
+          type="search"
+          :value="catalogQuery"
+          :placeholder="$t('app.rail.search')"
+          :aria-label="$t('app.rail.search')"
+          @input="e => catalogQuery = e.target.value"
+          @keydown="onCatalogSearchKey"
+          :ref="catalogSearchEl"
+          data-test="catalog-search" />
+        <button class="catalog-close" type="button" :aria-label="$t('app.rail.closeAll')" @click="dismiss(true)" data-test="catalog-close">×</button>
+      </div>
+      @show (catalogItems.length === 0) { <p class="catalog-empty pdx-txt-small pdx-ink-muted" data-test="catalog-empty">{{ $t('app.rail.noMatch', { query: catalogQuery }) }}</p> }
+      <pdx-nav-menu
+        class="rail-nav catalog-nav"
+        :items="catalogItems"
+        :active-key="activeCatalogKey"
+        :indent="24"
+        chevron="end"
+        actions="overlay"
+        @pdx-select="onCatalogSelect"
+        data-test="catalog-nav">
+        <slot name="item" let:item>
+          <span class="pdx-nav-icon rail-icon" aria-hidden="true">{{ item.glyph }}</span>
+          <span class="pdx-nav-label rail-label">{{ item.label }}</span>
+        </slot>
+        <!-- The pin, beside the entry's link and not inside it. -->
+        <slot name="actions" let:item>
+          @if (item.href) {
+            <span class="rail-tools catalog-tools">
+              <button
+                class="rail-tool"
+                type="button"
+                :aria-pressed="favourites.isPinned(item.pin) ? 'true' : 'false'"
+                :aria-label="$t('app.rail.pin', { name: item.label })"
+                :data-test="item.data.test + '-pin'"
+                @click.prevent.stop="favourites.togglePin(item.pin)"><svg class="pushpin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pushpin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
+            </span>
+          }
+        </slot>
+      </pdx-nav-menu>
+    </aside>
+  }
 </template>
 
 <script setup>

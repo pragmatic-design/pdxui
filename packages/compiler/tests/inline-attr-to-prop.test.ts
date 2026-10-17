@@ -160,9 +160,9 @@ describe('inlineBindings: :class merges with the static class, as core does', ()
     });
 });
 
-describe('inlineBindings: :class and :class.x on one element', () => {
-    it('a :class change keeps the class :class.x turned on, and turning it off removes only it', () => {
-        const { el, set } = live('<div class="btn" :class="variant" :class.active="on"></div>', { variant: 'primary', on: true });
+describe('inlineBindings: a :class string with a toggle joined to it, as pdx migrate writes it', () => {
+    it('a change of the string keeps the class the toggle turned on, and turning it off removes only it', () => {
+        const { el, set } = live('<div class="btn" :class="[variant, on && \'active\'].filter(Boolean).join(\' \')"></div>', { variant: 'primary', on: true });
         expect(classes(el)).toEqual(['active', 'btn', 'primary']);
         set({ variant: 'ghost' });
         expect(classes(el), 'the toggled class was dropped').toEqual(['active', 'btn', 'ghost']);
@@ -171,7 +171,7 @@ describe('inlineBindings: :class and :class.x on one element', () => {
     });
 
     it('a static class written after the class bindings does not wipe them', () => {
-        expect(classes(build('<div :class.on="flag" class="a"></div>', { flag: true }))).toEqual(['a', 'on']);
+        expect(classes(build('<div :class="{ on: flag }" class="a"></div>', { flag: true }))).toEqual(['a', 'on']);
     });
 
     it('a dynamic class that is also static stays when the dynamic value moves on', () => {
@@ -309,8 +309,8 @@ describe('the controls', () => {
         expect(el.getAttribute('class')).toBe('a');
     });
 
-    it(':class.x still toggles one class', () => {
-        expect(inline('<div :class.on="id"></div>')).toMatch(/classList\.toggle\("on",/);
+    it('the :class object still toggles one class', () => {
+        expect(inline('<div :class="{ on: id }"></div>')).toMatch(/classList\.toggle\("on",/);
     });
 });
 

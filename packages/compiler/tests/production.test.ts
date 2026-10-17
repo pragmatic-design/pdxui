@@ -360,7 +360,7 @@ let count = $signal(0);
 
     it('production does not deduplicate unique expressions', () => {
         const source = `<template>
-<button :disabled="loading" :class.active="active">Save</button>
+<button :disabled="loading" :class="{ active: active }">Save</button>
 </template>
 <script setup>
 let loading = $signal(false);
@@ -396,7 +396,7 @@ let items = $signal([]);
 
     it('multiple different duplicates get separate computeds', () => {
         const source = `<template>
-<div :class.a="x > 0" :class.b="x > 0" :class.c="y > 0" :class.d="y > 0">Test</div>
+<div :class="{ a: x > 0, b: x > 0, c: y > 0, d: y > 0 }">Test</div>
 </template>
 <script setup>
 let x = $signal(0);
@@ -612,9 +612,9 @@ let name = $signal('');
         expect(code).toMatch(/import \{[^}]*\bbindTwoWay\b[^}]*\} from '@pdxui\/core'/);
     });
 
-    it('handles :class.x toggle bindings', () => {
+    it('handles :class object toggle bindings', () => {
         const source = `<template>
-<div :class.active="isActive">Card</div>
+<div :class="{ active: isActive }">Card</div>
 </template>
 <script setup>
 let isActive = $signal(false);
@@ -650,9 +650,9 @@ let off = $signal(false);
         expect(markup(code).join('')).not.toMatch(/<\/(input|br|img)>/);
     });
 
-    it('handles :style.x and :show bindings', () => {
+    it('handles :style object and @show bindings', () => {
         const source = `<template>
-<div :style.color="textColor" :show="visible">Styled</div>
+@show (visible) { <div :style="{ color: textColor }">Styled</div> }
 </template>
 <script setup>
 let textColor = $signal('red');
@@ -660,12 +660,12 @@ let visible = $signal(true);
 </script>`;
         const { code } = compile(source, 'inline-style.pdx', [], undefined, { production: true });
         expect(code).toContain('style.setProperty');
-        expect(code).toContain('style.display');
+        expect(code).toMatch(/\.style\.display=\(ctx\.visible\(\)\)/);
     });
 
     it('handles ref bindings', () => {
         const source = `<template>
-<input ref="inputRef" />
+<input :ref="inputRef" />
 </template>
 <script setup>
 @prop label: string = '';
@@ -808,11 +808,11 @@ let dead3 = $signal([]);
 </script>`;
         const { code: devCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: false });
         const { code: prodCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: true });
-        // Dev has when() and show() calls; prod inlines/eliminates them
+        // Dev has when() and the display binding of a one-element @show; prod inlines/eliminates them
         expect(devCode).toContain('when(');
-        expect(devCode).toContain('show(');
+        expect(devCode).toContain('.style.display=(true)');
         expect(prodCode).not.toContain('when(');
-        expect(prodCode).not.toContain('show(');
+        expect(prodCode).not.toContain('.style.display=');
         expect(prodCode.length).toBeLessThan(devCode.length);
     });
 });

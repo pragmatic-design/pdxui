@@ -49,8 +49,8 @@
          panel's, because nobody using the product presses a button to be refused. -->
     <div class="card pdx-surface-card" data-test="billing-card">
       <h2 class="pdx-txt-heading">{{ $t('account.billingTitle') }}</h2>
-      <p class="pdx-txt-body" :show="closedMonths !== null" data-test="closed-months">{{ $t('account.closedMonths', { count: closedMonths ?? 0 }) }}</p>
-      <p class="pdx-txt-small pdx-ink-muted" :show="closedMonths === null" data-test="server-pending">{{ $t('account.billingPending') }}</p>
+      @show (closedMonths !== null) { <p class="pdx-txt-body" data-test="closed-months">{{ $t('account.closedMonths', { count: closedMonths ?? 0 }) }}</p> }
+      @show (closedMonths === null) { <p class="pdx-txt-small pdx-ink-muted" data-test="server-pending">{{ $t('account.billingPending') }}</p> }
 
       @if (canCloseMonth()) {
         <pdx-button variant="primary" @click="closeMonth" data-test="close-month">{{ $t('account.closeMonth') }}</pdx-button>
@@ -58,8 +58,8 @@
         <p class="pdx-txt-small pdx-ink-muted" data-test="close-month-hidden">{{ $t('account.closeMonthHidden') }}</p>
       }
 
-      <p class="pdx-txt-small allowed" :show="actionOk !== ''" role="status" data-test="action-ok">{{ actionOk }}</p>
-      <p class="pdx-txt-small refused" :show="actionError !== ''" role="alert" data-test="action-error">{{ actionError }}</p>
+      @show (actionOk !== '') { <p class="pdx-txt-small allowed" role="status" data-test="action-ok">{{ actionOk }}</p> }
+      @show (actionError !== '') { <p class="pdx-txt-small refused" role="alert" data-test="action-error">{{ actionError }}</p> }
     </div>
 
     <!-- ─── Session ─────────────────────────────────────────────────────────────────────

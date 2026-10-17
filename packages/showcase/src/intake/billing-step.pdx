@@ -14,8 +14,8 @@
       <pdx-button variant="primary" :disabled="!canSubmit" @click="submit()" data-test="submit">{{ $t('intake.submit') }}</pdx-button>
     </div>
 
-    <p class="pdx-txt-small cross-error" :show="serverError !== ''" role="alert" data-test="server-error">{{ serverError }}</p>
-    <p class="pdx-txt-small" :show="submitted" role="status" data-test="submitted">{{ $t('intake.submitted') }}</p>
+    @show (serverError !== '') { <p class="pdx-txt-small cross-error" role="alert" data-test="server-error">{{ serverError }}</p> }
+    @show (submitted) { <p class="pdx-txt-small" role="status" data-test="submitted">{{ $t('intake.submitted') }}</p> }
   </div>
 </template>
 

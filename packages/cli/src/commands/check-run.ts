@@ -169,8 +169,11 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
             // fix refused for overlapping one applied is tried again on the next round. Bounded,
             // so two fixes that undo each other cannot loop.
             if (args.fix) {
+                // A fix is applied whatever the level shown: an info such as PDX_PIPE_SINGLE carries one
+                // too (#129), and `--severity` decides what is reported, not what is fixed.
+                const fixOptions = { ...options, minLevel: severityOrder.info };
                 for (let round = 0; round < MAX_FIX_ROUNDS; round++) {
-                    const fixable = inspected.warnings.flatMap((w) => (w.fix ? [{ ...w, fix: w.fix }] : []));
+                    const fixable = inspectFile(source, file, fixOptions).warnings.flatMap((w) => (w.fix ? [{ ...w, fix: w.fix }] : []));
                     const applied = applyFixes(source, fixable);
                     if (applied.applied.length === 0) break;
                     source = applied.source;

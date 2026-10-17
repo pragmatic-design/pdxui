@@ -24,7 +24,7 @@
         @for (logLines as line; track line) {
           <span class="pdx-txt-mono pdx-txt-small pdx-ink-muted">{{ line }}</span>
         }
-        <span class="pdx-txt-small pdx-ink-muted" :show="logLines.length === 0">No events yet — try creating or deleting a row.</span>
+        @show (logLines.length === 0) { <span class="pdx-txt-small pdx-ink-muted">No events yet — try creating or deleting a row.</span> }
       </div>
     </div>
 

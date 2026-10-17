@@ -23,7 +23,7 @@
       searchable
       @pdx-pick="onCustomerPicked"
       data-test="customer-picker"></pdx-relation-picker>
-    <p class="pdx-txt-small picked" :show="customerName !== ''" data-test="customer-picked">{{ customerName }}</p>
+    @show (customerName !== '') { <p class="pdx-txt-small picked" data-test="customer-picked">{{ customerName }}</p> }
 
     <!-- What the request is about: the picked customer's assets, and only theirs. -->
     <pdx-asset-picker :customer-id="customerId" @picked="e => assetpicked(e.detail.id)" data-test="asset-picker"></pdx-asset-picker>

@@ -51,13 +51,13 @@
         <p class="pdx-label pick-label">{{ $t('assets.columns.customer') }}</p>
         <pdx-relation-picker :source="customerSource" :columns="customerColumns" searchable
           @pdx-pick="e => { customer = e.detail?.items?.[0] ?? null; customerMissing = false; }" data-test="new-customer"></pdx-relation-picker>
-        <p class="pdx-txt-small picked" :show="customer !== null" data-test="new-customer-picked">{{ customer?.name ?? '' }}</p>
-        <p class="pdx-txt-small pdx-ink-danger" :show="customerMissing" role="alert" data-test="new-customer-missing">{{ $t('assets.customerMissing') }}</p>
+        @show (customer !== null) { <p class="pdx-txt-small picked" data-test="new-customer-picked">{{ customer?.name ?? '' }}</p> }
+        @show (customerMissing) { <p class="pdx-txt-small pdx-ink-danger" role="alert" data-test="new-customer-missing">{{ $t('assets.customerMissing') }}</p> }
 
         <p class="pdx-label pick-label">{{ $t('assets.columns.site') }}</p>
         <pdx-relation-picker :source="siteSource" :columns="siteColumns" searchable
           @pdx-pick="e => { site = e.detail?.items?.[0] ?? null; }" data-test="new-site"></pdx-relation-picker>
-        <p class="pdx-txt-small picked" :show="site !== null" data-test="new-site-picked">{{ site?.name ?? '' }}</p>
+        @show (site !== null) { <p class="pdx-txt-small picked" data-test="new-site-picked">{{ site?.name ?? '' }}</p> }
 
         <div class="actions">
           <pdx-button variant="ghost" @click="createOpen = false" data-test="cancel">{{ $t('assets.cancel') }}</pdx-button>

@@ -200,7 +200,7 @@ the same way, and has no `effect`: a later change of what it read does not reach
 - The template path also accepts `:name="${expr}"` and strips the `${ }` — but the check above stops
   the compile first.
 - A modifier other than `.once` on `:name` raises `PDX_BINDING_MODIFIER` (error). `:class.x` and
-  `:style.x` are forms of their own, not modifiers.
+  `:style.x` are not modifiers: they are removed forms (#129), `PDX_REMOVED_FORM`.
 
 #### Examples
 
@@ -223,37 +223,40 @@ let limit = $signal(40);
 
 alpha
 
-### `:class`, `:class.name`
+### `:class`
 
 #### Syntax
 
 ```ebnf
 ClassBinding   ::= ":class" "=" AttrValue
                  | ":class" "=" ( '"{' ClassPair ( "," ClassPair )* '}"' | "'{" ClassPair ( "," ClassPair )* "}'" )
-                 | ":class." ClassName "=" AttrValue
 ClassPair      ::= S? ( ClassName | StringLiteral ) S? ":" S? Expression S?
 ClassName      ::= [A-Za-z_-] [A-Za-z0-9_-]*
 ```
 
 #### Semantics
 
-`:class="expr"` binds a string of classes. It merges with a static `class="…"`: each new value
-removes the classes the binding wrote last and adds its own, and never removes a static class.
-`:class.active="cond"` toggles one class, `classList.toggle('active', !!cond)`. The object form
-`:class="{ active: on, big: n > 2 }"` is split by the compiler into one `:class.name` toggle per pair.
+The object form `:class="{ active: on, big: n > 2 }"` toggles each class by its condition,
+`classList.toggle('active', !!on)`. `:class="expr"` binds a string of classes, for a fully dynamic
+class. Either merges with a static `class="…"`: each new value removes the classes the binding wrote
+last and adds its own, and never removes a static class.
 
 #### Rules
 
-- The object form is expanded into one `:class.name` per key before either render path reads the
-  tag, so both bind the same classes.
+- The object form is expanded into one toggle per key before either render path reads the tag, so
+  both bind the same classes.
 - The object form is recognised only when the whole value is one `{ … }`; a value that merely
   contains an object is the string form. Not checked today.
+- `:class.name="cond"` is removed (#129): `PDX_REMOVED_FORM`. `pdx migrate` merges every `:class.x`
+  of an element into one object — after the entries of an existing object, or joined to an existing
+  string as `[str, cond && 'x'].filter(Boolean).join(' ')`.
 
 #### Examples
 
 ```pdx
 <template>
-  <li class="row" :class="tone" :class.selected="picked" :class.done="progress === 100">{{ label }}</li>
+  <li class="row" :class="{ selected: picked, done: progress === 100 }">{{ label }}</li>
+  <li class="row" :class="tone">{{ label }}</li>
 </template>
 
 <script setup>
@@ -268,35 +271,35 @@ let label = $signal('Upload');
 
 alpha
 
-### `:style`, `:style.name`
+### `:style`
 
 #### Syntax
 
 ```ebnf
 StyleBinding   ::= ":style" "=" AttrValue
                  | ":style" "=" ( '"{' StylePair ( "," StylePair )* '}"' | "'{" StylePair ( "," StylePair )* "}'" )
-                 | ":style." CssProperty "=" AttrValue
 StylePair      ::= S? ( Identifier | StringLiteral ) S? ":" S? Expression S?
-CssProperty    ::= [A-Za-z-] [A-Za-z0-9-]*
 ```
 
 #### Semantics
 
-`:style="expr"` writes the string to `style.cssText`. `:style.color="c"` sets one property with
-`style.setProperty('color', String(c ?? ''))`. The object form `:style="{ fontSize: size }"` is split
-into one `:style.name` per pair, the key turned to kebab-case (`fontSize` → `font-size`).
+The object form `:style="{ width: w, 'background-color': c, '--accent': a }"` sets each property
+with `style.setProperty(name, String(value ?? ''))`, a camelCase key turned to kebab-case
+(`fontSize` → `font-size`); a custom property is a quoted key. `:style="expr"` writes a string to
+`style.cssText`.
 
 #### Rules
 
-- The object form is expanded into one `:style.name` per key (a camelCase key in kebab-case) before
-  either render path reads the tag, so both set the same properties.
-- A custom property is a `:style.name` too: `:style.--accent="c"`. Not checked today.
+- The object form is expanded into one property per key before either render path reads the tag,
+  so both set the same properties.
+- `:style.name="v"` (with `:style.--x`) is removed (#129): `PDX_REMOVED_FORM`. `pdx migrate` merges
+  every `:style.x` of an element into one object, custom-property and hyphenated keys quoted.
 
 #### Examples
 
 ```pdx
 <template>
-  <div class="bar" :style.width="percent + '%'" :style.background-color="colour"></div>
+  <div class="bar" :style="{ width: percent + '%', 'background-color': colour }"></div>
 </template>
 
 <script setup>
@@ -527,55 +530,19 @@ function send() { console.log('sent'); }
 
 alpha
 
-### `:show`
+### `:ref`
 
 #### Syntax
 
 ```ebnf
-ShowBinding    ::= ":show" "=" AttrValue
-```
-
-#### Semantics
-
-`:show="cond"` sets `style.display` to `''` when the condition is truthy and `'none'` when not, in an
-`effect` (core's `bindShow`; inline, the same `effect`). The element stays in the DOM, with its state
-and its listeners. `@if` removes and recreates it instead.
-
-#### Rules
-
-- Showing clears the inline `display` (`''`) and hands it back to the stylesheet: an element a rule
-  hides with `display: none` stays hidden. Not checked today.
-
-#### Examples
-
-```pdx
-<template>
-  <button @click="expanded = !expanded">Details</button>
-  <section :show="expanded">Kept in the DOM while hidden.</section>
-</template>
-
-<script setup>
-let expanded = $signal(false);
-</script>
-```
-
-#### Since
-
-alpha
-
-### `:ref`, `ref`
-
-#### Syntax
-
-```ebnf
-RefBinding     ::= ( ":ref" | "ref" ) "=" AttrValue
+RefBinding     ::= ":ref" "=" AttrValue
 ```
 
 The quoted value names a signal.
 
 #### Semantics
 
-`:ref="box"` and `ref="box"` both compile to `:ref=${ctx.box}`: the signal itself. When the element
+`:ref="box"` compiles to `:ref=${ctx.box}`: the signal itself. When the element
 is built, core's `bindRef` calls `box.set(element)`; the inline path does the same. Read it after the
 mount — in `onMount`, an `$effect` or a handler — as `box`, like any signal.
 
@@ -588,6 +555,7 @@ its scope is disposed, so they still read the element.
 
 - A value that is not a signal (no `.set`) is ignored without a word: declare the ref as
   `let box = $signal(null);`. Not checked today.
+- The bare `ref="box"` is removed (#129): `PDX_REMOVED_FORM`, rewritten to `:ref` by `pdx migrate`.
 - On a component, a ref declared `$signal(null)` is typed in the editor from what the component
   exposes (#140): its manifest methods for a library component, its `@expose` for a `.pdx` — the
   element plus those members, so calling one it does not expose is an error.
@@ -988,7 +956,7 @@ the implicit role of a `ul`/`ol` (`list`) or a table (`table`, read from a `tbod
 <template>
   <ul>
     @for (todos as todo, i; track todo.id) {
-      <li :class.done="todo.done">{{ i + 1 }}. {{ todo.text }}</li>
+      <li :class="{ done: todo.done }">{{ i + 1 }}. {{ todo.text }}</li>
     } @empty {
       <li>Nothing to do.</li>
     }
@@ -1206,6 +1174,13 @@ swapped for a placeholder comment while hidden and put back in its place when sh
 
 - Hiding does not pause: effects and components in the body keep running while it is hidden. Code
   that must stop while hidden belongs in an `@if`.
+- A body that is exactly one element is built where the block stands, its `display` bound on it:
+  no `show()` block, the cost the removed `:show` attribute had (#129). The whitespace between the
+  braces and that element is the block's, not markup: `@show (c) { <b>x</b> }` builds what
+  `<b :show="c">x</b>` built.
+- `@show` is the one form of hiding an element in place: the `:show="cond"` attribute is removed
+  (#129), `PDX_REMOVED_FORM`. `pdx migrate` wraps the element, `<section :show="open">…</section>`
+  becoming `@show (open) { <section>…</section> }`.
 
 #### Examples
 

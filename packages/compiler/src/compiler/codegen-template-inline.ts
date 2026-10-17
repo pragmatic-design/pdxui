@@ -16,6 +16,7 @@ import { BindingDedup } from './inline-dedup';
 import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, scopedSlotCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { hoistSlotFunction } from './codegen-template';
+import { isSingleElementBody, withoutEdgeWhitespace } from './show-single-element';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
@@ -206,6 +207,8 @@ class InlineGen {
     private v(prefix = 'el'): string { return `__${prefix}${this.idx++}`; }
     /** The origin mark the next line written carries: set just before a node's statement. */
     private pending = '';
+    /** The condition of a one-element `@show`, bound on the next element opened (#129). */
+    private showNext: string | null = null;
     private out(line: string): void {
         if (!this.tree.discarding()) this.lines.push(this.pending + line);
         this.pending = '';
@@ -390,6 +393,11 @@ class InlineGen {
         // the walk reaches.
         const before = this.lines.length;
         this.attrs(tag, el, kind, at ? attributeOrigins(tag, at) : null, raw);
+        if (this.showNext !== null) {
+            this.pending = '';
+            this.showBind(el, this.showNext);
+            this.showNext = null;
+        }
         if (this.lines.length > before) this.tree.target(el);
         if (!isVoid) {
             this.svgStack.push(svg && name !== 'foreignObject');
@@ -915,6 +923,12 @@ class InlineGen {
     }
 
     showN(node: ShowNode): void {
+        // One element: built here, in this block, its display bound as it is (#129).
+        if (isSingleElementBody(node.body)) {
+            this.showNext = node.condition;
+            this.walk(withoutEdgeWhitespace(node.body));
+            return;
+        }
         this.imports.add('show');
         const cond = callSignals(prefixCtx(node.condition, this.ctx), this.ctx);
         const body = this.sub(node.body);
