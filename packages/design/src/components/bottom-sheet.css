@@ -24,12 +24,16 @@
     z-index: var(--pdx-z-overlay, 40);
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--pdx-duration-base) ease-out, visibility var(--pdx-duration-base);
+    /* Hidden only once the fade-out has ended. */
+    transition: opacity var(--pdx-duration-base) ease-out, visibility 0ms var(--pdx-duration-base);
 }
 
+/* Visible at once, not transitioned: for the first frame of a `visibility` transition the value is
+ * still `hidden`, so a click on the backdrop went through to the page (#474, as #472 on the drawer). */
 .pdx-bottom-sheet-backdrop[data-open] {
     opacity: 1;
     visibility: visible;
+    transition: opacity var(--pdx-duration-base) ease-out, visibility 0ms;
 }
 
 /* ===== Sheet ===== */
