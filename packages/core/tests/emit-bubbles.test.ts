@@ -1,9 +1,9 @@
-// emit(event, detail, { bubbles: false }) — an event that describes a component's own state stays on
-// the component.
+// emit(event, detail) — a component's event stays on the component unless it says otherwise (#138).
 //
-// With bubbles: true, a select's pdx-close reaches the @pdx-close of the dialog around it, and the
-// dialog vanishes whenever an option is picked. The popup events opt out, like the native close of
-// <dialog> and toggle of <details>.
+// Bubbling by default, an application event named `change` or `close` was indistinguishable, on an
+// ancestor, from the native events of the same name rising from the inputs inside it; and a select's
+// pdx-close reached the @pdx-close of the dialog around it, and the dialog vanished whenever an option
+// was picked. Like Angular's `output()`, an event bubbles only when it is declared to.
 import { describe, it, expect, afterEach } from 'vitest';
 import { component } from '../src/component/component';
 import { html } from '../src/renderer/template';
@@ -45,12 +45,24 @@ describe('emit — bubbles', () => {
         expect(seen!.detail).toBe(7);
     });
 
-    it('control — without options it still bubbles, as every other event does', () => {
+    it('without options it does not bubble: the parent does not see it, the element does', () => {
         const { parent, child } = mountInParent();
         let onParent = 0;
+        let onChild = 0;
         parent.addEventListener('x-change', () => onParent++);
+        child.addEventListener('x-change', () => onChild++);
         child.emit('x-change', { value: 'a' });
-        expect(onParent).toBe(1);
+        expect(onParent, 'an undeclared bubble reached the parent').toBe(0);
+        expect(onChild).toBe(1);
+    });
+
+    it('{ bubbles: true } reaches the parent, and is composed', () => {
+        const { parent, child } = mountInParent();
+        let seen: CustomEvent | null = null;
+        parent.addEventListener('x-change', (e) => { seen = e as CustomEvent; });
+        child.emit('x-change', 3, { bubbles: true });
+        expect(seen, 'an event that asked to bubble did not reach the parent').not.toBeNull();
+        expect(seen!.composed).toBe(true);
     });
 
     it('the setup context forwards the option (ctx.emit)', () => {

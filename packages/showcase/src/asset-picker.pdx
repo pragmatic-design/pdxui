@@ -23,7 +23,7 @@ import { assetRowTransport } from './data/asset-rows';
 @prop customer: string = '';
 
 /** An asset was picked: the page keeps its id with the ticket. One word, lower case, as `switched`. */
-@event picked: { id: number };
+@event(bubbles) picked: { id: number };
 
 const assets = createDataSource({ transport: assetRowTransport, idField: 'id', pageSize: 5 });
 

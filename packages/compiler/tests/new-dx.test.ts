@@ -223,15 +223,16 @@ describe('compile new mode', () => {
         expect(code).toContain("events: { 'changed': {}, 'reset': {} },");
     });
 
-    it('a component that also dispatches with $emit declares none: $emit takes any name', () => {
-        const { code } = compile(`
+    it('with $emit removed (#138), its events are declared even beside a stray $emit, which is an error', () => {
+        const { code, warnings } = compile(`
 <template><button @click="$emit('pdx-change', 1)">x</button></template>
 
 <script setup>
   @event changed: number;
 </script>`, 'test.pdx');
 
-        expect(code).not.toContain('events:');
+        expect(warnings.map((w) => w.code)).toContain('PDX_REMOVED_FORM');
+        expect(code).toContain("events: { 'changed': {} },");
     });
 
     it('the control: a component with no @event declares no events', () => {

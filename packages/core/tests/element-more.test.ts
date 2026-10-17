@@ -252,19 +252,22 @@ describe('attributes', () => {
 });
 
 describe('emit', () => {
-    it('dispatches a bubbling, composed CustomEvent carrying the detail', () => {
+    it('dispatches a CustomEvent carrying the detail, on the element and not above it (#138)', () => {
         const tag = defineEl(() => html`<p></p>`);
         const el = document.createElement(tag) as PdxElement;
         document.body.appendChild(el);
 
         const seen: CustomEvent[] = [];
-        document.body.addEventListener('pdx-thing', (e) => seen.push(e as CustomEvent));
+        const above: CustomEvent[] = [];
+        el.addEventListener('pdx-thing', (e) => seen.push(e as CustomEvent));
+        document.body.addEventListener('pdx-thing', (e) => above.push(e as CustomEvent));
 
         el.emit('pdx-thing', { id: 1 });
 
-        expect(seen, 'the event did not reach an ancestor listener').toHaveLength(1);
+        expect(seen, 'the element did not hear its own event').toHaveLength(1);
         expect(seen[0].detail).toEqual({ id: 1 });
-        expect(seen[0].composed).toBe(true);
+        expect(seen[0].composed).toBe(false);
+        expect(above, 'an undeclared bubble reached an ancestor').toHaveLength(0);
     });
 
     it('an event with no detail is still dispatched', () => {

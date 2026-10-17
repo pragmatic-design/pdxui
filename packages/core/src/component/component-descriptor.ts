@@ -89,13 +89,13 @@ export const prop: typeof propBuilder & { required: typeof requiredProp; optiona
 /** An event whose `detail` is of type `D`; `void` for an event that carries none. */
 export interface EventSpec<D> {
     readonly __detail?: D;
-    /** Whether it bubbles: true unless declared otherwise, as `ctx.emit` does. */
+    /** Whether it bubbles (and is composed): false unless declared, as `ctx.emit` does (#138). */
     readonly bubbles?: boolean;
 }
 
-/** Declare an event: `event<number>()`, `event<void>({ bubbles: false })`. */
+/** Declare an event: `event<number>()`, `event<void>({ bubbles: true })` for one ancestors hear. */
 export function event<D = void>(options?: { bubbles?: boolean }): EventSpec<D> {
-    return options?.bubbles === false ? { bubbles: false } : {};
+    return options?.bubbles === true ? { bubbles: true } : {};
 }
 
 /**

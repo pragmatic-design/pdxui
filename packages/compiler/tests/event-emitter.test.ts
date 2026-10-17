@@ -53,10 +53,10 @@ for (const [name, opts] of Object.entries(PATHS)) {
                 .toBeLessThan(code.indexOf("picked('on-setup')"));
         });
 
-        it('$emit dispatches too', () => {
-            const { code } = compile(sfc("let n = $signal(0);\nfunction go(v) { $emit('chosen', v); }", '<b @click="go(1)">x</b>'), 'emit.pdx', [], undefined, opts);
-            parses(code);
-            expect(code, '$emit is called but defined nowhere').toMatch(/const \$emit = \(event, detail\) => ctx\.emit\(event, detail\)/);
+        it('$emit is a removed form, and no helper is generated for it (#138)', () => {
+            const { code, warnings } = compile(sfc("let n = $signal(0);\nfunction go(v) { $emit('chosen', v); }", '<b @click="go(1)">x</b>'), 'emit.pdx', [], undefined, opts);
+            expect(warnings.map((w) => w.code)).toContain('PDX_REMOVED_FORM');
+            expect(code).not.toMatch(/const \$emit/);
         });
     });
 }
@@ -66,11 +66,6 @@ describe('@event — what does not change', () => {
         const { code } = compile(sfc("@event picked: string;\nlet n = $signal(0);\nfunction picked(v) { console.log(v); }"), 'own.pdx', [], undefined, {});
         parses(code);
         expect(code).not.toMatch(/const picked =/);
-    });
-
-    it('no $emit helper when nothing calls $emit', () => {
-        const { code } = compile(sfc('@event picked: string;\nlet n = $signal(0);'), 'pick.pdx', [], undefined, {});
-        expect(code).not.toMatch(/const \$emit/);
     });
 
     it('control — the .d.ts still carries the events interface', () => {

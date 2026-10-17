@@ -80,7 +80,6 @@ it doing five things.
 | `$signal(v)` | reactive state. Write it like a plain variable: `count++` is an update (`.set(…)`), `name = 'x'` stores the value as it is (`.setRaw(…)`), a function too — so a `$signal` can hold a handler, and `handler()` calls it |
 | `$derived(expr)` | a computed value; recomputes when what it reads changes |
 | `$effect(fn)` | runs when its dependencies change; return a function to clean up |
-| `$emit(event, payload)` | dispatch a `CustomEvent` from this component — the untyped form; prefer an `@event` |
 | `onMount(fn)` / `onDestroy(fn)` | lifecycle. `onMount` is **one-shot**, not reactive |
 
 ⚠️ **A `$signal`'s value is replaced, never changed in place.** `items.push(x)` or `user.name = v` sets
@@ -113,12 +112,15 @@ Written at the top of `<script setup>`, one per line, ending in `;`.
 @prop hint?: string;               // `?`: optional, its type's empty value ('' here) when absent
 @model value: string = '';         // a prop the component writes: value = x dispatches 'value-change'
 @event changed: number;            // an emitter: changed(n) dispatches 'changed' with detail n
+@event(bubbles) closed;            // an event its ancestors hear too
 @page '/jobs/:id';                 // this component is a route
-@tag 'pdx-something-else';         // override the tag derived from the filename
+@tag 'app-something-else';         // override the tag derived from the filename
 ```
 
-The emitter is callable from the script and the template alike, and the event bubbles: the parent
-writes `<my-counter @changed="e => total = e.detail">` — the payload is `e.detail`. Keep event names
+The emitter is callable from the script and the template alike, and it is the **only** way to
+dispatch: there is no `$emit` (`PDX_REMOVED_FORM`). The event **stays on the component**: the parent
+listens on it, `<app-counter @changed="e => total = e.detail">` — the payload is `e.detail` — and an
+element further up hears nothing, unless the declaration says `@event(bubbles)`. Keep event names
 lowercase: the listener is an HTML attribute, lowercased when parsed, so `@event itemPicked` is
 dispatched as `itemPicked` and listened for as `itempicked` — never heard. The compiler warns
 `PDX_EVENT_NAME_CASE` on such a declaration. Not kebab-case either: the name is also the emitter's
@@ -206,11 +208,11 @@ A component with no content may be written self-closing, `<pdx-autocomplete … 
 core's `html` tag) expands it to `<pdx-autocomplete …></pdx-autocomplete>`. The browser alone would not — it
 would open the element and swallow what follows. Void elements (`<input />`, `<br />`) stay as written.
 
-**A component's popup events stay on it.** `pdx-open`, `pdx-close` and `pdx-toggle` do not bubble,
-like the native `close` of `<dialog>`: a `@pdx-close` on a `pdx-dialog` hears the dialog, not the
-select or date picker inside it. Listen on the component that opens and closes. Every other
-component event bubbles — `pdx-change` does, like `change` — so a listener on a container that must
-ignore its children's events still takes `.self`.
+**A component's events stay on it.** No `@pdxui/ui` event bubbles — `pdx-change` included — and
+neither does an `@event` without `(bubbles)`: a `@pdx-close` on a `pdx-dialog` hears the dialog, not
+the select or date picker inside it, and a `@pdx-change` on a `<form>` or a section hears none of the
+fields inside. Listen on the component itself. Native events (`input`, `change`, `click`) still bubble
+as the browser makes them.
 
 ⚠️ **In the template a `$signal` is read by its name**: `@if (open)`, `{{ count }}`. With
 parentheses it is *called* — `open()` reads the value and calls it, which is right for a `$signal`

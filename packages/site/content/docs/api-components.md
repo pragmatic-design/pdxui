@@ -506,7 +506,7 @@ import { event } from '@pdxui/core';
 function event(options?: { bubbles?: boolean }): EventSpec<D>
 ```
 
-Declare an event: `event<number>()`, `event<void>({ bubbles: false })`.
+Declare an event: `event<number>()`, `event<void>({ bubbles: true })` for one ancestors hear.
 
 ## `exposeOnElement`
 

@@ -144,10 +144,11 @@ Unchanged from alpha (`docs/language/script.md`).
 
 ### $emit — removed
 
-`$emit(name, detail)` is not part of the beta (#138). An event is declared with `@event`
+`$emit(name, detail)` is not part of the beta (#138 — landed). An event is declared with `@event`
 ([components.md](components.md)) and dispatched by the function the declaration creates. `$emit` is
 `PDX_REMOVED_FORM`; `pdx migrate` rewrites `$emit('saved', x)` to
-`saved(x)` and adds `@event saved: unknown;` when the declaration is missing.
+`saved(x)` and adds `@event saved: unknown;` when the declaration is missing. A hyphenated name,
+which no `@event` can declare, is listed for a person to rewrite.
 
 ## Module declarations
 

@@ -119,10 +119,12 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         case 'PDX_TAG_RESERVED':
             // Match: the `@tag` that names a pdx- tag — a component declares one.
             return find(source, script, /@tag\s+['"]pdx-/);
+        // Match: the declaration of that name, with or without `(bubbles)` (#138).
         case 'PDX_DUP_EVENT':
-            return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`), 1) : undefined;
+            return name ? find(source, script, new RegExp(`@event(?:\\(\\s*bubbles\\s*\\))?\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_EVENT_NAME_CASE':
-            return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`)) : undefined;
+        case 'PDX_EVENT_BUBBLES_UNUSED':
+            return name ? find(source, script, new RegExp(`@event(?:\\(\\s*bubbles\\s*\\))?\\s+${escape(name)}\\b`)) : undefined;
         case 'PDX_COMMAND_TARGET_MISSING': {
             // Match: the `commandfor="…"` the message names (`commandfor 'x' names …`).
             const id = /^commandfor '([^']+)'/.exec(w.message)?.[1];

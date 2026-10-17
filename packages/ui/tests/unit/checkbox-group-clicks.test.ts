@@ -40,10 +40,10 @@ async function createGroup(attrs: Record<string, string> = {}): Promise<{ group:
 beforeEach(() => { document.body.innerHTML = ''; });
 
 describe('pdx-checkbox-group follows its children', () => {
-    it('clicking a and c gives value "a,c", with one event per click reaching the parent', async () => {
+    it('clicking a and c gives value "a,c", with one event per click on the group', async () => {
         const { group, inputs } = await createGroup();
         const seen: Array<{ value: string; values: string[] }> = [];
-        group.parentElement!.addEventListener('pdx-change', (e) => {
+        group.addEventListener('pdx-change', (e) => {
             if (e.target === group) seen.push((e as CustomEvent).detail);
         });
         inputs[0].click();

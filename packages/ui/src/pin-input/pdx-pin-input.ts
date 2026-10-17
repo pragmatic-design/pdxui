@@ -10,6 +10,9 @@ import '../otp-input/pdx-otp-input';
 
 /**
  * A masked code input for entering a PIN: each cell shows a dot instead of the character typed.
+ *
+ * @fires pdx-input {{ value }} - On every character typed or deleted: the PIN so far.
+ * @fires pdx-complete {{ value }} - When every cell is filled: the whole PIN.
  */
 component('pdx-pin-input', {
     formAssociated: true,
@@ -29,17 +32,14 @@ component('pdx-pin-input', {
         // reach the form on submit.
         let _current = (ctx.value() as string) ?? '';
         ctx.track(() => { _current = (ctx.value() as string) ?? ''; });
-        ctx.el.addEventListener('pdx-change', (e: Event) => {
-            const v = (e as CustomEvent).detail?.value;
-            if (typeof v === 'string') {
-                _current = v;
-                (ctx.el as unknown as { value?: string }).value = v;
-            }
-        });
-        ctx.el.addEventListener('pdx-input', (e: Event) => {
+        // The inner pdx-otp-input's events stay on it (#138): the pin-input keeps the value, then
+        // dispatches each event again from its host, which is where the app listens.
+        function onInput(e: Event) {
             const v = (e as CustomEvent).detail?.value;
             if (typeof v === 'string') _current = v;
-        });
+            ctx.emit('pdx-input', (e as CustomEvent).detail);
+        }
+        function onComplete(e: Event) { ctx.emit('pdx-complete', (e as CustomEvent).detail); }
         useFormAssociated(ctx, { getFormValue: () => (_current ? _current : null) });
 
         // Imperative API: focus/blur/clear (delegates to inner pdx-otp-input)
@@ -54,7 +54,7 @@ component('pdx-pin-input', {
             },
         });
 
-        return {};
+        return { onInput, onComplete };
     },
     render: (ctx) => html`
         <pdx-otp-input
@@ -67,6 +67,8 @@ component('pdx-pin-input', {
             :label="${() => (ctx.label() as string) || uiString('pin-input', 'label')}"
             autocomplete="off"
             mask
+            @pdx-input="${ctx.onInput}"
+            @pdx-complete="${ctx.onComplete}"
         ></pdx-otp-input>
     `,
 });

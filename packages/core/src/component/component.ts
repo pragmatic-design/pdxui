@@ -82,7 +82,7 @@ type PropSignals<P extends Record<string, PropDefinition>> = {
 export interface ComponentContextBase {
     /** The host element. */
     el: HTMLElement;
-    /** Dispatch a custom event. It bubbles unless `{ bubbles: false }`. */
+    /** Dispatch a custom event. It stays on the host unless `{ bubbles: true }` (#138). */
     /** False when the event was `cancelable` and a listener prevented it. */
     emit(event: string, detail?: unknown, options?: EmitOptions): boolean;
     /** Set form value (form-associated components only). */
@@ -341,10 +341,10 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                         if (DEV) console.warn(`[pdx] <${tag}> emitted '${event}', which its descriptor does not declare in \`events\` (declared: ${[...declaredEvents].join(', ') || 'none'}).`);
                         return this.emit(event, detail, emitOptions);
                     }
-                    // An event declared `event({ bubbles: false })` does not bubble unless the call says so.
+                    // An event declared `event({ bubbles: true })` bubbles unless the call says otherwise (#138).
                     const declared = options.events?.[event];
-                    const resolved = declared?.bubbles === false && emitOptions?.bubbles === undefined
-                        ? { ...emitOptions, bubbles: false }
+                    const resolved = declared?.bubbles === true && emitOptions?.bubbles === undefined
+                        ? { ...emitOptions, bubbles: true }
                         : emitOptions;
                     return this.emit(event, detail, resolved);
                 },

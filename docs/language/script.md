@@ -186,24 +186,35 @@ beta (#124)
 #### Syntax
 
 ```ebnf
-EventDecl ::= "@event" S Identifier ( S? ":" S? Type )? S? ";"?
+EventDecl ::= "@event" ( "(" S? "bubbles" S? ")" )? S Identifier ( S? ":" S? Type )? S? ";"?
 ```
 
-The analyzer's form: `@event name: PayloadType;`
+The analyzer's form: `@event name: PayloadType;`, or `@event(bubbles) name: PayloadType;`
 
 #### Semantics
 
 Declares an event the component dispatches, and a function of the same name that dispatches it:
 `const name = (detail) => ctx.emit('name', detail);`, declared before the rest of the setup so any
 statement can call it, and returned to the template. `ctx.emit` dispatches a `CustomEvent` on the
-host with `detail`, `bubbles: true` and `composed: true`. Without a type the payload is `void`. The
-`.d.ts` gets an `Events` interface; a parent listens with `@name="…"` ([template.md](template.md)).
+host with `detail`, and **the event does not bubble** (#138): `bubbles: false, composed: false`, like
+Angular's `output()`, so an event named `change` or `close` is never confused, on an ancestor, with
+the native events of the same name rising from the inputs inside. `@event(bubbles) name` opts in:
+the emitter passes `{ bubbles: true }`, and the event bubbles and crosses shadow roots. The descriptor
+declares the same (`events: { name: event({ bubbles: true }) }`). Without a type the payload is
+`void`. The `.d.ts` gets an `Events` interface; a parent listens with `@name="…"` on the component
+([template.md](template.md)).
 
 #### Rules
 
 - A line `@event …` that is not this form raises `PDX_MALFORMED_EVENT`. That includes a name that is
   not an `Identifier`: `@event pdx-change: T` is an error, since the name is the emitter function too.
-  A hyphenated event is dispatched with `$emit('pdx-change', value)`.
+- `@event(…)` with an option other than `bubbles` raises `PDX_UNKNOWN_DECLARATION`, its hint the form.
+- The function is the only way to dispatch from a `.pdx`. `$emit('name', x)` is removed (#138):
+  `PDX_REMOVED_FORM`. `pdx migrate` rewrites it to `name(x)` and adds `@event name: unknown;` when the
+  script does not declare it; a hyphenated name, which no `@event` can declare, is listed for a person.
+- `@event name` keeps its spelling and no longer bubbles: `pdx migrate` writes `(bubbles)` on every
+  existing `@event`, which keeps what it did. `PDX_EVENT_BUBBLES_UNUSED` (info) then lists each one
+  that no template in the project listens to above the component, so the marker can be removed.
 - Two `@event` of one name raise `PDX_DUP_EVENT`.
 - A name with an uppercase letter raises `PDX_EVENT_NAME_CASE`: HTML lowercases the parent's listener
   attribute, which then never matches.
@@ -218,7 +229,7 @@ host with `detail`, `bubbles: true` and `composed: true`. Without a type the pay
 
 <script setup>
 @event saved: { id: string };
-@event closed;
+@event(bubbles) closed;
 
 function save() {
   saved({ id: 'a1' });
@@ -990,43 +1001,6 @@ $watch(query, (value, previous) => {
   console.log(previous, '→', value);
 });
 $watch([query, page], ([q, p]) => console.log(q, p));
-</script>
-```
-
-#### Since
-
-alpha
-
-### $emit
-
-#### Syntax
-
-```ebnf
-EmitCall ::= "$emit" S? "(" S? Expression ( S? "," S? Expression )? S? ")"
-```
-
-The analyzer's form: `$emit('name', payload);`
-
-#### Semantics
-
-Dispatches an event by name, untyped. When the script or the template contains `$emit(`, the setup
-declares `const $emit = (event, detail) => ctx.emit(event, detail);` and returns it to the template.
-The event is the same `CustomEvent` an `@event` function dispatches; `@event` is the typed form and the
-one to prefer.
-
-#### Rules
-
-- The event name is not checked against the `@event` declarations, and the payload is not typed.
-
-#### Examples
-
-```pdx
-<template>
-  <button @click="$emit('picked', 1)">Pick</button>
-</template>
-
-<script setup>
-const label = 'Pick';
 </script>
 ```
 

@@ -25,6 +25,7 @@ import { checkCommands, type MethodsLookup } from './validate-commands';
 import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validate-two-way';
 import { checkSinglePipes } from './validate-pipes';
 import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
+import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubbles';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -218,6 +219,12 @@ export interface ValidateOptions {
      * unset is PDX_PROP_REQUIRED (#130); without it, required props are not checked.
      */
     requiredPropsOf?: RequiredPropsLookup;
+    /**
+     * Whether the project listens to one of this component's events above it — the resolver's
+     * `eventHeardAbove`, bound to the component's tag. With it, an `@event(bubbles)` nothing hears
+     * above the component is PDX_EVENT_BUBBLES_UNUSED (#138); without it, the marker is not checked.
+     */
+    eventHeardAbove?: EventHeardLookup;
     /**
      * Where the caller looked for components — the resolver's `searched`: its component packages,
      * then its project folders. PDX_UNRESOLVED_COMPONENT's hint names them, so a package that was
@@ -527,6 +534,7 @@ export function validate(
     warnings.push(...checkCommands(ast, options?.methodsOf));
     warnings.push(...checkTwoWay(ast, options?.modelsOf));
     warnings.push(...checkRequiredProps(ast, options?.requiredPropsOf));
+    warnings.push(...checkBubblesUnused(analysis.events, options?.eventHeardAbove));
     warnings.push(...checkBindingModifiers(ast));
     warnings.push(...checkSinglePipes(ast));
 

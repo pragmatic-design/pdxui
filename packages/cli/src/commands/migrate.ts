@@ -125,8 +125,14 @@ export async function migrate(paths: string[], { cwd, dry = false, prefix = DEFA
                 }
                 continue;
             }
-            text = region.replace(change.fix(region.text, context));
-            report.changed.push({ file: rel, id: change.id, count: found.length });
+            const fixed = change.fix(region.text, context);
+            // What the rewrite could not reach (a `$emit` with a hyphenated name, #138) is a person's.
+            const left = change.detect(fixed, context);
+            text = region.replace(fixed);
+            if (found.length > left.length) report.changed.push({ file: rel, id: change.id, count: found.length - left.length });
+            for (const f of left) {
+                report.flagged.push({ file: rel, line: f.line + region.lineOffset, id: change.id, found: f.found, message: change.message });
+            }
         }
         if (!dry && text !== original) writeFileSync(path, text, 'utf-8');
     }

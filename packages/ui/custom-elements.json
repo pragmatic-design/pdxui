@@ -12417,7 +12417,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Bubbles up from the inner `pdx-form` once the values validate; an invalid submit fires nothing and scrolls to the first error.",
+              "description": "Dispatched from the template when the inner `pdx-form` submits and the values validate; an invalid submit fires nothing and scrolls to the first error.",
               "detail": "{ values }"
             }
           ],
@@ -17865,7 +17865,15 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
+              "description": "On every character typed or deleted: the PIN so far.",
+              "detail": "{ value }"
+            },
+            {
+              "name": "pdx-complete",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "When every cell is filled: the whole PIN.",
               "detail": "{ value }"
             }
           ],

@@ -100,6 +100,16 @@ semver.
 
 ### Changed
 
+- A component's events no longer bubble unless they are declared to, Angular's `output()` rule: an
+  event named `change` or `close` was, on an ancestor, the native one of every input inside. In a
+  `.pdx`, `@event saved: T;` stays on the host and `@event(bubbles) saved: T;` bubbles and crosses
+  shadow roots; `pdx migrate` writes `(bubbles)` on every existing `@event`, and
+  `PDX_EVENT_BUBBLES_UNUSED` lists the ones nothing hears above the component. `$emit` is removed
+  (`PDX_REMOVED_FORM`): dispatch with the function `@event` declares, which `pdx migrate` writes for
+  you. **The `@pdxui/ui` components' events stay on the component too**, `pdx-change` included: a
+  listener on a `<form>`, a section or `document` that heard every field's `pdx-change` hears nothing
+  — listen on the component. `emit()` and `ctx.emit()` take `{ bubbles: true }`, and a descriptor's
+  `event({ bubbles: true })`, to opt in. (#138)
 - `inlineBindings` is no longer in the type of `pdx()`'s options: a typed `vite.config.ts` that still
   sets it does not compile. An untyped config is still told, `PDX_INLINE_BINDINGS_IGNORED`. (#121)
 - A `.pdx` renders through one path, in dev as in a build: the dev server compiles a template to the

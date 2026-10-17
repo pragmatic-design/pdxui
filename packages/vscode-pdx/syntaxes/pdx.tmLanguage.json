@@ -324,7 +324,7 @@
     "pdx-runes": {
       "patterns": [
         {
-          "match": "\\$(signal|derived|effect|store|watch|emit|t|n|d|r)\\b",
+          "match": "\\$(signal|derived|effect|store|watch|t|n|d|r)\\b",
           "name": "support.function.rune.pdx"
         },
         {

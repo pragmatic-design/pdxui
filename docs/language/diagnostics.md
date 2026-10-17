@@ -39,6 +39,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_MALFORMED_EVENT` | error | `@event` written in a shape the compiler does not recognise. | `@event`, [script.md](script.md) |
 | `PDX_DUP_EVENT` | error | The same `@event` declared twice. | `@event`, [script.md](script.md) |
 | `PDX_EVENT_NAME_CASE` | warn | An `@event` name with an uppercase letter. | `@event`, [script.md](script.md) |
+| `PDX_EVENT_BUBBLES_UNUSED` | info | An `@event(bubbles)` no template in the project listens to above the component (#138). | `@event`, [script.md](script.md) |
 | `PDX_EXPOSE_UNDECLARED` | error | `@expose` names something the component does not declare. | `@expose`, [script.md](script.md) |
 | `PDX_COMMAND_TARGET_MISSING` | error | A `commandfor` whose target id is not in the template. | invoker commands, [template.md](template.md) |
 | `PDX_COMMAND_UNKNOWN` | error | A command its target does not answer: a `--name` the component does not expose, or a built-in command for another element type. | invoker commands, [template.md](template.md) |

@@ -235,8 +235,8 @@ export function assembleModule(
     sourceFile?: string | null,
     /** Whether the render has module-level declarations (#109): their line is reserved here. */
     hasModuleHoists = false,
-    /** The events the script declares with `@event`, written into the descriptor (#123). */
-    events: readonly string[] = [],
+    /** The events the script declares with `@event`, written into the descriptor (#123), with `(bubbles)` (#138). */
+    events: readonly { name: string; bubbles?: true }[] = [],
     /** The states the script declares with `@state`, written into the descriptor (#132). */
     states: readonly string[] = [],
     /** The descriptor's `host: { … }` from `@host` (#133), already compiled; '' for none. */
@@ -325,9 +325,9 @@ export function assembleModule(
     code += `  props: ${propsCode},\n`;
     // The descriptor's `models` (#124): props the component writes, each with its `<name>-change`.
     if (modelsCode) code += `  models: ${modelsCode},\n`;
-    // The descriptor's `events` (#123): what `event()` returns for each, so a .pdx and a TypeScript
-    // component declare their events the same way.
-    if (events.length > 0) code += `  events: { ${events.map(e => `${jsQuote(e)}: {}`).join(', ')} },\n`;
+    // The descriptor's `events` (#123): what `event()` returns for each — `{ bubbles: true }` for an
+    // `@event(bubbles)` (#138) — so a .pdx and a TypeScript component declare their events the same way.
+    if (events.length > 0) code += `  events: { ${events.map(e => `${jsQuote(e.name)}: ${e.bubbles ? '{ bubbles: true }' : '{}'}`).join(', ')} },\n`;
     // The descriptor's `states` (#132): the host attaches its internals for them.
     if (states.length > 0) code += `  states: [${states.map(s => jsQuote(s)).join(', ')}],\n`;
     // The descriptor's `host` (#133): core's bindHost applies it with the render's context.

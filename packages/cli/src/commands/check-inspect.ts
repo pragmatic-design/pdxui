@@ -39,6 +39,8 @@ export interface InspectOptions {
     /** The models components declare, for PDX_TWO_WAY_NOT_MODEL. */
     modelsOf?: (tag: string) => ReadonlySet<string> | null;
     requiredPropsOf?: (tag: string) => ReadonlySet<string> | null;
+    /** Whether the project listens to an event above a component, for PDX_EVENT_BUBBLES_UNUSED (#138). */
+    eventHeardAbove?: (event: string, tag: string) => boolean;
 }
 
 const SEVERITY_ORDER: Record<string, number> = { error: 0, warn: 1, info: 2 };
@@ -99,6 +101,8 @@ export function inspectFile(source: string, file: string, options: InspectOption
         // Exemptions are applied below, once, to everything: compile() would apply them to its part only.
         const compiled = compile(source, file, [], (src, from) => readFileSync(resolvePath(dirname(from), src), 'utf-8'), {
             propsOf: options.propsOf, enumValues: options.enumValues, methodsOf: options.methodsOf, modelsOf: options.modelsOf, requiredPropsOf: options.requiredPropsOf, applyIgnores: false,
+            // compile() knows the tag the file registers, which a listener above it is not written on.
+            eventHeardAbove: options.eventHeardAbove,
         });
         for (const w of compiled.warnings) add(w);
     }

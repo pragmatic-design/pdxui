@@ -45,7 +45,7 @@
     e.preventDefault();
     if (!isValid) return;
     submitting = true;
-    $emit('formsubmit', { name, email });
+    formsubmit({ name, email });
   }
 
   function reset() {

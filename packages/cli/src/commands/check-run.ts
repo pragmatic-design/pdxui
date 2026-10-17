@@ -107,6 +107,8 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
     // The models components declare, for PDX_TWO_WAY_NOT_MODEL (#124).
     let modelsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
     let requiredPropsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
+    // Whether the project's templates listen to an event above a component (#138).
+    let eventHeardAbove: ((event: string, tag: string) => boolean) | undefined;
     try {
         const resolver = new ComponentResolver();
         // The component packages the PROJECT depends on, read from its package.json — the
@@ -135,6 +137,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
         methodsOf = (tag: string) => resolver.methodsOf(tag);
         modelsOf = (tag: string) => resolver.modelsOf(tag);
         requiredPropsOf = (tag: string) => resolver.requiredPropsOf(tag);
+        eventHeardAbove = (event: string, tag: string) => resolver.eventHeardAbove(event, tag);
     } catch { /* no resolver → the check stays silent, which is the honest default */ }
 
     const result: CheckResult = { reports: [], checked: files.length, totalErrors: 0, totalWarnings: 0, totalFixed: 0, totalIgnored: 0 };
@@ -161,7 +164,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
                 continue;
             }
 
-            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, methodsOf, modelsOf, requiredPropsOf, design: !!args.design };
+            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, methodsOf, modelsOf, requiredPropsOf, eventHeardAbove, design: !!args.design };
             let inspected = inspectFile(source, file, options);
             // --fix: apply what can be applied, then report the file as it is AFTER — what is
             // left, re-validated, and what was fixed — so an agent does not have to run again to

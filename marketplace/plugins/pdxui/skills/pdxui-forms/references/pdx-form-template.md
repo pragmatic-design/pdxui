@@ -12,7 +12,7 @@ Render a whole form from a layout.
 | `formClass` | `formclass` | string | `''` | CSS class applied to the generated form. |
 | `showActions` | `showactions` | boolean | `true` | Show default submit/reset buttons. Override via slot="actions". |
 
-**Events:** `pdx-submit` → `detail: { values }` — Bubbles up from the inner `pdx-form` once the values validate; an invalid submit fires nothing and scrolls to the first error.
+**Events:** `pdx-submit` → `detail: { values }` — Dispatched from the template when the inner `pdx-form` submits and the values validate; an invalid submit fires nothing and scrolls to the first error.
 
 **Renders:** roles `button` · `group` · `tab` · `tablist`
 
