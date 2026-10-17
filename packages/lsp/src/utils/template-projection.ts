@@ -141,9 +141,12 @@ export function projectTemplate(
                     : null;
                 emit(';');
                 if (eventType) {
-                    emit(`(($event: ${eventType}) => (`);
+                    // A block body: a handler may be several statements, `save(); count += 2`, which
+                    // a parenthesised expression cannot hold (#487). A reference, a call, a lambda and
+                    // a mutation are each a statement as well.
+                    emit(`(($event: ${eventType}) => { `);
                     map.add(gen, templateStart + exprAbs, expr.length); emit(expr);
-                    emit('))(null!);\n');
+                    emit('; })(null!);\n');
                 } else if (modelType) {
                     emit(`((__v: ${modelType}) => __v)(`);
                     map.add(gen, templateStart + exprAbs, expr.length); emit(expr);

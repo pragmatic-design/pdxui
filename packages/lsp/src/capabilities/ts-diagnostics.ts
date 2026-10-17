@@ -1,4 +1,4 @@
-// TS diagnostics — type errors from the virtual file (script + template), mapped
+// TS diagnostics — syntax and type errors from the virtual file (script + template), mapped
 // back onto the .pdx through virtualToPdx. Diagnostics landing in the generated
 // scaffolding (an unmapped offset) are dropped → no noise from the synthetic parts.
 
@@ -18,7 +18,7 @@ const IGNORED_CODES = new Set<number>([
 export function getTsDiagnostics(
     svc: PdxTsService, uri: string, vf: VirtualFile, source: string,
 ): Diagnostic[] {
-    return mapTsDiagnostics(svc.getSemanticDiagnostics(uri, vf.content), vf, source);
+    return mapTsDiagnostics(svc.getDiagnostics(uri, vf.content), vf, source);
 }
 
 /**
