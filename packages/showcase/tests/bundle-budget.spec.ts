@@ -213,7 +213,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // loader, and a hover prefetches a route's data as well as its code (#119) — the router's navigation,
 // in the entry. Same machine, same day: main entry 37.9 → 38.4, js 462.4 → 463.1, blocking
 // 92.6 → 93.1. The showcase declares no @loader, so it pays for the router code and gains nothing yet.
-const BUDGET_KB = { entry: 39, js: 464, css: 60, blocking: 94 };
+// entry 39 → 40: two-way binding is a contract with a model (#124) and has the beta's forms (#126) —
+// the model signal in core's component, and `bindTwoWay`'s `{ get, set }` accessor with `.debounce`,
+// `.number` and their flushes, which every page with a `::` binding reaches. Measured locally: entry
+// 39.1, js 463.7, blocking 93.7.
+const BUDGET_KB = { entry: 40, js: 464, css: 60, blocking: 94 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

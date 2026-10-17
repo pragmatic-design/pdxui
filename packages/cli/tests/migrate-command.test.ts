@@ -160,6 +160,13 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
         expect(report.flagged[0].message).toContain('`@model x`');
     });
 
+    it('flags every ::x.number binding: an empty entry now writes null, an invalid one nothing (#126)', async () => {
+        file('src/age.pdx', "<template>\n  <input type=\"number\" ::value.number=\"age\" />\n  <input ::value.trim=\"name\" />\n</template>\n<script setup>\nlet age = $signal(0);\nlet name = $signal('');\n</script>\n");
+        const report = await migrate(['.'], { cwd: root, dry: true });
+        expect(report.flagged.map((f) => [f.file, f.line, f.id, f.found])).toEqual([['src/age.pdx', 2, 'two-way-number', '::value.number']]);
+        expect(report.flagged[0].message).toContain('null');
+    });
+
     it('control — a project written today has nothing to change or flag', async () => {
         file('src/a.pdx', '<template><p>{{ n }}</p></template>\n<script setup>\nlet n = $signal(0);\nfunction f() { n = n + 1; }\n</script>\n');
         file('vite.config.ts', "export default { plugins: [pdx()] };\n");

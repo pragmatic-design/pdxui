@@ -164,6 +164,7 @@ An attribute without a prefix is written as it is. The forms below are bindings:
 
 ```ebnf
 PropBinding    ::= ":" BoundName ( "=" AttrValue )?
+OnceBinding    ::= ":" BoundName ".once" "=" AttrValue
 BoundName      ::= [A-Za-z_] [A-Za-z0-9_-]*
 ```
 
@@ -181,6 +182,9 @@ prop. `href`, `src`, `action`, `formaction`, `xlink:href` and `poster` go throug
 `sanitizeBoundUrl`, so a `javascript:` value is dropped. A binding writes only when its value changes.
 On the inline path the same rule is generated inline, in one `effect` per binding.
 
+`:name.once="expr"` (#126) reads the value once, untracked, when the element is rendered, assigns it
+the same way, and has no `effect`: a later change of what it read does not reach the element.
+
 #### Rules
 
 - `${…}` inside a bound value — `:title="${n}"` — is `PDX_RAW_INTERPOLATION_IN_BINDING` (error, the
@@ -195,6 +199,8 @@ On the inline path the same rule is generated inline, in one `effect` per bindin
   `<input :value="value">`, on both render paths.
 - The template path also accepts `:name="${expr}"` and strips the `${ }` — but the check above stops
   the compile first.
+- A modifier other than `.once` on `:name` raises `PDX_BINDING_MODIFIER` (error). `:class.x` and
+  `:style.x` are forms of their own, not modifiers.
 
 #### Examples
 
@@ -309,10 +315,13 @@ alpha
 
 ```ebnf
 TwoWayBinding  ::= "::" BoundName ( "." TwoWayModifier )* "=" AttrValue
-TwoWayModifier ::= "trim" | "number" | "lazy"
+TwoWayModifier ::= "lazy" | "trim" | "number" | "debounce(" Digits ")"
+TwoWayValue    ::= Identifier ( "." Identifier )*
+                 | "{" S? "get" S? ":" S? Expression S? "," S? "set" S? ":" S? Expression S? "}"
 ```
 
-The quoted value is the name of a `$signal` (or a prop, or a `@model`).
+The quoted value is the name of a `$signal` (or a prop, or a `@model`), or the general form
+`{ get, set }`.
 
 #### Semantics
 
@@ -327,8 +336,19 @@ property. Element to signal: on an `<input>` or `<textarea>` the `input` event (
 `<kebab-name>-change` event and `detail.value`, and nothing else. On a library component that
 declares no model yet (#125) the alpha listening stays: its `pdx-input` and `pdx-change` events,
 whose value is the `detail` field named like the bound property, else `detail.value`, else the
-element's property. `.lazy` listens to `change` / `pdx-change` only; `.trim` trims a string;
-`.number` writes `Number(value) || 0`.
+element's property.
+
+The value is always read and written as `{ get, set }` (#126): a signal is `{ get: sig, set:
+sig.set }`, and the general form `::value="{ get: () => format(cents), set: (s) => cents = parse(s) }"`
+is given as written, its functions compiled like a handler's (`cents = …` writes the signal). The
+modifiers wrap the setter, so there is one mechanism:
+
+| Modifier | Meaning |
+|---|---|
+| `.lazy` | commit on `change` (native), on `pdx-change` (a library component without a model), on the model's change event otherwise |
+| `.debounce(ms)` | write `ms` after the last input; written at once on the element's `focusout` and on its form's `submit` (in the capture phase, before the form's own listeners) |
+| `.trim` | trim a string before writing |
+| `.number` | write `Number(v)` after trimming; an empty entry writes `null`; an invalid one writes nothing and marks the element invalid — `aria-invalid="true"`, and `setCustomValidity` on a native control — until a valid entry clears it |
 
 #### Rules
 
@@ -338,7 +358,11 @@ element's property. `.lazy` listens to `change` / `pdx-change` only; `.trim` tri
 - In the editor, the value bound to a model is checked against the model's type.
 - A value that is not a signal (no `.set`) falls back to a one-way `:name` binding. Not checked
   today.
-- A modifier other than the three is ignored. Not checked today.
+- A modifier outside the list raises `PDX_BINDING_MODIFIER` (error), naming the list.
+- `.number` writing `0` for an empty or invalid entry was the alpha behaviour; `pdx migrate` flags every
+  `::x.number` binding (`two-way-number`), whose value for those entries changed.
+- A `{ get, set }` value bound to a form field does not receive `.number`'s parse error yet: binding
+  to a form field is #128.
 - On a plain element other than `input`, `textarea` and `select`, the event listened to is
   `pdx-<name>`, which nothing dispatches: the binding is one-way. Not checked today.
 

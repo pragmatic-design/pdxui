@@ -48,6 +48,7 @@ const ROWS: Record<string, Row> = {
     PDX_EXPOSE_UNDECLARED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@expose close;'), at: '@expose close;' },
     PDX_COMMAND_TARGET_MISSING: { src: pdx('<p>{{ a }}</p>\n<button commandfor="gone" command="close">x</button>', 'let a = $signal(1);'), at: 'commandfor="gone"' },
     PDX_COMMAND_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<button commandfor="d" command="show">x</button><dialog id="d"></dialog>', 'let a = $signal(1);'), at: 'command="show"' },
+    PDX_BINDING_MODIFIER: { src: pdx('<p>{{ a }}</p>\n<input ::value.lazzy="a" />', 'let a = $signal(1);'), at: '::value.lazzy' },
     PDX_TWO_WAY_NOT_MODEL: { src: pdx('<p>{{ a }}</p>\n<app-field\n  ::label="a"></app-field>', 'let a = $signal(1);'), at: '::label="a"' },
     PDX_PART_MISSING: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@part trigger;'), at: '@part trigger;' },
     PDX_PART_DUPLICATE: { src: pdx('<b data-part="x">1</b><i data-part="x">2</i>', '@part x;'), at: 'data-part="x">2' },

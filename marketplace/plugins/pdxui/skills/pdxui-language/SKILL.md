@@ -176,7 +176,8 @@ Types map to the runtime as: `T[]` → Array, the primitives → their counterpa
 | `{{ expr }}` | text interpolation |
 | `:prop="expr"` | bind a property (**never** `${…}` in an attribute — the compiler warns `PDX_RAW_INTERPOLATION`). Write the prop's name — `:withBorder` or `:with-border`, not the attribute form `:withborder`: on a `pdx-*` component the compiler maps it and warns `PDX_PROP_NAME_CASE`, a name it does not declare warns `PDX_UNKNOWN_PROP` |
 | `@event="expr"` | a handler: a reference, an inline mutation (`count++`), a call, a lambda, or several statements |
-| `::name="sig"` | two-way binding: on native `value`/`checked`/`files`, and on a component's `@model name` |
+| `::name="sig"` | two-way binding: on native `value`/`checked`/`files`, and on a component's `@model name`. Modifiers, a closed list (`PDX_BINDING_MODIFIER` otherwise): `.lazy`, `.trim`, `.number` (empty → `null`, invalid → nothing written and `aria-invalid`), `.debounce(300)` (flushed on blur and submit). The general form `::value="{ get: () => fmt(c), set: (s) => c = parse(s) }"` converts both ways |
+| `:name.once="expr"` | a binding assigned once, with no effect |
 | `:class.x` / `:style.x` | conditional class / style |
 | `:ref="name"` | a DOM reference — the way to reach an element, never `getElementById` |
 

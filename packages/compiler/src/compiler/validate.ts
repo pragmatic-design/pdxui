@@ -22,7 +22,7 @@ import { invalidHostAttribute } from './host-block';
 import { checkParts } from './validate-parts';
 import { checkVirtualFor } from './validate-virtual';
 import { checkCommands, type MethodsLookup } from './validate-commands';
-import { checkTwoWay, type ModelsLookup } from './validate-two-way';
+import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validate-two-way';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -518,6 +518,7 @@ export function validate(
 
     warnings.push(...checkCommands(ast, options?.methodsOf));
     warnings.push(...checkTwoWay(ast, options?.modelsOf));
+    warnings.push(...checkBindingModifiers(ast));
 
     // ─── Check 10f: a @for … @virtual has the shape it needs (#283) ──
 

@@ -13,7 +13,7 @@ import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope,
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { BindingDedup } from './inline-dedup';
-import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, scopedSlotCall } from './codegen-template-rewrite';
+import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, scopedSlotCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { hoistSlotFunction } from './codegen-template';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
@@ -418,8 +418,8 @@ class InlineGen {
         // Groups: [1]=name  [2]/[3]=quoted value  [4]=`${` opening an unquoted value.
         // Names take `-` and `:` — `:aria-label`, `:xlink:href`, `@pdx-change`, `xlink:href` — and
         // `.` for modifiers. Without them `:aria-label` would match `:aria` with an empty value and
-        // the module would not parse.
-        const re = /(::[\w.:-]+|:[\w.:-]+|@[\w.:-]+|[\w:-]+)(?:=(?:"([^"]*)"|'([^']*)'|(\$\{)))?/g;
+        // the module would not parse. A two-way name takes `(digits)` too: `::value.debounce(300)` (#126).
+        const re = /(::(?:[\w.:-]|\(\d+\))+|:[\w.:-]+|@[\w.:-]+|[\w:-]+)(?:=(?:"([^"]*)"|'([^']*)'|(\$\{)))?/g;
         // The static class is written FIRST, whichever side of the class bindings it sits on: `:class`
         // and `:class.x` add and remove their own classes through classList, and a static
         // setAttribute("class") after them would wipe what they had added. The attribute, not
@@ -487,6 +487,14 @@ class InlineGen {
     }
 
     private propBind(el: string, prop: string, expr: string, kind: ElementKind, preRewritten = false): void {
+        // `:x.once` (#126): the value is read now, untracked, and assigned once.
+        if (prop.endsWith('.once')) {
+            this.imports.add('untracked');
+            const name = prop.slice(0, -'.once'.length);
+            const value = preRewritten ? `(${expr})()` : this.read(expr);
+            this.out(`{ const __b = untracked(() => ${value}); ${this.assign(el, this.boundName(name, kind), '__b', kind)} }`);
+            return;
+        }
         // A value that cannot change — a literal, a @for row's track key — is written once (#110).
         if (!preRewritten && isConstantBinding(expr, this.ctx)) {
             this.out(`{ ${this.assign(el, this.boundName(prop, kind), this.read(expr), kind)} }`);
@@ -688,7 +696,9 @@ class InlineGen {
         this.imports.add('bindTwoWay');
         const [name, ...mods] = desc.split('.');
         const resolved = [this.boundName(name, kind), ...mods].join('.');
-        this.out(`bindTwoWay(${el}, ${jsQuote(resolved)}, ${prefixCtx(expr, this.ctx)});`);
+        // The general form `{ get, set }` (#126): its functions are rewritten as handlers are.
+        const value = rewriteTwoWayAccessor(expr, this.ctx) ?? prefixCtx(expr, this.ctx);
+        this.out(`bindTwoWay(${el}, ${jsQuote(resolved)}, ${value});`);
     }
 
     private classToggle(el: string, cls: string, expr: string): void {

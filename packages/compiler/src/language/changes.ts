@@ -241,6 +241,20 @@ const twoWayNotModel: LanguageChange = {
     fix: 'flag',
 };
 
+// ─── #126: the two-way modifiers ─────────────────────────────────────────────────────────────
+
+const twoWayNumber: LanguageChange = {
+    id: 'two-way-number',
+    kind: 'changed',
+    scope: 'pdx',
+    issue: 126,
+    message: '`::x.number` now writes null for an empty entry, and nothing for an invalid one (the element is marked invalid); it wrote 0 for both. '
+        + 'Check that the value it binds accepts null.',
+    // Match: a two-way binding with `.number` among its modifiers.
+    detect: (text) => findAll(text, /(?<=\s)::[A-Za-z][\w-]*(?:\.[\w()]+)*\.number(?=[.=])(?:\.[\w()]+)*/g),
+    fix: 'flag',
+};
+
 /** Every registered change, in the order `pdx migrate` reports them. */
 export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     signalArrowAssignment,
@@ -248,6 +262,7 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     inlineBindingsOption,
     deferUnknownTrigger,
     twoWayNotModel,
+    twoWayNumber,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
