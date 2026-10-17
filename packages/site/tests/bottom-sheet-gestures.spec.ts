@@ -56,6 +56,26 @@ async function dragHandle(page: Page, moves: [number, number][], releaseAt: numb
     await cdp.detach();
 }
 
+test('the backdrop takes a click from the moment it opens (#474)', async ({ page }) => {
+    // The backdrop's `visibility` was transitioned with the opacity: for the first frame of the
+    // transition it is still `hidden`, so a click there went through to the page (#472 measured it on
+    // pdx-drawer). Measured in the same task that sees `data-open` appear, before any frame can pass.
+    await page.goto('/components/pdx-bottom-sheet', { waitUntil: 'networkidle' });
+    const hit = await page.evaluate((sel) => new Promise<string>((resolve) => {
+        const host = document.querySelector(sel) as HTMLElement & { open: boolean };
+        const backdrop = host.querySelector('.pdx-bottom-sheet-backdrop')!;
+        new MutationObserver((_, obs) => {
+            if (!backdrop.hasAttribute('data-open')) return;
+            obs.disconnect();
+            // High on the page, away from the sheet, which rises from the bottom.
+            const at = document.elementFromPoint(10, 100);
+            resolve(at === backdrop ? 'backdrop' : `${at?.tagName.toLowerCase()}.${at?.className}`);
+        }).observe(backdrop, { attributes: true, attributeFilter: ['data-open'] });
+        host.open = true;
+    }), SHEET);
+    expect(hit).toBe('backdrop');
+});
+
 test('a fast swipe down from the smallest detent dismisses the sheet', async ({ page }) => {
     const sheet = await openBasic(page);
     // 120 px in 64 ms: about 1900 px/s, released as the finger moves.
