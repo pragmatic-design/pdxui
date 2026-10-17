@@ -217,7 +217,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // the model signal in core's component, and `bindTwoWay`'s `{ get, set }` accessor with `.debounce`,
 // `.number` and their flushes, which every page with a `::` binding reaches. Measured locally: entry
 // 39.1, js 463.7, blocking 93.7.
-const BUDGET_KB = { entry: 40, js: 464, css: 60, blocking: 94 };
+// js 464 → 465: the app's own components register under app-, not pdx- (#136). No code is added; a
+// chunk that named its tags with the library's prefix now carries a second one, and gzip pays for
+// it. Measured on the built dist: js 464.1 KB, and 464.0 with every app- written back as pdx- — the
+// same bytes, 85 fewer gzipped over 216 occurrences.
+const BUDGET_KB = { entry: 40, js: 465, css: 60, blocking: 94 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

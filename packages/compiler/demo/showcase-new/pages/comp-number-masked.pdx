@@ -6,10 +6,10 @@
     </p>
 
     <!-- ═══ Number Input ═══ -->
-    <pdx-demo-comp-number-masked-number-input class="demo-section"></pdx-demo-comp-number-masked-number-input>
+    <app-demo-comp-number-masked-number-input class="demo-section"></app-demo-comp-number-masked-number-input>
 
     <!-- ═══ Masked Input ═══ -->
-    <pdx-demo-comp-number-masked-masked-input class="demo-section"></pdx-demo-comp-number-masked-masked-input>
+    <app-demo-comp-number-masked-masked-input class="demo-section"></app-demo-comp-number-masked-masked-input>
 
     <!-- ═══ Reference ═══ -->
     <section>

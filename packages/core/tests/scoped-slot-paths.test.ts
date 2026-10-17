@@ -33,8 +33,8 @@ describe('a scoped slot outlet', () => {
             const n = ++seq;
             define(`slotchild${n}`, '<div class="cell"><slot name="cell" :row="r"><em>none</em></slot></div><button @click="r++">+</button>',
                 'let r = $signal(1);', build);
-            define(`slotparent${n}`, `<pdx-slotchild${n}>@slot(cell, { row }) { <b>row {{ row }}</b> }</pdx-slotchild${n}>`, '', build);
-            const el = document.createElement(`pdx-slotparent${n}`);
+            define(`slotparent${n}`, `<app-slotchild${n}>@slot(cell, { row }) { <b>row {{ row }}</b> }</app-slotchild${n}>`, '', build);
+            const el = document.createElement(`app-slotparent${n}`);
             document.body.appendChild(el);
             await settle();
             expect(text(el.querySelector('.cell')!)).toBe('row 1');
@@ -47,7 +47,7 @@ describe('a scoped slot outlet', () => {
         it(`renders its default without a fill (${path})`, async () => {
             const n = ++seq;
             define(`slotalone${n}`, '<div class="cell"><slot name="cell" :row="r"><em>none</em></slot></div>', 'let r = $signal(1);', build);
-            const el = document.createElement(`pdx-slotalone${n}`);
+            const el = document.createElement(`app-slotalone${n}`);
             document.body.appendChild(el);
             await settle();
             expect(text(el.querySelector('.cell')!)).toBe('none');
@@ -57,7 +57,7 @@ describe('a scoped slot outlet', () => {
         it(`a self-closing outlet with no fill renders nothing, and the rest of the template (${path})`, async () => {
             const n = ++seq;
             define(`slotempty${n}`, '<div class="cell"><slot name="cell" :row="r" /></div><p>after</p>', 'let r = $signal(1);', build);
-            const el = document.createElement(`pdx-slotempty${n}`);
+            const el = document.createElement(`app-slotempty${n}`);
             document.body.appendChild(el);
             await settle();
             expect(text(el.querySelector('.cell')!)).toBe('');

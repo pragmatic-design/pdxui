@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-design-chips-variants class="demo-section"></pdx-demo-design-chips-variants>
+    <app-demo-design-chips-variants class="demo-section"></app-demo-design-chips-variants>
 
     <!-- ═══ Selected ═══ -->
-    <pdx-demo-design-chips-selected class="demo-section"></pdx-demo-design-chips-selected>
+    <app-demo-design-chips-selected class="demo-section"></app-demo-design-chips-selected>
 
     <!-- ═══ Removable ═══ -->
-    <pdx-demo-design-chips-removable class="demo-section"></pdx-demo-design-chips-removable>
+    <app-demo-design-chips-removable class="demo-section"></app-demo-design-chips-removable>
 
     <!-- ═══ With Icon ═══ -->
-    <pdx-demo-design-chips-icon class="demo-section"></pdx-demo-design-chips-icon>
+    <app-demo-design-chips-icon class="demo-section"></app-demo-design-chips-icon>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-design-chips-sizes class="demo-section"></pdx-demo-design-chips-sizes>
+    <app-demo-design-chips-sizes class="demo-section"></app-demo-design-chips-sizes>
 
     <!-- ═══ Chip Group ═══ -->
-    <pdx-demo-design-chips-group class="demo-section"></pdx-demo-design-chips-group>
+    <app-demo-design-chips-group class="demo-section"></app-demo-design-chips-group>
 
     <!-- ═══ Chip Field ═══ -->
-    <pdx-demo-design-chips-field class="demo-section"></pdx-demo-design-chips-field>
+    <app-demo-design-chips-field class="demo-section"></app-demo-design-chips-field>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-chips-composition class="demo-section"></pdx-demo-design-chips-composition>
+    <app-demo-design-chips-composition class="demo-section"></app-demo-design-chips-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

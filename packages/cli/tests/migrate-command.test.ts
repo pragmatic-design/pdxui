@@ -6,7 +6,7 @@
 // compiler's seam; the flags are the registry's own entries.
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setLanguageChangesForTests, LANGUAGE_CHANGES, removedExport, type LanguageChange } from '@pdxui/compiler';
@@ -42,6 +42,51 @@ beforeEach(() => { root = mkdtempSync(join(tmpdir(), 'pdx-migrate-')); });
 afterEach(() => {
     setLanguageChangesForTests(null);
     removeTree(root);
+});
+
+describe('pdx migrate — application tags take the app prefix (#136)', () => {
+    it('renames the project tags in .pdx templates and styles, @tag, and the HTML page; flags one in a string', async () => {
+        file('src/user-card.pdx', '<template><p>card</p></template>\n<script setup>\n</script>\n');
+        file('src/badge.pdx', "<template><b>x</b></template>\n<script setup>\n@tag 'pdx-hot-badge';\n</script>\n");
+        file('src/page.pdx', '<template>\n  <pdx-user-card></pdx-user-card><pdx-hot-badge/>\n</template>\n<style scoped>\npdx-user-card { display: block; }\n</style>\n');
+        file('index.html', '<body>\n  <pdx-page></pdx-page><pdx-root-shell></pdx-root-shell>\n</body>\n');
+        // A file named pdx-…, whose tag an app stylesheet also styles: still the project's.
+        file('src/pdx-code.pdx', '<template><pre><slot></slot></pre></template>\n');
+        file('src/styles.css', 'pdx-code { display: block; }\n');
+        file('src/uses-code.pdx', '<template><pdx-code>x</pdx-code></template>\n');
+        // A component outside src/ and pages/: every .pdx under what is migrated is the project's.
+        file('root-shell.pdx', '<template><slot></slot></template>\n');
+        file('tests/page.spec.ts', "await page.locator('pdx-user-card').click();\n");
+
+        const report = await migrate(['.'], { cwd: root });
+
+        expect(read('src/page.pdx')).toContain('<app-user-card></app-user-card><app-hot-badge/>');
+        expect(read('src/page.pdx')).toContain('app-user-card { display: block; }');
+        expect(read('src/badge.pdx')).toContain("@tag 'app-hot-badge';");
+        expect(read('index.html')).toContain('<app-page></app-page><app-root-shell></app-root-shell>');
+        expect(read('src/uses-code.pdx')).toContain('<app-code>x</app-code>');
+        expect(read('tests/page.spec.ts'), 'a string is flagged, not rewritten').toContain("'pdx-user-card'");
+        expect(report.flagged.map(f => [f.file, f.id, f.found])).toEqual([['tests/page.spec.ts', 'app-prefix-string', "'pdx-user-card'"]]);
+        // Idempotent: the renamed tags are not found again.
+        expect((await migrate(['.'], { cwd: root })).changed).toEqual([]);
+    });
+});
+
+describe('pdx migrate — a library tag stays the library\'s (#136)', () => {
+    // A control: in the workspace the resolver also finds packages/ui by walking up from itself, so the
+    // app's own package.json is not what makes this pass here — it is in an installed project run from
+    // above the app, which this repository cannot reproduce.
+    it('run from above the app, an app file named like a library component does not take its uses', async () => {
+        file('app/package.json', JSON.stringify({ name: 'app', dependencies: { '@pdxui/ui': '*' } }));
+        mkdirSync(join(root, 'app', 'node_modules', '@pdxui'), { recursive: true });
+        symlinkSync(join(__dirname, '..', '..', 'ui'), join(root, 'app', 'node_modules', '@pdxui', 'ui'), 'junction');
+        file('app/src/button.pdx', '<template><b>mine</b></template>\n');
+        file('app/src/page.pdx', '<template>\n  <pdx-button>Save</pdx-button>\n</template>\n');
+
+        await migrate(['app'], { cwd: root });
+
+        expect(read('app/src/page.pdx'), 'the library\'s <pdx-button> was renamed to the app file\'s tag').toContain('<pdx-button>Save</pdx-button>');
+    });
 });
 
 describe('pdx migrate — the rewrite', () => {

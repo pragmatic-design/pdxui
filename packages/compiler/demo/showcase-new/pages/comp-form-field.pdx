@@ -8,31 +8,31 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-form-field-basic class="demo-section"></pdx-demo-comp-form-field-basic>
+    <app-demo-comp-form-field-basic class="demo-section"></app-demo-comp-form-field-basic>
 
     <!-- ═══ Error Display ═══ -->
-    <pdx-demo-comp-form-field-error-display class="demo-section"></pdx-demo-comp-form-field-error-display>
+    <app-demo-comp-form-field-error-display class="demo-section"></app-demo-comp-form-field-error-display>
 
     <!-- ═══ Success ═══ -->
-    <pdx-demo-comp-form-field-success class="demo-section"></pdx-demo-comp-form-field-success>
+    <app-demo-comp-form-field-success class="demo-section"></app-demo-comp-form-field-success>
 
     <!-- ═══ With Various Inputs ═══ -->
-    <pdx-demo-comp-form-field-all-inputs class="demo-section"></pdx-demo-comp-form-field-all-inputs>
+    <app-demo-comp-form-field-all-inputs class="demo-section"></app-demo-comp-form-field-all-inputs>
 
     <!-- ═══ Horizontal Layout ═══ -->
-    <pdx-demo-comp-form-field-horizontal class="demo-section"></pdx-demo-comp-form-field-horizontal>
+    <app-demo-comp-form-field-horizontal class="demo-section"></app-demo-comp-form-field-horizontal>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-form-field-disabled class="demo-section"></pdx-demo-comp-form-field-disabled>
+    <app-demo-comp-form-field-disabled class="demo-section"></app-demo-comp-form-field-disabled>
 
     <!-- ═══ Size Propagation ═══ -->
-    <pdx-demo-comp-form-field-size-propagation class="demo-section"></pdx-demo-comp-form-field-size-propagation>
+    <app-demo-comp-form-field-size-propagation class="demo-section"></app-demo-comp-form-field-size-propagation>
 
     <!-- ═══ Composition: Full Form ═══ -->
-    <pdx-demo-comp-form-field-registration class="demo-section"></pdx-demo-comp-form-field-registration>
+    <app-demo-comp-form-field-registration class="demo-section"></app-demo-comp-form-field-registration>
 
     <!-- ═══ @form Integration ═══ -->
-    <pdx-demo-comp-form-field-form-integration class="demo-section"></pdx-demo-comp-form-field-form-integration>
+    <app-demo-comp-form-field-form-integration class="demo-section"></app-demo-comp-form-field-form-integration>
 
     <!-- ═══ Reference ═══ -->
     <section>

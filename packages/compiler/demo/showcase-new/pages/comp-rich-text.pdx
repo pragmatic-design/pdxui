@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Standard Editor ═══ -->
-    <pdx-demo-comp-rich-text-standard class="demo-section"></pdx-demo-comp-rich-text-standard>
+    <app-demo-comp-rich-text-standard class="demo-section"></app-demo-comp-rich-text-standard>
 
     <!-- ═══ Bubble Toolbar ═══ -->
-    <pdx-demo-comp-rich-text-bubble class="demo-section"></pdx-demo-comp-rich-text-bubble>
+    <app-demo-comp-rich-text-bubble class="demo-section"></app-demo-comp-rich-text-bubble>
 
     <!-- ═══ Compact / Comments ═══ -->
-    <pdx-demo-comp-rich-text-compact class="demo-section"></pdx-demo-comp-rich-text-compact>
+    <app-demo-comp-rich-text-compact class="demo-section"></app-demo-comp-rich-text-compact>
 
     <!-- ═══ Read Only ═══ -->
-    <pdx-demo-comp-rich-text-read-only class="demo-section"></pdx-demo-comp-rich-text-read-only>
+    <app-demo-comp-rich-text-read-only class="demo-section"></app-demo-comp-rich-text-read-only>
 
     <!-- ═══ Features ═══ -->
-    <pdx-demo-comp-rich-text-features class="demo-section"></pdx-demo-comp-rich-text-features>
+    <app-demo-comp-rich-text-features class="demo-section"></app-demo-comp-rich-text-features>
 
     <!-- ═══ Keyboard Shortcuts ═══ -->
     <section>

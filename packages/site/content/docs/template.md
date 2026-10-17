@@ -344,7 +344,7 @@ placeholder meanwhile:
 
 ```pdx
 @defer (viewport) {
-  <pdx-heavy-chart :data="series" />
+  <app-heavy-chart :data="series" />
 } @placeholder {
   <div class="skeleton" />
 }
@@ -407,7 +407,7 @@ A subtree can fail (a component that throws, malformed data). `@try` isolates it
 
 ```pdx
 @try {
-  <pdx-risky :data="data" />
+  <app-risky :data="data" />
 } @catch (e) {
   <p class="error">Something went wrong: {{ e instanceof Error ? e.message : String(e) }}</p>
 }

@@ -136,7 +136,7 @@ export function createSlotManager(host: HTMLElement): SlotManager {
  * Used when a compound component wraps another compound component.
  *
  * @example
- * // <pdx-fancy-dialog> wraps <pdx-dialog>
+ * // <app-fancy-dialog> wraps <pdx-dialog>
  * // Forward 'header' and 'footer' slots to inner dialog
  * forwardSlots(outerHost, innerHost, ['header', 'footer']);
  */

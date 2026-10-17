@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Built-in Set ═══ -->
-    <pdx-demo-comp-icon-built-in class="demo-section"></pdx-demo-comp-icon-built-in>
+    <app-demo-comp-icon-built-in class="demo-section"></app-demo-comp-icon-built-in>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-icon-sizes class="demo-section"></pdx-demo-comp-icon-sizes>
+    <app-demo-comp-icon-sizes class="demo-section"></app-demo-comp-icon-sizes>
 
     <!-- ═══ Weight ═══ -->
-    <pdx-demo-comp-icon-weight class="demo-section"></pdx-demo-comp-icon-weight>
+    <app-demo-comp-icon-weight class="demo-section"></app-demo-comp-icon-weight>
 
     <!-- ═══ Color Inheritance ═══ -->
-    <pdx-demo-comp-icon-color class="demo-section"></pdx-demo-comp-icon-color>
+    <app-demo-comp-icon-color class="demo-section"></app-demo-comp-icon-color>
 
     <!-- ═══ Accessibility ═══ -->
-    <pdx-demo-comp-icon-accessibility class="demo-section"></pdx-demo-comp-icon-accessibility>
+    <app-demo-comp-icon-accessibility class="demo-section"></app-demo-comp-icon-accessibility>
 
     <!-- ═══ Inline SVG & URL ═══ -->
-    <pdx-demo-comp-icon-inline-svg class="demo-section"></pdx-demo-comp-icon-inline-svg>
+    <app-demo-comp-icon-inline-svg class="demo-section"></app-demo-comp-icon-inline-svg>
 
     <!-- ═══ Multiple Icon Sets ═══ -->
-    <pdx-demo-comp-icon-icon-sets class="demo-section"></pdx-demo-comp-icon-icon-sets>
+    <app-demo-comp-icon-icon-sets class="demo-section"></app-demo-comp-icon-icon-sets>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-icon-composition class="demo-section"></pdx-demo-comp-icon-composition>
+    <app-demo-comp-icon-composition class="demo-section"></app-demo-comp-icon-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

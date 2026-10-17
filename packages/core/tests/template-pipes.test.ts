@@ -23,7 +23,7 @@ function mount(template: string, script: string, build: boolean, helpers: Record
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'\.\/helpers';?\s*$/gm, 'const {$1} = __helpers;');
     new Function('__core', '__helpers', body)(core, helpers);
-    const el = document.createElement(`pdx-${name}`);
+    const el = document.createElement(`app-${name}`);
     document.body.appendChild(el);
     return el;
 }

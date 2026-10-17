@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-row-col-basic class="demo-section"></pdx-demo-comp-row-col-basic>
+    <app-demo-comp-row-col-basic class="demo-section"></app-demo-comp-row-col-basic>
 
     <!-- ═══ Animated Span ═══ -->
-    <pdx-demo-comp-row-col-animated class="demo-section"></pdx-demo-comp-row-col-animated>
+    <app-demo-comp-row-col-animated class="demo-section"></app-demo-comp-row-col-animated>
 
     <!-- ═══ Responsive Breakpoints ═══ -->
-    <pdx-demo-comp-row-col-responsive class="demo-section"></pdx-demo-comp-row-col-responsive>
+    <app-demo-comp-row-col-responsive class="demo-section"></app-demo-comp-row-col-responsive>
 
     <!-- ═══ Offset ═══ -->
-    <pdx-demo-comp-row-col-offset class="demo-section"></pdx-demo-comp-row-col-offset>
+    <app-demo-comp-row-col-offset class="demo-section"></app-demo-comp-row-col-offset>
 
     <!-- ═══ Gutter Sizes ═══ -->
-    <pdx-demo-comp-row-col-gutter class="demo-section"></pdx-demo-comp-row-col-gutter>
+    <app-demo-comp-row-col-gutter class="demo-section"></app-demo-comp-row-col-gutter>
 
     <!-- ═══ Alignment ═══ -->
-    <pdx-demo-comp-row-col-alignment class="demo-section"></pdx-demo-comp-row-col-alignment>
+    <app-demo-comp-row-col-alignment class="demo-section"></app-demo-comp-row-col-alignment>
 
     <!-- ═══ Nested ═══ -->
-    <pdx-demo-comp-row-col-nested class="demo-section"></pdx-demo-comp-row-col-nested>
+    <app-demo-comp-row-col-nested class="demo-section"></app-demo-comp-row-col-nested>
 
     <!-- ═══ Real-world Layout ═══ -->
-    <pdx-demo-comp-row-col-dashboard class="demo-section"></pdx-demo-comp-row-col-dashboard>
+    <app-demo-comp-row-col-dashboard class="demo-section"></app-demo-comp-row-col-dashboard>
 
     <!-- ═══ Reference ═══ -->
     <section>

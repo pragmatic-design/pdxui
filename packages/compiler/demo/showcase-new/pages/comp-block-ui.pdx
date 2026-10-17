@@ -6,15 +6,15 @@
       Wraps content. When <code>blocked</code>, shows a semi-transparent overlay with spinner.
     </p>
 
-    <pdx-demo-comp-block-ui-basic class="demo-section"></pdx-demo-comp-block-ui-basic>
+    <app-demo-comp-block-ui-basic class="demo-section"></app-demo-comp-block-ui-basic>
 
-    <pdx-demo-comp-block-ui-with-message class="demo-section"></pdx-demo-comp-block-ui-with-message>
+    <app-demo-comp-block-ui-with-message class="demo-section"></app-demo-comp-block-ui-with-message>
 
-    <pdx-demo-comp-block-ui-simulated-fetch class="demo-section"></pdx-demo-comp-block-ui-simulated-fetch>
+    <app-demo-comp-block-ui-simulated-fetch class="demo-section"></app-demo-comp-block-ui-simulated-fetch>
 
-    <pdx-demo-comp-block-ui-delay class="demo-section"></pdx-demo-comp-block-ui-delay>
+    <app-demo-comp-block-ui-delay class="demo-section"></app-demo-comp-block-ui-delay>
 
-    <pdx-demo-comp-block-ui-fullscreen class="demo-section"></pdx-demo-comp-block-ui-fullscreen>
+    <app-demo-comp-block-ui-fullscreen class="demo-section"></app-demo-comp-block-ui-fullscreen>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

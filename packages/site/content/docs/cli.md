@@ -174,7 +174,7 @@ opened in it how to work — see [Using PDX with an AI agent](/docs/agents).
 A new project depends on `@pdxui/framework` and `@pdxui/design`, with `@pdxui/cli`, `@pdxui/compiler`
 and `vite` as dev dependencies, all at the version of the CLI that created it. Its `index.html` imports
 the design system's base and one theme — `@pdxui/design/base` and `@pdxui/design/themes/neutral`, the
-theme that applies with no `pdx-theme` on `<html>` — and places `<pdx-app>`; each component brings its
+theme that applies with no `pdx-theme` on `<html>` — and places `<app-app>`; each component brings its
 own CSS when the compiler imports it. To use another theme, import it instead of neutral and set
 `pdx-theme` on `<html>` ([Theming](/docs/theming#shipping-one-instead-of-thirteen)). Start it from a folder with no project yet with
 `npx @pdxui/cli new project shop`, then `npm install` and `npm run dev`.
@@ -188,7 +188,7 @@ npx pdx analyze --json              # prints it, writes nothing — the form for
 ```
 
 Reads every `.pdx` of the project and describes it as data. `components` lists each one with the tag
-it registers (the compiler's rule: `App.pdx` is `pdx-app`, or its `@tag`), its file, props with type
+it registers (the compiler's rule: `App.pdx` is `app-app`, or its `@tag`), its file, props with type
 and default, events with their payload, slots, exposed methods, signals, stores, `@fetch` endpoints,
 `@form` fields, and the other components it uses. `routes` is the route table: every component with
 `@page`, sorted by path, as `{ path, file, tag, guard, loader, layout }`.

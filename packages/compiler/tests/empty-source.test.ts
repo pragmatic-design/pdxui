@@ -81,7 +81,7 @@ describe('a write still in flight is not an error', () => {
         // has finished. Reading once here turns that whole case into a non-event.
         const out = serve('probe.pdx', REAL, '') as { code: string };
         expect(out, 'a blank read with content on disk still produced nothing').toBeTruthy();
-        expect(out.code).toContain("component('pdx-probe'");
+        expect(out.code).toContain("component('app-probe'");
         expect(out.code).toContain('data-test="ok"');
     });
 
@@ -97,7 +97,7 @@ describe('a write still in flight is not an error', () => {
 describe('the guard does not touch anything else', () => {
     it('a real component still compiles', () => {
         const out = serve('widget.pdx', REAL) as { code: string };
-        expect(out.code).toContain("component('pdx-widget'");
+        expect(out.code).toContain("component('app-widget'");
     });
 
     it('a file that is not a .pdx is not this plugin business', () => {

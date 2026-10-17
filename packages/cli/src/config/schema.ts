@@ -9,6 +9,8 @@ export interface PdxConfig {
     routes?: string;
     /** Auto-import component directory. Default: 'src/components' */
     components?: string;
+    /** The app's component tag prefix, as `pdx({ prefix })` (#136). Default: 'app' */
+    prefix?: string;
     /** Build options. */
     build?: {
         outDir?: string;
@@ -23,6 +25,7 @@ export interface ResolvedConfig {
     root: string;
     routes: string;
     components: string;
+    prefix: string;
     outDir: string;
     minify: boolean;
     target: string;

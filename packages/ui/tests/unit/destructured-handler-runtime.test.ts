@@ -38,7 +38,7 @@ afterEach(() => cleanup());
 
 describe('a destructured handler, compiled and mounted', () => {
     it('the template calls it, by reference and under its renamed local name', async () => {
-        const el = document.createElement('pdx-destructured-counter');
+        const el = document.createElement('app-destructured-counter');
         document.body.appendChild(el);
         await tick();
         const count = () => el.querySelector('.count')!.textContent!.trim();

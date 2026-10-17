@@ -7,22 +7,22 @@
     </p>
 
     <!-- ═══ 1. Basic ═══ -->
-    <pdx-demo-comp-mention-basic class="demo-section"></pdx-demo-comp-mention-basic>
+    <app-demo-comp-mention-basic class="demo-section"></app-demo-comp-mention-basic>
 
     <!-- ═══ 2. Multiple triggers ═══ -->
-    <pdx-demo-comp-mention-multiple-triggers class="demo-section"></pdx-demo-comp-mention-multiple-triggers>
+    <app-demo-comp-mention-multiple-triggers class="demo-section"></app-demo-comp-mention-multiple-triggers>
 
     <!-- ═══ 3. With descriptions ═══ -->
-    <pdx-demo-comp-mention-descriptions class="demo-section"></pdx-demo-comp-mention-descriptions>
+    <app-demo-comp-mention-descriptions class="demo-section"></app-demo-comp-mention-descriptions>
 
     <!-- ═══ 4. DataSource (simulated remote) ═══ -->
-    <pdx-demo-comp-mention-data-source class="demo-section"></pdx-demo-comp-mention-data-source>
+    <app-demo-comp-mention-data-source class="demo-section"></app-demo-comp-mention-data-source>
 
     <!-- ═══ 5. Disabled / Readonly ═══ -->
-    <pdx-demo-comp-mention-disabled-readonly class="demo-section"></pdx-demo-comp-mention-disabled-readonly>
+    <app-demo-comp-mention-disabled-readonly class="demo-section"></app-demo-comp-mention-disabled-readonly>
 
     <!-- ═══ Slot Template ═══ -->
-    <pdx-demo-comp-mention-slot-template class="demo-section"></pdx-demo-comp-mention-slot-template>
+    <app-demo-comp-mention-slot-template class="demo-section"></app-demo-comp-mention-slot-template>
 
     <!-- ═══ Slots Reference ═══ -->
     <section>

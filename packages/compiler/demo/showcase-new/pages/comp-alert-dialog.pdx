@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-alert-dialog-basic class="demo-section"></pdx-demo-comp-alert-dialog-basic>
+    <app-demo-comp-alert-dialog-basic class="demo-section"></app-demo-comp-alert-dialog-basic>
 
     <!-- ═══ Danger ═══ -->
-    <pdx-demo-comp-alert-dialog-danger class="demo-section"></pdx-demo-comp-alert-dialog-danger>
+    <app-demo-comp-alert-dialog-danger class="demo-section"></app-demo-comp-alert-dialog-danger>
 
     <!-- ═══ Type to Confirm ═══ -->
-    <pdx-demo-comp-alert-dialog-type-to-confirm class="demo-section"></pdx-demo-comp-alert-dialog-type-to-confirm>
+    <app-demo-comp-alert-dialog-type-to-confirm class="demo-section"></app-demo-comp-alert-dialog-type-to-confirm>
 
     <!-- ═══ Timer Gated ═══ -->
-    <pdx-demo-comp-alert-dialog-timer class="demo-section"></pdx-demo-comp-alert-dialog-timer>
+    <app-demo-comp-alert-dialog-timer class="demo-section"></app-demo-comp-alert-dialog-timer>
 
     <!-- ═══ Reference ═══ -->
     <section>

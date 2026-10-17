@@ -3,15 +3,15 @@
     <h2>Drag and Drop</h2>
     <p class="desc">Signal-based: PointerEvent unified (touch/mouse/pen), axis, bounds, drop zones, velocity, auto-scroll, keyboard a11y.</p>
 
-    <pdx-demo-infra-drag-free class="demo-section"></pdx-demo-infra-drag-free>
+    <app-demo-infra-drag-free class="demo-section"></app-demo-infra-drag-free>
 
-    <pdx-demo-infra-drag-axis class="demo-section"></pdx-demo-infra-drag-axis>
+    <app-demo-infra-drag-axis class="demo-section"></app-demo-infra-drag-axis>
 
-    <pdx-demo-infra-drag-drop-zones class="demo-section"></pdx-demo-infra-drag-drop-zones>
+    <app-demo-infra-drag-drop-zones class="demo-section"></app-demo-infra-drag-drop-zones>
 
-    <pdx-demo-infra-drag-keyboard class="demo-section"></pdx-demo-infra-drag-keyboard>
+    <app-demo-infra-drag-keyboard class="demo-section"></app-demo-infra-drag-keyboard>
 
-    <pdx-demo-infra-drag-auto-scroll class="demo-section"></pdx-demo-infra-drag-auto-scroll>
+    <app-demo-infra-drag-auto-scroll class="demo-section"></app-demo-infra-drag-auto-scroll>
   </div>
 </template>
 

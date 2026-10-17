@@ -39,29 +39,29 @@
              author reaches for, and the wizard finds a panel that is not its direct child. -->
         <pdx-form :form="intake" name="intake" data-test="form-intake">
         <!-- ─── 1 · who is asking: `src/intake/requester-step.pdx` ─── -->
-        <pdx-requester-step
+        <app-requester-step
           :customer-name="customerName"
           :customer-id="assetCustomerId"
           @customerpicked="onCustomerPicked"
-          @assetpicked="e => assetId = e.detail"></pdx-requester-step>
+          @assetpicked="e => assetId = e.detail"></app-requester-step>
 
         <!-- ─── 2 · the window and the mode: `src/intake/window-step.pdx` ─── -->
-        <pdx-window-step :mode="mode" @modechange="e => mode = e.detail"></pdx-window-step>
+        <app-window-step :mode="mode" @modechange="e => mode = e.detail"></app-window-step>
 
         <!-- ─── 3 · what step 2 asked for: `src/intake/details-step.pdx` ─── -->
-        <pdx-details-step :mode="mode" :form="intake" @attach="onAttach" @detach="onDetach"></pdx-details-step>
+        <app-details-step :mode="mode" :form="intake" @attach="onAttach" @detach="onDetach"></app-details-step>
         </pdx-form>
 
         <!-- ─── 4 · the second form, and one Save for both ─────────────────── -->
         <pdx-form :form="billing" name="billing" data-test="form-billing">
         <!-- `src/intake/billing-step.pdx`: the Save it shows is this page's `submitAll`. -->
-        <pdx-billing-step
+        <app-billing-step
           :customer-name="customerName"
           :line-count="lineCount"
           :can-submit="canSubmit"
           :submitted="submitted"
           :server-error="serverError"
-          @submit="submitAll"></pdx-billing-step>
+          @submit="submitAll"></app-billing-step>
         </pdx-form>
     </pdx-wizard>
 

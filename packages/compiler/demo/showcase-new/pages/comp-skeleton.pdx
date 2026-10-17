@@ -6,22 +6,22 @@
     </p>
 
     <!-- ═══ Shapes ═══ -->
-    <pdx-demo-comp-skeleton-shapes class="demo-section"></pdx-demo-comp-skeleton-shapes>
+    <app-demo-comp-skeleton-shapes class="demo-section"></app-demo-comp-skeleton-shapes>
 
     <!-- ═══ Animation Types ═══ -->
-    <pdx-demo-comp-skeleton-animation class="demo-section"></pdx-demo-comp-skeleton-animation>
+    <app-demo-comp-skeleton-animation class="demo-section"></app-demo-comp-skeleton-animation>
 
     <!-- ═══ Stagger Timing ═══ -->
-    <pdx-demo-comp-skeleton-stagger class="demo-section"></pdx-demo-comp-skeleton-stagger>
+    <app-demo-comp-skeleton-stagger class="demo-section"></app-demo-comp-skeleton-stagger>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-skeleton-composition class="demo-section"></pdx-demo-comp-skeleton-composition>
+    <app-demo-comp-skeleton-composition class="demo-section"></app-demo-comp-skeleton-composition>
 
     <!-- ═══ Loading Overlay ═══ -->
-    <pdx-demo-comp-skeleton-overlay class="demo-section"></pdx-demo-comp-skeleton-overlay>
+    <app-demo-comp-skeleton-overlay class="demo-section"></app-demo-comp-skeleton-overlay>
 
     <!-- ═══ Accessibility ═══ -->
-    <pdx-demo-comp-skeleton-accessibility class="demo-section"></pdx-demo-comp-skeleton-accessibility>
+    <app-demo-comp-skeleton-accessibility class="demo-section"></app-demo-comp-skeleton-accessibility>
 
     <!-- ═══ Reference ═══ -->
     <section>

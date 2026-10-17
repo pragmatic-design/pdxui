@@ -8,46 +8,46 @@
     </p>
 
     <!-- ═══ 1. Basic ═══ -->
-    <pdx-demo-comp-date-picker-basic class="demo-section"></pdx-demo-comp-date-picker-basic>
+    <app-demo-comp-date-picker-basic class="demo-section"></app-demo-comp-date-picker-basic>
 
     <!-- ═══ 2. Selection Modes ═══ -->
-    <pdx-demo-comp-date-picker-selection-modes class="demo-section"></pdx-demo-comp-date-picker-selection-modes>
+    <app-demo-comp-date-picker-selection-modes class="demo-section"></app-demo-comp-date-picker-selection-modes>
 
     <!-- ═══ 3. Calendar Systems ═══ -->
-    <pdx-demo-comp-date-picker-calendar-systems class="demo-section"></pdx-demo-comp-date-picker-calendar-systems>
+    <app-demo-comp-date-picker-calendar-systems class="demo-section"></app-demo-comp-date-picker-calendar-systems>
 
     <!-- ═══ 4. Constraints ═══ -->
-    <pdx-demo-comp-date-picker-min-max class="demo-section"></pdx-demo-comp-date-picker-min-max>
+    <app-demo-comp-date-picker-min-max class="demo-section"></app-demo-comp-date-picker-min-max>
 
     <!-- ═══ 4b. Editable ═══ -->
-    <pdx-demo-comp-date-picker-editable class="demo-section"></pdx-demo-comp-date-picker-editable>
+    <app-demo-comp-date-picker-editable class="demo-section"></app-demo-comp-date-picker-editable>
 
     <!-- ═══ 5. Standalone Calendar ═══ -->
-    <pdx-demo-comp-date-picker-standalone-calendar class="demo-section"></pdx-demo-comp-date-picker-standalone-calendar>
+    <app-demo-comp-date-picker-standalone-calendar class="demo-section"></app-demo-comp-date-picker-standalone-calendar>
 
     <!-- ═══ 6. Time Picker Standalone ═══ -->
-    <pdx-demo-comp-date-picker-time-picker class="demo-section"></pdx-demo-comp-date-picker-time-picker>
+    <app-demo-comp-date-picker-time-picker class="demo-section"></app-demo-comp-date-picker-time-picker>
 
     <!-- ═══ 7. Date Range ═══ -->
-    <pdx-demo-comp-date-picker-date-range class="demo-section"></pdx-demo-comp-date-picker-date-range>
+    <app-demo-comp-date-picker-date-range class="demo-section"></app-demo-comp-date-picker-date-range>
 
     <!-- ═══ 8. Presets ═══ -->
-    <pdx-demo-comp-date-picker-presets class="demo-section"></pdx-demo-comp-date-picker-presets>
+    <app-demo-comp-date-picker-presets class="demo-section"></app-demo-comp-date-picker-presets>
 
     <!-- ═══ 9. Highlighted Dates ═══ -->
-    <pdx-demo-comp-date-picker-highlighted class="demo-section"></pdx-demo-comp-date-picker-highlighted>
+    <app-demo-comp-date-picker-highlighted class="demo-section"></app-demo-comp-date-picker-highlighted>
 
     <!-- ═══ 10. Fiscal Year/Quarter ═══ -->
-    <pdx-demo-comp-date-picker-fiscal class="demo-section"></pdx-demo-comp-date-picker-fiscal>
+    <app-demo-comp-date-picker-fiscal class="demo-section"></app-demo-comp-date-picker-fiscal>
 
     <!-- ═══ 9. Inline Calendar ═══ -->
-    <pdx-demo-comp-date-picker-inline class="demo-section"></pdx-demo-comp-date-picker-inline>
+    <app-demo-comp-date-picker-inline class="demo-section"></app-demo-comp-date-picker-inline>
 
     <!-- ═══ 10. Sizes ═══ -->
-    <pdx-demo-comp-date-picker-sizes class="demo-section"></pdx-demo-comp-date-picker-sizes>
+    <app-demo-comp-date-picker-sizes class="demo-section"></app-demo-comp-date-picker-sizes>
 
     <!-- ═══ 11. Locales ═══ -->
-    <pdx-demo-comp-date-picker-locale class="demo-section"></pdx-demo-comp-date-picker-locale>
+    <app-demo-comp-date-picker-locale class="demo-section"></app-demo-comp-date-picker-locale>
 
     <!-- ═══ Reference ═══ -->
     <section>

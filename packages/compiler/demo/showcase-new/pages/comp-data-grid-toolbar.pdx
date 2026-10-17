@@ -6,27 +6,27 @@
       pagination position, column freeze, row detail, and external API.
     </p>
 
-    <pdx-demo-comp-data-grid-toolbar-toolbar class="demo-section"></pdx-demo-comp-data-grid-toolbar-toolbar>
+    <app-demo-comp-data-grid-toolbar-toolbar class="demo-section"></app-demo-comp-data-grid-toolbar-toolbar>
 
-    <pdx-demo-comp-data-grid-toolbar-toolbar-paginated class="demo-section"></pdx-demo-comp-data-grid-toolbar-toolbar-paginated>
+    <app-demo-comp-data-grid-toolbar-toolbar-paginated class="demo-section"></app-demo-comp-data-grid-toolbar-toolbar-paginated>
 
-    <pdx-demo-comp-data-grid-toolbar-inline-filters class="demo-section"></pdx-demo-comp-data-grid-toolbar-inline-filters>
+    <app-demo-comp-data-grid-toolbar-inline-filters class="demo-section"></app-demo-comp-data-grid-toolbar-inline-filters>
 
-    <pdx-demo-comp-data-grid-toolbar-enum-filter class="demo-section"></pdx-demo-comp-data-grid-toolbar-enum-filter>
+    <app-demo-comp-data-grid-toolbar-enum-filter class="demo-section"></app-demo-comp-data-grid-toolbar-enum-filter>
 
-    <pdx-demo-comp-data-grid-toolbar-group-bar class="demo-section"></pdx-demo-comp-data-grid-toolbar-group-bar>
+    <app-demo-comp-data-grid-toolbar-group-bar class="demo-section"></app-demo-comp-data-grid-toolbar-group-bar>
 
-    <pdx-demo-comp-data-grid-toolbar-grouping-declarative class="demo-section"></pdx-demo-comp-data-grid-toolbar-grouping-declarative>
+    <app-demo-comp-data-grid-toolbar-grouping-declarative class="demo-section"></app-demo-comp-data-grid-toolbar-grouping-declarative>
 
-    <pdx-demo-comp-data-grid-toolbar-pagination-position class="demo-section"></pdx-demo-comp-data-grid-toolbar-pagination-position>
+    <app-demo-comp-data-grid-toolbar-pagination-position class="demo-section"></app-demo-comp-data-grid-toolbar-pagination-position>
 
-    <pdx-demo-comp-data-grid-toolbar-frozen-columns class="demo-section"></pdx-demo-comp-data-grid-toolbar-frozen-columns>
+    <app-demo-comp-data-grid-toolbar-frozen-columns class="demo-section"></app-demo-comp-data-grid-toolbar-frozen-columns>
 
-    <pdx-demo-comp-data-grid-toolbar-virtual-scroll class="demo-section"></pdx-demo-comp-data-grid-toolbar-virtual-scroll>
+    <app-demo-comp-data-grid-toolbar-virtual-scroll class="demo-section"></app-demo-comp-data-grid-toolbar-virtual-scroll>
 
-    <pdx-demo-comp-data-grid-toolbar-row-detail class="demo-section"></pdx-demo-comp-data-grid-toolbar-row-detail>
+    <app-demo-comp-data-grid-toolbar-row-detail class="demo-section"></app-demo-comp-data-grid-toolbar-row-detail>
 
-    <pdx-demo-comp-data-grid-toolbar-command-column class="demo-section"></pdx-demo-comp-data-grid-toolbar-command-column>
+    <app-demo-comp-data-grid-toolbar-command-column class="demo-section"></app-demo-comp-data-grid-toolbar-command-column>
   </div>
 </template>
 

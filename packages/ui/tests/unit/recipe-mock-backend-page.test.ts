@@ -29,7 +29,7 @@ function loadMakeSource(): (o?: Record<string, unknown>) => unknown {
     return new Function('__core', `${body}\nreturn makeSource;`)(core);
 }
 
-const TAG = 'pdx-mock-backend-page';
+const TAG = 'app-mock-backend-page';
 
 beforeAll(() => {
     if (!moduleBlock || !pageBlock) return;

@@ -27,7 +27,7 @@ describe('integration — all demos compile without error', () => {
             // an error-severity diagnostic would go by unseen.
             expect(warnings.filter(w => w.severity === 'error'), `${name} compiled with errors`).toEqual([]);
             expect(code).toBeTruthy();
-            expect(code).toContain("component('pdx-");
+            expect(code).toContain("component('app-");
             expect(code).toContain("import {");
             expect(code).toContain("from '@pdxui/core'");
         });
@@ -249,7 +249,7 @@ describe('integration — @store compilation', () => {
         expect(code).toContain("createGlobalStore('tasks'");
         expect(code).toContain("persist: 'local'");
         expect(code).toContain('useTasks');
-        expect(code).not.toContain("component('pdx-");
+        expect(code).not.toContain("component('app-");
     });
 
     it('task-store.pdx: signals are rewritten inside store factory', () => {
@@ -299,8 +299,8 @@ describe('integration — _404.pdx compilation', () => {
     it('showcase/_404.pdx compiles successfully', () => {
         const { code } = compileDemo('showcase/_404.pdx');
         expect(code).toBeTruthy();
-        // Tag includes parent dir for uniqueness: showcase/_404.pdx → pdx-showcase-404
-        expect(code).toContain("component('pdx-showcase-404'");
+        // Tag includes parent dir for uniqueness: showcase/_404.pdx → app-showcase-404
+        expect(code).toContain("component('app-showcase-404'");
     });
 
     it('showcase/_404.pdx: has code and path props', () => {
@@ -323,7 +323,7 @@ describe('integration — showcase @store wiring', () => {
         expect(code).toContain("createGlobalStore('tasks'");
         expect(code).toContain("persist: 'local'");
         expect(code).toContain('useTasks');
-        expect(code).not.toContain("component('pdx-");
+        expect(code).not.toContain("component('app-");
     });
 
     it('showcase/task-store.pdx: has CRUD functions in auto-return', () => {
@@ -362,16 +362,16 @@ describe('integration — showcase @store wiring', () => {
     it('components with @page are still reusable AND auto-register route', () => {
         // theme-picker has @page '/settings' but compiles as regular component
         const { code: picker } = compileDemo('showcase/theme-picker.pdx');
-        expect(picker).toContain("component('pdx-theme-picker'");
+        expect(picker).toContain("component('app-theme-picker'");
         expect(picker).toContain('useHead({ title: "Settings');
         // Auto-route registration appended after component()
         expect(picker).toContain("__pdx_routes");
         expect(picker).toContain('path:"/settings"');
-        expect(picker).toContain('tag:"pdx-theme-picker"');
+        expect(picker).toContain('tag:"app-theme-picker"');
 
         // task-form has @page '/create' but compiles as regular component
         const { code: form } = compileDemo('showcase/task-form.pdx');
-        expect(form).toContain("component('pdx-task-form'");
+        expect(form).toContain("component('app-task-form'");
         expect(form).toContain('useHead({ title: "New Task');
         expect(form).toContain('path:"/create"');
     });

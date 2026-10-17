@@ -32,7 +32,7 @@
 
     <details class="pp-source" open>
       <summary>Live source</summary>
-      <pdx-code :code="markup"></pdx-code>
+      <app-code :code="markup"></app-code>
     </details>
   </div>
 </template>
@@ -220,5 +220,5 @@ function buildMarkup() {
   font-family: var(--font-heading); list-style: none;
 }
 .pp-source > summary::-webkit-details-marker { display: none; }
-.pp-source pdx-code { display: block; padding: 0.5rem 1rem 1rem; }
+.pp-source app-code { display: block; padding: 0.5rem 1rem 1rem; }
 </style>

@@ -6,13 +6,13 @@
       with styled, auto-hiding overlay scrollbars. Supports vertical, horizontal, and both axes.
     </p>
 
-    <pdx-demo-comp-scroll-area-vertical class="demo-section"></pdx-demo-comp-scroll-area-vertical>
+    <app-demo-comp-scroll-area-vertical class="demo-section"></app-demo-comp-scroll-area-vertical>
 
-    <pdx-demo-comp-scroll-area-always-visible class="demo-section"></pdx-demo-comp-scroll-area-always-visible>
+    <app-demo-comp-scroll-area-always-visible class="demo-section"></app-demo-comp-scroll-area-always-visible>
 
-    <pdx-demo-comp-scroll-area-horizontal class="demo-section"></pdx-demo-comp-scroll-area-horizontal>
+    <app-demo-comp-scroll-area-horizontal class="demo-section"></app-demo-comp-scroll-area-horizontal>
 
-    <pdx-demo-comp-scroll-area-both-axes class="demo-section"></pdx-demo-comp-scroll-area-both-axes>
+    <app-demo-comp-scroll-area-both-axes class="demo-section"></app-demo-comp-scroll-area-both-axes>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

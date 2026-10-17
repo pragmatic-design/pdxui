@@ -68,7 +68,7 @@ describe('the scan reads the whole declaration', () => {
 
     it('carries what the ROUTER needs', () => {
         const t = ticket();
-        expect(t.tag).toBe('pdx-ticket');
+        expect(t.tag).toBe('app-ticket');
         expect(t.guard).toBe('tickets.read');
         expect(t.meta).toEqual({ breadcrumb: 'Ticket' });
     });

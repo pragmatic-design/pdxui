@@ -1,7 +1,7 @@
 <template>
   <section class="page" data-test="contracts-list">
     <!-- The list's header, the tickets', with a view the list ships with. -->
-    <pdx-list-header
+    <app-list-header
       :title="$t('contracts.title')"
       store-key="contracts"
       :default-name="$t('contracts.views.default')"
@@ -10,7 +10,7 @@
       :source="source"
       :base-page-size="25">
       <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('contracts.matching', { count: total }) }}</span>
-    </pdx-list-header>
+    </app-list-header>
     <p class="pdx-txt-small pdx-ink-muted">{{ $t('contracts.intro') }}</p>
 
     <!-- READ-ONLY: no selection, no row action. A contract is changed in its employee, and the

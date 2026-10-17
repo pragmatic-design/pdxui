@@ -6,22 +6,22 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-tooltip-basic class="demo-section"></pdx-demo-comp-tooltip-basic>
+    <app-demo-comp-tooltip-basic class="demo-section"></app-demo-comp-tooltip-basic>
 
     <!-- ═══ Placements ═══ -->
-    <pdx-demo-comp-tooltip-placements class="demo-section"></pdx-demo-comp-tooltip-placements>
+    <app-demo-comp-tooltip-placements class="demo-section"></app-demo-comp-tooltip-placements>
 
     <!-- ═══ With Arrow ═══ -->
-    <pdx-demo-comp-tooltip-arrow class="demo-section"></pdx-demo-comp-tooltip-arrow>
+    <app-demo-comp-tooltip-arrow class="demo-section"></app-demo-comp-tooltip-arrow>
 
     <!-- ═══ Delay ═══ -->
-    <pdx-demo-comp-tooltip-delay class="demo-section"></pdx-demo-comp-tooltip-delay>
+    <app-demo-comp-tooltip-delay class="demo-section"></app-demo-comp-tooltip-delay>
 
     <!-- ═══ Overflow Only ═══ -->
-    <pdx-demo-comp-tooltip-overflow class="demo-section"></pdx-demo-comp-tooltip-overflow>
+    <app-demo-comp-tooltip-overflow class="demo-section"></app-demo-comp-tooltip-overflow>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-tooltip-disabled class="demo-section"></pdx-demo-comp-tooltip-disabled>
+    <app-demo-comp-tooltip-disabled class="demo-section"></app-demo-comp-tooltip-disabled>
 
     <!-- ═══ Reference ═══ -->
     <section>

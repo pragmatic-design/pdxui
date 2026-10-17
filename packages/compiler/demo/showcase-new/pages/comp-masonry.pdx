@@ -6,9 +6,9 @@
       variable heights. CSS columns for SSR compatibility.
     </p>
 
-    <pdx-demo-comp-masonry-three-columns class="demo-section"></pdx-demo-comp-masonry-three-columns>
+    <app-demo-comp-masonry-three-columns class="demo-section"></app-demo-comp-masonry-three-columns>
 
-    <pdx-demo-comp-masonry-four-columns class="demo-section"></pdx-demo-comp-masonry-four-columns>
+    <app-demo-comp-masonry-four-columns class="demo-section"></app-demo-comp-masonry-four-columns>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

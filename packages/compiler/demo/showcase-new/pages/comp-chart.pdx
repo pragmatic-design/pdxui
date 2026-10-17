@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Line Chart ═══ -->
-    <pdx-demo-comp-chart-line class="demo-section"></pdx-demo-comp-chart-line>
+    <app-demo-comp-chart-line class="demo-section"></app-demo-comp-chart-line>
 
     <!-- ═══ Area Chart ═══ -->
-    <pdx-demo-comp-chart-area class="demo-section"></pdx-demo-comp-chart-area>
+    <app-demo-comp-chart-area class="demo-section"></app-demo-comp-chart-area>
 
     <!-- ═══ Bar Chart ═══ -->
-    <pdx-demo-comp-chart-bar class="demo-section"></pdx-demo-comp-chart-bar>
+    <app-demo-comp-chart-bar class="demo-section"></app-demo-comp-chart-bar>
 
     <!-- ═══ Stacked Bar ═══ -->
-    <pdx-demo-comp-chart-stacked-bar class="demo-section"></pdx-demo-comp-chart-stacked-bar>
+    <app-demo-comp-chart-stacked-bar class="demo-section"></app-demo-comp-chart-stacked-bar>
 
     <!-- ═══ Pie Chart ═══ -->
-    <pdx-demo-comp-chart-pie class="demo-section"></pdx-demo-comp-chart-pie>
+    <app-demo-comp-chart-pie class="demo-section"></app-demo-comp-chart-pie>
 
     <!-- ═══ Props Reference ═══ -->
     <section>

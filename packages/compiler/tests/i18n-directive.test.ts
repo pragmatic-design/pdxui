@@ -170,7 +170,7 @@ describe('@transition / @layout — codegen manifest', () => {
 </script>
         `);
 
-        expect(code).toContain('layouts:["pdx-admin-layout"]');
+        expect(code).toContain('layouts:["app-admin-layout"]');
     });
 
     it('emits both transition and layout together', () => {
@@ -184,7 +184,7 @@ describe('@transition / @layout — codegen manifest', () => {
         `);
 
         expect(code).toContain('transition:"fade"');
-        expect(code).toContain('layouts:["pdx-dashboard-layout"]');
+        expect(code).toContain('layouts:["app-dashboard-layout"]');
         expect(code).toContain('path:"/settings"');
     });
 });

@@ -106,7 +106,7 @@ async function load(page: Page): Promise<Timings> {
         undefined, { timeout: 30_000 });
     // The app has to have rendered before the shift is read: a CLS sampled at `load` measures a
     // page that has not drawn anything yet, which is zero for the wrong reason.
-    await expect(page.locator('.pdx-app-layout, pdx-app > *').first()).toBeVisible();
+    await expect(page.locator('.pdx-app-layout, app-app > *').first()).toBeVisible();
     await page.waitForTimeout(800);
 
     // A cold load or nothing: an entry served from the HTTP cache measures a returning visitor, and
@@ -222,7 +222,7 @@ test.describe('the first paint, on a network that is not localhost', () => {
 
         // And the first paint follows the stylesheet. It is the SPLASH — text in `index.html`'s
         // body — painted as soon as the render-blocking stylesheet is in, before the entry module.
-        // Not `fcp >= entryJs - 50`, the premise of an empty `<pdx-app>`: measured under slow 4G,
+        // Not `fcp >= entryJs - 50`, the premise of an empty `<app-app>`: measured under slow 4G,
         // fcp − entryJs is −30…−59 ms sequential and −25…−55 four at a time, while fcp − stylesheet
         // is +13…+23 ms in all 40 loads. With the splash taken out of the HTML, the paint moves to
         // +683…+717 ms after the entry module: the splash is what paints first, not a clock.

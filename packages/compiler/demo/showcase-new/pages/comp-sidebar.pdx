@@ -6,11 +6,11 @@
       Supports expanded, collapsed, and mini (icon-only) modes.
     </p>
 
-    <pdx-demo-comp-sidebar-interactive class="demo-section"></pdx-demo-comp-sidebar-interactive>
+    <app-demo-comp-sidebar-interactive class="demo-section"></app-demo-comp-sidebar-interactive>
 
-    <pdx-demo-comp-sidebar-mini class="demo-section"></pdx-demo-comp-sidebar-mini>
+    <app-demo-comp-sidebar-mini class="demo-section"></app-demo-comp-sidebar-mini>
 
-    <pdx-demo-comp-sidebar-right class="demo-section"></pdx-demo-comp-sidebar-right>
+    <app-demo-comp-sidebar-right class="demo-section"></app-demo-comp-sidebar-right>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

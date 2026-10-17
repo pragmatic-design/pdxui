@@ -592,7 +592,7 @@ test('control — the design system does NOT default to those numbers', async ({
     await page.goto('/tickets');
     const fromRoot = await page.evaluate(() =>
         getComputedStyle(document.documentElement).getPropertyValue('--pdx-dialog-width-md').trim());
-    const fromShell = await page.locator('pdx-app .app').evaluate((el) =>
+    const fromShell = await page.locator('app-app .app').evaluate((el) =>
         getComputedStyle(el).getPropertyValue('--pdx-dialog-width-md').trim());
 
     expect(fromRoot, 'the design system no longer ships its own default width').toBe('480px');

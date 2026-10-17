@@ -29,7 +29,7 @@ async function render(template: string, literal: string, build: boolean): Promis
     const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
-    const el = document.createElement(`pdx-${name}`);
+    const el = document.createElement(`app-${name}`);
     document.body.appendChild(el);
     await settle();
     return el.querySelector('p')!.textContent ?? '';

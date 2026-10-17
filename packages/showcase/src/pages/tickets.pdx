@@ -6,7 +6,7 @@
     <!-- The list's header: title, views, and the page's own action on the right. The
          views are the header's — this page says where they are kept and what the list opens with.
          The arrangement changed under the selection, so a view put back clears it. -->
-    <pdx-list-header
+    <app-list-header
       :title="$t('tickets.title')"
       store-key="tickets"
       :default-name="$t('tickets.views.default')"
@@ -18,7 +18,7 @@
       @switched="clearSelection">
       <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('tickets.matching', { count: total }) }}</span>
       <pdx-button variant="primary" @click="list.openCreate()" data-test="new">{{ $t('tickets.new') }}</pdx-button>
-    </pdx-list-header>
+    </app-list-header>
     <!-- For the reader of the source, not of the screen: the grid is over a data source,
          not an array — the page on screen was asked for by the server, and so were its sort and its
          filter. -->
@@ -145,11 +145,11 @@
     @defer (idle) {
     <!-- CREATE IN A MODAL: `src/tickets/create-dialog.pdx`. The page owns
          whether it is open and what a create does; the modal says what was filled in. -->
-    <pdx-create-dialog
+    <app-create-dialog
       :open="createOpen"
       :schema="schema"
       @create="e => list.create(e.detail)"
-      @close="list.closeCreate()"></pdx-create-dialog>
+      @close="list.closeCreate()"></app-create-dialog>
 
     <!-- THE RECORD, FROM THE ROW. A drawer, opened by the row's own control, and it does not move
          the URL: a record read here is a record the Back button cannot lose.

@@ -6,19 +6,19 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-divider-basic class="demo-section"></pdx-demo-comp-divider-basic>
+    <app-demo-comp-divider-basic class="demo-section"></app-demo-comp-divider-basic>
 
     <!-- ═══ With Label ═══ -->
-    <pdx-demo-comp-divider-with-label class="demo-section"></pdx-demo-comp-divider-with-label>
+    <app-demo-comp-divider-with-label class="demo-section"></app-demo-comp-divider-with-label>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-comp-divider-line-variants class="demo-section"></pdx-demo-comp-divider-line-variants>
+    <app-demo-comp-divider-line-variants class="demo-section"></app-demo-comp-divider-line-variants>
 
     <!-- ═══ Vertical ═══ -->
-    <pdx-demo-comp-divider-vertical class="demo-section"></pdx-demo-comp-divider-vertical>
+    <app-demo-comp-divider-vertical class="demo-section"></app-demo-comp-divider-vertical>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-divider-composition class="demo-section"></pdx-demo-comp-divider-composition>
+    <app-demo-comp-divider-composition class="demo-section"></app-demo-comp-divider-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

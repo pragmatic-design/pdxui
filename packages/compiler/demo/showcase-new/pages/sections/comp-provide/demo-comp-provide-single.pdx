@@ -16,10 +16,10 @@
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide name="greeting" :value="greetingMsg"&gt;
   &lt;!-- all descendants can inject('greeting') --&gt;
-  &lt;pdx-my-widget /&gt;
+  &lt;app-my-widget /&gt;
 &lt;/pdx-provide&gt;
 
-// In pdx-my-widget setup:
+// In app-my-widget setup:
 const greeting = useProvided('greeting');</code></pre></details>}
   </section>
 </template>

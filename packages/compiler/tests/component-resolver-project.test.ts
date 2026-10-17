@@ -34,7 +34,7 @@ describe('scanning a project for components', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
 
-        expect(r.tags.sort()).toEqual(['pdx-dashboard', 'pdx-user-card']);
+        expect(r.tags.sort()).toEqual(['app-dashboard', 'app-user-card']);
     });
 
     it('scans the directories it is given as well as src/ and pages/', () => {
@@ -47,7 +47,7 @@ describe('scanning a project for components', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root, ['widgets']);
 
-        expect(r.tags.sort()).toEqual(['pdx-gauge', 'pdx-kept']);
+        expect(r.tags.sort()).toEqual(['app-gauge', 'app-kept']);
         expect(r.searched).toEqual(['src/', 'pages/', 'widgets/']);
     });
 
@@ -57,7 +57,7 @@ describe('scanning a project for components', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root, [join(root, 'lib')]);
 
-        expect(r.tags).toEqual(['pdx-meter']);
+        expect(r.tags).toEqual(['app-meter']);
     });
 
     it('does not fail on a directory that is not there', () => {
@@ -77,7 +77,7 @@ describe('scanning a project for components', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
 
-        expect(r.tags).toEqual(['pdx-real']);
+        expect(r.tags).toEqual(['app-real']);
     });
 
     it('skips files whose name starts with _ — those are layouts, not components', () => {
@@ -87,7 +87,7 @@ describe('scanning a project for components', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
 
-        expect(r.tags).toEqual(['pdx-page']);
+        expect(r.tags).toEqual(['app-page']);
     });
 
     it('skips .pdx.ts, which is a schema file and not a component', () => {
@@ -97,23 +97,23 @@ describe('scanning a project for components', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
 
-        expect(r.tags).toEqual(['pdx-user']);
+        expect(r.tags).toEqual(['app-user']);
     });
 
     it('honours an @tag override over the filename', () => {
-        pdx('src/thing.pdx', '<script setup>\n  @tag "pdx-custom-name";\n</script>');
+        pdx('src/thing.pdx', '<script setup>\n  @tag "app-custom-name";\n</script>');
 
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
 
-        expect(r.tags).toEqual(['pdx-custom-name']);
+        expect(r.tags).toEqual(['app-custom-name']);
     });
 
     it('descends into subdirectories', () => {
         pdx('src/a/b/deep.pdx');
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
-        expect(r.tags).toEqual(['pdx-deep']);
+        expect(r.tags).toEqual(['app-deep']);
     });
 });
 
@@ -132,7 +132,7 @@ describe('precedence when two things claim the same tag', () => {
         // The console line now leads with the diagnostic code — see
         // resolver-collision-channel.test.ts for the structured half of the same report.
         expect(String(warn.mock.calls[0][0])).toContain('PDX_TAG_COLLISION_RESOLVER');
-        expect(r.resolve('pdx-widget')!.importPath).toContain('/a/widget.pdx');
+        expect(r.resolve('app-widget')!.importPath).toContain('/a/widget.pdx');
     });
 
     it('a library component is not replaced by a project file of the same name', () => {
@@ -164,7 +164,7 @@ describe('the import statements it emits', () => {
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
 
-        const [line] = r.resolveImports(['pdx-user-card'], '', join(root, 'src', 'app.pdx'));
+        const [line] = r.resolveImports(['app-user-card'], '', join(root, 'src', 'app.pdx'));
         expect(line).toBe("import './user-card.pdx';");
     });
 
@@ -172,7 +172,7 @@ describe('the import statements it emits', () => {
         const self = pdx('src/user-card.pdx');
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
-        expect(r.resolveImports(['pdx-user-card'], '', self)).toEqual([]);
+        expect(r.resolveImports(['app-user-card'], '', self)).toEqual([]);
     });
 
     it('does not repeat an import the author already wrote', () => {

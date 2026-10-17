@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-rating-basic class="demo-section"></pdx-demo-comp-rating-basic>
+    <app-demo-comp-rating-basic class="demo-section"></app-demo-comp-rating-basic>
 
     <!-- ═══ Half-Star ═══ -->
-    <pdx-demo-comp-rating-half-star class="demo-section"></pdx-demo-comp-rating-half-star>
+    <app-demo-comp-rating-half-star class="demo-section"></app-demo-comp-rating-half-star>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-rating-sizes class="demo-section"></pdx-demo-comp-rating-sizes>
+    <app-demo-comp-rating-sizes class="demo-section"></app-demo-comp-rating-sizes>
 
     <!-- ═══ Tooltips ═══ -->
-    <pdx-demo-comp-rating-tooltips class="demo-section"></pdx-demo-comp-rating-tooltips>
+    <app-demo-comp-rating-tooltips class="demo-section"></app-demo-comp-rating-tooltips>
 
     <!-- ═══ Threshold Colors ═══ -->
-    <pdx-demo-comp-rating-thresholds class="demo-section"></pdx-demo-comp-rating-thresholds>
+    <app-demo-comp-rating-thresholds class="demo-section"></app-demo-comp-rating-thresholds>
 
     <!-- ═══ States ═══ -->
-    <pdx-demo-comp-rating-states class="demo-section"></pdx-demo-comp-rating-states>
+    <app-demo-comp-rating-states class="demo-section"></app-demo-comp-rating-states>
 
     <!-- ═══ Form ═══ -->
-    <pdx-demo-comp-rating-form class="demo-section"></pdx-demo-comp-rating-form>
+    <app-demo-comp-rating-form class="demo-section"></app-demo-comp-rating-form>
 
     <!-- ═══ Reference ═══ -->
     <section>

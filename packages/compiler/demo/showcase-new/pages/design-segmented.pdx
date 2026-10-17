@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Default ═══ -->
-    <pdx-demo-design-segmented-default class="demo-section"></pdx-demo-design-segmented-default>
+    <app-demo-design-segmented-default class="demo-section"></app-demo-design-segmented-default>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-design-segmented-sizes class="demo-section"></pdx-demo-design-segmented-sizes>
+    <app-demo-design-segmented-sizes class="demo-section"></app-demo-design-segmented-sizes>
 
     <!-- ═══ Full Width ═══ -->
-    <pdx-demo-design-segmented-full-width class="demo-section"></pdx-demo-design-segmented-full-width>
+    <app-demo-design-segmented-full-width class="demo-section"></app-demo-design-segmented-full-width>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-design-segmented-disabled-item class="demo-section"></pdx-demo-design-segmented-disabled-item>
+    <app-demo-design-segmented-disabled-item class="demo-section"></app-demo-design-segmented-disabled-item>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-segmented-composition class="demo-section"></pdx-demo-design-segmented-composition>
+    <app-demo-design-segmented-composition class="demo-section"></app-demo-design-segmented-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

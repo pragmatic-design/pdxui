@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ 1. Order Edit — Full JSON Schema ═══ -->
-    <pdx-demo-comp-form-composition-order-edit class="demo-section"></pdx-demo-comp-form-composition-order-edit>
+    <app-demo-comp-form-composition-order-edit class="demo-section"></app-demo-comp-form-composition-order-edit>
 
     <!-- ═══ 2. Declarative Composition ═══ -->
-    <pdx-demo-comp-form-composition-declarative class="demo-section"></pdx-demo-comp-form-composition-declarative>
+    <app-demo-comp-form-composition-declarative class="demo-section"></app-demo-comp-form-composition-declarative>
 
     <!-- ═══ 3. Wizard Layout ═══ -->
-    <pdx-demo-comp-form-composition-wizard class="demo-section"></pdx-demo-comp-form-composition-wizard>
+    <app-demo-comp-form-composition-wizard class="demo-section"></app-demo-comp-form-composition-wizard>
 
     <!-- ═══ 4. Display Modes ═══ -->
-    <pdx-demo-comp-form-composition-display-modes class="demo-section"></pdx-demo-comp-form-composition-display-modes>
+    <app-demo-comp-form-composition-display-modes class="demo-section"></app-demo-comp-form-composition-display-modes>
 
     <!-- ═══ 5. Comparison ═══ -->
-    <pdx-demo-comp-form-composition-json-vs-declarative class="demo-section"></pdx-demo-comp-form-composition-json-vs-declarative>
+    <app-demo-comp-form-composition-json-vs-declarative class="demo-section"></app-demo-comp-form-composition-json-vs-declarative>
   </div>
 </template>
 

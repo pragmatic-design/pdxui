@@ -5,7 +5,7 @@
       <code>&lt;pdx-aspect-ratio&gt;</code> — maintains a fixed aspect ratio on its content. Uses native CSS <code>aspect-ratio</code>.
     </p>
 
-    <pdx-demo-comp-aspect-ratio-common-ratios class="demo-section"></pdx-demo-comp-aspect-ratio-common-ratios>
+    <app-demo-comp-aspect-ratio-common-ratios class="demo-section"></app-demo-comp-aspect-ratio-common-ratios>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

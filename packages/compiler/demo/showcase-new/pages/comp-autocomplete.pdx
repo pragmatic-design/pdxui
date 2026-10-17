@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Basic — Local Array ═══ -->
-    <pdx-demo-comp-autocomplete-basic class="demo-section"></pdx-demo-comp-autocomplete-basic>
+    <app-demo-comp-autocomplete-basic class="demo-section"></app-demo-comp-autocomplete-basic>
 
     <!-- ═══ Object Array ═══ -->
-    <pdx-demo-comp-autocomplete-object-array class="demo-section"></pdx-demo-comp-autocomplete-object-array>
+    <app-demo-comp-autocomplete-object-array class="demo-section"></app-demo-comp-autocomplete-object-array>
 
     <!-- ═══ Remote DataSource ═══ -->
-    <pdx-demo-comp-autocomplete-remote class="demo-section"></pdx-demo-comp-autocomplete-remote>
+    <app-demo-comp-autocomplete-remote class="demo-section"></app-demo-comp-autocomplete-remote>
 
     <!-- ═══ Force Selection ═══ -->
-    <pdx-demo-comp-autocomplete-force-selection class="demo-section"></pdx-demo-comp-autocomplete-force-selection>
+    <app-demo-comp-autocomplete-force-selection class="demo-section"></app-demo-comp-autocomplete-force-selection>
 
     <!-- ═══ Highlight ═══ -->
-    <pdx-demo-comp-autocomplete-highlight class="demo-section"></pdx-demo-comp-autocomplete-highlight>
+    <app-demo-comp-autocomplete-highlight class="demo-section"></app-demo-comp-autocomplete-highlight>
 
     <!-- ═══ Declarative DataSource ═══ -->
-    <pdx-demo-comp-autocomplete-cascading class="demo-section"></pdx-demo-comp-autocomplete-cascading>
+    <app-demo-comp-autocomplete-cascading class="demo-section"></app-demo-comp-autocomplete-cascading>
 
     <!-- ═══ Select with Creatable ═══ -->
-    <pdx-demo-comp-autocomplete-creatable class="demo-section"></pdx-demo-comp-autocomplete-creatable>
+    <app-demo-comp-autocomplete-creatable class="demo-section"></app-demo-comp-autocomplete-creatable>
 
     <!-- ═══ Autocomplete vs Select ═══ -->
-    <pdx-demo-comp-autocomplete-vs-select class="demo-section"></pdx-demo-comp-autocomplete-vs-select>
+    <app-demo-comp-autocomplete-vs-select class="demo-section"></app-demo-comp-autocomplete-vs-select>
 
     <!-- ═══ Slots ═══ -->
     <section>

@@ -597,19 +597,19 @@ cut, and the cut is done when the before/after test counts are equal.
   The full target, of which the rail is not carried out (see above):
 
   ```
-  src/shell/rail.pdx            <pdx-rail>: the nav menu (navItems, railKey, onNavSelect,
+  src/shell/rail.pdx            <app-rail>: the nav menu (navItems, railKey, onNavSelect,
                                 onNavPrefetch, onNavToggle, groupsOpen persisted), the foot
                                 (environment, version); @expose focusAllEntities() for the focus
                                 return (a command, CD-A3). NOT DONE: see above
   src/shell/nav-model.ts        CATALOG, DASHBOARD, ALL_LINKS, activeFor(), fold(): data + pure functions
   src/shell/favourites.ts       createFavourites(): pins as a signal, persisted (CD-S3)
   src/shell/recents.ts          createRecents(currentPath, pins): a signal, not a counter (CD-S3, CD-D2)
-  src/shell/catalog.pdx         <pdx-catalog>: search, fold, select, its own :ref for the first entry
+  src/shell/catalog.pdx         <app-catalog>: search, fold, select, its own :ref for the first entry
                                 (CD-A1); @event select, @event close
-  src/shell/topbar.pdx          <pdx-topbar>: the menu button, the title, the demo panel, the
+  src/shell/topbar.pdx          <app-topbar>: the menu button, the title, the demo panel, the
                                 settings gear (openSettings), the profile menu;
                                 @expose focusMenuButton()
-  src/shell/profile-menu.pdx    <pdx-profile-menu>: items, locale, scheme / density / language,
+  src/shell/profile-menu.pdx    <app-profile-menu>: items, locale, scheme / density / language,
                                 sign-out, the user's name and initials
   ```
 

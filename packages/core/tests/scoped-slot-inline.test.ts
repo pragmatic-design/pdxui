@@ -25,11 +25,11 @@ function define(name: string, template: string, script = ''): string {
 }
 
 describe('a scoped slot fill', () => {
-    define('pdx-slot-owner',
+    define('app-slot-owner',
         '<p class="own"><slot name="cell" :row="r">none</slot></p><button @click="r = r + 1">next</button>',
         'let r = $signal(1);');
-    const parent = define('pdx-slot-filler',
-        '<pdx-slot-owner><slot name="cell" let:row><!-- a note --><b title="${row}">row {{ row }}</b></slot></pdx-slot-owner>');
+    const parent = define('app-slot-filler',
+        '<app-slot-owner><slot name="cell" let:row><!-- a note --><b title="${row}">row {{ row }}</b></slot></app-slot-owner>');
 
     it('is compiled without the template path: no html`` in the module', () => {
         expect(parent).toContain('slotCarrier(');
@@ -37,18 +37,18 @@ describe('a scoped slot fill', () => {
     });
 
     it('renders with its scope values, and follows them', async () => {
-        const el = document.createElement('pdx-slot-filler');
+        const el = document.createElement('app-slot-filler');
         document.body.appendChild(el);
         await settle();
         const b = () => el.querySelector('.own b');
         expect(b()?.textContent).toBe('row 1');
-        (el.querySelector('pdx-slot-owner button') as HTMLButtonElement).click();
+        (el.querySelector('app-slot-owner button') as HTMLButtonElement).click();
         await settle();
         expect(b()?.textContent, 'a changed scope value did not reach the slot').toBe('row 2');
     });
 
     it('reads `${…}` in an unbound attribute and an HTML comment as everywhere else', async () => {
-        const el = document.createElement('pdx-slot-filler');
+        const el = document.createElement('app-slot-filler');
         document.body.appendChild(el);
         await settle();
         expect(el.querySelector('.own b')?.getAttribute('title'), '`${row}` was evaluated').toBe('${row}');

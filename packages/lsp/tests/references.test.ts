@@ -82,7 +82,7 @@ describe('find references — @prop / @event cross-file', () => {
         '@event changed: number;',
         '</script>',
     ].join('\n');
-    const app = '<template><pdx-counter :label="t" @changed="f" /><pdx-counter label="x" /></template>';
+    const app = '<template><app-counter :label="t" @changed="f" /><app-counter label="x" /></template>';
     const cDoc = analyzeDocument(counter, 'counter.pdx');
     const cUri = 'file:///counter.pdx';
     const aUri = 'file:///app.pdx';

@@ -43,10 +43,10 @@ const json = async (): Promise<Manifest> => {
 };
 
 describe('pdx analyze', () => {
-    it('names a component by the tag the compiler registers: App.pdx is pdx-app', async () => {
+    it('names a component by the tag the compiler registers: App.pdx is app-app', async () => {
         write('src/App.pdx', '<template><p>app</p></template>\n');
         const manifest = await json();
-        expect(manifest.components.map((c) => c.tag)).toEqual(['pdx-app']);
+        expect(manifest.components.map((c) => c.tag)).toEqual(['app-app']);
     });
 
     it('fills routes[] from the @page components, sorted by path', async () => {
@@ -55,8 +55,8 @@ describe('pdx analyze', () => {
         write('src/card.pdx', '<template><p>not a page</p></template>\n');
         const { routes } = await json();
         expect(routes?.map((r) => [r.path, r.tag, r.file.replace(/\\/g, '/')])).toEqual([
-            ['/', 'pdx-home', 'src/pages/home.pdx'],
-            ['/users', 'pdx-users', 'src/pages/users.pdx'],
+            ['/', 'app-home', 'src/pages/home.pdx'],
+            ['/users', 'app-users', 'src/pages/users.pdx'],
         ]);
         expect(routes?.[1].guard).toBe('users.read');
     });

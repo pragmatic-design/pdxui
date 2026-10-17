@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-file-upload-basic class="demo-section"></pdx-demo-comp-file-upload-basic>
+    <app-demo-comp-file-upload-basic class="demo-section"></app-demo-comp-file-upload-basic>
 
     <!-- ═══ Image Only ═══ -->
-    <pdx-demo-comp-file-upload-image-only class="demo-section"></pdx-demo-comp-file-upload-image-only>
+    <app-demo-comp-file-upload-image-only class="demo-section"></app-demo-comp-file-upload-image-only>
 
     <!-- ═══ Size Limit ═══ -->
-    <pdx-demo-comp-file-upload-size-limit class="demo-section"></pdx-demo-comp-file-upload-size-limit>
+    <app-demo-comp-file-upload-size-limit class="demo-section"></app-demo-comp-file-upload-size-limit>
 
     <!-- ═══ Max Files ═══ -->
-    <pdx-demo-comp-file-upload-max-files class="demo-section"></pdx-demo-comp-file-upload-max-files>
+    <app-demo-comp-file-upload-max-files class="demo-section"></app-demo-comp-file-upload-max-files>
 
     <!-- ═══ Custom Label ═══ -->
-    <pdx-demo-comp-file-upload-custom-label class="demo-section"></pdx-demo-comp-file-upload-custom-label>
+    <app-demo-comp-file-upload-custom-label class="demo-section"></app-demo-comp-file-upload-custom-label>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-file-upload-sizes class="demo-section"></pdx-demo-comp-file-upload-sizes>
+    <app-demo-comp-file-upload-sizes class="demo-section"></app-demo-comp-file-upload-sizes>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-file-upload-disabled class="demo-section"></pdx-demo-comp-file-upload-disabled>
+    <app-demo-comp-file-upload-disabled class="demo-section"></app-demo-comp-file-upload-disabled>
 
     <!-- ═══ Slots ═══ -->
     <section>

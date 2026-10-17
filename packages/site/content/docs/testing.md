@@ -20,7 +20,7 @@ import { mount, tick, fireEvent, getByRole, cleanup } from '@pdxui/core/testing'
 afterEach(cleanup);   // unmount and clean up between tests
 
 it('increments on click', async () => {
-  const el = await mount('<pdx-counter start="0"></pdx-counter>');   // markup in, container out
+  const el = await mount('<app-counter start="0"></app-counter>');   // markup in, container out
   fireEvent(getByRole(el, 'button', { name: '+1' }), 'click');       // act
   await tick();                                                       // WAIT for the reactive flush
   expect(el.textContent).toContain('1');                              // assert on the new state

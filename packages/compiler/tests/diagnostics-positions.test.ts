@@ -51,6 +51,7 @@ const ROWS: Record<string, Row> = {
     PDX_PIPE_SINGLE: { src: pdx('<p>{{ a }}</p>\n<p>{{ a | up }}</p>', 'let a = $signal(1);\nfunction up(v) { return v; }'), at: '{{ a | up }}' },
     PDX_BINDING_MODIFIER: { src: pdx('<p>{{ a }}</p>\n<input ::value.lazzy="a" />', 'let a = $signal(1);'), at: '::value.lazzy' },
     PDX_TWO_WAY_NOT_MODEL: { src: pdx('<p>{{ a }}</p>\n<app-field\n  ::label="a"></app-field>', 'let a = $signal(1);'), at: '::label="a"' },
+    PDX_TAG_RESERVED: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@tag \'pdx-badge\';'), at: "@tag 'pdx-badge';" },
     PDX_PROP_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-card :id="a"></app-card>\n  <app-card></app-card>', 'let a = $signal(1);'), at: '<app-card></app-card>' },
     PDX_PART_MISSING: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@part trigger;'), at: '@part trigger;' },
     PDX_PART_DUPLICATE: { src: pdx('<b data-part="x">1</b><i data-part="x">2</i>', '@part x;'), at: 'data-part="x">2' },

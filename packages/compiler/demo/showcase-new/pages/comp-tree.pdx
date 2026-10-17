@@ -8,28 +8,28 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-tree-expanding class="demo-section"></pdx-demo-comp-tree-expanding>
+    <app-demo-comp-tree-expanding class="demo-section"></app-demo-comp-tree-expanding>
 
     <!-- ═══ Expanded by default ═══ -->
-    <pdx-demo-comp-tree-open-on-arrival class="demo-section"></pdx-demo-comp-tree-open-on-arrival>
+    <app-demo-comp-tree-open-on-arrival class="demo-section"></app-demo-comp-tree-open-on-arrival>
 
     <!-- ═══ Selection ═══ -->
-    <pdx-demo-comp-tree-selection class="demo-section"></pdx-demo-comp-tree-selection>
+    <app-demo-comp-tree-selection class="demo-section"></app-demo-comp-tree-selection>
 
     <!-- ═══ Checkboxes ═══ -->
-    <pdx-demo-comp-tree-checkboxes class="demo-section"></pdx-demo-comp-tree-checkboxes>
+    <app-demo-comp-tree-checkboxes class="demo-section"></app-demo-comp-tree-checkboxes>
 
     <!-- ═══ Lazy ═══ -->
-    <pdx-demo-comp-tree-lazy-children class="demo-section"></pdx-demo-comp-tree-lazy-children>
+    <app-demo-comp-tree-lazy-children class="demo-section"></app-demo-comp-tree-lazy-children>
 
     <!-- ═══ Fields ═══ -->
-    <pdx-demo-comp-tree-fields class="demo-section"></pdx-demo-comp-tree-fields>
+    <app-demo-comp-tree-fields class="demo-section"></app-demo-comp-tree-fields>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-tree-disabled class="demo-section"></pdx-demo-comp-tree-disabled>
+    <app-demo-comp-tree-disabled class="demo-section"></app-demo-comp-tree-disabled>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-tree-screen class="demo-section"></pdx-demo-comp-tree-screen>
+    <app-demo-comp-tree-screen class="demo-section"></app-demo-comp-tree-screen>
 
     <!-- ═══ Keyboard ═══ -->
     <section>

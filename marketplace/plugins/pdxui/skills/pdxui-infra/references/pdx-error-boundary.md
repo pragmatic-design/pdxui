@@ -26,7 +26,7 @@ are checked against the manifest above._
 
 ```html
 @try {
-  <pdx-risky-widget />
+  <app-risky-widget />
 } @catch (err) {
   <div role="alert">
     <p>{{ err instanceof Error ? err.message : String(err) }}</p>
@@ -41,7 +41,7 @@ are checked against the manifest above._
   fallback-message="Dashboard widget crashed."
   :max-retries="3"
   @pdx-error="onError">
-  <pdx-dashboard-widget />
+  <app-dashboard-widget />
 </pdx-error-boundary>
 ```
 
@@ -49,7 +49,7 @@ are checked against the manifest above._
 
 ```html
 @try {
-  <pdx-user-list />
+  <app-user-list />
 } @catch (err) {
   <div role="alert">
     {{ err instanceof Error ? err.message : String(err) }}

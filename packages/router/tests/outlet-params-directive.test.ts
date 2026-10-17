@@ -14,8 +14,8 @@ import * as core from '@pdxui/core';
 import { compile } from '../../compiler/src/plugin';
 
 const MODES = [
-    { name: 'dev', base: '/t', tag: 'pdx-pp-dev', production: false },
-    { name: 'production', base: '/p', tag: 'pdx-pp-prod', production: true },
+    { name: 'dev', base: '/t', tag: 'app-pp-dev', production: false },
+    { name: 'production', base: '/p', tag: 'app-pp-prod', production: true },
 ] as const;
 
 const source = (base: string, tag: string) => `<template><p data-test="id">{{ id }}</p><p data-test="next">{{ next }}</p><p data-test="type">{{ typeof id }}</p></template>

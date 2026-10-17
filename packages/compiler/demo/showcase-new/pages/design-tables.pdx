@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Base Table ═══ -->
-    <pdx-demo-design-tables-base class="demo-section"></pdx-demo-design-tables-base>
+    <app-demo-design-tables-base class="demo-section"></app-demo-design-tables-base>
 
     <!-- ═══ Striped ═══ -->
-    <pdx-demo-design-tables-striped class="demo-section"></pdx-demo-design-tables-striped>
+    <app-demo-design-tables-striped class="demo-section"></app-demo-design-tables-striped>
 
     <!-- ═══ Hover ═══ -->
-    <pdx-demo-design-tables-hover class="demo-section"></pdx-demo-design-tables-hover>
+    <app-demo-design-tables-hover class="demo-section"></app-demo-design-tables-hover>
 
     <!-- ═══ Compact ═══ -->
-    <pdx-demo-design-tables-compact class="demo-section"></pdx-demo-design-tables-compact>
+    <app-demo-design-tables-compact class="demo-section"></app-demo-design-tables-compact>
 
     <!-- ═══ Sticky Header ═══ -->
-    <pdx-demo-design-tables-sticky class="demo-section"></pdx-demo-design-tables-sticky>
+    <app-demo-design-tables-sticky class="demo-section"></app-demo-design-tables-sticky>
 
     <!-- ═══ Responsive ═══ -->
-    <pdx-demo-design-tables-responsive class="demo-section"></pdx-demo-design-tables-responsive>
+    <app-demo-design-tables-responsive class="demo-section"></app-demo-design-tables-responsive>
 
     <!-- ═══ Sort Indicators ═══ -->
-    <pdx-demo-design-tables-sort class="demo-section"></pdx-demo-design-tables-sort>
+    <app-demo-design-tables-sort class="demo-section"></app-demo-design-tables-sort>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-tables-composition class="demo-section"></pdx-demo-design-tables-composition>
+    <app-demo-design-tables-composition class="demo-section"></app-demo-design-tables-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

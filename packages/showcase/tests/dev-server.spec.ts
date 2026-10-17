@@ -35,9 +35,9 @@ test('an agent can ask the running page what it shows: __PDX_DEVTOOLS__ v1, as J
     // What an agent runs through `agent-browser eval`: a string, parsed on the other side.
     const raw = await page.evaluate(() => JSON.stringify((window as unknown as {
         __PDX_DEVTOOLS__: { v: number; inspect(t: string): unknown; route(): unknown };
-    }).__PDX_DEVTOOLS__.inspect('pdx-dashboard')));
+    }).__PDX_DEVTOOLS__.inspect('app-dashboard')));
     const info = JSON.parse(raw) as { tag: string; file?: string; state: Record<string, unknown> };
-    expect(info.tag).toBe('pdx-dashboard');
+    expect(info.tag).toBe('app-dashboard');
     expect(info.file).toBe('src/pages/dashboard.pdx');
     // A `$signal` of its setup, by the name the author wrote.
     expect(Object.keys(info.state)).toContain('neverReadByAnything');
@@ -49,7 +49,7 @@ test('an agent can ask the running page what it shows: __PDX_DEVTOOLS__ v1, as J
 test('a @state is a custom state in dev too: the Demo panel\'s host matches :state(expanded) while open', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('[data-test="dashboard"]')).toBeVisible();
-    const expanded = () => page.locator('pdx-demo-panel').evaluate((el) => el.matches(':state(expanded)'));
+    const expanded = () => page.locator('app-demo-panel').evaluate((el) => el.matches(':state(expanded)'));
     expect(await expanded()).toBe(false);
     await page.locator('[data-test="demo-open"]').click();
     await expect.poll(expanded).toBe(true);

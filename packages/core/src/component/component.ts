@@ -200,7 +200,7 @@ export interface ComponentOptionsWithSetup<
  * Define a function-based Web Component.
  *
  * Usage:
- *   component('pdx-counter', {
+ *   component('app-counter', {
  *     props: {
  *       initial: { type: Number, default: 0 },
  *     },

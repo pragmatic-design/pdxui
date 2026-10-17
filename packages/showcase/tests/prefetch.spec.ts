@@ -42,7 +42,7 @@ async function open(page: Page, path: string): Promise<void> {
     // The links hovered below are the rail's Customers and Board, favourites on a first visit. The
     // menu lists no single record: a record is reached from its list.
     await page.goto(path);
-    await expect(page.locator('pdx-app .app-bar')).toBeVisible();
+    await expect(page.locator('app-app .app-bar')).toBeVisible();
 }
 
 test.describe('hovering a link to a split route', () => {

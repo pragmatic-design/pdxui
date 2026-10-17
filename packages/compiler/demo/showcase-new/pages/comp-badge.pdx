@@ -7,31 +7,31 @@
     </p>
 
     <!-- ═══ Filled Variants ═══ -->
-    <pdx-demo-comp-badge-filled class="demo-section"></pdx-demo-comp-badge-filled>
+    <app-demo-comp-badge-filled class="demo-section"></app-demo-comp-badge-filled>
 
     <!-- ═══ Outline Variants ═══ -->
-    <pdx-demo-comp-badge-outline class="demo-section"></pdx-demo-comp-badge-outline>
+    <app-demo-comp-badge-outline class="demo-section"></app-demo-comp-badge-outline>
 
     <!-- ═══ Count ═══ -->
-    <pdx-demo-comp-badge-count class="demo-section"></pdx-demo-comp-badge-count>
+    <app-demo-comp-badge-count class="demo-section"></app-demo-comp-badge-count>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-badge-sizes class="demo-section"></pdx-demo-comp-badge-sizes>
+    <app-demo-comp-badge-sizes class="demo-section"></app-demo-comp-badge-sizes>
 
     <!-- ═══ Dot ═══ -->
-    <pdx-demo-comp-badge-dot class="demo-section"></pdx-demo-comp-badge-dot>
+    <app-demo-comp-badge-dot class="demo-section"></app-demo-comp-badge-dot>
 
     <!-- ═══ Overlay ═══ -->
-    <pdx-demo-comp-badge-overlay class="demo-section"></pdx-demo-comp-badge-overlay>
+    <app-demo-comp-badge-overlay class="demo-section"></app-demo-comp-badge-overlay>
 
     <!-- ═══ Interactive ═══ -->
-    <pdx-demo-comp-badge-interactive class="demo-section"></pdx-demo-comp-badge-interactive>
+    <app-demo-comp-badge-interactive class="demo-section"></app-demo-comp-badge-interactive>
 
     <!-- ═══ CSS Only ═══ -->
-    <pdx-demo-comp-badge-css-only class="demo-section"></pdx-demo-comp-badge-css-only>
+    <app-demo-comp-badge-css-only class="demo-section"></app-demo-comp-badge-css-only>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-badge-composition class="demo-section"></pdx-demo-comp-badge-composition>
+    <app-demo-comp-badge-composition class="demo-section"></app-demo-comp-badge-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

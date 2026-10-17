@@ -2,21 +2,21 @@
 
 import { readFileSync } from 'fs';
 import { relative } from 'pathe';
-import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, modelEventName } from '@pdxui/compiler';
+import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, modelEventName, DEFAULT_TAG_PREFIX } from '@pdxui/compiler';
 import type { ComponentManifest, RouteManifest, FetchManifest, FormManifest, ComponentMetadata } from './schema';
 
 /**
  * Analyze a single .pdx file and produce its component manifest.
  * Uses the compiler's parseSFC + analyzeScript + parseTemplate + findComponentTags.
  */
-export function analyzeComponent(filePath: string, rootDir: string): ComponentManifest {
+export function analyzeComponent(filePath: string, rootDir: string, prefix: string = DEFAULT_TAG_PREFIX): ComponentManifest {
     const source = readFileSync(filePath, 'utf-8');
     const descriptor = parseSFC(source);
 
     const scriptContent = descriptor.script?.content ?? '';
     const analysis = analyzeScript(scriptContent, filePath, { setup: descriptor.script?.setup });
-    // The tag the compiler registers: `@tag`, else its filename rule — not a copy of it.
-    const tag = analysis.customTag ?? deriveTag(filePath);
+    // The tag the compiler registers: `@tag`, else its filename rule with the app's prefix — not a copy of it.
+    const tag = analysis.customTag ?? deriveTag(filePath, prefix);
 
     const templateContent = descriptor.template?.content ?? '';
     const ast = parseTemplate(templateContent);

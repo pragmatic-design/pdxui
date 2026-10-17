@@ -6,22 +6,22 @@
     </p>
 
     <!-- ═══ Gauge ═══ -->
-    <pdx-demo-comp-chart-specialized-gauge class="demo-section"></pdx-demo-comp-chart-specialized-gauge>
+    <app-demo-comp-chart-specialized-gauge class="demo-section"></app-demo-comp-chart-specialized-gauge>
 
     <!-- ═══ Radar ═══ -->
-    <pdx-demo-comp-chart-specialized-radar class="demo-section"></pdx-demo-comp-chart-specialized-radar>
+    <app-demo-comp-chart-specialized-radar class="demo-section"></app-demo-comp-chart-specialized-radar>
 
     <!-- ═══ Candlestick ═══ -->
-    <pdx-demo-comp-chart-specialized-candlestick class="demo-section"></pdx-demo-comp-chart-specialized-candlestick>
+    <app-demo-comp-chart-specialized-candlestick class="demo-section"></app-demo-comp-chart-specialized-candlestick>
 
     <!-- ═══ Heatmap ═══ -->
-    <pdx-demo-comp-chart-specialized-heatmap class="demo-section"></pdx-demo-comp-chart-specialized-heatmap>
+    <app-demo-comp-chart-specialized-heatmap class="demo-section"></app-demo-comp-chart-specialized-heatmap>
 
     <!-- ═══ Funnel ═══ -->
-    <pdx-demo-comp-chart-specialized-funnel class="demo-section"></pdx-demo-comp-chart-specialized-funnel>
+    <app-demo-comp-chart-specialized-funnel class="demo-section"></app-demo-comp-chart-specialized-funnel>
 
     <!-- ═══ Sparkline ═══ -->
-    <pdx-demo-comp-chart-specialized-sparkline class="demo-section"></pdx-demo-comp-chart-specialized-sparkline>
+    <app-demo-comp-chart-specialized-sparkline class="demo-section"></app-demo-comp-chart-specialized-sparkline>
   </div>
 </template>
 

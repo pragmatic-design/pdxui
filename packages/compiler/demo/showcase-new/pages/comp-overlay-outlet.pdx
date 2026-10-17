@@ -9,16 +9,16 @@
     </p>
 
     <!-- ═══ Why ═══ -->
-    <pdx-demo-comp-overlay-outlet-why class="demo-section"></pdx-demo-comp-overlay-outlet-why>
+    <app-demo-comp-overlay-outlet-why class="demo-section"></app-demo-comp-overlay-outlet-why>
 
     <!-- ═══ Confirm ═══ -->
-    <pdx-demo-comp-overlay-outlet-confirm class="demo-section"></pdx-demo-comp-overlay-outlet-confirm>
+    <app-demo-comp-overlay-outlet-confirm class="demo-section"></app-demo-comp-overlay-outlet-confirm>
 
     <!-- ═══ Alert and message dialog ═══ -->
-    <pdx-demo-comp-overlay-outlet-alert class="demo-section"></pdx-demo-comp-overlay-outlet-alert>
+    <app-demo-comp-overlay-outlet-alert class="demo-section"></app-demo-comp-overlay-outlet-alert>
 
     <!-- ═══ Stacking ═══ -->
-    <pdx-demo-comp-overlay-outlet-stacking class="demo-section"></pdx-demo-comp-overlay-outlet-stacking>
+    <app-demo-comp-overlay-outlet-stacking class="demo-section"></app-demo-comp-overlay-outlet-stacking>
 
     <!-- ═══ Keyboard ═══ -->
     <section>

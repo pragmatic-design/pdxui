@@ -7,13 +7,13 @@
     </p>
 
     <!-- Basic -->
-    <pdx-demo-comp-search-basic class="demo-section"></pdx-demo-comp-search-basic>
+    <app-demo-comp-search-basic class="demo-section"></app-demo-comp-search-basic>
 
     <!-- States -->
-    <pdx-demo-comp-search-states class="demo-section"></pdx-demo-comp-search-states>
+    <app-demo-comp-search-states class="demo-section"></app-demo-comp-search-states>
 
     <!-- Sizes -->
-    <pdx-demo-comp-search-sizes class="demo-section"></pdx-demo-comp-search-sizes>
+    <app-demo-comp-search-sizes class="demo-section"></app-demo-comp-search-sizes>
 
     <!-- Reference -->
     <section>

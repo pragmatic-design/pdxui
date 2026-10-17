@@ -3,15 +3,15 @@
     <h2>Overlay System</h2>
     <p class="desc">Z-stack LIFO, portal, backdrop, Escape dismiss, body scroll lock.</p>
 
-    <pdx-demo-infra-overlay-stack class="demo-section"></pdx-demo-infra-overlay-stack>
+    <app-demo-infra-overlay-stack class="demo-section"></app-demo-infra-overlay-stack>
 
-    <pdx-demo-infra-overlay-portal class="demo-section"></pdx-demo-infra-overlay-portal>
+    <app-demo-infra-overlay-portal class="demo-section"></app-demo-infra-overlay-portal>
 
-    <pdx-demo-infra-overlay-backdrop class="demo-section"></pdx-demo-infra-overlay-backdrop>
+    <app-demo-infra-overlay-backdrop class="demo-section"></app-demo-infra-overlay-backdrop>
 
-    <pdx-demo-infra-overlay-bottom-sheet class="demo-section"></pdx-demo-infra-overlay-bottom-sheet>
+    <app-demo-infra-overlay-bottom-sheet class="demo-section"></app-demo-infra-overlay-bottom-sheet>
 
-    <pdx-demo-infra-overlay-nested class="demo-section"></pdx-demo-infra-overlay-nested>
+    <app-demo-infra-overlay-nested class="demo-section"></app-demo-infra-overlay-nested>
   </div>
 </template>
 

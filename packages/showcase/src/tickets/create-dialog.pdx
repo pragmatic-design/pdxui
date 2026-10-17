@@ -18,7 +18,7 @@
         :schema="schema"
         :show-actions="false"
         data-test="create-form"></pdx-auto-form>
-      <pdx-asset-picker :customer="createCustomer" @picked="e => createAssetId = e.detail.id" data-test="asset-picker"></pdx-asset-picker>
+      <app-asset-picker :customer="createCustomer" @picked="e => createAssetId = e.detail.id" data-test="asset-picker"></app-asset-picker>
       <div class="create-actions">
         <pdx-button variant="primary" @click="submitCreate" data-test="create-submit">{{ $t('tickets.create') }}</pdx-button>
       </div>

@@ -44,7 +44,7 @@ const PATHS = [
 ];
 
 const fileOf = (shape: string, path: number) => `ts-${shape.toLowerCase()}-${path}.pdx`;
-const tagOf = (shape: string, path: number) => `pdx-ts-${shape.toLowerCase()}-${path}`;
+const tagOf = (shape: string, path: number) => `app-ts-${shape.toLowerCase()}-${path}`;
 
 beforeAll(() => {
     for (const [shape, loop] of Object.entries(SHAPES)) {

@@ -25,9 +25,9 @@ const V2 = (name: string) => V1(name).replace('first version', 'second version')
 const STUB = '<template>\n  <div></div>\n</template>\n';
 
 const APP = `<template>
-  <pdx-late-full></pdx-late-full>
-  <pdx-late-empty></pdx-late-empty>
-  <pdx-late-stub></pdx-late-stub>
+  <app-late-full></app-late-full>
+  <app-late-empty></app-late-empty>
+  <app-late-stub></app-late-stub>
 </template>
 
 <script setup>
@@ -96,7 +96,7 @@ describe('a .pdx created while the dev server runs', () => {
 
         expect(await served('app.pdx'), 'the page that uses the tag imports the new module').toMatch(/import ["'][^"']*\/late-full\.pdx/);
         const first = await served('late-full.pdx');
-        expect(first).toContain("component('pdx-late-full'");
+        expect(first).toContain("component('app-late-full'");
         expect(first, 'the setup is compiled, not a stub').toContain('setup(ctx)');
         expect(first).toContain('full first version');
 
@@ -126,7 +126,7 @@ describe('a .pdx created while the dev server runs', () => {
         writeFileSync(join(root, 'src', 'late-stub.pdx'), STUB);
         await reported('add', 'late-stub.pdx');
         const stub = await served('late-stub.pdx');
-        expect(stub).toContain("component('pdx-late-stub'");
+        expect(stub).toContain("component('app-late-stub'");
         expect(stub, 'control — the stub really is a stub').not.toContain('setup(ctx)');
 
         writeFileSync(join(root, 'src', 'late-stub.pdx'), V1('stub'));

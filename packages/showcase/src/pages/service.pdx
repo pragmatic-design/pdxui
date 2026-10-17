@@ -4,7 +4,7 @@
     <h1 class="pdx-txt-title">{{ record?.name ?? $t('services.unknown') }}</h1>
 
     <!-- The record detail's shell, written once. -->
-    <pdx-record-detail :label="$t('services.sections')">
+    <app-record-detail :label="$t('services.sections')">
       <span slot="identity" class="portrait" aria-hidden="true">{{ record ? record.code.slice(4, 7) : '?' }}</span>
       <p slot="identity" class="pdx-txt-heading identity-name" data-test="identity-name">{{ record?.code ?? '' }}</p>
       <p slot="identity" class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ record ? $t('services.hours', { hours: record.slaHours }) + ' · ' + $t('services.states.' + (record.active ? 'active' : 'inactive')) : '' }}</p>
@@ -72,7 +72,7 @@
             </ul>
           </section>
         }
-    </pdx-record-detail>
+    </app-record-detail>
   </section>
 </template>
 
@@ -156,7 +156,7 @@ onBeforeLeave(async () => {
 
 <style scoped>
   .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
-  /* The shell — identity, section menu, rows — is <pdx-record-detail>'s. */
+  /* The shell — identity, section menu, rows — is <app-record-detail>'s. */
 
   .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--pdx-space-md); }
   .save-status { color: var(--pdx-color-muted); min-height: 1lh; }

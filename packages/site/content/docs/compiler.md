@@ -48,7 +48,7 @@ import { bindInterpolation, component, computed, signal, staticBlock, staticMark
 const __blk0=staticBlock(staticMarkup('<div><!----> <!----> <!----></div>'));
 // the walk → from the copy to the nodes the render binds, computed at compile time
 const __walk0=(r)=>{const __el0=r.firstChild;const __t1=__el0.firstChild;const __t2=__t1.nextSibling.nextSibling;const __t3=__t2.nextSibling.nextSibling;return [__t1,__t2,__t3];};
-component('pdx-counter', {
+component('app-counter', {
   props: {
     label: { type: String, default: 'Hello' }        // @prop → declared prop + attribute sync
   },

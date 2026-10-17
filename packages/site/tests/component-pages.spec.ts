@@ -83,7 +83,7 @@ test.describe('the router\'s elements', () => {
             await expect.poll(() => names.allTextContents().then(t => t.map(s => s.trim())), 'the attribute table').toEqual(expect.arrayContaining([...attrs]));
             await expect(page.locator('#playground')).toHaveCount(0);
             // Its site-authored gallery (src/demos-authored/), not the placeholder.
-            await expect(page.locator(`.cmp-gallery pdx-comp-${tag.slice(4)} section`).first()).toBeVisible();
+            await expect(page.locator(`.cmp-gallery app-comp-${tag.slice(4)} section`).first()).toBeVisible();
             await expect(page.locator('.cmp-placeholder')).toHaveCount(0);
             // It is listed in the component list, under its category.
             await expect(page.locator(`.cmp-nav-link[href="/components/${tag}"]`)).toHaveCount(1);
@@ -162,7 +162,7 @@ test.describe('every component page loads', () => {
             // A real demo: not the "being finalized" placeholder, and not the last-resort hero — the
             // element with its own name as its only content, `<pdx-x>x</pdx-x>`.
             await expect(page.locator('.cmp-placeholder'), `${short}: the "demos are being finalized" placeholder`).toHaveCount(0);
-            const heroCode = await page.locator('#overview pdx-demo').evaluateAll((els) => els.map((e) => (e as HTMLElement & { code?: string }).code ?? ''));
+            const heroCode = await page.locator('#overview app-demo').evaluateAll((els) => els.map((e) => (e as HTMLElement & { code?: string }).code ?? ''));
             expect(heroCode, `${short}: the demo is the bare element`).not.toContain(`<${tag}>${short}</${tag}>`);
         });
     }

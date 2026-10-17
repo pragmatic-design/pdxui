@@ -7,22 +7,22 @@
     </p>
 
     <!-- ═══ Bordered ═══ -->
-    <pdx-demo-comp-fieldset-bordered class="demo-section"></pdx-demo-comp-fieldset-bordered>
+    <app-demo-comp-fieldset-bordered class="demo-section"></app-demo-comp-fieldset-bordered>
 
     <!-- ═══ Filled ═══ -->
-    <pdx-demo-comp-fieldset-filled class="demo-section"></pdx-demo-comp-fieldset-filled>
+    <app-demo-comp-fieldset-filled class="demo-section"></app-demo-comp-fieldset-filled>
 
     <!-- ═══ Plain ═══ -->
-    <pdx-demo-comp-fieldset-plain class="demo-section"></pdx-demo-comp-fieldset-plain>
+    <app-demo-comp-fieldset-plain class="demo-section"></app-demo-comp-fieldset-plain>
 
     <!-- ═══ Collapsible ═══ -->
-    <pdx-demo-comp-fieldset-collapsible class="demo-section"></pdx-demo-comp-fieldset-collapsible>
+    <app-demo-comp-fieldset-collapsible class="demo-section"></app-demo-comp-fieldset-collapsible>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-fieldset-disabled class="demo-section"></pdx-demo-comp-fieldset-disabled>
+    <app-demo-comp-fieldset-disabled class="demo-section"></app-demo-comp-fieldset-disabled>
 
     <!-- ═══ Invalid ═══ -->
-    <pdx-demo-comp-fieldset-invalid class="demo-section"></pdx-demo-comp-fieldset-invalid>
+    <app-demo-comp-fieldset-invalid class="demo-section"></app-demo-comp-fieldset-invalid>
 
     <!-- ═══ Reference ═══ -->
     <section>

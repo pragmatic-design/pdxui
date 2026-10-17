@@ -1,7 +1,7 @@
 <template>
   <section class="page" data-test="customers">
     <!-- The list's header, the tickets': views of this list's own. -->
-    <pdx-list-header
+    <app-list-header
       :title="$t('customers.title')"
       store-key="customers"
       :default-name="$t('customers.views.default')"
@@ -10,7 +10,7 @@
       @switched="list.clearSelection()">
       <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('customers.matching', { count: total }) }}</span>
       <pdx-button variant="primary" @click="list.openCreate()" data-test="new">{{ $t('customers.new') }}</pdx-button>
-    </pdx-list-header>
+    </app-list-header>
     <!-- For the reader of the source: the same round-trip as the tickets, on a second
          entity — written once and repeated, which is what the pattern has to prove. -->
     <p class="pdx-txt-small pdx-ink-muted">{{ $t('customers.intro') }}</p>

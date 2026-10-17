@@ -6,28 +6,28 @@
     </p>
 
     <!-- ═══ Initials Fallback ═══ -->
-    <pdx-demo-comp-avatar-initials class="demo-section"></pdx-demo-comp-avatar-initials>
+    <app-demo-comp-avatar-initials class="demo-section"></app-demo-comp-avatar-initials>
 
     <!-- ═══ Auto Color ═══ -->
-    <pdx-demo-comp-avatar-auto-color class="demo-section"></pdx-demo-comp-avatar-auto-color>
+    <app-demo-comp-avatar-auto-color class="demo-section"></app-demo-comp-avatar-auto-color>
 
     <!-- ═══ With Image ═══ -->
-    <pdx-demo-comp-avatar-with-image class="demo-section"></pdx-demo-comp-avatar-with-image>
+    <app-demo-comp-avatar-with-image class="demo-section"></app-demo-comp-avatar-with-image>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-avatar-sizes class="demo-section"></pdx-demo-comp-avatar-sizes>
+    <app-demo-comp-avatar-sizes class="demo-section"></app-demo-comp-avatar-sizes>
 
     <!-- ═══ Shape ═══ -->
-    <pdx-demo-comp-avatar-shape class="demo-section"></pdx-demo-comp-avatar-shape>
+    <app-demo-comp-avatar-shape class="demo-section"></app-demo-comp-avatar-shape>
 
     <!-- ═══ Group / Stack ═══ -->
-    <pdx-demo-comp-avatar-group class="demo-section"></pdx-demo-comp-avatar-group>
+    <app-demo-comp-avatar-group class="demo-section"></app-demo-comp-avatar-group>
 
     <!-- ═══ With Status ═══ -->
-    <pdx-demo-comp-avatar-status-dot class="demo-section"></pdx-demo-comp-avatar-status-dot>
+    <app-demo-comp-avatar-status-dot class="demo-section"></app-demo-comp-avatar-status-dot>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-avatar-composition class="demo-section"></pdx-demo-comp-avatar-composition>
+    <app-demo-comp-avatar-composition class="demo-section"></app-demo-comp-avatar-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

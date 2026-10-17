@@ -12,11 +12,11 @@ import { pickLocale } from './locale';
  */
 const SCREENS = [
     { path: '/', description: 'main h1 + p' },
-    { path: '/tickets', description: 'main pdx-list-header + p' },
+    { path: '/tickets', description: 'main app-list-header + p' },
     { path: '/board', description: 'main h1 + p' },
-    { path: '/customers', description: 'main pdx-list-header + p' },
+    { path: '/customers', description: 'main app-list-header + p' },
     { path: '/customers/import', description: 'main h1 + p' },
-    { path: '/employees', description: 'main pdx-list-header + p' },
+    { path: '/employees', description: 'main app-list-header + p' },
     { path: '/tickets/1', description: 'main h1 + p' },
     { path: '/tickets/1', description: '[data-test="attachments"] h2 + p' },
     { path: '/tickets/1/interventions/2', description: '[data-test="intervention"] h2 + p' },

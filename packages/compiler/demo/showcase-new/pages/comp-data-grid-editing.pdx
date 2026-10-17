@@ -7,16 +7,16 @@
     </p>
 
     <!-- Cell Edit -->
-    <pdx-demo-comp-data-grid-editing-cell-edit class="demo-section"></pdx-demo-comp-data-grid-editing-cell-edit>
+    <app-demo-comp-data-grid-editing-cell-edit class="demo-section"></app-demo-comp-data-grid-editing-cell-edit>
 
     <!-- Row Edit -->
-    <pdx-demo-comp-data-grid-editing-row-edit class="demo-section"></pdx-demo-comp-data-grid-editing-row-edit>
+    <app-demo-comp-data-grid-editing-row-edit class="demo-section"></app-demo-comp-data-grid-editing-row-edit>
 
     <!-- Dialog Edit -->
-    <pdx-demo-comp-data-grid-editing-dialog-edit class="demo-section"></pdx-demo-comp-data-grid-editing-dialog-edit>
+    <app-demo-comp-data-grid-editing-dialog-edit class="demo-section"></app-demo-comp-data-grid-editing-dialog-edit>
 
     <!-- Batch Edit -->
-    <pdx-demo-comp-data-grid-editing-batch-edit class="demo-section"></pdx-demo-comp-data-grid-editing-batch-edit>
+    <app-demo-comp-data-grid-editing-batch-edit class="demo-section"></app-demo-comp-data-grid-editing-batch-edit>
 
     <!-- Reference -->
     <section>

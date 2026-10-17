@@ -14,6 +14,9 @@ import type { ValidationWarning } from './validate';
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
 import { routeParams } from '../text-scan';
+import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './tag-prefix';
+
+export { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX };
 
 // ─── Template-literal escaping ─────────────────────────────────────
 
@@ -45,9 +48,9 @@ export function escapeForReactiveTemplate(s: string): string {
 
 // ─── Tag derivation ────────────────────────────────────────────────
 
-/** Extract component tag from filename: "counter.pdx" → "pdx-counter" */
-export function extractTag(filename: string): string {
-    return deriveTag(filename);
+/** Extract component tag from filename: "counter.pdx" → "app-counter" */
+export function extractTag(filename: string, prefix: string = DEFAULT_TAG_PREFIX): string {
+    return deriveTag(filename, prefix);
 }
 
 /**
@@ -56,13 +59,16 @@ export function extractTag(filename: string): string {
  * If two files collide (e.g. admin/button.pdx vs settings/button.pdx),
  * the dev resolves it with `@tag` — the compiler warns on collision.
  *
- * - `counter.pdx` → `pdx-counter`
- * - `pages/counter.pdx` → `pdx-counter`
- * - `_layout.pdx` → `pdx-layout` (strip leading _)
- * - `admin/_layout.pdx` → `pdx-admin-layout` (special files keep one parent for uniqueness)
- * - `App.pdx` → `pdx-app` (lowercased: an element name cannot hold an uppercase letter)
+ * - `counter.pdx` → `app-counter`
+ * - `pages/counter.pdx` → `app-counter`
+ * - `_layout.pdx` → `app-layout` (strip leading _)
+ * - `admin/_layout.pdx` → `app-admin-layout` (special files keep one parent for uniqueness)
+ * - `App.pdx` → `app-app` (lowercased: an element name cannot hold an uppercase letter)
+ * - `pdx-code.pdx` → `app-code` (the reserved prefix is dropped, not kept)
+ *
+ * `prefix` is `pdx({ prefix })`, `app` by default (#136).
  */
-export function deriveTag(filename: string): string {
+export function deriveTag(filename: string, prefix: string = DEFAULT_TAG_PREFIX): string {
     const normalized = filename.replace(/\\/g, '/');
     const parts = normalized.split('/');
     // Lowercased: a custom element name may not contain an uppercase letter, and `App.pdx` compiled
@@ -75,12 +81,15 @@ export function deriveTag(filename: string): string {
         const suffix = baseName.slice(1);
         const parent = parts.length > 0 ? parts[parts.length - 1].toLowerCase() : '';
         if (parent && parent !== 'src' && parent !== 'pages' && parent !== 'routes' && parent !== 'components') {
-            return `pdx-${parent}-${suffix}`;
+            return `${prefix}-${parent}-${suffix}`;
         }
-        return `pdx-${suffix}`;
+        return `${prefix}-${suffix}`;
     }
 
-    return baseName.startsWith('pdx-') ? baseName : `pdx-${baseName}`;
+    // A file already named with the prefix keeps its name; one named with the reserved prefix drops it.
+    if (baseName.startsWith(`${prefix}-`)) return baseName;
+    const name = baseName.startsWith(RESERVED_TAG_PREFIX) ? baseName.slice(RESERVED_TAG_PREFIX.length) : baseName;
+    return `${prefix}-${name}`;
 }
 
 /**
@@ -90,8 +99,10 @@ export function deriveTag(filename: string): string {
  * `layouts` is the field it reads. Resolving here bridges the two, and it is done at build time so
  * the runtime keeps exactly one notion of a layout.
  *
- *     @layout 'admin'  →  pdx-admin-layout   (admin/_layout.pdx), preferred
- *                      →  pdx-admin         (admin.pdx), when the first is not a known tag
+ *     @layout 'admin'  →  app-admin-layout   (admin/_layout.pdx), preferred
+ *                      →  app-admin         (admin.pdx), when the first is not a known tag
+ *
+ * with the app's tag prefix (`pdx({ prefix })`, #136).
  *
  * The first is what `deriveTag` gives a layout file, so the directory convention works with no
  * further ceremony. The second is what lets a shell be an ordinary component with a slot, which is
@@ -104,12 +115,12 @@ export function deriveTag(filename: string): string {
  * what nested routes already compose (`hasOutlet`). `layouts` stays an array because
  * that is what the outlet diffs, and a hand-written route table may still pass several.
  */
-export function layoutChain(name: string | undefined, knows?: (tag: string) => boolean): string[] {
+export function layoutChain(name: string | undefined, knows?: (tag: string) => boolean, prefix: string = DEFAULT_TAG_PREFIX): string[] {
     if (!name) return [];
     const slug = name.trim().replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
     if (!slug) return [];
-    const fromLayoutFile = `pdx-${slug}-layout`;
-    if (knows && !knows(fromLayoutFile) && knows(`pdx-${slug}`)) return [`pdx-${slug}`];
+    const fromLayoutFile = `${prefix}-${slug}-layout`;
+    if (knows && !knows(fromLayoutFile) && knows(`${prefix}-${slug}`)) return [`${prefix}-${slug}`];
     return [fromLayoutFile];
 }
 
@@ -234,6 +245,8 @@ export function assembleModule(
     parts: readonly string[] = [],
     /** The descriptor's `models: { … }` from `@model` (#124), already built; '' for none. */
     modelsCode = '',
+    /** The app's tag prefix (#136), for the layout tag `@layout` names. */
+    tagPrefix: string = DEFAULT_TAG_PREFIX,
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -295,7 +308,7 @@ export function assembleModule(
     // The layout's module, imported like any component the template uses: without it the tag
     // resolves to nothing, `document.createElement` returns an unupgraded element, and the page
     // renders inside an empty box with nothing reporting it.
-    const layoutTags = layoutChain(route?.layout, importPathOf ? (t) => importPathOf(t) !== null : undefined);
+    const layoutTags = layoutChain(route?.layout, importPathOf ? (t) => importPathOf(t) !== null : undefined, tagPrefix);
     const layoutImports = importPathOf
         ? layoutTags.map((t) => importPathOf(t)).filter((path): path is string => path !== null)
         : [];

@@ -8,25 +8,25 @@
     </p>
 
     <!-- ═══ 1. Basic ═══ -->
-    <pdx-demo-comp-cascader-basic class="demo-section"></pdx-demo-comp-cascader-basic>
+    <app-demo-comp-cascader-basic class="demo-section"></app-demo-comp-cascader-basic>
 
     <!-- ═══ 2. Pre-selected ═══ -->
-    <pdx-demo-comp-cascader-preselected class="demo-section"></pdx-demo-comp-cascader-preselected>
+    <app-demo-comp-cascader-preselected class="demo-section"></app-demo-comp-cascader-preselected>
 
     <!-- ═══ 3. Searchable ═══ -->
-    <pdx-demo-comp-cascader-searchable class="demo-section"></pdx-demo-comp-cascader-searchable>
+    <app-demo-comp-cascader-searchable class="demo-section"></app-demo-comp-cascader-searchable>
 
     <!-- ═══ 4. Change on select ═══ -->
-    <pdx-demo-comp-cascader-change-on-select class="demo-section"></pdx-demo-comp-cascader-change-on-select>
+    <app-demo-comp-cascader-change-on-select class="demo-section"></app-demo-comp-cascader-change-on-select>
 
     <!-- ═══ 5. Disabled items ═══ -->
-    <pdx-demo-comp-cascader-disabled class="demo-section"></pdx-demo-comp-cascader-disabled>
+    <app-demo-comp-cascader-disabled class="demo-section"></app-demo-comp-cascader-disabled>
 
     <!-- ═══ Lazy loading ═══ -->
-    <pdx-demo-comp-cascader-lazy class="demo-section"></pdx-demo-comp-cascader-lazy>
+    <app-demo-comp-cascader-lazy class="demo-section"></app-demo-comp-cascader-lazy>
 
     <!-- ═══ 6. Custom separator ═══ -->
-    <pdx-demo-comp-cascader-separator class="demo-section"></pdx-demo-comp-cascader-separator>
+    <app-demo-comp-cascader-separator class="demo-section"></app-demo-comp-cascader-separator>
 
     <!-- ═══ Slots ═══ -->
     <section>

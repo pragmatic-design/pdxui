@@ -9,10 +9,10 @@
     </p>
 
     <!-- ═══ Full CRUD ═══ -->
-    <pdx-demo-comp-entity-grid-full-crud class="demo-section"></pdx-demo-comp-entity-grid-full-crud>
+    <app-demo-comp-entity-grid-full-crud class="demo-section"></app-demo-comp-entity-grid-full-crud>
 
     <!-- ═══ Read-only ═══ -->
-    <pdx-demo-comp-entity-grid-read-only class="demo-section"></pdx-demo-comp-entity-grid-read-only>
+    <app-demo-comp-entity-grid-read-only class="demo-section"></app-demo-comp-entity-grid-read-only>
 
     <!-- ═══ Props ═══ -->
     <section>

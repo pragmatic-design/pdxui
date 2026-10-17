@@ -27,7 +27,7 @@ const bpOrder: Breakpoint[] = ['2xl', 'xl', 'lg', 'md', 'sm'];
  *
  * Usage:
  *   const cols = responsive({ sm: 1, md: 2, lg: 3, xl: 4 });
- *   html`<pdx-grid :cols=${cols}>...</pdx-grid>`
+ *   html`<app-grid :cols=${cols}>...</app-grid>`
  *
  * @param map - Breakpoint → value mapping
  * @param base - Fallback value when no breakpoint matches (below smallest defined)

@@ -34,7 +34,7 @@ const form = tryUseForm();
 const PROBE = `<template>
 <pdx-form :form="f">
   <pdx-input class="here" name="here"></pdx-input>
-  <pdx-probe-section></pdx-probe-section>
+  <app-probe-section></app-probe-section>
 </pdx-form>
 </template>
 <script setup>
@@ -56,7 +56,7 @@ function type(el: Element, value: string): void {
 
 describe('a form section in its own component, compiled and mounted', () => {
     it('the recipe\'s probe: typed into both, the form holds both — { here: "A", deep: "A" }', async () => {
-        document.body.appendChild(document.createElement('pdx-probe-owner'));
+        document.body.appendChild(document.createElement('app-probe-owner'));
         await tick(50);
         const form = (window as unknown as { __probeForm: { getValues(): Record<string, unknown> } }).__probeForm;
 
@@ -70,7 +70,7 @@ describe('a form section in its own component, compiled and mounted', () => {
     it('control — the section rendered outside any form mounts, and a keystroke throws nothing', async () => {
         const errors: unknown[] = [];
         const off = core.onGlobalError((err) => { errors.push(err); return true; });
-        document.body.appendChild(document.createElement('pdx-probe-section'));
+        document.body.appendChild(document.createElement('app-probe-section'));
         await tick(50);
         expect(() => type(document.querySelector('pdx-input.deep')!, 'A')).not.toThrow();
         await tick();

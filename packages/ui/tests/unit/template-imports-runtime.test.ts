@@ -35,7 +35,7 @@ afterEach(() => {
 });
 
 async function mount(): Promise<HTMLElement> {
-    const el = document.createElement('pdx-imp-switch');
+    const el = document.createElement('app-imp-switch');
     document.body.appendChild(el);
     await tick();
     return el;

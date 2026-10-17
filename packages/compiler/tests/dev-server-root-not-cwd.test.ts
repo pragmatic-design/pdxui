@@ -27,7 +27,7 @@ beforeAll(async () => {
     writeFileSync(join(root, 'src', 'main.js'), "import './app.pdx';\n");
     // A component that exists when the server starts, and a page that uses its tag without importing it.
     writeFileSync(join(root, 'src', 'root-card.pdx'), '<template>\n  <em>a card</em>\n</template>\n');
-    writeFileSync(join(root, 'src', 'app.pdx'), '<template>\n  <pdx-root-card></pdx-root-card>\n</template>\n');
+    writeFileSync(join(root, 'src', 'app.pdx'), '<template>\n  <app-root-card></app-root-card>\n</template>\n');
     // A template in its own file, inside the root.
     writeFileSync(join(root, 'src', 'framed.pdx'), '<template src="./framed.html"></template>\n');
     writeFileSync(join(root, 'src', 'framed.html'), '<section>framed by an external template</section>\n');
@@ -70,7 +70,7 @@ describe('a dev server whose root is not the cwd', () => {
 
     it('auto-imports a component that existed when the server started', async () => {
         const out = await server.transformRequest('/src/app.pdx');
-        expect(out?.code ?? '', 'the page uses <pdx-root-card> and does not import it').toMatch(/import ["'][^"']*\/root-card\.pdx(\?[^"']*)?["']/);
+        expect(out?.code ?? '', 'the page uses <app-root-card> and does not import it').toMatch(/import ["'][^"']*\/root-card\.pdx(\?[^"']*)?["']/);
     });
 
     it('reads a <template src> that lies inside the root', async () => {

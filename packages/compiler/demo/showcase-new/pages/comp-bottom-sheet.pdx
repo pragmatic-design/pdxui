@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-bottom-sheet-basic class="demo-section"></pdx-demo-comp-bottom-sheet-basic>
+    <app-demo-comp-bottom-sheet-basic class="demo-section"></app-demo-comp-bottom-sheet-basic>
 
     <!-- ═══ Three Detents ═══ -->
-    <pdx-demo-comp-bottom-sheet-detents class="demo-section"></pdx-demo-comp-bottom-sheet-detents>
+    <app-demo-comp-bottom-sheet-detents class="demo-section"></app-demo-comp-bottom-sheet-detents>
 
     <!-- ═══ Scrollable Content ═══ -->
-    <pdx-demo-comp-bottom-sheet-scrollable class="demo-section"></pdx-demo-comp-bottom-sheet-scrollable>
+    <app-demo-comp-bottom-sheet-scrollable class="demo-section"></app-demo-comp-bottom-sheet-scrollable>
 
     <!-- ═══ With Close Button ═══ -->
-    <pdx-demo-comp-bottom-sheet-close-button class="demo-section"></pdx-demo-comp-bottom-sheet-close-button>
+    <app-demo-comp-bottom-sheet-close-button class="demo-section"></app-demo-comp-bottom-sheet-close-button>
 
     <!-- ═══ No Handle ═══ -->
-    <pdx-demo-comp-bottom-sheet-no-handle class="demo-section"></pdx-demo-comp-bottom-sheet-no-handle>
+    <app-demo-comp-bottom-sheet-no-handle class="demo-section"></app-demo-comp-bottom-sheet-no-handle>
 
     <!-- ═══ Action Sheet ═══ -->
-    <pdx-demo-comp-bottom-sheet-action-sheet class="demo-section"></pdx-demo-comp-bottom-sheet-action-sheet>
+    <app-demo-comp-bottom-sheet-action-sheet class="demo-section"></app-demo-comp-bottom-sheet-action-sheet>
 
     <!-- ═══ Nested with Dialog ═══ -->
-    <pdx-demo-comp-bottom-sheet-stacking class="demo-section"></pdx-demo-comp-bottom-sheet-stacking>
+    <app-demo-comp-bottom-sheet-stacking class="demo-section"></app-demo-comp-bottom-sheet-stacking>
 
     <!-- ═══ Props Reference ═══ -->
     <section>

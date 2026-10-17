@@ -7,22 +7,22 @@
     </p>
 
     <!-- ═══ Text Input ═══ -->
-    <pdx-demo-design-inputs-text class="demo-section"></pdx-demo-design-inputs-text>
+    <app-demo-design-inputs-text class="demo-section"></app-demo-design-inputs-text>
 
     <!-- ═══ Input Types ═══ -->
-    <pdx-demo-design-inputs-types class="demo-section"></pdx-demo-design-inputs-types>
+    <app-demo-design-inputs-types class="demo-section"></app-demo-design-inputs-types>
 
     <!-- ═══ Select ═══ -->
-    <pdx-demo-design-inputs-select class="demo-section"></pdx-demo-design-inputs-select>
+    <app-demo-design-inputs-select class="demo-section"></app-demo-design-inputs-select>
 
     <!-- ═══ Textarea ═══ -->
-    <pdx-demo-design-inputs-textarea class="demo-section"></pdx-demo-design-inputs-textarea>
+    <app-demo-design-inputs-textarea class="demo-section"></app-demo-design-inputs-textarea>
 
     <!-- ═══ Input Groups ═══ -->
-    <pdx-demo-design-inputs-groups class="demo-section"></pdx-demo-design-inputs-groups>
+    <app-demo-design-inputs-groups class="demo-section"></app-demo-design-inputs-groups>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-inputs-composition class="demo-section"></pdx-demo-design-inputs-composition>
+    <app-demo-design-inputs-composition class="demo-section"></app-demo-design-inputs-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

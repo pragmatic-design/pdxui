@@ -6,15 +6,15 @@
       4 directions, 4 layout types, tooltips, mask, hover trigger.
     </p>
 
-    <pdx-demo-comp-fab-basic class="demo-section"></pdx-demo-comp-fab-basic>
+    <app-demo-comp-fab-basic class="demo-section"></app-demo-comp-fab-basic>
 
-    <pdx-demo-comp-fab-speed-dial class="demo-section"></pdx-demo-comp-fab-speed-dial>
+    <app-demo-comp-fab-speed-dial class="demo-section"></app-demo-comp-fab-speed-dial>
 
-    <pdx-demo-comp-fab-circular class="demo-section"></pdx-demo-comp-fab-circular>
+    <app-demo-comp-fab-circular class="demo-section"></app-demo-comp-fab-circular>
 
-    <pdx-demo-comp-fab-mask-overlay class="demo-section"></pdx-demo-comp-fab-mask-overlay>
+    <app-demo-comp-fab-mask-overlay class="demo-section"></app-demo-comp-fab-mask-overlay>
 
-    <pdx-demo-comp-fab-variants-sizes class="demo-section"></pdx-demo-comp-fab-variants-sizes>
+    <app-demo-comp-fab-variants-sizes class="demo-section"></app-demo-comp-fab-variants-sizes>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

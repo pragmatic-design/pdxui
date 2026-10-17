@@ -68,7 +68,7 @@ test('the landing page states the alpha status in text a screen reader reaches',
 
 test('the landing install matches the quick start: runtime, compiler and the CLI', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    const install = page.locator('.cta pdx-code');
+    const install = page.locator('.cta app-code');
     await expect(install).toContainText('@pdxui/core @pdxui/compiler');
     await expect(install).toContainText('-D @pdxui/cli');
 });

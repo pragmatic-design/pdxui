@@ -7,40 +7,40 @@
     </p>
 
     <!-- ═══ pdx-stack ═══ -->
-    <pdx-demo-design-layout-stack class="demo-section"></pdx-demo-design-layout-stack>
+    <app-demo-design-layout-stack class="demo-section"></app-demo-design-layout-stack>
 
     <!-- ═══ pdx-row ═══ -->
-    <pdx-demo-design-layout-row class="demo-section"></pdx-demo-design-layout-row>
+    <app-demo-design-layout-row class="demo-section"></app-demo-design-layout-row>
 
     <!-- ═══ pdx-spacer ═══ -->
-    <pdx-demo-design-layout-spacer class="demo-section"></pdx-demo-design-layout-spacer>
+    <app-demo-design-layout-spacer class="demo-section"></app-demo-design-layout-spacer>
 
     <!-- ═══ pdx-divider ═══ -->
-    <pdx-demo-design-layout-divider class="demo-section"></pdx-demo-design-layout-divider>
+    <app-demo-design-layout-divider class="demo-section"></app-demo-design-layout-divider>
 
     <!-- ═══ pdx-grid ═══ -->
-    <pdx-demo-design-layout-grid class="demo-section"></pdx-demo-design-layout-grid>
+    <app-demo-design-layout-grid class="demo-section"></app-demo-design-layout-grid>
 
     <!-- ═══ pdx-split ═══ -->
-    <pdx-demo-design-layout-split class="demo-section"></pdx-demo-design-layout-split>
+    <app-demo-design-layout-split class="demo-section"></app-demo-design-layout-split>
 
     <!-- ═══ pdx-center ═══ -->
-    <pdx-demo-design-layout-center class="demo-section"></pdx-demo-design-layout-center>
+    <app-demo-design-layout-center class="demo-section"></app-demo-design-layout-center>
 
     <!-- ═══ pdx-container ═══ -->
-    <pdx-demo-design-layout-container class="demo-section"></pdx-demo-design-layout-container>
+    <app-demo-design-layout-container class="demo-section"></app-demo-design-layout-container>
 
     <!-- ═══ pdx-cluster ═══ -->
-    <pdx-demo-design-layout-cluster class="demo-section"></pdx-demo-design-layout-cluster>
+    <app-demo-design-layout-cluster class="demo-section"></app-demo-design-layout-cluster>
 
     <!-- ═══ Gap & Pad Scale ═══ -->
-    <pdx-demo-design-layout-scale class="demo-section"></pdx-demo-design-layout-scale>
+    <app-demo-design-layout-scale class="demo-section"></app-demo-design-layout-scale>
 
     <!-- ═══ Responsive Behavior ═══ -->
-    <pdx-demo-design-layout-responsive class="demo-section"></pdx-demo-design-layout-responsive>
+    <app-demo-design-layout-responsive class="demo-section"></app-demo-design-layout-responsive>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-layout-composition class="demo-section"></pdx-demo-design-layout-composition>
+    <app-demo-design-layout-composition class="demo-section"></app-demo-design-layout-composition>
 
     <!-- ═══ Reference Table ═══ -->
     <section>

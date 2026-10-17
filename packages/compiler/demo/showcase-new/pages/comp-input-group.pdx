@@ -7,22 +7,22 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-input-group-basic class="demo-section"></pdx-demo-comp-input-group-basic>
+    <app-demo-comp-input-group-basic class="demo-section"></app-demo-comp-input-group-basic>
 
     <!-- ═══ With Addons ═══ -->
-    <pdx-demo-comp-input-group-with-addons class="demo-section"></pdx-demo-comp-input-group-with-addons>
+    <app-demo-comp-input-group-with-addons class="demo-section"></app-demo-comp-input-group-with-addons>
 
     <!-- ═══ Size Propagation ═══ -->
-    <pdx-demo-comp-input-group-size-propagation class="demo-section"></pdx-demo-comp-input-group-size-propagation>
+    <app-demo-comp-input-group-size-propagation class="demo-section"></app-demo-comp-input-group-size-propagation>
 
     <!-- ═══ Multiple Buttons ═══ -->
-    <pdx-demo-comp-input-group-multiple-buttons class="demo-section"></pdx-demo-comp-input-group-multiple-buttons>
+    <app-demo-comp-input-group-multiple-buttons class="demo-section"></app-demo-comp-input-group-multiple-buttons>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-input-group-disabled class="demo-section"></pdx-demo-comp-input-group-disabled>
+    <app-demo-comp-input-group-disabled class="demo-section"></app-demo-comp-input-group-disabled>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-input-group-composition class="demo-section"></pdx-demo-comp-input-group-composition>
+    <app-demo-comp-input-group-composition class="demo-section"></app-demo-comp-input-group-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

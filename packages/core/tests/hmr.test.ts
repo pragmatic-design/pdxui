@@ -10,7 +10,7 @@ import { compile } from '../../compiler/src/plugin';
 
 // Generate unique tags per test to avoid CE registry collisions
 let tagCounter = 0;
-function uniqueTag() { return `pdx-hmr-test-${++tagCounter}`; }
+function uniqueTag() { return `app-hmr-test-${++tagCounter}`; }
 
 describe('HMR state save/restore', () => {
     beforeEach(() => { document.body.innerHTML = ''; });
@@ -245,7 +245,7 @@ describe('HMR of a .pdx the dev server compiled (the inline path, #107)', () => 
         const v1 = load('<p class="v1">{{ count }}</p><button @click="count++">+</button>');
         expect(v1, 'the dev compile is not the inline path: this case measures nothing new').not.toMatch(/\bhtml`/);
 
-        const el = document.createElement('pdx-hmr-inline');
+        const el = document.createElement('app-hmr-inline');
         document.body.appendChild(el);
         await settle();
         for (let i = 0; i < 3; i++) el.querySelector('button')!.click();
@@ -254,10 +254,10 @@ describe('HMR of a .pdx the dev server compiled (the inline path, #107)', () => 
 
         // The edit: the module is evaluated again, then accept() runs the four steps.
         load('<p class="v2">Count: {{ count }}</p><button @click="count++">+</button>');
-        __pdx_hmr_save('pdx-hmr-inline');
-        __pdx_hmr_swap('pdx-hmr-inline');
-        __pdx_hmr_rerender('pdx-hmr-inline');
-        __pdx_hmr_restore('pdx-hmr-inline');
+        __pdx_hmr_save('app-hmr-inline');
+        __pdx_hmr_swap('app-hmr-inline');
+        __pdx_hmr_rerender('app-hmr-inline');
+        __pdx_hmr_restore('app-hmr-inline');
         await settle();
 
         expect(el.querySelector('.v1'), 'the old template is still on screen').toBeNull();

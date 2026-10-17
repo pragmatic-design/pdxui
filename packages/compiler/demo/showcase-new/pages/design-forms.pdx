@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Checkbox ═══ -->
-    <pdx-demo-design-forms-checkbox class="demo-section"></pdx-demo-design-forms-checkbox>
+    <app-demo-design-forms-checkbox class="demo-section"></app-demo-design-forms-checkbox>
 
     <!-- ═══ Radio ═══ -->
-    <pdx-demo-design-forms-radio class="demo-section"></pdx-demo-design-forms-radio>
+    <app-demo-design-forms-radio class="demo-section"></app-demo-design-forms-radio>
 
     <!-- ═══ Toggle ═══ -->
-    <pdx-demo-design-forms-switch class="demo-section"></pdx-demo-design-forms-switch>
+    <app-demo-design-forms-switch class="demo-section"></app-demo-design-forms-switch>
 
     <!-- ═══ Range ═══ -->
-    <pdx-demo-design-forms-range class="demo-section"></pdx-demo-design-forms-range>
+    <app-demo-design-forms-range class="demo-section"></app-demo-design-forms-range>
 
     <!-- ═══ Field Wrapper ═══ -->
-    <pdx-demo-design-forms-field class="demo-section"></pdx-demo-design-forms-field>
+    <app-demo-design-forms-field class="demo-section"></app-demo-design-forms-field>
 
     <!-- ═══ Fieldset ═══ -->
-    <pdx-demo-design-forms-fieldset class="demo-section"></pdx-demo-design-forms-fieldset>
+    <app-demo-design-forms-fieldset class="demo-section"></app-demo-design-forms-fieldset>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-forms-composition class="demo-section"></pdx-demo-design-forms-composition>
+    <app-demo-design-forms-composition class="demo-section"></app-demo-design-forms-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

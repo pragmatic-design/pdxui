@@ -38,7 +38,9 @@ one with `defineProps`/`defineEmits`/a top-level `return {}` — but write `<scr
 files. `<style scoped>` is scoped by the compiler through a `data-pdx-*` attribute; components render
 in the light DOM, unless the template is `<template shadow>`, which renders into a shadow root.
 
-**The tag comes from the filename**: `src/job-list.pdx` → `<pdx-job-list>`. Override with `@tag`.
+**The tag comes from the filename**, behind the app prefix (`app`, or `pdx({ prefix })`):
+`src/job-list.pdx` → `<app-job-list>`. Override with `@tag 'app-…'`. Never `@tag 'pdx-…'`: that
+prefix is the library's, and the compiler rejects it (`PDX_TAG_RESERVED`).
 A `<script setup>` compiles the same way whatever it holds: one with no rune — only imports, consts,
 functions and an `onMount` — still returns what it declares to the template, and an empty one still
 registers the component.
@@ -320,7 +322,7 @@ export default { plugins: [pdx()] };
 <html pdx-theme="default" pdx-scheme="light">
   <head><meta charset="utf-8"><title>…</title></head>
   <body>
-    <pdx-app-shell></pdx-app-shell>
+    <app-app-shell></app-app-shell>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

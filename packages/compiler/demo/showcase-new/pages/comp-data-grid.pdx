@@ -7,19 +7,19 @@
       Built on <code>useDataGrid()</code> headless composable + <code>DataSource</code>.
     </p>
 
-    <pdx-demo-comp-data-grid-basic class="demo-section"></pdx-demo-comp-data-grid-basic>
+    <app-demo-comp-data-grid-basic class="demo-section"></app-demo-comp-data-grid-basic>
 
-    <pdx-demo-comp-data-grid-typed class="demo-section"></pdx-demo-comp-data-grid-typed>
+    <app-demo-comp-data-grid-typed class="demo-section"></app-demo-comp-data-grid-typed>
 
-    <pdx-demo-comp-data-grid-paginated class="demo-section"></pdx-demo-comp-data-grid-paginated>
+    <app-demo-comp-data-grid-paginated class="demo-section"></app-demo-comp-data-grid-paginated>
 
-    <pdx-demo-comp-data-grid-slot-templates class="demo-section"></pdx-demo-comp-data-grid-slot-templates>
+    <app-demo-comp-data-grid-slot-templates class="demo-section"></app-demo-comp-data-grid-slot-templates>
 
-    <pdx-demo-comp-data-grid-compact class="demo-section"></pdx-demo-comp-data-grid-compact>
+    <app-demo-comp-data-grid-compact class="demo-section"></app-demo-comp-data-grid-compact>
 
-    <pdx-demo-comp-data-grid-empty class="demo-section"></pdx-demo-comp-data-grid-empty>
+    <app-demo-comp-data-grid-empty class="demo-section"></app-demo-comp-data-grid-empty>
 
-    <pdx-demo-comp-data-grid-keyboard class="demo-section"></pdx-demo-comp-data-grid-keyboard>
+    <app-demo-comp-data-grid-keyboard class="demo-section"></app-demo-comp-data-grid-keyboard>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>
@@ -86,7 +86,7 @@
       </div>
     </section>
 
-    <pdx-demo-comp-data-grid-column-definition class="demo-section"></pdx-demo-comp-data-grid-column-definition>
+    <app-demo-comp-data-grid-column-definition class="demo-section"></app-demo-comp-data-grid-column-definition>
   </div>
 </template>
 

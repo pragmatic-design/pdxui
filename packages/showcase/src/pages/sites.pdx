@@ -1,7 +1,7 @@
 <template>
   <section class="page" data-test="sites">
     <!-- The list's header, the tickets': views of this list's own. -->
-    <pdx-list-header
+    <app-list-header
       :title="$t('sites.title')"
       store-key="sites"
       :default-name="$t('sites.views.default')"
@@ -10,7 +10,7 @@
       :base-page-size="20">
       <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('sites.matching', { count: total }) }}</span>
       <pdx-button variant="primary" @click="creating.open.set(true)" data-test="new">{{ $t('sites.new') }}</pdx-button>
-    </pdx-list-header>
+    </app-list-header>
     <p class="pdx-txt-small pdx-ink-muted">{{ $t('sites.intro') }}</p>
 
     <!-- A row is the way into the site, a page with its sections. No selection and no

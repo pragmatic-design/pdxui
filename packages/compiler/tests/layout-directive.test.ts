@@ -12,8 +12,8 @@
 //
 // The rule, in one place (`layoutChain` in codegen-shared.ts):
 //
-//     @layout 'admin'  →  pdx-admin-layout   (admin/_layout.pdx), preferred
-//                      →  pdx-admin          (admin.pdx), when the first is not a known tag
+//     @layout 'admin'  →  app-admin-layout   (admin/_layout.pdx), preferred
+//                      →  app-admin          (admin.pdx), when the first is not a known tag
 //
 // The second form is what makes a layout writable as an ordinary component with a slot, which is
 // what an app shell is. Knowing which of the two exists needs the resolver, so a compilation
@@ -36,7 +36,7 @@ describe('@layout resolves to the chain the outlet reads', () => {
     it('emits the layout tag as the route chain', () => {
         const { code } = compile(PAGE, 'pages/users.pdx');
         expect(code, 'the page registered no layout chain, so the outlet builds no shell')
-            .toContain('layouts:["pdx-admin-layout"]');
+            .toContain('layouts:["app-admin-layout"]');
     });
 
     it('does not emit the name, which nothing reads', () => {
@@ -48,14 +48,14 @@ describe('@layout resolves to the chain the outlet reads', () => {
     it('falls back to the plain component tag when no layout file claims the name', () => {
         // A shell written as an ordinary component: `shell.pdx`, a slot and some chrome.
         const { code } = compile(PAGE.replace("'admin'", "'shell'"), 'pages/users.pdx',
-            undefined, undefined, knowing({ 'pdx-shell': './shell.pdx' }));
-        expect(code).toContain('layouts:["pdx-shell"]');
+            undefined, undefined, knowing({ 'app-shell': './shell.pdx' }));
+        expect(code).toContain('layouts:["app-shell"]');
     });
 
     it('prefers the layout file when both exist', () => {
         const { code } = compile(PAGE, 'pages/users.pdx', undefined, undefined,
-            knowing({ 'pdx-admin-layout': './admin/_layout.pdx', 'pdx-admin': './admin.pdx' }));
-        expect(code).toContain('layouts:["pdx-admin-layout"]');
+            knowing({ 'app-admin-layout': './admin/_layout.pdx', 'app-admin': './admin.pdx' }));
+        expect(code).toContain('layouts:["app-admin-layout"]');
     });
 
     it('imports the layout module, so the element upgrades', () => {
@@ -63,7 +63,7 @@ describe('@layout resolves to the chain the outlet reads', () => {
         // unupgraded element, the page renders inside an empty box and nothing reports it. The same
         // mechanism `@defer` uses for the components in its body.
         const { code } = compile(PAGE, 'pages/users.pdx', undefined, undefined,
-            knowing({ 'pdx-admin-layout': './admin/_layout.pdx' }));
+            knowing({ 'app-admin-layout': './admin/_layout.pdx' }));
         expect(code, 'the page does not load the layout it declares')
             .toContain("import './admin/_layout.pdx'");
     });
@@ -94,17 +94,17 @@ describe('and the same page in a production build', () => {
         mkdirSync(join(dir, 'src'), { recursive: true });
         writeFileSync(join(dir, 'src', 'users.pdx'), PAGE);
         routes = [];
-        scanForRoutes(join(dir, 'src'), routes, (tag) => tag === 'pdx-admin-layout');
+        scanForRoutes(join(dir, 'src'), routes, (tag) => tag === 'app-admin-layout');
     });
 
     afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
     it('is scanned with its layout chain', () => {
         expect(routes[0]?.layouts, 'the scanned table carries no shell, so a built app renders none')
-            .toEqual(['pdx-admin-layout']);
+            .toEqual(['app-admin-layout']);
     });
 
     it('compiles the chain into the route table', () => {
-        expect(generateRouteTable(routes)).toContain('layouts: ["pdx-admin-layout"]');
+        expect(generateRouteTable(routes)).toContain('layouts: ["app-admin-layout"]');
     });
 });

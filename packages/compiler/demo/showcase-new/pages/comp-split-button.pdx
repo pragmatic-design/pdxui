@@ -5,13 +5,13 @@
       <code>&lt;pdx-split-button&gt;</code> — primary action button with a dropdown arrow for secondary actions.
     </p>
 
-    <pdx-demo-comp-split-button-basic class="demo-section"></pdx-demo-comp-split-button-basic>
+    <app-demo-comp-split-button-basic class="demo-section"></app-demo-comp-split-button-basic>
 
-    <pdx-demo-comp-split-button-variants class="demo-section"></pdx-demo-comp-split-button-variants>
+    <app-demo-comp-split-button-variants class="demo-section"></app-demo-comp-split-button-variants>
 
-    <pdx-demo-comp-split-button-sizes class="demo-section"></pdx-demo-comp-split-button-sizes>
+    <app-demo-comp-split-button-sizes class="demo-section"></app-demo-comp-split-button-sizes>
 
-    <pdx-demo-comp-split-button-disabled class="demo-section"></pdx-demo-comp-split-button-disabled>
+    <app-demo-comp-split-button-disabled class="demo-section"></app-demo-comp-split-button-disabled>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

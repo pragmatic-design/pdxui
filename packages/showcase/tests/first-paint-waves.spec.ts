@@ -188,7 +188,7 @@ test('a cold first screen fetches its JavaScript in two waves, not three', async
     // The first screen is what the dashboard needed to begin mounting; its numbers are asked for
     // after. At CPU 4×: the condition a loaded gate is, and the one where a late mark reads 3 every
     // time.
-    const { waves, files, after } = await jsWaves(page, '/', 'pdx-dashboard', 4);
+    const { waves, files, after } = await jsWaves(page, '/', 'app-dashboard', 4);
     expect(files.length, 'no JavaScript was fetched — this test is measuring nothing')
         .toBeGreaterThan(3);
     expect(files.some((f) => /^dashboard-/.test(f)), 'the landing chunk is not among what the first screen fetched')
@@ -229,7 +229,7 @@ test('a cold load of a route that is not the landing one fetches in two waves, n
     // wave of its own — 3 on this counter. The chunk starts alongside the strings.
     // Counted up to the page's mount, as the first screen is: what the page defers until it is idle —
     // the create modal and the record drawer (#449) — is asked for after, on purpose.
-    const { waves, files, after } = await jsWaves(page, '/tickets', 'pdx-tickets');
+    const { waves, files, after } = await jsWaves(page, '/tickets', 'app-tickets');
     expect(files.some((f) => /^tickets-/.test(f)), 'the tickets chunk was not fetched — nothing is being measured')
         .toBe(true);
     expect(waves, `a cold /tickets costs ${waves} round-trips: ${files.join(', ')} (after the mount: ${after.join(', ')})`)
@@ -244,7 +244,7 @@ test('control — a route the visitor navigates to still fetches in one wave', a
     // the chunk on hover, and the outlet imports it on the click. If this ever needed a preload
     // too, the preload above would be hiding a regression rather than fixing anything.
     await page.goto('/');
-    const { waves, files } = await jsWaves(page, '/tickets', 'pdx-tickets');
+    const { waves, files } = await jsWaves(page, '/tickets', 'app-tickets');
     expect(files.length, 'the navigation fetched no JavaScript at all — nothing is being measured')
         .toBeGreaterThan(0);
     expect(waves, `${waves} round-trips for a navigation: ${files.join(', ')}`).toBeLessThanOrEqual(2);

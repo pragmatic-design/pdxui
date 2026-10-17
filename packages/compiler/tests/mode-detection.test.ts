@@ -64,7 +64,7 @@ onMount(() => reload());
 
     it('an empty setup block still registers the component', () => {
         const code = compile(`<template><p>hi</p></template>\n<script setup>\n\n</script>`, 'empty-setup.pdx').code;
-        expect(code).toContain("component('pdx-empty-setup'");
+        expect(code).toContain("component('app-empty-setup'");
     });
 
     it('control — a plain <script> with defineProps still compiles in the legacy mode', () => {

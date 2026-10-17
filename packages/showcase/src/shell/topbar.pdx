@@ -18,7 +18,7 @@
 
     <div class="bar-cluster" data-test="bar-cluster">
       <!-- The demo's knobs, out of the screens: the current screen's, in one panel. -->
-      <pdx-demo-panel></pdx-demo-panel>
+      <app-demo-panel></app-demo-panel>
       <!-- No guest controls: every route is behind the login, so the bar is only ever
            drawn for someone signed in. The language and the scheme live in the profile menu's
            Settings; the sign-in keeps its own language control. -->
@@ -39,7 +39,7 @@
       <span class="bar-divider" aria-hidden="true"></span>
 
       <!-- The person and their menu: `profile-menu.pdx`. -->
-      <pdx-profile-menu data-test="session"></pdx-profile-menu>
+      <app-profile-menu data-test="session"></app-profile-menu>
     </div>
   </header>
 </template>

@@ -30,7 +30,7 @@ function go(v) { $emit('chosen', v); }
 </script>`;
 
 const PARENT = `<template>
-<pdx-ev-child @picked="e => got = e.detail" @chosen="e => chose = e.detail"></pdx-ev-child>
+<app-ev-child @picked="e => got = e.detail" @chosen="e => chose = e.detail"></app-ev-child>
 <p class="got">{{ got }}</p>
 <p class="chose">{{ chose }}</p>
 </template>
@@ -46,7 +46,7 @@ beforeAll(() => {
 afterEach(() => cleanup());
 
 async function mountParent(): Promise<HTMLElement> {
-    const el = document.createElement('pdx-ev-parent');
+    const el = document.createElement('app-ev-parent');
     document.body.appendChild(el);
     await tick();
     return el;

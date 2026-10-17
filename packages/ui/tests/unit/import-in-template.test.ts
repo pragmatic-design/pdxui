@@ -32,7 +32,7 @@ async function mount(script: string, template: string): Promise<HTMLElement> {
         .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/g, 'const {$1} = __core;')
         .replace(/import\s*\{([^}]*)\}\s*from\s*'\.\/store';?/g, 'const {$1} = __store;');
     new Function('__core', '__store', body)(core, store);
-    const el = document.createElement(`pdx-${file.replace('.pdx', '')}`);
+    const el = document.createElement(`app-${file.replace('.pdx', '')}`);
     document.body.appendChild(el);
     await tick();
     return el;

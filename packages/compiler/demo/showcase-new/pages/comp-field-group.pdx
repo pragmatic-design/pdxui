@@ -9,13 +9,13 @@
     </p>
 
     <!-- ═══ Nested object ═══ -->
-    <pdx-demo-comp-field-group-nested-object class="demo-section"></pdx-demo-comp-field-group-nested-object>
+    <app-demo-comp-field-group-nested-object class="demo-section"></app-demo-comp-field-group-nested-object>
 
     <!-- ═══ Nesting ═══ -->
-    <pdx-demo-comp-field-group-groups-inside class="demo-section"></pdx-demo-comp-field-group-groups-inside>
+    <app-demo-comp-field-group-groups-inside class="demo-section"></app-demo-comp-field-group-groups-inside>
 
     <!-- ═══ Display modes ═══ -->
-    <pdx-demo-comp-field-group-display-modes class="demo-section"></pdx-demo-comp-field-group-display-modes>
+    <app-demo-comp-field-group-display-modes class="demo-section"></app-demo-comp-field-group-display-modes>
 
     <!-- ═══ Reference ═══ -->
     <section>

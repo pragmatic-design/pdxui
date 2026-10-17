@@ -536,16 +536,17 @@ alpha
 TagDecl ::= "@tag" S StringLiteral S? ";"?
 ```
 
-The analyzer's form: `@tag 'pdx-other-name';`
+The analyzer's form: `@tag 'app-other-name';`
 
 #### Semantics
 
 Registers the component under the given tag instead of the one derived from its file name
-([overview.md](overview.md#the-tag)): `component('pdx-other-name', …)`. The component resolver reads
+([overview.md](overview.md#the-tag)): `component('app-other-name', …)`. The component resolver reads
 the same line, so the tag is auto-imported where a template uses it.
 
 #### Rules
 
+- A tag that starts with `pdx-`, the `@pdxui/*` packages' prefix, raises `PDX_TAG_RESERVED` (#136).
 - An unquoted tag raises `PDX_UNKNOWN_DECLARATION`.
 - Two files that end up with one tag raise `PDX_TAG_COLLISION`.
 - That the string is a valid custom-element name (lowercase, with a hyphen) is not checked today:
@@ -559,13 +560,13 @@ the same line, so the tag is auto-imported where a template uses it.
 </template>
 
 <script setup>
-@tag 'pdx-legacy-card';
+@tag 'app-legacy-card';
 </script>
 ```
 
 #### Since
 
-alpha
+alpha; `pdx-` reserved since beta (#136)
 
 ### @mixin
 

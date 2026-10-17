@@ -798,14 +798,14 @@ The child calls it with its scope. `@slot(row)` takes no scope; `<slot>` without
 
 ```pdx
 <template>
-  <pdx-user-table>
+  <app-user-table>
     @slot(row, { user, index }) {
       <span>{{ index }}. {{ user.name }}</span>
     }
     <slot name="empty" let:query>
       <p>No user matches {{ query }}.</p>
     </slot>
-  </pdx-user-table>
+  </app-user-table>
 </template>
 
 <script setup>

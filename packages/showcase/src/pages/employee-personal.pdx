@@ -36,7 +36,7 @@
         <div class="tab-panel" data-tab-panel="personal">
           <!-- The identity group is a section of this form in its own component: the one
                group with a field that appears for a condition. -->
-          <pdx-identity :country="country"></pdx-identity>
+          <app-identity :country="country"></app-identity>
 
           <!-- An address is the reference's row of four under a full-width street. -->
           <fieldset class="group" data-test="group-residence">

@@ -20,12 +20,12 @@ are checked against the manifest above._
 ```html
 <pdx-provide name="greeting" :value="greetingMsg">
   <!-- all descendants can inject('greeting') -->
-  <pdx-my-widget />
+  <app-my-widget />
 </pdx-provide>
 ```
 
 ```js
-// In pdx-my-widget setup:
+// In app-my-widget setup:
 const greeting = useProvided('greeting');
 ```
 
@@ -34,7 +34,7 @@ const greeting = useProvided('greeting');
 ```html
 <pdx-provide :values="appConfig">
   <!-- inject('theme'), inject('locale'), inject('debug') -->
-  <pdx-dashboard />
+  <app-dashboard />
 </pdx-provide>
 ```
 

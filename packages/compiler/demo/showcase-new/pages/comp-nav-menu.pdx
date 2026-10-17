@@ -7,35 +7,35 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-nav-menu-basic class="demo-section"></pdx-demo-comp-nav-menu-basic>
+    <app-demo-comp-nav-menu-basic class="demo-section"></app-demo-comp-nav-menu-basic>
 
     <!-- ═══ With Icons ═══ -->
-    <pdx-demo-comp-nav-menu-icons class="demo-section"></pdx-demo-comp-nav-menu-icons>
+    <app-demo-comp-nav-menu-icons class="demo-section"></app-demo-comp-nav-menu-icons>
 
     <!-- ═══ Badges ═══ -->
-    <pdx-demo-comp-nav-menu-badges class="demo-section"></pdx-demo-comp-nav-menu-badges>
+    <app-demo-comp-nav-menu-badges class="demo-section"></app-demo-comp-nav-menu-badges>
 
     <!-- ═══ Nested Groups ═══ -->
-    <pdx-demo-comp-nav-menu-nested-groups class="demo-section"></pdx-demo-comp-nav-menu-nested-groups>
+    <app-demo-comp-nav-menu-nested-groups class="demo-section"></app-demo-comp-nav-menu-nested-groups>
 
     <!-- ═══ Section Headers ═══ -->
-    <pdx-demo-comp-nav-menu-headers-separators class="demo-section"></pdx-demo-comp-nav-menu-headers-separators>
+    <app-demo-comp-nav-menu-headers-separators class="demo-section"></app-demo-comp-nav-menu-headers-separators>
 
     <!-- ═══ Collapsed Mode ═══ -->
-    <pdx-demo-comp-nav-menu-collapsed class="demo-section"></pdx-demo-comp-nav-menu-collapsed>
+    <app-demo-comp-nav-menu-collapsed class="demo-section"></app-demo-comp-nav-menu-collapsed>
 
     <!-- ═══ Looks ═══ -->
-    <pdx-demo-comp-nav-menu-compact-bar class="demo-section"></pdx-demo-comp-nav-menu-compact-bar>
+    <app-demo-comp-nav-menu-compact-bar class="demo-section"></app-demo-comp-nav-menu-compact-bar>
 
-    <pdx-demo-comp-nav-menu-row-actions class="demo-section"></pdx-demo-comp-nav-menu-row-actions>
+    <app-demo-comp-nav-menu-row-actions class="demo-section"></app-demo-comp-nav-menu-row-actions>
 
-    <pdx-demo-comp-nav-menu-type-per-level class="demo-section"></pdx-demo-comp-nav-menu-type-per-level>
+    <app-demo-comp-nav-menu-type-per-level class="demo-section"></app-demo-comp-nav-menu-type-per-level>
 
     <!-- ═══ Full Sidebar Example ═══ -->
-    <pdx-demo-comp-nav-menu-full-sidebar class="demo-section"></pdx-demo-comp-nav-menu-full-sidebar>
+    <app-demo-comp-nav-menu-full-sidebar class="demo-section"></app-demo-comp-nav-menu-full-sidebar>
 
     <!-- ═══ With the router ═══ -->
-    <pdx-demo-comp-nav-menu-router class="demo-section"></pdx-demo-comp-nav-menu-router>
+    <app-demo-comp-nav-menu-router class="demo-section"></app-demo-comp-nav-menu-router>
 
     <!-- ═══ Events ═══ -->
     <section>
@@ -86,7 +86,7 @@
     </section>
 
     <!-- ═══ NavMenuItem Interface ═══ -->
-    <pdx-demo-comp-nav-menu-item-interface class="demo-section"></pdx-demo-comp-nav-menu-item-interface>
+    <app-demo-comp-nav-menu-item-interface class="demo-section"></app-demo-comp-nav-menu-item-interface>
   </div>
 </template>
 

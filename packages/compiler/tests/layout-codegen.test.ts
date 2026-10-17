@@ -17,7 +17,7 @@ let title = $signal('App');
 </script>`;
 
         const { code } = compile(source, '_layout.pdx');
-        expect(code).toContain("component('pdx-layout'");
+        expect(code).toContain("component('app-layout'");
         expect(code, 'the dead self-registration is back').not.toContain('__pdx_layouts');
     });
 
@@ -33,7 +33,7 @@ let expanded = $signal(true);
 </script>`;
 
         const { code } = compile(source, 'admin/_layout.pdx');
-        expect(code, "the tag @layout 'admin' resolves to").toContain("component('pdx-admin-layout'");
+        expect(code, "the tag @layout 'admin' resolves to").toContain("component('app-admin-layout'");
     });
 
     it('does NOT emit __pdx_layouts for regular components', () => {
@@ -57,7 +57,7 @@ let count = $signal(0);
 </script>`;
 
         const { code } = compile(source, '_error.pdx');
-        expect(code).toContain("component('pdx-error'");
+        expect(code).toContain("component('app-error'");
     });
 
     it('registers no layout chain for a page that declares none', () => {
@@ -91,7 +91,7 @@ describe('error page codegen', () => {
         const { code } = compile(source, '_404.pdx');
         expect(code).toContain('__pdx_error_pages');
         expect(code).toContain("'404'");
-        expect(code).toContain("component('pdx-404'");
+        expect(code).toContain("component('app-404'");
     });
 
     it('generates __pdx_error_pages for _error-403.pdx', () => {

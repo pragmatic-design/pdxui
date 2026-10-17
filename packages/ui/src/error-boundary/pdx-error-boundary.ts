@@ -4,7 +4,7 @@
 //
 // Usage:
 //   <pdx-error-boundary>
-//     <pdx-risky-widget />
+//     <app-risky-widget />
 //   </pdx-error-boundary>
 //
 //   <pdx-error-boundary max-retries="3" auto-retry>

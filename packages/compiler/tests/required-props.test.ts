@@ -81,10 +81,10 @@ describe('the resolver knows the required props', () => {
             writeFileSync(file, child("@prop user: string;\n@prop size: string = 'md';\n@prop note?: string;"));
             const r = new ComponentResolver();
             r.registerProjectComponents(root);
-            expect([...r.requiredPropsOf('pdx-user-card')!]).toEqual(['user']);
+            expect([...r.requiredPropsOf('app-user-card')!]).toEqual(['user']);
             writeFileSync(file, child("@prop user?: string;"));
             utimesSync(file, new Date(), new Date(Date.now() + 5000));
-            expect([...r.requiredPropsOf('pdx-user-card')!]).toEqual([]);
+            expect([...r.requiredPropsOf('app-user-card')!]).toEqual([]);
         } finally {
             rmSync(root, { recursive: true, force: true });
         }

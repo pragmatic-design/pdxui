@@ -6,37 +6,37 @@
     </p>
 
     <!-- Basic -->
-    <pdx-demo-comp-image-basic class="demo-section"></pdx-demo-comp-image-basic>
+    <app-demo-comp-image-basic class="demo-section"></app-demo-comp-image-basic>
 
     <!-- Object Fit -->
-    <pdx-demo-comp-image-object-fit class="demo-section"></pdx-demo-comp-image-object-fit>
+    <app-demo-comp-image-object-fit class="demo-section"></app-demo-comp-image-object-fit>
 
     <!-- Aspect Ratio -->
-    <pdx-demo-comp-image-aspect-ratio class="demo-section"></pdx-demo-comp-image-aspect-ratio>
+    <app-demo-comp-image-aspect-ratio class="demo-section"></app-demo-comp-image-aspect-ratio>
 
     <!-- Lazy Loading -->
-    <pdx-demo-comp-image-lazy class="demo-section"></pdx-demo-comp-image-lazy>
+    <app-demo-comp-image-lazy class="demo-section"></app-demo-comp-image-lazy>
 
     <!-- Fallback -->
-    <pdx-demo-comp-image-fallback class="demo-section"></pdx-demo-comp-image-fallback>
+    <app-demo-comp-image-fallback class="demo-section"></app-demo-comp-image-fallback>
 
     <!-- Rounded -->
-    <pdx-demo-comp-image-rounded class="demo-section"></pdx-demo-comp-image-rounded>
+    <app-demo-comp-image-rounded class="demo-section"></app-demo-comp-image-rounded>
 
     <!-- Zoomable -->
-    <pdx-demo-comp-image-zoomable class="demo-section"></pdx-demo-comp-image-zoomable>
+    <app-demo-comp-image-zoomable class="demo-section"></app-demo-comp-image-zoomable>
 
     <!-- Lightbox -->
-    <pdx-demo-comp-image-lightbox class="demo-section"></pdx-demo-comp-image-lightbox>
+    <app-demo-comp-image-lightbox class="demo-section"></app-demo-comp-image-lightbox>
 
     <!-- Caption -->
-    <pdx-demo-comp-image-caption class="demo-section"></pdx-demo-comp-image-caption>
+    <app-demo-comp-image-caption class="demo-section"></app-demo-comp-image-caption>
 
     <!-- Authenticated Image -->
-    <pdx-demo-comp-image-authenticated class="demo-section"></pdx-demo-comp-image-authenticated>
+    <app-demo-comp-image-authenticated class="demo-section"></app-demo-comp-image-authenticated>
 
     <!-- Custom Fetch -->
-    <pdx-demo-comp-image-custom-fetch class="demo-section"></pdx-demo-comp-image-custom-fetch>
+    <app-demo-comp-image-custom-fetch class="demo-section"></app-demo-comp-image-custom-fetch>
 
     <!-- Props Reference -->
     <section>

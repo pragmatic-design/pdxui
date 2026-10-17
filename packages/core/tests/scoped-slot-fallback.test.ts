@@ -15,7 +15,7 @@ import { compile } from '../../compiler/src/plugin';
 
 let seq = 0;
 
-/** Compile `src` as `pdx-<name>` on one path and define it. */
+/** Compile `src` as `app-<name>` on one path and define it. */
 function define(name: string, template: string, script: string, build: boolean): void {
     const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
     const options = build ? { production: true } : {};
@@ -48,7 +48,7 @@ for (const [path, build] of [['dev', false], ['build', true]] as const) {
                 const child = `sfchild${++seq}${build ? 'b' : 'd'}`;
                 define(child, `<div class="box"><slot name="row" :item="first">${f.fallback}</slot></div>`,
                     "let first = $signal('Ada');", build);
-                const el = document.createElement(`pdx-${child}`);
+                const el = document.createElement(`app-${child}`);
                 document.body.appendChild(el);
                 await settle();
                 const box = el.querySelector('.box')!;
@@ -62,8 +62,8 @@ for (const [path, build] of [['dev', false], ['build', true]] as const) {
                 define(child, `<div class="box"><slot name="row" :item="first">${f.fallback}</slot></div>`,
                     "let first = $signal('Ada');", build);
                 const parent = `sfparent${seq}${build ? 'b' : 'd'}`;
-                define(parent, `<pdx-${child}><slot name="row" let:item><em>filled {{ item }}</em></slot></pdx-${child}>`, '', build);
-                const el = document.createElement(`pdx-${parent}`);
+                define(parent, `<app-${child}><slot name="row" let:item><em>filled {{ item }}</em></slot></app-${child}>`, '', build);
+                const el = document.createElement(`app-${parent}`);
                 document.body.appendChild(el);
                 await settle();
                 const box = el.querySelector('.box')!;

@@ -7,22 +7,22 @@
     </p>
 
     <!-- ═══ Single Keys ═══ -->
-    <pdx-demo-design-kbd-single class="demo-section"></pdx-demo-design-kbd-single>
+    <app-demo-design-kbd-single class="demo-section"></app-demo-design-kbd-single>
 
     <!-- ═══ Key Combos ═══ -->
-    <pdx-demo-design-kbd-combos class="demo-section"></pdx-demo-design-kbd-combos>
+    <app-demo-design-kbd-combos class="demo-section"></app-demo-design-kbd-combos>
 
     <!-- ═══ Key Sequences ═══ -->
-    <pdx-demo-design-kbd-sequences class="demo-section"></pdx-demo-design-kbd-sequences>
+    <app-demo-design-kbd-sequences class="demo-section"></app-demo-design-kbd-sequences>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-design-kbd-sizes class="demo-section"></pdx-demo-design-kbd-sizes>
+    <app-demo-design-kbd-sizes class="demo-section"></app-demo-design-kbd-sizes>
 
     <!-- ═══ Light Variant ═══ -->
-    <pdx-demo-design-kbd-light class="demo-section"></pdx-demo-design-kbd-light>
+    <app-demo-design-kbd-light class="demo-section"></app-demo-design-kbd-light>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-kbd-composition class="demo-section"></pdx-demo-design-kbd-composition>
+    <app-demo-design-kbd-composition class="demo-section"></app-demo-design-kbd-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

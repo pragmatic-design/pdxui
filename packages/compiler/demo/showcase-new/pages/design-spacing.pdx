@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Spacing Scale ═══ -->
-    <pdx-demo-design-spacing-scale class="demo-section"></pdx-demo-design-spacing-scale>
+    <app-demo-design-spacing-scale class="demo-section"></app-demo-design-spacing-scale>
 
     <!-- ═══ Density ═══ -->
-    <pdx-demo-design-spacing-density class="demo-section"></pdx-demo-design-spacing-density>
+    <app-demo-design-spacing-density class="demo-section"></app-demo-design-spacing-density>
 
     <!-- ═══ Border Radius ═══ -->
-    <pdx-demo-design-spacing-radius class="demo-section"></pdx-demo-design-spacing-radius>
+    <app-demo-design-spacing-radius class="demo-section"></app-demo-design-spacing-radius>
 
     <!-- ═══ Shadows ═══ -->
-    <pdx-demo-design-spacing-shadows class="demo-section"></pdx-demo-design-spacing-shadows>
+    <app-demo-design-spacing-shadows class="demo-section"></app-demo-design-spacing-shadows>
 
     <!-- ═══ Max-Width ═══ -->
-    <pdx-demo-design-spacing-max-width class="demo-section"></pdx-demo-design-spacing-max-width>
+    <app-demo-design-spacing-max-width class="demo-section"></app-demo-design-spacing-max-width>
 
     <!-- ═══ Motion ═══ -->
-    <pdx-demo-design-spacing-motion class="demo-section"></pdx-demo-design-spacing-motion>
+    <app-demo-design-spacing-motion class="demo-section"></app-demo-design-spacing-motion>
 
     <!-- ═══ Z-Index ═══ -->
-    <pdx-demo-design-spacing-z-index class="demo-section"></pdx-demo-design-spacing-z-index>
+    <app-demo-design-spacing-z-index class="demo-section"></app-demo-design-spacing-z-index>
 
     <!-- ═══ Reference ═══ -->
     <section>

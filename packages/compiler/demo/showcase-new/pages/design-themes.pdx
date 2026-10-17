@@ -9,16 +9,16 @@
     </p>
 
     <!-- ═══ Every theme, at once ═══ -->
-    <pdx-demo-design-themes-themes class="demo-section"></pdx-demo-design-themes-themes>
+    <app-demo-design-themes-themes class="demo-section"></app-demo-design-themes-themes>
 
     <!-- ═══ Contrast, computed here ═══ -->
-    <pdx-demo-design-themes-contrast class="demo-section"></pdx-demo-design-themes-contrast>
+    <app-demo-design-themes-contrast class="demo-section"></app-demo-design-themes-contrast>
 
     <!-- ═══ DTCG ═══ -->
-    <pdx-demo-design-themes-dtcg class="demo-section"></pdx-demo-design-themes-dtcg>
+    <app-demo-design-themes-dtcg class="demo-section"></app-demo-design-themes-dtcg>
 
     <!-- ═══ Where the reasoning lives ═══ -->
-    <pdx-demo-design-themes-why class="demo-section"></pdx-demo-design-themes-why>
+    <app-demo-design-themes-why class="demo-section"></app-demo-design-themes-why>
   </div>
 </template>
 

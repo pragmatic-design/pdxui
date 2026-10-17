@@ -92,16 +92,16 @@ describe('finding the routes in a project', () => {
 
         expect(routes).toHaveLength(1);
         expect(routes[0].path).toBe('/dashboard');
-        expect(routes[0].tag).toBe('pdx-dashboard');
+        expect(routes[0].tag).toBe('app-dashboard');
         expect(routes[0].file).toContain('/src/dashboard.pdx');
         expect(routes[0].guard).toBeUndefined();
     });
 
     it('prefers an explicit @tag over the filename', () => {
-        write('src/dashboard.pdx', "@page '/d';\n@tag 'pdx-my-dash';");
+        write('src/dashboard.pdx', "@page '/d';\n@tag 'app-my-dash';");
         const routes: ScannedRoute[] = [];
         scanForRoutes(root, routes);
-        expect(routes[0].tag).toBe('pdx-my-dash');
+        expect(routes[0].tag).toBe('app-my-dash');
     });
 
     it('carries the @guard through, because the route table needs it', () => {
@@ -256,7 +256,7 @@ describe('injecting the component imports for tags used in the template', () => 
 
     it('does not warn about the file’s own tag, which is a recursive component and not a mistake', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        injectComponentImports('x', 'src/tree-node.pdx', '<template><pdx-tree-node/></template>', uiResolver());
+        injectComponentImports('x', 'src/tree-node.pdx', '<template><app-tree-node/></template>', uiResolver());
         expect(warn).not.toHaveBeenCalled();
     });
 });

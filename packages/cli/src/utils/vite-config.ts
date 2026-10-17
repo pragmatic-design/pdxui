@@ -2,7 +2,7 @@
 //
 // `pdx build` and `pdx dev` hand Vite a `pdx()` of their own, and Vite also loads the project's
 // vite.config — which `pdx new project` writes with `pdx()` in it. Two `pragmatic-pdx` plugins then
-// transform the same module, and the build emits `component("pdx-app", …)` with `component` bound to
+// transform the same module, and the build emits `component("app-root", …)` with `component` bound to
 // nothing: a page that throws at load (#197). The CLI adds its plugin only when the config has none.
 
 import type { ConfigEnv, PluginOption } from 'vite';

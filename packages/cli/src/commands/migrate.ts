@@ -14,7 +14,7 @@
 import { defineCommand } from 'citty';
 import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, relative, resolve } from 'node:path';
-import { ComponentResolver, languageChanges, parseSFC, type LanguageChange, type LanguageChangeContext } from '@pdxui/compiler';
+import { ComponentResolver, DEFAULT_TAG_PREFIX, languageChanges, parseSFC, projectTagRenames, type LanguageChange, type LanguageChangeContext } from '@pdxui/compiler';
 import { findFiles } from '../find-files';
 
 /** One rewrite: a file, the change applied, and how many places it rewrote. */
@@ -28,11 +28,12 @@ const SCRIPT_FILE = /\.(?:[cm]?[jt]s|[jt]sx)$/;
 const VITE_CONFIG = /^vite\.config\.(?:[cm]?[jt]s)$/;
 const IGNORE = ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/coverage/**', '**/test-results/**', '**/playwright-report/**'];
 
-type FileKind = 'pdx' | 'script' | 'config';
+type FileKind = 'pdx' | 'script' | 'config' | 'html';
 
-/** What a file is to the registry: a .pdx, the Vite config, a script, or nothing it reads. */
+/** What a file is to the registry: a .pdx, the Vite config, a script, an HTML page, or nothing it reads. */
 function kindOf(path: string): FileKind | null {
     if (path.endsWith('.pdx')) return 'pdx';
+    if (path.endsWith('.html')) return 'html';
     if (VITE_CONFIG.test(basename(path))) return 'config';
     if (SCRIPT_FILE.test(path) && !path.endsWith('.d.ts')) return 'script';
     return null;
@@ -46,7 +47,7 @@ async function filesOf(paths: string[], cwd: string): Promise<string[]> {
         const stat = statSync(abs, { throwIfNoEntry: false });
         if (!stat) throw new Error(`pdx migrate: ${p} does not exist.`);
         if (stat.isFile()) { out.add(abs.replace(/\\/g, '/')); continue; }
-        for (const f of await findFiles(['**/*.pdx', '**/*.{ts,mts,cts,js,mjs,cjs,tsx,jsx}'], { cwd: abs, ignore: IGNORE })) out.add(f);
+        for (const f of await findFiles(['**/*.pdx', '**/*.html', '**/*.{ts,mts,cts,js,mjs,cjs,tsx,jsx}'], { cwd: abs, ignore: IGNORE })) out.add(f);
     }
     return [...out].filter((f) => kindOf(f) !== null).sort();
 }
@@ -59,6 +60,8 @@ function regionFor(change: LanguageChange, kind: FileKind, text: string): Region
     const whole: Region = { text, lineOffset: 0, replace: (next) => next };
     if (change.scope === 'config') return kind === 'config' ? whole : null;
     if (change.scope === 'pdx') return kind === 'pdx' ? whole : null;
+    if (change.scope === 'html') return kind === 'html' ? whole : null;
+    if (kind === 'html') return null;
     // A script: a module as a whole, or the `<script>` of a .pdx.
     if (kind === 'script' || kind === 'config') return whole;
     const script = parseSFC(text).script;
@@ -77,22 +80,35 @@ function regionFor(change: LanguageChange, kind: FileKind, text: string): Region
  * them — their models, for a `::x` whose child is another file (#124). A project whose packages
  * cannot be read gives nothing, and those changes find nothing.
  */
-function projectContext(cwd: string): LanguageChangeContext {
+function projectContext(cwd: string, prefix: string, paths: string[]): LanguageChangeContext {
     try {
         const resolver = new ComponentResolver();
+        // The component packages the project depends on — read from each folder being migrated as
+        // well, the app's own package.json: run from above it, the library would be unknown and an
+        // app file named like a library component would take that component's uses.
         resolver.registerUiManifest(cwd);
-        resolver.registerProjectComponents(cwd);
-        return { modelsOf: (tag) => resolver.modelsOf(tag) };
+        for (const p of paths) resolver.registerUiManifest(resolve(cwd, p));
+        // src/ and pages/, as the build scans them, and every folder being migrated: a component the
+        // build finds through `pdx({ components })` is under one of them, and this does not read it.
+        resolver.registerProjectComponents(cwd, paths, prefix);
+        // Its application tags, alpha name → the prefixed one (#136).
+        const projectTags = projectTagRenames(resolver.projectComponents(), prefix, (tag) => resolver.isLibraryTag(tag));
+        return {
+            // An alpha template names a child by its alpha tag: it is looked up by the tag it has now.
+            modelsOf: (tag) => resolver.modelsOf(projectTags.get(tag) ?? tag),
+            projectTags,
+        };
     } catch {
         return {};
     }
 }
 
 /** Apply the registry to the files under `paths`; with `dry`, compute the same report and write nothing. */
-export async function migrate(paths: string[], { cwd, dry = false }: { cwd: string; dry?: boolean }): Promise<MigrateReport> {
+export async function migrate(paths: string[], { cwd, dry = false, prefix = DEFAULT_TAG_PREFIX }: { cwd: string; dry?: boolean; prefix?: string }): Promise<MigrateReport> {
     const report: MigrateReport = { changed: [], flagged: [] };
-    const context = projectContext(cwd);
-    for (const path of await filesOf(paths.length > 0 ? paths : ['.'], cwd)) {
+    const targets = paths.length > 0 ? paths : ['.'];
+    const context = projectContext(cwd, prefix, targets.filter((p) => statSync(resolve(cwd, p), { throwIfNoEntry: false })?.isDirectory()));
+    for (const path of await filesOf(targets, cwd)) {
         const kind = kindOf(path)!;
         const rel = relative(cwd, path).replace(/\\/g, '/');
         const original = readFileSync(path, 'utf-8');
@@ -109,7 +125,7 @@ export async function migrate(paths: string[], { cwd, dry = false }: { cwd: stri
                 }
                 continue;
             }
-            text = region.replace(change.fix(region.text));
+            text = region.replace(change.fix(region.text, context));
             report.changed.push({ file: rel, id: change.id, count: found.length });
         }
         if (!dry && text !== original) writeFileSync(path, text, 'utf-8');

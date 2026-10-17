@@ -14,11 +14,12 @@ import { collectDeclaredNames } from './references';
 import { tagFromUri, type ComponentInfo } from '../utils/component-index';
 import type { WorkspaceFile } from './references';
 import { escapeRegex } from '../utils/positions';
+import { isComponentTag, withoutTagPrefix } from '../utils/tag-names';
 
 /** Valid JS identifier (for symbol rename). */
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
-/** Valid custom-element tag (for tag rename): pdx-foo, pdx-foo-bar. */
-const TAG_NAME = /^pdx-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Valid custom-element tag (for tag rename): app-foo, app-foo-bar — or a library's pdx-foo. */
+const TAG_NAME = /^(?:pdx|app)-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** Thrown when the requested new name is invalid for its kind. */
 export class InvalidRenameError extends Error {}
@@ -46,7 +47,7 @@ type RenameKind = 'symbol' | 'tag' | null;
 /** Classify the thing under the cursor: a renamable local symbol, a component tag, or neither. */
 export function renameKind(ctx: RenameContext): RenameKind {
     if (!ctx.word) return null;
-    if (ctx.word.startsWith('pdx-')) return 'tag';
+    if (isComponentTag(ctx.word)) return 'tag';
     if (ctx.descriptor?.script && ctx.analysis && collectDeclaredNames(ctx.analysis).has(ctx.word)) return 'symbol';
     return null;
 }
@@ -179,12 +180,12 @@ function tagLiteralEdit(content: string, oldTag: string, newTag: string): TextEd
     };
 }
 
-/** New file URI when a filename-derived tag is renamed: foo.pdx→bar.pdx, pdx-foo.pdx→pdx-bar.pdx. */
+/** New file URI when a filename-derived tag is renamed: foo.pdx→bar.pdx, app-foo.pdx→app-bar.pdx. */
 function renamedUri(uri: string, newTag: string): string {
     const slash = uri.lastIndexOf('/');
     const base = uri.slice(slash + 1);
-    const hadPrefix = base.startsWith('pdx-');
-    const newBase = (hadPrefix ? newTag : newTag.replace(/^pdx-/, '')) + '.pdx';
+    const hadPrefix = isComponentTag(base.replace(/\.pdx$/, ''));
+    const newBase = (hadPrefix ? newTag : withoutTagPrefix(newTag)) + '.pdx';
     return uri.slice(0, slash + 1) + newBase;
 }
 

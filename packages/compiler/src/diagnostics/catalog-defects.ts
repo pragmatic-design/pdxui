@@ -558,15 +558,25 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         severity: 'warn', category: 'defect',
         summary: 'Two component files derive the same tag; the second is not auto-importable.',
         explanation: 'Only one of the two is registered by auto-import, and which one depends on scan order.',
-        fix: "Rename one of the files, or give one an explicit `@tag 'pdx-other-name';`.",
+        fix: "Rename one of the files, or give one an explicit `@tag 'app-other-name';`.",
         reproducedIn: `${T}resolver-collision-channel.test.ts`,
     },
     PDX_TAG_COLLISION: {
         severity: 'error', category: 'defect',
         summary: 'Two compiled `.pdx` files register the same tag (build error).',
         explanation: 'A custom element can be defined once; the second definition would throw in the browser.',
-        fix: "Add `@tag 'pdx-unique-name';` to one of the files.",
+        fix: "Add `@tag 'app-unique-name';` to one of the files.",
         reproducedIn: `${T}resolver-collision-channel.test.ts`,
+    },
+    PDX_TAG_RESERVED: {
+        severity: 'error', category: 'defect',
+        summary: "An application component's tag starts with `pdx-`, the prefix the @pdxui packages own (#136).",
+        explanation: "An application's components are named with its own prefix, `app-` by default (`pdx({ prefix })`): `button.pdx` is `<app-button>`. A `pdx-` tag would take the library's name — `<pdx-button>` is the library's button — or collide with one it adds later.",
+        fix: "Use the app's prefix: `@tag 'app-button';`.",
+        example: {
+            bad: pdx('<p>{{ a }}</p>', "@tag 'pdx-badge';\nlet a = $signal(1);"),
+            good: pdx('<p>{{ a }}</p>', "@tag 'app-badge';\nlet a = $signal(1);"),
+        },
     },
     PDX_EMPTY_SOURCE: {
         severity: 'error', category: 'defect',

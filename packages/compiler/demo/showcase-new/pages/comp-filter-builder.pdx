@@ -7,10 +7,10 @@
     </p>
 
     <!-- Basic -->
-    <pdx-demo-comp-filter-builder-basic class="demo-section"></pdx-demo-comp-filter-builder-basic>
+    <app-demo-comp-filter-builder-basic class="demo-section"></app-demo-comp-filter-builder-basic>
 
     <!-- Same JSON for Grid + Filter -->
-    <pdx-demo-comp-filter-builder-same-json class="demo-section"></pdx-demo-comp-filter-builder-same-json>
+    <app-demo-comp-filter-builder-same-json class="demo-section"></app-demo-comp-filter-builder-same-json>
 
     <!-- Reference -->
     <section>

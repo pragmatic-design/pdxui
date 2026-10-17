@@ -591,7 +591,7 @@ Two ways, and they are the same machinery.
 
 ```html
 @try {
-  <pdx-wire-feed :source="agencies" />
+  <app-wire-feed :source="agencies" />
 } @catch (err, retry) {
   <div class="pdx-surface pdx-surface-card" role="alert">
     <p>{{ err instanceof Error ? err.message : String(err) }}</p>
@@ -607,7 +607,7 @@ it costs nothing extra.
 
 ```html
 <pdx-error-boundary max-retries="3">
-  <pdx-data-heavy-panel />
+  <app-data-heavy-panel />
 </pdx-error-boundary>
 ```
 

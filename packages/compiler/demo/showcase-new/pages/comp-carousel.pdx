@@ -6,21 +6,21 @@
       Supports slide &amp; fade animation, autoplay, touch/pointer swipe, multiple slides per view.
     </p>
 
-    <pdx-demo-comp-carousel-basic class="demo-section"></pdx-demo-comp-carousel-basic>
+    <app-demo-comp-carousel-basic class="demo-section"></app-demo-comp-carousel-basic>
 
-    <pdx-demo-comp-carousel-autoplay class="demo-section"></pdx-demo-comp-carousel-autoplay>
+    <app-demo-comp-carousel-autoplay class="demo-section"></app-demo-comp-carousel-autoplay>
 
-    <pdx-demo-comp-carousel-fade class="demo-section"></pdx-demo-comp-carousel-fade>
+    <app-demo-comp-carousel-fade class="demo-section"></app-demo-comp-carousel-fade>
 
-    <pdx-demo-comp-carousel-multiple class="demo-section"></pdx-demo-comp-carousel-multiple>
+    <app-demo-comp-carousel-multiple class="demo-section"></app-demo-comp-carousel-multiple>
 
-    <pdx-demo-comp-carousel-custom-slide class="demo-section"></pdx-demo-comp-carousel-custom-slide>
+    <app-demo-comp-carousel-custom-slide class="demo-section"></app-demo-comp-carousel-custom-slide>
 
-    <pdx-demo-comp-carousel-swipe class="demo-section"></pdx-demo-comp-carousel-swipe>
+    <app-demo-comp-carousel-swipe class="demo-section"></app-demo-comp-carousel-swipe>
 
-    <pdx-demo-comp-carousel-no-loop class="demo-section"></pdx-demo-comp-carousel-no-loop>
+    <app-demo-comp-carousel-no-loop class="demo-section"></app-demo-comp-carousel-no-loop>
 
-    <pdx-demo-comp-carousel-slot-template class="demo-section"></pdx-demo-comp-carousel-slot-template>
+    <app-demo-comp-carousel-slot-template class="demo-section"></app-demo-comp-carousel-slot-template>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Slots</h2>

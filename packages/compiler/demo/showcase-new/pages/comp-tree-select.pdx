@@ -6,15 +6,15 @@
       Single or multi-select, search filter, expand/collapse, lazy loading.
     </p>
 
-    <pdx-demo-comp-tree-select-single class="demo-section"></pdx-demo-comp-tree-select-single>
+    <app-demo-comp-tree-select-single class="demo-section"></app-demo-comp-tree-select-single>
 
-    <pdx-demo-comp-tree-select-multi class="demo-section"></pdx-demo-comp-tree-select-multi>
+    <app-demo-comp-tree-select-multi class="demo-section"></app-demo-comp-tree-select-multi>
 
-    <pdx-demo-comp-tree-select-searchable class="demo-section"></pdx-demo-comp-tree-select-searchable>
+    <app-demo-comp-tree-select-searchable class="demo-section"></app-demo-comp-tree-select-searchable>
 
-    <pdx-demo-comp-tree-select-expand-all class="demo-section"></pdx-demo-comp-tree-select-expand-all>
+    <app-demo-comp-tree-select-expand-all class="demo-section"></app-demo-comp-tree-select-expand-all>
 
-    <pdx-demo-comp-tree-select-pre-selected class="demo-section"></pdx-demo-comp-tree-select-pre-selected>
+    <app-demo-comp-tree-select-pre-selected class="demo-section"></app-demo-comp-tree-select-pre-selected>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Slots</h2>

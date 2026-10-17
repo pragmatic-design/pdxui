@@ -6,9 +6,9 @@
       3-5 items with icons and optional badges.
     </p>
 
-    <pdx-demo-comp-bottom-nav-preview class="demo-section"></pdx-demo-comp-bottom-nav-preview>
+    <app-demo-comp-bottom-nav-preview class="demo-section"></app-demo-comp-bottom-nav-preview>
 
-    <pdx-demo-comp-bottom-nav-with-badges class="demo-section"></pdx-demo-comp-bottom-nav-with-badges>
+    <app-demo-comp-bottom-nav-with-badges class="demo-section"></app-demo-comp-bottom-nav-with-badges>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

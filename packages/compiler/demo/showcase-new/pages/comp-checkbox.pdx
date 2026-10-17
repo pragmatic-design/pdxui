@@ -7,28 +7,28 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-checkbox-basic class="demo-section"></pdx-demo-comp-checkbox-basic>
+    <app-demo-comp-checkbox-basic class="demo-section"></app-demo-comp-checkbox-basic>
 
     <!-- ═══ With Description ═══ -->
-    <pdx-demo-comp-checkbox-description class="demo-section"></pdx-demo-comp-checkbox-description>
+    <app-demo-comp-checkbox-description class="demo-section"></app-demo-comp-checkbox-description>
 
     <!-- ═══ Indeterminate ═══ -->
-    <pdx-demo-comp-checkbox-indeterminate class="demo-section"></pdx-demo-comp-checkbox-indeterminate>
+    <app-demo-comp-checkbox-indeterminate class="demo-section"></app-demo-comp-checkbox-indeterminate>
 
     <!-- ═══ Tristate ═══ -->
-    <pdx-demo-comp-checkbox-tristate class="demo-section"></pdx-demo-comp-checkbox-tristate>
+    <app-demo-comp-checkbox-tristate class="demo-section"></app-demo-comp-checkbox-tristate>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-checkbox-sizes class="demo-section"></pdx-demo-comp-checkbox-sizes>
+    <app-demo-comp-checkbox-sizes class="demo-section"></app-demo-comp-checkbox-sizes>
 
     <!-- ═══ Label Position ═══ -->
-    <pdx-demo-comp-checkbox-label-position class="demo-section"></pdx-demo-comp-checkbox-label-position>
+    <app-demo-comp-checkbox-label-position class="demo-section"></app-demo-comp-checkbox-label-position>
 
     <!-- ═══ Error ═══ -->
-    <pdx-demo-comp-checkbox-error class="demo-section"></pdx-demo-comp-checkbox-error>
+    <app-demo-comp-checkbox-error class="demo-section"></app-demo-comp-checkbox-error>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-checkbox-composition class="demo-section"></pdx-demo-comp-checkbox-composition>
+    <app-demo-comp-checkbox-composition class="demo-section"></app-demo-comp-checkbox-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

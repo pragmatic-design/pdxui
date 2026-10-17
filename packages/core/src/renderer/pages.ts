@@ -4,7 +4,7 @@
 //
 // Usage in template:
 //   ${pages(() => currentPage(), {
-//     dashboard: () => html`<pdx-dashboard />`,
+//     dashboard: () => html`<app-dashboard />`,
 //     settings: () => html`<pdx-settings />`,
 //     profile:  () => html`<pdx-profile />`,
 //   })}

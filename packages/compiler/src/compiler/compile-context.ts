@@ -4,6 +4,7 @@
 
 import type { TemplateDirectiveHandler } from '../plugin-system';
 import type { ValidationWarning } from './validate';
+import { DEFAULT_TAG_PREFIX } from './tag-prefix';
 
 export interface CompileContext {
     /** Production mode flag — enables constant folding, loop invariant hoisting, dead code elimination. */
@@ -132,6 +133,8 @@ export interface CompileContext {
      * code generator may emit. `'baseline-2026'` unless the app says otherwise.
      */
     readonly target: BrowserTarget;
+    /** The app's component tag prefix, `pdx({ prefix })` (#136): `app` unless the app says otherwise. */
+    readonly tagPrefix: string;
 }
 
 /**
@@ -158,6 +161,7 @@ export function createCompileContext(options?: {
     sourceFile?: string | null;
     staticMarkup?: boolean;
     target?: BrowserTarget;
+    tagPrefix?: string;
 }): CompileContext {
     return {
         production: options?.production ?? false,
@@ -185,5 +189,6 @@ export function createCompileContext(options?: {
         sourceFile: options?.sourceFile ?? null,
         staticMarkup: options?.staticMarkup ?? true,
         target: options?.target ?? 'baseline-2026',
+        tagPrefix: options?.tagPrefix ?? DEFAULT_TAG_PREFIX,
     };
 }

@@ -3,9 +3,9 @@
     <h2>Layout / Sizing</h2>
     <p class="desc">Signal-based container awareness, measure utilities, container queries.</p>
 
-    <pdx-demo-infra-container-container-size class="demo-section"></pdx-demo-infra-container-container-size>
+    <app-demo-infra-container-container-size class="demo-section"></app-demo-infra-container-container-size>
 
-    <pdx-demo-infra-container-measure class="demo-section"></pdx-demo-infra-container-measure>
+    <app-demo-infra-container-measure class="demo-section"></app-demo-infra-container-measure>
   </div>
 </template>
 

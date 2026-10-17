@@ -7,7 +7,7 @@
       container reports the change. Against the window it becomes fixed, with a placeholder keeping its space.
     </p>
 
-    <pdx-demo-comp-affix-live class="demo-section"></pdx-demo-comp-affix-live>
+    <app-demo-comp-affix-live class="demo-section"></app-demo-comp-affix-live>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>

@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Default ═══ -->
-    <pdx-demo-design-progress-default class="demo-section"></pdx-demo-design-progress-default>
+    <app-demo-design-progress-default class="demo-section"></app-demo-design-progress-default>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-design-progress-variants class="demo-section"></pdx-demo-design-progress-variants>
+    <app-demo-design-progress-variants class="demo-section"></app-demo-design-progress-variants>
 
     <!-- ═══ Indeterminate ═══ -->
-    <pdx-demo-design-progress-indeterminate class="demo-section"></pdx-demo-design-progress-indeterminate>
+    <app-demo-design-progress-indeterminate class="demo-section"></app-demo-design-progress-indeterminate>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-progress-composition class="demo-section"></pdx-demo-design-progress-composition>
+    <app-demo-design-progress-composition class="demo-section"></app-demo-design-progress-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

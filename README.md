@@ -47,15 +47,15 @@ declaration the compiler turns into that wiring.
 
 This is a real page from the [showcase](packages/showcase/), a service-desk application built to
 measure the framework against real screens (abridged, imports left out; the comments are added here).
-`<pdx-list-header>` is the showcase's own component; the others come from `@pdxui/ui`:
+`<app-list-header>` is the showcase's own component; the others come from `@pdxui/ui`:
 
 ```pdx
 <template>
   <section class="page">
-    <pdx-list-header :title="$t('employees.title')" store-key="employees" :grid="gridEl" :source="source">
+    <app-list-header :title="$t('employees.title')" store-key="employees" :grid="gridEl" :source="source">
       <span>{{ $t('employees.matching', { count: total }) }}</span>
       <pdx-button variant="primary" @click="creating.open.set(true)">{{ $t('employees.new') }}</pdx-button>
-    </pdx-list-header>
+    </app-list-header>
 
     <pdx-data-grid :ref="gridEl" :source="source" :columns="columns"
                    show-toolbar search row-clickable
@@ -102,7 +102,7 @@ becomes 138 lines of plain JavaScript, and every part of them comes from a decla
 
 | From | The compiler writes |
 |---|---|
-| The file name | A custom element, `<pdx-employees>`, registered with `component()` |
+| The file name | A custom element, `<app-employees>`, registered with `component()` |
 | `@page '/employees'` | A route table entry: path, tag, label key, scroll policy, and a lazy `import()` so the page is its own chunk |
 | `@title` | An effect that keeps `document.title` in step with the language |
 | `$signal`, `$derived`, `$watch` | `signal()`, `computed()` and `watch()`, named for the devtools: a signal after the file and the variable (`employees:total`), a watch after the file and the line (`employees.pdx:63`) |
@@ -114,7 +114,7 @@ becomes 138 lines of plain JavaScript, and every part of them comes from a decla
 This is an excerpt of the output, the start of the setup and the route entry (reformatted):
 
 ```js
-component('pdx-employees', {
+component('app-employees', {
   props: {},
   setup(ctx) {
     const __gridEl = signal(null, { name: 'employees:gridEl' });
@@ -128,7 +128,7 @@ component('pdx-employees', {
 });
 
 // Auto-route: @page '/employees'
-__pdx_pushRoute({ path: "/employees", tag: "pdx-employees", scroll: "preserve",
+__pdx_pushRoute({ path: "/employees", tag: "app-employees", scroll: "preserve",
                   labelKey: "employees.title", lazy: true, file: './employees.pdx' });
 ```
 

@@ -22,15 +22,17 @@ import { escapeForRegExp } from '../compiler/regexp-escape';
 import { bindsModel, type ModelsLookup } from '../compiler/validate-two-way';
 import { refAttribute, showAttribute, classDot, styleDot } from './template-forms';
 import { propRequired } from './prop-required';
+import { appPrefix, appPrefixHtml, appPrefixString } from './app-prefix';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
 
 /**
  * Where a change is looked for: a `.pdx` file as a whole; a script — the `<script>` of a `.pdx`,
- * and a `.ts`/`.js` module; or a Vite config (`vite.config.*`), where the plugin's options are.
+ * and a `.ts`/`.js` module; a Vite config (`vite.config.*`), where the plugin's options are; or an
+ * HTML page, the one that mounts the app (#136).
  */
-export type LanguageChangeScope = 'pdx' | 'script' | 'config';
+export type LanguageChangeScope = 'pdx' | 'script' | 'config' | 'html';
 
 /** One place a change was found: its line (1-based) in the text it was looked for in, and the text. */
 export interface LanguageChangeFinding {
@@ -44,6 +46,8 @@ export interface LanguageChangeFinding {
  */
 export interface LanguageChangeContext {
     modelsOf?: ModelsLookup;
+    /** The project's application tags renamed by #136, old → new (`projectTagRenames`). */
+    projectTags?: ReadonlyMap<string, string>;
 }
 
 /** A registered change. */
@@ -66,7 +70,7 @@ export interface LanguageChange {
     /** Every place the form is in `text` (a file in the entry's scope). */
     detect(text: string, context?: LanguageChangeContext): LanguageChangeFinding[];
     /** The mechanical rewrite of a whole text, or `'flag'` when a person must rewrite it. */
-    fix: ((text: string) => string) | 'flag';
+    fix: ((text: string, context?: LanguageChangeContext) => string) | 'flag';
 }
 
 /** The line (1-based) of `index` in `text`. */
@@ -272,6 +276,10 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     styleDot,
     // #130: a `@prop` with no default is required (./prop-required).
     propRequired,
+    // #136: application tags take the app prefix (./app-prefix).
+    appPrefix,
+    appPrefixHtml,
+    appPrefixString,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

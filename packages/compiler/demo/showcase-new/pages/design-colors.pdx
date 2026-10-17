@@ -7,31 +7,31 @@
     </p>
 
     <!-- ═══ Gray Scale ═══ -->
-    <pdx-demo-design-colors-gray-scale class="demo-section"></pdx-demo-design-colors-gray-scale>
+    <app-demo-design-colors-gray-scale class="demo-section"></app-demo-design-colors-gray-scale>
 
     <!-- ═══ Semantic Surfaces ═══ -->
-    <pdx-demo-design-colors-surfaces class="demo-section"></pdx-demo-design-colors-surfaces>
+    <app-demo-design-colors-surfaces class="demo-section"></app-demo-design-colors-surfaces>
 
     <!-- ═══ Text & Ink Colors ═══ -->
-    <pdx-demo-design-colors-text-ink class="demo-section"></pdx-demo-design-colors-text-ink>
+    <app-demo-design-colors-text-ink class="demo-section"></app-demo-design-colors-text-ink>
 
     <!-- ═══ Interactive Colors ═══ -->
-    <pdx-demo-design-colors-interactive class="demo-section"></pdx-demo-design-colors-interactive>
+    <app-demo-design-colors-interactive class="demo-section"></app-demo-design-colors-interactive>
 
     <!-- ═══ Shade Ramps ═══ -->
-    <pdx-demo-design-colors-shade-ramps class="demo-section"></pdx-demo-design-colors-shade-ramps>
+    <app-demo-design-colors-shade-ramps class="demo-section"></app-demo-design-colors-shade-ramps>
 
     <!-- ═══ Border & Focus ═══ -->
-    <pdx-demo-design-colors-border-focus class="demo-section"></pdx-demo-design-colors-border-focus>
+    <app-demo-design-colors-border-focus class="demo-section"></app-demo-design-colors-border-focus>
 
     <!-- ═══ Semantic Ink Applied ═══ -->
-    <pdx-demo-design-colors-ink-applied class="demo-section"></pdx-demo-design-colors-ink-applied>
+    <app-demo-design-colors-ink-applied class="demo-section"></app-demo-design-colors-ink-applied>
 
     <!-- ═══ Dark Mode ═══ -->
-    <pdx-demo-design-colors-dark-mode class="demo-section"></pdx-demo-design-colors-dark-mode>
+    <app-demo-design-colors-dark-mode class="demo-section"></app-demo-design-colors-dark-mode>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-colors-composition class="demo-section"></pdx-demo-design-colors-composition>
+    <app-demo-design-colors-composition class="demo-section"></app-demo-design-colors-composition>
 
     <!-- ═══ CSS Variables Reference ═══ -->
     <section>

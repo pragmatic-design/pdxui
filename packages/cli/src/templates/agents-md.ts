@@ -71,7 +71,7 @@ Then run the app (\`npx pdx dev\`) and measure what you changed in the browser.
 - **This project** — \`npx pdx analyze --json\` prints its components, their props, events and
   slots, and the route table.
 - **The running app** — in development, \`window.__PDX_DEVTOOLS__\` answers in JSON:
-  \`__PDX_DEVTOOLS__.tree()\`, \`.inspect('pdx-app')\`, \`.errors()\`, \`.route()\`.
+  \`__PDX_DEVTOOLS__.tree()\`, \`.inspect('app-root')\`, \`.errors()\`, \`.route()\`.
 - **As tools** — \`npx pdx mcp\` serves check, explain, component, components, project and docs to an
   agent that speaks MCP (\`claude mcp add pdx -- npx pdx mcp\`).
 

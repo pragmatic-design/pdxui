@@ -1,7 +1,7 @@
 <template>
   <section class="page" data-test="employees">
     <!-- The list's header, the tickets': views of this list's own. -->
-    <pdx-list-header
+    <app-list-header
       :title="$t('employees.title')"
       store-key="employees"
       :default-name="$t('employees.views.default')"
@@ -9,7 +9,7 @@
       :source="source">
       <span class="pdx-txt-small pdx-ink-muted" data-test="total">{{ $t('employees.matching', { count: total }) }}</span>
       <pdx-button variant="primary" @click="creating.open.set(true)" data-test="new">{{ $t('employees.new') }}</pdx-button>
-    </pdx-list-header>
+    </app-list-header>
     <!-- For the reader of the source: the third entity, with the reference's detail —
          identity, sections on the left, edited in the page. -->
     <p class="pdx-txt-small pdx-ink-muted">{{ $t('employees.intro') }}</p>

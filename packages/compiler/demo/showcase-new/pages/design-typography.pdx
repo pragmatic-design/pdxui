@@ -7,19 +7,19 @@
     </p>
 
     <!-- ═══ Type Scale ═══ -->
-    <pdx-demo-design-typography-scale class="demo-section"></pdx-demo-design-typography-scale>
+    <app-demo-design-typography-scale class="demo-section"></app-demo-design-typography-scale>
 
     <!-- ═══ Ink Colors ═══ -->
-    <pdx-demo-design-typography-ink class="demo-section"></pdx-demo-design-typography-ink>
+    <app-demo-design-typography-ink class="demo-section"></app-demo-design-typography-ink>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-typography-composition class="demo-section"></pdx-demo-design-typography-composition>
+    <app-demo-design-typography-composition class="demo-section"></app-demo-design-typography-composition>
 
     <!-- ═══ Font Stacks ═══ -->
-    <pdx-demo-design-typography-font-stacks class="demo-section"></pdx-demo-design-typography-font-stacks>
+    <app-demo-design-typography-font-stacks class="demo-section"></app-demo-design-typography-font-stacks>
 
     <!-- ═══ Links ═══ -->
-    <pdx-demo-design-typography-links class="demo-section"></pdx-demo-design-typography-links>
+    <app-demo-design-typography-links class="demo-section"></app-demo-design-typography-links>
 
     <!-- ═══ Options Table ═══ -->
     <section>

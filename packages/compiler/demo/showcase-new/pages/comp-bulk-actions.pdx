@@ -8,7 +8,7 @@
       <code>pdx-action</code>/<code>pdx-clear</code>. (Used internally by <code>pdx-entity-grid</code>.)
     </p>
 
-    <pdx-demo-comp-bulk-actions-standalone class="demo-section"></pdx-demo-comp-bulk-actions-standalone>
+    <app-demo-comp-bulk-actions-standalone class="demo-section"></app-demo-comp-bulk-actions-standalone>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Props &amp; Events</h2>

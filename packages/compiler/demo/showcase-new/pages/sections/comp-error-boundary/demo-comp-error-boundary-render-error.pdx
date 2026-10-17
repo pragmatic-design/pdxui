@@ -16,7 +16,7 @@
       }
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>@@try {
-  &lt;pdx-risky-widget /&gt;
+  &lt;app-risky-widget /&gt;
 } @@catch (err) {
   &lt;div role="alert"&gt;
     &lt;p&gt;{{ err instanceof Error ? err.message : String(err) }}&lt;/p&gt;

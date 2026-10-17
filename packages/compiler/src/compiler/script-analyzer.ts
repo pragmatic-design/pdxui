@@ -10,6 +10,7 @@ import type {
     GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis, StateDecl, HostAttr,
 } from './script-analyzer-types';
 import { parseHostBlock } from './host-block';
+import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './tag-prefix';
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
     parseInlineFormSchema, parseFormOptions, parsePageOptions, parseSearchParams, normalizeStatementsWithOrigins,
@@ -680,10 +681,19 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             continue;
         }
 
-        // ─── @tag 'pdx-custom-name' — override file-derived CE tag ───
+        // ─── @tag 'app-custom-name' — override file-derived CE tag ───
         const tagMatch = trimmed.match(/^@tag\s+['"]([^'"]+)['"]\s*;?\s*$/);
         if (tagMatch) {
             customTag = tagMatch[1];
+            // `pdx-` is the @pdxui packages' (#136): a .pdx is an application's component.
+            if (customTag.startsWith(RESERVED_TAG_PREFIX)) {
+                warnings.push({
+                    code: 'PDX_TAG_RESERVED',
+                    severity: 'error',
+                    message: `@tag '${customTag}' uses the 'pdx-' prefix, which the @pdxui packages own: an application's component would take, or collide with, a library tag.`,
+                    hint: `Use your app's prefix: @tag '${DEFAULT_TAG_PREFIX}-${customTag.slice(RESERVED_TAG_PREFIX.length)}';`,
+                });
+            }
             continue;
         }
 

@@ -73,7 +73,7 @@ function mount(row: Row): HTMLElement {
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
         .replace(/\bimport\(/g, '__import(');
     new Function('__core', '__import', body)(core, lazyImport);
-    const el = document.createElement(`pdx-${name}`);
+    const el = document.createElement(`app-${name}`);
     document.body.appendChild(el);
     return el;
 }

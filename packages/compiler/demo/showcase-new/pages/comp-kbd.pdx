@@ -6,22 +6,22 @@
     </p>
 
     <!-- ═══ Single Keys ═══ -->
-    <pdx-demo-comp-kbd-single-keys class="demo-section"></pdx-demo-comp-kbd-single-keys>
+    <app-demo-comp-kbd-single-keys class="demo-section"></app-demo-comp-kbd-single-keys>
 
     <!-- ═══ Combos ═══ -->
-    <pdx-demo-comp-kbd-combinations class="demo-section"></pdx-demo-comp-kbd-combinations>
+    <app-demo-comp-kbd-combinations class="demo-section"></app-demo-comp-kbd-combinations>
 
     <!-- ═══ Symbols Mode ═══ -->
-    <pdx-demo-comp-kbd-modifiers class="demo-section"></pdx-demo-comp-kbd-modifiers>
+    <app-demo-comp-kbd-modifiers class="demo-section"></app-demo-comp-kbd-modifiers>
 
     <!-- ═══ CSS Only ═══ -->
-    <pdx-demo-comp-kbd-css-only class="demo-section"></pdx-demo-comp-kbd-css-only>
+    <app-demo-comp-kbd-css-only class="demo-section"></app-demo-comp-kbd-css-only>
 
     <!-- ═══ Inline ═══ -->
-    <pdx-demo-comp-kbd-inline class="demo-section"></pdx-demo-comp-kbd-inline>
+    <app-demo-comp-kbd-inline class="demo-section"></app-demo-comp-kbd-inline>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-comp-kbd-composition class="demo-section"></pdx-demo-comp-kbd-composition>
+    <app-demo-comp-kbd-composition class="demo-section"></app-demo-comp-kbd-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

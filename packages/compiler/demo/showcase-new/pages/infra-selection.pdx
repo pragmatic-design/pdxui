@@ -3,11 +3,11 @@
     <h2>Selection Model</h2>
     <p class="desc">Key-based: single/multiple, toggle/replace, range select (Shift+Click), disabled keys.</p>
 
-    <pdx-demo-infra-selection-single class="demo-section"></pdx-demo-infra-selection-single>
+    <app-demo-infra-selection-single class="demo-section"></app-demo-infra-selection-single>
 
-    <pdx-demo-infra-selection-multiple class="demo-section"></pdx-demo-infra-selection-multiple>
+    <app-demo-infra-selection-multiple class="demo-section"></app-demo-infra-selection-multiple>
 
-    <pdx-demo-infra-selection-grid class="demo-section"></pdx-demo-infra-selection-grid>
+    <app-demo-infra-selection-grid class="demo-section"></app-demo-infra-selection-grid>
   </div>
 </template>
 

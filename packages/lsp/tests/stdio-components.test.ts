@@ -74,12 +74,12 @@ describe('the language server over stdio', () => {
 
         expect(labels, 'no library component offered').toContain('pdx-button');
         expect(labels).toContain('pdx-data-grid');
-        expect(labels, 'the project component was not offered').toContain('pdx-profile-menu');
+        expect(labels, 'the project component was not offered').toContain('app-profile-menu');
     });
 
     it('inside a project component offers its props and events', async () => {
-        const text = '<template>\n<pdx-profile-menu ></pdx-profile-menu>\n</template>\n';
-        const labels = await complete('src/props.pdx', text, '<pdx-profile-menu ');
+        const text = '<template>\n<app-profile-menu ></app-profile-menu>\n</template>\n';
+        const labels = await complete('src/props.pdx', text, '<app-profile-menu ');
 
         expect(labels).toEqual(expect.arrayContaining(['label', 'compact', '@closed']));
         expect(labels, 'tag names were offered instead of its props').not.toContain('pdx-button');
@@ -93,16 +93,16 @@ describe('the language server over stdio', () => {
     });
 
     it('inside slot="" under a project component offers its named slots', async () => {
-        const text = '<template>\n<pdx-profile-menu>\n  <h2 slot=""></h2>\n</pdx-profile-menu>\n</template>\n';
+        const text = '<template>\n<app-profile-menu>\n  <h2 slot=""></h2>\n</app-profile-menu>\n</template>\n';
         const labels = await complete('src/slots-project.pdx', text, 'slot="');
 
         expect(labels).toEqual(['header']);
     });
 
     it('a hover on a project tag lists its props, events and slots', async () => {
-        const text = '<template>\n<pdx-profile-menu></pdx-profile-menu>\n</template>\n';
+        const text = '<template>\n<app-profile-menu></app-profile-menu>\n</template>\n';
         const uri = await open('src/hover.pdx', text);
-        const hover = await conn.sendRequest('textDocument/hover', { textDocument: { uri }, position: after(text, '<pdx-prof') }) as
+        const hover = await conn.sendRequest('textDocument/hover', { textDocument: { uri }, position: after(text, '<app-prof') }) as
             { contents: { value: string } } | null;
 
         expect(hover, 'hovering a project component said nothing').not.toBeNull();

@@ -6,6 +6,7 @@ import { resolve, join, dirname } from 'pathe';
 import { logger } from '../utils/logger';
 import { agentsMd } from '../templates/agents-md';
 import { findCliPackage } from '../mcp/docs';
+import { DEFAULT_TAG_PREFIX } from '@pdxui/compiler';
 
 export default defineCommand({
     meta: { name: 'new', description: 'Scaffold component, page, or project' },
@@ -27,7 +28,8 @@ export default defineCommand({
             process.exit(1);
         }
         const pascal = toPascal(kebab);
-        const tag = `pdx-${kebab}`;
+        // An application's tag takes the app prefix; `pdx-` is the @pdxui packages' (#136).
+        const tag = `${DEFAULT_TAG_PREFIX}-${kebab}`;
 
         const vars: Record<string, string> = {
             '{{NAME}}': kebab,
@@ -112,7 +114,8 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
     // The design system's base and one theme — neutral, the one that applies with no `pdx-theme` on
     // <html> — not the full sheet, which carries every component and all 13 themes: each component
     // brings its own CSS when it is imported. Then the app, placed: the page loaded App.pdx and never
-    // put `<pdx-app>` in it, so it rendered nothing. `pdx-scheme` because the tokens' light-dark()
+    // put its element in it, so it rendered nothing. `<app-root>`, the tag App.pdx declares — derived
+    // from the file it would be `<app-app>` (#136). `pdx-scheme` because the tokens' light-dark()
     // needs one to resolve.
     writeFileSync(join(dir, 'index.html'), `<!DOCTYPE html>
 <html lang="en" pdx-scheme="light">
@@ -122,7 +125,7 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
   <title>${vars['{{PASCAL_NAME}}']}</title>
 </head>
 <body>
-  <pdx-app></pdx-app>
+  <app-root></app-root>
   <script type="module">
     import '@pdxui/design/base';
     import '@pdxui/design/themes/neutral';
@@ -139,6 +142,7 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
 </template>
 
 <script setup>
+  @tag 'app-root';
   let title = $signal('${vars['{{PASCAL_NAME}}']}');
 </script>
 

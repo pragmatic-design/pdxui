@@ -7,25 +7,25 @@
     </p>
 
     <!-- ═══ Default Banner ═══ -->
-    <pdx-demo-design-banner-default class="demo-section"></pdx-demo-design-banner-default>
+    <app-demo-design-banner-default class="demo-section"></app-demo-design-banner-default>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-design-banner-variants class="demo-section"></pdx-demo-design-banner-variants>
+    <app-demo-design-banner-variants class="demo-section"></app-demo-design-banner-variants>
 
     <!-- ═══ Subtle ═══ -->
-    <pdx-demo-design-banner-subtle class="demo-section"></pdx-demo-design-banner-subtle>
+    <app-demo-design-banner-subtle class="demo-section"></app-demo-design-banner-subtle>
 
     <!-- ═══ With Action ═══ -->
-    <pdx-demo-design-banner-action-link class="demo-section"></pdx-demo-design-banner-action-link>
+    <app-demo-design-banner-action-link class="demo-section"></app-demo-design-banner-action-link>
 
     <!-- ═══ With Close ═══ -->
-    <pdx-demo-design-banner-close class="demo-section"></pdx-demo-design-banner-close>
+    <app-demo-design-banner-close class="demo-section"></app-demo-design-banner-close>
 
     <!-- ═══ Centered ═══ -->
-    <pdx-demo-design-banner-centered class="demo-section"></pdx-demo-design-banner-centered>
+    <app-demo-design-banner-centered class="demo-section"></app-demo-design-banner-centered>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-banner-composition class="demo-section"></pdx-demo-design-banner-composition>
+    <app-demo-design-banner-composition class="demo-section"></app-demo-design-banner-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

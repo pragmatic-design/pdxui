@@ -8,6 +8,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, dirname, relative, resolve } from 'path';
 import { createRequire } from 'module';
 import { deriveTag } from './compiler/codegen';
+import { DEFAULT_TAG_PREFIX } from './compiler/tag-prefix';
 import { moduleDir } from './module-dir';
 import { scanNoImportTags } from './no-import-tags';
 import { componentPackages, type ComponentPackage } from './component-packages';
@@ -58,6 +59,31 @@ export class ComponentResolver {
     private _packages: string[] = [];
     /** The project folders the last scan covered, relative to its root. */
     private _projectDirs: string[] = [];
+    /** The app's component tag prefix the project was registered with (#136). */
+    private _prefix: string = DEFAULT_TAG_PREFIX;
+
+    /** Each project file's `@tag`, null when it declares none — what `projectComponents` reports. */
+    private declaredTags = new Map<string, string | null>();
+
+    /** The app's component tag prefix, `pdx({ prefix })`: what a project file's tag starts with. */
+    get prefix(): string {
+        return this._prefix;
+    }
+
+    /** The project's components: each one's tag, its file, and the `@tag` it declares (null for none). */
+    projectComponents(): { tag: string; file: string; declaredTag: string | null }[] {
+        return [...this.map.values()].filter(e => e.source === 'project')
+            .map(e => ({ tag: e.tag, file: e.importPath, declaredTag: this.declaredTags.get(e.importPath) ?? null }));
+    }
+
+    /**
+     * Whether a component package registers `tag`. That is what took a tag from a project file in
+     * alpha, which auto-imported the package's module; an element style or a `define` found elsewhere
+     * did not, and the project file's tag pointed at the project file.
+     */
+    isLibraryTag(tag: string): boolean {
+        return this.map.get(tag)?.source === 'ui';
+    }
 
     /**
      * Tag collisions found while scanning the project, as structured diagnostics.
@@ -393,7 +419,8 @@ export class ComponentResolver {
      * the directories passed in (`pdx({ components })`), relative to the root or absolute. One rule,
      * so a component cannot resolve in one and not the other.
      */
-    registerProjectComponents(rootDir: string, scanDirs: string[] = []): void {
+    registerProjectComponents(rootDir: string, scanDirs: string[] = [], prefix: string = DEFAULT_TAG_PREFIX): void {
+        this._prefix = prefix;
         const dirs = [...new Set([join(rootDir, 'src'), join(rootDir, 'pages'), ...scanDirs.map(d => resolve(rootDir, d))])];
         this._projectDirs = dirs.map(d => normalizePath(relative(rootDir, d)) || '.');
 
@@ -485,7 +512,9 @@ export class ComponentResolver {
                         // Skip special files (_layout, _error)
                         if (baseName.startsWith('_')) continue;
                         // Check for @tag override in script
-                        const tag = this._detectTag(fullPath) ?? deriveTag(normalizePath(fullPath));
+                        const declaredTag = this._detectTag(fullPath);
+                        const tag = declaredTag ?? deriveTag(normalizePath(fullPath), this._prefix);
+                        this.declaredTags.set(normalizePath(fullPath), declaredTag);
                         // Don't overwrite @pdxui/ui entries — library takes precedence
                         if (this.map.has(tag)) {
                             const existing = this.map.get(tag)!;

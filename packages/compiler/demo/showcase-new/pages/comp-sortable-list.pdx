@@ -9,19 +9,19 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-sortable-list-drag class="demo-section"></pdx-demo-comp-sortable-list-drag>
+    <app-demo-comp-sortable-list-drag class="demo-section"></app-demo-comp-sortable-list-drag>
 
     <!-- ═══ Custom rows ═══ -->
-    <pdx-demo-comp-sortable-list-rows class="demo-section"></pdx-demo-comp-sortable-list-rows>
+    <app-demo-comp-sortable-list-rows class="demo-section"></app-demo-comp-sortable-list-rows>
 
     <!-- ═══ Horizontal ═══ -->
-    <pdx-demo-comp-sortable-list-horizontal class="demo-section"></pdx-demo-comp-sortable-list-horizontal>
+    <app-demo-comp-sortable-list-horizontal class="demo-section"></app-demo-comp-sortable-list-horizontal>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-sortable-list-disabled class="demo-section"></pdx-demo-comp-sortable-list-disabled>
+    <app-demo-comp-sortable-list-disabled class="demo-section"></app-demo-comp-sortable-list-disabled>
 
     <!-- ═══ Accessibility ═══ -->
-    <pdx-demo-comp-sortable-list-accessibility class="demo-section"></pdx-demo-comp-sortable-list-accessibility>
+    <app-demo-comp-sortable-list-accessibility class="demo-section"></app-demo-comp-sortable-list-accessibility>
 
     <!-- ═══ Reference ═══ -->
     <section>

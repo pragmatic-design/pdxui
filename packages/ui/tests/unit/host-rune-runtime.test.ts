@@ -34,7 +34,7 @@ beforeAll(() => load('host-combo.pdx', COMBO));
 afterEach(() => cleanup());
 
 async function mount(attrs: Record<string, string> = {}): Promise<HTMLElement> {
-    const el = document.createElement('pdx-host-combo');
+    const el = document.createElement('app-host-combo');
     for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
     document.body.appendChild(el);
     await tick();

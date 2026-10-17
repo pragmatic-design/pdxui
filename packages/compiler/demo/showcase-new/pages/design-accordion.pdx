@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Single Item ═══ -->
-    <pdx-demo-design-accordion-single class="demo-section"></pdx-demo-design-accordion-single>
+    <app-demo-design-accordion-single class="demo-section"></app-demo-design-accordion-single>
 
     <!-- ═══ Multiple Items ═══ -->
-    <pdx-demo-design-accordion-multiple class="demo-section"></pdx-demo-design-accordion-multiple>
+    <app-demo-design-accordion-multiple class="demo-section"></app-demo-design-accordion-multiple>
 
     <!-- ═══ Open by Default ═══ -->
-    <pdx-demo-design-accordion-open-default class="demo-section"></pdx-demo-design-accordion-open-default>
+    <app-demo-design-accordion-open-default class="demo-section"></app-demo-design-accordion-open-default>
 
     <!-- ═══ Composition ═══ -->
-    <pdx-demo-design-accordion-composition class="demo-section"></pdx-demo-design-accordion-composition>
+    <app-demo-design-accordion-composition class="demo-section"></app-demo-design-accordion-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

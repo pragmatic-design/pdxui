@@ -954,7 +954,8 @@ class InlineGen {
         if (node.error) opts.push(`error:()=>{${this.sub(node.error)}}`);
         // The components the body creates, its own and those of the blocks inside it, as the template
         // path reads them off its markup: the block loads its components, or nothing does (#44).
-        const tags = [...created].filter((t) => t.startsWith('pdx-'));
+        // Every custom element, the app's too (#136): `deferLoadFn` imports what `importPathOf` resolves.
+        const tags = [...created].filter((t) => t.includes('-'));
         const cf = this.v('cf');
         this.out(`const ${cf}=defer({${opts.join(',')}},${deferLoadFn(tags, this.ctx)},()=>{${body}});`);
         this.place(cf);

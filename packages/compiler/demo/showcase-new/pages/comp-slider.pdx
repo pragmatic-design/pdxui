@@ -6,7 +6,7 @@
     </p>
 
     <!-- ═══ Slider ═══ -->
-    <pdx-demo-comp-slider-slider class="demo-section"></pdx-demo-comp-slider-slider>
+    <app-demo-comp-slider-slider class="demo-section"></app-demo-comp-slider-slider>
 
     <!-- ═══ Reference ═══ -->
     <section>

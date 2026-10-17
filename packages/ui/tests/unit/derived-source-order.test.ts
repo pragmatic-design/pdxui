@@ -2,7 +2,7 @@
 //
 // The case: `const crumbs = $derived(buildCrumbs())` written after
 // `const requestedId = signal('')`, with buildCrumbs reading requestedId. The failure it guards
-// against is a blank screen: "[pdx] Component <pdx-split> setup failed: ReferenceError: Cannot access
+// against is a blank screen: "[pdx] Component <app-split> setup failed: ReferenceError: Cannot access
 // 'requestedId' before initialization". The setup is not emitted in source order, so reordering the
 // source does not help.
 //
@@ -17,7 +17,7 @@ let n = 0;
 /** Compile, run and mount a component; return the element and whatever setup logged as a failure. */
 async function mount(script: string, template: string, opts: object = {}): Promise<{ el: HTMLElement; failures: string[]; code: string }> {
     const file = `dso-${n++}.pdx`;
-    const tag = `pdx-${file.replace('.pdx', '')}`;
+    const tag = `app-${file.replace('.pdx', '')}`;
     const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
     const { code } = compile(source, file, [], undefined, opts);
     const body = code.replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/g, 'const {$1} = __core;');

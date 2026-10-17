@@ -335,14 +335,14 @@ function splitRuns(lines) {
 
 /**
  * A demo page as it reads, with the sections it composes in place: each
- * `<pdx-demo-<page>-<slug>>` is the template of `sections/<page>/demo-<page>-<slug>.pdx`, in the order
- * the page composes them.
+ * `<app-demo-<page>-<slug>>` is the template of `sections/<page>/demo-<page>-<slug>.pdx`, in the order
+ * the page composes them — an application component, so `app-` (#136).
  */
 function composedPage(file) {
   const text = readFileSync(file, 'utf-8').replace(/\r\n/g, '\n');
   const dir = join(dirname(file), 'sections', basename(file, '.pdx'));
-  return text.replace(/<(pdx-demo-[\w-]+)\b[^>]*><\/\1>/g, (tag, name) => {
-    const section = join(dir, `${name.slice('pdx-'.length)}.pdx`);
+  return text.replace(/<(app-demo-[\w-]+)\b[^>]*><\/\1>/g, (tag, name) => {
+    const section = join(dir, `${name.slice('app-'.length)}.pdx`);
     if (!existsSync(section)) return tag;
     const src = readFileSync(section, 'utf-8').replace(/\r\n/g, '\n');
     return /<template>([\s\S]*?)<\/template>/.exec(src)?.[1] ?? tag;

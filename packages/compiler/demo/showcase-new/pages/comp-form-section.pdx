@@ -7,7 +7,7 @@
       (<code>validate="onLeave" | "onSubmit" | "blocking"</code>) to just their own fields.
     </p>
 
-    <pdx-demo-comp-form-section-in-a-form class="demo-section"></pdx-demo-comp-form-section-in-a-form>
+    <app-demo-comp-form-section-in-a-form class="demo-section"></app-demo-comp-form-section-in-a-form>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>

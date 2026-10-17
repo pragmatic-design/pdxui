@@ -179,8 +179,8 @@ export function getWordAtPosition(source: string, position: Position): string | 
     const line = lines[position.line];
     const col = position.character;
 
-    // Check if we're inside a tag: <pdx-xxx
-    const tagMatch = line.match(/<(pdx-[\w-]+)/g);
+    // Check if we're inside a tag: <pdx-xxx or <app-xxx
+    const tagMatch = line.match(/<((?:pdx|app)-[\w-]+)/g);
     if (tagMatch) {
         for (const match of tagMatch) {
             const tag = match.slice(1); // remove '<'

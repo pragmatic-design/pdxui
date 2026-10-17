@@ -143,14 +143,14 @@ portal('#overlay-container', () => html`<div class="modal">...</div>`)
 Every Pragmatic Web Component is created through `component()`:
 
 ```typescript
-component('pdx-counter', {
+component('app-counter', {
     props: { /* property declarations */ },
     setup(ctx) { /* the component's logic */ },
     render: (ctx) => html`...`,
 });
 ```
 
-That call registers a Custom Element in the browser through `customElements.define()`. From then on, every `<pdx-counter>` in the DOM is handled by the framework.
+That call registers a Custom Element in the browser through `customElements.define()`. From then on, every `<app-counter>` in the DOM is handled by the framework.
 
 ### The context (ctx)
 
@@ -158,7 +158,7 @@ The `ctx` parameter given to `setup()` and `render()` is the component's main in
 
 ```typescript
 setup(ctx) {
-    ctx.el           // The host DOM element (<pdx-counter>)
+    ctx.el           // The host DOM element (<app-counter>)
     ctx.myProp()     // Reads the value of the "myProp" prop (it is a signal)
     ctx.emit('change', { value: 42 })   // Emits a CustomEvent
     ctx.track(fn)    // Registers an effect with automatic cleanup
@@ -169,12 +169,12 @@ setup(ctx) {
 
 ### The lifecycle timeline
 
-When a `<pdx-counter>` appears in the DOM, this is the exact sequence:
+When a `<app-counter>` appears in the DOM, this is the exact sequence:
 
 ```
-1. customElements.define('pdx-counter', ...)    — registration (once only)
+1. customElements.define('app-counter', ...)    — registration (once only)
 
-2. <pdx-counter value="5"> in the DOM           — the browser creates the instance
+2. <app-counter value="5"> in the DOM           — the browser creates the instance
 
 3. constructor()
    └── The signals for the attributes are created

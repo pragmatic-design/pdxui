@@ -7,13 +7,13 @@
     </p>
 
     <!-- ═══ Default Tabs ═══ -->
-    <pdx-demo-design-tabs-default class="demo-section"></pdx-demo-design-tabs-default>
+    <app-demo-design-tabs-default class="demo-section"></app-demo-design-tabs-default>
 
     <!-- ═══ With aria-selected ═══ -->
-    <pdx-demo-design-tabs-aria-selected class="demo-section"></pdx-demo-design-tabs-aria-selected>
+    <app-demo-design-tabs-aria-selected class="demo-section"></app-demo-design-tabs-aria-selected>
 
     <!-- ═══ Composition: Settings Panel ═══ -->
-    <pdx-demo-design-tabs-composition class="demo-section"></pdx-demo-design-tabs-composition>
+    <app-demo-design-tabs-composition class="demo-section"></app-demo-design-tabs-composition>
 
     <!-- ═══ Reference ═══ -->
     <section>

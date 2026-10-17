@@ -7,25 +7,25 @@
     </p>
 
     <!-- Confirm -->
-    <pdx-demo-comp-overlay-stack-confirm class="demo-section"></pdx-demo-comp-overlay-stack-confirm>
+    <app-demo-comp-overlay-stack-confirm class="demo-section"></app-demo-comp-overlay-stack-confirm>
 
     <!-- Alert -->
-    <pdx-demo-comp-overlay-stack-alert class="demo-section"></pdx-demo-comp-overlay-stack-alert>
+    <app-demo-comp-overlay-stack-alert class="demo-section"></app-demo-comp-overlay-stack-alert>
 
     <!-- Danger + Type-to-Confirm -->
-    <pdx-demo-comp-overlay-stack-danger class="demo-section"></pdx-demo-comp-overlay-stack-danger>
+    <app-demo-comp-overlay-stack-danger class="demo-section"></app-demo-comp-overlay-stack-danger>
 
     <!-- Timer-Gated -->
-    <pdx-demo-comp-overlay-stack-timer class="demo-section"></pdx-demo-comp-overlay-stack-timer>
+    <app-demo-comp-overlay-stack-timer class="demo-section"></app-demo-comp-overlay-stack-timer>
 
     <!-- Dialog + Toast -->
-    <pdx-demo-comp-overlay-stack-toast class="demo-section"></pdx-demo-comp-overlay-stack-toast>
+    <app-demo-comp-overlay-stack-toast class="demo-section"></app-demo-comp-overlay-stack-toast>
 
     <!-- Cascade Close -->
-    <pdx-demo-comp-overlay-stack-cascade class="demo-section"></pdx-demo-comp-overlay-stack-cascade>
+    <app-demo-comp-overlay-stack-cascade class="demo-section"></app-demo-comp-overlay-stack-cascade>
 
     <!-- Mix Declarative + Programmatic -->
-    <pdx-demo-comp-overlay-stack-mixed class="demo-section"></pdx-demo-comp-overlay-stack-mixed>
+    <app-demo-comp-overlay-stack-mixed class="demo-section"></app-demo-comp-overlay-stack-mixed>
 
     <!-- Reference -->
     <section>

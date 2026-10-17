@@ -7,16 +7,16 @@
     </p>
 
     <!-- ═══ Basic Menubar ═══ -->
-    <pdx-demo-comp-menubar-click-mode class="demo-section"></pdx-demo-comp-menubar-click-mode>
+    <app-demo-comp-menubar-click-mode class="demo-section"></app-demo-comp-menubar-click-mode>
 
     <!-- ═══ Full-featured ═══ -->
-    <pdx-demo-comp-menubar-full-featured class="demo-section"></pdx-demo-comp-menubar-full-featured>
+    <app-demo-comp-menubar-full-featured class="demo-section"></app-demo-comp-menubar-full-featured>
 
     <!-- ═══ Mega Menu ═══ -->
-    <pdx-demo-comp-menubar-mega-menu class="demo-section"></pdx-demo-comp-menubar-mega-menu>
+    <app-demo-comp-menubar-mega-menu class="demo-section"></app-demo-comp-menubar-mega-menu>
 
     <!-- ═══ Disabled Items ═══ -->
-    <pdx-demo-comp-menubar-disabled class="demo-section"></pdx-demo-comp-menubar-disabled>
+    <app-demo-comp-menubar-disabled class="demo-section"></app-demo-comp-menubar-disabled>
 
     <!-- ═══ Props Reference ═══ -->
     <section>

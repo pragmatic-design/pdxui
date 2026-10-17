@@ -6,19 +6,19 @@
     </p>
 
     <!-- ═══ Linear ═══ -->
-    <pdx-demo-comp-progress-linear class="demo-section"></pdx-demo-comp-progress-linear>
+    <app-demo-comp-progress-linear class="demo-section"></app-demo-comp-progress-linear>
 
     <!-- ═══ Variants ═══ -->
-    <pdx-demo-comp-progress-colors class="demo-section"></pdx-demo-comp-progress-colors>
+    <app-demo-comp-progress-colors class="demo-section"></app-demo-comp-progress-colors>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-progress-sizes class="demo-section"></pdx-demo-comp-progress-sizes>
+    <app-demo-comp-progress-sizes class="demo-section"></app-demo-comp-progress-sizes>
 
     <!-- ═══ Striped ═══ -->
-    <pdx-demo-comp-progress-striped class="demo-section"></pdx-demo-comp-progress-striped>
+    <app-demo-comp-progress-striped class="demo-section"></app-demo-comp-progress-striped>
 
     <!-- ═══ Circular ═══ -->
-    <pdx-demo-comp-progress-circular class="demo-section"></pdx-demo-comp-progress-circular>
+    <app-demo-comp-progress-circular class="demo-section"></app-demo-comp-progress-circular>
 
     <!-- ═══ Reference ═══ -->
     <section>

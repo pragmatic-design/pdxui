@@ -12,6 +12,7 @@ import { tsRenameEdits, realFileName, type RenameSource } from './ts-rename';
 import { positionToOffset } from '../utils/tag-context';
 import { pdxToVirtual } from '../utils/virtual-file';
 import { buildComponentIndex } from '../utils/component-index';
+import { isComponentTag } from '../utils/tag-names';
 import type { Workspace } from '../workspace';
 
 /** Every .pdx of the workspace, projected, plus the document itself when it is a real file (.pdx.ts). */
@@ -79,7 +80,7 @@ export function renameAt(ws: Workspace, document: TextDocument, params: RenamePa
         };
         // A tag, a @prop or an @event: the lexical rename, which knows the attributes that consume them.
         const isAttributeSymbol = !!analysis && (analysis.props.some(p => p.name === word) || analysis.events.some(e => e.name === word));
-        if (word.startsWith('pdx-') || isAttributeSymbol || !svc) return getRenameEdits(ctx);
+        if (isComponentTag(word) || isAttributeSymbol || !svc) return getRenameEdits(ctx);
         assertIdentifier(params.newName);
         // A script symbol: where TypeScript says it is used, in every file; the lexical
         // rename of this file when TypeScript finds nothing.

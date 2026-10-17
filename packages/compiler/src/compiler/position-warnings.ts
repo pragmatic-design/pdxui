@@ -116,6 +116,9 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         // The second declaration is the one the author adds by mistake; the first was there.
         case 'PDX_DUP_PROP':
             return name ? find(source, script, new RegExp(`@(?:prop|model)\\s+${escape(name)}\\b`), 1) : undefined;
+        case 'PDX_TAG_RESERVED':
+            // Match: the `@tag` that names a pdx- tag — a component declares one.
+            return find(source, script, /@tag\s+['"]pdx-/);
         case 'PDX_DUP_EVENT':
             return name ? find(source, script, new RegExp(`@event\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_EVENT_NAME_CASE':

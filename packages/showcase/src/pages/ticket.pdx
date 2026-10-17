@@ -59,7 +59,7 @@
 
     <!-- ─── Attachments ────────────────────────────────────────────────────────
          The one part of the data layer no page documents: uploadFile, downloadFile and the
-         TransferHandle they return. The upload is `<pdx-attachment-upload>` (src/attachment-upload.pdx),
+         TransferHandle they return. The upload is `<app-attachment-upload>` (src/attachment-upload.pdx),
          shared with the employee's documents; the list and the download are this
          page's. -->
     @show (!onChild && section === 'attachments') {
@@ -70,7 +70,7 @@
              and `abort()`. -->
         <p class="pdx-txt-small pdx-ink-muted">{{ $t('attachments.intro') }}</p>
 
-        <pdx-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></pdx-attachment-upload>
+        <app-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></app-attachment-upload>
 
         <!-- The list is the SERVER's, re-read after every transfer. An upload that only appends to a
              local array cannot show that a cancelled one left nothing behind. -->

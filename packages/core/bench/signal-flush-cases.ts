@@ -155,7 +155,7 @@ $effect(() => { a; b; c; globalThis.__flushProbeRuns = (globalThis.__flushProbeR
 </script>`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, {});
     new Function('__core', code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;'))(core);
-    const el = document.createElement(`pdx-${name}`);
+    const el = document.createElement(`app-${name}`);
     document.body.appendChild(el);
     const button = el.querySelector('button') as HTMLButtonElement;
     const g = globalThis as { __flushProbeRuns?: number };

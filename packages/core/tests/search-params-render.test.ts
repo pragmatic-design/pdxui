@@ -25,7 +25,7 @@ describe('@search', () => {
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')
                 .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/router';?\s*$/gm, 'const {$1} = __router;');
             new Function('__core', '__router', body)(core, { currentSearch: () => query() });
-            const el = document.createElement(`pdx-${name}`);
+            const el = document.createElement(`app-${name}`);
             document.body.appendChild(el);
             await settle();
             expect(el.querySelector('.t')!.textContent).toBe('3 ink');

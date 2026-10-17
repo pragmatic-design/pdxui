@@ -14,7 +14,7 @@ import { demo } from './demo';
 /** Wait for the app to have mounted, not merely for the document to have loaded. */
 async function open(page: Page, path: string): Promise<void> {
     await page.goto(path);
-    await expect(page.locator('pdx-app .app-bar')).toBeVisible();
+    await expect(page.locator('app-app .app-bar')).toBeVisible();
 }
 
 test('the built app mounts its shell and its first page', async ({ page }) => {

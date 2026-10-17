@@ -7,22 +7,22 @@
     </p>
 
     <!-- ═══ Basic ═══ -->
-    <pdx-demo-comp-segmented-basic class="demo-section"></pdx-demo-comp-segmented-basic>
+    <app-demo-comp-segmented-basic class="demo-section"></app-demo-comp-segmented-basic>
 
     <!-- ═══ Object Options ═══ -->
-    <pdx-demo-comp-segmented-object-options class="demo-section"></pdx-demo-comp-segmented-object-options>
+    <app-demo-comp-segmented-object-options class="demo-section"></app-demo-comp-segmented-object-options>
 
     <!-- ═══ Sizes ═══ -->
-    <pdx-demo-comp-segmented-sizes class="demo-section"></pdx-demo-comp-segmented-sizes>
+    <app-demo-comp-segmented-sizes class="demo-section"></app-demo-comp-segmented-sizes>
 
     <!-- ═══ Full Width ═══ -->
-    <pdx-demo-comp-segmented-full-width class="demo-section"></pdx-demo-comp-segmented-full-width>
+    <app-demo-comp-segmented-full-width class="demo-section"></app-demo-comp-segmented-full-width>
 
     <!-- ═══ Disabled ═══ -->
-    <pdx-demo-comp-segmented-disabled class="demo-section"></pdx-demo-comp-segmented-disabled>
+    <app-demo-comp-segmented-disabled class="demo-section"></app-demo-comp-segmented-disabled>
 
     <!-- ═══ Form ═══ -->
-    <pdx-demo-comp-segmented-form class="demo-section"></pdx-demo-comp-segmented-form>
+    <app-demo-comp-segmented-form class="demo-section"></app-demo-comp-segmented-form>
 
     <!-- ═══ Reference ═══ -->
     <section>

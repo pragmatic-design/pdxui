@@ -48,7 +48,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('head', 'Set the document head: title and meta tags.', "@head { title: 'Products', meta: [{ name: 'description', content: '…' }] }", "@head { title: '${1:Title}' }"),
     d('provide', 'Provide a value to the components below this one.', '@provide key = value;', '@provide ${1:key} = ${2:value};'),
     d('inject', 'Read a value a component above provides.', '@inject key;', '@inject ${1:key};'),
-    d('tag', 'Register the component under another tag than its file name.', "@tag 'pdx-other-name';", "@tag '${1:pdx-name}';"),
+    d('tag', 'Register the component under another tag than its file name. An application tag starts with its prefix, `app-` by default: `pdx-` is reserved for the @pdxui packages.', "@tag 'app-other-name';", "@tag '${1:app-name}';"),
     d('route', 'Route options for the page.', "@route { path: '/users', keepAlive: true }", "@route { path: '${1:/path}' }"),
     d('params', 'Declare and type the route params.', '@params { id: number }', '@params { ${1:id}: ${2:number} }'),
     d('redirect', "Send this page's route to another path; `'/from' -> '/to'` redirects any path.", "@redirect '/new-path';", "@redirect '${1:/path}';"),

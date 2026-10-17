@@ -35,7 +35,7 @@ const repoRoot = join(packageDir, '..', '..');
 /** Every route the app answers, from the `@page` runes. Kept here because the list is short and
  *  a wrong one fails loudly: an unrouted path renders the 404 and contributes no tags. */
 /** What says a route has rendered: the shell's bar, or — on the sign-in, which has none — its panel. */
-const shellOrSignIn = (page: Page) => page.locator('pdx-app .app-bar, [data-test="login"]').first();
+const shellOrSignIn = (page: Page) => page.locator('app-app .app-bar, [data-test="login"]').first();
 
 const ROUTES = [
     '/', '/tickets', '/tickets/1', '/tickets/1/billing',
@@ -240,7 +240,7 @@ test('no library string is still in English on an Italian screen', async ({ page
         .toBeGreaterThan(40);
 
     await page.goto('/tickets');
-    await expect(page.locator('pdx-app .app-bar')).toBeVisible();
+    await expect(page.locator('app-app .app-bar')).toBeVisible();
     await pickLocale(page, 'it');
     await expect(page.locator('[data-test="tickets"] h1')).toHaveText('Ticket');
     // The dictionary is a CHUNK, and `<html lang>` is what says it has landed: both registries

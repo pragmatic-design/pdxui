@@ -8,13 +8,13 @@
       to fully customise it.
     </p>
 
-    <pdx-demo-comp-form-actions-default class="demo-section"></pdx-demo-comp-form-actions-default>
+    <app-demo-comp-form-actions-default class="demo-section"></app-demo-comp-form-actions-default>
 
-    <pdx-demo-comp-form-actions-alignment class="demo-section"></pdx-demo-comp-form-actions-alignment>
+    <app-demo-comp-form-actions-alignment class="demo-section"></app-demo-comp-form-actions-alignment>
 
-    <pdx-demo-comp-form-actions-submit-only class="demo-section"></pdx-demo-comp-form-actions-submit-only>
+    <app-demo-comp-form-actions-submit-only class="demo-section"></app-demo-comp-form-actions-submit-only>
 
-    <pdx-demo-comp-form-actions-custom-buttons class="demo-section"></pdx-demo-comp-form-actions-custom-buttons>
+    <app-demo-comp-form-actions-custom-buttons class="demo-section"></app-demo-comp-form-actions-custom-buttons>
 
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>

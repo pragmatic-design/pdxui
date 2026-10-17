@@ -46,7 +46,7 @@ function heldTransport<T>() {
 let tagSeq = 0;
 /** Define a component whose setup runs `make`, mount it, and hand back the element. */
 async function mountWith(make: () => unknown): Promise<HTMLElement> {
-    const tag = `pdx-async-contract-${++tagSeq}`;
+    const tag = `app-async-contract-${++tagSeq}`;
     component(tag, { setup() { make(); return {}; }, render: () => html`<i></i>` });
     const el = document.createElement(tag);
     document.body.appendChild(el);
@@ -110,7 +110,7 @@ describe('resource()', () => {
         vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
         const t = heldTransport<string[]>();
         const cache = createCache({ gcInterval: 0 });
-        const tag = `pdx-async-contract-${++tagSeq}`;
+        const tag = `app-async-contract-${++tagSeq}`;
         component(tag, { setup() { resource(() => t.call(), { key: 'retrying', cache, retry: 1 }); return {}; }, render: () => html`<i></i>` });
         const el = document.createElement(tag);
         document.body.appendChild(el);
@@ -254,7 +254,7 @@ describe('a compiled @fetch', () => {
         const t = stubFetch();
         defineCompiled('acfetchlatest', "<template><p>{{ user.data()?.name ?? '' }}</p><button @click=\"id = 2\">2</button></template>\n"
             + "<script setup>\nlet id = $signal(1);\n@fetch user: 'GET /api/ac-latest/${id}' as User;\n</script>\n");
-        const el = document.createElement('pdx-acfetchlatest');
+        const el = document.createElement('app-acfetchlatest');
         document.body.appendChild(el);
         await settle();
         el.querySelector('button')!.click();
@@ -277,7 +277,7 @@ describe('a compiled @fetch', () => {
         core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
         defineCompiled('acfetchsignal', "<template><p></p><button @click=\"id = 2\">2</button></template>\n"
             + "<script setup>\nlet id = $signal(1);\n@fetch user: 'GET /api/ac-signal/${id}' as User;\n</script>\n");
-        const el = document.createElement('pdx-acfetchsignal');
+        const el = document.createElement('app-acfetchsignal');
         document.body.appendChild(el);
         await settle();
         el.querySelector('button')!.click();
@@ -294,7 +294,7 @@ describe('a compiled @fetch', () => {
         const t = stubFetch();
         defineCompiled('acfetchdispose', "<template><p>{{ users.data()?.length ?? 0 }}</p></template>\n"
             + "<script setup>\n@fetch users: 'GET /api/ac-dispose' as string[];\n</script>\n");
-        const el = document.createElement('pdx-acfetchdispose');
+        const el = document.createElement('app-acfetchdispose');
         document.body.appendChild(el);
         await settle();
         t.answer(0, json(['ada']));
@@ -312,7 +312,7 @@ describe('a compiled @fetch', () => {
         defineCompiled('acfetchretry', "<template><p></p></template>\n"
             + "<script setup>\n@fetch users: 'GET /api/ac-retry' as string[] { retry: 1 };\n</script>\n");
         vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-        const el = document.createElement('pdx-acfetchretry');
+        const el = document.createElement('app-acfetchretry');
         document.body.appendChild(el);
         await vi.advanceTimersByTimeAsync(0);
         expect(t.calls.length, 'the first request never started').toBe(1);
@@ -481,7 +481,7 @@ describe('case 6 — one layer retries, and only reads', () => {
         core.setDefaultClient(core.createHttpClient({ timeout: 0 })); // its own retry on, as by default
         defineCompiled('acretryfetch', "<template><p></p></template>\n"
             + "<script setup>\n@fetch users: 'GET /api/ac-retry-fetch' as string[] { retry: 2 };\n</script>\n");
-        document.body.appendChild(document.createElement('pdx-acretryfetch'));
+        document.body.appendChild(document.createElement('app-acretryfetch'));
         await vi.advanceTimersByTimeAsync(60_000);
         expect(seen.calls, 'the transport retried under the source\'s retries').toBe(3);
     });
@@ -492,7 +492,7 @@ describe('case 6 — one layer retries, and only reads', () => {
         core.setDefaultClient(core.createHttpClient({ timeout: 0 }));
         defineCompiled('acretryfetchok', "<template><p></p></template>\n"
             + "<script setup>\n@fetch users: 'GET /api/ac-retry-ok' as string[] { retry: 2 };\n</script>\n");
-        document.body.appendChild(document.createElement('pdx-acretryfetchok'));
+        document.body.appendChild(document.createElement('app-acretryfetchok'));
         await vi.advanceTimersByTimeAsync(60_000);
         expect(seen.calls).toBe(3);
     });

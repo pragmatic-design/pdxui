@@ -63,7 +63,7 @@ describe('a production build with a @loader', () => {
     it('puts the loader in a chunk without its page', () => {
         const withLoader = chunks.filter(c => c.code.includes('/api/rows-marker'));
         expect(withLoader.length, 'the loader is not in the bundle').toBeGreaterThan(0);
-        const own = withLoader.find(c => !c.code.includes("component('pdx-rows'") && !c.code.includes('component("pdx-rows"'));
+        const own = withLoader.find(c => !c.code.includes("component('app-rows'") && !c.code.includes('component("app-rows"'));
         expect(own, `every chunk with the loader also holds the page: ${withLoader.map(c => c.fileName).join(', ')}`).toBeDefined();
         // Its types are gone, and its import came with it.
         expect(own!.code).not.toContain('Promise<number[]>');
@@ -71,7 +71,7 @@ describe('a production build with a @loader', () => {
     });
 
     it('the page still has its own chunk', () => {
-        expect(chunks.some(c => c.code.includes('pdx-rows') && c.code.includes('component(')),
+        expect(chunks.some(c => c.code.includes('app-rows') && c.code.includes('component(')),
             'the page component is not in the bundle').toBe(true);
     });
 
