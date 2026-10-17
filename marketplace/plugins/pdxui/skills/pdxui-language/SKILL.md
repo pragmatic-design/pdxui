@@ -174,6 +174,14 @@ Types map to the runtime as: `T[]` → Array, the primitives → their counterpa
 Modifiers on events: `.prevent .stop .self .once .capture .passive`, plus key filters. The raw event
 is `$event`.
 
+**What the editor types in a template** (and `pdx check --types`): `$event` is the DOM event by its
+name, its `target` the element the handler is on (`$event.target.value` on an `<input>` is fine), or
+the `CustomEvent<Payload>` a `.pdx` component declares with `@event` — `unknown` detail when it gives
+no payload. The error of `@catch (e)` and `@await … @error (e)` is `unknown`: narrow it,
+`e instanceof Error ? e.message : String(e)`, since a template cannot write a cast. A scoped slot's
+`let:` names have the type its component declares with `@slot name: { … }`, `unknown` when it declares
+none. A library component's event details and slot contexts are not typed yet, so they are not checked.
+
 A component with no content may be written self-closing, `<pdx-autocomplete … />`: the compiler (and
 core's `html` tag) expands it to `<pdx-autocomplete …></pdx-autocomplete>`. The browser alone would not — it
 would open the element and swallow what follows. Void elements (`<input />`, `<br />`) stay as written.
@@ -245,7 +253,7 @@ waiting: once it passes, the body renders even though the promise has not settle
 error):
 
 ```html
-@await (job) { minMs: 200, maxMs: 5000 } { <p>{{ result }}</p> } @loading { <pdx-spinner></pdx-spinner> } @error (e) { <p>{{ e.message }}</p> }
+@await (job) { minMs: 200, maxMs: 5000 } { <p>{{ result }}</p> } @loading { <pdx-spinner></pdx-spinner> } @error (e) { <p>{{ e instanceof Error ? e.message : String(e) }}</p> }
 ```
 
 **Retrying is putting a new promise in the signal.** `@error` leaves as soon as the awaited
@@ -255,7 +263,7 @@ expression changes, shows `@loading`, and awaits the new promise. `@error (e, re
 ```html
 <template>
   @await (job) { <p>{{ result }}</p> } @loading { <pdx-spinner></pdx-spinner> } @error (e, retry) {
-    <p>{{ e.message }}</p>
+    <p>{{ e instanceof Error ? e.message : String(e) }}</p>
     <pdx-button @click="reload()">Retry</pdx-button>
   }
 </template>

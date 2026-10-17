@@ -3,6 +3,11 @@
 // emitted VERBATIM in the right scope (for-of for @for, catch for @catch, and so on).
 // It builds a 1:1 SegmentMap over the verbatim text; the scaffolding is not mapped.
 // Signals are already typed as their value ($signal<T>:T) → no unwrapping needed.
+//
+// The names a template introduces are typed, not `any` (#122): a handler's `$event`, the error of
+// `@catch` / `@await … @error` (`unknown`), a scoped slot's context. The projection shares the
+// script's program, so it is not compiled `strict`: forcing it raised 398 errors on the showcase,
+// nearly all in the scripts (./ts-service). The typed names report a misspelt member without it.
 
 import type { TemplateNode } from '@pdxui/compiler';
 import { SegmentMap } from './segment-map';
@@ -12,7 +17,8 @@ export interface TemplateProjection { code: string; map: SegmentMap; }
 /**
  * Resolves the (safe) TS type of a component's prop attribute, or null. Asked with `@name` for an
  * event, it answers the type of that event's `$event` — `CustomEvent<Payload>` — or null when the
- * payload is unknown.
+ * payload is unknown. Asked with `#name` for a slot, it answers the type of the context the slot
+ * passes (`{ row: Row }`), or null when the component declares none.
  */
 export type ResolveType = (tag: string, attr: string) => string | null;
 
@@ -31,6 +37,29 @@ function maskedRanges(content: string): Range[] {
         out.push({ start: m.index, end: m.index + m[0].length });
     }
     return out;
+}
+
+/** Elements that never have a closing tag. */
+const VOID_ELEMENTS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+
+/**
+ * The innermost custom element (a tag with a `-`) still open at `offset` in the template content:
+ * the component a slot fill written there belongs to. Null when none is.
+ */
+export function enclosingComponent(content: string, offset: number): string | null {
+    const open: string[] = [];
+    // Match: `<tag …>`, `</tag>`, `<tag … />`.  Groups: [1]=`/` of a closing tag [2]=the name [3]=`/` of a self-closing one
+    for (const m of content.slice(0, offset).matchAll(/<(\/?)([a-zA-Z][\w-]*)(?:[^>"']|"[^"]*"|'[^']*')*?(\/?)>/g)) {
+        const name = m[2].toLowerCase();
+        if (m[1]) {
+            const at = open.lastIndexOf(name);
+            if (at >= 0) open.length = at;
+        } else if (!m[3] && !VOID_ELEMENTS.has(name)) {
+            open.push(name);
+        }
+    }
+    for (let i = open.length - 1; i >= 0; i--) if (open[i].includes('-')) return open[i];
+    return null;
 }
 
 /**
@@ -101,9 +130,12 @@ export function projectTemplate(
                 cursor = exprAbs;
                 const bare = name.replace(/^[:@]+/, '');
                 const type = name.startsWith(':') && resolveType ? resolveType(tag, bare) : null;
-                // An event whose payload is known: `$event` in its handler is that event, not the
-                // global `any`.
-                const eventType = /^@[^@]/.test(name) && resolveType ? resolveType(tag, '@' + bare.split('.')[0]) : null;
+                // Every handler's `$event` is typed (#122): the event the component declares, or
+                // `PdxEvent` — a DOM event by its name, `CustomEvent<unknown>` for any other.
+                const event = bare.split('.')[0];
+                const eventType = /^@[^@]/.test(name)
+                    ? (resolveType?.(tag, '@' + event) ?? `PdxEvent<${JSON.stringify(event)}, ${JSON.stringify(tag.toLowerCase())}>`)
+                    : null;
                 emit(';');
                 if (eventType) {
                     emit(`(($event: ${eventType}) => (`);
@@ -161,7 +193,8 @@ export function projectTemplate(
                     break;
                 case 'try':
                     emit('try {\n'); walk(node.body); emit('}\n');
-                    emit('catch ('); verbatim((node.errorVar || 'err').trim()); emit(': any) {\n');
+                    // `unknown`, as TypeScript types a strict `catch` binding (#122).
+                    emit('catch ('); verbatim((node.errorVar || 'err').trim()); emit(': unknown) {\n');
                     // The retry function the boundary passes second: declared so a call to
                     // it in the catch body type-checks instead of reading as an unknown name.
                     emit('const ' + (node.retryVar || 'retry') + ' = (): void => {};\n');
@@ -169,7 +202,7 @@ export function projectTemplate(
                     break;
                 case 'await':
                     emit('if ('); verbatim(node.condition.trim()); emit(') {\n'); walk(node.body); emit('}\n');
-                    if (node.errorBody) { emit('{ const ' + (node.errorVar || 'err') + ': any = 0; const ' + (node.retryVar || 'retry') + ' = (): void => {};\n'); walk(node.errorBody); emit('}\n'); }
+                    if (node.errorBody) { emit('{ const ' + (node.errorVar || 'err') + ': unknown = 0; const ' + (node.retryVar || 'retry') + ' = (): void => {};\n'); walk(node.errorBody); emit('}\n'); }
                     if (node.loading) walk(node.loading);
                     break;
                 case 'let':
@@ -183,10 +216,18 @@ export function projectTemplate(
                     walk(node.body ?? []);
                     if ('elseBody' in node && node.elseBody) walk(node.elseBody);
                     break;
-                case 'slot-template':
-                    for (const v of node.scopeVars) emit(`let ${v}: any;\n`);
+                case 'slot-template': {
+                    // The context the component around it declares for this slot (`#name`), or
+                    // `unknown` when it declares its slots and gives this one none (#122). A
+                    // component that cannot describe it — a library one, an unknown tag — leaves it
+                    // unchecked until its slots can be typed (#131).
+                    const host = node.loc?.offset !== undefined ? enclosingComponent(templateContent, node.loc.offset) : null;
+                    const scope = host && resolveType ? resolveType(host, '#' + node.name) : null;
+                    if (scope && scope !== 'unknown' && node.scopeVars.length > 0) emit(`const { ${node.scopeVars.join(', ')} }: ${scope} = null!;\n`);
+                    else for (const v of node.scopeVars) emit(`let ${v}: ${scope === 'unknown' ? 'unknown' : 'any'};\n`);
                     walk(node.body);
                     break;
+                }
                 case 'scoped-slot':
                     // The outlet's tag is markup with bindings, projected as html was before it had a
                     // node of its own (#276); then its fallback.

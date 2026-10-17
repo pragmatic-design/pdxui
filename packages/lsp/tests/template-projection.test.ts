@@ -78,7 +78,8 @@ describe('control structures become the scope they imply', () => {
         // so the projection's `errorVar || 'err'` fallback is unreachable from real source.
         const { code } = project(pdx('@try { <b>x</b> } @catch (e) { <i>{{ e }}</i> }'));
         expect(code).toContain('try {');
-        expect(code).toContain('catch (e: any) {');
+        // `unknown`, as a strict `catch` binding is (#122).
+        expect(code).toContain('catch (e: unknown) {');
     });
 
     it('@let declares its binding', () => {
@@ -94,6 +95,7 @@ describe('control structures become the scope they imply', () => {
 
     it('a scoped slot declares its scope variables', () => {
         // The parent-side syntax is `@slot(name, { vars })`, not a <template #name> element.
+        // No component around it to type the context: unchecked, as for a library component (#122).
         const { code } = project(pdx('@slot(row, { item, index }) { <b>{{ item }}</b> }'));
         expect(code, 'the slot scope variables were not declared, so they read as undefined')
             .toContain('let item: any;');
@@ -120,7 +122,8 @@ describe('expressions become checkable statements', () => {
 
     it('an event handler is projected', () => {
         const { code } = project(pdx('<button @click="go()">x</button>', 'function go() {}'));
-        expect(code).toContain('(go());');
+        // Inside a function whose `$event` is the button's click (#122).
+        expect(code).toContain('(($event: PdxEvent<"click", "button">) => (go()))(null!);');
     });
 
     it('an empty expression projects nothing', () => {

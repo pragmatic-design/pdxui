@@ -18,7 +18,9 @@ export function describeProjectComponent(tag: string, filePath: string): Manifes
         const descriptor = parseSFC(source);
         const analysis = analyzeScript(descriptor.script?.content ?? '', filePath, { setup: descriptor.script?.setup });
         const slots = new Map<string, ManifestSlot>();
-        for (const s of analysis.slots) slots.set(s.name, { name: s.name, description: s.scopeType ? `Scope: ${s.scopeType}` : '' });
+        for (const s of analysis.slots) {
+            slots.set(s.name, { name: s.name, description: s.scopeType ? `Scope: ${s.scopeType}` : '', ...(s.scopeType ? { scopeType: s.scopeType } : {}) });
+        }
         // Match: <slot> or <slot name="x"> in the template.  Groups: [2]=the name
         for (const m of (descriptor.template?.content ?? '').matchAll(/<slot\b(?:[^>]*?\bname\s*=\s*(["'])([^"']*)\1)?[^>]*>/g)) {
             const name = m[2] ?? '';

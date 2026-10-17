@@ -92,6 +92,13 @@ JS you'd expect, and reactivity just works.
 > argument). `@click="save()"` *calls* it (no event passed unless you write `save($event)`). Use the
 > reference form when the handler just needs the event; the call form when you pass your own arguments.
 
+The editor and `pdx check --types` know what `$event` is. On a DOM event it is that event — a
+`KeyboardEvent` for `@keydown` — and its `target` is the element you wrote the handler on, so
+`$event.target.value` on an `<input>` is a string, and `$event.target.vlaue` is an error. On a
+component's event it is the `CustomEvent` that component declares with `@event`: `$event.detail` has
+the payload's type, or `unknown` when the `@event` gives none. A library component's events are not
+typed yet: their `$event.detail` is not checked.
+
 ### Event modifiers
 
 Append modifiers with a dot — no boilerplate in the handler:
@@ -366,12 +373,16 @@ A subtree can fail (a component that throws, malformed data). `@try` isolates it
 @try {
   <pdx-risky :data="data" />
 } @catch (e) {
-  <p class="error">Something went wrong: {{ e.message }}</p>
+  <p class="error">Something went wrong: {{ e instanceof Error ? e.message : String(e) }}</p>
 }
 ```
 
 The error doesn't propagate and crash the whole page: it stays confined to the boundary, which shows
 the fallback.
+
+What is thrown is not always an `Error`, so the editor types `e` as `unknown`, as TypeScript types a
+`catch`: say what you expect before reading a member, as above. The error of `@await … @error (e)` is
+the same.
 
 ## In short
 

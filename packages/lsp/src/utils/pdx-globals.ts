@@ -22,9 +22,18 @@ declare global {
   function $n(v: number, opts?: Intl.NumberFormatOptions): string;
   function $d(v: Date | number | string, opts?: Intl.DateTimeFormatOptions): string;
   function $r(v: number, unit: Intl.RelativeTimeFormatUnit): string;
-  // A handler's event: \`any\`, so \`$event.target.value\` reads as it runs. The template projection
-  // narrows it where the event's payload type is known.
-  const $event: any;
+  // A handler's event is typed by the template projection, each handler its own (#122): the event a
+  // component declares, \`PdxEvent\` otherwise. Outside a handler there is none.
+  const $event: unknown;
+  // The element a tag makes: \`HTMLInputElement\` for \`input\`, \`HTMLElement\` for a custom element.
+  type PdxElementOf<T extends string> = T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] : HTMLElement;
+  // The \`$event\` of a handler no component types: a DOM event by its name — whose target is the
+  // element the handler is written on, so \`$event.target.value\` reads as it runs (a cast cannot be
+  // written in a template). Any other name is an event of a library component or an unknown tag,
+  // whose detail nothing describes: a CustomEvent whose detail is not checked.
+  type PdxEvent<N extends string, T extends string> = N extends keyof HTMLElementEventMap
+    ? Omit<HTMLElementEventMap[N], 'target' | 'currentTarget'> & { readonly target: PdxElementOf<T>; readonly currentTarget: PdxElementOf<T> }
+    : CustomEvent<any>;
   const $el: HTMLElement;
   const $refs: Record<string, HTMLElement>;
   // The @pdxui/core helpers the compiler auto-imports (used with no import in the .pdx).

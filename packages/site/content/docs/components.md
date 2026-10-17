@@ -271,6 +271,12 @@ you customize the row), you use a **scoped slot**, passing data to the slot:
 > Without `let:` it's a normal projection slot. If you need a named slot with no data, add a dummy
 > `let:_` so it gets recognized.
 
+The component says what the slot passes with `@slot row: { row: User; index: number };` in its
+script, and the editor and `pdx check --types` type the parent's `let:` names from it: `row.nmae` is
+an error. A component of yours that declares the slot with no type gives `unknown` names, which
+cannot be read unchecked — declare the type. A library component's slots are not typed yet: their
+names are not checked.
+
 ## @expose — an imperative API, when you need it
 
 90% of the time props and events are enough. But some components have actions that aren't "data":

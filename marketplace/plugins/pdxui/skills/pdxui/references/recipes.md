@@ -594,7 +594,7 @@ Two ways, and they are the same machinery.
   <pdx-wire-feed :source="agencies" />
 } @catch (err, retry) {
   <div class="pdx-surface pdx-surface-card" role="alert">
-    <p>{{ err.message }}</p>
+    <p>{{ err instanceof Error ? err.message : String(err) }}</p>
     <pdx-button variant="outline" @click="retry()">Riprova</pdx-button>
   </div>
 }

@@ -18827,7 +18827,7 @@ component('pdx-demo-comp-error-boundary-healthy', {
       \`, (err, retry) => html\`
         <div class="pdx-error-fallback" role="alert">
           <div class="pdx-error-icon">&#9888;</div>
-          <div class="pdx-error-msg">\${err.message}</div>
+          <div class="pdx-error-msg">\${() => err instanceof Error ? err.message : String(err)}</div>
         </div>
       \`)}
     </div>
@@ -18860,7 +18860,7 @@ const __blk4=staticBlock(staticMarkup(' <div class="pdx-error-fallback" role="al
 const __walk4=(r)=>{const __el13=r.firstChild.nextSibling;const __el16=__el13.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __t17=__el16.firstChild;const __m25=__el16.nextSibling.nextSibling;return [__t17,__m25];};
 const __blk5=staticBlock(staticMarkup(' <div class="demo-widget success-widget" role="status"> <div class="pdx-txt-small" style="color: var(--pdx-color-success); font-weight: 600">✓ Data loaded successfully</div> <div class="pdx-txt-small pdx-ink-muted">Loaded 3 users after <!----> failed attempts.</div> <button class="pdx-btn pdx-btn-sm pdx-btn-outline" style="margin-top: var(--pdx-space-xs)">Reset</button> </div> '));
 const __walk5=(r)=>{const __el28=r.firstChild.nextSibling;const __el30=__el28.firstChild.nextSibling.nextSibling.nextSibling;const __t31=__el30.firstChild.nextSibling;const __el32=__el30.nextSibling.nextSibling;return [__t31,__el32];};
-const __blk6=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Network Fetch — Retry with Countdown</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Simulates a network request that fails. Click "Load Users" to start.\\n      Auto-retries up to 3 times with a live countdown, then succeeds or gives up.\\n    </p> <div class="demo-box"> <!----><!----><!----><!----></div> <details class="source"><summary>Source</summary><pre><code>@@try {\\n  &lt;pdx-user-list /&gt;\\n} @@catch (err) {\\n  &lt;div role="alert"&gt;\\n    {{ err.message }}\\n    &lt;button @@click="retry"&gt;Retry&lt;/button&gt;\\n  &lt;/div&gt;\\n}\\n\\n// Or with onGlobalError:\\nonGlobalError((error, ctx) =&gt; {\\n  if (ctx.source === \\'async\\') {\\n    showToast(error.message);\\n    return true; // handled\\n  }\\n});</code></pre></details> </section> '));
+const __blk6=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Network Fetch — Retry with Countdown</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Simulates a network request that fails. Click "Load Users" to start.\\n      Auto-retries up to 3 times with a live countdown, then succeeds or gives up.\\n    </p> <div class="demo-box"> <!----><!----><!----><!----></div> <details class="source"><summary>Source</summary><pre><code>@@try {\\n  &lt;pdx-user-list /&gt;\\n} @@catch (err) {\\n  &lt;div role="alert"&gt;\\n    {{ err instanceof Error ? err.message : String(err) }}\\n    &lt;button @@click="retry"&gt;Retry&lt;/button&gt;\\n  &lt;/div&gt;\\n}\\n\\n// Or with onGlobalError:\\nonGlobalError((error, ctx) =&gt; {\\n  if (ctx.source === \\'async\\') {\\n    showToast(error.message);\\n    return true; // handled\\n  }\\n});</code></pre></details> </section> '));
 const __walk6=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __m7=__el3.firstChild.nextSibling;const __m12=__m7.nextSibling;const __m27=__m12.nextSibling;const __m34=__m27.nextSibling;return [__m7,__m12,__m27,__m34];};
 component('pdx-demo-comp-error-boundary-network-fetch', {
   props: {},
@@ -18955,7 +18955,7 @@ const __blk0=staticBlock(staticMarkup(' <div class="demo-widget"><!----></div> '
 const __walk0=(r)=>{const __el4=r.firstChild.nextSibling;const __t5=__el4.firstChild;return [__t5];};
 const __blk1=staticBlock(staticMarkup(' <div class="pdx-error-fallback" role="alert"> <div class="pdx-error-icon">⚠</div> <div class="pdx-error-msg">Widget failed to render</div> <div class="pdx-error-detail"><!----></div> </div> '));
 const __walk1=(r)=>{const __el6=r.firstChild.nextSibling;const __el9=__el6.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __t10=__el9.firstChild;return [__t10];};
-const __blk2=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Render Error — @try / @catch</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      When content throws during render, the catch block shows with the actual error message.\\n    </p> <div class="demo-box"> <!----> </div> <details class="source"><summary>Source</summary><pre><code>@@try {\\n  &lt;pdx-risky-widget /&gt;\\n} @@catch (err) {\\n  &lt;div role="alert"&gt;\\n    &lt;p&gt;{{ err.message }}&lt;/p&gt;\\n  &lt;/div&gt;\\n}</code></pre></details> </section> '));
+const __blk2=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Render Error — @try / @catch</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      When content throws during render, the catch block shows with the actual error message.\\n    </p> <div class="demo-box"> <!----> </div> <details class="source"><summary>Source</summary><pre><code>@@try {\\n  &lt;pdx-risky-widget /&gt;\\n} @@catch (err) {\\n  &lt;div role="alert"&gt;\\n    &lt;p&gt;{{ err instanceof Error ? err.message : String(err) }}&lt;/p&gt;\\n  &lt;/div&gt;\\n}</code></pre></details> </section> '));
 const __walk2=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __m12=__el3.firstChild.nextSibling;return [__m12];};
 component('pdx-demo-comp-error-boundary-render-error', {
   props: {},
@@ -18968,7 +18968,7 @@ function throwRenderError() {
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__m12]=__walk2(__frag);
-    const __cf11=errorBoundary(()=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>ctx.throwRenderError());return __frag;},(err,retry)=>{const __frag=__blk1();const [__t10]=__walk1(__frag);bindInterpolation(__t10,()=>err.message);return __frag;});
+    const __cf11=errorBoundary(()=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>ctx.throwRenderError());return __frag;},(err,retry)=>{const __frag=__blk1();const [__t10]=__walk1(__frag);bindInterpolation(__t10,()=>err instanceof Error ? err.message : String(err));return __frag;});
     __m12.replaceWith(__cf11);
     return __frag;
   })(),
