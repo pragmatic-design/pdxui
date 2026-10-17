@@ -23,7 +23,7 @@ describe('a reactive variable read inside a slot template', () => {
         const code = src(
             `<pdx-data-grid>
   <slot name="empty" let:_>
-    <p :show="count > 0">{{ count }}</p>
+    @show (count > 0) { <p>{{ count }}</p> }
   </slot>
 </pdx-data-grid>`,
             'let count = $signal(0);',

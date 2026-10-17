@@ -7,16 +7,18 @@
     <!-- The conditional section: on site, there is an address to go to. The group lives HERE, not
          around this component on the page: a group in the parent does not prefix a section's
          controls. -->
-    <pdx-field-group name="address" :label="$t('intake.fields.address')" :show="mode === 'onsite'" data-test="address">
-      <pdx-form-field name="street" :label="$t('intake.fields.street')">
-        <pdx-input name="street" data-test="street"></pdx-input>
-      </pdx-form-field>
-      <pdx-form-field name="city" :label="$t('intake.fields.city')">
-        <pdx-input name="city" data-test="city"></pdx-input>
-      </pdx-form-field>
-    </pdx-field-group>
+    @show (mode === 'onsite') {
+      <pdx-field-group name="address" :label="$t('intake.fields.address')" data-test="address">
+        <pdx-form-field name="street" :label="$t('intake.fields.street')">
+          <pdx-input name="street" data-test="street"></pdx-input>
+        </pdx-form-field>
+        <pdx-form-field name="city" :label="$t('intake.fields.city')">
+          <pdx-input name="city" data-test="city"></pdx-input>
+        </pdx-form-field>
+      </pdx-field-group>
+    }
 
-    <p class="pdx-txt-small pdx-ink-muted" :show="mode === 'remote'" data-test="remote-note">{{ $t('intake.remoteNote') }}</p>
+    @show (mode === 'remote') { <p class="pdx-txt-small pdx-ink-muted" data-test="remote-note">{{ $t('intake.remoteNote') }}</p> }
 
     <!-- The one thing the draft cannot hold. A file is not in `localStorage`: not its bytes,
          and not a pretence that it is still there. What the restored form owes the reader is

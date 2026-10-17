@@ -130,6 +130,12 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const cmd = /^command '([^']+)'/.exec(w.message)?.[1];
             return cmd ? find(source, template, new RegExp(`(?<![\\w-])command=["']${escape(cmd)}["']`)) : undefined;
         }
+        case 'PDX_PIPE_SINGLE': {
+            // Match: the interpolation the message quotes (`'{{ price | money }}' has one pipe: …`).
+            // Groups: [1]=the value [2]=the pipe
+            const m = /^'\{\{ ([\s\S]+?) \| ([\s\S]+?) \}\}' has one pipe/.exec(w.message);
+            return m ? find(source, template, new RegExp(`\\{\\{\\s*${escape(m[1])}\\s*\\|\\s*${escape(m[2])}\\s*\\}\\}`)) : undefined;
+        }
         case 'PDX_BINDING_MODIFIER': {
             // Match: the binding the message names (`'.lazzy' on '::value': …`), with that modifier.
             const m = /^'\.([\w()]+)' on '(::?[\w-]+)'/.exec(w.message);

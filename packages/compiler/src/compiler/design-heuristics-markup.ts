@@ -24,25 +24,68 @@ interface Element {
     children: Element[];
 }
 
-/** The template's elements as a tree. Control-flow blocks (`@if {…}`) are transparent. */
+/** Where the parenthesis opened at `open` closes in `text`, strings skipped; -1 when it does not. */
+function closingParen(text: string, open: number): number {
+    let depth = 0;
+    let quote = '';
+    for (let i = open; i < text.length; i++) {
+        const c = text[i];
+        if (quote) { if (c === quote) quote = ''; continue; }
+        if (c === '"' || c === "'" || c === '`') quote = c;
+        else if (c === '(') depth++;
+        else if (c === ')' && --depth === 0) return i;
+    }
+    return -1;
+}
+
+/**
+ * The template's elements as a tree. Control-flow blocks (`@if {…}`) add no level, but what a
+ * block's header names binds the elements directly inside it, as an attribute of theirs would:
+ * `@show (open) { <div> }` is read as `<div :show="open">` was.
+ */
 function elementTree(template: string): Element[] {
     const text = template.replace(/<!--[\s\S]*?-->/g, (c) => ' '.repeat(c.length));
     const root: Element = { tag: '#root', attrs: '', start: 0, children: [] };
     const stack: Element[] = [root];
+    // The `{` of the text outside tags: a block's carries its header and the element depth it opened at.
+    const braces: ({ header: string; depth: number } | null)[] = [];
     // Match: an opening or closing tag, attribute values quoted so a `>` inside one (`e => x`) is kept.
     // Groups: [1]=`/` of a closing tag [2]=tag name [3]=attributes [4]=`/` of a self-closing tag
-    const tag = /<(\/?)([a-zA-Z][\w-]*)((?:\s+[^\s=>/"']+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>"']+))?)*)\s*(\/?)>/g;
-    let m: RegExpExecArray | null;
-    while ((m = tag.exec(text)) !== null) {
-        const name = m[2].toLowerCase();
-        if (m[1]) {
-            const at = stack.map(e => e.tag).lastIndexOf(name);
-            if (at > 0) stack.length = at;
+    const tag = /<(\/?)([a-zA-Z][\w-]*)((?:\s+[^\s=>/"']+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>"']+))?)*)\s*(\/?)>/y;
+    // Match: a block header up to its `(`, `@show (` or `@else if (`.
+    const header = /@[a-z]+(?:\s+if)?\s*\(/y;
+    let i = 0;
+    while (i < text.length) {
+        tag.lastIndex = i;
+        const m = tag.exec(text);
+        if (m) {
+            i = tag.lastIndex;
+            const name = m[2].toLowerCase();
+            if (m[1]) {
+                const at = stack.map(e => e.tag).lastIndexOf(name);
+                if (at > 0) stack.length = at;
+                continue;
+            }
+            const inherited = braces.filter(b => b?.depth === stack.length).map(b => b!.header);
+            const el: Element = { tag: name, attrs: [m[3], ...inherited].join(' '), start: m.index, children: [] };
+            stack[stack.length - 1].children.push(el);
+            if (!m[4] && !VOID_TAGS.has(name)) stack.push(el);
             continue;
         }
-        const el: Element = { tag: name, attrs: m[3], start: m.index, children: [] };
-        stack[stack.length - 1].children.push(el);
-        if (!m[4] && !VOID_TAGS.has(name)) stack.push(el);
+        header.lastIndex = i;
+        const h = header.exec(text);
+        if (h) {
+            const close = closingParen(text, header.lastIndex - 1);
+            const brace = close === -1 ? -1 : text.indexOf('{', close);
+            if (brace !== -1 && /^\s*$/.test(text.slice(close + 1, brace))) {
+                braces.push({ header: text.slice(header.lastIndex, close), depth: stack.length });
+                i = brace + 1;
+                continue;
+            }
+        }
+        if (text[i] === '{') braces.push(null);
+        else if (text[i] === '}') braces.pop();
+        i++;
     }
     return root.children;
 }

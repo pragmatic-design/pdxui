@@ -24,9 +24,11 @@
       </pdx-form-field>
       <!-- CONDITIONAL: asked, and required by the form's rule, only of someone living in Italy.
            Masked to the codice fiscale's shape; the rule refuses one not complete. -->
-      <pdx-form-field name="taxCode" :label="$t('employees.personal.fields.taxCode')" :show="country === 'IT'">
-        <pdx-masked-input name="taxCode" mask="AAAAAA##A##A###A" data-test="taxCode"></pdx-masked-input>
-      </pdx-form-field>
+      @show (country === 'IT') {
+        <pdx-form-field name="taxCode" :label="$t('employees.personal.fields.taxCode')">
+          <pdx-masked-input name="taxCode" mask="AAAAAA##A##A###A" data-test="taxCode"></pdx-masked-input>
+        </pdx-form-field>
+      }
       <pdx-form-field name="language" :label="$t('employees.personal.fields.language')">
         <pdx-select name="language" :options="languages" data-test="language"></pdx-select>
       </pdx-form-field>

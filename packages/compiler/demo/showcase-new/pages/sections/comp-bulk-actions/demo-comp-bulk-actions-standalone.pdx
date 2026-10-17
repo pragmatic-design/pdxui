@@ -15,10 +15,12 @@
       <pdx-bulk-actions :count="count" :actions="actions" @pdx-action="onAction" @pdx-clear="onClear"></pdx-bulk-actions>
     </div>
 
-    <div class="event-log" :show="last !== ''">
-      <strong class="pdx-txt-small">Last action</strong>
-      <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;">{{ last }}</div>
-    </div>
+    @show (last !== '') {
+      <div class="event-log">
+        <strong class="pdx-txt-small">Last action</strong>
+        <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;">{{ last }}</div>
+      </div>
+    }
 
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top: var(--pdx-space-md);">
       <strong>Export</strong> is an action this role may not perform. It is offered and refused

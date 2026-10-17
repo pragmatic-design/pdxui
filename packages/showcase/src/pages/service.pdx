@@ -19,55 +19,59 @@
 
         <!-- Details: the form IS the section, always editable, each field saved after its pause
              (the employee's personal data's shape). -->
-        <section :show="section === 'details'" data-test="details">
-          <div class="section-head">
-            <h2 class="pdx-txt-heading">{{ $t('services.sectionNames.details') }}</h2>
-            <span class="save-status pdx-txt-small" role="status" aria-live="polite" data-test="save-status"
-              :data-state="saveState" :title="savedTitle">{{ statusText }}</span>
-          </div>
-          <pdx-form :form="details" data-test="details-form">
-            <div class="grid two">
-              <pdx-form-field name="name" :label="$t('services.fields.name')">
-                <pdx-input name="name" data-test="name"></pdx-input>
-              </pdx-form-field>
-              <pdx-form-field name="code" :label="$t('services.fields.code')">
-                <pdx-input name="code" data-test="code"></pdx-input>
-              </pdx-form-field>
-              <pdx-form-field class="wide" name="description" :label="$t('services.fields.description')">
-                <pdx-textarea name="description" rows="2" data-test="description"></pdx-textarea>
-              </pdx-form-field>
-              <pdx-form-field name="slaHours" :label="$t('services.fields.slaHours')">
-                <pdx-number-input name="slaHours" min="1" data-test="slaHours"></pdx-number-input>
-              </pdx-form-field>
-              <pdx-form-field name="resolveHours" :label="$t('services.fields.resolveHours')">
-                <pdx-number-input name="resolveHours" min="1" data-test="resolveHours"></pdx-number-input>
-              </pdx-form-field>
-              <pdx-form-field name="price" :label="$t('services.fields.price')">
-                <pdx-number-input name="price" min="0" data-test="price"></pdx-number-input>
-              </pdx-form-field>
-              <pdx-form-field name="active" :label="$t('services.fields.active')">
-                <pdx-switch name="active" data-test="active"></pdx-switch>
-              </pdx-form-field>
+        @show (section === 'details') {
+          <section data-test="details">
+            <div class="section-head">
+              <h2 class="pdx-txt-heading">{{ $t('services.sectionNames.details') }}</h2>
+              <span class="save-status pdx-txt-small" role="status" aria-live="polite" data-test="save-status"
+                :data-state="saveState" :title="savedTitle">{{ statusText }}</span>
             </div>
-          </pdx-form>
-        </section>
+            <pdx-form :form="details" data-test="details-form">
+              <div class="grid two">
+                <pdx-form-field name="name" :label="$t('services.fields.name')">
+                  <pdx-input name="name" data-test="name"></pdx-input>
+                </pdx-form-field>
+                <pdx-form-field name="code" :label="$t('services.fields.code')">
+                  <pdx-input name="code" data-test="code"></pdx-input>
+                </pdx-form-field>
+                <pdx-form-field class="wide" name="description" :label="$t('services.fields.description')">
+                  <pdx-textarea name="description" rows="2" data-test="description"></pdx-textarea>
+                </pdx-form-field>
+                <pdx-form-field name="slaHours" :label="$t('services.fields.slaHours')">
+                  <pdx-number-input name="slaHours" min="1" data-test="slaHours"></pdx-number-input>
+                </pdx-form-field>
+                <pdx-form-field name="resolveHours" :label="$t('services.fields.resolveHours')">
+                  <pdx-number-input name="resolveHours" min="1" data-test="resolveHours"></pdx-number-input>
+                </pdx-form-field>
+                <pdx-form-field name="price" :label="$t('services.fields.price')">
+                  <pdx-number-input name="price" min="0" data-test="price"></pdx-number-input>
+                </pdx-form-field>
+                <pdx-form-field name="active" :label="$t('services.fields.active')">
+                  <pdx-switch name="active" data-test="active"></pdx-switch>
+                </pdx-form-field>
+              </div>
+            </pdx-form>
+          </section>
+        }
 
         <!-- Customers: those subscribed to it now, each with the day it started. -->
-        <section :show="section === 'customers'" data-test="service-customers">
-          <h2 class="pdx-txt-heading">{{ $t('services.sectionNames.customers') }}</h2>
-          <ul class="rows">
-            @for (subscribers as s; track s.customer.id) {
-              <li data-test="service-customer">
-                <pdx-link :to="'/customers/' + s.customer.id">{{ s.customer.name }}</pdx-link>
-                <span class="pdx-txt-small pdx-ink-muted">· {{ $t('services.customers.since', { date: $d(s.since, { dateStyle: 'medium' }) }) }}</span>
-              </li>
-            } @empty {
-              <li data-test="no-customers">
-                <pdx-empty-state icon="users" :title="$t('services.customers.emptyTitle')" :description="$t('services.customers.emptyBody')"></pdx-empty-state>
-              </li>
-            }
-          </ul>
-        </section>
+        @show (section === 'customers') {
+          <section data-test="service-customers">
+            <h2 class="pdx-txt-heading">{{ $t('services.sectionNames.customers') }}</h2>
+            <ul class="rows">
+              @for (subscribers as s; track s.customer.id) {
+                <li data-test="service-customer">
+                  <pdx-link :to="'/customers/' + s.customer.id">{{ s.customer.name }}</pdx-link>
+                  <span class="pdx-txt-small pdx-ink-muted">· {{ $t('services.customers.since', { date: $d(s.since, { dateStyle: 'medium' }) }) }}</span>
+                </li>
+              } @empty {
+                <li data-test="no-customers">
+                  <pdx-empty-state icon="users" :title="$t('services.customers.emptyTitle')" :description="$t('services.customers.emptyBody')"></pdx-empty-state>
+                </li>
+              }
+            </ul>
+          </section>
+        }
     </pdx-record-detail>
   </section>
 </template>

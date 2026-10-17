@@ -37,7 +37,7 @@
       </span>
       <!-- Dropping the connection and restoring it are the simulated server's, in the Demo panel;
            the state stays here, because a real list would show it. -->
-      <span class="pdx-txt-small pdx-ink-muted" :show="liveNotice !== ''" role="status" data-test="live-notice">{{ liveNotice }}</span>
+      @show (liveNotice !== '') { <span class="pdx-txt-small pdx-ink-muted" role="status" data-test="live-notice">{{ liveNotice }}</span> }
     </div>
 
     <!-- The table and the bar that belongs to it, in one box. The bar is ANCHORED to the table and
@@ -70,26 +70,28 @@
              They are two ELEMENTS, not one with two texts: an empty list because nothing has been
              created yet is an INVITATION; an empty list because a filter excludes everything is a
              WAY BACK. A test that asserts one has to fail on the other, and that is the control.
-             `:show` rather than `@if`, because a conditional AROUND slotted content does not
+             `@show` rather than `@if`, because a conditional AROUND slotted content does not
              project (the framework's own note). -->
         <slot name="empty" let:_>
-          <pdx-empty-state
-            :show="activeFilterCount > 0"
-            icon="filter"
-            :title="$t('tickets.empty.filtered.title')"
-            :description="$t('tickets.empty.filtered.body', { count: activeFilterCount })"
-            :action-label="$t('tickets.empty.filtered.action')"
-            @pdx-action="clearFilters"
-            data-test="empty-filtered"></pdx-empty-state>
+          @show (activeFilterCount > 0) {
+            <pdx-empty-state
+              icon="filter"
+              :title="$t('tickets.empty.filtered.title')"
+              :description="$t('tickets.empty.filtered.body', { count: activeFilterCount })"
+              :action-label="$t('tickets.empty.filtered.action')"
+              @pdx-action="clearFilters"
+              data-test="empty-filtered"></pdx-empty-state>
+          }
 
-          <pdx-empty-state
-            :show="activeFilterCount === 0"
-            icon="inbox"
-            :title="$t('tickets.empty.none.title')"
-            :description="$t('tickets.empty.none.body')"
-            :action-label="$t('tickets.new')"
-            @pdx-action="list.openCreate()"
-            data-test="empty-nothing-yet"></pdx-empty-state>
+          @show (activeFilterCount === 0) {
+            <pdx-empty-state
+              icon="inbox"
+              :title="$t('tickets.empty.none.title')"
+              :description="$t('tickets.empty.none.body')"
+              :action-label="$t('tickets.new')"
+              @pdx-action="list.openCreate()"
+              data-test="empty-nothing-yet"></pdx-empty-state>
+          }
         </slot>
       </pdx-data-grid>
 
@@ -108,24 +110,28 @@
          REFUSAL decides the placement — next to the control that asked, with no timer — and it
          carries rule 1's undo for the part that did go through. `role="status"` and not `alert`:
          most of the sentence is what succeeded. -->
-    <div class="bulk-outcome" :show="outcomeText !== ''" role="status" data-test="bulk-outcome">
-      <span class="pdx-txt-small">{{ outcomeText }}</span>
-      <span class="pdx-txt-small pdx-ink-muted">{{ outcomeReason }}</span>
-      <pdx-button size="sm" variant="ghost" @click="undoBulk" data-test="bulk-undo">{{ $t('tickets.undo') }}</pdx-button>
-    </div>
+    @show (outcomeText !== '') {
+      <div class="bulk-outcome" role="status" data-test="bulk-outcome">
+        <span class="pdx-txt-small">{{ outcomeText }}</span>
+        <span class="pdx-txt-small pdx-ink-muted">{{ outcomeReason }}</span>
+        <pdx-button size="sm" variant="ghost" @click="undoBulk" data-test="bulk-undo">{{ $t('tickets.undo') }}</pdx-button>
+      </div>
+    }
 
     <!-- The one field worth editing in place: no drawer, no form, no save button. -->
     <!-- Shown once a row is current, and its inline editor brings a colour picker, a rating and a
          switch with it: loaded after the list, as the overlays below are (#407). -->
     @defer (idle) {
-    <div class="detail" :show="current !== null" data-test="detail">
-      <span class="pdx-txt-small pdx-ink-muted">{{ $t('tickets.subjectOf', { reference: currentReference }) }}</span>
-      <pdx-inline-edit
-        :value="currentSubject"
-        :label="$t('tickets.columns.subject')"
-        @pdx-change="onInlineSubject"
-        data-test="inline-subject"></pdx-inline-edit>
-    </div>
+    @show (current !== null) {
+      <div class="detail" data-test="detail">
+        <span class="pdx-txt-small pdx-ink-muted">{{ $t('tickets.subjectOf', { reference: currentReference }) }}</span>
+        <pdx-inline-edit
+          :value="currentSubject"
+          :label="$t('tickets.columns.subject')"
+          @pdx-change="onInlineSubject"
+          data-test="inline-subject"></pdx-inline-edit>
+      </div>
+    }
     }
 
     <!-- WHAT AN ACTION OPENS, LOADED AFTER THE LIST (#407). The create modal, the record drawer and

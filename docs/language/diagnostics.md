@@ -41,6 +41,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_EXPOSE_UNDECLARED` | error | `@expose` names something the component does not declare. | `@expose`, [script.md](script.md) |
 | `PDX_COMMAND_TARGET_MISSING` | error | A `commandfor` whose target id is not in the template. | invoker commands, [template.md](template.md) |
 | `PDX_COMMAND_UNKNOWN` | error | A command its target does not answer: a `--name` the component does not expose, or a built-in command for another element type. | invoker commands, [template.md](template.md) |
+| `PDX_PIPE_SINGLE` | info | A template interpolation with exactly one pipe; its fix is the call (#129). | `{{ }}` pipes, [template.md](template.md) |
 | `PDX_BINDING_MODIFIER` | error | A binding modifier outside the closed list (#126). | `::name`, `:name`, [template.md](template.md) |
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not one of its models (#124). | `::name`, [template.md](template.md); `@model`, [script.md](script.md) |
 | `PDX_PART_MISSING` | error | A declared `@part` that no element of the template carries. | `@part`, [script.md](script.md) |

@@ -93,9 +93,11 @@ const _openPopoverTokens: object[] = [];
  *   const pop = usePopover({ trigger: 'click', placement: 'bottom-start' });
  *   // In template:
  *   <button :ref="pop.setTrigger" :aria-expanded="pop.isOpen">Open</button>
- *   <div :ref="pop.setContent" :show="pop.isOpen" :style="popoverStyle(pop.position)">
- *     Content here
- *   </div>
+ *   @show (pop.isOpen) {
+ *     <div :ref="pop.setContent" :style="popoverStyle(pop.position)">
+ *       Content here
+ *     </div>
+ *   }
  */
 export function usePopover(options?: PopoverOptions): PopoverReturn {
     const opts = {

@@ -54,8 +54,8 @@ describe(':class specialised forms', () => {
         expect(render('<p class="a" :class="on ? \'a\' : \'b\'">s</p>')).toMatch(GENERIC);
     });
 
-    it('4. a :class.x beside it keeps the generic routine for a plain value', () => {
-        expect(render('<p :class.big="on" :class="name">s</p>')).toMatch(GENERIC);
+    it('3. a string with a toggle joined to it, as pdx migrate writes :class.x beside a value, assigns className', () => {
+        expect(render('<p :class="[name, on && \'big\'].filter(Boolean).join(\' \')">s</p>')).toMatch(/\.className=interpolationText\(/);
     });
 
     it('4. a component keeps the generic routine: it may put classes on its own host', () => {

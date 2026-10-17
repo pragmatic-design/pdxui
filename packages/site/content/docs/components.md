@@ -402,7 +402,7 @@ is written from a theme or the page.
 
 ```pdx
 <template>
-  <article class="card" :class.verified="verified">
+  <article class="card" :class="{ verified: verified }">
     <header>
       <strong>{{ name }}</strong>
       @if (verified) { <span class="badge">✓</span> }

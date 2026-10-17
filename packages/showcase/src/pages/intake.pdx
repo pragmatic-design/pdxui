@@ -14,15 +14,17 @@
     <!-- THE OFFER, and it restores nothing until it is answered. A form that silently
          refills itself is how someone submits last week's answers without noticing — so the page
          says a draft exists, says WHEN, says what it could not keep, and waits. -->
-    <div class="draft-offer" :show="draftOffer !== null" role="status" data-test="draft-offer">
-      <span class="pdx-txt-small">{{ $t('intake.draft.found', { when: draftWhen }) }}</span>
-      <span class="pdx-txt-small draft-lost" :show="draftLost !== ''">{{ $t('intake.draft.lost', { names: draftLost }) }}</span>
-      <pdx-button size="sm" variant="primary" @click="resumeDraft" data-test="draft-resume">{{ $t('intake.draft.resume') }}</pdx-button>
-      <pdx-button size="sm" variant="ghost" @click="discardDraft" data-test="draft-discard">{{ $t('intake.draft.discard') }}</pdx-button>
-    </div>
+    @show (draftOffer !== null) {
+      <div class="draft-offer" role="status" data-test="draft-offer">
+        <span class="pdx-txt-small">{{ $t('intake.draft.found', { when: draftWhen }) }}</span>
+        @show (draftLost !== '') { <span class="pdx-txt-small draft-lost">{{ $t('intake.draft.lost', { names: draftLost }) }}</span> }
+        <pdx-button size="sm" variant="primary" @click="resumeDraft" data-test="draft-resume">{{ $t('intake.draft.resume') }}</pdx-button>
+        <pdx-button size="sm" variant="ghost" @click="discardDraft" data-test="draft-discard">{{ $t('intake.draft.discard') }}</pdx-button>
+      </div>
+    }
 
     <!-- That the work is safe is not something to leave to trust. -->
-    <span class="pdx-txt-small pdx-ink-muted" :show="draftSavedAt !== ''" data-test="draft-saved">{{ $t('intake.draft.saved') }}</span>
+    @show (draftSavedAt !== '') { <span class="pdx-txt-small pdx-ink-muted" data-test="draft-saved">{{ $t('intake.draft.saved') }}</span> }
 
     <!-- `:value="step"` and panels grouped by form: both arrangements work, a panel one level down
          (here, inside its `<pdx-form>`) and a bound `value`.

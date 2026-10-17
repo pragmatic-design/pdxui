@@ -179,8 +179,13 @@ Types map to the runtime as: `T[]` → Array, the primitives → their counterpa
 | `::name="sig"` | two-way binding: on native `value`/`checked`/`files`, and on a component's `@model name`. Modifiers, a closed list (`PDX_BINDING_MODIFIER` otherwise): `.lazy`, `.trim`, `.number` (empty → `null`, invalid → nothing written and `aria-invalid`), `.debounce(300)` (flushed on blur and submit). The general form `::value="{ get: () => fmt(c), set: (s) => c = parse(s) }"` converts both ways |
 | `:name.once="expr"` | a binding assigned once, with no effect |
 | `::group="sig"` | a checkbox group bound to an array of the checked values, or a radio group to the selected value; each input gives its own `value` (`:value` in a `@for`). On a component, it binds its one `@model` |
-| `:class.x` / `:style.x` | conditional class / style |
-| `:ref="name"` | a DOM reference — the way to reach an element, never `getElementById` |
+| `:class="{ active: on }"` / `:class="expr"` | classes toggled by condition, or a string of classes. `:class.x` is removed (`PDX_REMOVED_FORM`) |
+| `:style="{ color: c, '--gap': g }"` | style properties, a custom property as a quoted key. `:style.x` is removed |
+| `:ref="name"` | a DOM reference — the way to reach an element, never `getElementById`. Bare `ref=` is removed |
+| `@show (cond) { … }` | hide in place, kept in the DOM (`@if` removes). The `:show` attribute is removed |
+
+`pdx migrate` rewrites each removed form; `{{ a | f }}` with one pipe is `PDX_PIPE_SINGLE` (info),
+fixed to `{{ f(a) }}` by `pdx check --fix`.
 
 Modifiers on events: `.prevent .stop .self .once .capture .passive`, plus key filters. The raw event
 is `$event`.

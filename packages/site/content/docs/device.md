@@ -48,7 +48,7 @@ const columns = responsive({ sm: 1, md: 2, lg: 3, xl: 4 }, 1);
 ```
 
 ```pdx
-<div :style.grid-template-columns="`repeat(${columns()}, 1fr)`">…</div>
+<div :style="{ gridTemplateColumns: `repeat(${columns()}, 1fr)` }">…</div>
 ```
 
 ## `useAdaptive()` — container-aware

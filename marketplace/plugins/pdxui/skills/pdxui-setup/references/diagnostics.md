@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 88 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 89 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -22,7 +22,7 @@ The user sees nothing while the promise is pending.
 
 *error* — A binding modifier outside the closed list (#126).
 
-A two-way binding takes `.lazy`, `.trim`, `.number` and `.debounce(ms)`; a binding `:x` takes `.once`. Any other suffix was ignored, so a misspelt `.lazzy` bound on every input without a word. `:class.x` and `:style.x` are forms of their own.
+A two-way binding takes `.lazy`, `.trim`, `.number` and `.debounce(ms)`; a binding `:x` takes `.once`. Any other suffix was ignored, so a misspelt `.lazzy` bound on every input without a word. `:class.x` and `:style.x` are not modifiers: they are removed forms, PDX_REMOVED_FORM (#129).
 
 **Fix.** Use a listed modifier, or the general form `::x="{ get: () => …, set: (v) => … }"` for anything else.
 
@@ -817,6 +817,38 @@ write:
 </template>
 <script setup>
 @part popup;
+</script>
+```
+
+### PDX_PIPE_SINGLE
+
+*info* — A template interpolation with exactly one pipe (#129).
+
+A pipe reads well as a chain: `{{ price | round | money }}`. One pipe is a function call written backwards, `{{ price | money }}` for `{{ money(price) }}`. It stays valid; the call is the one spelling for one function.
+
+**Fix.** Write the call: `{{ money(price) }}`, the value first when the pipe takes arguments. `pdx check --fix` and the editor apply it.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ n | upper }}</p>
+</template>
+<script setup>
+let n = $signal(1);
+function upper(v) { return String(v).toUpperCase(); }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ upper(n) }}</p>
+</template>
+<script setup>
+let n = $signal(1);
+function upper(v) { return String(v).toUpperCase(); }
 </script>
 ```
 

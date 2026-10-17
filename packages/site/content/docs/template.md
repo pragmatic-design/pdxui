@@ -48,10 +48,10 @@ To bind an attribute or property to an expression, prefix it with `:`.
 Handy binding variants:
 
 ```pdx
-:class.active="isActive"     <!-- adds the 'active' class when true -->
-:style.color="color"         <!-- sets a single CSS property -->
-:show="visible"              <!-- show/hide (display) without removing from the DOM -->
-:ref="boxRef"                <!-- puts the element into a signal, to access it after mount -->
+:class="{ active: isActive }"     <!-- adds the 'active' class when true -->
+:class="variantClass"             <!-- a string of classes, for a fully dynamic class -->
+:style="{ color, '--gap': gap }"  <!-- sets CSS properties; a custom property is a quoted key -->
+:ref="boxRef"                     <!-- puts the element into a signal, to access it after mount -->
 ::value="text"               <!-- two-way: reads AND writes the signal (controlled inputs) -->
 ```
 
@@ -155,15 +155,20 @@ Append modifiers with a dot — no boilerplate in the handler:
 }
 ```
 
-Unlike `:show` (which hides with CSS but keeps the element in the DOM), `@if` actually **adds and
-removes** elements — and disposes their effects when it removes them. Use `:show` for frequent,
-lightweight toggles, `@if` when the element may not exist at all.
+Unlike `@show (cond) { … }` (which hides with CSS but keeps the elements in the DOM), `@if` actually
+**adds and removes** elements — and disposes their effects when it removes them. Use `@show` for
+frequent, lightweight toggles, `@if` when the element may not exist at all.
+
+Each of these forms has one spelling. The older ones — `:class.active="c"`, `:style.color="c"`,
+`ref="el"` and a `:show="c"` attribute — are errors (`PDX_REMOVED_FORM`), and `pdx migrate` rewrites
+them: the `:class.x` and `:style.x` of an element merged into one object, `ref=` into `:ref=`, and the
+element of a `:show` wrapped in `@show (c) { … }`.
 
 ## Lists: `@for`
 
 ```pdx
 @for (todos as todo; track todo.id) {
-  <li :class.done="todo.completed">{{ todo.text }}</li>
+  <li :class="{ done: todo.completed }">{{ todo.text }}</li>
 }
 ```
 
@@ -423,7 +428,7 @@ the same.
 | bind an attribute | `:attr="expr"` |
 | a controlled field | `::value="signal"` |
 | react to an event | `@click="fn"` |
-| show/hide with CSS | `:show="cond"` |
+| show/hide with CSS | `@show (cond) { … }` |
 | add/remove from the DOM | `@if` |
 | repeat | `@for (… as … ; track …)` |
 | load later | `@defer` |

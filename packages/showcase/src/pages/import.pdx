@@ -34,39 +34,45 @@
 
     <!-- Refused at the door, and told which mistake it was. «Invalid file» would be true of all
          five and useful for none. `role="alert"`: the reader is looking at the drop zone. -->
-    <p class="pdx-txt-small door-error" :show="doorError !== ''" role="alert" data-test="door-error">{{ doorError }}</p>
+    @show (doorError !== '') { <p class="pdx-txt-small door-error" role="alert" data-test="door-error">{{ doorError }}</p> }
 
     <!-- A column nobody claimed. Shown, never dropped in silence: a file with `Tier` spelled
          `Level` imports every row with no tier and says nothing, which is the worst outcome an
          import has — it succeeds. -->
-    <p class="pdx-txt-small pdx-ink-muted" :show="ignored !== ''" data-test="ignored">{{ $t('import.ignored', { names: ignored }) }}</p>
+    @show (ignored !== '') { <p class="pdx-txt-small pdx-ink-muted" data-test="ignored">{{ $t('import.ignored', { names: ignored }) }}</p> }
 
     <!-- THE PREVIEW. Nothing is written while this is on screen, and the count says so before the
          button is there to press. -->
-    <div class="preview-head" :show="plan.length > 0">
-      <span class="pdx-txt-body" data-test="preview-count">{{ $t('import.willImport', { good: goodCount, total: plan.length }) }}</span>
-      <pdx-button variant="primary" :disabled="goodCount === 0" @click="commit" data-test="commit">{{ $t('import.commit', { count: goodCount }) }}</pdx-button>
-    </div>
+    @show (plan.length > 0) {
+      <div class="preview-head">
+        <span class="pdx-txt-body" data-test="preview-count">{{ $t('import.willImport', { good: goodCount, total: plan.length }) }}</span>
+        <pdx-button variant="primary" :disabled="goodCount === 0" @click="commit" data-test="commit">{{ $t('import.commit', { count: goodCount }) }}</pdx-button>
+      </div>
+    }
 
     <!-- `rowClass` marks the ROW: repeating a
          `cellClass` on every column marks CELLS, and the gaps between them stay unmarked. The
          reason is a column because the reader has to READ it — a colour is not a reason. -->
-    <div class="list" :show="plan.length > 0">
-      <pdx-data-grid
-        :data="plan"
-        :columns="previewColumns"
-        :row-class="rowClassOf"
-        data-test="preview"></pdx-data-grid>
-    </div>
+    @show (plan.length > 0) {
+      <div class="list">
+        <pdx-data-grid
+          :data="plan"
+          :columns="previewColumns"
+          :row-class="rowClassOf"
+          data-test="preview"></pdx-data-grid>
+      </div>
+    }
 
     <!-- The «after», in the shape the showcase's README settles: a partly refused action is both a
          success and a refusal, so the refusal decides the placement — here, next to the rows that
          are still on screen — and it carries the way forward for the part that did not go through.
          Not an undo: the refused rows were never written, so what is owed is a way to FIX them. -->
-    <div class="outcome" :show="outcome !== ''" role="status" data-test="outcome">
-      <span class="pdx-txt-small">{{ outcome }}</span>
-      <pdx-button size="sm" variant="ghost" :show="plan.length > 0" @click="exportRefused" data-test="export-refused">{{ $t('import.exportRefused') }}</pdx-button>
-    </div>
+    @show (outcome !== '') {
+      <div class="outcome" role="status" data-test="outcome">
+        <span class="pdx-txt-small">{{ outcome }}</span>
+        @show (plan.length > 0) { <pdx-button size="sm" variant="ghost" @click="exportRefused" data-test="export-refused">{{ $t('import.exportRefused') }}</pdx-button> }
+      </div>
+    }
   </section>
 </template>
 

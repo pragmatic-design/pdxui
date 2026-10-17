@@ -782,7 +782,7 @@ test('an upload moves the count on the menu, without a navigation', async ({ pag
 //
 // Every date in these forms is the PDX calendar, not the browser's own `<input type="date">`, and
 // the weekly hours are not a native number input. The forms
-// are in the DOM even while hidden (`:show`), the add and End dialogs' too, so loading the page is
+// are in the DOM even while hidden (`@show`), the add and End dialogs' too, so loading the page is
 // enough to see every field.
 
 for (const path of ['/employees/1/personal', '/employees/1/contracts', '/employees/1/sites', '/employees/1/documents', '/intake']) {

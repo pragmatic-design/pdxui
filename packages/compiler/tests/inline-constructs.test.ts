@@ -33,7 +33,10 @@ describe('every template construct survives the inline production path', () => {
     it('@show — kept in the DOM and toggled, not removed', () => {
         const code = inline('@show (count) { <div>here</div> }');
         parses(code);
-        expect(code).toContain('show');
+        expect(code).toContain('.style.display=');
+        const several = inline('@show (count) { <div>here</div><div>too</div> }');
+        parses(several);
+        expect(several).toContain('show(');
     });
 
     it('@portal — rendered into another host', () => {

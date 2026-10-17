@@ -5,7 +5,7 @@
       <p class="pdx-txt-body pdx-ink-muted">{{ $t('settings.users.intro') }}</p>
     </header>
 
-    <p class="refusal pdx-txt-small" :show="refusal() !== ''" role="alert" data-test="refusal">{{ refusal() }}</p>
+    @show (refusal() !== '') { <p class="refusal pdx-txt-small" role="alert" data-test="refusal">{{ refusal() }}</p> }
 
     <!-- The identity server's accounts (`mock-auth.ts`), the same list it signs tokens for, each with
          what its roles let it do. With `settings.permissions` a role is given or taken here; the server

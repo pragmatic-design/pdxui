@@ -130,7 +130,7 @@ describe('CD-C1 — PDX_SHARED_STYLES', () => {
     const file = (style: string) => [
         '<template>',
         '  <nav class="rail" :data-side="side"><button class="rail-toggle" @click="toggle">≡</button></nav>',
-        '  <div class="profile" :show="profileOpen"><p class="profile-name">me</p></div>',
+        '  @show (profileOpen) { <div class="profile"><p class="profile-name">me</p></div> }',
         '</template>',
         '<script setup>',
         "let side = $signal('expanded');", 'let collapsed = $signal(false);',

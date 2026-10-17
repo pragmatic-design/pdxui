@@ -62,49 +62,53 @@
          TransferHandle they return. The upload is `<pdx-attachment-upload>` (src/attachment-upload.pdx),
          shared with the employee's documents; the list and the download are this
          page's. -->
-    <section class="attachments" :show="!onChild && section === 'attachments'" data-test="attachments">
-      <h2 class="pdx-txt-heading">{{ $t('attachments.title') }}</h2>
-      <!-- For the reader of the source: upload and download go through `uploadFile` and
-           `downloadFile`, whose TransferHandle carries `progress`, `loaded` and `total` as signals,
-           and `abort()`. -->
-      <p class="pdx-txt-small pdx-ink-muted">{{ $t('attachments.intro') }}</p>
+    @show (!onChild && section === 'attachments') {
+      <section class="attachments" data-test="attachments">
+        <h2 class="pdx-txt-heading">{{ $t('attachments.title') }}</h2>
+        <!-- For the reader of the source: upload and download go through `uploadFile` and
+             `downloadFile`, whose TransferHandle carries `progress`, `loaded` and `total` as signals,
+             and `abort()`. -->
+        <p class="pdx-txt-small pdx-ink-muted">{{ $t('attachments.intro') }}</p>
 
-      <pdx-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></pdx-attachment-upload>
+        <pdx-attachment-upload :endpoint="uploadEndpoint" @settled="reload"></pdx-attachment-upload>
 
-      <!-- The list is the SERVER's, re-read after every transfer. An upload that only appends to a
-           local array cannot show that a cancelled one left nothing behind. -->
-      <ul class="files" data-test="files">
-        @for (files as file; track file.id) {
-          <li class="file" :data-name="file.name">
-            <span class="pdx-txt-small">{{ file.name }}</span>
-            <span class="pdx-txt-small pdx-ink-muted">{{ $n(file.size) }}</span>
-            <pdx-button size="sm" variant="ghost" @click="download(file)" data-test="download">{{ $t('attachments.download') }}</pdx-button>
-          </li>
-        } @empty {
-          <li class="pdx-txt-small pdx-ink-muted" data-test="no-files">{{ $t('attachments.none') }}</li>
-        }
-      </ul>
+        <!-- The list is the SERVER's, re-read after every transfer. An upload that only appends to a
+             local array cannot show that a cancelled one left nothing behind. -->
+        <ul class="files" data-test="files">
+          @for (files as file; track file.id) {
+            <li class="file" :data-name="file.name">
+              <span class="pdx-txt-small">{{ file.name }}</span>
+              <span class="pdx-txt-small pdx-ink-muted">{{ $n(file.size) }}</span>
+              <pdx-button size="sm" variant="ghost" @click="download(file)" data-test="download">{{ $t('attachments.download') }}</pdx-button>
+            </li>
+          } @empty {
+            <li class="pdx-txt-small pdx-ink-muted" data-test="no-files">{{ $t('attachments.none') }}</li>
+          }
+        </ul>
 
-      <!-- What the last download was SAVED as. The server sends it in Content-Disposition and the
-           handle reads it; the URL's last segment is `content`, which is what a page that guessed
-           from the URL would have written to disk. -->
-      <p class="pdx-txt-small pdx-ink-muted" :show="savedAs !== ''" data-test="saved-as">{{ $t('attachments.savedAs', { name: savedAs }) }}</p>
-    </section>
+        <!-- What the last download was SAVED as. The server sends it in Content-Disposition and the
+             handle reads it; the URL's last segment is `content`, which is what a page that guessed
+             from the URL would have written to disk. -->
+        @show (savedAs !== '') { <p class="pdx-txt-small pdx-ink-muted" data-test="saved-as">{{ $t('attachments.savedAs', { name: savedAs }) }}</p> }
+      </section>
+    }
 
     <!-- The heavy tab, behind a `@defer`: the chart is not in this route's first payload, and the
          network assertion in the spec is what proves it — its chunk is requested when the tab is
          opened and not before. -->
-    <section class="history" :show="!onChild && section === 'history'" data-test="history">
-      <!-- `viewport`, not `interaction`: `interaction` listens on the block, and with it the chart
-           is never built at all, because an `interaction` that means what it says cannot fire for
-           a section the pointer has never been inside. The sentinel entering the viewport when the
-           tab opens is what this section actually wants. -->
-      @defer (viewport) {
-        <pdx-chart type="line" :data="historySeries" x-field="month" y-field="hours" height="160" data-test="chart"></pdx-chart>
-      } @placeholder {
-        <div class="skeleton" data-test="chart-placeholder">{{ $t('ticket.loadingChart') }}</div>
-      }
-    </section>
+    @show (!onChild && section === 'history') {
+      <section class="history" data-test="history">
+        <!-- `viewport`, not `interaction`: `interaction` listens on the block, and with it the chart
+             is never built at all, because an `interaction` that means what it says cannot fire for
+             a section the pointer has never been inside. The sentinel entering the viewport when the
+             tab opens is what this section actually wants. -->
+        @defer (viewport) {
+          <pdx-chart type="line" :data="historySeries" x-field="month" y-field="hours" height="160" data-test="chart"></pdx-chart>
+        } @placeholder {
+          <div class="skeleton" data-test="chart-placeholder">{{ $t('ticket.loadingChart') }}</div>
+        }
+      </section>
+    }
 
         <!-- The child route renders here, and when one is open it IS the body: the in-page sections
              above step aside. The number above is how the build test tells a nested render from a

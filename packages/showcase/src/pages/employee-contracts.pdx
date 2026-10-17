@@ -2,61 +2,67 @@
   <section class="section" data-test="contracts">
     <div class="section-head">
       <h2 class="pdx-txt-heading">{{ $t('employees.sectionNames.contracts') }}</h2>
-      <pdx-button size="sm" :show="!editing && filled" @click="openAdd" data-test="contract-add">{{ $t('employees.contracts.addShort') }}</pdx-button>
+      @show (!editing && filled) { <pdx-button size="sm" @click="openAdd" data-test="contract-add">{{ $t('employees.contracts.addShort') }}</pdx-button> }
     </div>
 
     <!-- VOID: what a create leaves. An invitation with the action in it. -->
-    <div :show="!editing && !filled" data-test="contracts-empty">
-      <pdx-empty-state
-        icon="briefcase"
-        :title="$t('employees.contracts.emptyTitle')"
-        :description="$t('employees.contracts.emptyBody')"
-        :action-label="$t('employees.contracts.add')"
-        @pdx-action="openAdd"></pdx-empty-state>
-    </div>
+    @show (!editing && !filled) {
+      <div data-test="contracts-empty">
+        <pdx-empty-state
+          icon="briefcase"
+          :title="$t('employees.contracts.emptyTitle')"
+          :description="$t('employees.contracts.emptyBody')"
+          :action-label="$t('employees.contracts.add')"
+          @pdx-action="openAdd"></pdx-empty-state>
+      </div>
+    }
 
     <!-- FILLED: the periods, newest last, as they happened. Rows of a grid, not a <table>: `@for`
          inside a table is a known trap of the template engine. -->
-    <div class="periods" :show="!editing && filled" role="list" data-test="contract-list">
-      @for (contracts as c; track c.id) {
-        <div class="period" role="listitem" data-test="contract-row">
-          <span class="period-type">{{ typeName(c.type) }}</span>
-          <span class="period-span">{{ span(c) }}</span>
-          <span class="pdx-ink-muted">{{ $t('employees.contracts.hours', { hours: c.weeklyHours }) }}</span>
-          <span class="period-actions">
-            <pdx-button size="sm" variant="ghost" @click="startEdit(c)" data-test="contract-edit">{{ $t('employees.contracts.edit') }}</pdx-button>
-            @if (!c.end) {
-              <pdx-button size="sm" variant="outline" @click="periods.askEnd(c)" data-test="contract-end">{{ $t('employees.contracts.end') }}</pdx-button>
-            }
-          </span>
-        </div>
-      }
-    </div>
+    @show (!editing && filled) {
+      <div class="periods" role="list" data-test="contract-list">
+        @for (contracts as c; track c.id) {
+          <div class="period" role="listitem" data-test="contract-row">
+            <span class="period-type">{{ typeName(c.type) }}</span>
+            <span class="period-span">{{ span(c) }}</span>
+            <span class="pdx-ink-muted">{{ $t('employees.contracts.hours', { hours: c.weeklyHours }) }}</span>
+            <span class="period-actions">
+              <pdx-button size="sm" variant="ghost" @click="startEdit(c)" data-test="contract-edit">{{ $t('employees.contracts.edit') }}</pdx-button>
+              @if (!c.end) {
+                <pdx-button size="sm" variant="outline" @click="periods.askEnd(c)" data-test="contract-end">{{ $t('employees.contracts.end') }}</pdx-button>
+              }
+            </span>
+          </div>
+        }
+      </div>
+    }
 
     <!-- EDIT, in the page: the URL does not move and no modal opens («create in a modal, edit in the
-         page»). `:show` and not `@if`: the form projects its fields through a slot. -->
-    <div :show="editing">
-      <pdx-form :form="contract" @pdx-submit="onSave" data-test="contract-form">
-        <div class="grid">
-          <pdx-form-field name="type" :label="$t('employees.contracts.fields.type')">
-            <pdx-select name="type" :options="typeOptions" data-test="type"></pdx-select>
-          </pdx-form-field>
-          <pdx-form-field name="weeklyHours" :label="$t('employees.contracts.fields.weeklyHours')">
-            <pdx-number-input name="weeklyHours" data-test="weeklyHours"></pdx-number-input>
-          </pdx-form-field>
-          <pdx-form-field name="start" :label="$t('employees.contracts.fields.start')">
-            <pdx-date-picker name="start" editable data-test="start"></pdx-date-picker>
-          </pdx-form-field>
-          <pdx-form-field name="end" :label="$t('employees.contracts.fields.end')">
-            <pdx-date-picker name="end" editable data-test="end"></pdx-date-picker>
-          </pdx-form-field>
-        </div>
-        <div class="actions">
-          <pdx-button type="submit" variant="primary" data-test="contract-save">{{ $t('employees.contracts.save') }}</pdx-button>
-          <pdx-button variant="ghost" @click="periods.editing.set(null)" data-test="contract-cancel">{{ $t('employees.contracts.cancel') }}</pdx-button>
-        </div>
-      </pdx-form>
-    </div>
+         page»). `@show` and not `@if`: the form projects its fields through a slot. -->
+    @show (editing) {
+      <div>
+        <pdx-form :form="contract" @pdx-submit="onSave" data-test="contract-form">
+          <div class="grid">
+            <pdx-form-field name="type" :label="$t('employees.contracts.fields.type')">
+              <pdx-select name="type" :options="typeOptions" data-test="type"></pdx-select>
+            </pdx-form-field>
+            <pdx-form-field name="weeklyHours" :label="$t('employees.contracts.fields.weeklyHours')">
+              <pdx-number-input name="weeklyHours" data-test="weeklyHours"></pdx-number-input>
+            </pdx-form-field>
+            <pdx-form-field name="start" :label="$t('employees.contracts.fields.start')">
+              <pdx-date-picker name="start" editable data-test="start"></pdx-date-picker>
+            </pdx-form-field>
+            <pdx-form-field name="end" :label="$t('employees.contracts.fields.end')">
+              <pdx-date-picker name="end" editable data-test="end"></pdx-date-picker>
+            </pdx-form-field>
+          </div>
+          <div class="actions">
+            <pdx-button type="submit" variant="primary" data-test="contract-save">{{ $t('employees.contracts.save') }}</pdx-button>
+            <pdx-button variant="ghost" @click="periods.editing.set(null)" data-test="contract-cancel">{{ $t('employees.contracts.cancel') }}</pdx-button>
+          </div>
+        </pdx-form>
+      </div>
+    }
 
     <!-- ADD, in a modal, from a schema — as the lists create. The schema carries the same rule the
          page's form does: a schema takes a form-level `validate` since this story. -->

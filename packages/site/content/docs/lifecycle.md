@@ -82,7 +82,7 @@ is frozen and resume on return, instead of keeping it running for nothing.
 
 ## The rule
 
-If you can get the result by **declaring** (a `$derived`, a `:show`, an `@if`), prefer it: it's
+If you can get the result by **declaring** (a `$derived`, an `@show`, an `@if`), prefer it: it's
 simpler and won't get cleanup wrong. Hooks are for what is **inherently imperative**: talking to the
 bare DOM, to external libraries, to timers and global listeners. And for everything you start in a
 hook, remember where you stop it.

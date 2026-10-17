@@ -107,6 +107,13 @@ describe('pdx check --fix and --json', () => {
         expect(report.summary.fixed).toBe(1);
     });
 
+    it('--fix applies an info-level fix too, at the default --severity warn: a single pipe becomes the call (#129)', async () => {
+        writeFileSync(join(root, 'pipe.pdx'), '<template><p>{{ n | upper }}</p></template>\n<script setup>\nlet n = $signal(1);\nfunction upper(v) { return String(v).toUpperCase(); }\n</script>\n');
+        const report = await check({ fix: true });
+        expect(readFileSync(join(root, 'pipe.pdx'), 'utf-8')).toContain('<p>{{ upper(n) }}</p>');
+        expect(report.files[0].fixed.map((f) => f.code)).toEqual(['PDX_PIPE_SINGLE']);
+    });
+
     it('--max-warnings 0 exits 1 on a file with only warnings', async () => {
         writeFileSync(join(root, 'counter.pdx'), TWO_COUNTS);
         const report = await check({ 'max-warnings': '0' });

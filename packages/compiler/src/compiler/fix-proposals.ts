@@ -8,7 +8,7 @@
 import type { ValidationWarning, FixProposal } from './validate';
 import {
     offsetOf, rawInterpolationFix, interpolationInBindingFix, boundNameFix, eventNameFix, tagRenameFix,
-    undeclaredRefFix, fetchTypeColonFix, routeFieldQuotedFix,
+    undeclaredRefFix, fetchTypeColonFix, routeFieldQuotedFix, singlePipeFix,
 } from './fix-builders';
 
 /**
@@ -70,6 +70,7 @@ const BUILDERS: Record<string, (source: string, w: ValidationWarning) => FixProp
     PDX_UNDECLARED_REF: undeclaredRefFix,
     PDX_FETCH_TYPE_COLON: fetchTypeColonFix,
     PDX_ROUTE_FIELD_INVALID: routeFieldQuotedFix,
+    PDX_PIPE_SINGLE: singlePipeFix,
 };
 
 /**

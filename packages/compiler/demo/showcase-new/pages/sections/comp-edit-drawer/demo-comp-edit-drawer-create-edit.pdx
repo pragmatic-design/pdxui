@@ -11,10 +11,12 @@
       <button class="pdx-secondary" @click="openEdit">Edit Alice</button>
     </div>
 
-    <div class="event-log" :show="lastSaved !== ''">
-      <strong class="pdx-txt-small">Last saved</strong>
-      <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;">{{ lastSaved }}</div>
-    </div>
+    @show (lastSaved !== '') {
+      <div class="event-log">
+        <strong class="pdx-txt-small">Last saved</strong>
+        <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;">{{ lastSaved }}</div>
+      </div>
+    }
 
     <pdx-edit-drawer
       :open="drawerOpen"

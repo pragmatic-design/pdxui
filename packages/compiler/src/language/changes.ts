@@ -20,6 +20,7 @@
 import { DEFER_TRIGGERS, unknownDeferTriggers } from '../compiler/defer-triggers';
 import { escapeForRegExp } from '../compiler/regexp-escape';
 import { bindsModel, type ModelsLookup } from '../compiler/validate-two-way';
+import { refAttribute, showAttribute, classDot, styleDot } from './template-forms';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -263,6 +264,11 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     deferUnknownTrigger,
     twoWayNotModel,
     twoWayNumber,
+    // #129: one spelling per template form (./template-forms).
+    refAttribute,
+    showAttribute,
+    classDot,
+    styleDot,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
