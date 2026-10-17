@@ -11,6 +11,9 @@ declare global {
   function $signal<T>(v: T): T;
   // The VALUE form, the one the compiler takes: \`$derived(a > b)\` is a boolean.
   function $derived<T>(value: T): T;
+  // What the projection writes for \`$derived(x)\`, \`$drv(()=>x)\`: the same length, and x read
+  // later, as the compiler's \`computed(() => x)\` reads it (./ts-service).
+  function $drv<T>(read: () => T): T;
   function $store<T extends object>(v: T): T;
   function $effect(fn: () => unknown): void;
   // Core's WatchOptions, whole (#206).
@@ -65,6 +68,8 @@ declare global {
   // Core's ReadonlySignal: a read and a peek of the SAME type. Written once, so the two cannot
   // drift — a peek typed apart made a form unassignable to core's Form in four showcase pages (#58).
   type PdxReadonly<T> = { (): T; peek(): T };
+  // Core's Signal, as a store module's hook hands one out (./rune-module).
+  type PdxSignal<T> = PdxReadonly<T> & { set(v: T | ((prev: T) => T)): void; setRaw(v: T): void };
   interface PdxResource<T> {
     readonly data: PdxReadonly<T | undefined>;
     readonly error: PdxReadonly<unknown>;

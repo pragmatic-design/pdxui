@@ -66,13 +66,31 @@ export interface FieldSaveConfig {
     saveDebounce?: number;
 }
 
+/**
+ * The dotted path of each nested field, as `createForm` flattens the values into fields:
+ * `{ customer: { name: string } }` → `'customer.name'`. An array is a field array (`form.array()`),
+ * not a group of fields, so it is not entered.
+ */
+type NestedFieldPath<T> = {
+    [K in keyof T & string]: T[K] extends readonly unknown[] ? never
+        : T[K] extends Record<string, unknown> ? `${K}.${keyof T[K] & string}` | `${K}.${NestedFieldPath<T[K]>}` : never;
+}[keyof T & string];
+
+/** The value at a dotted path of `T`. */
+type PathValue<T, P extends string> = P extends `${infer H}.${infer R}`
+    ? (H extends keyof T ? PathValue<T[H], R> : never)
+    : (P extends keyof T ? T[P] : never);
+
 export interface FormConfig<T extends Record<string, unknown>> {
     /** Initial field values. */
     initialValues: T;
-    /** Per-field sync validators. Key = field name. */
-    validators?: { [K in keyof T]?: Validator<T[K]>[] };
-    /** Per-field async validators. Key = field name. */
-    asyncValidators?: { [K in keyof T]?: AsyncValidator<T[K]> };
+    /**
+     * Per-field sync validators. Key = field name: a top-level one, or a nested field by its dotted
+     * path (`'customer.name'`), which is the name `createForm` gives it.
+     */
+    validators?: { [K in keyof T]?: Validator<T[K]>[] } & { [P in NestedFieldPath<T>]?: Validator<PathValue<T, P>>[] };
+    /** Per-field async validators. Key = field name, a nested one by its dotted path, as above. */
+    asyncValidators?: { [K in keyof T]?: AsyncValidator<T[K]> } & { [P in NestedFieldPath<T>]?: AsyncValidator<PathValue<T, P>> };
     /** Async validation debounce in ms (default: 300). */
     asyncDebounceMs?: number;
     /** External schema (Standard Schema v1 — Zod/Valibot/ArkType). */

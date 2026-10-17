@@ -29,7 +29,7 @@ function renderUser(user) {
 </template>
 
 <script setup>
-import { createDataSource } from '@pdxui/core';
+import { createDataSource, type DataResponse } from '@pdxui/core';
 
 // Fake DataSource that simulates 1.5s fetch
 const fakeUsers = [
@@ -40,9 +40,9 @@ const fakeUsers = [
   { id: 5, name: 'Tom Clark', email: 'tom@example.com', role: 'Admin' },
 ];
 
-const fakeDS = createDataSource({
+const fakeDS = createDataSource<(typeof fakeUsers)[number]>({
   transport: {
-    read: () => new Promise(function(resolve) {
+    read: () => new Promise<DataResponse<(typeof fakeUsers)[number]>>(function(resolve) {
       setTimeout(function() {
         resolve({ data: fakeUsers, total: fakeUsers.length });
       }, 1500);

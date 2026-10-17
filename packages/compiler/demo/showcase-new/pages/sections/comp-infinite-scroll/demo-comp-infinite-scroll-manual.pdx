@@ -21,18 +21,19 @@
 </template>
 
 <script setup>
-import { createDataSource } from '@pdxui/core';
+import { createDataSource, type DataResponse } from '@pdxui/core';
 
 // --- Manual demo: 50 items ---
-const manualAllItems = [];
+type Item = { id: number; title: string };
+const manualAllItems: Item[] = [];
 for (let _midx = 1; _midx <= 50; _midx++) {
     manualAllItems.push({ id: _midx, title: 'Manual Item ' + _midx });
 }
 
-const manualDS = createDataSource({
+const manualDS = createDataSource<Item>({
     transport: {
         read: function(params) {
-            return new Promise(function(resolve) {
+            return new Promise<DataResponse<Item>>(function(resolve) {
                 const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
                 const _result = manualAllItems.slice(_off, _off + (params.pageSize || 10));
                 setTimeout(function() { resolve({ data: _result, total: manualAllItems.length }); }, 300);

@@ -9905,7 +9905,7 @@ const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];
     
     
     // Tri-component demo: same fields drive filter + grid + form
-    const triFields = [
+    const triFields                    = [
       { field: 'name', label: 'Name', type: 'text' },
       { field: 'role', label: 'Role', type: 'enum', options: roles.map(function(r) { return { label: r, value: r }; }) },
       { field: 'salary', label: 'Salary', type: 'currency' },
@@ -18909,7 +18909,7 @@ component('pdx-demo-comp-error-boundary-network-fetch', {
     
     function startCountdown(seconds, onDone) {
       __netCountdown.setRaw(seconds);
-      timers.id = setInterval(() => {
+      timers.id = window.setInterval(() => {
         __netCountdown.setRaw(__netCountdown.peek() - 1);
         if (__netCountdown() <= 0) {
           clearInterval(timers.id);
@@ -19997,7 +19997,7 @@ const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.first
 component('pdx-demo-comp-filter-builder-basic', {
   props: {},
   setup(ctx) {
-const fields = [
+const fields                    = [
       { field: 'name', label: 'Name', type: 'text' },
       { field: 'category', label: 'Category', type: 'enum', options: categories.map(function(c) { return { label: c, value: c }; }) },
       { field: 'price', label: 'Price', type: 'currency' },
@@ -20036,7 +20036,7 @@ component('pdx-demo-comp-filter-builder-same-json', {
   props: {},
   setup(ctx) {
 // Second demo — same JSON pattern
-    const fields2 = [
+    const fields2                    = [
       { field: 'name', label: 'Name', type: 'text' },
       { field: 'category', label: 'Category', type: 'enum', options: categories.map(function(c) { return { label: c, value: c }; }) },
       { field: 'price', label: 'Price', type: 'currency' },
@@ -20828,7 +20828,7 @@ component('pdx-demo-comp-form-advanced-field-arrays', {
     
     
     
-    function renderLineItems(focusRow) { requestAnimationFrame(() => { const container = __lineItemRows(); if (!container) return; container.innerHTML = ''; const items = lineItems.items(); items.forEach((item, idx) => { const n = idx + 1; const row = document.createElement('div'); row.className = 'field-array-row'; const pInput = document.createElement('input'); pInput.className = 'pdx-input'; pInput.placeholder = 'Product name'; pInput.setAttribute('aria-label', 'Product, line ' + n); pInput.value = item.value.product || ''; pInput.addEventListener('input', (e) => { item.value.product = e.target.value; }); const qInput = document.createElement('input'); qInput.className = 'pdx-input'; qInput.type = 'number'; qInput.setAttribute('aria-label', 'Quantity, line ' + n); qInput.value = String(item.value.qty || 1); qInput.style.textAlign = 'center'; qInput.addEventListener('input', (e) => { item.value.qty = Number(e.target.value) || 0; }); const prInput = document.createElement('input'); prInput.className = 'pdx-input'; prInput.type = 'number'; prInput.step = '0.01'; prInput.setAttribute('aria-label', 'Price, line ' + n); prInput.value = String(item.value.price || 0); prInput.style.textAlign = 'right'; prInput.addEventListener('input', (e) => { item.value.price = Number(e.target.value) || 0; }); const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'pdx-btn pdx-ghost pdx-sm'; btn.style.padding = '4px'; btn.textContent = '×'; btn.setAttribute('aria-label', 'Remove line ' + n); btn.addEventListener('click', () => { removeLineItem(idx); }); row.appendChild(pInput); row.appendChild(qInput); row.appendChild(prInput); row.appendChild(btn); container.appendChild(row); }); if (typeof focusRow === 'number') { const rows = container.querySelectorAll('.field-array-row'); const target = rows[Math.min(focusRow, rows.length - 1)]; const first = target ? target.querySelector('input') : __addLineButton(); if (first) first.focus(); } }); }
+    function renderLineItems(focusRow         ) { requestAnimationFrame(() => { const container = __lineItemRows(); if (!container) return; container.innerHTML = ''; const items = lineItems.items(); items.forEach((item, idx) => { const n = idx + 1; const row = document.createElement('div'); row.className = 'field-array-row'; const pInput = document.createElement('input'); pInput.className = 'pdx-input'; pInput.placeholder = 'Product name'; pInput.setAttribute('aria-label', 'Product, line ' + n); pInput.value = item.value.product || ''; pInput.addEventListener('input', () => { item.value.product = pInput.value; }); const qInput = document.createElement('input'); qInput.className = 'pdx-input'; qInput.type = 'number'; qInput.setAttribute('aria-label', 'Quantity, line ' + n); qInput.value = String(item.value.qty || 1); qInput.style.textAlign = 'center'; qInput.addEventListener('input', () => { item.value.qty = Number(qInput.value) || 0; }); const prInput = document.createElement('input'); prInput.className = 'pdx-input'; prInput.type = 'number'; prInput.step = '0.01'; prInput.setAttribute('aria-label', 'Price, line ' + n); prInput.value = String(item.value.price || 0); prInput.style.textAlign = 'right'; prInput.addEventListener('input', () => { item.value.price = Number(prInput.value) || 0; }); const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'pdx-btn pdx-ghost pdx-sm'; btn.style.padding = '4px'; btn.textContent = '×'; btn.setAttribute('aria-label', 'Remove line ' + n); btn.addEventListener('click', () => { removeLineItem(idx); }); row.appendChild(pInput); row.appendChild(qInput); row.appendChild(prInput); row.appendChild(btn); container.appendChild(row); }); if (typeof focusRow === 'number') { const rows = container.querySelectorAll('.field-array-row'); const target = rows[Math.min(focusRow, rows.length - 1)]; const first = target ? target.querySelector('input') : __addLineButton(); if (first) first.focus(); } }); }
     function lineItemCount() { return lineItems.length() + ' item(s)'; }
     function lineItemTotal() { const items = lineItems.items(); let total = 0; for (const it of items) { total += (it.value.qty || 0) * (it.value.price || 0); } return 'Total: $' + total.toFixed(2); }
     function lineItemsJson() { const items = lineItems.items(); return JSON.stringify(items.map(i => i.value), null, 2); }
@@ -22677,16 +22677,18 @@ component('pdx-demo-comp-infinite-scroll-basic', {
     const __basicItems = signal(null, { name: 'demo-comp-infinite-scroll-basic:basicItems' });
     const __basicLog = signal('Loaded items: 0', { name: 'demo-comp-infinite-scroll-basic:basicLog' });
 // --- Basic demo: 100 items, 10 per page ---
-    const allItems = [];
+                                                                   
+    
+    const allItems         = [];
     
     for (let _idx = 1; _idx <= 100; _idx++) {
         allItems.push({ id: _idx, title: 'Item ' + _idx, description: 'Description for item ' + _idx });
     }
     
-    const scrollDS = createDataSource({
+    const scrollDS = createDataSource      ({
         transport: {
             read: function(params) {
-                return new Promise(function(resolve) {
+                return new Promise                    (function(resolve) {
                     const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
                     const _result = allItems.slice(_off, _off + (params.pageSize || 10));
                     setTimeout(function() { resolve({ data: _result, total: allItems.length }); }, 500);
@@ -22716,7 +22718,7 @@ component('pdx-demo-comp-infinite-scroll-basic', {
         }
         __basicLog.setRaw('Loaded items: ' + _data.length + ' of ' + scrollDS.total());
     }
-}, { name: "demo-comp-infinite-scroll-basic.pdx:57" });
+}, { name: "demo-comp-infinite-scroll-basic.pdx:58" });
     return { allItems, scrollDS, basicItems: __basicItems, basicLog: __basicLog };
   },
   render: (ctx) => (() => {
@@ -22744,17 +22746,20 @@ component('pdx-demo-comp-infinite-scroll-end-message', {
   props: {},
   setup(ctx) {
     const __endItems = signal(null, { name: 'demo-comp-infinite-scroll-end-message:endItems' });
-// --- End message demo: 20 items ---
-    const endAllItems = [];
+                                          
+    
+    
+    // --- End message demo: 20 items ---
+    const endAllItems         = [];
     
     for (let _eidx = 1; _eidx <= 20; _eidx++) {
         endAllItems.push({ id: _eidx, title: 'Short Item ' + _eidx });
     }
     
-    const endDS = createDataSource({
+    const endDS = createDataSource      ({
         transport: {
             read: function(params) {
-                return new Promise(function(resolve) {
+                return new Promise                    (function(resolve) {
                     const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
                     const _result = endAllItems.slice(_off, _off + (params.pageSize || 10));
                     setTimeout(function() { resolve({ data: _result, total: endAllItems.length }); }, 400);
@@ -22777,7 +22782,7 @@ component('pdx-demo-comp-infinite-scroll-end-message', {
             _container.appendChild(_div);
         }
     }
-}, { name: "demo-comp-infinite-scroll-end-message.pdx:38" });
+}, { name: "demo-comp-infinite-scroll-end-message.pdx:40" });
     return { endAllItems, endDS, endItems: __endItems };
   },
   render: (ctx) => (() => {
@@ -22813,16 +22818,18 @@ component('pdx-demo-comp-infinite-scroll-manual', {
     const __manualLoadMore = signal(null, { name: 'demo-comp-infinite-scroll-manual:manualLoadMore' });
     const __manualLog = signal('Click "Load More" to fetch...', { name: 'demo-comp-infinite-scroll-manual:manualLog' });
 // --- Manual demo: 50 items ---
-    const manualAllItems = [];
+                                              
+    
+    const manualAllItems         = [];
     
     for (let _midx = 1; _midx <= 50; _midx++) {
         manualAllItems.push({ id: _midx, title: 'Manual Item ' + _midx });
     }
     
-    const manualDS = createDataSource({
+    const manualDS = createDataSource      ({
         transport: {
             read: function(params) {
-                return new Promise(function(resolve) {
+                return new Promise                    (function(resolve) {
                     const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
                     const _result = manualAllItems.slice(_off, _off + (params.pageSize || 10));
                     setTimeout(function() { resolve({ data: _result, total: manualAllItems.length }); }, 300);
@@ -22860,7 +22867,7 @@ component('pdx-demo-comp-infinite-scroll-manual', {
         }
         __manualLog.setRaw('Showing ' + _data.length + ' of ' + manualDS.total() + ' items');
     }
-}, { name: "demo-comp-infinite-scroll-manual.pdx:59" });
+}, { name: "demo-comp-infinite-scroll-manual.pdx:60" });
     ctx.el.setAttribute('data-pdx-7vbk09', '');
     return { manualAllItems, manualDS, manualItems: __manualItems, manualLoadMore: __manualLoadMore, manualLog: __manualLog, onManualLoad };
   },
@@ -24461,9 +24468,9 @@ component('pdx-demo-comp-list-data-source', {
     ];
     
     
-    const fakeDS = createDataSource({
+    const fakeDS = createDataSource                            ({
       transport: {
-        read: () => new Promise(function(resolve) {
+        read: () => new Promise                                          (function(resolve) {
           setTimeout(function() {
             resolve({ data: fakeUsers, total: fakeUsers.length });
           }, 1500);
@@ -24563,21 +24570,23 @@ component('pdx-demo-comp-list-pagination', {
     const __pagedTotal = signal(23, { name: 'demo-comp-list-pagination:pagedTotal' });
     const __pagedPage = signal(1, { name: 'demo-comp-list-pagination:pagedPage' });
 // Paged DataSource — 23 items, 5 per page, simulates server paging
-    const allUsers = [];
+                                                                          
+    
+    const allUsers         = [];
     
     for (let _userIdx = 1; _userIdx <= 23; _userIdx++) {
       allUsers.push({ id: _userIdx, name: 'User ' + _userIdx, email: 'user' + _userIdx + '@example.com', dept: _userIdx % 3 === 0 ? 'Engineering' : _userIdx % 3 === 1 ? 'Design' : 'Marketing' });
     }
     
-    function _fakePagedRead(params) {
-      return new Promise(function(resolve) {
+    function _fakePagedRead(params             ) {
+      return new Promise                    (function(resolve) {
         const _off = ((params.page || 1) - 1) * (params.pageSize || 5);
         const _result = allUsers.slice(_off, _off + (params.pageSize || 5));
         setTimeout(function() { resolve({ data: _result, total: allUsers.length }); }, 800);
       });
     }
     
-    const pagedDS = createDataSource({
+    const pagedDS = createDataSource      ({
       transport: { read: _fakePagedRead },
       pageSize: 5,
       autoLoad: true,
@@ -24609,7 +24618,7 @@ component('pdx-demo-comp-list-pagination', {
   const dataLen = pagedDS.data().length;
   __pagedTotal.setRaw(total);
   __pagedPage.setRaw(pageNum);
-}, { name: "demo-comp-list-pagination.pdx:55" });
+}, { name: "demo-comp-list-pagination.pdx:56" });
     return { allUsers, pagedDS, pagedTotal: __pagedTotal, pagedPage: __pagedPage, pagedInfo, onPageChange, renderPagedItem };
   },
   render: (ctx) => (() => {
@@ -44420,7 +44429,7 @@ component('pdx-demo-infra-overlay-bottom-sheet', {
             detents: [0.4, 0.8],
             onDismiss: function() { log('Bottom sheet dismissed'); bsResult = null; },
         });
-        content.querySelector('#bs-close').onclick = function() {
+        content.querySelector                   ('#bs-close') .onclick = function() {
             bsResult?.dispose();
             log('Bottom sheet closed');
             bsResult = null;

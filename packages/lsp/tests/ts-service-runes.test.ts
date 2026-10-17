@@ -68,6 +68,16 @@ describe('the rune declarations', () => {
         expect(diagnose('const stop = effect(() => {});\nstop();\n$effect(async () => {});\n')).toEqual([]);
     });
 
+    it('a $derived that reads a const declared below it is no use before the declaration (#467)', () => {
+        // The compiler emits computed(() => …): the expression is read later, not where it is written.
+        const script = "let section = $signal('a');\nconst current = $derived(section === 'a' ? first : second);\nconst first = [1];\nconst second = [2];\ncurrent;\n";
+        expect(diagnose(script)).toEqual([]);
+        // An object literal is still an object, not an arrow's body.
+        expect(diagnose("let a = $signal(1);\nconst pair = $derived({ a, b: 2 });\nconst n: number = pair.b;\nn;\n")).toEqual([]);
+        // Still the value's type: a number is not a string.
+        expect(diagnose("const n = $derived(list.length);\nconst list = [1];\nconst s: string = n;\ns;\n").map((d) => d.split(' ')[0])).toEqual(['ts(2322)']);
+    });
+
     it('a rune declared below its first use is not "used before its declaration"', () => {
         // The compiler places signals where every use sees them.
         // At the top level: a use inside a function body is never reported, whatever the keyword.

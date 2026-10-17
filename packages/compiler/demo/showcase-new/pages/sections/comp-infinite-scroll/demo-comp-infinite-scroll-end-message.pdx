@@ -11,18 +11,20 @@
 </template>
 
 <script setup>
-import { createDataSource } from '@pdxui/core';
+import { createDataSource, type DataResponse } from '@pdxui/core';
+
+type Item = { id: number; title: string };
 
 // --- End message demo: 20 items ---
-const endAllItems = [];
+const endAllItems: Item[] = [];
 for (let _eidx = 1; _eidx <= 20; _eidx++) {
     endAllItems.push({ id: _eidx, title: 'Short Item ' + _eidx });
 }
 
-const endDS = createDataSource({
+const endDS = createDataSource<Item>({
     transport: {
         read: function(params) {
-            return new Promise(function(resolve) {
+            return new Promise<DataResponse<Item>>(function(resolve) {
                 const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
                 const _result = endAllItems.slice(_off, _off + (params.pageSize || 10));
                 setTimeout(function() { resolve({ data: _result, total: endAllItems.length }); }, 400);

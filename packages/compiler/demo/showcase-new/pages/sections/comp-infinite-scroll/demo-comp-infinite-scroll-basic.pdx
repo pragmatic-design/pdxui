@@ -28,18 +28,19 @@
 </template>
 
 <script setup>
-import { createDataSource } from '@pdxui/core';
+import { createDataSource, type DataResponse } from '@pdxui/core';
 
 // --- Basic demo: 100 items, 10 per page ---
-const allItems = [];
+type Item = { id: number; title: string; description: string };
+const allItems: Item[] = [];
 for (let _idx = 1; _idx <= 100; _idx++) {
     allItems.push({ id: _idx, title: 'Item ' + _idx, description: 'Description for item ' + _idx });
 }
 
-const scrollDS = createDataSource({
+const scrollDS = createDataSource<Item>({
     transport: {
         read: function(params) {
-            return new Promise(function(resolve) {
+            return new Promise<DataResponse<Item>>(function(resolve) {
                 const _off = ((params.page || 1) - 1) * (params.pageSize || 10);
                 const _result = allItems.slice(_off, _off + (params.pageSize || 10));
                 setTimeout(function() { resolve({ data: _result, total: allItems.length }); }, 500);

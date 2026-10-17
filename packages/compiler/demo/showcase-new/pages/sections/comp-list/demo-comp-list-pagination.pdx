@@ -26,23 +26,24 @@
 </template>
 
 <script setup>
-import { createDataSource } from '@pdxui/core';
+import { createDataSource, type DataRequest, type DataResponse } from '@pdxui/core';
 
 // Paged DataSource — 23 items, 5 per page, simulates server paging
-const allUsers = [];
+type User = { id: number; name: string; email: string; dept: string };
+const allUsers: User[] = [];
 for (let _userIdx = 1; _userIdx <= 23; _userIdx++) {
   allUsers.push({ id: _userIdx, name: 'User ' + _userIdx, email: 'user' + _userIdx + '@example.com', dept: _userIdx % 3 === 0 ? 'Engineering' : _userIdx % 3 === 1 ? 'Design' : 'Marketing' });
 }
 
-function _fakePagedRead(params) {
-  return new Promise(function(resolve) {
+function _fakePagedRead(params: DataRequest) {
+  return new Promise<DataResponse<User>>(function(resolve) {
     const _off = ((params.page || 1) - 1) * (params.pageSize || 5);
     const _result = allUsers.slice(_off, _off + (params.pageSize || 5));
     setTimeout(function() { resolve({ data: _result, total: allUsers.length }); }, 800);
   });
 }
 
-const pagedDS = createDataSource({
+const pagedDS = createDataSource<User>({
   transport: { read: _fakePagedRead },
   pageSize: 5,
   autoLoad: true,

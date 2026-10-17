@@ -4,8 +4,14 @@
 
 import packages from 'virtual:pdx-component-manifests';
 
-export interface CemMember { name: string; type?: { text: string }; default?: string; description?: string; attribute?: string; }
-export interface CemEvent { name: string; type?: { text: string }; description?: string; }
+export interface CemMember {
+    name: string; type?: { text: string }; default?: string; description?: string; attribute?: string;
+    /** In `members`: a field (a prop, or a read-only value an exposed getter gives) or a method. */
+    kind?: 'field' | 'method'; readonly?: boolean;
+    /** A method's parameters, as the generator read them from its declaration. */
+    parameters?: { name: string; optional?: boolean }[];
+}
+export interface CemEvent { name: string; type?: { text: string }; description?: string; /** The detail, as the source describes it. */ detail?: string; }
 export interface CemNamed { name: string; description?: string; default?: string; }
 export interface CemDecl {
     tagName: string;

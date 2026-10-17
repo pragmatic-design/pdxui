@@ -98,7 +98,7 @@ function simulateFetch() {
 
 function startCountdown(seconds, onDone) {
   netCountdown = seconds;
-  timers.id = setInterval(() => {
+  timers.id = window.setInterval(() => {
     netCountdown = netCountdown - 1;
     if (netCountdown <= 0) {
       clearInterval(timers.id);

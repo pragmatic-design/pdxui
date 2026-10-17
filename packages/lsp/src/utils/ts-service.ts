@@ -6,11 +6,12 @@
 import ts from 'typescript';
 import { DECORATOR_RUNES, parseFetchDecl } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
-import { existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { GLOBALS_FILE, GLOBALS_DTS } from './pdx-globals';
 import { formTypeOf } from './form-types';
+import { projectRuneModule } from './rune-module';
+import { findTsLibDir } from './ts-lib-dir';
 
 // Statement-leading runes. We recognise them ONLY at the start of a line (indent aside):
 // an `@form`/`@store` inside a comment ("(via @form rune)", for one) is not a rune.
@@ -137,49 +138,13 @@ export function projectScript(scriptContent: string): string {
     }
     let res = out.join('');
     res = res.replace(RUNE_DECL, (_all, indent: string, kw: string, rest: string) => `${indent}${kw === 'let' ? 'var' : 'var  '}${rest}`);
+    // `$derived(x)` is `computed(() => x)`: x is read later, so a const declared below it is no use
+    // before its declaration (#467). Same length, so the offsets hold: `$drv(()=>x)`. Not for an
+    // object literal, which an arrow would read as its body: `$derived({ … })` stays as written.
+    res = res.replace(/\$derived\((?!\s*\{)/g, '$drv(()=>');
     // `var`: declared after the code that reads them, as the compiler makes them available before it.
     const decls = [...[...names].map(([n, type]) => `var ${n}: ${type};`), ...emitters].join(' ');
     return decls ? `${res}\n;${decls}` : res;
-}
-
-const libDirs = new Map<string, string | null>(); // root → typescript's lib folder, null = not found
-
-const hasLib = (dir: string): boolean => existsSync(join(dir, 'lib.es2022.d.ts'));
-
-/**
- * Finds typescript's lib folder for the lib.*.d.ts files: the one the client points at (VS Code's
- * own TypeScript), then the project's — looked for in every node_modules from `rootDir` UP, pnpm's
- * store included — then the one next to this module when it is not bundled.
- *
- * Not only `<root>/node_modules`: the server ships no lib files, so a folder whose TypeScript sits
- * higher up (an app in a monorepo) or nowhere would get no lib at all — `String`, `JSON` and
- * `document` unknown, and hundreds of false errors.
- */
-function findTsLibDir(rootDir: string, hint?: string): string | null {
-    const key = `${rootDir}|${hint ?? ''}`;
-    if (libDirs.has(key)) return libDirs.get(key)!;
-    let found: string | null = hint && hasLib(hint) ? hint : null;
-    for (let dir = rootDir; !found && dir; ) {
-        const direct = join(dir, 'node_modules', 'typescript', 'lib');
-        if (hasLib(direct)) { found = direct; break; }
-        const pnpm = join(dir, 'node_modules', '.pnpm');
-        if (existsSync(pnpm)) {
-            // Several versions can coexist (typescript@5.8.x, 5.9.x): pick the one
-            // whose lib is actually there.
-            for (const d of readdirSync(pnpm)) {
-                const cand = join(pnpm, d, 'node_modules', 'typescript', 'lib');
-                if (d.startsWith('typescript@') && hasLib(cand)) { found = cand; break; }
-            }
-        }
-        const parent = dirname(dir);
-        dir = parent === dir ? '' : parent;
-    }
-    if (!found) {
-        const own = dirname(ts.getDefaultLibFilePath({}));
-        if (hasLib(own)) found = own;
-    }
-    libDirs.set(key, found);
-    return found;
 }
 
 /**
@@ -256,8 +221,8 @@ export class PdxTsService {
                 if (f === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(GLOBALS_DTS);
                 const v = this.files.get(f);
                 if (v) return ts.ScriptSnapshot.fromString(v.content);
-                const c = ts.sys.readFile(f);
-                return c !== undefined ? ts.ScriptSnapshot.fromString(c) : undefined;
+                const c = ts.sys.readFile(f); // a .pdx.ts is a rune module: read as compiled (./rune-module)
+                return c !== undefined ? ts.ScriptSnapshot.fromString(f.endsWith('.pdx.ts') ? projectRuneModule(c, f) : c) : undefined;
             },
             getCurrentDirectory: () => rootDir || ts.sys.getCurrentDirectory(),
             getCompilationSettings: () => this.options,
