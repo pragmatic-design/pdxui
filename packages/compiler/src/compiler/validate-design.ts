@@ -87,7 +87,8 @@ function checkScript(descriptor: SFCDescriptor, analysis: ScriptAnalysis | null,
     if (!script || !script.content.trim()) return [];
     const sf = parseableScript(script.content);
     const at = (node: ts.Node): number => lineAt(source, script.start + node.getStart(sf));
-    const props = new Set((analysis?.props ?? []).map(p => p.name));
+    // A `@model` is a prop the component writes by contract (#124): writing it is the point.
+    const props = new Set((analysis?.props ?? []).filter(p => !p.model).map(p => p.name));
     const warnings: ValidationWarning[] = [];
     const added: { key: string; event: string; target: string; line: number }[] = [];
     const removed = new Set<string>();
@@ -118,7 +119,7 @@ function checkScript(descriptor: SFCDescriptor, analysis: ScriptAnalysis | null,
                 code: 'PDX_PROP_WRITE',
                 severity: 'warn',
                 message: `'${written.text}' is a @prop, and this component writes it (CD-A2): the parent owns it, and its next value overwrites this one.`,
-                hint: `Emit the new value with an @event and let the parent set it; for a starting value, copy it into a $signal (initial${written.text[0].toUpperCase()}${written.text.slice(1)}).`,
+                hint: `Declare it '@model ${written.text}' when the parent binds it both ways ('::${written.text}'); for a starting value, copy it into a $signal (initial${written.text[0].toUpperCase()}${written.text.slice(1)}).`,
                 line: at(written),
             });
         }

@@ -14,7 +14,7 @@
 import { defineCommand } from 'citty';
 import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, relative, resolve } from 'node:path';
-import { languageChanges, parseSFC, type LanguageChange } from '@pdxui/compiler';
+import { ComponentResolver, languageChanges, parseSFC, type LanguageChange, type LanguageChangeContext } from '@pdxui/compiler';
 import { findFiles } from '../find-files';
 
 /** One rewrite: a file, the change applied, and how many places it rewrote. */
@@ -72,9 +72,26 @@ function regionFor(change: LanguageChange, kind: FileKind, text: string): Region
     };
 }
 
+/**
+ * What a change that reads other files looks with: the project's components, as the build resolves
+ * them — their models, for a `::x` whose child is another file (#124). A project whose packages
+ * cannot be read gives nothing, and those changes find nothing.
+ */
+function projectContext(cwd: string): LanguageChangeContext {
+    try {
+        const resolver = new ComponentResolver();
+        resolver.registerUiManifest(cwd);
+        resolver.registerProjectComponents(cwd);
+        return { modelsOf: (tag) => resolver.modelsOf(tag) };
+    } catch {
+        return {};
+    }
+}
+
 /** Apply the registry to the files under `paths`; with `dry`, compute the same report and write nothing. */
 export async function migrate(paths: string[], { cwd, dry = false }: { cwd: string; dry?: boolean }): Promise<MigrateReport> {
     const report: MigrateReport = { changed: [], flagged: [] };
+    const context = projectContext(cwd);
     for (const path of await filesOf(paths.length > 0 ? paths : ['.'], cwd)) {
         const kind = kindOf(path)!;
         const rel = relative(cwd, path).replace(/\\/g, '/');
@@ -84,7 +101,7 @@ export async function migrate(paths: string[], { cwd, dry = false }: { cwd: stri
             if (change.kind === 'target') continue;
             const region = regionFor(change, kind, text);
             if (!region) continue;
-            const found = change.detect(region.text);
+            const found = change.detect(region.text, context);
             if (found.length === 0) continue;
             if (change.kind === 'fix' || change.fix === 'flag') {
                 for (const f of found) {

@@ -8,6 +8,7 @@ import { setProp, bindGesture } from './dom';
 import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
 import type { Signal } from '../utils/types';
+import { modelEvent } from '../utils/model-event';
 
 // Properties whose value becomes a navigable/fetchable URL — a runtime-controlled value
 // (API/user data) must never be assigned raw (`javascript:`, `//evil.com`). Lowercased.
@@ -703,10 +704,25 @@ export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue
         sig.set(val);
     };
 
+    // A component that declares the prop as a model (#124) announces its writes with
+    // `<kebab-prop>-change` and `{ value }`, and that is all the binding listens to. The class is
+    // looked up by tag: an element not upgraded yet is still a plain HTMLElement.
+    if (el.tagName.includes('-')) {
+        const ctor = customElements.get(el.tagName.toLowerCase()) as { models?: ReadonlySet<string> } | undefined;
+        if (ctor?.models?.has(prop)) {
+            el.addEventListener(modelEvent(prop), (e) => {
+                const detail = (e as CustomEvent).detail as { value?: unknown } | null;
+                applyValue(detail && typeof detail === 'object' && 'value' in detail ? detail.value : (el as unknown as Record<string, unknown>)[prop]);
+            });
+            return;
+        }
+    }
+
     // Custom elements (pdx-*) don't emit `pdx-<prop>` and may not write the property back;
     // they emit `pdx-input` (live) / `pdx-change` (committed) carrying the value in
     // e.detail. Listen to those and read the payload — a `pdx-<prop>` listener never
-    // fires, and ::value/::checked would be silently one-way on every component.
+    // fires, and ::value/::checked would be silently one-way on every component. This is the
+    // alpha listening, kept for the library components that do not declare their models yet (#125).
     if (el.tagName.includes('-')) {
         const onEvt = (e: Event) => {
             const detail = (e as CustomEvent).detail;

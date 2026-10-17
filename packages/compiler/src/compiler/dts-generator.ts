@@ -37,11 +37,15 @@ export function generateDts(input: DtsInput): string {
     lines.push('}');
     lines.push('');
 
-    // Events interface
-    if (input.events.length > 0) {
+    // Events interface: the declared ones, and each model's `<name>-change` (#124)
+    const models = input.props.filter(p => p.model);
+    if (input.events.length > 0 || models.length > 0) {
         lines.push(`export interface ${pascalTag}Events {`);
         for (const e of input.events) {
             lines.push(`  ${e.name}: ${e.payloadType};`);
+        }
+        for (const m of models) {
+            lines.push(`  '${modelEventName(m.name)}': { value: ${m.tsType} };`);
         }
         lines.push('}');
         lines.push('');
@@ -103,6 +107,11 @@ export function generateDts(input: DtsInput): string {
     lines.push('');
 
     return lines.join('\n');
+}
+
+/** The event a model dispatches, as core names it: `selectedId` → `selected-id-change`. */
+export function modelEventName(name: string): string {
+    return `${name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}-change`;
 }
 
 function toPascalCase(kebab: string): string {

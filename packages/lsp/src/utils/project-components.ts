@@ -3,7 +3,7 @@
 // for both, so a project component gets what a library component gets.
 
 import { readFileSync } from 'fs';
-import { parseSFC, analyzeScript } from '@pdxui/compiler';
+import { parseSFC, analyzeScript, modelEventName } from '@pdxui/compiler';
 import type { ManifestComponent, ManifestSlot } from './manifest-index';
 
 /**
@@ -31,7 +31,14 @@ export function describeProjectComponent(tag: string, filePath: string): Manifes
             description: '',
             filePath,
             attributes: analysis.props.map(p => ({ name: p.name, type: p.tsType, default: p.default, description: '' })),
-            events: analysis.events.map(e => ({ name: e.name, type: e.payloadType, description: '' })),
+            events: [
+                ...analysis.events.map(e => ({ name: e.name, type: e.payloadType, description: '' })),
+                // A model's event (#124), as the library manifest describes it.
+                ...analysis.props.filter(p => p.model).map(p => ({
+                    name: modelEventName(p.name), type: `{ value: ${p.tsType} }`,
+                    description: `Fired when the component writes \`${p.name}\`. Does not bubble.`,
+                })),
+            ],
             slots: [...slots.values()],
         };
     } catch {

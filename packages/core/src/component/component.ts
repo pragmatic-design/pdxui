@@ -53,6 +53,7 @@ export function __pdx_hmr_restore(tag: string): void {
 // The prop and event shapes live with the descriptor's builders (#123); re-exported from here, where
 // they have always been imported from.
 import type { PropType, PropDefinition, TypedProp, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
+import { modelEvent } from '../utils/model-event';
 export type { PropType, PropDefinition, TypedProp } from './component-descriptor';
 
 /** Map PropType constructor to its JS type. */
@@ -111,12 +112,15 @@ export interface ComponentContextBase {
 /** The events a descriptor declares, by name. */
 export type EventMap = Record<string, EventSpec<unknown>>;
 
+/** The models a descriptor declares, by name (#124). */
+export type ModelMap = Record<string, ModelSpec<unknown>>;
+
 /**
- * Typed component context — its declared props as signals, and `emit` typed from its declared events
- * (any name when it declares none).
+ * Typed component context — its declared props and models as signals, and `emit` typed from its
+ * declared events (any name when it declares none).
  */
-export type TypedComponentContext<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>> =
-    Omit<ComponentContextBase, 'emit'> & { emit: EmitOf<E> } & PropSignals<P>;
+export type TypedComponentContext<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>> =
+    Omit<ComponentContextBase, 'emit'> & { emit: EmitOf<E> } & PropSignals<P> & PropSignals<M>;
 
 /**
  * Untyped component context — legacy compat for components without explicit prop typing.
@@ -130,12 +134,13 @@ export type ComponentContext = ComponentContextBase & Record<string, unknown>;
  * states, set with `ctx.state` (#132). `host` (#133) is declared beside `setup` in each options type,
  * where its functions are typed with the component's context. `parts` (#134) name the component's
  * public elements, `[data-part="name"]`, for the manifest; a `.pdx` checks and binds them at compile
- * time. The others are part of the descriptor's type now and get their behaviour in their own issues:
- * models #124, slots #131, expose #140, variants #153.
+ * time. `models` (#124) are props the component may write: writing one dispatches its
+ * `<name>-change`, and `::name` binds it both ways. The others are part of the descriptor's type now
+ * and get their behaviour in their own issues: slots #131, expose #140, variants #153.
  */
-export interface ComponentDeclarations<E extends EventMap = EventMap> {
+export interface ComponentDeclarations<E extends EventMap = EventMap, M extends ModelMap = ModelMap> {
     events?: E;
-    models?: Record<string, ModelSpec<unknown>>;
+    models?: M;
     slots?: Record<string, SlotSpec<unknown>>;
     states?: readonly string[];
     parts?: readonly string[];
@@ -150,8 +155,8 @@ export interface ComponentDeclarations<E extends EventMap = EventMap> {
  */
 export type HostOf<C> = Record<string, string | ((ctx: C, event: Event) => unknown)>;
 
-export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>, E extends EventMap = Record<never, never>>
-    extends ComponentDeclarations<E> {
+export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>>
+    extends ComponentDeclarations<E, M> {
     props?: P;
     /** Use Shadow DOM instead of Light DOM. Default: false (Light DOM). */
     shadow?: boolean;
@@ -164,28 +169,29 @@ export interface ComponentOptions<P extends Record<string, PropDefinition> = Rec
      * in development builds only, and an unhandled runtime error names it.
      */
     file?: string;
-    setup?: (ctx: TypedComponentContext<P, E>) => Record<string, unknown> | void;
-    render: (ctx: TypedComponentContext<P, E>) => DocumentFragment | Node;
+    setup?: (ctx: TypedComponentContext<P, E, M>) => Record<string, unknown> | void;
+    render: (ctx: TypedComponentContext<P, E, M>) => DocumentFragment | Node;
     /** See {@link HostOf}. */
-    host?: HostOf<TypedComponentContext<P, E>>;
+    host?: HostOf<TypedComponentContext<P, E, M>>;
 }
 
 /** Options with typed setup return — render ctx includes both props and setup exports. */
 export interface ComponentOptionsWithSetup<
     P extends Record<string, PropDefinition>,
     S extends Record<string, unknown>,
-    E extends EventMap = Record<never, never>
-> extends ComponentDeclarations<E> {
+    E extends EventMap = Record<never, never>,
+    M extends ModelMap = Record<never, never>
+> extends ComponentDeclarations<E, M> {
     props?: P;
     shadow?: boolean;
     static?: boolean;
     formAssociated?: boolean;
     /** See {@link ComponentOptions.file}. */
     file?: string;
-    setup: (ctx: TypedComponentContext<P, E>) => S;
-    render: (ctx: TypedComponentContext<P, E> & S) => DocumentFragment | Node;
+    setup: (ctx: TypedComponentContext<P, E, M>) => S;
+    render: (ctx: TypedComponentContext<P, E, M> & S) => DocumentFragment | Node;
     /** See {@link HostOf}: its functions see what `setup` returns, as `render` does. */
-    host?: HostOf<TypedComponentContext<P, E> & S>;
+    host?: HostOf<TypedComponentContext<P, E, M> & S>;
 }
 
 // ─── component() ───────────────────────────────────────────────────
@@ -209,16 +215,28 @@ export interface ComponentOptionsWithSetup<
  *   });
  */
 /** Overload: setup returns a typed record → render ctx merges props + setup exports. */
-export function component<P extends Record<string, PropDefinition>, S extends Record<string, unknown>, E extends EventMap = Record<never, never>>(
-    tag: string, options: ComponentOptionsWithSetup<P, S, E>): void;
+export function component<P extends Record<string, PropDefinition>, S extends Record<string, unknown>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>>(
+    tag: string, options: ComponentOptionsWithSetup<P, S, E, M>): void;
 /** Overload: no setup or setup returns void → render ctx has only props. */
-export function component<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>>(
-    tag: string, options: ComponentOptions<P, E>): void;
-export function component<P extends Record<string, PropDefinition>, E extends EventMap>(tag: string, options: ComponentOptions<P, E>): void {
-    const propDefs = (options.props ?? {}) as Record<string, PropDefinition>;
+export function component<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>>(
+    tag: string, options: ComponentOptions<P, E, M>): void;
+export function component<P extends Record<string, PropDefinition>, E extends EventMap, M extends ModelMap>(tag: string, options: ComponentOptions<P, E, M>): void {
+    // A model is a prop (#124): the same attribute, property and coercion, plus the event its own
+    // writes dispatch. A prop and a model of one name would be two accessors on one property.
+    const modelDefs = (options.models ?? {}) as Record<string, ModelSpec<unknown>>;
+    const modelNames = new Set(Object.keys(modelDefs));
+    if (DEV) {
+        for (const name of modelNames) {
+            if (options.props && name in options.props) console.warn(`[pdx] <${tag}> declares '${name}' as both a prop and a model; the model wins.`);
+        }
+    }
+    const propDefs = { ...(options.props ?? {}), ...modelDefs } as Record<string, PropDefinition>;
     const propNames = Object.keys(propDefs);
     // Declared events (#123): with any declared, a name that is not one is reported in development.
-    const declaredEvents = options.events ? new Set(Object.keys(options.events)) : null;
+    // A model's event counts as declared.
+    const declaredEvents = options.events
+        ? new Set([...Object.keys(options.events), ...[...modelNames].map(modelEvent)])
+        : null;
     // Declared states (#132): the host attaches its internals for them, and ctx.state sets them.
     const declaredStates = options.states && options.states.length > 0 ? new Set(options.states) : null;
 
@@ -266,6 +284,8 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
         static attrCanonical = attrCanonical;
         static formAssociated = useFormAssociated;
         static file = options.file;
+        /** The props a parent may bind both ways (#124): `bindTwoWay` listens to their events only. */
+        static models: ReadonlySet<string> = modelNames;
 
         /** The host's custom states, when the descriptor declares any and the browser has them. */
         _customStates: CustomStateSet | null = null;
@@ -461,7 +481,9 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                     console.warn(`[pdx] <${tag}> mounted without its required prop '${name}'.`);
                 }
 
-                ctx[name] = propSig;
+                ctx[name] = modelNames.has(name) ? modelSignal(propSig, (value) => {
+                    this.emit(modelEvent(name), { value }, { bubbles: false });
+                }) : propSig;
             }
 
             // Activate composable lifecycle scope during setup
@@ -489,7 +511,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
             pushScope(scope);
             try {
                 if (options.setup) {
-                    const result = options.setup(ctx as TypedComponentContext<P>);
+                    const result = options.setup(ctx as TypedComponentContext<P, E, M>);
                     if (result) Object.assign(ctx, result);
                 }
                 // The host's declared attributes, bindings and listeners (#133), after setup: a
@@ -525,7 +547,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
             popScope();
             if (DEV) devSetupEnd();
 
-            return options.render(ctx as TypedComponentContext<P>);
+            return options.render(ctx as TypedComponentContext<P, E, M>);
         }
     }
 
@@ -533,6 +555,24 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────
+
+/**
+ * A model as the component sees it (#124): its prop's signal, whose writes also announce the new
+ * value. The property setter the parent uses writes the prop's signal directly, so a value the
+ * parent set is not echoed back to it; a write that does not change the value announces nothing.
+ */
+function modelSignal(propSig: Signal<unknown>, announce: (value: unknown) => void): Signal<unknown> {
+    const write = (next: unknown): void => {
+        if (Object.is(propSig.peek(), next)) return;
+        propSig.setRaw(next);
+        announce(next);
+    };
+    const read = (() => propSig()) as Signal<unknown>;
+    read.peek = () => propSig.peek();
+    read.set = (value) => write(typeof value === 'function' ? (value as (prev: unknown) => unknown)(propSig.peek()) : value);
+    read.setRaw = write;
+    return read;
+}
 
 /** Coerce a string attribute value to the target prop type. */
 function coerce(value: unknown, def: { type: PropType; default?: unknown }): unknown {

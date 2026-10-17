@@ -2,7 +2,7 @@
 
 import { readFileSync } from 'fs';
 import { relative } from 'pathe';
-import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag } from '@pdxui/compiler';
+import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, modelEventName } from '@pdxui/compiler';
 import type { ComponentManifest, RouteManifest, FetchManifest, FormManifest, ComponentMetadata } from './schema';
 
 /**
@@ -74,10 +74,12 @@ export function analyzeComponent(filePath: string, rootDir: string): ComponentMa
             default: p.default,
             required: p.default === undefined,
         })),
-        events: analysis.events.map(e => ({
-            name: e.name,
-            payloadType: e.payloadType,
-        })),
+        // A model's `<name>-change` (#124) is an event of the component like any it declares.
+        events: [
+            ...analysis.events.map(e => ({ name: e.name, payloadType: e.payloadType })),
+            ...analysis.props.filter(p => p.model).map(p => ({ name: modelEventName(p.name), payloadType: `{ value: ${p.tsType} }` })),
+        ],
+        ...(analysis.props.some(p => p.model) ? { models: analysis.props.filter(p => p.model).map(p => p.name) } : {}),
         slots: analysis.slots.map(s => ({
             name: s.name,
             scoped: !!s.scopeType,

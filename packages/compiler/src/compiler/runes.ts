@@ -26,6 +26,7 @@ const f = (name: string, doc: string, shape: string, snippet: string): RuneInfo 
 /** Every rune, declarations first. */
 export const RUNES: readonly RuneInfo[] = [
     d('prop', 'Declare a component prop: a signal synced with its attribute.', '@prop name: Type = default;', "@prop ${1:name}: ${2:string} = ${3:'default'};"),
+    d('model', 'Declare a prop the component writes: assigning it dispatches `<name>-change` with `{ value }`, and the parent binds it with `::name`.', '@model name: Type = default;', "@model ${1:value}: ${2:string} = ${3:''};"),
     d('event', 'Declare an event; `name(payload)` dispatches it from the host.', '@event name: PayloadType;', '@event ${1:name}: ${2:void};'),
     d('slot', 'Declare a named slot, with an optional scope type.', '@slot name: { row: Item };', '@slot ${1:name};'),
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),

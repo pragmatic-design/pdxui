@@ -217,7 +217,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const hasLegacyMarkers = legacyMarkerAt !== -1;
     const isNewMode = (options.setup === true && !hasLegacyMarkers) || codeLines.some(l => {
         const t = l.trim();
-        return t.startsWith('@prop ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) ||
+        return t.startsWith('@prop ') || t.startsWith('@model ') || t.startsWith('@event ') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) ||
                t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||
                t.startsWith('@search ') || t.startsWith('@prefetch ') || t.startsWith('@layout ') ||
                t.startsWith('@fetch ') || t.startsWith('@form ') ||
@@ -372,11 +372,14 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             continue;
         }
 
-        // ─── @prop name: Type = default ───
-        // Tokenizer-based: handles generics (Map<K,V>), unions, function types, template literals
-        const propPrefix = trimmed.match(/^@prop\s+(\w+)\s*:/);
+        // ─── @prop name: Type = default · @model name: Type = default ───
+        // Tokenizer-based: handles generics (Map<K,V>), unions, function types, template literals.
+        // A model (#124) is a prop the component may write, marked as such.
+        // Match: `@prop name:` or `@model name:`. Groups: [1]=rune [2]=name
+        const propPrefix = trimmed.match(/^@(prop|model)\s+(\w+)\s*:/);
         if (propPrefix) {
-            const name = propPrefix[1];
+            const rune = propPrefix[1];
+            const name = propPrefix[2];
             const colonPos = propPrefix[0].length - 1; // position of `:` in trimmed
             const { type: tsType, rest } = extractTypeAnnotation(trimmed, colonPos);
             if (tsType) {
@@ -384,7 +387,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                     warnings.push({
                         code: 'PDX_PROP_INVALID_TYPE',
                         severity: 'warn',
-                        message: `@prop '${name}' has a malformed type annotation: '${tsType}'. The generated .d.ts may be invalid.`,
+                        message: `@${rune} '${name}' has a malformed type annotation: '${tsType}'. The generated .d.ts may be invalid.`,
                         hint: `Check for unbalanced <> [] {} () or a trailing | & , in the type.`,
                     });
                 }
@@ -397,21 +400,24 @@ export function analyzeScript(script: string, _filename: string, options: { setu
                     tsType,
                     runtimeType: tsToRuntimeType(tsType),
                     default: defaultVal,
+                    ...(rune === 'model' ? { model: true } : {}),
                 });
                 continue;
             }
         }
 
-        // Detect malformed @prop — starts with @prop but missing type annotation
-        if (trimmed.startsWith('@prop ') || trimmed === '@prop') {
-            const nameOnly = trimmed.match(/^@prop\s+(\w+)/);
+        // Detect malformed @prop / @model — starts with the rune but missing type annotation
+        const untyped = trimmed.match(/^@(prop|model)(?=\s|$)/);
+        if (untyped) {
+            const rune = untyped[1];
+            const nameOnly = trimmed.match(/^@(?:prop|model)\s+(\w+)/);
             const hint = nameOnly
-                ? `Use: @prop ${nameOnly[1]}: string = 'default';`
-                : `Use: @prop name: Type = default;`;
+                ? `Use: @${rune} ${nameOnly[1]}: string = 'default';`
+                : `Use: @${rune} name: Type = default;`;
             warnings.push({
                 code: 'PDX_PROP_NO_TYPE',
                 severity: 'error' as const,
-                message: `Invalid @prop declaration: "${trimmed}". Missing type annotation.`,
+                message: `Invalid @${rune} declaration: "${trimmed}". Missing type annotation.`,
                 hint,
             });
             continue; // Don't push to bodyLines — it's a recognized (but malformed) decorator

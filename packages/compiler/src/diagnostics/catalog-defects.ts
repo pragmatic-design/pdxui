@@ -226,6 +226,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use a method the component exposes (`command="--show"` on pdx-dialog), or point a built-in command at an element that has it.',
         example: { bad: pdx('<button commandfor="d" command="show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>', 'let a = $signal(1);'), good: pdx('<button commandfor="d" command="--show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>', 'let a = $signal(1);') },
     },
+    PDX_TWO_WAY_NOT_MODEL: {
+        severity: 'error', category: 'defect',
+        summary: '`::x` on a component prop that is not one of its models (#124).',
+        explanation: 'Two-way binding is a contract: the child declares which of its props it writes back, with `@model`, and dispatches `<name>-change` when it does. On any other prop nothing brings the value back, and the binding is silently one-way. Checked for project components and for library components whose manifest lists their models; native `value`, `checked` and `files` are the platform\'s models.',
+        fix: 'Declare `@model x` in the child, or bind it one way with `:x`.',
+        reproducedIn: `${T}model-rune.test.ts`,
+    },
     PDX_PART_MISSING: {
         severity: 'error', category: 'defect',
         summary: 'A declared `@part` that no element of the template carries.',
@@ -501,7 +508,7 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         severity: 'warn', category: 'defect',
         summary: 'A component writes one of its own props (CD-A2).',
         explanation: "The parent owns the prop: its next value overwrites the component's.",
-        fix: 'Emit the new value with an `@event`; for a starting value, copy it into a `$signal`.',
+        fix: 'Declare it `@model` when the parent binds it both ways (`::name`); for a starting value, copy it into a `$signal`.',
         reproducedIn: `${T}design-checks.test.ts`,
     },
     PDX_LISTENER_LEAK: {

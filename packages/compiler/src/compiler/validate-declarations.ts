@@ -40,9 +40,9 @@ function declarations(descriptor: SFCDescriptor, source: string): Declaration[] 
     if (!script || !script.content.trim()) return [];
     const lineAt = lineIndex(source);
     const found: Declaration[] = [];
-    // Match: a `@prop name` line. Groups: [1]=the name
-    for (const m of script.content.matchAll(/^[ \t]*@prop\s+([A-Za-z_$][\w$]*)/gm)) {
-        found.push({ name: m[1], kind: '@prop', line: lineAt(script.start + m.index!) });
+    // Match: a `@prop name` or `@model name` line. Groups: [1]=the rune [2]=the name
+    for (const m of script.content.matchAll(/^[ \t]*@(prop|model)\s+([A-Za-z_$][\w$]*)/gm)) {
+        found.push({ name: m[2], kind: `@${m[1]}`, line: lineAt(script.start + m.index!) });
     }
     const sf = parseableScript(script.content);
     const at = (node: ts.Node) => lineAt(script.start + node.getStart(sf));

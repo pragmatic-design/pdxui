@@ -129,6 +129,9 @@ export function projectTemplate(
                 if (inMask(exprAbs)) continue;
                 cursor = exprAbs;
                 const bare = name.replace(/^[:@]+/, '');
+                // `::name` on a component's model (#124): the value is checked against the model's
+                // type, asked as `::name`. A modifier changes what is written, so it is not checked.
+                const modelType = name.startsWith('::') && !bare.includes('.') && resolveType ? resolveType(tag, name) : null;
                 const type = name.startsWith(':') && resolveType ? resolveType(tag, bare) : null;
                 // Every handler's `$event` is typed (#122): the event the component declares, or
                 // `PdxEvent` — a DOM event by its name, `CustomEvent<unknown>` for any other.
@@ -141,6 +144,10 @@ export function projectTemplate(
                     emit(`(($event: ${eventType}) => (`);
                     map.add(gen, templateStart + exprAbs, expr.length); emit(expr);
                     emit('))(null!);\n');
+                } else if (modelType) {
+                    emit(`((__v: ${modelType}) => __v)(`);
+                    map.add(gen, templateStart + exprAbs, expr.length); emit(expr);
+                    emit(');\n');
                 } else if (type && type !== 'string' && STRING_LITERAL.test(expr)) {
                     emit(`((__v: ${type}) => __v)(`);
                     map.add(gen, templateStart + exprAbs, expr.length); emit(expr);

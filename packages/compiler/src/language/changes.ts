@@ -19,6 +19,7 @@
 
 import { DEFER_TRIGGERS, unknownDeferTriggers } from '../compiler/defer-triggers';
 import { escapeForRegExp } from '../compiler/regexp-escape';
+import { bindsModel, type ModelsLookup } from '../compiler/validate-two-way';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -33,6 +34,14 @@ export type LanguageChangeScope = 'pdx' | 'script' | 'config';
 export interface LanguageChangeFinding {
     line: number;
     found: string;
+}
+
+/**
+ * What a change that depends on other files is given to look with: the components' models, for a
+ * two-way binding whose child is another file (#124). A consumer without it finds nothing there.
+ */
+export interface LanguageChangeContext {
+    modelsOf?: ModelsLookup;
 }
 
 /** A registered change. */
@@ -53,7 +62,7 @@ export interface LanguageChange {
     /** For a removed export of `@pdxui/*`: what leaves the package and what replaces it. */
     export?: { from: string; name: string; replacement: string };
     /** Every place the form is in `text` (a file in the entry's scope). */
-    detect(text: string): LanguageChangeFinding[];
+    detect(text: string, context?: LanguageChangeContext): LanguageChangeFinding[];
     /** The mechanical rewrite of a whole text, or `'flag'` when a person must rewrite it. */
     fix: ((text: string) => string) | 'flag';
 }
@@ -204,12 +213,41 @@ const deferUnknownTrigger: LanguageChange = {
     fix: 'flag',
 };
 
+// ─── #124: two-way binding is a contract ─────────────────────────────────────────────────────
+
+const twoWayNotModel: LanguageChange = {
+    id: 'two-way-not-model',
+    kind: 'removed',
+    scope: 'pdx',
+    issue: 124,
+    message: '`::x` binds a component prop both ways only when the child declares it `@model x`: declare it in the child, or bind it one way with `:x`.',
+    reportedAs: 'PDX_TWO_WAY_NOT_MODEL',
+    detect(text, context) {
+        const modelsOf = context?.modelsOf;
+        if (!modelsOf) return [];
+        const findings: LanguageChangeFinding[] = [];
+        // Match: the opening tag of a custom element. Groups: [1]=the tag
+        for (const tag of text.matchAll(/<([A-Za-z][\w]*-[\w-]*)\b[^>]*>/g)) {
+            const models = modelsOf(tag[1].toLowerCase());
+            if (!models) continue;
+            // Match: a `::name` binding in that tag. Groups: [1]=the name
+            for (const b of tag[0].matchAll(/(?<=\s)::([A-Za-z][\w-]*)/g)) {
+                if (bindsModel(models, b[1])) continue;
+                findings.push({ line: lineAt(text, tag.index + b.index), found: `::${b[1]}` });
+            }
+        }
+        return findings;
+    },
+    fix: 'flag',
+};
+
 /** Every registered change, in the order `pdx migrate` reports them. */
 export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     signalArrowAssignment,
     signalLogicalAssignment,
     inlineBindingsOption,
     deferUnknownTrigger,
+    twoWayNotModel,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

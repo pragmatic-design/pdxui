@@ -22,6 +22,7 @@ import { invalidHostAttribute } from './host-block';
 import { checkParts } from './validate-parts';
 import { checkVirtualFor } from './validate-virtual';
 import { checkCommands, type MethodsLookup } from './validate-commands';
+import { checkTwoWay, type ModelsLookup } from './validate-two-way';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -203,6 +204,12 @@ export interface ValidateOptions {
      * custom command is not checked.
      */
     methodsOf?: MethodsLookup;
+    /**
+     * The models a component declares — the resolver's `modelsOf`: a project .pdx's `@model`s, a
+     * library component's from its manifest. With it, `::x` on a component prop that is not a model is
+     * PDX_TWO_WAY_NOT_MODEL (#124); without it, a two-way binding is not checked.
+     */
+    modelsOf?: ModelsLookup;
     /**
      * Where the caller looked for components — the resolver's `searched`: its component packages,
      * then its project folders. PDX_UNRESOLVED_COMPONENT's hint names them, so a package that was
@@ -510,6 +517,7 @@ export function validate(
     // ─── Check 10e: invoker commands reach a target that answers them (#140) ──
 
     warnings.push(...checkCommands(ast, options?.methodsOf));
+    warnings.push(...checkTwoWay(ast, options?.modelsOf));
 
     // ─── Check 10f: a @for … @virtual has the shape it needs (#283) ──
 

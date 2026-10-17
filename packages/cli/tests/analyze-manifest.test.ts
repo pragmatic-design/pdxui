@@ -12,7 +12,7 @@ import analyzeCmd from '../src/commands/analyze';
 
 type Runnable = { run: (c: { args: Record<string, unknown> }) => Promise<void> };
 interface Manifest {
-    components: { tag: string; file: string }[];
+    components: { tag: string; file: string; models?: string[]; props?: { name: string }[]; events?: { name: string; payloadType: string }[] }[];
     routes?: { path: string; file: string; tag: string; guard?: string; layout?: string }[];
 }
 
@@ -59,6 +59,14 @@ describe('pdx analyze', () => {
             ['/users', 'pdx-users', 'src/pages/users.pdx'],
         ]);
         expect(routes?.[1].guard).toBe('users.read');
+    });
+
+    it('lists each component\'s models, which are props, and their <name>-change events (#124)', async () => {
+        write('src/name-field.pdx', "<template><input ::value=\"value\" /></template>\n<script setup>\n@model selectedId: string = '';\n@prop label: string = '';\n</script>\n");
+        const [field] = (await json()).components;
+        expect(field.models).toEqual(['selectedId']);
+        expect(field.props?.map((p) => p.name)).toEqual(['selectedId', 'label']);
+        expect(field.events).toEqual([{ name: 'selected-id-change', payloadType: '{ value: string }' }]);
     });
 
     it('--json prints the manifest and writes no file', async () => {
