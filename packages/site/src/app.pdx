@@ -94,7 +94,7 @@ function _applyBehaviorAttrs(t) {
 const _pref = readPreference();
 const _knownTheme = (t) => themeItems.some((i) => i.key === t) ? t : null;
 let theme = $signal(_knownTheme(_pref.theme) || localStorage.getItem('pdx-theme') || document.documentElement.getAttribute('pdx-theme') || 'pragmatic-gold');
-let scheme = $signal(_pref.scheme || document.documentElement.getAttribute('pdx-scheme') || 'dark');
+let scheme = $signal<'light' | 'dark'>((_pref.scheme || document.documentElement.getAttribute('pdx-scheme')) === 'light' ? 'light' : 'dark');
 // Applied at once: the scheme depends on nothing below, and waiting for mount would paint the
 // page in the static one first.
 document.documentElement.setAttribute('pdx-scheme', scheme);

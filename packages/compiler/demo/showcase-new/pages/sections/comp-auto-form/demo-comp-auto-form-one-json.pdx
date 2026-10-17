@@ -25,12 +25,12 @@ const fields = [...];
 </template>
 
 <script setup>
-import { createDataSource, toColumnDefs } from '@pdxui/core';
+import { createDataSource, toColumnDefs, type FieldDefinition } from '@pdxui/core';
 
 const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];
 
 // Tri-component demo: same fields drive filter + grid + form
-const triFields = [
+const triFields: FieldDefinition[] = [
   { field: 'name', label: 'Name', type: 'text' },
   { field: 'role', label: 'Role', type: 'enum', options: roles.map(function(r) { return { label: r, value: r }; }) },
   { field: 'salary', label: 'Salary', type: 'currency' },

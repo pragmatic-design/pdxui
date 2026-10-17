@@ -66,11 +66,11 @@ onMount(() => {
   const _ed = editorRef;
   if (_ed) _ed.value = _src;
   // Runtime errors (a component throwing during render) surface here too.
-  const _dispose = onGlobalError((info) => {
-    const _err = info && (info.error || info);
+  // The handler is handed the error itself, `(error, context)`: there is no `.error` to unwrap.
+  const _dispose = onGlobalError((_err) => {
     ok = false;
     status = '✗ runtime error';
-    buildError = (_err && _err.message) ? _err.message : String(_err);
+    buildError = _err?.message ? _err.message : String(_err);
   });
   onDestroy(_dispose);
   // Register all <pdx-*> so the user's template can use them, load the compiler, then first build.

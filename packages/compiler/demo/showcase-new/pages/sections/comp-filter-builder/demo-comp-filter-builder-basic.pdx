@@ -27,10 +27,10 @@
 </template>
 
 <script setup>
-import { createDataSource, toColumnDefs } from '@pdxui/core';
+import { createDataSource, toColumnDefs, type FieldDefinition } from '@pdxui/core';
 import { categories, products } from './state.pdx';
 
-const fields = [
+const fields: FieldDefinition[] = [
   { field: 'name', label: 'Name', type: 'text' },
   { field: 'category', label: 'Category', type: 'enum', options: categories.map(function(c) { return { label: c, value: c }; }) },
   { field: 'price', label: 'Price', type: 'currency' },

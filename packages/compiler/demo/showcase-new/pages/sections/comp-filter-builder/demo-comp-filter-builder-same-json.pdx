@@ -26,11 +26,11 @@ const columns = toColumnDefs(fields);
 </template>
 
 <script setup>
-import { createDataSource, toColumnDefs } from '@pdxui/core';
+import { createDataSource, toColumnDefs, type FieldDefinition } from '@pdxui/core';
 import { categories, products } from './state.pdx';
 
 // Second demo — same JSON pattern
-const fields2 = [
+const fields2: FieldDefinition[] = [
   { field: 'name', label: 'Name', type: 'text' },
   { field: 'category', label: 'Category', type: 'enum', options: categories.map(function(c) { return { label: c, value: c }; }) },
   { field: 'price', label: 'Price', type: 'currency' },

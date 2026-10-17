@@ -27,7 +27,7 @@ function openBottomSheet() {
         detents: [0.4, 0.8],
         onDismiss: function() { log('Bottom sheet dismissed'); bsResult = null; },
     });
-    content.querySelector('#bs-close').onclick = function() {
+    content.querySelector<HTMLButtonElement>('#bs-close')!.onclick = function() {
         bsResult?.dispose();
         log('Bottom sheet closed');
         bsResult = null;

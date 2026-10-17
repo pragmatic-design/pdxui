@@ -71,19 +71,29 @@ describe('pdx check --types', () => {
         expect(exitSpy).not.toHaveBeenCalledWith(1);
     });
 
-    it('on the showcase, reports what the editor reports: nothing', async () => {
-        // The editor opens every showcase .pdx and finds no type error (packages/lsp/tests/
-        // showcase-sweep). The check and the editor must not disagree:
-        // same projection, same declarations, same mapping.
-        const showcase = join(__dirname, '..', '..', 'showcase');
-        process.chdir(showcase);
-        await (checkCmd as any).run({ args: { json: true, fix: false, severity: 'error', i18n: false, design: false, types: true } });
-        const printed = logSpy.mock.calls.map(c => String(c[0])).find(s => s.trimStart().startsWith('{'));
-        const report = JSON.parse(printed!) as { files: { file: string; warnings: Finding[] }[] };
-        const found = report.files.flatMap(f => f.warnings.filter(w => w.code === 'PDX_TS')
-            .map(w => `${relative(showcase, f.file).split('\\').join('/')} ts(${w.tsCode}) ${w.message.split('\n')[0]}`));
-        expect(found).toEqual([]);
-    }, 120_000);
+    // The editor opens every showcase .pdx and finds no type error (packages/lsp/tests/
+    // showcase-sweep). The check and the editor must not disagree: same projection, same
+    // declarations, same mapping. And the repository's other apps are held at zero too (#467):
+    // nothing held showcase-new and the site, and they drifted to 62 and 88 errors. The site's
+    // `src/demos/` is generated from showcase-new (and ignored by git), so it is checked there.
+    for (const [name, dir, skip] of [
+        ['the showcase', join(__dirname, '..', '..', 'showcase'), null],
+        ['showcase-new', join(__dirname, '..', '..', 'compiler', 'demo', 'showcase-new'), null],
+        ['the site', join(__dirname, '..', '..', 'site'), /^src\/demos\//],
+    ] as const) {
+        it(`on ${name}, reports what the editor reports: nothing`, async () => {
+            process.chdir(dir);
+            await (checkCmd as any).run({ args: { json: true, fix: false, severity: 'error', i18n: false, design: false, types: true } });
+            const printed = logSpy.mock.calls.map(c => String(c[0])).find(s => s.trimStart().startsWith('{'));
+            const report = JSON.parse(printed!) as { files: { file: string; warnings: Finding[] }[] };
+            const found = report.files
+                .map(f => ({ rel: relative(dir, f.file).split('\\').join('/'), warnings: f.warnings }))
+                .filter(f => !skip || !skip.test(f.rel))
+                .flatMap(f => f.warnings.filter(w => w.code === 'PDX_TS').map(w => `${f.rel} ts(${w.tsCode}) ${w.message.split('\n')[0]}`));
+            expect(report.files.length, `no .pdx was checked in ${dir}`).toBeGreaterThan(10);
+            expect(found).toEqual([]);
+        }, 120_000);
+    }
 
     it('a pdx-ignore exemption covers a PDX_TS finding too', async () => {
         writeFileSync(join(root, 'src', 'widget.pdx'), WIDGET.replace("function fire() { saved('no'); }",

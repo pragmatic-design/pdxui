@@ -39,12 +39,13 @@ import { currentParams } from '@pdxui/router';
 import { followLink } from '../lib/follow-link';
 import { effect } from '@pdxui/core';
 import { enhanceCodeBlocks } from '../lib/markdown/enhance';
+import type { DocModule } from '../lib/markdown/vite-markdown';
 
 
 // Every doc's title, order and slug up front, for the nav (`?meta`: the frontmatter, no HTML).
 // A doc's rendered HTML loads when it is opened: eagerly importing them all would put 848 kB of it
 // in the site's entry chunk, on every page.
-const metaMods = import.meta.glob('../../content/docs/**/*.md', { eager: true, query: '?meta', import: 'default' });
+const metaMods = import.meta.glob<Pick<DocModule, 'frontmatter' | 'slug'>>('../../content/docs/**/*.md', { eager: true, query: '?meta', import: 'default' });
 const docMetas = Object.values(metaMods);
 const docLoaders = import.meta.glob('../../content/docs/**/*.md', { import: 'default' });
 const loaderBySlug = {};
@@ -54,7 +55,7 @@ for (const _k in docLoaders) loaderBySlug[_k.split('/').pop().replace(/\.md$/, '
 // parent as the current page: thirteen module pages listed beside the guides would bury them.
 const navItems = $derived(docMetas
   .filter(d => !d.frontmatter.parent)
-  .map(d => ({ slug: d.slug, title: d.frontmatter.title || d.slug, order: Number(d.frontmatter.order || 999) }))
+  .map(d => ({ slug: d.slug, title: String(d.frontmatter.title || d.slug), order: Number(d.frontmatter.order || 999) }))
   .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title)));
 
 const current = $derived(currentParams().slug || 'getting-started');
