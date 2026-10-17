@@ -32,6 +32,13 @@ describe('projectScript', () => {
         expect(out).toContain('var myForm: import("@pdxui/core").Form<{ "a": string }>;');
     });
 
+    it('blanks a whole @fetch whose quoted URL holds `${…}`, braces in strings not counted (#487)', () => {
+        const src = "let id = $signal(1);\n@fetch orders: 'GET /api/c/${id}/orders?page=${id}' as number[] { staleTime: 60000, tags: ['orders'] };\nlet n = 1;";
+        const out = projectScript(src);
+        expect(out.slice(0, src.length)).not.toMatch(/orders\?|staleTime/);
+        expect((ts.transpileModule(out, { reportDiagnostics: true }).diagnostics ?? []).map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([]);
+    });
+
     it('does not treat a rune inside a comment as one', () => {
         const src = '// uso @form rune qui\nlet x = $signal(0);';
         expect(projectScript(src)).toContain('// uso @form rune qui');
@@ -68,6 +75,16 @@ describe('getScriptDiagnostics', () => {
         const syntax = ts.transpileModule(projectScript(sc), { reportDiagnostics: true }).diagnostics ?? [];
         expect(syntax.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([]);
         expect(getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src).map((d: { message: string }) => d.message)).toEqual([]);
+    });
+
+    it('a syntax error in the projected script is reported, not only the type errors (#487)', () => {
+        const sc = '\nlet n = ;\n';
+        const src = '<template></template>\n<script setup>' + sc + '</script>';
+        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const d = getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src);
+        expect(d.map((x: { message: string }) => x.message)).toContain('Expression expected.');
+        const at = d.find((x: { message: string }) => x.message === 'Expression expected.')!;
+        expect(at.range.start.line).toBe(2);
     });
 
     it('no diagnostics at all on a script that calls its own @event', () => {

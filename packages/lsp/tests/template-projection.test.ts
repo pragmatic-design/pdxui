@@ -12,6 +12,7 @@
 import { describe, it, expect } from 'vitest';
 import { analyzeDocument } from '../src/utils/compiler-bridge';
 import { projectTemplate } from '../src/utils/template-projection';
+import ts from 'typescript';
 
 /** Project the template of a .pdx source and hand back the generated TS plus its map. */
 function project(src: string, resolveType?: (tag: string, attr: string) => string | null) {
@@ -123,7 +124,13 @@ describe('expressions become checkable statements', () => {
     it('an event handler is projected', () => {
         const { code } = project(pdx('<button @click="go()">x</button>', 'function go() {}'));
         // Inside a function whose `$event` is the button's click (#122).
-        expect(code).toContain('(($event: PdxEvent<"click", "button">) => (go()))(null!);');
+        expect(code).toContain('(($event: PdxEvent<"click", "button">) => { go(); })(null!);');
+    });
+
+    it('a handler of several statements is valid TypeScript, as each handler form is (#487)', () => {
+        const { code } = project(pdx('<button @click="go(); a += 2">x</button><input @input="e => a = 1" /><i @click="go">y</i>', 'function go() {}'));
+        const syntax = ts.transpileModule(code, { reportDiagnostics: true }).diagnostics ?? [];
+        expect(syntax.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([]);
     });
 
     it('an empty expression projects nothing', () => {

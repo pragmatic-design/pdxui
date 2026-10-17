@@ -104,6 +104,12 @@ export function projectScript(scriptContent: string): string {
         let depth = 0, j = m.index, ended = false;
         for (; j < s.length; j++) {
             const c = s[j];
+            // A string is skipped whole: the `}` of `${id}` in `@fetch x: 'GET /a/${id}'` is not the
+            // end of the rune (#487).
+            if (c === "'" || c === '"' || c === '`') {
+                for (j++; j < s.length && s[j] !== c && s[j] !== '\n'; j++) if (s[j] === '\\') j++;
+                continue;
+            }
             if (c === '{' || c === '(' || c === '[') depth++;
             else if (c === '}' || c === ')' || c === ']') {
                 depth--;
@@ -263,7 +269,7 @@ export class PdxTsService {
     }
 
     /**
-     * The semantic diagnostics of every file in `entries`, from ONE program that holds them all —
+     * The diagnostics, syntactic and semantic, of every file in `entries`, from ONE program that holds them all —
      * `pdx check --types`. The editor builds a program per request for the file in
      * hand; a check of a whole project builds it once. The service syncs back on its next request.
      */
@@ -273,7 +279,7 @@ export class PdxTsService {
         this.projectVersion++;
         const out = new Map<string, readonly ts.Diagnostic[]>();
         try {
-            for (const e of entries) out.set(e.fileName, this.service.getSemanticDiagnostics(e.fileName));
+            for (const e of entries) out.set(e.fileName, this.diagnosticsOf(e.fileName));
         } finally {
             this.files.clear();
             this.projectVersion++;
@@ -358,11 +364,20 @@ export class PdxTsService {
         });
     }
 
-    /** The virtual file's semantic diagnostics (type errors); the offsets are relative
+    /** The virtual file's diagnostics, syntax errors and type errors (#487); the offsets are relative
      *  to the projected script (= the script content), to be mapped onto the .pdx after. */
-    getSemanticDiagnostics(uri: string, content: string): ts.Diagnostic[] {
+    getDiagnostics(uri: string, content: string): ts.Diagnostic[] {
         const name = this.sync(uri, content);
-        try { return this.service.getSemanticDiagnostics(name); } catch { return []; }
+        try { return this.diagnosticsOf(name); } catch { return []; }
+    }
+
+    /**
+     * A file's syntactic diagnostics, then its semantic ones. The semantic list alone leaves a syntax
+     * error unreported — a script the user wrote wrong, or a projection that produced invalid
+     * TypeScript, would both look clean (#487).
+     */
+    private diagnosticsOf(fileName: string): ts.Diagnostic[] {
+        return [...this.service.getSyntacticDiagnostics(fileName), ...this.service.getSemanticDiagnostics(fileName)];
     }
 
     /** Available only when the TS lib was found (full completion for the JS builtins). */
