@@ -46,7 +46,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 |---|---|---|
 | `PDX_UNKNOWN_DECLARATION` | Also raised by a malformed beta form of `@slot` (a signature), `@inject` (`from` is required), `@event` (`(bubbles)`), and by `@store` with an unknown `persist` value. | this specification, following the alpha rule «a known keyword in an unknown shape» (the issues do not say) |
 | `PDX_FETCH_NO_ERROR_UI` | Its example and fix use the async vocabulary (`users.state() === 'error'`, `users.error()`). | #141 |
-| `PDX_TS` | Raised by the strict template projection: slot contexts, `@catch`/`@error` names and `$event` are typed, not `any`. | #122 |
+| `PDX_TS` | Raised by the strict template projection: slot contexts, `@catch`/`@error` names and `$event` are typed, not `any`. | #122 — **landed** for the three typings, without TypeScript's `strict` mode: script and template share one program, and `strict` on the showcase's scripts raised 398 errors that were none. A library component's event details and slot contexts stay unchecked until its manifest types them (#131) |
 
 ## Retired
 

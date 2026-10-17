@@ -43,7 +43,7 @@
   &lt;pdx-user-list /&gt;
 } @@catch (err) {
   &lt;div role="alert"&gt;
-    {{ err.message }}
+    {{ err instanceof Error ? err.message : String(err) }}
     &lt;button @@click="retry"&gt;Retry&lt;/button&gt;
   &lt;/div&gt;
 }

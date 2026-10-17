@@ -29,7 +29,7 @@ are checked against the manifest above._
   <pdx-risky-widget />
 } @catch (err) {
   <div role="alert">
-    <p>{{ err.message }}</p>
+    <p>{{ err instanceof Error ? err.message : String(err) }}</p>
   </div>
 }
 ```
@@ -52,7 +52,7 @@ are checked against the manifest above._
   <pdx-user-list />
 } @catch (err) {
   <div role="alert">
-    {{ err.message }}
+    {{ err instanceof Error ? err.message : String(err) }}
     <button @click="retry">Retry</button>
   </div>
 }

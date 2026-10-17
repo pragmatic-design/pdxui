@@ -400,6 +400,13 @@ others run in a wrapper, in this order — `.self` (only when `target === curren
 filters (`.delete` is `Delete` or `Backspace`, the arrows are `ArrowUp` …), then `.prevent` and
 `.stop` — before the handler.
 
+In the editor and in `pdx check --types`, `$event` is typed (#122): the event a `.pdx` component
+declares (`CustomEvent<Payload>`, `CustomEvent<unknown>` for an `@event` with no payload); a DOM
+event by its name otherwise (`MouseEvent` for `click`), whose `target` and `currentTarget` are the
+element the handler is written on, so `$event.target.value` on an `<input>` reads as it runs. The event
+of a library component, whose manifest does not type its detail, and of an unknown tag is a
+`CustomEvent` whose detail is not checked.
+
 #### Rules
 
 - A name the script does not declare is `PDX_UNDECLARED_REF` (error).
@@ -1264,7 +1271,9 @@ even if the promise is still pending.
 - The resolved value is not handed to the body: read it from where the promise wrote it. Not checked
   today.
 - `@error` takes at most two names, distinct identifiers; anything else stops the compile.
-- Both names are in the `@error` body's scope, whatever they are called.
+- Both names are in the `@error` body's scope, whatever they are called. The error is `unknown` to
+  the editor, as a TypeScript `catch` binding is (#122): narrow it before reading a member,
+  `err instanceof Error ? err.message : String(err)`.
 - The timing block is recognised only when it contains `minMs` or `maxMs`; it is not an expression.
 
 #### Examples
@@ -1276,7 +1285,7 @@ even if the promise is still pending.
   } @loading {
     <p>Loading…</p>
   } @error (err, retry) {
-    <p>{{ err.message }}</p>
+    <p>{{ err instanceof Error ? err.message : String(err) }}</p>
     <button @click="retry()">Try again</button>
     <button @click="reload()">Start over</button>
   }
@@ -1313,7 +1322,9 @@ second, `retry` when omitted, renders the body again.
 - `@catch` is required right after the body: `Expected @catch after @try`.
 - At most two names, valid identifiers, not the same twice; anything else stops the compile.
 - Both names are in the `@catch` body's scope, whatever they are called: `@catch (problem, again)`
-  reads `problem.message` and calls `again()`.
+  reads `problem` and calls `again()`.
+- The error is `unknown` to the editor, as a TypeScript `catch` binding is (#122): narrow it before
+  reading a member, `problem instanceof Error ? problem.message : String(problem)`.
 
 #### Examples
 
@@ -1322,7 +1333,7 @@ second, `retry` when omitted, renders the body again.
   @try {
     <p>{{ total(order) }}</p>
   } @catch (err, retry) {
-    <p class="error">{{ err.message }}</p>
+    <p class="error">{{ err instanceof Error ? err.message : String(err) }}</p>
     <button @click="retry()">Retry</button>
   }
 </template>

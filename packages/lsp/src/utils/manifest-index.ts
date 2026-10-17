@@ -17,7 +17,12 @@ export interface ManifestMember {
     description: string;
 }
 
-export interface ManifestSlot { name: string; description: string; }
+export interface ManifestSlot {
+    name: string;
+    description: string;
+    /** The context the slot passes, as a project component's `@slot name: { … }` declares it. */
+    scopeType?: string;
+}
 
 export interface ManifestComponent {
     tag: string;
