@@ -542,12 +542,13 @@ import { bindTwoWay } from '@pdxui/core';
 function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void
 ```
 
-Two-way binding with optional modifiers (.trim, .number, .lazy): `::value`, `::checked`.
+Two-way binding: `::value`, `::checked`, with the modifiers `.lazy`, `.trim`, `.number` and
+`.debounce(ms)`, of a signal or of the general form `{ get, set }` (#126, see ./two-way-value).
 
 The inline build calls this too, so the two builds listen the same way: a component through its
-`pdx-input`/`pdx-change` and their `detail`, a `<select>` and a checkbox through `change`. The
-inline path had its own copy that listened to `input` on everything, and `::value` was one-way
-on a component in a production build (#97).
+model's event (#124) or, until it declares one, its `pdx-input`/`pdx-change`, a `<select>` and a
+checkbox through `change`. The inline path had its own copy that listened to `input` on
+everything, and `::value` was one-way on a component in a production build (#97).
 
 ### `booleanIcon`
 

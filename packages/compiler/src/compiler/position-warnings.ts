@@ -130,6 +130,11 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const cmd = /^command '([^']+)'/.exec(w.message)?.[1];
             return cmd ? find(source, template, new RegExp(`(?<![\\w-])command=["']${escape(cmd)}["']`)) : undefined;
         }
+        case 'PDX_BINDING_MODIFIER': {
+            // Match: the binding the message names (`'.lazzy' on '::value': …`), with that modifier.
+            const m = /^'\.([\w()]+)' on '(::?[\w-]+)'/.exec(w.message);
+            return m ? find(source, template, new RegExp(`${escape(m[2])}(?:\\.[\\w()]+)*\\.${escape(m[1])}(?=[.=])`)) : undefined;
+        }
         case 'PDX_TWO_WAY_NOT_MODEL': {
             // Match: the binding the message names (`'::label' on <app-field>: …`), in that tag.
             const m = /^'::([\w-]+)' on <([\w-]+)>/.exec(w.message);

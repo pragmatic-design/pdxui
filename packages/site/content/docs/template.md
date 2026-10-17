@@ -63,8 +63,25 @@ field, `change` on a `<select>` and on `::checked`, and on a component its `<nam
 (`value-change` for `::value`), reading `detail.value`. On a library component that declares no
 model yet it listens to `pdx-input` and `pdx-change`, as before — so `<pdx-select ::value="country">`
 works as `<input ::value="name">` does. `::x` on a component prop that is not a model is an error,
-`PDX_TWO_WAY_NOT_MODEL`. `.lazy` waits for the committed change, `.trim` and `.number` shape the
-value on its way back.
+`PDX_TWO_WAY_NOT_MODEL`.
+
+Modifiers shape the value on its way back — the list is closed, and anything else is the error
+`PDX_BINDING_MODIFIER`:
+
+```pdx
+<input ::value.lazy="name" />            <!-- commit on change, not on each keystroke -->
+<input ::value.trim="name" />            <!-- trim before writing -->
+<input ::value.debounce(300)="query" />  <!-- write 300 ms after the last input; at once on blur and on submit -->
+<input ::value.number="age" />           <!-- a number; empty writes null; "1,5" writes nothing and marks the field invalid -->
+<p :title.once="label">…</p>             <!-- a plain binding assigned once, never updated -->
+```
+
+When the value needs converting both ways — money shown as `12.50` and kept in cents — write the
+general form, of which every modifier is a shorthand:
+
+```pdx
+<input ::value="{ get: () => (cents / 100).toFixed(2), set: (s) => cents = Math.round(Number(s) * 100) }" />
+```
 
 The wiring is core's `bindTwoWay(el, 'value', signal)`, the call a compiled template makes in dev
 and in a build alike. A hand-written TypeScript component can call it the same way.

@@ -93,6 +93,28 @@ function unbatchedHandler(expr: string, ctx: CompileContext): string {
 }
 
 /**
+ * The general two-way form, `::x="{ get: () => …, set: (v) => … }"` (#126), with each function
+ * rewritten as a handler's: reads of a signal are calls, an assignment in `set` writes the signal
+ * (`cents = …` → `ctx.cents.setRaw(…)`). Null when `expr` is not an object with `get` and `set`.
+ */
+export function rewriteTwoWayAccessor(expr: string, ctx: CompileContext): string | null {
+    const e = expr.trim();
+    if (!e.startsWith('{') || !e.endsWith('}')) return null;
+    const fields = new Map<string, string>();
+    for (const entry of splitAtDepthZero(e.slice(1, -1), ',').map(s => s.trim()).filter(Boolean)) {
+        // Match: `get: <value>` / `set: <value>`. Groups: [1]=key [2]=value
+        const m = /^(get|set)\s*:\s*(\S[\s\S]*)$/.exec(entry);
+        if (!m) return null;
+        fields.set(m[1], m[2]);
+    }
+    const get = fields.get('get');
+    const set = fields.get('set');
+    if (get === undefined || set === undefined) return null;
+    const fn = (value: string): string => rewriteArrow(value, ctx) ?? callSignals(prefixCtx(value, ctx), ctx);
+    return `{ get: ${fn(get)}, set: ${fn(set)} }`;
+}
+
+/**
  * An arrow function written in a handler, with its body rewritten as handler statements (its
  * parameters stay local), or null when `expr` is not one. Used for a handler that IS an arrow and
  * for an arrow a handler assigns to a `$signal` (`onSave = () => count++`, #187).

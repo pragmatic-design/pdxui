@@ -233,6 +233,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare `@model x` in the child, or bind it one way with `:x`.',
         reproducedIn: `${T}model-rune.test.ts`,
     },
+    PDX_BINDING_MODIFIER: {
+        severity: 'error', category: 'defect',
+        summary: 'A binding modifier outside the closed list (#126).',
+        explanation: 'A two-way binding takes `.lazy`, `.trim`, `.number` and `.debounce(ms)`; a binding `:x` takes `.once`. Any other suffix was ignored, so a misspelt `.lazzy` bound on every input without a word. `:class.x` and `:style.x` are forms of their own.',
+        fix: 'Use a listed modifier, or the general form `::x="{ get: () => …, set: (v) => … }"` for anything else.',
+        example: { bad: pdx('<input ::value.lazzy="name" />', "let name = $signal('');"), good: pdx('<input ::value.lazy="name" />', "let name = $signal('');") },
+    },
     PDX_PART_MISSING: {
         severity: 'error', category: 'defect',
         summary: 'A declared `@part` that no element of the template carries.',

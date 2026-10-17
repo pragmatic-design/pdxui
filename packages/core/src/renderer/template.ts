@@ -9,6 +9,7 @@ import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
 import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
+import { parseTwoWay, twoWayAccessor, twoWayWriter } from './two-way-value';
 
 // Properties whose value becomes a navigable/fetchable URL — a runtime-controlled value
 // (API/user data) must never be assigned raw (`javascript:`, `//evil.com`). Lowercased.
@@ -362,6 +363,9 @@ function bindAttribute(el: Element, key: string, value: TemplateValue): void {
             } else if (key.startsWith(':style.')) {
                 // Style property: :style.color=${() => value}
                 bindStyleProp(el as HTMLElement, key.slice(7), value);
+            } else if (key.startsWith(':') && key.endsWith('.once')) {
+                // Assigned once (#126): :title.once=${() => t()} reads its value now and never again.
+                bindProperty(el, key.slice(1, -'.once'.length), untracked(() => (typeof value === 'function' ? (value as () => unknown)() : value)));
             } else if (key.startsWith(':')) {
                 // Property binding: :disabled=${expr}
                 bindProperty(el, key.slice(1), value);
@@ -668,41 +672,36 @@ function bindStyleProp(el: HTMLElement, prop: string, value: TemplateValue): voi
 // ─── Two-Way Binding (::attr) ──────────────────────────────────────
 
 /**
- * Two-way binding with optional modifiers (.trim, .number, .lazy): `::value`, `::checked`.
+ * Two-way binding: `::value`, `::checked`, with the modifiers `.lazy`, `.trim`, `.number` and
+ * `.debounce(ms)`, of a signal or of the general form `{ get, set }` (#126, see ./two-way-value).
  *
  * The inline build calls this too, so the two builds listen the same way: a component through its
- * `pdx-input`/`pdx-change` and their `detail`, a `<select>` and a checkbox through `change`. The
- * inline path had its own copy that listened to `input` on everything, and `::value` was one-way
- * on a component in a production build (#97).
+ * model's event (#124) or, until it declares one, its `pdx-input`/`pdx-change`, a `<select>` and a
+ * checkbox through `change`. The inline path had its own copy that listened to `input` on
+ * everything, and `::value` was one-way on a component in a production build (#97).
  */
 export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void {
-    const sig = value as Signal<unknown>;
-    if (typeof sig !== 'function' || typeof sig.set !== 'function') {
-        bindProperty(el, descriptor.split('.')[0], value);
+    const { name, mods } = parseTwoWay(descriptor);
+    const accessor = twoWayAccessor(value);
+    if (!accessor) {
+        bindProperty(el, name, value);
         return;
     }
-
-    // Parse modifiers: "value.trim.lazy" → prop="value", mods={trim, lazy}
-    const parts = descriptor.split('.');
     // Convert kebab-case prop to camelCase for JS property access
-    const prop = kebabToCamel(parts[0]);
-    const mods = new Set(parts.slice(1));
+    const prop = kebabToCamel(name);
 
-    // Forward: signal → DOM property. A URL name is written as the one-way binding writes it,
+    // Forward: value → DOM property. A URL name is written as the one-way binding writes it,
     // through the sanitiser and as the attribute: `formaction` is not the `formAction` property, and
     // a `javascript:` value must not reach the element whichever way it is bound.
-    const urlName = URL_PROPS.has(parts[0].toLowerCase());
+    const urlName = URL_PROPS.has(name.toLowerCase());
     effect(() => {
-        if (urlName) setUrlAttribute(el, parts[0], sig());
-        else (el as unknown as Record<string, unknown>)[prop] = sig();
+        const v = accessor.get();
+        if (urlName) setUrlAttribute(el, name, v);
+        // `.number`'s null is an empty entry, not the text "null".
+        else (el as unknown as Record<string, unknown>)[prop] = mods.number && v == null ? '' : v;
     });
 
-    const applyValue = (raw: unknown): void => {
-        let val = raw;
-        if (mods.has('trim') && typeof val === 'string') val = val.trim();
-        if (mods.has('number')) val = Number(val) || 0;
-        sig.set(val);
-    };
+    const applyValue = twoWayWriter(el, accessor, mods);
 
     // A component that declares the prop as a model (#124) announces its writes with
     // `<kebab-prop>-change` and `{ value }`, and that is all the binding listens to. The class is
@@ -736,13 +735,13 @@ export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue
             }
             applyValue(raw);
         };
-        const events = mods.has('lazy') ? ['pdx-change'] : ['pdx-input', 'pdx-change'];
+        const events = mods.lazy ? ['pdx-change'] : ['pdx-input', 'pdx-change'];
         for (const ev of events) el.addEventListener(ev, onEvt);
         return;
     }
 
     // Native elements: read the property on the appropriate DOM event.
-    const eventName = mods.has('lazy') ? 'change' : resolveTwoWayEvent(el, prop);
+    const eventName = mods.lazy ? 'change' : resolveTwoWayEvent(el, prop);
     el.addEventListener(eventName, () => {
         applyValue((el as unknown as Record<string, unknown>)[prop]);
     });

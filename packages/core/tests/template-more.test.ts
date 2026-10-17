@@ -310,7 +310,7 @@ describe('two-way modifiers', () => {
         expect(name()).toBe('Ada');
     });
 
-    it('.number turns the string into a number, and a non-number into 0', () => {
+    it('.number turns the string into a number, and leaves the model for a non-number (#126)', () => {
         const qty = signal<unknown>(0);
         const el = mount(html`<input ::value.number=${qty} />`).querySelector('input')!;
 
@@ -318,9 +318,11 @@ describe('two-way modifiers', () => {
         el.dispatchEvent(new Event('input'));
         expect(qty()).toBe(42);
 
+        // The beta meaning: an invalid entry writes nothing (it wrote 0, as alpha) and marks the input.
         el.value = 'abc';
         el.dispatchEvent(new Event('input'));
-        expect(qty(), 'a non-numeric entry produced NaN in the model').toBe(0);
+        expect(qty(), 'a non-numeric entry reached the model').toBe(42);
+        expect(el.getAttribute('aria-invalid')).toBe('true');
     });
 
     it('.lazy waits for change instead of following every keystroke', () => {

@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 87 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 88 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -21,6 +21,36 @@ Something is wrong: the output differs from what was written, or nothing is gene
 The user sees nothing while the promise is pending.
 
 **Fix.** Add `@loading { … }` with a placeholder.
+
+### PDX_BINDING_MODIFIER
+
+*error* — A binding modifier outside the closed list (#126).
+
+A two-way binding takes `.lazy`, `.trim`, `.number` and `.debounce(ms)`; a binding `:x` takes `.once`. Any other suffix was ignored, so a misspelt `.lazzy` bound on every input without a word. `:class.x` and `:style.x` are forms of their own.
+
+**Fix.** Use a listed modifier, or the general form `::x="{ get: () => …, set: (v) => … }"` for anything else.
+
+Instead of:
+
+```html
+<template>
+  <input ::value.lazzy="name" />
+</template>
+<script setup>
+let name = $signal('');
+</script>
+```
+
+write:
+
+```html
+<template>
+  <input ::value.lazy="name" />
+</template>
+<script setup>
+let name = $signal('');
+</script>
+```
 
 ### PDX_CIRCULAR_DERIVED
 
