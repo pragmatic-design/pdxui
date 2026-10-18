@@ -24,7 +24,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_EVENT_BUBBLES_UNUSED` | info | An `@event(bubbles)` no ancestor in the project listens to. | `@event` | #138 (landed) |
 | `PDX_COMMAND_TARGET_MISSING` | error | A `commandfor` whose target id is not in the template. | commands | #140 (landed) |
 | `PDX_COMMAND_UNKNOWN` | error | A custom command that is not an exposed method of the target. | commands | #140 (landed) |
-| `PDX_ATTACH_UNKNOWN` | error | `attach:name` with no `name` in scope. | `attach:` | #143 |
+| `PDX_ATTACH_UNKNOWN` | error | `attach:name` with no `name` in scope. | `attach:` | #143 (landed) |
 | `PDX_VARIANT_UNKNOWN` | error | An `@variant` naming an undeclared axis or value. | `@variants` | #153 |
 | `PDX_VARIANT_UNSTYLED` | warn | A declared variant value with no rule. | `@variants` | #153 |
 | `PDX_UNKNOWN_DIRECTIVE` | warn | A directive registered by no plugin. | directives | #296 (landed; #100 planned it and did not add it) |

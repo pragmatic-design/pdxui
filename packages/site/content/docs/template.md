@@ -145,6 +145,32 @@ Append modifiers with a dot — no boilerplate in the handler:
 `.prevent`, `.stop`, `.self`, `.once`, `.capture`, `.passive` and key filters (`.enter`, `.escape`,
 `.space`, `.tab`, arrows…) compose freely: `@keydown.enter.prevent="submit"`.
 
+## Behaviour on an element: `attach:`
+
+Focus on mount, a tooltip, a click outside, a textarea that grows: behaviour that belongs to one
+element. Instead of a ref, an `onMount` and a cleanup written by hand, **attach** it:
+
+```pdx
+<input attach:autofocus attach:tooltip="'Search by name'" />
+<div class="menu" attach:clickOutside="close">…</div>
+```
+
+An attachment is a plain function of the element and a getter for its value, which may return a
+cleanup:
+
+```ts
+export function tooltip(el: Element, text: () => string) {
+  const tip = showTooltip(el, text());
+  return () => tip.remove();   // when the text changes, and when the element goes
+}
+```
+
+It runs when the element is rendered; when its value changes, the cleanup runs and it runs again;
+when the element goes — an `@if` closing, a `@for` row removed, the component destroyed — the cleanup
+runs once more. On a component it attaches to the host. `autofocus`, `trapFocus` and `clickOutside`
+are core's and need no import; any other name is a function of the script or an import, and a name
+that is neither is `PDX_ATTACH_UNKNOWN`. The editor checks the value against the attachment's type.
+
 ## Conditions: `@if` / `@else`
 
 ```pdx

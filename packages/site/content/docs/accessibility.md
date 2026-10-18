@@ -17,7 +17,22 @@ what a **screen reader** is told.
 ## Keeping focus inside
 
 A dialog that does not trap focus lets Tab walk out into the page behind it — which for a keyboard
-user means the dialog is still open and unreachable:
+user means the dialog is still open and unreachable. In a template, attach the trap to the element
+that holds the dialog: it starts when the element is rendered and releases — focus back where it was
+— when the element goes, an `@if` closing it included.
+
+```pdx
+@if (open) {
+  <div class="panel" role="dialog" aria-label="Edit" attach:trapFocus attach:clickOutside="close">
+    <input attach:autofocus />
+    …
+  </div>
+}
+```
+
+`attach:` ([template](/docs/template#behaviour-on-an-element-attach)) calls an attachment with the
+element and removes it with the element; `trapFocus`, `autofocus` and `clickOutside` are core's, and
+need no import. Outside a template, the trap is a function:
 
 ```ts
 import { focusTrap } from '@pdxui/core';

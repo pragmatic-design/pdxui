@@ -161,6 +161,24 @@ export function projectTemplate(
                     emit(');\n');
                 }
             }
+            // `attach:name="value"` (#143): the name is an attachment, `(el, value: () => V) => void |
+            // (() => void)`, and the value its V. Match: `attach:name` and its optional value.
+            // Groups: [1]=name [2]=value
+            const attachRe = /(?<=\s)attach:([A-Za-z_$][\w$]*)(?:\s*=\s*"([^"]*)")?/g;
+            let am: RegExpExecArray | null;
+            while ((am = attachRe.exec(attrsRegion))) {
+                const nameAbs = baseOff + attrsBase + am.index + 'attach:'.length;
+                if (inMask(nameAbs)) continue;
+                const value = am[2];
+                emit(';__pdxAttach(');
+                map.add(gen, templateStart + nameAbs, am[1].length); emit(am[1]);
+                if (value !== undefined && value.trim() && !value.includes('${')) {
+                    const valueAbs = baseOff + attrsBase + am.index + am[0].indexOf('"') + 1;
+                    emit(', ');
+                    map.add(gen, templateStart + valueAbs, value.length); emit(value);
+                }
+                emit(');\n');
+            }
         }
     };
 

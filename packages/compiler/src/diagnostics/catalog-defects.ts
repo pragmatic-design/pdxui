@@ -205,6 +205,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use a lowercase name: `@event saveditem: Item;`. The fix renames it in the script; when the template uses the name, the rename is left to you.',
         reproducedIn: `${T}event-name-case.test.ts`,
     },
+    PDX_ATTACH_UNKNOWN: {
+        severity: 'error', category: 'defect',
+        summary: '`attach:name` whose name is neither in the script nor one of core\'s attachments (#143).',
+        explanation: 'An attachment is a function of the element and a getter for its value, called when the element is rendered, with its returned cleanup run when the value changes or the element goes. Its name is read like any template identifier — a function of the script, or an import — or is one of core\'s built-ins, `autofocus`, `trapFocus` and `clickOutside`, which the compiler imports. Any other name would be undefined, and the element would throw when rendered.',
+        fix: 'Declare the function, `function tooltip(el, value) { … return () => { … }; }`, or import it.',
+        example: { bad: pdx('<input attach:toltip="\'Search\'" />', "import { tooltip } from './tooltip';"), good: pdx('<input attach:tooltip="\'Search\'" />', "import { tooltip } from './tooltip';") },
+    },
     PDX_EVENT_BUBBLES_UNUSED: {
         severity: 'info', category: 'defect',
         summary: 'An `@event(bubbles)` no template in the project listens to above the component (#138).',

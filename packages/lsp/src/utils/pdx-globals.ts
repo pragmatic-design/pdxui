@@ -62,6 +62,15 @@ declare global {
   function onResize(fn: (...a: any[]) => void): void;
   // The router's navigation state, which the compiler imports from @pdxui/router where it is read (#149).
   const navigation: { readonly pending: PdxReadonly<boolean>; readonly to: PdxReadonly<string | null> };
+  // \`attach:name="value"\` (#143): the projection checks the name as an attachment of the value.
+  type PdxAttachment<V> = (el: Element, value: () => V) => void | (() => void);
+  // V comes from the attachment alone: inferred from the value too, any value would widen it. The
+  // value is the argument itself, so an error on it lands on the text the author wrote.
+  function __pdxAttach<V>(fn: PdxAttachment<V>, value?: NoInfer<V>): void;
+  // Core's built-in attachments, which the compiler imports where the template names them.
+  const autofocus: PdxAttachment<unknown>;
+  const trapFocus: PdxAttachment<unknown>;
+  const clickOutside: PdxAttachment<((event: Event) => void) | undefined>;
   // What \`@fetch name: 'GET /url' as T\` gives the script and the template: core's Resource<T>, whose
   // reads are signals — \`name.data()\`, not \`name.data\`. tests/fetch-types.test.ts fails when a
   // member of Resource is missing here.

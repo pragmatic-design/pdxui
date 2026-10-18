@@ -468,6 +468,7 @@ class InlineGen {
             else if (n.startsWith(':style.')) this.styleProp(el, n.slice(7), val);
             else if (n === ':show')           this.showBind(el, val);
             else if (n === ':ref' || n === 'ref') this.refBind(el, val);
+            else if (n.startsWith('attach:'))  this.attachBind(el, n.slice('attach:'.length), m[2] === undefined && m[3] === undefined && !m[4] ? '' : val, preRewritten);
             else if (n === ':class')          this.classBind(el, val, staticClassValue, preRewritten, toggled, kind);
             else if (n.startsWith(':'))       this.propBind(el, n.slice(1), val, kind, preRewritten);
             else if (gestureOf(n))            this.gestureBind(el, gestureOf(n)!, val, preRewritten);
@@ -729,6 +730,19 @@ class InlineGen {
         // rendering scope is disposed (#262).
         this.imports.add('bindRef');
         this.out(`bindRef(${el},${prefixCtx(expr, this.ctx)});`);
+    }
+
+    /**
+     * `attach:name="value"` (#143): core's `attach(el, name, () => value)`, which runs the attachment
+     * in an effect owned by this render. The name resolves like a template identifier; a built-in the
+     * script does not declare is in `importedNames`, put there by codegen-new.
+     */
+    private attachBind(el: string, name: string, expr: string, preRewritten: boolean): void {
+        this.imports.add('attach');
+        const fn = prefixCtx(name, this.ctx);
+        if (!expr && !preRewritten) { this.out(`attach(${el},${fn});`); return; }
+        const value = preRewritten ? `(${expr})` : `(${this.read(expr)})`;
+        this.out(`attach(${el},${fn},()=>${value});`);
     }
 
     // ─── Interpolation ────────────────────────────────────────

@@ -417,6 +417,16 @@ function rewriteTagAttributes(tag: string, ctx: CompileContext,
     // Simple accesses (signals/props) are passed directly as signal getters.
     // Non-signal names (functions, consts) MUST be wrapped in () => to avoid
     // the template engine calling them as getters.
+    // attach:name="value" (#143) → attach:name=${[ctx.name, () => value]}, which core's
+    // bindAttribute hands to attach(). Before the :prop step below, which would read `:name=`.
+    // Match: `attach:name` and its optional quoted value. Groups: [1]=the space [2]=name [3]/[4]=value
+    tag = tag.replace(/(\s)attach:([A-Za-z_$][\w$]*)(?:=(?:"([^"]*?)"|'([^']*?)'))?(?=[\s>/])/g,
+        (_, sp: string, name: string, dq: string | undefined, sq: string | undefined) => {
+            const expr = dq ?? sq;
+            const getter = expr === undefined ? '' : `,() => ${asArrowBody(callSignals(prefixCtx(expr, ctx), ctx))}`;
+            return `${sp}attach:${name}=\${${m('attach:' + name)}[${prefixCtx(name, ctx)}${getter}]}`;
+        });
+
     // Prop name normalized to kebab-case for HTML safety (browser lowercases attributes).
     tag = tag.replace(/:([\w.-]+)=(?:"([^"]*?)"|'([^']*?)')/g, (_, prop: string, dq: string, sq: string) => {
         let expr = dq ?? sq;

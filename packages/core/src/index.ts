@@ -135,6 +135,8 @@ export { DEV } from './utils/env';
 
 // Renderer
 export { html, clearBoundProperty, assignBoundProperty, bindTwoWay, bindInterpolation, bindRef, interpolationText } from './renderer/template';
+export { attach, autofocus, trapFocus, clickOutside } from './renderer/attach';
+export type { Attachment } from './renderer/attach';
 export { repeat } from './renderer/list';
 export { repeatWithSlot } from './renderer/slot-repeat';
 export { setProp, bindGesture, insert, remove, text, marker, staticBlock, staticMarkup, __staticHTML } from './renderer/dom';

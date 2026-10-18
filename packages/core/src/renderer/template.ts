@@ -10,6 +10,7 @@ import { sanitizeBoundUrl } from '../security/sanitize-url';
 import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
 import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup } from './two-way-value';
+import { attach, type Attachment } from './attach';
 
 // Properties whose value becomes a navigable/fetchable URL — a runtime-controlled value
 // (API/user data) must never be assigned raw (`javascript:`, `//evil.com`). Lowercased.
@@ -354,6 +355,10 @@ function bindAttribute(el: Element, key: string, value: TemplateValue): void {
             } else if (key === ':ref') {
                 // Element reference: :ref=${refSignal}
                 bindRef(el, value);
+            } else if (key.startsWith('attach:')) {
+                // Attachment (#143): attach:name=${[fn, () => value]} → attach(el, fn, getter)
+                const [fn, read] = value as unknown as [Attachment, (() => unknown)?];
+                attach(el, fn, read);
             } else if (key === ':show') {
                 // Show/hide: :show=${() => bool}
                 bindShow(el as HTMLElement, value);

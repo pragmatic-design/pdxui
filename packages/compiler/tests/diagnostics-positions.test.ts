@@ -45,6 +45,7 @@ const ROWS: Record<string, Row> = {
     PDX_MALFORMED_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event (saved): number;'), at: '@event (saved)' },
     PDX_DUP_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event changed: number;\n@event changed: string;'), at: '@event changed: string;' },
     PDX_EVENT_NAME_CASE: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event savedItem: number;'), at: '@event savedItem' },
+    PDX_ATTACH_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<input attach:toltip />', 'let a = $signal(1);'), at: 'attach:toltip' },
     PDX_EVENT_BUBBLES_UNUSED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event(bubbles) saved: number;'), at: '@event(bubbles) saved' },
     PDX_EXPOSE_UNDECLARED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@expose close;'), at: '@expose close;' },
     PDX_COMMAND_TARGET_MISSING: { src: pdx('<p>{{ a }}</p>\n<button commandfor="gone" command="close">x</button>', 'let a = $signal(1);'), at: 'commandfor="gone"' },

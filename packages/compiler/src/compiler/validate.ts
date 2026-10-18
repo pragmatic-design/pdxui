@@ -26,6 +26,7 @@ import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validat
 import { checkSinglePipes } from './validate-pipes';
 import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
 import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubbles';
+import { checkAttachments } from './validate-attach';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -535,6 +536,7 @@ export function validate(
     warnings.push(...checkTwoWay(ast, options?.modelsOf));
     warnings.push(...checkRequiredProps(ast, options?.requiredPropsOf));
     warnings.push(...checkBubblesUnused(analysis.events, options?.eventHeardAbove));
+    warnings.push(...checkAttachments(ast, analysis));
     warnings.push(...checkBindingModifiers(ast));
     warnings.push(...checkSinglePipes(ast));
 

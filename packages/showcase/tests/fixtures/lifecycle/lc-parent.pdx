@@ -1,0 +1,25 @@
+<template>
+  <input class="auto" attach:autofocus />
+  <button class="hide" @click="shown = false">hide</button>
+  @if (shown) {
+    <div class="block">
+      <input class="field" :ref="field" attach:probe />
+      <app-lc-child></app-lc-child>
+    </div>
+  }
+</template>
+
+<script setup>
+// Lifecycle case 3 (docs/language/beta/lifecycle.md): the block holds a ref, an attachment and a
+// child with a @fetch; removing it resets the ref, cleans the attachment up and disposes the fetch.
+let shown = $signal(true);
+let field = $signal(null);
+
+function probe() {
+  window.__lc.probe.push('run');
+  return () => window.__lc.probe.push('clean');
+}
+
+// What the ref holds, as the test reads it.
+$effect(() => { window.__lc.field = field; });
+</script>

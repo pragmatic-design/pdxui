@@ -4,11 +4,41 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 92 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 93 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
 Something is wrong: the output differs from what was written, or nothing is generated for it.
+
+### PDX_ATTACH_UNKNOWN
+
+*error* — `attach:name` whose name is neither in the script nor one of core's attachments (#143).
+
+An attachment is a function of the element and a getter for its value, called when the element is rendered, with its returned cleanup run when the value changes or the element goes. Its name is read like any template identifier — a function of the script, or an import — or is one of core's built-ins, `autofocus`, `trapFocus` and `clickOutside`, which the compiler imports. Any other name would be undefined, and the element would throw when rendered.
+
+**Fix.** Declare the function, `function tooltip(el, value) { … return () => { … }; }`, or import it.
+
+Instead of:
+
+```html
+<template>
+  <input attach:toltip="'Search'" />
+</template>
+<script setup>
+import { tooltip } from './tooltip';
+</script>
+```
+
+write:
+
+```html
+<template>
+  <input attach:tooltip="'Search'" />
+</template>
+<script setup>
+import { tooltip } from './tooltip';
+</script>
+```
 
 ### PDX_AWAIT_NO_LOADING
 

@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 55 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 59 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -59,6 +59,29 @@ name.
 
 The prototype walk runs only while the element has no own property of that name, which after the
 component's setup it always has. The inline build calls this too, for a component's props.
+
+## `attach`
+
+```ts
+import { attach } from '@pdxui/core';
+
+function attach(el: Element, fn: Attachment<V>, value?: () => V): void
+```
+
+Run `fn(el, value)` as an attachment of `el`: now, again when `value()` changes (its previous
+cleanup first), and its cleanup once more when the scope that called `attach` is disposed.
+
+## `autofocus`
+
+```ts
+import { autofocus } from '@pdxui/core';
+
+const autofocus: Attachment
+```
+
+`attach:autofocus` — focus the element once it is in the document. On a component it focuses the
+first focusable element inside the host. Unlike the `autofocus` attribute, it works for an element
+a block renders after the page loaded.
 
 ## `awaitReady`
 
@@ -201,6 +224,17 @@ What "no value" means follows the type the property holds, as Vue's `patchDOMPro
   `style = null` does not clear the inline style everywhere (happy-dom keeps it).
 
 The inline build calls this too, so both builds clear a property the same way.
+
+## `clickOutside`
+
+```ts
+import { clickOutside } from '@pdxui/core';
+
+const clickOutside: Attachment<((event: Event) => void) | undefined>
+```
+
+`attach:clickOutside="close"` — call the handler for a press (`pointerdown`) anywhere outside the
+element, with the event. Inside it, nothing happens.
 
 ## `createVirtualizer`
 
@@ -745,6 +779,18 @@ function trackUrgentLoad(load: Promise<T>): Promise<T>
 
 A load the visitor is waiting for: while it is in flight, no queued prefetch starts. It is never
 queued itself. Returns the same promise.
+
+## `trapFocus`
+
+```ts
+import { trapFocus } from '@pdxui/core';
+
+const trapFocus: Attachment
+```
+
+`attach:trapFocus` — keep Tab inside the element and hide what is beside it from screen readers
+(core's `focusTrap`), from the moment it is in the document until its scope is disposed, which
+gives focus back to where it was.
 
 ## `tween`
 
