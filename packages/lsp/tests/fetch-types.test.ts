@@ -38,9 +38,15 @@ describe('a typed @fetch in the script', () => {
         expect(diagnose(USER + 'function f() { return user.data()?.name; }')).toEqual([]);
     });
 
-    it('and the resource has the surface a page uses', () => {
-        const uses = 'function f() { user.loading(); user.error(); user.isPending(); user.state(); user.status().isError; user.refetch(); user.mutate({ name: "x" }); }';
+    it('and the resource has the surface a page uses: the async vocabulary (#141)', () => {
+        const uses = 'function f() { user.data(); user.error()?.message; user.state() === "pending"; user.pending(); user.stale(); user.refetch(); user.mutate({ name: "x" }); }';
         expect(diagnose(USER + uses)).toEqual([]);
+    });
+
+    it('the alpha names are gone from it: loading(), isPending(), status()', () => {
+        for (const gone of ['user.loading()', 'user.isPending()', 'user.status()']) {
+            expect(diagnose(USER + `function f() { ${gone}; }`).length, `${gone} still type-checks`).toBeGreaterThan(0);
+        }
     });
 
     it('mutate takes the declared type, not anything', () => {
@@ -67,7 +73,7 @@ describe('a typed @fetch in the template', () => {
     it('the example data.md teaches is clean', () => {
         // The page's own lines, so the documentation cannot teach code the editor marks red.
         const page = readFileSync(join(ROOT, 'packages/site/content/docs/data.md'), 'utf-8').replace(/\r\n/g, '\n');
-        const block = /```pdx\n(@if \(users\.loading[\s\S]*?)```/.exec(page);
+        const block = /```pdx\n(@if \(users\.state\(\) === 'pending'[\s\S]*?)```/.exec(page);
         expect(block, 'the @fetch example is no longer in data.md').not.toBeNull();
         const script = "interface User { id: number; name: string }\n@fetch users: 'GET /api/users' as User[];\n";
         expect(diagnose(script, block![1])).toEqual([]);

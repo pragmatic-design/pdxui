@@ -56,10 +56,10 @@ export function planLoaders(
         // data stays on screen and no request is made for something already held.
         if (prevKeys[level.path] === key && level.path in prevData) {
             data[level.path] = prevData[level.path];
-            state[level.path] = prevState[level.path] ?? 'done';
+            state[level.path] = prevState[level.path] ?? 'success';
             continue;
         }
-        state[level.path] = 'loading';
+        state[level.path] = 'pending';
         pending.push(level);
     }
 
@@ -111,7 +111,7 @@ export async function runLoaders(
             const result = data.value;
             if (!isCurrent()) return false; // a newer navigation won — drop this stale result
             _loaderData.set({ ..._loaderData.peek(), [level.path]: result });
-            _loaderState.set({ ..._loaderState.peek(), [level.path]: 'done' });
+            _loaderState.set({ ..._loaderState.peek(), [level.path]: 'success' });
         } catch (err) {
             if (!isCurrent()) return false;
             const nextData = { ..._loaderData.peek() };

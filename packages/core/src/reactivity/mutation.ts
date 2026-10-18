@@ -47,8 +47,8 @@ export interface Mutation<TData, TInput> {
     execute(input: TInput): Promise<TData>;
     /** The result of the last call that finished, if it succeeded. */
     readonly data: ReadonlySignal<TData | undefined>;
-    /** The error of the last call that finished, if it failed. */
-    readonly error: ReadonlySignal<unknown | undefined>;
+    /** The error of the last call that failed; cleared only by the next success (null until then). */
+    readonly error: ReadonlySignal<Error | null>;
     /** `pending` while any call is running or queued; otherwise the outcome of the last one. */
     readonly state: ReadonlySignal<MutationState>;
     /** Whether any call is running or queued. */
@@ -77,7 +77,7 @@ export function mutation<TData, TInput = void>(
     const cache = options.cache ?? getDefaultCache();
 
     const _data = signal<TData | undefined>(undefined);
-    const _error = signal<unknown | undefined>(undefined);
+    const _error = signal<Error | null>(null);
     const _state = signal<MutationState>('idle');
 
     // The queue: calls made and not yet settled, and the settlement of the last one, which the next
@@ -133,7 +133,7 @@ export function mutation<TData, TInput = void>(
 
             batch(() => {
                 _data.set(result);
-                _error.set(undefined);
+                _error.set(null);
                 _state.set(finalState('success'));
             });
 
@@ -156,7 +156,7 @@ export function mutation<TData, TInput = void>(
             }
 
             batch(() => {
-                _error.set(err);
+                _error.set(err as Error);
                 _state.set(finalState('error'));
             });
 
@@ -170,13 +170,13 @@ export function mutation<TData, TInput = void>(
     return {
         execute,
         data: computed(() => _data()) as ReadonlySignal<TData | undefined>,
-        error: computed(() => _error()) as ReadonlySignal<unknown | undefined>,
+        error: computed(() => _error()) as ReadonlySignal<Error | null>,
         state: computed(() => _state()) as ReadonlySignal<MutationState>,
         pending: computed(() => _state() === 'pending') as ReadonlySignal<boolean>,
         reset(): void {
             batch(() => {
                 _data.set(undefined);
-                _error.set(undefined);
+                _error.set(null);
                 _state.set('idle');
             });
         },

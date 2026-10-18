@@ -7,8 +7,10 @@ vocabulary**, so a template written against one works against the others.
 
 ### Semantics
 
-Owner decision of 2026-10-10 (#141). A resource (`@fetch`, `resource()`), `useQuery`, a mutation
-(`mutation()`, `@action`) and a route loader (`@loader`) all expose:
+Owner decision of 2026-10-10 (#141 — **landed** for `resource()`, `@fetch`, `useQuery` and
+`mutation()`; a route loader's states take these words, and its named object with `data()` … `stale()`
+is #146's). A resource (`@fetch`, `resource()`), `useQuery`, a mutation (`mutation()`, `@action`) and a
+route loader (`@loader`) all expose:
 
 | Member | Meaning |
 |---|---|
@@ -37,8 +39,8 @@ the request settles.
 | a failed first load waiting for or running its retry | `undefined` | `false` | `'pending'` |
 
 A new success sets `stale()` to `false`, clears `error()` and restarts the `staleTime` clock;
-nothing else clears `error()` — a request starting does not (alpha clears it at the start,
-`resource.ts:204`). A retry is part of its request: while it waits or runs, `pending()` is true and
+nothing else clears `error()` — a request starting does not (**landed**, #141; alpha cleared it at
+the start). A retry is part of its request: while it waits or runs, `pending()` is true and
 `state()` is the row's. The source's actions stay on it: `refetch()`, `abort()`, `mutate(value)` on a
 resource; `execute(arg)`, `cancel()` on an action.
 
@@ -48,7 +50,10 @@ resource; `execute(arg)`, `cancel()` on an action.
   (`loading`, `reloading`, `stale`, `local`), `currentLoaderState()` — are removed, `PDX_REMOVED_FORM`
   (decisions.md 36).
   `pdx migrate` rewrites the mechanical ones (`x.isPending()` → `x.pending()`) and flags the others
-  (`x.loading()` is `x.state() === 'pending' && !x.data()`, #141).
+  (`x.loading()` is `x.state() === 'pending' && !x.data()`, #141 — **landed**: entries
+  `async-is-pending`, `async-alpha-names`, read where the file declares the source; a loader's
+  `'loading'`/`'done'` compared in a file are rewritten to `'pending'`/`'success'`,
+  `loader-state-words`; `currentLoaderState()` itself is #146's).
 
 ### Since
 
@@ -68,8 +73,8 @@ differs today, the difference is stated, with the line that shows it (read on 20
 | E1 | **Latest wins.** A response for a request that is no longer the current one for its source — the key changed, or a newer request started — writes nothing: not `data()`, not `error()`, not `state()`, not the cache. | **landed** for `resource()`: a generation counter (`core/src/reactivity/resource.ts:172,216-217,234-235`), checked before `cache.set` |
 | E2 | **Cancellation reaches the transport.** Each request has an `AbortSignal`; `@fetch` passes it to the HTTP client, `resource(fetcher)` passes `{ signal }` to the fetcher. A request that is superseded (E1), cancelled or disposed is aborted on the network, not only ignored. | differs: `fetcher()` is called with no argument (`resource.ts:213`), `@fetch` emits `__httpClient.get(url)` with no signal; the client accepts one (`core/src/http/types.ts:75`) |
 | E3 | **Cancelling is not failing.** `abort()` / `cancel()` returns the source to its last settled state — `'success'` with the kept data, or `'idle'` — and leaves `error()` as it was. A cancellation never becomes `error()`. A transport **timeout** is a failure, not a cancellation: the client raises a distinct `HttpTimeoutError` for it (from the abort's `reason`), and that one becomes `error()`. | differs: `abort()` aborts and clears the controller without touching the state (`resource.ts:340-345`), so a source stays pending; the client turns every abort, its own timeout included, into one `AbortError` (`core/src/http/client.ts:133-134`), so the two cannot be told apart |
-| E4 | **A failed refresh keeps the data.** `state()` becomes `'error'`, `data()` keeps the last value, `stale()` is `true`, `pending()` is `false` — the `stale()` table above. The template keeps the body and may show the error beside it (`@await`, template.md). | differs: the alpha state is `'stale'` and `isPending` is true (`resource.ts:247-251,308-311`), so a failed refresh looks like a refresh in progress — #141 |
-| E5 | **Absence is `undefined`; `null`, `0`, `false` and `''` are data.** Whether there is a result is `state()`, not the value's truthiness: a source that resolved `null` is `'success'`, and `@await` renders its body. A fetcher that resolves `undefined` settles `'success'` with no data; in development it warns once (return `null` to say «nothing»). | **landed** for the sentinel (`resource.ts:137,300`); differs for `undefined`: `resourceWhen` renders nothing (`resource.ts:409`); and `@await` decides by **truthiness** for anything that is not a promise (`core/src/renderer/helpers.ts:143-147`), so `@await (x.data())` that is `null` or `0` stays on `@loading` |
+| E4 | **A failed refresh keeps the data.** `state()` becomes `'error'`, `data()` keeps the last value, `stale()` is `true`, `pending()` is `false` — the `stale()` table above. The template keeps the body and may show the error beside it (`@await`, template.md). | **landed** (#141) for `resource()`, `@fetch` and `useQuery`, in `core/tests/async-contract.test.ts`; `resourceWhen` keeps its success branch; `@await` is template.md's |
+| E5 | **Absence is `undefined`; `null`, `0`, `false` and `''` are data.** Whether there is a result is `state()`, not the value's truthiness: a source that resolved `null` is `'success'`, and `@await` renders its body. A fetcher that resolves `undefined` settles `'success'` with no data; in development it warns once (return `null` to say «nothing»). | **landed** for the sentinel, and for `resourceWhen` (#141: a success renders its branch whatever the value, `undefined` with a warning in development); differs for `@await`, which decides by **truthiness** for anything that is not a promise (`core/src/renderer/helpers.ts:143-147`), so `@await (x.data())` that is `null` or `0` stays on `@loading` |
 | E6 | **One layer retries, and only reads.** A read source retries on a network failure, a 5xx, a 408 or a 429 (honouring `Retry-After`), with exponential backoff and jitter; while it waits, `pending()` is true and `state()` is what the table above gives; `cancel`/`dispose` stops the chain. Every request a read source makes goes out with the transport's retry **off** — the source's `retry` (0 for `resource()`, 3 for `useQuery`, as today) is the only one, so attempts do not multiply. **Writes are not retried implicitly**: the transport's default retry covers `GET`, `HEAD` and `OPTIONS` only; `PUT` and `DELETE`, idempotent by HTTP but not by every server, are retried only when a request asks for it. | partly: `mutation()` has no retry (**landed**), but the client retries every method it calls idempotent — `GET`, `HEAD`, `OPTIONS`, **`PUT`, `DELETE`** (`core/src/http/middleware.ts:69,99`) — so an action that sends a `PUT` is retried by the transport; `useQuery` (3) on top of the client (3) can make 16 attempts; the resource backoff has no jitter (`resource.ts:238-244`) |
 | E7 | **Concurrent reads of one key share one request.** A second consumer that asks for a key already in flight joins that request instead of starting another; every consumer of the key is notified when its value is written. The shared request is aborted only when its **last** consumer cancels or is disposed; one consumer's `abort()` detaches that consumer. One key has one request: a consumer's `refetch()` supersedes the shared request for every consumer (E1), and `mutate(value)` writes the key for all of them; a consumer whose key changes detaches from the old key's request. | differs: each resource fetches for itself (`resource.ts:191-193`) and writes the cache with `silent: true` (`resource.ts:222`), against `cache.ts:379-380`, which promises one request |
 | E8 | **A read dies with its owner.** A read source created in a component's setup or a template scope is disposed with that scope: its request aborted (E2), its retry chain stopped, its cache subscription released. | differs: `resource()` registers no `onDispose` (`resource.ts:14`), and the compiler emits no dispose for `@fetch`, so a destroyed component's entries stay subscribed and are never collected; `useQuery` does (`use-query.ts:167`) |

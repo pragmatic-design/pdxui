@@ -26,7 +26,8 @@ export const _state = signal<Record<string, unknown> | undefined>(undefined);
 // `loaderData('/tickets/:id')` reads a named level — the case a parent/child split exists for. It
 // is the shape React Router settled on (`useLoaderData` / `useRouteLoaderData`), for the same
 // reason.
-export type LoaderState = 'idle' | 'loading' | 'done' | 'error';
+/** A loader's state, in the async vocabulary every source shares (beta spec, data.md, #141). */
+export type LoaderState = 'idle' | 'pending' | 'success' | 'error';
 export const _loaderData = signal<Record<string, unknown>>({});
 export const _loaderState = signal<Record<string, LoaderState>>({});
 /** Which level `currentLoaderData()` resolves against: the matched route, set before its loader runs. */
@@ -59,7 +60,7 @@ export const currentLoaderData: ReadonlySignal<unknown> = computed(() => {
     const focus = _loaderFocus();
     return focus === null ? undefined : _loaderData()[focus];
 });
-/** Loader execution state of the matched route: idle → loading → done/error. */
+/** Loader execution state of the matched route: idle → pending → success/error. */
 export const currentLoaderState: ReadonlySignal<LoaderState> = computed(() => {
     const focus = _loaderFocus();
     return focus === null ? 'idle' : (_loaderState()[focus] ?? 'idle');

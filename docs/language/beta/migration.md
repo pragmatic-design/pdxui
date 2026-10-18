@@ -85,8 +85,8 @@ proposals the implementing issue may change.
 | `@defer (hover)` | `@defer (interaction)` — the same trigger | mechanical | † (decision 37) |
 | `@prefetch 'hover';` | `@page '/x' { prefetch: 'hover' }` | mechanical | † (decision 19) |
 | a form field named like a form member (`valid`, `reset`, …) | another name | `PDX_FORM_FIELD_RESERVED`; flagged | † (decision 13) |
-| `x.isPending()` | `x.pending()` | mechanical | #141 |
-| `x.loading()`, `x.status()`, `x.isLoading()`, `state()` values `loading`/`reloading`/`stale`/`local` | the async vocabulary (`x.loading()` is `x.state() === 'pending' && !x.data()`) | flagged | #141 |
+| `x.isPending()` | `x.pending()` | mechanical — landed: `async-is-pending` | #141 |
+| `x.loading()`, `x.status()`, `x.isLoading()`, `state()` values `loading`/`reloading`/`stale`/`local` | the async vocabulary (`x.loading()` is `x.state() === 'pending' && !x.data()`) | flagged — landed: `async-alpha-names` (where the file declares the source) | #141 |
 | a control with `name="x"` inside `<pdx-form :form="f">` | `::<model>="f.x"`, the model read from the control's manifest: `::checked` on `pdx-checkbox`/`pdx-switch`, `::pressed` on `pdx-toggle`, `::value` on the others and on native inputs (`checked` for a native checkbox or radio) | mechanical; **flagged** for a control with no manifest entry or more than one model | #128 (model selection †) |
 | `<pdx-form-field name="email">` | `<pdx-form-field :field="f.email">` | mechanical | #128 |
 | `f.fields.email` | `f.email` | mechanical | #128 (rewrite †; see decision 13) |

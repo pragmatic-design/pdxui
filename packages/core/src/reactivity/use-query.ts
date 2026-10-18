@@ -3,9 +3,9 @@
 // Inspired by TanStack Query, but signal-native.
 
 import { resource } from './resource';
-import { computed, onDispose } from './signal';
+import { onDispose } from './signal';
 import { getDefaultCache, requestInFlight } from './cache';
-import type { ResourceOptions, ResourceFetcher } from './resource';
+import type { ResourceOptions, ResourceFetcher, AsyncState } from './resource';
 import type { ReadonlySignal } from '../utils/types';
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -39,17 +39,18 @@ export interface UseQueryOptions<T> {
     onError?: (error: unknown) => void;
 }
 
+/** A query's state, in the async vocabulary every source shares (beta spec, data.md, #141). */
 export interface QueryResult<T> {
-    /** Current data. */
+    /** The last successful value; `undefined` until there is one. */
     data: ReadonlySignal<T | undefined>;
-    /** Whether loading (first load or refetch). */
-    isLoading: ReadonlySignal<boolean>;
-    /** Error if fetch failed. */
-    error: ReadonlySignal<unknown>;
-    /** Whether data exists (even stale). */
-    hasData: ReadonlySignal<boolean>;
-    /** Whether data is stale. */
-    isStale: ReadonlySignal<boolean>;
+    /** The last error; cleared only by the next success. */
+    error: ReadonlySignal<Error | null>;
+    /** `'idle' | 'pending' | 'success' | 'error'`. */
+    state: ReadonlySignal<AsyncState>;
+    /** Whether a request is in flight: first load, refresh, retry. */
+    pending: ReadonlySignal<boolean>;
+    /** Whether the value shown is no longer known to be current. */
+    stale: ReadonlySignal<boolean>;
     /** Re-fetch manually. */
     refetch(): Promise<void>;
     /** Optimistically set data. */
@@ -73,7 +74,7 @@ export interface QueryResult<T> {
  *     { key: () => `users:${page()}`, staleTime: 60_000, refetchOnFocus: true },
  *   );
  *   users.data();      // the value, or undefined
- *   users.isLoading(); // reactive
+ *   users.pending();   // a request in flight, reactive
  *
  * A wrapper over {@link resource}: same cache, same `key`, same `tags`. What it adds is the
  * refetching a screen left open needs — on focus, on reconnect, on an interval — and `mutate()` for
@@ -105,8 +106,8 @@ export function useQuery<T>(
     // request in flight for every reader of the key (#258): coming back to the tab during a slow
     // first load would abort it and start it again, and a polling tick against a slower endpoint
     // would start a request every period, none of them ever the one whose result got used.
-    // In flight for the KEY, from the cache's registry of shared requests: not `loading()`, which is
-    // false while a source with stale data reloads, and blind to another reader's request.
+    // In flight for the KEY, from the cache's registry of shared requests: not `pending()`, which is
+    // this reader's own, and blind to another reader's request.
     const cache = getDefaultCache();
     const refreshUnlessPending = (): void => {
         if (requestInFlight(cache, res.key)) return;
@@ -169,10 +170,10 @@ export function useQuery<T>(
 
     return {
         data: res.data,
-        isLoading: res.loading,
         error: res.error,
-        hasData: computed(() => res.status().hasData),
-        isStale: computed(() => res.status().isStale),
+        state: res.state,
+        pending: res.pending,
+        stale: res.stale,
         refetch: () => res.refetch(),
         mutate: (value: T) => res.mutate(value),
         dispose,

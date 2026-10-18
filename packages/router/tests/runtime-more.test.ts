@@ -37,7 +37,7 @@ describe('route loaders', () => {
         navigate('/data');
         await tick();
 
-        expect(currentLoaderState()).toBe('done');
+        expect(currentLoaderState()).toBe('success');
         expect(currentLoaderData()).toEqual({ rows: [1, 2] });
         expect(currentRoute()?.path, 'the route resolved only after the loader').toBe('/data');
     });

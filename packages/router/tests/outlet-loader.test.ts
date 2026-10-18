@@ -44,7 +44,7 @@ describe('a route loader declared on a @page', () => {
 
         expect(calls, 'the loader was never called — the outlet dropped it').toEqual(['user']);
         expect(currentLoaderData()).toEqual({ name: 'Ada' });
-        expect(currentLoaderState()).toBe('done');
+        expect(currentLoaderState()).toBe('success');
     });
 
     it('the page is mounted, so the data is there when the component renders', () => {
@@ -56,14 +56,14 @@ describe('a route loader declared on a @page', () => {
         navigate('/slow');
         await tick();
 
-        expect(currentLoaderState(), 'nothing said the page was waiting on data').toBe('loading');
+        expect(currentLoaderState(), 'nothing said the page was waiting on data').toBe('pending');
         expect(document.querySelector('pdx-ol-slow'),
             'the page mounted before its data arrived').toBeNull();
 
         releaseSlow('arrived');
         await tick();
 
-        expect(currentLoaderState()).toBe('done');
+        expect(currentLoaderState()).toBe('success');
         expect(currentLoaderData()).toBe('arrived');
         expect(document.querySelector('pdx-ol-slow')).not.toBeNull();
     });

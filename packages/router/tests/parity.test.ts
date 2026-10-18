@@ -51,7 +51,7 @@ interface RouterUnderTest {
     scroll(): string | undefined;
     /** What the route's @loader returned. */
     loaderData(): unknown;
-    /** 'idle' | 'loading' | 'done' | 'error'. */
+    /** 'idle' | 'pending' | 'success' | 'error'. */
     loaderState(): string;
     /** What a SPECIFIC level's @loader returned, by its route pattern. */
     loaderDataFor(path: string): unknown;
@@ -668,7 +668,7 @@ const PARITY: Row[] = [
         run: async (r) => {
             r.navigate('/data');
             await settle();
-            expect(r.loaderState()).toBe('done');
+            expect(r.loaderState()).toBe('success');
             expect(r.loaderData()).toEqual({ rows: 2 });
         },
     },

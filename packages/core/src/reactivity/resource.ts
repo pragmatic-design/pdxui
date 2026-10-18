@@ -1,5 +1,5 @@
 // Reactive async data loading with cache, retry, stale-while-revalidate,
-// deduplication, abort, and 7-state lifecycle.
+// deduplication, abort, and the async vocabulary (beta spec, data.md, #141).
 //
 // Performance:
 //   - AbortController per-fetch: cancels stale requests immediately
@@ -17,26 +17,19 @@ import { getDefaultCache } from './cache';
 import type { Cache, CacheWriteListener, Flight } from './cache';
 import { joinRequest, leaveRequest, supersedeRequest } from './cache';
 import { isRetryableError, retryDelayMs } from '../http/middleware';
+import { DEV } from '../utils/env';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
-export type ResourceState =
-    | 'idle'        // never fetched (enabled=false or initial)
-    | 'loading'     // first fetch in progress, no data yet
-    | 'reloading'   // refetch in progress, previous data still available
-    | 'success'     // fresh data available
-    | 'stale'       // data available but past staleTime, background revalidate
-    | 'error'       // fetch failed, no data (or stale data in .data)
-    | 'local';      // data set manually via mutate()
+/**
+ * Where an async source is — the same four words for a resource, `useQuery`, a mutation and a route
+ * loader (beta spec, data.md, «The async vocabulary»). A refresh with data is `'success'` (or
+ * `'error'`, after a failed refresh) with `pending()` true; a first load is `'pending'`.
+ */
+export type AsyncState = 'idle' | 'pending' | 'success' | 'error';
 
-export interface ResourceStatus {
-    readonly isLoading: boolean;    // loading || reloading
-    readonly isError: boolean;
-    readonly isSuccess: boolean;
-    readonly isStale: boolean;
-    readonly hasData: boolean;      // data !== undefined (true even in error/stale if cached)
-    readonly isIdle: boolean;
-}
+/** A resource's state: the async vocabulary's. */
+export type ResourceState = AsyncState;
 
 export interface ResourceOptions<T = unknown> {
     /** Cache key. Auto-generated from fetcher if not provided. */
@@ -69,23 +62,21 @@ export interface ResourceOptions<T = unknown> {
 }
 
 export interface Resource<T> {
-    /** Current data (undefined if not yet loaded). */
+    /** The last successful value; `undefined` until there is one. `null`, `0` and `false` are values. */
     readonly data: ReadonlySignal<T | undefined>;
-    /** Current error (undefined if no error). */
-    readonly error: ReadonlySignal<unknown | undefined>;
-    /** Whether currently loading (first load or refetch). */
-    readonly loading: ReadonlySignal<boolean>;
-    /** True ONLY during background revalidation (has data + refetching). False during initial load. */
-    readonly isPending: ReadonlySignal<boolean>;
-    /** Current lifecycle state (7 states). */
+    /** The last error; cleared only by the next success. */
+    readonly error: ReadonlySignal<Error | null>;
+    /** `'idle' | 'pending' | 'success' | 'error'` — see {@link AsyncState}. */
     readonly state: ReadonlySignal<ResourceState>;
-    /** Derived status flags for convenience. */
-    readonly status: ReadonlySignal<ResourceStatus>;
+    /** Whether a request is in flight: first load or refresh, a retry and its wait included. */
+    readonly pending: ReadonlySignal<boolean>;
+    /** Whether the value shown is no longer known to be current: older than `staleTime`, invalidated, or kept after a failed refresh. */
+    readonly stale: ReadonlySignal<boolean>;
     /** The cache key used by this resource. */
     readonly key: string;
     /** Re-fetch data (cancels any in-flight request). */
     refetch(): Promise<void>;
-    /** Optimistically set data without fetching. State → 'local'. */
+    /** Set data without fetching: it is `data()`, a success, until a request settles. */
     mutate(value: T): void;
     /** Cancel any in-flight request. */
     abort(): void;
@@ -96,11 +87,12 @@ export interface Resource<T> {
 // ─── Render helper ─────────────────────────────────────────────────
 
 export interface ResourceHandlers<T> {
+    /** The first load, while there is no data yet. */
     loading?: () => Node | DocumentFragment;
+    /** A result — kept while it refreshes, and after a refresh that failed (E4). */
     success?: (data: T) => Node | DocumentFragment;
-    error?: (err: unknown, retry: () => void) => Node | DocumentFragment;
-    stale?: (data: T) => Node | DocumentFragment;
-    reloading?: (data: T) => Node | DocumentFragment;
+    /** A failure with no data to show. */
+    error?: (err: Error, retry: () => void) => Node | DocumentFragment;
 }
 
 // ─── resource() ────────────────────────────────────────────────────
@@ -116,12 +108,13 @@ export type ResourceFetcher<T> = (ctx: { signal: AbortSignal }) => Promise<T>;
 let resourceCounter = 0;
 
 /**
- * An async value as reactive state: `data`, `error` and `state` you read like signals, with the
- * fetch, the cache, the retries and the cancellation already handled.
+ * An async value as reactive state: `data`, `error`, `state`, `pending` and `stale` you read like
+ * signals, with the fetch, the cache, the retries and the cancellation already handled.
  *
- * The four states are `idle | loading | success | error`, and the point of having them is that a
+ * The four states are `idle | pending | success | error`, the words every async source uses: a
  * template branches on `state()` instead of juggling a loading boolean against a possibly-stale
- * `data`. {@link resourceWhen} renders that branch for you.
+ * `data`, `pending()` says a request is in flight, and `stale()` that the value shown may be out of
+ * date. {@link resourceWhen} renders the branch for you.
  *
  * A stale response can never overwrite a fresh one: each fetch takes a generation number and an
  * AbortController, so a slow request that returns after a newer one is discarded rather than
@@ -150,10 +143,42 @@ export function resource<T>(
     const keyFn = typeof opts.key === 'function' ? opts.key : null;
     let resolvedKey = typeof opts.key === 'string' ? opts.key : `__resource_${++resourceCounter}`;
 
-    // Internal signals
+    // Internal signals: the five members of the async vocabulary.
     const _data = signal<T | undefined>(undefined);
-    const _error = signal<unknown | undefined>(undefined);
+    const _error = signal<Error | null>(null);
     const _state = signal<ResourceState>('idle');
+    const _pending = signal(false);
+    const _stale = signal(false);
+    /** The state to go back to when a request is cancelled (E3): the last one a request settled in. */
+    let settledState: ResourceState = 'idle';
+    let warnedUndefined = false;
+
+    // The staleTime clock: a value becomes stale once it is older than staleTime, without a refetch
+    // (the table's third row). With staleTime 0 (or not finite) there is no clock: a 0 value is
+    // stale when a consumer comes back to the key, which loadFromCache sees.
+    let staleTimer: ReturnType<typeof setTimeout> | undefined;
+    function restartStaleClock(): void {
+        if (staleTimer !== undefined) clearTimeout(staleTimer);
+        staleTimer = undefined;
+        if (staleTime > 0 && Number.isFinite(staleTime)) staleTimer = setTimeout(() => { if (!disposed) _stale.set(true); }, staleTime);
+    }
+
+    /** A new value: success, fresh, the error cleared, the clock restarted (data.md, the table's last line). */
+    function succeed(value: T): void {
+        batch(() => {
+            _data.set(value);
+            _error.set(null);
+            _stale.set(false);
+            _pending.set(false);
+            _state.set('success');
+        });
+        settledState = 'success';
+        restartStaleClock();
+        if (DEV && value === undefined && !warnedUndefined) {
+            warnedUndefined = true;
+            console.warn(`[pdx] resource "${resolvedKey}": the fetcher resolved undefined, which is no data. Return null to say «nothing».`);
+        }
+    }
 
     // The shared request this resource waits for, and the key it was for (beta spec, data.md, E7):
     // concurrent reads of one key share one request, which is aborted when its last consumer leaves.
@@ -173,11 +198,7 @@ export function resource<T>(
     // the cache does not tell its own writes.
     const onWrite: CacheWriteListener = (value) => {
         if (disposed) return;
-        batch(() => {
-            _data.set(value as T);
-            _error.set(undefined);
-            _state.set('success');
-        });
+        succeed(value as T);
     };
 
     // Cache subscription
@@ -196,17 +217,36 @@ export function resource<T>(
         const now = Date.now();
         const isFresh = now < entry.staleAt;
 
+        // A value in the cache is a success; past its staleAt it is a stale one, which the caller
+        // refreshes (the table's third row, and the fifth while it does).
         batch(() => {
             _data.set(entry.data);
-            _error.set(undefined);
-            _state.set(isFresh ? 'success' : 'stale');
+            _error.set(null);
+            _stale.set(!isFresh);
+            _state.set('success');
         });
+        settledState = 'success';
+        if (isFresh) {
+            if (staleTimer !== undefined) clearTimeout(staleTimer);
+            const left = entry.staleAt - now;
+            staleTimer = Number.isFinite(left) ? setTimeout(() => { if (!disposed) _stale.set(true); }, left) : undefined;
+        }
 
         return isFresh; // true = no refetch needed
     }
 
-    // Core fetch logic
-    async function doFetch(attempt = 0): Promise<void> {
+    /** A request ends without a value: cancelled, superseded for good, disabled. Back to where it settled. */
+    function stopPending(): void {
+        batch(() => {
+            _pending.set(false);
+            if (_state.peek() === 'pending') _state.set(settledState);
+        });
+    }
+
+    // Core fetch logic. `byHand`: a refetch() — refreshing a fresh value leaves it fresh (the table's
+    // sixth row); a refresh the effect starts (an invalidation, a new key, a stale entry) is of a
+    // value no longer known to be current.
+    async function doFetch(attempt = 0, byHand = false): Promise<void> {
         const generation = ++fetchGeneration;
 
         // Resolve dynamic key
@@ -221,26 +261,30 @@ export function resource<T>(
         // Check enabled
         const isEnabled = typeof opts.enabled === 'function' ? opts.enabled() : opts.enabled;
         if (isEnabled === false) {
-            _state.set('idle');
+            batch(() => { _pending.set(false); _state.set('idle'); });
+            settledState = 'idle';
             return;
         }
 
         // Check cache first
         if (attempt === 0) {
+            const hadData = _data.peek() !== undefined;
             const isFresh = loadFromCache(resolvedKey);
-            if (isFresh) return; // Cache hit, data is fresh
-
-            // If stale data found, we're "reloading" (data visible, refetching)
-            if (_data.peek() !== undefined) {
-                _state.set(_state.peek() === 'stale' ? 'stale' : 'reloading');
+            if (isFresh) {
+                _pending.set(false);
+                return; // Cache hit, data is fresh
             }
+            // Data shown and no fresh entry for it: invalidated, evicted, or another key's — no
+            // longer known to be current, until the new value arrives. A refetch by hand is not.
+            if (hadData && !byHand) _stale.set(true);
         }
 
-        // Set loading state (only 'loading' if no data yet)
-        if (_data.peek() === undefined) {
-            _state.set('loading');
-        }
-        _error.set(undefined);
+        // A first load is 'pending'; a refresh keeps its state ('success', or 'error' after a failed
+        // refresh) with pending() true. error() is left: only a success clears it.
+        batch(() => {
+            _pending.set(true);
+            if (_data.peek() === undefined) _state.set('pending');
+        });
 
         // Leave the request this resource waited for before: it is superseded for this resource,
         // and aborted if no other consumer of its key still waits for it.
@@ -267,11 +311,7 @@ export function resource<T>(
             cache.set(resolvedKey, data, { tags: tagsFor(resolvedKey), staleTime, silent: true, writer: onWrite });
             subscribeToCacheKey(resolvedKey);
 
-            batch(() => {
-                _data.set(data);
-                _error.set(undefined);
-                _state.set('success');
-            });
+            succeed(data);
 
             opts.onSuccess?.(data);
         } catch (err) {
@@ -280,26 +320,30 @@ export function resource<T>(
             if (flight && current?.flight !== flight) return;
             current = null;
             // Superseded for everyone by another consumer's refetch: wait for the request it started.
-            if (flight?.superseded) return doFetch(attempt);
-            if (flight?.controller.signal.aborted) return;
+            if (flight?.superseded) return doFetch(attempt, byHand);
+            if (flight?.controller.signal.aborted) { stopPending(); return; }
 
             // Retry what retrying can fix, with the HTTP client's classifier and backoff (beta spec,
             // E6): not a 4xx, a cancellation or a timeout; jitter, and Retry-After when the server
             // sends one. A read source owns its retries — `@fetch` turns the transport's off.
+            // A retry is part of its request: pending() stays true while it waits and runs.
             if (attempt < maxRetry && isRetryableError(err)) {
                 const delay = retryDelayMs(err, attempt);
                 await new Promise(r => setTimeout(r, delay));
                 if (generation === fetchGeneration) {
-                    return doFetch(attempt + 1);
+                    return doFetch(attempt + 1, byHand);
                 }
                 return;
             }
 
+            // E4: a failed refresh keeps its data, which is now stale; a failed first load has none.
             batch(() => {
-                _error.set(err);
-                // Keep data if we have it (error + stale data)
-                _state.set(_data.peek() !== undefined ? 'stale' : 'error');
+                _error.set(err as Error);
+                _stale.set(_data.peek() !== undefined);
+                _pending.set(false);
+                _state.set('error');
             });
+            settledState = 'error';
 
             opts.onError?.(err);
         }
@@ -329,39 +373,19 @@ export function resource<T>(
         doFetch();
     });
 
-    // Derived signals (lazy — only computed when read)
+    // Derived signals (lazy — only computed when read): read-only views of the internal ones.
     const state = computed(() => _state()) as ReadonlySignal<ResourceState>;
     const data = computed(() => _data()) as ReadonlySignal<T | undefined>;
-    const error = computed(() => _error()) as ReadonlySignal<unknown | undefined>;
-    const loading = computed(() => {
-        const s = _state();
-        return s === 'loading' || s === 'reloading';
-    });
-    const status = computed<ResourceStatus>(() => {
-        const s = _state();
-        return {
-            isLoading: s === 'loading' || s === 'reloading',
-            isError: s === 'error',
-            isSuccess: s === 'success',
-            isStale: s === 'stale',
-            hasData: _data() !== undefined,
-            isIdle: s === 'idle',
-        };
-    });
-
-    // isPending: true only during background refresh (data exists + refetching)
-    const isPending = computed(() => {
-        const s = state();
-        return (s === 'reloading' || s === 'stale') && _data() !== undefined;
-    });
+    const error = computed(() => _error()) as ReadonlySignal<Error | null>;
+    const pending = computed(() => _pending()) as ReadonlySignal<boolean>;
+    const stale = computed(() => _stale()) as ReadonlySignal<boolean>;
 
     const res: Resource<T> = {
         data,
         error,
-        loading,
-        isPending,
         state,
-        status,
+        pending,
+        stale,
         // Getter: with a dynamic keyFn a snapshot would stay at the initial value
         get key() { return resolvedKey; },
 
@@ -371,16 +395,14 @@ export function resource<T>(
             // key for every consumer (beta spec, E7): they wait for the one this starts.
             cache.remove(resolvedKey, true);
             supersedeRequest(cache, resolvedKey);
-            await doFetch();
+            await doFetch(0, true);
         },
 
         mutate(value: T): void {
             if (disposed) return;
-            batch(() => {
-                _data.set(value);
-                _error.set(undefined);
-                _state.set('local');
-            });
+            // The value is data() until a request settles: a success, as one written by another
+            // consumer of the key is.
+            succeed(value);
             // Written for every consumer of the key (E7), and without a request: silent.
             cache.set(resolvedKey, value, { tags: tagsFor(resolvedKey), staleTime, silent: true, writer: onWrite });
         },
@@ -388,12 +410,12 @@ export function resource<T>(
         abort(): void {
             if (!current) return;
             // Cancelling is not failing (beta spec, data.md, E3): the bump stops the retry chain
-            // too, and the source goes back to its last settled state — it stayed 'loading' for
-            // good, its late answer discarded. error() is left as it was. The shared request is
-            // left, and aborted only if no other consumer of the key still waits for it (E7).
+            // too, and the source goes back to the state its last request settled in — the late
+            // answer discarded. error() is left as it was. The shared request is left, and aborted
+            // only if no other consumer of the key still waits for it (E7).
             fetchGeneration++;
             leaveCurrent();
-            _state.set(_data.peek() !== undefined ? 'success' : 'idle');
+            stopPending();
         },
 
         dispose(): void {
@@ -402,6 +424,7 @@ export function resource<T>(
             // It invalidates the retries waiting in the backoff too: without the bump, the chain
             // would start fetching again after the dispose.
             fetchGeneration++;
+            if (staleTimer !== undefined) clearTimeout(staleTimer);
             // The shared request goes on for the other consumers of the key, and is aborted when
             // this was the last one (E7).
             leaveCurrent();
@@ -425,13 +448,14 @@ export function resource<T>(
 /**
  * Render one branch per resource state, and swap it when the state changes.
  *
- * Takes `{ loading, error, success, empty?, reloading? }` and returns a fragment that keeps itself
- * in step with the resource. The branches it renders are OWNED: the effects created by the previous
- * branch are disposed when the state changes, so a loading spinner's timer does not survive the
- * success it was replaced by.
+ * Takes `{ loading, success, error }` and returns a fragment that keeps itself in step with the
+ * resource. The branches it renders are OWNED: the effects created by the previous branch are
+ * disposed when the state changes, so a loading spinner's timer does not survive the success it was
+ * replaced by.
  *
- * `empty` is the branch that stops "loaded, and there is nothing" from looking like "still loading";
- * `reloading` lets a background refresh show the old data instead of blanking the screen.
+ * `loading` is the first load. A result stays on `success` while it refreshes and after a refresh
+ * that failed (E4: the data is kept; the error is `res.error()` beside it); `error` is a failure with
+ * no data. A success is rendered whatever its value — `null`, `0`, `false`, and `undefined` too (E5).
  */
 export function resourceWhen<T>(
     res: Resource<T>,
@@ -460,32 +484,19 @@ export function resourceWhen<T>(
         let content: Node | DocumentFragment | null | undefined = null;
         const [, disposeContent] = collectDisposers(() => {
             switch (state) {
-            case 'loading':
+            case 'pending':
                 content = handlers.loading?.();
                 break;
             case 'success':
-            case 'local': {
-                const data = res.data();
-                if (data !== undefined && handlers.success) content = handlers.success(data);
+                // E5: absence is not a reason to render nothing — the fetcher resolved, so it is a result.
+                content = handlers.success?.(res.data() as T);
                 break;
-            }
             case 'error': {
+                // E4: a failed refresh keeps its data on screen; only a failure with none shows `error`.
+                const data = res.data();
                 const err = res.error();
-                if (err !== undefined && handlers.error) content = handlers.error(err, () => res.refetch());
-                break;
-            }
-            case 'stale': {
-                const data = res.data();
-                if (data !== undefined) {
-                    content = handlers.stale?.(data) ?? handlers.success?.(data);
-                }
-                break;
-            }
-            case 'reloading': {
-                const data = res.data();
-                if (data !== undefined) {
-                    content = handlers.reloading?.(data) ?? handlers.success?.(data);
-                }
+                if (data !== undefined) content = handlers.success?.(data);
+                else if (err !== null && handlers.error) content = handlers.error(err, () => res.refetch());
                 break;
             }
             }

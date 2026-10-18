@@ -206,15 +206,16 @@ describe('useQuery: refetchInterval', () => {
     });
 
     it('a query reloading over stale data counts as in flight too', async () => {
-        // The state is 'stale', not 'reloading', while a source that found stale data in the cache
-        // fetches: `loading()` is false, and a check on it let a focus refetch supersede the request.
+        // A source that found stale data in the cache fetches with the state still 'success': a check
+        // on the state let a focus refetch supersede the request. The query's own pending() shows it
+        // (#141); the triggers ask the cache, which also sees another reader's request.
         const key = nextKey();
         getDefaultCache().set(key, 0, { staleTime: -1 });
         const f = countingFetcher();
         const q = useQuery(f.fetcher, { key, staleTime: 0, refetchOnReconnect: false });
         await vi.advanceTimersByTimeAsync(0);
         expect(f.count, 'the reload over stale data did not start').toBe(1);
-        expect(q.isLoading(), 'control: loading() does not show this request').toBe(false);
+        expect([q.state(), q.pending(), q.stale()], 'refreshing a stale value').toEqual(['success', true, true]);
 
         setVisibility('visible');
         document.dispatchEvent(new Event('visibilitychange'));

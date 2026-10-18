@@ -365,9 +365,9 @@ The resource cannot be generated; dropping it silently would break the component
 
 *info* — An `@fetch` whose error state the template never shows.
 
-A failed request leaves the screen as it was, with nothing telling the user.
+A failed request leaves the screen as it was, with nothing telling the user. After a failed refresh the data stays on screen (E4): the error belongs beside it.
 
-**Fix.** Show it: `@if (users.state() === 'error') { … }`.
+**Fix.** Show it: `@if (users.state() === 'error') { <p role="alert">{{ users.error()?.message }}</p> }`.
 
 Instead of:
 
@@ -384,7 +384,7 @@ write:
 
 ```html
 <template>
-  @if (users.state() === 'error') { <p>Could not load</p> } <p>{{ users.data() }}</p>
+  @if (users.state() === 'error') { <p role="alert">{{ users.error()?.message }}</p> } <p>{{ users.data() }}</p>
 </template>
 <script setup>
 @fetch users: 'GET /api/users' as string[];

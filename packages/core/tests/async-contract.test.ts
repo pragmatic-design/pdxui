@@ -170,11 +170,11 @@ describe('resource()', () => {
         const cache = createCache({ gcInterval: 0 });
         const r = resource(() => t.call(), { key: 'ac-abort-first', cache, retry: 0 });
         await settle();
-        expect(r.state(), 'control: the first load is in flight').toBe('loading');
+        expect(r.state(), 'control: the first load is in flight').toBe('pending');
         const before = r.error();
         r.abort();
         expect(r.state(), 'cancelling left the source loading').toBe('idle');
-        expect(r.loading(), 'a spinner bound to loading() never stops').toBe(false);
+        expect(r.pending(), 'a spinner bound to pending() never stops').toBe(false);
         expect(r.error(), 'cancelling is not failing: error() changed').toBe(before);
 
         t.answer(0, 'late');
@@ -193,9 +193,9 @@ describe('resource()', () => {
         await settle();
         void r.refetch();
         await settle();
-        expect(r.state(), 'control: the refresh is in flight').toBe('reloading');
+        expect([r.state(), r.pending()], 'control: the refresh is in flight').toEqual(['success', true]);
         r.abort();
-        expect(r.state(), 'cancelling a refresh left the source reloading').toBe('success');
+        expect([r.state(), r.pending()], 'cancelling a refresh left the source refreshing').toEqual(['success', false]);
         expect(r.data()).toBe('first');
 
         t.answer(1, 'second');
@@ -555,5 +555,220 @@ describe('case 6 — one layer retries, and only reads', () => {
         await vi.advanceTimersByTimeAsync(60_000);
         expect(await caught).toBeInstanceOf(core.HttpError);
         expect(seen.calls).toBe(1);
+    });
+});
+
+// ─── the async vocabulary (#141): one table, every source ───────────
+//
+// data.md → «The async vocabulary»: data(), error(), state(), pending(), stale(), the same sequence
+// for resource(), useQuery and a compiled @fetch; a mutation for the rows without stale().
+
+/** What each source shows, read in one go: the row of the table the source is on. */
+type Row = { state: string; pending: boolean; stale: boolean; data: unknown; error: unknown };
+interface VocabularySource {
+    row(): Row;
+    refetch(): Promise<void>;
+    dispose(): void;
+}
+
+/** resource() and useQuery over one held transport, as a VocabularySource. */
+function sources(t: ReturnType<typeof heldTransport<string>>, key: string, extra: { retry?: number; staleTime?: number } = {}): [string, () => VocabularySource][] {
+    const read = (s: { state(): string; pending(): boolean; stale(): boolean; data(): unknown; error(): unknown }) => (): Row =>
+        ({ state: s.state(), pending: s.pending(), stale: s.stale(), data: s.data(), error: s.error() });
+    return [
+        ['resource()', () => {
+            const r = resource(() => t.call(), { key, cache: createCache({ gcInterval: 0 }), retry: extra.retry ?? 0, staleTime: extra.staleTime });
+            return { row: read(r), refetch: () => r.refetch(), dispose: () => r.dispose() };
+        }],
+        ['useQuery', () => {
+            const q = useQuery(() => t.call(), { key, retry: extra.retry ?? 0, staleTime: extra.staleTime, refetchOnFocus: false, refetchOnReconnect: false });
+            return { row: read(q), refetch: () => q.refetch(), dispose: () => q.dispose() };
+        }],
+    ];
+}
+
+let vocabularySeq = 0;
+for (const name of ['resource()', 'useQuery']) {
+    describe(`the async vocabulary — ${name}`, () => {
+        const make = (t: ReturnType<typeof heldTransport<string>>, extra?: { retry?: number; staleTime?: number }) =>
+            sources(t, `ac-vocab-${name}-${++vocabularySeq}`, extra).find(([n]) => n === name)![1]();
+
+        it('first load, then a hand refetch of a fresh value: pending, success, success while pending, success', async () => {
+            const t = heldTransport<string>();
+            const s = make(t);
+            await settle();
+            expect(s.row(), 'first load in flight').toEqual({ state: 'pending', pending: true, stale: false, data: undefined, error: null });
+            t.answer(0, 'v1');
+            await settle();
+            expect(s.row(), 'loaded').toEqual({ state: 'success', pending: false, stale: false, data: 'v1', error: null });
+            void s.refetch();
+            await settle();
+            expect(s.row(), 'refreshing a fresh value').toEqual({ state: 'success', pending: true, stale: false, data: 'v1', error: null });
+            t.answer(1, 'v2');
+            await settle();
+            expect(s.row()).toEqual({ state: 'success', pending: false, stale: false, data: 'v2', error: null });
+            s.dispose();
+        });
+
+        it('case 4 (E4) — a failed refresh keeps the data: error, stale, not pending; a later success clears it', async () => {
+            const t = heldTransport<string>();
+            const s = make(t);
+            await settle();
+            t.answer(0, 'kept');
+            await settle();
+            void s.refetch();
+            await settle();
+            const boom = new Error('refresh failed');
+            t.fail(1, boom);
+            await settle();
+            expect(s.row(), 'a failed refresh looked like a refresh in progress')
+                .toEqual({ state: 'error', pending: false, stale: true, data: 'kept', error: boom });
+            void s.refetch();
+            await settle();
+            expect(s.row(), 'refreshing again after a failed refresh: the error stays until a success')
+                .toEqual({ state: 'error', pending: true, stale: true, data: 'kept', error: boom });
+            t.answer(2, 'fresh');
+            await settle();
+            expect(s.row(), 'a success did not clear the error and the staleness')
+                .toEqual({ state: 'success', pending: false, stale: false, data: 'fresh', error: null });
+            s.dispose();
+        });
+
+        it('a first load that fails is error with no data; its retry is pending', async () => {
+            vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+            const t = heldTransport<string>();
+            const s = make(t, { retry: 1 });
+            await vi.advanceTimersByTimeAsync(0);
+            t.fail(0, new TypeError('network'));
+            await vi.advanceTimersByTimeAsync(0);
+            expect(s.row(), 'a failed first load waiting for its retry').toMatchObject({ state: 'pending', pending: true, stale: false, data: undefined });
+            await vi.advanceTimersByTimeAsync(10_000);
+            expect(t.calls.length, 'the retry never ran').toBe(2);
+            const boom = new TypeError('still down');
+            t.fail(1, boom);
+            await vi.advanceTimersByTimeAsync(0);
+            expect(s.row()).toEqual({ state: 'error', pending: false, stale: false, data: undefined, error: boom });
+            s.dispose();
+        });
+
+        it('a value older than staleTime is stale, still success, and not refreshing on its own', async () => {
+            vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+            const t = heldTransport<string>();
+            const s = make(t, { staleTime: 1000 });
+            await vi.advanceTimersByTimeAsync(0);
+            t.answer(0, 'v');
+            await vi.advanceTimersByTimeAsync(0);
+            expect(s.row().stale, 'control: fresh right after it arrived').toBe(false);
+            await vi.advanceTimersByTimeAsync(1001);
+            expect(s.row(), 'staleTime passed and the value was not marked stale')
+                .toEqual({ state: 'success', pending: false, stale: true, data: 'v', error: null });
+            s.dispose();
+        });
+
+        it('acceptance case 5 (E5) — null, 0 and false are data: success, data() is that very value', async () => {
+            for (const value of [null, 0, false] as unknown as string[]) {
+                const t = heldTransport<string>();
+                const s = make(t);
+                await settle();
+                t.answer(0, value);
+                await settle();
+                expect(s.row().state, `${String(value)} is not a result`).toBe('success');
+                expect(s.row().data, `${String(value)} was taken for absence`).toBe(value);
+                s.dispose();
+            }
+        });
+    });
+}
+
+describe('the async vocabulary — resource() only', () => {
+    it('an invalidated value is stale while its refresh runs, and fresh once it lands', async () => {
+        const t = heldTransport<string>();
+        const cache = createCache({ gcInterval: 0 });
+        const r = resource(() => t.call(), { key: 'ac-vocab-invalidate', cache, tags: ['users'] });
+        await settle();
+        t.answer(0, 'v1');
+        await settle();
+        cache.invalidate(['users']);
+        await settle();
+        expect([r.state(), r.pending(), r.stale(), r.data()], 'refreshing an invalidated value')
+            .toEqual(['success', true, true, 'v1']);
+        t.answer(1, 'v2');
+        await settle();
+        expect([r.state(), r.pending(), r.stale(), r.data()]).toEqual(['success', false, false, 'v2']);
+        r.dispose();
+    });
+
+    it('the alpha names are gone: loading, isPending, status', () => {
+        const r = resource(() => Promise.resolve(1), { key: 'ac-vocab-gone', cache: createCache({ gcInterval: 0 }) }) as unknown as Record<string, unknown>;
+        expect([r.loading, r.isPending, r.status]).toEqual([undefined, undefined, undefined]);
+        (r as unknown as { dispose(): void }).dispose();
+    });
+
+    it('resourceWhen renders the success branch for null, 0 and false, with that value', async () => {
+        for (const value of [null, 0, false]) {
+            const r = resource(() => Promise.resolve(value), { key: `ac-vocab-when-${String(value)}`, cache: createCache({ gcInterval: 0 }) });
+            const host = document.createElement('div');
+            host.appendChild(core.resourceWhen(r, {
+                loading: () => document.createTextNode('loading'),
+                success: (d) => document.createTextNode(`got:${JSON.stringify(d)}`),
+            }));
+            document.body.appendChild(host);
+            await settle();
+            expect(host.textContent, `${String(value)} did not render the success branch`).toBe(`got:${JSON.stringify(value)}`);
+            r.dispose();
+        }
+    });
+
+    it('E5 — resourceWhen renders the success branch for a fetcher that resolved undefined, and warns once', async () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const r = resource(() => Promise.resolve(undefined), { key: 'ac-vocab-when-undefined', cache: createCache({ gcInterval: 0 }) });
+        const host = document.createElement('div');
+        host.appendChild(core.resourceWhen(r, {
+            loading: () => document.createTextNode('loading'),
+            success: (d) => document.createTextNode(`got:${String(d)}`),
+        }));
+        document.body.appendChild(host);
+        await settle();
+        expect(host.textContent, 'a success with no data rendered nothing').toBe('got:undefined');
+        void r.refetch();
+        await settle();
+        expect(warn.mock.calls.filter((c) => String(c[0]).includes('resolved undefined')).length, 'the warning is once per resource').toBe(1);
+        warn.mockRestore();
+        r.dispose();
+    });
+});
+
+describe('the async vocabulary — a compiled @fetch', () => {
+    it('shows the same row as resource(): pending, then success', async () => {
+        const t = heldTransport<Response>();
+        vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => t.call(String(input))));
+        core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
+        // String(): an interpolation renders false and null as nothing.
+        defineCompiled('acvocabfetch', "<template><p>{{ users.state() }}|{{ String(users.pending()) }}|{{ String(users.stale()) }}|{{ String(users.error()) }}</p></template>\n"
+            + "<script setup>\n@fetch users: 'GET /api/ac-vocab' as string[];\n</script>\n");
+        const el = document.createElement('app-acvocabfetch');
+        document.body.appendChild(el);
+        await settle();
+        expect(el.querySelector('p')!.textContent).toBe('pending|true|false|null');
+        t.answer(0, json(['ada']));
+        await settle();
+        expect(el.querySelector('p')!.textContent).toBe('success|false|false|null');
+    });
+});
+
+describe('the async vocabulary — a mutation (no stale())', () => {
+    it('idle, pending, success with its result; a failure keeps the last result and sets error()', async () => {
+        let fail = false;
+        const m = core.mutation({ fn: (n: number) => (fail ? Promise.reject(new Error('no')) : Promise.resolve(n * 2)) });
+        expect([m.state(), m.pending(), m.data(), m.error()]).toEqual(['idle', false, undefined, null]);
+        const run = m.execute(2);
+        expect([m.state(), m.pending()]).toEqual(['pending', true]);
+        await run;
+        expect([m.state(), m.pending(), m.data(), m.error()]).toEqual(['success', false, 4, null]);
+        fail = true;
+        expect(await m.execute(3).catch((e: unknown) => e)).toBeInstanceOf(Error);
+        expect([m.state(), m.pending(), m.data()]).toEqual(['error', false, 4]);
+        expect((m.error() as Error).message).toBe('no');
+        expect('stale' in m, 'a mutation has no stale()').toBe(false);
     });
 });

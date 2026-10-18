@@ -23,20 +23,34 @@ diagnostic to look for when a page that reads `users.data()` renders nothing at 
 `@fetch` **reads**, so the method is `GET`: a `POST` or a `DELETE` here is the error
 `PDX_FETCH_METHOD`. A write is a `mutation()` (below).
 
-From this one line the compiler generates a typed `resource()` with three states you use directly in
-the template. Each is a signal, so it is read with a call — `users.loading()`, not `users.loading`,
-which is the function itself and always true:
+From this one line the compiler generates a typed `resource()` you use directly in the template. It
+speaks the **async vocabulary** every source in PDX shares — a resource, `useQuery`, a mutation, a
+route loader:
+
+| Member | Meaning |
+|---|---|
+| `data()` | the last successful value, `undefined` until there is one (`null`, `0`, `false` are values) |
+| `error()` | the last error, `null` when there is none; only a new success clears it |
+| `state()` | `'idle'`, `'pending'` (the first load), `'success'` or `'error'` |
+| `pending()` | a request in flight: the first load, a refresh, a retry |
+| `stale()` | the value shown is no longer known to be current: older than `staleTime`, invalidated, or kept after a failed refresh |
+
+Each is a signal, so it is read with a call — `users.pending()`, not `users.pending`, which is the
+function itself and always true:
 
 ```pdx
-@if (users.loading()) { <pdx-spinner /> }
-@if (users.error())   { <p class="err">{{ String(users.error()) }}</p> }
+@if (users.state() === 'pending') { <pdx-spinner /> }
+@if (users.state() === 'error')   { <p class="err" role="alert">{{ users.error()?.message }}</p> }
 @for (users.data() ?? [] as u; track u.id) { <li>{{ u.name }}</li> }
 ```
 
+A refresh keeps what is on screen: `state()` stays `'success'` while `pending()` is true. A refresh
+that fails keeps it too — `state()` becomes `'error'`, `data()` is the last value, `stale()` is
+true — so the list stays and the error goes beside it.
+
 In the editor and in `pdx check --types`, `users` is that resource with the type after `as`:
 `@fetch users: 'GET /api/users' as User[]` makes `users.data()` a `User[] | undefined`, and a
-misspelt field is an error. Without `as`, the data is `unknown`. The error is always `unknown` —
-anything can be thrown — so it is shown through `String()`, or narrowed before reading a field.
+misspelt field is an error. Without `as`, the data is `unknown`. The error is an `Error | null`.
 
 You didn't write a `useState`/`useEffect`, didn't hand-manage `try/catch`, don't have an `isLoading`
 flag to remember to turn off. You declared *which data you want*, and the state is modeled for you.
@@ -687,7 +701,7 @@ Two more you will meet rarely and should know exist:
 
 ## In practice
 
-- **Read data** → `@fetch name: 'GET /url' as Type` and read `name.loading()`, `name.error()`, `name.data()`.
+- **Read data** → `@fetch name: 'GET /url' as Type` and read `name.state()`, `name.pending()`, `name.error()`, `name.data()`.
 - **Feed a grid or a select** → `createDataSource(rows)` or `createDataSource({ transport })`.
 - **Depends on state** → put `${signal}` in the URL: it re-runs itself.
 - **Avoid duplicate requests** → `staleTime` + `tags`.

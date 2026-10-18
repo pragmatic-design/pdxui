@@ -45557,9 +45557,9 @@ let users = resource(() => {
     { const __s = new Set(["tag"]); let __w = []; effect(() => { const __n = interpolationText(ctx.stateClass()).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el4.classList.remove(__t); for (const __t of __n) __el4.classList.add(__t); __w = __n; }); }
     bindInterpolation(__t5,()=>ctx.users.state());
     bindInterpolation(__t7,()=>ctx.userCount());
-    const __cf9=when(()=>ctx.users.loading(),()=>{const __frag=__blk0();return __frag;},null);
+    const __cf9=when(()=>ctx.users.state() === 'pending',()=>{const __frag=__blk0();return __frag;},null);
     __m10.replaceWith(__cf9);
-    const __cf17=when(()=>ctx.users.state() === 'success' || ctx.users.state() === 'local',()=>{const __frag=__blk2();const [__m16]=__walk2(__frag);const __cf15=eachRow(()=>ctx.userData(),'name',(user)=>{const __frag=__blk1();const [__t13,__t14]=__walk1(__frag);bindInterpolation(__t13,()=>user().name,true);bindInterpolation(__t14,()=>user().role);return __frag;});__m16.replaceWith(__cf15);return __frag;},null);
+    const __cf17=when(()=>ctx.users.state() === 'success',()=>{const __frag=__blk2();const [__m16]=__walk2(__frag);const __cf15=eachRow(()=>ctx.userData(),'name',(user)=>{const __frag=__blk1();const [__t13,__t14]=__walk1(__frag);bindInterpolation(__t13,()=>user().name,true);bindInterpolation(__t14,()=>user().role);return __frag;});__m16.replaceWith(__cf15);return __frag;},null);
     __m18.replaceWith(__cf17);
     const __cf20=when(()=>ctx.users.state() === 'error',()=>{const __frag=__blk3();return __frag;},null);
     __m21.replaceWith(__cf20);

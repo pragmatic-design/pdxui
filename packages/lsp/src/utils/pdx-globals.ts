@@ -72,14 +72,10 @@ declare global {
   type PdxSignal<T> = PdxReadonly<T> & { set(v: T | ((prev: T) => T)): void; setRaw(v: T): void };
   interface PdxResource<T> {
     readonly data: PdxReadonly<T | undefined>;
-    readonly error: PdxReadonly<unknown>;
-    readonly loading: PdxReadonly<boolean>;
-    readonly isPending: PdxReadonly<boolean>;
-    readonly state: PdxReadonly<'idle' | 'loading' | 'reloading' | 'success' | 'stale' | 'error' | 'local'>;
-    readonly status: PdxReadonly<{
-      readonly isLoading: boolean; readonly isError: boolean; readonly isSuccess: boolean;
-      readonly isStale: boolean; readonly hasData: boolean; readonly isIdle: boolean;
-    }>;
+    readonly error: PdxReadonly<Error | null>;
+    readonly state: PdxReadonly<'idle' | 'pending' | 'success' | 'error'>;
+    readonly pending: PdxReadonly<boolean>;
+    readonly stale: PdxReadonly<boolean>;
     readonly key: string;
     refetch(): Promise<void>;
     mutate(value: T): void;
