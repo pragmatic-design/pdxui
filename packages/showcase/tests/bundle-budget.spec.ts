@@ -230,7 +230,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // wrote inside a component's tag, with the specificity the ancestor form had; the template marks those
 // elements `data-pdx-<hash>-in`. Same branch, same machine, the app built with `target:
 // 'baseline-2024'` against the default: js 464.5 → 465.1, css 59.1 → 62.6, blocking 94.3 → 94.9.
-const BUDGET_KB = { entry: 40, js: 466, css: 63, blocking: 95 };
+// blocking 95 → 96: a button reads its own tokens (#154) — `--pdx-button-bg`, `-bg-hover` and `-color`,
+// a rule per variant in buttons.css, which the landing route's stylesheet carries. Measured locally on
+// the built dist: blocking 94.9 → 95.2, css 62.6 → 62.8; the JavaScript did not move.
+const BUDGET_KB = { entry: 40, js: 466, css: 63, blocking: 96 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

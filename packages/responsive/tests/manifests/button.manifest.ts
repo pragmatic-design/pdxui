@@ -64,6 +64,19 @@ export const button: ComponentManifest = {
             setup: `document.querySelector('section:not([hidden]) [data-test="btn-pending"]').action = { execute() {}, pending: () => true };`,
         },
         {
+            // The component's tokens (#154), set on ONE element: its background, its hover background
+            // and its label follow them in every theme; the button beside it, without them, does not.
+            id: 'button-tokens',
+            title: 'Button — Component tokens on one element',
+            html: `
+                <div class="row">
+                    <pdx-button data-test="tok" style="--pdx-button-bg: rgb(10, 20, 30); --pdx-button-bg-hover: rgb(1, 2, 3); --pdx-button-color: rgb(250, 240, 230)">Token</pdx-button>
+                    <pdx-button data-test="tok-danger" variant="danger" style="--pdx-button-bg: rgb(10, 20, 30)">Danger</pdx-button>
+                    <pdx-button data-test="tok-plain">Plain</pdx-button>
+                    <pdx-button data-test="tok-legacy" variant="danger" style="--pdx-button-hover-transform: translateY(-3px)">Legacy</pdx-button>
+                </div>`,
+        },
+        {
             // Every variant whose label sits on a fill, or is the text itself. Primary is
             // measured by the theme gate: the Pragmatic themes paint it with a gradient.
             id: 'button-labels',
@@ -110,6 +123,45 @@ export const button: ComponentManifest = {
                 // Note: a universal "hover changes X" rule cannot be expressed reliably across
                 // themes (mustDiffer is an AND: it would ask for both the background AND the shadow).
                 // The hover affordance is tested per theme, where it is deterministic. See INVESTIGATE.
+            },
+            'button-tokens': {
+                standalone: [
+                    {
+                        selector: '[data-test="tok"] button',
+                        description: '--pdx-button-bg on the element is its background',
+                        backgroundColor: { op: 'is', value: 'rgb(10, 20, 30)' },
+                    },
+                    {
+                        selector: '[data-test="tok"] button',
+                        description: '--pdx-button-color on the element is its label',
+                        colorVar: '--pdx-button-color',
+                    },
+                    {
+                        selector: '[data-test="tok-danger"] button',
+                        description: '--pdx-button-bg holds for any variant, danger included',
+                        backgroundColor: { op: 'is', value: 'rgb(10, 20, 30)' },
+                    },
+                    {
+                        selector: '[data-test="tok-plain"] button',
+                        description: 'control: a button without the token keeps the theme\'s background',
+                        backgroundColor: { op: 'isNot', value: 'rgb(10, 20, 30)' },
+                    },
+                ],
+                states: [
+                    {
+                        description: '--pdx-button-bg-hover on the element is its hover background',
+                        selector: '[data-test="tok"] button',
+                        trigger: 'hover',
+                        changes: { backgroundColor: { op: 'is', value: 'rgb(1, 2, 3)' } },
+                    },
+                    {
+                        // A theme written before #154 sets the old name: it is still read after the new one.
+                        description: 'the old --pdx-button-hover-transform still lifts the button on hover',
+                        selector: '[data-test="tok-legacy"] button',
+                        trigger: 'hover',
+                        changes: { transform: { op: 'is', value: 'matrix(1, 0, 0, 1, 0, -3)' } },
+                    },
+                ],
             },
             'button-sizes': {
                 composition: [

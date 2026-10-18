@@ -136,7 +136,7 @@
     box-shadow: var(--pdx-shadow-sm);
 }
 [pdx-theme="neumorphic"] .pdx-primary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
-    --pdx-button-hover-shadow: var(--pdx-shadow-md);
+    --pdx-button-shadow-hover: var(--pdx-shadow-md);
 }
 [pdx-theme="neumorphic"] .pdx-primary:active:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
     box-shadow: inset 2px 2px 4px oklch(0 0 0 / 0.1), inset -1px -1px 3px oklch(1 0 0 / 0.4);

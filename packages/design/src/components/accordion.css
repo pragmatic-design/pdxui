@@ -35,7 +35,8 @@ details.pdx-accordion summary::after {
     transition: transform var(--pdx-transition);
 }
 
-details.pdx-accordion[open] summary::after { transform: var(--pdx-accordion-open-transform); }
+/* `--pdx-accordion-open-transform`, the name before #154, read after the new one for older themes. */
+details.pdx-accordion[open] summary::after { transform: var(--pdx-accordion-transform-open, var(--pdx-accordion-open-transform, rotate(45deg))); }
 
 details.pdx-accordion > :not(summary) {
     padding: 0 var(--pdx-space-md) var(--pdx-space-md);

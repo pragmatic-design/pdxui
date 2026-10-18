@@ -183,6 +183,13 @@ the cascade at any level: `:root`, a subtree, one element.
 
 beta (#154)
 
+**Landed** (#154): the convention, each component's tokens in the manifest's `cssProperties` (with
+the default `tokens.css` gives) and on its docs page, `pdx-button`'s `--pdx-button-bg`, `-bg-hover` and
+`-color` on every variant, and three tokens renamed to the convention with their old names still read
+(`--pdx-button-shadow-hover`, `--pdx-button-transform-hover`, `--pdx-accordion-transform-open`). The
+lint rule, with a registry of global tokens and the shared ones made global, is #514. Full text in
+[styles.md](../styles.md#component-tokens).
+
 ## States in CSS
 
 `:state(name)` styles a state the component declares with `@state` ([components.md](components.md),

@@ -22,6 +22,7 @@ import ts from 'typescript';
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { componentTokens } from '../../design/scripts/component-tokens.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const UI_ROOT = join(__dirname, '..');
@@ -966,6 +967,14 @@ export function buildManifest() {
         const mods = analyzeFile(file, text, categories);
         if (mods.length) modules.push(...mods);
         else skipped++;
+    }
+    // Each component's tokens, read from the design CSS (#154), after any `@cssprop` its source documents.
+    const decls = modules.map((m) => m.declarations[0]);
+    const tokens = componentTokens(decls.map((d) => d.tagName.replace(/^pdx-/, '')), join(UI_ROOT, '..', 'design', 'src'));
+    for (const d of decls) {
+        const found = tokens.get(d.tagName.replace(/^pdx-/, '')) ?? [];
+        const props = [...(d.cssProperties ?? []), ...found.filter((t) => !(d.cssProperties ?? []).some((p) => p.name === t.name))];
+        if (props.length) d.cssProperties = props;
     }
     return { manifest: { schemaVersion: '1.0.0', readme: '', modules }, skipped };
 }

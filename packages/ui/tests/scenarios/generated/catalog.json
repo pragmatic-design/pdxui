@@ -311,6 +311,10 @@
           "title": "Button — Action pending"
         },
         {
+          "id": "button-tokens",
+          "title": "Button — Component tokens on one element"
+        },
+        {
           "id": "button-labels",
           "title": "Button — Labels of every variant"
         }

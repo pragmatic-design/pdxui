@@ -103,7 +103,7 @@
 
 /* Primary button: frosted with glow */
 [pdx-theme="glass"] .pdx-primary:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
-    --pdx-button-hover-shadow: 0 4px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
+    --pdx-button-shadow-hover: 0 4px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
 }
 
 /* Tab: glow bottom border */

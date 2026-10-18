@@ -117,8 +117,8 @@
     font-weight: var(--pdx-weight-bold);
 }
 [pdx-theme="playful"] .pdx-primary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    --pdx-button-hover-shadow: 0 6px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
-    --pdx-button-hover-transform: translateY(-1px);
+    --pdx-button-shadow-hover: 0 6px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
+    --pdx-button-transform-hover: translateY(-1px);
 }
 [pdx-theme="playful"] .pdx-danger:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
     box-shadow: 0 6px 16px oklch(from var(--pdx-color-danger) l c h / 0.35);

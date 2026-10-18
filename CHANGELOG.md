@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- A component's own values are tokens, `--pdx-<component>-<property>[-<state>]`, overridable at
+  `:root`, on a subtree or on one element. `<pdx-button style="--pdx-button-bg: …">` restyles one
+  button, in every theme, on every variant; `--pdx-button-bg-hover` and `--pdx-button-color` likewise.
+  - Each component's tokens, with their defaults, are in the manifest (`cssProperties`) and on its
+    docs page.
+  - Renamed to the convention: `--pdx-button-hover-shadow` → `--pdx-button-shadow-hover`,
+    `--pdx-button-hover-transform` → `--pdx-button-transform-hover`, `--pdx-accordion-open-transform` →
+    `--pdx-accordion-transform-open`. The old names still apply. (#154)
 - `@variants` declares a component's variants once.
   `@variants { variant: { primary, ghost } = primary; size: { sm, md } = md; }` makes each axis a prop
   typed with its values and reflected on the host as an attribute.

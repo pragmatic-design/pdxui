@@ -65,3 +65,16 @@ test('a method with no JSDoc says nothing rather than repeating its name', async
     await openApi(page, 'pdx-auto-form');
     await expect(page.locator('.api td', { hasText: 'method (call via a ref)' })).toHaveCount(0);
 });
+
+test('the component\'s tokens are listed, with the default tokens.css gives (#154)', async ({ page }) => {
+    await openApi(page, 'pdx-button');
+    const rows = await page.evaluate(() => {
+        const h = Array.from(document.querySelectorAll('.api .api-h3')).find((x) => x.textContent?.trim() === 'CSS Custom Properties');
+        const table = h?.nextElementSibling as HTMLTableElement | null;
+        return Object.fromEntries(Array.from(table?.querySelectorAll('tbody tr') ?? [])
+            .map((tr) => Array.from(tr.querySelectorAll('td')).map((td) => td.textContent?.trim() ?? ''))
+            .map((cells) => [cells[0], cells[1]]));
+    });
+    expect(rows['--pdx-button-bg-hover'], 'no row for --pdx-button-bg-hover').toBe('');
+    expect(rows['--pdx-button-min-height']).toBe('2.5rem');
+});

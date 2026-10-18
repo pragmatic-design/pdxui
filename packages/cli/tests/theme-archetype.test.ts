@@ -31,7 +31,7 @@ const PERSONALITY = [
     '--pdx-button-radius', '--pdx-button-min-height', '--pdx-input-style',
     '--pdx-input-min-height', '--pdx-tab-indicator', '--pdx-tab-indicator-size',
     '--pdx-card-style', '--pdx-toggle-width', '--pdx-toggle-height',
-    '--pdx-accordion-glyph', '--pdx-accordion-open-transform', '--pdx-breadcrumb-separator',
+    '--pdx-accordion-glyph', '--pdx-accordion-transform-open', '--pdx-breadcrumb-separator',
     '--pdx-table-header-transform', '--pdx-table-header-weight', '--pdx-table-header-size',
     '--pdx-table-header-letter-spacing', '--pdx-table-header-border-width',
     '--pdx-font-sans',

@@ -34,11 +34,21 @@ A designer works at levels **1–2**. Level 3 is a *consumer*: when a component 
 | `--pdx-input-style` | `outlined` · `filled` · `underlined` |
 | `--pdx-tab-indicator` | `underline` · `pill` |
 | `--pdx-card-style` | `bordered` · `elevated` · `flat` |
-| `--pdx-accordion-glyph` + `--pdx-accordion-open-transform` | the glyph, and how it rotates when open |
+| `--pdx-accordion-glyph` + `--pdx-accordion-transform-open` | the glyph, and how it rotates when open |
 | `--pdx-field-required-marker` | the `content` after a required field's label: `' *'` (unset) · any string · `none`. Inherited, so it can also be set on one form or one field; the control's `aria-required` is set whatever it is |
 | density | `compact` · `normal` · `comfort` — a theme may declare its own `--pdx-density-factor`; the reader's `pdx-density` attribute (on `<html>` or any element) overrides it, from the layer `pdx.preferences` after the themes |
 
 **C. Scales**: spacing, radii, **typography** (font plus a modular scale), **shadows** (5 levels), motion.
+
+**D. Component tokens** — one component's own values, named `--pdx-<component>-<property>[-<state>]`
+(#154): `--pdx-button-bg`, `--pdx-button-bg-hover`, `--pdx-button-color`, `--pdx-button-radius`, … A
+component reads its own token first and falls back to the global value (or, for a button, its
+variant's), so a theme sets one like any token, and a page sets it at `:root`, on a subtree, or on one
+element: `<pdx-button style="--pdx-button-bg: var(--pdx-color-accent)">`. Each component's tokens, with
+the default `tokens.css` gives, are in the manifest (`cssProperties`) and on the component's docs page.
+Three were renamed to the convention in #154 — `--pdx-button-hover-shadow` → `--pdx-button-shadow-hover`,
+`--pdx-button-hover-transform` → `--pdx-button-transform-hover`, `--pdx-accordion-open-transform` →
+`--pdx-accordion-transform-open` — and the old names still apply: they are read after the new ones.
 
 ---
 
@@ -151,7 +161,7 @@ A theme's **frame** is 100% tokens; its **rich personality** is still partly per
 - **Colours**: all of them
 - **Scales**: spacing, radius, typography, shadows (5 levels), durations and easings, z-index
 - **Tonal elevation**: levels 2 and 3 are read by dialog/drawer/menu/toast to lift off the background — in dark, higher means lighter (Material 3); in light it stays near the base.
-- **Opt-in decoration** (value tokens, off by default, no JS): `--pdx-primary-gradient` (a gradient on primary), `--pdx-button-hover-transform` + `--pdx-button-hover-shadow` (the premium lift/glow). A card's accent edge is the `.pdx-card-accent-*` classes; a single or double focus ring is already a value of `--pdx-focus-ring`.
+- **Opt-in decoration** (value tokens, off by default, no JS): `--pdx-primary-gradient` (a gradient on primary), `--pdx-button-transform-hover` + `--pdx-button-shadow-hover` (the premium lift/glow). A card's accent edge is the `.pdx-card-accent-*` classes; a single or double focus ring is already a value of `--pdx-focus-ring`.
 - **Base behaviour**: `input-style`, `button-radius`, `button/input-min-height`, `tab-indicator` (+ `size`), `card-style`, `focus-ring`, `density-factor`
 
 ### 🟡 Partly tokenised
@@ -538,6 +548,9 @@ Shape is expressed by --pdx-button-radius (what the CSS actually reads);.
 | Token | Default |
 |---|---|
 | `--pdx-button-min-height` | `2.5rem` |
+| `--pdx-button-bg` | `initial` |
+| `--pdx-button-bg-hover` | `initial` |
+| `--pdx-button-color` | `initial` |
 
 ### Floating elements (popover, tooltip, dropdown, select, autocomplete)
 
@@ -573,7 +586,8 @@ The disclosure glyph + its open-state transform are behavior.
 |---|---|
 | `--pdx-accordion-glyph` | `'+'` |
 | `--pdx-accordion-glyph-size` | `var(--pdx-text-lg)` |
-| `--pdx-accordion-open-transform` | `rotate(45deg)` |
+| `--pdx-accordion-transform-open` | `initial` |
+| `--pdx-accordion-open-transform` | `initial` |
 
 ### Breadcrumb
 
@@ -606,8 +620,10 @@ OPT-IN, neutral by default (no JS, no attributes). A theme sets.
 | Token | Default |
 |---|---|
 | `--pdx-primary-gradient` | `initial` |
-| `--pdx-button-hover-transform` | `none` |
-| `--pdx-button-hover-shadow` | `none` |
+| `--pdx-button-transform-hover` | `initial` |
+| `--pdx-button-shadow-hover` | `initial` |
+| `--pdx-button-hover-transform` | `initial` |
+| `--pdx-button-hover-shadow` | `initial` |
 
 ### Toggle/Switch
 
