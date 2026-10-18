@@ -20,3 +20,11 @@ function onToggle(e) {
   collapsed1 = e.detail.collapsed;
 }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-md) 0;
+  }
+</style>

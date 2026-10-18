@@ -66,3 +66,9 @@ async function onBeforeClose() {
   if (leave) preventOpen = false;
 }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .page { }
+  .form-fields label { margin-top: var(--pdx-space-xs); }
+</style>

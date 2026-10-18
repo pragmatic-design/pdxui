@@ -84,4 +84,10 @@ function handleCheckAll(e) {
   .grid-row:hover { background: var(--pdx-color-inset); }
   .grid-row.selected { background: var(--pdx-color-primary-soft); }
   .grid-header, .grid-row { user-select: none; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 36px; margin: 8px 0 0; }
 </style>

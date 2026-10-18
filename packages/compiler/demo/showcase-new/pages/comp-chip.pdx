@@ -98,8 +98,6 @@ function clearLog() { chipConsole.clearLog(); }
 <style scoped>
   .page { }
 
-  .demo-row { gap: var(--pdx-space-sm); }
-
   .console-panel { margin-bottom: var(--pdx-space-xl); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
   .console-header { display: flex; align-items: center; justify-content: space-between; padding: var(--pdx-space-xs) var(--pdx-space-md); background: var(--pdx-color-inset); border-bottom: 1px solid var(--pdx-color-border); }
   .console-body { padding: var(--pdx-space-sm) var(--pdx-space-md); max-height: 120px; overflow-y: auto; font-size: var(--pdx-text-xs); background: var(--pdx-color-surface); }

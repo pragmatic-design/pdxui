@@ -282,15 +282,8 @@ effect(() => {
 .cmp-section { margin-top: 2.6rem; }
 .cmp-h2 { font-size: 1.35rem; margin: 0 0 0.6rem; }
 .cmp-lead { color: var(--ink-muted); font-size: 0.92rem; margin: 0 0 0.4rem; }
-.cmp-placeholder { padding: 2rem 1.5rem; border-radius: 14px; border: 1px dashed var(--outline); text-align: center; }
-.cmp-ph-title { margin: 0 0 0.3rem; font-family: var(--font-heading); font-weight: 600; color: var(--ink); }
-.cmp-ph-text { margin: 0; color: var(--ink-muted); font-size: 0.9rem; }
-
-.kbd-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin-top: 0.4rem; }
-.kbd-table th, .kbd-table td { border: 1px solid var(--outline); padding: 0.5rem 0.7rem; text-align: left; }
-.kbd-table th { background: var(--surface-container); color: var(--gold-fixed); font-weight: 600; }
-.kbd-table td { color: var(--ink-variant); }
-.kbd-table code { color: var(--gold-fixed); font-family: var(--font-mono); font-size: 0.85em; }
+/* The placeholder and the keyboard table are styled by pdx-cmp-fallback and pdx-cmp-a11y, which
+   render them: a scoped style stops at nested components (#152). */
 
 /* TOC */
 .cmp-toc { display: flex; flex-direction: column; gap: 0.15rem; position: sticky; top: 80px; }

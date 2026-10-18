@@ -48,4 +48,20 @@
     padding: var(--pdx-space-xs) var(--pdx-space-md) var(--pdx-space-md);
     background: var(--pdx-color-bg);
   }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .popover-static {
+    background: var(--pdx-color-overlay);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    padding: var(--pdx-space-md);
+    box-shadow: var(--pdx-shadow-xl);
+    max-width: 280px;
+  }
+  .popover-static p { margin: 0; }
+  .popover-static.bare { padding: 0; overflow: hidden; }
+  .popover-static.compact { max-width: 220px; }
+  .opt-row span { color: var(--pdx-color-muted); }
 </style>

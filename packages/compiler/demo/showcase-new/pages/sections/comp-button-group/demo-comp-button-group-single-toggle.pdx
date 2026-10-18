@@ -44,3 +44,8 @@ const viewMode = $derived(demo.viewMode());
 function onAlignment(e) { demo.onAlignment(e); }
 function onViewMode(e) { demo.onViewMode(e); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-row { gap: var(--pdx-space-sm); }
+</style>

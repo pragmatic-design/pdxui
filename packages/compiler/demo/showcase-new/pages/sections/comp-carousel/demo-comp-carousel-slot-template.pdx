@@ -41,4 +41,7 @@ const slotSlides = [
 .custom-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; background: linear-gradient(135deg, var(--pdx-color-primary), var(--pdx-color-accent, var(--pdx-color-primary))); color: var(--pdx-color-primary-text); text-align: center; padding: var(--pdx-space-xl); }
 .custom-slide h3 { margin: var(--pdx-space-sm) 0 var(--pdx-space-xs); font-size: 1.5rem; }
 .custom-slide p { margin: 0; opacity: 0.85; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-bg); margin-bottom: var(--pdx-space-md); }
 </style>

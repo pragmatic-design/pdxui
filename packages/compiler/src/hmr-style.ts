@@ -7,6 +7,7 @@
 
 import { parseSFC, type SFCDescriptor } from './parser/sfc';
 import { extractCSSBindings, hash, styleBlocks, styleCssFor } from './compiler/codegen-styles';
+import type { BrowserTarget } from './compiler/compile-context';
 
 /** One style element to rewrite: its id, and the CSS it holds now. */
 export interface StyleSwap {
@@ -29,7 +30,7 @@ export const STYLE_EVENT = 'pdx:style';
  *   changes the module's code;
  * - a light-DOM component: a `<template shadow>`'s CSS is adopted in its setup, not in a head element.
  */
-export function styleOnlyUpdate(prev: string, next: string, filename: string): StyleSwap[] | null {
+export function styleOnlyUpdate(prev: string, next: string, filename: string, target: BrowserTarget = 'baseline-2026'): StyleSwap[] | null {
     if (prev === next) return [];
     const before = parseSFC(prev);
     const after = parseSFC(next);
@@ -49,7 +50,7 @@ export function styleOnlyUpdate(prev: string, next: string, filename: string): S
         const scope = `data-pdx-${id}`;
         const names = (css: string) => extractCSSBindings(css, scope).join('\n');
         if (names(oldBlocks[i].content) !== names(newBlocks[i].content)) return null;
-        swaps.push({ id: `pdx-s-${i === 0 ? id : `${id}-${i}`}`, css: styleCssFor(after, filename, i, false) });
+        swaps.push({ id: `pdx-s-${i === 0 ? id : `${id}-${i}`}`, css: styleCssFor(after, filename, i, false, target) });
     }
     return swaps;
 }

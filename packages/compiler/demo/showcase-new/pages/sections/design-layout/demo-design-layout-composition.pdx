@@ -77,4 +77,30 @@
     border: 1px solid var(--pdx-color-border);
     border-radius: var(--pdx-radius-md);
   }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .page { }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-area {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-md);
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+  }
+  .demo-area.comp { border-style: solid; }
+  .tag {
+    display: inline-block;
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-full);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-text);
+  }
+  .tag.accent {
+    background: var(--pdx-primary-50);
+    border-color: var(--pdx-primary-200);
+    color: var(--pdx-primary-700);
+  }
 </style>

@@ -27,35 +27,57 @@ ScopedStyle    ::= "<style" S "scoped" S? ">" Css "</style>"
 
 #### Semantics
 
-The block's CSS is rewritten so that every selector sits under the host's scope attribute,
-`data-pdx-HASH`, where `HASH` is six base-36 characters hashed from the file path the compiler was
-given. Comments are removed, `responsive()` and `bind()` are rewritten, and then each top-level rule
-has its selector list split at every comma and each part prefixed with `[data-pdx-HASH] ` (a
-descendant combinator): `.a, .b:hover { … }` becomes `[data-pdx-HASH] .a, [data-pdx-HASH] .b:hover
-{ … }`. The selectors inside `@media`, `@supports`, `@layer`, `@container` and `@starting-style` are
-scoped the same way, recursively. `@keyframes` and `@font-face` are copied as written (their names are
-not selectors), and so is every other at-rule with a block, `@scope` included: an author's `@scope`
-sets its own boundary. A rule's body, nested rules (`&`) included, is copied as written. The setup the
-compiler generates calls `ctx.el.setAttribute('data-pdx-HASH', '')` on the host when at least one
-block of the file is scoped. Because the scope is an ancestor, a rule reaches everything rendered
-inside the host — child components, slotted content, `@raw` output — but never the host element
-itself.
+A scoped block applies to the component's own elements and stops at nested components (#152). Its
+scope attribute is `data-pdx-HASH`, where `HASH` is six base-36 characters hashed from the file path
+the compiler was given; the setup the compiler generates calls `ctx.el.setAttribute('data-pdx-HASH',
+'')` on the host when at least one block of the file is scoped. Comments are removed and
+`responsive()` and `bind()` rewritten first. What follows depends on `pdx({ target })`
+([file.md, Browser targets](beta/file.md#browser-targets)):
+
+- **`'baseline-2026'`, the default** — the rules are wrapped in a donut scope,
+  `@scope ([data-pdx-HASH], [data-pdx-HASH-in]) to ([data-pdx-root] > *) { … }`. Core sets
+  `data-pdx-root` on every component host when it first mounts, so the scope ends at the elements a
+  child component renders: a rule reaches the component's own elements and not the inside of a child.
+  The second root, `data-pdx-HASH-in`, is the compiler's mark on every element the template writes
+  inside a component's tag — slotted content, which light DOM places inside the child's subtree, stays
+  in the parent's scope. Each selector `S` becomes `:scope S, :where(:not([data-pdx-HASH])):scope:is(S)`,
+  which matches inside either root and a marked element itself, with the specificity
+  `[data-pdx-HASH] S` had, so a page's scoped rule weighs against a global one as before. `:scope` is
+  the host: it becomes `:where(:scope)[data-pdx-HASH]`. A trailing pseudo-element stays outside the
+  `:is()` (`:is(.a)::before`). The selectors inside `@media`, `@supports`, `@layer`, `@container` and
+  `@starting-style` get a scope of their own inside the at-rule.
+- **`'baseline-2024'`** — each top-level rule has its selector list split at every comma and each part
+  prefixed with `[data-pdx-HASH] ` (a descendant combinator): `.a, .b:hover { … }` becomes
+  `[data-pdx-HASH] .a, [data-pdx-HASH] .b:hover { … }`, and `:scope` becomes `[data-pdx-HASH]`. The
+  selectors inside the at-rules above are scoped the same way, recursively. Because the scope is an
+  ancestor, a rule reaches everything rendered inside the host — child components included — and no
+  element is marked.
+
+On both targets `@keyframes` and `@font-face` are copied as written (their names are not selectors),
+and so is every other at-rule with a block, `@scope` included: an author's `@scope` sets its own
+boundary. A rule's body, nested rules (`&`) included, is copied as written.
 
 #### Rules
 
 - `:global(…)` is not CSS; it raises `PDX_GLOBAL_SELECTOR` (warning) and the browser drops the rule.
-  A plain descendant selector already reaches what a child component renders. What a child component
-  makes public to it is its parts, `pdx-menu [data-part="popup"]` (`@part`, #134), its states,
-  `:state(name)` (`@state`, #132), and its tokens; its internal classes are not public.
+  What a child component makes public is its parts, `pdx-menu [data-part="popup"]` (`@part`, #134),
+  its states, `:state(name)` (`@state`, #132), and its tokens; its internal classes are not public,
+  and under `'baseline-2026'` a scoped rule does not reach them. `pdx migrate` flags a scoped selector
+  that did (`scoped-reaches-child`): one that names a component's tag and descends into it, or one whose
+  subject the template never writes and the script never names in a string.
+- An element the script creates inside an element of the template is the component's own, and a
+  scoped rule reaches it — unless it sits inside a child component without a marked element around
+  it: a node appended straight into a component's tag is past the scope's end. Not checked today.
 - The selector list is split at its top-level commas only: a list inside `:is()`, `:where()`,
-  `:not()` or `:has()` is one selector, `:is(.a, .b) > span` → `[data-pdx-HASH] :is(.a, .b) > span`.
+  `:not()` or `:has()` is one selector, `:is(.a, .b) > span` → `[data-pdx-HASH] :is(.a, .b) > span`
+  under `'baseline-2024'`.
 - A statement at-rule — `@import`, `@charset`, `@namespace`, `@layer a, b;` — ends at its `;` (one
   inside parentheses or quotes does not end it). It is copied as written, and the rule after it is
   scoped as usual.
 - At-rule names are matched as whole names, in any case: `@MEDIA` is scoped like `@media`, and
   `@media-x` is not `@media`.
 - `:root`, `html`, `body` and the host's own tag become descendants of the host and match nothing;
-  style the host from a plain `<style>` block. Not checked today.
+  style the host with `:scope`. Not checked today.
 - `@keyframes` names are global: two components that both define `@keyframes fade` collide. Not
   checked today.
 - `@scope` and any at-rule not listed above (`@property`, `@page`, `@font-feature-values`, …) are
@@ -87,12 +109,14 @@ itself.
 </style>
 ```
 
-`.card .title` reaches the browser as `[data-pdx-HASH] .card .title`; the rule inside `@media` is
-scoped the same way; `@keyframes card-in` is not.
+Under the default target `.card .title` reaches the browser as `:scope .card .title,
+:where(:not([data-pdx-HASH])):scope:is(.card .title)` inside the component's `@scope`; under
+`'baseline-2024'` as `[data-pdx-HASH] .card .title`. The rule inside `@media` gets the same treatment;
+`@keyframes card-in` is copied as written.
 
 #### Since
 
-alpha
+alpha; the donut scope of `'baseline-2026'` and `:scope` as the host since beta (#152).
 
 ### `<style>` without `scoped`
 

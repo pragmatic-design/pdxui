@@ -66,7 +66,4 @@
 
 <style scoped>
 .page { }
-.demo-container { max-width: 600px; }
-.event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 600px; }
-.slot-user-badge { font-size: var(--pdx-text-xs); padding: 2px 8px; border-radius: 9999px; background: var(--pdx-color-inset); white-space: nowrap; }
 </style>

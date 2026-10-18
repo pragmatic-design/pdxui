@@ -38,4 +38,12 @@ function sampleStyle() { return toggleGroupDemo.sampleStyle(); }
 <style scoped>
   .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pdx-space-sm); }
   .toolbar-sep { width: 1px; align-self: stretch; background: var(--pdx-color-border); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .aligned, .sample {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-md);
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+  }
 </style>

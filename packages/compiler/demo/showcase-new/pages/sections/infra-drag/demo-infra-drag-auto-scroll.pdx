@@ -46,4 +46,9 @@ onMount(() => {
   .scroll-list { max-height: 200px; overflow-y: auto; border: 2px dashed var(--pdx-color-border); border-radius: 8px; padding: 4px; margin-top: 8px; }
   .scroll-item { padding: 10px 14px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: 6px; margin: 4px 0; font-size: 0.85rem; }
   .scroll-item.drag-handle { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); cursor: grab; touch-action: none; user-select: none; font-weight: 600; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
 </style>

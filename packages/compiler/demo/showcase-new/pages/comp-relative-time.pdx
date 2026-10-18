@@ -44,7 +44,4 @@
 
 <style scoped>
 .page { }
-.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-bg); margin-bottom: var(--pdx-space-md); }
-.demo-row-labeled { display: flex; align-items: baseline; gap: var(--pdx-space-md); }
-.label-col { min-width: 100px; text-align: right; }
 </style>

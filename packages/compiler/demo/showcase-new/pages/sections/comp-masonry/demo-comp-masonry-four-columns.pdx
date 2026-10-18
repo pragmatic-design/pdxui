@@ -17,3 +17,19 @@
     </pdx-masonry>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .masonry-card {
+  background: var(--pdx-color-inset);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--pdx-text-lg);
+  font-weight: var(--pdx-weight-semibold);
+  color: var(--pdx-color-muted);
+}
+  .masonry-card-sm { font-size: var(--pdx-text-sm); }
+</style>

@@ -21,3 +21,9 @@
     </details>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .shortcut-list { display: flex; flex-direction: column; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
+  .shortcut-row { display: flex; gap: var(--pdx-space-md); align-items: center; }
+</style>

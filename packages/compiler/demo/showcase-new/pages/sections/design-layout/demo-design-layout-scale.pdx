@@ -64,4 +64,7 @@
     border-radius: var(--pdx-radius-full);
     background: var(--pdx-color-primary);
   }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  section { margin-bottom: var(--pdx-space-3xl); }
 </style>

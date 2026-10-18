@@ -17,6 +17,8 @@ import { compileNewMode, compileStoreMode } from './codegen-new';
 import { compileLegacyMode } from './codegen-legacy';
 import { eraseTypes } from './erase-types';
 import { insertModuleHoists } from './codegen-shared';
+import { styleBlocks, hash } from './codegen-styles';
+import { markSlotted } from './slotted-marks';
 
 // Re-exported for external callers (e.g. plugin-utils imports deriveTag from here).
 export { extractTag, deriveTag } from './codegen-shared';
@@ -77,6 +79,12 @@ export function compileSFC(
         }
     }
     const ctx = createCompileContext({ production, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.tagPrefix });
+
+    // A scoped block under baseline-2026 stops at nested components (#152): what the template writes
+    // inside a child's tag is marked as this component's, so the donut scope still reaches it.
+    if (ctx.target !== 'baseline-2024' && !descriptor.template?.shadow && styleBlocks(descriptor).some((b) => b.scoped)) {
+        ast = markSlotted(ast, `data-pdx-${hash(filename)}-in`);
+    }
 
     if (descriptor.script) {
         // Reuse pre-computed analysis from compile() validation pass if available

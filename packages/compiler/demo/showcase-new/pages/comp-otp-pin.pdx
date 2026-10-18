@@ -61,7 +61,6 @@
   .intro { margin-bottom: var(--pdx-space-xl); }
   .section-heading { margin-bottom: var(--pdx-space-sm); }
   section { margin-bottom: var(--pdx-space-3xl); }
-  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); padding: var(--pdx-space-md) 0; }
   .options-table { margin-top: var(--pdx-space-md); }
   .opt-header, .opt-row { display: grid; grid-template-columns: 200px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
   .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }

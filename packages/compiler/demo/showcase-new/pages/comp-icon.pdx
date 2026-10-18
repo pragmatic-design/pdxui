@@ -78,19 +78,5 @@ registerPragmaticIcons();
 <style scoped>
   .page { }
 
-  .size-row {
-    display: flex;
-    gap: var(--pdx-space-xl);
-    align-items: flex-end;
-    margin-top: var(--pdx-space-md);
-    flex-wrap: wrap;
-  }
-  .size-demo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--pdx-space-xs);
-  }
-
   .opt-header, .opt-row { grid-template-columns: 80px 80px 1fr; }
 </style>

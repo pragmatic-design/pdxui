@@ -57,8 +57,6 @@ let _ = $signal(0);
 
 <style scoped>
   .page { }
-  .shortcut-list { display: flex; flex-direction: column; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-md); }
-  .shortcut-row { display: flex; gap: var(--pdx-space-md); align-items: center; }
 
   .opt-header, .opt-row { grid-template-columns: 160px 1fr; }
 </style>

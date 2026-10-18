@@ -14,3 +14,8 @@ import { toast } from '@pdxui/ui/toast';
 function showPersistent() { toast.warning('Action required: verify your email.', { duration: 0 }); }
 function showLong() { toast.info('This toast lasts 8 seconds. Hover to pause the progress bar.', { duration: 8000 }); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
+</style>

@@ -21,3 +21,30 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  .options-table {
+  overflow-x: auto;
+}
+  .options-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--pdx-text-sm);
+}
+  .options-table th {
+  text-align: left;
+  font-weight: var(--pdx-weight-semibold);
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  border-bottom: 2px solid var(--pdx-color-border);
+  color: var(--pdx-color-muted);
+  font-size: var(--pdx-text-xs);
+  text-transform: uppercase;
+}
+  .options-table td {
+  padding: var(--pdx-space-xs) var(--pdx-space-sm);
+  border-bottom: 1px solid var(--pdx-color-border);
+}
+</style>

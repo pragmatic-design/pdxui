@@ -16,6 +16,9 @@ import { compile } from '../src/plugin';
 import { ComponentResolver } from '../src/component-resolver';
 import { designHeuristics } from '../src/compiler/design-heuristics';
 import { applyIgnores } from '../src/compiler/ignores';
+import { parseSFC } from '../src/parser/sfc';
+import { styleCssFor, hash } from '../src/compiler/codegen-styles';
+import { donutPrelude } from '../src/compiler/scope-donut';
 
 const APP = resolve(__dirname, '../demo/showcase-new');
 const PAGES = join(APP, 'pages');
@@ -103,70 +106,29 @@ describe('the pages compose their sections as components', () => {
     });
 
     // A page's scoped sheet and a section's are two sheets, and which one the document puts later is
-    // not the page's to decide. So two rules that style ONE element of a section on the same property —
-    // a modifier over its base (`.demo-split-tall` over `.demo-split`), a media override over its base
-    // rule — must live in one sheet, where their order is the order written. Split across the two, the
-    // modifier can lose (a nested splitter renders 280px tall instead of 400, a settings drawer draws
-    // both borders), and so can the media override.
-    it('no section rule overrides a page rule on one of its elements', () => {
-        const crossings: string[] = [];
+    // not the page's to decide: a page rule and a section rule on ONE element of the section, split
+    // across the two, fought (a nested splitter rendered 280px tall instead of 400, a settings drawer
+    // drew both borders). Under the default target a scoped sheet stops at nested components (#152),
+    // and a section is one: the page's rules no longer reach its elements, so there is nothing to
+    // fight over. What holds that is the page's sheet being a donut scope under the options the
+    // showcase builds with (vite.config.ts: `pdx()`, the default target). On baseline-2024 it is the
+    // ancestor form again, and the fight with it.
+    it('no page rule reaches the elements of its sections', () => {
+        const open: string[] = [];
         for (const page of readdirSync(SECTIONS)) {
             const pageFile = join(PAGES, `${page}.pdx`);
             if (!existsSync(pageFile)) continue;
-            const pageRules = scopedRules(readFileSync(pageFile, 'utf8'), true);
-            for (const f of readdirSync(join(SECTIONS, page)).filter((x) => x.endsWith('.pdx'))) {
-                const src = readFileSync(join(SECTIONS, page, f), 'utf8');
-                const els = classSets(src);
-                for (const s of scopedRules(src, false)) for (const p of pageRules) {
-                    if (s.pseudo !== p.pseudo) continue;
-                    if (!els.some((cls) => s.classes.every((c) => cls.has(c)) && p.classes.every((c) => cls.has(c)))) continue;
-                    const props = s.props.filter((a) => p.props.some((b) => a === b || a.startsWith(b + '-') || b.startsWith(a + '-')));
-                    if (props.length) crossings.push(`${page}/${f}: "${s.selector}" vs page "${p.selector}" on ${[...new Set(props)].join(', ')}`);
-                }
-            }
+            const rel = `showcase-new/pages/${page}.pdx`;
+            const sfc = parseSFC(readFileSync(pageFile, 'utf8'));
+            sfc.styles.forEach((block, i) => {
+                if (!block.scoped) return;
+                const css = styleCssFor(sfc, rel, i, false);
+                if (css.includes('{') && !css.includes(donutPrelude(`data-pdx-${hash(rel)}`))) open.push(`${page}.pdx, style block ${i}`);
+            });
         }
-        expect(crossings, 'a section rule and a page rule fight over one element from two sheets: put them in one').toEqual([]);
+        expect(open, 'a page\'s scoped sheet reaches into its sections: it is not a donut scope').toEqual([]);
     });
 });
-
-/** One selector of a scoped rule: its subject's classes and pseudo part, and the properties it sets. */
-interface ScopedRule { selector: string; classes: string[]; pseudo: string; props: string[] }
-
-/**
- * The selectors of a file's `<style scoped>`, one entry per selector of a list. With `inAtRules`, the
- * rules inside an `@media` / `@supports` block count too: they style the same elements.
- */
-function scopedRules(src: string, inAtRules: boolean): ScopedRule[] {
-    const css = (/<style scoped>([\s\S]*?)<\/style>/.exec(src)?.[1] ?? '').replace(/\/\*[\s\S]*?\*\//g, '');
-    const out: ScopedRule[] = [];
-    const walk = (text: string) => {
-        let depth = 0, start = 0;
-        for (let i = 0; i < text.length; i++) {
-            if (text[i] === '{') depth++;
-            if (text[i] !== '}') continue;
-            if (--depth !== 0) continue;
-            const rule = text.slice(start, i + 1);
-            start = i + 1;
-            const head = rule.slice(0, rule.indexOf('{')).trim();
-            const body = rule.slice(rule.indexOf('{') + 1, -1);
-            if (head.startsWith('@')) { if (inAtRules) walk(body); continue; }
-            const props = [...body.matchAll(/([\w-]+)\s*:/g)].map((m) => m[1]);
-            for (const selector of head.split(',').map((s) => s.trim())) {
-                const subject = selector.split(/\s+|>|\+|~/).filter(Boolean).pop() ?? '';
-                const classes = [...subject.matchAll(/\.([\w-]+)/g)].map((m) => m[1]);
-                if (classes.length) out.push({ selector, classes, pseudo: /(::?[\w-]+(\([^)]*\))?)*$/.exec(subject)![0], props });
-            }
-        }
-    };
-    walk(css);
-    return out;
-}
-
-/** The static class lists of a file's template elements. */
-function classSets(src: string): Set<string>[] {
-    const tpl = /<template>([\s\S]*)<\/template>/.exec(src)?.[1] ?? '';
-    return [...tpl.matchAll(/<[\w-]+\b[^>]*\bclass="([^"]*)"/g)].map((m) => new Set(m[1].split(/\s+/).filter(Boolean)));
-}
 
 describe('the showcase compiles without a warning', () => {
     it('there are showcase pages to check', () => {

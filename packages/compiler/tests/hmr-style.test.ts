@@ -33,7 +33,14 @@ describe('styleOnlyUpdate: which saves are a style swap', () => {
     it('a change inside <style scoped> only: the block\'s element id and its new scoped CSS', () => {
         const swaps = styleOnlyUpdate(PAGE, PAGE.replace('color: red', 'color: blue'), FILE);
         expect(swaps).toEqual([{ id: `pdx-s-${hash(FILE)}`, css: expect.stringContaining('color: blue') }]);
-        expect(swaps![0].css, 'the CSS is scoped as the compile scopes it').toContain(`[data-pdx-${hash(FILE)}] .note`);
+        // As the compile scopes it on the default target: the donut scope (#152).
+        expect(swaps![0].css, 'the CSS is scoped as the compile scopes it').toContain(`@scope ([data-pdx-${hash(FILE)}], [data-pdx-${hash(FILE)}-in])`);
+        expect(swaps![0].css).toContain('.note');
+    });
+
+    it('scopes the swap for the target the plugin compiles for', () => {
+        const swaps = styleOnlyUpdate(PAGE, PAGE.replace('color: red', 'color: blue'), FILE, 'baseline-2024');
+        expect(swaps![0].css, 'a baseline-2024 app got the donut in its swap').toContain(`[data-pdx-${hash(FILE)}] .note`);
     });
 
     it('names only the blocks that changed, the second by its index', () => {

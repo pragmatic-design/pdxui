@@ -27,3 +27,9 @@ const priority = $derived(demo.priority());
 
 function onPriority(e) { demo.onPriority(e); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-row { gap: var(--pdx-space-sm); }
+  .demo-row.align-start { align-items: flex-start; }
+</style>

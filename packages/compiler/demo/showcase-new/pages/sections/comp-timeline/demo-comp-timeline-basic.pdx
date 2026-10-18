@@ -29,3 +29,8 @@ const basicEvents = [
   { title: 'Delivered', description: 'Package delivered to front door.', date: 'Apr 5, 2026' },
 ];
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { max-width: 500px; padding: var(--pdx-space-md); }
+</style>

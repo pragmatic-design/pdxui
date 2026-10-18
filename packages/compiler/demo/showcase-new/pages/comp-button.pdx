@@ -111,13 +111,6 @@ function clearLog() {
   .page { }
 
   /* Shared by five of the sections: the page's scoped style reaches them, they render in its light DOM. */
-  .btn-row {
-    display: flex;
-    gap: var(--pdx-space-sm);
-    flex-wrap: wrap;
-    align-items: center;
-    margin-top: var(--pdx-space-md);
-  }
 
   /* Event console — own name (not .console-panel) so it doesn't inherit the
      shared self-scroll box; header stays fixed, .console-body is the sole

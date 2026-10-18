@@ -32,6 +32,4 @@
 
 <style scoped>
   .page { }
-  section { margin-bottom: var(--pdx-space-3xl); }
-  .demo-area { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
 </style>

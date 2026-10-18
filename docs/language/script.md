@@ -450,8 +450,8 @@ manifest lists a component's states.
   that starts as a non-boolean literal raises `PDX_STATE_NOT_BOOLEAN`. `@state` is not Svelte's
   `$state`: reactive data is a `$signal`.
 - A `@state` without `= expression` raises `PDX_MALFORMED_STATE`.
-- Inside the component's own `<style scoped>`, the host is not reachable yet (the scoping writes every
-  selector under the host, #152); `:state()` is written from outside it — a theme or the page.
+- Inside the component's own `<style scoped>`, the host is `:scope` (#152), so `:scope:state(open)`
+  styles the component in that state; a theme or the page write `:state()` on the tag.
 - Under `target: 'baseline-2024'` the state will also be mirrored as a `data-state-<name>` attribute;
   that comes with the target option (#121).
 

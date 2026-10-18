@@ -80,6 +80,5 @@ toast.add({ message: 'Starred!', type: 'success', icon: 'star' });</code></pre>
 
 <style scoped>
   .page { }
-  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
   .source-code { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; }
 </style>

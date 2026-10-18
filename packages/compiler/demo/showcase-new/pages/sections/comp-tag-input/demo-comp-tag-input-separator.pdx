@@ -30,3 +30,8 @@ function onSepChange(e) {
     addLog('separator change: [' + tags.join('; ') + ']');
 }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  kbd { font-family: var(--pdx-font-mono); font-size: 0.8em; padding: 2px 6px; background: var(--pdx-color-inset); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

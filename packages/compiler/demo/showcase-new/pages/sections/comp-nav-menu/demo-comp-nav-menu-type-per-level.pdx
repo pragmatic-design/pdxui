@@ -44,4 +44,13 @@ import { nestedItems } from './state.pdx';
   --pdx-nav-level2-size: 0.76rem;
   --pdx-nav-level3-size: 0.72rem;
 }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-sidebar {
+  width: 260px;
+  padding: var(--pdx-space-sm);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-surface);
+}
 </style>

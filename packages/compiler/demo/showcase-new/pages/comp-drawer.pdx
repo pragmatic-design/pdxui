@@ -52,5 +52,4 @@
 
 <style scoped>
   .page { }
-  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
 </style>

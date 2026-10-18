@@ -108,13 +108,6 @@ import '@pdxui/ui/file-upload';
 <style scoped>
   .page { }
 
-  .result-box {
-    padding: var(--pdx-space-sm) var(--pdx-space-md);
-    background: var(--pdx-color-inset);
-    border-radius: var(--pdx-radius-md);
-    border: 1px solid var(--pdx-color-border);
-  }
-
   .opt-row-2 { display: grid; grid-template-columns: 200px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; border-bottom: 1px solid var(--pdx-color-border); }
   .opt-row-2 span { color: var(--pdx-color-muted); }
 

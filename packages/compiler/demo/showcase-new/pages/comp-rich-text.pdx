@@ -77,13 +77,11 @@
 <style scoped>
   .page { }
   section { margin-bottom: var(--pdx-space-3xl); }
-  .demo-area { margin-top: var(--pdx-space-md); }
   .options-table { margin-top: var(--pdx-space-sm); }
   .opt-header, .opt-row { display: grid; grid-template-columns: 160px 90px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
   .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; }
   .opt-row { border-bottom: 1px solid var(--pdx-color-border); }
   .opt-row span { color: var(--pdx-color-muted); }
-  .info-bar { margin-top: var(--pdx-space-md); padding: var(--pdx-space-sm) var(--pdx-space-md); background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); }
   section:has(.opt-header span:first-child:last-child) .opt-header,
   section:has(.opt-header span:first-child:last-child) .opt-row { grid-template-columns: 200px 1fr; }
 </style>

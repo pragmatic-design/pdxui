@@ -22,4 +22,9 @@
 
 <style scoped>
   .loading-center { display: flex; justify-content: center; padding: var(--pdx-space-2xl); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-row { gap: var(--pdx-space-lg); }
+  .comp-card h3 { margin: 0 0 var(--pdx-space-sm); }
+  .comp-card p { margin: 0; }
 </style>

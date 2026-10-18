@@ -80,23 +80,4 @@
 
 <style scoped>
   .page { }
-
-  .avatar-placeholder {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: var(--pdx-color-inset);
-    border: 1px solid var(--pdx-color-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--pdx-text-xs);
-    font-weight: var(--pdx-weight-semibold);
-    color: var(--pdx-color-muted);
-  }
-  .avatar-placeholder.sm {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.65rem;
-  }
 </style>

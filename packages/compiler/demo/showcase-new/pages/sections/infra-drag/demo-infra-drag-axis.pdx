@@ -48,4 +48,8 @@ onMount(() => {
   .h-track .drag-small { width: 80px; height: 36px; top: 7px; left: 110px; }
   .v-track { width: 50px; height: 200px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; position: relative; }
   .v-track .drag-small { width: 36px; height: 36px; top: 82px; left: 7px; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
 </style>

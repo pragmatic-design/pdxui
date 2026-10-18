@@ -27,4 +27,7 @@ function onTimelineClick(evt) {
 
 <style scoped>
 .event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 500px; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { max-width: 500px; padding: var(--pdx-space-md); }
 </style>

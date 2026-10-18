@@ -48,4 +48,7 @@ let iconCount = $signal(PRAGMATIC_ICON_COUNT);
     transition: background var(--pdx-transition);
   }
   .icon-cell:hover { background: var(--pdx-color-inset); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .page { }
 </style>

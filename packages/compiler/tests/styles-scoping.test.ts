@@ -7,10 +7,15 @@
 //
 // `responsive()` and `bind()` are compile-time transforms with zero runtime cost, which is exactly
 // why nothing at runtime can catch them being wrong.
+//
+// The ancestor form these tests read is the `baseline-2024` target's (#152); the default target's
+// donut scope is tests/scope-donut.test.ts.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { minifyCSS, extractCSSBindings, hash } from '../src/compiler/codegen-styles';
+
+const ANCESTOR = { target: 'baseline-2024' } as const;
 
 /** The CSS a compiled module writes into its `<style>`, as text rather than as a JS string literal. */
 function emittedCss(module: string): string {
@@ -22,7 +27,7 @@ function emittedCss(module: string): string {
 /** Compile a scoped style block and return the generated module. */
 function css(style: string, production = false): string {
     const source = `<template><div class="a">x</div></template>\n<style scoped>\n${style}\n</style>\n<script setup>\n  let n = $signal(1);\n</script>`;
-    return compile(source, 'styled.pdx', [], undefined, { production }).code;
+    return compile(source, 'styled.pdx', [], undefined, { production, ...ANCESTOR }).code;
 }
 
 describe('scoping a selector', () => {
@@ -241,7 +246,7 @@ describe('the host carries the scope attribute', () => {
     it('with no script block, where the selector would otherwise match nothing', () => {
         const out = compile(
             '<template><div class="a">x</div></template>\n<style scoped>.a { color: red; }</style>',
-            'scoped-bare.pdx',
+            'scoped-bare.pdx', [], undefined, ANCESTOR,
         ).code;
         expect(out).toMatch(SET_ATTR);
         // and the emitted selector is the one the attribute serves
@@ -287,7 +292,7 @@ describe('more than one style block', () => {
 
     it('emits both, the scoped one scoped and the plain one verbatim', () => {
         const out = compile(two('<style scoped>.a { color: red; }</style>', '<style>.b { color: blue; }</style>'),
-            'two-blocks.pdx').code;
+            'two-blocks.pdx', [], undefined, ANCESTOR).code;
         const css = emitted(out);
 
         expect(css, 'the second block was dropped').toHaveLength(2);
@@ -306,7 +311,7 @@ describe('more than one style block', () => {
 
     it('sets the host scope attribute when ANY block is scoped, not only the first', () => {
         const out = compile(two('<style>.b { color: blue; }</style>', '<style scoped>.a { color: red; }</style>'),
-            'second-scoped.pdx').code;
+            'second-scoped.pdx', [], undefined, ANCESTOR).code;
 
         expect(out, 'the scoped block is the second one and its attribute was never set')
             .toMatch(/ctx\.el\.setAttribute\('data-pdx-[a-z0-9]+', ''\)/);
@@ -326,7 +331,7 @@ describe('more than one style block', () => {
     it('leaves a single block exactly as it was', () => {
         const out = compile(
             '<template><div class="a">x</div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n<style scoped>.a { color: red; }</style>',
-            'one-block.pdx').code;
+            'one-block.pdx', [], undefined, ANCESTOR).code;
         expect(emitted(out)).toHaveLength(1);
         expect(emitted(out)[0]).toMatch(/^\[data-pdx-[a-z0-9]+\] \.a/);
     });
@@ -388,7 +393,7 @@ describe('a shadow component carries its own styles', () => {
     it('leaves a light-DOM component alone', () => {
         const out = compile(
             '<template><div class="inside">x</div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n<style scoped>.inside { color: red; }</style>',
-            'light.pdx').code;
+            'light.pdx', [], undefined, ANCESTOR).code;
         expect(out, 'the light-DOM path must keep injecting into the head').toMatch(/document\.head\.appendChild/);
         expect(out).not.toMatch(/__adoptStyles\(/);
         expect(out).toMatch(/\[data-pdx-[a-z0-9]+\] \.inside/);

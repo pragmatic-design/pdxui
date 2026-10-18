@@ -237,7 +237,8 @@ export function compileNewMode(
         analysis.host ? hostDescriptor(analysis.host, ctx, imports) : '',
         analysis.parts,
         modelsCode,
-        ctx.tagPrefix);
+        ctx.tagPrefix,
+        ctx.target);
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

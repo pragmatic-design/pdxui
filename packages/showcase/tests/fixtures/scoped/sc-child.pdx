@@ -1,0 +1,10 @@
+<template>
+  <div class="frame">
+    <button class="child-own" id="child-own">child</button>
+    <slot></slot>
+  </div>
+</template>
+
+<script setup>
+
+</script>

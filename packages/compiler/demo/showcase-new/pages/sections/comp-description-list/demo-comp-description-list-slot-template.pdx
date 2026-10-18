@@ -36,4 +36,7 @@ const slotDlItems = [
 
 <style scoped>
 .dl-custom-value { color: var(--pdx-color-primary); font-weight: 600; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { max-width: 500px; }
 </style>

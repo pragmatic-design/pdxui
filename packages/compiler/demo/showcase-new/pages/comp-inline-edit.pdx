@@ -71,11 +71,4 @@
 
 <style scoped>
   .page { }
-
-  .demo-label {
-    min-width: 120px;
-    font-size: var(--pdx-text-sm);
-    color: var(--pdx-color-muted);
-    text-align: right;
-  }
 </style>

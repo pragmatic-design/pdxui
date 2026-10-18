@@ -41,5 +41,4 @@
 
 <style scoped>
   .page { }
-  .pop-text { margin: 0; font-size: var(--pdx-text-sm); }
 </style>

@@ -38,3 +38,19 @@ const warningForm = createForm({
   warnings: { price: [(v) => typeof v === 'number' && v > 1000 ? 'Price seems high — are you sure?' : undefined] },
 });
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .form-values pre {
+    margin: var(--pdx-space-xs) 0 0;
+    font-family: var(--pdx-font-mono);
+    white-space: pre-wrap;
+  }
+</style>

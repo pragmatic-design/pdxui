@@ -54,15 +54,5 @@
 
 <style scoped>
 .page { }
-.demo-container {
-  border: 1px solid var(--pdx-color-border);
-  border-radius: var(--pdx-radius-md);
-  overflow: hidden;
-}
-.scroll-content {
-  padding: var(--pdx-space-lg);
-  font-size: var(--pdx-text-sm);
-}
-.scroll-content h3 { margin: var(--pdx-space-md) 0 var(--pdx-space-xs); }
 .scroll-content p { color: var(--pdx-color-muted); margin-bottom: var(--pdx-space-sm); }
 </style>

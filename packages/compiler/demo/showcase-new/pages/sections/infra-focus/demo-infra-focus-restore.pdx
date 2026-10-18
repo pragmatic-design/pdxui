@@ -49,3 +49,12 @@ function restoreFocus() {
     restoreLog = restoreLog + '\nRestored to: "' + name + '"';
 }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.875rem; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 32px; }
+</style>

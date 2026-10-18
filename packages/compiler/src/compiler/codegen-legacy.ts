@@ -51,7 +51,7 @@ export function compileLegacyMode(descriptor: SFCDescriptor, ast: TemplateNode[]
     let code = `import { ${coreImports} } from '@pdxui/core';\n`;
     if (topLevelImports) code += topLevelImports + '\n';
     code += '\n';
-    code += generateStyles(descriptor, filename, production);
+    code += generateStyles(descriptor, filename, production, ctx.target);
     code += `component(${jsQuote(tag)}, {\n`;
     code += `  props: ${propsCode},\n`;
     code += sourceFileOption(ctx.sourceFile);

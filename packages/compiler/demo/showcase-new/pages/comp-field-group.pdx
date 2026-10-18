@@ -42,20 +42,6 @@
 
 <style scoped>
   .page { }
-
-  .demo-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--pdx-space-lg); align-items: start; margin-top: var(--pdx-space-md); }
-  .form-stack { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
-  .form-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--pdx-space-md); }
-  .values { display: flex; flex-direction: column; gap: var(--pdx-space-xs); margin-top: var(--pdx-space-md); }
-  .values-json {
-    margin: 0; padding: var(--pdx-space-md);
-    background: var(--pdx-color-surface-inset, var(--pdx-color-surface));
-    border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md);
-    font-size: 0.8rem; white-space: pre-wrap; overflow-wrap: anywhere;
-  }
   .note { margin-top: var(--pdx-space-md); }
 
-  @media (max-width: 720px) {
-    .demo-split { grid-template-columns: 1fr; }
-  }
 </style>

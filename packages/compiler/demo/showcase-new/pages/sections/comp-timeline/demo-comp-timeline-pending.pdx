@@ -15,3 +15,8 @@ const pendingEvents = [
   { title: 'Shipped', date: 'Apr 3, 2026', status: 'info', icon: 'truck' },
 ];
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { max-width: 500px; padding: var(--pdx-space-md); }
+</style>

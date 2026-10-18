@@ -314,3 +314,11 @@
         gap: var(--pdx-space-sm);
     }
 }
+
+/* ─── Page sections, as the shell spaces them ───
+   Moved here from app.pdx's scoped block: a scoped style stops at nested components (#152), and
+   every page is one. '.app' keeps the specificity the shell's scoped rule had, above '.page section'. */
+.app .content section { margin-bottom: 3rem; }
+.app .content section > h2 { margin-bottom: 0.5rem; }
+.app .content section > h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.app .content section > p { margin-bottom: 1rem; }

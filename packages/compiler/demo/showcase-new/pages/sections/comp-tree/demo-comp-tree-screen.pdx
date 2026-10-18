@@ -22,4 +22,20 @@ import { files } from './state.pdx';
 
 <style scoped>
   .explorer-main { flex: 1; padding: var(--pdx-space-lg); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .explorer {
+    display: flex;
+    gap: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .explorer-pane {
+    flex: 0 0 240px;
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+  }
+  @media (max-width: 640px) { .explorer { flex-direction: column; } }
+  @media (max-width: 640px) { .explorer-pane { flex: none; } }
 </style>

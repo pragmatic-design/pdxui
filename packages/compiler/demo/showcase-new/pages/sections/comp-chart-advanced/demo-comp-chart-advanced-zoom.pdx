@@ -15,3 +15,9 @@ const zoomData = Array.from({ length: 90 }, (_, i) => ({
   value: Math.round(50 + 30 * Math.sin(i / 8) + Math.random() * 15),
 }));
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-area { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
+</style>

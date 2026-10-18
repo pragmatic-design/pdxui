@@ -26,4 +26,14 @@
   padding: var(--pdx-space-lg);
   background: var(--pdx-color-bg);
 }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--pdx-space-lg);
+  margin-top: var(--pdx-space-md);
+  max-width: 640px;
+}
+  @media (max-width: 480px) { .dashboard-grid { grid-template-columns: 1fr; } }
 </style>

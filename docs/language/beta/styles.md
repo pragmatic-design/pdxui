@@ -19,29 +19,36 @@ ScopedStyle ::= "<style" S "scoped" S? ">" Css "</style>"
 
 ### Semantics
 
-A scoped block applies to the component's own elements and **stops at nested components** (#152).
+A scoped block applies to the component's own elements and **stops at nested components** (#152 —
+landed).
 
 - `target: 'baseline-2026'` (default): the block compiles to a donut scope,
-  `@scope ([data-pdx-H]) to ([data-pdx-root]) { …rules as written… }`. Every component host carries
-  the fixed attribute `data-pdx-root` (set by core at connection) besides its own `data-pdx-H`. A rule
-  reaches the component's elements and not the inside of a child component. Content projected into
-  the component's `<slot>` belongs to the parent's scope. The host itself is styled with `:scope`.
+  `@scope ([data-pdx-H], [data-pdx-H-in]) to ([data-pdx-root] > *) { … }`. Every component host
+  carries the fixed attribute `data-pdx-root` (set by core at first mount) besides its own
+  `data-pdx-H`, and the scope ends at the elements a child renders. A rule reaches the component's
+  elements and not the inside of a child component. Content the component writes inside a child's
+  tag — which light DOM projects into the child's subtree — carries the compiler's mark
+  `data-pdx-H-in` and stays in the component's scope. Each selector keeps the specificity it had under
+  the ancestor form (`:scope S, :where(:not([data-pdx-H])):scope:is(S)`). The host itself is styled
+  with `:scope`, which becomes `:where(:scope)[data-pdx-H]`. The full rewrite is in
+  [styles.md](../styles.md#style-scoped).
 - `target: 'baseline-2024'`: the alpha output, the ancestor selector `[data-pdx-H] sel`, which also
-  reaches children (the documented alpha behaviour). `:scope` is rewritten to the host,
-  `[data-pdx-H]`, so a block that styles its host means the same on both targets (proposed — #152
-  defines `:scope` for 2026 only; decisions.md).
+  reaches children (the documented alpha behaviour) and marks nothing. `:scope` is rewritten to the
+  host, `[data-pdx-H]`, so a block that styles its host means the same on both targets.
 
 Selectors inside `@media`, `@supports`, `@layer`, `@container` and `@starting-style` are scoped
-recursively; `@keyframes`, `@font-face` and an author's own `@scope` are copied as written (alpha,
-with #104 — landed). The production build extracts each block into a stylesheet (alpha).
+too — under 2026 each gets a `@scope` inside the at-rule; `@keyframes`, `@font-face` and an author's
+own `@scope` are copied as written (alpha, with #104 — landed). The production build extracts each
+block into a stylesheet (alpha).
 
 ### Rules
 
 - `:global()` is `PDX_GLOBAL_SELECTOR` (alpha).
 - A style that targets a library component's internal class is `PDX_LIBRARY_INTERNALS` (alpha);
   the public surface is `[data-part]`, `:state()` and the component tokens.
-- `:root`, `html`, `body` inside a scoped block match nothing (alpha) — under 2026, `:scope` is the
-  host.
+- `:root`, `html`, `body` inside a scoped block match nothing (alpha) — `:scope` is the host.
+- `pdx migrate` flags a scoped selector that reached inside a child (`scoped-reaches-child`, #152):
+  it cannot be rewritten, the replacement is the child's `[data-part]`, `:state()` or tokens.
 
 ### Examples
 
@@ -173,7 +180,8 @@ beta (#154)
 #132); under `baseline-2024` the design build also emits `[data-state-name]`.
 
 **Landed** (#132) for `:state(name)` written in a theme or a page. The `baseline-2024` selector comes
-with the `target` option (#121), and `:scope:state(…)` inside a `<style scoped>` with #152.
+with the `target` option (#121). `:scope` inside a `<style scoped>` is the host since #152, so
+`:scope:state(…)` reaches it.
 
 ## Design CSS extensions (the `@pdxui/design` themes)
 

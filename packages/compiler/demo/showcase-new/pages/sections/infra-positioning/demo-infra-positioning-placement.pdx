@@ -151,4 +151,10 @@ onDestroy(function() {
   .arena-content { width: 600px; min-height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .spacer { flex-shrink: 0; height: 250px; width: 100%; }
   .ref-box { flex-shrink: 0; width: 120px; height: 48px; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.875rem; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; }
+  .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; margin-top: 8px; }
 </style>

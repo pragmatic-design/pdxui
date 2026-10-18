@@ -118,7 +118,7 @@ has nothing to rewrite. They are listed because code may rely on the old behavio
 
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
-| a scoped rule that styled a child component's inside | `[data-part]`, `:state()` or the child's tokens | **target change** under `baseline-2026`; flagged where a scoped selector matches inside a component tag of the same template | #152 (flagging †) |
+| a scoped rule that styled a child component's inside | `[data-part]`, `:state()` or the child's tokens | **target change** under `baseline-2026`; flagged where a scoped selector descends into a component tag, or its subject is neither written by a template that renders components nor named in a string of the script — landed: `scoped-reaches-child` | #152 (flagging †) |
 | variant props mapped to classes by hand | `@variants` + `@variant` | manual (library work) | #153 |
 | theme overrides with the hand-written nested-theme guard | `@pdx-theme <name> { … }` | design build migration, output byte-compared | #155 |
 | behaviour attributes synced by `setTheme` | custom properties read with style queries | **target change**, no source change for an app | #156 |

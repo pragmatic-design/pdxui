@@ -35,3 +35,41 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-area {
+    margin-top: var(--pdx-space-md);
+    padding: var(--pdx-space-md);
+    border: 1px dashed var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-surface);
+  }
+  .demo-row {
+    display: flex;
+    gap: var(--pdx-space-md);
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .demo-labeled {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+    flex: 1;
+    min-width: 200px;
+  }
+  .box {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-primary-100);
+    border: 1px solid var(--pdx-primary-300);
+    border-radius: var(--pdx-radius-sm);
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-primary-800);
+    text-align: center;
+  }
+  .box.tall { padding: var(--pdx-space-xl) var(--pdx-space-md); }
+  .box.md-h { padding: var(--pdx-space-lg) var(--pdx-space-md); }
+  .opt-row span { color: var(--pdx-color-muted); }
+</style>

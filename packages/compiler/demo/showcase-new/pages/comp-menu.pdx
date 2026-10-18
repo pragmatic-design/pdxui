@@ -104,19 +104,6 @@
 .intro { margin-bottom: var(--pdx-space-2xl); }
 section { margin-bottom: var(--pdx-space-3xl); }
 .section-heading { margin-bottom: var(--pdx-space-xs); }
-.demo-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--pdx-space-md);
-  flex-wrap: wrap;
-  padding: var(--pdx-space-md) 0;
-}
-.menu-demo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--pdx-space-xs);
-}
 .options-table { overflow-x: auto; }
 .options-table table {
   width: 100%;

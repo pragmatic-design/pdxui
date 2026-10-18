@@ -77,56 +77,7 @@
 
 <style scoped>
 .page { }
-.demo-shell {
-  height: 350px;
-  border: 1px solid var(--pdx-color-border);
-  border-radius: var(--pdx-radius-md);
-  overflow: hidden;
-  min-width: 500px;
-}
-@media (max-width: 600px) {
-  .demo-shell { min-width: auto; height: 300px; overflow-x: auto; }
-}
-.demo-shell pdx-app-layout { height: 100%; }
-.shell-header {
-  display: flex;
-  align-items: center;
-  gap: var(--pdx-space-sm);
-  padding: 0 var(--pdx-space-md);
-  font-size: var(--pdx-text-sm);
-  height: 100%;
-}
-.shell-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--pdx-space-sm);
-  font-size: var(--pdx-text-sm);
-}
-.shell-nav-item {
-  display: flex;
-  align-items: center;
-  gap: var(--pdx-space-xs);
-  width: 100%;
-  padding: var(--pdx-space-xs) var(--pdx-space-sm);
-  border: none;
-  border-radius: var(--pdx-radius-sm);
-  background: none;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  color: var(--pdx-color-muted);
-}
-.shell-nav-item:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
-.shell-nav-item:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: -2px; }
 /* Collapsed (mini-rail): the component sets .pdx-app-navbar-collapsed on the navbar →
    hide the text labels (font-size:0 collapses the text node; the sized pdx-icon stays) and
    centre the icons so the rail reads as an icon-only nav. */
-.shell-nav.pdx-app-navbar-collapsed .shell-nav-item { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0; }
-.shell-nav-item[aria-current="page"] {
-  background: var(--pdx-color-inset);
-  color: var(--pdx-color-primary);
-  font-weight: var(--pdx-weight-medium);
-}
-.shell-main { padding: var(--pdx-space-lg); }
 </style>

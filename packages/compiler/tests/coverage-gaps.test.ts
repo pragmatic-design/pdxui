@@ -7,6 +7,9 @@ import { compile } from '../src/plugin';
 // CSS SCOPING EDGE CASES
 // ═══════════════════════════════════════════════════════════════
 
+// The ancestor form these read is baseline-2024's (#152); baseline-2026's donut is scope-donut.test.ts.
+const ANCESTOR = { target: 'baseline-2024' } as const;
+
 describe('CSS scoping edge cases', () => {
     it('scopes ::before and ::after pseudo-elements', () => {
         const source = `
@@ -15,7 +18,7 @@ describe('CSS scoping edge cases', () => {
 .icon::before { content: '→'; }
 .icon::after { content: '←'; }
 </style>`;
-        const { code } = compile(source, 'pseudo.pdx');
+        const { code } = compile(source, 'pseudo.pdx', [], undefined, ANCESTOR);
         // Scope should be BEFORE pseudo-element
         expect(code).toMatch(/\[data-pdx-\w+\]\s*\.icon::before/);
         expect(code).toMatch(/\[data-pdx-\w+\]\s*\.icon::after/);
@@ -29,7 +32,7 @@ button:hover { color: red; }
 button:focus-visible { outline: 2px solid blue; }
 button:active { transform: scale(0.98); }
 </style>`;
-        const { code } = compile(source, 'states.pdx');
+        const { code } = compile(source, 'states.pdx', [], undefined, ANCESTOR);
         expect(code).toMatch(/\[data-pdx-\w+\]\s*button:hover/);
         expect(code).toMatch(/\[data-pdx-\w+\]\s*button:focus-visible/);
         expect(code).toMatch(/\[data-pdx-\w+\]\s*button:active/);
@@ -41,7 +44,7 @@ button:active { transform: scale(0.98); }
 <style scoped>
 [data-role="admin"] { font-weight: bold; }
 </style>`;
-        const { code } = compile(source, 'attr-sel.pdx');
+        const { code } = compile(source, 'attr-sel.pdx', [], undefined, ANCESTOR);
         // Attribute selector gets scope prepended (quotes escaped in JS string)
         expect(code).toMatch(/\[data-pdx-\w+\].*\[data-role/);
     });
@@ -52,7 +55,7 @@ button:active { transform: scale(0.98); }
 <style scoped>
 p:not(:first-child) { margin-top: 1rem; }
 </style>`;
-        const { code } = compile(source, 'not-pseudo.pdx');
+        const { code } = compile(source, 'not-pseudo.pdx', [], undefined, ANCESTOR);
         expect(code).toMatch(/\[data-pdx-\w+\]\s*p:not\(:first-child\)/);
     });
 
@@ -62,7 +65,7 @@ p:not(:first-child) { margin-top: 1rem; }
 <style scoped>
 :is(h1, h2, h3) { color: navy; }
 </style>`;
-        const { code } = compile(source, 'is-pseudo.pdx');
+        const { code } = compile(source, 'is-pseudo.pdx', [], undefined, ANCESTOR);
         // The CSS scoper applies scope to each selector in :is() list
         expect(code).toContain(':is(h1');
         expect(code).toContain('color: navy');
@@ -74,7 +77,7 @@ p:not(:first-child) { margin-top: 1rem; }
 <style scoped>
 .card { color: var(--pdx-color-text); background: var(--my-custom); }
 </style>`;
-        const { code } = compile(source, 'vars.pdx');
+        const { code } = compile(source, 'vars.pdx', [], undefined, ANCESTOR);
         expect(code).toContain('var(--pdx-color-text)');
         expect(code).toContain('var(--my-custom)');
     });
@@ -86,7 +89,7 @@ p:not(:first-child) { margin-top: 1rem; }
 @keyframes rotate { from { transform: rotate(0) } to { transform: rotate(360deg) } }
 .spin { animation: rotate 1s linear infinite; }
 </style>`;
-        const { code } = compile(source, 'keyframes.pdx');
+        const { code } = compile(source, 'keyframes.pdx', [], undefined, ANCESTOR);
         // @keyframes should NOT have scope selector
         expect(code).toMatch(/@keyframes rotate/);
         expect(code).not.toMatch(/\[data-pdx.*@keyframes/);

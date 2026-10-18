@@ -28,7 +28,7 @@ semver.
   with a function on the right, `pdx({ inlineBindings })` in `vite.config`, and an unknown `@defer`
   trigger. A second run changes nothing; `--dry` writes nothing. (#121)
 - `pdx({ target: 'baseline-2026' | 'baseline-2024' })` names the browsers the compiled output may rely
-  on; `'baseline-2026'` by default. No output depends on it yet. `'baseline-2024'` is a support target
+  on; `'baseline-2026'` by default. The scoped style is the first output that depends on it (#152). `'baseline-2024'` is a support target
   for apps whose users run older browsers: maintained frozen — fixed, not developed — and retired when
   `@scope` is Baseline widely available, in September 2028. (#121)
 - A navigation in progress is visible: `navigation.pending()` from `@pdxui/router` is true from the
@@ -109,6 +109,18 @@ semver.
 
 ### Changed
 
+- A `<style scoped>` stops at nested components. Under the default `target: 'baseline-2026'` a scoped
+  block compiles to a CSS `@scope` that starts at the host and ends where a child component begins,
+  so a rule styles the component's own elements and no longer the inside of a child.
+  - Content a component writes inside a child's tag stays in its scope: the compiler marks it
+    `data-pdx-<hash>-in`. Core sets `data-pdx-root` on every component host.
+  - `:scope` in a scoped block is the host, on both targets.
+  - A scoped rule weighs what it weighed before against global CSS.
+  - `target: 'baseline-2024'` keeps the ancestor form, which still reaches into children.
+  - A child is styled through its `[data-part]`, `:state()` and tokens. `pdx migrate` lists each
+    scoped selector that reached inside one (`scoped-reaches-child`).
+
+  (#152)
 - Routes are types. The build and the dev server write `.pdx/routes.d.ts` from the app's `@page`
   patterns, and the editor and `pdx check --types` read it.
   - `navigate('/users/:id', { id: 42 })` checks; an unknown path, a wrong param, or a concrete URL in `navigate()` is a type error.

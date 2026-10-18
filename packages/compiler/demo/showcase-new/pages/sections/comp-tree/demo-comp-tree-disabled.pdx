@@ -12,3 +12,8 @@
 <script setup>
 import { docs } from './state.pdx';
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-xl); }
+</style>

@@ -108,8 +108,8 @@ is Baseline widely available (September 2028); #121 carries the details (decisio
 
 | Output | `baseline-2026` | `baseline-2024` |
 |---|---|---|
-| Scoped style | `@scope (…) to (…)` donut (#152) | ancestor selector `[data-pdx-H] …` (alpha) |
-| `:scope` in a scoped block (the host) | native, inside `@scope` | rewritten to the host, `[data-pdx-H]` (proposed — decisions.md 20) |
+| Scoped style | `@scope (…) to (…)` donut, slotted content marked `data-pdx-H-in` (#152 — landed) | ancestor selector `[data-pdx-H] …` (alpha) |
+| `:scope` in a scoped block (the host) | `:where(:scope)[data-pdx-H]`, inside `@scope` (#152 — landed) | rewritten to the host, `[data-pdx-H]` (#152 — landed; decisions.md 20) |
 | Theme behaviours | custom properties read with style queries (#156) | attributes on `<html>` synced by `setTheme` (alpha) |
 | Custom states | `:state(name)` (#132) | `:state(name)` plus a mirrored `data-state-name` attribute |
 | Variants | `:scope[variant="x"]` inside the `@scope` block (#153) | `[data-pdx-H][variant="x"]` |
@@ -120,8 +120,8 @@ it without per-element attributes.
 
 ### Since
 
-beta (#121 — **landed**: the option and `ctx.target`; the outputs in the table above land with #152,
-#132, #153 and #156)
+beta (#121 — **landed**: the option and `ctx.target`; the scoped-style outputs with #152 — landed;
+the others in the table above land with #132, #153 and #156)
 
 ## The render model
 

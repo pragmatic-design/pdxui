@@ -68,4 +68,8 @@ let slotLog = $signal('Click a slot item...');
 .slot-user-idx { color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); min-width: 20px; }
 .slot-user-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .slot-user-info span { font-size: var(--pdx-text-xs); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { max-width: 600px; }
+  .event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 600px; }
 </style>

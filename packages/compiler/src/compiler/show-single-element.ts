@@ -32,6 +32,8 @@ export function withoutEdgeWhitespace(body: TemplateNode[]): TemplateNode[] {
             content: first.content.slice(cut),
             ...(loc ? { loc } : {}),
             ...(first.shifts ? { shifts: first.shifts.filter(s => s >= cut).map(s => s - cut) } : {}),
+            // The slotted marks (#152) sit in tags, never in the leading whitespace cut here.
+            ...(first.insertions ? { insertions: first.insertions.map(ins => ({ ...ins, at: ins.at - cut })) } : {}),
         };
     }
     const lastIndex = out.length - 1;

@@ -64,6 +64,11 @@ export interface HtmlNode {
      */
     shifts?: number[];
     /**
+     * Text the compiler wrote into `content` that the source does not have — the slotted mark of
+     * #152 — as an index into `content` and a length: past it, the source is that much earlier.
+     */
+    insertions?: { at: number; length: number }[];
+    /**
      * An `@raw { … }` block: text as written, which no pass reads for bindings, interpolations or
      * directives. Each render path only escapes it for where it puts it.
      */
