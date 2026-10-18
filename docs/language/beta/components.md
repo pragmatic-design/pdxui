@@ -312,8 +312,7 @@ let open = $signal(false);
 **Landed** (#132), except the `baseline-2024` mirror: the rune, `PDX_STATE_NOT_BOOLEAN`, the
 descriptor's `states` with `ctx.state`, and the manifest's `cssStates`. The `data-state-<name>` mirror
 and its selector in the design build come with the `target` option (#121), which does not exist yet.
-In a `<style scoped>`, `:scope:state(…)` needs the host to be reachable, which is #152; until then a
-state is styled from a theme or the page. Certify's state rules do not read `:state()` yet: that
+In a `<style scoped>`, `:scope:state(…)` reaches the host since #152 (landed). Certify's state rules do not read `:state()` yet: that
 arrives with the first library component that declares a state (#286).
 
 ### Since

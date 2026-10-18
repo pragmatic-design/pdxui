@@ -47,4 +47,9 @@ onDestroy(function() {
 <style scoped>
   .cursor-area { width: 100%; height: 180px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; cursor: crosshair; position: relative; display: flex; align-items: center; justify-content: center; }
   .hint { color: var(--pdx-color-muted); font-size: 0.85rem; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.875rem; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; }
 </style>

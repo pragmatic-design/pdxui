@@ -40,9 +40,4 @@
 
 <style scoped>
 .page { }
-.demo-container {
-  max-width: 500px;
-  border: 1px solid var(--pdx-color-border);
-  border-radius: var(--pdx-radius-md);
-}
 </style>

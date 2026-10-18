@@ -74,11 +74,4 @@
 
 <style scoped>
 .page { }
-.demo-container { max-width: 500px; padding: var(--pdx-space-md); }
-.demo-container-wide { max-width: 700px; }
-.tl-slot-card { padding: 12px 16px; background: var(--pdx-color-surface); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); }
-.tl-slot-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
-.tl-slot-badge-success { background: var(--pdx-color-success); color: var(--pdx-color-success-text); }
-.tl-slot-badge-warning { background: var(--pdx-color-warning); color: var(--pdx-gray-900); }
-.tl-slot-badge-info { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
 </style>

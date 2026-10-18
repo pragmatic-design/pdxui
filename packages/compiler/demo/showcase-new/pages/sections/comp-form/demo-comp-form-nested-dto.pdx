@@ -103,3 +103,28 @@ function nestedValidText() { return 'Valid: ' + (nestedForm.valid() ? 'Yes' : 'N
 function nestedValidClass() { return 'form-status-badge' + (nestedForm.valid() ? ' success' : ' error'); }
 function nestedValuesJson() { const v = nestedForm.dirty(); return JSON.stringify(nestedForm.getValues(), null, 2); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .form-values {
+    margin: var(--pdx-space-md) 0 0;
+    padding: var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    overflow-x: auto;
+    max-height: 200px;
+  }
+  .form-values pre {
+    margin: var(--pdx-space-xs) 0 0;
+    font-family: var(--pdx-font-mono);
+    white-space: pre-wrap;
+  }
+</style>

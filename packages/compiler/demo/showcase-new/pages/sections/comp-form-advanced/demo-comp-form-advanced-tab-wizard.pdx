@@ -113,4 +113,41 @@ function nextBtnText() { return wizardStep < 2 ? 'Next →' : 'Submit ✓'; }
     border-top: 1px solid var(--pdx-color-border);
   }
   .confirm-summary { padding: var(--pdx-space-md); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .form-values {
+    margin: var(--pdx-space-xs) 0 0;
+    padding: var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    overflow-x: auto;
+    max-height: 120px;
+  }
+  .wizard-tab {
+    flex: 1;
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    border: none;
+    background: none;
+    font-size: var(--pdx-text-sm);
+    font-weight: var(--pdx-weight-medium);
+    color: var(--pdx-color-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .wizard-tab:hover { color: var(--pdx-color-text); }
+  .wizard-tab.active {
+    color: var(--pdx-color-primary);
+    border-bottom-color: var(--pdx-color-primary);
+    font-weight: var(--pdx-weight-semibold);
+  }
 </style>

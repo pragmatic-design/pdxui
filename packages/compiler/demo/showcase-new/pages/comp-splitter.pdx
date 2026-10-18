@@ -57,21 +57,4 @@
 
 <style scoped>
 .page { }
-.demo-split {
-  height: 280px;
-  border: 1px solid var(--pdx-color-border);
-  border-radius: var(--pdx-radius-md);
-  overflow: hidden;
-}
-.demo-split-tall { height: 400px; }
-.pane-content {
-  padding: var(--pdx-space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--pdx-space-xs);
-  font-size: var(--pdx-text-sm);
-  height: 100%;
-  box-sizing: border-box;
-}
-.pane-left { background: var(--pdx-color-inset); }
 </style>

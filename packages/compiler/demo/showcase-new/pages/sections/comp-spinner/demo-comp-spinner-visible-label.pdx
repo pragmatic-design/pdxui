@@ -14,3 +14,9 @@
     </details>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-row { gap: var(--pdx-space-lg); }
+  .comp-card p { margin: 0; }
+</style>

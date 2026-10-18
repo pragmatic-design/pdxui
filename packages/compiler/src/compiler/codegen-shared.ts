@@ -15,6 +15,7 @@ import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
 import { routeParams } from '../text-scan';
 import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './tag-prefix';
+import type { BrowserTarget } from './compile-context';
 
 export { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX };
 
@@ -247,6 +248,8 @@ export function assembleModule(
     modelsCode = '',
     /** The app's tag prefix (#136), for the layout tag `@layout` names. */
     tagPrefix: string = DEFAULT_TAG_PREFIX,
+    /** The browser target (#121): how `<style scoped>` compiles (#152). */
+    target: BrowserTarget = 'baseline-2026',
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -318,7 +321,7 @@ export function assembleModule(
     if (userImports.length > 0) code += userImports.join('\n') + '\n';
     for (const path of layoutImports) code += `import ${jsQuote(path)};\n`;
     code += '\n';
-    code += generateStyles(descriptor, filename, production);
+    code += generateStyles(descriptor, filename, production, target);
     code += hoistedLoader;
     if (hasModuleHoists) code += MODULE_HOISTS_SLOT + '\n';
     code += `component(${jsQuote(tag)}, {\n`;

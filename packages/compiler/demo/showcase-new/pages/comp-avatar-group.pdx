@@ -61,9 +61,6 @@
 
 <style scoped>
 .page { }
-.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); }
-.demo-stack { border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); padding: var(--pdx-space-lg); }
-.size-label { min-width: 24px; }
 .options-table { overflow-x: auto; }
 .options-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
 .options-table th, .options-table td { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }

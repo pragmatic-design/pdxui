@@ -44,9 +44,4 @@ onMount(() => {
 <style scoped>
 .page { max-width: 960px; }
 .intro { margin-bottom: var(--pdx-space-xl); }
-section { margin-bottom: var(--pdx-space-3xl); }
-.section-heading { margin-bottom: var(--pdx-space-sm); }
-.ct-verdict { font-size: 0.75rem; font-weight: 600; }
-.ct-verdict.ok { color: var(--pdx-color-success); }
-.ct-verdict.bad { color: var(--pdx-color-danger); }
 </style>

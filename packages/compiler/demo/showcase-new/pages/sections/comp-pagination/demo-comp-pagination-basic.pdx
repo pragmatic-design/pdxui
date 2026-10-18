@@ -24,4 +24,7 @@ function onPageChange(e) {
 
 <style scoped>
 .event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .page { }
 </style>

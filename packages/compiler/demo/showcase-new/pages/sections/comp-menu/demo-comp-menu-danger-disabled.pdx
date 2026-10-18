@@ -35,3 +35,22 @@ const dangerItems = [
   { key: 'delete', label: 'Delete', danger: true },
 ];
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .section-heading { margin-bottom: var(--pdx-space-xs); }
+  .demo-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pdx-space-md);
+  flex-wrap: wrap;
+  padding: var(--pdx-space-md) 0;
+}
+  .menu-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pdx-space-xs);
+}
+</style>

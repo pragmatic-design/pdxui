@@ -70,14 +70,4 @@
 
 <style scoped>
 .page { }
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--pdx-space-lg);
-  margin-top: var(--pdx-space-md);
-  max-width: 640px;
-}
-@media (max-width: 480px) {
-  .dashboard-grid { grid-template-columns: 1fr; }
-}
 </style>

@@ -34,3 +34,9 @@ const productItems = [
   { label: 'Description', value: 'Split mechanical keyboard with adjustable tenting, Cherry MX Brown switches, and programmable macro keys.', span: 2 },
 ];
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { max-width: 500px; }
+  .demo-wide { max-width: 700px; }
+</style>

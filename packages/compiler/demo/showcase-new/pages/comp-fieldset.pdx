@@ -50,9 +50,4 @@
 
 <style scoped>
   .page { }
-
-  .demo-block {
-    margin-top: var(--pdx-space-lg);
-    padding: var(--pdx-space-md) 0;
-  }
 </style>

@@ -16,3 +16,8 @@ import { useSortableTasks } from './state.pdx';
 const sortableTasks = useSortableTasks();
 const tasks = $derived(sortableTasks.tasks());
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .narrow { max-width: 420px; }
+</style>

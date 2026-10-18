@@ -14,14 +14,19 @@ export function templateMark(ctx: CompileContext, offset: number | undefined): s
 /**
  * For an html node: the .pdx offset of the character at index `k` of its content, or null when the
  * node has no position (one the compiler made itself) or the compile builds no map. An `@@` escape
- * left one `@` for two characters of source, so past it the source is one character further on.
+ * left one `@` for two characters of source, so past it the source is one character further on; text
+ * the compiler inserted moves it the other way.
  */
 export function htmlOriginOf(ctx: CompileContext, node: HtmlNode): ((k: number) => number | null) | null {
     const base = ctx.templateOrigin;
     const start = node.loc?.offset;
     if (base == null || start == null) return null;
     const shifts = node.shifts ?? [];
-    return (k: number) => base + start + k + shifts.filter((s) => s <= k).length;
+    const insertions = node.insertions ?? [];
+    // Text the compiler inserted (#152) is not in the source: past it the source is that much earlier,
+    // and inside it is where it was inserted.
+    const inserted = (k: number) => insertions.reduce((n, ins) => n + (k >= ins.at ? Math.min(ins.length, k - ins.at) : 0), 0);
+    return (k: number) => base + start + k + shifts.filter((s) => s <= k).length - inserted(k);
 }
 
 /**

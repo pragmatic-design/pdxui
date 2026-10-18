@@ -42,7 +42,4 @@ let _pdxKeep = $signal(0);
 
 <style scoped>
 .page { }
-.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
-.spark-grid { display: flex; flex-wrap: wrap; gap: var(--pdx-space-xl); }
-.spark-item { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
 </style>

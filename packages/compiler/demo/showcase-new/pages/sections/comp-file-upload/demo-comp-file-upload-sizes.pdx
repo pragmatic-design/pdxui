@@ -26,4 +26,7 @@
     flex-direction: column;
     gap: var(--pdx-space-xs);
   }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .opt-row-2 span { color: var(--pdx-color-muted); }
 </style>

@@ -10,3 +10,25 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .btn-row {
+    display: flex;
+    gap: var(--pdx-space-sm);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--pdx-space-md);
+  }
+  .opt-row span { color: var(--pdx-color-muted); }
+  code {
+    font-family: var(--pdx-font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    color: var(--pdx-color-text);
+  }
+</style>

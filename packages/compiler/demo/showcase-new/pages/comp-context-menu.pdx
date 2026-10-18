@@ -62,17 +62,4 @@
 
 <style scoped>
 .page { }
-.ctx-target {
-  width: 100%;
-  height: 200px;
-  border: 2px dashed var(--pdx-color-border);
-  border-radius: var(--pdx-radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--pdx-color-inset);
-  user-select: none;
-  cursor: context-menu;
-}
-.ctx-target-sm { height: 120px; }
 </style>

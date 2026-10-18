@@ -42,4 +42,7 @@ const emptyItems = [];
 <style scoped>
 .custom-empty { display: flex; flex-direction: column; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-xl); color: var(--pdx-color-muted); }
 .custom-empty p { margin: 0; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { max-width: 600px; }
 </style>

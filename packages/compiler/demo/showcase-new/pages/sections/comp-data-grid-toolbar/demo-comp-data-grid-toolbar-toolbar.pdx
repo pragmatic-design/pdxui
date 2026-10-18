@@ -32,3 +32,19 @@ const toolbarColumns = [
 
 const toolbarDS = createDataSource({ data: typedData, pageSize: 0 });
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  .demo-container {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  overflow: hidden;
+}
+  .source-block { margin-top: var(--pdx-space-sm); }
+  .source-block summary { cursor: pointer; font-size: var(--pdx-text-xs); color: var(--pdx-color-muted); }
+  .source-block pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); overflow-x: auto; font-size: var(--pdx-text-xs); }
+</style>

@@ -3,6 +3,8 @@
 
 import type { SFCDescriptor, SFCStyle } from '../parser/sfc';
 import { jsQuote, jsString } from './js-literal';
+import type { BrowserTarget } from './compile-context';
+import { donutScope } from './scope-donut';
 
 // ─── Public ────────────────────────────────────────────────────────
 
@@ -19,7 +21,7 @@ export function styleBlocks(descriptor: SFCDescriptor): SFCStyle[] {
  * page-level CSS that component owns. Each gets its own element id, or the second would overwrite
  * the first on every HMR pass.
  */
-export function generateStyles(descriptor: SFCDescriptor, filename: string, production = false): string {
+export function generateStyles(descriptor: SFCDescriptor, filename: string, production = false, target: BrowserTarget = 'baseline-2026'): string {
     const blocks = styleBlocks(descriptor);
     if (blocks.length === 0) return '';
     // A shadow component's CSS does not belong in the head — see generateShadowStyles.
@@ -51,7 +53,7 @@ export function generateStyles(descriptor: SFCDescriptor, filename: string, prod
         // did and the golden snapshots do not move.
         const id = index === 0 ? hash(filename) : `${hash(filename)}-${index}`;
 
-        let css = blockCss(block.scoped, content, filename);
+        let css = blockCss(block.scoped, content, filename, target);
         if (production) css = minifyCSS(css);
         return styleInjection(css, id);
     }).join('');
@@ -89,12 +91,12 @@ export function parseStyleModuleId(id: string): { file: string; index: number } 
 }
 
 /** The CSS one style block contributes — scoped and, in production, minified. */
-export function styleCssFor(descriptor: SFCDescriptor, filename: string, index: number, production: boolean): string {
+export function styleCssFor(descriptor: SFCDescriptor, filename: string, index: number, production: boolean, target: BrowserTarget = 'baseline-2026'): string {
     const block = styleBlocks(descriptor)[index];
     if (!block) return '';
     // Line endings first: see the note in generateStyles.
     const content = block.content.replace(/\r\n/g, '\n');
-    const css = blockCss(block.scoped, content, filename);
+    const css = blockCss(block.scoped, content, filename, target);
     return production ? minifyCSS(css) : css;
 }
 
@@ -103,9 +105,12 @@ export function styleCssFor(descriptor: SFCDescriptor, filename: string, index: 
  * A plain block kept them as written, which no browser reads, while the setup still set the bound
  * custom property (#205).
  */
-function blockCss(scoped: boolean | undefined, content: string, filename: string): string {
+function blockCss(scoped: boolean | undefined, content: string, filename: string, target: BrowserTarget): string {
     const scopeId = `data-pdx-${hash(filename)}`;
-    return scoped ? scopeStyles(content, scopeId) : transformCssFunctions(content, scopeId).trim();
+    if (!scoped) return transformCssFunctions(content, scopeId).trim();
+    // baseline-2026 stops at nested components (./scope-donut); baseline-2024 keeps the ancestor
+    // scope, which reaches into them (#152).
+    return target === 'baseline-2024' ? scopeStyles(content, scopeId) : donutScope(transformCssFunctions(content, scopeId), scopeId);
 }
 
 /**
@@ -403,6 +408,9 @@ function splitSelectorList(selector: string): string[] {
  */
 function scopeSelector(sel: string, scopeId: string): string {
     if (!sel) return sel;
+    // `:scope` is the host on both targets (#152): here the host attribute, the selector's own anchor.
+    // Match: `:scope` as a pseudo-class, not the start of a longer name. Groups: none
+    if (/:scope(?![\w-])/.test(sel)) return sel.replace(/:scope(?![\w-])/g, `[${scopeId}]`);
     return `[${scopeId}] ${sel}`;
 }
 

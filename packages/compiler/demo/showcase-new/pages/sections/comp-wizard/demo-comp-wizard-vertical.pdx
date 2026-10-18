@@ -47,4 +47,12 @@
   border-radius: var(--pdx-radius-md);
   margin-top: var(--pdx-space-md);
 }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-sm);
+  max-width: 360px;
+}
 </style>

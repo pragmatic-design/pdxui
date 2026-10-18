@@ -20,18 +20,21 @@ const injected = (code: string): string => {
     return m ? JSON.parse(m[1]) as string : '';
 };
 
+// The ancestor form these read is baseline-2024's (#152); baseline-2026's donut is scope-donut.test.ts.
+const ANCESTOR = { target: 'baseline-2024' } as const;
+
 describe('a selector list inside a functional pseudo-class', () => {
     const H = `[data-pdx-${hash('sel.pdx')}]`;
     for (const fn of ['is', 'where', 'not', 'has']) {
         it(`:${fn}(.a, .b) is one selector, scoped once`, () => {
-            const css = injected(compile(sfc(`<style scoped>:${fn}(.a, .b) > span { color: red; }</style>`), 'sel.pdx').code);
+            const css = injected(compile(sfc(`<style scoped>:${fn}(.a, .b) > span { color: red; }</style>`), 'sel.pdx', [], undefined, ANCESTOR).code);
             expect(css).toContain(`${H} :${fn}(.a, .b) > span`);
             expect(css.split(H)).toHaveLength(2);
         });
     }
 
     it('control — a top-level list is still split, each selector scoped', () => {
-        const css = injected(compile(sfc('<style scoped>.x, .y { color: red; }</style>'), 'sel.pdx').code);
+        const css = injected(compile(sfc('<style scoped>.x, .y { color: red; }</style>'), 'sel.pdx', [], undefined, ANCESTOR).code);
         expect(css).toContain(`${H} .x, ${H} .y`);
     });
 });
@@ -74,6 +77,8 @@ describe('<style src> in a production build', () => {
         const load = plugin.load as unknown as (this: { warn(m: string): void }, id: string) => string | null;
         const css = load.call({ warn: () => {} }, '\0' + styleModuleId(file, 0));
         expect(css).toContain('rebeccapurple');
-        expect(css).toContain(`[data-pdx-${hash(file)}] .card`);
+        // The default target's donut scope (#152), rooted at the file's own scope attribute, minified.
+        expect(css).toContain(`@scope ([data-pdx-${hash(file)}],[data-pdx-${hash(file)}-in])`);
+        expect(css).toContain('.card');
     });
 });

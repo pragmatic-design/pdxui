@@ -26,4 +26,11 @@
 .scroll-both table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
 .scroll-both th, .scroll-both td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); white-space: nowrap; }
 .scroll-both th { background: var(--pdx-color-inset); font-weight: var(--pdx-weight-semibold); position: sticky; top: 0; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container {
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+}
 </style>

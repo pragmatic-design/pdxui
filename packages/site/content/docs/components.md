@@ -131,26 +131,31 @@ Each block becomes its own `<style>` element, so one does not overwrite the othe
 > the browser fetches in parallel, not a string its JavaScript chunk has to parse first. You write
 > the same block either way; only where it travels changes.
 
-With `scoped`, the compiler puts an attribute on the host element and rewrites every selector to sit
-under it:
+With `scoped`, the compiler puts an attribute on the host element and wraps the block in a CSS
+`@scope` that starts at the host and **stops at the child components you render**:
 
 ```css
 /* you write */          .title { font-weight: 600; }
-/* the browser gets */   [data-pdx-a1b2c3] .title { font-weight: 600; }
+/* the browser gets */   @scope ([data-pdx-a1b2c3], [data-pdx-a1b2c3-in]) to ([data-pdx-root] > *) {
+                           :scope .title, :where(:not([data-pdx-a1b2c3])):scope:is(.title) { font-weight: 600; }
+                         }
 ```
 
-Read that selector literally, because it decides everything else. The scope is an **ancestor**: the rule
-applies to anything inside this component's subtree, not to the elements this file happened to write.
-Four consequences follow, and all four are what people get wrong:
+Every component host carries `data-pdx-root`, so the scope ends where a child begins. What follows:
 
-- A rule reaches **into child components** you render. `.title` here styles the `.title` inside a
-  `<pdx-badge>` you placed. `scoped` does not mean "only my own elements".
-- A rule reaches **content the parent slotted in**, for the same reason: projected content is rendered
-  inside your subtree.
-- It also reaches content that was never in your template — `@raw` blocks, and HTML you set with
-  `el.innerHTML` — because those end up in the subtree too.
+- A rule styles **your own elements** — the ones your template writes, and the ones your script
+  creates inside them. `.title` here does not reach the `.title` inside a `<pdx-badge>` you placed:
+  style a child through its parts (`[data-part]`), its states (`:state()`) and its tokens.
+- Content **you write inside a child's tag** stays yours: the compiler marks it (`data-pdx-…-in`), so
+  your rules still reach it after the child projects it into its own subtree.
+- The host itself is `:scope`: `:scope { display: block; }`.
+- A rule weighs what `[data-pdx-a1b2c3] .title` weighed, so it beats a global `.title` as before.
 - **`@keyframes` names are not scoped**, and cannot be: a keyframe name is not a selector. Two components
   that both define `@keyframes fade` will collide, so prefix them.
+
+`pdx({ target: 'baseline-2024' })`, for browsers without `@scope`, keeps the older ancestor form,
+`[data-pdx-a1b2c3] .title`, which also reaches into child components. `pdx migrate` flags a scoped
+selector that relied on reaching inside a child.
 
 `scoped` is also not protection *from* the outside: the page's CSS, and an enclosing component's scoped
 CSS, both reach your elements. If you need real isolation, that is what `<template shadow>` is for.

@@ -73,10 +73,11 @@ describe('integration — correct imports', () => {
 // ─── Scoped CSS ────────────────────────────────────────────────────
 
 describe('integration — scoped CSS', () => {
-    it('generates descendant selector [data-pdx-HASH] .class', () => {
+    it('generates the donut scope around its rules (#152)', () => {
         const { code } = compileDemo('counter.pdx');
-        expect(code).toMatch(/\[data-pdx-\w+\] \.counter-card/);
-        expect(code).toMatch(/\[data-pdx-\w+\] \.value/);
+        // `>` reaches the module escaped, `>`, inside the injected string.
+        expect(code).toMatch(/@scope \(\[data-pdx-\w+\], \[data-pdx-\w+-in\]\) to \(\[data-pdx-root\] (?:>|\\u003E) \*\) \{[^}]*\.counter-card/);
+        expect(code).toMatch(/:scope \.value, :where\(:not\(\[data-pdx-\w+\]\)\):scope:is\(\.value\)/);
     });
 
     it('generates setAttribute in setup for scope', () => {

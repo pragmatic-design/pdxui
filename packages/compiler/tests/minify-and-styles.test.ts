@@ -142,7 +142,7 @@ describe('CSS scoping', () => {
 <style scoped>
 @keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
 .loader { animation: spin 1s; }
-</style>`, 'test.pdx');
+</style>`, 'test.pdx', undefined, undefined, { target: 'baseline-2024' }); // the ancestor form (#152)
         expect(code).toContain('@keyframes spin');
         // @keyframes body should NOT have scope selectors (from/to aren't selectors)
         expect(code).toContain('from');
@@ -186,7 +186,8 @@ describe('CSS scoping', () => {
         it('the stylesheet the bundler asks for is scoped and minified', () => {
             const css = styleCssFor(parseSFC(SOURCE), 'test.pdx', 0, true);
             expect(css, 'the comment survived').not.toContain('/* comment */');
-            expect(css, 'the block is not scoped').toContain(`[data-pdx-${hash('test.pdx')}] .btn`);
+            // The default target's donut scope (#152), minified.
+            expect(css, 'the block is not scoped').toContain(`@scope ([data-pdx-${hash('test.pdx')}],[data-pdx-${hash('test.pdx')}-in]) to ([data-pdx-root]>*){:scope .btn`);
             expect(css).toContain('color:red');
         });
 

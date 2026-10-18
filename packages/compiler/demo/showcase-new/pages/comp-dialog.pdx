@@ -79,8 +79,5 @@
 
 <style scoped>
   .page { }
-  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
-  .form-fields { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
-  .form-fields label { margin-top: var(--pdx-space-xs); }
   .source-code { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; }
 </style>

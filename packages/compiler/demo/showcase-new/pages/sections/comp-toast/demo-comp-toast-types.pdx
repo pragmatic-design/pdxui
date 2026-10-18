@@ -19,3 +19,8 @@ function showError() { toast.error('Failed to connect to server.'); }
 function showWarning() { toast.warning('Your session expires in 5 minutes.'); }
 function showInfo() { toast.info('A new version is available.'); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
+</style>

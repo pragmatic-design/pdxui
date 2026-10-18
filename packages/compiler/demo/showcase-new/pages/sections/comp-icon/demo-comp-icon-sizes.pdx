@@ -36,3 +36,20 @@
     </details>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .size-row {
+    display: flex;
+    gap: var(--pdx-space-xl);
+    align-items: flex-end;
+    margin-top: var(--pdx-space-md);
+    flex-wrap: wrap;
+  }
+  .size-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+  }
+</style>

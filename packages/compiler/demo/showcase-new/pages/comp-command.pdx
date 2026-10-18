@@ -58,6 +58,4 @@
 
 <style scoped>
 .page { }
-.demo-container { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }
-.run-note { white-space: nowrap; }
 </style>

@@ -78,4 +78,22 @@ onMount(renderLineItems);
   .field-array-rows { display: flex; flex-direction: column; gap: var(--pdx-space-xs); margin-bottom: var(--pdx-space-md); }
   .field-array-footer { display: flex; gap: var(--pdx-space-sm); align-items: center; }
   .fa-total { margin-left: auto; font-size: var(--pdx-text-sm); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+  .form-values {
+    margin: var(--pdx-space-xs) 0 0;
+    padding: var(--pdx-space-sm);
+    font-size: var(--pdx-text-xs);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-sm);
+    overflow-x: auto;
+    max-height: 120px;
+  }
 </style>

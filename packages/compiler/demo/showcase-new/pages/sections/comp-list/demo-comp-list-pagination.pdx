@@ -74,3 +74,9 @@ function renderPagedItem(userItem) {
   return '<span style="min-width:28px;color:var(--pdx-color-muted);font-size:0.75rem">#' + userItem.id + '</span><strong>' + userItem.name + '</strong><span style="color:var(--pdx-color-muted);font-size:0.8rem">' + userItem.email + '</span><span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;border-radius:9999px;background:var(--pdx-color-inset)">' + userItem.dept + '</span>';
 }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .page { }
+  .demo-container { max-width: 600px; }
+</style>

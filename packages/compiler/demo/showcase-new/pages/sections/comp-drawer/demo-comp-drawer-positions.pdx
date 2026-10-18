@@ -33,3 +33,8 @@ let drawerPos = $signal('right');
 function openDrawer(pos) { drawerPos = pos; drawerOpen = true; }
 function closeDrawer() { drawerOpen = false; }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
+</style>

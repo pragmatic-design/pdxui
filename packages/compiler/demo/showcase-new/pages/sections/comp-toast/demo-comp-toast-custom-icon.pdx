@@ -15,3 +15,8 @@ import { toast } from '@pdxui/ui/toast';
 function showCustomIcon() { toast.add({ message: 'Added to favorites!', type: 'success', icon: 'star' }); }
 function showNoIcon() { toast.add({ message: 'A toast without any icon.', type: 'info', icon: null }); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .btn-row { display: flex; gap: var(--pdx-space-sm); flex-wrap: wrap; margin-top: var(--pdx-space-md); }
+</style>

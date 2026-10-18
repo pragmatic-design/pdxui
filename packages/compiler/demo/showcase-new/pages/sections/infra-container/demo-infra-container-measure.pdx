@@ -35,4 +35,8 @@ function doMeasure() {
   .box-a { padding: 16px 32px; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); border-radius: 8px; font-weight: 600; }
   .box-b { padding: 16px 32px; background: var(--pdx-color-success); color: var(--pdx-color-success-text); border-radius: 8px; font-weight: 600; }
   .log { font-family: monospace; font-size: 0.75rem; background: var(--pdx-color-inset); padding: 8px; border-radius: 6px; white-space: pre-wrap; min-height: 48px; margin: 8px 0 0; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
 </style>

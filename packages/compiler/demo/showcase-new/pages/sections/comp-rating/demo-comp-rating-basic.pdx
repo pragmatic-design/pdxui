@@ -22,3 +22,8 @@ const ratingDemo = useRatingDemo();
 const rating1 = $derived(ratingDemo.rating1());
 function onRating1(e) { ratingDemo.onRating1(e); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-stack > div { display: flex; align-items: center; gap: var(--pdx-space-sm); }
+</style>

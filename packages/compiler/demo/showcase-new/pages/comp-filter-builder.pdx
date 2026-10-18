@@ -39,5 +39,4 @@
 
 <style scoped>
 .page { }
-.demo-container { display: flex; flex-direction: column; gap: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-bg); }
 </style>

@@ -46,12 +46,4 @@
 
 <style scoped>
   .page { }
-
-  .form-stack { display: flex; flex-direction: column; gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); }
-  .values-json {
-    margin-top: var(--pdx-space-md); padding: var(--pdx-space-md);
-    background: var(--pdx-color-surface-inset, var(--pdx-color-surface));
-    border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md);
-    font-size: 0.8rem; white-space: pre-wrap; overflow-wrap: anywhere;
-  }
 </style>

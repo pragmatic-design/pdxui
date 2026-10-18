@@ -67,4 +67,8 @@ const themes = ['neutral', ...Object.keys(THEME_INHERITED)].sort();
 .tc-sw { width: 22px; height: 22px; border-radius: var(--pdx-radius-sm); }
 .tc-btn { width: 100%; }
 .tc-input-wrap { width: 100%; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
 </style>

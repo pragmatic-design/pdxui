@@ -16,3 +16,22 @@ import { typedColumns } from './state.pdx';
 
 const emptyData = [];
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .page {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--pdx-space-xl) var(--pdx-space-md);
+}
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  .demo-container {
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  overflow: hidden;
+}
+</style>

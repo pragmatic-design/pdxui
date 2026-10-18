@@ -7,6 +7,7 @@ import { createCompileContext } from '../src/compiler/compile-context';
 import { parseTemplate } from '../src/parser/template';
 import { markup, builds } from './static-markup-of';
 
+// The ancestor form is baseline-2024's (#152); baseline-2026's donut scope is scope-donut.test.ts.
 describe('scoped styles fix', () => {
     it('scopes selectors as descendant: [scope] .btn:hover', () => {
         const { code } = compile(`
@@ -15,7 +16,7 @@ describe('scoped styles fix', () => {
   .btn:hover { color: red; }
   .link:focus { outline: 2px solid; }
   .item::before { content: "•"; }
-</style>`, 'test.pdx');
+</style>`, 'test.pdx', [], undefined, { target: 'baseline-2024' });
 
         // Descendant scoping: [data-pdx-HASH] .selector
         expect(code).toMatch(/\[data-pdx-\w+\] \.btn:hover/);
@@ -30,7 +31,7 @@ describe('scoped styles fix', () => {
   @media (min-width: 768px) {
     .card { padding: 2rem; }
   }
-</style>`, 'test.pdx');
+</style>`, 'test.pdx', [], undefined, { target: 'baseline-2024' });
 
         expect(code).toContain('@media (min-width: 768px)');
         expect(code).toMatch(/\[data-pdx-\w+\] \.card/);
@@ -56,7 +57,7 @@ describe('scoped styles fix', () => {
 <style scoped>
   /* This is a comment with } braces */
   .test { color: red; }
-</style>`, 'test.pdx');
+</style>`, 'test.pdx', [], undefined, { target: 'baseline-2024' });
 
         expect(code).not.toContain('comment');
         expect(code).toMatch(/\[data-pdx-\w+\] \.test/);

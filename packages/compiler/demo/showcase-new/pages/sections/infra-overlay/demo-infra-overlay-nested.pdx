@@ -13,3 +13,10 @@ import { useOverlayDemo } from './state.pdx';
 const overlayDemo = useOverlayDemo();
 function openNested() { overlayDemo.openNested(); }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
+</style>

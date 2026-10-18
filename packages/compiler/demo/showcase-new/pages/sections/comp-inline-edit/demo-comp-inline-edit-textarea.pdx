@@ -8,3 +8,13 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-label {
+    min-width: 120px;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+    text-align: right;
+  }
+</style>

@@ -27,3 +27,16 @@ function simulateFetch() {
   }, 2000);
 }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-actions { margin-bottom: var(--pdx-space-sm); }
+  .demo-wrap { max-width: 500px; }
+  .demo-panel {
+  padding: var(--pdx-space-lg);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  min-height: 120px;
+  max-width: 500px;
+}
+</style>

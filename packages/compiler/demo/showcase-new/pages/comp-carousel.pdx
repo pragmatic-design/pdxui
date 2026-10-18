@@ -79,6 +79,4 @@
 
 <style scoped>
 .page { }
-.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md, 8px); background: var(--pdx-color-bg); margin-bottom: var(--pdx-space-md); }
-.custom-slide-number { font-size: 3rem; font-weight: 700; opacity: 0.3; }
 </style>

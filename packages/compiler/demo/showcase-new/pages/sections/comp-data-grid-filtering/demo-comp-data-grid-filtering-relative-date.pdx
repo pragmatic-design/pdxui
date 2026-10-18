@@ -32,3 +32,8 @@ const dateColumns = [
 
 const dateDS = createDataSource({ data: products.slice(), pageSize: 10 });
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-container { padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-bg); overflow: hidden; }
+</style>

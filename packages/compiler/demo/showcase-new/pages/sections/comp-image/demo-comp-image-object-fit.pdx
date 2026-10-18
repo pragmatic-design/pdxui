@@ -24,3 +24,19 @@
     </details>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .fit-demos {
+    align-items: flex-start;
+}
+  .fit-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+}
+  .fit-label {
+    text-align: center;
+    font-weight: 500;
+}
+</style>

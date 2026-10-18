@@ -70,4 +70,13 @@ function setTask(index, key, value) {
 
 <style scoped>
   .task-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--pdx-space-sm); width: 100%; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .form-stack { display: flex; flex-direction: column; gap: var(--pdx-space-md); margin-top: var(--pdx-space-md); }
+  .values-json {
+    margin-top: var(--pdx-space-md); padding: var(--pdx-space-md);
+    background: var(--pdx-color-surface-inset, var(--pdx-color-surface));
+    border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md);
+    font-size: 0.8rem; white-space: pre-wrap; overflow-wrap: anywhere;
+  }
 </style>

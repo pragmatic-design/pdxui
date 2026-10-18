@@ -67,11 +67,4 @@
 
 <style scoped>
   .page { }
-
-  .aligned, .sample {
-    margin-top: var(--pdx-space-md);
-    padding: var(--pdx-space-md);
-    border: 1px dashed var(--pdx-color-border);
-    border-radius: var(--pdx-radius-md);
-  }
 </style>

@@ -110,9 +110,6 @@ function clearLog() {
 <style scoped>
   .page { }
 
-  .demo-row { gap: var(--pdx-space-sm); }
-  .demo-row.align-start { align-items: flex-start; }
-
   /* Console */
   .console-panel {
     margin-bottom: var(--pdx-space-xl);

@@ -539,8 +539,8 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     PDX_GLOBAL_SELECTOR: {
         severity: 'warn', category: 'defect',
         summary: '`:global()` in a style.',
-        explanation: '`:global()` is not CSS, and the browser drops the whole rule. A scoped style already reaches the descendants a child component renders.',
-        fix: 'Remove the wrapper: `:global(.x) .y` → `.x .y`.',
+        explanation: '`:global()` is not CSS, and the browser drops the whole rule. A scoped style reaches the component\'s own elements and stops at a child component (#152); a plain `<style>` block is global.',
+        fix: 'Move the rule to a plain `<style>` block; to style a child component, use its `[data-part]`, `:state()` or tokens.',
         reproducedIn: `${T}global-selector.test.ts`,
     },
     PDX_DOCUMENT_QUERY: {

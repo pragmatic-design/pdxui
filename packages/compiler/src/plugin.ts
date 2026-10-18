@@ -367,9 +367,9 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 // The source file and the block index are in the id, read back by the inverse of
                 // the function that wrote it; the CSS is produced by the SAME function the dev-mode
                 // injection uses, so the two modes cannot scope or minify a block differently.
-                const target = parseStyleModuleId(id.slice(1));
-                if (!target) return null;
-                const { file, index } = target;
+                const styleModule = parseStyleModuleId(id.slice(1));
+                if (!styleModule) return null;
+                const { file, index } = styleModule;
                 try {
                     // A block's `src=` resolved as the transform resolves it: re-reading the .pdx alone
                     // gave a `<style src>` block no content, and the build shipped it empty (#205).
@@ -378,7 +378,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     for (const style of descriptor.styles ?? (descriptor.style ? [descriptor.style] : [])) {
                         if (style.src) style.content = resolver(style.src, file);
                     }
-                    return styleCssFor(descriptor, file, index, true);
+                    return styleCssFor(descriptor, file, index, true, target);
                 } catch {
                     // A file that moved between the transform and this load: an empty stylesheet is
                     // wrong, but it is not a build that fails for a reason nobody can read.
@@ -613,7 +613,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                     const before = compiledSources.get(id);
                     if (before !== undefined) {
                         const next = await ctx.read();
-                        const swaps = styleOnlyUpdate(before, next, id);
+                        const swaps = styleOnlyUpdate(before, next, id, target);
                         if (swaps) {
                             compiledSources.set(id, next);
                             if (swaps.length > 0) ctx.server.ws.send({ type: 'custom', event: STYLE_EVENT, data: { styles: swaps } });

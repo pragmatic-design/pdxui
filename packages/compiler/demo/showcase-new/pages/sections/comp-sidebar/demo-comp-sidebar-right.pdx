@@ -17,3 +17,25 @@ const shortItems = [
   { key: 'comments', label: 'Comments', icon: 'message-circle' },
 ];
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-layout {
+  display: flex;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  overflow: hidden;
+  height: 320px;
+}
+  .demo-content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--pdx-space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pdx-color-muted);
+  background: var(--pdx-color-bg);
+  font-size: var(--pdx-text-sm);
+}
+</style>

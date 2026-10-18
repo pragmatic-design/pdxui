@@ -109,9 +109,4 @@
 
 <style scoped>
   .page { }
-  .demo-labeled {
-    display: flex;
-    flex-direction: column;
-    gap: var(--pdx-space-xs);
-  }
 </style>

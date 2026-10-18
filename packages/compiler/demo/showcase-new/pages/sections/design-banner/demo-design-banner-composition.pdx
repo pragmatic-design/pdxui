@@ -13,3 +13,18 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .banner-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    margin-top: var(--pdx-space-md);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+  }
+  .opt-row span { color: var(--pdx-color-muted); }
+</style>

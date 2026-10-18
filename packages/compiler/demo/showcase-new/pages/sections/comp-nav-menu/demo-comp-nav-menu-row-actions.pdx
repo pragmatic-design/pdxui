@@ -33,4 +33,13 @@ import { iconItems } from './state.pdx';
   border: 0; border-radius: var(--pdx-radius-sm);
   background: var(--pdx-color-inset); color: inherit; cursor: pointer;
 }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-sidebar {
+  width: 260px;
+  padding: var(--pdx-space-sm);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-surface);
+}
 </style>

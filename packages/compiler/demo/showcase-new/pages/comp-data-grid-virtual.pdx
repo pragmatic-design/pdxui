@@ -23,5 +23,4 @@
   padding: var(--pdx-space-xl) var(--pdx-space-md);
 }
 .intro { margin-bottom: var(--pdx-space-2xl); }
-section { margin-bottom: var(--pdx-space-3xl); }
 </style>

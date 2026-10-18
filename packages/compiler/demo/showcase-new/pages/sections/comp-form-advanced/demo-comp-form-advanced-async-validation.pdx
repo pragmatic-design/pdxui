@@ -46,3 +46,14 @@ const reservedNames = ['admin', 'root', 'test', 'superuser'];
 
 const asyncForm = createForm({ initialValues: { username: '', email: '' }, validators: { username: [required('Username is required'), minLength(3, 'Min 3 characters')], email: [required('Email is required'), email('Invalid email')] }, asyncValidators: { username: async (val) => { await new Promise(r => setTimeout(r, 500)); if (reservedNames.includes(val.toLowerCase())) return `"${val}" is already taken`; return undefined; } }, validateOn: 'onBlur' });
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-block {
+    margin-top: var(--pdx-space-lg);
+    padding: var(--pdx-space-lg);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-lg);
+    background: var(--pdx-color-surface);
+  }
+</style>

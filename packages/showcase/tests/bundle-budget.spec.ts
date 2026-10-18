@@ -225,7 +225,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // href, click and active state at the filled URL; `navigate` gains `navigate.url`. Both are the router
 // in the entry; the types themselves erase. Same machine, same day, from the pre-push's own line:
 // main blocking 94.0, entry 39.3, js 464.2 → this branch 94.2, 39.5, 464.3.
-const BUDGET_KB = { entry: 40, js: 465, css: 60, blocking: 95 };
+// js 465 → 466, css 60 → 63: a scoped style stops at nested components (#152). Every scoped block is a
+// `@scope (…) to (…)`, and each selector carries a second form that matches an element the template
+// wrote inside a component's tag, with the specificity the ancestor form had; the template marks those
+// elements `data-pdx-<hash>-in`. Same branch, same machine, the app built with `target:
+// 'baseline-2024'` against the default: js 464.5 → 465.1, css 59.1 → 62.6, blocking 94.3 → 94.9.
+const BUDGET_KB = { entry: 40, js: 466, css: 63, blocking: 95 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

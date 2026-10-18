@@ -49,5 +49,4 @@
 
 <style scoped>
 .page { }
-.demo-container { padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); max-width: 720px; }
 </style>

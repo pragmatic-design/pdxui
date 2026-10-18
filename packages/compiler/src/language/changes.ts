@@ -27,6 +27,7 @@ import { eventBubbles, emitRemoved } from './event-bubbles';
 import { asyncIsPending, asyncIsPendingScript, asyncAlphaNames, asyncAlphaNamesScript, loaderStateWords, loaderStateWordsScript } from './async-vocabulary';
 import { awaitAsAssertion, awaitPlainValue, awaitMaxMs } from './await-forms';
 import { navigateUrl, navigateUrlManual } from './navigate-url';
+import { scopedReachesChild } from './scoped-reach';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -304,6 +305,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // #150: a concrete URL is navigate.url() (./navigate-url).
     navigateUrl,
     navigateUrlManual,
+    // #152: a scoped style stops at nested components (./scoped-reach).
+    scopedReachesChild,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

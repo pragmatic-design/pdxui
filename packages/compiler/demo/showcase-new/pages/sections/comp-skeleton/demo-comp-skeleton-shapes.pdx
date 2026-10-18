@@ -22,4 +22,7 @@
 
 <style scoped>
   .shape-row { display: flex; gap: var(--pdx-space-md); align-items: center; margin-top: var(--pdx-space-sm); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-col { display: flex; flex-direction: column; gap: var(--pdx-space-xs); margin-top: var(--pdx-space-md); }
 </style>

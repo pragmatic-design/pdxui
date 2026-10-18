@@ -47,4 +47,18 @@ const menuItems = [
 
 <style scoped>
 .event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .ctx-target {
+  width: 100%;
+  height: 200px;
+  border: 2px dashed var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pdx-color-inset);
+  user-select: none;
+  cursor: context-menu;
+}
 </style>

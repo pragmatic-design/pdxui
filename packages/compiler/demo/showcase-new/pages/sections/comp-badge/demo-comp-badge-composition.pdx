@@ -68,4 +68,24 @@
   .user-list { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
   .user-row { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) 0; font-size: var(--pdx-text-sm); }
   .user-row span:nth-child(2) { flex: 1; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .avatar-placeholder {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--pdx-color-inset);
+    border: 1px solid var(--pdx-color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--pdx-text-xs);
+    font-weight: var(--pdx-weight-semibold);
+    color: var(--pdx-color-muted);
+  }
+  .avatar-placeholder.sm {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.65rem;
+  }
 </style>

@@ -1,0 +1,19 @@
+<template>
+  <button class="own" id="own">own</button>
+  <pdx-button label="library" id="lib"><span class="note" id="in-lib">icon</span></pdx-button>
+  <app-sc-child id="child">
+    <p class="note" id="projected">projected <button id="projected-button">deep</button></p>
+  </app-sc-child>
+</template>
+
+<script setup>
+
+</script>
+
+<style scoped>
+/* An aggressive parent: every button, every note, every pdx-button it can reach. */
+:scope { display: block; outline: 3px solid rgb(1, 2, 3); }
+button { color: rgb(255, 0, 0); }
+.note { color: rgb(0, 128, 0); }
+pdx-button { margin-left: 17px; }
+</style>

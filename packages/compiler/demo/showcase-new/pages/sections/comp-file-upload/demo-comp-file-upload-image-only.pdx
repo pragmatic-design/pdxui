@@ -30,3 +30,14 @@ function onImageSelect(e) {
   imageFiles = names.join(', ') || 'None';
 }
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .result-box {
+    padding: var(--pdx-space-sm) var(--pdx-space-md);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+    border: 1px solid var(--pdx-color-border);
+  }
+  .opt-row-2 span { color: var(--pdx-color-muted); }
+</style>

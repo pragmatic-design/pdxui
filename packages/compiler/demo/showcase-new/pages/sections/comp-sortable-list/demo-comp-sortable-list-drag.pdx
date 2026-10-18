@@ -36,3 +36,8 @@ function onReorder(e) { sortableTasks.onReorder(e); }
 
 const orderLine = $derived(tasks.map(t => t.label).join(' · '));
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .narrow { max-width: 420px; }
+</style>

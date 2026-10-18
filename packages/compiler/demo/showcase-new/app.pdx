@@ -493,11 +493,8 @@ function rebuildToc() {
     max-width: 100%;
     min-width: 0;
   }
-  /* Global demo spacing — applies to all pages */
-  .content section { margin-bottom: 3rem; }
-  .content section > h2 { margin-bottom: 0.5rem; }
-  .content section > h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
-  .content section > p { margin-bottom: 1rem; }
+  /* Global demo spacing — applies to all pages: in showcase-shared.css, since a scoped style stops at
+     the pages, which are components of their own (#152). */
 
   /* ─── Right TOC panel ─── */
   .page-toc {

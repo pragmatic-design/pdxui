@@ -56,5 +56,4 @@
   .page { }
 
   .demo-stack > div { display: flex; align-items: center; gap: var(--pdx-space-sm); }
-  .label-w { min-width: 80px; }
 </style>

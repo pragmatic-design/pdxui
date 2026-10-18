@@ -34,4 +34,9 @@ onMount(() => {
   .arena-small { position: relative; width: 300px; height: 150px; border: 2px dashed var(--pdx-color-border); border-radius: 8px; }
   .drag-box-small { position: absolute; top: 40px; left: 100px; width: 100px; height: 50px; background: var(--pdx-color-accent); color: var(--pdx-color-accent-text); display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: grab; user-select: none; touch-action: none; font-size: 0.8rem; font-weight: 600; }
   .drag-box-small:focus { outline: 3px solid var(--pdx-color-focus); outline-offset: 2px; }
+
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
+  section { padding: 16px; border: 1px solid var(--pdx-color-border); border-radius: 8px; background: var(--pdx-color-surface); }
 </style>

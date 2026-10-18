@@ -36,3 +36,18 @@ const circleActions = [
   { key: 'bookmark', label: 'Save', icon: 'bookmark' },
 ];
 </script>
+
+<style scoped>
+  /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
+  .demo-row-wrap { display: flex; gap: var(--pdx-space-lg); flex-wrap: wrap; align-items: flex-start; }
+  .demo-frame {
+  position: relative;
+  max-width: 100%;
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-bg);
+  overflow: visible;
+  margin-top: var(--pdx-space-xs);
+}
+  .demo-frame { --pdx-fab-position: absolute; }
+</style>

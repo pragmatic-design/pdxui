@@ -59,53 +59,8 @@
   .section-heading { margin-bottom: var(--pdx-space-sm); }
   section { margin-bottom: var(--pdx-space-3xl); }
 
-  .demo-row {
-    display: flex;
-    gap: var(--pdx-space-lg);
-    margin-top: var(--pdx-space-md);
-    flex-wrap: wrap;
-  }
-  .demo-labeled {
-    display: flex;
-    flex-direction: column;
-    gap: var(--pdx-space-xs);
-    flex: 1;
-    min-width: 200px;
-  }
-
   /* Static popover preview (not positioned) */
-  .popover-static {
-    background: var(--pdx-color-overlay);
-    border: 1px solid var(--pdx-color-border);
-    border-radius: var(--pdx-radius-lg);
-    padding: var(--pdx-space-md);
-    box-shadow: var(--pdx-shadow-xl);
-    max-width: 280px;
-  }
   .popover-static p { margin: 0; }
-  .popover-static.bare { padding: 0; overflow: hidden; }
-  .popover-static.compact { max-width: 220px; }
-  .popover-static.has-arrow {
-    position: relative;
-    margin-top: var(--pdx-space-sm);
-  }
-  .popover-static.has-arrow::before {
-    content: '';
-    position: absolute;
-    top: -6px;
-    left: 24px;
-    width: 10px;
-    height: 10px;
-    background: var(--pdx-color-overlay);
-    border: 1px solid var(--pdx-color-border);
-    border-right: none;
-    border-bottom: none;
-    transform: rotate(45deg);
-  }
-
-  .source-block { margin-top: var(--pdx-space-md); margin-bottom: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); overflow: hidden; }
-  .source-block summary { padding: var(--pdx-space-xs) var(--pdx-space-md); font-size: var(--pdx-text-xs); font-weight: var(--pdx-weight-medium); color: var(--pdx-color-muted); cursor: pointer; background: var(--pdx-color-inset); user-select: none; }
-  .source-block pre { margin: 0; padding: var(--pdx-space-md); font-size: var(--pdx-text-xs); overflow-x: auto; background: var(--pdx-color-surface); }
   .options-table { margin-top: var(--pdx-space-md); }
   .opt-header, .opt-row { display: grid; grid-template-columns: 220px 80px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }
   .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }

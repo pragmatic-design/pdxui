@@ -205,6 +205,9 @@ export abstract class PdxElement extends HTMLElementBase {
         if (!this._mounted) {
             // First mount: render component
             this._mounted = true;
+            // Every component host is a boundary a parent's scoped style stops at (#152): the donut
+            // scope's limit, `[data-pdx-root] > *`. Set before the render, so the first paint has it.
+            this.setAttribute('data-pdx-root', '');
             // The id `__PDX_DEVTOOLS__.tree()` and `inspect()` know this instance by.
             if (DEV) devInstanceId(this);
             this._projectedChildren = Array.from(this.childNodes);
