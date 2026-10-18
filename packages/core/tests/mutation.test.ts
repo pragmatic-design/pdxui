@@ -129,7 +129,7 @@ describe('mutation — basic', () => {
         m.reset();
         expect(m.state()).toBe('idle');
         expect(m.data()).toBeUndefined();
-        expect(m.error()).toBeUndefined();
+        expect(m.error()).toBeNull();
     });
 });
 

@@ -34,8 +34,8 @@ describe('httpResource()', () => {
     it('creates a resource with GET by default', () => {
         const res = httpResource<string[]>('/api/items');
         expect(res.data).toBeDefined();
-        expect(res.loading).toBeDefined();
-        expect(res.isPending).toBeDefined();
+        expect(res.pending).toBeDefined();
+        expect(res.stale).toBeDefined();
         expect(res.state).toBeDefined();
         res.dispose();
     });
@@ -58,16 +58,15 @@ describe('httpResource()', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// isPending() on Resource
+// pending() on Resource (#141: isPending is gone)
 // ═══════════════════════════════════════════════════════════════
 
-describe('resource isPending', () => {
+describe('resource pending', () => {
     stubFetchWithEmptyJson();
 
-    it('isPending is false during initial load', () => {
+    it('the initial load is pending: state() says first load, pending() says in flight', () => {
         const res = httpResource<string>('/api/data');
-        // During initial load: loading=true but isPending=false (no data yet)
-        expect(res.isPending()).toBe(false);
+        expect([res.state(), res.pending()]).toEqual(['pending', true]);
         res.dispose();
     });
 });

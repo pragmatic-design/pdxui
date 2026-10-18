@@ -13,10 +13,10 @@ import { waitUntil } from './wait-until';
 describe('resource()', () => {
     beforeEach(() => { document.body.innerHTML = ''; });
 
-    it('starts in loading state', () => {
+    it('starts in the pending state', () => {
         const res = resource(() => new Promise<string>(() => {})); // never resolves
-        expect(res.state()).toBe('loading');
-        expect(res.loading()).toBe(true);
+        expect(res.state()).toBe('pending');
+        expect(res.pending()).toBe(true);
         expect(res.data()).toBeUndefined();
     });
 
@@ -26,7 +26,7 @@ describe('resource()', () => {
         await waitUntil(() => res.state() === 'success', 'the query to resolve');
         expect(res.state()).toBe('success');
         expect(res.data()).toBe('hello');
-        expect(res.error()).toBeUndefined();
+        expect(res.error()).toBeNull();
     });
 
     it('transitions to error on reject', async () => {
@@ -67,7 +67,7 @@ describe('resource()', () => {
 
         res.mutate('optimistic');
         expect(res.data()).toBe('optimistic');
-        expect(res.state()).toBe('local'); // 'local' = manually set via mutate()
+        expect(res.state()).toBe('success'); // a value set by mutate() is data(), a success (#141)
     });
 
     it('refetch() triggers a new load', async () => {

@@ -415,11 +415,11 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     PDX_FETCH_NO_ERROR_UI: {
         severity: 'info', category: 'defect',
         summary: 'An `@fetch` whose error state the template never shows.',
-        explanation: 'A failed request leaves the screen as it was, with nothing telling the user.',
-        fix: "Show it: `@if (users.state() === 'error') { … }`.",
+        explanation: 'A failed request leaves the screen as it was, with nothing telling the user. After a failed refresh the data stays on screen (E4): the error belongs beside it.',
+        fix: "Show it: `@if (users.state() === 'error') { <p role=\"alert\">{{ users.error()?.message }}</p> }`.",
         example: {
             bad: pdx('<p>{{ users.data() }}</p>', "@fetch users: 'GET /api/users' as string[];"),
-            good: pdx("@if (users.state() === 'error') { <p>Could not load</p> } <p>{{ users.data() }}</p>", "@fetch users: 'GET /api/users' as string[];"),
+            good: pdx("@if (users.state() === 'error') { <p role=\"alert\">{{ users.error()?.message }}</p> } <p>{{ users.data() }}</p>", "@fetch users: 'GET /api/users' as string[];"),
         },
     },
     PDX_FORM_NO_SUBMIT: {

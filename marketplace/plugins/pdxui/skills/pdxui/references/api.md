@@ -4258,12 +4258,13 @@ import { resource } from '@pdxui/core';
 function resource(fetcher: ResourceFetcher<T>, options?: ResourceOptions<T>): Resource<T>
 ```
 
-An async value as reactive state: `data`, `error` and `state` you read like signals, with the
-fetch, the cache, the retries and the cancellation already handled.
+An async value as reactive state: `data`, `error`, `state`, `pending` and `stale` you read like
+signals, with the fetch, the cache, the retries and the cancellation already handled.
 
-The four states are `idle | loading | success | error`, and the point of having them is that a
+The four states are `idle | pending | success | error`, the words every async source uses: a
 template branches on `state()` instead of juggling a loading boolean against a possibly-stale
-`data`. {@link resourceWhen} renders that branch for you.
+`data`, `pending()` says a request is in flight, and `stale()` that the value shown may be out of
+date. {@link resourceWhen} renders the branch for you.
 
 A stale response can never overwrite a fresh one: each fetch takes a generation number and an
 AbortController, so a slow request that returns after a newer one is discarded rather than
@@ -4285,13 +4286,14 @@ function resourceWhen(res: Resource<T>, handlers: ResourceHandlers<T>): Document
 
 Render one branch per resource state, and swap it when the state changes.
 
-Takes `{ loading, error, success, empty?, reloading? }` and returns a fragment that keeps itself
-in step with the resource. The branches it renders are OWNED: the effects created by the previous
-branch are disposed when the state changes, so a loading spinner's timer does not survive the
-success it was replaced by.
+Takes `{ loading, success, error }` and returns a fragment that keeps itself in step with the
+resource. The branches it renders are OWNED: the effects created by the previous branch are
+disposed when the state changes, so a loading spinner's timer does not survive the success it was
+replaced by.
 
-`empty` is the branch that stops "loaded, and there is nothing" from looking like "still loading";
-`reloading` lets a background refresh show the old data instead of blanking the screen.
+`loading` is the first load. A result stays on `success` while it refreshes and after a refresh
+that failed (E4: the data is kept; the error is `res.error()` beside it); `error` is a failure with
+no data. A success is rendered whatever its value — `null`, `0`, `false`, and `undefined` too (E5).
 
 ### `responsive`
 
@@ -5903,7 +5905,7 @@ Usage:
     { key: () => `users:${page()}`, staleTime: 60_000, refetchOnFocus: true },
   );
   users.data();      // the value, or undefined
-  users.isLoading(); // reactive
+  users.pending();   // a request in flight, reactive
 
 A wrapper over {@link resource}: same cache, same `key`, same `tags`. What it adds is the
 refetching a screen left open needs — on focus, on reconnect, on an interval — and `mutate()` for
@@ -6234,7 +6236,7 @@ import { currentLoaderState } from '@pdxui/router';
 const currentLoaderState: ReadonlySignal<LoaderState>
 ```
 
-Loader execution state of the matched route: idle → loading → done/error.
+Loader execution state of the matched route: idle → pending → success/error.
 
 ### `currentMeta`
 

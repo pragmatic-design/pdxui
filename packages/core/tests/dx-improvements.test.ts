@@ -352,13 +352,13 @@ describe('useQuery()', () => {
             { key: 'test-users', refetchOnFocus: false, refetchOnReconnect: false },
         );
 
-        expect(result.isLoading()).toBe(true);
+        expect(result.pending()).toBe(true);
 
-        await waitUntil(() => result.isLoading() === false, 'the query to settle');
+        await waitUntil(() => result.pending() === false, 'the query to settle');
 
         expect(result.data()).toEqual({ users: [1, 2, 3] });
-        expect(result.isLoading()).toBe(false);
-        expect(result.error()).toBeUndefined();
+        expect([result.state(), result.pending()]).toEqual(['success', false]);
+        expect(result.error()).toBeNull();
 
         result.dispose();
     });

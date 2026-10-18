@@ -474,7 +474,7 @@ export function validate(
                 code: 'PDX_FETCH_NO_ERROR_UI',
                 severity: 'info',
                 message: `@fetch '${f.name}' has no error state handling in template.`,
-                hint: `Consider adding: @if (${f.name}.state() === 'error') { <div>Error</div> }`,
+                hint: `Consider adding: @if (${f.name}.state() === 'error') { <div role="alert">{{ ${f.name}.error()?.message }}</div> }`,
             });
         }
     }

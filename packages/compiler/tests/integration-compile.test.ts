@@ -155,7 +155,7 @@ describe('integration — template codegen', () => {
         const { code } = compileDemo('user-list.pdx');
         expect(code).not.toContain('ctx.users()');
         expect(code).toContain('ctx.users.state()');
-        expect(code).toContain('ctx.users.loading()');
+        expect(code).toContain("ctx.users.state() === 'pending'");
     });
 
     it('counter.pdx: signals called in reactive expressions (when/binding)', () => {

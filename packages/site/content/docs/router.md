@@ -132,7 +132,7 @@ async function loadUser() {
 ```
 
 The resolved data is in `currentLoaderData()`, and `currentLoaderState()` reports
-`idle → loading → done` (or `error`). The page mounts only once the loader has settled, which is
+`idle → pending → success` (or `error`), the words of the async vocabulary ([data](/docs/data)). The page mounts only once the loader has settled, which is
 what makes it *blocking* data — for declarative fetching inside the page see
 [Data layer](/docs/data).
 

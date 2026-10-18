@@ -100,6 +100,18 @@ semver.
 
 ### Changed
 
+- Every async source speaks one vocabulary: `data()`, `error()`, `state()`, `pending()`, and
+  `stale()` where it caches. That holds for a resource (`@fetch`, `resource()`, `httpResource()`),
+  `useQuery` and a mutation.
+  - `state()` is `'idle' | 'pending' | 'success' | 'error'`: `'pending'` is a first load, and a refresh keeps `'success'` with `pending()` true.
+  - `error()` is `null` when there is none, and only a new success clears it.
+  - A failed refresh keeps the data, with `state()` `'error'` and `stale()` true; it used to look like a refresh in progress.
+  - `resourceWhen` renders its success branch for `null`, `0`, `false`, and `undefined` too, with a warning in development.
+  - Removed: `loading()`, `isPending()`, `status()`, `useQuery`'s `isLoading()`, `hasData()` and `isStale()`, the `state()` values `'loading'`, `'reloading'`, `'stale'` and `'local'`, the `ResourceStatus` type, and `resourceWhen`'s `stale` and `reloading` branches.
+  - A route loader's state is `'idle' | 'pending' | 'success' | 'error'`; it was `'loading'` and `'done'`.
+  - `pdx migrate` rewrites `isPending()` to `pending()` and the loader's words, and lists the rest.
+
+  (#141)
 - A component's events no longer bubble unless they are declared to, Angular's `output()` rule: an
   event named `change` or `close` was, on an ancestor, the native one of every input inside. In a
   `.pdx`, `@event saved: T;` stays on the host and `@event(bubbles) saved: T;` bubbles and crosses

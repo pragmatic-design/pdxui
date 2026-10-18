@@ -5,10 +5,10 @@
       <span class="tag" :class="stateClass">{{ users.state() }}</span>
       <span class="tag info">{{ userCount }} users</span>
     </div>
-    @if (users.loading()) {
+    @if (users.state() === 'pending') {
       <div class="loading">Loading users...</div>
     }
-    @if (users.state() === 'success' || users.state() === 'local') {
+    @if (users.state() === 'success') {
       <ul class="list">
         @for (userData as user; track user.name) {
           <li>{{ user.name }} — {{ user.role }}</li>

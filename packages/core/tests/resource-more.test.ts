@@ -1,9 +1,10 @@
-// resource() — the seven states, the cache in front of them, and resourceWhen()'s branches.
+// resource() — the async vocabulary (#141), the cache in front of it, and resourceWhen()'s branches.
 // resource-lifecycle.test.ts covers the dynamic key, the dispose during a retry and resourceWhen's
-// ownership scope.
+// ownership scope; async-contract.test.ts walks the whole `stale()` table.
 //
-// The state machine is the feature: `loading` vs `reloading` vs `stale` is the difference between
-// blanking the screen and refreshing behind the data, and each of those transitions is tested here.
+// The state machine is the feature: a first load (`'pending'`) against a refresh (`'success'` with
+// `pending()`) is the difference between blanking the screen and refreshing behind the data, and
+// each of those transitions is tested here.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { resource, resourceWhen } from '../src/reactivity/resource';
@@ -24,19 +25,19 @@ function scripted<T>(...answers: (T | Error)[]) {
 }
 
 describe('the first load', () => {
-    it('goes idle → loading → success and exposes the data', async () => {
+    it('goes pending → success and exposes the data', async () => {
         const cache = createCache();
         const res = resource(scripted('hello'), { cache, key: 'k1' });
 
-        expect(res.state()).toBe('loading');
-        expect(res.status().isLoading).toBe(true);
-        expect(res.status().hasData).toBe(false);
+        expect(res.state()).toBe('pending');
+        expect(res.pending()).toBe(true);
+        expect(res.data()).toBeUndefined();
 
         await tick();
 
         expect(res.state()).toBe('success');
         expect(res.data()).toBe('hello');
-        expect(res.status()).toMatchObject({ isSuccess: true, isLoading: false, hasData: true });
+        expect([res.pending(), res.stale(), res.error()]).toEqual([false, false, null]);
         res.dispose();
     });
 
@@ -47,7 +48,7 @@ describe('the first load', () => {
 
         expect(res.state()).toBe('error');
         expect(res.error()).toBe(boom);
-        expect(res.status()).toMatchObject({ isError: true, hasData: false });
+        expect([res.data(), res.pending(), res.stale()]).toEqual([undefined, false, false]);
         res.dispose();
     });
 
@@ -86,7 +87,7 @@ describe('enabled — the dependent query', () => {
         await tick();
 
         expect(res.state()).toBe('idle');
-        expect(res.status().isIdle).toBe(true);
+        expect(res.pending()).toBe(false);
         expect(fetcher).not.toHaveBeenCalled();
         res.dispose();
     });
@@ -130,14 +131,12 @@ describe('the cache in front of the fetcher', () => {
         const res = resource(scripted('new'), { cache, key: 'st' });
 
         expect(res.data(), 'the stale value was not shown while refetching').toBe('old');
-        expect(res.status().hasData).toBe(true);
-        expect(res.state()).toBe('stale');
-        expect(res.isPending(), 'a background refresh must be distinguishable from a first load')
-            .toBe(true);
+        expect(res.state(), 'a background refresh must be distinguishable from a first load').toBe('success');
+        expect([res.pending(), res.stale()], 'refreshing a stale value').toEqual([true, true]);
 
         await tick();
         expect(res.data()).toBe('new');
-        expect(res.state()).toBe('success');
+        expect([res.state(), res.stale()]).toEqual(['success', false]);
         res.dispose();
     });
 
@@ -156,7 +155,7 @@ describe('the cache in front of the fetcher', () => {
         a.dispose(); b.dispose();
     });
 
-    it('an error keeps the data that was already there, and says stale', async () => {
+    it('an error keeps the data that was already there, and says stale (E4)', async () => {
         const cache = createCache();
         cache.set('keep', 'cached', { staleTime: -1 });
         const boom = new Error('offline');
@@ -166,7 +165,7 @@ describe('the cache in front of the fetcher', () => {
         expect(res.error()).toBe(boom);
         expect(res.data(), 'a failed refresh threw away data the user could still read')
             .toBe('cached');
-        expect(res.state()).toBe('stale');
+        expect([res.state(), res.stale(), res.pending()]).toEqual(['error', true, false]);
         res.dispose();
     });
 
@@ -241,7 +240,7 @@ describe('refetch, mutate and abort', () => {
         res.mutate('optimistic');
 
         expect(res.data()).toBe('optimistic');
-        expect(res.state()).toBe('local');
+        expect(res.state(), 'there is no local state: the value is data(), a success').toBe('success');
         expect(cache.get('mu')!.data, 'another resource on the same key would not see it')
             .toBe('optimistic');
         res.dispose();
@@ -253,7 +252,7 @@ describe('refetch, mutate and abort', () => {
         expect(res.error()).toBeTruthy();
 
         res.mutate('recovered');
-        expect(res.error()).toBeUndefined();
+        expect(res.error()).toBeNull();
         res.dispose();
     });
 
@@ -278,7 +277,7 @@ describe('refetch, mutate and abort', () => {
         const res = resource(() => new Promise<string>((r) => { release = r; }), {
             cache: createCache(), key: 'ab',
         });
-        expect(res.state()).toBe('loading');
+        expect(res.state()).toBe('pending');
 
         res.abort();
         release('too late');
@@ -362,7 +361,7 @@ describe('resourceWhen', () => {
         host.remove();
     });
 
-    it('falls back to the success branch when there is no stale branch', async () => {
+    it('a stale value refreshing renders the success branch', async () => {
         const cache = createCache();
         cache.set('w3', 'old', { staleTime: -1 });
         const res = resource(() => new Promise<string>(() => {}), { cache, key: 'w3' });
@@ -377,17 +376,19 @@ describe('resourceWhen', () => {
         host.remove();
     });
 
-    it('uses the stale branch when it is given one', async () => {
+    it('a failed refresh keeps the success branch with its data, not the error branch (E4)', async () => {
         const cache = createCache();
         cache.set('w4', 'old', { staleTime: -1 });
-        const res = resource(() => new Promise<string>(() => {}), { cache, key: 'w4' });
+        const res = resource(() => Promise.reject(new Error('down')), { cache, key: 'w4' });
 
         const host = mount(resourceWhen(res, {
             success: (d) => node(`success:${d}`),
-            stale: (d) => node(`stale:${d}`),
+            error: () => node('error'),
         }));
+        await tick();
 
-        expect(host.textContent).toBe('stale:old');
+        expect(res.state(), 'control: the refresh failed').toBe('error');
+        expect(host.textContent, 'a failed refresh blanked the data').toBe('success:old');
         res.dispose();
         host.remove();
     });

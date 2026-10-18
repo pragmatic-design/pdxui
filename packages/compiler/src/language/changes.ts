@@ -24,6 +24,7 @@ import { refAttribute, showAttribute, classDot, styleDot } from './template-form
 import { propRequired } from './prop-required';
 import { appPrefix, appPrefixHtml, appPrefixString } from './app-prefix';
 import { eventBubbles, emitRemoved } from './event-bubbles';
+import { asyncIsPending, asyncIsPendingScript, asyncAlphaNames, asyncAlphaNamesScript, loaderStateWords, loaderStateWordsScript } from './async-vocabulary';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -285,6 +286,13 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // the `@event` the first declares for a `$emit` gets the second's `(bubbles)`, as `$emit` bubbled.
     emitRemoved,
     eventBubbles,
+    // #141: one vocabulary for async state (./async-vocabulary).
+    asyncIsPending,
+    asyncIsPendingScript,
+    asyncAlphaNames,
+    asyncAlphaNamesScript,
+    loaderStateWords,
+    loaderStateWordsScript,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

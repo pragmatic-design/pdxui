@@ -127,7 +127,8 @@ const users = useQuery(
 ```
 
 The query function is the **first argument**; the options object does not carry it. Then
-`users.data()`, `users.isLoading()`, `users.error()`, `users.refetch()`.
+`users.data()`, `users.state()`, `users.pending()`, `users.stale()`, `users.error()` — the async
+vocabulary every source shares ([data](/docs/data)) — and `users.refetch()`.
 
 It receives the request's **`signal`**: hand it to the transport, and a request that a newer one
 supersedes (`page` changed again), or one in flight when the component goes, stops on the network

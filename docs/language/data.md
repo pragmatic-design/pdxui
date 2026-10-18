@@ -40,11 +40,17 @@ error, a 5xx, 408 or 429, never a 4xx (#257). When the URL holds a `${…}` it i
 signals and props are read (`${page}` → `${__page()}`, `${userId}` → `${userId()}`), whatever quote
 the spec was written with, and `key` becomes a function of the same text; `resource()` runs its fetcher
 inside an effect, so a change to anything the URL reads fetches again, under the new key. The
-resource's `data()`, `error()`, `state()` (`idle`, `loading`, `reloading`, `success`, `stale`, `error`,
-`local`), `loading()` and `status()` are signals; `refetch()`, `mutate(value)` and `abort()` act on it.
-`abort()` cancels, which is not failing: the source goes back to `idle`, or to `success` when it has
-data, and `error()` is left as it was; a request that outlives the client's `timeout` fails with an
-`HttpTimeoutError` in `error()` (#255).
+resource speaks the async vocabulary every source shares — a resource, `useQuery`, a mutation, a
+route loader (#141): `data()` (the last successful value, `undefined` until there is one), `error()`
+(the last error, `null` when none; only a new success clears it), `state()` (`idle`, `pending` for a
+first load, `success`, `error`), `pending()` (a request in flight: first load, refresh, retry) and
+`stale()` (the value is older than `staleTime`, invalidated, or kept after a failed refresh). A
+refresh keeps `state()` as it was with `pending()` true; a refresh that fails keeps the data, with
+`state()` `error` and `stale()` true (E4). `null`, `0` and `false` are data: `resourceWhen` renders its
+success branch with them, and with `undefined` too, with a warning in development (E5).
+`refetch()`, `mutate(value)` and `abort()` act on it. `abort()` cancels, which is not failing: the
+source goes back to the state its last request settled in, and `error()` is left as it was; a request
+that outlives the client's `timeout` fails with an `HttpTimeoutError` in `error()` (#255).
 Concurrent reads of one key share one request, aborted only when its last reader goes; a value one
 reader writes — its answer, its `refetch()`, its `mutate()` — reaches the others on the key (#258).
 Responses are cached by key and stay fresh for `staleTime` (30 000 ms by default). Every `@fetch` is
@@ -64,6 +70,10 @@ read as in the rest of the script. The type after `as` is read by the editor and
 - An option `resource()` does not take is `PDX_FETCH_UNKNOWN_OPTION`. A spread in the block names no
   key and is not checked.
 - A template that never branches on the resource's error is `PDX_FETCH_NO_ERROR_UI` (info).
+- The alpha names `loading()`, `isPending()`, `status()`, `isLoading()`, `hasData()`, `isStale()` and
+  the `state()` values `loading`, `reloading`, `stale`, `local` are removed (#141): `PDX_REMOVED_FORM`
+  where the file declares the source. `pdx migrate` rewrites `isPending()` to `pending()` and lists
+  the others; `loading()` is `state() === 'pending' && !data()`.
 - The options are an expression like the rest of the script: a signal or a prop named inside them
   (`enabled: () => ready`) is read (`__ready()`).
 - The declaration may go on to the next lines, its options block opened on the first one.

@@ -71,7 +71,7 @@ import { currentLoaderState } from '@pdxui/router';
 const currentLoaderState: ReadonlySignal<LoaderState>
 ```
 
-Loader execution state of the matched route: idle → loading → done/error.
+Loader execution state of the matched route: idle → pending → success/error.
 
 ## `currentMeta`
 
