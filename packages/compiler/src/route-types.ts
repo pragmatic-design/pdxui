@@ -15,18 +15,57 @@ import { scanForRoutes, type ScannedRoute } from './plugin-utils';
 /** The generated file, relative to the app's root. */
 export const ROUTE_TYPES_FILE = '.pdx/routes.d.ts';
 
-// Match: `:id` or `:id(number)` in a pattern. Groups: [1]=the name [2]=the constraint
-const PARAM = /:([A-Za-z_]\w*)(?:\(([^)]*)\))?/g;
+interface PatternPart {
+    /** Literal text, or the param's name. */
+    text: string;
+    /** Set on a param: its constraint, `''` when it has none. */
+    constraint?: string;
+}
+
+/** `\w`, one character at a time — the router's matcher reads a param's name the same way. */
+const isWord = (c: string | undefined): boolean => c !== undefined && /\w/.test(c);
+
+/**
+ * `pattern` as literal text and params, in one left-to-right scan: `:id`, `:id(number)`. Scanned,
+ * not matched with a regex: a regex for a param and its optional `(…)` runs in polynomial time on a
+ * pattern of repeated `:A((`, as the router's matcher found (#67). The constraint ends at the first `)`,
+ * as the matcher reads it.
+ */
+function patternParts(pattern: string): PatternPart[] {
+    const parts: PatternPart[] = [];
+    let literal = '';
+    let i = 0;
+    while (i < pattern.length) {
+        if (pattern[i] === ':' && isWord(pattern[i + 1])) {
+            let end = i + 1;
+            while (isWord(pattern[end])) end++;
+            const name = pattern.slice(i + 1, end);
+            let constraint = '';
+            if (pattern[end] === '(') {
+                const close = pattern.indexOf(')', end + 1);
+                if (close > end) { constraint = pattern.slice(end + 1, close); end = close + 1; }
+            }
+            if (literal) { parts.push({ text: literal }); literal = ''; }
+            parts.push({ text: name, constraint });
+            i = end;
+            continue;
+        }
+        literal += pattern[i];
+        i++;
+    }
+    if (literal) parts.push({ text: literal });
+    return parts;
+}
 
 /** `/users/:id(number)` → `/users/:id`: the key `navigate()` is called with. */
 export function routeKey(pattern: string): string {
-    return pattern.replace(PARAM, ':$1');
+    return patternParts(pattern).map((p) => (p.constraint === undefined ? p.text : `:${p.text}`)).join('');
 }
 
 /** The params of `pattern` as a TypeScript object type: `{ id: number; slug: string }`, or `{}`. */
 export function routeParamsType(pattern: string): string {
-    const fields = [...pattern.matchAll(PARAM)].map(([, name, constraint]) =>
-        `${name}: ${constraint === 'number' ? 'number' : 'string'}`);
+    const fields = patternParts(pattern).filter((p) => p.constraint !== undefined)
+        .map((p) => `${p.text}: ${p.constraint === 'number' ? 'number' : 'string'}`);
     return fields.length ? `{ ${fields.join('; ')} }` : '{}';
 }
 

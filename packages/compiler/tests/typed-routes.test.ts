@@ -23,6 +23,16 @@ describe('the route types', () => {
         expect(routeParamsType('/')).toBe('{}');
     });
 
+    it('reads a hostile pattern in linear time', () => {
+        // `:A(` then `:A((` repeated: what made a regex for a param and its constraint polynomial
+        // (CodeQL js/polynomial-redos, as #67 found in the router's matcher).
+        const hostile = `/:A(${':A(('.repeat(50_000)}`;
+        const started = performance.now();
+        routeKey(hostile);
+        routeParamsType(hostile);
+        expect(performance.now() - started).toBeLessThan(200);
+    });
+
     it('augments RouteRegistry, sorted, a wildcard left out', () => {
         const dts = routeTypesDts(['/users/:id(number)', '/', '/docs/*']);
         expect(dts).toContain("declare module '@pdxui/router'");

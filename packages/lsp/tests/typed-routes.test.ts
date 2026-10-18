@@ -19,10 +19,21 @@ beforeAll(() => {
 });
 afterAll(() => { rmSync(APP, { recursive: true, force: true }); });
 
+/**
+ * The errors of each probe, all checked in ONE TypeScript program: a program per probe costs a
+ * second or more each, and under coverage several of them overran a test's budget.
+ */
+function errorsOf(probes: { script: string; template?: string }[], options?: { routeTypes?: boolean }): string[][] {
+    const files = probes.map(({ script, template = '<p></p>' }, i) => ({
+        path: join(APP, `probe-${i}.pdx`),
+        content: `<template>${template}</template>\n<script setup lang="ts">\nimport { navigate } from '@pdxui/router';\n${script}\n</script>\n`,
+    }));
+    const byFile = typecheckPdx(APP, files, options);
+    return files.map((f) => (byFile.get(f.path) ?? []).map((e) => `TS${e.tsCode} ${e.message.split('\n')[0]}`));
+}
+
 function errors(script: string, template = '<p></p>', options?: { routeTypes?: boolean }): string[] {
-    const path = join(APP, 'probe.pdx');
-    const content = `<template>${template}</template>\n<script setup lang="ts">\nimport { navigate } from '@pdxui/router';\n${script}\n</script>\n`;
-    return (typecheckPdx(APP, [{ path, content }], options).get(path) ?? []).map((e) => `TS${e.tsCode} ${e.message.split('\n')[0]}`);
+    return errorsOf([{ script, template }], options)[0];
 }
 
 describe('navigate() against the generated routes', () => {
@@ -43,9 +54,14 @@ describe('navigate() against the generated routes', () => {
     });
 
     it('a wrong param name, a wrong param type, and a missing params object are type errors', () => {
-        expect(errors("navigate('/users/:id', { userId: 1 });"), 'wrong name').not.toEqual([]);
-        expect(errors("navigate('/users/:id', { id: 'x' });"), 'wrong type').not.toEqual([]);
-        expect(errors("navigate('/users/:id');"), 'missing params').not.toEqual([]);
+        const [name, type, missing] = errorsOf([
+            { script: "navigate('/users/:id', { userId: 1 });" },
+            { script: "navigate('/users/:id', { id: 'x' });" },
+            { script: "navigate('/users/:id');" },
+        ]);
+        expect(name, 'wrong name').not.toEqual([]);
+        expect(type, 'wrong type').not.toEqual([]);
+        expect(missing, 'missing params').not.toEqual([]);
     });
 
     it('control — without the routes file, navigate() takes any string, as before', () => {
@@ -61,8 +77,12 @@ describe('<pdx-link> against the generated routes', () => {
     });
 
     it('an unknown path or a wrong param is an error', () => {
-        expect(page('<pdx-link to="/user/:id" :params="{ id: u.id }">u</pdx-link>'), 'unknown path').not.toEqual([]);
-        expect(page('<pdx-link to="/users/:id" :params="{ id: \'x\' }">u</pdx-link>'), 'wrong param').not.toEqual([]);
+        const [unknown, wrong] = errorsOf([
+            { script: 'const u = { id: 3 };', template: '<pdx-link to="/user/:id" :params="{ id: u.id }">u</pdx-link>' },
+            { script: 'const u = { id: 3 };', template: '<pdx-link to="/users/:id" :params="{ id: \'x\' }">u</pdx-link>' },
+        ]);
+        expect(unknown, 'unknown path').not.toEqual([]);
+        expect(wrong, 'wrong param').not.toEqual([]);
     });
 
     it('control — a computed :to is a URL, which nothing types', () => {
