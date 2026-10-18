@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 59 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 61 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -83,6 +83,30 @@ const autofocus: Attachment
 first focusable element inside the host. Unlike the `autofocus` attribute, it works for an element
 a block renders after the page loaded.
 
+## `awaitBlock`
+
+```ts
+import { awaitBlock } from '@pdxui/core';
+
+function awaitBlock(source: () => unknown, thenFn: (value: () => T) => Node | DocumentFragment, loadingFn: (() => Node | DocumentFragment | null) | null, errorFn: ((error: unknown, retry: () => void) => Node | DocumentFragment) | null, options: AwaitTiming = {}): DocumentFragment
+```
+
+The `@await` block. `source` is read reactively; the block shows:
+  - the body, given a getter for the result, once there is one — and keeps it through a refresh;
+  - `@error`, given the error and a retry, for a failure with no result, or when `maxMs` runs out
+    (an {@link AwaitTimeoutError}); retry calls the source's `refetch()`, or reads the expression
+    again. Without `error`, a failure throws to the enclosing boundary and a timeout leaves
+    `@loading` up;
+  - `@loading` while waiting, after `minMs` when it is set — a result that arrives earlier renders
+    the body with no spinner frame.
+The timers start when the block renders, restart when it starts waiting again (a new promise, a
+source back to pending with no data), and stop when it is removed. With `error`, an exception the
+body throws while it renders reaches `@error` too.
+
+Usage:
+  ${awaitBlock(() => users, (list) => html`<ul>${…list()…}</ul>`, () => html`<p>Loading…</p>`,
+      (err, retry) => html`<button @click=${retry}>Retry</button>`, { maxMs: 5000 })}
+
 ## `awaitReady`
 
 ```ts
@@ -91,15 +115,10 @@ import { awaitReady } from '@pdxui/core';
 function awaitReady(value: unknown): boolean
 ```
 
-The condition `@await` switches on — for a promise, whether it has settled.
+Whether `@await (value)` has a result: `true` for a result, `false` while waiting, and for a
+failure it throws the reason as an Error. The same rules as {@link awaitBlock}, as a condition.
 
-A plain truthiness switch (`when(() => x, …)`) cannot serve `@await (x)`: a Promise object is
-always truthy, and the body would render at once and forever, pending or rejected. So:
-  - a thenable → `false` while pending, `true` once fulfilled, and when it REJECTS this throws the
-    reason (as an Error) — which the error boundary the compiler emits for `@error` catches;
-  - anything else → its truthiness, so `@await (appReady)` is a plain condition.
-
-⚠️ The expression must yield the SAME promise each time it is evaluated. A call that makes a new
+⚠️ The expression must yield the SAME promise each time it is evaluated: a call that makes a new
 promise per evaluation (`@await (fetchUser())`) starts over on every re-run and never settles —
 store the promise, or use a resource.
 
@@ -108,16 +127,24 @@ store the promise, or use a resource.
 ```ts
 import { awaitTimed } from '@pdxui/core';
 
-function awaitTimed(condition: () => boolean, thenFn: () => Node | DocumentFragment, loadingFn: (() => Node | DocumentFragment | null) | null, options: { minMs?: number; maxMs?: number }): DocumentFragment
+function awaitTimed(condition: () => boolean, thenFn: () => Node | DocumentFragment, loadingFn: (() => Node | DocumentFragment | null) | null, options: AwaitTiming): DocumentFragment
 ```
 
-Timed conditional rendering for @await { minMs, maxMs }.
-- minMs: don't show loading until this delay (avoid flash for fast loads)
-- maxMs: stop waiting after this duration — the body renders even if the condition is still false
-  (not an error)
+`@await (condition) { minMs, maxMs }` over a plain condition: {@link awaitBlock} with no value
+bound and no `@error`, so `maxMs` running out leaves `@loading` up.
 
 Usage:
   ${awaitTimed(() => ready(), () => html`<main/>`, () => html`<loading/>`, { minMs: 200 })}
+
+## `AwaitTimeoutError`
+
+```ts
+import { AwaitTimeoutError } from '@pdxui/core';
+
+class AwaitTimeoutError
+```
+
+`@await`'s `maxMs` ran out with no result. The source is not cancelled; a later result replaces it.
 
 ## `bindGesture`
 

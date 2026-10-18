@@ -14,6 +14,7 @@
 // ALL position advancement goes through advance() for accurate line/column tracking.
 
 import { BLOCK_DIRECTIVES, TEMPLATE_AT_DIRECTIVES } from './template-directives';
+import { splitAwaitBinding } from './await-binding';
 
 // ─── Source Location ───────────────────────────────────────────────
 
@@ -163,7 +164,8 @@ export interface TryNode {
 
 export interface AwaitNode {
     type: 'await';
-    condition: string;        // signal/boolean expression
+    condition: string;        // the awaited expression: a source, a promise or a plain value
+    as?: string;              // the name the result is bound to in the body (`@await (x as name)`)
     body: TemplateNode[];     // content when ready
     loading?: TemplateNode[]; // placeholder while waiting
     errorBody?: TemplateNode[]; // fallback on error
@@ -908,12 +910,13 @@ function parseDefer(ctx: ParseContext, loc: SourceLoc): DeferNode {
 
 /**
  * Parse @await — universal async boundary directive.
- * Syntax: @await (condition) { content } @loading { ... } @error (err) { ... }
- * Extended: @await (condition) { minMs: 200, maxMs: 5000 } { content } @loading { ... }
- * Condition is a boolean signal expression — body shows when true, @loading when false.
+ * Syntax: @await (expr as name) { content } @loading { ... } @error (err, retry) { ... }
+ * Extended: @await (expr) { minMs: 200, maxMs: 5000 } { content } @loading { ... }
+ * The expression is a source, a promise or a plain value (core's awaitBlock); `as name` binds its
+ * result in the body (./await-binding).
  */
 function parseAwait(ctx: ParseContext, loc: SourceLoc): AwaitNode {
-    const condition = parseParenthesized(ctx);
+    const { expr: condition, as } = splitAwaitBinding(parseParenthesized(ctx));
     skipWhitespace(ctx);
 
     // Optional timing options: { minMs: 200, maxMs: 5000 }
@@ -976,7 +979,7 @@ function parseAwait(ctx: ParseContext, loc: SourceLoc): AwaitNode {
         }
     }
 
-    return { type: 'await', condition, body, loading, errorBody, errorVar, retryVar, minMs, maxMs, loc };
+    return { type: 'await', condition, as, body, loading, errorBody, errorVar, retryVar, minMs, maxMs, loc };
 }
 
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;

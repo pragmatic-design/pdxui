@@ -12,7 +12,8 @@
 
 import { describe, it, expect, afterEach } from 'vitest';
 import { signal } from '../src/reactivity/signal';
-import { when, awaitReady } from '../src/renderer/helpers';
+import { when } from '../src/renderer/helpers';
+import { awaitReady } from '../src/renderer/await';
 import { errorBoundary } from '../src/renderer/error-boundary';
 
 const node = (text: string) => {
@@ -92,9 +93,10 @@ describe('awaitReady with anything else — unchanged', () => {
         expect(host.textContent).toBe('ok');
     });
 
-    it('treats a non-thenable object as truthy, and null as not ready', () => {
+    it('treats a non-thenable object, null and 0 as data, and undefined as not there yet (E5, #145)', () => {
         expect(awaitReady({ then: 'not a function' })).toBe(true);
-        expect(awaitReady(null)).toBe(false);
-        expect(awaitReady(0)).toBe(false);
+        expect(awaitReady(null)).toBe(true);
+        expect(awaitReady(0)).toBe(true);
+        expect(awaitReady(undefined)).toBe(false);
     });
 });

@@ -67,6 +67,7 @@ const ROWS: Record<string, Row> = {
     PDX_VIRTUAL_SHAPE: { src: pdx('<p>x</p>\n  <ul><li>Header</li>@for (items as item; track item) @virtual { <li>{{ item }}</li> }</ul>', 'let items = $signal([1]);'), at: '@virtual {' },
     PDX_VIRTUAL_TRANSITION: { src: pdx("<p>x</p>\n  <ul>@for (items as item; track item) @move(200) @virtual { <li>{{ item }}</li> }</ul>", 'let items = $signal([1]);'), at: '@move(200)' },
     PDX_AWAIT_NO_LOADING: { src: pdx('@await (ready) { <p>ok</p> }', 'let ready = $signal(Promise.resolve());'), at: '@await (ready)' },
+    PDX_AWAIT_TIMING: { src: pdx('<p>{{ a }}</p>\n@await (ready) { minMs: 500, maxMs: 300 } { <p>ok</p> } @loading { <i>…</i> }', 'let a = $signal(1);\nlet ready = $signal(Promise.resolve());'), at: '@await (ready) { minMs' },
     PDX_FETCH_INVALID: { src: pdx('<p>x</p>', "let a = $signal(1);\n@fetch users: 'nomethod';"), at: '@fetch users' },
     PDX_FETCH_NO_ERROR_UI: { src: pdx('<p>{{ users.data() }}</p>', "@fetch users: 'GET /api/users' as string[];"), at: '@fetch users' },
     PDX_TEMPLATE_NAME_NOT_PROVIDED: { src: '<template>\n  <h1>{{ title }}</h1>\n</template>\n<script>\nconst title = 1;\n</script>\n', at: '{{ title }}' },

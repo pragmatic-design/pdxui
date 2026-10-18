@@ -107,7 +107,7 @@ describe('@await timing parser', () => {
 });
 
 describe('@await timing codegen', () => {
-    it('generates awaitTimed for @await with timing options', () => {
+    it('passes the timing options to awaitBlock', () => {
         const { code } = compile(`
 <template>
     @await (ready) { minMs: 200 } {
@@ -120,11 +120,11 @@ describe('@await timing codegen', () => {
 let ready = $signal(false);
 </script>`, 'timed.pdx');
 
-        expect(code).toContain('awaitTimed');
+        expect(code).toContain('awaitBlock(');
         expect(code).toContain('{minMs:200}');
     });
 
-    it('uses when() for @await without timing (no awaitTimed)', () => {
+    it('passes no timing argument for @await without timing', () => {
         const { code } = compile(`
 <template>
     @await (ready) {
@@ -137,8 +137,8 @@ let ready = $signal(false);
 let ready = $signal(false);
 </script>`, 'simple.pdx');
 
-        expect(code).toContain('when(');
-        expect(code).not.toContain('awaitTimed');
+        expect(code).toContain('awaitBlock(');
+        expect(code).not.toMatch(/minMs|maxMs/);
     });
 });
 

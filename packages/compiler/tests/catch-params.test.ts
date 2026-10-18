@@ -41,6 +41,13 @@ function fallbackParams(code: string): string {
     return m![1].replace(/\s+/g, '');
 }
 
+/** The parameter list of `@await`'s error branch, awaitBlock's fourth argument (#145): two names. */
+function awaitErrorParams(code: string): string {
+    const m = code.match(/awaitBlock\([\s\S]*?,\s*\(([A-Za-z_$][\w$]*\s*,\s*[A-Za-z_$][\w$]*)\)\s*=>/);
+    expect(m, 'no @error branch found in the awaitBlock call').not.toBeNull();
+    return m![1].replace(/\s+/g, '');
+}
+
 for (const [name, opts] of Object.entries(PATHS)) {
     describe(`@try / @catch parameters — ${name}`, () => {
         it('one name: the error, and the retry function is still called retry', () => {
@@ -68,13 +75,19 @@ for (const [name, opts] of Object.entries(PATHS)) {
         it('two names in @error, the second being retry', () => {
             const code = compileTemplate('@await (ready) { <div>done</div> } @error (err, retry) { <button @click="retry()">again</button> }', opts);
             parses(code);
-            expect(fallbackParams(code)).toBe('err,retry');
+            expect(awaitErrorParams(code)).toBe('err,retry');
+        });
+
+        it('two names in @error: the second one IS the retry function, under the author\'s name', () => {
+            const code = compileTemplate('@await (ready) { <div>done</div> } @error (err, again) { <button @click="again()">again</button> }', opts);
+            parses(code);
+            expect(awaitErrorParams(code)).toBe('err,again');
         });
 
         it('one name in @error still gets retry', () => {
             const code = compileTemplate('@await (ready) { <div>done</div> } @error (e) { <div>bad</div> }', opts);
             parses(code);
-            expect(fallbackParams(code)).toBe('e,retry');
+            expect(awaitErrorParams(code)).toBe('e,retry');
         });
     });
 }

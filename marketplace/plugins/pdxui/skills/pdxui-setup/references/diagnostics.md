@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 93 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 94 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -47,6 +47,36 @@ import { tooltip } from './tooltip';
 The user sees nothing while the promise is pending.
 
 **Fix.** Add `@loading { … }` with a placeholder.
+
+### PDX_AWAIT_TIMING
+
+*error* — `@await`'s `maxMs` is not greater than its `minMs` (#145).
+
+`minMs` is a delay — nothing shows until it has passed, then `@loading` — and `maxMs` a timeout: no result by then renders `@error` with an `AwaitTimeoutError`. A timeout no later than the delay gives up before the spinner could ever show.
+
+**Fix.** Make `maxMs` greater than `minMs`, or drop one of them.
+
+Instead of:
+
+```html
+<template>
+  @await (users) { minMs: 500, maxMs: 300 } { <p>ok</p> } @loading { <p>…</p> }
+</template>
+<script setup>
+@fetch users: 'GET /api/users' as string[];
+</script>
+```
+
+write:
+
+```html
+<template>
+  @await (users) { minMs: 300, maxMs: 5000 } { <p>ok</p> } @loading { <p>…</p> }
+</template>
+<script setup>
+@fetch users: 'GET /api/users' as string[];
+</script>
+```
 
 ### PDX_BINDING_MODIFIER
 

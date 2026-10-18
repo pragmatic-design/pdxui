@@ -85,7 +85,7 @@ describe('@await parser', () => {
 // ─── Codegen (end-to-end compile) ────────────────────────────────────
 
 describe('@await codegen', () => {
-    it('compiles @await to when()', () => {
+    it('compiles @await to awaitBlock()', () => {
         const source = `
 <template>
     @await (ready) {
@@ -100,13 +100,13 @@ let ready = $signal(false);
 </script>`;
 
         const { code } = compile(source, 'await-basic.pdx');
-        expect(code).toContain('when(');
+        expect(code).toContain('awaitBlock(');
         expect(code).toContain('ctx.ready()');
         expect(code).toContain('Content');
         expect(code).toContain('Loading...');
     });
 
-    it('imports when from @pdxui/core', () => {
+    it('imports awaitBlock from @pdxui/core', () => {
         const source = `
 <template>
     @await (appReady) {
@@ -121,8 +121,7 @@ let appReady = $signal(false);
 </script>`;
 
         const { code } = compile(source, 'await-import.pdx');
-        expect(code).toContain('when');
-        expect(code).toContain("from '@pdxui/core'");
+        expect(code).toMatch(/import\s*\{[^}]*\bawaitBlock\b[^}]*\}\s*from '@pdxui\/core'/);
     });
 
     it('compiles @await without @loading (null else branch)', () => {
@@ -138,11 +137,11 @@ let ready = $signal(false);
 </script>`;
 
         const { code } = compile(source, 'await-no-loading.pdx');
-        expect(code).toContain('when(');
-        expect(code).toContain(',null)');
+        expect(code).toContain('awaitBlock(');
+        expect(code, 'no loading and no error branch').toContain(',null,null)');
     });
 
-    it('compiles @await with @error to errorBoundary wrapping when', () => {
+    it('compiles @await with @error to awaitBlock with an error branch', () => {
         const source = `
 <template>
     @await (data) {
@@ -159,10 +158,8 @@ let data = $signal(false);
 </script>`;
 
         const { code } = compile(source, 'await-error.pdx');
-        expect(code).toContain('errorBoundary(');
-        expect(code).toContain('when(');
-        expect(code).toContain('err');
-        expect(code).toContain('retry');
+        expect(code).toContain('awaitBlock(');
+        expect(code, 'the error branch, with its error and retry names').toMatch(/,\(err,retry\)=>\{[^]*err\.message/);
     });
 
     it('compiles complex condition with signal calls', () => {

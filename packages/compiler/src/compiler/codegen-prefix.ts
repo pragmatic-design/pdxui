@@ -6,6 +6,7 @@ import ts from 'typescript';
 import { skipNonCode, findClosing } from './tokenizer';
 import type { CompileContext } from './compile-context';
 import { jsQuote } from './js-literal';
+import { isAssertionOperator, skipAssertedType } from './asserted-type';
 
 // ─── Signal call insertion ──────────────────────────────────────
 
@@ -228,6 +229,15 @@ export function prefixCtx(expr: string, ctx: CompileContext, outerLocals?: Set<s
             const start = pos;
             while (pos < expr.length && /[\w$]/.test(expr[pos])) pos++;
             const id = expr.slice(start, pos);
+
+            // `x as Resource<User[]>`: the type is copied as written, not prefixed — the module's
+            // types are erased (#145).
+            if (isAssertionOperator(expr, id, start, pos)) {
+                const end = skipAssertedType(expr, pos);
+                result += expr.slice(start, end);
+                pos = end;
+                continue;
+            }
 
             // Arrow single-param without parens: `x => x.name`. The `(…) =>` form is
             // detected at the paren branch above, but a bare-identifier param never opens a

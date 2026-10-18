@@ -8,7 +8,8 @@ import { describe, it, expect } from 'vitest';
 import { signal } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import { errorBoundary } from '../src/renderer/error-boundary';
-import { when, awaitReady } from '../src/renderer/helpers';
+import { when } from '../src/renderer/helpers';
+import { awaitReady } from '../src/renderer/await';
 
 const settle = () => new Promise((r) => setTimeout(r, 0));
 

@@ -27,6 +27,8 @@ import { checkSinglePipes } from './validate-pipes';
 import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
 import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubbles';
 import { checkAttachments } from './validate-attach';
+import { isAssertionOperator, skipAssertedType } from './asserted-type';
+import { checkAwaitTiming } from './validate-await';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -483,6 +485,7 @@ export function validate(
     // ─── Check 8: @await without @loading ──────────────────────────
 
     checkAwaitWithoutLoading(ast, warnings);
+    checkAwaitTiming(ast, warnings);
 
     // ─── Check 9: Circular $derived dependencies ─────────────────
 
@@ -991,6 +994,8 @@ function walkNodes(
                 break;
             case 'await':
                 extractIdentifiers(node.condition, ids);
+                // `@await (x as name)`: the result's name is the block's, like a @for item.
+                if (node.as) loopVars.add(node.as);
                 walkNodes(node.body, ids, loopVars);
                 if (node.loading) walkNodes(node.loading, ids, loopVars);
                 if (node.errorBody) {
@@ -1070,6 +1075,12 @@ function extractIdentifiers(expr: string, ids: Set<string>, outerLocals?: Set<st
             // `e => …`: the parameter of an arrow function with no parentheses is the expression's
             // own name, like the parenthesised ones above.
             if (after.startsWith('=>')) { localVars.add(id); continue; }
+            // `x as Resource<User[]>`: a type assertion names a type, not a value (#145 —
+            // `@await ((x as T) as list)` is the spec's form). The module's types are erased.
+            if (isAssertionOperator(expr, id, start, pos)) {
+                pos = skipAssertedType(expr, pos);
+                continue;
+            }
             // `{ key: value }`: a key is not a read. A ternary's `a ? b : c` is — its `b` follows `?`.
             if ((before === '{' || before === ',') && after.startsWith(':') && !after.startsWith('::')) continue;
             // GLOBALS are not dropped here: `collectTemplateIdentifiers` drops the ones the

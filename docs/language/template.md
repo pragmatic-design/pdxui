@@ -1353,7 +1353,8 @@ alpha
 #### Syntax
 
 ```ebnf
-AwaitBlock     ::= "@await" S? Paren S? AwaitTiming? Block ( S? ( "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*
+AwaitBlock     ::= "@await" S? "(" S? Expression ( S "as" S Identifier )? S? ")" S? AwaitTiming? Block
+                   ( S? ( "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*
 AwaitTiming    ::= "{" S? TimingOption ( S? "," S? TimingOption )? S? "}"
 TimingOption   ::= ( "minMs" | "maxMs" ) S? ":" S? [0-9]+
 ErrorNames     ::= "(" S? Identifier ( S? "," S? Identifier )? S? ")"
@@ -1361,54 +1362,72 @@ ErrorNames     ::= "(" S? Identifier ( S? "," S? Identifier )? S? ")"
 
 #### Semantics
 
-`when(() => awaitReady(value), () => html\`…\`, () => html\`…\`)`. A promise shows `@loading` while
-pending and the body once fulfilled; any other value is a condition, the body while it is truthy.
-With `@error`, the whole is wrapped in `errorBoundary(…, (err, retry) => html\`…\`, { resetOn: () =>
-value })`: a rejection shows `@error`, the first name being the error (`err` by default) and the second
-a function that renders the block again (`retry` by default); a new promise in the awaited expression
-leaves `@error` and awaits it. With timing the switch is `awaitTimed(…, { minMs, maxMs })`: `@loading`
-is held back for `minMs`, so a fast answer never flashes it, and after `maxMs` the body is rendered
-even if the promise is still pending.
+`awaitBlock(() => value, (name) => html\`…\`, loading, (err, retry) => html\`…\`, { minMs, maxMs })`
+(#145). What is awaited decides the branch by its state, never by its truthiness:
+
+- **a source** — anything with `state()` and `data()`: `@fetch`, `resource()`, `useQuery`. While
+  `state()` is `'idle'` or `'pending'` with no `data()`, `@loading`; `'error'` with no data, `@error`,
+  whose second name calls the source's `refetch()`; otherwise the body. A refresh in flight, and a
+  refresh that **failed** over kept data, keep the body: `@error` is not rendered in its place, and the
+  body reads `x.error()` to show the failure beside the data.
+- **a promise** — `@loading` while pending, the body once fulfilled, `@error` when it rejects; a new
+  promise in the awaited expression is awaited from the start.
+- **a plain value** — `undefined` waits, `false` is a condition not yet met, and anything else is the
+  result: `null`, `0` and `''` render the body. `@await (appReady)` is still a condition.
+
+`as name` binds the result in the body: a promise's value, a source's `data()`. It is a getter, so the
+body stays when a refresh brings new data, and reads it; the body renders only with a result, so the
+name is never bound to a pending value. The editor types it, `Promise<T>` → `T`, `Resource<T>` → `T`.
+
+The timing: `minMs` is a **delay** — nothing shows until it has passed, then `@loading`; a result
+that arrives earlier renders the body with no spinner frame. `maxMs` is a **timeout** — with no result
+by then, `@error` renders with an `AwaitTimeoutError` (`err.name === 'AwaitTimeoutError'`, exported
+from `@pdxui/core`); the source is not cancelled, and a result that arrives later replaces `@error`
+with the body. Without `@error`, `@loading` stays. The timers start when the block renders, restart
+when it starts waiting again (a new promise, a source back to pending with no data), and stop when the
+block is removed. With `@error`, an exception the body throws while it renders lands there too.
 
 #### Rules
 
+- The binding is the **last** top-level `as` followed by a name and the closing parenthesis. A type
+  assertion in the awaited expression is written in its own parentheses:
+  `@await ((x as Resource<User[]>) as list)`.
 - No `@loading` is `PDX_AWAIT_NO_LOADING` (info).
+- `maxMs` not greater than `minMs` is `PDX_AWAIT_TIMING` (error).
 - The expression must give the same promise every time it is read: `@await (load())` makes a new one
-  on every re-run and never settles. Keep the promise in a signal. Not checked today.
-- The resolved value is not handed to the body: read it from where the promise wrote it. Not checked
-  today.
+  on every re-run and never settles. Keep the promise in a signal, or use a source. Not checked today.
 - `@error` takes at most two names, distinct identifiers; anything else stops the compile.
 - Both names are in the `@error` body's scope, whatever they are called. The error is `unknown` to
   the editor, as a TypeScript `catch` binding is (#122): narrow it before reading a member,
   `err instanceof Error ? err.message : String(err)`.
 - The timing block is recognised only when it contains `minMs` or `maxMs`; it is not an expression.
+- `pdx migrate` parenthesises an alpha `@await (x as T)` whose name is a type, and flags every
+  `@await` with `maxMs` and every one whose operand is neither a declared source nor a promise.
 
 #### Examples
 
 ```pdx
 <template>
-  @await (job) { minMs: 200 } {
-    <p>{{ result }}</p>
+  @await (users as list) { maxMs: 8000 } {
+    <ul>@for (list as u; track u.id) { <li>{{ u.name }}</li> }</ul>
+    @if (users.error()) { <p>Showing the last list: the refresh failed.</p> }
   } @loading {
     <p>Loading…</p>
   } @error (err, retry) {
     <p>{{ err instanceof Error ? err.message : String(err) }}</p>
     <button @click="retry()">Try again</button>
-    <button @click="reload()">Start over</button>
   }
 </template>
 
 <script setup>
-let result = $signal('');
-let job = $signal(load());
-function load() { return fetch('/api/report').then((r) => r.text()).then((t) => { result = t; }); }
-function reload() { job = load(); }
+interface User { id: number; name: string }
+@fetch users: 'GET /api/users' as User[];
 </script>
 ```
 
 #### Since
 
-alpha
+alpha; the source, `as`, the plain values and the timing as above since #145
 
 ### `@try`, `@catch`
 

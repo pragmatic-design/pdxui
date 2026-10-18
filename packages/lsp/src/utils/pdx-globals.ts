@@ -71,6 +71,12 @@ declare global {
   const autofocus: PdxAttachment<unknown>;
   const trapFocus: PdxAttachment<unknown>;
   const clickOutside: PdxAttachment<((event: Event) => void) | undefined>;
+  // \`@await (x as name)\` (#145): the result the body is given — a promise's value, a source's
+  // \`data()\` (the body renders only with a result, so not \`undefined\`), or the value itself.
+  type PdxAwaited<T> = T extends PromiseLike<infer V> ? V
+    : T extends { data(): infer D; state(): unknown } ? Exclude<D, undefined>
+    : T;
+  function __pdxAwaited<T>(source: T): PdxAwaited<T>;
   // What \`@fetch name: 'GET /url' as T\` gives the script and the template: core's Resource<T>, whose
   // reads are signals — \`name.data()\`, not \`name.data\`. tests/fetch-types.test.ts fails when a
   // member of Resource is missing here.

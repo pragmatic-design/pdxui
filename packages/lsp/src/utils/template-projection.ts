@@ -229,7 +229,10 @@ export function projectTemplate(
                     walk(node.catchBody ?? []); emit('}\n');
                     break;
                 case 'await':
-                    emit('if ('); verbatim(node.condition.trim()); emit(') {\n'); walk(node.body); emit('}\n');
+                    // `@await (x as name)` (#145): the body sees the result, typed — `T` for a
+                    // `Promise<T>`, `data()` without `undefined` for a source.
+                    if (node.as) { emit('{ const ' + node.as + ' = __pdxAwaited('); verbatim(node.condition.trim()); emit(');\n'); walk(node.body); emit('}\n'); }
+                    else { emit('if ('); verbatim(node.condition.trim()); emit(') {\n'); walk(node.body); emit('}\n'); }
                     if (node.errorBody) { emit('{ const ' + (node.errorVar || 'err') + ': unknown = 0; const ' + (node.retryVar || 'retry') + ' = (): void => {};\n'); walk(node.errorBody); emit('}\n'); }
                     if (node.loading) walk(node.loading);
                     break;

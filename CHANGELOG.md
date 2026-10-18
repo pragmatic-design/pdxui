@@ -109,6 +109,20 @@ semver.
 
 ### Changed
 
+- `@await` understands a source, binds its result with `as`, and decides by state, not truthiness.
+  `@await (users as list) { … } @loading { … } @error (e, retry) { … }` takes an `@fetch`, a resource,
+  `useQuery` or a promise.
+  - `@loading` shows while there is no data yet, and `@error` when a first load fails; `retry` calls `refetch()`.
+  - The body gets the result as `list`, typed in the editor, and stays through a refresh, including a failed one.
+  - A plain `null`, `0` or `''` renders the body; `undefined` and `false` wait. They used to stay on `@loading`.
+  - `maxMs` is a timeout to `@error` with an `AwaitTimeoutError`, exported from `@pdxui/core`; it used to render the body over a pending promise.
+  - `minMs` is a delay, and both timers restart when the block starts waiting again.
+  - A type assertion in the expression goes in its own parentheses: `@await ((x as T) as list)`.
+  - `maxMs` not greater than `minMs` is `PDX_AWAIT_TIMING`.
+  - `pdx migrate` parenthesises an alpha `@await (x as T)` and flags every `maxMs` and plain operand.
+  - The compiler emits `awaitBlock()`, new in core; `awaitReady` and `awaitTimed` follow the same rules.
+
+  (#145)
 - Every async source speaks one vocabulary: `data()`, `error()`, `state()`, `pending()`, and
   `stale()` where it caches. That holds for a resource (`@fetch`, `resource()`, `httpResource()`),
   `useQuery` and a mutation.

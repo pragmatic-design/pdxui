@@ -25,6 +25,7 @@ import { propRequired } from './prop-required';
 import { appPrefix, appPrefixHtml, appPrefixString } from './app-prefix';
 import { eventBubbles, emitRemoved } from './event-bubbles';
 import { asyncIsPending, asyncIsPendingScript, asyncAlphaNames, asyncAlphaNamesScript, loaderStateWords, loaderStateWordsScript } from './async-vocabulary';
+import { awaitAsAssertion, awaitPlainValue, awaitMaxMs } from './await-forms';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -293,6 +294,10 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     asyncAlphaNamesScript,
     loaderStateWords,
     loaderStateWordsScript,
+    // #145: @await on a source, with `as` (./await-forms).
+    awaitAsAssertion,
+    awaitPlainValue,
+    awaitMaxMs,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

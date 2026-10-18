@@ -51,7 +51,7 @@ proposals the implementing issue may change.
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
 | `::x` on a component prop that is not two-way | `@model x` in the child | flagged (the child is another file, maybe another package) — landed: `two-way-not-model` | #124 (flagging †) |
-| `@await (x as T)`, where `as T` was a TypeScript assertion (alpha has no `as` binding) | `@await ((x as T))`: in the beta a trailing `as Name` binds the value | mechanical: parenthesises every `@await` whose expression ends in `as <Identifier>` | † (decision 18) |
+| `@await (x as T)`, where `as T` was a TypeScript assertion (alpha has no `as` binding) | `@await ((x as T))`: in the beta a trailing `as Name` binds the value | mechanical: parenthesises every `@await` whose expression ends in `as <Identifier>` where the identifier is a type — a primitive, or a name the file declares as a type or imports with a capital — so a beta binding is left alone and a second run changes nothing — landed: `await-as-assertion` | #145 (decision 18) |
 | `<pdx-pin-input>` | `<pdx-otp-input mask numeric length="4">` — pin-input defaulted to 4 cells and `numeric`, otp-input to 6; an explicit `length` or `:numeric` is carried over | mechanical | † (decision 48) |
 | `<pdx-button toggle :pressed="p">` | `<pdx-toggle variant="solid" ::pressed="p">` (an explicit outline or ghost variant is kept) | mechanical | † (decisions 49, 53) |
 | `<pdx-button-group mode="multiple">` or `mode="single"` | `<pdx-toggle-group type="multiple">` or `type="single"`, with `pdx-toggle` items | mechanical where every child is a plain button; flagged otherwise | † (decision 51) |
@@ -70,7 +70,8 @@ proposals the implementing issue may change.
 | parent `<slot name="row" let:item>…</slot>` / `@slot(row, { item }) { … }` | `@snippet row(item) { … }` inside the tag | mechanical | #131 |
 | template props (`:item-template="fn"`) on library components | `@snippet item(o) { … }` | flagged | #131 (flagging †) |
 | `component(tag, { props: { x: { type: String } } })` (TypeScript) | the typed descriptor | manual (library work) | #123 |
-| `@await (…) { maxMs: n }` renders the body when `n` passes | `@error` with an `AwaitTimeoutError` when `n` passes; the body only with a result | behaviour: flagged on every `maxMs` | † (decision 26) |
+| `@await (…) { maxMs: n }` renders the body when `n` passes | `@error` with an `AwaitTimeoutError` when `n` passes; the body only with a result | behaviour: flagged on every `maxMs` — landed: `await-max-ms` | #145 (decision 26) |
+| `@await (x)` on a plain value decides by truthiness: `null`, `0`, `''` stay on `@loading` | `undefined` waits, `false` is a condition, anything else renders the body (data.md, E5) | behaviour: flagged on every `@await` whose operand is neither a declared source nor promise-typed — landed: `await-plain-value` | #145 |
 | `@defer (anything)` — an unknown trigger fires at once | `PDX_DEFER_UNKNOWN_TRIGGER` | flagged; `immediate` suggested when that is what it did | † (decision 27) |
 
 ## Data and routing

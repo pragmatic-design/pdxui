@@ -397,8 +397,8 @@ resolved `null` or `0` renders its body (data.md, E5). A refresh that **fails** 
 keeps the body, and `@error` is not rendered in its place; the body reads `x.error()` to show it
 beside the data (data.md, E4).
 
-**Timing** (`{ minMs, maxMs }`, grammar unchanged; semantics changed, proposed — decisions.md
-point 26). One rule above the others: **the body with `as` renders only with a result**, so the
+**Timing** (`{ minMs, maxMs }`, grammar unchanged; semantics changed — decisions.md point 26,
+landed with #145). One rule above the others: **the body with `as` renders only with a result**, so the
 name is never bound to a pending value.
 
 | Option | Beta meaning | Alpha meaning (`core/src/renderer/helpers.ts:165-209`) |
@@ -445,7 +445,7 @@ interface User { id: number; name: string }
 
 #### Since
 
-alpha → beta (#145)
+alpha → beta (#145 — landed)
 
 ### `@defer` — two phases, rules for removal
 
