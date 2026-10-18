@@ -1,0 +1,404 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Material Theme
+   Material Design 3 "Expressive" inspired.
+   Reference: m3.material.io, material-web.dev
+   Key traits: tonal surfaces, warm cream bg, filled inputs, rounded shapes.
+   ========================================================================== */
+
+[pdx-theme="material"] {
+    --pdx-hue-primary: 280;
+    --pdx-hue-accent:  155;
+
+    /* M3 purple primary (#6442d6) */
+    --pdx-color-primary:       oklch(0.50 0.20 280);
+    --pdx-color-primary-hover: oklch(0.43 0.22 280);
+    --pdx-color-primary-text:  oklch(0.98 0.01 280);
+    --pdx-color-accent:        oklch(0.60 0.12 155);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.60 0.20 280);
+
+    /* M3 error */
+    --pdx-hue-danger: 30;
+    --pdx-color-danger:       light-dark(oklch(0.55 0.22 30), oklch(0.57 0.18 30));
+    --pdx-color-danger-hover: light-dark(oklch(0.48 0.24 30), oklch(0.62 0.20 30));
+
+    /* M3 warm cream grays */
+    --pdx-gray-50:  oklch(0.97 0.010 70);
+    --pdx-gray-100: oklch(0.95 0.012 70);
+    --pdx-gray-200: oklch(0.91 0.010 70);
+    --pdx-gray-300: oklch(0.85 0.008 75);
+    --pdx-gray-800: oklch(0.25 0.008 280);
+    --pdx-gray-900: oklch(0.18 0.010 280);
+    --pdx-gray-950: oklch(0.12 0.008 280);
+
+    /* Warm cream surfaces */
+    --pdx-color-bg:      light-dark(oklch(0.965 0.012 70), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(oklch(0.99 0.006 70), oklch(0.17 0.010 280));
+    --pdx-color-inset:   light-dark(oklch(0.945 0.014 70), oklch(0.22 0.010 280));
+    --pdx-color-overlay: light-dark(oklch(0.99 0.004 70), oklch(0.22 0.012 280));
+
+    /* M3 borders */
+    --pdx-color-border: light-dark(oklch(0.80 0.012 75), oklch(0.35 0.010 280));
+    --pdx-color-border-strong: light-dark(oklch(0.70 0.015 75), oklch(0.45 0.012 280));
+
+    /* Roboto */
+    --pdx-font-sans: 'Roboto', system-ui, sans-serif;
+    --pdx-font-heading: 'Roboto', system-ui, sans-serif;
+
+    /* M3 shape scale — official spec: extra-small=4, small=8, medium=12, large=16, extra-large=28 */
+    --pdx-radius-sm:  0.25rem;   /* 4px — corner-extra-small */
+    --pdx-radius-md:  0.5rem;    /* 8px — corner-small */
+    --pdx-radius-lg:  0.75rem;   /* 12px — corner-medium */
+    --pdx-radius-xl:  1rem;      /* 16px — corner-large */
+
+    /* M3 elevation shadows — 5 levels mapped to pdx-shadow-* tokens.
+       M3 uses two shadow layers: ambient (spread) + key (directional).
+       Dark mode: stronger shadows for visibility on dark surfaces. */
+    --pdx-shadow-sm:  0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);    /* level1 */
+    --pdx-shadow-md:  0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);    /* level2 */
+    --pdx-shadow-lg:  0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);    /* level3 */
+    --pdx-shadow-xl:  0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.3);   /* level4 */
+    --pdx-shadow-color: light-dark(oklch(0 0 0 / 0.12), oklch(0 0 0 / 0.45));
+
+    /* M3 semantic colors — adapted from Material 3 palette */
+    --pdx-color-danger:       light-dark(oklch(0.5 0.20 25), oklch(0.57 0.16 25));
+    --pdx-color-danger-hover: light-dark(oklch(0.43 0.22 25), oklch(0.62 0.18 25));
+    --pdx-color-success:      light-dark(oklch(0.52 0.14 165), oklch(0.535 0.12 165));
+    --pdx-color-warning:      light-dark(oklch(0.72 0.14 80), oklch(0.75 0.11 80));
+    --pdx-color-info:         light-dark(oklch(0.52 0.14 245), oklch(0.55 0.12 245));
+
+    /* M3 focus */
+    --pdx-focus-ring: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.3);
+
+    /* M3 type weights */
+    --pdx-weight-medium: 500;
+    --pdx-weight-semibold: 500;
+    --pdx-line-tight: 1.2;
+
+    /* M3 motion — standard and emphasized curves */
+    --pdx-ease-standard: cubic-bezier(0.2, 0.0, 0, 1.0);
+    --pdx-ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    --pdx-ease-accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15);
+
+    /* M3 behavior tokens */
+    --pdx-button-radius: 9999px;       /* pill buttons — M3 Expressive uses 20dp+ */
+    --pdx-button-min-height: 2.5rem;   /* 40px — M3 standard button height */
+    --pdx-input-style: filled;
+    --pdx-input-min-height: 3.5rem;    /* 56px M3 filled */
+    --pdx-tab-indicator: underline;
+    --pdx-tab-indicator-size: 3px;
+    --pdx-card-style: elevated;
+    --pdx-toggle-width: 3.25rem;
+    --pdx-toggle-height: 2rem;
+    --pdx-opacity-hover: 0.08;
+    --pdx-opacity-pressed: 0.12;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   M3 Component Overrides
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Input: structural variant (filled) driven by [pdx-input-style="filled"] in inputs.css.
+   Only M3-specific size overrides remain here. */
+@pdx-theme material {
+:is(.pdx-input-wrap, .pdx-number-group, .pdx-input-group).pdx-input-lg {
+    height: 4rem; min-height: 4rem;    /* 64px — M3 lg */
+}
+:is(.pdx-input-wrap, .pdx-number-group, .pdx-input-group).pdx-input-xl {
+    height: 4.5rem; min-height: 4.5rem; /* 72px — M3 xl */
+}
+
+/* M3 filled: primary/danger/success buttons inside group lose own border (group provides container). */
+:is(.pdx-input-group, pdx-input-group) button:is(.pdx-primary, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
+    border: none;
+}
+
+/* M3 input-group: buttons must match the taller 56px filled input at default size,
+   but respect smaller sizes (xs/sm) when the group specifies them. */
+:is(.pdx-input-group, pdx-input-group):not([size]) > pdx-button > button[class],
+:is(.pdx-input-group, pdx-input-group):not([size]) > button {
+    height: var(--pdx-input-min-height);
+    min-height: var(--pdx-input-min-height);
+}
+:is(.pdx-input-group, pdx-input-group)[size="lg"] > pdx-button > button[class],
+:is(.pdx-input-group, pdx-input-group)[size="lg"] > button {
+    height: 4rem; min-height: 4rem;
+}
+:is(.pdx-input-group, pdx-input-group)[size="xl"] > pdx-button > button[class],
+:is(.pdx-input-group, pdx-input-group)[size="xl"] > button {
+    height: 4.5rem; min-height: 4.5rem;
+}
+
+/* M3 button sizes lg/xl — match the taller M3 inputs (lg=64px, xl=72px) */
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="lg"] {
+    height: 4rem; min-height: 4rem;
+}
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="xl"] {
+    height: 4.5rem; min-height: 4.5rem;
+}
+
+/* M3 number addon tonal background */
+.pdx-number-group > .pdx-input-addon {
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.06), oklch(from var(--pdx-color-primary) l c h / 0.10));
+}
+
+/* Buttons: M3 — label-large typography. Shape via --pdx-button-radius token. */
+:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
+    padding: var(--pdx-space-sm) 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.00625rem;   /* M3 label-large: 0.1px */
+    font-size: var(--pdx-text-sm);    /* M3 label-large: 14px */
+    line-height: 1.25rem;         /* M3 label-large: 20px */
+}
+
+/* Toggle: M3 — wider track, larger thumb */
+.pdx-toggle {
+    width: 3.25rem;
+    height: 2rem;
+}
+.pdx-toggle::before {
+    width: calc(2rem - 6px);
+    height: calc(2rem - 6px);
+    top: 3px;
+    left: 3px;
+}
+.pdx-toggle:checked::before {
+    transform: translateX(1.25rem);
+}
+/* M3 size variants: the `.pdx-toggle` override (specificity 0,2,0) beat the base variants
+   .pdx-toggle-sm/-lg (0,1,0) → sm=md=lg. We redefine the sizes at the same specificity
+   (they win on source order), so sm < md < lg holds in the Material theme too.
+   Thumb = height - 6px, gap 3px per lato; translateX = trackWidth - thumb - 6px. */
+.pdx-toggle-sm {
+    width: 2.75rem;
+    height: 1.65rem;
+}
+.pdx-toggle-sm::before {
+    width: calc(1.65rem - 6px);
+    height: calc(1.65rem - 6px);
+    top: 3px;
+    left: 3px;
+}
+.pdx-toggle-sm:checked::before {
+    transform: translateX(1.1rem);
+}
+.pdx-toggle-lg {
+    width: 3.75rem;
+    height: 2.35rem;
+}
+.pdx-toggle-lg::before {
+    width: calc(2.35rem - 6px);
+    height: calc(2.35rem - 6px);
+    top: 3px;
+    left: 3px;
+}
+.pdx-toggle-lg:checked::before {
+    transform: translateX(1.4rem);
+}
+
+/* Checkbox: rounder */
+.pdx-checkbox {
+    border-radius: var(--pdx-radius-sm);
+    border-width: 2.5px;
+}
+
+/* Card: elevated variant driven by [pdx-card-style="elevated"] in base.css.
+   M3 corner-medium radius kept as theme-specific. */
+.pdx-surface-card {
+    --pdx-card-radius: var(--pdx-radius-lg);  /* 12px = corner-medium */
+}
+
+/* Field labels: M3 caption style — smaller, muted */
+.pdx-field-label,
+.pdx-field > label {
+    font-size: var(--pdx-text-xs);
+    letter-spacing: 0.03em;
+    color: var(--pdx-color-muted);
+}
+
+/* Tab: M3 keeps its UNDERLINE pattern, not the base 'enclosed folder' look — reset the folder borders
+   + panel border and re-show the animated 3dp indicator. */
+.pdx-tabs { border-bottom: var(--pdx-tab-indicator-size) solid var(--pdx-color-border); gap: 0; }
+.pdx-tab { border: none; margin-bottom: 0; }
+:is([data-tab-panel], [role="tabpanel"]) { border: none; border-radius: 0; padding: var(--pdx-space-lg) 0; }
+.pdx-tab-indicator { display: block; }
+
+/* M3 primary tab — tonal state-layer bg + the 3dp indicator (top-rounded shape) */
+.pdx-tab.active,
+.pdx-tab[aria-selected="true"] {
+    /* M3 state layer + top-rounded shape. The active line is the single animated .pdx-tab-indicator
+       (3dp) on the divider — a border-bottom here added a SECOND offset line above it ("strana"). */
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.15));
+    border-radius: var(--pdx-radius-md) var(--pdx-radius-md) 0 0;
+}
+
+/* CSS-only tabs (no <pdx-tabs>, so no .pdx-tab-indicator element): the 3dp indicator on the active tab
+   itself. An outer shadow offset by the indicator size is clipped out of the tab's own box,
+   so it shows only as the strip under the tab — on the divider, where the element sits. No layout
+   change, and no second line. The focus variant keeps the base focus ring, a box-shadow too. */
+.pdx-tabs:not(:has(> .pdx-tab-indicator)) > .pdx-tab:is(.active, [aria-selected="true"]) {
+    box-shadow: 0 var(--pdx-tab-indicator-size) 0 0 var(--pdx-color-primary);
+}
+.pdx-tabs:not(:has(> .pdx-tab-indicator)) > .pdx-tab:is(.active, [aria-selected="true"]):focus-visible {
+    box-shadow: 0 var(--pdx-tab-indicator-size) 0 0 var(--pdx-color-primary),
+                inset 0 0 0 2px color-mix(in oklab, var(--pdx-color-primary) 40%, transparent);
+}
+
+/* ── Breadcrumb: dot separator (M3 style) ── */
+.pdx-breadcrumb { --pdx-breadcrumb-separator: '·'; }
+.pdx-breadcrumb > *:not(:last-child)::after {
+    font-size: 1.4em;
+    font-weight: var(--pdx-weight-bold);
+}
+
+/* ── Accordion: M3 expand icon, rounded container ── */
+details.pdx-accordion {
+    border-radius: var(--pdx-radius-md);
+}
+details.pdx-accordion summary::after {
+    content: '▾';
+    font-size: 1.1em;
+    transition: transform var(--pdx-duration-base) var(--pdx-ease-standard);
+}
+details.pdx-accordion[open] summary::after {
+    transform: rotate(180deg);
+}
+
+/* ── Table: M3 tonal header, no uppercase ── */
+.pdx-table th {
+    --pdx-table-header-transform: none;
+    --pdx-table-header-letter-spacing: normal;
+    --pdx-table-header-weight: var(--pdx-weight-medium);
+    --pdx-table-header-size: var(--pdx-text-sm);
+    --pdx-table-header-color: var(--pdx-color-muted);
+    --pdx-table-header-bg: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.04), oklch(from var(--pdx-color-primary) l c h / 0.08));
+}
+
+/* ── Headings: ensure contrast — M3 uses onSurface which is high-contrast ── */
+:is(h1, h2, h3, h4, h5, h6) {
+    color: var(--pdx-color-text);
+}
+
+/* ── Button: M3 Filled — state layer on hover (onPrimary at 8%) ── */
+.pdx-primary {
+    --pdx-button-shadow-hover: var(--pdx-shadow-sm);
+}
+.pdx-primary:hover {
+    filter: brightness(1.08);
+}
+
+/* ── Button: M3 Tonal (secondary) — secondary-container bg, on-secondary-container text ── */
+.pdx-secondary {
+    background: light-dark(oklch(from var(--pdx-color-primary) 0.90 0.04 h), oklch(from var(--pdx-color-primary) 0.30 0.06 h));
+    color: light-dark(oklch(from var(--pdx-color-primary) 0.25 0.08 h), oklch(from var(--pdx-color-primary) 0.90 0.04 h));
+    border-color: transparent;
+}
+.pdx-secondary:hover {
+    box-shadow: var(--pdx-shadow-sm);
+    filter: brightness(0.96);
+}
+
+/* ── Button: M3 Outlined — neutral stroke, surface bg ── */
+.pdx-outline {
+    border-color: var(--pdx-color-border);
+}
+.pdx-outline:hover {
+    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.12));
+}
+
+/* ── Select: M3 filled style, dropdown with elevation ── */
+.pdx-select-dropdown {
+    border: none;
+    border-radius: var(--pdx-radius-sm);
+    box-shadow: var(--pdx-shadow-lg);
+}
+.pdx-select-option:hover,
+.pdx-select-option.active {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+.pdx-select-caret {
+    --pdx-select-caret-size: 1.5rem;
+}
+/* M3: thicker stroke, bolder feel */
+.pdx-select-caret svg {
+    --pdx-select-caret-stroke: 2.5;
+    stroke: var(--pdx-color-text);
+}
+.pdx-select-check {
+    border-radius: var(--pdx-radius-xs, 2px);
+}
+
+/* ── Calendar: M3 — circle selected, state layer hover, tonal container ── */
+.pdx-cal-cell {
+    border-radius: 9999px;  /* M3: full circle for day cells */
+    width: 40px;
+    height: 40px;
+}
+.pdx-cal-cell:hover:not(.pdx-cal-disabled) {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08); /* M3 state layer */
+}
+.pdx-cal-selected {
+    border-radius: 9999px;
+}
+.pdx-cal-today::after {
+    width: 5px;
+    height: 5px;
+}
+/* M3 range: pill ends, flat middle */
+.pdx-cal-range-start {
+    border-radius: 9999px 0 0 9999px;
+}
+.pdx-cal-range-end {
+    border-radius: 0 9999px 9999px 0;
+}
+.pdx-cal-range-start.pdx-cal-range-end {
+    border-radius: 9999px;
+}
+/* M3 calendar container: elevated surface */
+.pdx-calendar-inline {
+    border: none;
+    box-shadow: var(--pdx-shadow-sm);
+    border-radius: var(--pdx-radius-lg);
+}
+/* M3 nav buttons: circular */
+.pdx-cal-nav-btn {
+    border-radius: 9999px;
+}
+.pdx-cal-nav-btn:hover {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+/* M3 month/year cells: pill shape */
+.pdx-cal-month-cell,
+.pdx-cal-year-cell {
+    border-radius: 9999px;
+}
+.pdx-cal-month-cell:hover,
+.pdx-cal-year-cell:hover {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+
+/* ── Date Picker: M3 — elevated panel, no border ── */
+.pdx-date-picker-panel {
+    border: none;
+    box-shadow: var(--pdx-shadow-lg);
+    border-radius: var(--pdx-radius-xl);
+}
+.pdx-date-picker-preset-btn:hover {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+}
+
+/* ── Time Picker: M3 — rounded container, tonal hover ── */
+.pdx-time-picker {
+    border-radius: var(--pdx-radius-lg);
+}
+.pdx-time-value:focus {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.12);
+    border-radius: var(--pdx-radius-md);
+}
+.pdx-time-arrow:hover {
+    background: oklch(from var(--pdx-color-primary) l c h / 0.08);
+    border-radius: 9999px;
+}
+}
+
+/* Group composition radius enforced by pdx.composition layer (composition.css) */

@@ -1,0 +1,180 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Pragmatic Brand Theme
+   Premium blue identity inspired by FUT/gaming UI aesthetics.
+   Deep navy undertone, electric blue primary, gold accent for premium touches.
+
+   Design language:
+   - Pill tabs (signature)
+   - Chevron breadcrumbs
+   - Blue left-accent on cards
+   - Premium hover (lift + blue glow)
+   - Gold reserved for accent/highlight only
+   ========================================================================== */
+
+/* ── Section 1: Token overrides ── */
+
+[pdx-theme="pragmatic"] {
+    --pdx-hue-primary: 235;
+    --pdx-hue-accent:  75;
+
+    /* Deep electric blue primary — premium, confident */
+    --pdx-color-primary:       oklch(0.525 0.20 235);
+    --pdx-color-primary-hover: oklch(0.48 0.22 235);
+    --pdx-color-primary-text:  white;
+    /* Gold accent — sparingly, for premium highlights */
+    --pdx-color-accent:        oklch(0.78 0.15 75);
+    --pdx-color-accent-text:   var(--pdx-gray-900);
+    --pdx-color-focus:         oklch(0.60 0.22 235);
+
+    /* Warning stays orange (no hue conflict with blue primary) */
+    --pdx-hue-warning: 55;
+    --pdx-color-warning: light-dark(oklch(0.72 0.16 55), oklch(0.68 0.12 55));
+
+    /* Cool blue-tinted grays — premium, not sterile */
+    --pdx-gray-50:  oklch(0.985 0.004 235);
+    --pdx-gray-100: oklch(0.965 0.006 235);
+    --pdx-gray-200: oklch(0.92  0.006 235);
+    --pdx-gray-800: oklch(0.22  0.010 235);
+    --pdx-gray-900: oklch(0.15  0.008 235);
+    --pdx-gray-950: oklch(0.10  0.008 235);
+
+    /* Premium typography */
+    --pdx-font-sans: 'Inter', 'DM Sans', system-ui, sans-serif;
+    --pdx-font-heading: 'DM Sans', 'Manrope', system-ui, sans-serif;
+    --pdx-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Premium rounded corners — more generous than Default */
+    --pdx-radius-sm: 0.375rem;
+    --pdx-radius-md: 0.5rem;
+    --pdx-radius-lg: 0.75rem;
+    --pdx-radius-xl: 1rem;
+
+    /* Cool premium surfaces */
+    --pdx-color-bg:      light-dark(oklch(0.98 0.004 235), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(oklch(0.995 0.002 235), oklch(0.16 0.008 235));
+    --pdx-color-inset:   light-dark(oklch(0.96 0.006 235), oklch(0.22 0.008 235));
+
+    /* Blue-tinted shadows — premium depth */
+    --pdx-shadow-color: oklch(0.3 0.08 235 / 0.08);
+    --pdx-shadow-sm:  0 1px 3px oklch(0 0 0 / 0.06), 0 0 1px oklch(0.3 0.06 235 / 0.08);
+    --pdx-shadow-md:  0 3px 8px oklch(0 0 0 / 0.07), 0 0 1px oklch(0.3 0.06 235 / 0.10);
+    --pdx-shadow-lg:  0 6px 16px oklch(0 0 0 / 0.09), 0 0 2px oklch(0.3 0.06 235 / 0.08);
+    --pdx-shadow-xl:  0 12px 32px oklch(0 0 0 / 0.11), 0 0 2px oklch(0.3 0.06 235 / 0.08);
+
+    /* Blue focus ring */
+    --pdx-focus-ring: 0 0 0 3px oklch(0.55 0.20 235 / 0.3);
+
+    /* Borders — cool blue tint */
+    --pdx-color-border: light-dark(oklch(0.88 0.005 235), oklch(0.30 0.008 235));
+    --pdx-color-border-strong: light-dark(oklch(0.78 0.007 235), oklch(0.42 0.010 235));
+
+    /* Pragmatic behavior tokens — premium enterprise */
+    --pdx-button-radius: var(--pdx-radius-md);
+    --pdx-input-style: outlined;
+    --pdx-tab-indicator: pill;
+    --pdx-card-style: bordered;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Section 2: Component structure overrides — Pragmatic design language
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tabs: pill variant — active tab with filled primary bg */
+@pdx-theme pragmatic {
+[pdx-tab-style="pill"]& .pdx-tabs { border-radius: 9999px; background: light-dark(oklch(0.96 0.006 235), oklch(0.18 0.008 235)); padding: 3px; }
+[pdx-tab-style="pill"]& .pdx-tab { border-radius: 9999px; }
+[pdx-tab-style="pill"]& .pdx-tab[aria-selected="true"] {
+    background: var(--pdx-color-primary); color: white; font-weight: var(--pdx-weight-semibold);
+}
+
+/* ── Breadcrumb: chevron separator ── */
+.pdx-breadcrumb { --pdx-breadcrumb-separator: '›'; }
+.pdx-breadcrumb > *:not(:last-child)::after {
+    font-size: 1.1em;
+}
+
+/* ── Accordion: chevron that rotates ── */
+details.pdx-accordion summary::after {
+    content: '›';
+    font-size: 1.2em;
+    font-weight: var(--pdx-weight-bold);
+}
+details.pdx-accordion[open] summary::after {
+    transform: rotate(90deg);
+}
+
+/* ── Card: blue accent top border — distinct from Gold (left) ── */
+.pdx-surface-card {
+    border-top: 3px solid var(--pdx-color-primary);
+}
+
+/* Interactive card: blue glow on hover */
+.pdx-surface-card[interactive]:hover {
+    box-shadow: 0 4px 12px oklch(0.55 0.15 235 / 0.15), var(--pdx-shadow-md);
+}
+
+/* ── Buttons: premium gradient + hover lift ── */
+.pdx-primary {
+    /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
+    background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.58 0.20 235), oklch(0.50 0.22 250)));
+}
+.pdx-primary {
+    --pdx-button-shadow-hover: 0 4px 16px oklch(0.50 0.20 235 / 0.35);
+    --pdx-button-transform-hover: translateY(-1px);
+}
+.pdx-primary:hover {
+    background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.52 0.22 235), oklch(0.45 0.24 250)));
+}
+
+.pdx-secondary {
+    border-color: light-dark(oklch(0.55 0.10 235 / 0.3), oklch(0.55 0.10 235 / 0.25));
+}
+.pdx-secondary:hover {
+    /* Only retint the border on hover — the base .pdx-secondary darkens its OWN solid background
+       via filter: brightness(0.95); overriding `background` here wiped the solid fill out. */
+    border-color: var(--pdx-color-primary);
+}
+
+/* ── Input: blue focus — standalone only; the wrapped ones use .pdx-input-wrap:focus-within
+   (base) → niente doppio bordo interno+esterno. ── */
+.pdx-input:not(.pdx-input-wrap > *):focus-visible {
+    border-color: var(--pdx-color-primary);
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* ── Pagination: pill style for active page ── */
+.pdx-page[aria-current="page"] {
+    border-radius: var(--pdx-radius-full);
+}
+
+/* ── Toggle/Checkbox/Radio: blue when active ── */
+.pdx-toggle:checked { background: var(--pdx-color-primary); }
+.pdx-checkbox:checked { background-color: var(--pdx-color-primary); border-color: var(--pdx-color-primary); }
+.pdx-radio:checked { border-color: var(--pdx-color-primary); box-shadow: inset 0 0 0 4px var(--pdx-color-primary); }
+
+/* ── Progress/Stepper: blue accent ── */
+.pdx-progress-bar { background: var(--pdx-color-primary); }
+.pdx-step[data-status="done"] .pdx-step-number { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+.pdx-step[data-status="done"] + .pdx-step-connector { background: var(--pdx-color-primary); }
+
+/* ── Alert/Badge: blue accent ── */
+.pdx-alert-info { border-left-color: var(--pdx-color-primary); }
+.pdx-badge-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+
+/* ── Table: blue header accent ── */
+.pdx-table th {
+    --pdx-table-header-transform: none;
+    --pdx-table-header-letter-spacing: normal;
+    --pdx-table-header-weight: var(--pdx-weight-semibold);
+    --pdx-table-header-color: var(--pdx-color-text);
+    --pdx-table-header-border-color: var(--pdx-color-primary);
+    --pdx-table-header-border-width: 2px;
+}
+.pdx-table-striped tr:nth-child(even) td {
+    background: light-dark(oklch(0.55 0.04 235 / 0.04), oklch(0.55 0.04 235 / 0.06));
+}
+
+/* ── Timeline: blue dots ── */
+.pdx-timeline-item[data-status="done"]::before { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); }
+.pdx-timeline-item[data-status="active"]::before { border-color: var(--pdx-color-primary); }
+}

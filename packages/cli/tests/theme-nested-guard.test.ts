@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { createTheme } from '@pdxui/design/engine';
-import { guardThemeRules, nestedThemeGuard } from '../../design/src/engine/nested-theme-guard';
+import { guardThemeRules, nestedThemeGuard, expandThemeBlocks } from '../../design/src/engine/nested-theme-guard';
 
 const GUARD = nestedThemeGuard('test');
 
@@ -64,5 +64,33 @@ describe('guardThemeRules', () => {
     it('is idempotent', () => {
         const once = guardThemeRules('& .a::before, & .b:hover { x: 1; }', 'test');
         expect(guardThemeRules(once, 'test')).toBe(once);
+    });
+});
+
+// `@pdx-theme <name> { … }` (#155): a shipped theme's overrides are written without the root and the
+// guard, and the generator writes both — the theme files in src/themes are generated from
+// theme-sources/.
+describe('expandThemeBlocks', () => {
+    const ROOT = '[pdx-theme="test"]';
+
+    it('puts the theme root before each selector and the guard on its subject', () => {
+        expect(expandThemeBlocks('@pdx-theme test {\n.pdx-primary, .a > b::before { color: red; }\n}'))
+            .toBe(`${ROOT} .pdx-primary${GUARD}, ${ROOT} .a > b${GUARD}::before { color: red; }`);
+    });
+
+    it('expands the rules inside an at-rule, and keeps the comments and blank lines between rules', () => {
+        expect(expandThemeBlocks('@pdx-theme test {\n/* lift */\n.a { x: 1; }\n\n@media (hover: hover) {\n    .b:hover { y: 2; }\n}\n}'))
+            .toBe(`/* lift */\n${ROOT} .a${GUARD} { x: 1; }\n\n@media (hover: hover) {\n    ${ROOT} .b:hover${GUARD} { y: 2; }\n}`);
+    });
+
+    it('a selector with `&` puts the root where `&` is, as CSS nesting does: a behaviour attribute beside it', () => {
+        expect(expandThemeBlocks('@pdx-theme test {\n[pdx-tab-style="pill"]& .pdx-tab { x: 1; }\n}'))
+            .toBe(`[pdx-tab-style="pill"]${ROOT} .pdx-tab${GUARD} { x: 1; }`);
+    });
+
+    it('control — CSS outside a block is copied as written, the root\'s own token block included', () => {
+        const css = `${ROOT} {\n    --pdx-color-primary: red;\n}\n\n${ROOT} .kept { z: 3; }\n`;
+        expect(expandThemeBlocks(css)).toBe(css);
+        expect(expandThemeBlocks(`${css}@pdx-theme test {\n.a { x: 1; }\n}\n`)).toBe(`${css}${ROOT} .a${GUARD} { x: 1; }\n`);
     });
 });

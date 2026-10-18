@@ -211,6 +211,15 @@ In a theme file, overrides are written inside `@pdx-theme <name> { … }` and th
 the nested-theme guard on each rule: `[pdx-theme="<name>"] sel:not(:where(<guard>))` (#155). The
 built CSS of the thirteen shipped themes is identical to the hand-guarded one. Since: beta (#155).
 
+**Landed** (#155). The block's opening line is `@pdx-theme <name> {` alone, its `}` at the start of a
+line. A selector inside it gets the root before it, or where it writes `&`, as CSS nesting places it:
+`[pdx-tab-style="pill"]& .pdx-tab` → `[pdx-tab-style="pill"][pdx-theme="<name>"] .pdx-tab:not(…)`. In
+this repository the theme files reach the browser as written, so the expansion is a generator, not a
+build step: the sources are `packages/design/theme-sources/<name>.css`, `scripts/gen-themes.mjs` writes
+`src/themes/<name>.css` through the engine's `expandThemeBlocks` (the guard of `guardThemeRules`), and
+`packages/cli/tests/theme-sources.test.ts` holds the two together. The thirteen themes' generated files
+are today's byte for byte, plus one line naming their source.
+
 ### Theme behaviours
 
 A theme declares its behaviours as custom properties (`--pdx-card-style: elevated`,

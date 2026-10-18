@@ -1,0 +1,156 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Pragmatic Gold Theme
+   Warm gold/amber premium identity. Luxury, warmth, recognizable.
+
+   Design language (same as Pragmatic Blue):
+   - Pill tabs (signature)
+   - Chevron breadcrumbs
+   - Gold left-accent on cards
+   - Rotating chevron on accordions
+   - Premium hover (lift + gold glow)
+   ========================================================================== */
+
+[pdx-theme="pragmatic-gold"] {
+    --pdx-hue-primary: 85;
+    --pdx-hue-accent:  235;
+
+    /* True gold — hue 85 (yellow-gold, NOT 50 which is orange) */
+    /* Reference: #FFD700 ≈ oklch(0.88 0.17 96), #DAA520 ≈ oklch(0.74 0.15 80) */
+    --pdx-color-primary:       oklch(0.78 0.16 85);
+    --pdx-color-primary-hover: oklch(0.70 0.18 80);
+    --pdx-color-primary-text:  oklch(0.15 0.04 85);
+    /* 0.52, not 0.55: the info button is filled with the accent, and at 0.55 this blue holds
+       neither a white label (4.43) nor a dark one. */
+    --pdx-color-accent:        oklch(0.52 0.18 235);
+    --pdx-color-accent-text:   white;
+    --pdx-color-focus:         oklch(0.78 0.18 85);
+
+    /* Warning shifted to orange (avoid gold conflict) */
+    --pdx-hue-warning: 55;
+    --pdx-color-warning: light-dark(oklch(0.72 0.16 55), oklch(0.68 0.12 55));
+
+    /* Warm grays — amber undertone */
+    --pdx-gray-50:  oklch(0.985 0.006 75);
+    --pdx-gray-100: oklch(0.965 0.008 75);
+    --pdx-gray-200: oklch(0.92  0.008 75);
+    --pdx-gray-800: oklch(0.22  0.010 75);
+    --pdx-gray-900: oklch(0.15  0.008 75);
+    --pdx-gray-950: oklch(0.10  0.006 75);
+
+    /* Premium typography */
+    --pdx-font-sans: 'Inter', 'DM Sans', system-ui, sans-serif;
+    --pdx-font-heading: 'DM Sans', 'Manrope', system-ui, sans-serif;
+    --pdx-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Premium rounded corners — same family as Pragmatic Blue */
+    --pdx-radius-sm: 0.375rem;
+    --pdx-radius-md: 0.5rem;
+    --pdx-radius-lg: 0.75rem;
+    --pdx-radius-xl: 1rem;
+
+    /* Warm premium surfaces */
+    --pdx-color-bg:      light-dark(oklch(0.98 0.006 75), var(--pdx-gray-950));
+    --pdx-color-surface: light-dark(oklch(0.995 0.003 75), oklch(0.16 0.008 75));
+    --pdx-color-inset:   light-dark(oklch(0.96 0.008 75), oklch(0.22 0.008 75));
+
+    /* Gold-tinted shadows */
+    --pdx-shadow-color: oklch(0.6 0.10 85 / 0.10);
+    --pdx-shadow-sm:  0 1px 3px oklch(0 0 0 / 0.06), 0 0 1px oklch(0.6 0.10 85 / 0.10);
+    --pdx-shadow-md:  0 3px 8px oklch(0 0 0 / 0.07), 0 0 1px oklch(0.6 0.10 85 / 0.12);
+    --pdx-shadow-lg:  0 6px 16px oklch(0 0 0 / 0.09), 0 0 2px oklch(0.6 0.10 85 / 0.10);
+    --pdx-shadow-xl:  0 12px 32px oklch(0 0 0 / 0.11), 0 0 2px oklch(0.6 0.10 85 / 0.10);
+
+    /* Gold focus ring */
+    --pdx-focus-ring: 0 0 0 3px oklch(0.78 0.16 85 / 0.35);
+
+    /* Warm borders */
+    --pdx-color-border: light-dark(oklch(0.88 0.006 75), oklch(0.30 0.008 75));
+    --pdx-color-border-strong: light-dark(oklch(0.78 0.008 75), oklch(0.42 0.010 75));
+
+    /* Pragmatic Gold behavior tokens — premium family */
+    --pdx-button-radius: var(--pdx-radius-md);
+    --pdx-input-style: outlined;
+    --pdx-tab-indicator: pill;
+    --pdx-card-style: bordered;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Component overrides — same design language as Pragmatic Blue, gold accent
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tabs: pill with filled active — Pragmatic family signature */
+@pdx-theme pragmatic-gold {
+[pdx-tab-style="pill"]& .pdx-tabs { border-radius: 9999px; background: light-dark(oklch(0.96 0.008 85), oklch(0.18 0.008 85)); padding: 3px; }
+[pdx-tab-style="pill"]& .pdx-tab { border-radius: 9999px; }
+[pdx-tab-style="pill"]& .pdx-tab[aria-selected="true"] {
+    background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); font-weight: var(--pdx-weight-semibold);
+}
+
+/* Breadcrumb: chevron */
+.pdx-breadcrumb { --pdx-breadcrumb-separator: '›'; }
+.pdx-breadcrumb > *:not(:last-child)::after { font-size: 1.1em; }
+
+/* Accordion: rotating chevron */
+details.pdx-accordion summary::after { content: '›'; font-size: 1.2em; font-weight: var(--pdx-weight-bold); }
+details.pdx-accordion[open] summary::after { transform: rotate(90deg); }
+
+/* Card: gold accent left border */
+.pdx-surface-card { border-left: 3px solid var(--pdx-color-primary); }
+.pdx-surface-card[interactive]:hover {
+    box-shadow: 0 4px 12px oklch(0.78 0.14 85 / 0.15), var(--pdx-shadow-md);
+}
+
+/* Button: gold gradient + premium hover */
+.pdx-primary {
+    /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
+    background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.80 0.16 90), oklch(0.72 0.18 75)));
+}
+.pdx-primary {
+    --pdx-button-shadow-hover: 0 4px 16px oklch(0.70 0.16 85 / 0.35);
+    --pdx-button-transform-hover: translateY(-1px);
+}
+.pdx-primary:hover {
+    background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.74 0.18 88), oklch(0.66 0.20 72)));
+}
+
+.pdx-secondary {
+    border-color: light-dark(oklch(0.78 0.12 85 / 0.3), oklch(0.78 0.12 85 / 0.25));
+}
+.pdx-secondary:hover {
+    /* Only retint the border on hover. The base .pdx-secondary hover darkens the element's OWN
+       (solid) background via filter: brightness(0.95) — overriding `background` here with a faint
+       gold tint wiped the solid fill out (button "disappeared" on hover, broken normal↔hover). */
+    border-color: var(--pdx-color-primary);
+}
+
+/* Input: gold focus — standalone only; the wrapped ones use .pdx-input-wrap:focus-within
+   (the base rule, already on gold tokens) → no doubled inner+outer border. */
+.pdx-input:not(.pdx-input-wrap > *):focus-visible {
+    border-color: var(--pdx-color-primary);
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* Toggle/Checkbox/Radio/Progress: gold accent */
+.pdx-toggle:checked { background: var(--pdx-color-primary); }
+.pdx-checkbox:checked { background-color: var(--pdx-color-primary); border-color: var(--pdx-color-primary); }
+.pdx-radio:checked { border-color: var(--pdx-color-primary); box-shadow: inset 0 0 0 4px var(--pdx-color-primary); }
+.pdx-progress-bar { background: var(--pdx-color-primary); }
+.pdx-page[aria-current="page"] { border-radius: var(--pdx-radius-full); }
+
+/* Table: gold header */
+.pdx-table th {
+    --pdx-table-header-transform: none; --pdx-table-header-letter-spacing: normal; --pdx-table-header-weight: var(--pdx-weight-semibold);
+    --pdx-table-header-color: var(--pdx-color-text); --pdx-table-header-border-color: var(--pdx-color-primary); --pdx-table-header-border-width: 2px;
+}
+.pdx-table-striped tr:nth-child(even) td {
+    background: light-dark(oklch(0.78 0.06 85 / 0.04), oklch(0.78 0.06 85 / 0.06));
+}
+
+/* Stepper/Timeline/Alert/Badge: gold accent */
+.pdx-step[data-status="done"] .pdx-step-number { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+.pdx-step[data-status="done"] + .pdx-step-connector { background: var(--pdx-color-primary); }
+.pdx-alert-info { border-left-color: var(--pdx-color-primary); }
+.pdx-badge-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+.pdx-timeline-item[data-status="done"]::before { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); }
+.pdx-timeline-item[data-status="active"]::before { border-color: var(--pdx-color-primary); }
+}

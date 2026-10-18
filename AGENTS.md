@@ -73,6 +73,7 @@ These are generated. Change the source and run the command; the gate fails when 
 | `packages/ui/tests/scenarios/generated/`, `…/contracts/generated/` | the certification manifests | `pnpm certify:gen` |
 | the skill catalogue under `marketplace/plugins/pdxui/skills/` | `custom-elements.json`, the site's summaries, the sources' events | `node marketplace/plugins/pdxui/skills/pdxui/tools/gen-catalog.mjs` and `gen-topics.mjs` |
 | `packages/site/content/docs/api.md`, the `api-*.md` module pages, and the skill's `api.md` | core's and router's public surface | `node packages/site/scripts/gen-api.mjs` |
+| `packages/design/src/themes/*.css`, the 13 shipped themes | `packages/design/theme-sources/*.css`, overrides inside `@pdx-theme <name> { … }` | `node packages/design/scripts/gen-themes.mjs` |
 
 A snapshot (`__snapshots__/*.snap`) is updated with `vitest -u` only after reading every line of its
 diff. A change under `marketplace/` raises the plugin's `version` in `.claude-plugin/marketplace.json`
