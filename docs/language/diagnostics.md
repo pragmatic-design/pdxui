@@ -98,6 +98,9 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_LIBRARY_INTERNALS` | warn | A style that targets a library component's internal class (CD-C2). | [styles.md](styles.md) |
 | `PDX_COLOUR_LITERAL` | warn | A colour written as a value in a `.pdx` style (CD-C3). *(design)* | [styles.md](styles.md) |
 | `PDX_SHARED_STYLES` | warn | One stylesheet serves several of the pieces CD-B1 finds (CD-C1, a heuristic). *(design)* | [styles.md](styles.md) |
+| `PDX_VARIANTS_MALFORMED` | error | `@variants` holds something that is not an axis. | `@variants`, [styles.md](styles.md) |
+| `PDX_VARIANT_UNKNOWN` | error | An `@variant` names an axis or a value `@variants` does not declare. | `@variant`, [styles.md](styles.md) |
+| `PDX_VARIANT_UNSTYLED` | warn | A declared variant value has no `@variant` rule. | `@variants`, [styles.md](styles.md) |
 
 ## Routing
 

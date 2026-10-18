@@ -42,3 +42,23 @@ test('what the parent projects into a child stays the parent\'s, deep elements i
 test('the parent still places a child: its host is in reach', async ({ page }) => {
     await expect(page.locator('#lib')).toHaveCSS('margin-left', '17px');
 });
+
+// `@variants` and `@variant` (#153), in `tests/fixtures/scoped/sc-variant.pdx`.
+test('a variant is a prop reflected on the host, and its rules follow it', async ({ page }) => {
+    const host = page.locator('#variant');
+    const root = host.locator('[data-part="root"]');
+    await expect(host, 'the default is reflected on the host').toHaveAttribute('tone', 'plain');
+    await expect(host).toHaveAttribute('size', 'md');
+    await expect(root, 'control: the default takes the base rules').toHaveCSS('color', 'rgb(0, 0, 255)');
+    await expect(root).toHaveCSS('padding-top', '8px');
+
+    await host.evaluate((el) => { (el as unknown as { tone: string }).tone = 'loud'; });
+    await expect(host, 'a prop set from script is reflected').toHaveAttribute('tone', 'loud');
+    await expect(root).toHaveCSS('color', 'rgb(255, 0, 0)');
+    await expect(root, 'a compound rule waits for both axes').not.toHaveCSS('font-weight', '700');
+
+    await host.evaluate((el) => el.setAttribute('size', 'sm'));
+    await expect(root).toHaveCSS('padding-top', '2px');
+    await expect(root, 'the compound rule, both axes set').toHaveCSS('font-weight', '700');
+    await expect(host, 'a rule on the host itself').toHaveCSS('display', 'inline-block');
+});

@@ -2,6 +2,7 @@
 // Extracted from script-analyzer.ts for modularity.
 
 import type { ValidationWarning } from './validate';
+import type { VariantAxis } from './variants';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -236,6 +237,7 @@ export interface ScriptAnalysis {
     exposes: string[];       // names declared via @expose
     states: StateDecl[];     // @state name = expr;
     host?: HostAttr[];       // @host { role="x" :aria-expanded="open" @keydown="onKey" }
+    variants?: VariantAxis[]; // @variants { variant: { primary, ghost } = primary; } (#153)
     parts: string[];         // @part trigger, popup;
     route: RouteInfo;       // route metadata from @page/@guard/etc.
     globalStore?: GlobalStoreDirective;  // @store rune (file = store module)

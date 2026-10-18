@@ -182,6 +182,16 @@ const first = document.querySelector('[data-test="catalog"] .pdx-nav-item');
 let firstEl = $signal(null);   // <a :ref="firstEl" …>
 ```
 
+A choice among a fixed set of looks (a tone, a size) is a variant: `@variants` declares it once, each
+axis a prop typed with its values and reflected on the host; the styles key on it with `@variant` (CD-C1).
+
+```js
+@variants {
+  variant: { primary, ghost, danger } = primary;
+  size: { sm, md, lg } = md;
+}
+```
+
 ### CD-A2 — A component does not write its own props, except as the user's input
 
 A prop the component edits is a two-way value: it emits the new value, and the parent writes it back.
@@ -232,6 +242,15 @@ onMount(() => {
 
 When you split a component, its styles go with its markup. The shell and the layout keep only what
 several pieces read: the rhythm tokens, the breakpoints that move several regions at once.
+
+A variant's look is keyed by its axis with `@variant`, never by a class assembled from the prop. A
+value no rule styles is `PDX_VARIANT_UNSTYLED`; a rule for a value that does not exist, `PDX_VARIANT_UNKNOWN`.
+
+```css
+[data-part="root"] { background: var(--pdx-color-primary); }
+@variant variant(ghost) { [data-part="root"] { background: transparent; } }
+@variant variant(ghost) and size(sm) { [data-part="root"] { padding-inline: 0; } }
+```
 
 ### CD-C2 — A page does not style a library component's internals
 

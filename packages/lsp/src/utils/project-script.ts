@@ -1,0 +1,160 @@
+// The .pdx script projected into valid TypeScript, offsets unchanged: the @… runes blanked, the names
+// they declare typed at the end, the $… runes left to their ambient declarations. Split from
+// ts-service.ts, which hosts the language service that reads it.
+
+import { DECORATOR_RUNES, parseFetchDecl, parseVariantsBlock } from '@pdxui/compiler';
+import { routeNameTypes } from './route-name-types';
+import { formTypeOf } from './form-types';
+
+// Statement-leading runes. We recognise them ONLY at the start of a line (indent aside):
+// an `@form`/`@store` inside a comment ("(via @form rune)", for one) is not a rune.
+// Every declaration the compiler knows, from its one rune list: a rune missing here would stay
+// in the projected code as text, and `@inject employeeDocuments;` would become a name TypeScript
+// cannot find.
+const RUNE_KW = new RegExp(`@(${[...DECORATOR_RUNES.keys()].join('|')})\\b`, 'g');
+// Not `store`: `@store cart;` names a store MODULE and makes no `cart` variable — the module exports
+// `useCart()`. Declared, a script reading `cart` type-checked and threw a ReferenceError (#58).
+const NAME_INTRO = new Set(['fetch', 'form']);
+
+// Match: let x = $signal(   const y = $derived(   — a rune declaration.  Groups: [1]=let|const
+// The compiler places these where every use can see them, so TypeScript must not report
+// a use above the line as one before the declaration: the keyword is projected as `var`, padded to
+// the same length.
+const RUNE_DECL = /^([ \t]*)(let|const)(\s+[A-Za-z_$][\w$]*\s*(?::[^=\n]+)?=\s*\$(?:signal|derived|store)\b)/gm;
+
+/** Is the offset `idx` at the start of a line (only whitespace between the line start and idx)? */
+function atLineStart(s: string, idx: number): boolean {
+    let i = idx - 1;
+    while (i >= 0 && (s[i] === ' ' || s[i] === '\t')) i--;
+    return i < 0 || s[i] === '\n';
+}
+
+/** Projects the .pdx script into valid TS, with the length and the offsets unchanged.
+ *  - `@prop name: T = d` → `var  name…` (a TYPED prop; `@prop`=5 → `var  `=5), `@model` the same (6 → 6);
+ *    the `?` of an optional `@prop name?: T` is blanked.
+ *  - the other @… runes → blanked out (from the keyword to a `;` at depth 0, or to the
+ *    balanced `{…}`), preserving the newlines. The names of @fetch/@form are declared at
+ *    the end, typed (their lines are blanked) → the references resolve.
+ *  - the `$…` runes stay (they are declared ambient). */
+export function projectScript(scriptContent: string): string {
+    const s = scriptContent;
+    const out = s.split('');
+    // Each name a rune introduces → the type it is declared with at the end.
+    const names = new Map<string, string>();
+    // `@event name: T` → the script's `name(detail)`, declared typed by its payload.
+    const emitters: string[] = [];
+    RUNE_KW.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = RUNE_KW.exec(s))) {
+        if (!atLineStart(s, m.index)) continue;
+        const kw = m[1];
+        if (kw === 'prop' || kw === 'model') {
+            // `var`, not `let`: the compiler declares props before anything reads them. A `@model`
+            // (#124) is a prop the script writes, so it is the same typed name: `@model` → `var   `.
+            `var${' '.repeat(kw.length - 2)}`.split('').forEach((ch, o) => { out[m!.index + o] = ch; });
+            // `@prop hint?: T` (#130): a variable takes no `?`, so it is blanked — the name keeps its type.
+            // Match: the name and the `?` after it. Groups: [1]=up to the `?`
+            const optional = /^(\s+[A-Za-z_$][\w$]*\s*)\?/.exec(s.slice(m.index + 1 + kw.length));
+            if (optional) out[m.index + 1 + kw.length + optional[1].length] = ' ';
+            continue;
+        }
+        if (NAME_INTRO.has(kw)) {
+            const after = /^\s+([A-Za-z_$][\w$]*)/.exec(s.slice(m.index + 1 + kw.length));
+            if (after) names.set(after[1], 'any');
+        }
+        if (kw === 'inject' || kw === 'mixin') {
+            // Match: @inject key;  @inject key as alias;  @mixin './use-thing.ts' as thing;
+            // Groups: [1]=key (absent for a quoted mixin path) [2]=alias
+            const inj = /^\s+(?:'[^'\n]*'|"[^"\n]*"|([A-Za-z_$][\w$]*))(?:\s+as\s+([A-Za-z_$][\w$]*))?/.exec(s.slice(m.index + 1 + kw.length));
+            const declared = inj && (inj[2] ?? inj[1]);
+            if (declared) names.set(declared, 'any');
+        }
+        if (kw === 'event') {
+            // Match: @event name: PayloadType;  or  @event(bubbles) name: PayloadType; (#138)
+            // Groups: [1]=name [2]=payload type (optional)
+            const ev = /^(?:\(\s*bubbles\s*\))?\s+([A-Za-z_$][\w$]*)\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            if (ev) emitters.push(ev[2] ? `var ${ev[1]}: (detail: ${ev[2]}) => void;` : `var ${ev[1]}: (detail?: unknown) => void;`);
+        }
+        if (kw === 'part') {
+            // Match: @part trigger, popup; — each name is its element, null while not rendered (#134).
+            // Typed by the tag it sits on would need the template; HTMLElement is what it always is.
+            const list = /^\s+([\w\s,]+?)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            for (const name of list ? list[1].split(',').map((n) => n.trim()).filter(Boolean) : []) {
+                emitters.push(`var ${name}: HTMLElement | null;`);
+            }
+        }
+        if (kw === 'snippet') {
+            // Match: @snippet name(a, b) — the function the compiler declares (#206).
+            // Groups: [1]=name [2]=parameters as written
+            const sn = /^\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/.exec(s.slice(m.index + 1 + kw.length));
+            if (sn) {
+                const params = sn[2].split(',').map((p) => p.trim()).filter(Boolean);
+                // Plain names keep their names; a default or a pattern is not read, so any arguments go.
+                const signature = params.every((p) => /^[A-Za-z_$][\w$]*$/.test(p))
+                    ? params.map((p) => `${p}?: any`).join(', ') : '...args: any[]';
+                emitters.push(`var ${sn[1]}: (${signature}) => unknown;`);
+            }
+        }
+        let depth = 0, j = m.index, ended = false;
+        for (; j < s.length; j++) {
+            const c = s[j];
+            // A string is skipped whole: the `}` of `${id}` in `@fetch x: 'GET /a/${id}'` is not the
+            // end of the rune (#487).
+            if (c === "'" || c === '"' || c === '`') {
+                for (j++; j < s.length && s[j] !== c && s[j] !== '\n'; j++) if (s[j] === '\\') j++;
+                continue;
+            }
+            if (c === '{' || c === '(' || c === '[') depth++;
+            else if (c === '}' || c === ')' || c === ']') {
+                depth--;
+                if (depth <= 0 && c === '}') {
+                    // `@form name: { schema } { options };` goes on into its options block, and a
+                    // `;` after the last block belongs to the rune. Ending at the first `}` would leave
+                    // `{ save: onChange; … }` in the code.
+                    let k = j + 1;
+                    while (k < s.length && (s[k] === ' ' || s[k] === '\t' || s[k] === '\n' || s[k] === '\r')) k++;
+                    if (s[k] === '{') { j = k - 1; depth = 0; continue; }
+                    j = s[k] === ';' ? k + 1 : j + 1;
+                    ended = true; break;
+                }
+            }
+            else if (c === ';' && depth === 0) { j++; ended = true; break; }
+        }
+        if (!ended) { j = s.indexOf('\n', m.index); if (j < 0) j = s.length; }
+        if (kw === 'fetch') {
+            // `as User` → `PdxResource<User>`, read by the compiler's own parser so the two cannot
+            // disagree; `unknown` with no type. A line the compiler rejects stays `any`: it is
+            // already an error, and a second one on every read of the name would bury it.
+            const decl = parseFetchDecl(s.slice(m.index, j).replace(/\s+/g, ' ').trim());
+            if (decl) names.set(decl.name, `PdxResource<${decl.type || 'unknown'}>`);
+        }
+        if (kw === 'params' || kw === 'search') {
+            // Each param, and `searchParams`, under the type the compiler gives it (./route-name-types).
+            for (const [name, type] of routeNameTypes(kw, s.slice(m.index, j))) names.set(name, type);
+        }
+        if (kw === 'variants') {
+            // Each axis is a prop typed with its values (#153), read by the compiler's own parser.
+            for (const axis of parseVariantsBlock(s.slice(m.index, j)).axes) {
+                names.set(axis.name, axis.values.map((v) => `'${v}'`).join(' | '));
+            }
+        }
+        if (kw === 'form') {
+            // The form createForm builds from this declaration (./form-types); `any` only for one
+            // the compiler does not understand, which it reports itself.
+            const name = /^@form\s+([A-Za-z_$][\w$]*)/.exec(s.slice(m.index, j));
+            const type = name && formTypeOf(s.slice(m.index, j));
+            if (name && type) names.set(name[1], type);
+        }
+        for (let k = m.index; k < j; k++) if (out[k] !== '\n') out[k] = ' ';
+        RUNE_KW.lastIndex = j;
+    }
+    let res = out.join('');
+    res = res.replace(RUNE_DECL, (_all, indent: string, kw: string, rest: string) => `${indent}${kw === 'let' ? 'var' : 'var  '}${rest}`);
+    // `$derived(x)` is `computed(() => x)`: x is read later, so a const declared below it is no use
+    // before its declaration (#467). Same length, so the offsets hold: `$drv(()=>x)`. Not for an
+    // object literal, which an arrow would read as its body: `$derived({ … })` stays as written.
+    res = res.replace(/\$derived\((?!\s*\{)/g, '$drv(()=>');
+    // `var`: declared after the code that reads them, as the compiler makes them available before it.
+    const decls = [...[...names].map(([n, type]) => `var ${n}: ${type};`), ...emitters].join(' ');
+    return decls ? `${res}\n;${decls}` : res;
+}

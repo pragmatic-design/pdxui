@@ -35,6 +35,20 @@ describe('the rune declarations', () => {
         expect(hover?.contents.value).toMatch(/boolean/);
     });
 
+    it('@variants declares each axis as its prop, typed with its values (#153)', () => {
+        const script = [
+            '@variants {',
+            '  variant: { primary, ghost } = primary;',
+            '  size: { sm, md } = md;',
+            '}',
+            "const loud: boolean = variant === 'ghost' && size !== 'sm';",
+            'loud;',
+        ].join('\n');
+        expect(diagnose(script)).toEqual([]);
+        // The control: a value the axis does not have is TypeScript's comparison error.
+        expect(diagnose(`${script}\nconst bad = variant === 'danger';\nbad;`).some((d) => d.startsWith('ts(2367)'))).toBe(true);
+    });
+
     it('@host and @state reach TypeScript blanked, on one line or several (#133, #132)', () => {
         const script = [
             'let open = $signal(false);',

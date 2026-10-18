@@ -11,6 +11,16 @@ semver.
 
 ### Features
 
+- `@variants` declares a component's variants once.
+  `@variants { variant: { primary, ghost } = primary; size: { sm, md } = md; }` makes each axis a prop
+  typed with its values and reflected on the host as an attribute.
+  - In the `<style scoped>`, `@variant variant(ghost) { … }` keys rules by it; `and` combines axes,
+    and `:scope` in the body is the host. It compiles inside the donut scope on `baseline-2026`, to
+    `[data-pdx-<hash>][variant="ghost"] …` on `baseline-2024`, and to `:host([variant="ghost"])` under
+    `<template shadow>`.
+  - A rule for a value that does not exist is `PDX_VARIANT_UNKNOWN`; a declared value no rule styles,
+    `PDX_VARIANT_UNSTYLED`; an axis that cannot be read, `PDX_VARIANTS_MALFORMED`.
+  - Library components follow in #512. (#153)
 - `attach:` attaches behaviour to an element. `<input attach:tooltip="'Search'">` calls
   `tooltip(el, () => 'Search')` when the element is rendered. Its returned cleanup runs when the
   value changes and when the element goes, with no ref, `onMount` or `onDestroy` written by hand. On
@@ -210,6 +220,8 @@ semver.
 
 ### Fixes
 
+- A component whose only declaration is a `@part` mounts: its part's ref is a signal, which the module
+  called without importing, so the setup threw. (#153)
 - The child components of a kept-alive route page keep their state when the page is frozen: they
   were destroyed by the move that froze it, and set up again on return. They are frozen with the
   page — `onHide`, then `onShow` — and destroyed with it when the outlet discards it. (#268)
