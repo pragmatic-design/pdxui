@@ -23,14 +23,13 @@ describe('the route types', () => {
         expect(routeParamsType('/')).toBe('{}');
     });
 
-    it('reads a hostile pattern in linear time', () => {
+    it('reads a hostile pattern as the matcher does: each constraint ends at the first `)`', () => {
         // `:A(` then `:A((` repeated: what made a regex for a param and its constraint polynomial
-        // (CodeQL js/polynomial-redos, as #67 found in the router's matcher).
-        const hostile = `/:A(${':A(('.repeat(50_000)}`;
-        const started = performance.now();
-        routeKey(hostile);
-        routeParamsType(hostile);
-        expect(performance.now() - started).toBeLessThan(200);
+        // (CodeQL js/polynomial-redos). Its time is measured in tests/perf/compiler-scans.test.ts.
+        const hostile = `/:A(${':A(('.repeat(3)}`;
+        expect(routeKey(hostile)).toBe(hostile);
+        expect(routeParamsType('/:id(number)/:x((a)/:y')).toBe('{ id: number; x: string; y: string }');
+        expect(routeKey('/:id(number)/:x((a)/:y')).toBe('/:id/:x/:y');
     });
 
     it('augments RouteRegistry, sorted, a wildcard left out', () => {
