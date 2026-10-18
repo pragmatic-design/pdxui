@@ -204,11 +204,13 @@ function exportRefused() {
   .expected-list li { display: flex; gap: var(--pdx-space-sm); align-items: baseline; flex-wrap: wrap; }
   .preview-head { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; }
   .outcome { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; }
+</style>
 
+<style>
   /* A refused row reads as refused across its whole width, which is what a set of marked cells
      cannot do. Tinted rather than outlined: an outline inside a table is a border nobody can
-     tell from the grid's own. A plain descendant selector, not `.list :global(…)`, which is not
-     CSS: the browser drops that rule. */
+     tell from the grid's own. Page-level CSS: the grid puts `rowClass` on a row IT renders, past
+     this page's scoped style. */
   .list .pdx-dg-row-invalid {
     background: color-mix(in oklch, var(--pdx-color-danger) 8%, transparent);
   }

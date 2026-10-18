@@ -5,8 +5,8 @@
        focus goes back to its opener. The same `pdx-nav-menu` as the rail, so it is walked with the
        same keys. `@show`, not `@if`: the menu projects its item slot.
        Its head is a search, as the reference's is: with every entity in one list, finding one by
-       name is the quicker way. Where it sits and how wide it is is the shell's layout;
-       what is inside is this component's. -->
+       name is the quicker way. It starts where the rail ends, a width the shell hands it as
+       `--app-rail-width`; everything else is this component's. -->
   @show (open) {
     <aside
       id="catalog"
@@ -122,6 +122,46 @@ const activeCatalogKey = $derived('cat-' + activeFor(currentPath()));
 </script>
 
 <style scoped>
+  /* The rail's SECOND COLUMN: the rail's surface and edge, the window's height, and no shadow — a
+     card with a large shadow reads as floating over the page. Its left is the rail's right, at
+     either width. Its head is the rail head's height with the same rule under it, so the two read
+     as one strip. */
+  .catalog {
+    position: fixed; top: 0; bottom: 0; left: var(--app-rail-width, 300px); z-index: 30;
+    width: 320px; max-width: calc(100vw - var(--app-rail-width, 300px));
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    --rail-pad: var(--pdx-space-xs);
+  }
+  /* The entries are the rail's, drawn the same (shell.pdx): the menu's host scrolls, an entry is
+     icon, label and the tools laid over its end. */
+  .rail-nav {
+    flex: 1 1 auto; min-width: 0;
+    display: block;
+    overflow-x: hidden; overflow-y: auto;
+    padding: var(--rail-pad);
+  }
+  .rail-icon { width: 24px; text-align: center; flex: 0 0 auto; }
+  .rail-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .rail-tools {
+    display: flex; gap: 2px;
+    background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm);
+  }
+  .rail-tool {
+    width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
+    border: 0; border-radius: var(--pdx-radius-sm); background: transparent;
+    color: inherit; font-size: 11px; cursor: pointer; text-decoration: none;
+  }
+  .rail-tool[aria-pressed="true"] { color: var(--pdx-color-primary-ink); }
+  /* The pin is a pushpin: outlined when the entry is not pinned, filled when it is. */
+  .pushpin { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .rail-tool[aria-pressed="true"] .pushpin-head { fill: currentColor; }
+  /* A printed page is the record, not the application around it. */
+  @media print {
+    .catalog { display: none !important; }
+  }
   .catalog-head {
     display: flex; align-items: center; gap: var(--pdx-space-xs);
     height: var(--app-bar-height); padding: 0 var(--pdx-space-sm);

@@ -8,8 +8,9 @@
 //     `app-row > td`;
 //   - a selector whose subject — its last compound — is a tag or classes the template never writes,
 //     in a template that renders components: it could only have matched what a child renders. A
-//     class the script names as a whole word of a string (`d.className = 'scroll-item'`) counts as
-//     written: an element the component builds is its own.
+//     class the script puts on an element (`d.className = 'scroll-item'`) counts as written: an
+//     element the component builds is its own. One it only names in a string does not — handed to a
+//     component (`cellClass: () => 'warranty-ended'`), it lands on what that component renders.
 // The second is a reading of the text, not a match against the DOM: a class a script assembles out of
 // pieces is not seen, and such a selector is flagged although it is the component's own.
 
@@ -80,10 +81,14 @@ function compounds(sel: string): string[] {
     return parts;
 }
 
-/** Whether the script names `cls` as a whole word inside a string: `'scroll-item'`, `'badge active'`. */
+/**
+ * Whether the script puts `cls` on an element itself: `el.className = 'scroll-item'`,
+ * `el.classList.add('open')`, `el.setAttribute('class', 'x')`. A class merely named in a string —
+ * returned to a component's `cellClass`, say — lands on what that component renders, past the scope.
+ */
 function scriptWrites(script: string, cls: string): boolean {
-    // Match: the class between a quote or a space on each side. Groups: none
-    return new RegExp(`['"\`\\s]${cls}['"\`\\s]`).test(script);
+    // Match: a class assignment, then a string holding the class as a whole word. Groups: none
+    return new RegExp(`(\\.className\\s*=|\\.classList\\.(?:add|toggle|replace)\\(|setAttribute\\(\\s*['"]class['"]\\s*,)\\s*['"\`]([^'"\`]*\\s)?${cls}(\\s[^'"\`]*)?['"\`]`).test(script);
 }
 
 /** Whether `sel` reaches inside a component the template renders, read off the template's and script's text. */

@@ -364,7 +364,10 @@ applyDensity(storedDensity());
        insets, the design system's input height (40) — the height of a bar holding a control — and
        its 1px rule. */
     --app-bar-height: calc(2 * var(--pdx-inset) + var(--pdx-input-min-height) * var(--pdx-density-factor, 1) + 1px);
+    /* The rail's width, which the catalogue beside it starts at (src/shell/catalog.pdx). */
+    --app-rail-width: 300px;
   }
+  .app[data-side="collapsed"] { --app-rail-width: 80px; }
 
 
   /* Three items on one row, and each one says how it behaves under pressure. Left to the defaults,
@@ -410,21 +413,8 @@ applyDensity(storedDensity());
   .app[data-side="collapsed"] .rail { --rail-pad: var(--pdx-space-2xs); }
   .app[data-side="expanded"] .rail { --rail-pad: var(--pdx-space-xs); }
 
-  /* The catalogue: a panel of its own beside the rail, over the content — its own
-     surface and edge, a heading, a way out. Its left is the rail's right, at either width. */
-  /* The rail's SECOND COLUMN: the rail's surface and edge, the window's height, and no shadow — a
-     card with a large shadow reads as floating over the page. Its head is the rail head's height with the same rule under it, so the two read as one
-     strip. */
-  .catalog {
-    position: fixed; top: 0; bottom: 0; left: 300px; z-index: 30;
-    width: 320px; max-width: calc(100vw - 300px);
-    display: flex; flex-direction: column;
-    overflow: hidden;
-    background: var(--pdx-color-surface);
-    border-right: 1px solid var(--pdx-color-border);
-    --rail-pad: var(--pdx-space-xs);
-  }
-  .app[data-side="collapsed"] .catalog { left: 80px; max-width: calc(100vw - 80px); }
+  /* The catalogue lays itself out (src/shell/catalog.pdx): a scoped style stops at a child
+     component, so the shell hands it the rail's width, `--app-rail-width`, and nothing more. */
   /* The pin is a pushpin: outlined when the entry is not pinned, filled when it is. */
   .pushpin { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .rail-tool[aria-pressed="true"] .pushpin-head { fill: currentColor; }
@@ -598,6 +588,6 @@ applyDensity(storedDensity());
   /* A printed page is the record, not the application around it: the rail, the
      catalogue, the handle and the service bar stay on screen. */
   @media print {
-    .rail, .catalog, .rail-handle { display: none !important; }
+    .rail, .rail-handle { display: none !important; }
   }
 </style>

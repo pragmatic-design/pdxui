@@ -127,6 +127,11 @@ describe('pdx migrate: a scoped selector that reached inside a child', () => {
         expect(scopedReachesChild.detect(text)).toEqual([]);
     });
 
+    it('flags a class the script hands to a component to put on what it renders', () => {
+        const text = `<template><pdx-data-grid :columns="columns"></pdx-data-grid></template>\n<script setup>\nconst columns = [{ field: 'ends', cellClass: (v) => (v < '2026' ? 'warranty-ended' : '') }];\n</script>\n<style scoped>\n.warranty-ended { color: red; }\n</style>\n`;
+        expect(scopedReachesChild.detect(text).map((f) => f.found)).toEqual(['.warranty-ended']);
+    });
+
     it('control — a template that renders no component has nothing to reach into', () => {
         expect(scopedReachesChild.detect(file('<div class="a">x</div>', 'button { color: red; }'))).toEqual([]);
     });

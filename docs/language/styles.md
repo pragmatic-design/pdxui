@@ -64,10 +64,14 @@ boundary. A rule's body, nested rules (`&`) included, is copied as written.
   its states, `:state(name)` (`@state`, #132), and its tokens; its internal classes are not public,
   and under `'baseline-2026'` a scoped rule does not reach them. `pdx migrate` flags a scoped selector
   that did (`scoped-reaches-child`): one that names a component's tag and descends into it, or one whose
-  subject the template never writes and the script never names in a string.
+  subject the template never writes and the script never puts on an element (`el.className = …`,
+  `el.classList.add(…)`).
 - An element the script creates inside an element of the template is the component's own, and a
   scoped rule reaches it — unless it sits inside a child component without a marked element around
   it: a node appended straight into a component's tag is past the scope's end. Not checked today.
+- A class handed to a component to put on what it renders — `pdx-data-grid`'s `cellClass` and
+  `rowClass` — lands past the scope's end under `'baseline-2026'`: style it from a plain `<style>`
+  block. `pdx migrate` flags the scoped rule.
 - The selector list is split at its top-level commas only: a list inside `:is()`, `:where()`,
   `:not()` or `:has()` is one selector, `:is(.a, .b) > span` → `[data-pdx-HASH] :is(.a, .b) > span`
   under `'baseline-2024'`.

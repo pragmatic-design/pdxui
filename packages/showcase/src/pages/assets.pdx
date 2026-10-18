@@ -185,9 +185,14 @@ async function onCreate(e) {
 
 <style scoped>
   .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
-  .page .warranty-ended { color: var(--pdx-color-danger-ink); font-weight: 600; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--pdx-space-md); }
   .pick-label { margin: var(--pdx-space-md) 0 var(--pdx-space-xs); }
   .picked { margin: var(--pdx-space-xs) 0 0; font-weight: 600; }
   .actions { display: flex; justify-content: flex-end; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-lg); }
+</style>
+
+<style>
+  /* The grid puts `cellClass` on a cell IT renders, past this page's scoped style: the mark is
+     page-level CSS. */
+  .warranty-ended { color: var(--pdx-color-danger-ink); font-weight: 600; }
 </style>
