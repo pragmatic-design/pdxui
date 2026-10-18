@@ -25,6 +25,15 @@ export function nestedThemeGuard(name: string): string {
  */
 export function guardThemeRules(css: string, name: string): string {
     const guard = nestedThemeGuard(name);
+    return mapSelectorLists(css, (list) => guardSelectorList(list, guard));
+}
+
+/**
+ * `css` with `map` applied to the selector list of every style rule, recursing into at-rule blocks.
+ * Comments and strings are copied as they are; a block-less at-rule too; a rule's declarations and
+ * nested rules are copied as written.
+ */
+function mapSelectorLists(css: string, map: (list: string) => string): string {
     let out = '';
     let i = 0;
     let prelude = '';
@@ -75,11 +84,11 @@ export function guardThemeRules(css: string, name: string): string {
             const head = prelude;
             prelude = '';
             if (head.trim().startsWith('@')) {
-                // An at-rule's block holds rules: guard them, keep the braces.
+                // An at-rule's block holds rules: map them, keep the braces.
                 const block = copyBlock();
-                out += head + '{' + guardThemeRules(block.slice(1, -1), name) + '}';
+                out += head + '{' + mapSelectorLists(block.slice(1, -1), map) + '}';
             } else {
-                out += guardSelectorList(head, guard) + copyBlock();
+                out += map(head) + copyBlock();
             }
             continue;
         }
@@ -94,6 +103,83 @@ export function guardThemeRules(css: string, name: string): string {
         i++;
     }
     return out + prelude;
+}
+
+/**
+ * `css` with every `@pdx-theme <name> { … }` block expanded (#155): each rule inside gets the theme
+ * root before each of its selectors and the guard on their subject — `[pdx-theme="name"] sel:not(…)` —
+ * and the block's braces go. A shipped theme's overrides are written that way in
+ * packages/design/theme-sources/, and src/themes/<name>.css is generated from them
+ * (scripts/gen-themes.mjs). Everything outside a block is copied as written.
+ *
+ * The block is written as the generator reads it: `@pdx-theme <name> {` alone on its line, its rules
+ * after it, and its closing `}` at the start of a line.
+ */
+export function expandThemeBlocks(css: string): string {
+    let out = '';
+    let pos = 0;
+    // Match: a block's opening line. Groups: [1]=the theme name
+    const OPEN = /^@pdx-theme ([\w-]+) \{\n/gm;
+    let m: RegExpExecArray | null;
+    while ((m = OPEN.exec(css)) !== null) {
+        const brace = m.index + m[0].length - 2;
+        const close = matchingBrace(css, brace);
+        if (close < 0 || css[close - 1] !== '\n') throw new Error(`@pdx-theme ${m[1]}: the block is not closed by a \`}\` at the start of a line`);
+        const body = css.slice(m.index + m[0].length, close - 1);
+        const root = `[pdx-theme="${m[1]}"]`;
+        out += css.slice(pos, m.index) + guardThemeRules(mapSelectorLists(body, (list) => prefixSelectorList(list, root)), m[1]);
+        pos = close + 1;
+        OPEN.lastIndex = pos;
+    }
+    return out + css.slice(pos);
+}
+
+/** Where the block opened at `css[open] === '{'` closes, strings and comments skipped; -1 if it does not. */
+function matchingBrace(css: string, open: number): number {
+    let depth = 0;
+    for (let k = open; k < css.length; k++) {
+        const c = css[k];
+        if (c === '"' || c === "'") {
+            for (k++; k < css.length && css[k] !== c; k++) if (css[k] === '\\') k++;
+        } else if (c === '/' && css[k + 1] === '*') {
+            const end = css.indexOf('*/', k + 2);
+            if (end < 0) return -1;
+            k = end + 1;
+        } else if (c === '{') depth++;
+        else if (c === '}' && --depth === 0) return k;
+    }
+    return -1;
+}
+
+/**
+ * The theme root in each selector of a list, as CSS nesting places it: where the selector writes `&`
+ * (`[pdx-tab-style="pill"]& .pdx-tab`), or else before it with a descendant space, after the
+ * whitespace that leads it.
+ */
+function prefixSelectorList(list: string, root: string): string {
+    return splitTop(list, (c) => c === ',').map((s) => {
+        if (!s.trim()) return s;
+        const amp = topLevelAmpersands(s);
+        if (amp.length) return amp.reduceRight((acc, k) => acc.slice(0, k) + root + acc.slice(k + 1), s);
+        const lead = s.slice(0, s.length - s.trimStart().length);
+        return `${lead}${root} ${s.slice(lead.length)}`;
+    }).join(',');
+}
+
+/** The offsets of `&` in a selector, outside brackets, parentheses and strings. */
+function topLevelAmpersands(selector: string): number[] {
+    const out: number[] = [];
+    let depth = 0;
+    let quote = '';
+    for (let k = 0; k < selector.length; k++) {
+        const c = selector[k];
+        if (quote) { if (c === '\\') k++; else if (c === quote) quote = ''; continue; }
+        if (c === '"' || c === "'") quote = c;
+        else if (c === '(' || c === '[') depth++;
+        else if (c === ')' || c === ']') depth--;
+        else if (c === '&' && depth === 0) out.push(k);
+    }
+    return out;
 }
 
 /** Split `text` at top-level occurrences of `isSep`, outside brackets, parentheses and strings. */

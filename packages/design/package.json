@@ -363,6 +363,7 @@
     "dev": "npx serve demo -p 3333",
     "gen:themes": "npx tsx scripts/gen-brand-themes.ts",
     "gen:reference": "node scripts/gen-theming-reference.mjs",
+    "gen:theme-files": "node scripts/gen-themes.mjs",
     "gen:entries": "node scripts/gen-layered-entries.mjs",
     "build": "node scripts/gen-layered-entries.mjs && node scripts/build-css.mjs && tsc -p tsconfig.engine.json",
     "test": "npx playwright test --config tests/playwright.config.ts",

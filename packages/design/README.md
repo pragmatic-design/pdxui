@@ -212,7 +212,7 @@ Every surface/component exposes CSS Custom Properties:
     [pdx-theme="my-brand"] [pdx-theme]:not([pdx-theme="my-brand"]) *)) { … }
 ```
 
-`:where()` adds no specificity. `tests/nested-themes.spec.ts` fails on any rule of a shipped theme that lacks the guard. `@scope` would express the same thing directly, but it is outside the browser baseline below.
+`:where()` adds no specificity. A shipped theme does not write it by hand (#155): its source, `theme-sources/<name>.css`, writes the overrides inside `@pdx-theme <name> { … }` without the root and the guard — `.pdx-primary { … }`, or `[pdx-tab-style="pill"]& .pdx-tab { … }` where a behaviour attribute sits beside the root, `&` being the root as in CSS nesting — and `pnpm --filter @pdxui/design gen:theme-files` writes `src/themes/<name>.css` with both. `src/themes/*.css` are generated: edit the source. `packages/cli/tests/theme-sources.test.ts` fails when the two drift apart, and `tests/nested-themes.spec.ts` stays the behavioural check. `@scope` would express the same thing directly, but it is outside the browser baseline below.
 
 A generated theme gets the same guard: `createTheme().toCSS()` passes the design language's and the author's `cssOverrides` through `guardThemeRules` (`src/engine/nested-theme-guard.ts`), so a theme saved from the builder stops at a nested theme too.
 

@@ -1,0 +1,23 @@
+/* ==========================================================================
+   Pragmatic Design CSS — Neutral Theme
+   Neutral charcoal palette. Deliberately unbranded — a vanilla canvas.
+   The canvas theme (also applies when no [pdx-theme] is set).
+   Themes add personality. light-dark() handles dark mode via pdx-scheme.
+   ========================================================================== */
+
+[pdx-theme="neutral"],
+:root:not([pdx-theme]) {
+    --pdx-hue-primary: 260;
+    --pdx-hue-accent:  170;
+    --pdx-hue-danger:  25;
+    --pdx-hue-warning: 85;
+    --pdx-hue-success: 155;
+
+    /* Neutral charcoal — very low chroma, functional not expressive */
+    --pdx-color-primary:       oklch(0.35 0.02 260);
+    --pdx-color-primary-hover: oklch(0.28 0.03 260);
+    --pdx-color-primary-text:  oklch(0.98 0.002 260);
+    --pdx-color-accent:        oklch(0.55 0.10 170);
+    --pdx-color-accent-text:   white;
+    --pdx-color-focus:         oklch(0.40 0.04 260);
+}
