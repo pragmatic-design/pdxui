@@ -30,11 +30,13 @@
 
 /* Optional premium hover (lift/glow) — opt-in via tokens, default no-op. The glow
    applies only when NOT focused, so it never overrides the focus ring. */
+/* The old names, `--pdx-button-hover-transform` and `-hover-shadow`, are read after the new ones so a
+   theme written before #154 keeps its lift and glow. */
 :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):hover {
-    transform: var(--pdx-button-hover-transform, none);
+    transform: var(--pdx-button-transform-hover, var(--pdx-button-hover-transform, none));
 }
 :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):hover:not(:focus-visible) {
-    box-shadow: var(--pdx-button-hover-shadow, none);
+    box-shadow: var(--pdx-button-shadow-hover, var(--pdx-button-hover-shadow, none));
 }
 
 :is(button, a, [role="button"], .pdx-chip, .pdx-badge).pdx-primary {
@@ -138,6 +140,57 @@
     &:hover { color: var(--pdx-color-primary-hover); text-decoration-thickness: 2px; }
     &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
     &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+}
+
+/* The button's component tokens (#154): `--pdx-button-bg`, `--pdx-button-bg-hover` and
+   `--pdx-button-color`, set at any level — `:root`, a subtree, one element's `style`. Every variant
+   reads them and falls back to what it draws itself. Written for the button elements only, after the
+   rules above: the variant classes on a chip or a badge are not a button and do not take them. A
+   variant whose hover is a `filter` keeps it; its hover background is the token, or its own. */
+:is(button, a, [role="button"]).pdx-primary {
+    background: var(--pdx-button-bg, var(--pdx-primary-gradient, var(--pdx-color-primary)));
+    color: var(--pdx-button-color, var(--pdx-color-primary-text));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-primary-hover)); }
+}
+:is(button, a, [role="button"]).pdx-secondary {
+    background: var(--pdx-button-bg, var(--pdx-color-secondary));
+    color: var(--pdx-button-color, var(--pdx-color-secondary-text));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-secondary))); }
+}
+:is(button, a, [role="button"]).pdx-outline {
+    background: var(--pdx-button-bg, transparent);
+    color: var(--pdx-button-color, var(--pdx-color-text));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-inset)); }
+}
+:is(button, a, [role="button"]).pdx-ghost {
+    background: var(--pdx-button-bg, transparent);
+    color: var(--pdx-button-color, var(--pdx-color-muted));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-inset)); color: var(--pdx-button-color, var(--pdx-color-text)); }
+}
+:is(button, a, [role="button"]).pdx-danger {
+    background: var(--pdx-button-bg, var(--pdx-color-danger));
+    color: var(--pdx-button-color, var(--pdx-color-danger-text, white));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-danger-hover)); }
+}
+:is(button, a, [role="button"]).pdx-success {
+    background: var(--pdx-button-bg, var(--pdx-color-success));
+    color: var(--pdx-button-color, var(--pdx-color-success-text, white));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-success))); }
+}
+:is(button, a, [role="button"]).pdx-warning {
+    background: var(--pdx-button-bg, var(--pdx-color-warning));
+    color: var(--pdx-button-color, var(--pdx-color-warning-text, var(--pdx-gray-900)));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-warning))); }
+}
+:is(button, a, [role="button"]).pdx-info {
+    background: var(--pdx-button-bg, var(--pdx-color-accent));
+    color: var(--pdx-button-color, var(--pdx-color-accent-text));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-accent))); }
+}
+:is(button, a, [role="button"]).pdx-link {
+    background: var(--pdx-button-bg, transparent);
+    color: var(--pdx-button-color, var(--pdx-color-primary-ink));
+    &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, transparent)); color: var(--pdx-button-color, var(--pdx-color-primary-hover)); }
 }
 
 /* Sizes — derived from the --pdx-button-min-height token (md) with fixed offsets.

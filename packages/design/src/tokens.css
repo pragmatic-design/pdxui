@@ -411,6 +411,9 @@
     /* Button — shape is expressed by --pdx-button-radius (what the CSS actually reads);
        the engine derives it from the design-language's buttonShape. */
     --pdx-button-min-height: 2.5rem;       /* 40px default */
+    --pdx-button-bg:         initial;      /* unset: each variant's own fill; set it at any level (#154) */
+    --pdx-button-bg-hover:   initial;      /* unset: each variant's own hover */
+    --pdx-button-color:      initial;      /* unset: each variant's own label */
 
     /* Floating elements (popover, tooltip, dropdown, select, autocomplete) */
     --pdx-float-offset:      4px;
@@ -433,7 +436,8 @@
        Signature themes may still override for per-glyph size/color/weight. */
     --pdx-accordion-glyph:          '+';
     --pdx-accordion-glyph-size:     var(--pdx-text-lg);
-    --pdx-accordion-open-transform: rotate(45deg);
+    --pdx-accordion-transform-open: initial;  /* rotate(45deg), accordion.css's fallback; unset so an older theme's --pdx-accordion-open-transform still applies */
+    --pdx-accordion-open-transform: initial;  /* the name before #154, read after --pdx-accordion-transform-open */
 
     /* Breadcrumb — single source of truth for the separator glyph, read by BOTH
        the CSS breadcrumb (::after) and the WC (.pdx-breadcrumb-sep). A theme sets
@@ -459,8 +463,10 @@
        a value; components read it with a fallback so "unset" = off.
        (The card accent edge is already a system of classes: .pdx-card-accent-{success|danger|…}.) */
     --pdx-primary-gradient:       initial;  /* e.g. linear-gradient(135deg, …) on the primary button */
-    --pdx-button-hover-transform: none;     /* e.g. translateY(-1px) → a premium "lift" */
-    --pdx-button-hover-shadow:    none;     /* e.g. a glow on hover (not on focus) */
+    --pdx-button-transform-hover: initial;  /* e.g. translateY(-1px) → a premium "lift"; unset so an older theme's --pdx-button-hover-transform still applies */
+    --pdx-button-shadow-hover:    initial;  /* e.g. a glow on hover (not on focus); unset so an older theme's --pdx-button-hover-shadow still applies */
+    --pdx-button-hover-transform: initial;  /* the name before #154, read after --pdx-button-transform-hover */
+    --pdx-button-hover-shadow:    initial;  /* the name before #154, read after --pdx-button-shadow-hover */
 
     /* Toggle/Switch */
     --pdx-toggle-width:      2.75rem;

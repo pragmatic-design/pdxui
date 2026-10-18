@@ -40,7 +40,7 @@ test('it reports the count for the selected theme, and the count differs per the
 test('it names the tokens, not just how many', async ({ page }) => {
     // A count alone would leave the author exactly where they started.
     await open(page, 'cupertino');
-    await expect(page.locator('[data-test="inherit-list"]')).toHaveText('--pdx-button-hover-shadow');
+    await expect(page.locator('[data-test="inherit-list"]')).toHaveText('--pdx-button-shadow-hover');
 
     await open(page, 'glass');
     const listed = await page.locator('[data-test="inherit-list"] .viol-rule').allTextContents();

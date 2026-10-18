@@ -114,14 +114,15 @@
 
 /* ── Buttons: premium gradient + hover lift ── */
 [pdx-theme="pragmatic"] .pdx-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    background: linear-gradient(135deg, oklch(0.58 0.20 235), oklch(0.50 0.22 250));
+    /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
+    background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.58 0.20 235), oklch(0.50 0.22 250)));
 }
 [pdx-theme="pragmatic"] .pdx-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    --pdx-button-hover-shadow: 0 4px 16px oklch(0.50 0.20 235 / 0.35);
-    --pdx-button-hover-transform: translateY(-1px);
+    --pdx-button-shadow-hover: 0 4px 16px oklch(0.50 0.20 235 / 0.35);
+    --pdx-button-transform-hover: translateY(-1px);
 }
 [pdx-theme="pragmatic"] .pdx-primary:hover:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    background: linear-gradient(135deg, oklch(0.52 0.22 235), oklch(0.45 0.24 250));
+    background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.52 0.22 235), oklch(0.45 0.24 250)));
 }
 
 [pdx-theme="pragmatic"] .pdx-secondary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {

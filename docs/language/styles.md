@@ -416,6 +416,56 @@ sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Un
 
 beta (#153)
 
+### Component tokens
+
+#### Syntax
+
+```ebnf
+ComponentToken ::= "--pdx-" KebabName "-" KebabName ( "-" KebabName )?   /* --pdx-<component>-<property>[-<state>] */
+```
+
+#### Semantics
+
+A component's own customisable values are custom properties named `--pdx-<component>-<property>[-<state>]`
+(#154): `--pdx-button-bg`, `--pdx-button-bg-hover`, `--pdx-button-color`, `--pdx-button-radius`. The
+component's CSS reads its own token first and falls back to a global token, or to the value it draws
+itself: `background: var(--pdx-button-bg, var(--pdx-color-primary))`. They are overridden by the cascade
+at any level — `:root`, a subtree, one element's `style` — and a theme sets them like any token. Each
+component's tokens are read off the design CSS into the manifest's `cssProperties`, with the default
+`tokens.css` gives (`packages/design/scripts/component-tokens.mjs`), and listed on its docs page. A
+token belongs to the component whose name is its longest prefix; one read only as another's fallback
+is a renamed token's old name, not part of the surface.
+
+#### Rules
+
+- A token renamed to the convention keeps its old name as the fallback of the new one, so a theme
+  written before the rename keeps working: `--pdx-button-hover-shadow`, `--pdx-button-hover-transform`
+  and `--pdx-accordion-open-transform` still apply.
+- A component's CSS reading another component's token is to become a design lint error (#514). Not
+  checked today.
+
+#### Examples
+
+```pdx
+<template>
+  <div class="actions">
+    <pdx-button>Save</pdx-button>
+    <pdx-button class="quiet">Later</pdx-button>
+  </div>
+</template>
+
+<style scoped>
+.actions { --pdx-button-radius: 9999px; }
+.quiet { --pdx-button-bg: var(--pdx-color-inset); --pdx-button-color: var(--pdx-color-text); }
+</style>
+```
+
+Both buttons are pills; the second has the inset background and the text colour.
+
+#### Since
+
+beta (#154)
+
 ## Where the CSS goes
 
 ### Development and production

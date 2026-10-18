@@ -226,6 +226,16 @@
         <pdx-button data-test="btn-pending">Save</pdx-button>
     </section>
 
+    <section data-scenario="button-tokens">
+        <h3>Button — Component tokens on one element</h3>
+        <div class="row">
+                    <pdx-button data-test="tok" style="--pdx-button-bg: rgb(10, 20, 30); --pdx-button-bg-hover: rgb(1, 2, 3); --pdx-button-color: rgb(250, 240, 230)">Token</pdx-button>
+                    <pdx-button data-test="tok-danger" variant="danger" style="--pdx-button-bg: rgb(10, 20, 30)">Danger</pdx-button>
+                    <pdx-button data-test="tok-plain">Plain</pdx-button>
+                    <pdx-button data-test="tok-legacy" variant="danger" style="--pdx-button-hover-transform: translateY(-3px)">Legacy</pdx-button>
+                </div>
+    </section>
+
     <section data-scenario="button-labels">
         <h3>Button — Labels of every variant</h3>
         <div class="row">

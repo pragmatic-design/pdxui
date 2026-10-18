@@ -45,7 +45,7 @@ describe('the theme contract', () => {
 
 describe('what each theme inherits', () => {
     it('names cupertino’s single gap exactly', () => {
-        expect(gaps.get('cupertino')).toEqual(['--pdx-button-hover-shadow']);
+        expect(gaps.get('cupertino')).toEqual(['--pdx-button-shadow-hover']);
     });
 
     it('names tokens in glass, the widest case', () => {

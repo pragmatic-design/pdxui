@@ -310,7 +310,7 @@ describe('engine ↔ shipped theme fidelity', () => {
                 // Card VALUES + premium hover: both are per-theme CSS the engine
                 // expresses too.
                 '--pdx-card-radius', '--pdx-card-shadow', '--pdx-card-border-color',
-                '--pdx-button-hover-shadow', '--pdx-button-hover-transform',
+                '--pdx-button-shadow-hover', '--pdx-button-transform-hover',
             ];
             for (const token of BEHAVIOR) {
                 it(`${token} matches the shipped value exactly`, () => {

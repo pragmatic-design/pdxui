@@ -145,6 +145,19 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-accordion-glyph",
+              "default": "'+'"
+            },
+            {
+              "name": "--pdx-accordion-glyph-size",
+              "default": "var(--pdx-text-lg)"
+            },
+            {
+              "name": "--pdx-accordion-transform-open"
+            }
           ]
         }
       ],
@@ -2833,6 +2846,12 @@
               "name": "item",
               "description": "Scoped — renders one crumb. Receives `{ item, index, isFirst, isLast }`."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-breadcrumb-separator",
+              "default": "'/'"
+            }
           ]
         }
       ],
@@ -3424,6 +3443,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-button-bg"
+            },
+            {
+              "name": "--pdx-button-bg-hover"
+            },
+            {
+              "name": "--pdx-button-color"
+            },
+            {
+              "name": "--pdx-button-min-height",
+              "default": "2.5rem"
+            },
+            {
+              "name": "--pdx-button-radius"
+            },
+            {
+              "name": "--pdx-button-shadow-hover"
+            },
+            {
+              "name": "--pdx-button-transform-hover"
             }
           ]
         }
@@ -4071,6 +4114,20 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-card-border-color",
+              "default": "var(--pdx-color-border)"
+            },
+            {
+              "name": "--pdx-card-radius",
+              "default": "var(--pdx-radius-lg)"
+            },
+            {
+              "name": "--pdx-card-shadow",
+              "default": "var(--pdx-shadow-sm)"
             }
           ]
         }
@@ -9136,6 +9193,32 @@
               "name": "footer",
               "description": "Action area at the bottom (e.g. Confirm/Cancel); hidden automatically when empty."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-dialog-footer-height",
+              "default": "auto"
+            },
+            {
+              "name": "--pdx-dialog-header-height",
+              "default": "auto"
+            },
+            {
+              "name": "--pdx-dialog-width-lg",
+              "default": "640px"
+            },
+            {
+              "name": "--pdx-dialog-width-md",
+              "default": "480px"
+            },
+            {
+              "name": "--pdx-dialog-width-sm",
+              "default": "360px"
+            },
+            {
+              "name": "--pdx-dialog-width-xl",
+              "default": "800px"
+            }
           ]
         }
       ],
@@ -9525,6 +9608,11 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-drawer-width"
             }
           ]
         }
@@ -10819,6 +10907,11 @@
                 "label: string",
                 "icon: string"
               ]
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-fab-position"
             }
           ]
         }
@@ -12201,6 +12294,12 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-form-field-gap",
+              "default": "var(--pdx-space-md)"
             }
           ]
         }
@@ -14274,6 +14373,19 @@
               "name": "suffix",
               "description": "Content inside the input's frame, after the text."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-input-border-width",
+              "default": "var(--pdx-border-width)"
+            },
+            {
+              "name": "--pdx-input-height"
+            },
+            {
+              "name": "--pdx-input-min-height",
+              "default": "2.5rem"
+            }
           ]
         }
       ],
@@ -15182,6 +15294,11 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-masonry-gap"
             }
           ]
         }
@@ -21322,6 +21439,14 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-select-caret-size"
+            },
+            {
+              "name": "--pdx-select-caret-stroke"
+            }
           ]
         }
       ],
@@ -24890,6 +25015,16 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-toggle-height",
+              "default": "1.5rem"
+            },
+            {
+              "name": "--pdx-toggle-width",
+              "default": "2.75rem"
+            }
           ]
         }
       ],
@@ -26329,6 +26464,11 @@
             {
               "name": "node",
               "description": "Scoped — renders one node's label. Receives `{ node, level, expanded }`."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-tree-level"
             }
           ]
         }

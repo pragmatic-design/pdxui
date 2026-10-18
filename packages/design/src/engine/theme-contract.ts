@@ -9,9 +9,9 @@
 /** Tokens a majority of the 13 themes set (7 or more): what a theme is expected to have an opinion about. */
 export const THEME_CONTRACT: readonly string[] = [
     '--pdx-breadcrumb-separator',
-    '--pdx-button-hover-shadow',
     '--pdx-button-min-height',
     '--pdx-button-radius',
+    '--pdx-button-shadow-hover',
     '--pdx-card-style',
     '--pdx-color-accent',
     '--pdx-color-accent-text',
@@ -61,14 +61,14 @@ export const THEME_CONTRACT: readonly string[] = [
 
 /** Per theme, the contract tokens it does not set. 'neutral' is the base and has no entry. */
 export const THEME_INHERITED: Readonly<Record<string, readonly string[]>> = {
-    'corporate': ['--pdx-button-hover-shadow', '--pdx-color-warning', '--pdx-gray-200', '--pdx-gray-800', '--pdx-shadow-xl', '--pdx-table-header-color', '--pdx-table-header-letter-spacing', '--pdx-table-header-transform', '--pdx-table-header-weight'],
-    'cupertino': ['--pdx-button-hover-shadow'],
+    'corporate': ['--pdx-button-shadow-hover', '--pdx-color-warning', '--pdx-gray-200', '--pdx-gray-800', '--pdx-shadow-xl', '--pdx-table-header-color', '--pdx-table-header-letter-spacing', '--pdx-table-header-transform', '--pdx-table-header-weight'],
+    'cupertino': ['--pdx-button-shadow-hover'],
     'cyberpunk': ['--pdx-color-bg', '--pdx-color-border', '--pdx-color-border-strong', '--pdx-color-inset', '--pdx-color-surface', '--pdx-color-warning', '--pdx-table-header-border-width', '--pdx-table-header-weight'],
     'editorial': ['--pdx-color-border', '--pdx-color-border-strong', '--pdx-color-warning', '--pdx-shadow-color', '--pdx-table-header-color'],
-    'fluent': ['--pdx-button-hover-shadow', '--pdx-tab-indicator', '--pdx-table-header-border-width'],
+    'fluent': ['--pdx-button-shadow-hover', '--pdx-tab-indicator', '--pdx-table-header-border-width'],
     'glass': ['--pdx-breadcrumb-separator', '--pdx-button-min-height', '--pdx-color-warning', '--pdx-density-factor', '--pdx-font-mono', '--pdx-input-min-height', '--pdx-shadow-color', '--pdx-tab-indicator-size'],
     'material': ['--pdx-density-factor', '--pdx-font-mono', '--pdx-table-header-border-color', '--pdx-table-header-border-width'],
-    'metro': ['--pdx-button-hover-shadow', '--pdx-table-header-color'],
+    'metro': ['--pdx-button-shadow-hover', '--pdx-table-header-color'],
     'neumorphic': ['--pdx-color-bg', '--pdx-color-border', '--pdx-color-border-strong', '--pdx-color-inset', '--pdx-color-surface', '--pdx-color-warning', '--pdx-focus-ring', '--pdx-font-mono', '--pdx-tab-indicator-size'],
     'playful': ['--pdx-button-min-height', '--pdx-color-border', '--pdx-color-border-strong', '--pdx-color-inset', '--pdx-density-factor', '--pdx-font-mono', '--pdx-input-min-height', '--pdx-tab-indicator-size', '--pdx-table-header-border-width', '--pdx-table-header-letter-spacing', '--pdx-table-header-weight'],
     'pragmatic': ['--pdx-button-min-height', '--pdx-density-factor', '--pdx-input-min-height', '--pdx-tab-indicator-size'],

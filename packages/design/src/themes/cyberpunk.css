@@ -129,7 +129,7 @@
 
 /* ── Button: triple-layer neon glow hover ── */
 [pdx-theme="cyberpunk"] .pdx-primary:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
-    --pdx-button-hover-shadow: 0 0 6px oklch(from var(--pdx-color-primary) l c h / 0.5),
+    --pdx-button-shadow-hover: 0 0 6px oklch(from var(--pdx-color-primary) l c h / 0.5),
                 0 0 16px oklch(from var(--pdx-color-primary) l c h / 0.3),
                 0 0 32px oklch(from var(--pdx-color-primary) l c h / 0.1);
 }

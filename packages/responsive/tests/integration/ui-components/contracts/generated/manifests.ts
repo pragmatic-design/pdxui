@@ -148,6 +148,7 @@ export const scenarioPage: Record<string, string> = {
     "button-disabled": "tier-1a",
     "button-icon-only": "tier-1a",
     "button-action-pending": "tier-1a",
+    "button-tokens": "tier-1a",
     "button-labels": "tier-1a",
     "calendar-month": "tier-3",
     "calendar-disabled": "tier-3",

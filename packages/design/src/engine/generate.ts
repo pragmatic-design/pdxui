@@ -194,7 +194,7 @@ export function generateTheme(input: ThemeInput): GeneratedTheme {
     const accordionGlyph = { plus: "'+'", chevron: "'▾'", arrow: "'▸'" } as const;
     const accordionOpen = { plus: 'rotate(45deg)', chevron: 'rotate(180deg)', arrow: 'rotate(90deg)' } as const;
     tokens['--pdx-accordion-glyph'] = accordionGlyph[behaviors.accordionIcon];
-    tokens['--pdx-accordion-open-transform'] = accordionOpen[behaviors.accordionIcon];
+    tokens['--pdx-accordion-transform-open'] = accordionOpen[behaviors.accordionIcon];
     // Table header vocabulary → --pdx-table-header-*. Only the fields the language declares
     // are emitted; the rest inherit tokens.css.
     const TH_SUFFIX: Record<string, string> = {
@@ -210,8 +210,8 @@ export function generateTheme(input: ThemeInput): GeneratedTheme {
     const FLAT_VOCAB: Record<string, string> = {
         cardRadius: '--pdx-card-radius', cardShadow: '--pdx-card-shadow',
         cardBorderColor: '--pdx-card-border-color',
-        buttonHoverShadow: '--pdx-button-hover-shadow',
-        buttonHoverTransform: '--pdx-button-hover-transform',
+        buttonHoverShadow: '--pdx-button-shadow-hover',
+        buttonHoverTransform: '--pdx-button-transform-hover',
     };
     for (const [field, token] of Object.entries(FLAT_VOCAB)) {
         const v = (behaviors as unknown as Record<string, string | undefined>)[field];

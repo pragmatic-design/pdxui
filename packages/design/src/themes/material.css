@@ -280,7 +280,7 @@
 
 /* ── Button: M3 Filled — state layer on hover (onPrimary at 8%) ── */
 [pdx-theme="material"] .pdx-primary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    --pdx-button-hover-shadow: var(--pdx-shadow-sm);
+    --pdx-button-shadow-hover: var(--pdx-shadow-sm);
 }
 [pdx-theme="material"] .pdx-primary:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
     filter: brightness(1.08);

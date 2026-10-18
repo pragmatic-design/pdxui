@@ -152,7 +152,7 @@
     letter-spacing: 0.04em;
 }
 [pdx-theme="editorial"] .pdx-primary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
-    --pdx-button-hover-shadow: 0 2px 0 0 var(--pdx-color-primary);
+    --pdx-button-shadow-hover: 0 2px 0 0 var(--pdx-color-primary);
 }
 [pdx-theme="editorial"] .pdx-secondary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
     font-family: var(--pdx-font-heading);
