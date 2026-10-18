@@ -26,6 +26,7 @@ import { appPrefix, appPrefixHtml, appPrefixString } from './app-prefix';
 import { eventBubbles, emitRemoved } from './event-bubbles';
 import { asyncIsPending, asyncIsPendingScript, asyncAlphaNames, asyncAlphaNamesScript, loaderStateWords, loaderStateWordsScript } from './async-vocabulary';
 import { awaitAsAssertion, awaitPlainValue, awaitMaxMs } from './await-forms';
+import { navigateUrl, navigateUrlManual } from './navigate-url';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -51,6 +52,8 @@ export interface LanguageChangeContext {
     modelsOf?: ModelsLookup;
     /** The project's application tags renamed by #136, old → new (`projectTagRenames`). */
     projectTags?: ReadonlyMap<string, string>;
+    /** The project's route keys, `/users/:id` (`projectRoutePatterns`, #150). */
+    routePatterns?: ReadonlySet<string>;
 }
 
 /** A registered change. */
@@ -298,6 +301,9 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     awaitAsAssertion,
     awaitPlainValue,
     awaitMaxMs,
+    // #150: a concrete URL is navigate.url() (./navigate-url).
+    navigateUrl,
+    navigateUrlManual,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

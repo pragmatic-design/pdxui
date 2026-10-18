@@ -14,7 +14,7 @@
 import { defineCommand } from 'citty';
 import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, relative, resolve } from 'node:path';
-import { ComponentResolver, DEFAULT_TAG_PREFIX, languageChanges, parseSFC, projectTagRenames, type LanguageChange, type LanguageChangeContext } from '@pdxui/compiler';
+import { ComponentResolver, DEFAULT_TAG_PREFIX, languageChanges, parseSFC, projectRoutePatterns, projectTagRenames, type LanguageChange, type LanguageChangeContext } from '@pdxui/compiler';
 import { findFiles } from '../find-files';
 
 /** One rewrite: a file, the change applied, and how many places it rewrote. */
@@ -97,6 +97,8 @@ function projectContext(cwd: string, prefix: string, paths: string[]): LanguageC
             // An alpha template names a child by its alpha tag: it is looked up by the tag it has now.
             modelsOf: (tag) => resolver.modelsOf(projectTags.get(tag) ?? tag),
             projectTags,
+            // Its routes (#150): a `navigate('/x')` to one of them stays a pattern, any other is a URL.
+            routePatterns: new Set(projectRoutePatterns(cwd, paths)),
         };
     } catch {
         return {};

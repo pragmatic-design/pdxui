@@ -127,7 +127,7 @@ const prioritySeries = $derived(['high', 'normal', 'low'].map(p => ({
 })));
 
 function openTicket(e) {
-  navigate('/tickets/' + e.detail.id);
+  navigate('/tickets/:id', { id: String(e.detail.id) });
 }
 
 // The simulated server's knobs, in the Demo panel: what makes the counts move.

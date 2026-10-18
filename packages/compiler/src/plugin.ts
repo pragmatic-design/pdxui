@@ -34,6 +34,7 @@ import type { CompilerPlugin } from './plugin-system';
 import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
 import { generateRouteTable, routerSeamModule, devRouteTableModule, buildSpecifier, devSpecifier, ROUTE_TABLE_ID } from './route-table';
 import { generateLoaderModule, LOADER_MODULE_PREFIX } from './loader-module';
+import { writeRouteTypes } from './route-types';
 import { FormControlRegistry } from './compiler/codegen-form-binding';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
@@ -205,6 +206,20 @@ export function pdx(options?: PdxPluginOptions): Plugin {
     // to tell a style-only change (#246).
     const compiledSources = new Map<string, string>(); // module id → source
 
+    /**
+     * Scan the routes again and rewrite `.pdx/routes.d.ts` if they changed (#150): the dev server's
+     * answer to a page saved, added or stripped of its `@page`. The route table itself is left to
+     * the reload that follows a structural change; only the types are refreshed here.
+     */
+    function refreshRouteTypes(): void {
+        const root = viteRoot ?? process.cwd();
+        const routes: ScannedRoute[] = [];
+        for (const sub of ['src', 'pages']) {
+            scanForRoutes(resolve(root, sub), routes, (tag) => componentResolver.has(tag), defaultLayout, prefix);
+        }
+        if (routes.length > 0) writeRouteTypes(root, routes.map((r) => r.path));
+    }
+
     return {
         name: 'pragmatic-pdx',
         enforce: 'pre',
@@ -298,6 +313,8 @@ export function pdx(options?: PdxPluginOptions): Plugin {
                 scanForStores(dir, storeRegistry);
                 scanForRoutes(dir, scannedRoutes, (tag) => componentResolver.has(tag), defaultLayout, prefix);
             }
+            // The routes as types (#150), for navigate() and <pdx-link>: an app with no route has none.
+            if (scannedRoutes.length > 0) writeRouteTypes(root, scannedRoutes.map((r) => r.path));
 
             // Tag collisions found by the SCAN are reported here, through Rollup's warning channel,
             // so they carry a code and reach whatever is consuming the build — not only a terminal.
@@ -557,6 +574,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
         configureServer(server: ViteDevServer) {
             server.watcher.on('add', (file: string) => {
                 if (!extensions.some(ext => file.endsWith(ext))) return;
+                refreshRouteTypes();
 
                 const root = viteRoot ?? process.cwd();
                 const before = componentResolver.size;
@@ -579,6 +597,12 @@ export function pdx(options?: PdxPluginOptions): Plugin {
 
         async handleHotUpdate(ctx) {
             if (extensions.some(ext => ctx.file.endsWith(ext))) {
+                // A route changed (#150): `.pdx/routes.d.ts` follows, while the server runs. Read the
+                // saved text, not the module: a page that has just lost its `@page` changes the routes too.
+                const file = ctx.file.replace(/\\/g, '/');
+                if (/^[ \t]*@page[ \t]/m.test(await ctx.read()) || scannedRoutes.some((r) => r.file === file)) {
+                    refreshRouteTypes();
+                }
                 const mod = ctx.server.moduleGraph.getModuleById(ctx.file);
                 if (mod) {
                     ctx.server.moduleGraph.invalidateModule(mod);

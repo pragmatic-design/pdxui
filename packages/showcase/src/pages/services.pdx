@@ -105,7 +105,7 @@ const total = $derived(source.total());
 let gridEl = $signal(null);
 
 function openRecord(row) {
-  navigate(`/services/${row.id}`);
+  navigate('/services/:id', { id: String(row.id) });
 }
 
 // ── New ─────────────────────────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ async function onCreate(e) {
     ...v, slaHours: Number(v.slaHours), resolveHours: Number(v.resolveHours), price: Number(v.price),
   });
   createOpen = false;
-  navigate(`/services/${created.id}`);
+  navigate('/services/:id', { id: String(created.id) });
 }
 </script>
 

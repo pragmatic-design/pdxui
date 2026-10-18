@@ -16,6 +16,7 @@ import { routeFieldQuotedFix } from '../../src/compiler/fix-builders';
 import { parseRouteParams } from '../../src/compiler/script-analyzer-helpers';
 import { checkVirtualFor } from '../../src/compiler/validate-virtual';
 import { parseTemplate, type TemplateNode } from '../../src/parser/template';
+import { routeKey, routeParamsType } from '../../src/route-types';
 
 /** How long `fn` takes, and how it ended: a malformed input may be refused, and refusing it is timed too. */
 function elapsed(fn: () => void): { ms: number; outcome: string } {
@@ -68,6 +69,8 @@ const cases: [string, () => void][] = [
     // not see it, and these keep the rewrite as fast.
     ['handler arrow: $=> and a run of tabs (alert #159)', () => compile(pdx(`<button @click="$=>${'\t'.repeat(N)}">x</button>`), 'h.pdx')],
     ['handler assignment: a -= and a run of tabs (alert #160)', () => compile(pdx(`<button @click="a-=${'\t'.repeat(N)}">x</button>`), 'h.pdx')],
+    // The regex it replaced took about 6 s for 200,000 characters on the machine it was written on (#150).
+    ['route types: :A(( repeated (alerts #170, #171)', () => { const p = `/:A(${':A(('.repeat(N / 4)}`; routeKey(p); routeParamsType(p); }],
     // The regex it replaced took 1.7 s for 200,000 characters (#283).
     ['@for … @virtual shape: an open <ul> and <!-- repeated', () => checkVirtualFor([
         { type: 'html', content: `<ul><!--${'<!--'.repeat(N / 4)}` },

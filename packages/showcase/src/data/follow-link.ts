@@ -7,5 +7,5 @@ import { navigate } from '@pdxui/router';
 export function followLink(e: MouseEvent, href: string): void {
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
-    navigate(href);
+    navigate.url(href);
 }

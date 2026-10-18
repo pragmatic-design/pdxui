@@ -14,6 +14,8 @@ export {
     registerGuardChecker, setQuery, setQueryParam,
 } from './active';
 export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute } from './active';
+// Typed routes (#150): augmented by the app's generated `.pdx/routes.d.ts`.
+export type { Navigate, RouteRegistry, RoutePath, RouteParams, RouteArgs, NavigationState } from './route-types';
 
 // Compile-time route types. The route table is emitted by @pdxui/compiler
 // (virtual:pdx-routes); these type aliases keep public imports type-checking,

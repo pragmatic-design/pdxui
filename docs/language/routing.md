@@ -745,6 +745,69 @@ Both are signals: a template or a `$derived` that reads them updates with them.
 
 beta (#149)
 
+### navigate, navigate.url, and typed routes
+
+#### Syntax
+
+```ebnf
+NavigateCall ::= "navigate" "(" Path ( "," Expression ( "," Expression )? )? ")"
+               | "navigate.url" "(" Expression ( "," Expression )? ")"
+```
+
+A call from `@pdxui/router`, imported where it is used. `<pdx-link to="…" :params="…">` is the same
+call, made on a click.
+
+#### Semantics
+
+`navigate(pattern, params, state)` fills the pattern's `:param` placeholders from `params`, each
+value URL-encoded, and navigates there; `state` travels with the history entry, not in the URL.
+`navigate.url(url, state)` navigates to a concrete URL, query and hash included. Both refuse a target
+outside the origin.
+
+The build, and the dev server whenever a page is saved or added, write `.pdx/routes.d.ts` under the
+app's root from the scanned `@page` patterns (#150). It augments `@pdxui/router`'s `RouteRegistry`
+with one key per pattern, written without its constraints (`/users/:id`), and that pattern's params
+typed from them: `:id(number)` is a `number`; every other constraint, and no constraint, a `string`.
+With the file in the program — the editor and `pdx check --types` read it, and a `.ts` module reads
+it when the app's tsconfig includes `.pdx` — the calls are typed:
+
+- the path of `navigate()` is one of the keys, and its params are required when the pattern has any;
+- a concrete URL is `navigate.url()`: `navigate('/users/42')` is a type error;
+- `<pdx-link>` with a literal `to` is checked as `navigate(to, params)`; a computed `:to` is a URL,
+  which nothing types.
+
+Without the file every path is a string and every param a string or a number, as before.
+`<pdx-link :params="{ id: u.id }">` points at the filled URL: its `href`, its click and its active
+state.
+
+#### Rules
+
+- A pattern with a `*` has no key: a URL into it goes through `navigate.url()`.
+- The file is generated: it is rewritten when a route changes, and belongs in `.gitignore`.
+- `pdx migrate` rewrites `navigate('<literal>')` to `navigate.url('<literal>')` when the literal is
+  not one of the project's patterns, and flags a call whose path is not a literal, or a URL passed
+  with more arguments. A file that declares a `navigate` of its own is left alone.
+
+#### Examples
+
+```pdx
+<template>
+  <pdx-link to="/users/:id" :params="{ id: user.id }">{{ user.name }}</pdx-link>
+  <button @click="openNext()">Next</button>
+</template>
+
+<script setup>
+import { navigate } from '@pdxui/router';
+const user = { id: 41, name: 'Ada' };
+function openNext() { navigate('/users/:id', { id: user.id + 1 }); }
+function openSearch(q: string) { navigate.url(`/search?q=${encodeURIComponent(q)}`); }
+</script>
+```
+
+#### Since
+
+beta (#150)
+
 ## The document head
 
 ### @title

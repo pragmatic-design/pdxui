@@ -51,7 +51,8 @@
           ],
           "members": [
             { "kind": "field", "name": "to", "type": { "text": "string" }, "description": "Reflected to the `to` attribute, so a binding works.", "attribute": "to" },
-            { "kind": "field", "name": "exact", "type": { "text": "boolean" }, "description": "Reflected to the `exact` attribute, so a binding works.", "attribute": "exact" }
+            { "kind": "field", "name": "exact", "type": { "text": "boolean" }, "description": "Reflected to the `exact` attribute, so a binding works.", "attribute": "exact" },
+            { "kind": "field", "name": "params", "type": { "text": "Record<string, string | number> | undefined" }, "description": "The values of `to`'s params, as `:params=\"{ id: u.id }\"` binds them; the link points at the filled URL. The `params` attribute sets it from JSON." }
           ],
           "slots": [
             { "name": "", "description": "The link's content." }

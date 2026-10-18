@@ -409,7 +409,10 @@ function tsFilesOf(dir: string): string[] {
     const walk = (abs: string, rel: string): void => {
         for (const entry of readdirSync(abs, { withFileTypes: true })) {
             if (entry.isDirectory()) {
-                if (['node_modules', 'dist', 'coverage', '.turbo'].includes(entry.name)) continue;
+                // `.pdx` holds the app's routes as types, which the compiler's plugin writes on every
+                // build (#150): generated and git-ignored, like `dist`. It exists only after a build,
+                // so a tsconfig that compiled it would type-check differently before and after one.
+                if (['node_modules', 'dist', 'coverage', '.turbo', '.pdx'].includes(entry.name)) continue;
                 walk(join(abs, entry.name), rel ? `${rel}/${entry.name}` : entry.name);
             } else if (entry.name.endsWith('.ts')) {
                 out.push(rel ? `${rel}/${entry.name}` : entry.name);

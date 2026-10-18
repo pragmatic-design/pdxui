@@ -266,7 +266,7 @@ function onNavToggle(e) {
 function onNavSelect(e) {
     if (!e.detail.href) return;
     e.preventDefault();
-    navigate(e.detail.href);
+    navigate.url(e.detail.href);
 }
 
 /** Hover and focus fetch the route's chunk ahead of the click, as `<pdx-link>` does. */

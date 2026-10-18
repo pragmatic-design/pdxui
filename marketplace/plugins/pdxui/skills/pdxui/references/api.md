@@ -6426,12 +6426,14 @@ The same, for the state. 'idle' for a level that is not loading and has nothing.
 ```ts
 import { navigate } from '@pdxui/router';
 
-function navigate(path: string, params?: Record<string, string>, state?: Record<string, unknown>): void
+const navigate: Navigate
 ```
 
-Navigate programmatically.
-@param path — route path (can include :param placeholders)
-@param params — URL path params to replace :param segments
+Navigate to a route by its pattern (#150): `navigate('/users/:id', { id: 42 })`. With the app's
+generated `.pdx/routes.d.ts`, the pattern must be one the app declares and the params are typed
+from its constraints; a concrete URL goes through {@link navigate.url}.
+@param path — the route pattern (its `:param` placeholders are filled from `params`)
+@param params — the values of its params
 @param state — ephemeral navigation state (not in URL, accessible via currentState)
 
 ### `navigation`

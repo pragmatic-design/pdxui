@@ -127,7 +127,7 @@ const total = $derived(source.total());
 let gridEl = $signal(null);
 
 function openRecord(row) {
-  navigate(`/assets/${row.id}`);
+  navigate('/assets/:id', { id: String(row.id) });
 }
 
 // ── New ─────────────────────────────────────────────────────────────────────────
@@ -179,7 +179,7 @@ async function onCreate(e) {
     ...e.detail.values, customerId: Number(customer.id), siteId: Number(site?.id ?? 0), status: 'inService', categories: [],
   });
   createOpen = false;
-  navigate(`/assets/${created.id}`);
+  navigate('/assets/:id', { id: String(created.id) });
 }
 </script>
 

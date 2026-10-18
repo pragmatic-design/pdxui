@@ -221,7 +221,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // chunk that named its tags with the library's prefix now carries a second one, and gzip pays for
 // it. Measured on the built dist: js 464.1 KB, and 464.0 with every app- written back as pdx- — the
 // same bytes, 85 fewer gzipped over 216 occurrences.
-const BUDGET_KB = { entry: 40, js: 465, css: 60, blocking: 94 };
+// blocking 94 → 95: routes are types (#150). `<pdx-link>` takes `params` as a property and points its
+// href, click and active state at the filled URL; `navigate` gains `navigate.url`. Both are the router
+// in the entry; the types themselves erase. Same machine, same day, from the pre-push's own line:
+// main blocking 94.0, entry 39.3, js 464.2 → this branch 94.2, 39.5, 464.3.
+const BUDGET_KB = { entry: 40, js: 465, css: 60, blocking: 95 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

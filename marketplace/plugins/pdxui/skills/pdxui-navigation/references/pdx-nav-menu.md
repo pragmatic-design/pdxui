@@ -166,7 +166,7 @@ are checked against the manifest above._
 // function go(e) {
 //   if (!e.detail.href) return;
 //   e.preventDefault();       // the menu does not follow the link
-//   navigate(e.detail.href);  // the router does, with no page load
+//   navigate.url(e.detail.href);  // the router does, with no page load
 // }
 ```
 

@@ -202,8 +202,9 @@ export class PdxTsService {
     /**
      * @param rootDir the project the service checks — its nearest tsconfig.json is read
      * @param tsLibHint a typescript lib folder the client knows of (VS Code's own TypeScript)
+     * @param options.routeTypes false to leave the app's `.pdx/routes.d.ts` out of the program (#150)
      */
-    constructor(private rootDir: string, private tsLibHint?: string) {
+    constructor(private rootDir: string, private tsLibHint?: string, options: { routeTypes?: boolean } = {}) {
         const lib = findTsLibDir(rootDir, tsLibHint);
         // The project's tsconfig.json for what it decides — `paths`, `strict`, `lib`, `types`;
         // the defaults when it has none. What makes a projected .pdx a module that
@@ -223,13 +224,24 @@ export class PdxTsService {
             noEmit: true, skipLibCheck: true, allowNonTsExtensions: true,
         };
         const defaultLib = lib ? join(lib, 'lib.es2022.full.d.ts') : ts.getDefaultLibFilePath(this.options);
+        // The app's routes as types (#150), which the compiler's plugin writes on build and in dev:
+        // `navigate()` and `<pdx-link>` are checked against them once the file exists. Versioned by
+        // its modification time, so a route added while the editor is open is seen.
+        // A check of code that is not the app's — the documentation's examples — passes
+        // `routeTypes: false`, so the app's routes do not judge it.
+        const routeTypes = options.routeTypes === false ? '' : join(rootDir, '.pdx', 'routes.d.ts').replace(/\\/g, '/');
+        const routeTypesVersion = (): string => {
+            if (!routeTypes) return '0';
+            const stat = ts.sys.getModifiedTime?.(routeTypes);
+            return stat ? String(stat.getTime()) : '0';
+        };
 
         const host: ts.LanguageServiceHost = {
             // Bumped when the fileset or the content changes → the LS rebuilds the program
             // with the current file alone (nothing left over from earlier .pdx files).
-            getProjectVersion: () => String(this.projectVersion),
-            getScriptFileNames: () => [GLOBALS_FILE, ...this.files.keys()],
-            getScriptVersion: f => f === GLOBALS_FILE ? '1' : String(this.files.get(f)?.version ?? 0),
+            getProjectVersion: () => `${this.projectVersion}:${routeTypesVersion()}`,
+            getScriptFileNames: () => [GLOBALS_FILE, ...(routeTypes && ts.sys.fileExists(routeTypes) ? [routeTypes] : []), ...this.files.keys()],
+            getScriptVersion: f => f === GLOBALS_FILE ? '1' : f === routeTypes ? routeTypesVersion() : String(this.files.get(f)?.version ?? 0),
             getScriptSnapshot: f => {
                 if (f === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(GLOBALS_DTS);
                 const v = this.files.get(f);

@@ -95,7 +95,7 @@ proposals the implementing issue may change.
 | `@loader loadUser;` + `currentLoaderData()` | `@loader loadUser: loadUser;` + `loadUser.data()` | mechanical; reports the rename | #146 |
 | `currentLoaderState()` | `<name>.state()` | mechanical where the page has one loader; flagged otherwise | #141, #146 (†) |
 | a loader reading params from `location` or `currentParams()` | `({ params, signal })` | flagged | #146 (†) |
-| `navigate('/users/42')` | `navigate.url('/users/42')`, or `navigate('/users/:id', { id: 42 })` | mechanical to `navigate.url` | #150 |
+| `navigate('/users/42')` | `navigate.url('/users/42')`, or `navigate('/users/:id', { id: 42 })` | mechanical to `navigate.url` when the literal is not one of the project's patterns; a computed path, or a URL with more arguments, flagged — landed: `navigate-url`, `navigate-url-manual` | #150 |
 | `@store x { persist: 'other' }` | `'local'` or `'session'` | flagged | † (decision 14) |
 
 **Runtime behaviour that changes with the execution contract** (data.md E1–E9, F1–F7). These are

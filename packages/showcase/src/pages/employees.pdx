@@ -101,7 +101,7 @@ let gridEl = $signal(null);
 
 /** The record opens on its first section, which is where the reference lands. */
 function openRecord(row) {
-  navigate(`/employees/${row.id}/personal`);
+  navigate('/employees/:id/personal', { id: String(row.id) });
 }
 </script>
 

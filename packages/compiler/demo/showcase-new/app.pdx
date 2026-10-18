@@ -78,7 +78,7 @@ function _filterNavItems(items, query) {
 }
 
 function onNavSelect(e) {
-    navigate(e.detail.key);
+    navigate.url(e.detail.key);
     menuOpen = false;
 }
 function goDesign() { navigate('/design/typography'); }

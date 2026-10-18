@@ -104,7 +104,7 @@ async function onSubmit(e) {
     await login({ ...e.detail.values, ttl });
     // The permissions are already rebuilt: the effect in `src/auth.ts` runs on `setTokens`, so the
     // guard on the destination has something to read by the time the router asks.
-    navigate(destination);
+    navigate.url(destination);
   } catch (err) {
     // The SERVER's message, not one invented here: it is the server that knows why.
     failure = String(err?.data?.error ?? err?.message ?? err);

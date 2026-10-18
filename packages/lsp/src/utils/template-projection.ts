@@ -161,6 +161,33 @@ export function projectTemplate(
                     emit(');\n');
                 }
             }
+            // `<pdx-link to="/users/:id" :params="{ id: u.id }">` (#150): checked as the call it makes,
+            // `navigate(to, params)`, against the app's routes. Only a literal `to` — `to="…"`, or
+            // `:to="'…'"` — is a pattern to check; a computed one is a URL, which nothing types.
+            if (tag === 'pdx-link') {
+                // Match: `to="/x"` or `:to="'/x'"`. Groups: [1]=a static path [2]=a bound literal path
+                const toM = /(?<=\s)(?:to\s*=\s*"([^"]*)"|:to\s*=\s*"\s*'([^']*)'\s*")/.exec(attrsRegion);
+                // Match: `:params="expr"`. Groups: [1]=the expression
+                const paramsM = /(?<=\s):params\s*=\s*"([^"]*)"/.exec(attrsRegion);
+                const path = toM ? (toM[1] ?? toM[2]) : undefined;
+                if (toM && path !== undefined && !path.includes('${')) {
+                    const pathAbs = baseOff + attrsBase + toM.index + toM[0].indexOf(path, toM[0].indexOf('='));
+                    if (!inMask(pathAbs)) {
+                        // The literal with the quotes it has in the source — `"` around `to="…"`, `'`
+                        // inside `:to="'…'"` — mapped whole: TypeScript reports a wrong path on the
+                        // literal, quotes included, and an unmapped quote would drop the error.
+                        const quote = toM[1] !== undefined ? '"' : "'";
+                        emit(";(null! as typeof import('@pdxui/router').navigate)(");
+                        map.add(gen, templateStart + pathAbs - 1, path.length + 2); emit(quote + path + quote);
+                        if (paramsM && paramsM[1].trim() && !paramsM[1].includes('${')) {
+                            const paramsAbs = baseOff + attrsBase + paramsM.index + paramsM[0].indexOf('"') + 1;
+                            emit(', ');
+                            map.add(gen, templateStart + paramsAbs, paramsM[1].length); emit(paramsM[1]);
+                        }
+                        emit(');\n');
+                    }
+                }
+            }
             // `attach:name="value"` (#143): the name is an attachment, `(el, value: () => V) => void |
             // (() => void)`, and the value its V. Match: `attach:name` and its optional value.
             // Groups: [1]=name [2]=value

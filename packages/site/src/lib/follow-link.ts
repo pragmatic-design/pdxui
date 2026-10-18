@@ -13,5 +13,5 @@ export function followLink(e: MouseEvent): void {
     const href = (e.currentTarget as Element).getAttribute('href');
     if (!href) return;
     e.preventDefault();
-    navigate(href);
+    navigate.url(href);
 }

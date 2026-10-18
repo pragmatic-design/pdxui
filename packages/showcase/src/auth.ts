@@ -146,7 +146,7 @@ let wasSignedIn = auth.isAuthenticated();
 effect(() => {
     const signedIn = auth.isAuthenticated();
     if (wasSignedIn && !signedIn && typeof location !== 'undefined' && !isLoginPath(location.pathname)) {
-        navigate(loginFor(location.pathname + location.search));
+        navigate.url(loginFor(location.pathname + location.search));
     }
     wasSignedIn = signedIn;
 });
@@ -175,5 +175,5 @@ export function signOut(): void {
         off();
         if (isLoginPath(to)) logout();
     });
-    navigate(loginFor(here));
+    navigate.url(loginFor(here));
 }

@@ -82,12 +82,12 @@ const formattedRevenue = $derived($n(98750.5, { style: 'currency', currency: 'EU
 let activeLang = $signal(getLocale()());
 
 function goTo(target) {
-  navigate(target);
+  navigate.url(target);
 }
 
 function goToUser(id) {
   // Navigate with virtual state (not in URL)
-  navigate('/users/:id(number)', { id: String(id) }, { fromList: true, timestamp: Date.now() });
+  navigate('/users/:id', { id }, { fromList: true, timestamp: Date.now() });
 }
 
 function switchLocale(lang) {

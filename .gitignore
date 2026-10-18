@@ -10,6 +10,8 @@ dist-*/
 
 # Vite / cache
 .vite/
+# The app's routes as types, written by the compiler's plugin on build and in dev (#150)
+.pdx/
 .tmp-*/
 
 # Test / coverage
