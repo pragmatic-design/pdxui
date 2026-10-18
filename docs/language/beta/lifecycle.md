@@ -88,7 +88,7 @@ One browser suite (Chromium: mount order and disconnection are not reliable in h
    setup runs once.
 3. An `@if` removes a block with a `:ref`, an `attach:` and a child component that declares a
    `@fetch` → the ref is `null`, the attachment's cleanup ran, the child's request was aborted and its
-   cache subscription released.
+   cache subscription released. **Landed** (#143), in Chromium: `packages/showcase/tests/lifecycle.spec.ts`.
 4. A component is destroyed while its `@action` is pending → the request completes, `invalidate`
    runs, no error is thrown for the gone component.
 5. Eleven `<component :is @keepAlive>` views visited with a maximum of ten → the first is destroyed.

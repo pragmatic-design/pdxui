@@ -251,9 +251,12 @@ AttachBinding ::= "attach:" Identifier ( "=" AttrValue )?
 #### Semantics
 
 `attach:name="value"` calls the function `name` in scope as `name(element, () => value)` inside an
-effect owned by the element (#143); the function may return a cleanup, run before a re-run and when
+effect owned by the element (#143 — **landed**); the function may return a cleanup, run before a re-run and when
 the element is removed. Without a value the getter returns `undefined`. On a component, the
 attachment applies to its host. Core ships `autofocus`, `trapFocus` and `clickOutside(handler)`.
+As landed, the effect tracks the value only (what the attachment reads inside does not re-run it),
+and a built-in the script does not declare is imported by the compiler, so the import in the example
+below is optional.
 
 #### Rules
 

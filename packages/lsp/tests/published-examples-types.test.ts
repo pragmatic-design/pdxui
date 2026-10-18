@@ -50,6 +50,7 @@ const CATALOGUE = Object.entries(DIAGNOSTICS).flatMap(([code, entry]) => entry.e
 const TYPE_ERRORS_SHOWN: Record<string, { tsCode: number; why: string }[]> = {
     // The defect the example shows IS the misspelt name.
     'diagnostics catalogue PDX_UNDECLARED_REF (bad)': [{ tsCode: 2552, why: 'the misspelling it shows' }],
+    'diagnostics catalogue PDX_ATTACH_UNKNOWN (bad)': [{ tsCode: 2552, why: 'the misspelt attachment it shows' }],
     // The defect it shows: a quoted type drops the field, in the compiler and in the editor alike,
     // so the name it would have declared is not there.
     'diagnostics catalogue PDX_ROUTE_FIELD_INVALID (bad)': [{ tsCode: 2304, why: 'the field it drops' }],

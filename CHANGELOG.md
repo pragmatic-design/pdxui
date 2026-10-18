@@ -11,6 +11,15 @@ semver.
 
 ### Features
 
+- `attach:` attaches behaviour to an element. `<input attach:tooltip="'Search'">` calls
+  `tooltip(el, () => 'Search')` when the element is rendered. Its returned cleanup runs when the
+  value changes and when the element goes, with no ref, `onMount` or `onDestroy` written by hand. On
+  a component it attaches to the host.
+  - Core ships `autofocus`, `trapFocus` and `clickOutside` as attachments, exported from
+    `@pdxui/core`; the compiler imports them where a template names them.
+  - An unknown name is `PDX_ATTACH_UNKNOWN`, and the editor checks the value against the
+    attachment's type.
+  - `attach()` is core's runtime for it. (#143)
 - `pdx migrate [paths] [--dry]` moves code written in alpha to the beta. Every form the beta removes or
   changes is registered once in the compiler; a removed form is an error, `PDX_REMOVED_FORM`, whose
   message names what to write instead. `pdx migrate` rewrites every form that has a mechanical

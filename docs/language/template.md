@@ -578,6 +578,56 @@ function focus() { field?.focus(); }
 
 alpha; typed on a component since beta (#140)
 
+### `attach:` attachments
+
+#### Syntax
+
+```ebnf
+AttachBinding  ::= "attach:" Identifier ( "=" AttrValue )?
+```
+
+The analyzer's form: `attach:name` or `attach:name="value"`.
+
+#### Semantics
+
+`attach:name="value"` compiles to core's `attach(element, name, () => value)` (#143): `name` is called
+as `name(element, () => value)` inside an effect owned by the scope that rendered the element. The
+function may return a cleanup, which runs before the attachment runs again and when the element's
+scope is disposed — its `@if` branch, its `@for` row, the component. The effect tracks the value:
+when it changes, the cleanup runs and the attachment runs again; what the attachment reads inside
+does not re-run it. Without a value the getter returns `undefined`. On a component, the element is
+its host.
+
+`name` is read like any template identifier: a function of the script, or an import. Core's built-in
+attachments — `autofocus` (focuses the element, or the first focusable element inside a host, once it
+is in the document), `trapFocus` (core's `focusTrap` while the element is rendered) and
+`clickOutside` (calls its value, a handler, for a press outside the element) — are imported by the
+compiler when the script declares no name of its own for them. In the editor `name` is checked as
+`(el: Element, value: () => V) => void | (() => void)`, and the value as its `V`.
+
+#### Rules
+
+- A name that is neither in scope nor a built-in is `PDX_ATTACH_UNKNOWN` (error), at its attribute.
+
+#### Examples
+
+```pdx
+<template>
+  <input attach:autofocus attach:tooltip="'Search by name'" />
+  <div class="menu" attach:clickOutside="close">…</div>
+</template>
+
+<script setup>
+import { tooltip } from './tooltip';
+function close() { open = false; }
+let open = $signal(true);
+</script>
+```
+
+#### Since
+
+beta (#143)
+
 ### `commandfor`, `command` — invoker commands
 
 #### Syntax

@@ -13,6 +13,7 @@ import type { CompileContext } from './compile-context';
 import { applyFormBindings, applyInjectedFormBindings } from './codegen-form-binding';
 import { maskNonCode } from './tokenizer';
 import { navigationIsRouter, templateReadsNavigation, setupReadsNavigation } from './navigation-import';
+import { builtinAttachmentsToImport } from './attach-names';
 import { foldConstantConditions } from './fold-constant-conditions';
 import { literalConstNames } from './codegen-constant-bindings';
 import { delegatedEventTypes } from './inline-event-delegation';
@@ -110,6 +111,11 @@ export function compileNewMode(
     const templateNavigation = navigationFromRouter
         && templateReadsNavigation(ast, descriptor.template?.content ?? '');
     if (templateNavigation) ctx.importedNames.add('navigation');
+    // And so are core's built-in attachments the template names and the script does not (#143).
+    for (const name of builtinAttachmentsToImport(descriptor.template?.content ?? '', (n) => declared.has(n) || ctx.importedNames!.has(n))) {
+        imports.add(name);
+        ctx.importedNames.add(name);
+    }
 
     // Form-binding pass: auto-wire <pdx-input name="x"> inside <pdx-form :form="xxx">
     // Always run — works whether the form was created via @form rune or manually.

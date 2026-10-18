@@ -188,6 +188,7 @@ Types map to the runtime as: `T[]` → Array, the primitives → their counterpa
 | `:class="{ active: on }"` / `:class="expr"` | classes toggled by condition, or a string of classes. `:class.x` is removed (`PDX_REMOVED_FORM`) |
 | `:style="{ color: c, '--gap': g }"` | style properties, a custom property as a quoted key. `:style.x` is removed |
 | `:ref="name"` | a DOM reference — the way to reach an element, never `getElementById`. Bare `ref=` is removed |
+| `attach:name="value"` | behaviour on the element: `name(el, () => value)` runs when it is rendered, its returned cleanup when the value changes and when the element goes. Core's `attach:autofocus`, `attach:trapFocus`, `attach:clickOutside="close"` need no import; any other name is a function of the script or an import (`PDX_ATTACH_UNKNOWN` otherwise). Use it instead of a ref + `onMount` + cleanup |
 | `@show (cond) { … }` | hide in place, kept in the DOM (`@if` removes). The `:show` attribute is removed |
 
 `pdx migrate` rewrites each removed form; `{{ a | f }}` with one pipe is `PDX_PIPE_SINGLE` (info),
