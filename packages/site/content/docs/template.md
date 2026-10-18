@@ -380,6 +380,35 @@ The trigger (`viewport`, `idle`, `interaction`…) decides *when*. The compiler 
 import and the boundary: you don't write `import()`, `Suspense` or error boundaries by hand. It's the
 right way to keep a chart you only see on scroll out of the home bundle.
 
+## Waiting for data: `@await`
+
+`@defer` waits for code; `@await` waits for data. It takes an `@fetch`, a resource, `useQuery` or a
+promise, and `as` names the result for the body:
+
+```pdx
+@await (users as list) { minMs: 200, maxMs: 8000 } {
+  @for (list as u; track u.id) { <li>{{ u.name }}</li> }
+} @loading {
+  <pdx-skeleton />
+} @error (err, retry) {
+  <p role="alert">{{ err instanceof Error ? err.message : String(err) }}</p>
+  <button @click="retry()">Retry</button>
+}
+```
+
+- **What it decides on is the state, not the value.** `@loading` while there is no data yet, `@error`
+  when the first load fails, the body otherwise — through a refresh, and through a refresh that
+  failed, which keeps the data on screen (read `users.error()` in the body to say so). A plain value
+  is data too: `null`, `0` and `''` render the body; only `undefined` and `false` wait.
+- **`retry`** calls the source's `refetch()`; for a promise, put a new one in the signal.
+- **`minMs`** holds `@loading` back, so a fast answer never flashes a spinner. **`maxMs`** gives up:
+  with no result by then, `@error` shows an `AwaitTimeoutError`, and the body replaces it if the
+  result arrives later. A `maxMs` not greater than `minMs` is `PDX_AWAIT_TIMING`.
+- **A type assertion** in the expression goes in its own parentheses — `@await ((x as Resource<User[]>) as list)` —
+  because the last `as` is the binding.
+
+The block compiles to core's `awaitBlock()`, which a hand-written `html` template can call too.
+
 ## Raw HTML: `@raw`
 
 When you have HTML that should be inserted exactly as written, with nothing in it read as template
@@ -458,5 +487,6 @@ the same.
 | add/remove from the DOM | `@if` |
 | repeat | `@for (… as … ; track …)` |
 | load later | `@defer` |
+| wait for data | `@await (x as name)` |
 | swappable view | `<component :is>` |
 | isolate an error | `@try` / `@catch` |

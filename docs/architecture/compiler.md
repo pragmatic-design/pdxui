@@ -44,7 +44,7 @@ Takes the template's HTML and produces an AST (Abstract Syntax Tree). The AST re
 | `@portal (selector) { ... }` | Portal | Rendering somewhere else in the DOM |
 | `@defer (trigger) { ... }` | Defer | Lazy loading with a trigger (viewport, hover, idle) |
 | `@try { ... } @catch { ... }` | ErrorBoundary | Handling errors during rendering |
-| `@await (promise) { ... }` | Await | Async rendering with loading/error states |
+| `@await (source as name) { ... }` | Await | Async rendering with loading/error states, the result bound to `name` |
 | `@require (permission) { ... }` | Require | Conditional rendering driven by permissions |
 | `@let name = expr` | Let | A local variable in the template |
 

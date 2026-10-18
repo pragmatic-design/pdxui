@@ -377,6 +377,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Add `@loading { … }` with a placeholder.',
         reproducedIn: `${T}await-directive.test.ts`,
     },
+    PDX_AWAIT_TIMING: {
+        severity: 'error', category: 'defect',
+        summary: "`@await`'s `maxMs` is not greater than its `minMs` (#145).",
+        explanation: '`minMs` is a delay — nothing shows until it has passed, then `@loading` — and `maxMs` a timeout: no result by then renders `@error` with an `AwaitTimeoutError`. A timeout no later than the delay gives up before the spinner could ever show.',
+        fix: 'Make `maxMs` greater than `minMs`, or drop one of them.',
+        example: {
+            bad: pdx('@await (users) { minMs: 500, maxMs: 300 } { <p>ok</p> } @loading { <p>…</p> }', "@fetch users: 'GET /api/users' as string[];"),
+            good: pdx('@await (users) { minMs: 300, maxMs: 5000 } { <p>ok</p> } @loading { <p>…</p> }', "@fetch users: 'GET /api/users' as string[];"),
+        },
+    },
     PDX_FETCH_INVALID: {
         severity: 'error', category: 'defect',
         summary: "`@fetch` without a valid `'METHOD /url'`.",

@@ -228,7 +228,7 @@ and an imported signal is read with its parentheses, `{{ shared() }}`.
 @if (ready) { … } @else { … }
 @for (jobs as job; track job.id) { … } @empty { … }
 @switch (status) { @case ('open') { … } @default { … } }
-@await (promise) { … } @loading { … } @error (e) { … }
+@await (users as list) { … } @loading { … } @error (e, retry) { … }
 @defer (viewport) { … } @placeholder { … }
 ```
 
@@ -265,37 +265,43 @@ container's role:
   `aria-selected` from the template;
 - a focused row that scrolls away is kept.
 
-**`@await` waits for a promise** — `@loading` while it is pending, the body once it resolves, `@error`
-if it rejects (a boolean works too: the body when true). Two things it needs:
-- **the same promise on every evaluation.** `@await (loadUser())` makes a new promise each time the
-  block re-runs and never settles. Keep the promise in a signal, or use a resource.
-- **the value is not handed to the body.** Read it from the signal or resource that holds it.
-
-With timing — `minMs` holds the `@loading` back so a fast answer does not flash it, and `maxMs` stops
-waiting: once it passes, the body renders even though the promise has not settled (it is not an
-error):
-
-```html
-@await (job) { minMs: 200, maxMs: 5000 } { <p>{{ result }}</p> } @loading { <pdx-spinner></pdx-spinner> } @error (e) { <p>{{ e instanceof Error ? e.message : String(e) }}</p> }
-```
-
-**Retrying is putting a new promise in the signal.** `@error` leaves as soon as the awaited
-expression changes, shows `@loading`, and awaits the new promise. `@error (e, retry)` also hands you
-`retry`, which renders the block again with the same expression.
+**`@await` waits for data, and `as` names it.** It takes an `@fetch`, a resource, `useQuery` or a
+promise, and decides by the state, never by truthiness:
+- `@loading` while there is no data yet; `@error` when the first load fails (or the promise
+  rejects), and `retry` calls the source's `refetch()`; the body otherwise, with the `as` name bound
+  to `data()` (or the promise's value), typed.
+- a refresh keeps the body, and so does a refresh that **fails**: the data stays, and the body reads
+  `users.error()` to say so. `@error` is only for no data at all.
+- a plain value: `null`, `0` and `''` render the body; `undefined` and `false` wait. `@await (ready)`
+  on a boolean is still a condition.
+- a type assertion in the expression goes in its own parentheses — `@await ((x as T) as list)` —
+  because the last `as` is the binding.
+- a promise must be the same on every evaluation: `@await (loadUser())` makes a new one each time the
+  block re-runs and never settles. Keep it in a signal, or use a resource.
 
 ```html
 <template>
-  @await (job) { <p>{{ result }}</p> } @loading { <pdx-spinner></pdx-spinner> } @error (e, retry) {
+  @await (users as list) {
+    <ul>@for (list as u; track u.id) { <li>{{ u.name }}</li> }</ul>
+    @if (users.error()) { <p role="alert">Could not refresh.</p> }
+  } @loading { <pdx-spinner></pdx-spinner> } @error (e, retry) {
     <p>{{ e instanceof Error ? e.message : String(e) }}</p>
-    <pdx-button @click="reload()">Retry</pdx-button>
+    <pdx-button @click="retry()">Retry</pdx-button>
   }
 </template>
 <script setup>
-let result = $signal('');
-let job = $signal(load());
-function load() { return fetch('/api/registry').then(r => r.json()).then(d => { result = d.name; }); }
-function reload() { job = load(); }
+interface User { id: number; name: string }
+@fetch users: 'GET /api/users' as User[];
 </script>
+```
+
+With timing — `minMs` is a delay, so a fast answer never flashes `@loading`; `maxMs` is a timeout:
+with no result by then `@error` shows an `AwaitTimeoutError` (`e.name === 'AwaitTimeoutError'`), and
+the body replaces it when the result arrives. Without `@error`, `@loading` stays. `maxMs` not greater
+than `minMs` is `PDX_AWAIT_TIMING`.
+
+```html
+@await (users as list) { minMs: 200, maxMs: 5000 } { <p>{{ list.length }} users</p> } @loading { <pdx-spinner></pdx-spinner> } @error (e) { <p>{{ e instanceof Error ? e.message : String(e) }}</p> }
 ```
 
 ## Putting a project together

@@ -5,7 +5,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { signal, collectDisposers } from '../src/reactivity/signal';
-import { awaitTimed, portal } from '../src/renderer/helpers';
+import { portal } from '../src/renderer/helpers';
+import { awaitTimed } from '../src/renderer/await';
 
 const node = (text: string) => {
     const el = document.createElement('span');
@@ -65,14 +66,14 @@ describe('awaitTimed — the minimum delay', () => {
 });
 
 describe('awaitTimed — the timeout', () => {
-    it('gives up waiting and shows the resolved branch once maxMs passes', async () => {
-        const host = mount(awaitTimed(() => false, () => node('timed out'), () => node('loading'), { maxMs: 30 }));
+    it('never renders the resolved branch over a condition still false once maxMs passes (#145)', async () => {
+        // maxMs is a timeout to @error (awaitBlock); with no error branch, the loading one stays.
+        const host = mount(awaitTimed(() => false, () => node('resolved'), () => node('loading'), { maxMs: 30 }));
         expect(host.textContent).toBe('loading');
 
         await after(50);
 
-        expect(host.textContent, 'a request that never answered stayed on the spinner forever')
-            .toBe('timed out');
+        expect(host.textContent, 'the resolved branch rendered with nothing resolved').toBe('loading');
     });
 
     it('a load that answers first wins the race', async () => {

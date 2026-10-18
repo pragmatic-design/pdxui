@@ -52,6 +52,26 @@ A refresh keeps what is on screen: `state()` stays `'success'` while `pending()`
 that fails keeps it too — `state()` becomes `'error'`, `data()` is the last value, `stale()` is
 true — so the list stays and the error goes beside it.
 
+The three branches have a block of their own, `@await`, which reads those states for you and binds
+the data with `as`:
+
+```pdx
+@await (users as list) {
+  @for (list as u; track u.id) { <li>{{ u.name }}</li> }
+  @if (users.error()) { <p role="alert">Could not refresh: showing the last list.</p> }
+} @loading {
+  <pdx-spinner />
+} @error (err, retry) {
+  <p role="alert">Could not load the users.</p> <button @click="retry()">Retry</button>
+}
+```
+
+`@loading` shows while there is no data yet; `@error` when the first load fails, and `retry` calls
+`users.refetch()`; the body otherwise, with `list` typed `User[]` — through a refresh, and through a
+refresh that failed. `{ minMs: 200, maxMs: 8000 }` after the parentheses holds `@loading` back for a
+fast answer and gives up after 8 s with an `AwaitTimeoutError` in `@error`. The full rules are in
+[Template syntax](/docs/template#waiting-for-data-await).
+
 In the editor and in `pdx check --types`, `users` is that resource with the type after `as`:
 `@fetch users: 'GET /api/users' as User[]` makes `users.data()` a `User[] | undefined`, and a
 misspelt field is an error. Without `as`, the data is `unknown`. The error is an `Error | null`.

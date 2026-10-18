@@ -3,7 +3,7 @@
 // placeholder regex, no bindAttribute dispatch. Each block's static markup is built once and cloned,
 // and the render binds the nodes a compile-time walk reaches (inline-static-tree.ts, #109).
 
-import { deferLoadFn, extractLoopInvariants, generateTransition, virtualOptions } from './codegen-template';
+import { awaitTimingArg, deferLoadFn, extractLoopInvariants, generateTransition, virtualOptions } from './codegen-template';
 import type {
     TemplateNode, IfNode, ForNode, SwitchNode, RequireNode,
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
@@ -985,40 +985,27 @@ class InlineGen {
     }
 
     awaitN(node: AwaitNode): void {
-        this.imports.add('when');
-        // See generateAwait in codegen-template.ts: a promise is waited for, not tested for truth.
-        this.imports.add('awaitReady');
+        // See generateAwait in codegen-template.ts: core's awaitBlock decides the branch.
+        this.imports.add('awaitBlock');
         const awaited = callSignals(prefixCtx(node.condition, this.ctx), this.ctx);
-        const cond = `awaitReady(${awaited})`;
-        const body = this.sub(node.body);
+        const bound = node.as;
+        // The bound name is a getter, read as `name()` like a @for row's item: the body stays when
+        // a refresh brings new data, and reads it.
+        const body = bound
+            ? withLoopScope({ item: bound }, true, this.ctx, () => this.sub(node.body))
+            : this.sub(node.body);
         const loading = node.loading ? `()=>{${this.sub(node.loading)}}` : 'null';
-        let switchCall: string;
-        if (node.minMs || node.maxMs) {
-            this.imports.add('awaitTimed');
-            const opts: string[] = [];
-            if (node.minMs) opts.push(`minMs:${node.minMs}`);
-            if (node.maxMs) opts.push(`maxMs:${node.maxMs}`);
-            switchCall = `awaitTimed(()=>${cond},()=>{${body}},${loading},{${opts.join(',')}})`;
-        } else {
-            switchCall = `when(()=>${cond},()=>{${body}},${loading})`;
-        }
+        let error = 'null';
         if (node.errorBody) {
-            this.imports.add('errorBoundary');
             const errVar = node.errorVar || 'err';
             const retryVar = node.retryVar ?? 'retry';
             const errorBody = node.errorBody;
-            const errBody = withBoundaryScope(errVar, retryVar, this.ctx, () => this.sub(errorBody));
-            const wrap = this.v('cf');
-            // The switch is built INSIDE the content function: a boundary that renders its content
-            // again (retry, or resetOn) needs a new one, not the fragment the first render emptied.
-            // resetOn: a new promise in the awaited expression leaves @error.
-            this.out(`const ${wrap}=errorBoundary(()=>{const f=document.createDocumentFragment();f.appendChild(${switchCall});return f;},(${errVar},${retryVar})=>{${errBody}},{resetOn:()=>${awaited}});`);
-            this.place(wrap);
-        } else {
-            const cf = this.v('cf');
-            this.out(`const ${cf}=${switchCall};`);
-            this.place(cf);
+            error = `(${errVar},${retryVar})=>{${withBoundaryScope(errVar, retryVar, this.ctx, () => this.sub(errorBody))}}`;
         }
+        const opts = awaitTimingArg(node);
+        const cf = this.v('cf');
+        this.out(`const ${cf}=awaitBlock(()=>${awaited},(${bound ?? ''})=>{${body}},${loading},${error}${opts ? `,${opts}` : ''});`);
+        this.place(cf);
     }
 
     // ─── Custom Directives ──────────────────────────────────────

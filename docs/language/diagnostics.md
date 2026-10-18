@@ -82,6 +82,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_VIRTUAL_SHAPE` | error | A `@for … @virtual` without the shape it needs: alone in a native element, with one root element per row. | `@for … @virtual`, [template.md](template.md) |
 | `PDX_VIRTUAL_TRANSITION` | error | A `@for … @virtual` with `@transition`, `@stagger`, `@mode` or `@move`. | `@for … @virtual`, [template.md](template.md) |
 | `PDX_AWAIT_NO_LOADING` | info | `@await` without a `@loading` block. | `@await`, [template.md](template.md) |
+| `PDX_AWAIT_TIMING` | error | `@await`'s `maxMs` is not greater than its `minMs`: the timeout would give up before `@loading` could show. | `@await`, [template.md](template.md) |
 | `PDX_DEFER_UNKNOWN_TRIGGER` | error | A `@defer` trigger the runtime does not know (`@defer (viewprt)`). | `@defer`, [template.md](template.md) |
 | `PDX_KEEPALIVE_MAX` | error | A `<component :is @keepAlive(n)>` whose maximum is not a whole number of at least 1. | `<component :is>`, [template.md](template.md) |
 | `PDX_DYNAMIC_CONTENT` | warn | Content between `<component :is>` and `</component>`, which is not rendered. | `<component :is>`, [template.md](template.md) |

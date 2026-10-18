@@ -756,6 +756,62 @@ describe('the async vocabulary — a compiled @fetch', () => {
     });
 });
 
+describe('case 4 (E4), the template leg — @await over a compiled @fetch (#145)', () => {
+    const src = (name: string) => "<template>\n"
+        + "<button class=\"refresh\" @click=\"users.refetch()\">refresh</button>\n"
+        + "@await (users as list) {\n"
+        + "  <ul>@for (list as u; track u) { <li>{{ u }}</li> }</ul>\n"
+        + "  @if (users.error()) { <p class=\"kept-error\">{{ users.error().message }}</p> }\n"
+        + "} @loading { <p class=\"loading\">loading</p> } @error (err, retry) {\n"
+        + "  <p class=\"error\">{{ err.message }}</p><button class=\"retry\" @click=\"retry()\">retry</button>\n"
+        + "}\n</template>\n"
+        + `<script setup>\n@fetch users: 'GET /api/ac-await-${name}' as string[];\n</script>\n`;
+
+    it('@loading, then the body with the bound list; a refresh and a failed refresh keep the body', async () => {
+        const t = heldTransport<Response>();
+        vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => t.call(String(input))));
+        core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
+        defineCompiled('acawaitkeep', src('keep'));
+        const el = document.createElement('app-acawaitkeep');
+        document.body.appendChild(el);
+        await settle();
+        expect(el.querySelector('.loading'), 'no @loading while the first load is in flight').not.toBeNull();
+        t.answer(0, json(['ada', 'bob']));
+        await settle();
+        expect([...el.querySelectorAll('li')].map((li) => li.textContent)).toEqual(['ada', 'bob']);
+        const list = el.querySelector('ul');
+        el.querySelector<HTMLButtonElement>('.refresh')!.click();
+        await settle();
+        expect(el.querySelector('ul'), 'a refresh in flight replaced the body').toBe(list);
+        t.fail(1, new TypeError('offline'));
+        await settle();
+        expect(el.querySelector('ul'), 'a failed refresh replaced the kept data').toBe(list);
+        expect(el.querySelector('.error'), '@error rendered in place of the kept data').toBeNull();
+        expect(el.querySelector('.kept-error')?.textContent, 'the body cannot read the failure beside the data').toBe('offline');
+    });
+
+    it('a first load that fails shows @error, and retry refetches', async () => {
+        const t = heldTransport<Response>();
+        vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => t.call(String(input))));
+        core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
+        defineCompiled('acawaiterr', src('err'));
+        const el = document.createElement('app-acawaiterr');
+        document.body.appendChild(el);
+        await settle();
+        t.fail(0, new TypeError('offline'));
+        await settle();
+        expect(el.querySelector('.error')?.textContent).toBe('offline');
+        expect(el.querySelector('ul'), 'the body rendered with no data').toBeNull();
+        el.querySelector<HTMLButtonElement>('.retry')!.click();
+        await settle();
+        expect(t.calls.length, 'retry did not refetch').toBe(2);
+        expect(el.querySelector('.loading'), 'the retry in flight is not pending').not.toBeNull();
+        t.answer(1, json(['ada']));
+        await settle();
+        expect([...el.querySelectorAll('li')].map((li) => li.textContent)).toEqual(['ada']);
+    });
+});
+
 describe('the async vocabulary — a mutation (no stale())', () => {
     it('idle, pending, success with its result; a failure keeps the last result and sets error()', async () => {
         let fail = false;

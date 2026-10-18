@@ -404,39 +404,37 @@ function generateTry(node: TryNode, imports: Set<string>, ctx: CompileContext): 
     return `\${errorBoundary(() => ${bodyCode}, (${node.errorVar}, ${node.retryVar}) => ${catchCode})}`;
 }
 
+/**
+ * `@await` → core's awaitBlock, which decides the branch from the awaited value: a source by its
+ * `state()` and `data()`, a promise by whether it settled, a plain value by data.md's E5 — never by
+ * truthiness, which a Promise object always passes. `as name` is bound in the body as a getter, like
+ * a @for row's item; the timing options pass through.
+ */
 function generateAwait(node: AwaitNode, imports: Set<string>, ctx: CompileContext): string {
-    imports.add('when');
-    // awaitReady, not the raw condition: a Promise is always truthy, so `when(() => promise, …)` would show
-    // the body at once and forever, pending or rejected. It waits for a thenable and is
-    // plain truthiness for anything else; a rejection throws into the @error boundary below.
-    imports.add('awaitReady');
+    imports.add('awaitBlock');
     const awaited = callSignals(prefixCtx(node.condition, ctx), ctx);
-    const condition = `awaitReady(${awaited})`;
-    const bodyCode = generateNodes(node.body, imports, ctx);
+    const bound = node.as;
+    const bodyCode = bound
+        ? withLoopScope({ item: bound }, true, ctx, () => generateNodes(node.body, imports, ctx))
+        : generateNodes(node.body, imports, ctx);
     const loadingCode = node.loading ? `() => ${generateNodes(node.loading, imports, ctx)}` : 'null';
-
-    let whenExpr: string;
-    if (node.minMs || node.maxMs) {
-        imports.add('awaitTimed');
-        const opts: string[] = [];
-        if (node.minMs) opts.push(`minMs: ${node.minMs}`);
-        if (node.maxMs) opts.push(`maxMs: ${node.maxMs}`);
-        whenExpr = `awaitTimed(() => ${condition}, () => ${bodyCode}, ${loadingCode}, { ${opts.join(', ')} })`;
-    } else {
-        whenExpr = `when(() => ${condition}, () => ${bodyCode}, ${loadingCode})`;
-    }
-
+    let errorCode = 'null';
     if (node.errorBody) {
-        imports.add('errorBoundary');
         const errorVar = node.errorVar || 'err';
         const retryVar = node.retryVar ?? 'retry';
         const errorBody = node.errorBody;
-        const errorCode = withBoundaryScope(errorVar, retryVar, ctx, () => generateNodes(errorBody, imports, ctx));
-        // resetOn: a new promise in the awaited expression leaves @error and awaits it.
-        return `\${errorBoundary(() => html\`\${${whenExpr}}\`, (${errorVar}, ${retryVar}) => ${errorCode}, { resetOn: () => ${awaited} })}`;
+        errorCode = `(${errorVar}, ${retryVar}) => ${withBoundaryScope(errorVar, retryVar, ctx, () => generateNodes(errorBody, imports, ctx))}`;
     }
+    const opts = awaitTimingArg(node);
+    return `\${awaitBlock(() => ${awaited}, (${bound ?? ''}) => ${bodyCode}, ${loadingCode}, ${errorCode}${opts ? `, ${opts}` : ''})}`;
+}
 
-    return `\${${whenExpr}}`;
+/** `@await`'s `{ minMs, maxMs }` as awaitBlock's last argument, or '' when neither is set. */
+export function awaitTimingArg(node: AwaitNode): string {
+    const opts: string[] = [];
+    if (node.minMs) opts.push(`minMs:${node.minMs}`);
+    if (node.maxMs) opts.push(`maxMs:${node.maxMs}`);
+    return opts.length ? `{${opts.join(',')}}` : '';
 }
 
 // ─── @slot (parent-side scoped slot template) ─────────────────────
