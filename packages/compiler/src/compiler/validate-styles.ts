@@ -9,10 +9,9 @@ import type { ValidationWarning } from './validate';
  * PDX_GLOBAL_SELECTOR — `:global(...)` is Vue's and Svelte's escape from a scoped style, and it is
  * not CSS. PDX passes it through, so the browser drops the whole rule, silently.
  *
- * PDX does not need it. A scoped style is scoped by an ANCESTOR attribute (`[data-pdx-HASH] .list`),
- * so a plain descendant selector already reaches what a child component renders. The message
- * carries the selector rewritten that way. Reported in a plain block too: the browser drops the
- * rule there as well.
+ * PDX does not need it: a plain `<style>` block is global. A scoped style stops at a child component
+ * (#152), whose public surface is its parts, states and tokens. The message carries the selector
+ * without the wrapper. Reported in a plain block too: the browser drops the rule there as well.
  *
  * `source` is the whole file, because `style.start` is an offset into it: the line reported is the
  * file's, not the block's.
@@ -33,9 +32,9 @@ export function validateStyles(styles: SFCStyle[], source: string): ValidationWa
             warnings.push({
                 code: 'PDX_GLOBAL_SELECTOR',
                 severity: 'warn',
-                message: `':global()' is not CSS, and the browser drops the rule '${selector}'. PDX does not need it: `
-                    + `a scoped style reaches the descendants a child component renders. Write '${rewritten}'.`,
-                hint: `Replace '${selector}' with '${rewritten}'.`,
+                message: `':global()' is not CSS, and the browser drops the rule '${selector}'. `
+                    + `A rule meant for the whole page belongs in a plain <style> block: write '${rewritten}' there.`,
+                hint: `Replace '${selector}' with '${rewritten}' in a plain <style> block.`,
                 line: source.slice(0, at).split('\n').length,
             });
         }

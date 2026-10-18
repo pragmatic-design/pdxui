@@ -35,8 +35,10 @@ button { margin-top: var(--pdx-space-md); }
 Three optional blocks. `<script setup>` is where state and logic live. A plain `<script>` is the new
 mode too when it uses a rune or a declaration — the legacy mode is only a `<script>` without them, or
 one with `defineProps`/`defineEmits`/a top-level `return {}` — but write `<script setup>` for new
-files. `<style scoped>` is scoped by the compiler through a `data-pdx-*` attribute; components render
-in the light DOM, unless the template is `<template shadow>`, which renders into a shadow root.
+files. `<style scoped>` is scoped by the compiler through a `data-pdx-*` attribute, and stops at the
+child components the template renders: style a child through its parts, states and tokens; `:scope` is
+the component's own element. Components render in the light DOM, unless the template is
+`<template shadow>`, which renders into a shadow root.
 
 **The tag comes from the filename**, behind the app prefix (`app`, or `pdx({ prefix })`):
 `src/job-list.pdx` → `<app-job-list>`. Override with `@tag 'app-…'`. Never `@tag 'pdx-…'`: that
@@ -160,10 +162,18 @@ written in a theme or the page). The compiler keeps it in sync with the conditio
 It takes a boolean only; `@state count = 0;` is `PDX_STATE_NOT_BOOLEAN` — reactive data is a `$signal`.
 A TypeScript component declares `states: ['open']` and calls `ctx.state('open', on)`.
 
+**`@variants { variant: { primary, ghost } = primary; size: { sm, md } = md; }`** declares the
+component's variants once: each axis is a prop typed with its values (`variant: 'primary' | 'ghost'`),
+reflected on the host (`variant="ghost"`). The `<style scoped>` keys rules by it —
+`@variant variant(ghost) { [data-part="root"] { … } }`, `@variant variant(ghost) and size(sm) { … }`,
+`@variant size(sm) { :scope { … } }` for the host itself — instead of a class assembled from the prop.
+A rule for a value that does not exist is `PDX_VARIANT_UNKNOWN`; a value (other than the default) no
+rule styles, `PDX_VARIANT_UNSTYLED`.
+
 The full vocabulary the analyzer accepts:
 
 `@prop` `@model` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
-`@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@part` `@host` `@state` `@scroll`
+`@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@part` `@host` `@state` `@variants` `@scroll`
 `@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use` `@mixin`
 
 **`@form f: Schema { … }`** builds a form (`createForm` underneath). Its options: `save` (when a field

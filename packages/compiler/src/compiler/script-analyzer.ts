@@ -10,6 +10,7 @@ import type {
     GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis, StateDecl, HostAttr,
 } from './script-analyzer-types';
 import { parseHostBlock } from './host-block';
+import { parseVariantsBlock, variantProps, variantHostAttrs, type VariantAxis } from './variants';
 import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './tag-prefix';
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
@@ -177,6 +178,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const exposes: string[] = [];
     const states: StateDecl[] = [];
     let host: HostAttr[] | undefined;
+    const variants: VariantAxis[] = [];
     const parts: string[] = [];
     const route: RouteInfo = {};
     let globalStore: GlobalStoreDirective | undefined;
@@ -218,7 +220,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const hasLegacyMarkers = legacyMarkerAt !== -1;
     const isNewMode = (options.setup === true && !hasLegacyMarkers) || codeLines.some(l => {
         const t = l.trim();
-        return t.startsWith('@prop ') || t.startsWith('@model ') || t.startsWith('@event ') || t.startsWith('@event(') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) ||
+        return t.startsWith('@prop ') || t.startsWith('@model ') || t.startsWith('@event ') || t.startsWith('@event(') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) || /^@variants\s*\{/.test(t) ||
                t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||
                t.startsWith('@search ') || t.startsWith('@prefetch ') || t.startsWith('@layout ') ||
                t.startsWith('@fetch ') || t.startsWith('@form ') ||
@@ -637,6 +639,27 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         if (/^@host\s*\{/.test(trimmed)) {
             const block = extractBlock(lines, i);
             host = [...(host ?? []), ...parseHostBlock(block.content)];
+            i = block.endLine;
+            continue;
+        }
+
+        // ─── @variants { axis: { a, b } = a; … } — the component's variants (#153) ───
+        // Each axis is a prop typed with its values, reflected on the host as an attribute.
+        // Match: `@variants {` or `@variants{`, the block possibly spread over several lines.
+        if (/^@variants\s*\{/.test(trimmed)) {
+            const block = extractBlock(lines, i);
+            const read = parseVariantsBlock(block.content);
+            variants.push(...read.axes);
+            props.push(...variantProps(read.axes));
+            host = [...(host ?? []), ...variantHostAttrs(read.axes)];
+            for (const error of read.errors) {
+                warnings.push({
+                    code: 'PDX_VARIANTS_MALFORMED',
+                    severity: 'error',
+                    message: `@variants: ${error}.`,
+                    hint: 'Use: @variants { variant: { primary, ghost } = primary; }',
+                });
+            }
             i = block.endLine;
             continue;
         }
@@ -1115,6 +1138,8 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         if (signals.some(s => s.name === name) || exports.some(e => e.name === name)) continue;
         signals.push({ name, initialExpr: 'null' });
         exports.push({ name, kind: 'signal' });
+        // As a `$signal` does: a component whose only declaration is a part would call it unimported.
+        usedFeatures.add('signal');
     }
 
     // The loop above scans LINE BY LINE, and several of its branches swallow a whole block and
@@ -1158,6 +1183,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
         exposes,
         states,
         ...(host ? { host } : {}),
+        ...(variants.length ? { variants } : {}),
         parts,
         route,
         globalStore,

@@ -5,6 +5,7 @@ import type { SFCDescriptor, SFCStyle } from '../parser/sfc';
 import { jsQuote, jsString } from './js-literal';
 import type { BrowserTarget } from './compile-context';
 import { donutScope } from './scope-donut';
+import { expandVariantRules } from './variants';
 
 // ─── Public ────────────────────────────────────────────────────────
 
@@ -109,8 +110,9 @@ function blockCss(scoped: boolean | undefined, content: string, filename: string
     const scopeId = `data-pdx-${hash(filename)}`;
     if (!scoped) return transformCssFunctions(content, scopeId).trim();
     // baseline-2026 stops at nested components (./scope-donut); baseline-2024 keeps the ancestor
-    // scope, which reaches into them (#152).
-    return target === 'baseline-2024' ? scopeStyles(content, scopeId) : donutScope(transformCssFunctions(content, scopeId), scopeId);
+    // scope, which reaches into them (#152). A `@variant` becomes rules on the host's `:scope` first
+    // (#153), and each target's scoping compiles that `:scope` as it does any other.
+    return target === 'baseline-2024' ? scopeStyles(content, scopeId) : donutScope(expandVariantRules(transformCssFunctions(content, scopeId)), scopeId);
 }
 
 /**
@@ -129,7 +131,8 @@ export function generateShadowStyles(descriptor: SFCDescriptor, filename: string
     const blocks = styleBlocks(descriptor);
     if (blocks.length === 0) return '';
 
-    let css = blocks.map(b => transformCssFunctions(b.content.replace(/\r\n/g, '\n'), `data-pdx-${hash(filename)}`)).join('\n').trim();
+    // A `@variant` (#153) tests the host's attributes, which inside a shadow root is `:host(…)`.
+    let css = blocks.map(b => expandVariantRules(transformCssFunctions(b.content.replace(/\r\n/g, '\n'), `data-pdx-${hash(filename)}`), (attrs) => `:host(${attrs})`)).join('\n').trim();
     if (!css) return '';
     if (production) css = minifyCSS(css);
     return `    __adoptStyles(ctx.el.shadowRoot, ${jsString(css)}, ${jsString(hash(filename))});`;
@@ -201,7 +204,7 @@ function tightenDeclaration(declaration: string): string {
  * Steps: strip comments → transform responsive() → transform bind() → recursively process blocks → insert scope attr.
  */
 function scopeStyles(css: string, scopeId: string): string {
-    return scopeBlock(transformCssFunctions(css, scopeId), scopeId);
+    return scopeBlock(expandVariantRules(transformCssFunctions(css, scopeId)), scopeId);
 }
 
 /**

@@ -3,7 +3,7 @@
 // and provides the two-way mapping between .pdx offsets and virtual offsets.
 
 import type { TemplateNode } from '@pdxui/compiler';
-import { projectScript } from './ts-service';
+import { projectScript } from './project-script';
 import { projectTemplate } from './template-projection';
 import type { ResolveType } from './template-projection';
 import type { SegmentMap } from './segment-map';

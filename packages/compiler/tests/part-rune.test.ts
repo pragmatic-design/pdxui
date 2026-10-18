@@ -27,6 +27,13 @@ describe('@part compiles into a ref and the descriptor', () => {
         expect(code).toContain(`parts: ['trigger'],`);
     });
 
+    it('a component whose only declaration is a part imports the signal its ref is', () => {
+        // The ref is `signal(null)`: without the import the setup throws, and the component mounts
+        // with no scope attribute and no host bindings.
+        const { code } = compile(pdx('<button data-part="trigger">x</button>', '@part trigger;'), 'test.pdx');
+        expect(code).toMatch(/^import \{[^}]*\bsignal\b[^}]*\} from '@pdxui\/core';/m);
+    });
+
     it('a part inside a block is bound when the block renders', () => {
         const { code } = compile(pdx('<p>x</p>@if (open) { <div data-part="popup">y</div> }', '@part popup;\nlet open = $signal(false);'), 'test.pdx');
         expect(code).toMatch(/when\([\s\S]*bindRef\(__el\d+,ctx\.popup\)/);

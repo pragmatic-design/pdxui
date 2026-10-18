@@ -8,7 +8,7 @@
 // of the module, a signal as a signal — `logs()` — and the rest as declared.
 
 import { analyzeScript } from '@pdxui/compiler';
-import { projectScript } from './ts-service';
+import { projectScript } from './project-script';
 
 /** `text` (a `.pdx.ts` named `filename`) as TypeScript should read it. */
 export function projectRuneModule(text: string, filename: string): string {

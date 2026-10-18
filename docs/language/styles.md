@@ -345,6 +345,77 @@ to any of them re-writes all the bound properties of that instance.
 
 alpha
 
+### `@variants` and `@variant`
+
+#### Syntax
+
+```ebnf
+VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                     /* in the script */
+VariantAxis    ::= Word S? ":" S? "{" S? Word ( S? "," S? Word )* S? "}" ( S? "=" S? Word )? S? ";"?
+VariantRule    ::= "@variant" S VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in a <style scoped> */
+VariantTest    ::= Word S? "(" S? Word S? ")"
+```
+
+#### Semantics
+
+`@variants` in the script declares the component's variants once (#153), on one line —
+`@variants { variant: { primary, ghost } = primary; }` — or one axis per line. Each axis becomes a prop
+typed with its values — `variant: { primary, ghost } = primary;` is
+`@prop variant: 'primary' | 'ghost' = 'primary';` — and is reflected on the host as an attribute,
+`variant="ghost"`, as `@host { :variant="variant" }` would write it. An axis without `= default`
+defaults to its first value. The generated `.d.ts` carries the union.
+
+`@variant` in a `<style scoped>` keys rules by those attributes. Before the block is scoped, each
+selector of its body is put under the host's attribute test: `@variant variant(ghost) { .label { … } }`
+becomes `:scope[variant="ghost"] .label { … }`, and a selector that starts with `:scope` takes the
+test on the host itself (`:scope { … }` → `:scope[variant="ghost"] { … }`). `and` combines axes:
+`@variant variant(ghost) and size(sm)` tests both attributes. The scoping then compiles `:scope` as it
+does everywhere: `:where(:scope)[data-pdx-HASH][variant="ghost"] .label` inside the donut scope under
+`'baseline-2026'`, `[data-pdx-HASH][variant="ghost"] .label` under `'baseline-2024'`. An `@variant` may
+sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Under
+`<template shadow>` the test is `:host([variant="ghost"])`.
+
+#### Rules
+
+- An axis without values, declared twice, or whose default is not one of its values:
+  `PDX_VARIANTS_MALFORMED` (error); the axis is skipped and no prop is generated for it.
+- An `@variant` naming an axis `@variants` does not declare, or a value its axis does not have:
+  `PDX_VARIANT_UNKNOWN` (error) — any `@variant` in a component that declares no `@variants` is one.
+- A declared value other than the default that no `@variant` rule names: `PDX_VARIANT_UNSTYLED`
+  (warning). The default is the base rules' look and is never reported.
+- The values are CSS: a colour in them is a token, like any colour in a component (CD-C3).
+- An `@variant` in a plain `<style>` block is copied as written: the browser drops it.
+
+#### Examples
+
+```pdx
+<template>
+  <button data-part="root"><slot></slot></button>
+</template>
+
+<script setup>
+@variants {
+  variant: { primary, ghost } = primary;
+  size: { sm, md } = md;
+}
+@part root;
+</script>
+
+<style scoped>
+[data-part="root"] { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+@variant variant(ghost) { [data-part="root"] { background: transparent; color: var(--pdx-color-text); } }
+@variant size(sm) { [data-part="root"] { padding-inline: var(--pdx-space-xs); } }
+@variant variant(ghost) and size(sm) { [data-part="root"] { padding-inline: 0; } }
+</style>
+```
+
+`<app-button variant="ghost" size="sm">` matches the last three rules; the props are typed
+`variant?: 'primary' | 'ghost'` and `size?: 'sm' | 'md'`.
+
+#### Since
+
+beta (#153)
+
 ## Where the CSS goes
 
 ### Development and production

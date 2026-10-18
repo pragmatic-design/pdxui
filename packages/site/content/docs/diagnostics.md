@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 94 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 97 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1364,6 +1364,30 @@ The custom element is never registered: it renders as an empty unknown element, 
 Reactive state no template, effect or function reads costs a subscription and says nothing.
 
 **Fix.** Remove it, or prefix it with `_` if it is kept on purpose.
+
+### PDX_VARIANT_UNKNOWN
+
+*error* — An `@variant` names an axis or a value `@variants` does not declare.
+
+The rule selects a host attribute value the component never takes, so it never applies — a typo in a value is otherwise silent.
+
+**Fix.** Use an axis and a value the script declares in `@variants`, or declare them there.
+
+### PDX_VARIANT_UNSTYLED
+
+*warn* — A declared variant value has no `@variant` rule.
+
+Choosing the value renders the component exactly as the default does. The default itself is styled by the base rules and is never reported.
+
+**Fix.** Add `@variant axis(value) { … }` to the `<style scoped>`, or remove the value from the axis.
+
+### PDX_VARIANTS_MALFORMED
+
+*error* — `@variants` holds something that is not an axis.
+
+Each axis is a name, its values in braces and an optional default: `size: { sm, md, lg } = md;`. An axis without values, declared twice, or with a default that is not one of its values declares nothing, and its prop is not generated.
+
+**Fix.** Write each axis as `name: { a, b } = a;`, with the default among the values.
 
 ### PDX_VIRTUAL_SHAPE
 

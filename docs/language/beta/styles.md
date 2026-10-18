@@ -112,10 +112,19 @@ values are CSS; colours are tokens. The manifest lists every axis and value, and
 generates one scenario per value. Descriptor: `variants: { size: ['sm', 'md', 'lg'] }`, with the same
 `@variant` rules in the component's stylesheet, processed by the design build.
 
+**Landed** (#153) for a `.pdx`: `@variants`, `@variant` on both targets (and `:host(…)` under
+`<template shadow>`), `PDX_VARIANT_UNKNOWN`, `PDX_VARIANT_UNSTYLED`, and `PDX_VARIANTS_MALFORMED` for an
+axis that cannot be read; the full rewrite is in [styles.md](../styles.md). The library half — the
+descriptor's `variants`, the design build, the manifest and certification, `pdx-button` migrated — is
+#512.
+
 ### Rules
 
 - An `@variant` naming an undeclared axis or value: `PDX_VARIANT_UNKNOWN` (error).
-- A declared value with no rule and no default styling: `PDX_VARIANT_UNSTYLED` (warning).
+- A declared value with no rule and no default styling: `PDX_VARIANT_UNSTYLED` (warning) — the
+  axis's default is the base rules' look and is never reported.
+- An axis that cannot be read — no values, declared twice, a default outside its values:
+  `PDX_VARIANTS_MALFORMED` (error).
 - The token lint applies to the values (colours as tokens).
 
 ### Examples

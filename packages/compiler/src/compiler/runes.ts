@@ -32,6 +32,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),
     d('part', 'Declare named, public parts: `data-part="name"` on one element each, and `name` is its ref.', '@part trigger, popup;', '@part ${1:name};'),
     d('host',"Attributes, bindings and listeners on the component's own element, with the template's attribute grammar.", '@host { role="combobox" :aria-expanded="open" @keydown="onKey" }', '@host { ${1:role}="${2:value}" }'),
+    d('variants', 'Declare the component\'s variants: each axis is a prop typed with its values, reflected on the host, and styled with `@variant axis(value) { … }`.', '@variants { variant: { primary, ghost } = primary; }', '@variants {\n  ${1:variant}: { ${2:primary}, ${3:ghost} } = ${2:primary};\n}'),
     d('state','A visual state of the host, kept in sync with a boolean; CSS matches it with `:state(name)`.', '@state name = booleanExpression;', '@state ${1:name} = ${2:condition};'),
     d('form', 'Declare a form with its fields and validation.', '@form name: { field: string { required } };   // the colon is not optional', '@form ${1:name}: { ${2:field}: ${3:string} };'),
     d('fetch', 'Declare a data fetch, a reactive resource().', "@fetch name: 'GET /api/path' as Type;   // the method is part of the string", "@fetch ${1:data}: 'GET ${2:/api/path}' as ${3:Type[]};"),

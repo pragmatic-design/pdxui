@@ -13,6 +13,7 @@ import { analyzeScript } from './compiler/script-analyzer';
 import { validate } from './compiler/validate';
 import { diagnosticUrl, DIAGNOSTICS } from './diagnostics/catalog';
 import { validateStyles } from './compiler/validate-styles';
+import { validateVariants } from './compiler/validate-variants';
 import { validateDesign } from './compiler/validate-design';
 import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
@@ -881,6 +882,8 @@ export function compile(
     }
     // What the styles say that the browser will not read.
     allWarnings.push(...validateStyles(descriptor.styles ?? [], source));
+    // The variants the script declares against the @variant rules the styles write (#153).
+    allWarnings.push(...validateVariants(cachedAnalysis?.variants, descriptor.styles ?? [], source));
     // The component-design rules one file can decide: CD-A1, A2, D3, C2.
     allWarnings.push(...validateDesign(descriptor, cachedAnalysis, source));
     // A name declared twice by runes or @prop: the output would keep one of them in silence.

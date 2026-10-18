@@ -3,4 +3,5 @@
 // sc-parent.pdx, which is true of the scan and not of this page, where it is registered first.
 await import('./sc-child.pdx');
 await import('./sc-parent.pdx');
+await import('./sc-variant.pdx');
 window.__scReady = true;

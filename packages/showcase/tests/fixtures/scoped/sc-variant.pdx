@@ -1,0 +1,21 @@
+<template>
+  <button data-part="root"><slot></slot></button>
+</template>
+
+<script setup>
+// `@variants` and `@variant` (#153): two axes, a compound rule and a rule on the host itself. The
+// colours are literals on purpose — the spec reads them back.
+@variants {
+  tone: { plain, loud } = plain;
+  size: { sm, md } = md;
+}
+@part root;
+</script>
+
+<style scoped>
+[data-part="root"] { color: rgb(0, 0, 255); padding: 8px; }
+@variant tone(loud) { [data-part="root"] { color: rgb(255, 0, 0); } }
+@variant size(sm) { [data-part="root"] { padding: 2px; } }
+@variant tone(loud) and size(sm) { [data-part="root"] { font-weight: 700; } }
+@variant size(sm) { :scope { display: inline-block; } }
+</style>

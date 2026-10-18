@@ -311,6 +311,27 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Give it the condition it is on for (`@state busy = count > 0;`); for reactive data, use `$signal`.',
         example: { bad: pdx('<p>x</p>', '@state count = 0;'), good: pdx('<p>x</p>', 'let count = $signal(0);\n@state busy = count > 0;') },
     },
+    PDX_VARIANTS_MALFORMED: {
+        severity: 'error', category: 'defect',
+        summary: '`@variants` holds something that is not an axis.',
+        explanation: 'Each axis is a name, its values in braces and an optional default: `size: { sm, md, lg } = md;`. An axis without values, declared twice, or with a default that is not one of its values declares nothing, and its prop is not generated.',
+        fix: 'Write each axis as `name: { a, b } = a;`, with the default among the values.',
+        reproducedIn: `${T}variants.test.ts`,
+    },
+    PDX_VARIANT_UNKNOWN: {
+        severity: 'error', category: 'defect',
+        summary: 'An `@variant` names an axis or a value `@variants` does not declare.',
+        explanation: 'The rule selects a host attribute value the component never takes, so it never applies — a typo in a value is otherwise silent.',
+        fix: 'Use an axis and a value the script declares in `@variants`, or declare them there.',
+        reproducedIn: `${T}variants.test.ts`,
+    },
+    PDX_VARIANT_UNSTYLED: {
+        severity: 'warn', category: 'defect',
+        summary: 'A declared variant value has no `@variant` rule.',
+        explanation: 'Choosing the value renders the component exactly as the default does. The default itself is styled by the base rules and is never reported.',
+        fix: 'Add `@variant axis(value) { … }` to the `<style scoped>`, or remove the value from the axis.',
+        reproducedIn: `${T}variants.test.ts`,
+    },
     PDX_CIRCULAR_DERIVED: {
         severity: 'error', category: 'defect',
         summary: '`$derived` values that depend on each other in a cycle.',

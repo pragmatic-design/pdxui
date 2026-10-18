@@ -1,7 +1,6 @@
 // `:global()` is Vue's and Svelte's escape from a scoped style. It is not CSS: passed through, the
-// browser drops the whole rule, silently. PDX scopes by an ANCESTOR attribute, so a plain
-// descendant selector already reaches what a child component renders: the escape is not needed,
-// and the compiler says so.
+// browser drops the whole rule, silently. PDX does not need it — a plain `<style>` block is global,
+// and a scoped style stops at child components (#152) — and the compiler says so.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
@@ -23,6 +22,9 @@ describe('PDX_GLOBAL_SELECTOR', () => {
         const w = warnings.find(x => x.code === 'PDX_GLOBAL_SELECTOR');
         expect(w, 'the compiler said nothing about :global()').toBeDefined();
         expect(w!.message).toContain('.list .row-invalid');
+        // A scoped style no longer reaches inside a child (#152): the rule goes in a plain block.
+        expect(w!.message).toContain('a plain <style> block');
+        expect(w!.message, 'the message still says a scoped style reaches inside children').not.toContain('reaches');
         // Where it is, so `pdx check` and the editor can point at it: line 7 of the file.
         expect(w!.line).toBe(7);
     });
