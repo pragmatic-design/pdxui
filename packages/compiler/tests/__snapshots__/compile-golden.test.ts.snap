@@ -3080,12 +3080,12 @@ component('app-shell', {
     
     
     function goTo(target) {
-      navigate(target);
+      navigate.url(target);
     }
     
     function goToUser(id) {
       // Navigate with virtual state (not in URL)
-      navigate('/users/:id(number)', { id: String(id) }, { fromList: true, timestamp: Date.now() });
+      navigate('/users/:id', { id }, { fromList: true, timestamp: Date.now() });
     }
     
     function switchLocale(lang) {
@@ -3593,7 +3593,7 @@ component('app-user-detail', {
 function goBack() { navigate('/dashboard'); }
     function goNext() {
       const next = Number(currentParams().id) + 1;
-      navigate('/users/:id(number)', { id: String(next) }, { fromList: false });
+      navigate('/users/:id', { id: next }, { fromList: false });
     }
     const routeMeta = computed(() => currentMeta(), { name: 'user-detail:routeMeta' });
     useHead({ title: "User Detail — TaskMgr" });
@@ -3677,7 +3677,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     }
     
     function onNavSelect(e) {
-        navigate(e.detail.key);
+        navigate.url(e.detail.key);
         __menuOpen.setRaw(false);
     }
     function goDesign() { navigate('/design/typography'); }
@@ -25983,7 +25983,7 @@ component('app-demo-comp-nav-menu-router', {
 // function go(e) {
 //   if (!e.detail.href) return;
 //   e.preventDefault();       // the menu does not follow the link
-//   navigate(e.detail.href);  // the router does, with no page load
+//   navigate.url(e.detail.href);  // the router does, with no page load
 // }</code></pre>
     </details>
   </section>

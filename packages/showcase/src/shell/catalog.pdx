@@ -103,7 +103,7 @@ function onCatalogSearchKey(e) {
 function onCatalogSelect(e) {
     if (!e.detail.href) return;
     e.preventDefault();
-    navigate(e.detail.href);
+    navigate.url(e.detail.href);
     picked(e.detail.href);
 }
 

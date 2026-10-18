@@ -183,7 +183,7 @@ let section = $signal('attachments');
 /** Choose a page section — and leave a child route for it, or the outlet would keep the body. */
 function choose(next) {
   section = next;
-  if (onChild) navigate(`/tickets/${id}`);
+  if (onChild) navigate('/tickets/:id', { id: String(id) });
 }
 
 // ─── Attachments ───────────────────────────────────────────────────────────────

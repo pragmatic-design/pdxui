@@ -88,7 +88,7 @@ const total = $derived(source.total());
 let gridEl = $signal(null);
 
 function openRecord(row) {
-  navigate(`/sites/${row.id}`);
+  navigate('/sites/:id', { id: String(row.id) });
 }
 </script>
 

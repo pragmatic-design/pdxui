@@ -131,7 +131,7 @@ function step(delta) {
   const next = order[position + delta];
   if (next === undefined) return;
   const section = String(currentPath()).split('/')[3] ?? 'personal';
-  navigate(`/employees/${next}/${section}`);
+  navigate.url(`/employees/${next}/${section}`);
 }
 
 // ── The counts on the sections ─────────────────────────────────────────────────────────────

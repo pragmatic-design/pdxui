@@ -74,7 +74,8 @@ describe('the published .pdx examples type-check', () => {
     });
 
     it('with no TypeScript error, and every import resolved', () => {
-        const byFile = typecheckPdx(SITE, EXAMPLES.map(e => ({ path: e.path, content: e.source })));
+        // The site's own routes do not judge the examples it publishes (#150).
+        const byFile = typecheckPdx(SITE, EXAMPLES.map(e => ({ path: e.path, content: e.source })), { routeTypes: false });
         const found = EXAMPLES.flatMap(e => {
             const errors = byFile.get(e.path) ?? [];
             const allowed = TYPE_ERRORS_SHOWN[e.where] ?? [];

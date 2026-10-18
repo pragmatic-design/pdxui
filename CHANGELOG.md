@@ -109,6 +109,16 @@ semver.
 
 ### Changed
 
+- Routes are types. The build and the dev server write `.pdx/routes.d.ts` from the app's `@page`
+  patterns, and the editor and `pdx check --types` read it.
+  - `navigate('/users/:id', { id: 42 })` checks; an unknown path, a wrong param, or a concrete URL in `navigate()` is a type error.
+  - A param is typed by its constraint: `:id(number)` is a `number`, anything else a `string`.
+  - A concrete URL is `navigate.url('/users/42')`.
+  - `<pdx-link to="/users/:id" :params="{ id: u.id }">` is checked the same way. It now takes `params` as a property, so a binding works, and points its `href`, click and active state at the filled URL; the pattern used to end up in the `href`.
+  - `pdx migrate` turns a literal URL in `navigate()` into `navigate.url()` and lists the calls whose path is computed.
+  - `RouteRegistry`, `RoutePath`, `RouteParams` and `RouteArgs` are exported from `@pdxui/router`.
+
+  (#150)
 - `@await` understands a source, binds its result with `as`, and decides by state, not truthiness.
   `@await (users as list) { … } @loading { … } @error (e, retry) { … }` takes an `@fetch`, a resource,
   `useQuery` or a promise.

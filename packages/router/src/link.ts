@@ -2,7 +2,7 @@
 //
 // Usage:
 //   <pdx-link to="/dashboard">Dashboard</pdx-link>
-//   <pdx-link to="/users/:id" params='{"id":"42"}'>User</pdx-link>
+//   <pdx-link to="/users/:id" :params="{ id: user.id }">User</pdx-link>   (or params='{"id":42}')
 //   <pdx-link to="/settings" prefetch="never" active-class="current">Settings</pdx-link>
 //
 // Features:
@@ -15,14 +15,16 @@
 
 import { effect, sanitizeUrl } from '@pdxui/core';
 import { navigate, currentPath } from './active';
+import { fillParams } from './navigation';
 import { prefetchRoute, policyFor, whenInView } from './prefetch';
 
 class PdxLink extends HTMLElement {
     private _dispose: (() => void) | null = null;
     private _unwatch: (() => void) | null = null;
     private _prefetchDone = false;
+    private _params: Record<string, string | number> | undefined;
 
-    static get observedAttributes() { return ['to', 'active-class', 'exact']; }
+    static get observedAttributes() { return ['to', 'params', 'active-class', 'exact']; }
 
     /**
      * `to` as a PROPERTY, reflected to the attribute.
@@ -47,6 +49,23 @@ class PdxLink extends HTMLElement {
      * element reads `hasAttribute('exact')`, and without the reflection an exact link to `/` would
      * match every path — `/` is a prefix of everything — and be highlighted on every screen.
      */
+    /**
+     * The values of `to`'s `:param` placeholders (#150): `:params="{ id: u.id }"` sets this property,
+     * `params='{"id":42}'` the attribute. The link points at the filled URL — the href a middle
+     * click opens, the path it is active on — and the editor checks both against the app's routes.
+     */
+    get params(): Record<string, string | number> | undefined { return this._params; }
+    set params(value: Record<string, string | number> | undefined) {
+        this._params = value ?? undefined;
+        this._retarget();
+    }
+
+    /** Where the link goes: `to` with its params filled in. */
+    private _target(): string {
+        const to = this.getAttribute('to') ?? '';
+        return this._params ? fillParams(to, this._params) : to;
+    }
+
     get exact(): boolean { return this.hasAttribute('exact'); }
     set exact(value: boolean) {
         if (value) this.setAttribute('exact', '');
@@ -59,7 +78,7 @@ class PdxLink extends HTMLElement {
         // the element is still an unknown tag, so the setter never runs, the attribute is never
         // written, and the link stays dead. `component.ts` does this for every PDX component;
         // this element is hand-written and has to do it itself.
-        for (const name of ['to', 'exact'] as const) {
+        for (const name of ['to', 'exact', 'params'] as const) {
             const own = Object.getOwnPropertyDescriptor(this, name);
             if (!own || !('value' in own)) continue;
             delete (this as unknown as Record<string, unknown>)[name];
@@ -69,7 +88,7 @@ class PdxLink extends HTMLElement {
         // Render as <a> for a11y if not already wrapped
         if (!this.querySelector('a')) {
             const a = document.createElement('a');
-            a.href = sanitizeUrl(this.getAttribute('to')) ?? '#';
+            a.href = sanitizeUrl(this._target()) ?? '#';
             while (this.firstChild) a.appendChild(this.firstChild);
             this.appendChild(a);
             this.style.display = 'contents';
@@ -126,7 +145,7 @@ class PdxLink extends HTMLElement {
         this._unwatch?.();
         this._unwatch = null;
         if (!this.isConnected || this._prefetchDone || this.getAttribute('prefetch') === 'never') return;
-        const policy = policyFor(sanitizeUrl(this.getAttribute('to')) ?? '');
+        const policy = policyFor(sanitizeUrl(this._target()) ?? '');
         if (policy === 'eager') this._onPrefetchSignal();
         // The anchor, not this element: the host is `display: contents`, has no box, and an
         // IntersectionObserver never reports it as intersecting.
@@ -142,7 +161,7 @@ class PdxLink extends HTMLElement {
         const activeClass = this.getAttribute('active-class');
         if (!activeClass) return;
         const current = currentPath();
-        const to = this.getAttribute('to') ?? '';
+        const to = this._target();
         const isActive = this.hasAttribute('exact')
             ? current === to
             : current === to || current.startsWith(to.endsWith('/') ? to : to + '/');
@@ -159,16 +178,24 @@ class PdxLink extends HTMLElement {
     attributeChangedCallback(name: string) {
         // `exact` changes what the active state MEANS, so it re-applies it too.
         if (name === 'exact') this._applyActiveClass();
-        if (name === 'to') {
-            const a = this.querySelector('a');
-            if (a) a.href = sanitizeUrl(this.getAttribute('to')) ?? '#';
-            // And the active state, which cannot be left to the effect above: that one re-runs on
-            // a navigation, and a link told where it points AFTER it is connected — every `:to`
-            // binding — sees no navigation on the page it was rendered into.
-            this._applyActiveClass();
-            // And the prefetch policy, for the same reason: the route is known only now.
-            this._applyPrefetchPolicy();
+        if (name === 'params') {
+            const raw = this.getAttribute('params');
+            this._params = raw ? parseParams(raw) : undefined;
+            this._retarget();
         }
+        if (name === 'to') this._retarget();
+    }
+
+    /** The target changed — `to` or its params: the href, the active state and the prefetch follow. */
+    private _retarget(): void {
+        const a = this.querySelector('a');
+        if (a) a.href = sanitizeUrl(this._target()) ?? '#';
+        // And the active state, which cannot be left to the effect above: that one re-runs on
+        // a navigation, and a link told where it points AFTER it is connected — every `:to`
+        // binding — sees no navigation on the page it was rendered into.
+        this._applyActiveClass();
+        // And the prefetch policy, for the same reason: the route is known only now.
+        this._applyPrefetchPolicy();
     }
 
     private _onClick = (e: Event) => {
@@ -177,20 +204,9 @@ class PdxLink extends HTMLElement {
         if (me.ctrlKey || me.metaKey || me.shiftKey || me.altKey) return;
 
         e.preventDefault();
-        const to = this.getAttribute('to');
-        if (!to) return;
-
-        const paramsAttr = this.getAttribute('params');
-        let params: Record<string, string> | undefined;
-        if (paramsAttr) {
-            try {
-                params = JSON.parse(paramsAttr);
-            } catch {
-                // Malformed params attribute → ignore rather than throwing out of the click handler.
-                params = undefined;
-            }
-        }
-        navigate(to, params);
+        if (!this.getAttribute('to')) return;
+        // The filled URL, already resolved: the router matches it like any other.
+        navigate.url(this._target());
     };
 
     /**
@@ -203,12 +219,23 @@ class PdxLink extends HTMLElement {
      */
     private _onPrefetchSignal = () => {
         if (this._prefetchDone) return;
-        const safe = sanitizeUrl(this.getAttribute('to'));
+        const safe = sanitizeUrl(this._target());
         if (!safe) return;
         // Only mark it done once something was actually started: a route whose table has not
         // landed yet must still be prefetchable on the next hover.
         if (prefetchRoute(safe)) this._prefetchDone = true;
     };
+}
+
+/** `params='{"id":42}'`: a malformed attribute is no params, not an exception out of a callback. */
+function parseParams(raw: string): Record<string, string | number> | undefined {
+    try {
+        const value: unknown = JSON.parse(raw);
+        return value && typeof value === 'object' ? value as Record<string, string | number> : undefined;
+    } catch (err) {
+        console.warn(`[pdx-router] <pdx-link params> is not JSON: ${String(err)}`);
+        return undefined;
+    }
 }
 
 if (typeof customElements !== 'undefined') {

@@ -33,7 +33,7 @@ const routeMeta = $derived(currentMeta());
 function goBack() { navigate('/dashboard'); }
 function goNext() {
   const next = Number(currentParams().id) + 1;
-  navigate('/users/:id(number)', { id: String(next) }, { fromList: false });
+  navigate('/users/:id', { id: next }, { fromList: false });
 }
 </script>
 

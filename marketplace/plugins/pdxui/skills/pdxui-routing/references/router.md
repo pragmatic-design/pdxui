@@ -33,9 +33,34 @@ And links that navigate without reloading the page:
 click to navigate client-side. To navigate from code: `navigate('/dashboard')` from
 `@pdxui/router`.
 
-> **Gotcha — dynamic links.** `<pdx-link to="/x">` with a *static* `to` works. If the URL is
-> *dynamic* (inside a `@for`), prefer `<a :href="url" @click="go">` with
-> `function go(e){ e.preventDefault(); navigate(e.currentTarget.getAttribute('href')); }`.
+A link to a page with params names the pattern and binds the values; the `href` is the filled URL:
+
+```pdx
+@for (users as u; track u.id) {
+  <pdx-link to="/users/:id" :params="{ id: u.id }">{{ u.name }}</pdx-link>
+}
+```
+
+### Typed routes
+
+The build and the dev server write `.pdx/routes.d.ts` from your `@page` patterns, and the editor and
+`pdx check --types` read it. From then on a route is a type:
+
+```ts
+import { navigate } from '@pdxui/router';
+
+navigate('/users/:id', { id: 42 });      // ✓ a declared pattern, its params typed
+navigate('/user/:id', { id: 42 });       // ✗ no such route
+navigate('/users/:id', { userId: 42 });  // ✗ the param is `id`
+navigate('/users/42');                   // ✗ a URL, not a pattern…
+navigate.url('/users/42?tab=history');   // ✓ …which goes through navigate.url
+```
+
+`<pdx-link to="/users/:id" :params="…">` is checked the same way. A param is typed by its
+constraint: `:id(number)` is a `number`, anything else a `string`. The file is generated: add `.pdx/`
+to `.gitignore`, and to the `include` of your `tsconfig.json` if your `.ts` modules call `navigate`.
+`pdx migrate` turns an existing `navigate('/users/42')` into `navigate.url('/users/42')`, and lists
+the calls whose path is computed.
 
 ## Params
 
@@ -611,7 +636,7 @@ No import: the compiler writes `import { navigation } from '@pdxui/router'` in a
 | data ready on entry | `@loader fn` |
 | a shared frame | `@layout 'admin'` — or, for a frame inside a frame, a parent page with a `<pdx-router-outlet>` |
 | to keep state | `@page '/x' { keepAlive }` |
-| to navigate from code | `navigate('/path')` |
+| to navigate from code | `navigate('/users/:id', { id })`, or `navigate.url(url)` for a built URL |
 | the chunk ready before the click | nothing — `<pdx-link>` does it; `@page '/x' { prefetch: 'never' }` opts out |
 | to read or write the query | `currentQuery()` · `setQueryParam(k, v)` |
 | to guard or track every route | `onBeforeNavigate` · `onAfterNavigate` |

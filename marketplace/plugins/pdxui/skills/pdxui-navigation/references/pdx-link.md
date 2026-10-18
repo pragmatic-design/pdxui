@@ -6,6 +6,7 @@ A link that navigates without a reload and marks itself active.
 |---|---|---|---|---|
 | `to` | `to` | string | — | Reflected to the `to` attribute, so a binding works. |
 | `exact` | `exact` | boolean | — | Reflected to the `exact` attribute, so a binding works. |
+| `params` | — | Record<string, string \| number> \| undefined | — | The values of `to`'s params, as `:params="{ id: u.id }"` binds them; the link points at the filled URL. The `params` attribute sets it from JSON. |
 | `active-class` | `active-class` | string | — | The class added while the link's target is the current route. |
 | `prefetch` | `prefetch` | 'never' | — | `never` turns off fetching the route's chunk on hover, focus and pointerdown; otherwise the route's own @prefetch decides. |
 | `params` | `params` | string | — | JSON object of route params that fill the pattern in `to`. |

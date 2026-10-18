@@ -22,10 +22,11 @@ export interface PdxTypeError {
 
 /**
  * The TypeScript errors of each .pdx in `files`, checked together against the project at `rootDir`
- * (its nearest tsconfig.json, its node_modules). A file with no script has none.
+ * (its nearest tsconfig.json, its node_modules). A file with no script has none. The app's
+ * `.pdx/routes.d.ts` types `navigate()` and `<pdx-link>` unless `routeTypes` is false (#150).
  */
-export function typecheckPdx(rootDir: string, files: { path: string; content: string }[]): Map<string, PdxTypeError[]> {
-    const svc = new PdxTsService(rootDir);
+export function typecheckPdx(rootDir: string, files: { path: string; content: string }[], options: { routeTypes?: boolean } = {}): Map<string, PdxTypeError[]> {
+    const svc = new PdxTsService(rootDir, undefined, options);
     const projected = files.flatMap((f) => {
         const descriptor = parseSFC(f.content);
         if (!descriptor.script) return [];

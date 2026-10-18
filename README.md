@@ -84,7 +84,7 @@ const columns = $derived([                            // recomputed when the lan
 const total = $derived(source.total());
 let gridEl = $signal(null);
 
-function openRecord(row) { navigate(`/employees/${row.id}/personal`); }
+function openRecord(row) { navigate('/employees/:id/personal', { id: String(row.id) }); }
 </script>
 ```
 

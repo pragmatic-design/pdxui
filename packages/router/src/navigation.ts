@@ -13,6 +13,7 @@ import {
     isRouterTarget, markShown, restoreShown, writeUrl, publishQuery, parseQueryString, primaryOutlet,
 } from './address';
 import type { NavigationHop, RouteConfig, RouterOptions } from './types';
+import type { Navigate, NavigationState } from './route-types';
 
 /** What `createRouter` and `configureRouter` set, and every navigation reads. */
 export const config: {
@@ -113,12 +114,30 @@ export function stripBase(pathname: string): string {
 }
 
 /**
- * Navigate programmatically.
- * @param path — route path (can include :param placeholders)
- * @param params — URL path params to replace :param segments
+ * Navigate to a route by its pattern (#150): `navigate('/users/:id', { id: 42 })`. With the app's
+ * generated `.pdx/routes.d.ts`, the pattern must be one the app declares and the params are typed
+ * from its constraints; a concrete URL goes through {@link navigate.url}.
+ * @param path — the route pattern (its `:param` placeholders are filled from `params`)
+ * @param params — the values of its params
  * @param state — ephemeral navigation state (not in URL, accessible via currentState)
  */
-export function navigate(path: string, params?: Record<string, string>, state?: Record<string, unknown>): void {
+export const navigate: Navigate = /*#__PURE__*/ Object.assign(navigateToRoute, { url: navigateToUrl });
+
+/** `navigate(pattern, params, state)`: the pattern filled, then pushed. */
+function navigateToRoute(path: string, params?: Record<string, string | number>, state?: NavigationState): void {
+    go(fillParams(path, params), state);
+}
+
+/**
+ * Navigate to a concrete URL, `navigate.url('/users/42?tab=a')`: checked by nothing but the router's
+ * own match, so an explicit call rather than a string `navigate()` would take untyped.
+ */
+function navigateToUrl(url: string, state?: NavigationState): void {
+    go(url, state);
+}
+
+/** `path` with its `:param` placeholders (and their constraints) replaced by `params`, URL-encoded. */
+export function fillParams(path: string, params?: Record<string, string | number>): string {
     let resolved = path;
     if (params) {
         for (const [key, value] of Object.entries(params)) {
@@ -132,7 +151,11 @@ export function navigate(path: string, params?: Record<string, string>, state?: 
             resolved = resolved.replace(new RegExp(`:${escKey}(\\([^)]*\\))?(?![A-Za-z0-9_])`, 'g'), () => enc);
         }
     }
+    return resolved;
+}
 
+/** Push `resolved`, a path inside this origin, with its ephemeral `state`. */
+function go(resolved: string, state?: NavigationState): void {
     // Reject external/protocol-relative/javascript: targets — navigate() is for internal routes
     // only. The <a href> is already sanitized, but the click handler reaches here with the raw `to`.
     //

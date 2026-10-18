@@ -75,7 +75,7 @@ function followLink(e) {
   const a = e.target.closest?.('a.pdx-dg-link');
   if (!a || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
   e.preventDefault();
-  navigate(a.getAttribute('href'));
+  navigate.url(a.getAttribute('href'));
 }
 </script>
 

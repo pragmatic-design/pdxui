@@ -204,7 +204,7 @@ its constraints. `navigate()` is then overloaded on them — `navigate('/users/:
 an unknown path or a wrong param is a type error — and a concrete URL goes through
 `navigate.url('/users/42')`, explicitly. `<pdx-link to="/users/:id" :params="{ id: u.id }">` is checked
 by the editor with the same types, and `pdx check --types` reads the file. An untyped
-`navigate(string)` is a language change (`navigate.url` in beta). Since: beta (#150).
+`navigate(string)` is a language change (`navigate.url` in beta). Since: beta (#150 — landed).
 
 ## The document head
 
