@@ -60,8 +60,20 @@ import { throttle, lcpOf, medianLcp } from './lcp';
  * so the alarm had gone blind; it is placed again between the two rows: ~111 ms over the shipped
  * medians, 46 under the padded ones, which are red against it. Another machine's numbers will
  * differ, and this is where it will say so first.
+ *
+ * And it did, on CI (#517). The medians CI recorded on 32 runs of 2026-10-17/18, none of which
+ * touched the first page, spread from 898 to 1013 ms (typical 957): the 1000 ms alarm sat inside
+ * that spread and went red twice, once on main. Re-measured locally the same day, entry 39.5 KB:
+ *
+ *                                   app ready median
+ *   as shipped                        926–933 ms            (4 medians)
+ *   entry doubled (+34 KB gzipped)   1097–1111 ms           (4 medians, all red)
+ *
+ * CI runs ~27 ms slower than this machine, so a doubled entry there should land around 1070–1185.
+ * The alarm sits between the two: 27 ms over the highest unchanged CI median, ~30 under the lowest
+ * doubled estimate, 57 under the doubled medians measured here.
  */
-const APP_READY_CEILING_MS = 1_000;
+const APP_READY_CEILING_MS = 1_040;
 
 interface Timings {
     /** The first contentful paint — the SPLASH's, before any JavaScript has run. */
