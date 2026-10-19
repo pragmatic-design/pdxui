@@ -1,15 +1,16 @@
-**The value follows `output`.** `value` goes in and comes out in the same format:
+**The value follows `output`.** `value` is the model: it goes in and comes out in the same format,
+and every edit writes it and dispatches `value-change` with `{ value }`, so `::value` binds it both
+ways.
 
-| `output` | `value` accepts | `value` after an edit, and `pdx-change.detail` |
+| `output` | `value` accepts | `value` after an edit |
 |---|---|---|
-| `'json'` (default) | the document object, or its JSON string | the document object · `detail.doc` |
-| `'html'` | an HTML string | the HTML string · `detail.html` |
-| `'text'` | a JSON document (plain text in is not parsed) | the plain text · `detail.text` |
-| `'all'` | the document object, or its JSON string | the document object · `detail.doc` **and** `detail.html` |
+| `'json'` (default) | the document object, or its JSON string | the document object |
+| `'html'` | an HTML string | the HTML string |
+| `'text'` | a JSON document (plain text in is not parsed) | the plain text |
+| `'all'` | the document object, or its JSON string | the document object; `getHTML()` gives the HTML |
 
-`detail.wordCount` is always there. A `value` set from outside after mount replaces the content
-without rebuilding the editor; reading `el.value` after an edit gives the current content, so a
-form can bind it like any other input.
+The word count is `getWordCount()`. A `value` set from outside after mount replaces the content
+without rebuilding the editor.
 
 The imperative API — `getHTML()`, `setHTML(html)`, `getJSON()`, `setJSON(doc)`, `getText()`,
 `clear()`, `focus()` — exists from the moment the element is connected, and calls made before the
@@ -49,7 +50,7 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 **Pitfalls**
 - An HTML string as `value` with the default `output="json"` is not HTML to it: the editor starts EMPTY, and
   only a dev build warns. Set `output="html"`.
-- The compiler does not wire it inside `<pdx-form>` by `name`: bind `:value` and `@pdx-change` yourself.
+- The compiler does not wire it inside `<pdx-form>` by `name`: bind it yourself, `::value="field"`.
 - `source` and `field` are declared and read by nothing: setting them does nothing.
 - Only the setters wait for the editor. Before `pdx-ready`, `getJSON()` is `null`, `getHTML()` and `getText()`
   are `''`, and `execCommand()` does nothing.

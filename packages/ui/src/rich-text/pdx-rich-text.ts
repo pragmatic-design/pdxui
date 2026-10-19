@@ -3,12 +3,12 @@
 //
 // The value contract is the one every input in the library keeps: the content goes in
 // through `value`, parsed per `output` (HTML for `output="html"`, JSON otherwise); it comes out
-// through `value` after every change, equal to the `pdx-change` detail; and a later `value` from
-// outside replaces the document without rebuilding the editor. The imperative API is attached at
+// through `value`, the model (#482), whose write after every change dispatches `value-change`; and a
+// later `value` from outside replaces the document without rebuilding the editor. The imperative API is attached at
 // setup — before `pdx-ready` and before anything can call it — so it shadows the platform's own
 // Element.prototype.setHTML from the start; calls made before the editor exists are queued.
 
-import { component, html, untracked, DEV, isDataSource } from '@pdxui/core';
+import { component, html, untracked, DEV, isDataSource, model } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
 import { findRecord } from '../shared/find-record';
 import { EditorView, type EditorViewConfig } from './view/view.js';
@@ -29,10 +29,16 @@ import '@pdxui/design/components/menu';
 
 /**
  * A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail doc $event.detail.value
+ * @alphadetail html $event.detail.value
+ * @alphadetail text $event.detail.value
+ * @alphadetail wordCount $event.currentTarget.getWordCount()
  */
 component('pdx-rich-text', {
+  models: { value: model<unknown>(null, { type: Object }) },
   props: {
-    value: { type: Object, default: null },
     output: { type: String, default: 'json' },
     extensions: { type: Array, default: null },
     preset: { type: String, default: 'starter' },
@@ -217,22 +223,16 @@ component('pdx-rich-text', {
             // Loading the initial value is not a change the user made: no event, no reflection.
             if (building) return;
 
-            const detail: Record<string, unknown> = {};
-            if (outputCfg === 'json' || outputCfg === 'all') detail.doc = toJSON(state.doc);
-            if (outputCfg === 'html' || outputCfg === 'all') detail.html = serializeToClipboardHTML(state.doc.content);
-            if (outputCfg === 'text') detail.text = textContent(state.doc);
-            detail.wordCount = countWords(state.doc);
-
-            // Reflect first, so a pdx-change listener that reads el.value sees the new content.
-            const out = outputCfg === 'html' ? detail.html : outputCfg === 'text' ? detail.text : detail.doc;
-            reflected = out;
-            el.value = out;
+            const out = outputCfg === 'html' ? serializeToClipboardHTML(state.doc.content)
+              : outputCfg === 'text' ? textContent(state.doc) : toJSON(state.doc);
 
             // Bound: the edit goes back into the record, through the source, as an unsaved change.
             const b = untracked(binding);
             if (b?.record) b.source.update({ ...b.record, [b.field]: out });
 
-            el.dispatchEvent(new CustomEvent('pdx-change', { detail, bubbles: true }));
+            // The model: the write dispatches `value-change` with the content.
+            reflected = out;
+            ctx.value.set(out);
           },
           onFocus: () => el.dispatchEvent(new CustomEvent('pdx-focus', { bubbles: true })),
           onBlur: () => el.dispatchEvent(new CustomEvent('pdx-blur', { bubbles: true })),

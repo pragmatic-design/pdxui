@@ -38,7 +38,7 @@ async function mountEditor(schema: unknown = SCHEMA, value: unknown = VALUE): Pr
     el.schema = schema;
     el.value = value;
     const changes: unknown[] = [];
-    el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail.value));
+    el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail.value));
     await tick(100);
     return { el, changes };
 }
@@ -92,7 +92,7 @@ describe('pdx-json-editor sub-modal', () => {
         expect(document.activeElement).toBe(d.querySelector('pdx-input input'));
     });
 
-    it('Apply writes the value, emits pdx-change once, and returns focus to Edit…', async () => {
+    it('Apply writes the value, emits value-change once, and returns focus to Edit…', async () => {
         const { el, changes } = await mountEditor();
         const leaked: string[] = [];
         document.addEventListener('jed-edit', () => leaked.push('jed-edit'));

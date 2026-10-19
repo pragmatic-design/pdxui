@@ -179,13 +179,13 @@ describe('pdx-number-input can be empty', () => {
 
 describe('pdx-inline-edit type="number" saves what was typed', () => {
     // An integer on purpose: this measures the event wiring only. The decimals are measured below.
-    it('edit 29.5 → type 31 → Enter: pdx-change carries 31, not the starting value', async () => {
+    it('edit 29.5 → type 31 → Enter: value-change carries 31, not the starting value', async () => {
         const edit = document.createElement('pdx-inline-edit') as HTMLElement & { value: unknown };
         edit.setAttribute('type', 'number');
         document.body.appendChild(edit);
         edit.value = 29.5;
         const display = await until(() => edit.querySelector<HTMLElement>('.pdx-inline-edit-display'), 'the display');
-        const saved = record(edit, 'pdx-change');
+        const saved = record(edit, 'value-change');
         display.click();
         const input = await until(() => edit.querySelector<HTMLInputElement>('pdx-number-input input'), 'the number editor');
         await frames(3); // the inline editor wires its own Enter handler two frames after building
@@ -204,7 +204,7 @@ describe('pdx-inline-edit keeps the decimals typed into a number or currency', (
         document.body.appendChild(edit);
         edit.value = start;
         const display = await until(() => edit.querySelector<HTMLElement>('.pdx-inline-edit-display'), 'the display');
-        const saved = record(edit, 'pdx-change');
+        const saved = record(edit, 'value-change');
         display.click();
         const input = await until(() => edit.querySelector<HTMLInputElement>('pdx-number-input input'), 'the number editor');
         await frames(3);

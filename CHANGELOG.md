@@ -134,6 +134,16 @@ semver.
 
 ### Changed
 
+- The editors and the upload declare their value as a model, announced with `value-change` and
+  `{ value }`: `pdx-rich-text`, `pdx-json-editor`, `pdx-inline-edit`, and `pdx-file-upload`, whose
+  value is the `File[]` it holds. `::value` binds each both ways — on `pdx-file-upload` for the first
+  time: it had no `value`.
+  - They no longer emit `pdx-change`. A listener on it is `PDX_REMOVED_FORM`, and `pdx migrate`
+    rewrites an inline handler: `detail.doc`, `detail.html` and `detail.text` of the rich text are
+    `detail.value`, and its `detail.wordCount` is `getWordCount()`. The rich text's event no longer
+    bubbles.
+  - `getFormControlConfig()` describes the choice controls (#480) and `pdx-inline-edit` by their
+    model's event, not the alpha one. (#482)
 - The choice controls declare their value as a model and announce it with the model's event, whose
   detail is `{ value }`: `checked-change` on `pdx-checkbox`, `pdx-switch` and `pdx-radio`,
   `pressed-change` on `pdx-toggle`, `value-change` on `pdx-radio-group`, `pdx-checkbox-group`,

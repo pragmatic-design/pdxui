@@ -128,7 +128,7 @@
         <pdx-inline-edit
           :value="currentSubject"
           :label="$t('tickets.columns.subject')"
-          @pdx-change="onInlineSubject"
+          @value-change="onInlineSubject"
           data-test="inline-subject"></pdx-inline-edit>
       </div>
     }

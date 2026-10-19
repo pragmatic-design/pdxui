@@ -3,10 +3,9 @@
 // Supports: text, number, currency, date, datetime, boolean, select, multiselect,
 // color, rating, textarea.
 
-import { component, html, signal, untracked } from '@pdxui/core';
+import { component, html, signal, untracked, model } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
-import { setOwnProp } from '../shared/own-prop';
 import { onControlValue } from '../shared/model-event';
 import { onPressOutside } from '../shared/press-outside';
 import { uiString, format } from '../shared/i18n';
@@ -32,20 +31,27 @@ registerComponentStrings('inline-edit', {
 });
 
 registerFormControl('pdx-inline-edit', {
-    valueEvent: 'pdx-change',
+    valueEvent: 'value-change',
     valueProp: 'value',
+    valueExpr: 'e.detail?.value',
 });
 
 /**
  * A value the user clicks to edit in place, in the editor its `type` calls for.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
  */
 component('pdx-inline-edit', {
     formAssociated: true,
+    // A commit writes it (#482), and the write dispatches `value-change`.
+    models: {
+        /** Current value */
+        value: model<unknown>(null, { type: Object }),
+    },
     props: {
         /** Data type — determines which editor to show */
         type: { type: String, default: 'text' },
-        /** Current value */
-        value: { type: Object, default: null },
         /** Options for select/multiselect: [{ value, label }] */
         options: { type: Array, default: [] },
         /** Placeholder when value is empty */
@@ -179,8 +185,7 @@ component('pdx-inline-edit', {
             if (getType() === 'boolean') {
                 _editValue = !_editValue;
                 _internalValue.set(_editValue);
-                setOwnProp(ctx.el, 'value', _editValue);
-                ctx.emit('pdx-change', { value: _editValue });
+                ctx.value.set(_editValue);
                 return;
             }
             // Rating: show editor inline (no separate edit mode needed)
@@ -219,9 +224,8 @@ component('pdx-inline-edit', {
             removeOutsideHandler();
             _internalValue.set(_editValue);
             _editing.set(false);
-            // The saved value is the host's `value`, as registerFormControl declares.
-            setOwnProp(ctx.el, 'value', _editValue);
-            ctx.emit('pdx-change', { value: _editValue });
+            // The saved value is the host's `value`, its model, as registerFormControl declares.
+            ctx.value.set(_editValue);
             refocusDisplay(hadFocus);
         }
 

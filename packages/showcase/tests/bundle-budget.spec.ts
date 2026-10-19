@@ -242,7 +242,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // its model's event (model-event, +257 B); the pages that import them carry the imports. Same machine,
 // same day, the built dist: main 465.8 → this branch 466.9 KB over 462 → 464 files; entry and blocking
 // did not move.
-const BUDGET_KB = { entry: 40, js: 467, css: 63, blocking: 97 };
+// js 467 → 468: the editors and the upload declare their model (#482). pdx-file-upload had no `value`
+// at all: its model is the files it holds, written on every change and followed when a parent sets it
+// (+180 B in its chunk); core's form registry describes the choice controls by their model (+24 B).
+// Same machine, same day, the built dist: main 466.9 → this branch 467.2 KB; entry and blocking did
+// not move.
+const BUDGET_KB = { entry: 40, js: 468, css: 63, blocking: 97 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -209,13 +209,13 @@ const CASES: Case[] = [
         props: { value: (d) => d },
     },
     {
-        name: 'pdx-inline-edit (boolean)', html: '<pdx-inline-edit type="boolean"></pdx-inline-edit>', event: 'pdx-change',
+        name: 'pdx-inline-edit (boolean)', html: '<pdx-inline-edit type="boolean"></pdx-inline-edit>', event: 'value-change',
         setup: (el) => { el.value = false; },
         act: (el) => q<HTMLElement>(el, '.pdx-inline-edit-display').click(),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-json-editor', html: '<pdx-json-editor></pdx-json-editor>', event: 'pdx-change',
+        name: 'pdx-json-editor', html: '<pdx-json-editor></pdx-json-editor>', event: 'value-change',
         setup: (el) => { el.schema = { label: 'Profile', fields: [{ k: 'name', label: 'Name' }] }; el.value = { name: 'Grace' }; },
         act: (el) => typeInto(q(el, 'input'), 'Ada'),
         props: { value: (d) => d.value },

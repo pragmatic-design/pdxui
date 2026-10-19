@@ -14,6 +14,7 @@ Drag-and-drop or browse to upload.
 | `auto` | `auto` | boolean | `false` | Upload immediately on selection. |
 | `action` | `action` | string | `''` | URL to upload files to. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
+| `value` | — | File[] | `() => []` | The current value. |
 
 **API (via `:ref`)**
 
@@ -24,7 +25,7 @@ Drag-and-drop or browse to upload.
 | `uploadAll()` | Start uploading every file still pending; those uploading, done or failed are left alone. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-error` → `detail: { file, error }` — Fired when an error occurs.; `pdx-progress` → `detail: { file, percent }` — Fired on `pdx-progress`.; `pdx-remove` → `detail: { file, index }` — Fired when an item is removed.; `pdx-select` → `detail: { files }` — Fired when an item is selected.; `pdx-success` → `detail: { file, response }` — Fired on `pdx-success`.; `pdx-upload` → `detail: { file }` — Fired on `pdx-upload`.
+**Events:** `pdx-error` → `detail: { file, error }` — Fired when an error occurs.; `pdx-progress` → `detail: { file, percent }` — Fired on `pdx-progress`.; `pdx-remove` → `detail: { file, index }` — Fired when an item is removed.; `pdx-select` → `detail: { files }` — Fired when an item is selected.; `pdx-success` → `detail: { file, response }` — Fired on `pdx-success`.; `pdx-upload` → `detail: { file }` — Fired on `pdx-upload`.; `value-change` → `detail: { value: File[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `button` · `list` · `listitem` · `progressbar` · `status`
 

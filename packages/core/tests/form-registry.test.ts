@@ -23,15 +23,21 @@ describe('form registry', () => {
         expect(cfg?.valueEvent).toBe('pdx-input');
     });
 
-    it('marks checkbox/switch as checked controls', () => {
-        expect(getFormControlConfig('pdx-checkbox')?.checked).toBe(true);
-        expect(getFormControlConfig('pdx-switch')?.checked).toBe(true);
+    it('marks checkbox/switch as checked controls, on their model\'s event (#480)', () => {
+        for (const tag of ['pdx-checkbox', 'pdx-switch']) {
+            expect(getFormControlConfig(tag)).toMatchObject({ checked: true, valueProp: 'checked', valueEvent: 'checked-change', valueExpr: 'e.detail?.value' });
+        }
     });
 
-    it('captures special event names (toggle)', () => {
-        const cfg = getFormControlConfig('pdx-toggle');
-        expect(cfg?.valueEvent).toBe('pressedchange');
-        expect(cfg?.valueExpr).toBe('e.detail?.pressed');
+    it('describes a control that declares a model by its model (#480)', () => {
+        expect(getFormControlConfig('pdx-toggle')).toMatchObject({ valueProp: 'pressed', valueEvent: 'pressed-change', valueExpr: 'e.detail?.value' });
+        for (const tag of ['pdx-radio-group', 'pdx-checkbox-group', 'pdx-segmented', 'pdx-slider', 'pdx-rating']) {
+            expect(getFormControlConfig(tag)?.valueEvent, tag).toBe('value-change');
+        }
+    });
+
+    it('control: one with no model yet keeps the default alpha event', () => {
+        expect(getFormControlConfig('pdx-select')).toEqual({});
     });
 
     it('registers a custom control (case-insensitive)', () => {
