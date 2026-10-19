@@ -71,6 +71,7 @@
        that has to be exact rather than close. Dividing the factor out gives it. */
     --pdx-button-min-height: calc(2.75rem / 1.1);  /* 44px Apple touch target, at cupertino's density */
     --pdx-input-style: outlined;
+    --pdx-input-border-color: transparent;          /* gray fill, no border until focus */
     --pdx-input-min-height: calc(2.75rem / 1.1);   /* the same, so a row of both aligns */
     --pdx-tab-indicator: pill;         /* segmented control style */
     --pdx-tab-indicator-size: 2px;
@@ -85,7 +86,6 @@
    out so the rendered height is 44px, not 48.4. */
 @pdx-theme cupertino {
 :is(.pdx-input-wrap, .pdx-input:not(.pdx-input-wrap > *)) {
-    border-color: transparent;
     background: light-dark(oklch(0.96 0.003 60), oklch(0.22 0.004 60));
 }
 .pdx-input-wrap:focus-within {

@@ -78,6 +78,7 @@
        corporate's). Dividing it out gives 32px at the theme's density. */
     --pdx-button-min-height: calc(2rem / 0.9);        /* 32px — compact tile feel, at metro's density */
     --pdx-input-style: outlined;
+    --pdx-input-border-color: var(--pdx-color-border-strong);   /* sharp, strong border */
     --pdx-input-min-height: calc(2rem / 0.9);         /* 32px — match buttons */
     --pdx-card-style: bordered;
     --pdx-tab-indicator: underline;
@@ -160,10 +161,7 @@ details.pdx-accordion[open] summary::after {
     border-color: var(--pdx-color-primary);
 }
 
-/* Input: sharp, strong border */
-.pdx-input-wrap {
-    border-color: var(--pdx-color-border-strong);
-}
+/* Input: the strong resting border is --pdx-input-border-color (#519) */
 .pdx-input-wrap:focus-within {
     border-color: var(--pdx-color-primary);
 }

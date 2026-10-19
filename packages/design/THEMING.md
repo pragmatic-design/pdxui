@@ -534,6 +534,7 @@ Extracted from hardcoded values.
 |---|---|
 | `--pdx-input-style` | `outlined` |
 | `--pdx-input-focus` | `ring` |
+| `--pdx-input-border-color` | `initial` |
 | `--pdx-input-min-height` | `2.5rem` |
 | `--pdx-input-border-width` | `var(--pdx-border-width)` |
 

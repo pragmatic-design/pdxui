@@ -62,6 +62,7 @@
     --pdx-button-min-height: calc(2.25rem / 0.88);   /* 36px at corporate's density */
     --pdx-input-min-height: calc(2.25rem / 0.88);    /* the same, so a row of both aligns */
     --pdx-input-style: outlined;
+    --pdx-input-border-color: var(--pdx-color-border-strong);
     --pdx-card-style: bordered;
     --pdx-tab-indicator: underline;
     --pdx-tab-indicator-size: 3px;
@@ -112,10 +113,8 @@ details.pdx-accordion[open] summary::after {
     font-weight: var(--pdx-weight-bold);
 }
 
-/* Input: outlined with border-strong — sharper, structured. Focus ring = single pixel primary. */
-.pdx-input-wrap {
-    border-color: var(--pdx-color-border-strong);
-}
+/* Input: outlined with border-strong (--pdx-input-border-color, #519) — sharper, structured.
+   Focus ring = single pixel primary. */
 .pdx-input-wrap:focus-within {
     box-shadow: 0 0 0 1px var(--pdx-color-primary);
 }
