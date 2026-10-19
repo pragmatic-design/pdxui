@@ -4,15 +4,15 @@ A managed set of radios.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | The current value. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `orientation` | `orientation` | string | `'vertical'` | Layout orientation — horizontal or vertical. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `label` | `label` | string | `''` | Accessible name of the group. Without it, a <pdx-label> right before the group names it. |
+| `value` | `value` | string | `''` | The current value. |
 
-**Events:** `pdx-change` → `detail: { value }` — Fired when the value changes.
+**Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `radiogroup`
 

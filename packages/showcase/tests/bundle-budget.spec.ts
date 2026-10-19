@@ -236,7 +236,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // blocking 96 → 97: `@defer` has two phases (#281) — `defer()` keeps the prefetched load and reuses it,
 // queues the prefetch, and arms `when (…)` triggers; the landing route's chunk carries `defer()`. From
 // the CI's own line, same shard: main blocking 95.8, js 465.5 → this branch 96.1, 465.8; entry 39.9.
-const BUDGET_KB = { entry: 40, js: 466, css: 63, blocking: 97 };
+// js 466 → 467: the choice controls declare their model (#480). Nine components import `model`, which
+// puts the descriptor's builders in a chunk of their own (component-descriptor, +296 B), and the forms
+// that wire a control they create — form-template, field-list, inline-edit — share a helper that picks
+// its model's event (model-event, +257 B); the pages that import them carry the imports. Same machine,
+// same day, the built dist: main 465.8 → this branch 466.9 KB over 462 → 464 files; entry and blocking
+// did not move.
+const BUDGET_KB = { entry: 40, js: 467, css: 63, blocking: 97 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

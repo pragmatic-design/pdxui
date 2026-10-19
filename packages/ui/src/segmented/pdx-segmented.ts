@@ -3,8 +3,8 @@
 // Features: sizes, full width, vertical, disabled per-item, form name,
 // animated indicator (Mantine/Ark pattern), roving tabindex keyboard nav.
 
-import { component, html, useFormAssociated, DEV } from '@pdxui/core';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { component, html, useFormAssociated, DEV, model } from '@pdxui/core';
+import { reflectNameToHost } from '../shared/own-prop';
 import { nameGroup } from '../shared/group-name';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -25,11 +25,16 @@ interface SegmentOption {
 
 /**
  * A radio-group style selector: the user picks one of its segments, marked by a sliding indicator.
+ *
+ * @alphaevent pdx-change
+ * @alphaevent change
+ * @alphadetail value $event.detail.value
  */
 component('pdx-segmented', {
     formAssociated: true,
+    // A choice writes it (#480), and the write dispatches `value-change`.
+    models: { value: model('') },
     props: {
-        value: { type: String, default: '' },
         /** Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. */
         options: { type: Array, default: [] },
         size: { type: String, default: '' },
@@ -62,13 +67,9 @@ component('pdx-segmented', {
 
         function selectValue(val: string) {
             if (ctx.disabled()) return;
-            // The choice is written to `value` before the events, or the segment would stay
-            // unselected unless a parent bound the value back from the event.
-            const previousValue = ctx.value();
-            setOwnProp(ctx.el, 'value', val);
-            // The event contract: the pdx- prefix. The legacy event stays as an alias.
-            ctx.emit('pdx-change', { value: val, previousValue });
-            ctx.emit('change', { value: val, previousValue });
+            // The choice is the model: written here, so the segment is selected whether or not a
+            // parent binds the value back.
+            ctx.value.set(val);
         }
 
         function onKeydown(e: KeyboardEvent) {
@@ -138,10 +139,7 @@ component('pdx-segmented', {
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() {
-                const prev = ctx.value();
-                (ctx.el as any).value = '';
-                ctx.emit('pdx-change', { value: '', previousValue: prev });
-                ctx.emit('change', { value: '', previousValue: prev });
+                ctx.value.set('');
             },
         });
 

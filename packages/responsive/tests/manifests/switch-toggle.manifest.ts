@@ -11,7 +11,7 @@
  *            <span class="pdx-switch-label"> (the label text) and/or <span class="pdx-switch-desc"> (description).
  *          otherwise a <slot>.
  *      wrapClass: + " pdx-switch-label-left" when labelPosition='left'; + " disabled" when disabled||loading.
- *      onChange emits the CustomEvent 'pdx-change' { checked, value } (gated on disabled/loading).
+ *      onChange writes the `checked` model, which announces checked-change { value } (#480; gated on disabled/loading).
  *      No custom keydown handler: the native checkbox input is tabbable and toggles with Space → keyboard 'none'.
  *
  *  - CSS: packages/design/src/surfaces/forms.css (the "Toggle / Switch" block)

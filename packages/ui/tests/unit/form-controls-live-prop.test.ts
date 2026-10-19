@@ -113,23 +113,24 @@ const CASES: Case[] = [
         act: (el) => typeInto(q(el, 'input'), '42'),
         props: { value: (d) => d.value },
     },
+    // The choice controls announce their model (#480): `<model>-change`, the value in `detail.value`.
     {
-        name: 'pdx-checkbox', html: '<pdx-checkbox value="yes"></pdx-checkbox>', event: 'pdx-change',
+        name: 'pdx-checkbox', html: '<pdx-checkbox value="yes"></pdx-checkbox>', event: 'checked-change',
         act: (el) => check(el, q(el, 'input[type="checkbox"]')),
-        props: { checked: (d) => d.checked },
+        props: { checked: (d) => d.value },
     },
     {
-        name: 'pdx-switch', html: '<pdx-switch value="on"></pdx-switch>', event: 'pdx-change',
+        name: 'pdx-switch', html: '<pdx-switch value="on"></pdx-switch>', event: 'checked-change',
         act: (el) => check(el, q(el, 'input[type="checkbox"]')),
-        props: { checked: (d) => d.checked },
+        props: { checked: (d) => d.value },
     },
     {
-        name: 'pdx-radio', html: '<pdx-radio value="a"></pdx-radio>', event: 'pdx-change',
+        name: 'pdx-radio', html: '<pdx-radio value="a"></pdx-radio>', event: 'checked-change',
         act: (el) => check(el, q(el, 'input[type="radio"]')),
-        props: { checked: () => true },
+        props: { checked: (d) => d.value },
     },
     {
-        name: 'pdx-slider', html: '<pdx-slider value="10" min="0" max="100" step="1"></pdx-slider>', event: 'pdx-change',
+        name: 'pdx-slider', html: '<pdx-slider value="10" min="0" max="100" step="1"></pdx-slider>', event: 'value-change',
         act: (el) => key(el, 'ArrowRight'),
         props: { value: (d) => d.value },
     },
@@ -170,12 +171,12 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-rating', html: '<pdx-rating value="2"></pdx-rating>', event: 'change',
+        name: 'pdx-rating', html: '<pdx-rating value="2"></pdx-rating>', event: 'value-change',
         act: (el) => key(q(el, '.pdx-rating'), 'ArrowRight'),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-segmented', html: `<pdx-segmented options='["Day","Week","Month"]' value="Day"></pdx-segmented>`, event: 'pdx-change',
+        name: 'pdx-segmented', html: `<pdx-segmented options='["Day","Week","Month"]' value="Day"></pdx-segmented>`, event: 'value-change',
         act: (el) => (el.querySelectorAll<HTMLElement>('.pdx-segmented-item')[1]).click(),
         props: { value: (d) => d.value },
     },
@@ -189,9 +190,9 @@ const CASES: Case[] = [
         props: { value: (d) => d.tags },
     },
     {
-        name: 'pdx-toggle', html: '<pdx-toggle value="bold">B</pdx-toggle>', event: 'pdx-pressed-change',
+        name: 'pdx-toggle', html: '<pdx-toggle value="bold">B</pdx-toggle>', event: 'pressed-change',
         act: (el) => q<HTMLButtonElement>(el, 'button').click(),
-        props: { pressed: (d) => d.pressed },
+        props: { pressed: (d) => d.value },
     },
     {
         name: 'pdx-toggle-group',

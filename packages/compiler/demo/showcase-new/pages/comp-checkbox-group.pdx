@@ -34,7 +34,7 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ value, values }</span><span>Once per change; the children's own events stop at them</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Once per change, the comma-separated selection; the children's own events stop at them</span></div>
       </div>
     </section>
   </div>

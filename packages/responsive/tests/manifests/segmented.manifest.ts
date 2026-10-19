@@ -13,7 +13,7 @@
  *      Radio-group semantics (exactly one selected). JSON-driven options.
  *      A roving tabindex: the active item has tabindex=0, the others -1.
  *      Keyboard: onKeydown custom → ArrowLeft/Right (horizontal) o Up/Down (vertical) +
- *      Home/End, wrapping modulo the count. The selection follows the focus (it emits 'change').
+ *      Home/End, wrapping modulo the count. The selection follows the focus (it writes its model, value-change, #480).
  *      aria-label from the `label` prop. formAssociated.
  *  - CSS: packages/design/src/components/segmented.css
  *      .pdx-segmented → display:inline-flex; position:relative; background:inset;

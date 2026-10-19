@@ -58,6 +58,14 @@ describe('the rewrite pdx migrate applies', () => {
             .toBe('<pdx-x @checked-change="e => total = e.detail.value ? e.currentTarget.value : 0"></pdx-x>');
     });
 
+    it('a mapping that reads the event twice, not at its start, is written with the arrow\'s parameter throughout', () => {
+        const alphaOf: AlphaLookup = (tag) => (tag === 'pdx-x'
+            ? { events: ['pdx-change'], detail: { state: '($event.currentTarget.indeterminate ? null : $event.detail.value)' }, modelEvent: 'checked-change' }
+            : null);
+        const fixed = (alphaChangeEvent.fix as (t: string, c: object) => string)('<pdx-x @pdx-change="e => save(e.detail.state)"></pdx-x>', { alphaOf });
+        expect(fixed).toBe('<pdx-x @checked-change="e => save((e.currentTarget.indeterminate ? null : e.detail.value))"></pdx-x>');
+    });
+
     it('an inline handler through $event, modifiers kept', () => {
         expect(fix('<pdx-x @pdx-change.stop="save($event.detail.checked)"></pdx-x>'))
             .toBe('<pdx-x @checked-change.stop="save($event.detail.value)"></pdx-x>');
@@ -78,22 +86,22 @@ describe('the rewrite pdx migrate applies', () => {
 });
 
 describe('the form binding', () => {
-    const SETUP = "<script>\n  let f = $form({ agree: false });\n</script>";
-    const formCode = (modelEventOf?: (tag: string) => { model: string; event: string } | null) =>
-        compile(`<template>\n<pdx-form :form="f"><pdx-checkbox name="agree"></pdx-checkbox></pdx-form>\n</template>\n${SETUP}`, 'form.pdx', [], undefined, { modelEventOf }).code;
+    const SETUP = "<script>\n  let f = $form({ agree: false, qty: 0 });\n</script>";
+    const formCode = (tag: string, modelEventOf?: (tag: string) => { model: string; event: string } | null) =>
+        compile(`<template>\n<pdx-form :form="f"><${tag} name="agree"></${tag}></pdx-form>\n</template>\n${SETUP}`, 'form.pdx', [], undefined, { modelEventOf }).code;
 
     it('a control that lists models listens to its first model\'s event and reads detail.value', () => {
-        const code = formCode((tag) => (tag === 'pdx-checkbox' ? { model: 'checked', event: 'checked-change' } : null));
+        const code = formCode('pdx-checkbox', (tag) => (tag === 'pdx-checkbox' ? { model: 'checked', event: 'checked-change' } : null));
         expect(code).toContain('checked-change');
         expect(code).toContain('e.detail.value');
         expect(code).not.toContain("'pdx-change'");
     });
 
     it('control: one that lists none keeps its hand-written alpha event', () => {
-        const code = formCode();
-        expect(code).toContain('pdx-change');
-        expect(code).toContain('e.detail?.checked');
-        expect(code).not.toContain('checked-change');
+        // pdx-input has no model yet (#479): its row of the table stays.
+        const code = formCode('pdx-input');
+        expect(code).toContain("'pdx-input'");
+        expect(code).not.toContain('-change\'');
     });
 });
 

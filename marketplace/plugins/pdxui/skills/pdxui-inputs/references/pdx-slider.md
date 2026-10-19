@@ -4,7 +4,6 @@ Pick a number by dragging.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | number | `0` | The current value. |
 | `min` | `min` | number | `0` | Minimum allowed value. |
 | `max` | `max` | number | `100` | Maximum allowed value. |
 | `step` | `step` | number | `1` | Increment step. |
@@ -21,6 +20,7 @@ Pick a number by dragging.
 | `range` | `range` | boolean | `false` | Range mode: value is "min,max" |
 | `minGap` | `mingap` | number | `0` | Minimum gap between thumbs in range mode |
 | `color` | `color` | string | `''` | Color the fill portion |
+| `value` | `value` | number \| number[] | `0` | The current value. |
 
 **API (via `:ref`)**
 
@@ -30,7 +30,7 @@ Pick a number by dragging.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change` → `detail: { value, min, max } | { value }` — Fired when the value changes.; `pdx-change-end` → `detail: { value }` — Fired on `pdx-change-end`.
+**Events:** `pdx-change-end` → `detail: { value }` — Fired on `pdx-change-end`.; `value-change` → `detail: { value: number | number[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `slider`
 

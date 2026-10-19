@@ -10,9 +10,19 @@ function makeHtml(content: string): HtmlNode[] {
     return [{ type: 'html', content } as HtmlNode];
 }
 
+/**
+ * The first model of each control that declares one, as the plugin reads it from the manifest
+ * (`modelEventOf`, #478/#480). A control with none keeps the compiler's alpha table.
+ */
+const MODELS: Record<string, string> = {
+    'pdx-checkbox': 'checked', 'pdx-switch': 'checked', 'pdx-toggle': 'pressed',
+    'pdx-segmented': 'value', 'pdx-slider': 'value', 'pdx-rating': 'value',
+};
+const modelEventOf = (tag: string) => (MODELS[tag] ? { model: MODELS[tag], event: `${MODELS[tag]}-change` } : null);
+
 function applyAndGet(content: string): string {
     const nodes = makeHtml(content);
-    applyFormBindings(nodes);
+    applyFormBindings(nodes, undefined, modelEventOf);
     return (nodes[0] as HtmlNode).content;
 }
 
@@ -75,26 +85,26 @@ describe('applyFormBindings — text input controls', () => {
 // ─── Checked controls ─────────────────────────────────────────
 
 describe('applyFormBindings — checked controls', () => {
-    it('injects :checked, @pdx-change, @pdx-blur on pdx-checkbox', () => {
+    it('injects :checked, @checked-change, @pdx-blur on pdx-checkbox, its model', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-checkbox name="agree"></pdx-checkbox></pdx-form>'
         );
 
         expect(result).toContain(':checked=');
         expect(result).not.toContain(':value=');
-        expect(result).toContain('@pdx-change=');
+        expect(result).toContain('@checked-change=');
         expect(result).toContain('@pdx-blur=');
-        expect(result).toContain('e.detail?.checked');
+        expect(result).toContain('e.detail.value');
     });
 
-    it('injects :checked, @pdx-change on pdx-switch', () => {
+    it('injects :checked, @checked-change on pdx-switch, its model', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-switch name="dark"></pdx-switch></pdx-form>'
         );
 
         expect(result).toContain(':checked=');
-        expect(result).toContain('@pdx-change=');
-        expect(result).toContain('e.detail?.checked');
+        expect(result).toContain('@checked-change=');
+        expect(result).toContain('e.detail.value');
     });
 });
 
@@ -120,43 +130,44 @@ describe('applyFormBindings — non-text controls', () => {
         expect(result).toContain('@pdx-change=');
     });
 
-    it('injects :value and @pdx-change on pdx-slider', () => {
+    it('injects :value and @value-change on pdx-slider, its model', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-slider name="volume"></pdx-slider></pdx-form>'
         );
 
         expect(result).toContain(':value=');
-        expect(result).toContain('@pdx-change=');
-        expect(result).toContain('e.detail?.value');
+        expect(result).toContain('@value-change=');
+        expect(result).toContain('e.detail.value');
     });
 
-    it('injects :value and @pdx-change on pdx-rating', () => {
+    it('injects :value and @value-change on pdx-rating, its model', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-rating name="stars"></pdx-rating></pdx-form>'
         );
 
         expect(result).toContain(':value=');
-        expect(result).toContain('@pdx-change=');
+        expect(result).toContain('@value-change=');
     });
 
-    it('injects :value and change event on pdx-segmented', () => {
+    it('injects :value and @value-change on pdx-segmented, its model', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-segmented name="view"></pdx-segmented></pdx-form>'
         );
 
         expect(result).toContain(':value=');
-        expect(result).toContain('@change=');
-        expect(result).toContain('e.detail?.value');
+        expect(result).toContain('@value-change=');
+        expect(result).toContain('e.detail.value');
     });
 
-    it('injects :value and pressedchange on pdx-toggle', () => {
+    it('injects :pressed and @pressed-change on pdx-toggle, its model', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-toggle name="mode"></pdx-toggle></pdx-form>'
         );
 
-        expect(result).toContain(':value=');
-        expect(result).toContain('@pressedchange=');
-        expect(result).toContain('e.detail?.pressed');
+        expect(result).toContain(':pressed=');
+        expect(result).not.toContain(':value=');
+        expect(result).toContain('@pressed-change=');
+        expect(result).toContain('e.detail.value');
     });
 });
 
@@ -356,7 +367,7 @@ describe('applyFormBindings — self-closing tags', () => {
         );
 
         expect(result).toContain(':checked=');
-        expect(result).toContain('@pdx-change=');
+        expect(result).toContain('@checked-change=');
         expect(result).toContain('/>');
     });
 });

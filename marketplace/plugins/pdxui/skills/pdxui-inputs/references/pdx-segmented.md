@@ -4,7 +4,6 @@ A compact set of exclusive options.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | The current value. |
 | `options` | — | array | `[]` | Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `full` | `full` | boolean | `false` | Stretches to the full width of its container. |
@@ -12,6 +11,7 @@ A compact set of exclusive options.
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `label` | `label` | string | `''` | Visible label text. |
+| `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -21,7 +21,7 @@ A compact set of exclusive options.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `change` → `detail: { value, previousValue }` — Fired when the value changes.; `pdx-change` → `detail: { value, previousValue }` — Fired when the value changes.
+**Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `radio` · `radiogroup`
 
@@ -35,14 +35,14 @@ are checked against the manifest above._
 **Basic** — Select a time period.
 
 ```html
-<pdx-segmented :value="view" options='["day","week","month","year"]' @change="onView"></pdx-segmented>
+<pdx-segmented :value="view" options='["day","week","month","year"]' @value-change="onView"></pdx-segmented>
 ```
 
 **Object Options** — With label/value objects. _(from the live demo)_
 
 ```html
 <div class="demo-row">
-  <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Quarterly","value":"quarterly"},{"label":"Yearly","value":"yearly"}]' @change="onPeriod"></pdx-segmented>
+  <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Quarterly","value":"quarterly"},{"label":"Yearly","value":"yearly"}]' @value-change="onPeriod"></pdx-segmented>
 </div>
 ```
 
@@ -69,7 +69,7 @@ are checked against the manifest above._
 
 ```html
 <div class="demo-row">
-  <pdx-segmented label="Layout" :value="layout" options='[{"label":"Grid","value":"grid"},{"label":"List","value":"list"},{"label":"Table","value":"table"}]' full @change="onLayout"></pdx-segmented>
+  <pdx-segmented label="Layout" :value="layout" options='[{"label":"Grid","value":"grid"},{"label":"List","value":"list"},{"label":"Table","value":"table"}]' full @value-change="onLayout"></pdx-segmented>
 </div>
 ```
 
@@ -87,7 +87,7 @@ are checked against the manifest above._
 <div class="demo-row">
   <form @submit="onSubmit">
     <pdx-form-field label="Billing period">
-      <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Yearly","value":"yearly"}]' name="period" @change="onPeriod"></pdx-segmented>
+      <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Yearly","value":"yearly"}]' name="period" @value-change="onPeriod"></pdx-segmented>
     </pdx-form-field>
     <button type="submit" class="pdx-primary" style="margin-top:var(--pdx-space-sm)">Submit</button>
   </form>

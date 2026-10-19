@@ -99,7 +99,7 @@
           <legend class="pdx-label">{{ $t('settings.categories.appliesTo') }}</legend>
           @for (ENTITIES as entity; track entity) {
             <pdx-checkbox :label="$t('settings.lookups.owner.' + entity)" :checked="draftApplies.includes(entity)"
-              @pdx-change="e => toggleApplies(entity, e.detail.checked)" :data-test="'applies-' + entity"></pdx-checkbox>
+              @checked-change="e => toggleApplies(entity, e.detail.value)" :data-test="'applies-' + entity"></pdx-checkbox>
           }
         </fieldset>
         <div class="add-actions">

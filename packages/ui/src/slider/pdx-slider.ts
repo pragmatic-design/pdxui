@@ -2,18 +2,25 @@
 // Custom DOM (not <input type="range">) for full control over track/fill/thumb styling.
 // Uses PointerEvents for unified mouse/touch/pen. ARIA slider role.
 
-import { component, html, signal, useFormAssociated } from '@pdxui/core';
+import { component, html, signal, useFormAssociated, model } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { reflectNameToHost } from '../shared/own-prop';
 
 /**
  * A slider the user drags or moves from the keyboard to pick a value, or a range with two thumbs,
  * with marks and value labels.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail min $event.detail.value[0]
+ * @alphadetail max $event.detail.value[1]
  */
 component('pdx-slider', {
     formAssociated: true,
+    // A drag or a key writes it (#480), and each write dispatches `value-change`; `pdx-change-end`
+    // still marks the end of a drag. In range mode it holds `[min, max]`.
+    models: { value: model<number | number[]>(0, { type: Number }) },
     props: {
-        value: { type: Number, default: 0 },
         min: { type: Number, default: 0 },
         max: { type: Number, default: 100 },
         step: { type: Number, default: 1 },
@@ -92,13 +99,9 @@ component('pdx-slider', {
             // `value` is live. In range mode it is written as the array the event
             // carries: the prop is a Number, and a "min,max" STRING would be coerced to NaN, which
             // the sync track below reads as "fall back to the attribute" — the initial range.
-            if (ctx.range()) {
-                setOwnProp(ctx.el, 'value', [_rangeMin, _rangeMax]);
-                ctx.emit('pdx-change', { value: [_rangeMin, _rangeMax], min: _rangeMin, max: _rangeMax });
-            } else {
-                setOwnProp(ctx.el, 'value', _value);
-                ctx.emit('pdx-change', { value: _value });
-            }
+            // The model's write dispatches `value-change` (#480).
+            if (ctx.range()) ctx.value.set([_rangeMin, _rangeMax]);
+            else ctx.value.set(_value);
         }
 
         function setSingleValue(v: number) {

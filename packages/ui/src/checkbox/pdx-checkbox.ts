@@ -2,8 +2,8 @@
 // Maps to .pdx-checkbox CSS class from design system (forms.css).
 // tristate=true: click cycles unchecked → checked → indeterminate → unchecked.
 
-import { component, html, useFormAssociated } from '@pdxui/core';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { component, html, useFormAssociated, model } from '@pdxui/core';
+import { reflectNameToHost } from '../shared/own-prop';
 // A container rule in form.css (`.has-warning .pdx-checkbox`) styles this element, and it owns
 // no stylesheet of its own, so nothing else would carry it.
 import '@pdxui/design/components/form';
@@ -11,12 +11,21 @@ import '@pdxui/design/components/form';
 /**
  * A checkbox with a label and a description, which can be indeterminate or, as a tristate, cycle
  * through unchecked, checked and indeterminate.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail checked $event.detail.value
+ * @alphadetail value $event.currentTarget.value
+ * @alphadetail indeterminate $event.currentTarget.indeterminate
+ * @alphadetail state ($event.currentTarget.indeterminate ? null : $event.detail.value)
  */
 component('pdx-checkbox', {
     formAssociated: true,
+    // A click writes them (#480): `checked-change`, and in a tristate `indeterminate-change` too.
+    models: {
+        checked: model(false),
+        indeterminate: model(false),
+    },
     props: {
-        checked: { type: Boolean, default: false },
-        indeterminate: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
         /** Enable 3-state cycle: unchecked → checked → indeterminate → unchecked */
         tristate: { type: Boolean, default: false },
@@ -34,7 +43,9 @@ component('pdx-checkbox', {
         // state: 0=unchecked, 1=checked, 2=indeterminate
         let tristatePhase = 0;
 
-        // `checked` and `indeterminate` are the live state: a click writes them.
+        // `checked` and `indeterminate` are the live state, and models: a click writes them, and each
+        // write dispatches its event. `indeterminate` first, so a `checked-change` listener reading the
+        // element sees both.
 
         function onChange(e: Event) {
             if (ctx.disabled()) return;
@@ -47,23 +58,12 @@ component('pdx-checkbox', {
                 const isIndeterminate = tristatePhase === 2;
                 input.checked = isChecked;
                 input.indeterminate = isIndeterminate;
-                setOwnProp(ctx.el, 'checked', isChecked);
-                setOwnProp(ctx.el, 'indeterminate', isIndeterminate);
-                ctx.emit('pdx-change', {
-                    checked: isChecked,
-                    indeterminate: isIndeterminate,
-                    value: ctx.value() || ctx.label(),
-                    // null = indeterminate, true = checked, false = unchecked
-                    state: isIndeterminate ? null : isChecked,
-                });
+                ctx.indeterminate.set(isIndeterminate);
+                ctx.checked.set(isChecked);
             } else {
                 // A click settles an indeterminate box, as it does a native one.
-                setOwnProp(ctx.el, 'checked', input.checked);
-                setOwnProp(ctx.el, 'indeterminate', false);
-                ctx.emit('pdx-change', {
-                    checked: input.checked,
-                    value: ctx.value() || ctx.label(),
-                });
+                ctx.indeterminate.set(false);
+                ctx.checked.set(input.checked);
             }
         }
 

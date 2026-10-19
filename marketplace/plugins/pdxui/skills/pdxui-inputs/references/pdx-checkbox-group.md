@@ -3,30 +3,30 @@
 A managed set of checkboxes.
 
 **The children are `<pdx-checkbox value="…">`.** The group reads each child's `value`, keeps `value`
-as the comma-separated list of the checked ones, and emits one `pdx-change` per click with
-`detail: { value: 'a,c', values: ['a', 'c'] }`. A child with no `value` falls back to its `label`;
-with neither, the group cannot report it and warns once.
+as the comma-separated list of the checked ones — its model — and announces one `value-change` per
+click with `detail: { value: 'a,c' }`. A child with no `value` falls back to its `label`; with neither,
+the group cannot report it and warns once.
 
 ```html
-<pdx-checkbox-group :value="signs" @pdx-change="e => signs = e.detail.value">
+<pdx-checkbox-group ::value="signs">
   <pdx-checkbox value="fever">Febbre</pdx-checkbox>
   <pdx-checkbox value="cough">Tosse</pdx-checkbox>
 </pdx-checkbox-group>
 ```
 
-Listen on the group, not on the children: the children's own `pdx-change` stops at the group, and
-the group's `value` always matches what is checked. Classes you put on the group are kept.
+Listen on the group, not on the children: the children's own `checked-change` stops at the group,
+and the group's `value` always matches what is checked. Classes you put on the group are kept.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | Comma-separated selected values |
 | `orientation` | `orientation` | string | `'vertical'` | Layout orientation — horizontal or vertical. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `label` | `label` | string | `''` | Accessible name of the group. Without it, a <pdx-label> right before the group names it. |
+| `value` | `value` | string | `''` | Comma-separated selected values |
 
-**Events:** `pdx-change` → `detail: { value, values }` — Fired when the value changes.
+**Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `group`
 
@@ -42,14 +42,14 @@ are checked against the manifest above._
 ```html
 <pdx-label text="Interests"></pdx-label>
 <pdx-checkbox-group value="code,design"
-  @pdx-change="e => interests = e.detail.values.join(', ')">
+  @value-change="e => interests = e.detail.value.split(',').join(', ')">
   <pdx-checkbox label="Coding" value="code"></pdx-checkbox>
   <pdx-checkbox label="Design" value="design"></pdx-checkbox>
 </pdx-checkbox-group>
 ```
 
 ```js
-// one pdx-change per click: { value: "code,design", values: ["code", "design"] }
+// one value-change per click: { value: "code,design" }
 ```
 
 **Horizontal Orientation** — Use `orientation="horizontal"` for an inline layout. _(from the live demo)_

@@ -1,10 +1,9 @@
 // Choice groups: a listener ON the group hears only the group, and every group can be named.
 //
-// stopPropagation on the child's pdx-change does not stop the other listeners on the element the
-// event is at — and the author's @pdx-change on the group is one of them: two events per click, the
-// second without `values`. stopImmediatePropagation stops only the listeners added AFTER the group's
-// own: a listener added before the group connects — create, listen, append — hears both. (A compiled
-// template binds @pdx-change after setup, so there stopImmediatePropagation holds.)
+// A group announces its value with its model's event, `value-change`, and its children theirs,
+// `checked-change` (#480). The group handles the child's on its way down and stops it at the child,
+// after the child's own listeners: a listener on the group, added before or after the group connects,
+// hears one event per click, the group's; one on the child still hears the child.
 // Both groups, and pdx-segmented, can be named: by `label`, or by a pdx-label before them, and
 // pdx-segmented does not write aria-label="".
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -20,14 +19,18 @@ const CHECKBOXES = '<pdx-checkbox value="a" label="A"></pdx-checkbox><pdx-checkb
 const RADIOS = '<pdx-radio value="a" label="A"></pdx-radio><pdx-radio value="b" label="B"></pdx-radio>';
 
 /**
- * A group with a pdx-change listener on it. `early`: the listener is added before the group is in
- * the document (create, listen, append); otherwise after it has mounted.
+ * A group with a value-change listener on it, and one for every event a child announces, which must
+ * not reach it. `early`: the listeners are added before the group is in the document (create, listen,
+ * append); otherwise after it has mounted.
  */
 async function groupWithListener(tag: string, children: string, early: boolean) {
     const group = document.createElement(tag);
     group.innerHTML = children;
     const seen: Array<Record<string, unknown>> = [];
-    const listen = () => group.addEventListener('pdx-change', (e) => seen.push((e as CustomEvent).detail));
+    const listen = () => {
+        group.addEventListener('value-change', (e) => seen.push((e as CustomEvent).detail));
+        group.addEventListener('checked-change', (e) => seen.push({ child: (e as CustomEvent).detail }));
+    };
     if (early) listen();
     document.body.appendChild(group);
     await tick(30);
@@ -41,15 +44,14 @@ beforeEach(cleanup);
 describe('a listener on the group hears only the group', () => {
     for (const early of [false, true]) {
         const when = early ? 'added before the group connects' : 'added after mount';
-        it(`pdx-checkbox-group: one pdx-change per click, with values (listener ${when})`, async () => {
+        it(`pdx-checkbox-group: one value-change per click, the group's (listener ${when})`, async () => {
             const { seen, inputs } = await groupWithListener('pdx-checkbox-group', CHECKBOXES, early);
             inputs[1].click();
             await tick();
-            expect(seen, JSON.stringify(seen)).toHaveLength(1);
-            expect(seen[0].values).toEqual(['b']);
+            expect(seen, JSON.stringify(seen)).toEqual([{ value: 'b' }]);
         });
 
-        it(`pdx-radio-group: one pdx-change per click, the group's (listener ${when})`, async () => {
+        it(`pdx-radio-group: one value-change per click, the group's (listener ${when})`, async () => {
             const { seen, inputs } = await groupWithListener('pdx-radio-group', RADIOS, early);
             inputs[1].click();
             await tick();
@@ -61,10 +63,10 @@ describe('a listener on the group hears only the group', () => {
     it('a listener on the child itself still hears the child', async () => {
         const { group, inputs } = await groupWithListener('pdx-checkbox-group', CHECKBOXES, false);
         const onChild: unknown[] = [];
-        group.querySelectorAll('pdx-checkbox')[1].addEventListener('pdx-change', (e) => onChild.push((e as CustomEvent).detail));
+        group.querySelectorAll('pdx-checkbox')[1].addEventListener('checked-change', (e) => onChild.push((e as CustomEvent).detail));
         inputs[1].click();
         await tick();
-        expect(onChild).toEqual([{ checked: true, value: 'b' }]);
+        expect(onChild).toEqual([{ value: true }]);
     });
 });
 

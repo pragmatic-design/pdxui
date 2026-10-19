@@ -9,10 +9,10 @@
     </p>
 
     <div class="demo-stack">
-      <pdx-checkbox label="Select all items" :checked="allOn(items)" :indeterminate="someOn(items)" @pdx-change="e => items = setAll(items, e.detail.checked)"></pdx-checkbox>
+      <pdx-checkbox label="Select all items" :checked="allOn(items)" :indeterminate="someOn(items)" @checked-change="e => items = setAll(items, e.detail.value)"></pdx-checkbox>
       @for (items as item; track item.label) {
         <div style="padding-left:var(--pdx-space-xl)">
-          <pdx-checkbox :label="item.label" :value="item.label" :checked="item.on" @pdx-change="e => items = setOne(items, e.detail)"></pdx-checkbox>
+          <pdx-checkbox :label="item.label" :value="item.label" :checked="item.on" @checked-change="e => items = setOne(items, item.label, e.detail.value)"></pdx-checkbox>
         </div>
       }
     </div>
@@ -21,10 +21,10 @@
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-checkbox label="Select all items"
   :checked="allOn(items)" :indeterminate="someOn(items)"
-  @pdx-change="e =&gt; items = setAll(items, e.detail.checked)"&gt;&lt;/pdx-checkbox&gt;
+  @checked-change="e =&gt; items = setAll(items, e.detail.value)"&gt;&lt;/pdx-checkbox&gt;
 &#64;for (items as item; track item.label) {
   &lt;pdx-checkbox :label="item.label" :value="item.label" :checked="item.on"
-    @pdx-change="e =&gt; items = setOne(items, e.detail)"&gt;&lt;/pdx-checkbox&gt;
+    @checked-change="e =&gt; items = setOne(items, item.label, e.detail.value)"&gt;&lt;/pdx-checkbox&gt;
 }</code></pre>
     </details>
   </section>

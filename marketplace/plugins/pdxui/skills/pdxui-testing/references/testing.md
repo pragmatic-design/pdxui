@@ -81,21 +81,22 @@ chart canvas. Reaching for it first is a smell; reaching for it third is fine.
 ## Testing events
 
 ```ts
-it('emits pdx-change on toggle', async () => {
+it('announces checked-change on toggle', async () => {
   const el = await mount('<pdx-switch></pdx-switch>');
   const onChange = vi.fn();
-  el.addEventListener('pdx-change', onChange);
+  el.querySelector('pdx-switch')!.addEventListener('checked-change', onChange);
 
   fireEvent(getByRole(el, 'switch'), 'click');
   await tick();
 
   expect(onChange).toHaveBeenCalledOnce();
+  expect(onChange.mock.calls[0][0].detail).toEqual({ value: true });
 });
 ```
 
-The listener goes on the **container**, not the component: the events a component declares with
-`@event` bubble and are composed, so the container sees them, and a test that listens there is testing
-what a parent would actually receive.
+The listener goes on the **component**, not the container `mount` returns: a component's events do
+not bubble unless it declares them `@event(bubbles)`, and a model's change event never does. A
+listener on the component is what a parent's `@checked-change` on the tag is.
 
 ## Beyond unit tests: contract tests
 

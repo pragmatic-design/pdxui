@@ -1,29 +1,32 @@
 // pdx-checkbox-group — Manages multiple selection across child <pdx-checkbox> elements.
-// Propagates size/disabled. Uses createSelection() for state management.
-// Emits pdx-change with selected values array.
+// Propagates size/disabled. Uses createSelection() for state management. Its model is `value`, the
+// comma-separated selection (#480): a user change writes it, and the write dispatches `value-change`.
 //
-// The group follows its children. It handles the pdx-change its CHILDREN emit and
-// ignores its own: the same event name bubbles from both, and taking its own event for a child's
-// would make one click loop (the joined "a,b" toggled as a value, emitted again, forever). The child's
-// event is stopped at the child, so a listener on the group — however early it was added — hears
-// exactly one pdx-change per click, the group's { value, values }. After every
-// user change the joined value is reflected on the host's `value`, and the value track reads the
-// selection untracked — subscribed to it, the track would re-run on every click and put the selection
-// back to the stale prop. Its own classes go through classList, so the author's classes survive.
+// The group follows its children. It handles the `checked-change` its CHILDREN emit, in the capture
+// phase, since a model's event does not bubble, and stops it at the child, so a listener on the group
+// hears the group's event alone. The value track reads the selection untracked — subscribed to it, the
+// track would re-run on every click and put the selection back to the stale prop. Its own classes go
+// through classList, so the author's classes survive.
 
-import { component, html, createSelection, useFormAssociated, untracked, DEV } from '@pdxui/core';
+import { component, html, createSelection, useFormAssociated, untracked, DEV, model } from '@pdxui/core';
 import { interceptChildEvent } from '../shared/child-event';
 import { nameGroup, authoredName } from '../shared/group-name';
 import '../checkbox/pdx-checkbox'; // rendered by this component, and registered by nobody else
 
 /**
  * A multi-selection across child `pdx-checkbox` elements, with one value for the form.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value.split(',').filter(Boolean)
  */
 component('pdx-checkbox-group', {
     formAssociated: true,
-    props: {
+    models: {
         /** Comma-separated selected values */
-        value: { type: String, default: '' },
+        value: model(''),
+    },
+    props: {
         orientation: { type: String, default: 'vertical' },
         size: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
@@ -46,11 +49,9 @@ component('pdx-checkbox-group', {
             defaultSelected: parseValue(ctx.value() as string),
             onSelectionChange: (selected) => {
                 if (_syncing) return;
-                const values = Array.from(selected);
-                const value = values.join(',');
+                const value = Array.from(selected).join(',');
                 _reflected = value;
-                (ctx.el as unknown as { value: string }).value = value;
-                ctx.emit('pdx-change', { value, values });
+                ctx.value.set(value);
             },
         });
 
@@ -59,9 +60,12 @@ component('pdx-checkbox-group', {
         }
 
         let _warnedNoValue = false;
-        function handleChange(ce: CustomEvent<{ checked?: boolean; value?: string }>) {
+        // A box announces its `checked`; which choice it is is its value, or its label without one.
+        function handleChange(ce: CustomEvent<{ value?: boolean }>) {
             if (!ce.detail) return;
-            const cbValue = String(ce.detail.value ?? '');
+            const box = ce.target as HTMLElement & { value?: string; label?: string };
+            const checked = ce.detail.value === true;
+            const cbValue = String(box.value || box.label || '');
             if (!cbValue) {
                 if (DEV && !_warnedNoValue) {
                     _warnedNoValue = true;
@@ -72,12 +76,12 @@ component('pdx-checkbox-group', {
             }
             // Set, not toggle: the child says what it is now, so a repeated event cannot flip it.
             const has = untracked(() => selection.selected()).has(cbValue);
-            if (ce.detail.checked && !has) selection.select(cbValue);
-            else if (!ce.detail.checked && has) selection.deselect(cbValue);
+            if (checked && !has) selection.select(cbValue);
+            else if (!checked && has) selection.deselect(cbValue);
         }
-        // The child's pdx-change is handled and stopped at the child, so a listener on the group
+        // The child's checked-change is handled and stopped at the child, so a listener on the group
         // hears only the group's (shared/child-event.ts).
-        const stopChildEvents = interceptChildEvent(ctx.el, 'pdx-change',
+        const stopChildEvents = interceptChildEvent(ctx.el, 'checked-change',
             (t) => t.tagName === 'PDX-CHECKBOX' && t.closest('pdx-checkbox-group') === ctx.el, handleChange);
         ctx.track(() => stopChildEvents);
 

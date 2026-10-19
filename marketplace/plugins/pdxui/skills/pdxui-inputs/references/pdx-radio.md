@@ -4,7 +4,6 @@ Pick a single option from a set.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `label` | `label` | string | `''` | Visible label text. |
 | `description` | `description` | string | `''` | Secondary descriptive text. |
@@ -13,8 +12,9 @@ Pick a single option from a set.
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `labelPosition` | `labelposition` | string | `'right'` | Where the label sits relative to the control. |
+| `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
 
-**Events:** `pdx-change` → `detail: { value }` — Fired when the value changes.
+**Events:** `checked-change` → `detail: { value: boolean }` — Fired when the component writes `checked`. Does not bubble.
 
 
 #### Examples

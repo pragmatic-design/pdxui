@@ -33,11 +33,11 @@
            sighted reader to guess what it sets. -->
       <div class="prefs">
         <span class="pref-label" aria-hidden="true">{{ $t('app.language') }}</span>
-        <pdx-segmented :label="$t('app.language')" :options="localeOptions" :value="locale" @pdx-change="e => switchLocale(e.detail.value)" data-test="pref-locale"></pdx-segmented>
+        <pdx-segmented :label="$t('app.language')" :options="localeOptions" :value="locale" @value-change="e => switchLocale(e.detail.value)" data-test="pref-locale"></pdx-segmented>
         <span class="pref-label" aria-hidden="true">{{ $t('app.profile.scheme') }}</span>
-        <pdx-segmented :label="$t('app.profile.scheme')" :options="schemeOptions" :value="scheme" @pdx-change="e => setScheme(e.detail.value)" data-test="pref-scheme"></pdx-segmented>
+        <pdx-segmented :label="$t('app.profile.scheme')" :options="schemeOptions" :value="scheme" @value-change="e => setScheme(e.detail.value)" data-test="pref-scheme"></pdx-segmented>
         <span class="pref-label" aria-hidden="true">{{ $t('app.profile.density') }}</span>
-        <pdx-segmented :label="$t('app.profile.density')" :options="densityOptions" :value="density" @pdx-change="pickDensity" data-test="pref-density"></pdx-segmented>
+        <pdx-segmented :label="$t('app.profile.density')" :options="densityOptions" :value="density" @value-change="pickDensity" data-test="pref-density"></pdx-segmented>
       </div>
     </div>
 

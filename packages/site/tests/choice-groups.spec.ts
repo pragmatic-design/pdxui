@@ -1,8 +1,8 @@
 /**
  * Choice groups on the site, measured with getByRole in Chromium:
  * - /components/pdx-checkbox-group shows the checkbox-group gallery, not the checkbox one;
- * - the group's @pdx-change hears one event per click, with `values` — the child's event does not
- *   reach it, since a handler reading `values` throws on it;
+ * - the group's @value-change hears one event per click, the group's (#480) — the child's
+ *   checked-change does not reach it;
  * - checkbox groups, radio groups and segmented controls are named, not anonymous groups, and
  *   pdx-segmented writes no aria-label="".
  */
@@ -17,7 +17,8 @@ test('the checkbox-group page is its own gallery, and its group reports one chan
     await expect(group.getByRole('checkbox')).toHaveCount(4);
     const events = await group.evaluate((el) => {
         const seen: unknown[] = [];
-        el.addEventListener('pdx-change', (e) => seen.push((e as CustomEvent).detail));
+        el.addEventListener('value-change', (e) => seen.push((e as CustomEvent).detail));
+        el.addEventListener('checked-change', (e) => seen.push({ child: (e as CustomEvent).detail }));
         (window as Window & { __groupEvents?: unknown[] }).__groupEvents = seen;
         return seen.length;
     });
@@ -26,8 +27,8 @@ test('the checkbox-group page is its own gallery, and its group reports one chan
     await group.getByRole('checkbox', { name: 'Marketing' }).click();
     await expect(page.locator('[data-test="interests-out"]')).toHaveText('Selected: code, design, marketing');
     const seen = await page.evaluate(() => (window as Window & { __groupEvents?: unknown[] }).__groupEvents);
-    expect(seen).toEqual([{ value: 'code,design,marketing', values: ['code', 'design', 'marketing'] }]);
-    expect(errors, 'a handler reading e.detail.values threw').toEqual([]);
+    expect(seen).toEqual([{ value: 'code,design,marketing' }]);
+    expect(errors, 'a handler threw').toEqual([]);
 });
 
 test('the radio groups are named by the pdx-label before them', async ({ page }) => {

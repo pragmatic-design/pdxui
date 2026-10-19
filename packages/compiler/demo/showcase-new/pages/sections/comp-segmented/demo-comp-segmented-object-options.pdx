@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">With label/value objects.</p>
 
     <div class="demo-row">
-      <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Quarterly","value":"quarterly"},{"label":"Yearly","value":"yearly"}]' @change="onPeriod"></pdx-segmented>
+      <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Quarterly","value":"quarterly"},{"label":"Yearly","value":"yearly"}]' @value-change="onPeriod"></pdx-segmented>
     </div>
   </section>
 </template>

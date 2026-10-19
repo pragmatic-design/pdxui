@@ -4,12 +4,12 @@ A pressable on/off button.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `pressed` | `pressed` | boolean | `false` | Whether the toggle is pressed/on. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `value` | `value` | string | `''` | The current value. |
 | `variant` | `variant` | string | `'outline'` | Visual variant. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `ariaLabel` | `arialabel` | string | `''` | The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. |
+| `pressed` | `pressed` | boolean | `false` |  |
 
 **API (via `:ref`)**
 
@@ -19,7 +19,7 @@ A pressable on/off button.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change`; `pdx-pressed-change` → `detail: { pressed: boolean }` — Fired when the toggle is pressed or released.; `pressedchange` → `detail: { pressed: boolean }` — The legacy name of `pdx-pressed-change`, kept as an alias.
+**Events:** `pressed-change` → `detail: { value: boolean }` — Fired when the component writes `pressed`. Does not bubble.
 
 
 #### Examples
@@ -32,8 +32,8 @@ are checked against the manifest above._
 
 ```html
 <!-- aria-label names it by what it does: "B" alone is read as the letter -->
-<pdx-toggle :pressed="bold" @pressedchange="onBold" aria-label="Bold"><strong>B</strong></pdx-toggle>
-<pdx-toggle :pressed="italic" @pressedchange="onItalic" aria-label="Italic"><em>I</em></pdx-toggle>
+<pdx-toggle :pressed="bold" @pressed-change="onBold" aria-label="Bold"><strong>B</strong></pdx-toggle>
+<pdx-toggle :pressed="italic" @pressed-change="onItalic" aria-label="Italic"><em>I</em></pdx-toggle>
 ```
 
 **Toggle Group — Multiple** — Multiple toggles can be active simultaneously. _(from the live demo)_

@@ -13,6 +13,7 @@
 
 import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required } from '@pdxui/core';
 import type { Form, FormInternals, SlotFunction, Validator } from '@pdxui/core';
+import { onControlValue } from '../shared/model-event';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
 import '@pdxui/design/components/form';
@@ -404,14 +405,11 @@ component('pdx-field-list', {
                                 }
                             }
 
+                            // Its model's event, or the alpha one of a control that has no model yet (#125).
                             const eventName = (tag === 'pdx-input' || tag === 'pdx-textarea') ? 'pdx-input' : 'pdx-change';
-                            input.addEventListener(eventName, (e: Event) => {
-                                const detail = (e as CustomEvent).detail;
-                                const value = CHECKED_TYPES.has(field.type || '')
-                                    ? detail?.checked
-                                    : (detail?.value ?? (e.target as any)?.value);
-                                formField?.onChange(value);
-                            });
+                            onControlValue(input, eventName, (e) => CHECKED_TYPES.has(field.type || '')
+                                ? e.detail?.checked
+                                : (e.detail?.value ?? (e.target as any)?.value), (value) => formField?.onChange(value));
                             input.addEventListener('pdx-blur', () => formField?.onBlur());
 
                             cell.appendChild(input);
@@ -553,14 +551,11 @@ component('pdx-field-list', {
                         input.setAttribute('value', String(val ?? ''));
                     }
 
+                    // Its model's event, or the alpha one of a control that has no model yet (#125).
                     const eventName = (tag === 'pdx-input' || tag === 'pdx-textarea') ? 'pdx-input' : 'pdx-change';
-                    input.addEventListener(eventName, (e: Event) => {
-                        const detail = (e as CustomEvent).detail;
-                        const value = CHECKED_TYPES.has(field.type || '')
-                            ? detail?.checked
-                            : (detail?.value ?? (e.target as any)?.value);
-                        formField.onChange(value);
-                    });
+                    onControlValue(input, eventName, (e) => CHECKED_TYPES.has(field.type || '')
+                        ? e.detail?.checked
+                        : (e.detail?.value ?? (e.target as any)?.value), (value) => formField.onChange(value));
                     input.addEventListener('pdx-blur', () => formField.onBlur());
 
                     row.appendChild(input);
