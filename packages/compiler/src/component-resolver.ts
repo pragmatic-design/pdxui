@@ -17,6 +17,8 @@ import { jsQuote } from './compiler/js-literal';
 import { parseSFC } from './parser/sfc';
 import { analyzeScript } from './compiler/script-analyzer';
 import { ProjectListeners } from './project-listeners';
+import { modelEventName } from './compiler/dts-generator';
+import type { AlphaEvents } from './language/alpha-events';
 
 /** Resolved component: tag name → import path */
 export interface ComponentEntry {
@@ -47,6 +49,8 @@ export class ComponentResolver {
     private methods = new Map<string, Set<string>>();
     /** tag → the models a library component's manifest lists (#124); only components that list some. */
     private libraryModels = new Map<string, Set<string>>();
+    /** tag → the alpha events a library component's manifest records (#478); only components that record some. */
+    private libraryAlpha = new Map<string, { events: string[]; detail: Record<string, string> }>();
     /** A project file's `@model`s, with the modification time they were read at. */
     private projectModels = new Map<string, { mtimeMs: number; models: Set<string> }>();
     /** tag → the props a library component's manifest marks required (#130); only components that mark some. */
@@ -199,6 +203,27 @@ export class ComponentResolver {
     }
 
     /**
+     * A component's first model and the event it dispatches when written (#478), or null when it lists
+     * none: what the form binding listens to on a control that has moved to its model.
+     */
+    modelEventOf(tag: string): { model: string; event: string } | null {
+        const first = this.modelsOf(tag)?.values().next();
+        if (!first || first.done) return null;
+        return { model: first.value, event: modelEventName(first.value) };
+    }
+
+    /**
+     * The alpha events a library component no longer emits, how each alpha `detail.<field>` reads now,
+     * and its model's event (#478) — or null when its manifest records none, or it has no model to
+     * name instead.
+     */
+    alphaOf(tag: string): AlphaEvents | null {
+        const alpha = this.libraryAlpha.get(tag);
+        const model = alpha ? this.modelEventOf(tag) : null;
+        return alpha && model ? { ...alpha, modelEvent: model.event } : null;
+    }
+
+    /**
      * The props a component requires (#130), or null when they are not known. A project `.pdx` is read
      * for its `@prop`s with no default and no `?`, again whenever the file changes; a library component
      * answers the fields its manifest marks `required` (`prop.required<T>()`).
@@ -329,6 +354,10 @@ export class ComponentResolver {
             if (required.size) this.libraryRequired.set(decl.tagName, required);
             // The models the component declares (#124), as the manifest generator lists them.
             if (decl.models && decl.models.length > 0) this.libraryModels.set(decl.tagName, new Set(decl.models));
+            // The alpha events it no longer emits, and how their detail reads now (#478).
+            if (decl.alphaEvents && decl.alphaEvents.length > 0) {
+                this.libraryAlpha.set(decl.tagName, { events: [...decl.alphaEvents], detail: { ...(decl.alphaDetail ?? {}) } });
+            }
             this.props.set(decl.tagName, settable);
             this.methods.set(decl.tagName, methods);
             count++;
@@ -580,7 +609,10 @@ function isAlreadyImported(existingImports: string, importPath: string): boolean
 // ─── Manifest-driven resolution helpers ──────────────────────────────────────
 
 interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; required?: boolean; type?: { text?: string } }
-interface ManifestDeclaration { tagName?: string; members?: ManifestMember[]; models?: string[] }
+interface ManifestDeclaration {
+    tagName?: string; members?: ManifestMember[]; models?: string[];
+    alphaEvents?: string[]; alphaDetail?: Record<string, string>;
+}
 interface ManifestModule { path?: string; declarations?: ManifestDeclaration[] }
 
 /** Collect every string leaf (file target) of a package.json `exports` entry. */

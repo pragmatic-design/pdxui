@@ -8,7 +8,7 @@ import {
     parseSFC, parseTemplate, templateStartInFile, analyzeScript, validate, compile, designHeuristics, positionWarnings, applyIgnores,
     DIAGNOSTICS,
 } from '@pdxui/compiler';
-import type { FixProposal } from '@pdxui/compiler';
+import type { AlphaLookup, FixProposal } from '@pdxui/compiler';
 
 export interface InspectedWarning {
     code: string;
@@ -38,6 +38,8 @@ export interface InspectOptions {
     methodsOf?: (tag: string) => ReadonlySet<string> | null;
     /** The models components declare, for PDX_TWO_WAY_NOT_MODEL. */
     modelsOf?: (tag: string) => ReadonlySet<string> | null;
+    /** The alpha events library components no longer emit, for PDX_REMOVED_FORM (#478). */
+    alphaOf?: AlphaLookup;
     requiredPropsOf?: (tag: string) => ReadonlySet<string> | null;
     /** Whether the project listens to an event above a component, for PDX_EVENT_BUBBLES_UNUSED (#138). */
     eventHeardAbove?: (event: string, tag: string) => boolean;
@@ -100,7 +102,7 @@ export function inspectFile(source: string, file: string, options: InspectOption
     if (!validated.some((w) => w.code === 'PDX_RAW_INTERPOLATION_IN_BINDING')) {
         // Exemptions are applied below, once, to everything: compile() would apply them to its part only.
         const compiled = compile(source, file, [], (src, from) => readFileSync(resolvePath(dirname(from), src), 'utf-8'), {
-            propsOf: options.propsOf, enumValues: options.enumValues, methodsOf: options.methodsOf, modelsOf: options.modelsOf, requiredPropsOf: options.requiredPropsOf, applyIgnores: false,
+            propsOf: options.propsOf, enumValues: options.enumValues, methodsOf: options.methodsOf, modelsOf: options.modelsOf, alphaOf: options.alphaOf, requiredPropsOf: options.requiredPropsOf, applyIgnores: false,
             // compile() knows the tag the file registers, which a listener above it is not written on.
             eventHeardAbove: options.eventHeardAbove,
         });

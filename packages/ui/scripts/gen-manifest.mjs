@@ -872,6 +872,16 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     }
     const cssProperties = tags.filter(t => t.tag === 'cssprop' || t.tag === 'cssproperty').map(t => splitNameDesc(t.text));
     const cssStates = extractDescriptorStates(optionsObj, sourceFile, tags);
+    // The alpha events the component no longer emits (#478): `@alphaevent <name>`, and how each alpha
+    // `detail.<field>` reads in the beta, `@alphadetail <field> <expression>`. The compiler reports a
+    // listener on one as a removed form; `pdx migrate` rewrites it with the detail map.
+    const alphaEvents = tags.filter(t => t.tag === 'alphaevent').map(t => t.text.trim()).filter(Boolean);
+    const alphaDetail = {};
+    for (const t of tags.filter(t => t.tag === 'alphadetail')) {
+        // Match: `<field> <expression>`. Groups: [1]=the field [2]=the expression
+        const m = /^(\S+)\s+(\S[\s\S]*)$/.exec(t.text.trim());
+        if (m) alphaDetail[m[1]] = m[2].trim();
+    }
     const summary = tags.find(t => t.tag === 'summary')?.text || '';
     const description = jsdocDescription(statement);
 
@@ -925,6 +935,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             members,
             // The props `::x` may bind (#124): the compiler's resolver reads them from here.
             ...(models.length ? { models: models.map(m => m.name) } : {}),
+            ...(alphaEvents.length ? { alphaEvents } : {}),
+            ...(Object.keys(alphaDetail).length ? { alphaDetail } : {}),
             ...(events.length ? { events } : {}),
             ...(roles.length ? { roles } : {}),
             attributes,

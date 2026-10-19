@@ -88,5 +88,6 @@ describe('pdx check --types', () => {
         const path = join(ROOT, 'strict-probe.pdx');
         const found = typecheckPdx(ROOT, [{ path, content: sourceOf(USER, '<p>{{ user.name }}</p>') }], { routeTypes: false }).get(path) ?? [];
         expect(found.map((e) => e.tsCode)).toEqual([18047]);
-    });
+        // A `pdx check --types` of its own builds both programs from cold: 30 s rather than 5 (#536).
+    }, 30_000);
 });

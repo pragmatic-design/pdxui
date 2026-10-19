@@ -11,7 +11,7 @@ import {
 } from '@pdxui/compiler';
 import { scanPdxFiles } from '../manifest/scanner';
 import type { ResolvedConfig } from '../config/schema';
-import { inspectFile, categoryOf } from './check-inspect';
+import { inspectFile, categoryOf, type InspectOptions } from './check-inspect';
 import { applyFixes, reportFix, type ReportedFix } from './check-fix';
 
 /** How many times `--fix` applies and re-inspects one file. */
@@ -106,6 +106,8 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
     let methodsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
     // The models components declare, for PDX_TWO_WAY_NOT_MODEL (#124).
     let modelsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
+    // The alpha events library components no longer emit, for PDX_REMOVED_FORM (#478).
+    let alphaOf: InspectOptions['alphaOf'];
     let requiredPropsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
     // Whether the project's templates listen to an event above a component (#138).
     let eventHeardAbove: ((event: string, tag: string) => boolean) | undefined;
@@ -136,6 +138,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
         enumValues = (tag: string, prop: string) => resolver.enumValues(tag, prop);
         methodsOf = (tag: string) => resolver.methodsOf(tag);
         modelsOf = (tag: string) => resolver.modelsOf(tag);
+        alphaOf = (tag: string) => resolver.alphaOf(tag);
         requiredPropsOf = (tag: string) => resolver.requiredPropsOf(tag);
         eventHeardAbove = (event: string, tag: string) => resolver.eventHeardAbove(event, tag);
     } catch { /* no resolver → the check stays silent, which is the honest default */ }
@@ -164,7 +167,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
                 continue;
             }
 
-            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, methodsOf, modelsOf, requiredPropsOf, eventHeardAbove, design: !!args.design };
+            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, methodsOf, modelsOf, alphaOf, requiredPropsOf, eventHeardAbove, design: !!args.design };
             let inspected = inspectFile(source, file, options);
             // --fix: apply what can be applied, then report the file as it is AFTER — what is
             // left, re-validated, and what was fixed — so an agent does not have to run again to

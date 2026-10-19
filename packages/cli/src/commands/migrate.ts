@@ -99,17 +99,23 @@ function projectContext(cwd: string, prefix: string, paths: string[]): LanguageC
             projectTags,
             // Its routes (#150): a `navigate('/x')` to one of them stays a pattern, any other is a URL.
             routePatterns: new Set(projectRoutePatterns(cwd, paths)),
+            // The alpha events a library component no longer emits, from its manifest (#478).
+            alphaOf: (tag) => resolver.alphaOf(tag),
         };
     } catch {
         return {};
     }
 }
 
-/** Apply the registry to the files under `paths`; with `dry`, compute the same report and write nothing. */
-export async function migrate(paths: string[], { cwd, dry = false, prefix = DEFAULT_TAG_PREFIX }: { cwd: string; dry?: boolean; prefix?: string }): Promise<MigrateReport> {
+/**
+ * Apply the registry to the files under `paths`; with `dry`, compute the same report and write nothing.
+ * `context` replaces what the project's components say, key by key — how a test gives a library
+ * component alpha events no shipped manifest records yet (#478).
+ */
+export async function migrate(paths: string[], { cwd, dry = false, prefix = DEFAULT_TAG_PREFIX, context: given }: { cwd: string; dry?: boolean; prefix?: string; context?: LanguageChangeContext }): Promise<MigrateReport> {
     const report: MigrateReport = { changed: [], flagged: [] };
     const targets = paths.length > 0 ? paths : ['.'];
-    const context = projectContext(cwd, prefix, targets.filter((p) => statSync(resolve(cwd, p), { throwIfNoEntry: false })?.isDirectory()));
+    const context = { ...projectContext(cwd, prefix, targets.filter((p) => statSync(resolve(cwd, p), { throwIfNoEntry: false })?.isDirectory())), ...given };
     for (const path of await filesOf(targets, cwd)) {
         const kind = kindOf(path)!;
         const rel = relative(cwd, path).replace(/\\/g, '/');
@@ -121,9 +127,11 @@ export async function migrate(paths: string[], { cwd, dry = false, prefix = DEFA
             if (!region) continue;
             const found = change.detect(region.text, context);
             if (found.length === 0) continue;
+            // A place may say what it takes in particular (#478: the model's event on this tag).
+            const messageOf = (f: { note?: string }) => (f.note ? `${change.message} ${f.note}` : change.message);
             if (change.kind === 'fix' || change.fix === 'flag') {
                 for (const f of found) {
-                    report.flagged.push({ file: rel, line: f.line + region.lineOffset, id: change.id, found: f.found, message: change.message });
+                    report.flagged.push({ file: rel, line: f.line + region.lineOffset, id: change.id, found: f.found, message: messageOf(f) });
                 }
                 continue;
             }
@@ -133,7 +141,7 @@ export async function migrate(paths: string[], { cwd, dry = false, prefix = DEFA
             text = region.replace(fixed);
             if (found.length > left.length) report.changed.push({ file: rel, id: change.id, count: found.length - left.length });
             for (const f of left) {
-                report.flagged.push({ file: rel, line: f.line + region.lineOffset, id: change.id, found: f.found, message: change.message });
+                report.flagged.push({ file: rel, line: f.line + region.lineOffset, id: change.id, found: f.found, message: messageOf(f) });
             }
         }
         if (!dry && text !== original) writeFileSync(path, text, 'utf-8');

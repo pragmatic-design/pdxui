@@ -123,9 +123,9 @@ export function compileNewMode(
     // template is wired to that form. Read from the script with comments and strings
     // masked, so a mention is not a call.
     if (declaresFormSection(descriptor.script?.content ?? '')) {
-        if (applyInjectedFormBindings(ast)) imports.add('tryUseForm');
+        if (applyInjectedFormBindings(ast, ctx.modelEventOf)) imports.add('tryUseForm');
     } else {
-        applyFormBindings(ast);
+        applyFormBindings(ast, undefined, ctx.modelEventOf);
     }
 
     // One render path, in dev and in a build (#107): the inline path.
