@@ -58,7 +58,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { onMount } from '@pdxui/core';
 import { followLink } from './lib/follow-link';
 import { readPreference, writePreference } from '../../../brand/preference';

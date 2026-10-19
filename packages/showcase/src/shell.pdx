@@ -132,7 +132,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 // The app's chrome — the rail, the bar, the compact drawer — as its DEFAULT LAYOUT, not `app.pdx`
 // itself around the outlet: there every route would get it, the sign-in included. `app.pdx` keeps what is the APP's rather than the chrome's: the outlet, the locale gate, the
 // dictionary warm-up.

@@ -18,7 +18,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useToggleGroupDemo } from './state.pdx';
 
 // The composition section's style group shows and sets the same value (state.pdx.ts).

@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, type DataResponse } from '@pdxui/core';
 
 type Item = { id: number; title: string };

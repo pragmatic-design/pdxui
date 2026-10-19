@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let fetchLoading = $signal(false);
 let fetchContent = $signal('Click "Load Data" to simulate a fetch...');
 

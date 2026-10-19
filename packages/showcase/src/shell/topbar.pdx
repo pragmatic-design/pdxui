@@ -44,7 +44,7 @@
   </header>
 </template>
 
-<script setup>
+<script>
 import { navigate, currentPath } from '@pdxui/router';
 
 /** Whether the rail's drawer is open (a compact window): the shell's. */

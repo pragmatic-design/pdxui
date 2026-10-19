@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { toast } from '@pdxui/ui/toast';
 
 function showFilled() { toast.success('Filled variant — colored background.'); }

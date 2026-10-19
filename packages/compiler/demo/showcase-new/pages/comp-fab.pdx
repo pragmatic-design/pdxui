@@ -59,7 +59,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/fab';
 @title 'FAB — PDX Components';
 

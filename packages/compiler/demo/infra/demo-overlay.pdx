@@ -59,7 +59,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { overlayStack, createPortal, createBackdrop, createBottomSheet, effect, onMount, onDestroy } from '@pdxui/core';
 
 let count = $signal(0);

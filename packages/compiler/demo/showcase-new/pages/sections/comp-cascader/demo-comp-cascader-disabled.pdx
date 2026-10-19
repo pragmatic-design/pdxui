@@ -7,7 +7,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const disabledLocations = [
   {
     value: 'europe', label: 'Europe', children: [

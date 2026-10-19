@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/infra/container';
 @title 'Container Size';
 </script>

@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createVirtualizer, effect, onMount } from '@pdxui/core';
 
 let rendered2 = $signal(0);

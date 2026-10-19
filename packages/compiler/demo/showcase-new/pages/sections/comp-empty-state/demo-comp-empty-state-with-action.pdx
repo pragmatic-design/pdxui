@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let actionLog = $signal('Click the action button...');
 
 function onAction() {

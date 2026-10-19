@@ -116,7 +116,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import '@pdxui/ui/tag-input';
 
 @page '/components/tag-input';

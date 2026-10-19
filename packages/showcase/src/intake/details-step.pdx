@@ -44,7 +44,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 // Intake's third step: what the mode asked for, the attachment, and the lines. A section of the
 // `intake` form. The file goes up to the page, which hands it to the draft.
 import { tryUseForm } from '@pdxui/core';

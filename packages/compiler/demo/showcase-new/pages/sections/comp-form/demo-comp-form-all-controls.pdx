@@ -58,7 +58,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm } from '@pdxui/core';
 
 // ─── 7. All Types Form ───

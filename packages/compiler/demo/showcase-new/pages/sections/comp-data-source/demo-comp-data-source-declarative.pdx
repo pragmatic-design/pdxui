@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { users } from './state.pdx';
 
 let dsRef = $signal(null);

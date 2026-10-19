@@ -100,7 +100,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/employees/:id/contracts' { label: contractsLabel };
 @title $t('employees.sectionNames.contracts');
 

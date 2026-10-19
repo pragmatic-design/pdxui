@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { onMount, onDestroy, effect } from '@pdxui/core';
 import { getComponent } from '../lib/manifest';
 import { controlsFor } from '../lib/cem-controls';

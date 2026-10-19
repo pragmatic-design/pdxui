@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { dialog } from '@pdxui/ui/dialog';
 
 async function onAlert() {

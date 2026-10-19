@@ -75,7 +75,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/error-boundary';
 @title 'ErrorBoundary — PDX UI';
 

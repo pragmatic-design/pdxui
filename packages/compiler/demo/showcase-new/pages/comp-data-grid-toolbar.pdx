@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/data-grid-toolbar';
 @title 'Data Grid Toolbar & Filters — PDX Components';
 </script>

@@ -44,7 +44,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let scrollOpen = $signal(false);
 
 function openScroll() { scrollOpen = true; }

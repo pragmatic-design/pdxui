@@ -34,7 +34,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/sparkline';
 @title 'Sparkline';
 let _pdxKeep = $signal(0);

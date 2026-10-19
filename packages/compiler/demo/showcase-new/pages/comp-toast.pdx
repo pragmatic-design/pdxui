@@ -73,7 +73,7 @@ toast.add({ message: 'Starred!', type: 'success', icon: 'star' });</code></pre>
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/toast';
 @title 'Toast';
 </script>

@@ -31,7 +31,7 @@ const countryDS = createDataSource({
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, delayTransport, arrayTransport } from '@pdxui/core';
 
 // ─── Remote DataSource (simulated) ───

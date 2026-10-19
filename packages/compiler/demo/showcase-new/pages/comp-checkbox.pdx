@@ -58,7 +58,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/checkbox';
 @title 'Checkbox Component';

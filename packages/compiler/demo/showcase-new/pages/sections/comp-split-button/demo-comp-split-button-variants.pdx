@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const saveItems = [
   { key: 'save-as', label: 'Save As...', icon: 'file-text' },
   { key: 'save-copy', label: 'Save a Copy', icon: 'copy' },

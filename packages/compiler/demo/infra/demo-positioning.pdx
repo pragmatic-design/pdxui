@@ -62,7 +62,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { computeFloatingPosition, autoUpdate, offset, flip, shift, hideMiddleware, onMount, onDestroy } from '@pdxui/core';
 
 const placements = [

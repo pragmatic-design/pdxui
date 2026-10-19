@@ -56,7 +56,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/data-grid-editing';
 @title 'Data Grid Editing — PDX Components';
 </script>

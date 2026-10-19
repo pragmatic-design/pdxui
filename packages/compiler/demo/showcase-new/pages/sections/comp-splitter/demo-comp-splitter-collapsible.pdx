@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const collapsiblePanes = [
   { min: 0, max: 50, defaultSize: 30, collapsible: true, collapsedSize: 0 },
   { min: 20 },

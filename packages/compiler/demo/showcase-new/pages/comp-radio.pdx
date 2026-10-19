@@ -57,7 +57,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/radio';
 @title 'Radio & Groups';

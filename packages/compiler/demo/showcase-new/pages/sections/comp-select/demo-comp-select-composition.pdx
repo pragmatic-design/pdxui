@@ -33,7 +33,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'China', 'Denmark', 'Egypt', 'France', 'Germany', 'India', 'Italy', 'Japan', 'Mexico', 'Netherlands', 'Norway', 'Portugal', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom', 'United States'];
 const languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Korean', 'Arabic', 'Hindi', 'Russian'];
 const roles = ['Admin', 'Editor', 'Viewer', 'Moderator', 'Developer'];

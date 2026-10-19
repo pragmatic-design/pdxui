@@ -29,6 +29,6 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import '@pdxui/ui/provide';
 </script>

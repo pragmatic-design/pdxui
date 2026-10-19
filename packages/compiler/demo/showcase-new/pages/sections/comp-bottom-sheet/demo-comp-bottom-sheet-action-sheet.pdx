@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Action sheet
 let actionOpen = $signal(false);
 

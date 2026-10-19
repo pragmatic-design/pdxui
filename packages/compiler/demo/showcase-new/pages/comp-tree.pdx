@@ -88,7 +88,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/tree';
 @title 'Tree Component';
 </script>

@@ -62,7 +62,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/statistic';
 @title 'Statistic — PDX Components';
 

@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useTasks } from './task-store.pdx';
 
 @page '/dashboard' { keepAlive, preload };

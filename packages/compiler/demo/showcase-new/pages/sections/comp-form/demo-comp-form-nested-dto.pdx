@@ -79,7 +79,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, email } from '@pdxui/core';
 
 // ─── 2. Nested DTO (Field Groups) ───

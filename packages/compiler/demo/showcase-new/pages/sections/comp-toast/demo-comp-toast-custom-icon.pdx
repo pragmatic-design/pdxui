@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { toast } from '@pdxui/ui/toast';
 
 function showCustomIcon() { toast.add({ message: 'Added to favorites!', type: 'success', icon: 'star' }); }

@@ -7,7 +7,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let layout = $signal('grid');
 
 function onLayout(e) {

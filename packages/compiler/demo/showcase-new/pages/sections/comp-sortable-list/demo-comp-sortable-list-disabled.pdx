@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useSortableTasks } from './state.pdx';
 
 // The list the first section reorders (state.pdx.ts).

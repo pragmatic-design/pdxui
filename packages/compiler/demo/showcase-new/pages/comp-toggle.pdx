@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/toggle';
 @title 'Toggle Button';
 </script>

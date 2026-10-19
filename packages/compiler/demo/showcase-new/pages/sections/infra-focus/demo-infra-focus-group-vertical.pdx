@@ -13,7 +13,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { focusGroup, onMount } from '@pdxui/core';
 
 const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];

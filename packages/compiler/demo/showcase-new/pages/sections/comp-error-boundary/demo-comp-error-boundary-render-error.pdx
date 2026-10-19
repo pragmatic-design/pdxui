@@ -25,7 +25,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 function throwRenderError() {
   throw new Error('NullReferenceError: widget data source returned null — check API connection');
 }

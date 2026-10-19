@@ -35,7 +35,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useButtonGroupDemo } from './state.pdx';
 
 const demo = useButtonGroupDemo();

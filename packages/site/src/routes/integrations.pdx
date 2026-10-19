@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/integrations';
 @title 'Framework Integration — PDX';
 

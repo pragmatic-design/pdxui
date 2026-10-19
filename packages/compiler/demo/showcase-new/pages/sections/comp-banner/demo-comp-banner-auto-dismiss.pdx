@@ -19,7 +19,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let autoBanner = $signal(null);
 
 function showAgain() { autoBanner?.show(); }

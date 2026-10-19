@@ -17,7 +17,7 @@ const ds = createDataSource({ data: bigData, pageSize: 0 });
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource } from '@pdxui/core';
 
 const columns = [

@@ -16,6 +16,6 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let office = $signal('');
 </script>

@@ -56,7 +56,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/number-input';
 @title 'Number Input';
 </script>

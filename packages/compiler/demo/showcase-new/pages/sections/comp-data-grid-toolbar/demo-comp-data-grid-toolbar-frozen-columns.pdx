@@ -22,7 +22,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource } from '@pdxui/core';
 import { products } from './state.pdx';
 

@@ -58,7 +58,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import '@pdxui/ui/button';
 import '@pdxui/ui/bottom-sheet';
 import '@pdxui/ui/dialog';

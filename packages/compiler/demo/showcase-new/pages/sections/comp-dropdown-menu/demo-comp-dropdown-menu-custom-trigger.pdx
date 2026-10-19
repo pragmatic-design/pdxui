@@ -25,7 +25,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useDropdownMenuLog } from './state.pdx';
 
 // The basic section shows the same line (state.pdx.ts).

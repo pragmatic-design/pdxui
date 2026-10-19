@@ -33,7 +33,7 @@ const orderForm = createForm({
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm } from '@pdxui/core';
 
 const lineFields = [

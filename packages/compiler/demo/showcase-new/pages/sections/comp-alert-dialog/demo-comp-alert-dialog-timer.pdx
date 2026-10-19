@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let timerOpen = $signal(false);
 
 function openTimer() { timerOpen = true; }

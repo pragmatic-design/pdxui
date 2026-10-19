@@ -22,7 +22,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const idePanesH = [
   { min: 10, max: 30, defaultSize: 20 },
   { min: 40 },

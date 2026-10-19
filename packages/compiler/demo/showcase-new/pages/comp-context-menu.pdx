@@ -54,7 +54,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/context-menu';
 @title 'ContextMenu — PDX Components';
 

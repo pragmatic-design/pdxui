@@ -23,7 +23,7 @@ function onSelect(e) {
   </section>
 </template>
 
-<script setup>
+<script>
 let selectedFiles = $signal('None');
 
 function onSelect(e) {

@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { focusRestore } from '@pdxui/core';
 
 let restoreInputRef = $signal(null);

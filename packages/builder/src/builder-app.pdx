@@ -310,7 +310,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { onMount } from '@pdxui/core';
 import { CATALOG_URL, THEMES, VIEWPORTS, CAN_SAVE, scenarioUrl, compositionUrl, COMPOSITION_NAME } from './config';
 import { readPreference, writePreference } from '../../../brand/preference';

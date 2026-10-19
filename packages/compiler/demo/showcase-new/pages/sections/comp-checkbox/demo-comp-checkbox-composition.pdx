@@ -28,7 +28,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { allOn, someOn, setAll, setOne } from './state.pdx';
 
 let perms = $signal([

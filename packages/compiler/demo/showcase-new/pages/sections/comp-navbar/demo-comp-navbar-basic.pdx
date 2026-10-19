@@ -13,7 +13,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useNavbarEvents } from './state.pdx';
 
 // The enterprise section shows what this navbar selects (state.pdx.ts).

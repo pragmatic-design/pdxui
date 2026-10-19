@@ -10,7 +10,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/data-grid-virtual';
 @title 'Data Grid Virtual Scroll — PDX Components';
 </script>

@@ -49,7 +49,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/kbd';
 @title 'Kbd Component';
 let _ = $signal(0);

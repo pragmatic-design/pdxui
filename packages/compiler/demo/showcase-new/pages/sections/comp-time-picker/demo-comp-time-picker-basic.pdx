@@ -23,6 +23,6 @@ let meeting = $signal('09:30');</code></pre>
   </section>
 </template>
 
-<script setup>
+<script>
 let meeting = $signal('09:30');
 </script>

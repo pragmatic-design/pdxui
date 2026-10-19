@@ -47,7 +47,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, effect, onMount, onDestroy } from '@pdxui/core';
 
 // ─── Mock transport (simulates server) ────────────────────────

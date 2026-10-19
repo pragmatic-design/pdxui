@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 /** The section menu's accessible name: «Customer sections». */
 @prop label: string = '';
 </script>

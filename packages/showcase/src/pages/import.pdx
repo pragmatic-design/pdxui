@@ -76,7 +76,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/customers/import' { label: importLabel };
 @title $t('import.title');
 

@@ -23,7 +23,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/form-composition';
 @title 'Form Composition';
 </script>

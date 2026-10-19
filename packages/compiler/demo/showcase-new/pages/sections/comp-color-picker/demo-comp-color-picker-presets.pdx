@@ -20,7 +20,7 @@ const presetColors = [
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Presets ───
 const presetColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b', '#000000', '#ffffff', '#f5f5f4'];
 

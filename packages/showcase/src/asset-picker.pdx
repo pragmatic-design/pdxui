@@ -13,7 +13,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { createDataSource } from '@pdxui/core';
 import { assetRowTransport } from './data/asset-rows';
 

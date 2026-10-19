@@ -67,7 +67,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/color-picker';
 @title 'Color Picker — PDX UI';
 

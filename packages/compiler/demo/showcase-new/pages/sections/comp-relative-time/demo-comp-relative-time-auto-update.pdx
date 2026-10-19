@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const justNow = new Date().toISOString();
 </script>
 

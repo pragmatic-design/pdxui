@@ -12,6 +12,6 @@ const largeList = Array.from({ length: 10000 }, (_, i) =&gt; 'Item ' + (i + 1));
   </section>
 </template>
 
-<script setup>
+<script>
 const largeList = Array.from({ length: 10000 }, (_, i) => 'Item ' + (i + 1));
 </script>

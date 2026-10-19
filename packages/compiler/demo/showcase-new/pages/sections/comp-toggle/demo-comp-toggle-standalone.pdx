@@ -17,7 +17,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let bold = $signal(false);
 let italic = $signal(false);
 

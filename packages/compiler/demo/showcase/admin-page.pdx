@@ -16,7 +16,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/admin' { preload };
 @guard 'admin';
 @title 'Admin — TaskMgr';

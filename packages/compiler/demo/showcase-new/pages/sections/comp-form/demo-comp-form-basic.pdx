@@ -53,7 +53,7 @@ const saveBasic = basicForm.handleSubmit(async (values) =&gt; { await api.savePr
   </section>
 </template>
 
-<script setup>
+<script>
 // Helper functions for template — :textContent="${fn}" binds reactively via the template engine.
 // Each helper includes the label text so the binding is a simple function reference (no arrow wrapper).
 function basicDirtyText() { return 'Dirty: ' + (basicForm.dirty() ? 'Yes' : 'No'); }

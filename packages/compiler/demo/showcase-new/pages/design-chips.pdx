@@ -81,7 +81,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/chips';
 @title 'Chips';
 </script>

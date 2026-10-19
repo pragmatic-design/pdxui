@@ -33,7 +33,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const basicMenubar = [
   {
     key: 'file', label: 'File',

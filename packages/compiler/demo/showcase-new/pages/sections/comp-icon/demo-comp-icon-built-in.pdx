@@ -24,7 +24,7 @@ registerPragmaticIcons();  // from '@pdxui/ui/icon/pragmatic-icons'</code></pre>
   </section>
 </template>
 
-<script setup>
+<script>
 import { getPragmaticIconNames, PRAGMATIC_ICON_COUNT } from '@pdxui/ui/icon/pragmatic-icons';
 
 let iconNames = $signal(getPragmaticIconNames());

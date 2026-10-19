@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, type DataResponse } from '@pdxui/core';
 
 // --- Manual demo: 50 items ---

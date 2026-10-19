@@ -38,7 +38,7 @@
   }
 </template>
 
-<script setup>
+<script>
 import { navigate, currentPath, onBeforeNavigate, onAfterNavigate } from '@pdxui/router';
 import { useTasks } from './task-store.pdx';
 import { initI18n, loadTranslations, setLocale, getLocale, setPermissions } from '@pdxui/core';

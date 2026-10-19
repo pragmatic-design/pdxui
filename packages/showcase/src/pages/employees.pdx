@@ -44,7 +44,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // A dictionary key, for the reason in `customers.pdx`: an ancestor of `/employees/:id`, which does
 // not render inside it.
 @page '/employees' { label: $t('employees.title') };

@@ -99,7 +99,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/sites/:id' { label: siteLabel };
 @title record?.name ?? $t('sites.unknown');
 

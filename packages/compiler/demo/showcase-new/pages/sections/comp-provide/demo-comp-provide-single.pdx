@@ -24,7 +24,7 @@ const greeting = useProvided('greeting');</code></pre></details>}
   </section>
 </template>
 
-<script setup>
+<script>
 import '@pdxui/ui/provide';
 
 let greetingMsg = $signal('Hello from provider!');

@@ -98,7 +98,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/file-upload';
 @title 'File Upload — PDX UI';
 

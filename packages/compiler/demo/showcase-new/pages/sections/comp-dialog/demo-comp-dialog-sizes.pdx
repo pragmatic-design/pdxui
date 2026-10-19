@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let sizeOpen = $signal(false);
 let currentSize = $signal('md');
 const sizeTitle = $derived('Dialog — ' + currentSize);

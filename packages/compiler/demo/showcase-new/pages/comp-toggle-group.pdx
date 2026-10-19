@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/toggle-group';
 @title 'Toggle Group Component';
 </script>

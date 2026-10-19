@@ -36,7 +36,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useChipConsole } from './state.pdx';
 
 const chipConsole = useChipConsole();

@@ -49,7 +49,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/provide';
 @title 'Provide — PDX UI';
 </script>

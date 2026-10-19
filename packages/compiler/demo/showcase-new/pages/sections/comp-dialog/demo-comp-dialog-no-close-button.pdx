@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let noCloseOpen = $signal(false);
 
 function openNoClose() { noCloseOpen = true; }

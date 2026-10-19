@@ -70,7 +70,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/';
 @title 'PDX UI';
 import { followLink } from '../lib/follow-link';

@@ -21,7 +21,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const fullMenubar = [
   {
     key: 'file', label: 'File',

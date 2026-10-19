@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/banner';
 @title 'Banner / Alert';
 </script>

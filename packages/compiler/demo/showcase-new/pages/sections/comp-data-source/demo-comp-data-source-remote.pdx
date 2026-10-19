@@ -24,7 +24,7 @@ const remoteDS = createDataSource({
   </section>
 </template>
 
-<script setup>
+<script>
 import { users } from './state.pdx';
 import { createDataSource, arrayTransport, delayTransport } from '@pdxui/core';
 

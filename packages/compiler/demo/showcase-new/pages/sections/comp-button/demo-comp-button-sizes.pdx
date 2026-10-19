@@ -24,7 +24,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useButtonConsole } from './state.pdx';
 
 const buttonConsole = useButtonConsole();

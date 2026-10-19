@@ -49,7 +49,7 @@ validators: { email: [required('validation.required')] }</code></pre></details>}
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, setValidationLocale, required, minLength, email, min } from '@pdxui/core';
 
 // ─── 2. Validation i18n ───

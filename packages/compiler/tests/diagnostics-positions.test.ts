@@ -70,7 +70,7 @@ const ROWS: Record<string, Row> = {
     PDX_AWAIT_TIMING: { src: pdx('<p>{{ a }}</p>\n@await (ready) { minMs: 500, maxMs: 300 } { <p>ok</p> } @loading { <i>…</i> }', 'let a = $signal(1);\nlet ready = $signal(Promise.resolve());'), at: '@await (ready) { minMs' },
     PDX_FETCH_INVALID: { src: pdx('<p>x</p>', "let a = $signal(1);\n@fetch users: 'nomethod';"), at: '@fetch users' },
     PDX_FETCH_NO_ERROR_UI: { src: pdx('<p>{{ users.data() }}</p>', "@fetch users: 'GET /api/users' as string[];"), at: '@fetch users' },
-    PDX_TEMPLATE_NAME_NOT_PROVIDED: { src: '<template>\n  <h1>{{ title }}</h1>\n</template>\n<script>\nconst title = 1;\n</script>\n', at: '{{ title }}' },
+    PDX_TEMPLATE_NAME_NOT_PROVIDED: { src: '<template>\n  <h1>{{ title }}</h1>\n</template>\n<script>\nconst title = 1;\nreturn {};\n</script>\n', at: '{{ title }}' },
     PDX_PREFETCH_POLICY: { src: pdx('<p>x</p>', "@page '/x';\n@prefetch 'visible';"), at: "@prefetch 'visible'" },
     PDX_FETCH_METHOD: { src: pdx('<p>{{ hits }}</p>', "let a = $signal(1);\n@fetch hits: 'POST /api/search';"), at: '@fetch hits' },
     PDX_FETCH_TYPE_COLON: { src: pdx('<p>{{ user }}</p>', "let a = $signal(1);\n@fetch user: 'GET /api/user' : User;"), at: '@fetch user' },

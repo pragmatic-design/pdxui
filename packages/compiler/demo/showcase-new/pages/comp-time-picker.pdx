@@ -61,7 +61,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/time-picker';
 @title 'Time Picker Component';
 </script>

@@ -24,7 +24,7 @@ const fields = [...];
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, toColumnDefs, type FieldDefinition } from '@pdxui/core';
 
 const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];

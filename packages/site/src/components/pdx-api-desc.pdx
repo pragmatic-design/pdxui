@@ -2,7 +2,7 @@
   <span class="pdx-api-desc" :ref="descRef"></span>
 </template>
 
-<script setup>
+<script>
 // An API description with its inline code rendered as code. The manifest carries JSDoc text, where
 // `x` marks code; printed as text, the backticks would show. Built as nodes — a text node
 // per run, a <code> per span — so the text is never parsed as HTML.

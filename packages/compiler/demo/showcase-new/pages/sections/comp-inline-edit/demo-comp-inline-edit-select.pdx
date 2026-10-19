@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const statusOptions = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' },

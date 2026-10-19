@@ -59,7 +59,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/row-col';
 @title 'Row & Col';
 </script>

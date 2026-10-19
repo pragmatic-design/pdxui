@@ -35,7 +35,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useThemeMeasure } from './state.pdx';
 
 // Measured by the page on mount and on every theme change (state.pdx.ts).

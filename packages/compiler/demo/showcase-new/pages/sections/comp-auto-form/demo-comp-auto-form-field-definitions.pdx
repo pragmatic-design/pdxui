@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const roles = ['Engineer', 'Designer', 'PM', 'DevOps', 'QA'];
 
 const formFields = [

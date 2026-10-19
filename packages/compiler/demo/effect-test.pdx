@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop initial: number = 0;
 
   let count = $signal(0);

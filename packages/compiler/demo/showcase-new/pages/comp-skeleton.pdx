@@ -49,7 +49,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/skeleton';
 @title 'Skeleton';
 let _ = $signal(0);

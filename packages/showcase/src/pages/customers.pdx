@@ -90,7 +90,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // A dictionary KEY, not a function: this route is an ancestor of pages that do not render it
 // (`/customers/1`, `/customers/import`), so a deep link never loads this module, and a function
 // label here would vanish from their trail. A key travels in the route table.

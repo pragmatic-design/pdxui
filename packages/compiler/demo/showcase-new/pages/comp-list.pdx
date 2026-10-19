@@ -58,7 +58,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/list';
 @title 'List — PDX Components';
 

@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/empty-state';
 @title 'EmptyState — PDX Components';
 

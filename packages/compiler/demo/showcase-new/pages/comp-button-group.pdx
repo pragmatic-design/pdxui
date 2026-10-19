@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useButtonGroupDemo } from './sections/comp-button-group/state.pdx';
 
 @page '/components/button-group';

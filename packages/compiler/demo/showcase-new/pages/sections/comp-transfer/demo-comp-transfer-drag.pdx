@@ -15,6 +15,6 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { basicItems } from './state.pdx';
 </script>

@@ -19,7 +19,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const badgeItems = [
   { key: 'home', label: 'Home', icon: 'home' },
   { key: 'search', label: 'Search', icon: 'search' },

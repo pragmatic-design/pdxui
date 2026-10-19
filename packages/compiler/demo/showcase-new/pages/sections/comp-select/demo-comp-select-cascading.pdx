@@ -34,7 +34,7 @@ function onCountryChange(e) {
   </section>
 </template>
 
-<script setup>
+<script>
 // Cascade selects
 let selectedCountry = $signal('');
 

@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop emoji: string = '🎨';
 
   let color = $signal('#3b82f6');

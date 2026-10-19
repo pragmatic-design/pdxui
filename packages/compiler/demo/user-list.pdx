@@ -25,7 +25,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop title: string = 'Users';
 
   let users = resource(() => {

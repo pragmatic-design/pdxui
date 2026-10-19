@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { basicItems } from './data.pdx';
 import { useDropdownMenuLog } from './state.pdx';
 

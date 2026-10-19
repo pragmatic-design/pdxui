@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { toast } from '@pdxui/ui/toast';
 
 function showPersistent() { toast.warning('Action required: verify your email.', { duration: 0 }); }

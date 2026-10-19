@@ -50,7 +50,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/number-masked';
 @title 'Number & Masked Input';
 </script>

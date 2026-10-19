@@ -64,7 +64,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── 1. Order Schema (JSON-driven) ───
 const orderSchema = {
   fields: [

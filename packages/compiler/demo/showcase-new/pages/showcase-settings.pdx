@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 // The showcase's theme, density and colour scheme: the topbar's dropdowns and mode button
 // on a desktop, the settings drawer on a phone — two views of one state, which is why the drawer's
 // chips are rendered from it rather than built once and left behind when the dropdown changes it.

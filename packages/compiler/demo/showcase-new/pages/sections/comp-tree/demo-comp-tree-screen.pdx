@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { files } from './state.pdx';
 </script>
 

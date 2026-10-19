@@ -2,7 +2,7 @@
   <button data-part="root"><slot></slot></button>
 </template>
 
-<script setup>
+<script>
 // `@variants` and `@variant` (#153): two axes, a compound rule and a rule on the host itself. The
 // colours are literals on purpose — the spec reads them back.
 @variants {

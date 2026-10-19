@@ -44,7 +44,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/sortable-list';
 @title 'Sortable List Component';
 </script>

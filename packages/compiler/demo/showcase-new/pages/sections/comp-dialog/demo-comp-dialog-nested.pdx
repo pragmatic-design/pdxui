@@ -30,7 +30,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let nested1Open = $signal(false);
 let nested2Open = $signal(false);
 

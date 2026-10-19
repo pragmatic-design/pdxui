@@ -39,7 +39,7 @@ function setTask(index, key, value) {
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm } from '@pdxui/core';
 
 const people = [

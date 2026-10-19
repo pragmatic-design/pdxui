@@ -44,7 +44,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const actions = [
   { key: 'archive', label: 'Archive', icon: 'archive' },
   { key: 'export', label: 'Export', icon: 'download', disabled: true, disabledReason: 'Your role cannot export' },

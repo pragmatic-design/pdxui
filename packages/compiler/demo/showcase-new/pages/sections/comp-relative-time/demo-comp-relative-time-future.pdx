@@ -21,7 +21,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const inFiveMin = new Date(Date.now() + 5 * 60000).toISOString();
 const inTwoHours = new Date(Date.now() + 2 * 3600000).toISOString();
 const inOneDay = new Date(Date.now() + 86400000).toISOString();

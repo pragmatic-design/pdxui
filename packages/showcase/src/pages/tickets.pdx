@@ -196,7 +196,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // A dictionary key, for the reason in `customers.pdx`: `/tickets/:id` does not render inside this
 // page, so a deep link never loads it, and a function label would vanish from the trail.
 @page '/tickets' { label: $t('tickets.title') };

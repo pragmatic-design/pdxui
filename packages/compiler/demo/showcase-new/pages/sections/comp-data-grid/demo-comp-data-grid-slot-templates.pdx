@@ -55,7 +55,7 @@ const columns = [
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, status } from '@pdxui/core';
 
 // ─── Slot/cell demo — custom cell rendering ───────────

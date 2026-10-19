@@ -58,7 +58,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components';
 @title 'Components — PDX Showcase';
 

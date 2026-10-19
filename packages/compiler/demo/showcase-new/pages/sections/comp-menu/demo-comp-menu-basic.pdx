@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useMenuDemo } from './state.pdx';
 
 // One menu open at a time across the sections, and the line every menu writes (state.pdx.ts).

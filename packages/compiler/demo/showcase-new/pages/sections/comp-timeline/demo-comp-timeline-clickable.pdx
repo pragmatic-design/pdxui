@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const basicEvents = [
   { title: 'Order Placed', description: 'Your order #12345 has been placed.', date: 'Apr 1, 2026' },
   { title: 'Payment Confirmed', description: 'Payment received via credit card.', date: 'Apr 1, 2026' },

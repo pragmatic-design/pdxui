@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/split-button';
 @title 'SplitButton — PDX Components';
 

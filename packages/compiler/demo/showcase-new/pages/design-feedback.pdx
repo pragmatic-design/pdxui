@@ -63,7 +63,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/feedback';
 @title 'Badges, Dots & Alerts';
 </script>

@@ -25,7 +25,7 @@ const schema = { fields: [
   </section>
 </template>
 
-<script setup>
+<script>
 // Server-side lookup field (type: 'lookup') — options loaded on demand while typing.
 const allCities = ['Milano', 'Roma', 'Torino', 'Napoli', 'Bologna', 'Firenze', 'Venezia', 'Genova', 'Palermo', 'Bari', 'Verona'];
 

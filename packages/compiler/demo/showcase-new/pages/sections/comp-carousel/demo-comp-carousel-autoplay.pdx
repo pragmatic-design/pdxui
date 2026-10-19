@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { basicSlides } from './state.pdx';
 </script>
 

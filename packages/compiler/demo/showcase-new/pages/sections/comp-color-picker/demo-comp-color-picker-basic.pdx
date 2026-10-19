@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Basic ───
 let colorValue = $signal('#3b82f6');
 

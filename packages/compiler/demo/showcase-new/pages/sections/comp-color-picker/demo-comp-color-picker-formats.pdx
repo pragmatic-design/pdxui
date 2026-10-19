@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Formats ───
 let hexOutput = $signal('#8b5cf6');
 

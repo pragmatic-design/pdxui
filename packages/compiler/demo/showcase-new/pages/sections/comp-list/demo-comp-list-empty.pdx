@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const emptyItems = [];
 </script>
 

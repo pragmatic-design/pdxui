@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // A component page's accessibility section: the notes and the keyboard table written for
 // the component in content/components/<name>.ts.
 import { a11yOf } from '../lib/component-content';

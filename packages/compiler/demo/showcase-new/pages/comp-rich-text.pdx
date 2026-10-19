@@ -69,7 +69,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/rich-text';
 @title 'Rich Text Editor';
 </script>

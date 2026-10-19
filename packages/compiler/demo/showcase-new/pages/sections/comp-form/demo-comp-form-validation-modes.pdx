@@ -46,7 +46,7 @@ const submitForm = createForm({ ..., validateOn: 'onSubmit' }); // validates onl
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, email } from '@pdxui/core';
 
 // ─── 3. Validation Modes ───

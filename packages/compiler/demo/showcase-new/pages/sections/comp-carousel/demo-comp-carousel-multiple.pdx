@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const cardSlides = [
   { src: '/demo-images/desk.svg', alt: 'Product 1', caption: 'Product Alpha' },
   { src: '/demo-images/chair.svg', alt: 'Product 2', caption: 'Product Beta' },

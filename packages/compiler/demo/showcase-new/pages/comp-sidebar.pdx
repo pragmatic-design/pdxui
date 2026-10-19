@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/sidebar';
 @title 'Sidebar — PDX Components';
 

@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const productItems = [
   { label: 'Name', value: 'Ergonomic Keyboard' },
   { label: 'SKU', value: 'KB-ERG-2026' },

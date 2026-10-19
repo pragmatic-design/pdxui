@@ -61,7 +61,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/description-list';
 @title 'DescriptionList — PDX Components';
 

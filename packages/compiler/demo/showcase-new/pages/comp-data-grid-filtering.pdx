@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/data-grid-filtering';
 @title 'Data Grid Filtering — PDX Components';
 </script>

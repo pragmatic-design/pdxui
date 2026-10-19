@@ -26,7 +26,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Products for wrapping demo
 const products = [
   { id: 1, name: 'Widget Pro', price: 29.99 },

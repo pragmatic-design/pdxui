@@ -19,7 +19,7 @@
   }
 </template>
 
-<script setup>
+<script>
   @prop open: boolean = false;
   @prop title: string = 'Confirm';
   @prop confirmLabel: string = 'OK';

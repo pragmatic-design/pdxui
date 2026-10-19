@@ -46,7 +46,7 @@ function renderValue(item) {
   </section>
 </template>
 
-<script setup>
+<script>
 import { sanitizeUrl } from '@pdxui/core';
 
 const customItems = [

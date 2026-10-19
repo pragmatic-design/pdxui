@@ -35,7 +35,7 @@ onGlobalError((error, context) =&gt; {
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Global Error Interceptor Demo ──────────────────────
 
 import { onGlobalError } from '@pdxui/core';

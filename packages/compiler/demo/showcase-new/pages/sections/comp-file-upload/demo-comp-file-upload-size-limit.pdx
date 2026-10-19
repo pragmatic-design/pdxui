@@ -34,7 +34,7 @@ function onError(e) {
   </section>
 </template>
 
-<script setup>
+<script>
 let errorMsg = $signal('');
 let sizeFiles = $signal('');
 

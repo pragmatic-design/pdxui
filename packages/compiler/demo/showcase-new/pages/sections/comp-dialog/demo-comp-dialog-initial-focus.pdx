@@ -31,7 +31,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let focusOpen = $signal(false);
 const focusSelector = '.focus-email';
 

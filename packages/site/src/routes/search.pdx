@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/search';
 @title 'Search — PDX';
 import { allComponents } from '../lib/manifest';

@@ -111,7 +111,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/settings/lookups' { label: lookupsLabel };
 @title $t('settings.tiles.lookups');
 

@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let dangerOpen = $signal(false);
 
 function openDanger() { dangerOpen = true; }

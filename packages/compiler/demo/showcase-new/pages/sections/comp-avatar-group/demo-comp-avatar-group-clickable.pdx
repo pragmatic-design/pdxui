@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { teamItems } from './state.pdx';
 
 let clickLog = $signal('Click an avatar...');

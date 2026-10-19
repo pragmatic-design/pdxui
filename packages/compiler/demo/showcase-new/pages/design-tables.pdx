@@ -69,7 +69,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/tables';
 @title 'Tables';
 </script>

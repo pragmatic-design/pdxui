@@ -27,7 +27,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/form-section';
 @title 'Form Section';
 </script>

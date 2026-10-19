@@ -18,7 +18,7 @@ proposals the implementing issue may change.
 
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
-| `<script setup>` | `<script>` | mechanical | #158 |
+| `<script setup>` | `<script>` | mechanical (landed: `script-setup`; a script without legacy markers already reads the same under both, and the repository's `.pdx` files are converted) | #158 |
 | `defineProps({ x: { type: String, default: 'a' } })` | `@prop x: string = 'a';` | mechanical | #158 |
 | `defineEmits(['e'])` | `@event e: unknown;` | mechanical | #158 |
 | a top-level `return { … }` | removed: every top-level name reaches the template | mechanical | #158 |

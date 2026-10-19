@@ -11,7 +11,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const sectionedSchema = {
   layout: 'grid', columns: 12,
   sections: [

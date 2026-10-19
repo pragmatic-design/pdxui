@@ -37,7 +37,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const slotTimelineItems = [
   { title: 'Started', description: 'Project kicked off with initial planning.', date: 'Jan 2026', status: 'success' },
   { title: 'Design Phase', description: 'UI/UX wireframes and prototypes completed.', date: 'Feb 2026', status: 'success' },

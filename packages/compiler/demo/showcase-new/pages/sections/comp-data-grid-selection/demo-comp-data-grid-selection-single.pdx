@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { data, columns } from './state.pdx';
 import { createDataSource } from '@pdxui/core';
 

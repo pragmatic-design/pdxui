@@ -172,7 +172,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/employees/:id/personal' { label: personalLabel };
 @title $t('employees.sectionNames.personal');
 

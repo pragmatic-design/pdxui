@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/segmented';
 @title 'Segmented Control';
 </script>

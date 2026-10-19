@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { lineData } from './state.pdx';
 </script>
 

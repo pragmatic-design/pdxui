@@ -87,7 +87,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useScrollbar, effect, onMount, onDestroy } from '@pdxui/core';
 
 let scrollTop1 = $signal(0);

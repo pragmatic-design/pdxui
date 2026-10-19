@@ -24,7 +24,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useTagInputLog } from './state.pdx';
 
 // The page's event console (state.pdx.ts).

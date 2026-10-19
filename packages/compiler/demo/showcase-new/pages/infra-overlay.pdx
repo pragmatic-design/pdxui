@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/infra/overlay';
 @title 'Overlay System';
 </script>

@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // No handle
 let noHandleOpen = $signal(false);
 

@@ -89,7 +89,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/menu';
 @title 'Menu — PDX Components';
 

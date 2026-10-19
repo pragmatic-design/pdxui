@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/nav';
 @title 'Navigation';
 </script>

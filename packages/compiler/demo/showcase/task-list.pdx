@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useTasks } from './task-store.pdx';
 
 @prop title: string = 'Tasks';

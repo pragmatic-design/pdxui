@@ -72,7 +72,7 @@ function nextStep() {
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, minLength } from '@pdxui/core';
 
 // ─── 3. Wizard Form ───

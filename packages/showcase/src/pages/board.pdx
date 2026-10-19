@@ -48,7 +48,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/board';
 @title $t('board.title');
 

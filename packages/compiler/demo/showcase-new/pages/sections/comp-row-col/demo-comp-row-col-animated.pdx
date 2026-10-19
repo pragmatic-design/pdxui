@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let sidebarSpan = $signal(3);
 const contentSpan = $derived(12 - sidebarSpan);
 

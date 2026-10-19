@@ -56,7 +56,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/spinner';
 @title 'Spinner Component';

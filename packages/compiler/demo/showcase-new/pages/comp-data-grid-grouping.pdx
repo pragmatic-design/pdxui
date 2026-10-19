@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/data-grid-grouping';
 @title 'Data Grid Grouping — PDX Components';
 </script>

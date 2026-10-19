@@ -47,7 +47,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/rating';
 @title 'Rating Component';
 </script>

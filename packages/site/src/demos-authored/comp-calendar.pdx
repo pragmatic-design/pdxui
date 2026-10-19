@@ -61,7 +61,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 let _keep = $signal(0);
 </script>
 

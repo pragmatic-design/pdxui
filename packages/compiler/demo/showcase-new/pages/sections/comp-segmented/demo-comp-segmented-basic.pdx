@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let view = $signal('day');
 
 function onView(e) {

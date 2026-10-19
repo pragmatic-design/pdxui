@@ -65,7 +65,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components';
 @title 'Components — PDX';
 import { byCategory, allComponents } from '../lib/manifest';

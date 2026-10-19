@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { users } from './state.pdx';
 </script>
 

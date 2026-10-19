@@ -93,7 +93,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/buttons';
 @title 'Buttons';
 </script>

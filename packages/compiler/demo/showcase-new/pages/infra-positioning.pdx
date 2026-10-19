@@ -14,7 +14,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/infra/positioning';
 @title 'Positioning Engine';
 </script>

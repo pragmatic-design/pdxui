@@ -33,7 +33,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Form drawer
 let formOpen = $signal(false);
 

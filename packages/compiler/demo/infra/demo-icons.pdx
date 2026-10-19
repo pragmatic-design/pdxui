@@ -92,7 +92,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { registerIconSet, resolveIcon, clearIconSets, signal, onMount } from '@pdxui/core';
 import '../../../ui/src/icon/pdx-icon';
 

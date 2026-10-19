@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/command';
 @title 'Command';
 </script>

@@ -23,7 +23,7 @@ const remoteUserDS = createDataSource({
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, arrayTransport, delayTransport } from '@pdxui/core';
 
 const dsUsers = [

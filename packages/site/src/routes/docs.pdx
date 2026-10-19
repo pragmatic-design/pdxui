@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/docs', '/docs/:slug';
 @title 'Docs — PDX';
 import { currentParams } from '@pdxui/router';

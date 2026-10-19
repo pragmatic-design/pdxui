@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let page2 = $signal('Overview');
 </script>
 

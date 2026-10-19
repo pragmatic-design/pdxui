@@ -49,7 +49,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/overlay-outlet';
 @title 'Overlay Outlet Component';
 </script>

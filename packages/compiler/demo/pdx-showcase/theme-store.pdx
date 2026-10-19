@@ -1,4 +1,4 @@
-<script setup>
+<script>
 @store theme { persist: 'local' };
 
 let currentTheme = $signal('neutral');

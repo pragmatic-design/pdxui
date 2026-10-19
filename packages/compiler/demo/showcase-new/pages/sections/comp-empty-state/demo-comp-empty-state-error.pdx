@@ -7,7 +7,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 function onRetry() {
   alert('Retrying...');
 }

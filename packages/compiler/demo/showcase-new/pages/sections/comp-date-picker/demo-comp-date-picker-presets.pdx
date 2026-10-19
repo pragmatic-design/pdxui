@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const rangePresets = [
   { label: 'Today', value: ['2026-04-07', '2026-04-07'] },
   { label: 'Last 7 days', value: ['2026-04-01', '2026-04-07'] },

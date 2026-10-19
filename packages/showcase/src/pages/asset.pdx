@@ -77,7 +77,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/assets/:id' { label: assetLabel };
 // A ticket shows its asset as a link at the top of the page: seen there, it is likely to be followed,
 // so the chunk is fetched once the link is in view rather than on the hover (`prefetch.spec.ts`).

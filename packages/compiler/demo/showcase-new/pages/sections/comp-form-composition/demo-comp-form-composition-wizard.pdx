@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── 3. Wizard Schema ───
 const wizardSchema = {
   fields: [

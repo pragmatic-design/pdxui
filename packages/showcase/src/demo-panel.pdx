@@ -53,7 +53,7 @@
   </span>
 </template>
 
-<script setup>
+<script>
 // The Demo panel: the current screen's demo knobs, out of the screen.
 //
 // A screen says which knobs it has with `registerDemo` (src/demo.ts); this draws them. It is in the
