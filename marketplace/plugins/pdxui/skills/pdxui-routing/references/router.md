@@ -503,10 +503,16 @@ Sometimes you don't want that: a list with filters set, a half-scroll, a partial
 @page '/results' { keepAlive };
 ```
 
-What happens under the hood: the component is moved into a `DocumentFragment` (zero CPU while frozen)
-and, on return, re-appended to the DOM, reconciling with state. Come back and you find everything as
-it was. Use it for views that are expensive to rebuild or hold precious user state; leave the default
-(destroy) for the rest, so you don't accumulate memory.
+What happens under the hood: the component is moved into a `DocumentFragment` and, on return,
+re-appended to the DOM, reconciling with state. Come back and you find everything as it was. Use it
+for views that are expensive to rebuild or hold precious user state; leave the default (destroy) for
+the rest, so you don't accumulate memory.
+
+A frozen page costs no CPU. Its effects are paused — a change made meanwhile runs each one once on
+return — its `useQuery` polling and the framework's timers stop, no request starts, and a dynamic
+`@title` is not written. An `@fetch` or `useQuery` whose value went stale while frozen is refreshed
+on return. The one thing that keeps running is a timer you start yourself in `onMount`: start it in
+an `$effect` instead, and it pauses with the page ([Lifecycle](https://pdxui.com/docs/lifecycle), «The rule»).
 
 The outlet keeps at most **10** frozen pages; past that, the least recently used one is destroyed. Set
 the bound on the outlet itself — `keepAlive: 30000` on a page stays what it is, a timeout in ms:

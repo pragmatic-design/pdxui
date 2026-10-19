@@ -429,3 +429,10 @@ imported once in `index.html`; an `AGENTS.md`. Then `npm install` and `npm run d
 - **`onMount` is one-shot.** For anything reactive use `$effect`, and for a route whose params change
   without remounting use `onRouteChange` — two URLs on the same route do **not** re-create the
   component.
+- **A frozen page costs no CPU** (a `keepAlive` page left, a `<component :is @keepAlive>` view
+  switched away): its effects and bindings pause and each runs **once** on return if something it
+  reads changed; `useQuery` polling, focus and reconnect refetch stop; `@await` `minMs`/`maxMs` and
+  `@defer` `idle`/`timer(n)` keep their remaining time; no request starts, and a stale `@fetch` or
+  `useQuery` refreshes on return; a dynamic `@title` is not written. Do not stop these in `onHide`.
+  **A timer you start in `onMount` keeps running** — the framework cannot see it: put it in an
+  `$effect` and clear it in the effect's cleanup.

@@ -1,0 +1,10 @@
+<template>
+  <p data-test="view-a">a</p>
+</template>
+
+<script>
+import { onHide, onShow } from '@pdxui/core';
+import { lc } from './probe';
+onHide(() => { lc.hidden.a = (lc.hidden.a ?? 0) + 1; });
+onShow(() => { lc.shown.a = (lc.shown.a ?? 0) + 1; });
+</script>

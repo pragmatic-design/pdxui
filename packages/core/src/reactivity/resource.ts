@@ -11,7 +11,7 @@
 //   - AbortController prevents leaked pending requests on component destroy
 //   - Error objects sanitized (no response body in error.message)
 
-import { signal, computed, effect, batch, collectDisposers, onDispose } from './signal';
+import { signal, computed, effect, batch, collectDisposers, onDispose, currentScope, onScopeSuspension } from './signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
 import { getDefaultCache } from './cache';
 import type { Cache, CacheWriteListener, Flight } from './cache';
@@ -372,6 +372,17 @@ export function resource<T>(
 
         doFetch();
     });
+
+    // Frozen with its page (#269; beta spec, lifecycle.md → «The matrix»): no request starts while the
+    // page is frozen — an invalidation then parks the auto-fetch effect above, which runs once on
+    // resume. A value that aged past staleTime meanwhile is refreshed on resume; a fresh one is not.
+    // After the parked effects: a refresh one of them started is not started twice.
+    const scope = currentScope();
+    if (scope) {
+        onScopeSuspension(scope, () => {}, () => {
+            if (!disposed && _stale.peek() && !_pending.peek()) void doFetch();
+        });
+    }
 
     // Derived signals (lazy — only computed when read): read-only views of the internal ones.
     const state = computed(() => _state()) as ReadonlySignal<ResourceState>;

@@ -1,7 +1,9 @@
 // Lazy loading with composite triggers and permission integration.
 // Innovation: viewport | idle(2000) composite triggers + @require permission-aware.
 
-import { signal, effect, collectDisposers, untracked } from '../reactivity/signal';
+import { signal, effect, collectDisposers, untracked, currentScope, onScopeSuspension, isScopeSuspended } from '../reactivity/signal';
+import type { OwnerScope } from '../reactivity/signal';
+import { pausableTimeout } from '../reactivity/scope-timer';
 import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
 import { trackUrgentLoad } from './load-queue';
@@ -60,6 +62,8 @@ export function defer(
     const loadError = signal<Error | null>(null);
     let sentinel: HTMLElement | null = null;
     let cleanups: (() => void)[] = [];
+    // The idle and timer triggers pause with the page that holds the block (#269).
+    const scope = currentScope();
 
     function doLoad() {
         if (state.peek() !== 'placeholder' && state.peek() !== 'triggered') return;
@@ -105,7 +109,7 @@ export function defer(
         const triggers = options.trigger.split('|').map(t => t.trim());
 
         for (const trigger of triggers) {
-            const cleanup = activateTrigger(trigger, parent, end, () => {
+            const cleanup = activateTrigger(trigger, parent, end, scope, () => {
                 state.set('triggered');
                 doLoad();
             });
@@ -172,6 +176,7 @@ function activateTrigger(
     trigger: string,
     parent: Node,
     before: Node,
+    scope: OwnerScope | null,
     onTrigger: () => void
 ): (() => void) | null {
     if (!isBrowser) return null;
@@ -190,7 +195,7 @@ function activateTrigger(
 
     if (idleMatch) {
         const timeout = idleMatch[1] ? parseInt(idleMatch[1]) : 2000;
-        return setupIdleTrigger(timeout, onTrigger);
+        return setupIdleTrigger(timeout, scope, onTrigger);
     }
 
     if (trigger === 'hover' || trigger === 'interaction') {
@@ -199,8 +204,7 @@ function activateTrigger(
 
     if (timerMatch) {
         const ms = parseInt(timerMatch[1]);
-        const id = setTimeout(onTrigger, ms);
-        return () => clearTimeout(id);
+        return pausableTimeout(scope, onTrigger, ms);
     }
 
     // Unknown trigger — fire immediately. The safe failure for a hand-written defer() (render rather
@@ -243,18 +247,24 @@ function setupViewportTrigger(
     };
 }
 
-function setupIdleTrigger(timeout: number, onTrigger: () => void): () => void {
+function setupIdleTrigger(timeout: number, scope: OwnerScope | null, onTrigger: () => void): () => void {
     const w = window as Window & {
         requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
         cancelIdleCallback?: (id: number) => void;
     };
-    if (w.requestIdleCallback) {
-        const id = w.requestIdleCallback(onTrigger, { timeout });
-        return () => w.cancelIdleCallback?.(id);
-    }
-    // Fallback to setTimeout
-    const id = setTimeout(onTrigger, timeout);
-    return () => clearTimeout(id);
+    // Fallback to a timeout, which pauses with the page like the timer trigger.
+    if (!w.requestIdleCallback) return pausableTimeout(scope, onTrigger, timeout);
+    const request = w.requestIdleCallback;
+    let id: number | undefined;
+    const ask = (): void => { id = request(() => { id = undefined; onTrigger(); }, { timeout }); };
+    const cancel = (): void => {
+        if (id !== undefined) w.cancelIdleCallback?.(id);
+        id = undefined;
+    };
+    // A frozen page is not idle work: the request is dropped, and asked again on resume.
+    const removeHook = scope ? onScopeSuspension(scope, cancel, ask) : null;
+    if (!isScopeSuspended(scope)) ask();
+    return () => { cancel(); removeHook?.(); };
 }
 
 /**

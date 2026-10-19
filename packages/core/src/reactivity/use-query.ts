@@ -3,7 +3,7 @@
 // Inspired by TanStack Query, but signal-native.
 
 import { resource } from './resource';
-import { onDispose } from './signal';
+import { onDispose, currentScope, isScopeSuspended, onScopeSuspension } from './signal';
 import { getDefaultCache, requestInFlight } from './cache';
 import type { ResourceOptions, ResourceFetcher, AsyncState } from './resource';
 import type { ReadonlySignal } from '../utils/types';
@@ -109,7 +109,11 @@ export function useQuery<T>(
     // In flight for the KEY, from the cache's registry of shared requests: not `pending()`, which is
     // this reader's own, and blind to another reader's request.
     const cache = getDefaultCache();
+    // A frozen page starts no request (#269): focus and reconnect do nothing while it is frozen, and
+    // the polling pauses. A value that went stale meanwhile is refreshed on resume, by the resource.
+    const scope = currentScope();
     const refreshUnlessPending = (): void => {
+        if (isScopeSuspended(scope)) return;
         if (requestInFlight(cache, res.key)) return;
         void res.refetch();
     };
@@ -135,11 +139,21 @@ export function useQuery<T>(
     // default) the tab is refreshed the moment it comes back; with it off, on the next tick after.
     // Either way a tab nobody looks at makes no requests.
     let intervalId: ReturnType<typeof setInterval> | null = null;
-    if (opts.refetchInterval && opts.refetchInterval > 0) {
+    let removeSuspension: (() => void) | null = null;
+    const period = opts.refetchInterval ?? 0;
+    const startPolling = (): void => {
         intervalId = setInterval(() => {
             if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
             refreshUnlessPending();
-        }, opts.refetchInterval);
+        }, period);
+    };
+    const stopPolling = (): void => {
+        if (intervalId !== null) clearInterval(intervalId);
+        intervalId = null;
+    };
+    if (period > 0) {
+        if (!isScopeSuspended(scope)) startPolling();
+        if (scope) removeSuspension = onScopeSuspension(scope, stopPolling, () => { if (intervalId === null) startPolling(); });
     }
 
     // A query's teardown belongs to whatever created it.
@@ -161,10 +175,9 @@ export function useQuery<T>(
             window.removeEventListener('online', onlineHandler);
             onlineHandler = null;
         }
-        if (intervalId !== null) {
-            clearInterval(intervalId);
-            intervalId = null;
-        }
+        stopPolling();
+        removeSuspension?.();
+        removeSuspension = null;
     };
     onDispose(dispose);
 

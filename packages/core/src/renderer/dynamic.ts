@@ -1,7 +1,7 @@
 // Dynamic Component — enhanced version with keep-alive, lazy loading,
 // typed props, and transition modes.
 
-import { effect } from '../reactivity/signal';
+import { effect, onDispose } from '../reactivity/signal';
 import { enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
 
@@ -56,8 +56,11 @@ export function dynamic(
         const el = currentEl;
 
         if (cache) {
-            // Keep-alive: hide instead of remove
-            (el as HTMLElement).style.display = 'none';
+            // Keep-alive: frozen in a fragment, as the router outlet freezes a page (#269). Hidden with
+            // `display: none` it stayed connected — its effects, polling and timers kept running, and
+            // it never had `onHide`. Moved out with `_keepAlive`, it is disconnected without being
+            // destroyed: `onHide` runs and its scope is suspended.
+            keep(el);
             currentEl = null;
             currentTag = '';
             return Promise.resolve();
@@ -77,7 +80,10 @@ export function dynamic(
         // Check cache first
         if (cache?.has(tag)) {
             const cached = cache.get(tag)!;
-            (cached as HTMLElement).style.display = '';
+            // Back in place: the connect is a resume — `onShow`, and the parked effects run once.
+            // The flag goes with it, so the instance shown is destroyed like any other when removed.
+            placePartNode(parent, cached, end);
+            (cached as KeptElement)._keepAlive = false;
             currentEl = cached;
             currentTag = tag;
             // Move to front of LRU
@@ -104,7 +110,7 @@ export function dynamic(
                 const evicted = cacheOrder.shift()!;
                 const evictedEl = cache.get(evicted);
                 cache.delete(evicted);
-                evictedEl?.parentNode?.removeChild(evictedEl);
+                if (evictedEl) destroyKept(evictedEl);
             }
         }
 
@@ -170,5 +176,41 @@ export function dynamic(
         }
     });
 
+    // The instances kept in fragments are not in the DOM the block is removed with: destroyed here.
+    if (cache) {
+        onDispose(() => {
+            for (const el of cache.values()) if (el !== currentEl) destroyKept(el);
+            cache.clear();
+        });
+    }
+
     return frag;
+}
+
+/** An element the keep-alive freezes: a component reads the flag in its disconnect. */
+type KeptElement = Element & { _keepAlive?: boolean; _frozenWithAncestor?: boolean; disconnectedCallback?: () => void };
+
+/** Freeze `el` into a fragment of its own: disconnected, not destroyed. */
+function keep(el: Element): void {
+    (el as KeptElement)._keepAlive = true;
+    document.createDocumentFragment().appendChild(el);
+}
+
+/**
+ * Destroy an instance frozen in its fragment. Already disconnected, removing it would not disconnect
+ * it again: the teardown is run explicitly, for the components frozen with it first, deepest first,
+ * as the router outlet destroys a frozen page.
+ */
+function destroyKept(el: Element): void {
+    const kept = el as KeptElement;
+    if (kept.isConnected) { kept.parentNode?.removeChild(kept); return; }
+    kept._keepAlive = false;
+    const children = Array.from(el.querySelectorAll('*'))
+        .filter((c) => (c as KeptElement)._frozenWithAncestor === true);
+    for (const child of children.reverse()) {
+        (child as KeptElement)._frozenWithAncestor = false;
+        (child as KeptElement).disconnectedCallback?.();
+    }
+    kept.disconnectedCallback?.();
+    el.remove();
 }

@@ -10,7 +10,8 @@
 // The branch is decided by the state, never by the value's truthiness. A refresh, and a refresh that
 // failed over kept data, keep the body (E4): the body reads `x.error()` to show the failure.
 
-import { signal, computed, effect, collectDisposers, onDispose, untracked } from '../reactivity/signal';
+import { signal, computed, effect, collectDisposers, onDispose, untracked, currentScope } from '../reactivity/signal';
+import { pausableTimeout } from '../reactivity/scope-timer';
 import type { Dispose } from '../utils/types';
 import { nodesBetween } from './helpers';
 import { errorBoundary } from './error-boundary';
@@ -158,14 +159,16 @@ export function awaitBlock<T = unknown>(
     // ─── Timers ──────────────────────────────────────────────────
     const showLoading = signal(minMs === 0);
     const timedOut = signal(false);
-    let timers: ReturnType<typeof setTimeout>[] = [];
-    const clearTimers = () => { for (const t of timers) clearTimeout(t); timers = []; };
+    // Paused with the page that holds the block, keeping the time they had left (#269).
+    const scope = currentScope();
+    let timers: (() => void)[] = [];
+    const clearTimers = () => { for (const clear of timers) clear(); timers = []; };
     const restartTimers = () => {
         clearTimers();
         showLoading.set(minMs === 0);
         timedOut.set(false);
-        if (minMs > 0) timers.push(setTimeout(() => showLoading.set(true), minMs));
-        if (maxMs > 0) timers.push(setTimeout(() => timedOut.set(true), maxMs));
+        if (minMs > 0) timers.push(pausableTimeout(scope, () => showLoading.set(true), minMs));
+        if (maxMs > 0) timers.push(pausableTimeout(scope, () => timedOut.set(true), maxMs));
     };
     // The wait being timed: a sentinel while there is none, so the first wait starts the timers.
     const NONE = {};

@@ -202,7 +202,51 @@ export function onCleanup(fn: () => void): void {
 // enclosing scope (component body, when/match branch, repeat item) can tear them
 // down when its DOM subtree is removed. Without this, every removed subtree leaks
 // its effects: they stay subscribed and re-run forever on detached nodes.
-let currentOwner: Dispose[] | null = null;
+//
+// A scope can also be SUSPENDED (#269): a frozen page — a kept-alive route left by navigation, a
+// `<component :is @keepAlive>` instance switched away — costs no CPU. The flush parks an effect whose
+// scope, or a scope above it, is suspended, and resuming runs each parked effect once. Framework
+// timers and polling follow through the hooks of {@link onScopeSuspension}.
+
+/** An ownership scope: what it disposes, the scope it was created under, and whether it is suspended. */
+export interface OwnerScope {
+    /** The scope this one was created under: suspending that one holds this one too. */
+    readonly parent: OwnerScope | null;
+    /** What disposing the scope runs. */
+    readonly disposers: Dispose[];
+    suspended: boolean;
+    /** The effects that came due while it was suspended, run once when it resumes. */
+    parked: Set<Subscriber> | null;
+    /** How many suspension hooks are registered on it: removed when it is disposed. */
+    hooks: number;
+}
+
+/** An effect knows the scope it was created in, as it knows its error route. */
+type Scoped = Subscriber & { __pdx_scope?: OwnerScope | null };
+
+let currentOwner: OwnerScope | null = null;
+
+/** How many scopes are suspended now. While none is, the flush checks nothing. */
+let suspendedCount = 0;
+
+/**
+ * The scope a construct created now belongs to: the one being collected, or — in a flush, where none
+ * is — the scope of the effect running, as an effect created there inherits its error route.
+ */
+export function currentScope(): OwnerScope | null {
+    return currentOwner ?? ((currentEffect as Scoped | null)?.__pdx_scope ?? null);
+}
+
+/** The nearest suspended scope from `scope` up, or null when it runs. */
+function suspendedFrom(scope: OwnerScope | null | undefined): OwnerScope | null {
+    for (let s = scope; s; s = s.parent) if (s.suspended) return s;
+    return null;
+}
+
+/** Whether `scope`, or a scope above it, is suspended. */
+export function isScopeSuspended(scope: OwnerScope | null): boolean {
+    return suspendedCount !== 0 && suspendedFrom(scope) !== null;
+}
 
 /**
  * Register a disposer with the current ownership scope (if any).
@@ -211,7 +255,7 @@ let currentOwner: Dispose[] | null = null;
  * a collectDisposers() scope.
  */
 export function onDispose(fn: Dispose): void {
-    if (currentOwner) currentOwner.push(fn);
+    if (currentOwner) currentOwner.disposers.push(fn);
 }
 
 /**
@@ -222,11 +266,16 @@ export function onDispose(fn: Dispose): void {
  */
 export function collectDisposers<T>(fn: () => T): [T, Dispose] {
     const prev = currentOwner;
-    const owned: Dispose[] = [];
-    currentOwner = owned;
+    const scope: OwnerScope = { parent: currentScope(), disposers: [], suspended: false, parked: null, hooks: 0 };
+    currentOwner = scope;
     try {
         const result = fn();
+        const owned = scope.disposers;
         const dispose: Dispose = () => {
+            // Disposed while suspended — a frozen page destroyed: nothing is held any more.
+            if (scope.suspended) { scope.suspended = false; suspendedCount--; }
+            scope.parked = null;
+            if (scope.hooks !== 0) removeHooksOf(scope);
             for (let i = 0; i < owned.length; i++) owned[i]();
             owned.length = 0;
         };
@@ -234,6 +283,95 @@ export function collectDisposers<T>(fn: () => T): [T, Dispose] {
     } finally {
         currentOwner = prev;
     }
+}
+
+/** {@link collectDisposers}, and the scope it collected into: what a container suspends. */
+export function collectScope<T>(fn: () => T): [T, Dispose, OwnerScope] {
+    let scope!: OwnerScope;
+    const [result, dispose] = collectDisposers(() => { scope = currentOwner!; return fn(); });
+    return [result, dispose, scope];
+}
+
+/** Run `fn` with `scope` as the current one: what it creates belongs to that scope. */
+export function runInScope<T>(scope: OwnerScope, fn: () => T): T {
+    const prev = currentOwner;
+    currentOwner = scope;
+    try { return fn(); } finally { currentOwner = prev; }
+}
+
+/** A construct that pauses with its scope: polling, a framework timer. */
+interface SuspensionHook {
+    readonly scope: OwnerScope;
+    readonly suspend: () => void;
+    readonly resume: () => void;
+}
+const suspensionHooks = new Set<SuspensionHook>();
+
+/**
+ * Pause and resume with `scope`: `suspend` runs when the scope (or one above it) is suspended,
+ * `resume` when it runs again. Internal — the framework's polling and timers use it; a developer's
+ * own timer belongs in an effect, which is paused with its page. Removed when the scope is disposed,
+ * or by the returned function. Registered while the scope is suspended, `suspend` runs at once.
+ */
+export function onScopeSuspension(scope: OwnerScope, suspend: () => void, resume: () => void): Dispose {
+    const hook: SuspensionHook = { scope, suspend, resume };
+    suspensionHooks.add(hook);
+    scope.hooks++;
+    if (isScopeSuspended(scope)) suspend();
+    return () => { if (suspensionHooks.delete(hook)) scope.hooks--; };
+}
+
+/** Remove the hooks registered on a scope being disposed. */
+function removeHooksOf(scope: OwnerScope): void {
+    for (const hook of suspensionHooks) if (hook.scope === scope) suspensionHooks.delete(hook);
+    scope.hooks = 0;
+}
+
+/** The hooks whose scope is running now, before a scope changes state. */
+function runningHooks(): SuspensionHook[] {
+    const out: SuspensionHook[] = [];
+    for (const hook of suspensionHooks) if (!isScopeSuspended(hook.scope)) out.push(hook);
+    return out;
+}
+
+/** The hooks whose scope is held now. */
+function heldHooks(): SuspensionHook[] {
+    const out: SuspensionHook[] = [];
+    for (const hook of suspensionHooks) if (isScopeSuspended(hook.scope)) out.push(hook);
+    return out;
+}
+
+/**
+ * Suspend `scope`: from now its effects, and those of the scopes under it, are parked instead of
+ * run, and the framework's polling and timers under it pause.
+ */
+export function suspendScope(scope: OwnerScope): void {
+    if (scope.suspended) return;
+    const running = suspensionHooks.size === 0 ? [] : runningHooks();
+    scope.suspended = true;
+    suspendedCount++;
+    for (const hook of running) if (isScopeSuspended(hook.scope)) hook.suspend();
+}
+
+/**
+ * Resume `scope`: each effect parked while it was suspended runs once — and only if what it reads
+ * changed, as any queued effect — then the polling and timers under it start again.
+ */
+export function resumeScope(scope: OwnerScope): void {
+    if (!scope.suspended) return;
+    const held = suspensionHooks.size === 0 ? [] : heldHooks();
+    scope.suspended = false;
+    suspendedCount--;
+    const parked = scope.parked;
+    scope.parked = null;
+    if (parked) {
+        // Their flags are kept: one queued by a direct write runs, a «maybe» is checked first. One
+        // still held by another suspended scope above is parked there.
+        for (const sub of parked) enqueuePending(sub);
+        if (batchDepth === 0) flush();
+    }
+    // After the parked effects: a source refreshed on resume sees the request they started.
+    for (const hook of held) if (!isScopeSuspended(hook.scope)) hook.resume();
 }
 
 // --- Untracked ---
@@ -545,7 +683,7 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
     // then unmounted stays subscribed to its sources forever (a retention leak) and — with
     // `equals` — keeps recomputing eagerly on every source change. Computeds
     // created outside a scope (modules/singletons) stay permanent.
-    if (currentOwner) currentOwner.push(read.dispose);
+    if (currentOwner) currentOwner.disposers.push(read.dispose);
 
     return read as ReadonlySignal<T>;
 }
@@ -643,6 +781,9 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
     };
 
     if (boundaryHandler) (run as { __pdx_errh?: ErrorRoute }).__pdx_errh = boundaryHandler;
+    // The scope it belongs to, captured like the error route: the flush parks it while that scope is
+    // suspended (#269).
+    (run as Scoped).__pdx_scope = currentScope();
     // The name the trace reports, and the registry entry `effects()` lists — the latter only at
     // telemetry level 2, like signals.
     const name = options?.name;
@@ -661,7 +802,7 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
     };
     // Register with the enclosing ownership scope so removed subtrees dispose
     // their effects (idempotent — safe even if also disposed explicitly).
-    if (currentOwner) currentOwner.push(dispose);
+    if (currentOwner) currentOwner.disposers.push(dispose);
     return dispose;
 }
 
@@ -812,6 +953,11 @@ function flush(): void {
         batchDepth++;
         try {
             for (let i = 0; i < len; i++) {
+                // Held by a suspended scope (#269): parked, with its flags, until the scope resumes.
+                if (suspendedCount !== 0) {
+                    const held = suspendedFrom((arr[i] as Scoped).__pdx_scope);
+                    if (held !== null) { (held.parked ??= new Set()).add(arr[i]); continue; }
+                }
                 // A «maybe» whose computeds all kept their value has nothing new to see (#115).
                 if (!shouldRun(arr[i])) continue;
                 const effectName = (arr[i] as { __pdx_name?: string }).__pdx_name ?? 'anonymous';
