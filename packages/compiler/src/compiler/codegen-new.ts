@@ -3,7 +3,7 @@
 
 import type { TemplateNode } from '../parser/template';
 import type { SFCDescriptor } from '../parser/sfc';
-import { generateInlineNodes } from './codegen-template-inline';
+import { generateInlineNodes, generateScriptSnippets } from './codegen-template-inline';
 import type { analyzeScript } from './script-analyzer';
 import type { PluginRunner } from '../plugin-system';
 import { buildSetupBody, buildPropsObject } from './codegen-setup';
@@ -140,6 +140,16 @@ export function compileNewMode(
     ctx.delegatedEvents = delegatedEventTypes(ast);
     // A literal `data-part` naming a declared part is also that part's ref (#134).
     ctx.parts = new Set(analysis.parts);
+    // What a `@render` calls (#489): a typed snippet the script declares, or one of its template
+    // `@snippet`s, which are compiled here as functions of the render, beside the hoisted slots.
+    const typedSlots = analysis.slots.filter(s => s.signature !== undefined).map(s => s.name);
+    ctx.slotNames = new Set(typedSlots);
+    ctx.scriptSnippets = new Set(analysis.snippets.map(s => s.name));
+    // Declared in the render, they are in scope for the template as they are: `{{ cell(user) }}`
+    // calls one as the alpha's `ctx.cell(user)` did.
+    for (const s of analysis.snippets) ctx.importedNames!.add(s.name);
+    const snippetFunctions = generateScriptSnippets(analysis.snippets, imports, ctx, templateHoists);
+    for (const [i, code] of snippetFunctions.entries()) ctx.hoistedSlots.push([analysis.snippets[i].name, code]);
     const renderCode = generateInlineNodes(ast, imports, ctx, templateHoists);
     ctx.literalConsts = new Set();
     ctx.delegatedEvents = new Set();
@@ -153,7 +163,8 @@ export function compileNewMode(
 
     // Production: dead signal elimination — remove signals with zero references
     if (production) {
-        const deadSignals = detectDeadSignals(analysis, renderCode);
+        // A signal only a script snippet reads is read by the render all the same.
+        const deadSignals = detectDeadSignals(analysis, [renderCode, ...snippetFunctions].join('\n'));
         if (deadSignals.size > 0) {
             analysis.signals = analysis.signals.filter(s => !deadSignals.has(s.name));
             analysis.exports = analysis.exports.filter(e =>
@@ -238,7 +249,8 @@ export function compileNewMode(
         analysis.parts,
         modelsCode,
         ctx.tagPrefix,
-        ctx.target);
+        ctx.target,
+        typedSlots);
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

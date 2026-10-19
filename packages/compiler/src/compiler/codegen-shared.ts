@@ -250,12 +250,16 @@ export function assembleModule(
     tagPrefix: string = DEFAULT_TAG_PREFIX,
     /** The browser target (#121): how `<style scoped>` compiles (#152). */
     target: BrowserTarget = 'baseline-2026',
+    /** The typed snippets the script declares with `@slot name: (…)` (#489), written into the descriptor. */
+    slots: readonly string[] = [],
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
     // the emitted body rather than passed down: the decision is made in buildSetupBody, and a second
     // flag threaded through here is a second thing to keep in step.
     if (setupBody.includes('__adoptStyles(')) imports.add('__adoptStyles');
+    // The descriptor's `slots` below are core's `slot()`.
+    if (slots.length > 0) imports.add('slot');
 
     // @loader: lift the named function to module scope so the route below can reference it.
     // Done before the setup body is written out, and `loaderRef` records whether it worked —
@@ -337,6 +341,9 @@ export function assembleModule(
     if (hostCode) code += `  host: ${hostCode},\n`;
     // The descriptor's `parts` (#134): the component's public, named elements, as the manifest lists them.
     if (parts.length > 0) code += `  parts: [${parts.map(p => jsQuote(p)).join(', ')}],\n`;
+    // The descriptor's `slots` (#489): each typed snippet is a property of the element, a function
+    // the parent's `@snippet` (or a script) assigns and the component's `@render` calls.
+    if (slots.length > 0) code += `  slots: { ${slots.map(s => `${s}: slot()`).join(', ')} },\n`;
     code += sourceFileOption(sourceFile);
     // Shadow DOM opt-in via <template shadow>
     if (descriptor.template && 'shadow' in descriptor.template && descriptor.template.shadow) {

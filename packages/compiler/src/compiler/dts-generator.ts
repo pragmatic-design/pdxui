@@ -56,7 +56,9 @@ export function generateDts(input: DtsInput): string {
     if (input.slots.length > 0) {
         lines.push(`export interface ${pascalTag}Slots {`);
         for (const s of input.slots) {
-            lines.push(`  ${s.name}: ${s.scopeType ?? '{}'};`);
+            // A typed snippet (#489) is the function the parent provides; `?` when it is optional.
+            if (s.signature !== undefined) lines.push(`  ${s.name}${s.required ? '' : '?'}: ${s.signature} => Node;`);
+            else lines.push(`  ${s.name}: ${s.scopeType ?? '{}'};`);
         }
         lines.push('}');
         lines.push('');

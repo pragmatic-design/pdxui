@@ -874,6 +874,99 @@ The child calls it with its scope. `@slot(row)` takes no scope; `<slot>` without
 
 alpha
 
+### `@render`
+
+#### Syntax
+
+```ebnf
+RenderDirective ::= "@render" S Identifier "?."? S? "(" S? ( Expression ( S? "," S? Expression )* )? S? ")"
+                    ( S? "@else" Block )?
+```
+
+#### Semantics
+
+`@render row(it, i)` renders a typed snippet (#489) where it is written, called with the arguments: a
+snippet the parent passes, declared in the script with `@slot row: (…);` ([script.md](script.md)), or
+a template `@snippet` of the script itself. It compiles to `renderSnippet(() => snippet, () =>
+[args], fallback)`: core renders it again when the parent gives another function or an argument
+changes, and the snippet's bindings belong to the block that renders it — removed with it, while the
+parent that wrote the snippet stays.
+
+`@render row?.(it)` is for an optional slot (`@slot row?: (…);`): it renders nothing when the parent
+gives none, or, with `@else { … }`, that block instead.
+
+#### Rules
+
+- A name that is neither a declared slot nor a script `@snippet` is read from the component's context;
+  that it names a function is not checked today.
+- A required slot (`@slot row: (…);`) that the parent does not fill renders nothing, and the parent's
+  use is `PDX_SLOT_REQUIRED` at compile time.
+
+#### Examples
+
+```pdx
+<template>
+  <ul>
+    @for (items as it, i; track it.name) {
+      <li>@render row(it, i)</li>
+    }
+  </ul>
+  @render empty?.() @else { <p>Nothing to show.</p> }
+</template>
+
+<script>
+@prop items: { name: string }[] = [];
+@slot row: (item: { name: string }, index: number);
+@slot empty?: ();
+</script>
+```
+
+#### Since
+
+beta (#489)
+
+### `@snippet`
+
+#### Syntax
+
+```ebnf
+SnippetFill ::= "@snippet" S Identifier S? "(" S? ( Identifier ( S? "," S? Identifier )* )? S? ")" Block
+```
+
+#### Semantics
+
+Written inside a component's tag, `@snippet row(u, i) { … }` passes the block as that component's
+`row` slot (#489): the compiler assigns the element's `row` property, before the element connects,
+a function that renders the block with the arguments the component's `@render` passes. Its
+parameters are named; there is no implicit context. The rest of the block reads the parent's names,
+as any of its template does.
+
+#### Rules
+
+- It fills the component whose tag it is written directly in, not one nested inside it.
+- Outside a component's tag it is a compile error.
+- Inside the tag of a component that declares the slot required, it is what keeps the use from
+  `PDX_SLOT_REQUIRED`.
+- The script form, `@snippet` in the `<script>`, is in [script.md](script.md).
+
+#### Examples
+
+```pdx
+<template>
+  <app-user-list :items="users">
+    @snippet row(u, i) { <span>{{ i + 1 }}. {{ u.name }}</span> }
+  </app-user-list>
+</template>
+
+<script>
+let users = $signal([{ name: 'Ada' }]);
+</script>
+```
+
+#### Since
+
+beta (#489)
+
 ## Block directives
 
 A block directive is `@name`, an optional `Paren`, and a `Block`. The condition, collection or value

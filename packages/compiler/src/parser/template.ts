@@ -15,6 +15,7 @@
 
 import { BLOCK_DIRECTIVES, TEMPLATE_AT_DIRECTIVES } from './template-directives';
 import { splitAwaitBinding } from './await-binding';
+import { splitAtDepthZero } from '../compiler/tokenizer';
 
 // ─── Source Location ───────────────────────────────────────────────
 
@@ -43,6 +44,8 @@ export type TemplateNode =
     | LetNode
     | SlotTemplateNode
     | ScopedSlotNode
+    | RenderNode
+    | SnippetNode
     | CustomDirectiveNode;
 
 /** Plugin-defined custom directive node. */
@@ -214,6 +217,33 @@ export interface ScopedSlotNode {
     /** The opening tag as written, `<slot name="row" :item="it">`: the name and the scope bindings. */
     tag: string;
     /** The fallback, rendered when the parent does not fill the slot. */
+    body: TemplateNode[];
+    loc?: SourceLoc;
+}
+
+/**
+ * `@render row(it, i)` (#489): the child renders a snippet — a slot its parent fills, or one its
+ * script declares — with these arguments. `@render row?.(it)` is optional, and renders `fallback`
+ * (its `@else { … }`) or nothing when the slot is not filled.
+ */
+export interface RenderNode {
+    type: 'render';
+    name: string;
+    /** The arguments as written, one expression each. */
+    args: string[];
+    optional: boolean;
+    fallback?: TemplateNode[];
+    loc?: SourceLoc;
+}
+
+/**
+ * `@snippet row(u, i) { … }` inside a component's tag (#489): the parent passes the template as that
+ * component's `row` slot. Its parameters are named; there is no implicit context.
+ */
+export interface SnippetNode {
+    type: 'snippet';
+    name: string;
+    params: string[];
     body: TemplateNode[];
     loc?: SourceLoc;
 }
@@ -592,6 +622,8 @@ function parseDirective(ctx: ParseContext, directive: string): TemplateNode | nu
         case 'try': return parseTry(ctx, loc);
         case 'let': return parseLet(ctx, loc);
         case 'slot': return parseSlotTemplate(ctx, loc);
+        case 'render': return parseRender(ctx, loc);
+        case 'snippet': return parseSnippet(ctx, loc);
         case 'raw': return parseRaw(ctx, loc);
         case 'else':
             throw new Error(
@@ -1088,6 +1120,56 @@ function parseSlotTemplate(ctx: ParseContext, loc: SourceLoc): SlotTemplateNode 
     skipWhitespace(ctx);
     const body = parseBlock(ctx);
     return { type: 'slot-template', name, scopeVars, body, loc };
+}
+
+// ─── @render / @snippet (typed snippets, #489) ───────────────────
+
+/** The comma-separated items of a parenthesised list, `a, f(b, c)` → ['a', 'f(b, c)']; '' → []. */
+function listItems(raw: string): string[] {
+    return raw.trim() === '' ? [] : splitAtDepthZero(raw, ',').map(s => s.trim());
+}
+
+/**
+ * Parse `@render name(args)`, `@render name?.(args)` and the optional slot's `@else { … }`.
+ * The blanks after a `@render` with no `@else` stay where they were: they are content.
+ */
+function parseRender(ctx: ParseContext, loc: SourceLoc): RenderNode {
+    // Match: `row(` or `row?.(` at the cursor. Groups: [1]=the name [2]=`?.` when optional
+    const head = /^([A-Za-z_$][\w$]*)\s*(\?\.)?\s*(?=\()/.exec(ctx.source.slice(ctx.pos));
+    if (!head) {
+        throw new Error(
+            `Invalid @render at line ${ctx.line}.\n` +
+            `  Hint: @render name(args), or @render name?.(args) @else { … } for an optional slot.`
+        );
+    }
+    advance(ctx, head[0].length);
+    const args = listItems(parseParenthesized(ctx));
+    const optional = head[2] !== undefined;
+    const before = { pos: ctx.pos, line: ctx.line, column: ctx.column };
+    skipWhitespace(ctx);
+    if (lookAhead(ctx, '@else')) {
+        advance(ctx, 5); // skip @else
+        const fallback = parseBlock(ctx);
+        return { type: 'render', name: head[1], args, optional, fallback, loc };
+    }
+    Object.assign(ctx, before);
+    return { type: 'render', name: head[1], args, optional, loc };
+}
+
+/** Parse `@snippet name(params) { … }`: a template the parent passes as the enclosing component's slot. */
+function parseSnippet(ctx: ParseContext, loc: SourceLoc): SnippetNode {
+    // Match: `row` at the cursor, before its parameters. Groups: [1]=the name
+    const head = /^([A-Za-z_$][\w$]*)\s*(?=\()/.exec(ctx.source.slice(ctx.pos));
+    if (!head) {
+        throw new Error(
+            `Invalid @snippet at line ${ctx.line}.\n` +
+            `  Hint: @snippet name(params) { … }, inside the tag of the component whose slot it fills.`
+        );
+    }
+    advance(ctx, head[0].length);
+    const params = listItems(parseParenthesized(ctx));
+    const body = parseBlock(ctx);
+    return { type: 'snippet', name: head[1], params, body, loc };
 }
 
 // ─── @let name = expr; ────────────────────────────────────────────

@@ -24,7 +24,8 @@ function markupOf(nodes: TemplateNode[]): string {
                 case 'for': walk(node.body); walk(node.emptyBody); break;
                 case 'switch': for (const c of node.cases) walk(c.body); walk(node.defaultBody); break;
                 case 'require': walk(node.body); walk(node.elseBody); break;
-                case 'show': case 'portal': case 'slot-template': case 'scoped-slot': case 'custom-directive': walk(node.body); break;
+                case 'show': case 'portal': case 'slot-template': case 'scoped-slot': case 'snippet': case 'custom-directive': walk(node.body); break;
+                case 'render': walk(node.fallback); break;
                 case 'defer': walk(node.body); walk(node.placeholder); walk(node.loading); walk(node.error); break;
                 case 'try': walk(node.body); walk(node.catchBody); break;
                 case 'await': walk(node.body); walk(node.loading); walk(node.errorBody); break;

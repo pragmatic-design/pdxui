@@ -49,6 +49,7 @@ import type { ModelsLookup } from './compiler/validate-two-way';
 import type { ModelEventLookup } from './compiler/compile-context';
 import type { AlphaLookup } from './language/alpha-events';
 import type { RequiredPropsLookup } from './compiler/validate-required-props';
+import type { RequiredSlotsLookup } from './compiler/validate-required-slots';
 import { jsQuote } from './compiler/js-literal';
 import { designTargetPlugin } from './design-target';
 /** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
@@ -519,6 +520,7 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                     modelEventOf: (tag) => componentResolver.modelEventOf(tag),
                     alphaOf: (tag) => componentResolver.alphaOf(tag),
                     requiredPropsOf: (tag) => componentResolver.requiredPropsOf(tag),
+                    requiredSlotsOf: (tag) => componentResolver.requiredSlotsOf(tag),
                     eventHeardAbove: (event, tag) => componentResolver.eventHeardAbove(event, tag),
                     importPathOf: (tag) => componentResolver.resolve(tag)?.importPath ?? null,
                 });
@@ -745,6 +747,11 @@ export interface CompileOptions {
      */
     requiredPropsOf?: RequiredPropsLookup;
     /**
+     * Typed snippets components require (the plugin passes the resolver's: project .pdx files). With
+     * it, a use that does not fill one is PDX_SLOT_REQUIRED (#489).
+     */
+    requiredSlotsOf?: RequiredSlotsLookup;
+    /**
      * Whether the project listens to an event above a component (the plugin passes the resolver's
      * `eventHeardAbove`: the project's templates). With it, an `@event(bubbles)` nothing hears above
      * the component is PDX_EVENT_BUBBLES_UNUSED (#138).
@@ -899,6 +906,7 @@ export function compile(
         const heard = options?.eventHeardAbove;
         allWarnings.push(...validate(cachedAnalysis, ast, filename, {
             enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf,
+            requiredSlotsOf: options?.requiredSlotsOf,
             eventHeardAbove: heard ? (event) => heard(event, ownTag) : undefined,
         }));
         // The app's default layout, or none for `@layout 'none'`.

@@ -55,6 +55,12 @@ export class StaticTree {
 
     private parent(): StaticNode { return this.open[this.open.length - 1] ?? this.root; }
 
+    /** The element the generator is inside, its variable and tag as written; null at the block's top. */
+    openElement(): { v: string; tag: string } | null {
+        const node = this.open[this.open.length - 1];
+        return node?.kind === 'element' && node.tag ? { v: node.v, tag: node.tag } : null;
+    }
+
     private add(node: StaticNode, create: string): void {
         if (this.discarding()) return;
         this.parent().kids.push(node);

@@ -205,14 +205,16 @@ GenericArgument ::= Identifier "=" AttrValue
 
 ### Semantics
 
-Typed snippets replace scoped slots and template props (#131). Three words, three roles:
+Typed snippets replace scoped slots and template props (#131). Three words, three roles — the three
+landed in #489, part 1 of #131; `@generic`, the library's components and the removal of the alpha
+forms are #131's other parts:
 
 - **Declare** (child, script): `@slot row: (item: T, index: number);` — the contract, a function
   signature. `@slot row?: (…)` is optional; without `?` the parent must provide it.
 - **Render** (child, template): `@render row(it, i)`; `@render row?.(it, i)` for an optional one,
   which renders nothing when the parent gives none — or, with a fallback, `@render row?.(it, i) @else
   { <li>{{ it.name }}</li> }`, which renders the `@else` block instead (the alpha `<slot>` fallback;
-  proposed, decisions.md).
+  decisions.md 22 — landed, #489).
 - **Define** (parent, inside the child's tag): `@snippet row(u, i) { … }` passes a template as the
   `row` slot. Parameters are always named; there is no implicit `context`.
 
@@ -579,8 +581,9 @@ types `ctx.emit` — the name is a declared one and the detail its type — and,
 bubbles only when declared `{ bubbles: true }`; emitting an undeclared one is reported in development
 and still dispatched. A `.pdx` compiles its `@event` names into `events`, `(bubbles)` as
 `{ bubbles: true }`. The manifest reads a prop's type and an event's detail type from the
-type arguments; `pdx-select` and `pdx-toggle` are written this way. The other fields are typed and do
-nothing yet: `slots` #131, the rest in their own issues (`states` landed since, #132; `models`, #124).
+type arguments; `pdx-select` and `pdx-toggle` are written this way. The other fields are typed and get
+their behaviour in their own issues (`states` landed since, #132; `models`, #124; `slots`, #489: each
+is a function property of the element, which `@render` calls).
 The constructor form is still accepted.
 
 ### Since

@@ -245,44 +245,63 @@ alpha
 #### Syntax
 
 ```ebnf
-SlotDecl ::= "@slot" S Identifier ( S? ":" S? Type )? S? ";"?
+SlotDecl      ::= "@slot" S Identifier "?"? S? ":" S? SlotSignature S? ";"?
+                | "@slot" S Identifier ( S? ":" S? Type )? S? ";"?          /* the alpha object form */
+SlotSignature ::= "(" S? ( SlotParam ( S? "," S? SlotParam )* )? S? ")"
+SlotParam     ::= Identifier S? ":" S? Type
 ```
 
-The analyzer's form: `@slot name: { row: Item };`
+The analyzer's form: `@slot row: (item: T, index: number);`
 
 #### Semantics
 
-Declares a named slot and, after the colon, the type of the scope the slot hands to its content. It
-generates nothing in the module: the slot itself is the `<slot>` element of the template
-([template.md](template.md)). The `.d.ts` gets a `Slots` interface with `name: ScopeType`, or `{}`
-without a type.
+With a signature, `@slot` declares a **typed snippet** (#489): a template the parent provides and the
+component renders with `@render row(it, i)` ([template.md](template.md)). The parent writes it inside
+the component's tag, `@snippet row(u, i) { … }`; a script that is not PDX assigns a function to the
+element's property of the same name, `el.row = (item, i) => node`. The descriptor declares it,
+`slots: { row: slot() }`, and core keeps the function in a signal: a function assigned after the
+render renders too. Without `?` the parent must provide it; with `?` it is optional, and `@render
+row?.(…)` renders nothing, or its `@else` block, when the parent gives none.
+
+A snippet is a function the component calls, not content projected into it: one rendered inside an
+`@if` that becomes true later renders like anything else there — the case a scoped `<slot>` fails.
+
+The object form, `@slot name: { row: Item };`, names the scope of an alpha scoped `<slot>`. It keeps
+compiling until #131 removes it; it generates nothing in the module, and requires nothing of a parent.
+The `.d.ts` gets a `Slots` interface with `name: ScopeType`, or `{}` without a type.
 
 #### Rules
 
-- `@slot` with no name raises `PDX_UNKNOWN_DECLARATION`.
-- That the template has a `<slot>` of the declared name, and passes the declared scope, is not checked
-  today.
+- A use of the component that does not fill a slot declared without `?` raises `PDX_SLOT_REQUIRED`
+  (error), at the tag.
+- A signature whose parentheses do not close (`@slot row: (item`) raises `PDX_UNKNOWN_DECLARATION`,
+  and so does `@slot` with no name.
+- The name becomes a property of the element: a name the element already has (`body`, `track`,
+  `emit`, an `HTMLElement` member) replaces it — not checked today (#542).
 - The name is an `Identifier`; a hyphenated slot name cannot be declared — not checked today.
 
 #### Examples
 
 ```pdx
 <template>
-  <section>
-    <header><slot name="header"></slot></header>
-    <slot></slot>
-  </section>
+  <ul>
+    @for (items as it, i; track it.name) {
+      <li>@render row(it, i)</li>
+    }
+  </ul>
+  @render empty?.() @else { <p>Nothing yet.</p> }
 </template>
 
 <script>
-@slot header;
-@slot row: { item: string; index: number };
+@prop items: { name: string }[] = [];
+@slot row: (item: { name: string }, index: number);
+@slot empty?: ();
 </script>
 ```
 
 #### Since
 
-alpha
+alpha; the signature form, beta (#489)
 
 ### @expose
 
@@ -618,42 +637,48 @@ alpha
 #### Syntax
 
 ```ebnf
-SnippetDecl ::= "@snippet" S Identifier S? "(" [^)]* ")" S? "{" SnippetBody "}"
-SnippetBody ::= /* markup, kept as the text of a tagged template */
+SnippetDecl   ::= "@snippet" S Identifier S? "(" S? SnippetParams? S? ")" S? "{" Template "}"
+SnippetParams ::= SnippetParam ( S? "," S? SnippetParam )*
+SnippetParam  ::= Identifier ( S? ":" S? Type )?
 ```
 
-The analyzer's form: `@snippet name(arg) { <div>…</div> }`
+The analyzer's form: `@snippet name(arg) { <div>{{ arg }}</div> }`
 
 #### Semantics
 
-Declares a function that returns a fragment of markup: `function name(arg) { return html\`…\`; }`,
-returned to the template, where `{{ name(value) }}` renders the fragment. The body is copied into the
-tagged template as written: it is not compiled as a template, so a value goes in as `${arg}`, and
-`{{ }}`, `:attr` bindings and block directives are not read.
+Declares a template function the component's own template renders with `@render name(args)`
+([template.md](template.md)). The body is a **template**, compiled like the component's (#489,
+decision 9): `{{ arg }}`, `:attr` bindings and blocks are read, and the parameters are its names.
+It is a function of the render, so the template may also call it in an expression, `{{ name(value) }}`.
+A parameter's type is for the reader; the function receives what `@render` passes.
+
+A body that uses `${arg}` is the alpha form: it is copied as written into an `html` tagged template,
+where `{{ }}` is not read, and the setup returns the function. It keeps working until #131's removal
+part, where `pdx migrate` turns `${arg}` into `{{ arg }}`.
 
 #### Rules
 
-- The body is not checked: `{{ arg }}` inside it renders as literal text — not checked today.
 - The body ends at the `}` that balances the opening `{`, counted line by line; a `}` in the markup
   ends it early.
+- The body's names are not checked against the script — not checked today.
 
 #### Examples
 
 ```pdx
 <template>
-  <ul>{{ row('Ada') }}</ul>
+  <ul>@render row('Ada')</ul>
 </template>
 
 <script>
-@snippet row(name) {
-  <li class="row">${name}</li>
+@snippet row(name: string) {
+  <li class="row">{{ name }}</li>
 }
 </script>
 ```
 
 #### Since
 
-alpha
+alpha; the template body, beta (#489)
 
 ### @i18n
 

@@ -89,7 +89,7 @@ TagDecl        ::= "@tag" S StringLiteral End
 
 ```ebnf
 UseDecl        ::= "@use" S "'" [^']+ "'" S "from" S "'" [^']+ "'" End
-SnippetDecl    ::= "@snippet" S Identifier S? "(" S? SnippetParams? S? ")" S? "{" Template "}"       († the body is a Template — decisions.md 9)
+SnippetDecl    ::= "@snippet" S Identifier S? "(" S? SnippetParams? S? ")" S? "{" Template "}"       (the body is a Template — decisions.md 9, landed #489)
 SnippetParams  ::= SnippetParam ( S? "," S? SnippetParam )*
 SnippetParam   ::= Identifier ( S? ":" S? Type )?
 I18nDecl       ::= "@i18n" S? "{" S? I18nOption ( S? ( "," | ";" ) S? I18nOption )* S? ( "," | ";" )? S? "}"
@@ -253,7 +253,7 @@ DynamicOption    ::= PropBinding | "@keepAlive" ( S? "(" S? Digits S? ")" )? | "
 SlotOutlet       ::= "<slot" ( S "name=" AttrValue )? S? ( "/>" | ">" Template "</slot>" )             (β #131: no `:x` scope, no `let:`)
 SnippetFill      ::= "@snippet" S Identifier S? "(" S? ( Identifier ( S? "," S? Identifier )* )? S? ")" Block   (β #131)
 RenderDirective  ::= "@render" S Identifier "?."? S? "(" S? ( Expression ( S? "," S? Expression )* )? S? ")"  (β #131)
-                     ( S? "@else" Block )?          /* fallback of an optional slot (proposed — decisions.md 22) */
+                     ( S? "@else" Block )?          /* fallback of an optional slot (decisions.md 22 — landed, #489) */
 ```
 
 ### Block directives

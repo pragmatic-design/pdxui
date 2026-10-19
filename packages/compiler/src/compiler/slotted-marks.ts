@@ -93,8 +93,9 @@ export function markSlotted(nodes: TemplateNode[], attr: string): TemplateNode[]
             case 'defer': return { ...node, body: body(node.body), placeholder: optional(node.placeholder), loading: optional(node.loading), error: optional(node.error) };
             case 'try': return { ...node, body: body(node.body), catchBody: body(node.catchBody) };
             case 'await': return { ...node, body: body(node.body), loading: optional(node.loading), errorBody: optional(node.errorBody) };
-            case 'show': case 'portal': case 'slot-template': case 'scoped-slot': case 'custom-directive':
+            case 'show': case 'portal': case 'slot-template': case 'scoped-slot': case 'snippet': case 'custom-directive':
                 return { ...node, body: body(node.body) };
+            case 'render': return { ...node, fallback: optional(node.fallback) };
             default: return node;
         }
     });

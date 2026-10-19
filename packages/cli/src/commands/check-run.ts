@@ -109,6 +109,8 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
     // The alpha events library components no longer emit, for PDX_REMOVED_FORM (#478).
     let alphaOf: InspectOptions['alphaOf'];
     let requiredPropsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
+    // The typed snippets project components require, for PDX_SLOT_REQUIRED (#489).
+    let requiredSlotsOf: ((tag: string) => ReadonlySet<string> | null) | undefined;
     // Whether the project's templates listen to an event above a component (#138).
     let eventHeardAbove: ((event: string, tag: string) => boolean) | undefined;
     try {
@@ -140,6 +142,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
         modelsOf = (tag: string) => resolver.modelsOf(tag);
         alphaOf = (tag: string) => resolver.alphaOf(tag);
         requiredPropsOf = (tag: string) => resolver.requiredPropsOf(tag);
+        requiredSlotsOf = (tag: string) => resolver.requiredSlotsOf(tag);
         eventHeardAbove = (event: string, tag: string) => resolver.eventHeardAbove(event, tag);
     } catch { /* no resolver → the check stays silent, which is the honest default */ }
 
@@ -167,7 +170,7 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
                 continue;
             }
 
-            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, methodsOf, modelsOf, alphaOf, requiredPropsOf, eventHeardAbove, design: !!args.design };
+            const options = { minLevel, isKnownTag, knownTags, searched, propsOf, enumValues, methodsOf, modelsOf, alphaOf, requiredPropsOf, requiredSlotsOf, eventHeardAbove, design: !!args.design };
             let inspected = inspectFile(source, file, options);
             // --fix: apply what can be applied, then report the file as it is AFTER — what is
             // left, re-validated, and what was fixed — so an agent does not have to run again to

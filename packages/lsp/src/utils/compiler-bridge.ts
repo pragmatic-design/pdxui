@@ -25,6 +25,8 @@ export interface AnalyzeOptions {
     alphaOf?: AlphaLookup;
     /** The props components require, for PDX_PROP_REQUIRED. */
     requiredPropsOf?: (tag: string) => ReadonlySet<string> | null;
+    /** The typed snippets project components require, for PDX_SLOT_REQUIRED (#489). */
+    requiredSlotsOf?: (tag: string) => ReadonlySet<string> | null;
     /** Whether the project listens to an event above a component, for PDX_EVENT_BUBBLES_UNUSED (#138). */
     eventHeardAbove?: (event: string, tag: string) => boolean;
 }
@@ -67,7 +69,7 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
             // The column too, for a template that starts on the `<template>` line.
             const start = templateStartInFile(source, template);
             const fileAst = parseTemplate(template.content, start.line, undefined, start.column);
-            result.warnings.push(...validate(result.analysis, fileAst, filename, { enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf }));
+            result.warnings.push(...validate(result.analysis, fileAst, filename, { enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf, requiredSlotsOf: options?.requiredSlotsOf }));
         } catch { /* validation error */ }
     }
 
@@ -78,7 +80,7 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
     if (result.descriptor.template) {
         try {
             const listed = new Map(result.warnings.map((w, i) => [`${w.code}: ${w.message}`, i]));
-            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, alphaOf: options?.alphaOf, requiredPropsOf: options?.requiredPropsOf, eventHeardAbove: options?.eventHeardAbove, applyIgnores: false }).warnings) {
+            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, alphaOf: options?.alphaOf, requiredPropsOf: options?.requiredPropsOf, requiredSlotsOf: options?.requiredSlotsOf, eventHeardAbove: options?.eventHeardAbove, applyIgnores: false }).warnings) {
                 const key = `${w.code}: ${w.message}`;
                 const at = listed.get(key);
                 if (at !== undefined) { result.warnings[at] = w; continue; }

@@ -218,6 +218,8 @@ export class Workspace {
                     // The alpha events a library component no longer emits, for PDX_REMOVED_FORM (#478).
                     alphaOf: (tag) => resolver.alphaOf(tag),
                     requiredPropsOf: (tag) => resolver.requiredPropsOf(tag),
+                    // The typed snippets a project component requires, for PDX_SLOT_REQUIRED (#489).
+                    requiredSlotsOf: (tag) => resolver.requiredSlotsOf(tag),
                     // Whether the project listens to an event above a component (#138).
                     eventHeardAbove: (event, tag) => resolver.eventHeardAbove(event, tag),
                 };

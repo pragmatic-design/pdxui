@@ -24,6 +24,7 @@ import { checkCommands, type MethodsLookup } from './validate-commands';
 import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validate-two-way';
 import { checkSinglePipes } from './validate-pipes';
 import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
+import { checkRequiredSlots, type RequiredSlotsLookup } from './validate-required-slots';
 import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubbles';
 import { checkAttachments } from './validate-attach';
 import { isAssertionOperator, skipAssertedType } from './asserted-type';
@@ -221,6 +222,11 @@ export interface ValidateOptions {
      * unset is PDX_PROP_REQUIRED (#130); without it, required props are not checked.
      */
     requiredPropsOf?: RequiredPropsLookup;
+    /**
+     * The typed snippets a component requires — the resolver's `requiredSlotsOf`: a project .pdx's
+     * `@slot name: (…)` without `?`. With it, a use that does not fill one is PDX_SLOT_REQUIRED (#489).
+     */
+    requiredSlotsOf?: RequiredSlotsLookup;
     /**
      * Whether the project listens to one of this component's events above it — the resolver's
      * `eventHeardAbove`, bound to the component's tag. With it, an `@event(bubbles)` nothing hears
@@ -535,6 +541,7 @@ export function validate(
     warnings.push(...checkCommands(ast, options?.methodsOf));
     warnings.push(...checkTwoWay(ast, options?.modelsOf));
     warnings.push(...checkRequiredProps(ast, options?.requiredPropsOf));
+    warnings.push(...checkRequiredSlots(ast, options?.requiredSlotsOf));
     warnings.push(...checkBubblesUnused(analysis.events, options?.eventHeardAbove));
     warnings.push(...checkAttachments(ast, analysis));
     warnings.push(...checkBindingModifiers(ast));
@@ -848,7 +855,8 @@ function checkDeferTriggers(nodes: TemplateNode[], warnings: ValidationWarning[]
                 case 'portal': walk(node.body); break;
                 case 'try': walk(node.body); walk(node.catchBody); break;
                 case 'await': walk(node.body); walk(node.loading); walk(node.errorBody); break;
-                case 'slot-template': case 'scoped-slot': walk(node.body); break;
+                case 'slot-template': case 'scoped-slot': case 'snippet': walk(node.body); break;
+                case 'render': walk(node.fallback); break;
                 case 'custom-directive': walk(node.body); break;
             }
         }
@@ -906,6 +914,8 @@ function checkRawInterpolation(nodes: TemplateNode[], warnings: ValidationWarnin
                 // The outlet's tag was html content before it had a node of its own (#276): it is
                 // checked as such, then its fallback.
                 case 'scoped-slot': walk([{ type: 'html', content: node.tag, loc: node.loc }]); walk(node.body); break;
+                case 'render': if (node.fallback) walk(node.fallback); break;
+                case 'snippet': walk(node.body); break;
                 case 'custom-directive': walk(node.body); break;
             }
         }
@@ -1035,6 +1045,18 @@ function walkNodes(
                 // The outlet's scope bindings (`:item="first"`) read the component's names, as any
                 // bound attribute does; then its fallback (#276).
                 extractHtmlBindingIds(node.tag, ids);
+                walkNodes(node.body, ids, loopVars);
+                break;
+            case 'render':
+                // `@render row(it, i)` (#489): the arguments read the template's names; the name is
+                // the snippet's, not a variable of the script.
+                for (const a of node.args) extractIdentifiers(a, ids);
+                if (node.fallback) walkNodes(node.fallback, ids, loopVars);
+                break;
+            case 'snippet':
+                // A snippet's parameters are the values the child passes, as a slot's `let:` names
+                // are: seen, then removed. What else it reads is the page's (#489).
+                for (const p of node.params) loopVars.add(p);
                 walkNodes(node.body, ids, loopVars);
                 break;
         }

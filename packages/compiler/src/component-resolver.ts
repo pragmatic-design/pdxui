@@ -56,7 +56,7 @@ export class ComponentResolver {
     /** tag → the props a library component's manifest marks required (#130); only components that mark some. */
     private libraryRequired = new Map<string, Set<string>>();
     /** A project file's required `@prop`s, with the modification time they were read at. */
-    private projectRequired = new Map<string, { mtimeMs: number; props: Set<string> }>();
+    private projectRequired = new Map<string, { mtimeMs: number; props: Set<string>; slots: Set<string> }>();
     /** The project templates' listeners, for `eventHeardAbove` (#138). */
     private listeners = new ProjectListeners();
     /** The icons a component package publishes one module each (`./icons/*`): name → import path. */
@@ -232,15 +232,33 @@ export class ComponentResolver {
         const entry = this.map.get(tag);
         if (!entry) return null;
         if (entry.source === 'ui') return this.libraryRequired.get(tag) ?? null;
+        return this.projectDeclarations(entry.importPath)?.props ?? null;
+    }
+
+    /**
+     * The typed snippets a component requires (#489), or null when they are not known: a project
+     * `.pdx`'s `@slot name: (…)` without `?`, read again whenever the file changes. A library
+     * component declares none yet.
+     */
+    requiredSlotsOf(tag: string): ReadonlySet<string> | null {
+        const entry = this.map.get(tag);
+        if (!entry || entry.source === 'ui') return null;
+        return this.projectDeclarations(entry.importPath)?.slots ?? null;
+    }
+
+    /** A project .pdx's required props and snippets, from one reading of its script per change. */
+    private projectDeclarations(file: string): { props: Set<string>; slots: Set<string> } | null {
         try {
-            const { mtimeMs } = statSync(entry.importPath);
-            const cached = this.projectRequired.get(entry.importPath);
-            if (cached && cached.mtimeMs === mtimeMs) return cached.props;
-            const props = new Set(analyzeScript(parseSFC(readFileSync(entry.importPath, 'utf-8')).script?.content ?? '', entry.importPath)
-                .props.filter(p => p.required).map(p => p.name));
-            this.projectRequired.set(entry.importPath, { mtimeMs, props });
-            return props;
-        } catch { return null; } // unreadable: its props are not known
+            const { mtimeMs } = statSync(file);
+            const cached = this.projectRequired.get(file);
+            if (cached && cached.mtimeMs === mtimeMs) return cached;
+            const analysis = analyzeScript(parseSFC(readFileSync(file, 'utf-8')).script?.content ?? '', file);
+            const props = new Set(analysis.props.filter(p => p.required).map(p => p.name));
+            const slots = new Set(analysis.slots.filter(s => s.required).map(s => s.name));
+            const declared = { mtimeMs, props, slots };
+            this.projectRequired.set(file, declared);
+            return declared;
+        } catch { return null; } // unreadable: what it requires is not known
     }
 
     /**
