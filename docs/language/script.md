@@ -308,6 +308,57 @@ The `.d.ts` gets a `Slots` interface with `name: ScopeType`, or `{}` without a t
 
 alpha; the signature form, beta (#489)
 
+### @generic
+
+#### Syntax
+
+```ebnf
+GenericDecl   ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* S? ";"?
+TypeParameter ::= Identifier ( S "extends" S Type )?
+GenericArgument ::= Identifier "=" AttrValue      /* on the component's tag: T="User" */
+```
+
+The analyzer's form: `@generic T extends { id: string };`
+
+#### Semantics
+
+Declares the component's type parameters (#490), for the props and the typed snippets that use them:
+`@prop items: T[];` and `@slot row: (item: T, index: number);` say that the item a snippet receives
+is an element of `items`. It generates nothing in the module. In a parent, the editor infers `T` from
+the props bound on the tag (`:items="users"` gives `T = User`) and types the parameters of a
+`@snippet` written there; `T="User"` on the tag sets it where inference cannot. `pdx check --types`
+does not type them yet: it projects the template without the components' declarations.
+That attribute is a type, not an attribute of the element, and is not written into the page.
+
+#### Rules
+
+- With no type parameter, `@generic ;`, it raises `PDX_UNKNOWN_DECLARATION`.
+- A type argument on a tag is an attribute whose name starts with a capital letter, on a component.
+- That `T="…"` names a type the parent can see, and that the inferred `T` meets its constraint, is
+  not checked: an error there is not reported on the template.
+
+#### Examples
+
+```pdx
+<template>
+  <ul>
+    @for (items as it, i; track it.id) {
+      <li>@render row(it, i)</li>
+    }
+  </ul>
+</template>
+
+<script>
+@generic T extends { id: string };
+@prop items: T[] = [];
+@slot row: (item: T, index: number);
+</script>
+```
+
+#### Since
+
+beta (#490)
+
 ### @expose
 
 #### Syntax

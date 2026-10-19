@@ -19,6 +19,11 @@ export function describeProjectComponent(tag: string, filePath: string): Manifes
         const analysis = analyzeScript(descriptor.script?.content ?? '', filePath);
         const slots = new Map<string, ManifestSlot>();
         for (const s of analysis.slots) {
+            // A typed snippet (#489) has a signature, which types a parent's `@snippet` (#490).
+            if (s.signature !== undefined) {
+                slots.set(s.name, { name: s.name, description: `Snippet: ${s.signature}`, signature: s.signature });
+                continue;
+            }
             slots.set(s.name, { name: s.name, description: s.scopeType ? `Scope: ${s.scopeType}` : '', ...(s.scopeType ? { scopeType: s.scopeType } : {}) });
         }
         // Match: <slot> or <slot name="x"> in the template.  Groups: [2]=the name
@@ -30,6 +35,7 @@ export function describeProjectComponent(tag: string, filePath: string): Manifes
             tag,
             description: '',
             filePath,
+            ...(analysis.generics.length > 0 ? { generics: analysis.generics } : {}),
             attributes: analysis.props.map(p => ({ name: p.name, type: p.tsType, default: p.default, description: '' })),
             events: [
                 ...analysis.events.map(e => ({ name: e.name, type: e.payloadType, description: '' })),

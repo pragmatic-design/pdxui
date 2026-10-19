@@ -29,6 +29,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('model', 'Declare a prop the component writes: assigning it dispatches `<name>-change` with `{ value }`, and the parent binds it with `::name`.', '@model name: Type = default;', "@model ${1:value}: ${2:string} = ${3:''};"),
     d('event', 'Declare an event; `name(payload)` dispatches it from the host, where it stays unless declared `@event(bubbles)`.', '@event name: PayloadType;   // @event(bubbles) name: … to bubble', '@event ${1:name}: ${2:void};'),
     d('slot', 'Declare a typed snippet the parent provides: its signature; `?` makes it optional.', '@slot row: (item: T, index: number);', '@slot ${1:row}: (${2:item: T});'),
+    d('generic', 'Declare a type parameter, inferred from the props that use it (`T="User"` on the tag sets it).', '@generic T extends { id: string };', '@generic ${1:T};'),
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),
     d('part', 'Declare named, public parts: `data-part="name"` on one element each, and `name` is its ref.', '@part trigger, popup;', '@part ${1:name};'),
     d('host',"Attributes, bindings and listeners on the component's own element, with the template's attribute grammar.", '@host { role="combobox" :aria-expanded="open" @keydown="onKey" }', '@host { ${1:role}="${2:value}" }'),

@@ -521,6 +521,10 @@ class InlineGen {
             else if (gestureOf(n))            this.gestureBind(el, gestureOf(n)!, val, preRewritten);
             else if (n.startsWith('@'))       this.eventBind(el, n.slice(1), val, preRewritten, kind.custom || this.opaque());
             else if (n === 'class')           continue; // written first, above
+            // A type argument of a generic component, `T="User"` (#490): it types the snippets in the
+            // tag for the editor, and is no attribute of the element. A capital first letter is the
+            // mark: HTML attribute names are written in lower case.
+            else if (kind.custom && /^[A-Z][\w$]*$/.test(n)) continue;
             else if (val && n === 'data-part' && this.ctx.parts.has(val)) {
                 // A declared part (#134): the attribute is written, and the element is the part's ref.
                 this.tree.attribute(el, n, val);

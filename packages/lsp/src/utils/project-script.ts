@@ -22,6 +22,20 @@ const NAME_INTRO = new Set(['fetch', 'form']);
 // the same length.
 const RUNE_DECL = /^([ \t]*)(let|const)(\s+[A-Za-z_$][\w$]*\s*(?::[^=\n]+)?=\s*\$(?:signal|derived|store)\b)/gm;
 
+/** `a, B<c, d>, { e, f }` → its three entries: split on the commas outside brackets. */
+function topLevelCommaSplit(text: string): string[] {
+    const out: string[] = [];
+    let depth = 0, start = 0;
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (c === '{' || c === '(' || c === '[' || c === '<') depth++;
+        else if (c === '}' || c === ')' || c === ']' || c === '>') depth--;
+        else if (c === ',' && depth === 0) { out.push(text.slice(start, i)); start = i + 1; }
+    }
+    out.push(text.slice(start));
+    return out.filter(e => e.trim());
+}
+
 /** Is the offset `idx` at the start of a line (only whitespace between the line start and idx)? */
 function atLineStart(s: string, idx: number): boolean {
     let i = idx - 1;
@@ -131,6 +145,15 @@ export function projectScript(scriptContent: string): string {
         if (kw === 'params' || kw === 'search') {
             // Each param, and `searchParams`, under the type the compiler gives it (./route-name-types).
             for (const [name, type] of routeNameTypes(kw, s.slice(m.index, j))) names.set(name, type);
+        }
+        if (kw === 'generic') {
+            // `@generic T extends { id: string }, K;` (#490): inside the component a type parameter is
+            // opaque, and reads as what its constraint promises — `unknown` without one.
+            for (const entry of topLevelCommaSplit(s.slice(m.index + 1 + kw.length, j).replace(/;\s*$/, ''))) {
+                // Match: `T` or `T extends X`, trimmed. Groups: [1]=the name [2]=the constraint
+                const tp = /^([A-Za-z_$][\w$]*)(?:\s+extends\s([\s\S]+))?$/.exec(entry.trim());
+                if (tp) emitters.push(`type ${tp[1]} = ${tp[2]?.trim() || 'unknown'};`);
+            }
         }
         if (kw === 'variants') {
             // Each axis is a prop typed with its values (#153), read by the compiler's own parser.

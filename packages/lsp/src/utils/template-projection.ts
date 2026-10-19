@@ -23,6 +23,22 @@ export interface TemplateProjection { code: string; map: SegmentMap; }
  */
 export type ResolveType = (tag: string, attr: string) => string | null;
 
+/**
+ * What types a `@snippet name(…)` written in a component (#490): the slot's signature, the component's
+ * type parameters, and the props whose type uses one — the values TypeScript infers them from.
+ */
+export interface SnippetType {
+    /** `T extends { id: string }`, as `@generic` declares each. */
+    generics: string[];
+    /** The props whose type uses a type parameter, `items: T[]`. */
+    props: { name: string; type: string }[];
+    /** `(item: T, index: number)`, as `@slot` declares it. */
+    signature: string;
+}
+
+/** The snippet type of slot `name` of component `tag`, or null when it is not known. */
+export type ResolveSnippet = (tag: string, name: string) => SnippetType | null;
+
 // Type-check ONLY string-literal values (`'x'` / `"x"`): assigning one to a
 // number/boolean prop or to the wrong string enum is a real bug (`:count="'x'"`, for one).
 // Boolean/number literals are NOT checked: auto-generated manifests often type as
@@ -54,20 +70,35 @@ const VOID_ELEMENTS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img'
  * the component a slot fill written there belongs to. Null when none is.
  */
 export function enclosingComponent(content: string, offset: number): string | null {
-    const open: string[] = [];
+    return enclosingComponentTag(content, offset)?.name ?? null;
+}
+
+/** As `enclosingComponent`, with the component's opening tag as written: its attributes. */
+export function enclosingComponentTag(content: string, offset: number): { name: string; tag: string } | null {
+    const open: { name: string; tag: string }[] = [];
     // Match: `<tag …>`, `</tag>`, `<tag … />`.  Groups: [1]=`/` of a closing tag [2]=the name [3]=`/` of a self-closing one
     for (const m of content.slice(0, offset).matchAll(/<(\/?)([a-zA-Z][\w-]*)(?:[^>"']|"[^"]*"|'[^']*')*?(\/?)>/g)) {
         const name = m[2].toLowerCase();
         if (m[1]) {
-            const at = open.lastIndexOf(name);
+            const at = open.map(o => o.name).lastIndexOf(name);
             if (at >= 0) open.length = at;
         } else if (!m[3] && !VOID_ELEMENTS.has(name)) {
-            open.push(name);
+            open.push({ name, tag: m[0] });
         }
     }
-    for (let i = open.length - 1; i >= 0; i--) if (open[i].includes('-')) return open[i];
+    for (let i = open.length - 1; i >= 0; i--) if (open[i].name.includes('-')) return open[i];
     return null;
 }
+
+/** The value of attribute `name` in an opening tag as written, `:items="users"` → `users`; null if absent. */
+function attributeValue(tag: string, name: string): string | null {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Match: ` name="value"` after a blank. Groups: [1]=the value
+    return new RegExp(`(?<=\\s)${escaped}\\s*=\\s*"([^"]*)"`).exec(tag)?.[1] ?? null;
+}
+
+/** The name a type parameter declares: `T` in `T extends { id: string }`. */
+const typeParameterName = (g: string): string => /^\s*([A-Za-z_$][\w$]*)/.exec(g)?.[1] ?? g.trim();
 
 /**
  * @param ast            template AST
@@ -78,6 +109,7 @@ export function enclosingComponent(content: string, offset: number): string | nu
 export function projectTemplate(
     ast: TemplateNode[], templateContent: string, templateStart: number, genBase: number,
     resolveType?: ResolveType,
+    resolveSnippet?: ResolveSnippet,
 ): TemplateProjection {
     const map = new SegmentMap();
     const masks = maskedRanges(templateContent);
@@ -317,14 +349,37 @@ export function projectTemplate(
                     for (const a of node.args) stmt(a);
                     if (node.fallback) walk(node.fallback);
                     break;
-                case 'snippet':
+                case 'snippet': {
                     // `@snippet row(u, i) { … }` (#489): its parameters are the values the child
-                    // passes, untyped until the child's signature types them (#131).
-                    emit('{\n');
-                    for (const p of node.params) emit(`let ${p}: any;\n`);
+                    // passes. With the child's signature known (#490), the body is the argument of a
+                    // call to a function typed by it, generic in the child's type parameters, whose
+                    // first argument holds the props that use them as bound on the tag: TypeScript
+                    // infers `T` from `:items="users"`, or takes it from `T="User"`, and types the
+                    // parameters. Without it they are `any`, left unchecked.
+                    const host = node.loc?.offset !== undefined ? enclosingComponentTag(templateContent, node.loc.offset) : null;
+                    const typed = host && resolveSnippet ? resolveSnippet(host.name, node.name) : null;
+                    if (!host || !typed) {
+                        emit('{\n');
+                        for (const p of node.params) emit(`let ${p}: any;\n`);
+                        walk(node.body);
+                        emit('}\n');
+                        break;
+                    }
+                    const params = typed.generics.length > 0 ? `<${typed.generics.join(', ')}>` : '';
+                    const propsType = typed.props.map(p => `${p.name}?: ${p.type}`).join('; ');
+                    const bound = typed.props.flatMap(p => {
+                        const kebab = p.name.replace(/[A-Z]/g, c => `-${c.toLowerCase()}`);
+                        const value = attributeValue(host.tag, `:${p.name}`) ?? attributeValue(host.tag, `:${kebab}`);
+                        return value !== null && value.trim() && !value.includes('${') ? [`${p.name}: (${value})`] : [];
+                    });
+                    const explicit = typed.generics.map(g => attributeValue(host.tag, typeParameterName(g)));
+                    const typeArgs = explicit.some(t => t !== null) ? `<${explicit.map(t => t ?? 'unknown').join(', ')}>` : '';
+                    emit(`;(null! as ${params}(__p: { ${propsType} }, __f: ${typed.signature} => unknown) => void)${typeArgs}(`);
+                    emit(`{ ${bound.join(', ')} }, (${node.params.join(', ')}) => {\n`);
                     walk(node.body);
-                    emit('}\n');
+                    emit('});\n');
                     break;
+                }
                 case 'custom-directive':
                     if (node.expr) stmt(node.expr);
                     if (node.body) walk(node.body);
