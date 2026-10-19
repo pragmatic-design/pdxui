@@ -398,6 +398,8 @@
     --pdx-input-style:       outlined;     /* outlined | filled | underlined */
     --pdx-input-focus:       ring;         /* ring | bottom */
     --pdx-input-border-color: initial;     /* unset: --pdx-color-border; the resting border, which a state replaces (#519) */
+    --pdx-input-border-color-focus: initial; /* unset: --pdx-color-primary; the focused border, which a state replaces (#521) */
+    --pdx-input-focus-ring:  initial;      /* unset: --pdx-focus-ring (none when underlined); a state replaces it */
     --pdx-input-min-height:  2.5rem;       /* 40px default */
     --pdx-input-border-width: var(--pdx-border-width);
 

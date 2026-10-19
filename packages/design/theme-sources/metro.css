@@ -161,10 +161,8 @@ details.pdx-accordion[open] summary::after {
     border-color: var(--pdx-color-primary);
 }
 
-/* Input: the strong resting border is --pdx-input-border-color (#519) */
-.pdx-input-wrap:focus-within {
-    border-color: var(--pdx-color-primary);
-}
+/* Input: the strong resting border is --pdx-input-border-color (#519); the focus is the
+   component's own, a primary border (#521) */
 
 /* Select: sharp corners, flat dropdown */
 .pdx-select-dropdown {

@@ -67,6 +67,7 @@
     /* Editorial behavior tokens */
     --pdx-button-radius: 0;
     --pdx-input-style: underlined;
+    --pdx-input-border-color-focus: var(--pdx-color-text);   /* an ink underline, not the brand */
     --pdx-card-style: flat;
     --pdx-tab-indicator: underline;
     --pdx-tab-indicator-size: 1px;
@@ -139,13 +140,7 @@ details.pdx-accordion summary::after {
 }
 
 /* Input: underlined variant driven by [pdx-input-style="underlined"] in inputs.css.
-   Editorial focus uses text color instead of primary — kept as theme-specific. */
-[pdx-input-style="underlined"]& .pdx-input-wrap:focus-within {
-    border-bottom-color: var(--pdx-color-text);
-}
-[pdx-input-style="underlined"]& .pdx-input:not(.pdx-input-wrap > *):focus-visible {
-    border-bottom-color: var(--pdx-color-text);
-}
+   Editorial focus uses text color instead of primary: --pdx-input-border-color-focus (#521). */
 
 /* ── Button: editorial underline hover ── */
 .pdx-primary {

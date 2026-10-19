@@ -19,7 +19,7 @@
     /* type="search" inputs (pdx-search-input) render a native clear button — suppress it so the
        component's own clear control isn't doubled. */
     &::-webkit-search-cancel-button, &::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
-    &:focus-visible { border-color: var(--pdx-color-primary); box-shadow: var(--pdx-focus-ring); outline: none; transition: box-shadow var(--pdx-duration-fast); }
+    &:focus-visible { border-color: var(--pdx-input-border-color-focus, var(--pdx-color-primary)); box-shadow: var(--pdx-input-focus-ring, var(--pdx-focus-ring)); outline: none; transition: box-shadow var(--pdx-duration-fast); }
     &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; background: var(--pdx-color-inset); }
     &[aria-invalid="true"],
     &:invalid:not(:placeholder-shown) {
@@ -63,10 +63,11 @@
 .pdx-input-wrap > input::placeholder,
 .pdx-input-wrap > textarea::placeholder { color: var(--pdx-color-muted); }
 
-/* Focus state — on wrapper when input inside is focused */
+/* Focus state — on wrapper when input inside is focused. A theme's focus look is the two tokens,
+   never a rule of its own: in the themes' layer a rule would beat the states below (#521). */
 .pdx-input-wrap:focus-within {
-    border-color: var(--pdx-color-primary);
-    box-shadow: var(--pdx-focus-ring);
+    border-color: var(--pdx-input-border-color-focus, var(--pdx-color-primary));
+    box-shadow: var(--pdx-input-focus-ring, var(--pdx-focus-ring));
     transition: box-shadow var(--pdx-duration-fast);
 }
 
@@ -687,9 +688,9 @@ pdx-row > .pdx-input {
 }
 
 [pdx-input-style="underlined"] .pdx-input-wrap:focus-within {
-    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-color: var(--pdx-input-border-color-focus, var(--pdx-color-primary));
     border-bottom-width: var(--pdx-border-width-focus);
-    box-shadow: none;
+    box-shadow: var(--pdx-input-focus-ring, none);
 }
 
 [pdx-input-style="underlined"] .pdx-input-wrap.error,
@@ -713,9 +714,9 @@ pdx-row > .pdx-input {
     background: transparent;
 }
 [pdx-input-style="underlined"] .pdx-input:not(.pdx-input-wrap > *):focus-visible {
-    border-bottom-color: var(--pdx-color-primary);
+    border-bottom-color: var(--pdx-input-border-color-focus, var(--pdx-color-primary));
     border-bottom-width: var(--pdx-border-width-focus);
-    box-shadow: none;
+    box-shadow: var(--pdx-input-focus-ring, none);
     outline: none;
 }
 

@@ -58,6 +58,7 @@
     --pdx-button-radius: var(--pdx-radius-lg);
     --pdx-input-style: outlined;
     --pdx-input-border-color: light-dark(oklch(1 0 0 / 0.3), oklch(1 0 0 / 0.12));
+    --pdx-input-focus-ring: 0 0 0 2px oklch(from var(--pdx-color-primary) l c h / 0.2), 0 0 12px oklch(from var(--pdx-color-primary) l c h / 0.15);
     --pdx-card-style: bordered;
     --pdx-tab-indicator: underline;
     --pdx-opacity-hover: 0.08;
@@ -81,10 +82,6 @@
     background: light-dark(oklch(1 0 0 / 0.35), oklch(0.15 0.010 240 / 0.4));
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-}
-[pdx-theme="glass"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
-    border-color: var(--pdx-color-primary);
-    box-shadow: 0 0 0 2px oklch(from var(--pdx-color-primary) l c h / 0.2), 0 0 12px oklch(from var(--pdx-color-primary) l c h / 0.15);
 }
 
 /* Buttons: translucent with glow hover */

@@ -59,6 +59,7 @@
     /* Cyberpunk behavior tokens */
     --pdx-button-radius: 0;
     --pdx-input-style: underlined;
+    --pdx-input-focus-ring: 0 1px 0 0 var(--pdx-color-primary), 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.2);
     --pdx-card-style: bordered;
     --pdx-tab-indicator: underline;
     --pdx-tab-indicator-size: 3px;
@@ -120,13 +121,7 @@
 }
 
 /* Input: underlined variant driven by [pdx-input-style="underlined"] in inputs.css.
-   Neon glow on focus is cyberpunk-specific. */
-[pdx-input-style="underlined"][pdx-theme="cyberpunk"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
-    box-shadow: 0 1px 0 0 var(--pdx-color-primary), 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.2);
-}
-[pdx-input-style="underlined"][pdx-theme="cyberpunk"] .pdx-input:not(.pdx-input-wrap > *):focus-visible:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
-    box-shadow: 0 1px 0 0 var(--pdx-color-primary), 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.2);
-}
+   Neon glow on focus is cyberpunk-specific: --pdx-input-focus-ring (#521). */
 
 /* ── Button: triple-layer neon glow hover ── */
 [pdx-theme="cyberpunk"] .pdx-primary:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {

@@ -14379,8 +14379,14 @@
               "name": "--pdx-input-border-color"
             },
             {
+              "name": "--pdx-input-border-color-focus"
+            },
+            {
               "name": "--pdx-input-border-width",
               "default": "var(--pdx-border-width)"
+            },
+            {
+              "name": "--pdx-input-focus-ring"
             },
             {
               "name": "--pdx-input-height"
