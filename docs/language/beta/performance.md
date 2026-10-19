@@ -120,7 +120,7 @@ move onto this one; that move is not part of the beta.
 | Criterion | Measured by |
 |---|---|
 | Every cache has a maximum and an eviction: resource cache (**landed**: 200 entries LRU, 5 min `gcTime`), kept-alive pages and `@keepAlive` instances (lifecycle.md) | unit tests per cache |
-| Mount and destroy a page with `@fetch`, `@for`, `attach:` and child components 100 times → retained heap returns within 5% of the first iteration, and the resource cache holds no subscription for the destroyed instances | heap snapshot, Chromium (needs data.md E8) |
+| Mount and destroy a page with `@fetch`, `@for`, `attach:` and child components 100 times → retained heap returns within 5% of the first iteration, and the resource cache holds no subscription for the destroyed instances (**landed**, #243) | the heap after a forced GC, Chromium, on a production build: `packages/showcase/tests/scenario-memory.spec.ts`, with a page that leaks on purpose as its control; the subscriptions, case 8 of `packages/core/tests/async-contract.test.ts` |
 | Memory per 1 000 benchmark rows ≤ 3.5 MB (4.8 MB measured on 2026-10-10) | `pnpm bench:jfb` |
 
 ## Requests

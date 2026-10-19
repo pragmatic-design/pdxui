@@ -240,9 +240,6 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
     // Declared states (#132): the host attaches its internals for them, and ctx.state sets them.
     const declaredStates = options.states && options.states.length > 0 ? new Set(options.states) : null;
 
-    // Track setup signals per-component for HMR state save/restore
-    const _setupSignalRegistry = new WeakMap<HTMLElement, Map<string, Signal<unknown>>>();
-
     const useShadow = options.shadow ?? false;
     const useFormAssociated = options.formAssociated ?? false;
     // _skipAttrSync removed — attribute→prop sync must be identical in dev and prod
@@ -290,6 +287,13 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
         /** The host's custom states, when the descriptor declares any and the browser has them. */
         _customStates: CustomStateSet | null = null;
 
+        /**
+         * The signals setup returned, by name, for HMR state save/restore. A field, not a WeakMap keyed
+         * by the instance: V8 sizes a WeakMap's table to the instances created between two full
+         * collections and never shrinks it, which a page mounted 100 times read as a leak (#243).
+         */
+        _setupSignals: Map<string, Signal<unknown>> | null = null;
+
         constructor() {
             super();
             // Internals are attached once, for a form-associated component and for declared states.
@@ -313,7 +317,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
 
         /** Save all setup signal values for HMR state preservation. */
         __pdx_saveState(): Map<string, unknown> | null {
-            const signals = _setupSignalRegistry.get(this);
+            const signals = this._setupSignals;
             if (!signals) return null;
             const state = new Map<string, unknown>();
             for (const [name, sig] of signals) {
@@ -324,7 +328,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
 
         /** Restore signal values from HMR-saved state. */
         __pdx_restoreState(state: Map<string, unknown>): void {
-            const signals = _setupSignalRegistry.get(this);
+            const signals = this._setupSignals;
             if (!signals || !state) return;
             for (const [name, value] of state) {
                 const sig = signals.get(name);
@@ -524,7 +528,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                         signalMap.set(key, value as Signal<unknown>);
                     }
                 }
-                if (signalMap.size > 0) _setupSignalRegistry.set(this, signalMap);
+                if (signalMap.size > 0) this._setupSignals = signalMap;
             } catch (err) {
                 popScope();
                 if (DEV) {

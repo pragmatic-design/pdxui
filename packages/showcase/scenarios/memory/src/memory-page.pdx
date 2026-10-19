@@ -1,0 +1,21 @@
+<script>
+// The page the memory scenario mounts and destroys (#243): what a page holds that its destruction must
+// release — an @fetch's subscription to the resource cache, a @for's row scopes, an attach:'s cleanup
+// on every row, and a child component per row with its own scope.
+import { observeSize } from './observe-size';
+
+interface Row { id: number; name: string; note: string }
+
+@fetch rows: 'GET /api/rows' as Row[];
+const list = $derived(rows.data() ?? []);
+</script>
+
+<template>
+  <ul>
+    @for (list as row; track row.id) {
+      <li attach:observeSize>
+        <app-memory-row :label="row.name" :note="row.note"></app-memory-row>
+      </li>
+    }
+  </ul>
+</template>

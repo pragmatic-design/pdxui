@@ -1,0 +1,10 @@
+<script>
+@prop label: string = '';
+@prop note: string = '';
+let open = $signal(false);
+</script>
+
+<template>
+  <span class="row" @click="open = !open">{{ label }}</span>
+  @if (open) { <small>{{ note }}</small> }
+</template>

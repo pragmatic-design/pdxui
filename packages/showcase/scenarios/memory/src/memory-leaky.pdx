@@ -1,0 +1,23 @@
+<script>
+// The control of the memory scenario (#243): the same page, plus a listener added to `window` in the
+// script and never removed — the leak the measurement exists to catch. Its closure holds a per-instance
+// ballast, so what every destroyed instance keeps is large enough to read in the heap.
+import { observeSize } from './observe-size';
+
+interface Row { id: number; name: string; note: string }
+
+@fetch rows: 'GET /api/rows' as Row[];
+const list = $derived(rows.data() ?? []);
+const ballast = Array.from({ length: 2000 }, (_, i) => ({ i, text: `ballast ${i}` }));
+window.addEventListener('pdx-memory-never', () => ballast.length);
+</script>
+
+<template>
+  <ul>
+    @for (list as row; track row.id) {
+      <li attach:observeSize>
+        <app-memory-row :label="row.name" :note="row.note"></app-memory-row>
+      </li>
+    }
+  </ul>
+</template>
