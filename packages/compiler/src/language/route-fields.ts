@@ -16,6 +16,7 @@
 
 import { parseSFC } from '../parser/sfc';
 import { findClosing, maskNonCode, splitAtDepthZero } from '../compiler/tokenizer';
+import { declarationEnd } from '../compiler/statement-extent';
 import type { LanguageChange, LanguageChangeFinding } from './changes';
 
 /** The inline script of a .pdx: its content and where the content starts in the file. */
@@ -37,14 +38,8 @@ interface Decl { from: number; to: number; text: string }
  * the way. Read on the masked code, so a brace or a `;` in a string is not one.
  */
 function declarationAt(code: string, masked: string, at: number): Decl {
-    let i = at;
-    for (; i < code.length; i++) {
-        const ch = masked[i];
-        if (ch === '{' || ch === '[') { const close = findClosing(code, i); if (close < 0) break; i = close; continue; }
-        if (ch === ';') { i++; break; }
-        if (ch === '\n') break;
-    }
-    return { from: at, to: i, text: code.slice(at, i) };
+    const to = declarationEnd(code, masked, at);
+    return { from: at, to, text: code.slice(at, to) };
 }
 
 /** Every declaration whose line opens with `re` (a global, multiline regex with no groups). */

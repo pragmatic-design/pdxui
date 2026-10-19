@@ -300,8 +300,8 @@ store's top-level `$signal`s are restored when it is created and written 100 ms 
   `PDX_UNKNOWN_DECLARATION`, and nothing is generated.
 - An `export` that reads a name the store declares is `PDX_STORE_EXPORT`: exports are moved to module
   level, outside the factory. An export that reads none of them is moved as it is.
-- A `persist` value other than `'local'` or `'session'` persists to `sessionStorage`. Not checked
-  today.
+- A `persist` value other than `'local'` or `'session'` is `PDX_UNKNOWN_DECLARATION` (error), and
+  the store is not persisted; it used to be kept in `sessionStorage` whatever was written (#278).
 - A `<template>` in a store file is ignored, and none of the template checks run. Not checked today.
 - Two files that declare the same store name share one instance. Not checked today.
 
@@ -372,8 +372,8 @@ not follow the prop afterwards.
 #### Rules
 
 - `$store` is read only as the initialiser of a `let`, `const` or `var` declarator at the top of the
-  script. Anywhere else (`wrap($store({}))`) it is left as written, and `$store` does not exist at run
-  time. Not checked today.
+  script. Anywhere else (`wrap($store({}))`, a function body) it is `PDX_RUNE_POSITION` (error) at the
+  call, naming `store()` from `@pdxui/core` (#278).
 - The variable keeps the keyword that declared it. Assigning a `let` store again (`state = { … }`)
   changes the script's variable only: the template keeps the store it was handed when the component
   was set up. Write its properties to update the page. Not checked today.

@@ -37,6 +37,7 @@ const ROWS: Record<string, Row> = {
     PDX_NON_REACTIVE: { src: pdx('<p>{{ count }}</p>', 'let count = 0;\nfunction bump() { count = count + 1; }'), at: 'let count = 0;' },
     PDX_SCRIPT_SYNTAX_ERROR: { src: pdx('<p>x</p>', 'let a = $signal(1);\nlet b = ;'), at: 'let b = ;' },
     PDX_UNKNOWN_DECLARATION: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@expose;'), at: '@expose;' },
+    PDX_RUNE_POSITION: { src: pdx('<p>x</p>', "let a = $signal(1);\nfunction reset() {\n  let draft = $signal('');\n}"), at: "$signal('')" },
     PDX_DUP_DECLARATION: { src: pdx('<p>{{ a }}</p>', "@prop a: string = 'x';\nlet a = $signal(1);"), at: 'let a = $signal(1);' },
     PDX_PROP_NO_TYPE: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@prop label;'), at: '@prop label;' },
     PDX_PROP_INVALID_TYPE: { src: pdx('<p>{{ items }}</p>', '@prop items: Array<string = [];'), at: '@prop items' },

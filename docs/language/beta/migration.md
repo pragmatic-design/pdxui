@@ -44,7 +44,7 @@ proposals the implementing issue may change.
 | `onSave()` with `onSave` a `$signal` (named nothing in alpha) | read, then called: `__onSave()()` | **fix**, nothing to rewrite | † (decision 17) |
 | `@mixin './x.ts' as name` | `const name = useX();` — an imported function | flagged (landed: `mixin-removed`; the module's `setup(ctx)` signature changes) | #158 (decision 6) |
 | a script `@snippet` body with `${arg}` | the body is a template: `{{ arg }}` | mechanical | † (decision 9) |
-| a rune outside its position (`$signal` in a function body) | `PDX_RUNE_POSITION`; the core function (`signal()`) | flagged | † (decision 12) |
+| a rune outside its position (`$signal` in a function body) | `PDX_RUNE_POSITION`; the core function (`signal()`) | flagged — landed: `rune-position` | #278 (decision 12) |
 
 ## Component contract and templates
 
@@ -96,7 +96,7 @@ proposals the implementing issue may change.
 | `currentLoaderState()` | `<name>.state()` | mechanical where the page has one loader; flagged otherwise | #141, #146 (†) |
 | a loader reading params from `location` or `currentParams()` | `({ params, signal })` | flagged | #146 (†) |
 | `navigate('/users/42')` | `navigate.url('/users/42')`, or `navigate('/users/:id', { id: 42 })` | mechanical to `navigate.url` when the literal is not one of the project's patterns; a computed path, or a URL with more arguments, flagged — landed: `navigate-url`, `navigate-url-manual` | #150 |
-| `@store x { persist: 'other' }` | `'local'` or `'session'` | flagged | † (decision 14) |
+| `@store x { persist: 'other' }` | `'local'` or `'session'` | flagged — landed: `store-persist` | #278 (decision 14) |
 
 **Runtime behaviour that changes with the execution contract** (data.md E1–E9, F1–F7). These are
 runtime fixes, not syntax: they apply when they land, and `pdx migrate`

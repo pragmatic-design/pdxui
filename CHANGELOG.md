@@ -127,6 +127,12 @@ semver.
 
 ### Changed
 
+- Two script forms the compiler read wrongly, in silence, are errors. A `$` rune outside its place —
+  `$signal`, `$derived`, `$store` that are not the whole initialiser of a top-level declaration,
+  `$effect`, `$watch` that are not a top-level statement — is `PDX_RUNE_POSITION`, its hint naming the
+  core function for that place; it was left as written and undefined at run time, and an `$effect`
+  inside an `if` was lifted out of it. An `@store` `persist` other than `'local'` or `'session'` is
+  `PDX_UNKNOWN_DECLARATION`; it kept the store in `sessionStorage`. `pdx migrate` lists both. (#278)
 - `@page` is the one home of every route field. Further paths are aliases, and the options are
   `keepAlive`, `preload`, `prefetch`, `label`, `transition` and `meta`:
   `@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };`.

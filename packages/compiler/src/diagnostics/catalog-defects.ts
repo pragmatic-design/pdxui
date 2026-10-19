@@ -110,10 +110,20 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_UNKNOWN_DECLARATION: {
         severity: 'error', category: 'defect',
-        summary: 'A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; or a `$inline { … }` block, which is not part of the language.',
-        explanation: 'The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds. A `$inline` block is dropped whole: it used to be copied into the render, where the template could not reach what it declared and its signals were not rewritten (#361).',
-        fix: 'Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`. For a `$inline` block, declare what the template reads with `$derived`.',
+        summary: 'A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; an `@store` `persist` that is not `\'local\'` or `\'session\'`; or a `$inline { … }` block, which is not part of the language.',
+        explanation: 'The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds. An `@store` `persist` other than the two storages kept the store in sessionStorage whatever was written: gone when the tab closed (#278). A `$inline` block is dropped whole: it used to be copied into the render, where the template could not reach what it declared and its signals were not rewritten (#361).',
+        fix: "Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`; for a store, `@store cart { persist: 'local' };`. For a `$inline` block, declare what the template reads with `$derived`.",
         reproducedIn: `${T}validate.test.ts`,
+    },
+    PDX_RUNE_POSITION: {
+        severity: 'error', category: 'defect',
+        summary: 'A `$` rune where the compiler does not read it: `$signal`, `$derived`, `$store` that are not the whole initialiser of a top-level `let`/`const`, or `$effect`, `$watch` that are not a top-level statement.',
+        explanation: 'A rune is rewritten only in its position. Anywhere else — a function body, a callback, a block — it was left as written, and `$signal` is not defined when that code runs; an `$effect` inside an `if` was lifted out of the block and ran whatever the condition said (#278).',
+        fix: "Inside a function, a callback or a block, call the core function the hint names — `signal()`, `computed()`, `store()`, `effect()`, `watch()` — imported from '@pdxui/core'; or move the declaration to the top level of the script.",
+        example: {
+            bad: pdx('<button @click="reset()">Reset</button>', "function reset() {\n  let draft = $signal('');\n  draft = '';\n}"),
+            good: pdx('<button @click="reset()">Reset</button>', "let draft = $signal('');\nfunction reset() {\n  draft = '';\n}"),
+        },
     },
     PDX_TS_UNSUPPORTED: {
         severity: 'error', category: 'defect',

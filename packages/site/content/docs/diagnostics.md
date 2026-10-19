@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 97 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 98 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1133,6 +1133,42 @@ write:
 </script>
 ```
 
+### PDX_RUNE_POSITION
+
+*error* — A `$` rune where the compiler does not read it: `$signal`, `$derived`, `$store` that are not the whole initialiser of a top-level `let`/`const`, or `$effect`, `$watch` that are not a top-level statement.
+
+A rune is rewritten only in its position. Anywhere else — a function body, a callback, a block — it was left as written, and `$signal` is not defined when that code runs; an `$effect` inside an `if` was lifted out of the block and ran whatever the condition said (#278).
+
+**Fix.** Inside a function, a callback or a block, call the core function the hint names — `signal()`, `computed()`, `store()`, `effect()`, `watch()` — imported from '@pdxui/core'; or move the declaration to the top level of the script.
+
+Instead of:
+
+```html
+<template>
+  <button @click="reset()">Reset</button>
+</template>
+<script>
+function reset() {
+  let draft = $signal('');
+  draft = '';
+}
+</script>
+```
+
+write:
+
+```html
+<template>
+  <button @click="reset()">Reset</button>
+</template>
+<script>
+let draft = $signal('');
+function reset() {
+  draft = '';
+}
+</script>
+```
+
 ### PDX_SCRIPT_SYNTAX_ERROR
 
 *error* — The `<script>` does not parse.
@@ -1328,11 +1364,11 @@ let count = $signal(0);
 
 ### PDX_UNKNOWN_DECLARATION
 
-*error* — A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; or a `$inline { … }` block, which is not part of the language.
+*error* — A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; an `@store` `persist` that is not `'local'` or `'session'`; or a `$inline { … }` block, which is not part of the language.
 
-The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds. A `$inline` block is dropped whole: it used to be copied into the render, where the template could not reach what it declared and its signals were not rewritten (#361).
+The line is dropped and nothing is generated for it; left in the body it would make the module unparseable, or, for a rune, ship `$signal` in the JavaScript — a ReferenceError at run time. A rune is read as the whole initialiser of a named declarator, whatever its type argument holds. An `@store` `persist` other than the two storages kept the store in sessionStorage whatever was written: gone when the tab closed (#278). A `$inline` block is dropped whole: it used to be copied into the render, where the template could not reach what it declared and its signals were not rewritten (#361).
 
-**Fix.** Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`. For a `$inline` block, declare what the template reads with `$derived`.
+**Fix.** Write it in the shape the hint shows for that keyword; for a rune, `let name = $signal<Type>(initial);`; for a store, `@store cart { persist: 'local' };`. For a `$inline` block, declare what the template reads with `$derived`.
 
 ### PDX_UNKNOWN_DIRECTIVE
 
