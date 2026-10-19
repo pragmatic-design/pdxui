@@ -205,11 +205,10 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
                 : undefined;
         }
         case 'PDX_ROUTE_FIELD_INVALID': {
-            // Match: the field's name inside its own `@search {` / `@params {` block — or `search: {` /
-            // `params: {` in an `@route` block — at the name.
+            // Match: the field's name inside its own `@search {` / `@params {` block, at the name.
             const rune = /^@(search|params)\b/.exec(w.message)?.[1];
             return name && rune
-                ? find(source, script, new RegExp(`(?<=(?:@${rune}|\\b${rune}\\s*:)\\s*\\{[^}]*)\\b${escape(name)}\\s*(?:\\?\\s*)?:`))
+                ? find(source, script, new RegExp(`(?<=@${rune}\\s*\\{[^}]*)\\b${escape(name)}\\s*(?:\\?\\s*)?:`))
                 : undefined;
         }
         case 'PDX_PAGE_INVALID_PATH':
@@ -221,8 +220,13 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return tag ? find(source, template, new RegExp(`<${escape(tag)}(?![\\w-])`)) : undefined;
         }
         case 'PDX_PREFETCH_POLICY':
-            // Match: `@prefetch 'x'` or `prefetch: 'x'` in a @page block — the policy the message names.
-            return name ? find(source, script, new RegExp(`prefetch\\s*:?\\s*['"]${escape(name)}['"]`)) : undefined;
+            // Match: `prefetch: 'x'` in a @page block — the policy the message names.
+            return name ? find(source, script, new RegExp(`prefetch\\s*:\\s*['"]${escape(name)}['"]`)) : undefined;
+        case 'PDX_PAGE_UNKNOWN_OPTION': {
+            // Match: the option the message names in backticks, a key of the `@page` block.
+            const option = /^`([\w$]+)`/.exec(w.message)?.[1];
+            return option ? find(source, script, new RegExp(`(?<=@page\\b[^;]*\\{[^;]*)(?<![\\w$])${escape(option)}(?![\\w$])`)) : undefined;
+        }
         case 'PDX_KEEPALIVE_MAX':
             // Match: the `@keepAlive(…)` the message quotes, in the template.
             return text ? find(source, template, new RegExp(escape(text))) : undefined;

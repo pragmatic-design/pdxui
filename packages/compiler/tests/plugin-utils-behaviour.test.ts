@@ -122,10 +122,9 @@ describe('finding the routes in a project', () => {
         expect(routes[0].redirects).toEqual([{ from: '/old', to: '/new' }]);
     });
 
-    it('reads @meta { … } as route metadata and leaves @meta name: … alone', () => {
-        // The same directive spells two unrelated things: a block is route meta, a `name:` pair is
-        // an HTML head tag. The scanner has to tell them apart on the `{`, as script-analyzer does.
-        write('src/about.pdx', "@page '/about';\n@meta { breadcrumb: 'About', nested: { depth: 2 } };\n@meta description: 'A page';");
+    it('reads @page meta as route metadata and leaves @meta name: … alone', () => {
+        // Route data is `@page`'s `meta` option (#277); `@meta` with a name is an HTML head tag.
+        write('src/about.pdx', "@page '/about' { meta: { breadcrumb: 'About', nested: { depth: 2 } } };\n@meta description: 'A page';");
         const routes: ScannedRoute[] = [];
         scanForRoutes(root, routes);
         expect(routes[0].meta).toEqual({ breadcrumb: 'About', nested: { depth: 2 } });

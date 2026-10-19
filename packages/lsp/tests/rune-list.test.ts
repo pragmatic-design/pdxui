@@ -26,9 +26,9 @@ function statement(name: string, shape: string): string {
 
 describe('the rune list, as the editor reads it', () => {
     it('is the compiler\'s, and holds the declarations the analyzer knows', () => {
-        expect(decorators.map(r => r.name)).toEqual(expect.arrayContaining(['inject', 'provide', 'tag', 'loader', 'search', 'prefetch', 'use']));
-        // @mixin is removed (#158): the editor offers it no more.
-        expect(decorators.map(r => r.name)).not.toContain('mixin');
+        expect(decorators.map(r => r.name)).toEqual(expect.arrayContaining(['inject', 'provide', 'tag', 'loader', 'search', 'page', 'use']));
+        // @mixin is removed (#158), and the route forms `@page` replaces (#277): the editor offers them no more.
+        for (const removed of ['mixin', 'route', 'alias', 'prefetch', 'transition', 'head']) expect(decorators.map(r => r.name)).not.toContain(removed);
     });
 
     it('completion offers every rune', () => {

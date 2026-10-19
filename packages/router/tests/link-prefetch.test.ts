@@ -130,13 +130,13 @@ describe('the signals that a navigation is about to happen', () => {
 });
 
 describe('what the route says', () => {
-    it("`@prefetch 'eager'` fetches as soon as a link to it is on the page", async () => {
+    it("`prefetch: 'eager'` fetches as soon as a link to it is on the page", async () => {
         link({ to: '/eagerly' });
         await idle();
         expect(loaded, 'an eager route waited for a hover').toEqual(['/eagerly']);
     });
 
-    it("`@prefetch 'never'` is not fetched, hover or not", async () => {
+    it("`prefetch: 'never'` is not fetched, hover or not", async () => {
         const el = link({ to: '/admin' });
         el.dispatchEvent(new Event('pointerenter'));
         el.dispatchEvent(new Event('focusin', { bubbles: true }));
@@ -144,7 +144,7 @@ describe('what the route says', () => {
         expect(loaded).toEqual([]);
     });
 
-    it("`@prefetch 'viewport'` fetches when the link scrolls into view, and not before", async () => {
+    it("`prefetch: 'viewport'` fetches when the link scrolls into view, and not before", async () => {
         const el = link({ to: '/below' });
         await idle();
         expect(loaded, 'a viewport route was fetched before its link was seen').toEqual([]);
@@ -153,13 +153,13 @@ describe('what the route says', () => {
         expect(loaded, 'the link came into view and nothing was fetched').toEqual(['/below']);
     });
 
-    it("`@prefetch 'viewport'` watches the anchor, which has a box, not the `display: contents` host", async () => {
+    it("`prefetch: 'viewport'` watches the anchor, which has a box, not the `display: contents` host", async () => {
         const el = link({ to: '/below' });
         const watched = observers.flatMap((o) => [...o.watched]);
         expect(watched, 'the host was watched: an element with no box never intersects').toEqual([el.querySelector('a')]);
     });
 
-    it("`@prefetch 'viewport'` is fetched once, and the link is no longer watched", async () => {
+    it("`prefetch: 'viewport'` is fetched once, and the link is no longer watched", async () => {
         const el = link({ to: '/below' });
         scrollInto(el);
         scrollInto(el, false);
@@ -169,7 +169,7 @@ describe('what the route says', () => {
         expect(watchedCount(), 'the link is still observed after its fetch').toBe(0);
     });
 
-    it("`@prefetch 'viewport'` still fetches on hover, before it was seen", async () => {
+    it("`prefetch: 'viewport'` still fetches on hover, before it was seen", async () => {
         const el = link({ to: '/below' });
         el.dispatchEvent(new Event('pointerenter'));
         await idle();

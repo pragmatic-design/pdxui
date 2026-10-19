@@ -9,7 +9,7 @@
 //   - Calls navigate() on click (SPA navigation, no full reload)
 //   - `active-class` applied when currentPath matches `to`
 //   - Fetches the target route's chunk on hover, focus or pointerdown — see ./prefetch — and,
-//     for a `viewport` route, when the link scrolls into view. The ROUTE's `@prefetch` decides
+//     for a `viewport` route, when the link scrolls into view. The ROUTE's `prefetch` (an option of its `@page`) decides
 //     the policy; `prefetch="never"` here is a local override.
 //   - Renders as <a> for accessibility + SEO (right-click → open in new tab)
 
@@ -101,7 +101,7 @@ class PdxLink extends HTMLElement {
         // it fires before `click`, which is the whole margin there is on a phone. `prefetchRoute`
         // is idempotent per route, so registering all three costs one fetch, not three.
         //
-        // No `prefetch="hover"` attribute is needed: the ROUTE's `@prefetch` decides, and
+        // No `prefetch="hover"` attribute is needed: the ROUTE's `prefetch` option decides, and
         // the attribute is kept as a local override — `prefetch="never"` on a link the page draws
         // a hundred times, or one nobody is expected to follow.
         if (this.getAttribute('prefetch') !== 'never') {
@@ -134,7 +134,7 @@ class PdxLink extends HTMLElement {
     }
 
     /**
-     * What the target route's `@prefetch` asks of this link beyond hover, focus and press.
+     * What the target route's `prefetch` option asks of this link beyond hover, focus and press.
      *
      * `eager` means "with the route that links to it": fetch now, not on a signal. `viewport`
      * means "once this link is seen": a link far down a long page costs nothing until the visitor

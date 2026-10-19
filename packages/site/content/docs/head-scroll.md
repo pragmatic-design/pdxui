@@ -51,21 +51,9 @@ turns the whole thing into a tracked effect, so the tab re-titles itself when th
 </script>
 ```
 
-> **`@meta` with braces is a different rune.** `@meta { requiresAuth: true }` attaches arbitrary data
-> to the *route* — read back from the router, not written to the document. The `<head>` form is the one
-> with a `key: 'value'` pair and no braces. If a meta tag you declared never appears in the DOM, check
-> which of the two you wrote.
-
-When several tags belong together, `@head` groups them:
-
-```pdx
-<script>
-@head {
-  title: 'Products',
-  meta: [{ name: 'description', content: 'Everything we sell' }]
-}
-</script>
-```
+> **Route data is not a meta tag.** Data you attach to the *route* — read back from the router, never
+> written to the document — is `@page`'s `meta` option: `@page '/billing' { meta: { requiresAuth: true } };`.
+> `@meta` writes the `<head>` only.
 
 When the page changes, PDX updates `document.title` and the matching meta. You don't hand-manage the
 `<head>` DOM.

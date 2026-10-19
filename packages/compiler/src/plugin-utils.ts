@@ -139,7 +139,7 @@ export interface ScannedRoute {
     redirect?: string;
     /** `@redirect '/from' -> '/to'` — table entries, merged across every scanned file. */
     redirects?: { from: string; to: string }[];
-    /** `@meta { … }` — the route's own metadata, exposed as currentMeta() while it is matched. */
+    /** `@page { meta: { … } }` — the route's own metadata, exposed as currentMeta() while it is matched. */
     meta?: Record<string, unknown>;
     /**
      * `@loader loadUser` — the loader's NAME, never the function.
@@ -182,9 +182,9 @@ export interface ScannedRoute {
      */
     title?: string;
     titleKey?: string;
-    /** `@prefetch 'hover' | 'eager' | 'viewport' | 'never'` — when to fetch the chunk. */
+    /** `@page { prefetch: 'hover' | 'eager' | 'viewport' | 'never' }` — when to fetch the chunk. */
     prefetch?: string;
-    /** `@transition 'fade'` — the enter/exit animation between this page and the previous one. */
+    /** `@page { transition: 'fade' }` — the enter/exit animation between this page and the previous one. */
     transition?: string;
     /** `@scroll` — what the scroll position does when this route is entered. */
     scroll?: 'preserve' | 'top';

@@ -71,15 +71,6 @@ describe('a @page that declares more than one path', () => {
         expect(routes.map(r => r.path)).toEqual(['/u', '/users/:id']);
     });
 
-    it('adds the paths an @alias declares', () => {
-        // The analyzer treats `@alias` as another way of writing the extra paths of `@page`, and the
-        // codegen registers it identically. A scanner that knew only one of the two forms would put
-        // the dev/prod difference back under a different directive.
-        const routes = scan('home.pdx', "<script>\n@page '/';\n@alias '/home';\nlet n = $signal(0);\n</script>");
-
-        expect(routes.map(r => r.path)).toEqual(['/', '/home']);
-    });
-
     it('does not read a @page out of a commented-out line', () => {
         // The control for the anchoring: the scan is line-anchored like the analyzer, so a
         // directive that is not at the start of its line is not a directive.

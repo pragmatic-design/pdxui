@@ -1,4 +1,4 @@
-// Tests for Sprint 2 router runes: @redirect, @alias, @search, @outlet, route @meta, param constraints.
+// Tests for Sprint 2 router runes: @redirect, @page's further paths, @search, @outlet, @page's meta, param constraints.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
@@ -57,13 +57,8 @@ describe('@redirect rune', () => {
     });
 });
 
-describe('@alias rune', () => {
-    it('parses alias', () => {
-        const analysis = analyzeScript("@page '/users';\n@alias '/people';", 'test.pdx');
-        expect(analysis.route.aliases).toEqual(['/people']);
-    });
-
-    it('parses inline aliases via @page', () => {
+describe('a further @page path', () => {
+    it('is an alias', () => {
         const analysis = analyzeScript("@page '/users', '/people';", 'test.pdx');
         expect(analysis.route.page).toBe('/users');
         expect(analysis.route.aliases).toEqual(['/people']);
@@ -73,8 +68,7 @@ describe('@alias rune', () => {
         const { code } = compile(`
 <template><div>Users</div></template>
 <script>
-@page '/users';
-@alias '/people';
+@page '/users', '/people';
 </script>`, 'users.pdx');
         expect(code).toContain('path:"/users"');
         expect(code).toContain('path:"/people"');
@@ -108,9 +102,9 @@ describe('@outlet rune', () => {
     });
 });
 
-describe('route @meta (block form)', () => {
+describe('route meta, the @page option', () => {
     it('parses route meta object', () => {
-        const analysis = analyzeScript("@page '/admin';\n@meta { permissions: ['admin'], breadcrumb: 'Admin' };", 'test.pdx');
+        const analysis = analyzeScript("@page '/admin' { meta: { permissions: ['admin'], breadcrumb: 'Admin' } };", 'test.pdx');
         expect(analysis.route.meta).toEqual({ permissions: ['admin'], breadcrumb: 'Admin' });
     });
 
@@ -125,8 +119,7 @@ describe('route @meta (block form)', () => {
         const { code } = compile(`
 <template><div>Admin</div></template>
 <script>
-@page '/admin';
-@meta { permissions: ['admin.view'] };
+@page '/admin' { meta: { permissions: ['admin.view'] } };
 </script>`, 'admin.pdx');
         expect(code).toContain('meta:{"permissions":["admin.view"]}');
     });

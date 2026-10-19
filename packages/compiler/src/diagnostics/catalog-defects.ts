@@ -424,7 +424,7 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_PREFETCH_POLICY: {
         severity: 'error', category: 'defect',
-        summary: 'A route\'s `@prefetch` names a policy the router does not have.',
+        summary: 'A route\'s `prefetch` names a policy the router does not have.',
         explanation: 'The router treats a policy it does not know as `hover`: the route would prefetch on a hover whatever was written, and nothing would say so.',
         fix: "One of `'hover'` (the default), `'eager'`, `'viewport'`, `'never'`.",
         reproducedIn: `${T}prefetch-policy.test.ts`,
@@ -497,6 +497,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         explanation: 'The route would never match an address.',
         fix: "`@page '/users';`",
         example: { bad: pdx('<p>x</p>', "@page 'users';"), good: pdx('<p>x</p>', "@page '/users';") },
+    },
+    PDX_PAGE_UNKNOWN_OPTION: {
+        severity: 'error', category: 'defect',
+        summary: 'An `@page` option the router does not have.',
+        explanation: 'It would be ignored: the route is registered without it, and nothing says so at run time.',
+        fix: "Use one of `keepAlive`, `preload`, `prefetch`, `label`, `transition`, `meta`; a guard, a loader or a layout is a declaration of its own: `@guard 'name';`.",
+        example: { bad: pdx('<p>x</p>', "@page '/users' { guard: 'admin' };"), good: pdx('<p>x</p>', "@page '/users';\n@guard 'admin';") },
     },
     PDX_PAGE_INVALID_CONSTRAINT: {
         severity: 'warn', category: 'defect',

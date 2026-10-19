@@ -129,7 +129,7 @@ test; an entry marked *inference* is filed as «write the test first».
 - A `@defer` body mounted after its load is not disposed with its block (confirmed by its test —
   landed, #261).
 - A frozen route page keeps running effects and polling, and its child components were destroyed
-  (confirmed by its test; the children landed, #268).
+  (confirmed by its test; the children landed, #268; the pause landed, #269).
 - `:ref` is never reset to `null` when its element is removed (landed, #262).
 - `pdx-data-grid` column headers take their tools into their accessible name (landed, #263).
 - The compiler micro-benchmark asserts 200 ms where its comment states 50 ms (landed, #264).

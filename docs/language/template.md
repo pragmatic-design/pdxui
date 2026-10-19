@@ -1067,7 +1067,8 @@ Number          ::= [0-9]+ ( "." [0-9]+ )?
 ```
 
 Written between the parentheses and the body of an `@if` or a `@for`, in this order. The page rune
-`@transition 'fade';` in a script is another construct, in [routing.md](routing.md).
+The page transition is `@page`'s `transition` option, in [routing.md](routing.md); the script's
+`@transition 'fade';` is a removed form (#277).
 
 #### Semantics
 

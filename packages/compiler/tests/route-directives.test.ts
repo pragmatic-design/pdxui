@@ -1,4 +1,4 @@
-// Tests for route directives: @page, @guard, @loader, @search, @prefetch, @layout.
+// Tests for route directives: @page (and its prefetch option), @guard, @loader, @search, @layout.
 
 import { describe, it, expect } from 'vitest';
 import { analyzeScript } from '../src/compiler/script-analyzer';
@@ -48,10 +48,9 @@ describe('route directives', () => {
         expect(a.route.search).toContain('sort: string');
     });
 
-    it('detects @prefetch', () => {
+    it('detects the prefetch option', () => {
         const a = analyzeScript(`
-            @page '/home';
-            @prefetch 'hover';
+            @page '/home' { prefetch: 'hover' };
             let msg = $signal('');
         `, 'home.pdx');
         expect(a.route.prefetch).toBe('hover');
@@ -68,11 +67,10 @@ describe('route directives', () => {
 
     it('detects all route directives together', () => {
         const a = analyzeScript(`
-            @page '/admin/users/:id';
+            @page '/admin/users/:id' { prefetch: 'eager' };
             @guard 'admin.users.edit';
             @loader fetchUser;
             @search { tab: string = 'profile' };
-            @prefetch 'eager';
             @layout 'admin';
             let user = $signal(null);
         `, 'admin-user.pdx');

@@ -15,11 +15,11 @@ import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './tag-prefix';
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
     parseInlineFormSchema, parseFormOptions, parsePageOptions, parseSearchParams, normalizeStatementsWithOrigins,
-    extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, PREFETCH_POLICIES, extractSearchBlock, parseHeadBlock,
-    parseRouteBlock, parseRouteParams, parseObjectLiteralToJson, splitAtTopLevelCommas, invalidRouteFields,
+    extractTypeAnnotation, parseFetchDecl, fetchOptionKeys, FETCH_OPTION_KEYS, PREFETCH_POLICIES, extractSearchBlock,
+    parseRouteParams, splitAtTopLevelCommas, invalidRouteFields, PAGE_OPTIONS,
     routeTitleOf,
 } from './script-analyzer-helpers';
-import { maskNonCode, skipNonCode } from './tokenizer';
+import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
 import { importedLocalNames } from './import-names';
 import { coreRuntimeNames } from './core-import-names';
 import { destructuredNames } from './destructured-names';
@@ -70,6 +70,11 @@ function isMalformedTsType(type: string): boolean {
 const DECLARATION_SHAPES: Record<string, string> = Object.fromEntries(
     [...DECORATOR_RUNES.values()].map(r => [r.name, r.shape]),
 );
+
+// Match: a route or head declaration the beta removed (#277) — `@route`, `@alias`, `@prefetch`,
+// `@head`, the script's `@transition '…'`, and `@meta { … }` (route data; `@meta name: '…'` is the
+// head form and stays).
+const REMOVED_ROUTE_FORM = /^@(?:route|alias|prefetch|head)\b|^@transition\s+['"]|^@meta\s*\{/;
 
 /**
  * PDX_ROUTE_FIELD_INVALID for each field of a `@params` / `@search` block its parser would skip.
@@ -660,22 +665,18 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
 
-        // ─── @route { ... } — aggregate block for complex routing ───
-        // Replaces multiple single-line route runes with one structured block.
-        // Cannot coexist with individual @page/@guard/@prefetch etc.
-        if (trimmed.startsWith('@route') && trimmed.includes('{') && !trimmed.match(/^@route\s+['"]/)) {
-            const block = extractBlock(lines, i);
-            const read = parseRouteBlock(block.content, route);
-            // Its `search` and `params` are checked as `@search`'s and `@params`'s are, and declare the
-            // same names (#204).
-            if (read.search) warnings.push(...routeFieldWarnings(read.search, 'search'));
-            if (read.params) warnings.push(...routeFieldWarnings(read.params, 'params'));
-            declareRouteNames(route, exports);
-            i = block.endLine;
+        // ─── Route and head forms the beta removed (#277) ───
+        // `@route { … }`, `@alias`, `@prefetch`, the script's `@transition`, `@meta { … }` and
+        // `@head { … }`: `@page` is the one home of every route field, and `@title` and `@meta` write the
+        // head. PDX_REMOVED_FORM reports each, naming what replaces it (`language/route-fields.ts`).
+        // The declaration is read to its end and dropped: left in the setup, it is code that does not
+        // parse, reported against text the author did not write as code.
+        if (REMOVED_ROUTE_FORM.test(trimmed)) {
+            i = trimmed.includes('{') ? extractBlock(lines, i).endLine : collectDeclarationStatement(lines, i).endLine;
             continue;
         }
 
-        // ─── Route directives: @page, @guard, @loader, @search, @prefetch, @transition, @layout ───
+        // ─── Route directives: @page (paths and options), @guard, @loader, @search, @layout ───
         // Match: @page '/path'; or @page "/path"; or @page '/path' { options };
         // Groups: [1]=path [2]=options block (optional, without braces)
         // Support: @page '/users'; OR @page '/users', '/people'; OR @page '/path' { options };
@@ -686,9 +687,12 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         if (pageMatch && pageDecl) i = pageDecl.endLine;
         if (pageMatch) {
             const raw = pageMatch[1];
-            // Extract options block if present: { keepAlive, preload }
-            const optionsMatch = raw.match(/\{([^}]*)\}\s*$/);
-            const pathsPart = optionsMatch ? raw.slice(0, raw.lastIndexOf('{')).trim() : raw;
+            // The options block, if present: its first brace outside a string, read to the brace that
+            // closes it — `meta: { … }` holds braces of its own (#277).
+            const open = maskNonCode(raw).indexOf('{');
+            const close = open >= 0 ? findClosing(raw, open) : -1;
+            const options = close > open ? raw.slice(open + 1, close) : null;
+            const pathsPart = options !== null ? raw.slice(0, open).trim() : raw;
             // Parse comma-separated paths: '/users', '/people'
             // Match properly quoted strings: "value with 'quotes'" or 'value with "quotes"'
             const paths = pathsPart.match(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g)?.map(p => p.slice(1, -1)) ?? [];
@@ -698,7 +702,16 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     route.aliases = [...(route.aliases ?? []), ...paths.slice(1)];
                 }
             }
-            if (optionsMatch) parsePageOptions(optionsMatch[1], route);
+            if (options !== null) {
+                for (const name of parsePageOptions(options, route)) {
+                    warnings.push({
+                        code: 'PDX_PAGE_UNKNOWN_OPTION',
+                        severity: 'error' as const,
+                        message: `\`${name}\` is not an option of @page: it would be ignored.`,
+                        hint: `The options are ${PAGE_OPTIONS.join(', ')}. A guard, a loader or a layout is a declaration of its own: @guard 'name';`,
+                    });
+                }
+            }
             continue;
         }
 
@@ -725,16 +738,6 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             }
         }
 
-        // Match: @prefetch 'strategy';
-        const prefetchMatch = trimmed.match(/^@prefetch\s+(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*;?\s*$/);
-        if (prefetchMatch) { route.prefetch = prefetchMatch[1] ?? prefetchMatch[2]; continue; }
-
-        // Match: @transition 'name'; (page-level, not template-level)
-        if (trimmed.match(/^@transition\s+['"]/) && !trimmed.includes('(')) {
-            const transMatch = trimmed.match(/^@transition\s+(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*;?\s*$/);
-            if (transMatch) { route.transition = transMatch[1] ?? transMatch[2]; continue; }
-        }
-
         // Match: @layout 'name';
         const layoutMatch = trimmed.match(/^@layout\s+(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*;?\s*$/);
         if (layoutMatch) { route.layout = layoutMatch[1] ?? layoutMatch[2]; continue; }
@@ -755,14 +758,6 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             } else {
                 route.redirectTo = from;
             }
-            continue;
-        }
-
-        // Match: @alias '/alternative-path';
-        const aliasMatch = trimmed.match(/^@alias\s+(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*;?\s*$/);
-        if (aliasMatch) {
-            if (!route.aliases) route.aliases = [];
-            route.aliases.push(aliasMatch[1] ?? aliasMatch[2]);
             continue;
         }
 
@@ -790,24 +785,6 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             }
         }
 
-        // Match: @meta { key: value, ... }; — route meta (block with braces, not HTML meta)
-        // Parsed as JSON5-like (no new Function — avoids code execution at build time)
-        if (trimmed.startsWith('@meta') && trimmed.includes('{')) {
-            // The whole block, which may span lines (#204); a block naming `name:` or `property:` is
-            // the head form, read further down.
-            const metaDecl = collectDeclarationStatement(lines, i);
-            const metaText = metaDecl.text.trim();
-            const metaBlock = !metaText.includes('name:') && !metaText.includes('property:')
-                ? metaText.match(/^@meta\s+(\{[\s\S]+\})\s*;?\s*$/) : null;
-            if (metaBlock) {
-                // Quote only KEYS — preserves `:` inside URLs/values (e.g. og:url).
-                const parsed = parseObjectLiteralToJson(metaBlock[1]);
-                if (parsed !== undefined) route.meta = parsed as Record<string, unknown>;
-                i = metaDecl.endLine;
-                continue;
-            }
-        }
-
         // ─── @i18n { locales: [...], default: '...', ... } — multi-line block ───
         // Match start: @i18n {
         if (trimmed.startsWith('@i18n') && (trimmed.includes('{') || (i + 1 < lines.length && lines[i + 1].trim().startsWith('{')))) {
@@ -827,15 +804,6 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 persist: globalStoreMatch[2] as 'local' | 'session' | undefined,
             };
             usedFeatures.add('createGlobalStore');
-            continue;
-        }
-
-        // ─── @head { title: '...', meta: [...] } — structured head block ───
-        // Disambiguates SEO/head tags from route metadata (@meta { ... })
-        if (trimmed.startsWith('@head') && trimmed.includes('{')) {
-            const block = extractBlock(lines, i);
-            parseHeadBlock(block.content, head);
-            i = block.endLine;
             continue;
         }
 
@@ -1086,13 +1054,12 @@ export function analyzeScript(script: string, _filename: string, options: { orig
 
     dropLocallyDeclared(usedFeatures, lines, setupDepthAt);
 
-    // A prefetch policy the router does not have: it normalised it to `hover`, in silence. Checked
-    // here, once, because it arrives from `@prefetch '…'` and from `@page '…' { prefetch: … }` alike.
+    // A prefetch policy the router does not have: it normalised it to `hover`, in silence.
     if (route.prefetch !== undefined && !PREFETCH_POLICIES.includes(route.prefetch)) {
         warnings.push({
             code: 'PDX_PREFETCH_POLICY',
             severity: 'error' as const,
-            message: `@prefetch '${route.prefetch}' is not a policy the router has: it would behave as 'hover'.`,
+            message: `@page's prefetch '${route.prefetch}' is not a policy the router has: it would behave as 'hover'.`,
             hint: `Use one of: ${PREFETCH_POLICIES.map((p) => `'${p}'`).join(', ')}.`,
         });
     }

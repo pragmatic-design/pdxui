@@ -116,126 +116,22 @@ describe('@scroll — script analyzer', () => {
     });
 });
 
-describe('@head { ... } — structured head block', () => {
-    it('parses @head with title', () => {
-        const { code } = compileHead(`
-<template><div>Page</div></template>
-<script>
-@head {
-  title: 'My Dashboard';
-}
-</script>
-        `);
-        expect(code).toContain('useHead({ title: "My Dashboard" })');
-    });
-
-    it('parses @head with meta array', () => {
-        const { code } = compileHead(`
-<template><div>Page</div></template>
-<script>
-@head {
-  meta: [
-    { name: 'description', content: 'Browse products' },
-    { property: 'og:title', content: 'My Site' },
-  ];
-}
-</script>
-        `);
-        expect(code).toContain('name: "description"');
-        expect(code).toContain('content: "Browse products"');
-        expect(code).toContain('property: "og:title"');
-        expect(code).toContain('content: "My Site"');
-    });
-
-    it('parses @head with title + meta combined', () => {
-        const { code } = compileHead(`
-<template><div>Page</div></template>
-<script>
-@head {
-  title: 'Products';
-  meta: [
-    { name: 'description', content: 'Product list' },
-  ];
-}
-</script>
-        `);
-        expect(code).toContain('useHead({ title: "Products" })');
-        expect(code).toContain('name: "description"');
-    });
-
-    it('coexists with @meta { } route metadata', () => {
-        const { code } = compileHead(`
-<template><div>Page</div></template>
-<script>
-@page '/products';
-@head {
-  title: 'Products';
-  meta: [{ name: 'description', content: 'List' }];
-}
-@meta { permissions: ['admin'] };
-</script>
-        `);
-        expect(code).toContain('useHead({ title: "Products" })');
-        expect(code).toContain('name: "description"');
-    });
-});
-
-describe('@route { ... } — aggregate routing block', () => {
-    it('parses @route with path', () => {
+// `@head { … }` and `@route { … }` are removed forms (#277): `page-one-home.test.ts` has them, and how
+// `pdx migrate` splits them. What stays here is what they were used for, in the beta's forms.
+describe('route data and head tags, apart', () => {
+    it('@page meta is the route\'s data, and @title / @meta name the head', () => {
         const { code, warnings } = compileHead(`
 <template><div>Page</div></template>
 <script>
-@route {
-  path: '/users/:id';
-  guard: 'admin.users';
-  prefetch: 'hover';
-  layout: 'dashboard';
-}
+@page '/products' { meta: { permissions: ['admin'] } };
+@title 'Products';
+@meta description: 'List';
 </script>
         `);
-        expect(warnings).toEqual([]);
-        expect(code).toBeTruthy();
-    });
-
-    it('parses @route with search params', () => {
-        const { code } = compileHead(`
-<template><div>Page</div></template>
-<script>
-@route {
-  path: '/products';
-  search: { page: number, q: string };
-}
-</script>
-        `);
-        expect(code).toBeTruthy();
-    });
-
-    it('parses @route with transition and scroll', () => {
-        const { code } = compileHead(`
-<template><div>Page</div></template>
-<script>
-@route {
-  path: '/dashboard';
-  transition: 'slide-right';
-  scroll: 'preserve';
-  keepAlive: true;
-}
-</script>
-        `);
-        expect(code).toBeTruthy();
-    });
-
-    it('parses @route with params', () => {
-        const { code } = compileHead(`
-<template><div>Page</div></template>
-<script>
-@route {
-  path: '/users/:id';
-  params: { id: number };
-}
-</script>
-        `);
-        expect(code).toBeTruthy();
+        expect(warnings.filter((w) => w.severity !== 'info')).toEqual([]);
+        expect(code).toContain('useHead({ title: "Products" })');
+        expect(code).toContain('name: "description"');
+        expect(code).toContain('meta:{"permissions":["admin"]}');
     });
 });
 

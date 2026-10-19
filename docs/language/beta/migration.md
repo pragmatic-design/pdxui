@@ -78,13 +78,13 @@ proposals the implementing issue may change.
 
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
-| `@route { path, guard, loader, … }` | `@page` with its options, plus `@guard`, `@loader`, … one per line | mechanical | † (decision 1) |
-| `@alias '/people'` | a further `@page` path: `@page '/users', '/people'` | mechanical | † (decision 2) |
-| `@head { title, meta: [...] }` | `@title` and `@meta` lines | mechanical | † (decision 3) |
-| `@transition 'fade';` in the script | `@page '/x' { transition: 'fade' }` | mechanical | † (decision 7) |
-| `@meta { requiresAuth: true }` (route data) | `@page '/x' { meta: { requiresAuth: true } }` | mechanical | † (decision 8) |
+| `@route { path, guard, loader, … }` | `@page` with its options, plus `@guard`, `@loader`, … one per line | mechanical — landed: `route-block` | #277 (decision 1) |
+| `@alias '/people'` | a further `@page` path: `@page '/users', '/people'` | mechanical — landed: `page-alias` | #277 (decision 2) |
+| `@head { title, meta: [...] }` | `@title` and `@meta` lines | mechanical — landed: `head-block` | #277 (decision 3) |
+| `@transition 'fade';` in the script | `@page '/x' { transition: 'fade' }` | mechanical — landed: `page-transition` | #277 (decision 7) |
+| `@meta { requiresAuth: true }` (route data) | `@page '/x' { meta: { requiresAuth: true } }` | mechanical — landed: `route-meta` | #277 (decision 8) |
 | `@defer (hover)` | `@defer (interaction)` — the same trigger | mechanical | † (decision 37) |
-| `@prefetch 'hover';` | `@page '/x' { prefetch: 'hover' }` | mechanical | † (decision 19) |
+| `@prefetch 'hover';` | `@page '/x' { prefetch: 'hover' }` | mechanical — landed: `page-prefetch` | #277 (decision 19) |
 | a form field named like a form member (`valid`, `reset`, …) | another name | `PDX_FORM_FIELD_RESERVED`; flagged | † (decision 13) |
 | `x.isPending()` | `x.pending()` | mechanical — landed: `async-is-pending` | #141 |
 | `x.loading()`, `x.status()`, `x.isLoading()`, `state()` values `loading`/`reloading`/`stale`/`local` | the async vocabulary (`x.loading()` is `x.state() === 'pending' && !x.data()`) | flagged — landed: `async-alpha-names` (where the file declares the source) | #141 |

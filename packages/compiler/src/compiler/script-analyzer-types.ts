@@ -195,7 +195,7 @@ export interface RouteParamDecl {
     type: string;         // 'number', 'string'
 }
 
-/** Route metadata extracted from @page/@guard/@loader/@search/@prefetch/@transition/@layout/@scroll/@redirect/@alias/@outlet/@params. */
+/** Route metadata extracted from @page (its paths and options)/@guard/@loader/@search/@layout/@scroll/@redirect/@outlet/@params. */
 export interface RouteInfo {
     page?: string;        // '/users/:id(number)'
     guard?: string;       // 'admin.users.view'
@@ -217,8 +217,8 @@ export interface RouteInfo {
     titleKey?: string;    // @title $t('intake.title') — the page's title as a dictionary key (#389)
     redirectTo?: string;  // @redirect '/target'; (page-level)
     redirects?: { from: string; to: string }[];  // @redirect '/from' -> '/to';
-    aliases?: string[];   // @alias '/people'; or @page '/users', '/people';
-    meta?: Record<string, unknown>;  // @meta { permissions: [...], breadcrumb: '...' };
+    aliases?: string[];   // @page '/users', '/people'; — the paths after the first
+    meta?: Record<string, unknown>;  // @page '/x' { meta: { permissions: [...], breadcrumb: '...' } };
     outlets?: OutletDecl[];  // @outlet 'sidebar' -> 'pdx-nav';
     params?: RouteParamDecl[];  // @params { id: number };
 }

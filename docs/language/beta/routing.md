@@ -25,7 +25,7 @@ PageDecl ::= "@page" S StringLiteral ( S? "," S? StringLiteral )* ( S? PageOptio
 
 Each string must be a `Path` (`PDX_PAGE_INVALID_PATH`, alpha).
 
-`@page` is the **one home of every route field** (decisions.md 1, 2, 7, 8, 19 — proposed): its
+`@page` is the **one home of every route field** (decisions.md 1, 2, 7, 8, 19 — landed, #277): its
 paths (an alias is a further path), and its options `keepAlive`, `preload`, `prefetch`, `label`,
 `transition` (the page transition) and `meta` (route data). A page is its own chunk; loading it and
 running its loader start together (#119 — landed, below).
@@ -47,7 +47,7 @@ Grammars in [grammar.md](grammar.md).
 ### Removed: @route, @alias, @prefetch, the script @transition
 
 Each restated a field `@page` already has, or used a keyword that means something else in the
-template. Each is `PDX_REMOVED_FORM`; `pdx migrate` rewrites
+template. Each is `PDX_REMOVED_FORM` (landed, #277); `pdx migrate` rewrites
 them mechanically — `@route { … }` into the separate declarations and `@page` options,
 `@alias 'p'` into a further `@page` path, `@prefetch 'x'` and `@transition 'x'` into `@page`'s
 `prefetch` and `transition` options (migration.md).
@@ -215,9 +215,9 @@ TitleDecl ::= "@title" S Expression End
 MetaDecl  ::= "@meta" S ( "property" S )? [A-Za-z0-9_:-]+ S? ":" S? StringLiteral End
 ```
 
-`@title` is unchanged. `@meta` writes **head tags only** (decisions.md 8 — proposed): route data,
+`@title` is unchanged. `@meta` writes **head tags only** (decisions.md 8 — landed, #277): route data,
 which alpha registered with `@meta { … }`, is `@page`'s `meta` option. `@head`, which restated
-`@title` and `@meta` in one weaker block, is removed (decisions.md 3); `pdx migrate` splits it.
+`@title` and `@meta` in one weaker block, is removed (decisions.md 3 — landed, #277); `pdx migrate` splits it.
 
 ## Static generation
 
