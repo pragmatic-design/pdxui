@@ -8,6 +8,7 @@ import type {
     PropInfo, EventInfo, SlotInfo, SignalDecl, DerivedDecl, ExportDecl,
     StoreDecl, WatchDecl, FetchDecl, FormDecl, FormFieldDecl, RouteInfo,
     GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis, StateDecl, HostAttr,
+    ScriptSnippet,
 } from './script-analyzer-types';
 import { parseHostBlock } from './host-block';
 import { parseVariantsBlock, variantProps, variantHostAttrs, type VariantAxis } from './variants';
@@ -160,6 +161,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const props: PropInfo[] = [];
     const events: EventInfo[] = [];
     const slots: SlotInfo[] = [];
+    const snippets: ScriptSnippet[] = [];
     const signals: SignalDecl[] = [];
     const deriveds: DerivedDecl[] = [];
     const effects: string[] = [];
@@ -282,6 +284,9 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const snippetLines: string[] = [];
             // Find opening {
             for (const ch of trimmed) { if (ch === '{') depth++; if (ch === '}') depth--; }
+            // On one line, `@snippet x(a) { <b>{{ a }}</b> }`: the body is between its braces.
+            const open = trimmed.indexOf('{', snippetMatch[0].length);
+            if (depth === 0 && open !== -1) snippetLines.push(trimmed.slice(open + 1, trimmed.lastIndexOf('}')).trim());
             while (depth > 0 && i + 1 < lines.length) {
                 i++;
                 const sl = lines[i].trim();
@@ -293,8 +298,17 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     snippetLines.push(lines[i]);
                 }
             }
-            // Store snippet as a function that returns template html
             const snippetBody = snippetLines.join('\n');
+            // A template body (#489, decision 9) is compiled with the component's template, where
+            // `{{ }}`, bindings and blocks are read. A `${arg}` body is the alpha form, an html``
+            // literal, which keeps working until `pdx migrate` turns it into `{{ arg }}` (#131).
+            if (!snippetBody.includes('${')) {
+                // Each parameter's name, without its type: `name: string` → `name`.
+                const names = splitAtTopLevelCommas(params).map(p => p.split(':')[0].trim()).filter(Boolean);
+                snippets.push({ name: snippetName, params: names, body: snippetBody, line: snippetAt });
+                continue;
+            }
+            // The alpha form: a function that returns an html`` template
             pushBody(`    function ${snippetName}(${params}) { return html\`${snippetBody}\`; }`, snippetAt);
             exports.push({ name: snippetName, kind: 'function' as const });
             usedFeatures.add('html');
@@ -408,9 +422,19 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
 
+        // ─── @slot name: (signature); — a typed snippet the parent provides (#489) ───
+        // Match: `@slot row: (item: T, index: number);`, `@slot row?: ();`. Groups: [1]=name [2]=`?`
+        // [3]=the signature. A signature whose parentheses do not close matches nothing here, nor the
+        // object form below, and is PDX_UNKNOWN_DECLARATION with the form as its hint.
+        const slotSignature = trimmed.match(/^@slot\s+(\w+)\s*(\?)?\s*:\s*(\(.*\))\s*;?$/);
+        if (slotSignature && findClosing(slotSignature[3], 0) === slotSignature[3].length - 1) {
+            slots.push({ name: slotSignature[1], signature: slotSignature[3], required: slotSignature[2] === undefined });
+            continue;
+        }
+
         // ─── @slot name or @slot name: { ScopeType } ───
         // Tokenizer-based for scope types with generics: { item: Item<T> }
-        if (trimmed.startsWith('@slot ')) {
+        if (trimmed.startsWith('@slot ') && !/^@slot\s+\w+\s*\??\s*:\s*\(/.test(trimmed)) {
             const slotPrefix = trimmed.match(/^@slot\s+(\w+)\s*(?::\s*)?/);
             if (slotPrefix) {
                 const slotName = slotPrefix[1];
@@ -1089,6 +1113,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         props,
         events,
         slots,
+        snippets,
         signals,
         deriveds,
         stores,

@@ -264,6 +264,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Set it, `:name="…"`, or declare it optional in the child: `@prop name?: T;` or a default.',
         reproducedIn: `${T}required-props.test.ts`,
     },
+    PDX_SLOT_REQUIRED: {
+        severity: 'error', category: 'defect',
+        summary: 'A component used without a snippet it requires (#489).',
+        explanation: 'A `@slot name: (…);` declared without `?` is a template the parent must provide: the component calls it with `@render name(…)`, and without it that part of the component renders nothing. A use fills it with `@snippet name(…) { … }` written directly inside its tag. Checked for project components.',
+        fix: 'Write `@snippet name(…) { … }` inside the tag, or declare it optional in the child, `@slot name?: (…);`, and render it with `@render name?.(…)`.',
+        reproducedIn: `${T}typed-snippets.test.ts`,
+    },
     PDX_SETUP_REDUNDANT: {
         severity: 'info', category: 'defect',
         summary: '`<script setup>`: `setup` has no meaning (#158).',

@@ -81,6 +81,7 @@ const cases: [string, () => void][] = [
         ...parseTemplate('@for (xs as x; track x) @virtual { <li>{{ x }}</li> }'),
         { type: 'html', content: '</ul>' },
     ] as TemplateNode[])],
+    ['@render: a name and a run of tabs (alert #173)', () => parseTemplate('@render $' + '\t'.repeat(N))],
 ];
 
 describe('linear scans in the compiler', () => {

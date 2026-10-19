@@ -135,8 +135,9 @@ export type ComponentContext = ComponentContextBase & Record<string, unknown>;
  * where its functions are typed with the component's context. `parts` (#134) name the component's
  * public elements, `[data-part="name"]`, for the manifest; a `.pdx` checks and binds them at compile
  * time. `models` (#124) are props the component may write: writing one dispatches its
- * `<name>-change`, and `::name` binds it both ways. The others are part of the descriptor's type now
- * and get their behaviour in their own issues: slots #131, expose #140, variants #153.
+ * `<name>-change`, and `::name` binds it both ways. `slots` (#489) are typed snippets: functions the
+ * element holds as properties, which a `.pdx`'s `@render` calls. The others are part of the
+ * descriptor's type now and get their behaviour in their own issues: expose #140, variants #153.
  */
 export interface ComponentDeclarations<E extends EventMap = EventMap, M extends ModelMap = ModelMap> {
     events?: E;
@@ -230,7 +231,12 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
             if (options.props && name in options.props) console.warn(`[pdx] <${tag}> declares '${name}' as both a prop and a model; the model wins.`);
         }
     }
-    const propDefs = { ...(options.props ?? {}), ...modelDefs } as Record<string, PropDefinition>;
+    // A typed snippet (#489) is a property of the element too: a function, which `@render` calls. As a
+    // Function prop it has the accessor, the value set before the upgrade, and a signal on the context
+    // (`ctx.row`), so a function assigned after the render renders as well.
+    const slotDefs: Record<string, PropDefinition> = {};
+    for (const name of Object.keys(options.slots ?? {})) slotDefs[name] = { type: Function };
+    const propDefs = { ...(options.props ?? {}), ...modelDefs, ...slotDefs } as Record<string, PropDefinition>;
     const propNames = Object.keys(propDefs);
     // Declared events (#123): with any declared, a name that is not one is reported in development.
     // A model's event counts as declared.

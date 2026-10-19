@@ -317,7 +317,7 @@ SnippetFill     ::= "@snippet" S Identifier S? "(" S? ( Identifier ( S? "," S? I
 RenderDirective ::= "@render" S Identifier "?."? S? "(" S? ( Expression ( S? "," S? Expression )* )? S? ")" ( S? "@else" Block )?
 ```
 
-Defined in [components.md](components.md) (#131).
+Defined in [components.md](components.md) (#131 — landed, #489).
 
 ### `<pdx-icon>`
 

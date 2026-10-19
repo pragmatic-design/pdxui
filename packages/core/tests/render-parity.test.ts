@@ -144,6 +144,12 @@ beforeAll(() => {
             change(next: string) { this.value = next; this.dispatchEvent(new CustomEvent('pdx-change', { detail: next, bubbles: true })); }
         });
     }
+    if (!customElements.get('x-snip')) {
+        // A component that renders the snippet it is given, as `@render row('a', 0)` would (#489).
+        customElements.define('x-snip', class extends HTMLElement {
+            set row(fn: (v: string, i: number) => Node) { this.replaceChildren(fn('a', 0)); }
+        });
+    }
 });
 
 const ROWS: Row[] = [
@@ -345,6 +351,20 @@ const ROWS: Row[] = [
     // An @name the parser does not know is text on both paths. The divergence #100 names needs a
     // directive a plugin registers; this row keeps the plain case honest.
     { name: 'an unknown @name is text', expected: '<p>a</p>@frobnicate { <p>b</p> }', template: '<p>a</p>@frobnicate { <p>b</p> }' },
+    // Typed snippets (#489) came after the template path: these rows record what the one path renders,
+    // so a dev server and a build keep rendering the same for them.
+    {
+        name: '@render of a script @snippet with a template body', expected: '<p><em>hi x</em></p>',
+        template: "<p>@render greet('x')</p>", script: '@snippet greet(name) {\n  <em>hi {{ name }}</em>\n}',
+    },
+    {
+        name: '@render row?.(…) @else, with nothing given', expected: '<p><i>none</i></p>',
+        template: "<p>@render row?.('x') @else { <i>none</i> }</p>", script: '@slot row?: (v: string);',
+    },
+    {
+        name: '@snippet in a component tag, called by the component', expected: '<x-snip><b>a0</b></x-snip>',
+        template: '<x-snip>@snippet row(v, i) { <b>{{ v }}{{ i }}</b> }</x-snip>',
+    },
 ];
 
 describe('a .pdx puts in the page what the template path did (#92, #237)', () => {

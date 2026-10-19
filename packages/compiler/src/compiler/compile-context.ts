@@ -40,6 +40,13 @@ export interface CompileContext {
     /** The parts the script declares with `@part` (#134): a literal `data-part` naming one binds it as a ref. */
     parts: Set<string>;
 
+    /**
+     * What a `@render name(…)` calls (#489): the typed snippets the script declares with `@slot`, read
+     * from the element's property, and the script's own template `@snippet`s, functions of the render.
+     */
+    slotNames: Set<string>;
+    scriptSnippets: Set<string>;
+
     /** The signals a keyed selector is declared for at the top of the render (#117; inline-keyed-selector). */
     readonly selectors: Set<string>;
 
@@ -182,6 +189,8 @@ export function createCompileContext(options?: {
         delegatedEvents: new Set(),
         rowHandlers: null,
         parts: new Set(),
+        slotNames: new Set(),
+        scriptSnippets: new Set(),
         selectors: new Set(),
         nonSignalNames: null,
         stateSignalNames: null,

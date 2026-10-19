@@ -36,6 +36,8 @@ export function declaredNames(analysis: ScriptAnalysis): Set<string> {
     for (const f of analysis.fetches) s.add(f.name);
     for (const inj of analysis.injects) s.add(inj.alias ?? inj.key);
     for (const e of analysis.exports) s.add(e.name);
+    // A template `@snippet` of the script is a function of the render (#489).
+    for (const sn of analysis.snippets) s.add(sn.name);
     for (const n of analysis.importedNames ?? []) s.add(n);
     for (const n of analysis.coreImportNames) s.add(n);
     return s;

@@ -4,6 +4,8 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 describe('@snippet — reusable template blocks', () => {
+    // Its body is a template (#489, decision 9): `{{ user.name }}` is read, not copied into an
+    // html`` literal as text.
     it('compiles @snippet into a function', () => {
         const source = `
 <template>
@@ -16,8 +18,11 @@ describe('@snippet — reusable template blocks', () => {
 </script>`;
         const { code } = compile(source, 'snippet.pdx');
         expect(code).toContain('function userCell(user)');
-        expect(code).toContain('return html`');
-        expect(code).toContain('user.name');
+        expect(code).not.toContain('html`');
+        expect(code).toContain('bindInterpolation(__t1,()=>user.name)');
+        // The template calls it as a function of the render, not of the setup's context.
+        expect(code).toContain("userCell({ name: 'Alice' })");
+        expect(code).not.toContain('ctx.userCell');
     });
 
     it('snippet is exported and available in template', () => {

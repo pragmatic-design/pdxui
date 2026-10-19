@@ -6,7 +6,7 @@
 
 /** The block directives and their clauses, which the parser reads where a node may start. */
 export const BLOCK_DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'try', 'await',
-    'let', 'slot', 'raw', 'else', 'catch', 'case', 'default', 'placeholder', 'loading', 'error', 'empty'] as const;
+    'let', 'slot', 'render', 'snippet', 'raw', 'else', 'catch', 'case', 'default', 'placeholder', 'loading', 'error', 'empty'] as const;
 
 /**
  * Every template `@`-word: the block directives, `@transition` and `@mode` after a block, `@stagger`,

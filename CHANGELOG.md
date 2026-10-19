@@ -11,6 +11,18 @@ semver.
 
 ### Features
 
+- Typed snippets: a component declares a template its parent provides, with a signature, and
+  renders it where it wants with the values it chooses.
+  - The child declares `@slot row: (item: User, index: number);` and renders `@render row(it, i)`.
+    `@slot row?: (…)` is optional, and `@render row?.(it) @else { … }` renders the block when the
+    parent gives none.
+  - The parent writes `@snippet row(u, i) { <span>{{ u.name }}</span> }` inside the child's tag.
+    A required slot left unfilled is `PDX_SLOT_REQUIRED`.
+  - A snippet is a function the child calls, not a projection: one inside an `@if` that turns true
+    later renders. Outside PDX it is a property of the element, `el.row = (item, i) => node`.
+  - A `@snippet` in the script now has a template body, compiled like the template (`{{ arg }}`,
+    bindings, blocks). A body that uses `${arg}` is still the alpha `html` function until #131
+    migrates it. (#489)
 - The editor and `pdx check --types` check template expressions under TypeScript's `strict` mode.
   `{{ user.name }}` on a `$signal<User | null>(null)` is an error until it is guarded, and an arrow
   handler's parameter (`@input="e => …"`) is typed as the event, so `e.taget` is an error too.

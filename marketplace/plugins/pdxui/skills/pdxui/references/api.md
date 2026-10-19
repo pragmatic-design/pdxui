@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-464 value exports.
+465 value exports.
 
 ### `__adoptStyles`
 
@@ -4196,6 +4196,19 @@ function renderSlot(slots: Record<string, SlotFunction> | undefined, name: strin
 
 Render a scoped slot. If the parent provided a slot function, call it with scope data.
 Otherwise, render the default content.
+
+### `renderSnippet`
+
+```ts
+import { renderSnippet } from '@pdxui/core';
+
+function renderSnippet(source: () => unknown, args: () => readonly unknown[], fallback?: (() => Node | null) | null): DocumentFragment
+```
+
+Render the snippet `source()` returns, called with `args()`, between two markers: again whenever the
+function or an argument changes, and `fallback` (the optional slot's `@else`) or nothing while there
+is no function. The snippet's own effects and bindings belong to this render, not to the code that
+wrote the snippet: they are disposed when it renders again and when the block around it goes.
 
 ### `repeat`
 

@@ -44,6 +44,24 @@ export interface SlotInfo {
     name: string;
     /** Scope type for scoped slots: '{ row: Item, column: string }' or undefined. */
     scopeType?: string;
+    /** A typed snippet's signature as written, `(item: T, index: number)` (#489). */
+    signature?: string;
+    /** A typed snippet the parent must provide: declared without `?` (#489). */
+    required?: boolean;
+}
+
+/**
+ * A script `@snippet name(params) { … }` whose body is a template (#489, decision 9): compiled like
+ * the component's template, and rendered with `@render name(args)`.
+ */
+export interface ScriptSnippet {
+    name: string;
+    /** The parameters' names, without their types. */
+    params: string[];
+    /** The body as written, between the braces. */
+    body: string;
+    /** The 0-based line of the script the declaration starts on. */
+    line: number;
 }
 
 export interface SignalDecl {
@@ -227,6 +245,8 @@ export interface ScriptAnalysis {
     props: PropInfo[];
     events: EventInfo[];
     slots: SlotInfo[];
+    /** The script's `@snippet`s whose body is a template (#489): the render compiles them. */
+    snippets: ScriptSnippet[];
     signals: SignalDecl[];
     deriveds: DerivedDecl[];
     stores: StoreDecl[];

@@ -149,6 +149,9 @@ export { errorBoundary } from './renderer/error-boundary';
 export { renderSlot, slotCarrier } from './renderer/slot';
 export type { SlotFunction } from './renderer/slot';
 
+// Typed snippets (#489): what `@render` compiles to
+export { renderSnippet } from './renderer/snippet';
+
 // Helpers
 export { awaitBlock, awaitTimed, awaitReady, AwaitTimeoutError, type AwaitTiming } from './renderer/await';
 export { when, each, eachDestructured, eachRow, match, pipe as templatePipe, show, portal, dynamic } from './renderer/helpers';

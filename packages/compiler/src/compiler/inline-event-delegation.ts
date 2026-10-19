@@ -35,7 +35,7 @@ interface Handler { type: string; mods: string[]; inFor: boolean; opaque: boolea
  * (`<A"` repeated, `<A` and a run of `-`): `tests/perf/compiler-scans.test.ts`. A tag that does not
  * close ends the scan, as it ends the markup.
  */
-function* tags(content: string): Generator<{ closing: boolean; name: string; attrs: string }> {
+export function* tags(content: string): Generator<{ closing: boolean; name: string; attrs: string }> {
     const isName = (c: string) => /[\w-]/.test(c);
     let i = 0;
     while (i < content.length) {
@@ -94,8 +94,10 @@ function collect(nodes: TemplateNode[]): { handlers: Handler[]; twoWay: boolean 
                 case 'show': case 'custom-directive': case 'scoped-slot':
                     walk(node.body, inFor, inPortal);
                     break;
-                // A slot template's body is rendered into another component: opaque, its events stay
-                // on its elements (#113, #364).
+                // The fallback of `@render … @else` is the component's own markup (#489).
+                case 'render': if (node.fallback) walk(node.fallback, inFor, inPortal); break;
+                // A slot template's body — a @snippet's too (#489) — is rendered into another
+                // component: opaque, its events stay on its elements (#113, #364).
                 default: break;
             }
         }

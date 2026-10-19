@@ -135,6 +135,23 @@ export function withBoundaryScope<T>(errorVar: string, retryVar: string, ctx: Co
     return withLoopScope({ item: errorVar, index: retryVar }, false, ctx, generate);
 }
 
+/**
+ * Generate a snippet's body (#489) with its parameters in scope as plain locals: the values its
+ * caller passes, not a @for's row getters, and not `ctx.<name>`. Membership is restored afterwards.
+ */
+export function withPlainLocals<T>(names: readonly string[], ctx: CompileContext, generate: () => T): T {
+    const before = names.map(n => ({ n, scope: ctx.scopeVars.has(n), row: ctx.rowVars.has(n) }));
+    for (const n of names) { ctx.scopeVars.add(n); ctx.rowVars.delete(n); }
+    try {
+        return generate();
+    } finally {
+        for (const { n, scope, row } of before) {
+            if (scope) ctx.scopeVars.add(n); else ctx.scopeVars.delete(n);
+            if (row) ctx.rowVars.add(n); else ctx.rowVars.delete(n);
+        }
+    }
+}
+
 // ─── ctx. prefix logic ──────────────────────────────────────────
 
 /**

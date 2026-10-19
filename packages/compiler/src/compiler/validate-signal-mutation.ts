@@ -95,6 +95,8 @@ function templateHandlers(ast: TemplateNode[]): TemplateHandler[] {
                 case 'let': bound.add(node.name); break;
                 case 'for': walk(node.body, plus(...bindingNames(node.item), node.index)); walk(node.emptyBody, bound); break;
                 case 'slot-template': walk(node.body, plus(...node.scopeVars)); break;
+                case 'snippet': walk(node.body, plus(...node.params)); break;
+                case 'render': walk(node.fallback, bound); break;
                 case 'try': walk(node.body, bound); walk(node.catchBody, plus(node.errorVar, node.retryVar)); break;
                 case 'await':
                     walk(node.body, bound); walk(node.loading, bound);

@@ -314,7 +314,51 @@ Usage:
 </app-user-card>
 ```
 
+### Typed snippets (a template the component calls with data)
+
+When the component has the data but the parent decides *how* to show it (think of a list that lets
+you customize the row), the component declares a **snippet**: a template, with a signature, that the
+parent provides and the component renders where it wants, with the values it chooses.
+
+```pdx
+<!-- app-user-list.pdx -->
+<template>
+  <ul>
+    @for (items as it, i; track it.name) {
+      <li>@render row(it, i)</li>
+    }
+  </ul>
+  @render empty?.() @else { <p>No users.</p> }
+</template>
+
+<script>
+@prop items: { name: string }[] = [];
+@slot row: (item: { name: string }, index: number);
+@slot empty?: ();
+</script>
+```
+
+The parent writes it inside the component's tag, naming the parameters:
+
+```pdx
+<app-user-list :items="users">
+  @snippet row(u, i) { <span>{{ i + 1 }}. {{ u.name }}</span> }
+</app-user-list>
+```
+
+A snippet is a function the component calls, not content projected into it: one rendered inside an
+`@if` that becomes true later renders like anything else. `@slot row: (…);` without `?` must be given
+— a use without it is `PDX_SLOT_REQUIRED`; `@slot empty?: ();` is optional, and `@render empty?.()`
+renders nothing, or its `@else` block, when the parent gives none. Outside PDX, a snippet is a property
+of the element: `list.row = (item, i) => node`. `@render` compiles to core's `renderSnippet()`, which
+renders the function again when the parent gives another one or an argument changes.
+
+A `@snippet` in the component's own `<script>` is a template it renders with `@render` too:
+`@snippet badge(n: number) { <b>{{ n }}</b> }`.
+
 ### Scoped slots (data from the component to the content)
+
+Typed snippets replace them (#131): they still compile, until the beta removes them.
 
 When the component has the data but the parent decides *how* to show it (think of a list that lets
 you customize the row), you use a **scoped slot**, passing data to the slot:

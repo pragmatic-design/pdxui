@@ -7,9 +7,12 @@ import { awaitTimingArg, deferLoadFn, extractLoopInvariants, generateTransition,
 import type {
     TemplateNode, IfNode, ForNode, SwitchNode, RequireNode,
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
-    CustomDirectiveNode, SlotTemplateNode, ScopedSlotNode,
+    CustomDirectiveNode, SlotTemplateNode, ScopedSlotNode, RenderNode, SnippetNode,
 } from '../parser/template';
-import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope, trackKeyArg, pipeChain } from './codegen-prefix';
+import { parseTemplate } from '../parser/template';
+import type { ScriptSnippet } from './script-analyzer-types';
+import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope, withPlainLocals, trackKeyArg, pipeChain } from './codegen-prefix';
+import { renderSnippetCall, snippetSourceOf } from './snippet-calls';
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { BindingDedup } from './inline-dedup';
@@ -162,6 +165,14 @@ export function generateInlineNodes(nodes: TemplateNode[], imports: Set<string>,
     return gen.build(hoists ? [] : own.lines);
 }
 
+/**
+ * The script's template `@snippet`s (#489), each a function declaration of the render: declared, so
+ * a `@render` above it in the render's code finds it. Their blocks' builders go to `hoists`.
+ */
+export function generateScriptSnippets(snippets: readonly ScriptSnippet[], imports: Set<string>, ctx: CompileContext, hoists: TemplateHoists): string[] {
+    return snippets.map(s => new InlineGen(imports, 0, ctx, false, hoists).scriptSnippet(s));
+}
+
 // ─── Generator ────────────────────────────────────────────────────
 
 class InlineGen {
@@ -264,6 +275,8 @@ class InlineGen {
                 case 'custom-directive': this.customDirectiveN(node as CustomDirectiveNode); break;
                 case 'slot-template': this.slotTemplateN(node as SlotTemplateNode); break;
                 case 'scoped-slot': this.scopedSlotN(node); break;
+                case 'render': this.renderN(node); break;
+                case 'snippet': this.snippetN(node); break;
                 default:
                     // NOT a silent break. A node type this generator cannot render would vanish
                     // from the module without a trace. A warning is the difference between a
@@ -299,6 +312,39 @@ class InlineGen {
     private scopedSlotN(node: ScopedSlotNode): void {
         this.imports.add('renderSlot');
         this.place(scopedSlotCall(node.tag, `()=>{${this.sub(node.body)}}`, this.ctx));
+    }
+
+    /**
+     * `@render row(it, i)` (#489): core's renderSnippet calls the snippet with the arguments, in this
+     * block's scope, and again when the snippet or an argument changes. `@else { … }` is its fallback.
+     */
+    private renderN(node: RenderNode): void {
+        this.imports.add('renderSnippet');
+        const args = node.args.map(a => this.read(a));
+        const fallback = node.fallback ? `()=>{${this.sub(node.fallback)}}` : null;
+        this.place(renderSnippetCall(snippetSourceOf(node.name, this.ctx), args, fallback));
+    }
+
+    /**
+     * `@snippet row(u, i) { … }` inside a component's tag (#489): the template is assigned to that
+     * element's `row` property, before the element connects. Its body is this path's own block, with
+     * the parameters as plain locals; opaque, as the content of a component's tag is (#113).
+     */
+    private snippetN(node: SnippetNode): void {
+        const host = this.tree.openElement();
+        if (!host || !host.tag.includes('-')) {
+            throw new Error(`@snippet ${node.name} is not inside a component's tag: it fills a slot of the component it is written in.`);
+        }
+        this.tree.target(host.v);
+        const body = withPlainLocals(node.params, this.ctx, () => this.block(node.body, true).code);
+        this.out(`${host.v}[${jsQuote(node.name)}]=(${node.params.join(',')})=>{${body}};`);
+    }
+
+    /** A script `@snippet` with a template body (#489): a function of the render, hoisted. */
+    scriptSnippet(snippet: ScriptSnippet): string {
+        const nodes = parseTemplate(snippet.body);
+        const body = withPlainLocals(snippet.params, this.ctx, () => this.block(nodes).code);
+        return `function ${snippet.name}(${snippet.params.join(',')}){${body}}`;
     }
 
     // ─── HTML Fragment Parsing ────────────────────────────────

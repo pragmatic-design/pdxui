@@ -18,7 +18,7 @@ const ATTRIBUTE = /(?<=\s)(?:::|:)?([A-Za-z][\w-]*)(?:\.[\w()]+)*(?=[\s=/>]|$)/g
 const key = (name: string): string => name.replace(/-/g, '').toLowerCase();
 
 /** `2` → `2nd`. */
-function ordinal(n: number): string {
+export function ordinal(n: number): string {
     const tens = n % 100;
     const suffix = tens >= 11 && tens <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th';
     return `${n}${suffix}`;

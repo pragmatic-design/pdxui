@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 98 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 99 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1216,6 +1216,14 @@ function add(x: number) {
 }
 </script>
 ```
+
+### PDX_SLOT_REQUIRED
+
+*error* — A component used without a snippet it requires (#489).
+
+A `@slot name: (…);` declared without `?` is a template the parent must provide: the component calls it with `@render name(…)`, and without it that part of the component renders nothing. A use fills it with `@snippet name(…) { … }` written directly inside its tag. Checked for project components.
+
+**Fix.** Write `@snippet name(…) { … }` inside the tag, or declare it optional in the child, `@slot name?: (…);`, and render it with `@render name?.(…)`.
 
 ### PDX_STATE_NOT_BOOLEAN
 

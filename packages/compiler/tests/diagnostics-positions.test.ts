@@ -56,6 +56,7 @@ const ROWS: Record<string, Row> = {
     PDX_TWO_WAY_NOT_MODEL: { src: pdx('<p>{{ a }}</p>\n<app-field\n  ::label="a"></app-field>', 'let a = $signal(1);'), at: '::label="a"' },
     PDX_TAG_RESERVED: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@tag \'pdx-badge\';'), at: "@tag 'pdx-badge';" },
     PDX_PROP_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-card :id="a"></app-card>\n  <app-card></app-card>', 'let a = $signal(1);'), at: '<app-card></app-card>' },
+    PDX_SLOT_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-list>@snippet row(u) { <b>{{ u }}</b> }</app-list>\n  <app-list></app-list>', 'let a = $signal(1);'), at: '<app-list></app-list>' },
     PDX_PART_MISSING: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@part trigger;'), at: '@part trigger;' },
     PDX_PART_DUPLICATE: { src: pdx('<b data-part="x">1</b><i data-part="x">2</i>', '@part x;'), at: 'data-part="x">2' },
     PDX_PART_UNDECLARED: { src: pdx('<p data-part="popup">{{ a }}</p>', 'let a = $signal(1);'), at: 'data-part="popup"' },
@@ -148,6 +149,7 @@ function produce(code: string, row: Row): ValidationWarning | undefined {
         enumValues: (tag, prop) => (tag === 'pdx-button' && prop === 'size' ? ['sm', 'md', 'lg'] : null),
         modelsOf: (tag) => (tag === 'app-field' ? new Set(['value']) : null),
         requiredPropsOf: (tag) => (tag === 'app-card' ? new Set(['id']) : null),
+        requiredSlotsOf: (tag) => (tag === 'app-list' ? new Set(['row']) : null),
         eventHeardAbove: () => false,
     });
     return r.warnings.find((w) => w.code === code);

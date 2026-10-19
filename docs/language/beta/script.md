@@ -189,7 +189,8 @@ Declares a template function the component's own template renders with `@render 
 alpha the body is raw markup copied into an `html` literal (`{{ }}` not read); in the beta the body
 is a **template**, compiled like any other, so a snippet written in the script and a snippet passed
 inside a component's tag (#131, [components.md](components.md)) are the same thing (decisions.md 9 —
-proposed). `pdx migrate` turns `${arg}` into `{{ arg }}`.
+landed, #489). A `${arg}` body still compiles as the alpha's `html` literal until #131's removal part,
+where `pdx migrate` turns `${arg}` into `{{ arg }}`.
 
 ### @i18n
 

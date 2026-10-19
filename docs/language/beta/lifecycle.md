@@ -29,7 +29,7 @@ marked *inference* are read from the code and still need the test that shows the
 | timers the developer starts in `onMount` | cleared only through the cleanup the developer registers (`onDestroy`, an `$effect` return) | run | keep running — the framework cannot see them; the docs say to use `$effect` | — | as removed |
 | `attach:` | its cleanup runs | stays | stays | — | its cleanup runs |
 | `:ref` | set to `null` | unchanged | unchanged | unchanged | set to `null` |
-| a snippet rendered by `@render` | disposed with the block that renders it, not with the component that declared it | — | frozen with its renderer | resumed | disposed |
+| a snippet rendered by `@render` | disposed with the block that renders it, not with the component that declared it (**landed**, #489) | — | frozen with its renderer | resumed | disposed |
 | child components | destroyed (**landed**) | kept, no hook | **frozen with the page** | resumed, `onShow` | destroyed (**landed**) |
 | hooks | `onDestroy` of each child | none | `onHide` | `onShow` | `onDestroy` |
 | `@title` / document head | — | — | not written while frozen (**landed**, #269: the dynamic `@title` is an effect, paused with the page) | written again when it changed | — |

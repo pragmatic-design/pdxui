@@ -312,6 +312,19 @@ export function projectTemplate(
                     walk([{ type: 'html', content: node.tag, loc: node.loc }]);
                     walk(node.body);
                     break;
+                case 'render':
+                    // `@render row(it, i)` (#489): its arguments are expressions of the template.
+                    for (const a of node.args) stmt(a);
+                    if (node.fallback) walk(node.fallback);
+                    break;
+                case 'snippet':
+                    // `@snippet row(u, i) { … }` (#489): its parameters are the values the child
+                    // passes, untyped until the child's signature types them (#131).
+                    emit('{\n');
+                    for (const p of node.params) emit(`let ${p}: any;\n`);
+                    walk(node.body);
+                    emit('}\n');
+                    break;
                 case 'custom-directive':
                     if (node.expr) stmt(node.expr);
                     if (node.body) walk(node.body);
