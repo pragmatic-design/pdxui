@@ -86,6 +86,11 @@ it doing five things.
 | `$effect(fn)` | runs when its dependencies change; return a function to clean up |
 | `onMount(fn)` / `onDestroy(fn)` | lifecycle. `onMount` is **one-shot**, not reactive |
 
+⚠️ **A rune is read only in its place.** `$signal`, `$derived`, `$store`: the whole initialiser of a
+**top-level** `let`/`const`. `$effect`, `$watch`: a **top-level** statement. Inside a function, a
+callback or an `if` it is `PDX_RUNE_POSITION` (error): there, call the core function —
+`signal()`, `computed()`, `store()`, `effect()`, `watch()` from `@pdxui/core`.
+
 ⚠️ **A `$signal`'s value is replaced, never changed in place.** `items.push(x)` or `user.name = v` sets
 nothing, so nothing on screen updates. Write `items = [...items, x]` and `user = { ...user, name: v }`.
 The compiler reports the in-place form as `PDX_SIGNAL_MUTATED_IN_PLACE` — in the script and in a

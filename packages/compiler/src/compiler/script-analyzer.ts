@@ -24,6 +24,7 @@ import { importedLocalNames } from './import-names';
 import { coreRuntimeNames } from './core-import-names';
 import { destructuredNames } from './destructured-names';
 import { RUNE_CALL, readDeclarators } from './rune-declarations';
+import { misplacedRunes } from './validate-rune-position';
 import { DECORATOR_RUNES } from './runes';
 import { liftStoreExports } from './store-exports';
 
@@ -799,10 +800,19 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         // Groups: [1]=name [2]=persist value (optional)
         const globalStoreMatch = trimmed.match(/^@store\s+(\w+)\s*(?:\{\s*persist\s*:\s*['"](\w+)['"]\s*\})?\s*;?\s*$/);
         if (globalStoreMatch) {
-            globalStore = {
-                name: globalStoreMatch[1],
-                persist: globalStoreMatch[2] as 'local' | 'session' | undefined,
-            };
+            // `persist` is one of the two storages: any other word was cast to them and kept in
+            // sessionStorage, gone when the tab closed — whatever the author asked for (#278).
+            const persist = globalStoreMatch[2];
+            const storage = persist === 'local' || persist === 'session' ? persist : undefined;
+            if (persist !== undefined && storage === undefined) {
+                warnings.push({
+                    code: 'PDX_UNKNOWN_DECLARATION',
+                    severity: 'error' as const,
+                    message: `Unrecognised @store declaration: "${trimmed}". '${persist}' is not a storage, and the store would not be kept where you meant.`,
+                    hint: "`persist` is 'local' or 'session': @store name { persist: 'local' };",
+                });
+            }
+            globalStore = { name: globalStoreMatch[1], persist: storage };
             usedFeatures.add('createGlobalStore');
             continue;
         }
@@ -852,10 +862,15 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 // A rune is only read as the whole initialiser of a named declarator. Anywhere else —
                 // a statement that does not parse, `wrap($signal(1))`, a pattern — it would reach the
                 // module as `$signal`, a ReferenceError at run time: an error here instead.
-                const unread = !read || read.declarators.some(d =>
-                    d.kind ? d.name === null : RUNE_CALL.test(maskNonCode(d.text)));
-                if (unread) {
-                    warnings.push({
+                // A rune call inside an initialiser that is not the rune itself, `wrap($signal(1))`, is
+                // PDX_RUNE_POSITION at the call (#278). What is left here is a statement that does not
+                // parse — `$signal<Record<string, number>(1)` is no call at all — or a pattern bound to
+                // a rune.
+                const misplaced = misplacedRunes(stmt.text).length > 0;
+                const unread = !misplaced && (!read || read.declarators.some(d =>
+                    d.kind ? d.name === null : RUNE_CALL.test(maskNonCode(d.text))));
+                if (unread || misplaced || !read) {
+                    if (unread) warnings.push({
                         code: 'PDX_UNKNOWN_DECLARATION',
                         severity: 'error' as const,
                         message: `Unrecognised rune declaration: "${trimmed}". It was dropped — nothing is generated for it.`,
@@ -897,7 +912,9 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         }
 
         // ─── $watch(source, callback) — may span multiple lines ───
-        if (trimmed.startsWith('$watch(')) {
+        // A top-level statement only: one inside a block is left where it is written, and is
+        // PDX_RUNE_POSITION — lifted out, it ran whatever the block's condition said (#278).
+        if (trimmed.startsWith('$watch(') && setupDepthAt[i] === 0) {
             const body = extractCallBody(lines, i, '$watch');
             watchOrigins.push(callOrigins(i, body.content));
             watchLines.push(pdxLineOf(i));
@@ -915,7 +932,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         }
 
         // ─── $effect(() => { ... }) — may span multiple lines ───
-        if (trimmed.startsWith('$effect(')) {
+        // A top-level statement only, as `$watch` above (#278).
+        if (trimmed.startsWith('$effect(') && setupDepthAt[i] === 0) {
             const body = extractCallBody(lines, i, '$effect');
             effects.push(body.content);
             effectOrigins.push(callOrigins(i, body.content));

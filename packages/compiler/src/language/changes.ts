@@ -31,6 +31,7 @@ import { scopedReachesChild } from './scoped-reach';
 import { scriptSetup } from './script-setup';
 import { legacyScript, mixinRemoved } from './legacy-script';
 import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlock } from './route-fields';
+import { runePosition, storePersist } from './script-misreadings';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -323,6 +324,9 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     pageTransition,
     routeMeta,
     headBlock,
+    // #278: silent misreadings of the script are errors (./script-misreadings).
+    runePosition,
+    storePersist,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

@@ -31,7 +31,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_UNKNOWN_DIRECTIVE` | warn | A directive registered by no plugin. | directives | #296 (landed; #100 planned it and did not add it) |
 | `PDX_LOADER_UNKNOWN_OPTION` | error | An `@loader` option other than `staleTime`. | `@loader` | this specification (#148 asks for the check) |
 | `PDX_ACTION_UNKNOWN_OPTION` | error | An `@action` option outside its list. | `@action` | this specification |
-| `PDX_RUNE_POSITION` | error | A `$` rune outside the position the compiler reads it in. | `$signal`, `$derived`, `$store`, `$effect`, `$watch` | this specification (proposed, decisions.md 12) |
+| `PDX_RUNE_POSITION` | error | A `$` rune outside the position the compiler reads it in. | `$signal`, `$derived`, `$store`, `$effect`, `$watch` | this specification (decisions.md 12 — landed, #278) |
 | `PDX_HOST_INVALID_ATTRIBUTE` | error | On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument. | `@host` | #133 (landed; decisions.md 21) |
 | `PDX_FORM_FIELD_RESERVED` | error | A form field named like a form member (`valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array`). | `@form` | this specification (proposed, decisions.md 13) |
 | `PDX_PIPE_SINGLE` | info | A single template pipe; the hint is the function call. | `\|` pipes | #129 (landed) |
@@ -45,7 +45,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 
 | Code | Change | Issue |
 |---|---|---|
-| `PDX_UNKNOWN_DECLARATION` | Also raised by a malformed beta form of `@slot` (a signature), `@inject` (`from` is required), `@event` (`(bubbles)` — landed with #138), and by `@store` with an unknown `persist` value. | this specification, following the alpha rule «a known keyword in an unknown shape» (#138 says it for `@event`) |
+| `PDX_UNKNOWN_DECLARATION` | Also raised by a malformed beta form of `@slot` (a signature), `@inject` (`from` is required), `@event` (`(bubbles)` — landed with #138), and by `@store` with an unknown `persist` value (landed, #278). | this specification, following the alpha rule «a known keyword in an unknown shape» (#138 says it for `@event`) |
 | `PDX_FETCH_NO_ERROR_UI` | Its example and fix use the async vocabulary (`users.state() === 'error'`, `users.error()`). | #141 |
 | `PDX_TS` | Raised by the strict template projection: slot contexts, `@catch`/`@error` names and `$event` are typed, not `any`. | #122 — **landed** for the three typings, without TypeScript's `strict` mode: script and template share one program, and `strict` on the showcase's scripts raised 398 errors that were none. A library component's event details and slot contexts stay unchecked until its manifest types them (#131) |
 

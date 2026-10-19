@@ -19,6 +19,7 @@ import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
 import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
 import { checkRemovedForms } from './language/removed-forms';
+import { validateRunePosition } from './compiler/validate-rune-position';
 import { setupRedundant } from './language/script-setup';
 import { validateDynamicContent } from './compiler/dynamic-content';
 import { routeLayout } from './compiler/codegen-shared';
@@ -906,6 +907,8 @@ export function compile(
     if (descriptor.template) allWarnings.push(...validateDynamicContent(descriptor.template.content, descriptor.template.start, source));
     // A form the beta removed, from the registry of language changes (#121).
     allWarnings.push(...checkRemovedForms(descriptor, source));
+    // A `$` rune where the compiler does not read it: left as written, undefined at run time (#278).
+    allWarnings.push(...validateRunePosition(descriptor, source));
     // `<script setup>`: one script grammar (#158), so `setup` changes nothing. Said once, at the tag.
     if (descriptor.script?.setup) allWarnings.push(setupRedundant(source));
 

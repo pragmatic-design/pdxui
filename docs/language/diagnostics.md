@@ -28,7 +28,8 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 
 | Code | Severity | Meaning | Construct |
 |---|---|---|---|
-| `PDX_UNKNOWN_DECLARATION` | error | A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise. | any `@` declaration, `$signal`, [script.md](script.md) |
+| `PDX_UNKNOWN_DECLARATION` | error | A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; an `@store` `persist` that is not `'local'` or `'session'`. | any `@` declaration, `$signal`, `@store`, [script.md](script.md), [data.md](data.md) |
+| `PDX_RUNE_POSITION` | error | A `$` rune where the compiler does not read it: not the initialiser of a top-level declaration, or not a top-level statement. | `$signal`, `$derived`, `$store`, `$effect`, `$watch`, [script.md](script.md) |
 | `PDX_DUP_DECLARATION` | error | The same name declared twice at the top of the script: runes, `@prop`, functions, classes, plain variables. | [script.md](script.md) |
 | `PDX_PROP_NO_TYPE` | error | `@prop` without a type annotation. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_INVALID_TYPE` | warn | A `@prop`'s type annotation is malformed. | `@prop`, [script.md](script.md) |

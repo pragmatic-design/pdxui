@@ -779,10 +779,11 @@ the rewritten expression is `undefined`.
 
 - `$signal` is read only as the whole initialiser of a named declarator, in a `let`/`const`/`var` at
   the start of a line, with or without a type argument — whatever the type holds: `Record<string,
-  string>`, `(A & B)[]`, `() => void` (#275). Elsewhere in such a statement — an argument
-  (`wrap($signal(1))`), a destructuring pattern, a statement that does not parse — it is
-  `PDX_UNKNOWN_DECLARATION` (error), and nothing is generated for it. Inside a function the call is
-  left as written, and `$signal` is not defined at run time — not checked today.
+  string>`, `(A & B)[]`, `() => void` (#275). Anywhere else — an argument (`wrap($signal(1))`), a
+  function body, a callback, a block — it is `PDX_RUNE_POSITION` (error) at the call, whose hint names
+  `signal()` from `@pdxui/core`, the function for that place (#278). A destructuring pattern, or a
+  statement that does not parse, is `PDX_UNKNOWN_DECLARATION` (error), and nothing is generated for
+  it. The same rule holds for `$derived` (`computed()`) and `$store` (`store()`).
 - A destructuring assignment to a signal (`[count] = pair`) is not rewritten, and `count` is not
   defined at run time — not checked today.
 - A plain `let` the template reads and the script changes raises `PDX_NON_REACTIVE`.
@@ -844,6 +845,8 @@ reads when it reads a body variable.
 
 #### Rules
 
+- `$derived` is read only as the whole initialiser of a top-level declaration, as `$signal` is;
+  anywhere else it is `PDX_RUNE_POSITION` (error), naming `computed()` from `@pdxui/core` (#278).
 - `$derived` values that read each other in a cycle raise `PDX_CIRCULAR_DERIVED`.
 - Writing into the object a `$derived` returned raises `PDX_DERIVED_WRITE`.
 - A `$derived` nothing reads raises `PDX_UNUSED_REACTIVE` (info).
@@ -891,9 +894,10 @@ A function the callback returns is its cleanup, run before each re-run and on di
 
 #### Rules
 
-- `$effect(` is read only where a line starts with it at the top of the script. Inside a function, or
-  as a value (`const stop = $effect(…)`), the call is left as written and `$effect` is not defined at
-  run time — not checked today; `effect()` from `@pdxui/core` is the form for those places.
+- `$effect(…)` is read only as a top-level statement of the script. Inside a function or a block —
+  an `if` included, which it used to be lifted out of — or as a value (`const stop = $effect(…)`), it
+  is `PDX_RUNE_POSITION` (error) at the call (#278); `effect()` from `@pdxui/core` is the form for
+  those places. The same holds for `$watch` (`watch()`).
 - An effect that writes state computed from what it reads raises `PDX_EFFECT_STATE`: that state is a
   `$derived`.
 
@@ -938,8 +942,8 @@ The options (`immediate`, `once`) are an expression rewritten like the body; a d
 
 #### Rules
 
-- `$watch(` is read only where a line starts with it at the top of the script, like `$effect` — not
-  checked today.
+- `$watch(…)` is read only as a top-level statement of the script, like `$effect`; anywhere else it is
+  `PDX_RUNE_POSITION` (error), naming `watch()` from `@pdxui/core` (#278).
 - The callback does not run at setup unless `{ immediate: true }`.
 - A callback that writes a signal from what the watch reads (`$watch(query, () => { page = 1; })`)
   raises `PDX_EFFECT_STATE`, as an `$effect` does.

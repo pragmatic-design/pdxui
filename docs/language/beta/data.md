@@ -322,4 +322,4 @@ Unchanged from alpha: the file is the store, its actions are plain functions ins
 component reads it with the generated hook (`const cart = useCart();`). `@store` is the one mechanism
 for state shared by the whole app (the untyped bus leaves the public API, #144). A `persist` value
 other than `'local'` or `'session'` is `PDX_UNKNOWN_DECLARATION` in the beta grammar (alpha persisted
-it to `sessionStorage` silently) — proposed, see decisions.md.
+it to `sessionStorage` silently) — landed, #278 (decisions.md 14).
