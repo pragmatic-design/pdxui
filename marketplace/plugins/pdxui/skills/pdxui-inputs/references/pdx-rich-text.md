@@ -4,18 +4,19 @@ A WYSIWYG editor.
 
 **Takes a DataSource:** bind one to `:source`.
 
-**The value follows `output`.** `value` goes in and comes out in the same format:
+**The value follows `output`.** `value` is the model: it goes in and comes out in the same format,
+and every edit writes it and dispatches `value-change` with `{ value }`, so `::value` binds it both
+ways.
 
-| `output` | `value` accepts | `value` after an edit, and `pdx-change.detail` |
+| `output` | `value` accepts | `value` after an edit |
 |---|---|---|
-| `'json'` (default) | the document object, or its JSON string | the document object · `detail.doc` |
-| `'html'` | an HTML string | the HTML string · `detail.html` |
-| `'text'` | a JSON document (plain text in is not parsed) | the plain text · `detail.text` |
-| `'all'` | the document object, or its JSON string | the document object · `detail.doc` **and** `detail.html` |
+| `'json'` (default) | the document object, or its JSON string | the document object |
+| `'html'` | an HTML string | the HTML string |
+| `'text'` | a JSON document (plain text in is not parsed) | the plain text |
+| `'all'` | the document object, or its JSON string | the document object; `getHTML()` gives the HTML |
 
-`detail.wordCount` is always there. A `value` set from outside after mount replaces the content
-without rebuilding the editor; reading `el.value` after an edit gives the current content, so a
-form can bind it like any other input.
+The word count is `getWordCount()`. A `value` set from outside after mount replaces the content
+without rebuilding the editor.
 
 The imperative API — `getHTML()`, `setHTML(html)`, `getJSON()`, `setJSON(doc)`, `getText()`,
 `clear()`, `focus()` — exists from the moment the element is connected, and calls made before the
@@ -55,7 +56,7 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 **Pitfalls**
 - An HTML string as `value` with the default `output="json"` is not HTML to it: the editor starts EMPTY, and
   only a dev build warns. Set `output="html"`.
-- The compiler does not wire it inside `<pdx-form>` by `name`: bind `:value` and `@pdx-change` yourself.
+- The compiler does not wire it inside `<pdx-form>` by `name`: bind it yourself, `::value="field"`.
 - `source` and `field` are declared and read by nothing: setting them does nothing.
 - Only the setters wait for the editor. Before `pdx-ready`, `getJSON()` is `null`, `getHTML()` and `getText()`
   are `''`, and `execCommand()` does nothing.
@@ -64,7 +65,6 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | — | object | `null` | The current value. |
 | `output` | `output` | string | `'json'` | Output format: 'html' or 'json'. |
 | `extensions` | — | array | `null` | Editor extensions to enable. |
 | `preset` | `preset` | string | `'starter'` | A named toolbar/feature preset. |
@@ -80,6 +80,7 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 | `field` | `field` | string | `''` | The field of the `source` record that holds the document. |
 | `recordId` | `recordid` | string | `''` | The id of the `source` record to edit, as pdx-form's `record-id`: `"1"` finds `{ id: 1 }`. |
 | `label` | `label` | string | `''` | Accessible name of the editing area. Empty → the `rich-text.label` component string. |
+| `value` | — | unknown | `null` | The current value. |
 
 **API (via `:ref`)**
 
@@ -98,7 +99,7 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 | `setHTML(markup)` | Replace the document with this HTML, waiting for the editor when it is not built yet. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-change` — Fired when the value changes.; `pdx-focus` — Fired when it receives focus.; `pdx-ready` — Fired on `pdx-ready`.
+**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `pdx-ready` — Fired on `pdx-ready`.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 
 #### Examples
@@ -115,7 +116,7 @@ are checked against the manifest above._
     toolbar="full"
     placeholder="Start writing..."
     min-height="300px"
-    @pdx-change="onDocChange"
+    @value-change="onDocChange"
   ></pdx-rich-text>
 </div>
 ```

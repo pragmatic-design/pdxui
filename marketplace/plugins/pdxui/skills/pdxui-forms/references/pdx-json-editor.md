@@ -5,9 +5,9 @@ Edit nested JSON through a schema.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `schema` | — | object | `null` |  |
-| `value` | — | object | `null` | The current value. |
+| `value` | — | unknown | `null` | The current value. |
 
-**Events:** `pdx-change` → `detail: { value }` — Fired when the value changes.
+**Events:** `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `dialog`
 
@@ -21,7 +21,7 @@ are checked against the manifest above._
 **Object with a nested list** — Edit the fields; the "Contacts" branch (a list of objects) opens a sub-modal. The live value is shown below. _(from the live demo)_
 
 ```html
-<pdx-json-editor :schema="schema" :value="value" @pdx-change="onChange"></pdx-json-editor>
+<pdx-json-editor :schema="schema" :value="value" @value-change="onChange"></pdx-json-editor>
 <pre class="pdx-txt-small" style="background: var(--pdx-color-bg); padding: .75rem; border-radius: 8px; overflow: auto;">{{ output }}</pre>
 ```
 

@@ -1,7 +1,7 @@
 // pdx-file-upload — Drag-and-drop file upload with validation, preview, and XHR upload.
 // Supports accept filter, size/count limits, image thumbnails, progress tracking.
 
-import { component, html, signal, computed, generatedId } from '@pdxui/core';
+import { component, html, signal, computed, generatedId, model, untracked } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -72,6 +72,9 @@ function acceptHint(accept: string): string {
  * @slot file - Scoped — renders one file in the list. Receives `{ file, status, progress }`.
  */
 component('pdx-file-upload', {
+    // The files it holds (#482): adding, removing or clearing writes it, and the write dispatches
+    // `value-change`; a value set from outside replaces the list.
+    models: { value: model<File[]>(() => [], { type: Array }) },
     props: {
         accept: { type: String, default: '' },
         multiple: { type: Boolean, default: false },
@@ -111,6 +114,41 @@ component('pdx-file-upload', {
             return s ? 'pdx-file-upload pdx-file-upload-' + s : 'pdx-file-upload';
         });
 
+        /** A file as the list holds it, its thumbnail read in the background for an image. */
+        function makeEntry(file: File): FileEntry {
+            const entry: FileEntry = { file, id: uid(), status: 'pending', progress: 0 };
+            if (isImageFile(file)) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    entry.preview = reader.result as string;
+                    entries.set([...entries()]);
+                };
+                reader.readAsDataURL(file);
+            }
+            return entry;
+        }
+
+        // The last list THIS component wrote to `value`: a value equal to it is its own reflection
+        // coming back, not a new list from outside.
+        let reflected: File[] | null = null;
+        /** The model is the files the list holds: written after every change the user makes. */
+        function writeValue(): void {
+            reflected = entries.peek().map((e) => e.file);
+            ctx.value.set(reflected);
+        }
+
+        // A list set from outside: the files it names, each keeping its entry (and its upload) when it
+        // is one the list already holds.
+        ctx.track(() => {
+            const value = ctx.value() as unknown;
+            if (value === reflected) return;
+            const files = Array.isArray(value) ? (value as File[]) : [];
+            untracked(() => {
+                const held = new Map(entries.peek().map((e) => [e.file, e]));
+                entries.set(files.map((f) => held.get(f) ?? makeEntry(f)));
+            });
+        });
+
         function addFiles(files: FileList | File[]) {
             if (ctx.disabled()) return;
             const accept = ctx.accept() as string;
@@ -138,21 +176,13 @@ component('pdx-file-upload', {
                     reject(file, err);
                     continue;
                 }
-                const entry: FileEntry = { file, id: uid(), status: 'pending', progress: 0 };
-                if (isImageFile(file)) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        entry.preview = reader.result as string;
-                        entries.set([...entries()]);
-                    };
-                    reader.readAsDataURL(file);
-                }
                 added.push(file);
-                entries.set([...entries(), entry]);
+                entries.set([...entries(), makeEntry(file)]);
             }
             rejections.set(refused);
 
             if (added.length > 0) {
+                writeValue();
                 ctx.emit('pdx-select', { files: added });
                 if (ctx.auto() && ctx.action()) uploadAll();
             }
@@ -170,6 +200,7 @@ component('pdx-file-upload', {
             if (entry.status === 'uploading' && entry.xhr) entry.xhr.abort();
             ctx.emit('pdx-remove', { file: entry.file, index });
             entries.set(list.filter((_, i) => i !== index));
+            writeValue();
             if (hadFocus) {
                 requestAnimationFrame(() => {
                     const buttons = ctx.el.querySelectorAll<HTMLElement>('.pdx-file-remove');
@@ -231,7 +262,9 @@ component('pdx-file-upload', {
             for (const entry of entries()) {
                 if (entry.status === 'uploading' && entry.xhr) entry.xhr.abort();
             }
+            const had = entries.peek().length > 0;
             entries.set([]);
+            if (had) writeValue();
         }
 
         function onDropzoneClick() {

@@ -2,13 +2,17 @@
 // design CSS reads for it, the surface a page overrides at `:root`, on a subtree or on one element.
 // The manifest is what the component's docs page renders them from.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 // @ts-expect-error — plain .mjs build script, no type declarations by design
 import { buildManifest } from '../../scripts/gen-manifest.mjs';
 
 type Prop = { name: string; default?: string };
-const decl = (tag: string) => (buildManifest().manifest.modules as { declarations: { tagName: string; cssProperties?: Prop[] }[] }[])
-    .map((m) => m.declarations[0]).find((d) => d.tagName === tag);
+type Module = { declarations: { tagName: string; cssProperties?: Prop[] }[] };
+// The whole library, read once (#539): built per lookup, one test read it three times and passed 5 s
+// under the gate's load.
+let modules: Module[] = [];
+beforeAll(() => { modules = buildManifest().manifest.modules as Module[]; }, 60_000);
+const decl = (tag: string) => modules.map((m) => m.declarations[0]).find((d) => d.tagName === tag);
 const names = (tag: string) => (decl(tag)?.cssProperties ?? []).map((p) => p.name);
 
 describe('the manifest lists each component\'s tokens', () => {

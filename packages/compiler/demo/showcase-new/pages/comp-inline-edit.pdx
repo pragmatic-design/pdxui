@@ -57,7 +57,7 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ value }</span><span>Value confirmed (Enter, blur, or button)</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Value confirmed (Enter, blur, or button); <code>::value</code> binds it both ways</span></div>
         <div class="opt-row"><code>pdx-cancel</code><span>—</span><span>Edit cancelled (Escape or cancel button)</span></div>
       </div>
     </section>

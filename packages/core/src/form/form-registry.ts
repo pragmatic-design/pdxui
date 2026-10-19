@@ -49,15 +49,16 @@ const BUILT_IN_CONTROLS: [string, FormControlConfig][] = [
     // Text inputs — skip reactive :value, use pdx-input event
     ...['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']
         .map((tag): [string, FormControlConfig] => [tag, { textInput: true, valueEvent: 'pdx-input' }]),
-    // Checked controls
-    ['pdx-checkbox', { checked: true }],
-    ['pdx-switch', { checked: true }],
-    // Standard controls
-    ...['pdx-radio', 'pdx-radio-group', 'pdx-checkbox-group', 'pdx-select', 'pdx-slider', 'pdx-rating', 'pdx-number-input', 'pdx-otp-input', 'pdx-pin-input', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']
+    // The controls that declare a model (#480): its event, `<model>-change`, with the value in
+    // `detail.value`, and the model as the prop.
+    ...['pdx-checkbox', 'pdx-switch', 'pdx-radio']
+        .map((tag): [string, FormControlConfig] => [tag, { checked: true, valueProp: 'checked', valueEvent: 'checked-change', valueExpr: 'e.detail?.value' }]),
+    ['pdx-toggle', { valueProp: 'pressed', valueEvent: 'pressed-change', valueExpr: 'e.detail?.value' }],
+    ...['pdx-radio-group', 'pdx-checkbox-group', 'pdx-segmented', 'pdx-slider', 'pdx-rating']
+        .map((tag): [string, FormControlConfig] => [tag, { valueEvent: 'value-change', valueExpr: 'e.detail?.value' }]),
+    // Standard controls, on the alpha event until their batch of #125 lands
+    ...['pdx-select', 'pdx-number-input', 'pdx-otp-input', 'pdx-pin-input', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']
         .map((tag): [string, FormControlConfig] => [tag, {}]),
-    // Special event names
-    ['pdx-segmented', { valueEvent: 'change' }],
-    ['pdx-toggle', { valueEvent: 'pressedchange', valueExpr: 'e.detail?.pressed' }],
 ];
 
 const _formControls = new Map<string, FormControlConfig>(BUILT_IN_CONTROLS);

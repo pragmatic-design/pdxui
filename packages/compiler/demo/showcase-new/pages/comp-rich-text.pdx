@@ -65,7 +65,7 @@
       </div>
     </section>
 
-    <!-- Word count tracked via pdx-change event -->
+    <!-- The word count is el.getWordCount(), read when value-change fires -->
   </div>
 </template>
 

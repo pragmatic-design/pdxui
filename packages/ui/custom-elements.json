@@ -11613,6 +11613,15 @@
               "attribute": "size"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "File[]"
+              },
+              "default": "() => []"
+            },
+            {
               "kind": "method",
               "name": "addFiles",
               "parameters": [
@@ -11651,7 +11660,18 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
           "events": [
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: File[] }"
+            },
             {
               "name": "pdx-error",
               "type": {
@@ -13550,15 +13570,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "Current value",
-              "type": {
-                "text": "object"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
               "name": "options",
               "description": "Options for select/multiselect: [{ value, label }]",
               "type": {
@@ -13685,16 +13696,34 @@
               },
               "default": "''",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "description": "Current value",
+              "type": {
+                "text": "unknown"
+              },
+              "default": "null"
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: unknown }"
             },
             {
               "name": "pdx-cancel",
@@ -14464,19 +14493,28 @@
               "name": "value",
               "description": "The current value.",
               "type": {
-                "text": "object"
+                "text": "unknown"
               },
               "default": "null"
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: unknown }"
             }
           ],
           "roles": [
@@ -19594,15 +19632,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "object"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
               "name": "output",
               "description": "Output format: 'html' or 'json'.",
               "type": {
@@ -19751,6 +19780,15 @@
             },
             {
               "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "unknown"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
               "name": "editor",
               "readonly": true,
               "description": "Read-only, via a ref: `el.editor`."
@@ -19843,13 +19881,26 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "doc": "$event.detail.value",
+            "html": "$event.detail.value",
+            "text": "$event.detail.value",
+            "wordCount": "$event.currentTarget.getWordCount()"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes."
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: unknown }"
             },
             {
               "name": "pdx-focus",

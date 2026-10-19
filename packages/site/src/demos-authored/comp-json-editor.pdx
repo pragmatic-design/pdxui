@@ -4,13 +4,13 @@
     <h1 class="pdx-txt-title">JSON Editor</h1>
     <p class="pdx-txt-body pdx-ink-muted intro">
       Schema-driven form editor for nested JSON — objects, lists-of-objects (repeater), and scalars. Complex
-      branches open a sub-modal so the UI stays uncluttered. Emits <code>pdx-change</code> with the edited value.
+      branches open a sub-modal so the UI stays uncluttered. Announces the edited value with <code>value-change</code>, its model's event.
     </p>
 
     <section>
       <h2 class="pdx-txt-heading">Object with a nested list</h2>
       <p class="pdx-txt-small pdx-ink-muted">Edit the fields; the "Contacts" branch (a list of objects) opens a sub-modal. The live value is shown below.</p>
-      <pdx-json-editor :schema="schema" :value="value" @pdx-change="onChange"></pdx-json-editor>
+      <pdx-json-editor :schema="schema" :value="value" @value-change="onChange"></pdx-json-editor>
       <pre class="pdx-txt-small" style="background: var(--pdx-color-bg); padding: .75rem; border-radius: 8px; overflow: auto;">{{ output }}</pre>
     </section>
   </div>

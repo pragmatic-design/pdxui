@@ -64,7 +64,7 @@ describe('pdx-inline-edit focus', () => {
         const next = document.createElement('button');
         document.body.appendChild(next);
         const changes: unknown[] = [];
-        el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail.value));
+        el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail.value));
 
         const inp = await openWithEnter(el);
         inp.value = 'Tabbed away';

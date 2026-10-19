@@ -8,14 +8,13 @@ up to 3 — 29.5 edited to «30.2» saves 30.2. Set `precision` to fix it (`prec
 numbers). The number editor shows the value with that many decimals while you edit («29.500»).
 
 ```html
-<pdx-inline-edit type="number" :value="weight" @pdx-change="e => weight = e.detail.value"></pdx-inline-edit>
+<pdx-inline-edit type="number" ::value="weight"></pdx-inline-edit>
 <pdx-inline-edit type="currency" currency="EUR" precision="2" :value="price"></pdx-inline-edit>
 ```
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `type` | `type` | string | `'text'` | Data type — determines which editor to show |
-| `value` | — | object | `null` | Current value |
 | `options` | — | array | `[]` | Options for select/multiselect: [{ value, label }] |
 | `placeholder` | `placeholder` | string | `''` | Placeholder when value is empty |
 | `editOn` | `editon` | string | `'click'` | When to enter edit mode: 'click' \| 'dblclick' \| 'icon' |
@@ -29,8 +28,9 @@ numbers). The number editor shows the value with that many decimals while you ed
 | `name` | `name` | string | `''` | Form field name |
 | `showIcon` | `showicon` | boolean | `true` | Show edit icon on hover |
 | `label` | `label` | string | `''` | The field's name, for the editor's accessible name. Empty: the inline-edit.edit component string, «Edit {value}». |
+| `value` | — | unknown | `null` | Current value |
 
-**Events:** `pdx-cancel` — Fired when cancelled.; `pdx-change` → `detail: { value }` — Fired when the value changes.
+**Events:** `pdx-cancel` — Fired when cancelled.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `button`
 

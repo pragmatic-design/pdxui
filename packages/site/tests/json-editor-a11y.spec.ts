@@ -51,7 +51,8 @@ test('Edit… opens a modal dialog named Contacts, keeps focus in it, and Apply 
 });
 
 test('the API table lists no internal jed-edit event', async ({ page }) => {
-    await expect(page.getByText('pdx-change').first()).toBeAttached();
+    // The control: the table is there, listing the component's own event, its model's (#482).
+    await expect(page.getByText('value-change').first()).toBeAttached();
     expect(await page.locator('body').textContent()).not.toContain('jed-edit');
 });
 

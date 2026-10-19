@@ -1,17 +1,17 @@
 // pdx-json-editor — schema-driven form editor for nested JSON (object / list-of-objects / 2-level dict).
 // Scalars render inline; each complex branch (object / objectList) is a "Edit…" button opening a sub-modal,
 // so the UI stays uncluttered. Recursive renderer: every control exposes { el, read() } — no DOM queries,
-// so repeaters/nesting compose unambiguously. Emits `pdx-change` { value } whenever the edited value changes.
+// so repeaters/nesting compose unambiguously. Its model is `value` (#482): every edit writes it, and the
+// write dispatches `value-change` { value }.
 // Promoted from the hand-built profiler editor (UI-15h), generalized: enum options come from `values` (static)
 // or `options` (async () => {label,value}[]) — no app-specific lookup coupling.
 //
 // Usage:
-//   <pdx-json-editor :schema="${schema}" :value="${obj}"></pdx-json-editor>
-//   el.addEventListener('pdx-change', e => save(e.detail.value));
+//   <pdx-json-editor :schema="schema" ::value="profile"></pdx-json-editor>
+//   el.addEventListener('value-change', e => save(e.detail.value));
 
-import { component, html, focusTrap, focusFirst, generatedId } from '@pdxui/core';
+import { component, html, focusTrap, focusFirst, generatedId, model } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/json-editor';
@@ -229,11 +229,14 @@ async function buildRoot(schema: FieldDef & { kind?: 'object' | 'list'; item?: F
 /**
  * A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each
  * object or list of objects in a sub-modal of its own.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
  */
 component('pdx-json-editor', {
+    models: { value: model<unknown>(null, { type: Object }) },
     props: {
         schema: { type: Object, default: null },
-        value: { type: Object, default: null },
     },
     setup(ctx) {
         let root: Ctrl | null = null;
@@ -243,13 +246,13 @@ component('pdx-json-editor', {
         let _reflected: unknown = undefined;
         let _builtSchema: unknown = undefined;
 
+        // Every edit writes the model (#482), and the write dispatches `value-change`.
         function emit(): void {
             if (!root) return;
             const v = root.read();
             const value = isEmpty(v) ? null : v;
             _reflected = value;
-            setOwnProp(ctx.el, 'value', value);
-            ctx.emit('pdx-change', { value });
+            ctx.value.set(value);
         }
 
         ctx.track(() => {

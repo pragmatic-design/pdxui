@@ -60,10 +60,10 @@ describe('pdx-rich-text value contract', () => {
         expect((el.getHTML().match(/<em>/g) ?? []).length).toBe(1);
     });
 
-    it('value is reflected after every change, equal to the pdx-change detail', async () => {
+    it('value is reflected after every change, equal to the value-change detail (#482)', async () => {
         const el = await make(e => e.setAttribute('output', 'html'));
         let last: unknown;
-        el.addEventListener('pdx-change', (e) => { last = (e as CustomEvent).detail.html; });
+        el.addEventListener('value-change', (e) => { last = (e as CustomEvent).detail.value; });
         el.setHTML('<p>scritto</p>');
         expect(last).toContain('scritto');
         expect(el.value).toBe(last);
