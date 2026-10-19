@@ -73,6 +73,7 @@
     --pdx-button-min-height: calc(2.75rem / 1.1);  /* 44px Apple touch target, at cupertino's density */
     --pdx-input-style: outlined;
     --pdx-input-border-color: transparent;          /* gray fill, no border until focus */
+    --pdx-input-focus-ring: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
     --pdx-input-min-height: calc(2.75rem / 1.1);   /* the same, so a row of both aligns */
     --pdx-tab-indicator: pill;         /* segmented control style */
     --pdx-tab-indicator-size: 2px;
@@ -87,15 +88,6 @@
    out so the rendered height is 44px, not 48.4. */
 [pdx-theme="cupertino"] :is(.pdx-input-wrap, .pdx-input:not(.pdx-input-wrap > *)):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
     background: light-dark(oklch(0.96 0.003 60), oklch(0.22 0.004 60));
-}
-[pdx-theme="cupertino"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
-    border-color: var(--pdx-color-primary);
-    box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
-}
-[pdx-theme="cupertino"] .pdx-input:not(.pdx-input-wrap > *):focus-visible:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
-    border-color: var(--pdx-color-primary);
-    box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
-    outline: none;
 }
 
 /* Buttons: Apple — 44px touch target (default), generous padding.

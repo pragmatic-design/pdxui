@@ -41,6 +41,27 @@ for (const theme of THEMES) {
     });
 }
 
+// A theme that restyles the FOCUSED field with a rule of its own beat the component's focused state
+// rules the same way (#521): an invalid field turned the theme's primary when it took focus.
+for (const theme of THEMES) {
+    test(`a focused invalid input keeps the danger colour: ${theme}`, async ({ page }) => {
+        await goToScenario(page, 'input-error', theme, { page: scenarioPage['input-error'] });
+        await freezeAnimations(page);
+        await settle(page);
+        await page.locator('section:not([hidden]) [data-test="input"] input').focus();
+        const wrap = page.locator('section:not([hidden]) [data-test="input"] .pdx-input-wrap');
+        const danger = await resolveColour(page, '--pdx-color-danger');
+        const primary = await resolveColour(page, '--pdx-color-primary');
+        const { side, shadow } = await wrap.evaluate((el) => {
+            const s = getComputedStyle(el);
+            return { side: s.borderLeftStyle === 'none' ? s.borderBottomColor : s.borderLeftColor, shadow: s.boxShadow };
+        });
+        expect(side, 'the border took another colour').toBe(danger);
+        // The ring, if any, is not the primary's: `oklch(L C H / a)` starts as the primary does.
+        expect(shadow, 'the focus ring is the primary\'s').not.toContain(primary.replace(/\)$/, ''));
+    });
+}
+
 test('fluent: a focused field shows the bottom accent in the primary colour', async ({ page }) => {
     await goToScenario(page, 'input-basic', 'fluent', { page: scenarioPage['input-basic'] });
     await freezeAnimations(page);

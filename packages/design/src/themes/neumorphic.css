@@ -53,6 +53,8 @@
     --pdx-button-radius: var(--pdx-radius-lg);
     --pdx-input-style: outlined;
     --pdx-input-border-color: transparent;          /* the inset shadow draws the field */
+    --pdx-input-focus-ring: inset 2px 2px 5px oklch(0 0 0 / 0.07), inset -2px -2px 4px oklch(1 0 0 / 0.6),
+                            0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.15);
     --pdx-card-style: flat;
     --pdx-tab-indicator: pill;
 }
@@ -124,12 +126,10 @@
 /* ── Input: inset shadow (pressed feel) — both standalone and wrapper ── */
 [pdx-theme="neumorphic"] :is(.pdx-input:not(.pdx-input-wrap > *), .pdx-input-wrap):not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
     background: var(--pdx-color-bg);
-    box-shadow: inset 2px 2px 5px oklch(0 0 0 / 0.07), inset -2px -2px 4px oklch(1 0 0 / 0.6);
 }
-[pdx-theme="neumorphic"] :is(.pdx-input:not(.pdx-input-wrap > *):focus-visible, .pdx-input-wrap:focus-within):not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
-    border-color: var(--pdx-color-primary);
-    box-shadow: inset 2px 2px 5px oklch(0 0 0 / 0.07), inset -2px -2px 4px oklch(1 0 0 / 0.6),
-                0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.15);
+/* The inset at rest only: a focused field's shadow is --pdx-input-focus-ring, or its state's (#521). */
+[pdx-theme="neumorphic"] :is(.pdx-input:not(.pdx-input-wrap > *):not(:focus-visible), .pdx-input-wrap:not(:focus-within)):not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+    box-shadow: inset 2px 2px 5px oklch(0 0 0 / 0.07), inset -2px -2px 4px oklch(1 0 0 / 0.6);
 }
 
 /* ── Button: raised neumorphic surface ── */

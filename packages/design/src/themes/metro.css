@@ -161,10 +161,8 @@
     border-color: var(--pdx-color-primary);
 }
 
-/* Input: the strong resting border is --pdx-input-border-color (#519) */
-[pdx-theme="metro"] .pdx-input-wrap:focus-within:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
-    border-color: var(--pdx-color-primary);
-}
+/* Input: the strong resting border is --pdx-input-border-color (#519); the focus is the
+   component's own, a primary border (#521) */
 
 /* Select: sharp corners, flat dropdown */
 [pdx-theme="metro"] .pdx-select-dropdown:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
