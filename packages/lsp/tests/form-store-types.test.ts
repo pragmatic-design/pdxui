@@ -6,7 +6,7 @@
 // MODULE: it makes no `prefs` variable (the module exports `usePrefs()`), so a script reading
 // `prefs` throws a ReferenceError, and `var prefs: any` hid it.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
@@ -30,6 +30,10 @@ function diagnose(script: string, template = ''): string[] {
 }
 
 const PROFILE = '@form profile: { name: string { required }, age: number, admin: boolean, skills: string[] };\n';
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = 1;', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('an inline @form', () => {
     it('a member Form does not have is an error', () => {

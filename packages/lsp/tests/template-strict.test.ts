@@ -2,7 +2,7 @@
 // author wrote and nothing else checks: an implicit `any` or a read of a possibly-null value there is
 // a bug. The script is checked as before, so `$signal(null)` and `$signal([])` stay what they mean.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { parseTemplate } from '@pdxui/compiler';
@@ -32,6 +32,10 @@ function diagnose(script: string, template: string): { code: string; message: st
 }
 
 const USER = 'interface User { name: string }\nlet user = $signal<User | null>(null);';
+
+// The language service's cold start — the lenient program and the strict one — paid here with a
+// timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('the template under strict', () => {
     it("an arrow handler's parameter is the event: a misspelt member of it is reported", () => {

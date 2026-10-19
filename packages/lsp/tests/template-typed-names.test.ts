@@ -10,7 +10,7 @@
 // slot with no context. A library component's manifest types neither, and an unknown tag says
 // nothing: those stay unchecked, because a template has no cast to answer a false error with.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { parseTemplate } from '@pdxui/compiler';
@@ -36,6 +36,10 @@ function diagnose(script: string, template: string, resolveType?: Resolve): { co
         return { code: String(d.code), message: d.message.split('\n')[0], at: line.slice(d.range.start.character, d.range.end.character) };
     });
 }
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('what the workspace answers for an event and a slot', () => {
     const registry = {

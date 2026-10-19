@@ -4,7 +4,7 @@
 // the editor and `pdx check --types` read — and it declared every @fetch name `any`: a misspelt
 // field passed in silence, and nothing completed on `User` (#53).
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
@@ -27,6 +27,10 @@ function diagnose(script: string, template = ''): string[] {
 }
 
 const USER = "interface User { name: string }\n@fetch user: 'GET /u' as User;\n";
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('a typed @fetch in the script', () => {
     it('a misspelt field of the declared type is an error', () => {

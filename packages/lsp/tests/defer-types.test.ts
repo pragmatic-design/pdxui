@@ -1,7 +1,7 @@
 // `@defer` in the editor (#281): `when ( … )` is an expression of the script's names, checked in
 // either phase, and `@error (err, retry)` gives its branch the error, `unknown`, and a retry function.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { parseTemplate } from '@pdxui/compiler';
@@ -25,6 +25,10 @@ function diagnose(script: string, template: string): { message: string; at: stri
 }
 
 const SCRIPT = "const tab: 'sales' | 'overview' = 'sales';\nconst ready = true;";
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('@defer in the editor', () => {
     it('when ( … ) reads the script, in both phases', () => {

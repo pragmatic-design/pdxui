@@ -2,7 +2,7 @@
 // `(el: Element, value: () => V) => void | (() => void)` — and the value as its V; core's built-ins
 // need no import, as the compiler imports them.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { parseTemplate } from '@pdxui/compiler';
@@ -26,6 +26,10 @@ function diagnose(script: string, template: string): { message: string; at: stri
 }
 
 const TIP = 'function tip(el: Element, value: () => string) { el.setAttribute("title", value()); }';
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('attach: in the editor', () => {
     it('an attachment and a value of its type are clean', () => {
