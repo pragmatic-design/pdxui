@@ -214,6 +214,10 @@ describe('diagnostics on change', () => {
         return stub.sent[0];
     };
 
+    // The language service's cold start — the lenient program and the strict one that checks the
+    // template (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s (#536).
+    beforeAll(() => { diagnosticsFor(pageDoc); }, 60_000);
+
     it('publishes for the document that changed', () => {
         const sent = diagnosticsFor(pageDoc);
         expect(sent.uri).toBe(pageDoc.uri);

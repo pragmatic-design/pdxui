@@ -90,7 +90,9 @@ describe('pdx check --types', () => {
         const path = join(ROOT, 'fetch-types-probe.pdx');
         const errors = typecheckPdx(ROOT, [{ path, content }]).get(path) ?? [];
         expect(errors.some(e => /nmae/.test(e.message) && e.line === 1), JSON.stringify(errors)).toBe(true);
-    });
+        // A `pdx check --types` of its own builds its programs from cold, the strict one too (#468):
+        // 30 s rather than vitest's 5 (#536).
+    }, 30_000);
 });
 
 describe('PdxResource follows core\'s Resource', () => {
