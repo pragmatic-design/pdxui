@@ -39,9 +39,16 @@ describe('__PDX_DEVTOOLS__.map()', () => {
     it('reads a hostile pattern in linear time', () => {
         // `:0(` then `:0((` repeated: what made a regex scan polynomial (#67, CodeQL).
         const hostile = `/:0(${':0(('.repeat(50_000)}`;
-        const started = performance.now();
-        const params = paramsOf(hostile);
-        expect(performance.now() - started).toBeLessThan(200);
+        // The fastest of five runs (#538): load only ever adds time, so the minimum is the scan's own
+        // cost, and a polynomial scan takes seconds in every run. One run timed the machine's load.
+        let fastest = Infinity;
+        let params: ReturnType<typeof paramsOf> = [];
+        for (let i = 0; i < 5; i++) {
+            const started = performance.now();
+            params = paramsOf(hostile);
+            fastest = Math.min(fastest, performance.now() - started);
+        }
+        expect(fastest).toBeLessThan(200);
         expect(params.length).toBeGreaterThan(0);
     });
 
