@@ -10,7 +10,7 @@
     line-height: var(--pdx-line-normal);
     color: var(--pdx-color-text);
     background: var(--pdx-color-surface);
-    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border: var(--pdx-border-width) solid var(--pdx-input-border-color, var(--pdx-color-border));
     border-radius: var(--pdx-radius-md);
     transition: border-color var(--pdx-transition),
                 box-shadow var(--pdx-transition);
@@ -35,7 +35,7 @@
     gap: var(--pdx-space-xs);
     padding: 0 var(--pdx-space-sm);
     background: var(--pdx-color-surface);
-    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border: var(--pdx-border-width) solid var(--pdx-input-border-color, var(--pdx-color-border));
     border-radius: var(--pdx-radius-md);
     transition: border-color var(--pdx-transition),
                 box-shadow var(--pdx-transition);

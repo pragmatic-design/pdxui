@@ -56,6 +56,7 @@
     /* Behavior tokens */
     --pdx-button-radius: var(--pdx-radius-lg);
     --pdx-input-style: outlined;
+    --pdx-input-border-color: light-dark(oklch(1 0 0 / 0.3), oklch(1 0 0 / 0.12));
     --pdx-card-style: bordered;
     --pdx-tab-indicator: underline;
     --pdx-opacity-hover: 0.08;
@@ -80,7 +81,6 @@
     background: light-dark(oklch(1 0 0 / 0.35), oklch(0.15 0.010 240 / 0.4));
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border-color: light-dark(oklch(1 0 0 / 0.3), oklch(1 0 0 / 0.12));
 }
 .pdx-input-wrap:focus-within {
     border-color: var(--pdx-color-primary);

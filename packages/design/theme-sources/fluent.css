@@ -84,6 +84,8 @@
        an app's `pdx-density` still scales from there. Spacing keeps the 0.9. */
     --pdx-button-min-height: calc(2rem / 0.9);     /* 32px Fluent medium, at fluent's density */
     --pdx-input-style: outlined;
+    --pdx-input-focus: bottom;                     /* the brand bottom stroke of a focused field */
+    --pdx-input-border-color: var(--pdx-color-border-strong);
     --pdx-input-min-height: calc(2rem / 0.9);      /* the same, so a row of both aligns */
     --pdx-tab-indicator-size: 3px;     /* strokeWidthThicker */
     --pdx-card-style: bordered;
@@ -98,12 +100,9 @@
 /* Input: focus bottom-accent driven by [pdx-input-focus="bottom"] in inputs.css.
    No size overrides — height flows from --pdx-input-min-height × density,
    and base size variants in inputs.css scale with density automatically. */
-/* Fluent uses border-strong on inputs by default */
+/* Fluent's border-strong at rest is --pdx-input-border-color above: a rule here, in the themes'
+   layer, would beat the component's focus and error colours (#519). */
 @pdx-theme fluent {
-.pdx-input-wrap {
-    border-color: var(--pdx-color-border-strong);
-}
-
 /* Buttons: Fluent — compact (32px medium), no letter-spacing, semibold 600 */
 :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
     letter-spacing: 0;
