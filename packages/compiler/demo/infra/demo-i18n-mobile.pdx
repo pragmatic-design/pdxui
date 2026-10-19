@@ -63,7 +63,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { registerComponentStrings, setComponentStrings, getComponentString, setLocaleStrings, direction, isRTL, setDirection, useBottomSheet, useSafeArea, injectSafeAreaCSS, effect, onMount, onDestroy } from '@pdxui/core';
 
 // ─── i18n: Component Strings ──────────────────────────────────

@@ -29,7 +29,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const fiveMinAgo = new Date(Date.now() - 5 * 60000).toISOString();
 const twoHoursAgo = new Date(Date.now() - 2 * 3600000).toISOString();
 const oneDayAgo = new Date(Date.now() - 86400000).toISOString();

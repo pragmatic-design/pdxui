@@ -1,4 +1,4 @@
-<script setup>
+<script>
 import { buildData } from './data.js';
 
 let rows = $signal([]);

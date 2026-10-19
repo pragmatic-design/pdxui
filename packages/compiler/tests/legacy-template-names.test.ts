@@ -15,8 +15,10 @@ const codes = (source: string): string[] => compile(source, 'legacy.pdx').warnin
 const finding = (source: string) => compile(source, 'legacy.pdx').warnings.find((w) => w.code === 'PDX_TEMPLATE_NAME_NOT_PROVIDED');
 
 describe('a legacy template reads only what the script provides', () => {
-    it('a plain <script> that returns nothing: the name it reads is an error', () => {
-        const w = finding(sfc('<h1>{{ title }}</h1>', "const title = 'Hi';"));
+    // A legacy script is one with a legacy marker (#158): a plain `<script>` without one is the
+    // declarative mode, which returns `title` by itself (one-script-grammar.test.ts).
+    it('a legacy script that returns nothing: the name it reads is an error', () => {
+        const w = finding(sfc('<h1>{{ title }}</h1>', "const title = 'Hi';\nreturn {};"));
         expect(w, 'compiled to ctx.title — undefined — with no word').toBeDefined();
         expect(w!.severity).toBe('error');
         expect(w!.message).toContain("'title'");

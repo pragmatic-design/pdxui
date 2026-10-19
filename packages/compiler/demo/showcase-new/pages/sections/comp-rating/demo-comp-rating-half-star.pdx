@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let rating2 = $signal(2.5);
 
 function onRating2(e) {

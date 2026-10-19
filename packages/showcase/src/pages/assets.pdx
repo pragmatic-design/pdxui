@@ -70,7 +70,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // A dictionary key, for the reason in `customers.pdx`: an ancestor of `/assets/:id`, which does not
 // render inside it.
 @page '/assets' { label: $t('assets.title') };

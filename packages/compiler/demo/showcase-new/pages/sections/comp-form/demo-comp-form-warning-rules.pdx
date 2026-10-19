@@ -28,7 +28,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, min } from '@pdxui/core';
 
 // ─── 4. Warning Form ───

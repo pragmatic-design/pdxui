@@ -30,7 +30,7 @@
   }
 </template>
 
-<script setup>
+<script>
 // What a component page shows when it has no gallery: a hero demo — or, for a component
 // that needs data to show anything, a placeholder — then the examples and use cases written for it.
 import { contentOf, heroSourceOf } from '../lib/component-content';

@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const radarData = [
   { skill: 'Speed', alice: 85, bob: 70 },
   { skill: 'Strength', alice: 60, bob: 90 },

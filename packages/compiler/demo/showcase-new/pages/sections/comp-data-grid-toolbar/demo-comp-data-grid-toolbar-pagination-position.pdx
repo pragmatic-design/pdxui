@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, fakeTransport } from '@pdxui/core';
 import { products } from './state.pdx';
 

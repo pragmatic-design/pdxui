@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const iconItems = [
   { label: 'Name', value: 'Jane Smith', icon: 'user' },
   { label: 'Email', value: 'jane.smith@example.com', icon: 'mail' },

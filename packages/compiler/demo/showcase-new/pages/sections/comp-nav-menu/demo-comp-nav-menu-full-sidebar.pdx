@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const fullSidebar = [
   { key: 'hdr-main', label: 'Main', type: 'header' },
   { key: 'dashboard', label: 'Dashboard', icon: 'home' },

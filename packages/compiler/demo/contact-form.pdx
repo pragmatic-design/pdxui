@@ -43,7 +43,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @form contact: {
     name: string { required, minLength: 3 },
     email: string { required, email },

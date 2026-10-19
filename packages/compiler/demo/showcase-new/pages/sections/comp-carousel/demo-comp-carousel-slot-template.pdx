@@ -29,7 +29,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const slotSlides = [
   { title: 'Welcome', desc: 'Get started with our platform in minutes.' },
   { title: 'Features', desc: 'Explore powerful tools built for your team.' },

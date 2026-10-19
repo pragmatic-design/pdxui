@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { currentPath, navigate } from '@pdxui/router';
 import '@pdxui/router/outlet';
 import '@pdxui/router/link';

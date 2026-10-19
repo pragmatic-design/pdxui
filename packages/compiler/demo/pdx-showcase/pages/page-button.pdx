@@ -67,7 +67,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/button';
 @title 'Button — PDX Components';
 

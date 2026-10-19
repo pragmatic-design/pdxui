@@ -42,7 +42,7 @@ export function agentsMd(name: string): string {
     return `# ${name} — notes for an AI agent
 
 This is a PDX app. PDX compiles \`.pdx\` single-file components — a \`<template>\`, a
-\`<script setup>\` with runes such as \`$signal\` and \`@prop\`, a \`<style scoped>\` — into standard
+\`<script>\` with runes such as \`$signal\` and \`@prop\`, a \`<style scoped>\` — into standard
 Web Components, and ships a library of \`pdx-*\` components and a design system.
 
 ## The loop

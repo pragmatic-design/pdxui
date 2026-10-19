@@ -19,7 +19,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const teamData = [
   { id: 'alice', name: 'Alice', team: 'alpha' },
   { id: 'bob', name: 'Bob', team: '' },

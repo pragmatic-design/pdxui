@@ -44,7 +44,7 @@ async function onBeforeClose() {
   </section>
 </template>
 
-<script setup>
+<script>
 import { dialog } from '@pdxui/ui/dialog';
 
 let preventOpen = $signal(false);

@@ -148,7 +148,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/colors';
 @title 'Colors & Tokens';
 </script>

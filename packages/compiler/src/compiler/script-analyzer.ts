@@ -210,15 +210,16 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const RAW_MARKER = '/*@raw*/'; // marker prepended to raw lines to skip rewriting
     const warnings: ValidationWarning[] = [];
 
-    // Detect mode. The legacy mode is recognised by its OWN markers — defineProps/defineEmits, or a
-    // `return {` at the top level, which only a legacy setup body may contain. A `<script setup>`
-    // without them is the new mode, rune or not: otherwise a setup block with only imports, consts
-    // and an onMount would fall into the legacy mode, silently — no auto-return, onMount not
-    // imported. A plain `<script>` needs a new-mode marker (code-only view).
+    // Detect mode. One script grammar (#158): a script is the declarative mode whatever it contains,
+    // under `<script>` and `<script setup>` alike — the legacy mode is recognised by its OWN markers
+    // alone, defineProps/defineEmits or a `return {` at the top level, which only a legacy setup
+    // body may contain. Without them a script with only imports, consts and an onMount would fall
+    // into the legacy mode, silently — no auto-return, onMount not imported. With them, a rune still
+    // selects the new mode (code-only view).
     const legacyMarkerAt = codeLines.findIndex((l, idx) =>
         /\bdefine(?:Props|Emits)\s*[<(]/.test(l) || (setupDepthAt[idx] === 0 && /^\s*return\s*\{/.test(l)));
     const hasLegacyMarkers = legacyMarkerAt !== -1;
-    const isNewMode = (options.setup === true && !hasLegacyMarkers) || codeLines.some(l => {
+    const isNewMode = !hasLegacyMarkers || codeLines.some(l => {
         const t = l.trim();
         return t.startsWith('@prop ') || t.startsWith('@model ') || t.startsWith('@event ') || t.startsWith('@event(') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) || /^@variants\s*\{/.test(t) ||
                t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||

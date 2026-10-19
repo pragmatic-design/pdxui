@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const richItems = [
   { id: 1, name: 'Alice Johnson', role: 'Frontend', status: 'Active', initials: 'AJ' },
   { id: 2, name: 'Bob Smith', role: 'Backend', status: 'Active', initials: 'BS' },

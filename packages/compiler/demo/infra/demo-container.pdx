@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useContainerSize, measure, measureRelative, effect, onMount, onDestroy } from '@pdxui/core';
 
 let width = $signal(0);

@@ -58,7 +58,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useClipboard, useResizeHandle, createToastQueue, effect, onMount, onDestroy } from '@pdxui/core';
 
 // ─── Clipboard ────────────────────────

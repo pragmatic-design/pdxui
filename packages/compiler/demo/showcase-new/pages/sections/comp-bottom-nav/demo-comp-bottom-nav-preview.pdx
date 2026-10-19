@@ -24,7 +24,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const navItems = [
   { key: 'home', label: 'Home', icon: 'home' },
   { key: 'search', label: 'Search', icon: 'search' },

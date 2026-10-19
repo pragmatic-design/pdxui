@@ -47,7 +47,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const teamMembers = [
   { id: 1, name: 'Alice Johnson', role: 'Lead', initials: 'AJ' },
   { id: 2, name: 'Bob Smith', role: 'Developer', initials: 'BS' },

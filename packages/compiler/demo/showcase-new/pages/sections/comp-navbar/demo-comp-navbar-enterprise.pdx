@@ -42,7 +42,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useNavbarEvents } from './state.pdx';
 
 // The basic section's navbar writes this line too (state.pdx.ts).

@@ -39,7 +39,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let respFrame = $signal(null);
 let respHamburger = $signal(null);
 let respNav = $signal(null);

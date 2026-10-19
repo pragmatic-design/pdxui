@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Served by the app: public/avatars/, here and in packages/site, not by a third party — whose uptime
 // and privacy terms the page would depend on.
 const imageItems = [

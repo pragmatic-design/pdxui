@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 // The upload half of an attachments panel: the drop zone, one transfer at a time with its handle on
 // screen, the cancel, and the refusals.
 //

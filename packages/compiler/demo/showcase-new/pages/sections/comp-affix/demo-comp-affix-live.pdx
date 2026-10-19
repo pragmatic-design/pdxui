@@ -40,7 +40,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let affixed = $signal(false);
 </script>
 

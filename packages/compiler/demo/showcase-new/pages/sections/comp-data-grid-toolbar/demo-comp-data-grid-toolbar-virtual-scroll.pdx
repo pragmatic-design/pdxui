@@ -21,7 +21,7 @@ const ds = createDataSource({ data: bigData, pageSize: 0 });</code></pre>
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource } from '@pdxui/core';
 import { categories } from './state.pdx';
 

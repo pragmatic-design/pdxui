@@ -82,7 +82,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/:tag';
 @title 'Component — PDX';
 import { currentParams } from '@pdxui/router';

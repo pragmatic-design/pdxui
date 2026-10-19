@@ -33,7 +33,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { THEME_INHERITED } from '@pdxui/design/engine';
 
 // `neutral` IS the base, so it is absent from THEME_INHERITED by construction — a theme that

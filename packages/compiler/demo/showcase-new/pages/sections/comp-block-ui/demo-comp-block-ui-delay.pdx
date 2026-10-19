@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let saving = $signal(false);
 
 function save(ms) {

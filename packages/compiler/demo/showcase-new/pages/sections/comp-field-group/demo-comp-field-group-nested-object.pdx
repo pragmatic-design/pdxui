@@ -60,7 +60,7 @@ const orderForm = createForm({
   </section>
 </template>
 
-<script setup>
+<script>
 import { valuesJson } from './state.pdx';
 import { createForm, required, email } from '@pdxui/core';
 

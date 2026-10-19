@@ -46,8 +46,8 @@ afterEach(() => {
 
 describe('pdx migrate — application tags take the app prefix (#136)', () => {
     it('renames the project tags in .pdx templates and styles, @tag, and the HTML page; flags one in a string', async () => {
-        file('src/user-card.pdx', '<template><p>card</p></template>\n<script setup>\n</script>\n');
-        file('src/badge.pdx', "<template><b>x</b></template>\n<script setup>\n@tag 'pdx-hot-badge';\n</script>\n");
+        file('src/user-card.pdx', '<template><p>card</p></template>\n<script>\n</script>\n');
+        file('src/badge.pdx', "<template><b>x</b></template>\n<script>\n@tag 'pdx-hot-badge';\n</script>\n");
         file('src/page.pdx', '<template>\n  <pdx-user-card></pdx-user-card><pdx-hot-badge/>\n</template>\n<style scoped>\npdx-user-card { display: block; }\n</style>\n');
         file('index.html', '<body>\n  <pdx-page></pdx-page><pdx-root-shell></pdx-root-shell>\n</body>\n');
         // A file named pdx-…, whose tag an app stylesheet also styles: still the project's.
@@ -74,7 +74,7 @@ describe('pdx migrate — application tags take the app prefix (#136)', () => {
 
 describe('pdx migrate — events stop bubbling, and $emit leaves (#138)', () => {
     it('keeps an alpha component bubbling, rewrites $emit, and flags the one it cannot rewrite', async () => {
-        file('src/card.pdx', "<template><button @click=\"$emit('saved', 1)\">x</button></template>\n<script setup>\n@event closed;\nfunction go() { closed(); $emit('pdx-change', 2); }\n</script>\n");
+        file('src/card.pdx', "<template><button @click=\"$emit('saved', 1)\">x</button></template>\n<script>\n@event closed;\nfunction go() { closed(); $emit('pdx-change', 2); }\n</script>\n");
 
         const report = await migrate(['.'], { cwd: root });
 
@@ -113,7 +113,7 @@ describe('pdx migrate — a library tag stays the library\'s (#136)', () => {
 describe('pdx migrate — the rewrite', () => {
     it('rewrites a removed form, writes the file and says so', async () => {
         setLanguageChangesForTests([OLD_FORM]);
-        file('src/a.pdx', '<template><p>x</p></template>\n<script setup>\n// @oldform and @oldform\n</script>\n');
+        file('src/a.pdx', '<template><p>x</p></template>\n<script>\n// @oldform and @oldform\n</script>\n');
 
         const report = await migrate(['.'], { cwd: root });
 
@@ -185,7 +185,7 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
     });
 
     it('reports an arrow function assigned to a $signal (#187), and leaves the file as it is', async () => {
-        const source = '<template><p>x</p></template>\n<script setup>\nlet cb = $signal(null);\nfunction set() { cb = () => 1; }\n</script>\n';
+        const source = '<template><p>x</p></template>\n<script>\nlet cb = $signal(null);\nfunction set() { cb = () => 1; }\n</script>\n';
         file('src/a.pdx', source);
         const report = await migrate(['.'], { cwd: root });
         expect(report.flagged.map((f) => [f.file, f.line, f.id])).toEqual([['src/a.pdx', 4, 'signal-arrow-assignment']]);
@@ -212,14 +212,14 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
     it('flags an import of a removed export in a .ts file and in a .pdx script', async () => {
         setLanguageChangesForTests([removedExport('@pdxui/core', 'oldThing', '`newThing()`', 0)]);
         file('src/util.ts', "import { signal, oldThing } from '@pdxui/core';\n");
-        file('src/a.pdx', "<template><p>x</p></template>\n<script setup>\nimport { oldThing } from '@pdxui/core';\n</script>\n");
+        file('src/a.pdx', "<template><p>x</p></template>\n<script>\nimport { oldThing } from '@pdxui/core';\n</script>\n");
         const report = await migrate(['.'], { cwd: root });
         expect(report.flagged.map((f) => [f.file, f.line]).sort()).toEqual([['src/a.pdx', 3], ['src/util.ts', 1]]);
     });
 
     it('flags ::x on a prop the child does not declare @model, reading the child\'s file (#124)', async () => {
-        file('src/name-field.pdx', "<template><input ::value=\"value\" /></template>\n<script setup>\n@model value: string = '';\n@prop label: string = '';\n</script>\n");
-        file('src/page.pdx', "<template>\n  <pdx-name-field ::value=\"name\" ::label=\"title\"></pdx-name-field>\n  <input ::value=\"name\" />\n</template>\n<script setup>\nlet name = $signal('');\nlet title = $signal('');\n</script>\n");
+        file('src/name-field.pdx', "<template><input ::value=\"value\" /></template>\n<script>\n@model value: string = '';\n@prop label: string = '';\n</script>\n");
+        file('src/page.pdx', "<template>\n  <pdx-name-field ::value=\"name\" ::label=\"title\"></pdx-name-field>\n  <input ::value=\"name\" />\n</template>\n<script>\nlet name = $signal('');\nlet title = $signal('');\n</script>\n");
         const report = await migrate(['.'], { cwd: root, dry: true });
         expect(report.flagged.map((f) => [f.file, f.line, f.id, f.found])).toEqual([['src/page.pdx', 2, 'two-way-not-model', '::label']]);
         // The registry's message is one per change; the place and the name are the finding's.
@@ -227,14 +227,22 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
     });
 
     it('flags every ::x.number binding: an empty entry now writes null, an invalid one nothing (#126)', async () => {
-        file('src/age.pdx', "<template>\n  <input type=\"number\" ::value.number=\"age\" />\n  <input ::value.trim=\"name\" />\n</template>\n<script setup>\nlet age = $signal(0);\nlet name = $signal('');\n</script>\n");
+        file('src/age.pdx', "<template>\n  <input type=\"number\" ::value.number=\"age\" />\n  <input ::value.trim=\"name\" />\n</template>\n<script>\nlet age = $signal(0);\nlet name = $signal('');\n</script>\n");
         const report = await migrate(['.'], { cwd: root, dry: true });
         expect(report.flagged.map((f) => [f.file, f.line, f.id, f.found])).toEqual([['src/age.pdx', 2, 'two-way-number', '::value.number']]);
         expect(report.flagged[0].message).toContain('null');
     });
 
+    it('rewrites <script setup> to <script>, the one script grammar (#158)', async () => {
+        file('src/a.pdx', '<template><p>{{ n }}</p></template>\n<script setup lang="js">\nlet n = $signal(0);\n</script>\n');
+        const report = await migrate(['.'], { cwd: root });
+        expect(report.changed).toEqual([{ file: 'src/a.pdx', id: 'script-setup', count: 1 }]);
+        expect(read('src/a.pdx')).toBe('<template><p>{{ n }}</p></template>\n<script lang="js">\nlet n = $signal(0);\n</script>\n');
+        expect(await migrate(['.'], { cwd: root }), 'not idempotent').toEqual({ changed: [], flagged: [] });
+    });
+
     it('control — a project written today has nothing to change or flag', async () => {
-        file('src/a.pdx', '<template><p>{{ n }}</p></template>\n<script setup>\nlet n = $signal(0);\nfunction f() { n = n + 1; }\n</script>\n');
+        file('src/a.pdx', '<template><p>{{ n }}</p></template>\n<script>\nlet n = $signal(0);\nfunction f() { n = n + 1; }\n</script>\n');
         file('vite.config.ts', "export default { plugins: [pdx()] };\n");
         const report = await migrate(['.'], { cwd: root });
         expect(report).toEqual({ changed: [], flagged: [] });

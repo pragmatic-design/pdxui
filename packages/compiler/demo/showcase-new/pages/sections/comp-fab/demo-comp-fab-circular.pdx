@@ -25,7 +25,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { speedDialActions } from './state.pdx';
 
 const circleActions = [

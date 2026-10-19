@@ -24,7 +24,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Position drawer
 let drawerOpen = $signal(false);
 

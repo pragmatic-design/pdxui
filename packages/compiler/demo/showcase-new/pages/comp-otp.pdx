@@ -52,7 +52,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/otp';
 @title 'OTP Input';
 </script>

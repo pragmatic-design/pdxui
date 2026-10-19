@@ -29,7 +29,7 @@ const cities = [
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Cities (objects) ───
 const cities = [
   { name: 'Rome', code: 'FCO' }, { name: 'Milan', code: 'MXP' }, { name: 'Naples', code: 'NAP' },

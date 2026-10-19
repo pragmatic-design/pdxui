@@ -21,7 +21,7 @@ function loadRegions(node) {
   </section>
 </template>
 
-<script setup>
+<script>
 // Lazy loading: the countries have no children until opened; loadRegions stands in for a server.
 const lazyCountries = [
   { value: 'it', label: 'Italy', isLeaf: false },

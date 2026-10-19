@@ -25,7 +25,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const slotDlItems = [
   { label: 'Status', value: 'Active' },
   { label: 'Plan', value: 'Enterprise' },

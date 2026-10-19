@@ -41,7 +41,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/masked-input';
 @title 'Masked Input';
 </script>

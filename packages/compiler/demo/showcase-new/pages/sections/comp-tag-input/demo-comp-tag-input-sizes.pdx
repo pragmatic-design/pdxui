@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Sizes
 let sizeTags = $signal(['Tag A', 'Tag B']);
 </script>

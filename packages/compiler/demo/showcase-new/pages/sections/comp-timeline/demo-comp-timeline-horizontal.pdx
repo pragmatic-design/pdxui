@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const horizontalEvents = [
   { title: 'Draft', status: 'success', icon: 'pencil' },
   { title: 'Review', status: 'success', icon: 'eye' },

@@ -48,7 +48,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required } from '@pdxui/core';
 
 // ─── 5. DataSource Form (SessionStorage) ───

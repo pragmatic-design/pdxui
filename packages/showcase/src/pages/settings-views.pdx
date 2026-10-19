@@ -62,7 +62,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/settings/views' { label: viewsLabel };
 @title $t('settings.tiles.views');
 

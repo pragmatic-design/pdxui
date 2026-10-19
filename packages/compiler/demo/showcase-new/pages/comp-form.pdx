@@ -99,7 +99,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/form';
 @title 'Form System';
 </script>

@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useDrag, effect, onMount, onDestroy } from '@pdxui/core';
 
 let kbRef = $signal(null);

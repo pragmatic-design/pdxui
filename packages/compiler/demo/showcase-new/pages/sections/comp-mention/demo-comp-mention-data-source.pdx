@@ -18,7 +18,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const allUsers = [
   { value: 'alice', label: 'Alice Johnson' },
   { value: 'bob', label: 'Bob Smith' },

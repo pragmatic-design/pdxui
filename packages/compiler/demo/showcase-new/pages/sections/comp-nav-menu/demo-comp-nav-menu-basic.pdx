@@ -19,7 +19,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const basicItems = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'projects', label: 'Projects' },

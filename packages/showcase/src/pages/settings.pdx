@@ -21,7 +21,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/settings' { label: settingsLabel };
 @title $t('settings.title');
 

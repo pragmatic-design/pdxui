@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const megaMenubar = [
   {
     key: 'home', label: 'Home',

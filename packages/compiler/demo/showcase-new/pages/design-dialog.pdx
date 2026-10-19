@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/dialog-css';
 @title 'Dialog (CSS)';
 </script>

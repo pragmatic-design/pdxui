@@ -30,7 +30,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useToggleGroupDemo } from './state.pdx';
 
 // The composition section's alignment group shows and sets the same value (state.pdx.ts).

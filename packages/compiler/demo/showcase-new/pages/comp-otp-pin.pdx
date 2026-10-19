@@ -50,7 +50,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/otp-pin';
 @title 'OTP & PIN Input';

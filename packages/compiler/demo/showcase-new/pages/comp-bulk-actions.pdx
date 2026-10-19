@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/bulk-actions';
 @title 'Bulk Actions — PDX Components';
 </script>

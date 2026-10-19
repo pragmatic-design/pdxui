@@ -74,7 +74,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { focusTrap, focusGroup, focusRestore, manageFocusOrder, onMount } from '@pdxui/core';
 
 const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];

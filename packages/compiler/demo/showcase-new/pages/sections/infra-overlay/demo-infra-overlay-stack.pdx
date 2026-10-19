@@ -22,7 +22,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { overlayStack, effect, onMount, onDestroy } from '@pdxui/core';
 import { useOverlayDemo } from './state.pdx';
 

@@ -41,7 +41,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { columns, people } from './state.pdx';
 
 const schema = { fields: [

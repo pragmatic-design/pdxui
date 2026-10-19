@@ -26,7 +26,7 @@
   </pdx-dialog>
 </template>
 
-<script setup>
+<script>
 // The tickets list's create modal, for `pages/tickets.pdx`: its form, the customer
 // typed into it, and the asset picked for it. The page owns whether it is open and what a
 // create does — `list.create(values)` — so the modal says what was filled in, and nothing else.

@@ -44,7 +44,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useTheme } from './theme-store.pdx';
 
 const store = useTheme();

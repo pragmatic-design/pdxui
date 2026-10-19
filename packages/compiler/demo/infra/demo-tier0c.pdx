@@ -76,7 +76,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { createFormEngine, useAdaptive, showSkeleton, hideSkeleton, useScrollAnimation, effect, onMount, onDestroy } from '@pdxui/core';
 
 // ─── Form Engine ──────────────────────────────────────────────

@@ -22,7 +22,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createSelection, effect, onMount, onDestroy } from '@pdxui/core';
 
 const people = [

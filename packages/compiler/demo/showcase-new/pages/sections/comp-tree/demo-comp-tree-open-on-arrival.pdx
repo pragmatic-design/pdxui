@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { docs } from './state.pdx';
 </script>
 

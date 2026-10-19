@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let dynamicData = $signal([
   { category: 'A', value: 42 },
   { category: 'B', value: 68 },

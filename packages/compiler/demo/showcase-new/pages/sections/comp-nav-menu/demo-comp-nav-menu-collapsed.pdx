@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { iconItems } from './state.pdx';
 </script>
 

@@ -22,7 +22,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 function highlightFn(iso) {
   const d = parseInt(iso.split('-')[2]);
   return d === 5 || d === 15 || d === 25 ? 'event' : false;

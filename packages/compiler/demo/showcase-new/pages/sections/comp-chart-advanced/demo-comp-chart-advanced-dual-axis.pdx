@@ -19,7 +19,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const dualAxisData = [
   { month: 'Jan', revenue: 42000, growth: 5 },
   { month: 'Feb', revenue: 51000, growth: 8 },

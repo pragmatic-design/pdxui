@@ -45,7 +45,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/tree-select';
 @title 'TreeSelect Component';
 </script>

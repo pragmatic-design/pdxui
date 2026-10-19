@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { focusGroup, onMount } from '@pdxui/core';
 
 const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'Denmark', 'Egypt', 'France'];

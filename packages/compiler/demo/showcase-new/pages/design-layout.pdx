@@ -99,7 +99,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/layout';
 @title 'Layout';
 </script>

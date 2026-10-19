@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createBottomSheet } from '@pdxui/core';
 import { useOverlayDemo } from './state.pdx';
 

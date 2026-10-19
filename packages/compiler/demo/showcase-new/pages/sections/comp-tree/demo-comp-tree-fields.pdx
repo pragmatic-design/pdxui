@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const org = [
   {
     code: 'ceo', name: 'Chief Executive', reports: [

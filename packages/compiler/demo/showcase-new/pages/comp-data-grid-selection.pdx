@@ -39,7 +39,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/data-grid-selection';
 @title 'Data Grid Selection — PDX Components';
 </script>

@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/login' { label: loginLabel };
 @title $t('login.title');
 

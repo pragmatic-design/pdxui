@@ -16,7 +16,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 let value = $signal({ name: 'Acme', active: true, tags: ['vip', 'eu'], contacts: [{ label: 'Email', value: 'a@b.com' }] });
 let output = $signal('{\n  "name": "Acme",\n  "active": true,\n  "tags": ["vip", "eu"],\n  "contacts": [{ "label": "Email", "value": "a@b.com" }]\n}');
 

@@ -19,7 +19,7 @@ function customFetch(url) {
   </section>
 </template>
 
-<script setup>
+<script>
 const customFetchFn = function(url) {
     return new Promise(function(resolve) {
         setTimeout(function() {

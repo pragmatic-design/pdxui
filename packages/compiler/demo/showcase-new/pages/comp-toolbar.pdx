@@ -44,7 +44,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/toolbar';
 @title 'Toolbar — PDX Components';
 

@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let fabLog = $signal('Click the FAB...');
 
 function onFabClick() {

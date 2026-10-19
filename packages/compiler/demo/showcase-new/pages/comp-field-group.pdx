@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/field-group';
 @title 'Field Group Component';
 </script>

@@ -14,7 +14,7 @@
   }
 </template>
 
-<script setup>
+<script>
 // The side-effect import registers `<pdx-router-outlet>`. It is NOT redundant with the compiler's
 // auto-import: measured by removing it, the router leaves the entry chunk entirely and the outlet
 // is never defined. The compiler's tag scan matches `pdx-*` tags to @pdxui/ui, and the outlet

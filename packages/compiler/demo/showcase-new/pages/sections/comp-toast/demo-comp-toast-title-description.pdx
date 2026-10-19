@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { toast } from '@pdxui/ui/toast';
 
 function showRichSuccess() { toast.success('Your changes have been saved to the database.', { title: 'Saved Successfully' }); }

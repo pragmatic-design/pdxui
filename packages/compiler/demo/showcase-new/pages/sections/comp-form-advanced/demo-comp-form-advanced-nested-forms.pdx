@@ -70,7 +70,7 @@ async function submitOrder() {
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, createFormCoordinator, required, email } from '@pdxui/core';
 
 // ─── 7. Nested Forms (Coordinator) ───

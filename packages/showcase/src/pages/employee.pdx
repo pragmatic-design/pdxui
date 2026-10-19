@@ -86,7 +86,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/employees/:id' { label: employeeLabel };
 // No `@title` here: this page is the frame around a SECTION, and the section names the tab. A
 // dynamic title on the frame re-runs when the record arrives and writes over the section's.

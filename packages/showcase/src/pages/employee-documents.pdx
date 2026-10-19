@@ -70,7 +70,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/employees/:id/documents' { label: documentsLabel };
 @title $t('employees.sectionNames.documents');
 

@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let basicOpen = $signal(false);
 
 function openBasic() { basicOpen = true; }

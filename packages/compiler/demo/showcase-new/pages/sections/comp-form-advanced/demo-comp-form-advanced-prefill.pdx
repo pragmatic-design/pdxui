@@ -55,7 +55,7 @@ function savePrefill() {
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, email } from '@pdxui/core';
 
 // ─── 1. Prefill / Update Mode ───

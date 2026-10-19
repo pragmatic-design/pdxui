@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 let crumbs = $signal([
   { key: 'home', label: 'Home', href: '/' },
   { key: 'clinic', label: 'Clinic', href: '/clinic' },

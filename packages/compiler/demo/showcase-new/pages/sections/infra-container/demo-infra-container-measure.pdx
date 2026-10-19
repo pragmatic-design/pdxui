@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { measure, measureRelative } from '@pdxui/core';
 
 let measureLog = $signal('Click "Measure"');

@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { computeFloatingPosition, offset, shift, onDestroy } from '@pdxui/core';
 
 let cursorFloatEl = null;

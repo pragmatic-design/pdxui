@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const basicItems = [
   { key: 'home', label: 'Home', href: '#' },
   { key: 'products', label: 'Products', href: '#' },

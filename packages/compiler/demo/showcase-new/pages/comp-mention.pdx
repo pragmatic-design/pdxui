@@ -64,7 +64,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/mention';
 @title 'Mention Component';
 </script>

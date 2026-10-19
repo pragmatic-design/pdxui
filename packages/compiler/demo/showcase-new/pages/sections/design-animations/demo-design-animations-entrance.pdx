@@ -39,7 +39,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let playing = $signal(false);
 
 function play() {

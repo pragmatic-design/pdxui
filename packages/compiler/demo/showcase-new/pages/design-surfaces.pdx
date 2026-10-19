@@ -96,7 +96,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/surfaces';
 @title 'Surfaces & Cards';
 </script>

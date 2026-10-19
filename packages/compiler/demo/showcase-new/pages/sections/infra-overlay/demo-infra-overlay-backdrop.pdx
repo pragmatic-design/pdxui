@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createBackdrop } from '@pdxui/core';
 
 // ── Backdrop ──

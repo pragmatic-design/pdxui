@@ -76,7 +76,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/services/:id' { label: serviceLabel };
 @title record?.name ?? $t('services.unknown');
 

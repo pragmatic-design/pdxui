@@ -38,7 +38,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useTasks } from './task-store.pdx';
 
 @page '/create' { preload };

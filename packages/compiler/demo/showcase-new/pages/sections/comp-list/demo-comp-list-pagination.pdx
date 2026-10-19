@@ -25,7 +25,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, type DataRequest, type DataResponse } from '@pdxui/core';
 
 // Paged DataSource — 23 items, 5 per page, simulates server paging

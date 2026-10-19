@@ -28,7 +28,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/card';
 @title 'Card';
 </script>

@@ -27,7 +27,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useSortable, effect, onMount, onDestroy } from '@pdxui/core';
 
 let items = $signal([

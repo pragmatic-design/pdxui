@@ -86,8 +86,9 @@ const props = defineProps({ label: { type: String } });
         expect(analyzeScript(`function pick() {\n  return { a: 1 };\n}`, 'd.pdx', { setup: true }).mode).toBe('new');
     });
 
-    it('control — analyzeScript without the setup flag keeps detecting by content', () => {
-        expect(analyzeScript(`const label = 'x';`, 'plain.pdx').mode).toBe('legacy');
+    // One script grammar (#158): the setup flag no longer selects anything.
+    it('analyzeScript reads a script without legacy markers in the new mode, with or without the setup flag', () => {
+        expect(analyzeScript(`const label = 'x';`, 'plain.pdx').mode).toBe('new');
         expect(analyzeScript(`const label = 'x';`, 'setup.pdx', { setup: true }).mode).toBe('new');
     });
 });

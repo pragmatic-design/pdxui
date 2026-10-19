@@ -18,7 +18,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Sized drawer
 let sizedOpen = $signal(false);
 

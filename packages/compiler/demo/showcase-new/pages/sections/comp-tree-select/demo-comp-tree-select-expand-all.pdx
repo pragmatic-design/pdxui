@@ -7,6 +7,6 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { departments } from './state.pdx';
 </script>

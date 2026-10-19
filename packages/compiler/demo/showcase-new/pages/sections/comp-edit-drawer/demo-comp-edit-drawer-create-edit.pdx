@@ -36,7 +36,7 @@ function onSave(e) { persist(e.detail.values); drawerOpen = false; }</code></pre
   </section>
 </template>
 
-<script setup>
+<script>
 const schema = { fields: [
   { name: 'name', type: 'text', label: 'Name', validators: [{ type: 'required' }] },
   { name: 'role', type: 'text', label: 'Role' },

@@ -63,7 +63,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/tabs';
 @title 'Tabs';
 </script>

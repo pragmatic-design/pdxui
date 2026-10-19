@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const permissionData = [
   { id: 'read', name: 'Read', granted: true },
   { id: 'write', name: 'Write', granted: true },

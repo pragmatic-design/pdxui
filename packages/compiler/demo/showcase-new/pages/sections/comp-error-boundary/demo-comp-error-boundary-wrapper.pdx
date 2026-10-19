@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { signal as rawSignal, computed as rawComputed, component as defineComponent, html as h } from '@pdxui/core';
 
 let boundaryErrorCount = $signal(0);

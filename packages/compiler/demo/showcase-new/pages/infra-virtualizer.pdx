@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/infra/virtualizer';
 @title 'Virtualization';
 </script>

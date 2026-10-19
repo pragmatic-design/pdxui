@@ -9,6 +9,6 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { locations } from './state.pdx';
 </script>

@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { THEME_CONTRACT } from '@pdxui/design/engine';
 import { useThemeMeasure } from './state.pdx';
 

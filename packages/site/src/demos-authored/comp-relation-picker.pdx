@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { createDataSource } from '@pdxui/core';
 
 const rows = [

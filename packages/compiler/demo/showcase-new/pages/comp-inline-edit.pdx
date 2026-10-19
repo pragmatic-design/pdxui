@@ -64,7 +64,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/inline-edit';
 @title 'InlineEdit Component';
 </script>

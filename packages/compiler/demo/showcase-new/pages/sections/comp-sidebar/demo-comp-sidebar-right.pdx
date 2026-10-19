@@ -10,7 +10,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const shortItems = [
   { key: 'overview', label: 'Overview', icon: 'eye' },
   { key: 'details', label: 'Details', icon: 'file-text' },

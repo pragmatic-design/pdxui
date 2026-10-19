@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useSegmentedPeriod } from './state.pdx';
 
 // The form-integration control shows and sets the same period (state.pdx.ts).

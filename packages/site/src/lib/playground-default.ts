@@ -15,7 +15,7 @@ export const DEFAULT_SRC = `<template>
   </div>
 </template>
 
-<script setup>
+<script>
 @prop title: string = 'Live PDX component';
 let count = $signal(0);
 const doubled = $derived(count * 2);

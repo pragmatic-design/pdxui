@@ -75,7 +75,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/settings/permissions' { label: permissionsLabel };
 @title $t('settings.tiles.permissions');
 

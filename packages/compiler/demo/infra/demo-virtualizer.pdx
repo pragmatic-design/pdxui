@@ -31,7 +31,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { createVirtualizer, effect, onMount, onDestroy } from '@pdxui/core';
 
 let rendered1 = $signal(0);

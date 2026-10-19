@@ -46,7 +46,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const productSubmenu = [
   { key: 'analytics', label: 'Analytics', icon: 'trending-up' },
   { key: 'automation', label: 'Automation', icon: 'zap' },

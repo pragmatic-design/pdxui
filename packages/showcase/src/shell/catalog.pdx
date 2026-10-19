@@ -62,7 +62,7 @@
   }
 </template>
 
-<script setup>
+<script>
 import { navigate, currentPath } from '@pdxui/router';
 import { CATALOG, fold, activeFor } from './nav-model';
 import type { Favourites } from './favourites';

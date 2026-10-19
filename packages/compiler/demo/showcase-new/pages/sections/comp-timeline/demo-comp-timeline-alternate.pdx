@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const statusEvents = [
   { title: 'Code Committed', description: 'feat: add timeline component', date: '10:23 AM', status: 'success', icon: 'check-circle' },
   { title: 'Build Passed', description: 'All 1934 tests green.', date: '10:25 AM', status: 'success', icon: 'check-circle' },

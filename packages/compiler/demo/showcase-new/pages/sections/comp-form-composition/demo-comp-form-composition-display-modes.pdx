@@ -41,7 +41,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required } from '@pdxui/core';
 
 // ─── 4. Display Modes Form ───

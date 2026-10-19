@@ -58,7 +58,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/';
 @title $t('dashboard.title');
 

@@ -13,7 +13,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let collapsed1 = $signal(false);
 
 function onToggle(e) {

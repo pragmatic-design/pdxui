@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 // Intake's second step: the window, and whether the visit is on site or remote. A section of the
 // `intake` form; the mode is the page's, which step 3 reads too.
 import { tryUseForm } from '@pdxui/core';

@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const vPanes = [
   { min: 15, defaultSize: 60 },
   { min: 15, defaultSize: 40 },

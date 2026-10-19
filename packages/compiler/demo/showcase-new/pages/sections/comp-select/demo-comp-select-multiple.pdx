@@ -10,6 +10,6 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan', 'Teal'];
 </script>

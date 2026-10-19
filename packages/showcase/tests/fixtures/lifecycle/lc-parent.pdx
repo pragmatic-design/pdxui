@@ -9,7 +9,7 @@
   }
 </template>
 
-<script setup>
+<script>
 // Lifecycle case 3 (docs/language/beta/lifecycle.md): the block holds a ref, an attachment and a
 // child with a @fetch; removing it resets the ref, cleans the attachment up and disposes the fetch.
 let shown = $signal(true);

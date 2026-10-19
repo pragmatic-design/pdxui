@@ -75,7 +75,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/menu';
 @title 'Menu';
 </script>

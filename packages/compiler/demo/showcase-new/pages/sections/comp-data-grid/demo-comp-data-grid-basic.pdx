@@ -13,7 +13,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { basicData } from './state.pdx';
 </script>
 

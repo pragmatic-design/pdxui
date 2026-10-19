@@ -38,7 +38,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, minLength, email } from '@pdxui/core';
 
 // ─── 5. Async Validation ───

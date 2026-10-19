@@ -19,7 +19,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const basicItems = [
   { id: 1, name: 'Alice Johnson', role: 'Frontend Developer' },
   { id: 2, name: 'Bob Smith', role: 'Backend Developer' },

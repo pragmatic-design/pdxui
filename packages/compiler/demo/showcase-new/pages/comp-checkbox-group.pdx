@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/checkbox-group';
 @title 'Checkbox Group';
 </script>

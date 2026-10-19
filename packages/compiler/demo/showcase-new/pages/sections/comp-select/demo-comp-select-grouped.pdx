@@ -17,7 +17,7 @@ const cities = [
   </section>
 </template>
 
-<script setup>
+<script>
 const cities = [
   { id: 1, name: 'New York', country: 'USA' },
   { id: 2, name: 'Los Angeles', country: 'USA' },

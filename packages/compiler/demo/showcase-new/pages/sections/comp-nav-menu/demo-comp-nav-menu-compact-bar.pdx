@@ -21,7 +21,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { nestedItems } from './state.pdx';
 </script>
 

@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, fakeTransport } from '@pdxui/core';
 
 const products = [];

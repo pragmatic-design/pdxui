@@ -81,7 +81,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useChipConsole } from './sections/comp-chip/state.pdx';
 
 @page '/components/chip';

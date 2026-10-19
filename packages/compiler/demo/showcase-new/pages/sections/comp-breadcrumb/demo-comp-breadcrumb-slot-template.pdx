@@ -27,7 +27,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const slotCrumbs = [
   { key: 'home', label: 'Home', href: '#' },
   { key: 'docs', label: 'Docs', href: '#' },

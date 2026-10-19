@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/tickets/:id/interventions/:n' { label: interventionLabel };
 @title $t('intervention.title', { n: n });
 

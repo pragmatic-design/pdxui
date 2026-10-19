@@ -44,7 +44,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, minLength } from '@pdxui/core';
 
 // ─── 6. Cross-Field Validation ───

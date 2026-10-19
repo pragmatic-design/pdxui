@@ -83,7 +83,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design', '/design/:topic';
 @title 'Design — PDX';
 import { currentParams } from '@pdxui/router';

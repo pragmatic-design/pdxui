@@ -83,7 +83,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/autocomplete';
 @title 'Autocomplete — PDX UI';
 

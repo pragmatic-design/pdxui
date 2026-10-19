@@ -21,7 +21,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Declarative DataSource ───
 const programmingLangs = ['JavaScript', 'TypeScript', 'Python', 'Rust', 'Go', 'Java', 'C#', 'C++', 'Ruby', 'Swift', 'Kotlin', 'Dart', 'PHP', 'Scala', 'Elixir', 'Haskell', 'Clojure', 'F#', 'Erlang', 'Lua', 'R', 'Julia', 'Zig', 'Nim', 'Crystal', 'OCaml', 'Perl', 'COBOL', 'Fortran', 'Assembly'];
 

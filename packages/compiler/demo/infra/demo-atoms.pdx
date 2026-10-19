@@ -129,7 +129,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import '@pdxui/ui';
 </script>
 

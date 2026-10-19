@@ -27,7 +27,7 @@ function authFetch(url) {
   </section>
 </template>
 
-<script setup>
+<script>
 let authLog = $signal('Waiting for auth fetch...');
 
 const authFetchFn = function(url) {

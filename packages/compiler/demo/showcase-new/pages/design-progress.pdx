@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/progress';
 @title 'Progress';
 </script>

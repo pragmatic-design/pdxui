@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/form-advanced';
 @title 'Form Advanced';
 </script>

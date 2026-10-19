@@ -13,7 +13,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const iconItems = [
   { key: 'home', label: 'Home', icon: 'home', href: '#' },
   { key: 'settings', label: 'Settings', icon: 'settings', href: '#' },

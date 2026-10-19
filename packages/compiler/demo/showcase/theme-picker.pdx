@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { setTheme, toggleDarkMode, currentTheme, debounced } from '@pdxui/core';
 
 @page '/settings' { preload };

@@ -30,7 +30,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { allOn, someOn, setAll, setOne } from './state.pdx';
 
 // Two "Select all" parents: each follows its children, and sets them all when clicked.

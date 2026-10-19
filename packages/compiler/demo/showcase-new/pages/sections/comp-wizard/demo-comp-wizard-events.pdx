@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let wizardLog = $signal('No events yet');
 
 function onStepChange(e) {

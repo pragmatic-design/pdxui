@@ -41,7 +41,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/tooltip';
 @title 'Tooltip';
 </script>

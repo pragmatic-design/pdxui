@@ -58,7 +58,7 @@ onGlobalError((error, ctx) =&gt; {
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Network Fetch Simulation ───────────────────────────
 
 let netState = $signal('idle');

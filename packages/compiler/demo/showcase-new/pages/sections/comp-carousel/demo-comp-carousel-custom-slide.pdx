@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const testimonialSlides = [
   { content: 'Absolutely fantastic framework. Changed how we build UIs.', alt: 'Alice Johnson' },
   { content: 'The signal reactivity model is incredibly intuitive.', alt: 'Bob Martinez' },

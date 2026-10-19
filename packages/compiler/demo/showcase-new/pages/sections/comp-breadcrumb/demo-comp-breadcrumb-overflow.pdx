@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const longItems = [
   { key: 'home', label: 'Home', href: '#' },
   { key: 'docs', label: 'Documentation', href: '#' },

@@ -33,7 +33,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop title: string = 'Items';
   @event itemschanged: number;
 

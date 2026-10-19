@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const disabledItems = [
   { value: 'viewer', label: 'Viewer' },
   { value: 'editor', label: 'Editor' },

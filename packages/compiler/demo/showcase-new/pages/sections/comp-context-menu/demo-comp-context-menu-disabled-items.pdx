@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useContextMenuLog } from './state.pdx';
 
 const contextMenuLog = useContextMenuLog();

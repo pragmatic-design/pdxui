@@ -53,7 +53,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // The hamburger drives the navbar through its documented property, :navbarCollapsed; collapsed, it
 // is the 60px icon rail.
 let navOpen = $signal(true);

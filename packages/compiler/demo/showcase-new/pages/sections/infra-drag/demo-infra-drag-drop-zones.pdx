@@ -22,7 +22,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useDrag, useDropZone, effect, onMount, onDestroy } from '@pdxui/core';
 
 let dropLog = $signal('Drag cards between zones...');

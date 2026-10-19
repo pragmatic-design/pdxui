@@ -48,7 +48,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/settings/users' { label: usersLabel };
 @title $t('settings.tiles.users');
 

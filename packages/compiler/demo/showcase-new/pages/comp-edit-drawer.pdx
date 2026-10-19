@@ -33,7 +33,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/edit-drawer';
 @title 'Edit Drawer — PDX Components';
 </script>

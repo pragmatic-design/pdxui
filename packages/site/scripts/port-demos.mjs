@@ -34,13 +34,6 @@ for (const f of files) {
     // Strip route metadata so importing the file does NOT register a route.
     code = code.replace(/^[ \t]*@page\b.*$\n?/gm, '');
     code = code.replace(/^[ \t]*@title\b.*$\n?/gm, '');
-    // Many showcase pages relied on @page/@title alone for new-mode detection. Stripping it would
-    // drop them to legacy mode -> no auto-return -> top-level consts aren't exposed to ctx, so
-    // bindings like :data="rows" arrive empty (e.g. data-grid). Restore the original (new) mode
-    // with a harmless dummy signal when no other new-mode marker remains.
-    if (!/\$signal\(|\$derived\(|\$store\(|\$effect\(|\$watch\(|@prop |@event |@fetch |@form |@expose |@provide |@inject |@store /.test(code)) {
-        code = code.replace(/(<script setup>)/, '$1\nlet _pdxKeep = $signal(0);');
-    }
     // No syntax rewriting here: translating raw `${…}` bindings into `:attr=` / `{{ }}` would let
     // the site compile clean while the showcase pages it ports teach the form the compiler warns
     // against (PDX_RAW_INTERPOLATION). The pages are written in the supported syntax, and

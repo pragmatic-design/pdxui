@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { computeFloatingPosition, autoUpdate, offset, shift, onMount, onDestroy } from '@pdxui/core';
 
 let iframeLog = $signal('Click the button inside the iframe');

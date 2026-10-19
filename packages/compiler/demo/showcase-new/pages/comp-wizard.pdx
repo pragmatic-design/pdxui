@@ -83,7 +83,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/wizard';
 @title 'Wizard — PDX Components';
 </script>

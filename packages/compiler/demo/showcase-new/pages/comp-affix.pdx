@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/affix';
 @title 'Affix — PDX Components';
 

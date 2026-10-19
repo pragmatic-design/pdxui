@@ -20,7 +20,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // A branch whose children are not in the page yet: `isBranch` is what says "this one opens"
 // before anything is known about what is inside it.
 const servers = [

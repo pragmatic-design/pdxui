@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const badgeItems = [
   { key: 'inbox', label: 'Inbox', icon: 'mail', badge: '12', badgeVariant: 'primary' },
   { key: 'sent', label: 'Sent', icon: 'send' },

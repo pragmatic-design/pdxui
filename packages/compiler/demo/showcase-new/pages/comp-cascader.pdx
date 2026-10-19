@@ -69,7 +69,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/cascader';
 @title 'Cascader Component';
 </script>

@@ -72,7 +72,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/account' { label: accountLabel };
 @title $t('account.title');
 

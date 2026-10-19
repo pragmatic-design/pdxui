@@ -141,7 +141,7 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
   </div>
 </template>
 
-<script setup>
+<script>
   @tag 'app-root';
   let title = $signal('${vars['{{PASCAL_NAME}}']}');
 </script>
@@ -177,7 +177,7 @@ function getInlineTemplate(name: string): string {
   </div>
 </template>
 
-<script setup>
+<script>
   @prop label: string = '{{PASCAL_NAME}}';
 </script>
 
@@ -191,7 +191,7 @@ function getInlineTemplate(name: string): string {
   </div>
 </template>
 
-<script setup>
+<script>
   @page '/{{NAME}}';
   let title = $signal('{{PASCAL_NAME}}');
 </script>

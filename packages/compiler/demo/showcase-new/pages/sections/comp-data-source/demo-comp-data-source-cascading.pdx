@@ -39,7 +39,7 @@ function onCountryPick(e) {
   </section>
 </template>
 
-<script setup>
+<script>
 // Cascade
 const cities = [
   { id: 1, name: 'New York', country: 'USA' },

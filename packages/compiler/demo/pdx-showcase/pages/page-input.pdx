@@ -78,7 +78,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/input';
 @title 'Input — PDX Components';
 

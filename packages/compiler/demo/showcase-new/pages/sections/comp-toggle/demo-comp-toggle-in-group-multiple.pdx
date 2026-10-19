@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let formatting = $signal('');
 
 function onFormatting(e) {

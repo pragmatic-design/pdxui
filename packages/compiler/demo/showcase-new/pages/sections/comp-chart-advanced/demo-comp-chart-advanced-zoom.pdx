@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const zoomData = Array.from({ length: 90 }, (_, i) => ({
   day: 'Day ' + (i + 1),
   value: Math.round(50 + 30 * Math.sin(i / 8) + Math.random() * 15),

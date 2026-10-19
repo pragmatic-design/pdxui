@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let align = $signal('left');
 
 function onAlign(e) {

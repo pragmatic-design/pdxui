@@ -63,7 +63,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/pagination';
 @title 'Pagination — PDX Components';
 </script>

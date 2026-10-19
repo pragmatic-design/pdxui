@@ -19,7 +19,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let start = $signal('10:00');
 let end = $signal('11:30');
 

@@ -29,7 +29,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/contracts' { label: $t('contracts.title') };
 @title $t('contracts.title');
 @scroll 'preserve';

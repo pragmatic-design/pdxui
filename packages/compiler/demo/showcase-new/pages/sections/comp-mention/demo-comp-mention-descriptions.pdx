@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const richUsers = [
   { value: 'alice', label: 'Alice Johnson', role: 'Engineer' },
   { value: 'bob', label: 'Bob Smith', role: 'Designer' },

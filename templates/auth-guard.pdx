@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop showLogin: boolean = true;
   @event loginrequested: void;
   @slot content;

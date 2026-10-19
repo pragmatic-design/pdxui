@@ -85,7 +85,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/image';
 @title 'Image — PDX Components';
 </script>

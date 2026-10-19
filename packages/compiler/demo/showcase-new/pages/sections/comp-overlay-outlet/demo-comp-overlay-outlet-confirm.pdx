@@ -30,7 +30,7 @@ dialog.confirm({ title: 'Publish now?', confirmDelay: 3 });</code></pre>
   </section>
 </template>
 
-<script setup>
+<script>
 import { useOutletAnswer } from './state.pdx';
 
 // The stacking section writes the same answer (state.pdx.ts).

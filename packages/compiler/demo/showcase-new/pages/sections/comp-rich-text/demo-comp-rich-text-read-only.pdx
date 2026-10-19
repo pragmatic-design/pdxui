@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const sampleDoc = {
   type: 'doc',
   content: [

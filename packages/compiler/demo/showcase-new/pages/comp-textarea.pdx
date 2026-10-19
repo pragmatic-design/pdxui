@@ -52,7 +52,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/textarea';
 @title 'Textarea Component';

@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/themes';
 @title 'Themes & Tokens — PDX UI';
 import { onMount } from '@pdxui/core';

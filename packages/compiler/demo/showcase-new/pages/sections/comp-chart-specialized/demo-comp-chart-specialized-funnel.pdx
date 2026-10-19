@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const funnelData = [
   { stage: 'Visitors', users: 10000 },
   { stage: 'Sign-ups', users: 4200 },

@@ -69,7 +69,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/app-layout';
 @title 'AppLayout — PDX Components';
 

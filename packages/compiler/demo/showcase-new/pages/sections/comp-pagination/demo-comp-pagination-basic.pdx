@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let pageLog = $signal('Click a page...');
 
 function onPageChange(e) {

@@ -22,7 +22,7 @@
   </span>
 </template>
 
-<script setup>
+<script>
 // The profile menu, as its own component (CD-B1): its state — whether it is open, its
 // items, its trigger — is read by nothing else in the shell, and nothing of the shell's is read here.
 import { getLocale, currentScheme, setScheme } from '@pdxui/core';

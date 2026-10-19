@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Highlight (languages) ───
 const languages = ['JavaScript', 'TypeScript', 'Python', 'Rust', 'Go', 'Java', 'C#', 'C++', 'Ruby', 'Swift', 'Kotlin', 'Dart', 'PHP', 'Scala', 'Elixir', 'Haskell', 'Clojure', 'F#'];
 </script>

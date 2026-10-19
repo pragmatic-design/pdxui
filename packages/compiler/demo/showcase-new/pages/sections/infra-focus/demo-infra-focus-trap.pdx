@@ -15,7 +15,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { focusTrap } from '@pdxui/core';
 
 let trapActive = $signal(false);

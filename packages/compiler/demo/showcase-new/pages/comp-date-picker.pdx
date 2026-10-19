@@ -102,7 +102,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/date-picker';
 @title 'Date Picker Component';
 </script>

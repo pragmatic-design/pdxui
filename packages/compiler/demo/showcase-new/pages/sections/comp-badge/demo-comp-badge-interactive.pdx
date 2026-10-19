@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Interactive demo
 let notifCount = $signal(3);
 

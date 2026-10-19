@@ -24,6 +24,6 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let quarter = $signal('10:00');
 </script>

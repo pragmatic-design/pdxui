@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/search';
 @title 'Search Input';
 </script>

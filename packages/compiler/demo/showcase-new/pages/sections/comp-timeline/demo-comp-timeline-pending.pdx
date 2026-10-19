@@ -8,7 +8,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const pendingEvents = [
   { title: 'Order Placed', date: 'Apr 1, 2026', status: 'success', icon: 'check-circle' },
   { title: 'Payment Confirmed', date: 'Apr 1, 2026', status: 'success', icon: 'check-circle' },

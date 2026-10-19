@@ -25,7 +25,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop total: number = 0;
   @prop done: number = 0;
 

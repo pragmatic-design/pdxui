@@ -43,7 +43,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/dropdown-menu';
 @title 'Dropdown Menu';
 </script>

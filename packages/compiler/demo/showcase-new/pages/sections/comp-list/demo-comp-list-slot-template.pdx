@@ -47,7 +47,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const slotItems = [
   { id: 1, name: 'Alice Johnson', email: 'alice@acme.com', dept: 'Engineering' },
   { id: 2, name: 'Bob Smith', email: 'bob@acme.com', dept: 'Design' },

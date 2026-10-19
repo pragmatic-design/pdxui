@@ -31,7 +31,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Slot demo
 let slotTags = $signal(['Frontend', 'Backend', 'DevOps']);
 </script>

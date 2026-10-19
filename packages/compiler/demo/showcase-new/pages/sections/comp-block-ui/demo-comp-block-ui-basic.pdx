@@ -30,7 +30,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let blocked = $signal(false);
 
 function toggleBlock() { blocked = !blocked; }

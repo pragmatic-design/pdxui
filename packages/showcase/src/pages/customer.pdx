@@ -140,7 +140,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/customers/:id' { label: customerLabel };
 @title record?.name ?? $t('customers.unknown');
 

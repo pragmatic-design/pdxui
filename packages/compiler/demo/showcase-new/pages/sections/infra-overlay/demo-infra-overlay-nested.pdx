@@ -6,7 +6,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useOverlayDemo } from './state.pdx';
 
 // It numbers its overlays from the stack section's counter and writes its log (state.pdx.ts).

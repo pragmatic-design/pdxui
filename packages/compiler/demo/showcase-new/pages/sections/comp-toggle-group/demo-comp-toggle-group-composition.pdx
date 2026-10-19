@@ -23,7 +23,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useToggleGroupDemo } from './state.pdx';
 
 // The single and multiple sections show and set the same two values (state.pdx.ts).

@@ -3,7 +3,7 @@
   @if (users.state() === 'error') { <p role="alert">{{ users.error()?.message }}</p> }
 </template>
 
-<script setup>
+<script>
 // A @fetch whose request never answers (main.js): disposed with this component, it must abort.
 @fetch users: 'GET /api/lc-never' as string[];
 </script>

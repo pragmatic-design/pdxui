@@ -72,7 +72,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/carousel';
 @title 'Carousel';
 </script>

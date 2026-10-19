@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/filter-builder';
 @title 'Filter Builder';
 </script>

@@ -119,7 +119,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/tickets/:id' { label: ticketLabel };
 @title $t('ticket.title', { id: id });
 

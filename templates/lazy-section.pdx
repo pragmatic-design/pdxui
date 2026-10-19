@@ -34,7 +34,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop title: string = 'Lazy Section';
   @slot content;
 

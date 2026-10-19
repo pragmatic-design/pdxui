@@ -109,7 +109,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/employees/:id/sites' { label: sitesLabel };
 @title $t('employees.sectionNames.sites');
 

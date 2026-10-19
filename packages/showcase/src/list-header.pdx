@@ -59,7 +59,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { setQueryParam, currentQuery } from '@pdxui/router';
 import { createViewStore, pickView, markViewFilter, DEFAULT_VIEW } from './data/views';
 import type { ListGrid, BuiltInView } from './data/views';

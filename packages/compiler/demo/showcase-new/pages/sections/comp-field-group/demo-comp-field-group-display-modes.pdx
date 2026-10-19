@@ -56,7 +56,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { valuesJson } from './state.pdx';
 import { createForm } from '@pdxui/core';
 

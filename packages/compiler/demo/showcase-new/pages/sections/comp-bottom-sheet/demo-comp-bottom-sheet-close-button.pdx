@@ -12,7 +12,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // Close button
 let closeOpen = $signal(false);
 

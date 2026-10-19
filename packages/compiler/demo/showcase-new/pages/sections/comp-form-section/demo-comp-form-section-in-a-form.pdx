@@ -36,7 +36,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createForm } from '@pdxui/core';
 
 const profileForm = createForm({ initialValues: { first: '', last: '', email: '', phone: '', city: '', zip: '' } });

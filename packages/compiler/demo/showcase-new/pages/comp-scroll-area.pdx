@@ -47,7 +47,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/scroll-area';
 @title 'ScrollArea — PDX Components';
 </script>

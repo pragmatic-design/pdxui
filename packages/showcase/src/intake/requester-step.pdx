@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 // Intake's first step: who is asking, and for which customer and asset. Its fields are the
 // `intake` form's — `tryUseForm()` makes this component a section of the form above it, so its
 // named controls are wired to that form. What it picks goes to the page, which holds the values

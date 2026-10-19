@@ -21,7 +21,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   let category = $signal('Books');
 
   const page = linkedSignal({

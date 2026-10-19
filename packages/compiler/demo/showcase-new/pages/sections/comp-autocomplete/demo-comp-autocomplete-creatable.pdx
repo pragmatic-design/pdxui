@@ -29,7 +29,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Select creatable (tags) ───
 let tags = $signal(['Bug', 'Feature', 'Enhancement', 'Documentation', 'Help Wanted', 'Good First Issue']);
 

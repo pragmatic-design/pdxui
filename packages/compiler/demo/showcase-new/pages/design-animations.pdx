@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/animations';
 @title 'Animations';
 </script>

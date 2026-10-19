@@ -5,7 +5,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/products';
 @title 'Products — TaskMgr';
 @meta description: 'Browse all available products';

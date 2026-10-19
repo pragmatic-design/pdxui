@@ -44,7 +44,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/avatar';
 @title 'Avatar Component';

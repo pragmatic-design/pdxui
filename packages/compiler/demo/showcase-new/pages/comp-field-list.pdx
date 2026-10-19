@@ -39,7 +39,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/field-list';
 @title 'Field List Component';
 </script>

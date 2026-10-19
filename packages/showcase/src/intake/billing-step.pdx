@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 // Intake's last step: the `billing` form's field, the review, and the one Save. A section of the
 // `billing` form. The Save itself is the page's: it is the coordinator's
 // `submitAll` over BOTH forms, so this step only asks for it.

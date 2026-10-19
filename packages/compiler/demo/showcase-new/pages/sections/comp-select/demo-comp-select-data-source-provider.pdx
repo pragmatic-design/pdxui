@@ -30,7 +30,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { arrayTransport, delayTransport } from '@pdxui/core';
 
 const dsUsers = [

@@ -88,7 +88,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { getComponent } from '../lib/manifest';
 
 @prop tag: string = '';

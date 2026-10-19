@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/playground';
 @title 'Playground — PDX';
 import { onMount, onDestroy, onGlobalError } from '@pdxui/core';

@@ -9,7 +9,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const sectionItems = [
   { key: 'hdr1', label: 'Account', type: 'header' },
   { key: 'profile', label: 'Profile', icon: 'user' },

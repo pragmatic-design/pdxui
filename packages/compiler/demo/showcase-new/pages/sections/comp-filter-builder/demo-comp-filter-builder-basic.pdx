@@ -26,7 +26,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { createDataSource, toColumnDefs, type FieldDefinition } from '@pdxui/core';
 import { categories, products } from './state.pdx';
 

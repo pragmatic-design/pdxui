@@ -5,7 +5,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @prop code: string = '';
 import { effect } from '@pdxui/core';
 import { highlightPdx } from '../lib/highlight';

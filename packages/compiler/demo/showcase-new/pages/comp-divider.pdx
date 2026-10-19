@@ -34,7 +34,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/divider';
 @title 'Divider Component';
 let _ = $signal(0);

@@ -16,7 +16,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 // ─── Force selection (colors) ───
 const colors = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Indigo', 'Violet', 'Pink', 'Cyan', 'Magenta', 'Teal', 'Navy', 'Coral', 'Salmon', 'Gold'];
 

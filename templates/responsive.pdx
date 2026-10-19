@@ -33,7 +33,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   import { responsive } from '@pdxui/core';
 
   @prop title: string = 'App';

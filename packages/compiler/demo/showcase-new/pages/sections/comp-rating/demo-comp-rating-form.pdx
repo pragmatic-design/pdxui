@@ -14,7 +14,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 import { useRatingDemo } from './state.pdx';
 
 // The basic rating shows and sets the same value (state.pdx.ts).

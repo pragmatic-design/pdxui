@@ -22,7 +22,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 let imageFiles = $signal('None');
 
 function onImageSelect(e) {

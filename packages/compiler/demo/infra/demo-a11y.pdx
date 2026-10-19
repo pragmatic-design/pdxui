@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useActiveDescendant, useRovingTabindex, createLiveRegion, effect, onMount, onDestroy } from '@pdxui/core';
 
 let adActiveId = $signal('');

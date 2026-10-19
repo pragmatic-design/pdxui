@@ -39,7 +39,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
   @prop columns: object[] = [];
   @prop rows: object[] = [];
   @prop pageSize: number = 10;

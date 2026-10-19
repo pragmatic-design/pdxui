@@ -11,7 +11,7 @@
   </section>
 </template>
 
-<script setup>
+<script>
 const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString();
 </script>
 

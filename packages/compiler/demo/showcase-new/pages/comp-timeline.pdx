@@ -66,7 +66,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/timeline';
 @title 'Timeline — PDX Components';
 

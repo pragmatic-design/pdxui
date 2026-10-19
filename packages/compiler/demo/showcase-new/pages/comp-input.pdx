@@ -106,7 +106,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/input';
 @title 'Input Component';

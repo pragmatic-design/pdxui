@@ -71,7 +71,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 
 @page '/components/badge';
 @title 'Badge Component';

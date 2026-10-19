@@ -69,7 +69,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/design/pagination';
 @title 'Pagination';
 </script>

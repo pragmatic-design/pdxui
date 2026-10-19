@@ -61,7 +61,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { createSelection, effect, onMount, onDestroy } from '@pdxui/core';
 
 const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape'];
