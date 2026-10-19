@@ -33,6 +33,7 @@ import { legacyScript, mixinRemoved } from './legacy-script';
 import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlock } from './route-fields';
 import { runePosition, storePersist } from './script-misreadings';
 import { deferHover } from './defer-hover';
+import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha-events';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -48,6 +49,8 @@ export type LanguageChangeScope = 'pdx' | 'script' | 'config' | 'html';
 export interface LanguageChangeFinding {
     line: number;
     found: string;
+    /** What this place in particular takes, said after the change's message: `Here, write \`@checked-change\`.` */
+    note?: string;
 }
 
 /**
@@ -60,6 +63,8 @@ export interface LanguageChangeContext {
     projectTags?: ReadonlyMap<string, string>;
     /** The project's route keys, `/users/:id` (`projectRoutePatterns`, #150). */
     routePatterns?: ReadonlySet<string>;
+    /** The alpha events a library component no longer emits, from its manifest (#478). */
+    alphaOf?: AlphaLookup;
 }
 
 /** A registered change. */
@@ -330,6 +335,9 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     storePersist,
     // #281: `@defer (hover)` is `interaction` (./defer-hover).
     deferHover,
+    // #478: a library component's alpha change events, read from its manifest (./alpha-events).
+    alphaChangeEvent,
+    alphaChangeListener,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

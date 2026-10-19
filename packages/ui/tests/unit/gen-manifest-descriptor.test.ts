@@ -136,6 +136,36 @@ describe('gen-manifest reads the descriptor\'s models (#124)', () => {
     });
 });
 
+describe('gen-manifest reads the alpha events a component no longer emits (#478)', () => {
+    const source = [
+        '/**',
+        ' * A widget.',
+        ' * @alphaevent pdx-change',
+        ' * @alphaevent change',
+        ' * @alphadetail checked $event.detail.value',
+        ' * @alphadetail value $event.currentTarget.value',
+        ' */',
+        "component('pdx-widget', {",
+        '    models: { checked: model(false) },',
+        '    render: () => html`<div></div>`,',
+        '});',
+    ].join('\n');
+    const decl = () => analyzeFile('src/widget/pdx-widget.ts', source, {})[0].declarations[0];
+
+    it('@alphaevent becomes alphaEvents, in order', () => {
+        expect(decl().alphaEvents).toEqual(['pdx-change', 'change']);
+    });
+
+    it('@alphadetail becomes alphaDetail: each alpha detail field and its beta source', () => {
+        expect(decl().alphaDetail).toEqual({ checked: '$event.detail.value', value: '$event.currentTarget.value' });
+    });
+
+    it('the control: a component that records none lists neither', () => {
+        expect(declaration().alphaEvents).toBeUndefined();
+        expect(declaration().alphaDetail).toBeUndefined();
+    });
+});
+
 describe('gen-manifest reads the descriptor\'s states (#132)', () => {
     const source = [
         '/**',

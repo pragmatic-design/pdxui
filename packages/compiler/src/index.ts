@@ -9,6 +9,7 @@ export { LANGUAGE_CHANGES, languageChanges, removedExport, setLanguageChangesFor
 export { projectTagRenames } from './language/app-prefix';
 export { projectRoutePatterns, routeTypesDts, writeRouteTypes, ROUTE_TYPES_FILE } from './route-types';
 export type { LanguageChange, LanguageChangeKind, LanguageChangeScope, LanguageChangeFinding, LanguageChangeContext } from './language/changes';
+export type { AlphaEvents, AlphaLookup } from './language/alpha-events';
 export { generateDts, modelEventName } from './compiler/dts-generator';
 export { SourceMapBuilder } from './compiler/sourcemap';
 export type { SourceMapJSON } from './compiler/sourcemap';

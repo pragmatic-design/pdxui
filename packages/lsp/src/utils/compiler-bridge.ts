@@ -3,7 +3,7 @@
 
 // Import from @pdxui/compiler — resolved via esbuild alias to source
 import { parseSFC, parseTemplate, templateStartInFile, analyzeScript, validate, compile, positionWarnings, applyIgnores } from '@pdxui/compiler';
-import type { SFCDescriptor, TemplateNode, ScriptAnalysis, ValidationWarning } from '@pdxui/compiler';
+import type { AlphaLookup, SFCDescriptor, TemplateNode, ScriptAnalysis, ValidationWarning } from '@pdxui/compiler';
 
 export interface AnalysisResult {
     descriptor: SFCDescriptor | null;
@@ -21,6 +21,8 @@ export interface AnalyzeOptions {
     methodsOf?: (tag: string) => ReadonlySet<string> | null;
     /** The models components declare, for PDX_TWO_WAY_NOT_MODEL. */
     modelsOf?: (tag: string) => ReadonlySet<string> | null;
+    /** The alpha events library components no longer emit, for PDX_REMOVED_FORM (#478). */
+    alphaOf?: AlphaLookup;
     /** The props components require, for PDX_PROP_REQUIRED. */
     requiredPropsOf?: (tag: string) => ReadonlySet<string> | null;
     /** Whether the project listens to an event above a component, for PDX_EVENT_BUBBLES_UNUSED (#138). */
@@ -76,7 +78,7 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
     if (result.descriptor.template) {
         try {
             const listed = new Map(result.warnings.map((w, i) => [`${w.code}: ${w.message}`, i]));
-            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf, eventHeardAbove: options?.eventHeardAbove, applyIgnores: false }).warnings) {
+            for (const w of compile(source, filename, [], undefined, { propsOf: options?.propsOf, enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, alphaOf: options?.alphaOf, requiredPropsOf: options?.requiredPropsOf, eventHeardAbove: options?.eventHeardAbove, applyIgnores: false }).warnings) {
                 const key = `${w.code}: ${w.message}`;
                 const at = listed.get(key);
                 if (at !== undefined) { result.warnings[at] = w; continue; }

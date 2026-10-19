@@ -46,6 +46,8 @@ import type { PropsLookup, BrowserTarget } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
 import type { MethodsLookup } from './compiler/validate-commands';
 import type { ModelsLookup } from './compiler/validate-two-way';
+import type { ModelEventLookup } from './compiler/compile-context';
+import type { AlphaLookup } from './language/alpha-events';
 import type { RequiredPropsLookup } from './compiler/validate-required-props';
 import { jsQuote } from './compiler/js-literal';
 import { designTargetPlugin } from './design-target';
@@ -514,6 +516,8 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                     enumValues: (tag, prop) => componentResolver.enumValues(tag, prop),
                     methodsOf: (tag) => componentResolver.methodsOf(tag),
                     modelsOf: (tag) => componentResolver.modelsOf(tag),
+                    modelEventOf: (tag) => componentResolver.modelEventOf(tag),
+                    alphaOf: (tag) => componentResolver.alphaOf(tag),
                     requiredPropsOf: (tag) => componentResolver.requiredPropsOf(tag),
                     eventHeardAbove: (event, tag) => componentResolver.eventHeardAbove(event, tag),
                     importPathOf: (tag) => componentResolver.resolve(tag)?.importPath ?? null,
@@ -725,6 +729,17 @@ export interface CompileOptions {
      */
     modelsOf?: ModelsLookup;
     /**
+     * The event of a component's first model and the field its value is in (the plugin passes the
+     * resolver's `modelEventOf`, #478). With it, a form control that lists models is bound to that
+     * event instead of the alpha one the compiler knows by hand.
+     */
+    modelEventOf?: ModelEventLookup;
+    /**
+     * The alpha events library components no longer emit (the plugin passes the resolver's `alphaOf`,
+     * #478). With it, a listener on one is PDX_REMOVED_FORM naming the model's event.
+     */
+    alphaOf?: AlphaLookup;
+    /**
      * Props components require (the plugin passes the resolver's: project .pdx files and the UI
      * manifest). With it, a use that leaves one unset is PDX_PROP_REQUIRED (#130).
      */
@@ -906,7 +921,7 @@ export function compile(
     // Content inside `<component :is>`: no render path renders it (#358).
     if (descriptor.template) allWarnings.push(...validateDynamicContent(descriptor.template.content, descriptor.template.start, source));
     // A form the beta removed, from the registry of language changes (#121).
-    allWarnings.push(...checkRemovedForms(descriptor, source));
+    allWarnings.push(...checkRemovedForms(descriptor, source, { alphaOf: options?.alphaOf }));
     // A `$` rune where the compiler does not read it: left as written, undefined at run time (#278).
     allWarnings.push(...validateRunePosition(descriptor, source));
     // `<script setup>`: one script grammar (#158), so `setup` changes nothing. Said once, at the tag.
@@ -944,7 +959,7 @@ export function compile(
     const beforeCodegen = allWarnings.length;
     let code = compileSFC(
         descriptor, ast, filename, runner,
-        { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
+        { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, modelEventOf: options?.modelEventOf, importPathOf: options?.importPathOf, mapOrigins: true,
           sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.prefix,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.

@@ -14,6 +14,7 @@
 import type { TemplateNode, HtmlNode } from '../parser/template';
 import { jsQuote } from './js-literal';
 import { isSpace, openTags, type OpenTag } from '../text-scan';
+import type { ModelEventLookup } from './compile-context';
 
 // ─── Known Form Controls ──────────────────────────────────────
 
@@ -91,16 +92,17 @@ const DEFAULT_VALUE_EXPR = 'e.detail?.value ?? e.target?.value';
  * Walk all template AST nodes, find <pdx-form> blocks, and inject
  * form bindings on child controls. Modifies HtmlNode.content in-place.
  */
-export function applyFormBindings(nodes: TemplateNode[], inherited?: FormCtx): void {
+export function applyFormBindings(nodes: TemplateNode[], inherited?: FormCtx, modelEventOf?: ModelEventLookup | null): void {
     let formVar = inherited?.formVar ?? null;
     let depth = inherited?.depth ?? 0;
     let groupPath = inherited?.groupPath ? [...inherited.groupPath] : [];
     const base = inherited?.base;
+    const lookup = modelEventOf ?? inherited?.modelEventOf ?? null;
 
     for (const node of nodes) {
         if (node.type === 'html') {
             const html = node as HtmlNode;
-            html.content = processHtmlContent(html.content, { formVar, depth, groupPath, base });
+            html.content = processHtmlContent(html.content, { formVar, depth, groupPath, base, modelEventOf: lookup });
             const state = getFormState(html.content, formVar, depth, groupPath, base);
             formVar = state.formVar;
             depth = state.depth;
@@ -113,7 +115,7 @@ export function applyFormBindings(nodes: TemplateNode[], inherited?: FormCtx): v
                 errorBody?: TemplateNode[]; placeholder?: TemplateNode[]; defaultBody?: TemplateNode[];
                 cases?: { body?: TemplateNode[] }[];
             };
-            const ctx: FormCtx = { formVar, depth, groupPath: [...groupPath], base };
+            const ctx: FormCtx = { formVar, depth, groupPath: [...groupPath], base, modelEventOf: lookup };
             if (n.body) applyFormBindings(n.body, ctx);
             if (n.elseBody) applyFormBindings(n.elseBody, ctx);
             if (n.emptyBody) applyFormBindings(n.emptyBody, ctx);
@@ -138,6 +140,8 @@ interface FormCtx {
     depth: number;
     groupPath: string[];
     base?: { formVar: string | null; depth: number };
+    /** The event of a component's first model (#478); null without a component registry. */
+    modelEventOf?: ModelEventLookup | null;
 }
 
 /**
@@ -154,9 +158,9 @@ export const INJECTED = '@injected-form';
  * template counts as inside that form. Returns whether any binding was written, so the caller
  * imports `tryUseForm`.
  */
-export function applyInjectedFormBindings(nodes: TemplateNode[]): boolean {
+export function applyInjectedFormBindings(nodes: TemplateNode[], modelEventOf?: ModelEventLookup | null): boolean {
     const base = { formVar: INJECTED, depth: 1 };
-    applyFormBindings(nodes, { formVar: INJECTED, depth: 1, groupPath: [], base });
+    applyFormBindings(nodes, { formVar: INJECTED, depth: 1, groupPath: [], base }, modelEventOf);
     return collectHtml(nodes).includes(INJECTED_REF);
 }
 
@@ -244,7 +248,7 @@ function processHtmlContent(content: string, ctx: FormCtx): string {
                         }
                     }
                     // Inside a pdx-form — check if this tag needs binding
-                    result += maybeInjectBindings(tagStr, tagName, formVar, groupPath);
+                    result += maybeInjectBindings(tagStr, tagName, formVar, groupPath, ctx.modelEventOf ?? null);
                     if (!isSelfClosing && tagName === 'pdx-form') depth++;
                 } else {
                     result += tagStr;
@@ -316,7 +320,7 @@ function getFormState(content: string, formVar: string | null, depth: number, gr
  * If the tag is a form control or form-field with a `name` attribute,
  * inject the appropriate bindings. Never overwrite existing bindings.
  */
-function maybeInjectBindings(tagStr: string, tagName: string, formVar: string, groupPath: string[]): string {
+function maybeInjectBindings(tagStr: string, tagName: string, formVar: string, groupPath: string[], modelEventOf: ModelEventLookup | null): string {
     // Extract name attribute (static only — name="xxx", not :name="...")
     const nameMatch = tagStr.match(/\bname=(?:"([^"]+)"|'([^']+)'|`([^`]+)`)/);
     if (!nameMatch) return tagStr;
@@ -344,7 +348,7 @@ function maybeInjectBindings(tagStr: string, tagName: string, formVar: string, g
     }
 
     if (FORM_CONTROL_TAGS.has(tagName)) {
-        return injectControlBindings(result, tagName, formVar, resolvedPath);
+        return injectControlBindings(result, tagName, formVar, resolvedPath, modelEventOf?.(tagName) ?? null);
     }
 
     return result;
@@ -377,7 +381,7 @@ function injectFormFieldBindings(tagStr: string, formVar: string, fieldPath: str
  * Inject :value (or :checked), @pdx-change, @pdx-blur on form controls.
  * Uses .pdx binding syntax — rewriteHtmlBindings converts to interpolations.
  */
-function injectControlBindings(tagStr: string, tagName: string, formVar: string, fieldPath: string): string {
+function injectControlBindings(tagStr: string, tagName: string, formVar: string, fieldPath: string, model: { event: string } | null): string {
     let injected = '';
     const f = fieldRef(formVar, fieldPath);
 
@@ -394,9 +398,11 @@ function injectControlBindings(tagStr: string, tagName: string, formVar: string,
 
     // Change event binding — inject as pre-rewritten template interpolation
     // Use __pdx_form_change_N pattern: the actual handler is already a final expression
-    const eventName = EVENT_NAME[tagName] || 'pdx-change';
+    // A control that lists models is bound to its first model's event, whose detail is `{ value }`
+    // (#478); the hand-written table holds the alpha events of the controls that list none yet.
+    const eventName = model ? model.event : (EVENT_NAME[tagName] || 'pdx-change');
     if (!tagStr.includes(`@${eventName}=`)) {
-        const valueExpr = VALUE_EXPR[tagName] || DEFAULT_VALUE_EXPR;
+        const valueExpr = model ? 'e.detail.value' : (VALUE_EXPR[tagName] || DEFAULT_VALUE_EXPR);
         // Inject as already-rewritten: @event=${handler} (no quotes = no rewrite)
         injected += ` @${eventName}=$` + `{(e) => ${f}?.onChange(${valueExpr})}`;
     }
