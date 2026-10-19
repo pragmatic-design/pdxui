@@ -356,6 +356,11 @@ renders the function again when the parent gives another one or an argument chan
 A `@snippet` in the component's own `<script>` is a template it renders with `@render` too:
 `@snippet badge(n: number) { <b>{{ n }}</b> }`.
 
+A list that works for any item says so with a type parameter. With `@generic T extends { id: string };`,
+`@prop items: T[];` and `@slot row: (item: T, index: number);`, the editor knows that `u` in the
+parent's `@snippet row(u, i)` is an element of whatever `:items` was given — `u.nmae` on a `User` is an
+error where it is written. Where nothing bound tells it, set it on the tag: `<app-user-list T="User">`.
+
 ### Scoped slots (data from the component to the content)
 
 Typed snippets replace them (#131): they still compile, until the beta removes them.

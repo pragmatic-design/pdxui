@@ -73,7 +73,7 @@ EventDecl      ::= "@event" ( "(" S? "bubbles" S? ")" )? S Identifier ( S? ":" S
 SlotDecl       ::= "@slot" S Identifier "?"? ( S? ":" S? SlotSignature )? End                     (β #131: a signature)
 SlotSignature  ::= "(" S? ( SlotParam ( S? "," S? SlotParam )* )? S? ")"
 SlotParam      ::= Identifier S? ":" S? Type
-GenericDecl    ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* End                    (β #131)
+GenericDecl    ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* End                    (β #131 — landed #490)
 StateDecl      ::= "@state" S Identifier S? "=" S? Expression End                                   (β #132)
 PartDecl       ::= "@part" S Identifier ( S? "," S? Identifier )* End                               (β #134)
 HostDecl       ::= "@host" S? "{" ( S? Attribute )* S? "}"                                          (β #133: the template's attribute grammar)
@@ -231,7 +231,7 @@ GestureBinding ::= "@swipe." ( "left" | "right" | "up" | "down" ) "=" AttrValue
                  | ( "@longpress" | "@pinch" ) "=" AttrValue
 AttachBinding  ::= "attach:" Identifier ( "=" AttrValue )?                                             (β #143)
 PartAttribute  ::= 'data-part="' Identifier '"'                                                        (β #134)
-GenericArgument ::= Identifier "=" AttrValue      /* on a generic component: T="User" */               (β #131)
+GenericArgument ::= Identifier "=" AttrValue      /* on a generic component: T="User" */               (β #131 — landed #490)
 ```
 
 A two-way value is a signal name, a form field (`f.email`), or the general form:

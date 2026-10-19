@@ -11,6 +11,13 @@ semver.
 
 ### Features
 
+- The editor types a `@snippet`'s parameters from the child's `@slot` signature, so `u.nmae` on a
+  `User` is an error where it is written.
+  - `@generic T extends { id: string };` declares a type parameter. The editor infers it from the
+    props that use it (`:items="users"` gives `T = User`), and `T="User"` on the tag sets it.
+  - Inside the component, `T` reads as its constraint.
+  - `T="User"` is not written into the page.
+  - `pdx check --types` does not type snippet parameters yet. (#490)
 - Typed snippets: a component declares a template its parent provides, with a signature, and
   renders it where it wants with the values it chooses.
   - The child declares `@slot row: (item: User, index: number);` and renders `@render row(it, i)`.

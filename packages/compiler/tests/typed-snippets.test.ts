@@ -76,6 +76,34 @@ describe('@slot with a signature', () => {
     });
 });
 
+describe('@generic (#490)', () => {
+    it('declares the type parameters, each as written', () => {
+        const { generics, warnings } = analyzeScript('@generic T extends { id: string }, K;\n@prop items: T[] = [];', 'list.pdx');
+        expect(generics).toEqual(['T extends { id: string }', 'K']);
+        expect((warnings ?? []).filter((w) => w.code === 'PDX_UNKNOWN_DECLARATION')).toEqual([]);
+    });
+
+    it('generates nothing in the module: it is for the editor', () => {
+        const { code, warnings } = compile(child('@generic T;\n@prop items: T[] = [];\n@slot row: (item: T);', '<p>@render row(items[0])</p>'), 'list.pdx');
+        expect(warnings.filter((w) => w.severity === 'error')).toEqual([]);
+        expect(code).not.toContain('@generic');
+        expect(code).toMatch(/items: \{ type: Array, default: \[\] \}/);
+    });
+
+    it('with no type parameter is PDX_UNKNOWN_DECLARATION', () => {
+        const { warnings } = analyzeScript('@generic ;', 'list.pdx');
+        expect((warnings ?? []).map((w) => w.code)).toContain('PDX_UNKNOWN_DECLARATION');
+    });
+
+    it('a type argument on a component tag, `T="User"`, is not written into the page', () => {
+        const { code } = compile(`<template><app-list T="User" class="x"></app-list></template>\n<script>\n</script>\n`, 'page.pdx');
+        expect(code).not.toMatch(/['"]T['"]/);
+        expect(code).not.toContain('User');
+        // The control: the component's other static attribute is still written.
+        expect(code).toContain('class="x"');
+    });
+});
+
 describe('@snippet in the script', () => {
     it('with a template body is compiled with the template, and `@render` calls it', () => {
         const { code } = compile(child("let who = $signal('Ann');\n@snippet greet(name: string) {\n  <em>{{ name }}</em>\n}", '<p>@render greet(who)</p>'), 'card.pdx');

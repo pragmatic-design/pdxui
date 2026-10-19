@@ -9,6 +9,7 @@ import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { getAnalysis, setAnalyzeOptions } from './document-manager';
 import { PdxTsService } from './utils/ts-service';
 import { buildVirtualFile, type VirtualFile } from './utils/virtual-file';
+import type { SnippetType } from './utils/template-projection';
 import { scanWorkspace, scanTagHostFiles, type TranslationKeys } from './utils/project-scanner';
 import { analyzeDocument } from './utils/compiler-bridge';
 import { ProjectRegistries, type ProjectRegistry } from './utils/project-registry';
@@ -68,6 +69,23 @@ export function resolveModelType(
     const flat = (s: string) => s.replace(/-/g, '').toLowerCase();
     const model = models && [...models].find(m => flat(m) === flat(name));
     return model ? resolvePropType(registry, tag, model) : null;
+}
+
+/**
+ * What types a `@snippet name(…)` written in `tag` (#490): the slot's signature, the component's type
+ * parameters, and the props whose type uses one of them — what TypeScript infers a parameter from.
+ * Null for a slot with no signature, or a tag the project does not know: its parameters stay unchecked.
+ */
+export function resolveSnippetType(registry: Pick<ProjectRegistry, 'describe'>, tag: string, name: string): SnippetType | null {
+    const comp = registry.describe(tag);
+    const signature = comp?.slots.find(s => s.name === name)?.signature;
+    if (!comp || !signature) return null;
+    const generics = comp.generics ?? [];
+    // Match: the name a type parameter declares, `T` in `T extends { id: string }`. Groups: [1]=the name
+    const names = generics.map(g => /^\s*([A-Za-z_$][\w$]*)/.exec(g)?.[1]).filter((n): n is string => !!n);
+    const uses = (type: string) => names.some(n => new RegExp(`(?<![\\w$])${n}(?![\\w$])`).test(type));
+    const props = comp.attributes.filter(a => a.type && uses(a.type)).map(a => ({ name: a.name, type: a.type }));
+    return { generics, props, signature };
 }
 
 /** A project's `ResolveType`: a `::name` asks for its model's type, anything else for the prop's. */
@@ -142,7 +160,7 @@ export class Workspace {
         const tmplStart = tmpl ? source.indexOf(tmpl) : -1;
         const registry = this.registryOf(document.uri);
         const vf = buildVirtualFile(descriptor.script.content, descriptor.script.start, ast ?? null, tmpl, tmplStart,
-            projectResolveType(registry), (tag) => this.exposedOf(registry, tag));
+            projectResolveType(registry), (tag) => this.exposedOf(registry, tag), (tag, name) => resolveSnippetType(registry, tag, name));
         this.vfCache.set(document.uri, { version: document.version, vf });
         return vf;
     }
@@ -154,7 +172,7 @@ export class Workspace {
         const tmpl = descriptor.template?.content ?? null;
         const registry = this.registryOf(uri);
         return buildVirtualFile(descriptor.script.content, descriptor.script.start, ast ?? null, tmpl, tmpl ? text.indexOf(tmpl) : -1,
-            projectResolveType(registry), (tag) => this.exposedOf(registry, tag));
+            projectResolveType(registry), (tag) => this.exposedOf(registry, tag), (tag, name) => resolveSnippetType(registry, tag, name));
     }
 
     /**

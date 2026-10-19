@@ -5,7 +5,7 @@
 import type { TemplateNode } from '@pdxui/compiler';
 import { projectScript } from './project-script';
 import { projectTemplate } from './template-projection';
-import type { ResolveType } from './template-projection';
+import type { ResolveType, ResolveSnippet } from './template-projection';
 import type { SegmentMap } from './segment-map';
 import { refTargets, typeRefs, type ResolveExposed } from './ref-types';
 
@@ -27,6 +27,8 @@ export function buildVirtualFile(
     resolveType?: ResolveType,
     /** What a component tag exposes, to type a `:ref` on it (#140). */
     resolveExposed?: ResolveExposed,
+    /** What types a `@snippet`'s parameters (#490). */
+    resolveSnippet?: ResolveSnippet,
 ): VirtualFile {
     const { script, declarations } = typeRefs(projectScript(scriptContent), refTargets(ast, resolveExposed));
     let content = script + EPILOGUE + (declarations ? declarations + '\n' : '');
@@ -35,7 +37,7 @@ export function buildVirtualFile(
 
     if (ast && ast.length > 0 && templateContent != null && templateStart >= 0) {
         templateBase = content.length;
-        const proj = projectTemplate(ast, templateContent, templateStart, content.length, resolveType);
+        const proj = projectTemplate(ast, templateContent, templateStart, content.length, resolveType, resolveSnippet);
         content += proj.code;
         templateMap = proj.map;
     }

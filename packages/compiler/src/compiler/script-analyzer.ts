@@ -162,6 +162,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const events: EventInfo[] = [];
     const slots: SlotInfo[] = [];
     const snippets: ScriptSnippet[] = [];
+    const generics: string[] = [];
     const signals: SignalDecl[] = [];
     const deriveds: DerivedDecl[] = [];
     const effects: string[] = [];
@@ -420,6 +421,20 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     : `Use: @event eventName: PayloadType;`,
             });
             continue;
+        }
+
+        // ─── @generic T extends { id: string }, K; — the component's type parameters (#490) ───
+        // Types only: the editor infers each from the props that use it. Nothing is generated. A list
+        // with an entry that does not start with a name matches nothing here, and is
+        // PDX_UNKNOWN_DECLARATION below.
+        // Match: `@generic` and the list, up to its `;`. Groups: [1]=the list as written
+        const genericDecl = trimmed.match(/^@generic\s([^;]*)/);
+        if (genericDecl) {
+            const entries = splitAtTopLevelCommas(genericDecl[1].trim()).map(g => g.trim());
+            if (entries.length > 0 && entries.every(g => /^[A-Za-z_$][\w$]*(?:\s|$)/.test(g))) {
+                generics.push(...entries);
+                continue;
+            }
         }
 
         // ─── @slot name: (signature); — a typed snippet the parent provides (#489) ───
@@ -1114,6 +1129,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         events,
         slots,
         snippets,
+        generics,
         signals,
         deriveds,
         stores,

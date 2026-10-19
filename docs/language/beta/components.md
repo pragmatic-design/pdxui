@@ -206,8 +206,8 @@ GenericArgument ::= Identifier "=" AttrValue
 ### Semantics
 
 Typed snippets replace scoped slots and template props (#131). Three words, three roles — the three
-landed in #489, part 1 of #131; `@generic`, the library's components and the removal of the alpha
-forms are #131's other parts:
+landed in #489, part 1 of #131, and `@generic` with the editor's typing of snippet parameters in
+#490; the library's components and the removal of the alpha forms are #131's other parts:
 
 - **Declare** (child, script): `@slot row: (item: T, index: number);` — the contract, a function
   signature. `@slot row?: (…)` is optional; without `?` the parent must provide it.
@@ -219,7 +219,9 @@ forms are #131's other parts:
   `row` slot. Parameters are always named; there is no implicit `context`.
 
 `@generic T extends { id: string };` declares a type parameter; `T` is inferred from the props that
-use it (`:items="users"` gives `T = User`), and `T="User"` on the tag sets it where inference cannot.
+use it (`:items="users"` gives `T = User`), and `T="User"` on the tag sets it where inference cannot
+(landed, #490: the editor types a `@snippet`'s parameters from the signature, with `T` resolved; a
+library component's from the signature its manifest records, once it declares one, #491).
 A snippet is a function the child calls, not a projection: one inside an `@if` that becomes true later
 renders like anything else. A snippet is also a JavaScript property of the element (`el.row = (item,
 i) => node`), so a consumer that is not PDX assigns a function. Plain `<slot>` stays, for content

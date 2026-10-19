@@ -179,7 +179,7 @@ rule styles, `PDX_VARIANT_UNSTYLED`.
 
 The full vocabulary the analyzer accepts:
 
-`@prop` `@model` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
+`@prop` `@model` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@generic` `@title` `@meta`
 `@params` `@search` `@redirect` `@provide` `@inject` `@expose` `@part` `@host` `@state` `@variants` `@scroll`
 `@i18n` `@raw` `@layout` `@outlet` `@snippet` `@use`
 

@@ -22,6 +22,8 @@ export interface ManifestSlot {
     description: string;
     /** The context the slot passes, as a project component's `@slot name: { … }` declares it. */
     scopeType?: string;
+    /** A typed snippet's signature, `(item: T, index: number)` (#489, #490). */
+    signature?: string;
 }
 
 export interface ManifestComponent {
@@ -29,6 +31,8 @@ export interface ManifestComponent {
     description: string;
     /** Absolute path of the component's source (.ts). */
     filePath: string;
+    /** Its type parameters, `T extends { id: string }`, as `@generic` declares them (#490). */
+    generics?: string[];
     attributes: ManifestMember[];
     events: ManifestMember[];
     slots: ManifestSlot[];
@@ -69,7 +73,11 @@ function readManifest(manifestPath: string): Map<string, ManifestComponent> {
         for (const d of mod.declarations ?? []) {
             const decl = d as {
                 customElement?: boolean; tagName?: string; description?: string;
-                attributes?: RawMember[]; events?: RawMember[]; slots?: Array<{ name?: string; description?: string }>;
+                attributes?: RawMember[]; events?: RawMember[];
+                // `signature` and `generics` are the typed snippets' (#490): the manifest generator
+                // records them for a component that declares `slot<(…) => Node>()` (#491).
+                slots?: Array<{ name?: string; description?: string; signature?: string }>;
+                generics?: string[];
             };
             if (!decl.customElement || !decl.tagName) continue;
             index.set(decl.tagName, {
@@ -78,7 +86,8 @@ function readManifest(manifestPath: string): Map<string, ManifestComponent> {
                 filePath: mod.path ? resolve(baseDir, mod.path) : manifestPath,
                 attributes: (decl.attributes ?? []).map(mapMember),
                 events: (decl.events ?? []).map(mapMember),
-                slots: (decl.slots ?? []).map(s => ({ name: s.name ?? '', description: s.description ?? '' })),
+                slots: (decl.slots ?? []).map(s => ({ name: s.name ?? '', description: s.description ?? '', ...(s.signature ? { signature: s.signature } : {}) })),
+                ...(decl.generics?.length ? { generics: decl.generics } : {}),
             });
         }
     }

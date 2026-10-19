@@ -247,6 +247,8 @@ export interface ScriptAnalysis {
     slots: SlotInfo[];
     /** The script's `@snippet`s whose body is a template (#489): the render compiles them. */
     snippets: ScriptSnippet[];
+    /** The type parameters `@generic` declares, each as written: `T extends { id: string }` (#490). */
+    generics: string[];
     signals: SignalDecl[];
     deriveds: DerivedDecl[];
     stores: StoreDecl[];
