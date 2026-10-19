@@ -39,29 +39,27 @@ export const RUNES: readonly RuneInfo[] = [
     // The file IS the store: `@store name;` names it, `$store({…})` holds its state. `@store name = {…}`
     // is not a form the compiler reads — it is PDX_UNKNOWN_DECLARATION — and completion offered it (#58).
     d('store', 'Make this file a global reactive store module, its state in $store({ … }).', "@store name;   // or @store name { persist: 'local' };", '@store ${1:name};'),
-    d('page', 'Register the component as a route page, lazy-loaded.', "@page '/users/:id';", "@page '${1:/path}';"),
+    // The one home of every route field (#277): further paths, and the options keepAlive, preload,
+    // prefetch, label, transition and meta. `@route`, `@alias`, `@prefetch`, the script's `@transition`
+    // and `@head` are removed forms, and not offered.
+    d('page', 'Register the component as a route page, lazy-loaded: further paths are aliases, and the options carry every route field.', "@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };", "@page '${1:/path}';"),
     d('guard', 'Require a permission for the route.', "@guard 'users.read';", "@guard '${1:permission}';"),
     d('loader', 'Name the function that loads the route data before the page renders.', '@loader loadUsers;', '@loader ${1:load};'),
     d('layout', 'Render the page inside a layout; \'none\' opts out.', "@layout 'admin';", "@layout '${1:name}';"),
     d('title', 'Set document.title, static or reactive.', "@title 'Dashboard';   // or a backtick template for a reactive one", "@title '${1:Page Title}';"),
     d('meta', 'Add a meta tag to the document head.', "@meta description: 'text';   // or @meta property og:title: 'text';", "@meta ${1:description}: '${2:content}';"),
     d('scroll', 'The page\'s scroll behaviour on navigation.', "@scroll 'top';", "@scroll '${1|preserve,top|}';"),
-    d('head', 'Set the document head: title and meta tags.', "@head { title: 'Products', meta: [{ name: 'description', content: '…' }] }", "@head { title: '${1:Title}' }"),
     d('provide', 'Provide a value to the components below this one.', '@provide key = value;', '@provide ${1:key} = ${2:value};'),
     d('inject', 'Read a value a component above provides.', '@inject key;', '@inject ${1:key};'),
     d('tag', 'Register the component under another tag than its file name. An application tag starts with its prefix, `app-` by default: `pdx-` is reserved for the @pdxui packages.', "@tag 'app-other-name';", "@tag '${1:app-name}';"),
-    d('route', 'Route options for the page.', "@route { path: '/users', keepAlive: true }", "@route { path: '${1:/path}' }"),
     d('params', 'Declare and type the route params.', '@params { id: number }', '@params { ${1:id}: ${2:number} }'),
     d('redirect', "Send this page's route to another path; `'/from' -> '/to'` redirects any path.", "@redirect '/new-path';", "@redirect '${1:/path}';"),
-    d('alias', 'Another path that renders this page.', "@alias '/old-path';", "@alias '${1:/path}';"),
     d('outlet', 'Render a component into a named outlet beside this page.', "@outlet 'sidebar' -> 'pdx-nav';", "@outlet '${1:name}' -> '${2:pdx-component}';"),
     d('search', 'Declare and type the query-string params.', '@search { q?: string, page: number = 1 }', '@search { ${1:q}?: ${2:string} }'),
-    d('prefetch', 'When the page\'s chunk is fetched ahead of a click.', "@prefetch 'hover';", "@prefetch '${1|hover,eager,viewport,never|}';"),
     d('snippet', 'Declare a reusable template fragment.', '@snippet name(arg) { <div>…</div> }', '@snippet ${1:name}(${2:arg}) {\n  $3\n}'),
     d('i18n', 'Configure internationalization for the app.', "@i18n { locales: ['en', 'it'], default: 'en' }", "@i18n {\n  locales: ['${1:en}', '${2:it}'],\n  default: '${3:en}',\n  translations: '${4:./translations}',\n}"),
     d('use', 'Use a Web Component from another package: imports the package that registers the tag.', "@use 'sl-button' from '@shoelace-style/shoelace';", "@use '${1:tag-name}' from '${2:package}';"),
     d('raw', 'Kept as written. In the script, no signal is rewritten inside the block; in the template, no binding, interpolation or directive is read inside it.', '@raw { … }', '@raw {\n  $1\n}'),
-    d('transition', 'The page transition animation: a preset, `none`, or a class name used for both enter and exit.', "@transition 'fade';", "@transition '${1|fade,slide-left,slide-right,slide-up,slide-down,scale,collapse,none|}';"),
 
     f('signal', 'A reactive value; `count++` and `count = x` are rewritten into updates.', 'let count = $signal(0);', '\\$signal(${1:initial})'),
     f('derived', 'A value computed from others; recomputed when they change.', 'const total = $derived(price * quantity);', '\\$derived(${1:expression})'),

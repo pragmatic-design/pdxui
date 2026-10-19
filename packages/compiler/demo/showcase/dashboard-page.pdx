@@ -12,8 +12,7 @@
 <script>
 import { useTasks } from './task-store.pdx';
 
-@page '/dashboard' { keepAlive, preload };
-@transition 'fade';
+@page '/dashboard' { keepAlive, preload, transition: 'fade' };
 @title 'Dashboard — TaskMgr';
 
 const store = useTasks();

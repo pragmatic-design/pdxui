@@ -2,7 +2,7 @@
 // Extracted from script-analyzer.ts for modularity.
 
 import type { FormFieldDecl, HeadInfo, RouteInfo, RouteParamDecl, SearchParamDecl } from './script-analyzer-types';
-import { skipNonCode, findClosing, endsWithExpressionKeyword } from './tokenizer';
+import { skipNonCode, findClosing, endsWithExpressionKeyword, splitAtDepthZero } from './tokenizer';
 
 // ─── Tokenizer-Based Type Extraction ─────────────────────────────
 
@@ -443,14 +443,22 @@ export function splitAtTopLevelCommas(content: string): string[] {
     return result;
 }
 
+/** The options `@page` reads, the one home of every route field (#277). */
+export const PAGE_OPTIONS = ['keepAlive', 'preload', 'prefetch', 'label', 'transition', 'meta'] as const;
+
 /**
- * Parse @page options block: 'keepAlive', 'keepAlive: 300000', 'preload', 'prefetch: "hover"'.
- * Comma-separated key or key: value pairs. Updates the RouteInfo in place.
+ * Parse @page options block: 'keepAlive', 'keepAlive: 300000', 'preload', 'prefetch: "hover"',
+ * 'transition: "fade"', 'meta: { requiresAuth: true }'. Comma-separated key or key: value pairs, split
+ * at depth zero so an object value keeps its own commas. Updates the RouteInfo in place, and returns
+ * the keys it does not know.
  */
-export function parsePageOptions(optionsStr: string, route: RouteInfo): void {
-    const parts = optionsStr.split(',').map(p => p.trim()).filter(Boolean);
+export function parsePageOptions(optionsStr: string, route: RouteInfo): string[] {
+    const unknown: string[] = [];
+    const parts = splitAtDepthZero(optionsStr, ',').map(p => p.trim()).filter(Boolean);
     for (const part of parts) {
         const colonIdx = part.indexOf(':');
+        const name = (colonIdx === -1 ? part : part.slice(0, colonIdx)).trim();
+        if (!(PAGE_OPTIONS as readonly string[]).includes(name)) { unknown.push(name); continue; }
         if (colonIdx === -1) {
             // Boolean flag: keepAlive, preload
             const key = part.trim();
@@ -471,6 +479,14 @@ export function parsePageOptions(optionsStr: string, route: RouteInfo): void {
                 route.preload = val === 'true';
             } else if (key === 'prefetch') {
                 route.prefetch = val;
+            } else if (key === 'transition') {
+                // The page transition (#277): what the script's `@transition 'x'` was.
+                route.transition = val;
+            } else if (key === 'meta') {
+                // The route's data (#277): what `@meta { … }` was. A JSON value written as an object
+                // literal; one that is not — a function, a variable — is not read.
+                const parsed = rawVal.startsWith('{') ? parseObjectLiteralToJson(rawVal) : undefined;
+                if (parsed && typeof parsed === 'object') route.meta = parsed as Record<string, unknown>;
             } else if (key === 'label') {
                 // What this route is called in a breadcrumb. Two shapes, told apart by
                 // the quotes the author wrote:
@@ -499,6 +515,7 @@ export function parsePageOptions(optionsStr: string, route: RouteInfo): void {
             }
         }
     }
+    return unknown;
 }
 
 /**
@@ -685,148 +702,6 @@ export function routeTitleOf(title: HeadInfo['title']): { title?: string; titleK
     // Groups: [1]=quote [2]=key
     const keyCall = title.value.match(/^\$t\(\s*(['"])([^'"]+)\1\s*\)$/);
     return keyCall ? { titleKey: keyCall[2] } : {};
-}
-
-/**
- * Parse an @head { ... } block into HeadInfo.
- * Supports: title (static string), meta (array of { name/property, content }).
- *
- * Example:
- *   @head {
- *     title: 'My Page';
- *     meta: [
- *       { name: 'description', content: 'Browse products' },
- *       { property: 'og:title', content: 'My Site' },
- *     ];
- *   }
- */
-export function parseHeadBlock(blockContent: string, head: HeadInfo): void {
-    const braceStart = blockContent.indexOf('{');
-    const braceEnd = blockContent.lastIndexOf('}');
-    if (braceStart === -1 || braceEnd === -1) return;
-    const inner = blockContent.slice(braceStart + 1, braceEnd).trim();
-
-    // Parse title: 'value';
-    const titleMatch = inner.match(/title\s*:\s*(['"])(.+?)\1/);
-    if (titleMatch) {
-        head.title = { value: titleMatch[2], isDynamic: false };
-    }
-
-    // Parse meta: [ { name/property: '...', content: '...' }, ... ]
-    const metaArrayMatch = inner.match(/meta\s*:\s*\[([\s\S]*)\]/);
-    if (metaArrayMatch) {
-        const objRegex = /\{([^}]+)\}/g;
-        let objMatch: RegExpExecArray | null;
-        while ((objMatch = objRegex.exec(metaArrayMatch[1])) !== null) {
-            const objContent = objMatch[1];
-            const nameMatch = objContent.match(/name\s*:\s*['"]([^'"]+)['"]/);
-            const propMatch = objContent.match(/property\s*:\s*['"]([^'"]+)['"]/);
-            const contentMatch = objContent.match(/content\s*:\s*['"]([^'"]+)['"]/);
-            if (contentMatch && (nameMatch || propMatch)) {
-                const entry: { name?: string; property?: string; content: string } = {
-                    content: contentMatch[1],
-                };
-                if (nameMatch) entry.name = nameMatch[1];
-                if (propMatch) entry.property = propMatch[1];
-                head.meta.push(entry);
-            }
-        }
-    }
-}
-
-/**
- * Parse an @route { ... } aggregate block into RouteInfo, and return its raw `search` and `params`
- * blocks. Maps keys to the same properties as individual route runes.
- *
- * Supported keys: path, guard, loader, prefetch, transition, layout, scroll,
- * keepAlive, preload, search (as { ... } object), meta (as { ... } object).
- *
- * Example:
- *   @route {
- *     path: '/users/:id';
- *     guard: 'admin.users';
- *     prefetch: 'hover';
- *     layout: 'dashboard';
- *     scroll: 'preserve';
- *     transition: 'slide-right';
- *     search: { id: number };
- *   }
- */
-export function parseRouteBlock(blockContent: string, route: RouteInfo): { search?: string; params?: string } {
-    const braceStart = blockContent.indexOf('{');
-    const braceEnd = blockContent.lastIndexOf('}');
-    if (braceStart === -1 || braceEnd === -1) return {};
-    const inner = blockContent.slice(braceStart + 1, braceEnd);
-
-    // Helper: extract a quoted string value for a key
-    const str = (key: string): string | undefined => {
-        const m = inner.match(new RegExp(`${key}\\s*:\\s*['"]([^'"]+)['"]`));
-        return m?.[1];
-    };
-
-    // path → route.page
-    const path = str('path');
-    if (path) route.page = path;
-
-    // Simple string properties
-    const guard = str('guard');
-    if (guard) route.guard = guard;
-
-    const loader = inner.match(/loader\s*:\s*(\w+)/);
-    if (loader) route.loader = loader[1];
-
-    const prefetch = str('prefetch');
-    if (prefetch) route.prefetch = prefetch;
-
-    const transition = str('transition');
-    if (transition) route.transition = transition;
-
-    const layout = str('layout');
-    if (layout) route.layout = layout;
-
-    const scroll = str('scroll');
-    if (scroll) route.scroll = scroll;
-
-    // Boolean/number properties
-    if (/keepAlive\s*:\s*true/.test(inner)) route.keepAlive = true;
-    if (/preload\s*:\s*true/.test(inner)) route.preload = true;
-    const keepAliveNum = inner.match(/keepAlive\s*:\s*(\d+)/);
-    if (keepAliveNum) route.keepAlive = parseInt(keepAliveNum[1], 10);
-
-    // search: { ... } — extract raw block for parseSearchParams
-    const searchBlock = objectAfterKey(inner, 'search');
-    if (searchBlock) {
-        route.search = searchBlock;
-        route.searchParams = parseSearchParams(searchBlock);
-    }
-
-    // params: { ... } — typed route params
-    const paramsBlock = objectAfterKey(inner, 'params');
-    if (paramsBlock) {
-        route.params = parseRouteParams(paramsBlock);
-    }
-
-    // meta: { ... } — route metadata
-    const metaBlock = objectAfterKey(inner, 'meta');
-    if (metaBlock) {
-        const parsed = parseObjectLiteralToJson(metaBlock);
-        if (parsed && typeof parsed === 'object') route.meta = parsed as Record<string, unknown>;
-    }
-    // The raw blocks, for the caller to check their fields.
-    return { search: searchBlock, params: paramsBlock };
-}
-
-/**
- * The `{ … }` written after `key:` in a route block, braces balanced: a nested object ends it at its
- * own closing brace, not at the first `}` (#204). Undefined when the key has no object.
- */
-function objectAfterKey(inner: string, key: string): string | undefined {
-    // Match: the key as a whole word, then `:` and the opening brace.
-    const m = new RegExp(`(?<![\\w$.])${key}\\s*:\\s*\\{`).exec(inner);
-    if (!m) return undefined;
-    const open = m.index + m[0].length - 1;
-    const close = findClosing(inner, open);
-    return close === -1 ? undefined : inner.slice(open, close + 1);
 }
 
 /**

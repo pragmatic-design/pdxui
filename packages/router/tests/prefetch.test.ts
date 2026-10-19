@@ -1,4 +1,4 @@
-// `@prefetch` fetches the route's chunk.
+// A route's `prefetch` fetches its chunk.
 //
 // Appending `<link rel="prefetch" href="/settings">` is not a prefetch: in a single-page app it asks
 // the server for the SPA fallback, `index.html`, a document the router will never navigate to. The

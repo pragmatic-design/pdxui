@@ -63,7 +63,7 @@ onBeforeNavigate(async (_from, to) => {
 // request, and it went red until this existed.
 //
 // The app's own listener rather than a hook in the router: `prefetchRoute` decides a POLICY (the
-// route's `@prefetch`, the connection, saveData) and this is a consequence of a decision already
+// route's `prefetch` option, the connection, saveData) and this is a consequence of a decision already
 // taken, not a second one. Passive and capturing, so it costs nothing and sees links inside
 // components too.
 onMount(() => {

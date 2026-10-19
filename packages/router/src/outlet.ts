@@ -33,8 +33,8 @@ registerComponentStrings('router', {
 const routerString = (key: string): string => getComponentString('router', key)();
 
 // ─── Transition Preset Resolution ───────────────────────────────────
-// @transition 'fade' → enter: 'fade-in', exit: 'fade-out'
-// @transition 'slide-left' → enter: 'slide-left', exit: 'slide-left' (same class, different from/to)
+// @page { transition: 'fade' } → enter: 'fade-in', exit: 'fade-out'
+// @page { transition: 'slide-left' } → enter: 'slide-left', exit: 'slide-left' (same class, different from/to)
 
 const TRANSITION_PRESETS: Record<string, { enter: string; exit: string }> = {
     'fade':        { enter: 'fade-in',     exit: 'fade-out' },

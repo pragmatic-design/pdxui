@@ -17,7 +17,8 @@ describe('Completion', () => {
         const labels = items.map(i => i.label);
         expect(labels).toContain('@prop');
         expect(labels).toContain('@page');
-        expect(labels).toContain('@transition');
+        // The forms the beta removed (#277) are not offered: `@page` holds every route field.
+        for (const removed of ['@transition', '@route', '@alias', '@prefetch', '@head']) expect(labels).not.toContain(removed);
         expect(labels).toContain('@i18n');
         expect(labels).toContain('@fetch');
         expect(labels).toContain('@form');
@@ -122,11 +123,16 @@ describe('Hover', () => {
         expect((hover!.contents as any).value).toContain('$t');
     });
 
-    it('returns docs for @transition', () => {
-        const source = "@transition 'fade';";
-        const hover = getHoverInfo(source, { line: 0, character: 5 });
+    it('returns docs for @page, with its route options', () => {
+        const source = "@page '/users' { transition: 'fade' };";
+        const hover = getHoverInfo(source, { line: 0, character: 2 });
         expect(hover).not.toBeNull();
-        expect((hover!.contents as any).value).toContain('@transition');
+        expect((hover!.contents as any).value).toContain("transition: 'fade'");
+    });
+
+    // A form the beta removed (#277) is not offered as documentation: it is PDX_REMOVED_FORM.
+    it('returns nothing for the script\'s removed @transition', () => {
+        expect(getHoverInfo("@transition 'fade';", { line: 0, character: 5 })).toBeNull();
     });
 
     it('returns null for non-keyword', () => {

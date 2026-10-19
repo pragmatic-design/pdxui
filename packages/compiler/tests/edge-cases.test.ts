@@ -151,12 +151,11 @@ let x = $signal($t('hello'));
         expect(analysis.usedFeatures.has('$t')).toBe(true);
     });
 
-    it('@transition and @layout appear in route manifest', () => {
+    it('the transition option and @layout appear in route manifest', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
 <script>
-@page '/test' { preload };
-@transition 'fade';
+@page '/test' { preload, transition: 'fade' };
 @layout 'admin';
 </script>`, 'test.pdx');
 

@@ -59,7 +59,7 @@ ComponentDecl  ::= PropDecl | ModelDecl | EventDecl | SlotDecl | GenericDecl | S
 ModuleDecl     ::= UseDecl | SnippetDecl | I18nDecl | RawScriptBlock                                    († `@mixin` removed — decisions.md 6)
 RouteDecl      ::= PageDecl | GuardDecl | LoaderDecl | LayoutDecl | OutletDecl | ScrollDecl | RedirectDecl
                  | ParamsDecl | SearchDecl | TitleDecl | MetaDecl
-                 /* † removed: @route, @alias, @prefetch, the script @transition, @head — decisions.md 1, 2, 3, 7, 19 */
+                 /* † removed: @route, @alias, @prefetch, the script @transition, @head — decisions.md 1, 2, 3, 7, 19 (landed #277) */
 DataDecl       ::= FetchDecl | ActionDecl | FormDecl | StoreDecl
 ```
 
@@ -128,8 +128,8 @@ PageOption     ::= "keepAlive" ( S? ":" S? ( "true" | "false" | Digits ) )?     
                  | "preload" ( S? ":" S? ( "true" | "false" ) )?
                  | "prefetch" S? ":" S? ( "'hover'" | "'eager'" | "'viewport'" | "'never'" )
                  | "label" S? ":" S? ( StringLiteral | Identifier | "$t(" S? StringLiteral S? ")" )
-                 | "transition" S? ":" S? StringLiteral                                                († decisions.md 7)
-                 | "meta" S? ":" S? ObjectLiteral                                                      († decisions.md 8)
+                 | "transition" S? ":" S? StringLiteral                                                († decisions.md 7, landed #277)
+                 | "meta" S? ":" S? ObjectLiteral                                                      († decisions.md 8, landed #277)
 GuardDecl      ::= "@guard" S StringLiteral End
 LoaderDecl     ::= "@loader" S Identifier S? ":" S? Identifier ( S? LoaderOptions )? End              (β #146, #148)
 LoaderOptions  ::= "{" S? "staleTime" S? ":" S? Expression S? "}"

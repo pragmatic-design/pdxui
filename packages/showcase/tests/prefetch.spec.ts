@@ -3,7 +3,7 @@
  *
  * The application is out of the first download: a route is its own chunk and arrives the first
  * time it is shown. That MOVES the wait rather than removing it — the first click on a route stalls
- * for a round trip. `@prefetch` is the answer, and only if it fetches the route's JavaScript: a
+ * for a round trip. A route's `prefetch` is the answer, and only if it fetches the route's JavaScript: a
  * `<pdx-link prefetch="hover">` that asks the server for `/tickets/1` gets the SPA fallback —
  * `index.html` — and never the route's code.
  *
@@ -100,7 +100,7 @@ test.describe('hovering a link to a split route', () => {
     });
 });
 
-test.describe("a route that says @prefetch 'viewport'", () => {
+test.describe("a route that says prefetch: 'viewport'", () => {
     // `/assets/:id` declares it, and a ticket shows its asset as a link at the top of the page. The
     // policy used to be documented and treated as `hover` by the router (#42).
     test('is fetched when its link is in view, with no hover, focus or press', async ({ page }) => {

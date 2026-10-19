@@ -21,10 +21,8 @@
 <script>
 import { navigate, currentParams, currentState, currentMeta } from '@pdxui/router';
 
-@page '/users/:id(number)';
-@transition 'slide-right';
+@page '/users/:id(number)' { transition: 'slide-right', meta: { section: 'users', permissions: ['users.view'] } };
 @title 'User Detail — TaskMgr';
-@meta { section: 'users', permissions: ['users.view'] };
 
 const userId = $derived(currentParams().id);
 const fromList = $derived(currentState()?.fromList === true);

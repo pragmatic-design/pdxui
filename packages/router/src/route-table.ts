@@ -33,7 +33,7 @@ export function routeTable(): readonly TableRoute[] | null {
 
 /**
  * The lazy import of a page, with a literal specifier so the bundler gives the page its own chunk.
- * Keyed by path rather than by file, because two routes can share a page (an `@alias`).
+ * Keyed by path rather than by file, because two routes can share a page (a further path of its `@page`).
  */
 export function pageModule(path: string): (() => Promise<unknown>) | undefined {
     return installed()?.pageModules?.[path];

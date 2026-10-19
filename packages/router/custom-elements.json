@@ -46,7 +46,7 @@
             { "name": "to", "type": { "text": "string" }, "description": "The path to navigate to. A route pattern (`/users/:id`) is filled from `params`.", "fieldName": "to" },
             { "name": "exact", "type": { "text": "boolean" }, "description": "Active only when the current path is exactly `to`, not when it starts with it.", "fieldName": "exact" },
             { "name": "active-class", "type": { "text": "string" }, "description": "The class added while the link's target is the current route." },
-            { "name": "prefetch", "type": { "text": "'never'" }, "description": "`never` turns off fetching the route's chunk on hover, focus and pointerdown; otherwise the route's own @prefetch decides." },
+            { "name": "prefetch", "type": { "text": "'never'" }, "description": "`never` turns off fetching the route's chunk on hover, focus and pointerdown; otherwise the route's own prefetch option decides." },
             { "name": "params", "type": { "text": "string" }, "description": "JSON object of route params that fill the pattern in `to`." }
           ],
           "members": [

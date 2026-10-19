@@ -5,9 +5,13 @@ data it loads first, the frame it renders in, how it arrives, the other paths th
 URL values it reads, and what it writes into the document head. Each is a line of the script
 ([script.md](script.md)) that starts with its keyword, and each is read by the script analyzer on
 that line alone, unless the section says it reads a block. A route declaration does nothing on a
-component without a `@page` (or an `@route { path }`): the route fields are emitted only with the
-registration that `@page` produces. The head declarations (`@title`, `@meta` with a name, `@head`)
-work on any component.
+component without a `@page`: the route fields are emitted only with the registration that `@page`
+produces. The head declarations (`@title`, `@meta`) work on any component.
+
+`@page` is the one home of every route field (#277): its further paths and its options carry what
+`@route { … }`, `@alias`, `@prefetch`, the script's `@transition` and `@meta { … }` carried in the
+alpha, and `@head { … }` is `@title` and `@meta`. Those six are removed forms, `PDX_REMOVED_FORM`,
+and `pdx migrate` rewrites each ([overview.md](overview.md#removed-forms-and-browser-targets)).
 
 The registration is the same in both modes of the build: the page module registers its route when it
 is imported, and the plugin scans every `.pdx` that has an `@page` line with the same analyzer and
@@ -42,11 +46,15 @@ PageDecl     ::= "@page" S StringLiteral ( S? "," S? StringLiteral )* ( S? PageO
 PageOptions  ::= "{" S? PageOption ( S? "," S? PageOption )* S? "}"
 PageOption   ::= "keepAlive" ( S? ":" S? ( "true" | "false" | Digits ) )?
                | "preload" ( S? ":" S? ( "true" | "false" ) )?
-               | "prefetch" S? ":" S? StringLiteral
+               | "prefetch" S? ":" S? ( "'hover'" | "'eager'" | "'viewport'" | "'never'" )
                | "label" S? ":" S? ( StringLiteral | Identifier | "$t(" S? StringLiteral S? ")" )
+               | "transition" S? ":" S? StringLiteral
+               | "meta" S? ":" S? ObjectLiteral
+ObjectLiteral ::= /* a JSON value written as a JavaScript object literal: unquoted keys, single quotes, trailing commas */
 ```
 
-The analyzer's form: `@page '/users/:id';`. The options block may span lines.
+The analyzer's form: `@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };`.
+The options block may span lines, and `meta` is read to its own closing brace.
 
 #### Semantics
 
@@ -62,7 +70,20 @@ gets `hasOutlet:true`: the routes below its path render inside it. The options b
   the frozen page after that many milliseconds. A keep-alive page re-applies its `@title` in
   `onShow`.
 - `preload` (or `preload: true`) keeps the page in the entry chunk: no `lazy`, no `file`.
-- `prefetch` is the same field `@prefetch` sets.
+- `prefetch` registers `prefetch:'eager'` on the route: when `<pdx-link>` fetches the route's chunk
+  before a click. `hover`, the router's default, fetches it on hover, focus and pointerdown of a link
+  to it; `eager` as soon as a link to it is on the page; `viewport` once a link to it scrolls into
+  view; `never` not before the navigation. Under `hover` and `viewport` the route's loader starts too
+  (see `@loader`).
+- `transition` registers `transition:'fade'` on the route. The outlet applies it between the page
+  that leaves and the page that enters, through `@pdxui/core`'s enter and exit classes. The presets
+  are `fade` (`fade-in`/`fade-out`), `slide-left`, `slide-right`, `slide-up`, `slide-down`, `scale`
+  (`scale-in`/`scale-out`) and `collapse`; `none` is no transition, and any other name is used as both
+  the enter and the exit class. The block modifier `@transition` of `@if` and `@for` is another
+  construct, in [template.md](template.md).
+- `meta` is the route's own data: parsed at build time into JSON and registered as
+  `meta:{"requiresAuth":true}`; `currentMeta()` from `@pdxui/router` returns it while the route is
+  matched. Nothing of it reaches the document.
 - `label` names the route in the breadcrumb that `<pdx-breadcrumb>` builds with no `items`. A string
   is the crumb, and a `:param` in it is replaced by the param's value. An identifier names a function
   of the script, which is moved to module scope (as `@loader`'s is) and registered by reference,
@@ -71,17 +92,19 @@ gets `hasOutlet:true`: the routes below its path render inside it. The options b
 
 #### Rules
 
-- A path that does not start with `/` raises `PDX_PAGE_INVALID_PATH`. Every path is checked, an
-  `@alias`'s too.
+- A path that does not start with `/` raises `PDX_PAGE_INVALID_PATH`. Every path is checked.
 - A param constraint that is not `string`, `number`, `uuid` or `slug` raises
   `PDX_PAGE_INVALID_CONSTRAINT` (a warning: the constraint is not applied); empty parentheses,
   `:id()`, raise `PDX_PAGE_EMPTY_CONSTRAINT`.
 - A `label` that names a function the script does not declare raises `PDX_LABEL_NOT_FOUND`; the
   route is registered without a label.
-- `prefetch` follows the rules of `@prefetch` (`PDX_PREFETCH_POLICY`).
-- An option key other than the four above is ignored, and two `@page` lines leave the last one's
-  paths in place: not checked today.
-- A `keepAlive` value other than `true`, `false` or digits is ignored. Not checked today.
+- A `prefetch` policy that is none of the four raises `PDX_PREFETCH_POLICY`.
+- An option other than the six above raises `PDX_PAGE_UNKNOWN_OPTION`: a guard, a loader or a layout
+  is a declaration of its own.
+- Two `@page` lines leave the last one's paths in place: not checked today.
+- A `keepAlive` value other than `true`, `false` or digits is ignored, and a `meta` that is not a JSON
+  value once its keys are quoted — a function, a variable — is dropped. Not checked today.
+- The `transition` name is not checked against the presets: not checked today.
 
 #### Examples
 
@@ -112,82 +135,19 @@ function crumb(params) {
 </script>
 ```
 
-#### Since
-
-alpha
-
-### @route
-
-#### Syntax
-
-```ebnf
-RouteDecl   ::= "@route" S? "{" S? RouteField ( S? ( "," | ";" ) S? RouteField )* S? ( "," | ";" )? S? "}" S? ";"?
-RouteField  ::= ( "path" | "guard" | "prefetch" | "transition" | "layout" | "scroll" ) S? ":" S? StringLiteral
-              | "loader" S? ":" S? Identifier
-              | "keepAlive" S? ":" S? ( "true" | Digits )
-              | "preload" S? ":" S? "true"
-              | ( "search" | "params" | "meta" ) S? ":" S? ObjectLiteral
-```
-
-The analyzer's form: `@route { path: '/users', keepAlive: true }`. The block may span lines.
-
-#### Semantics
-
-`@route` writes the route in one block instead of one declaration per line. Each key sets the field
-its own declaration sets: `path` is `@page`'s first path, `guard` is `@guard`, `loader` is `@loader`,
-`search` is `@search`'s block, `params` is `@params`'s, `meta` is `@meta { … }`'s, and so on. The
-registration is the one `@page` emits.
-
-#### Rules
-
-- The path is checked as `@page`'s is (`PDX_PAGE_INVALID_PATH`, `PDX_PAGE_INVALID_CONSTRAINT`,
-  `PDX_PAGE_EMPTY_CONSTRAINT`); `prefetch` as `@prefetch`'s (`PDX_PREFETCH_POLICY`); `loader` as
-  `@loader`'s (`PDX_LOADER_NOT_FOUND`).
-- The fields of `search` and `params` are checked as `@search`'s and `@params`'s are
-  (`PDX_ROUTE_FIELD_INVALID`), and declare the same names: each param, and `searchParams`.
-- `search`, `params` and `meta` are read to their own closing brace: a nested object is part of them.
-- A key other than those above is ignored — `label`, `alias`, `redirect` and `outlet` have no key —
-  and a field declared both here and by its own declaration takes the last one read. Not checked
-  today.
-
-#### Examples
-
 ```pdx
 <template>
   <p>Users</p>
 </template>
 
 <script>
-@route { path: '/users', keepAlive: true }
-</script>
-```
-
-```pdx
-<template>
-  <p>{{ count }} users</p>
-</template>
-
-<script>
-@route {
-  path: '/admin/users',
-  guard: 'users.read',
-  loader: loadUsers,
-  layout: 'admin',
-  transition: 'fade'
-}
-import { currentLoaderData } from '@pdxui/router';
-
-const count = $derived(((currentLoaderData() ?? []) as string[]).length);
-
-async function loadUsers() {
-  return [];
-}
+@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };
 </script>
 ```
 
 #### Since
 
-alpha
+alpha; `transition` and `meta` as options, beta (#277)
 
 ## Access and data
 
@@ -391,46 +351,6 @@ creates a `pdx-nav` element in itself; on a route that assigns it nothing, it em
 
 alpha
 
-### @transition
-
-#### Syntax
-
-```ebnf
-TransitionDecl ::= "@transition" S StringLiteral S? ";"?
-```
-
-The analyzer's form: `@transition 'fade';`. This is the page transition, a line of the script; the
-block modifier of `@if` and `@for` is in [template.md](template.md).
-
-#### Semantics
-
-`@transition` registers `transition:'fade'` on the route. The outlet applies it between the page
-that leaves and the page that enters, through `@pdxui/core`'s enter and exit classes. The presets are
-`fade` (`fade-in`/`fade-out`), `slide-left`, `slide-right`, `slide-up`, `slide-down`, `scale`
-(`scale-in`/`scale-out`) and `collapse`; `none` is no transition, and any other name is used as both
-the enter and the exit class.
-
-#### Rules
-
-- The name is not checked against the presets: not checked today.
-
-#### Examples
-
-```pdx
-<template>
-  <p>Details</p>
-</template>
-
-<script>
-@page '/details';
-@transition 'slide-left';
-</script>
-```
-
-#### Since
-
-alpha
-
 ### @scroll
 
 #### Syntax
@@ -471,83 +391,7 @@ wins over both.
 
 alpha
 
-### @prefetch
-
-#### Syntax
-
-```ebnf
-PrefetchDecl ::= "@prefetch" S ( "'hover'" | "'eager'" | "'viewport'" | "'never'" ) S? ";"?
-```
-
-The analyzer's form: `@prefetch 'hover';`. Double quotes are read too.
-
-#### Semantics
-
-`@prefetch` registers `prefetch:'eager'` on the route: when `<pdx-link>` fetches the route's chunk
-before a click. `hover`, the router's default, fetches it on hover, focus and pointerdown of a link
-to it; `eager` as soon as a link to it is on the page; `viewport` once a link to it scrolls into view;
-`never` not before the navigation.
-
-#### Rules
-
-- A policy that is none of the four raises `PDX_PREFETCH_POLICY`, from this declaration and from
-  `@page`'s `prefetch` option alike.
-
-#### Examples
-
-```pdx
-<template>
-  <p>Reports</p>
-</template>
-
-<script>
-@page '/reports';
-@prefetch 'eager';
-</script>
-```
-
-#### Since
-
-alpha
-
 ## Other paths
-
-### @alias
-
-#### Syntax
-
-```ebnf
-AliasDecl ::= "@alias" S StringLiteral S? ";"?
-```
-
-The analyzer's form: `@alias '/old-path';`.
-
-#### Semantics
-
-`@alias` adds a path that renders this page, exactly as a further path of `@page` does: the module
-emits a second `__pdx_pushRoute({path, tag, guard})` for it, and the scanned route table gets an
-entry for it with the page's other fields.
-
-#### Rules
-
-- The alias path is not checked as `@page`'s is: not checked today.
-
-#### Examples
-
-```pdx
-<template>
-  <p>People</p>
-</template>
-
-<script>
-@page '/users';
-@alias '/people';
-</script>
-```
-
-#### Since
-
-alpha
 
 ### @redirect
 
@@ -865,10 +709,7 @@ alpha
 #### Syntax
 
 ```ebnf
-MetaDecl      ::= HeadMeta | RouteMeta
-HeadMeta      ::= "@meta" S ( "property" S )? [A-Za-z0-9_:-]+ S? ":" S? StringLiteral S? ";"?
-RouteMeta     ::= "@meta" S "{" ObjectLiteral "}" S? ";"?
-ObjectLiteral ::= /* a JSON value written as a JavaScript object literal: unquoted keys, single quotes, trailing commas */
+MetaDecl ::= "@meta" S ( "property" S )? [A-Za-z0-9_:-]+ S? ":" S? StringLiteral S? ";"?
 ```
 
 The analyzer's form: `@meta description: 'text';`. The property form is
@@ -876,21 +717,16 @@ The analyzer's form: `@meta description: 'text';`. The property form is
 
 #### Semantics
 
-Two declarations share the keyword. With a name, `@meta` writes a tag to the document head:
-`@meta description: 'text'` compiles to `useHead({ meta: [{ name: "description", content: "text" }] })`
-and the `property` form to `{ property: "og:title", content: … }`; all the head `@meta` lines of a
-script go into one `useHead` call. With braces, `@meta { requiresAuth: true }` is the route's own
-data: it is parsed at build time into JSON and registered as `meta:{"requiresAuth":true}`, and
-`currentMeta()` from `@pdxui/router` returns it while the route is matched. Nothing of it reaches the
-document.
+`@meta` writes a tag to the document head: `@meta description: 'text'` compiles to
+`useHead({ meta: [{ name: "description", content: "text" }] })` and the `property` form to
+`{ property: "og:title", content: … }`; all the `@meta` lines of a script go into one `useHead` call.
+Route data, which the alpha also wrote with this keyword (`@meta { … }`), is `@page`'s `meta` option.
 
 #### Rules
 
-- A route `@meta` may span lines. A block whose text contains `name:` or `property:` is not read as
-  one and raises `PDX_UNKNOWN_DECLARATION`.
-- A route `@meta` that is not a JSON value once its keys are quoted — a function, a variable — is
-  dropped without a diagnostic. Not checked today.
-- A head `@meta` content is a static string. Not checked today.
+- `@meta { … }` is a removed form, `PDX_REMOVED_FORM`: `pdx migrate` moves the block into `@page`'s
+  `meta` option.
+- A `@meta` content is a static string. Not checked today.
 
 #### Examples
 
@@ -905,62 +741,6 @@ document.
 </script>
 ```
 
-```pdx
-<template>
-  <p>Billing</p>
-</template>
-
-<script>
-@page '/billing';
-@meta { requiresAuth: true, section: 'account' };
-</script>
-```
-
 #### Since
 
-alpha
-
-### @head
-
-#### Syntax
-
-```ebnf
-HeadDecl  ::= "@head" S? "{" S? HeadField ( S? ( "," | ";" ) S? HeadField )* S? ( "," | ";" )? S? "}" S? ";"?
-HeadField ::= "title" S? ":" S? StringLiteral
-            | "meta" S? ":" S? "[" S? HeadTag ( S? "," S? HeadTag )* S? ","? S? "]"
-HeadTag   ::= "{" S? ( "name" | "property" ) S? ":" S? StringLiteral S? "," S? "content" S? ":" S? StringLiteral S? "}"
-```
-
-The analyzer's form: `@head { title: 'Products', meta: [{ name: 'description', content: '…' }] }`.
-The block may span lines.
-
-#### Semantics
-
-`@head` declares the title and the head tags in one block. It produces what `@title` with a string
-and the named `@meta` lines produce: `useHead({ title: 'Products' })` and
-`useHead({ meta: [{ name: "description", content: "…" }] })`.
-
-#### Rules
-
-- The title in `@head` is always static: a template literal or an expression is not read. Not
-  checked today.
-- A tag with no `content`, or with neither `name` nor `property`, is dropped. Not checked today.
-
-#### Examples
-
-```pdx
-<template>
-  <p>Products</p>
-</template>
-
-<script>
-@head {
-  title: 'Products',
-  meta: [{ name: 'description', content: 'Everything we sell' }, { property: 'og:title', content: 'Products' }]
-}
-</script>
-```
-
-#### Since
-
-alpha
+alpha; head tags only, beta (#277)

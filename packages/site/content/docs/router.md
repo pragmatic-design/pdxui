@@ -488,10 +488,12 @@ queued one starts then at the latest.
 ## Transitions
 
 ```pdx
-@transition 'fade';   <!-- or slide-left/right/up/down, scale, collapse, none -->
+<script>
+@page '/reports' { transition: 'fade' };   // or slide-left/right/up/down, scale, collapse, none
+</script>
 ```
 
-On navigation the router applies the transition between the outgoing and incoming page, using
+The transition is an option of `@page`, like every route field. On navigation the router applies the transition between the outgoing and incoming page, using
 `@pdxui/core`'s enter/exit classes. `fade` and `scale` use `fade-in`/`fade-out` and
 `scale-in`/`scale-out`; the slides and `collapse` use their own name for both; `none` animates
 nothing. Any other name is used as the class for both enter and exit, so a transition of your own is
@@ -620,18 +622,22 @@ No import: the compiler writes `import { navigation } from '@pdxui/router'` in a
 
 ## Other route declarations
 
+`@page` holds every field of the route: further paths are aliases, and the options carry the rest.
+
 ```pdx
+<script>
+@page '/users', '/people' { prefetch: 'hover', meta: { requiresAuth: true } };  // an alias, a prefetch policy, route data
 @redirect '/old' -> '/new';      // redirect
-@alias '/people';                // alternative path for the same page
 @outlet 'sidebar' -> 'pdx-nav';  // named outlet
-@params { id: number };          // typed params, read by name (see the top of this page)
-@prefetch 'hover';               // 'hover' (the default), 'eager', 'viewport', or 'never'
+</script>
 ```
 
-`@prefetch` is the policy for fetching the page's chunk before the click — see
-[Before the click](#before-the-click-prefetching) above, which is where it is explained.
+`prefetch` is the policy for fetching the page's chunk before the click — `'hover'` (the default),
+`'eager'`, `'viewport'` or `'never'`; see [Before the click](#before-the-click-prefetching) above,
+which is where it is explained. `meta` is data the router keeps with the route, which `currentMeta()`
+reads while it is matched; `@params { id: number }` types the params (see the top of this page).
 
-> One thing `@prefetch` does not do: nothing emits the browser's
+> One thing `prefetch` does not do: nothing emits the browser's
 > **Speculation Rules** — `GeneratedRouter.speculationRules` is a type with no producer. Prefetching
 > is done by `<pdx-link>` calling the route's own `import()`, which is a different mechanism and
 > the one that works in a single-page app.

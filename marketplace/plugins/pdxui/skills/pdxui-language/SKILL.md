@@ -175,8 +175,14 @@ rule styles, `PDX_VARIANT_UNSTYLED`.
 The full vocabulary the analyzer accepts:
 
 `@prop` `@model` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
-`@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@part` `@host` `@state` `@variants` `@scroll`
-`@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use`
+`@params` `@search` `@redirect` `@provide` `@inject` `@expose` `@part` `@host` `@state` `@variants` `@scroll`
+`@i18n` `@raw` `@layout` `@outlet` `@snippet` `@use`
+
+**`@page` holds every route field**: `@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };`
+— further paths are aliases; the options are `keepAlive`, `preload`, `prefetch`, `label`, `transition`,
+`meta`, and any other is `PDX_PAGE_UNKNOWN_OPTION`. `@route { … }`, `@alias`, `@prefetch`, the script's
+`@transition`, `@meta { … }` and `@head { … }` are removed forms (`PDX_REMOVED_FORM`; `pdx migrate`
+rewrites them); `@meta name: '…'` writes the head only.
 
 **`@form f: Schema { … }`** builds a form (`createForm` underneath). Its options: `save` (when a field
 saves), `source`, `parent`, `fields` (per-field save), and **`warnUnsaved`** — written bare,

@@ -61,12 +61,12 @@ describe('fix 10 — @title static only for a single string literal', () => {
     });
 });
 
-// ─── Fix 11: @meta quotes keys only (URLs preserved) ────────────────
+// ─── Fix 11: route meta quotes keys only (URLs preserved) ───────────
 
-describe('fix 11 — @meta block preserves : inside values', () => {
+describe('fix 11 — @page meta preserves : inside values', () => {
     it('keeps a URL value intact and parses the object', () => {
         const a = analyzeScript(
-            `@prop x: string = 'a';\n@meta { url: 'https://x.com/p', count: 3 };`,
+            `@prop x: string = 'a';\n@page '/x' { meta: { url: 'https://x.com/p', count: 3 } };`,
             'x.pdx'
         );
         expect(a.route.meta).toEqual({ url: 'https://x.com/p', count: 3 });

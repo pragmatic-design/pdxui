@@ -17,10 +17,9 @@
 </template>
 
 <script>
-@page '/admin' { preload };
+@page '/admin' { preload, meta: { permissions: ['admin'], breadcrumb: 'Admin' } };
 @guard 'admin';
 @title 'Admin — TaskMgr';
-@meta { permissions: ['admin'], breadcrumb: 'Admin' };
 </script>
 
 <style scoped>

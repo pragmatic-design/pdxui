@@ -38,17 +38,12 @@ describe('@page options', () => {
 
 describe('every path of a page', () => {
     it('a second path carries the same fields', () => {
-        const all = routes(compile(pdx("@page '/tickets/:id(number)', '/t/:id(number)' { keepAlive: 60000, label: 'Ticket' };\n@guard 'tickets.view';\n@transition 'fade';"), 'two.pdx').code);
+        const all = routes(compile(pdx("@page '/tickets/:id(number)', '/t/:id(number)' { keepAlive: 60000, label: 'Ticket', transition: 'fade' };\n@guard 'tickets.view';"), 'two.pdx').code);
         const second = all.get('/t/:id(number)');
         expect(second).toBeDefined();
         for (const field of ['guard:"tickets.view"', 'keepAlive:60000', 'label:"Ticket"', 'transition:"fade"', 'lazy:true', 'paramConstraints:{id:"number"}']) {
             expect(second, field).toContain(field);
         }
-    });
-
-    it('an @alias too', () => {
-        const all = routes(compile(pdx("@page '/people';\n@alias '/users';\n@transition 'fade';"), 'alias.pdx').code);
-        expect(all.get('/users')).toContain('transition:"fade"');
     });
 
     it('every path is checked, not only the first', () => {
@@ -76,23 +71,23 @@ describe('@search', () => {
     });
 });
 
-describe('route @meta', () => {
+describe('@page meta', () => {
     it('over several lines is read', () => {
-        const r = compile(pdx("@page '/x';\n@meta {\n  section: 'admin',\n  order: 2\n};"), 'meta.pdx');
+        const r = compile(pdx("@page '/x' {\n  meta: {\n    section: 'admin',\n    order: 2\n  }\n};"), 'meta.pdx');
         expect(codes(r)).not.toContain('PDX_UNKNOWN_DECLARATION');
         expect(codes(r)).not.toContain('PDX_SCRIPT_SYNTAX_ERROR');
         expect(routes(r.code).get('/x')).toContain('section');
     });
+
+    it('reads a nested object whole', () => {
+        const { code } = compile(pdx("@page '/x' { meta: { crumb: { label: 'X' }, order: 2 } };"), 'rt.pdx');
+        expect(routes(code).get('/x')).toContain('"order":2');
+    });
 });
 
-describe('@route', () => {
-    it('reads a nested object in meta whole', () => {
-        const { code } = compile(pdx("@route { path: '/x', meta: { crumb: { label: 'X' }, order: 2 } }"), 'rt.pdx');
-        expect(routes(code).get('/x')).toContain('order');
-    });
-
-    it('checks its search and params fields as @search and @params are', () => {
-        const r = compile(pdx("@route { path: '/x/:id', params: { id: 'number' }, search: { q: 'string' } }"), 'rt2.pdx');
+describe('@search and @params fields', () => {
+    it('are checked', () => {
+        const r = compile(pdx("@page '/x/:id';\n@params { id: 'number' };\n@search { q: 'string' };"), 'rt2.pdx');
         expect(codes(r).filter((c) => c === 'PDX_ROUTE_FIELD_INVALID')).toHaveLength(2);
     });
 });

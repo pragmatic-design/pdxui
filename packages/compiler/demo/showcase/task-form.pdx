@@ -41,8 +41,7 @@
 <script>
 import { useTasks } from './task-store.pdx';
 
-@page '/create' { preload };
-@transition 'slide-right';
+@page '/create' { preload, transition: 'slide-right' };
 @title 'New Task — TaskMgr';
 
 const store = useTasks();

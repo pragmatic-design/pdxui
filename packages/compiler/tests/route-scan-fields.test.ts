@@ -27,13 +27,9 @@ const PAGE = `
 </template>
 
 <script>
-@page '/tickets/:id';
-@alias '/cases/:id';
+@page '/tickets/:id', '/cases/:id' { transition: 'fade', prefetch: 'hover', meta: { breadcrumb: 'Ticket' } };
 @guard 'tickets.read';
-@transition 'fade';
 @scroll 'top';
-@prefetch 'hover';
-@meta { breadcrumb: 'Ticket' };
 </script>`;
 
 const EAGER = `
@@ -60,9 +56,9 @@ afterAll(() => rmSync(dir, { recursive: true, force: true }));
 const ticket = (): ScannedRoute => routes.find(r => r.path === '/tickets/:id')!;
 
 describe('the scan reads the whole declaration', () => {
-    it('finds the page and its alias as two routes', () => {
-        // An alias registered by the codegen and missed by the scan is a route that is a page in
-        // dev and a 404 in production, as `@page 'a', 'b'` would be.
+    it('finds the page and its further path as two routes', () => {
+        // A further path registered by the codegen and missed by the scan is a route that is a page
+        // in dev and a 404 in production.
         expect(routes.map(r => r.path).sort()).toEqual(['/', '/cases/:id', '/tickets/:id']);
     });
 

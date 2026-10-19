@@ -30,6 +30,7 @@ import { navigateUrl, navigateUrlManual } from './navigate-url';
 import { scopedReachesChild } from './scoped-reach';
 import { scriptSetup } from './script-setup';
 import { legacyScript, mixinRemoved } from './legacy-script';
+import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlock } from './route-fields';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -314,6 +315,14 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     scriptSetup,
     legacyScript,
     mixinRemoved,
+    // #277: `@page` is the one home of every route field, and `@head` is gone (./route-fields). The
+    // `@route` block first: it may write the `@page` the others add to.
+    routeBlock,
+    pageAlias,
+    pagePrefetch,
+    pageTransition,
+    routeMeta,
+    headBlock,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

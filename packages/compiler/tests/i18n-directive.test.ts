@@ -145,13 +145,12 @@ let count = $signal(0);
     });
 });
 
-describe('@transition / @layout — codegen manifest', () => {
+describe('@page transition / @layout — codegen manifest', () => {
     it('emits transition in route manifest', () => {
         const { code } = compileI18n(`
 <template><div>Page</div></template>
 <script>
-@page '/dashboard';
-@transition 'slide-left';
+@page '/dashboard' { transition: 'slide-left' };
 </script>
         `);
 
@@ -177,8 +176,7 @@ describe('@transition / @layout — codegen manifest', () => {
         const { code } = compileI18n(`
 <template><div>Page</div></template>
 <script>
-@page '/settings';
-@transition 'fade';
+@page '/settings' { transition: 'fade' };
 @layout 'dashboard';
 </script>
         `);

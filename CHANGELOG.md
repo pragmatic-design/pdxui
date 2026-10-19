@@ -127,6 +127,16 @@ semver.
 
 ### Changed
 
+- `@page` is the one home of every route field. Further paths are aliases, and the options are
+  `keepAlive`, `preload`, `prefetch`, `label`, `transition` and `meta`:
+  `@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };`.
+  - `@route { … }`, `@alias`, `@prefetch`, the script's `@transition` and `@meta { … }` are
+    `PDX_REMOVED_FORM`; `@meta name: '…'` writes the head only. The template's `@transition` modifier
+    of `@if` and `@for` stays.
+  - `@head { … }` is removed: `@title` and `@meta` write the head.
+  - An option `@page` does not have is `PDX_PAGE_UNKNOWN_OPTION`; it used to be ignored.
+  - `pdx migrate` rewrites each removed form: `@route` into `@page` and the declarations it carried,
+    `@head` into `@title` and `@meta` lines. (#277)
 - A `<style scoped>` stops at nested components. Under the default `target: 'baseline-2026'` a scoped
   block compiles to a CSS `@scope` that starts at the host and ends where a child component begins,
   so a rule styles the component's own elements and no longer the inside of a child.
