@@ -1134,26 +1134,33 @@ function listItems(raw: string): string[] {
  * The blanks after a `@render` with no `@else` stay where they were: they are content.
  */
 function parseRender(ctx: ParseContext, loc: SourceLoc): RenderNode {
-    // Match: `row(` or `row?.(` at the cursor. Groups: [1]=the name [2]=`?.` when optional
-    const head = /^([A-Za-z_$][\w$]*)\s*(\?\.)?\s*(?=\()/.exec(ctx.source.slice(ctx.pos));
-    if (!head) {
+    // Read `row`, then blanks, an optional `?.`, blanks, and the `(`, one step after another: a
+    // single regex with a blank run on each side of the optional `?.` backtracks over a long run of
+    // blanks with no `(` after it (js/polynomial-redos).
+    // Match: the name at the cursor. Groups: [0]=the name
+    const name = /^[A-Za-z_$][\w$]*/.exec(ctx.source.slice(ctx.pos))?.[0];
+    const refuse = (): never => {
         throw new Error(
             `Invalid @render at line ${ctx.line}.\n` +
             `  Hint: @render name(args), or @render name?.(args) @else { … } for an optional slot.`
         );
-    }
-    advance(ctx, head[0].length);
+    };
+    if (!name) return refuse();
+    advance(ctx, name.length);
+    skipWhitespace(ctx);
+    const optional = lookAhead(ctx, '?.');
+    if (optional) { advance(ctx, 2); skipWhitespace(ctx); }
+    if (!lookAhead(ctx, '(')) return refuse();
     const args = listItems(parseParenthesized(ctx));
-    const optional = head[2] !== undefined;
     const before = { pos: ctx.pos, line: ctx.line, column: ctx.column };
     skipWhitespace(ctx);
     if (lookAhead(ctx, '@else')) {
         advance(ctx, 5); // skip @else
         const fallback = parseBlock(ctx);
-        return { type: 'render', name: head[1], args, optional, fallback, loc };
+        return { type: 'render', name, args, optional, fallback, loc };
     }
     Object.assign(ctx, before);
-    return { type: 'render', name: head[1], args, optional, loc };
+    return { type: 'render', name, args, optional, loc };
 }
 
 /** Parse `@snippet name(params) { … }`: a template the parent passes as the enclosing component's slot. */
