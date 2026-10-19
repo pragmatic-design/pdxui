@@ -230,10 +230,24 @@ export const currentTheme: ReadonlySignal<string> = computed(() => _currentTheme
 /** Current color scheme ('light' or 'dark'). */
 export const currentScheme: ReadonlySignal<string> = computed(() => _currentScheme());
 
+// The app's browser target, defined by the pdx() plugin (#156). Read with `typeof`: an app without the
+// plugin — the CDN bundle, a hand-written page — defines nothing and gets the baseline-2024 behaviour.
+declare const __PDX_TARGET__: string | undefined;
+
+/**
+ * Does the design CSS read the behaviour attributes on <html>? Under baseline-2026 the pdx() plugin
+ * rewrites it into style queries on the tokens themselves, which a `pdx-theme` subtree answers for
+ * itself and a theme switch answers in the same frame; under baseline-2024, or with no plugin, the
+ * CSS selects on the attributes and setTheme has to mirror them.
+ */
+function behaviourAttrsNeeded(): boolean {
+    return typeof __PDX_TARGET__ === 'undefined' || __PDX_TARGET__ !== 'baseline-2026';
+}
+
 /**
  * Set the brand theme (e.g. 'material', 'fluent', 'cupertino').
- * Sets `pdx-theme` attribute on <html>, persists to localStorage,
- * and syncs behavior attributes (input-style, tab-style, card-style)
+ * Sets `pdx-theme` attribute on <html>, persists to localStorage, and — under baseline-2024 or
+ * without the pdx() plugin — syncs behavior attributes (input-style, tab-style, card-style)
  * from the theme's CSS custom properties.
  */
 export function setTheme(name: string): void {
@@ -243,7 +257,7 @@ export function setTheme(name: string): void {
         localStorage.setItem(THEME_KEY, name);
         // Sync behavior attributes from theme CSS tokens → HTML attributes
         // CSS selectors like [pdx-input-style="filled"] need these attrs
-        requestAnimationFrame(() => syncBehaviorAttrs());
+        if (behaviourAttrsNeeded()) requestAnimationFrame(() => syncBehaviorAttrs());
     }
 }
 
@@ -330,7 +344,7 @@ if (isBrowser) {
         document.documentElement.setAttribute('pdx-scheme', 'dark');
     }
     // Sync behavior attrs from theme tokens on initial load
-    requestAnimationFrame(() => syncBehaviorAttrs());
+    if (behaviourAttrsNeeded()) requestAnimationFrame(() => syncBehaviorAttrs());
 }
 
 // ─── Shadow-root styles ────────────────────────────────────────────

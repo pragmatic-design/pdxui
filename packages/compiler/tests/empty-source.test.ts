@@ -42,7 +42,7 @@ afterEach(() => rmSync(root, { recursive: true, force: true }));
 
 /** The plugin's transform, called the way Vite calls it. */
 function transform(code: string, id: string): unknown {
-    const plugin = pdx() as unknown as { transform(code: string, id: string): unknown };
+    const plugin = pdx()[0] as unknown as { transform(code: string, id: string): unknown };
     return plugin.transform.call(plugin, code, id);
 }
 

@@ -90,7 +90,7 @@ theme.toCSS();      // the complete [pdx-theme="acme"] { … } block
 theme.apply();      // set the tokens on <html> right now
 theme.tokens;       // Record<string, string> — every token, as data
 theme.behaviors;    // the archetype's decisions
-theme.attributes;   // structural attributes for <html> (pdx-tab-style, pdx-card-style, …)
+theme.attributes;   // structural attributes for <html> under baseline-2024 (pdx-tab-style, pdx-card-style, …)
 theme.validate();   // ThemeIssue[]
 ```
 

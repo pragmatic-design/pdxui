@@ -228,6 +228,19 @@ queries — `@container style(--pdx-card-style: elevated) { … }` — so a nest
 its own behaviours with no script and in the same frame (#156). Under `baseline-2024`, `setTheme`
 keeps mirroring them as attributes on `<html>` (alpha). Since: beta (#156).
 
+**Landed** (#156). The design CSS is written in the `baseline-2024` form, `[pdx-card-style="elevated"]
+.pdx-surface-card`, and reaches the browser as written in development, so the two forms are two
+stylesheets chosen by the app's target: `pdx()` returns two Vite plugins, and the second rewrites each
+stylesheet of `@pdxui/design` under `baseline-2026` into `@container style(--pdx-card-style: elevated)
+{ :is(:root, *) .pdx-surface-card { … } }` (`packages/compiler/src/compiler/behaviour-queries.ts`).
+`:is(:root, *)` stands where the attribute stood and keeps its weight, so a rewritten rule wins and
+loses where it did. A behaviour attribute anywhere but the selector's leading compound is refused at
+build time. The plugin defines `__PDX_TARGET__`, and `setTheme` mirrors the attributes only when it is
+not `baseline-2026` — an app without the plugin keeps the alpha behaviour. The style query reads the
+value an element inherits from its parent, so an element that carries `pdx-theme` itself takes its
+parent's behaviours; its descendants take its own. Measured in Chromium, build and dev:
+`packages/showcase/tests/theme-behaviours.spec.ts`; certified by the `input-nested-theme` scenario.
+
 ### Density
 
 `pdx-density="compact|normal|comfort"` on any element sets `--pdx-density-factor` (0.75, 1, 1.25) in

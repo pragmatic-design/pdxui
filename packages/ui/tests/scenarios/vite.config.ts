@@ -3,9 +3,11 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { offlineEndpoint } from './offline-endpoint';
+import { designTargetPlugin } from '../../../compiler/src/design-target';
 
 // Scenarios don't use .pdx files — just HTML + ES modules importing @pdxui/*
-// The pdx() plugin is not needed here, only aliases for workspace packages.
+// The pdx() plugin is not needed here, only aliases for workspace packages — and its design-target
+// plugin, which gives the design CSS the form of the target.
 //
 // IMPORTANT: the alias targets must be ABSOLUTE. @rollup/plugin-alias resolves a relative
 // target against the IMPORTING FILE, so a page in generated/ (one level deeper) would break
@@ -50,11 +52,17 @@ function uiSubpathAliases(): { find: string; replacement: string }[] {
     return aliases.sort((a, b) => b.find.length - a.find.length);
 }
 
+// The browser target the pages are certified for (#156): the design CSS in the form pdx() gives an
+// app on that target, and core told the same. The default target unless PDX_TARGET says
+// `baseline-2024`, the form with the behaviour attributes on <html>.
+const target = process.env.PDX_TARGET === 'baseline-2024' ? 'baseline-2024' : 'baseline-2026';
+
 export default defineConfig({
     server: { port: 5220 },
+    define: { __PDX_TARGET__: JSON.stringify(target) },
     // A real endpoint for `offline-queue.html`, so that going offline is a network fact and not a
     // redefined `navigator.onLine`. It answers `/__offline/*` and nothing else.
-    plugins: [offlineEndpoint()],
+    plugins: [offlineEndpoint(), designTargetPlugin(target)],
     resolve: {
         // An ARRAY, not an object: the design sub-paths need a regex, because each one resolves to
         // a FILE named after the component and a prefix alias would produce `<dir>/button` with no

@@ -59,7 +59,7 @@ describe('the plugin writes it', () => {
         mkdirSync(join(root, 'src', 'pages'), { recursive: true });
         writeFileSync(join(root, 'src', 'pages', 'user.pdx'), page('/users/:id(number)'));
         writeFileSync(join(root, 'src', 'pages', 'home.pdx'), page('/'));
-        const plugin = pdx() as unknown as { configResolved(c: { root: string; command: string }): void; buildStart(this: { warn(): void }): void };
+        const plugin = pdx()[0] as unknown as { configResolved(c: { root: string; command: string }): void; buildStart(this: { warn(): void }): void };
         plugin.configResolved({ root, command: 'build' });
         plugin.buildStart.call({ warn() {} });
         const dts = readFileSync(join(root, ROUTE_TYPES_FILE), 'utf-8');
@@ -71,7 +71,7 @@ describe('the plugin writes it', () => {
     it('control — an app with no route gets no file', () => {
         const root = tmp();
         mkdirSync(join(root, 'src'), { recursive: true });
-        const plugin = pdx() as unknown as { configResolved(c: { root: string; command: string }): void; buildStart(this: { warn(): void }): void };
+        const plugin = pdx()[0] as unknown as { configResolved(c: { root: string; command: string }): void; buildStart(this: { warn(): void }): void };
         plugin.configResolved({ root, command: 'build' });
         plugin.buildStart.call({ warn() {} });
         expect(() => statSync(join(root, ROUTE_TYPES_FILE))).toThrow();

@@ -1146,6 +1146,10 @@
         {
           "id": "input-sizes",
           "title": "Input — Sizes"
+        },
+        {
+          "id": "input-nested-theme",
+          "title": "Input — Nested themes"
         }
       ]
     },

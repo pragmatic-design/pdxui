@@ -22,7 +22,7 @@ type Hooks = {
 
 /** The plugin with its mode decided, and the two hooks this file drives. */
 function pluginIn(command: 'build' | 'serve'): Hooks {
-    const plugin = pdx({ autoAlias: false }) as unknown as Hooks;
+    const plugin = pdx({ autoAlias: false })[0] as unknown as Hooks;
     plugin.config({}, { command });
     return plugin;
 }

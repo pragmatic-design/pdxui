@@ -291,9 +291,8 @@ a:not([class*="pdx-"]) { color: var(--gold); }
 }
 
 /* ── Tabs: the enclosed "folder tab" as the showcase default ──────────────────────────────
-   The Pragmatic family themes ship --pdx-tab-indicator: pill, which @pdxui/core mirrors
-   onto <html pdx-tab-style="pill"> → every tablist renders as pills (even the Bordered/Card
-   demos). This site wants the enclosed folder-tab look as the default and pills only as the
-   explicit .pdx-tabs-pills variant. Neutralise the token for the Pragmatic themes (site-only;
-   the design-system theme is untouched). */
-:root[pdx-theme="pragmatic"], :root[pdx-theme="pragmatic-gold"] { --pdx-tab-indicator: line; }
+   Five themes ship --pdx-tab-indicator: pill, which the design CSS reads → every tablist
+   renders as pills (even the Bordered/Card demos). This site wants the enclosed folder-tab look
+   as the default and pills only as the explicit .pdx-tabs-pills variant. Neutralise the token
+   for those themes (site-only; the design-system theme is untouched). */
+:root:is([pdx-theme="pragmatic"], [pdx-theme="pragmatic-gold"], [pdx-theme="cupertino"], [pdx-theme="playful"], [pdx-theme="neumorphic"]) { --pdx-tab-indicator: line; }

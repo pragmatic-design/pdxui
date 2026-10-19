@@ -39,7 +39,7 @@ describe('the browser target', () => {
     });
 
     it('reaches ctx.target from the plugin', async () => {
-        const plugin = pdx({ target: 'baseline-2024', devtools: false }) as unknown as {
+        const plugin = pdx({ target: 'baseline-2024', devtools: false })[0] as unknown as {
             transform: (code: string, id: string) => unknown;
         };
         await plugin.transform.call({ warn() {}, error(e: unknown) { throw e; }, addWatchFile() {} }, SOURCE, '/app/src/x.pdx');

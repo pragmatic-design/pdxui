@@ -32,7 +32,7 @@ export function donutPrelude(scopeId: string): string {
 }
 
 /** The index of the `}` that closes the block opened at `open`, braces in strings skipped. */
-function blockEnd(css: string, open: number): number {
+export function blockEnd(css: string, open: number): number {
     let depth = 0;
     let quote = '';
     for (let i = open; i < css.length; i++) {
@@ -46,7 +46,7 @@ function blockEnd(css: string, open: number): number {
 }
 
 /** Where an at-rule's prelude ends: the first `;` or `{` outside strings and parentheses, or -1. */
-function preludeEnd(css: string, from: number): number {
+export function preludeEnd(css: string, from: number): number {
     let depth = 0;
     let quote = '';
     for (let i = from; i < css.length; i++) {
@@ -61,7 +61,7 @@ function preludeEnd(css: string, from: number): number {
 }
 
 /** A selector list split at its top-level commas. */
-function splitList(selector: string): string[] {
+export function splitList(selector: string): string[] {
     const parts: string[] = [];
     let depth = 0;
     let quote = '';

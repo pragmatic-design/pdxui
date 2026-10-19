@@ -4885,8 +4885,8 @@ function setTheme(name: string): void
 ```
 
 Set the brand theme (e.g. 'material', 'fluent', 'cupertino').
-Sets `pdx-theme` attribute on <html>, persists to localStorage,
-and syncs behavior attributes (input-style, tab-style, card-style)
+Sets `pdx-theme` attribute on <html>, persists to localStorage, and — under baseline-2024 or
+without the pdx() plugin — syncs behavior attributes (input-style, tab-style, card-style)
 from the theme's CSS custom properties.
 
 ### `setValidationLocale`

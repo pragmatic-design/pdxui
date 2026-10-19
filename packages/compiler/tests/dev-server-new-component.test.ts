@@ -110,12 +110,12 @@ describe('the dev server notices a new .pdx', () => {
     }
 
     it('registers a watcher at all', () => {
-        const plugin = pdx() as unknown as { configureServer?: (s: unknown) => void };
+        const plugin = pdx()[0] as unknown as { configureServer?: (s: unknown) => void };
         expect(typeof plugin.configureServer, 'the plugin must hook the dev server').toBe('function');
     });
 
     it('teaches the resolver and reloads the page when a .pdx appears', () => {
-        const plugin = pdx() as unknown as {
+        const plugin = pdx()[0] as unknown as {
             configureServer: (s: unknown) => void;
             buildStart: () => void;
             configResolved: (c: { root: string }) => void;
@@ -135,7 +135,7 @@ describe('the dev server notices a new .pdx', () => {
     });
 
     it('ignores files that are not components', () => {
-        const plugin = pdx() as unknown as {
+        const plugin = pdx()[0] as unknown as {
             configureServer: (s: unknown) => void;
             configResolved: (c: { root: string }) => void;
         };

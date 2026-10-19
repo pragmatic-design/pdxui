@@ -74,20 +74,9 @@ const themeItems = [
   { key: 'metro', label: 'Metro' },
 ];
 
-// Structural behavior attributes derived from theme (same map as the showcase).
-const _inputStyleMap = { material: 'filled', editorial: 'underlined', cyberpunk: 'underlined' };
-const _inputFocusMap = { fluent: 'bottom' };
-const _tabStyleMap = {};   /* tabs default to the enclosed 'linguetta' look in every theme; pills are an explicit opt-in variant (the "Pills Variant" demo), not a theme default */
-const _cardStyleMap = { material: 'elevated', playful: 'elevated' };
-
-function _applyBehaviorAttrs(t) {
-  const root = document.documentElement;
-  const _set = (attr, map) => { const v = map[t]; if (v) root.setAttribute(attr, v); else root.removeAttribute(attr); };
-  _set('pdx-input-style', _inputStyleMap);
-  _set('pdx-input-focus', _inputFocusMap);
-  _set('pdx-tab-style', _tabStyleMap);
-  _set('pdx-card-style', _cardStyleMap);
-}
+// A theme's behaviours (filled inputs, elevated cards) are its own tokens, which the design CSS
+// reads through style queries (#156): setting `pdx-theme` is all a theme switch takes. The site's
+// one exception, tabs without the theme's pills, is a token in site.css.
 
 // The visitor's choice lives in a cookie shared with themebuilder.pdxui.com (brand/preference.ts).
 // localStorage is read only as the older place a returning visitor's theme was kept.
@@ -99,10 +88,8 @@ let scheme = $signal<'light' | 'dark'>((_pref.scheme || document.documentElement
 // page in the static one first.
 document.documentElement.setAttribute('pdx-scheme', scheme);
 
-// Restore + apply behavior attrs after setup (avoids TDZ on the const maps above).
 onMount(() => {
   document.documentElement.setAttribute('pdx-theme', theme);
-  _applyBehaviorAttrs(theme);
 });
 
 function onTheme(e) {
@@ -110,7 +97,6 @@ function onTheme(e) {
   theme = t;
   document.documentElement.setAttribute('pdx-theme', t);
   writePreference({ theme: t });
-  _applyBehaviorAttrs(t);
 }
 
 function toggleScheme() {

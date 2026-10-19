@@ -79,7 +79,7 @@ describe('the plugin on the dev server', () => {
     function served() {
         root = mkdtempSync(join(tmpdir(), 'pdx-hmr-style-'));
         mkdirSync(join(root, 'src', 'pages'), { recursive: true });
-        const plugin = pdx();
+        const [plugin] = pdx();
         (plugin.config as (c: object, e: { command: string }) => void)({}, { command: 'serve' });
         (plugin.configResolved as (c: { root: string; server: { fs: { allow: string[] } } }) => void)(
             { root, server: { fs: { allow: [] } } });

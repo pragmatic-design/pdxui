@@ -126,8 +126,12 @@ dispatch.
 
 `pdx({ target })` names the browsers the output may rely on: `'baseline-2026'`, the default, or
 `'baseline-2024'` for an app whose users run older browsers, where the beta's output needs a 2026
-feature. No output depends on it yet. `'baseline-2024'` is maintained frozen — fixed, not developed —
-and retired when `@scope` is Baseline widely available, in September 2028.
+feature. Under the default a `<style scoped>` block is a donut `@scope` that stops at nested
+components, and the stylesheets of `@pdxui/design` read a theme's behaviours (filled inputs, pill
+tabs, elevated cards) through container style queries — which is why `pdx()` is two Vite plugins,
+the second rewriting those stylesheets between Vite's CSS steps. `'baseline-2024'` keeps the ancestor
+selector and the behaviour attributes `setTheme` writes on `<html>`. It is maintained frozen — fixed,
+not developed — and retired when `@scope` is Baseline widely available, in September 2028.
 
 ## The first screen, in one round-trip less
 

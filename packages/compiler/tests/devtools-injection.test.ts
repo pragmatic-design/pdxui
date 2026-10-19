@@ -35,7 +35,7 @@ const HTML = '<!doctype html><html><head></head><body><div id="app"></div></body
 
 /** A plugin instance in dev mode, with devtools on. */
 function devPlugin(): HtmlPlugin {
-    const p = pdx({ devtools: true }) as unknown as HtmlPlugin;
+    const p = pdx({ devtools: true })[0] as unknown as HtmlPlugin;
     p.config({}, { command: 'serve' });
     return p;
 }
@@ -110,13 +110,13 @@ describe('the injected devtools script is loadable', () => {
     });
 
     it('injects nothing when devtools are off', () => {
-        const p = pdx({ devtools: false }) as unknown as HtmlPlugin;
+        const p = pdx({ devtools: false })[0] as unknown as HtmlPlugin;
         p.config({}, { command: 'serve' });
         expect(p.transformIndexHtml(HTML) ?? HTML).not.toContain('initDevTools');
     });
 
     it('injects nothing in a production build', () => {
-        const p = pdx({ devtools: true }) as unknown as HtmlPlugin;
+        const p = pdx({ devtools: true })[0] as unknown as HtmlPlugin;
         p.config({}, { command: 'build' });
         expect(p.transformIndexHtml(HTML) ?? HTML).not.toContain('initDevTools');
     });
