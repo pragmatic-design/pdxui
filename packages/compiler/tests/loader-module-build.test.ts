@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { pdx } from '../src/plugin';
 
 const PAGE = `<template><div class="rows">{{ title }}</div></template>
-<script setup>
+<script>
 @page '/rows';
 @loader loadRows;
 import { rowsFrom } from './api';

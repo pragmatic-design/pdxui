@@ -20,7 +20,7 @@ const BACKTICK = '`';
 function compile(setupLine: string): string {
     const src = [
         '<template>', '  <div>{{ id }}</div>', '</template>', '',
-        '<script setup>', 'let id = $signal(1);', setupLine, '</script>',
+        '<script>', 'let id = $signal(1);', setupLine, '</script>',
     ].join('\n');
     const d = parseSFC(src);
     return compileSFC(d, parseTemplate(d.template?.content ?? ''), 'probe.pdx');

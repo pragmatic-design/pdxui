@@ -2,6 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { templateGenerator } from './template-generator';
 import { generateNodes } from '../src/compiler/codegen-template';
 import { createCompileContext } from '../src/compiler/compile-context';
 import { parseTemplate } from '../src/parser/template';
@@ -119,19 +120,13 @@ describe('rewriteHtmlBindings fix', () => {
     });
 
     it('rewrites :ref="name" to :ref=${ctx.name}', () => {
-        const { code } = compile(`
-<template>
-  <canvas :ref="canvasEl"></canvas>
-</template>`, 'test.pdx');
+        const code = templateGenerator(`<canvas :ref="canvasEl"></canvas>`);
 
         expect(code).toContain(':ref=${ctx.canvasEl}');
     });
 
     it('handles ::value with modifiers', () => {
-        const { code } = compile(`
-<template>
-  <input ::value.trim="name">
-</template>`, 'test.pdx');
+        const code = templateGenerator(`<input ::value.trim="name">`);
 
         expect(code).toContain('::value.trim=${ctx.name}');
     });
@@ -139,77 +134,37 @@ describe('rewriteHtmlBindings fix', () => {
 
 describe('kebab-case normalization', () => {
     it('converts camelCase :prop to kebab-case in output', () => {
-        const { code } = compile(`
-<template>
-  <pdx-select :itemTemplate="renderFn"></pdx-select>
-</template>`, 'test.pdx');
+        const code = templateGenerator(`<pdx-select :itemTemplate="renderFn"></pdx-select>`);
 
         expect(code).toContain(':item-template=');
         expect(code).not.toContain(':itemTemplate=');
     });
 
     it('converts camelCase ::prop to kebab-case in output', () => {
-        const { code } = compile(`
-<template>
-  <pdx-field ::formValue="val"></pdx-field>
-</template>`, 'test.pdx');
+        const code = templateGenerator(`<pdx-field ::formValue="val"></pdx-field>`);
 
         expect(code).toContain('::form-value=');
         expect(code).not.toContain('::formValue=');
     });
 
     it('preserves single-word props unchanged', () => {
-        const { code } = compile(`
-<template>
-  <pdx-select :options="items" :disabled="off"></pdx-select>
-</template>`, 'test.pdx');
+        const code = templateGenerator(`<pdx-select :options="items" :disabled="off"></pdx-select>`);
 
         expect(code).toContain(':options=');
         expect(code).toContain(':disabled=');
     });
 
     it('preserves class and style bindings', () => {
-        const { code } = compile(`
-<template>
-  <div :class="cls" :style="stl"></div>
-</template>`, 'test.pdx');
+        const code = templateGenerator(`<div :class="cls" :style="stl"></div>`);
 
         expect(code).toContain(':class=');
         expect(code).toContain(':style=');
     });
 
     it('handles multi-word camelCase', () => {
-        const { code } = compile(`
-<template>
-  <pdx-grid :selectedRowKeys="keys"></pdx-grid>
-</template>`, 'test.pdx');
+        const code = templateGenerator(`<pdx-grid :selectedRowKeys="keys"></pdx-grid>`);
 
         expect(code).toContain(':selected-row-keys=');
-    });
-});
-
-describe('defineEmits', () => {
-    it('transforms defineEmits to ctx.emit wrapper', () => {
-        const { code } = compile(`
-<template><button @click="save">Save</button></template>
-<script setup>
-  const emit = defineEmits();
-  function save() { emit('save', { data: 'test' }); }
-</script>`, 'test.pdx');
-
-        expect(code).toContain("const emit = (event, detail) => ctx.emit(event, detail)");
-        expect(code).toContain("emit('save'");
-    });
-
-    it('transforms typed defineEmits', () => {
-        const { code } = compile(`
-<template><button @click="save">Save</button></template>
-<script setup>
-  const emit = defineEmits<{ 'save': FormData; 'cancel': void }>();
-  function save() { emit('save', data); }
-</script>`, 'test.pdx');
-
-        expect(code).toContain("const emit = (event, detail) => ctx.emit(event, detail)");
     });
 });
 
@@ -221,7 +176,7 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
     <p>You'd think this would work.</p>
   }
 </template>
-<script setup>
+<script>
   let show = $signal(true);
 </script>`, 'test.pdx');
 
@@ -238,7 +193,7 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
     <p>Error occurred</p>
   }
 </template>
-<script setup>
+<script>
   let x = $signal(0);
 </script>`, 'test.pdx');
 
@@ -253,7 +208,7 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
     <p>The "best" items aren't always obvious.</p>
   }
 </template>
-<script setup>
+<script>
   let items = $signal([{id: 1}]);
 </script>`, 'test.pdx');
 
@@ -267,7 +222,7 @@ describe('Parser: apostrophe in HTML text (regression)', () => {
     <div class="test" title="it's fine">Content</div>
   }
 </template>
-<script setup>
+<script>
   let show = $signal(true);
 </script>`, 'test.pdx');
 
@@ -281,7 +236,7 @@ describe('scoped styles — line-ending independence', () => {
     // the golden snapshots flip-flop. CSS is line-ending agnostic; the output must be too.
     const src = (eol: string) => [
         '<template><div class="a">x</div></template>',
-        '<script setup>',
+        '<script>',
         '  let n = $signal(1);',
         '</script>',
         '<style scoped>',
@@ -310,7 +265,7 @@ describe('interpolation of a member access on a signal', () => {
     it('calls the signal before reading the property', () => {
         const out = compile(`
 <template><span>{{ items.length }}</span></template>
-<script setup>
+<script>
 let items = $signal([1, 2, 3]);
 </script>`, 'x.pdx').code;
 
@@ -321,7 +276,7 @@ let items = $signal([1, 2, 3]);
     it('reads a bare signal by calling it', () => {
         const out = compile(`
 <template><span>{{ count }}</span></template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`, 'x.pdx').code;
 
@@ -333,7 +288,7 @@ let count = $signal(0);
         // object. The PROPERTY is never called.
         const out = compile(`
 <template>@for (rows as r; track r.id) {<span>{{ r.label }}</span>}</template>
-<script setup>
+<script>
 let rows = $signal([]);
 </script>`, 'x.pdx').code;
 
@@ -345,7 +300,7 @@ let rows = $signal([]);
     it('applies to attribute bindings too', () => {
         const out = compile(`
 <template><input :value="draft.name" /></template>
-<script setup>
+<script>
 let draft = $signal({ name: 'a' });
 </script>`, 'x.pdx').code;
 
@@ -369,7 +324,7 @@ describe('HTML comments are never rewritten — the inline render, every .pdx\'s
   <!-- no @click="go" here; :value="draft.name" and {{ count }} are examples; a -> b, and 1 > 0; use \`html\` with \${x} -->
   <span>{{ count }}</span>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 let draft = $signal({ name: 'a' });
 function go() {}
@@ -407,7 +362,7 @@ describe('HTML comments are copied verbatim, never rewritten — the template ge
   <!-- no @click="go" here -->
   <a href="/x">x</a>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 function go() {}
 </script>`, 'x.pdx').code;
@@ -422,7 +377,7 @@ function go() {}
   <!-- :value="draft.name" and {{ count }} are examples, not bindings -->
   <span>{{ count }}</span>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 let draft = $signal({ name: 'a' });
 </script>`, 'x.pdx').code;
@@ -438,7 +393,7 @@ let draft = $signal({ name: 'a' });
   <!-- a -> b, and 1 > 0 -->
   <span>ok</span>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`, 'x.pdx').code;
 
@@ -452,7 +407,7 @@ let count = $signal(0);
   <!-- use \`html\` with \${x} carefully -->
   <span>ok</span>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`, 'x.pdx').code;
 

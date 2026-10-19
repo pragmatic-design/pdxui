@@ -8,7 +8,7 @@ import { analyzeScript } from '../src/compiler/script-analyzer';
 import { validate } from '../src/compiler/validate';
 import { parseTemplate } from '../src/parser/template';
 
-const pdx = (script: string) => `<template><button>x</button></template>\n<script setup>\n${script}\n</script>`;
+const pdx = (script: string) => `<template><button>x</button></template>\n<script>\n${script}\n</script>`;
 
 function codes(script: string, code: string) {
     const analysis = analyzeScript(script, 'test.pdx');
@@ -32,10 +32,6 @@ describe('@state compiles into the descriptor and an effect', () => {
         const { code } = compile(pdx('let open = $signal(false);'), 'test.pdx');
         expect(code).not.toContain('states:');
         expect(code).not.toContain('ctx.state(');
-    });
-
-    it('@state alone marks the script as the new mode', () => {
-        expect(analyzeScript('@state on = true;', 'test.pdx').mode).toBe('new');
     });
 });
 

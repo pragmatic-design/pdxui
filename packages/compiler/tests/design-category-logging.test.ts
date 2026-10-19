@@ -9,7 +9,7 @@ import { compile } from '../src/plugin';
 // next to a defect (PDX_RAW_INTERPOLATION).
 const SOURCE = [
     '<template><p title="${label}">{{ label }}</p></template>',
-    '<script setup>',
+    '<script>',
     "let path = $signal('/');",
     'let recentsVersion = $signal(0);',
     'const label = $derived(recentsVersion);',

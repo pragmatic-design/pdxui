@@ -13,7 +13,7 @@ import type { ValidationWarning } from '../src/compiler/validate';
 const CODE = 'PDX_SIGNAL_MUTATED_IN_PLACE';
 
 const file = (script: string, template = '<p>{{ items.length }} {{ user.name }}</p>'): string =>
-    `<template>\n  ${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n`;
 
 const DECLS = 'let items = $signal<number[]>([]);\nlet user = $signal({ name: "a", age: 1, address: { city: "x" } });\nlet tags = $signal(new Set<string>());\nlet byId = $signal(new Map<number, string>());';
 
@@ -39,7 +39,7 @@ describe('PDX_SIGNAL_MUTATED_IN_PLACE', () => {
             const found = findings(source);
             expect(found, `no ${CODE} for ${m}`).toHaveLength(1);
             expect(found[0].severity).toBe('warn');
-            // The template is lines 1-3, `<script setup>` line 4, the four declarations 5-8, the function 9.
+            // The template is lines 1-3, `<script>` line 4, the four declarations 5-8, the function 9.
             expect(found[0].line).toBe(10);
             expect(found[0].column).toBe(3);
         });

@@ -26,7 +26,7 @@ function emittedCss(module: string): string {
 
 /** Compile a scoped style block and return the generated module. */
 function css(style: string, production = false): string {
-    const source = `<template><div class="a">x</div></template>\n<style scoped>\n${style}\n</style>\n<script setup>\n  let n = $signal(1);\n</script>`;
+    const source = `<template><div class="a">x</div></template>\n<style scoped>\n${style}\n</style>\n<script>\n  let n = $signal(1);\n</script>`;
     return compile(source, 'styled.pdx', [], undefined, { production, ...ANCESTOR }).code;
 }
 
@@ -237,7 +237,7 @@ describe('the host carries the scope attribute', () => {
 
     it('in new mode', () => {
         const out = compile(
-            '<template><div class="a">x</div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n<style scoped>.a { color: red; }</style>',
+            '<template><div class="a">x</div></template>\n<script>\nlet n = $signal(1);\n</script>\n<style scoped>.a { color: red; }</style>',
             'scoped-new.pdx',
         ).code;
         expect(out).toMatch(SET_ATTR);
@@ -282,7 +282,7 @@ describe('the host carries the scope attribute', () => {
 // page-level CSS that component owns.
 describe('more than one style block', () => {
     const two = (a: string, b: string): string =>
-        `<template><div class="a">x</div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n${a}\n${b}`;
+        `<template><div class="a">x</div></template>\n<script>\nlet n = $signal(1);\n</script>\n${a}\n${b}`;
 
     /** The CSS of every emitted <style> injection, in order. */
     function emitted(code: string): string[] {
@@ -320,7 +320,7 @@ describe('more than one style block', () => {
 
     it('reads bind() from a later block too', () => {
         const out = compile(
-            `<template><div class="bar"></div></template>\n<script setup>\nlet pct = $signal(42);\n</script>\n`
+            `<template><div class="bar"></div></template>\n<script>\nlet pct = $signal(42);\n</script>\n`
             + `<style>.x { color: red; }</style>\n<style scoped>.bar { width: bind(pct); }</style>`,
             'bind-second.pdx').code;
 
@@ -330,7 +330,7 @@ describe('more than one style block', () => {
 
     it('leaves a single block exactly as it was', () => {
         const out = compile(
-            '<template><div class="a">x</div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n<style scoped>.a { color: red; }</style>',
+            '<template><div class="a">x</div></template>\n<script>\nlet n = $signal(1);\n</script>\n<style scoped>.a { color: red; }</style>',
             'one-block.pdx', [], undefined, ANCESTOR).code;
         expect(emitted(out)).toHaveLength(1);
         expect(emitted(out)[0]).toMatch(/^\[data-pdx-[a-z0-9]+\] \.a/);
@@ -345,7 +345,7 @@ describe('more than one style block', () => {
 // there is nothing for a host attribute to do when no selector can escape the root anyway.
 describe('a shadow component carries its own styles', () => {
     const shadowFile = (styleOpen: string): string =>
-        `<template shadow><div class="inside">x</div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n${styleOpen}.inside { color: rgb(3, 3, 3); }</style>`;
+        `<template shadow><div class="inside">x</div></template>\n<script>\nlet n = $signal(1);\n</script>\n${styleOpen}.inside { color: rgb(3, 3, 3); }</style>`;
 
     it('does not append the stylesheet to the document head', () => {
         const out = compile(shadowFile('<style scoped>'), 'shadow-styled.pdx').code;
@@ -392,7 +392,7 @@ describe('a shadow component carries its own styles', () => {
 
     it('leaves a light-DOM component alone', () => {
         const out = compile(
-            '<template><div class="inside">x</div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n<style scoped>.inside { color: red; }</style>',
+            '<template><div class="inside">x</div></template>\n<script>\nlet n = $signal(1);\n</script>\n<style scoped>.inside { color: red; }</style>',
             'light.pdx', [], undefined, ANCESTOR).code;
         expect(out, 'the light-DOM path must keep injecting into the head').toMatch(/document\.head\.appendChild/);
         expect(out).not.toMatch(/__adoptStyles\(/);

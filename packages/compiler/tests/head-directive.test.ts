@@ -11,7 +11,7 @@ describe('@title — script analyzer + codegen', () => {
     it('parses static @title with single quotes', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @title 'My Page';
 </script>
         `);
@@ -21,7 +21,7 @@ describe('@title — script analyzer + codegen', () => {
     it('parses static @title with double quotes', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @title "Products";
 </script>
         `);
@@ -31,7 +31,7 @@ describe('@title — script analyzer + codegen', () => {
     it('parses dynamic @title as expression', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/products';
 let name = $signal('Widget');
 @title name;
@@ -45,7 +45,7 @@ let name = $signal('Widget');
     it('imports useHead for static title', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @title 'Dashboard';
 </script>
         `);
@@ -58,7 +58,7 @@ describe('@meta — script analyzer + codegen', () => {
     it('parses @meta with name', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @meta description: 'Browse our products';
 </script>
         `);
@@ -68,7 +68,7 @@ describe('@meta — script analyzer + codegen', () => {
     it('parses @meta with property (Open Graph)', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @meta property og:title: 'My App';
 </script>
         `);
@@ -79,7 +79,7 @@ describe('@meta — script analyzer + codegen', () => {
     it('combines multiple @meta tags', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @meta description: 'Product listing';
 @meta property og:image: '/hero.png';
 </script>
@@ -91,7 +91,7 @@ describe('@meta — script analyzer + codegen', () => {
     it('combines @title and @meta', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @title 'Products';
 @meta description: 'Browse products';
 </script>
@@ -105,7 +105,7 @@ describe('@scroll — script analyzer', () => {
     it('parses @scroll preserve', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/products';
 @scroll 'preserve';
 </script>
@@ -120,7 +120,7 @@ describe('@head { ... } — structured head block', () => {
     it('parses @head with title', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @head {
   title: 'My Dashboard';
 }
@@ -132,7 +132,7 @@ describe('@head { ... } — structured head block', () => {
     it('parses @head with meta array', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @head {
   meta: [
     { name: 'description', content: 'Browse products' },
@@ -150,7 +150,7 @@ describe('@head { ... } — structured head block', () => {
     it('parses @head with title + meta combined', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @head {
   title: 'Products';
   meta: [
@@ -166,7 +166,7 @@ describe('@head { ... } — structured head block', () => {
     it('coexists with @meta { } route metadata', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/products';
 @head {
   title: 'Products';
@@ -184,7 +184,7 @@ describe('@route { ... } — aggregate routing block', () => {
     it('parses @route with path', () => {
         const { code, warnings } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @route {
   path: '/users/:id';
   guard: 'admin.users';
@@ -200,7 +200,7 @@ describe('@route { ... } — aggregate routing block', () => {
     it('parses @route with search params', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @route {
   path: '/products';
   search: { page: number, q: string };
@@ -213,7 +213,7 @@ describe('@route { ... } — aggregate routing block', () => {
     it('parses @route with transition and scroll', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @route {
   path: '/dashboard';
   transition: 'slide-right';
@@ -228,7 +228,7 @@ describe('@route { ... } — aggregate routing block', () => {
     it('parses @route with params', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @route {
   path: '/users/:id';
   params: { id: number };
@@ -243,7 +243,7 @@ describe('@params — typed route parameters', () => {
     it('parses @params with single param', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/users/:id';
 @params { id: number };
 </script>
@@ -254,7 +254,7 @@ describe('@params — typed route parameters', () => {
     it('parses @params with multiple params', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/products/:category/:id';
 @params { category: string, id: number };
 </script>
@@ -265,7 +265,7 @@ describe('@params — typed route parameters', () => {
     it('generates inject + computed for number param coercion', () => {
         const { code } = compileHead(`
 <template><div>{{ id }}</div></template>
-<script setup>
+<script>
 @page '/users/:id';
 @params { id: number };
 </script>
@@ -278,7 +278,7 @@ describe('@params — typed route parameters', () => {
     it('generates string param without coercion', () => {
         const { code } = compileHead(`
 <template><div>{{ slug }}</div></template>
-<script setup>
+<script>
 @page '/posts/:slug';
 @params { slug: string };
 </script>
@@ -290,7 +290,7 @@ describe('@params — typed route parameters', () => {
     it('generates boolean param coercion', () => {
         const { code } = compileHead(`
 <template><div>{{ active }}</div></template>
-<script setup>
+<script>
 @page '/items/:active';
 @params { active: boolean };
 </script>
@@ -301,7 +301,7 @@ describe('@params — typed route parameters', () => {
     it('emits paramTypes in route registration', () => {
         const { code } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/users/:id';
 @params { id: number };
 </script>
@@ -314,7 +314,7 @@ describe('head directives — no warnings', () => {
     it('produces zero warnings', () => {
         const { warnings } = compileHead(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @title 'Dashboard';
 @meta description: 'Main dashboard';
 @meta property og:title: 'Dashboard';

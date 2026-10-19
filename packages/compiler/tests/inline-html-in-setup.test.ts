@@ -19,7 +19,7 @@ const SCRIPT_USES_HTML = `<template>
   <pdx-select label="Team member" :options="people" :item-template="renderItem"></pdx-select>
 </template>
 
-<script setup>
+<script>
 const people = [{ id: 1, name: 'Ada' }];
 function renderItem(item) {
   return html\`<span class="who">\${item.label}</span>\`;
@@ -27,7 +27,7 @@ function renderItem(item) {
 </script>`;
 
 const PLAIN = `<template><p :title="t">{{ t }}</p></template>
-<script setup>
+<script>
 @prop t: string = '';
 </script>`;
 

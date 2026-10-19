@@ -18,7 +18,7 @@ const PAGE = `<template>
   <p class="note">{{ text }}</p>
 </template>
 
-<script setup>
+<script>
 let text = $signal('hello');
 </script>
 

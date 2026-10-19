@@ -12,7 +12,7 @@ import { buildComponentIndex } from '../src/utils/component-index';
 const DEF_URI = 'file:///widget.pdx';
 const def = [
     '<template><p>x</p></template>',
-    '<script setup>',
+    '<script>',
     "// renamed from @tag 'pdx-aXb' last week",
     "@tag 'pdx-a.b';",
     '</script>',

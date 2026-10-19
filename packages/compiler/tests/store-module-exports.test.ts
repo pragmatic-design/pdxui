@@ -87,7 +87,7 @@ export function choose(selected) { return selected; }
     });
 
     it('…and in a .pdx store it points at the export\'s line', () => {
-        const source = `<template><div></div></template>\n<script setup>\n${READS_THE_STORE}</script>\n`;
+        const source = `<template><div></div></template>\n<script>\n${READS_THE_STORE}</script>\n`;
         const errors = compile(source, 'menu-store.pdx').warnings.filter(w => w.code === 'PDX_STORE_EXPORT');
         expect(errors.map(w => [w.line, w.column])).toEqual([[6, 1]]);
     });

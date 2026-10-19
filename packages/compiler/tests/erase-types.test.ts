@@ -17,7 +17,7 @@ function parses(code: string): void {
 }
 
 const TYPED = `<template><p>{{ label }} {{ n }}</p></template>
-<script setup>
+<script>
 import type { ViewState } from './data/views';
 import { pickView, type SavedView } from './data/views';
 interface Row { id: number; name?: string }
@@ -59,7 +59,7 @@ describe('TypeScript in a .pdx script', () => {
         const script = "import type { DataSource } from '@pdxui/core';\nimport { createDataSource, type SortDescriptor } from '@pdxui/core';\n"
             + "const s: DataSource<unknown> | null = null;\nconst sort: SortDescriptor[] = [];\nconst d = createDataSource({ sort });\n";
         for (const source of [
-            `<template><p>x</p></template>\n<script setup>\n${script}</script>`,
+            `<template><p>x</p></template>\n<script>\n${script}</script>`,
             `<template><p>x</p></template>\n<script>\n${script}const props = defineProps({});\nreturn { s, d };\n</script>`,
         ]) {
             const { code } = compile(source, 'core-types.pdx');
@@ -116,13 +116,13 @@ describe('TypeScript in a .pdx script', () => {
             ['namespace', 'namespace NS { export const a = 1; }\nlet c = $signal(1);'],
             ['parameter property', 'class A { constructor(private x: number) {} }\nlet c = $signal(1);'],
         ] as const) {
-            expect(() => compile(`<template><p>{{ c }}</p></template>\n<script setup>\n${script}\n</script>`, 'rt.pdx'), name)
+            expect(() => compile(`<template><p>{{ c }}</p></template>\n<script>\n${script}\n</script>`, 'rt.pdx'), name)
                 .toThrow(/PDX_TS_UNSUPPORTED/);
         }
     });
 
     it('control — a script with no TypeScript compiles to the module it always did', () => {
-        const plain = "<template><p>{{ n }}</p></template>\n<script setup>\nlet n = $signal(1);\nfunction bump() { n++; }\n</script>";
+        const plain = "<template><p>{{ n }}</p></template>\n<script>\nlet n = $signal(1);\nfunction bump() { n++; }\n</script>";
         const { code } = compile(plain, 'plain.pdx');
         parses(code);
         expect(code).toContain('function bump() { __n.set(');

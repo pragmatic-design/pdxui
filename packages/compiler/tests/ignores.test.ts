@@ -15,7 +15,7 @@ describe('pdx-ignore, the next line', () => {
             '  <p title="${a}">x</p>',
             '  <p title="${b}">y</p>',
             '</template>',
-            '<script setup>',
+            '<script>',
             'let a = $signal(1);',
             'let b = $signal(2);',
             '</script>',
@@ -25,17 +25,17 @@ describe('pdx-ignore, the next line', () => {
     });
 
     it('in the script: // pdx-ignore', () => {
-        const src = '<template><p>{{ count }}</p></template>\n<script setup>\n// pdx-ignore PDX_NON_REACTIVE: read once, on purpose\nlet count = 0;\nfunction bump() { count = count + 1; }\n</script>\n';
+        const src = '<template><p>{{ count }}</p></template>\n<script>\n// pdx-ignore PDX_NON_REACTIVE: read once, on purpose\nlet count = 0;\nfunction bump() { count = count + 1; }\n</script>\n';
         expect(codes(src)).not.toContain('PDX_NON_REACTIVE');
     });
 
     it('in a style: /* pdx-ignore */', () => {
-        const src = '<template><p class="y">x</p></template>\n<script setup>\nlet a = $signal(1);\n</script>\n<style scoped>\n/* pdx-ignore PDX_GLOBAL_SELECTOR: the demo shows what the browser drops */\n:global(.x) .y { margin: 0; }\n</style>\n';
+        const src = '<template><p class="y">x</p></template>\n<script>\nlet a = $signal(1);\n</script>\n<style scoped>\n/* pdx-ignore PDX_GLOBAL_SELECTOR: the demo shows what the browser drops */\n:global(.x) .y { margin: 0; }\n</style>\n';
         expect(codes(src)).not.toContain('PDX_GLOBAL_SELECTOR');
     });
 
     it('the control: the same files without the comment give the finding', () => {
-        expect(codes('<template><p>{{ count }}</p></template>\n<script setup>\nlet count = 0;\nfunction bump() { count = count + 1; }\n</script>\n')).toContain('PDX_NON_REACTIVE');
+        expect(codes('<template><p>{{ count }}</p></template>\n<script>\nlet count = 0;\nfunction bump() { count = count + 1; }\n</script>\n')).toContain('PDX_NON_REACTIVE');
     });
 });
 
@@ -48,7 +48,7 @@ describe('pdx-ignore-file', () => {
             '  <p>filler</p>',
             '  <p title="${b}">y</p>',
             '</template>',
-            '<script setup>',
+            '<script>',
             'let a = $signal(1);',
             'let b = $signal(2);',
             '</script>',
@@ -59,7 +59,7 @@ describe('pdx-ignore-file', () => {
 
 describe('an exemption must say why', () => {
     it('without a reason it is an error, and exempts nothing', () => {
-        const src = '<template>\n  <!-- pdx-ignore PDX_RAW_INTERPOLATION -->\n  <p title="${a}">x</p>\n</template>\n<script setup>\nlet a = $signal(1);\n</script>\n';
+        const src = '<template>\n  <!-- pdx-ignore PDX_RAW_INTERPOLATION -->\n  <p title="${a}">x</p>\n</template>\n<script>\nlet a = $signal(1);\n</script>\n';
         const ws = compile(src, 'x.pdx').warnings;
         expect(ws.find((w) => w.code === 'PDX_IGNORE_WITHOUT_REASON')).toMatchObject({ severity: 'error', line: 2 });
         expect(ws.map((w) => w.code)).toContain('PDX_RAW_INTERPOLATION');
@@ -71,7 +71,7 @@ describe('an exemption must say why', () => {
 });
 
 describe('an exemption that silences nothing', () => {
-    const src = '<template>\n  <!-- pdx-ignore PDX_RAW_INTERPOLATION: was here once -->\n  <p>x</p>\n</template>\n<script setup>\nlet a = $signal(1);\n</script>\n';
+    const src = '<template>\n  <!-- pdx-ignore PDX_RAW_INTERPOLATION: was here once -->\n  <p>x</p>\n</template>\n<script>\nlet a = $signal(1);\n</script>\n';
 
     it('is PDX_IGNORE_UNUSED when every check ran', () => {
         const r = applyIgnores(src, [], { reportUnused: true });
@@ -88,7 +88,7 @@ describe('a palette swatch', () => {
     it('/* pdx-ignore PDX_COLOUR_LITERAL: swatch */ silences the literal, and counts as one ignored', () => {
         const src = [
             '<template><div class="swatch">red</div></template>',
-            '<script setup>',
+            '<script>',
             'let a = $signal(1);',
             '</script>',
             '<style scoped>',

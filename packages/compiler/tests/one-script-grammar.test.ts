@@ -29,12 +29,8 @@ describe('one script grammar', () => {
         expect(code).toMatch(/return \{[^}]*\blabel\b/);
     });
 
-    it('reads a script without the setup flag in the declarative mode', () => {
-        expect(analyzeScript(`const label = 'x';`, 'plain.pdx').mode).toBe('new');
-    });
-
-    it('control — the legacy markers still select the legacy mode, until #158 removes it', () => {
-        expect(analyzeScript(`const props = defineProps({ a: { type: String } });`, 'a.pdx').mode).toBe('legacy');
+    it('reads any script declaratively: a top-level const reaches the template', () => {
+        expect(analyzeScript(`const label = 'x';`, 'plain.pdx').exports.map((e) => e.name)).toContain('label');
     });
 });
 

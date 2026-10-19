@@ -17,7 +17,7 @@ import { pdx } from '../src/plugin';
 const COMPONENT = `<template>
   <p class="line" :title="label">{{ label }}</p>
 </template>
-<script setup>
+<script>
 @prop label: string = 'hello';
 </script>`;
 

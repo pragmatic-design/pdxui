@@ -39,7 +39,7 @@ provide('cart', cartStore);          // key, value
 Or declaratively in a `.pdx` component — note the `=`, the rune always takes a value:
 
 ```pdx
-<script setup>
+<script>
 let cartStore = $store({ items: [] });
 
 @provide cart = cartStore;
@@ -57,7 +57,7 @@ const theme = tryInject('theme');    // returns undefined if absent
 ```
 
 ```pdx
-<script setup>
+<script>
 @inject cart;
 @inject theme;
 </script>
@@ -193,7 +193,7 @@ themselves — that is why you never wire a field to a form by hand. The mechani
 not a string key:
 
 ```pdx
-<script setup>
+<script>
 import { useForm } from '@pdxui/core';
 
 const form = useForm();    // the nearest <pdx-form> ancestor; must run during setup()

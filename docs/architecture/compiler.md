@@ -18,7 +18,7 @@ The first stage takes the raw content of the `.pdx` file and splits it into thre
 
 ```html
 <template>...</template>     → descriptor.template
-<script setup>...</script>   → descriptor.script
+<script>...</script>   → descriptor.script
 <style scoped>...</style>    → descriptor.style
 ```
 
@@ -54,7 +54,7 @@ The parser tracks the line and column of every node, which is what makes accurat
 
 **File**: `compiler/script-analyzer.ts` (853 lines) + helpers (588 lines)
 
-Analyses the `<script setup>` block and extracts every declaration. This stage is the compiler's "brain": it works out what the developer declared and builds a complete model of the component.
+Analyses the `<script>` block and extracts every declaration. This stage is the compiler's "brain": it works out what the developer declared and builds a complete model of the component.
 
 The declarations it recognises:
 
@@ -105,11 +105,10 @@ const doubled = $derived(count * 2);  // recomputed when count changes
 @store useTheme from './stores/theme'; // an imported singleton
 ```
 
-The analyzer also decides the **compilation mode**:
-- If it finds `@prop` or `$signal` → **new mode** (recommended, with auto-return)
-- If it finds `defineProps` or `return {}` → **legacy mode** (backward compatibility)
-
-The two modes cannot be mixed in one file.
+There is one compilation mode (#158): every script is read for its declarations and runes, with or
+without `setup`, and every top-level name reaches the template. The pre-rune syntax (`defineProps`,
+`defineEmits`, a top-level `return {}`) and `@mixin` are removed forms, reported as
+`PDX_REMOVED_FORM` from the registry of language changes (`src/language/legacy-script.ts`).
 
 ### Stage 4 — signal rewrite
 

@@ -19,7 +19,7 @@ const MODES = [
 ] as const;
 
 const source = (base: string, tag: string) => `<template><p data-test="id">{{ id }}</p><p data-test="next">{{ next }}</p><p data-test="type">{{ typeof id }}</p></template>
-<script setup>
+<script>
 @page '${base}/:id';
 @tag '${tag}';
 @params { id: number }

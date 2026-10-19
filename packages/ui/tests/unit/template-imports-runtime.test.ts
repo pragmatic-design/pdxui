@@ -23,7 +23,7 @@ const SWITCH = `<template>
 <button class="light" @click="setScheme('light')">light</button>
 <p class="label">{{ which }}</p>
 </template>
-<script setup>
+<script>
 import { setScheme } from '@pdxui/core';
 let which = $signal('light');
 </script>`;

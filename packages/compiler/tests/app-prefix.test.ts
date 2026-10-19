@@ -14,7 +14,7 @@ import { injectComponentImports } from '../src/plugin-utils';
 import { LANGUAGE_CHANGES } from '../src/language/changes';
 import { projectTagRenames } from '../src/language/app-prefix';
 
-const sfc = (script = '', template = '<p>x</p>') => `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+const sfc = (script = '', template = '<p>x</p>') => `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
 const registered = (code: string) => /component\('([\w-]+)'/.exec(code)?.[1];
 
 describe('the tag a file derives', () => {
@@ -105,7 +105,7 @@ describe('pdx migrate renames the app tags', () => {
         expect(typeof change?.fix).toBe('function');
     });
     it('in the template, the CSS and @tag; a library tag and a longer name are left alone', () => {
-        const src = "<template>\n<pdx-shell><pdx-user-card :user=\"u\"></pdx-user-card><pdx-button>x</pdx-button><pdx-user-cards></pdx-user-cards></pdx-shell>\n</template>\n<script setup>\n@tag 'pdx-user-card';\nconst el = document.querySelector('pdx-user-card');\n</script>\n<style scoped>\npdx-user-card { display: block; }\npdx-shell > .x { gap: 1px; }\n</style>\n";
+        const src = "<template>\n<pdx-shell><pdx-user-card :user=\"u\"></pdx-user-card><pdx-button>x</pdx-button><pdx-user-cards></pdx-user-cards></pdx-shell>\n</template>\n<script>\n@tag 'pdx-user-card';\nconst el = document.querySelector('pdx-user-card');\n</script>\n<style scoped>\npdx-user-card { display: block; }\npdx-shell > .x { gap: 1px; }\n</style>\n";
         const out = (change!.fix as (t: string, c?: unknown) => string)(src, context);
         expect(out).toContain('<app-shell><app-user-card :user="u"></app-user-card><pdx-button>x</pdx-button><pdx-user-cards></pdx-user-cards></app-shell>');
         expect(out).toContain("@tag 'app-user-card';");

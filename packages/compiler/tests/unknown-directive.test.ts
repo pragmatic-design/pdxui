@@ -12,7 +12,7 @@ import { TEMPLATE_AT_DIRECTIVES } from '../src/parser/template-directives';
 import type { CompilerPlugin } from '../src/plugin-system';
 import type { ValidationWarning } from '../src/compiler/validate';
 
-const sfc = (template: string) => `<template>\n${template}\n</template>\n<script setup>\nlet xs = $signal([1]);\n</script>\n`;
+const sfc = (template: string) => `<template>\n${template}\n</template>\n<script>\nlet xs = $signal([1]);\n</script>\n`;
 const unknownOf = (warnings: ValidationWarning[]) => warnings.filter(w => w.code === 'PDX_UNKNOWN_DIRECTIVE');
 
 describe('PDX_UNKNOWN_DIRECTIVE', () => {

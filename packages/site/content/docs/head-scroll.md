@@ -18,7 +18,7 @@ When you navigate between pages in an SPA, the tab title should change: it's wha
 bookmarks and history, and what engines and social cards read. `@title` declares it:
 
 ```pdx
-<script setup>
+<script>
 @title 'Dashboard';
 </script>
 ```
@@ -27,7 +27,7 @@ For a title that follows your state, give `@title` an **expression** — a bare 
 literal in backticks:
 
 ```pdx
-<script setup>
+<script>
 @prop userId: string = '';
 let user = $signal({ name: '' });
 
@@ -44,7 +44,7 @@ turns the whole thing into a tracked effect, so the tab re-titles itself when th
 `name: 'content'`, with `property` in front for the OG family:
 
 ```pdx
-<script setup>
+<script>
 @meta description: 'Control panel for your account.';
 @meta property og:title: 'PDX Dashboard';
 @meta property og:image: '/covers/dashboard.png';
@@ -59,7 +59,7 @@ turns the whole thing into a tracked effect, so the tab re-titles itself when th
 When several tags belong together, `@head` groups them:
 
 ```pdx
-<script setup>
+<script>
 @head {
   title: 'Products',
   meta: [{ name: 'description', content: 'Everything we sell' }]
@@ -80,7 +80,7 @@ appears after a while. `useScroll()` exposes the **window's** scroll as signals 
 those four are all there is:
 
 ```pdx
-<script setup>
+<script>
 import { useScroll, scrollTo } from '@pdxui/core';
 
 const { x, y, direction, isScrolling } = useScroll();
@@ -128,7 +128,7 @@ Two behaviours worth knowing before you build on them:
     <main class="page" :ref="region">…</main>
   </template>
 
-  <script setup>
+  <script>
   import { useScroll } from '@pdxui/core';
 
   let region = $signal(null);
@@ -170,7 +170,7 @@ So: a long list, a detail page, and back — you resume from the same spot, with
 Two pages want something other than the default, and they declare it:
 
 ```pdx
-<script setup>
+<script>
 @page '/checkout';
 @scroll 'top';        // always enter at the top, even on Back
 </script>

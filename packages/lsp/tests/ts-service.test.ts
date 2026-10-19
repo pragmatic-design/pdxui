@@ -1,4 +1,4 @@
-// LSP P4 — TS IntelliSense inside <script setup> (over the projected virtual file).
+// LSP P4 — TS IntelliSense inside <script> (over the projected virtual file).
 
 import { describe, it, expect } from 'vitest';
 import { join } from 'path';

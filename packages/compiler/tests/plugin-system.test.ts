@@ -9,7 +9,7 @@ const minimalPdx = `
   <div>{{ name }}</div>
 </template>
 
-<script setup>
+<script>
   @prop name: string = 'World';
 </script>`;
 
@@ -124,7 +124,7 @@ describe('compiler plugin system', () => {
     it('works with legacy mode too', () => {
         const legacyPdx = `
 <template><div>{{ name }}</div></template>
-<script setup>
+<script>
   import { signal } from '@pdxui/core';
   const props = defineProps({ name: { type: String, default: 'World' } });
   return { name: signal('test') };

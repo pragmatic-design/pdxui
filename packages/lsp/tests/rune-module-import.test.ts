@@ -41,7 +41,7 @@ afterAll(() => rmSync(root, { recursive: true, force: true }));
 
 /** The TS diagnostics of src/page.pdx made of `script`, with no template. */
 function diagnose(script: string): string[] {
-    const source = `<template><p>x</p></template>\n<script setup>\n${script}\n</script>\n`;
+    const source = `<template><p>x</p></template>\n<script>\n${script}\n</script>\n`;
     const uri = pathToFileURL(join(root, 'src', 'page.pdx')).href;
     const vf = buildVirtualFile(script, source.indexOf(script), [], null, -1);
     return getTsDiagnostics(svc, uri, vf, source).map((d) => `${d.code} ${d.message.split('\n')[0]}`);

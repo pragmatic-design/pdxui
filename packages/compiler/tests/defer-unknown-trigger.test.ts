@@ -10,7 +10,7 @@ import { compile } from '../src/plugin';
 import { DEFER_TRIGGERS, unknownDeferTriggers } from '../src/compiler/defer-triggers';
 
 const page = (trigger: string) =>
-    `<template>\n  <section>\n    @defer (${trigger}) { <p>x</p> }\n  </section>\n</template>\n<script setup>\n</script>\n`;
+    `<template>\n  <section>\n    @defer (${trigger}) { <p>x</p> }\n  </section>\n</template>\n<script>\n</script>\n`;
 
 const unknown = (trigger: string) =>
     compile(page(trigger), 'x.pdx').warnings.filter((w) => w.code === 'PDX_DEFER_UNKNOWN_TRIGGER');

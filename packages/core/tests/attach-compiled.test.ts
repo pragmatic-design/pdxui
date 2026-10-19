@@ -29,7 +29,7 @@ describe('attach: in a compiled template', () => {
 <button class="hide" @click="shown = false">hide</button>
 @if (shown) { <input attach:probe="label" /> }
 </template>
-<script setup>
+<script>
 let shown = $signal(true);
 let label = $signal('a');
 function probe(el, value) {
@@ -51,7 +51,7 @@ function probe(el, value) {
     });
 
     it('a built-in, autofocus, needs no import: it focuses the input', async () => {
-        define('attachfocus', '<template><button>first</button><input class="target" attach:autofocus /></template>\n<script setup>\nlet n = $signal(0);\n</script>');
+        define('attachfocus', '<template><button>first</button><input class="target" attach:autofocus /></template>\n<script>\nlet n = $signal(0);\n</script>');
         const el = document.createElement('app-attachfocus');
         document.body.appendChild(el);
         await settle();
@@ -60,9 +60,9 @@ function probe(el, value) {
 
     it('on a component, it attaches to the host element', async () => {
         log.length = 0;
-        define('attachchild', '<template><p>child</p></template>\n<script setup>\nlet n = $signal(0);\n</script>');
+        define('attachchild', '<template><p>child</p></template>\n<script>\nlet n = $signal(0);\n</script>');
         define('attachhost', `<template><app-attachchild attach:probe /></template>
-<script setup>
+<script>
 function probe(el) { globalThis.__attachLog.push('host:' + el.tagName.toLowerCase()); }
 </script>`);
         const el = document.createElement('app-attachhost');

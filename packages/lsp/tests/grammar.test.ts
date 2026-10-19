@@ -108,11 +108,11 @@ describe('the hand-written rules', () => {
         const open = (block: string) => re(grammar.repository[block].begin!);
         expect('<template>').toMatch(open('template-block'));
         expect('<template shadow>').toMatch(open('template-block'));
-        expect('<script setup>').toMatch(open('script-block'));
-        expect('<script setup lang="ts">').toMatch(open('script-block'));
+        expect('<script>').toMatch(open('script-block'));
+        expect('<script lang="ts">').toMatch(open('script-block'));
         expect('<style scoped>').toMatch(open('style-block'));
         expect('<style scoped src="x.css">').toMatch(open('style-block'));
         // A block read from another file has no content and no closing tag to wait for.
-        expect('<script setup src="./logic.ts" />').not.toMatch(open('script-block'));
+        expect('<script src="./logic.ts" />').not.toMatch(open('script-block'));
     });
 });

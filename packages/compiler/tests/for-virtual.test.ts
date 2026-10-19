@@ -11,7 +11,7 @@ import type { ValidationWarning } from '../src/compiler/validate';
 import { checkVirtualFor } from '../src/compiler/validate-virtual';
 
 const sfc = (template: string, script = 'let posts = $signal([]);') =>
-    `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
 
 const codes = (warnings: ValidationWarning[], code: string) => warnings.filter((w) => w.code === code);
 

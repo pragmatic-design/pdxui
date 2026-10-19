@@ -22,7 +22,7 @@ const page = (tag: string) => `<template>
 <input type="radio" name="size" class="large" value="large" ::group="size" />
 <p class="out">{{ toppings.join(',') }}|{{ size }}</p>
 </template>
-<script setup>
+<script>
 @tag '${tag}';
 let options = $signal(['cheese', 'ham', 'olives']);
 let toppings = $signal(['ham']);

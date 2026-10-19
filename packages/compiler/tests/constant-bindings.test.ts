@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function render(template: string, script = "let rows = $signal([]);\nlet label = $signal('x');"): string {
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const { code } = compile(src, 'constant.pdx', [], undefined, { production: true });
     return code.slice(code.indexOf('render:'));
 }

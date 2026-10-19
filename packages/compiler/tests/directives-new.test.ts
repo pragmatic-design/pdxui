@@ -33,7 +33,7 @@ describe('@try / @catch', () => {
     <div class="error">{{ err.message }}</div>
   }
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`;
         const result = compile(source, 'test.pdx');
@@ -74,7 +74,7 @@ describe('@stagger', () => {
     <div>{{ item.name }}</div>
   }
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 </script>`;
         const result = compile(source, 'test.pdx');
@@ -106,7 +106,7 @@ describe('@mode', () => {
     <div>bye</div>
   }
 </template>
-<script setup>
+<script>
 let visible = $signal(true);
 </script>`;
         const result = compile(source, 'test.pdx');
@@ -175,7 +175,7 @@ describe('@move', () => {
     it('reaches the generated each() call', () => {
         const { code } = compile(
             '<template>@for (items as i; track i.id) @move(200) { <li>{{ i.n }}</li> }</template>\n'
-            + '<script setup>\nlet items = $signal([]);\n</script>',
+            + '<script>\nlet items = $signal([]);\n</script>',
             'movable.pdx');
         expect(code, 'the option the reconciler reads never reached it').toMatch(/move: '200'/);
     });
@@ -183,7 +183,7 @@ describe('@move', () => {
     it('still emits enter and exit beside it', () => {
         const { code } = compile(
             "<template>@for (items as i; track i.id) @transition('fade') @move(200) { <li>{{ i.n }}</li> }</template>\n"
-            + '<script setup>\nlet items = $signal([]);\n</script>',
+            + '<script>\nlet items = $signal([]);\n</script>',
             'movable2.pdx');
         expect(code).toMatch(/enter: 'fade'/);
         expect(code).toMatch(/move: '200'/);
@@ -192,7 +192,7 @@ describe('@move', () => {
     it('a list without @move emits no move option', () => {
         const { code } = compile(
             "<template>@for (items as i; track i.id) @transition('fade') { <li>{{ i.n }}</li> }</template>\n"
-            + '<script setup>\nlet items = $signal([]);\n</script>',
+            + '<script>\nlet items = $signal([]);\n</script>',
             'plain.pdx');
         expect(code, 'every list started animating its reorder').not.toMatch(/move:/);
     });

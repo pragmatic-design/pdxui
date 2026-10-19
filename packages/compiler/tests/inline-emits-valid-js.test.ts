@@ -30,7 +30,7 @@ const FORM = `<template>
   </pdx-form>
 </template>
 
-<script setup>
+<script>
 @form orderForm: { reference: string { required } };
 </script>`;
 
@@ -68,7 +68,7 @@ describe('the inline path emits a module a bundler can read', () => {
         ['a scoped slot outlet', '<slot name="cell" :row="row"><em>none</em></slot>', 'let row = $signal(1);'],
     ]) {
         it(`${form}`, () => {
-            const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+            const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
             const { code } = compile(src, 'forms.pdx', [], undefined, { production: true });
             expect(parses(code)).toBe(true);
         });

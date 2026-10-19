@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../../compiler/src/plugin';
 
 const SRC = `<template><section class="a"><h2>Title</h2><p>{{ msg }} <b>!</b></p><button @click="n++">+</button></section></template>
-<script setup>
+<script>
 let msg = $signal('hi');
 let n = $signal(0);
 </script>

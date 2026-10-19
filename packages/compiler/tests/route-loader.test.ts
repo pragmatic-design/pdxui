@@ -13,7 +13,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const src = (script: string, template = '<div>x</div>') =>
-    `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
 
 const out = (s: string) => {
     const r = compile(s, 'user.pdx');

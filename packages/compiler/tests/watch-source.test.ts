@@ -12,7 +12,7 @@ import type { Signal } from '../../core/src/utils/types';
 import { watch } from '../../core/src/reactivity/watch';
 
 function watchSource(script: string, opts: object = {}): string {
-    const source = `<template><div>x</div></template>\n<script setup>\n${script}\n</script>`;
+    const source = `<template><div>x</div></template>\n<script>\n${script}\n</script>`;
     const code = compile(source, 'watch-source.pdx', [], undefined, opts).code;
     // Match: `watch(<source>, (` — the source up to the callback's parameter list.
     const m = code.match(/\bwatch\((.*?),\s*\(/);
@@ -94,7 +94,7 @@ for (const [name, opts] of Object.entries({ dev: {}, build: { production: true }
 
 /** The source of the one `watch([…], …)` call: the bracketed list, up to the callback. */
 function watchArraySource(script: string, opts: object = {}): string {
-    const source = `<template><div>x</div></template>\n<script setup>\n${script}\n</script>`;
+    const source = `<template><div>x</div></template>\n<script>\n${script}\n</script>`;
     const code = compile(source, 'watch-source.pdx', [], undefined, opts).code;
     // Match: `watch([ … ], ` — the source, up to the comma before the callback.
     const m = code.match(/\bwatch\((\[.*?\]),\s*\(/);
@@ -114,7 +114,7 @@ describe('$watch([a, b]) at runtime', () => {
         it(`${name}: a change calls back once with the new and the old values; a re-run over equal values does not`, () => {
             // Whatever the compiler emits as the source — one getter or a list — up to the `(v) =>`
             // callback, so this row runs either form alike.
-            const source = `<template><div>x</div></template>\n<script setup>\nlet a = $signal(1);\nlet b = $signal(2);\n$watch([a, b], (v) => console.log(v));\n</script>`;
+            const source = `<template><div>x</div></template>\n<script>\nlet a = $signal(1);\nlet b = $signal(2);\n$watch([a, b], (v) => console.log(v));\n</script>`;
             const m = compile(source, 'watch-source.pdx', [], undefined, opts).code.match(/\bwatch\((.*), \(v\) =>/);
             expect(m, 'no watch() call').not.toBeNull();
             const src = m![1];
@@ -141,7 +141,7 @@ describe('$watch([a, b]) at runtime', () => {
 // setup and renders nothing — as a list header whose store key is read once the grid arrives does.
 describe('a prop read only in a $watch', () => {
     const compiled = (script: string) =>
-        compile(`<template><div>x</div></template>\n<script setup>\n${script}\n</script>`, 'watch-prop.pdx').code;
+        compile(`<template><div>x</div></template>\n<script>\n${script}\n</script>`, 'watch-prop.pdx').code;
 
     it('in the callback, it is declared', () => {
         const code = compiled(`@prop storeKey: string = '';\n@prop grid: object = null;\n$watch(grid, (el) => console.log(el, storeKey));`);

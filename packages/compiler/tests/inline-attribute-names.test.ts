@@ -22,7 +22,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
  * gives SVG its namespace, which responsive's static-markup-parse.spec.ts measures in Chromium.
  */
 function inline(template: string, script = "let label = $signal('x');\nlet id = $signal(1);\nlet url = $signal('#t');\nfunction go() {}"): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
     return compile(source, 'inline-names.pdx', [], undefined, { production: true, staticMarkup: false }).code;
 }
 

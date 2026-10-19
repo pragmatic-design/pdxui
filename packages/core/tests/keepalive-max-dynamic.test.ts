@@ -24,7 +24,7 @@ function defineViews(prefix: string, count: number): void {
 /** The switcher, compiled on one path, mounted; returns a function that shows view `i`. */
 function mountSwitcher(prefix: string, keepAlive: string, build: boolean): (i: number) => Promise<void> {
     const name = `kvswitch${++seq}${build ? 'b' : 'd'}`;
-    const src = `<template><component :is="view" ${keepAlive}></component></template>\n<script setup>\nlet view = $signal('${prefix}-0');\nwindow.__show_${name} = (t) => { view = t; };\n</script>\n`;
+    const src = `<template><component :is="view" ${keepAlive}></component></template>\n<script>\nlet view = $signal('${prefix}-0');\nwindow.__show_${name} = (t) => { view = t; };\n</script>\n`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     new Function('__core', code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;'))(core);
     document.body.appendChild(document.createElement(`app-${name}`));

@@ -14,8 +14,8 @@ const URI = pathToFileURL(join(ROOT, 'await-probe.pdx')).href;
 const svc = new PdxTsService(ROOT);
 
 function diagnose(script: string, template: string): { message: string; at: string }[] {
-    const source = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const scriptStart = source.indexOf('<script setup>\n') + '<script setup>\n'.length;
+    const source = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
+    const scriptStart = source.indexOf('<script>\n') + '<script>\n'.length;
     const vf = buildVirtualFile(script, scriptStart, parseTemplate(template, 1), template, '<template>'.length);
     const lines = source.split('\n');
     return getTsDiagnostics(svc, URI, vf, source).map((d) => ({

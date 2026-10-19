@@ -9,7 +9,7 @@ describe('@search validation codegen', () => {
     it('generates searchParams computed from @search schema', () => {
         const { code } = compile(`
 <template><div>Products</div></template>
-<script setup>
+<script>
 @page '/products';
 @search { page: number = 1, sort: string = 'name', filter?: string };
 </script>`, 'products.pdx');
@@ -25,7 +25,7 @@ describe('@search validation codegen', () => {
     it('generates number validation warning for number params', () => {
         const { code } = compile(`
 <template><div>List</div></template>
-<script setup>
+<script>
 @page '/list';
 @search { page: number = 1 };
 </script>`, 'list.pdx');
@@ -38,7 +38,7 @@ describe('@search validation codegen', () => {
     it('includes searchParams in auto-return', () => {
         const { code } = compile(`
 <template><div>{{ searchParams.page }}</div></template>
-<script setup>
+<script>
 @page '/items';
 @search { page: number = 1 };
 </script>`, 'items.pdx');
@@ -54,7 +54,7 @@ describe('@search validation codegen', () => {
         // router's input, not a component's.
         const { code } = compile(`
 <template><div>{{ searchParams.page }}</div></template>
-<script setup>
+<script>
 @page '/items';
 @search { page: number = 1 };
 </script>`, 'items.pdx');
@@ -67,7 +67,7 @@ describe('@search validation codegen', () => {
     it('applies default + number validation from the @search schema', () => {
         const { code } = compile(`
 <template><div>{{ searchParams.page }}</div></template>
-<script setup>
+<script>
 @page '/items';
 @search { page: number = 1 };
 </script>`, 'items.pdx');
@@ -116,7 +116,7 @@ describe('@await timing codegen', () => {
         <p>Loading...</p>
     }
 </template>
-<script setup>
+<script>
 let ready = $signal(false);
 </script>`, 'timed.pdx');
 
@@ -133,7 +133,7 @@ let ready = $signal(false);
         <p>Loading...</p>
     }
 </template>
-<script setup>
+<script>
 let ready = $signal(false);
 </script>`, 'simple.pdx');
 
@@ -146,7 +146,7 @@ describe('@outlet parallel codegen', () => {
     it('emits outlets in route manifest', () => {
         const { code } = compile(`
 <template><div>Dashboard</div></template>
-<script setup>
+<script>
 @page '/dashboard';
 @outlet 'sidebar' -> 'pdx-sidebar';
 @outlet 'toolbar' -> 'pdx-toolbar';

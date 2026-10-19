@@ -13,16 +13,16 @@ Vite plugin that compiles `.pdx` Single File Components into standard Web Compon
 ### Reading Order (for new developers)
 
 1. **`src/plugin.ts`** — Entry point. Vite plugin that triggers compilation on `.pdx` files.
-2. **`src/parser/sfc.ts`** — Splits `.pdx` into `<template>`, `<script setup>`, `<style>` blocks.
+2. **`src/parser/sfc.ts`** — Splits `.pdx` into `<template>`, `<script>`, `<style>` blocks.
 3. **`src/parser/template.ts`** — Parses template into AST: `@if`, `@for`, `@switch`, `{{ interpolation }}`.
-4. **`src/compiler/script-analyzer.ts`** — Analyzes `<script setup>`: extracts `@prop`, `@event`, `$signal`, auto-expose list.
+4. **`src/compiler/script-analyzer.ts`** — Analyzes `<script>`: extracts `@prop`, `@event`, `$signal`, auto-expose list.
 5. **`src/compiler/signal-rewrite.ts`** — Transforms `count++` → `__count.set(v => v + 1)` in function bodies.
-6. **`src/compiler/codegen.ts`** — Assembles final JS module from all the above. Two modes: new (decorator+rune) and legacy (defineProps).
+6. **`src/compiler/codegen.ts`** — Assembles final JS module from all the above: one script grammar (#158), a component or a `@store` module.
 7. **`src/compiler/dts-generator.ts`** — Generates `.pdx.d.ts` for IntelliSense.
 
-### Two Compilation Modes
+### The script
 
-**New mode** (decorator + rune): detected by `@prop` or `$signal` in script.
+Every script is read the same way (#158): declarations and runes.
 ```
 @prop label: string = 'Hello';   → props: { label: { type: String, default: 'Hello' } }
 let count = $signal(0);          → const __count = signal(0, { name: 'file:count' })
@@ -30,12 +30,8 @@ count++;                         → __count.set(v => v + 1)
 // No return needed              → auto-generated from top-level declarations
 ```
 
-**Legacy mode**: detected by `defineProps` or explicit `return`.
-```
-const props = defineProps({ label: { type: String } });
-const count = signal(0);
-return { count };
-```
+`defineProps`, `defineEmits`, a top-level `return {}` and `@mixin` are removed forms
+(`PDX_REMOVED_FORM`); `pdx migrate` converts the first three.
 
 ### Key Transformations
 

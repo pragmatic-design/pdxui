@@ -18,7 +18,7 @@ let n = 0;
 async function mount(script: string, template: string, opts: object = {}): Promise<{ el: HTMLElement; failures: string[]; code: string }> {
     const file = `dso-${n++}.pdx`;
     const tag = `app-${file.replace('.pdx', '')}`;
-    const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
     const { code } = compile(source, file, [], undefined, opts);
     const body = code.replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/g, 'const {$1} = __core;');
     const failures: string[] = [];

@@ -67,7 +67,7 @@ describe('minifyHTML', () => {
 // again.
 describe('a production compile keeps the text the author wrote', () => {
     const SOURCE = '<template>\n  <button>clicked {{ count }} times</button>\n</template>\n'
-        + '\n<script setup>\nlet count = $signal(0);\n</script>\n';
+        + '\n<script>\nlet count = $signal(0);\n</script>\n';
 
     // The block's static markup. The inline render (#107) writes the text around an interpolation as
     // text nodes of their own — `clicked `, the bound value, ` times` — in the block's HTML (#369),
@@ -115,7 +115,7 @@ describe('CSS scoping', () => {
     it('scopes selectors with data attribute', () => {
         const { code } = compile(`
 <template><div class="btn">Click</div></template>
-<script setup>let x = $signal(0);</script>
+<script>let x = $signal(0);</script>
 <style scoped>.btn { color: red; }</style>`, 'test.pdx');
         // The generated style should contain the scope attribute
         expect(code).toContain('data-pdx-');
@@ -125,7 +125,7 @@ describe('CSS scoping', () => {
     it('scopes @media inner selectors', () => {
         const { code } = compile(`
 <template><div>Test</div></template>
-<script setup>let x = $signal(0);</script>
+<script>let x = $signal(0);</script>
 <style scoped>
 @media (max-width: 768px) {
     .mobile { display: block; }
@@ -138,7 +138,7 @@ describe('CSS scoping', () => {
     it('does NOT scope @keyframes', () => {
         const { code } = compile(`
 <template><div>Test</div></template>
-<script setup>let x = $signal(0);</script>
+<script>let x = $signal(0);</script>
 <style scoped>
 @keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
 .loader { animation: spin 1s; }
@@ -160,7 +160,7 @@ describe('CSS scoping', () => {
     describe('production', () => {
         const SOURCE = `
 <template><div>Test</div></template>
-<script setup>let x = $signal(0);</script>
+<script>let x = $signal(0);</script>
 <style scoped>.btn { color: red; /* comment */ }</style>`;
 
         const prod = (): string =>
@@ -228,7 +228,7 @@ describe('responsive() CSS', () => {
     it('transforms responsive(min, max) to clamp()', () => {
         const { code } = compile(`
 <template><h1>Title</h1></template>
-<script setup>let x = $signal(0);</script>
+<script>let x = $signal(0);</script>
 <style scoped>h1 { font-size: responsive(16px, 64px); }</style>`, 'test.pdx');
         expect(code).toContain('clamp(');
         expect(code).not.toContain('responsive(');

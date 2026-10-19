@@ -57,6 +57,6 @@ test('the playground loads its compiler and compiles the starting component', as
     await expect(page.locator('.pg-status')).toHaveText('✓ compiled', { timeout: 15_000 });
     await expect(page.locator('.pg-preview pdx-button')).toBeVisible();
     // And it still compiles what the reader types.
-    await page.locator('.pg-editor').fill('<template><p class="probe">typed</p></template>\n<script setup>\n</script>');
+    await page.locator('.pg-editor').fill('<template><p class="probe">typed</p></template>\n<script>\n</script>');
     await expect(page.locator('.pg-preview .probe')).toHaveText('typed');
 });

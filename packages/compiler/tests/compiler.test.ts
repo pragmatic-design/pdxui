@@ -9,7 +9,9 @@ describe('compile (end-to-end)', () => {
 </template>`;
 
         const { code } = compile(source, 'hello.pdx');
-        expect(code).toContain("import { component, html } from '@pdxui/core'");
+        // A file without a script goes through the one code generator (#158): its markup is a static
+        // block, no html`` template.
+        expect(code).toMatch(/import \{ component, staticBlock, staticMarkup \} from '@pdxui\/core'/);
         expect(code).toContain("component('app-hello'");
         expect(code).toContain('<div>Hello World</div>');
     });
@@ -20,7 +22,7 @@ describe('compile (end-to-end)', () => {
   <span>{{ name }}</span>
 </template>
 
-<script setup>
+<script>
   const name = signal('World');
 </script>`;
 
@@ -124,7 +126,7 @@ describe('compile (end-to-end)', () => {
   <span>{{ label }}</span>
 </template>
 
-<script setup>
+<script>
   const props = defineProps({
     label: { type: String, default: 'Hello' },
     count: { type: Number, default: 0 },
@@ -158,7 +160,7 @@ describe('compile (end-to-end)', () => {
 
     it('compiles script-only file (template optional)', () => {
         // Template is now optional — script-only .pdx files use empty template fallback
-        const { code } = compile('<script setup>\nlet x = $signal(1);\n</script>', 'util.pdx');
+        const { code } = compile('<script>\nlet x = $signal(1);\n</script>', 'util.pdx');
         expect(code).toContain('signal(');
     });
 
@@ -173,7 +175,7 @@ describe('compile (end-to-end)', () => {
   }
 </template>
 
-<script setup>
+<script>
   const props = defineProps({
     position: { type: String, default: 'right' },
     size: { type: String, default: 'md' },
@@ -200,7 +202,7 @@ describe('compile (end-to-end)', () => {
 describe('@tag decorator', () => {
     it('overrides file-derived tag name', () => {
         const source = `<template><div>{{ label }}</div></template>
-<script setup>
+<script>
 @tag 'app-my-widget';
 @prop label: string = 'Hello';
 </script>`;
@@ -211,7 +213,7 @@ describe('@tag decorator', () => {
 
     it('uses file-derived tag when @tag is absent', () => {
         const source = `<template><div>{{ count }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'counter.pdx');
@@ -220,7 +222,7 @@ let count = $signal(0);
 
     it('works with double quotes', () => {
         const source = `<template><div>test</div></template>
-<script setup>
+<script>
 @tag "app-special-component";
 </script>`;
         const { code } = compile(source, 'generic.pdx');
@@ -232,7 +234,7 @@ let count = $signal(0);
 
 describe('tag derivation', () => {
     const source = `<template><div>test</div></template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`;
 
@@ -263,7 +265,7 @@ let x = $signal(0);
 
     it('respects @tag override', () => {
         const tagged = `<template><div>test</div></template>
-<script setup>
+<script>
 @tag 'my-widget';
 let x = $signal(0);
 </script>`;
@@ -291,7 +293,7 @@ let x = $signal(0);
 describe('$derived arrow function handling', () => {
     it('$derived(expr) wraps in computed(() => expr)', () => {
         const source = `<template><div>{{ doubled }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 const doubled = $derived(count * 2);
 </script>`;
@@ -303,7 +305,7 @@ const doubled = $derived(count * 2);
 
     it('$derived(() => expr) passes arrow directly to computed()', () => {
         const source = `<template><div>{{ doubled }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 const doubled = $derived(() => count * 2);
 </script>`;
@@ -316,7 +318,7 @@ const doubled = $derived(() => count * 2);
 
 describe('script-only compilation', () => {
     it('produces valid lowered code without component() wrapper', () => {
-        const source = '<script setup>\nlet count = $signal(0);\nconst doubled = $derived(count * 2);\n</script>';
+        const source = '<script>\nlet count = $signal(0);\nconst doubled = $derived(count * 2);\n</script>';
         const { code } = compile(source, 'util.pdx');
         expect(code).toContain('signal(');
         expect(code).toContain('computed(');
@@ -326,7 +328,7 @@ describe('script-only compilation', () => {
     });
 
     it('$effect compiles to effect() not ctx.track() in script-only', () => {
-        const source = '<script setup>\nlet count = $signal(0);\n$effect(() => console.log(count));\n</script>';
+        const source = '<script>\nlet count = $signal(0);\n$effect(() => console.log(count));\n</script>';
         const { code } = compile(source, 'reactive-util.pdx');
         expect(code).toContain('effect(');
         expect(code).not.toContain('ctx.track');
@@ -334,7 +336,7 @@ describe('script-only compilation', () => {
     });
 
     it('onDestroy is skipped in script-only (modules do not unmount)', () => {
-        const source = '<script setup>\nlet count = $signal(0);\nonDestroy(() => cleanup());\n</script>';
+        const source = '<script>\nlet count = $signal(0);\nonDestroy(() => cleanup());\n</script>';
         const { code } = compile(source, 'cleanup-util.pdx');
         expect(code).not.toContain('ctx.track');
         expect(code).not.toContain('ctx.');

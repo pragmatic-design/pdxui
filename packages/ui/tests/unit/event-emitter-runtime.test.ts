@@ -22,7 +22,7 @@ const CHILD = `<template>
 <button class="choose" @click="choose('b')">choose</button>
 <button class="emit" @click="chosen('c')">emit</button>
 </template>
-<script setup>
+<script>
 @event picked: string;
 @event(bubbles) chosen: string;
 let clicks = $signal(0);
@@ -34,7 +34,7 @@ const PARENT = `<template>
 <p class="got">{{ got }}</p>
 <p class="chose">{{ chose }}</p>
 </template>
-<script setup>
+<script>
 let got = $signal('');
 let chose = $signal('');
 </script>`;

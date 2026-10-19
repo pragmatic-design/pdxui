@@ -8,7 +8,7 @@ import { analyzeScript } from '../src/compiler/script-analyzer';
 import { validate } from '../src/compiler/validate';
 import { parseTemplate } from '../src/parser/template';
 
-const pdx = (script: string) => `<template><span>x</span></template>\n<script setup>\n${script}\n</script>`;
+const pdx = (script: string) => `<template><span>x</span></template>\n<script>\n${script}\n</script>`;
 
 function codes(script: string, code: string) {
     const analysis = analyzeScript(script, 'test.pdx');
@@ -36,10 +36,6 @@ describe('@host compiles into the descriptor', () => {
             '}',
         ].join('\n')), 'test.pdx');
         expect(code).toContain(`host: { 'role': "combobox", ':aria-expanded': (ctx) => ctx.open() },`);
-    });
-
-    it('@host alone marks the script as the new mode', () => {
-        expect(analyzeScript('@host { role="button" }', 'test.pdx').mode).toBe('new');
     });
 
     it('the control: a component with no @host declares no host', () => {

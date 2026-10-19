@@ -90,7 +90,7 @@ const COUNTER = `<template>
   <button @click="inc">{{ count }}</button>
 </template>
 
-<script setup>
+<script>
 @prop start: number = 0;
 let count = $signal(start);
 function inc() {
@@ -102,7 +102,7 @@ console.log('setup ran', count);
 `;
 
 const NESTED = `<template><p>{{ n }}</p></template>
-<script setup>
+<script>
 let n = $signal(0);
 const cfg = { render: 'grid', size: 2 };
 const total = computed(() => {
@@ -115,7 +115,7 @@ function boom() {
 `;
 
 const HOISTED = `<template><p>{{ doubled }}</p></template>
-<script setup>
+<script>
 let n = $signal(1);
 function helper() { return 2; }
 const doubled = $derived(n * 2);
@@ -173,7 +173,7 @@ describe('the source map sends each setup statement to where it was written', ()
   </section>
 </template>
 
-<script setup>
+<script>
 let name = $signal('a');
 let show = $signal(true);
 const items = ['x'];
@@ -217,7 +217,7 @@ function save() { throw new Error('nope'); }
   <button :disabled="count > 0" :hidden="count > 0">Save</button>
   @for (rows as r; track r) { <i :title="count > 0">{{ r }}</i> }
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 const rows = [1, 2];
 </script>
@@ -260,7 +260,7 @@ export function bump() {
     });
 
     // A .pdx.ts with no rune at all — data a page's sections share — is still a plain module: its
-    // exports stay at the top level. The code generator reads it as the `<script setup>` it wraps it
+    // exports stay at the top level. The code generator reads it as the `<script>` it wraps it
     // in; read as a plain script it fell into the legacy mode and the module did not parse.
     it('a .pdx.ts with no rune stays a module with its exports at the top level', () => {
         const DATA = `// The team the sections show.
@@ -310,7 +310,7 @@ function add(item) {
 
     it('auto-imports spliced in after compiling move the map with them', () => {
         const SRC = `<template><p>{{ count }}</p></template>
-<script setup>
+<script>
 const cart = useCart();
 let count = $signal(0);
 console.log('cart', cart);

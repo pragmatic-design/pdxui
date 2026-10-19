@@ -25,7 +25,7 @@ const settle = async () => { for (let i = 0; i < 3; i++) await new Promise((r) =
 
 async function render(template: string, literal: string, build: boolean): Promise<string> {
     const name = `interptext${++seq}${build ? 'b' : 'd'}`;
-    const src = `<template>${template}</template>\n<script setup>\nlet v = $signal(${literal});\nfunction same(x) { return x; }\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\nlet v = $signal(${literal});\nfunction same(x) { return x; }\n</script>\n`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);

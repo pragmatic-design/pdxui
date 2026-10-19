@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { templateGenerator } from './template-generator';
 
-const SCRIPT = "<script setup>\nlet view = $signal('pdx-home');\n</script>\n";
+const SCRIPT = "<script>\nlet view = $signal('pdx-home');\n</script>\n";
 const build = (template: string) => compile(`<template>${template}</template>\n${SCRIPT}`, 'host.pdx', [], undefined, { production: true });
 const codes = (template: string) => build(template).warnings.map((w) => w.code).filter((c) => c === 'PDX_DYNAMIC_CONTENT');
 

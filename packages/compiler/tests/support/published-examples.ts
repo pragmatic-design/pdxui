@@ -50,7 +50,7 @@ function docsFile(body: string): string {
     // A leading <!-- file name --> caption is not markup the fragment opens with, nor script.
     const uncaptioned = body.replace(/^\s*<!--[\s\S]*?-->[ \t]*\n?/, '');
     const opensWithMarkup = /^\s*(?:<|\{\{)/.test(uncaptioned);
-    if (!opensWithMarkup && SCRIPT_LINE.test(uncaptioned)) return `<template><div></div></template>\n<script setup>\n${uncaptioned}\n</script>`;
+    if (!opensWithMarkup && SCRIPT_LINE.test(uncaptioned)) return `<template><div></div></template>\n<script>\n${uncaptioned}\n</script>`;
     return `<template>\n${body}\n</template>`;
 }
 
@@ -76,7 +76,7 @@ export function docsExamples(): PublishedExample[] {
 }
 
 /** A .pdx construct: a block directive, or an SFC block. */
-const PDX_CONSTRUCT = /@for\b|@if\b|@try\b|@await\b|@switch\b|@defer\b|<script setup>|<template[\s>]/;
+const PDX_CONSTRUCT = /@for\b|@if\b|@try\b|@await\b|@switch\b|@defer\b|<script>|<template[\s>]/;
 
 function skillFiles(dir: string, out: string[] = []): string[] {
     for (const name of readdirSync(dir)) {

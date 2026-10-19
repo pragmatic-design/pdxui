@@ -14,7 +14,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const sfc = (script: string, template: string) =>
-    `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
 
 function parses(code: string): void {
     const body = code.replace(/^import .*$/gm, '');

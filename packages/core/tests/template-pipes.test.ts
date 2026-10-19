@@ -17,7 +17,7 @@ let seq = 0;
 /** The component compiled on one path, run against core with `helpers` as its other imports, mounted. */
 function mount(template: string, script: string, build: boolean, helpers: Record<string, unknown> = {}): HTMLElement {
     const name = `pipes${++seq}${build ? 'b' : 'd'}`;
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code
         .replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;')

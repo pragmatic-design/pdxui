@@ -13,7 +13,7 @@ const PATHS = { dev: {}, production: { production: true } } as const;
 const IMPORT = /import \{[^}]*\bnavigation\b[^}]*\} from '@pdxui\/router';/;
 
 const sfc = (template: string, script = 'let n = $signal(0);') =>
-    `<template>\n  ${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n`;
 
 for (const [path, opts] of Object.entries(PATHS)) {
     describe(`navigation is auto-imported — ${path}`, () => {

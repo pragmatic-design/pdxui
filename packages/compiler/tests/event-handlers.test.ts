@@ -5,7 +5,7 @@ import { compile } from '../src/plugin';
 
 function handlerCode(clickExpr: string): string {
     const src = `<template><button @click="${clickExpr}">x</button></template>\n`
-        + `<script setup>\nlet count = $signal(0);\nfunction inc() { count++; }\n</script>`;
+        + `<script>\nlet count = $signal(0);\nfunction inc() { count++; }\n</script>`;
     return compile(src, 'x.pdx').code;
 }
 

@@ -27,7 +27,7 @@ let n = 0;
 /** Compile a .pdx that imports { shared, go } from './store', mount it, return the element. */
 async function mount(script: string, template: string): Promise<HTMLElement> {
     const file = `imp-${n++}.pdx`;
-    const src = `<template>\n${template}\n</template>\n<script setup>\nimport { shared, go } from './store';\nlet _k = $signal(0);\n${script}\n</script>`;
+    const src = `<template>\n${template}\n</template>\n<script>\nimport { shared, go } from './store';\nlet _k = $signal(0);\n${script}\n</script>`;
     const body = compile(src, file, [], undefined, {}).code
         .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/g, 'const {$1} = __core;')
         .replace(/import\s*\{([^}]*)\}\s*from\s*'\.\/store';?/g, 'const {$1} = __store;');

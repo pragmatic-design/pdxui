@@ -12,7 +12,7 @@ import { compile } from '../src/plugin';
 const SOURCE = `<template>
   @for (sorted as item; track item.id) { <div>{{ item.name }}</div> }
 </template>
-<script setup>
+<script>
   let items = $signal([]);
   $inline {
     const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name));
@@ -35,7 +35,7 @@ describe('$inline blocks', () => {
 
     it('a block of several lines is dropped whole, and what follows it still compiles', () => {
         const { code, warnings } = compile(`<template><div>{{ count }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   $inline {
     const a = count * 2;

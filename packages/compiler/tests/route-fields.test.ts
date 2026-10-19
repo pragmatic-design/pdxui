@@ -9,7 +9,7 @@ import { RUNES } from '../src/compiler/runes';
 import type { ValidationWarning } from '../src/compiler/validate';
 
 function pdx(script: string): string {
-    return `<template>\n  <p>x</p>\n</template>\n<script setup>\n@page '/users/:id';\n${script}\n</script>\n`;
+    return `<template>\n  <p>x</p>\n</template>\n<script>\n@page '/users/:id';\n${script}\n</script>\n`;
 }
 
 function run(script: string) {

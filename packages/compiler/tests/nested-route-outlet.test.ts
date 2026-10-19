@@ -15,7 +15,7 @@ import { compile } from '../src/plugin';
 const page = (template: string, path = '/tickets/:id'): string => `
 <template>${template}</template>
 
-<script setup>
+<script>
 @page '${path}';
 </script>`;
 
@@ -53,7 +53,7 @@ describe('hasOutlet on the route a page registers', () => {
         const source = `
 <template><pdx-router-outlet /></template>
 
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'shell.pdx');
@@ -64,7 +64,7 @@ describe('hasOutlet on the route a page registers', () => {
         const { code } = compile(`
 <template><pdx-router-outlet /></template>
 
-<script setup>
+<script>
 @page '/tickets/:id';
 @guard 'tickets.read';
 </script>`, 'ticket.pdx');

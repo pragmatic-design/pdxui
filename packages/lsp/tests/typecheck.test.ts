@@ -13,7 +13,7 @@ const broken = [
     '<template>',
     '  <p>{{ count }}</p>',
     '</template>',
-    '<script setup>',
+    '<script>',
     'let count = $signal(0);',
     "const label: number = 'not a number';",
     '</script>',
@@ -23,7 +23,7 @@ const clean = [
     '<template>',
     '  <p>{{ count }}</p>',
     '</template>',
-    '<script setup>',
+    '<script>',
     'let count = $signal(0);',
     '</script>',
 ].join('\n');

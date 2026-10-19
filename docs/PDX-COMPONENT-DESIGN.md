@@ -71,7 +71,7 @@ file does*, and *how many files do the same thing*.
   That shared part is exactly what stays in the shell when the pieces leave (section 9). The profile
   menu reads no signal of the rail, the catalogue, the favourites or the recents.
 - **Check:** *candidate.* Build the graph "function/derived → signals it reads or writes" of one
-  `<script setup>`. More than one connected component, each with at least two signals, is more than
+  `<script>`. More than one connected component, each with at least two signals, is more than
   one piece. Run on `shell.pdx` it finds three groups:
   - the profile menu;
   - rail + catalogue, joined by the Escape and outside-click handlers;
@@ -210,7 +210,7 @@ file does*, and *how many files do the same thing*.
 
 ### CD-L1 — Logic repeated across pages is a composable; logic *with its markup* is a component
 
-- **Mechanism:** a plain `.ts` module exporting a function called in `<script setup>`:
+- **Mechanism:** a plain `.ts` module exporting a function called in `<script>`:
   - it returns signals, or an object of signals and methods. Name it `use*` when it attaches to
     something that already exists (an element, the route, the browser) and `create*` when it makes
     a new thing the caller owns. That is the tendency of core's names (`useDrag`, `useScroll`;

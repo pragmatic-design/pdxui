@@ -33,7 +33,7 @@ afterEach(() => {
 
 describe('a @page that declares more than one path', () => {
     it('produces a route for every path', () => {
-        const routes = scan('docs.pdx', "<script setup>\n@page '/docs', '/docs/:slug';\nlet n = $signal(0);\n</script>");
+        const routes = scan('docs.pdx', "<script>\n@page '/docs', '/docs/:slug';\nlet n = $signal(0);\n</script>");
 
         expect(routes.map(r => r.path),
             'the second path was dropped, so it is a page in dev and a 404 in production',
@@ -44,7 +44,7 @@ describe('a @page that declares more than one path', () => {
         // They are one component under two URLs; a second path that resolved to nothing renderable
         // would be a different way of getting the same blank page.
         const routes = scan('docs.pdx', [
-            '<script setup>',
+            '<script>',
             "@page '/docs', '/docs/:slug';",
             "@guard 'docs.read';",
             'let n = $signal(0);',
@@ -60,13 +60,13 @@ describe('a @page that declares more than one path', () => {
 
     it('still produces exactly one route for the ordinary single-path form', () => {
         // The control. Splitting on quotes would be easy to get wrong in the other direction.
-        const routes = scan('about.pdx', "<script setup>\n@page '/about';\nlet n = $signal(0);\n</script>");
+        const routes = scan('about.pdx', "<script>\n@page '/about';\nlet n = $signal(0);\n</script>");
 
         expect(routes.map(r => r.path)).toEqual(['/about']);
     });
 
     it('reads the paths and the options block, not the option names as paths', () => {
-        const routes = scan('user.pdx', "<script setup>\n@page '/u', '/users/:id' { keepAlive };\nlet n = $signal(0);\n</script>");
+        const routes = scan('user.pdx', "<script>\n@page '/u', '/users/:id' { keepAlive };\nlet n = $signal(0);\n</script>");
 
         expect(routes.map(r => r.path)).toEqual(['/u', '/users/:id']);
     });
@@ -75,7 +75,7 @@ describe('a @page that declares more than one path', () => {
         // The analyzer treats `@alias` as another way of writing the extra paths of `@page`, and the
         // codegen registers it identically. A scanner that knew only one of the two forms would put
         // the dev/prod difference back under a different directive.
-        const routes = scan('home.pdx', "<script setup>\n@page '/';\n@alias '/home';\nlet n = $signal(0);\n</script>");
+        const routes = scan('home.pdx', "<script>\n@page '/';\n@alias '/home';\nlet n = $signal(0);\n</script>");
 
         expect(routes.map(r => r.path)).toEqual(['/', '/home']);
     });
@@ -83,7 +83,7 @@ describe('a @page that declares more than one path', () => {
     it('does not read a @page out of a commented-out line', () => {
         // The control for the anchoring: the scan is line-anchored like the analyzer, so a
         // directive that is not at the start of its line is not a directive.
-        const routes = scan('note.pdx', "<script setup>\n@page '/real';\n// see also @page '/fake', '/fake/:id'\nlet n = $signal(0);\n</script>");
+        const routes = scan('note.pdx', "<script>\n@page '/real';\n// see also @page '/fake', '/fake/:id'\nlet n = $signal(0);\n</script>");
 
         expect(routes.map(r => r.path)).toEqual(['/real']);
     });

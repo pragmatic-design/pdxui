@@ -47,7 +47,7 @@ type Path = 'the render' | 'a scoped slot body' | 'the template generator';
 function module(template: string, path: Path): string {
     if (path === 'the template generator') return templateGenerator(`<div>${template}</div>`, ['on', 'mode'], { production: true });
     const body = path === 'the render' ? `<div>${template}</div>` : `<pdx-list><slot name="item" let:row><div>${template}</div></slot></pdx-list>`;
-    const src = `<template>\n  ${body}\n</template>\n\n<script setup>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
+    const src = `<template>\n  ${body}\n</template>\n\n<script>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
     return compile(src, 'probe.pdx', [], undefined, { production: true }).code;
 }
 

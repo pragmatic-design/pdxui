@@ -36,13 +36,13 @@ afterEach(() => {
 
 describe('a route that says what it is called', () => {
     it('carries the label into the route table', () => {
-        const routes = scan('tickets.pdx', "<script setup>\n@page '/tickets' { label: 'Tickets' };\n</script>");
+        const routes = scan('tickets.pdx', "<script>\n@page '/tickets' { label: 'Tickets' };\n</script>");
 
         expect(routes.map(r => r.label)).toEqual(['Tickets']);
     });
 
     it('keeps the label with the other options, not instead of them', () => {
-        const routes = scan('t.pdx', "<script setup>\n@page '/tickets' { keepAlive, label: 'Tickets' };\n</script>");
+        const routes = scan('t.pdx', "<script>\n@page '/tickets' { keepAlive, label: 'Tickets' };\n</script>");
 
         expect(routes[0].label).toBe('Tickets');
         expect(routes[0].keepAlive, 'the option beside it still parses').toBe(true);
@@ -51,14 +51,14 @@ describe('a route that says what it is called', () => {
     it('takes a label with a space in it', () => {
         // The naive `split(',')` over the options block is fine; the naive strip of quotes is what
         // would eat half of "Open tickets".
-        const routes = scan('t.pdx', "<script setup>\n@page '/tickets' { label: 'Open tickets' };\n</script>");
+        const routes = scan('t.pdx', "<script>\n@page '/tickets' { label: 'Open tickets' };\n</script>");
 
         expect(routes[0].label).toBe('Open tickets');
     });
 
     it('leaves a route with no label alone', () => {
         // The control. A label invented from the filename would put "t" in front of a reader.
-        const routes = scan('t.pdx', "<script setup>\n@page '/tickets';\n</script>");
+        const routes = scan('t.pdx', "<script>\n@page '/tickets';\n</script>");
 
         expect(routes[0].label).toBeUndefined();
     });
@@ -67,7 +67,7 @@ describe('a route that says what it is called', () => {
         // The scan is half the path; the other half is what the page module registers at runtime.
         // A label parsed and not emitted is a declaration that does nothing — which is what
         // `loader`, `scroll` and `hasOutlet` each did once.
-        const routes = scan('tickets.pdx', "<script setup>\n@page '/tickets' { label: 'Tickets' };\n</script>");
+        const routes = scan('tickets.pdx', "<script>\n@page '/tickets' { label: 'Tickets' };\n</script>");
         expect(routes[0].label).toBe('Tickets');
     });
 });

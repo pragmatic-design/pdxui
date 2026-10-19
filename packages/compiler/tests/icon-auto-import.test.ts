@@ -31,7 +31,7 @@ function iconImports(code: string): string[] {
 }
 
 function compiled(template: string, script = 'let x = $signal("check");'): { code: string; warnings: string[] } {
-    const source = [`<template>${template}</template>`, '<script setup>', script, '</script>'].join('\n');
+    const source = [`<template>${template}</template>`, '<script>', script, '</script>'].join('\n');
     const result = compile(source, 'icons.pdx');
     const resolver = new ComponentResolver();
     resolver.registerUiManifest();

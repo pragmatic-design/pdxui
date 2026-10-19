@@ -16,13 +16,13 @@ import { join } from 'node:path';
 import { pdx } from '../src/plugin';
 
 const PAGE = `<template><div class="p">{{ title }}</div></template>
-<script setup>
+<script>
 @page '/about';
 let title = $signal('About');
 </script>`;
 
 const GUARDED = `<template><div class="a">{{ n }}</div></template>
-<script setup>
+<script>
 @page '/admin';
 @guard 'admin.access';
 let n = $signal(1);

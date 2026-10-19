@@ -10,7 +10,6 @@ import { onlyNear } from './edit-distance';
 import { checkUndeclaredRefs } from './validate-refs';
 import { checkFormRules } from './form-rules';
 import { DEFER_TRIGGERS, unknownDeferTriggers } from './defer-triggers';
-import { validateLegacy } from './validate-legacy';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
 import { skipNonCode, findClosing } from './tokenizer';
@@ -242,15 +241,13 @@ export function validate(
     _filename: string,
     options?: ValidateOptions
 ): ValidationWarning[] {
-    // The legacy mode has one check of its own: a template read its script does not hand over.
-    if (analysis.mode !== 'new') return validateLegacy(analysis, ast);
     // @store files are store modules — no template usage checks apply
     if (analysis.globalStore) return [];
 
     const warnings: ValidationWarning[] = [];
 
     // ─── Check 0: setup-body syntax ────────────────────────────────
-    // A genuine syntax error in <script setup> would otherwise pass straight through into the
+    // A genuine syntax error in <script> would otherwise pass straight through into the
     // generated module as broken code, with no diagnostic. Parse the assembled setup
     // body and surface the first syntax error as a PDX finding. The body's lines are not the file's:
     // positionWarnings() places it in the file.
@@ -262,7 +259,7 @@ export function validate(
             warnings.push({
                 code: 'PDX_SCRIPT_SYNTAX_ERROR',
                 severity: 'error',
-                message: `Syntax error in <script setup>: ${ts.flattenDiagnosticMessageText(d.messageText, ' ')}`,
+                message: `Syntax error in <script>: ${ts.flattenDiagnosticMessageText(d.messageText, ' ')}`,
                 hint: `Fix the syntax error in the setup script before it reaches code generation.`,
             });
         }

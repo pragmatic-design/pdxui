@@ -101,7 +101,7 @@ describe('scanning a project for components', () => {
     });
 
     it('honours an @tag override over the filename', () => {
-        pdx('src/thing.pdx', '<script setup>\n  @tag "app-custom-name";\n</script>');
+        pdx('src/thing.pdx', '<script>\n  @tag "app-custom-name";\n</script>');
 
         const r = new ComponentResolver();
         r.registerProjectComponents(root);

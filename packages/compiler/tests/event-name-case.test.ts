@@ -44,7 +44,7 @@ describe('PDX_EVENT_NAME_CASE — an @event name a listener attribute cannot car
 <template>
   <button @click="itemPicked('z')">pick</button>
 </template>
-<script setup>
+<script>
 @event itemPicked: string;
 </script>`, 'test.pdx');
         expect(result.warnings.filter(w => w.code === 'PDX_EVENT_NAME_CASE')).toHaveLength(1);

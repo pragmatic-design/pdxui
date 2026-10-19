@@ -34,7 +34,7 @@ function diagsFor(src: string) {
 
 const wrap = (tmplBody: string) =>
     ['<template>', tmplBody, '</template>',
-     '<script setup>', 'let n = $signal(0);', '</script>'].join('\n');
+     '<script>', 'let n = $signal(0);', '</script>'].join('\n');
 
 describe('type-checking literal bindings against the props of a component', () => {
     it('reports a string literal on a number prop', () => {

@@ -13,7 +13,7 @@ const prod = (src: string) => compile(src, 'li-write.pdx', [], undefined, { prod
 describe('loop invariants never hoist a signal the loop writes', () => {
     it('an assignment in an @for handler stays a write on the signal', () => {
         const code = prod(`<template>@for (items as it; track it.href) { <a :href="it.href" @click="open = false">{{ it.label }}</a> }</template>
-<script setup>
+<script>
 let open = $signal(true);
 let items = $signal([{ href: '/a', label: 'A' }]);
 </script>`);
@@ -24,7 +24,7 @@ let items = $signal([{ href: '/a', label: 'A' }]);
 
     it('the same for ++ and a compound assignment', () => {
         const code = prod(`<template>@for (items as it; track it) { <button @click="n++">{{ n }}</button><i @click="n += 2"></i> }</template>
-<script setup>
+<script>
 let n = $signal(0);
 let items = $signal([1]);
 </script>`);
@@ -33,7 +33,7 @@ let items = $signal([1]);
 
     it('the control: a signal only READ in the loop is still hoisted', () => {
         const code = prod(`<template>@for (items as it; track it) { <span :title="open">{{ it }}</span> }</template>
-<script setup>
+<script>
 let open = $signal(true);
 let items = $signal([1]);
 </script>`);

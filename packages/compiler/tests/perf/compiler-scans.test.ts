@@ -10,7 +10,7 @@ import { parseIgnores } from '../../src/compiler/ignores';
 import { coreRuntimeNames } from '../../src/compiler/core-import-names';
 import { injectSplash } from '../../src/splash';
 import { stripHtmlComments, isRouterSeam, injectAfterHeadOpen, shortPath } from '../../src/plugin-utils';
-import { extractLegacyScript } from '../../src/compiler/codegen-legacy';
+import { legacyScript } from '../../src/language/legacy-script';
 import { elementContent } from '../../src/text-scan';
 import { routeFieldQuotedFix } from '../../src/compiler/fix-builders';
 import { parseRouteParams } from '../../src/compiler/script-analyzer-helpers';
@@ -31,17 +31,21 @@ function elapsed(fn: () => void): { ms: number; outcome: string } {
 const BOUND = 300;
 const N = 120_000;
 
+/** A .pdx whose script is `body`, and the legacy conversion of a whole file (detect, then fix). */
+const script = (body: string) => `<template><p>x</p></template>\n<script>\n${body}\n</script>\n`;
+const legacyFix = (text: string) => { legacyScript.detect(text); (legacyScript.fix as (t: string) => string)(text); };
+
 /** A .pdx with this template body and a script that is plain new mode. */
-const pdx = (template: string, script = 'let a = $signal(0);') => `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+const pdx = (template: string, script = 'let a = $signal(0);') => `<template>\n${template}\n</template>\n<script>\n${script}\n</script>\n`;
 
 const cases: [string, () => void][] = [
     ['parseSFC: <script and a run of tabs (alert #10)', () => parseSFC('<script' + '\t'.repeat(N))],
     ['parseSFC: <style and a run of tabs (alert #11)', () => parseSFC('<style' + '\t'.repeat(N))],
-    // Called directly: through compile() a script this deeply nested overflows the stack in an
-    // earlier pass before it reaches these.
-    ['legacy defineProps({{ repeated (alert #1)', () => extractLegacyScript('const props = ' + 'defineProps({{'.repeat(N / 14))],
-    ['legacy defineEmits< repeated (alert #2)', () => extractLegacyScript('defineEmits<'.repeat(N / 12))],
-    ['legacy defineEmits and a run of tabs (alert #2)', () => extractLegacyScript('defineEmits' + '\t'.repeat(N) + 'x')],
+    // The legacy markers' shapes, now read by `pdx migrate`'s conversion of them (#158), called directly:
+    // through compile() a script this deeply nested overflows the stack in an earlier pass.
+    ['legacy defineProps({{ repeated (alert #1)', () => legacyFix(script('const props = ' + 'defineProps({{'.repeat(N / 14)))],
+    ['legacy defineEmits< repeated (alert #2)', () => legacyFix(script('defineEmits<'.repeat(N / 12)))],
+    ['legacy defineEmits and a run of tabs (alert #2)', () => legacyFix(script('defineEmits' + '\t'.repeat(N) + 'x'))],
     ['form binding: <pdx-form and a tab, repeated (alert #3)', () => compile(pdx(`<div>${'<pdx-form\t'.repeat(N / 10)}</div>`), 'f.pdx')],
     ['form binding: <pdx-field-group and a tab, repeated (alert #4)', () => compile(pdx(`<pdx-form :form="f">${'<pdx-field-group\t'.repeat(N / 17)}</pdx-form>`), 'f.pdx')],
     ['route constraints: :0(( repeated (alerts #12, #151)', () => compile(pdx('<p>x</p>', `@page '/a${':0(('.repeat(N / 4)}';\nlet a = $signal(0);`), 'r.pdx')],

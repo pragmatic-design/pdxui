@@ -77,7 +77,7 @@ export function inspectFile(source: string, file: string, options: InspectOption
     // column on the `<template>` line — is the file's, as compile() counts it.
     const start = templateStartInFile(source, descriptor.template!);
     const ast = parseTemplate(descriptor.template!.content, start.line, undefined, start.column);
-    const analysis = analyzeScript(descriptor.script?.content ?? '', file, { setup: descriptor.script?.setup });
+    const analysis = analyzeScript(descriptor.script?.content ?? '', file);
     for (const w of positionWarnings(source, analysis.warnings, analysis.body)) add(w);
 
     // Cross-check template vs script

@@ -224,7 +224,6 @@ export interface RouteInfo {
 }
 
 export interface ScriptAnalysis {
-    mode: 'new' | 'legacy';
     props: PropInfo[];
     events: EventInfo[];
     slots: SlotInfo[];

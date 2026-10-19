@@ -14,7 +14,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, utimesSync } from 'node:
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const child = (script: string) => `<template><p>x</p></template>\n<script setup>\n${script}\n</script>\n`;
+const child = (script: string) => `<template><p>x</p></template>\n<script>\n${script}\n</script>\n`;
 
 describe('the three forms', () => {
     const { props, warnings } = (() => {
@@ -45,7 +45,7 @@ describe('the three forms', () => {
 describe('PDX_PROP_REQUIRED', () => {
     const required = (tag: string) => (tag === 'app-card' ? new Set(['id', 'userName']) : null);
     const parent = (template: string) => compile(
-        `<template>\n${template}\n</template>\n<script setup>\nlet i = $signal('1');\n</script>\n`,
+        `<template>\n${template}\n</template>\n<script>\nlet i = $signal('1');\n</script>\n`,
         'page.pdx', [], undefined, { requiredPropsOf: required });
     const findings = (template: string) => parent(template).warnings.filter(w => w.code === 'PDX_PROP_REQUIRED');
 

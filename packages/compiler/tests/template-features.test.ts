@@ -30,7 +30,7 @@ describe('@empty — fallback for empty lists', () => {
     <p>No items yet</p>
   }
 </template>
-<script setup>
+<script>
   let items = $signal([]);
 </script>`);
         expect(code).toContain('when(');
@@ -45,7 +45,7 @@ describe('@empty — fallback for empty lists', () => {
     <div>{{ item.name }}</div>
   }
 </template>
-<script setup>
+<script>
   let items = $signal([]);
 </script>`);
         expect(code).toContain('eachRow(');
@@ -70,7 +70,7 @@ describe('@let — local template variables', () => {
   @let total = count * price;
   <p>Total: {{ total }}</p>
 </template>
-<script setup>
+<script>
   let count = $signal(5);
   let price = $signal(10);
 </script>`);
@@ -90,7 +90,7 @@ describe('pipe arguments — {{ x | pipe(arg) }}', () => {
     it('compiles pipe with argument', () => {
         const { code } = c(`
 <template><p>{{ price | currency('EUR') }}</p></template>
-<script setup>
+<script>
   let price = $signal(42);
   function currency(val, code) { return code + ' ' + val; }
 </script>`);
@@ -101,7 +101,7 @@ describe('pipe arguments — {{ x | pipe(arg) }}', () => {
     it('compiles pipe with multiple arguments', () => {
         const { code } = c(`
 <template><p>{{ text | slice(0, 5) }}</p></template>
-<script setup>
+<script>
   let text = $signal('hello world');
   function slice(val, start, end) { return val.slice(start, end); }
 </script>`);
@@ -111,7 +111,7 @@ describe('pipe arguments — {{ x | pipe(arg) }}', () => {
     it('compiles simple pipe without arguments', () => {
         const { code } = c(`
 <template><p>{{ name | uppercase }}</p></template>
-<script setup>
+<script>
   let name = $signal('hello');
   function uppercase(v) { return v.toUpperCase(); }
 </script>`);
@@ -122,7 +122,7 @@ describe('pipe arguments — {{ x | pipe(arg) }}', () => {
     it('compiles chained pipes with and without args', () => {
         const { code } = c(`
 <template><p>{{ text | trim | slice(0, 10) | uppercase }}</p></template>
-<script setup>
+<script>
   let text = $signal('  hello world  ');
   function trim(v) { return v.trim(); }
   function slice(v, s, e) { return v.slice(s, e); }
@@ -140,7 +140,7 @@ describe(':class object binding', () => {
 <template>
   <div :class="{ active: isActive, disabled: isDisabled }">Content</div>
 </template>
-<script setup>
+<script>
   let isActive = $signal(true);
   let isDisabled = $signal(false);
 </script>`);
@@ -155,7 +155,7 @@ describe(':style object binding', () => {
 <template>
   <div :style="{ color: textColor, fontSize: size }">Styled</div>
 </template>
-<script setup>
+<script>
   let textColor = $signal('red');
   let size = $signal('14px');
 </script>`);

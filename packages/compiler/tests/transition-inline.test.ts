@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { templateGenerator } from './template-generator';
 
-const SCRIPT = '<script setup>\nlet on = $signal(true);\nlet list = $signal([1, 2]);\n</script>\n';
+const SCRIPT = '<script>\nlet on = $signal(true);\nlet list = $signal([1, 2]);\n</script>\n';
 
 function both(template: string): { tpl: string; inline: string; slot: string } {
     const src = (body: string) => `<template>${body}</template>\n${SCRIPT}`;

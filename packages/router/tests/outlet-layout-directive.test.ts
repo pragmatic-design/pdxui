@@ -44,7 +44,7 @@ function registrationOf(source: string, file: string): Record<string, unknown> {
 }
 
 const page = (path: string, tag: string, layout?: string) => `<template><h1>Users</h1></template>
-<script setup>
+<script>
 @page '${path}';
 @tag '${tag}';
 ${layout ? `@layout '${layout}';` : ''}

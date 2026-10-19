@@ -78,7 +78,6 @@ describe('fix 11 — @meta block preserves : inside values', () => {
 describe('fix 1 — signal detection accepts const/var/let', () => {
     it('detects const $signal as a signal', () => {
         const a = analyzeScript(`const count = $signal(0);\ncount++;`, 'x.pdx');
-        expect(a.mode).toBe('new');
         expect(a.signals.map(s => s.name)).toContain('count');
     });
 
@@ -203,7 +202,7 @@ describe('fix 9 — directives in comments are ignored', () => {
 describe('fix 13 — PDX_NON_REACTIVE fix is well-formed', () => {
     it('wraps the whole initializer in $signal(...) (balanced parens)', () => {
         // The fix is offset edits into the file, built from the declaration's position.
-        const source = `<template><div>{{ counter }}</div></template>\n<script setup>\n@prop title: string = 'x';\nlet counter = Math.max(5, 1);\n</script>\n`;
+        const source = `<template><div>{{ counter }}</div></template>\n<script>\n@prop title: string = 'x';\nlet counter = Math.max(5, 1);\n</script>\n`;
         const w = compile(source, 'x.pdx').warnings.find(x => x.code === 'PDX_NON_REACTIVE');
         expect(w?.fix, 'PDX_NON_REACTIVE carries no fix').toBeDefined();
         // Applying the fix must produce valid, balanced source (not `$signal(5;`).

@@ -1,6 +1,6 @@
 # The script
 
-The `<script setup>` of a component: TypeScript statements, some of which are **declarations** — a
+The `<script>` of a component: TypeScript statements, some of which are **declarations** — a
 line that starts with `@` — and some of which call a **`$` rune**. The compiler reads the
 declarations line by line, rewrites every read and write of a `$signal`, and wraps what is left in
 the component's `setup(ctx)`. This page defines the declarations of a component and the `$` runes;
@@ -14,7 +14,7 @@ Script               ::= ( S? ScriptItem )* S?
 ScriptItem           ::= Declaration | Statement
 Declaration          ::= ComponentDeclaration | RouteDeclaration | DataDeclaration
 ComponentDeclaration ::= PropDecl | EventDecl | SlotDecl | ExposeDecl | ProvideDecl | InjectDecl
-                       | TagDecl | MixinDecl | UseDecl | SnippetDecl | I18nDecl | RawBlock
+                       | TagDecl | UseDecl | SnippetDecl | I18nDecl | RawBlock
 Statement            ::= /* a TypeScript statement, the $ runes included */
 ```
 
@@ -26,10 +26,8 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
   with `@keyword` in code (not in a comment or a string). A declaration of a known keyword that matches
   none of its forms is dropped and raises `PDX_UNKNOWN_DECLARATION`, whose hint is the form below.
   Only `@i18n`, `@raw` and `@snippet` may span lines (a balanced `{ … }` block).
-- **The mode.** A `<script setup>` is the new mode unless it carries a legacy marker
-  ([overview.md](overview.md#the-two-script-modes)); a plain `<script>` is the new mode only when one of
-  its lines starts with a declaration other than `@mixin`, `@use`, `@raw` and `@transition`, or calls
-  `$signal(`, `$derived(`, `$effect(`, `$store(`, `$watch(` or `linkedSignal(`.
+- **One grammar.** Every script is read this way, with or without `setup`, whatever it contains
+  ([overview.md](overview.md#one-script-grammar)); the legacy markers and `@mixin` are removed forms.
 - **What the template sees.** Every top-level `const`, `let`, `function`, rune and declared name is
   returned from `setup` to the template, except a name that starts with `_`.
 - **The rest is TypeScript**, type-erased (overview.md). A syntax error raises
@@ -117,7 +115,7 @@ and the rewrite turns each read into `name()`; in a `$signal` or `$store` initia
   <button :disabled="disabled">{{ label }} · {{ clicks }}</button>
 </template>
 
-<script setup>
+<script>
 @prop label: string = 'Save';
 @prop disabled: boolean = false;
 @prop start: number = 0;
@@ -171,7 +169,7 @@ component's `models`.
   <button @click="clear()">Clear</button>
 </template>
 
-<script setup>
+<script>
 @model value: string = '';
 function clear() { value = ''; }
 </script>
@@ -227,7 +225,7 @@ declares the same (`events: { name: event({ bubbles: true }) }`). Without a type
   <button @click="save">Save</button>
 </template>
 
-<script setup>
+<script>
 @event saved: { id: string };
 @event(bubbles) closed;
 
@@ -276,7 +274,7 @@ without a type.
   </section>
 </template>
 
-<script setup>
+<script>
 @slot header;
 @slot row: { item: string; index: number };
 </script>
@@ -315,7 +313,7 @@ and writes it with `open.set(…)`; a function or a constant as it is.
   @if (open) { <p class="panel">Details</p> }
 </template>
 
-<script setup>
+<script>
 let open = $signal(false);
 
 function show() { open = true; }
@@ -365,7 +363,7 @@ manifest lists them.
   @if (open) { <div data-part="popup"><slot></slot></div> }
 </template>
 
-<script setup>
+<script>
 @part trigger, popup;
 let open = $signal(false);
 function close() { open = false; trigger?.focus(); }
@@ -414,7 +412,7 @@ render's context:
   <span>{{ label }}</span>
 </template>
 
-<script setup>
+<script>
 @prop label: string = 'Choose';
 let open = $signal(false);
 @host { role="combobox" :aria-expanded="open ? 'true' : 'false'" @keydown.enter="open = !open" }
@@ -462,7 +460,7 @@ manifest lists a component's states.
   <button @click="open = !open">Menu</button>
 </template>
 
-<script setup>
+<script>
 let open = $signal(false);
 @state expanded = open;
 </script>
@@ -512,7 +510,7 @@ to the template like any other.
   <div class="invoice"><slot></slot></div>
 </template>
 
-<script setup>
+<script>
 let density = $signal('compact');
 
 @provide theme = 'invoice';
@@ -527,7 +525,7 @@ function toggle() { density = density === 'compact' ? 'comfortable' : 'compact';
   <p :class="theme">{{ label }}</p>
 </template>
 
-<script setup>
+<script>
 @inject theme;
 @inject rowDensity as density;
 
@@ -570,7 +568,7 @@ the same line, so the tag is auto-imported where a template uses it.
   <p>Legacy card</p>
 </template>
 
-<script setup>
+<script>
 @tag 'app-legacy-card';
 </script>
 ```
@@ -578,46 +576,6 @@ the same line, so the tag is auto-imported where a template uses it.
 #### Since
 
 alpha; `pdx-` reserved since beta (#136)
-
-### @mixin
-
-#### Syntax
-
-```ebnf
-MixinDecl ::= "@mixin" S "'" [^']+ "'" S "as" S Identifier S? ";"?
-```
-
-The analyzer's form: `@mixin './use-thing.ts' as thing;`
-
-#### Semantics
-
-Runs another module's `setup` inside this one, under a name: the module gets
-`import { setup as __mixin_thing } from './use-thing.ts';` and the setup body
-`const thing = __mixin_thing(ctx);`. `thing` is whatever that `setup` returns, and is returned to the
-template.
-
-#### Rules
-
-- The path is single-quoted; a double-quoted path raises `PDX_UNKNOWN_DECLARATION`.
-- The module must export a function `setup(ctx)`. A compiled `.pdx` exports none — its setup is inside
-  `component(…)` — so a `.pdx` path fails when the module loads; a `.ts` or `.js` module that exports
-  `setup` works. Not checked today.
-
-#### Examples
-
-```pdx
-<template>
-  <p>{{ clock.now }}</p>
-</template>
-
-<script setup>
-@mixin './use-clock.ts' as clock;
-</script>
-```
-
-#### Since
-
-alpha
 
 ### @use
 
@@ -646,7 +604,7 @@ side-effect import `import '@shoelace-style/shoelace';`. The tag is not read: on
   <pdx-button>Save</pdx-button>
 </template>
 
-<script setup>
+<script>
 @use 'pdx-button' from '@pdxui/ui/button';
 </script>
 ```
@@ -686,7 +644,7 @@ tagged template as written: it is not compiled as a template, so a value goes in
   <ul>{{ row('Ada') }}</ul>
 </template>
 
-<script setup>
+<script>
 @snippet row(name) {
   <li class="row">${name}</li>
 }
@@ -733,7 +691,7 @@ it becomes active. Without `default` it is `'en'`; without `translations` it is 
   <p>{{ $t('app.title') }}</p>
 </template>
 
-<script setup>
+<script>
 @i18n {
   locales: ['en', 'it'],
   default: 'en',
@@ -779,7 +737,7 @@ block is for code that must not be rewritten. The template meaning of `@raw` is 
   <p>{{ count }}</p>
 </template>
 
-<script setup>
+<script>
 let count = $signal(0);
 
 @raw {
@@ -848,7 +806,7 @@ the rewritten expression is `undefined`.
   <p>{{ name }}</p>
 </template>
 
-<script setup>
+<script>
 @prop start: number = 0;
 let count = $signal(start);
 let name = $signal<string>('Ada');
@@ -902,7 +860,7 @@ reads when it reads a body variable.
   <p>{{ line.label }}</p>
 </template>
 
-<script setup>
+<script>
 let price = $signal(10);
 let quantity = $signal(2);
 const total = $derived(price * quantity);
@@ -946,7 +904,7 @@ A function the callback returns is its cleanup, run before each re-run and on di
   <p>{{ unread }} unread</p>
 </template>
 
-<script setup>
+<script>
 let unread = $signal(3);
 
 $effect(() => {
@@ -993,7 +951,7 @@ The options (`immediate`, `once`) are an expression rewritten like the body; a d
   <input :value="query" @input="query = $event.target.value" />
 </template>
 
-<script setup>
+<script>
 let query = $signal('');
 let page = $signal(1);
 
@@ -1042,7 +1000,7 @@ once.
   <p>{{ $d(created, { dateStyle: 'medium' }) }} · {{ $r(-3, 'day') }}</p>
 </template>
 
-<script setup>
+<script>
 let total = $signal(1234.5);
 const created = new Date(2026, 0, 5);
 </script>

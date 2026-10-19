@@ -107,7 +107,7 @@ describe('the slotted elements', () => {
 });
 
 describe('pdx migrate: a scoped selector that reached inside a child', () => {
-    const file = (template: string, css: string) => `<template>${template}</template>\n<script setup>\n</script>\n<style scoped>\n${css}\n</style>\n`;
+    const file = (template: string, css: string) => `<template>${template}</template>\n<script>\n</script>\n<style scoped>\n${css}\n</style>\n`;
 
     it('flags a component tag descended into, and a subject the template never writes', () => {
         const text = file('<div class="own"><pdx-card><p class="note">x</p></pdx-card><pdx-button label="Go"></pdx-button></div>',
@@ -123,12 +123,12 @@ describe('pdx migrate: a scoped selector that reached inside a child', () => {
     });
 
     it('control — a class the script builds into the DOM is the component\'s own', () => {
-        const text = `<template><div :ref="list"></div><pdx-card></pdx-card></template>\n<script setup>\nlet list = $signal(null);\n$effect(() => { const d = document.createElement('div'); d.className = 'scroll-item'; list?.appendChild(d); });\n</script>\n<style scoped>\n.scroll-item { padding: 0; }\n</style>\n`;
+        const text = `<template><div :ref="list"></div><pdx-card></pdx-card></template>\n<script>\nlet list = $signal(null);\n$effect(() => { const d = document.createElement('div'); d.className = 'scroll-item'; list?.appendChild(d); });\n</script>\n<style scoped>\n.scroll-item { padding: 0; }\n</style>\n`;
         expect(scopedReachesChild.detect(text)).toEqual([]);
     });
 
     it('flags a class the script hands to a component to put on what it renders', () => {
-        const text = `<template><pdx-data-grid :columns="columns"></pdx-data-grid></template>\n<script setup>\nconst columns = [{ field: 'ends', cellClass: (v) => (v < '2026' ? 'warranty-ended' : '') }];\n</script>\n<style scoped>\n.warranty-ended { color: red; }\n</style>\n`;
+        const text = `<template><pdx-data-grid :columns="columns"></pdx-data-grid></template>\n<script>\nconst columns = [{ field: 'ends', cellClass: (v) => (v < '2026' ? 'warranty-ended' : '') }];\n</script>\n<style scoped>\n.warranty-ended { color: red; }\n</style>\n`;
         expect(scopedReachesChild.detect(text).map((f) => f.found)).toEqual(['.warranty-ended']);
     });
 
@@ -139,7 +139,7 @@ describe('pdx migrate: a scoped selector that reached inside a child', () => {
 
 describe('in a compiled component', () => {
     const page = (style: string, opts?: object) => compile(
-        `<template><div class="own"><pdx-card><p class="note">x</p></pdx-card></div></template>\n<script setup>\nlet n = $signal(1);\n</script>\n${style}`,
+        `<template><div class="own"><pdx-card><p class="note">x</p></pdx-card></div></template>\n<script>\nlet n = $signal(1);\n</script>\n${style}`,
         'page.pdx', [], undefined, opts,
     ).code;
     const id = `data-pdx-${hash('page.pdx')}`;

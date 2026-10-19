@@ -6,7 +6,7 @@ import { compile } from '../src/plugin';
 import { markup } from './static-markup-of';
 
 const tpl = (script: string, template = '<div></div>') =>
-    `<template>${template}</template>\n<script setup>\n${script}\n</script>`;
+    `<template>${template}</template>\n<script>\n${script}\n</script>`;
 
 describe('arrow single-param in template expressions', () => {
     it('does not prefix a bare arrow param with ctx.', () => {
@@ -52,7 +52,7 @@ describe('regex literal with quotes does not derail the tokenizer', () => {
 
 describe('multi-line imports', () => {
     it('flattens a multi-line named import into a single valid line', () => {
-        const src = `<template><div></div></template>\n<script setup>\nimport {\n  foo,\n  bar\n} from './utils';\nlet count = $signal(0);\n</script>`;
+        const src = `<template><div></div></template>\n<script>\nimport {\n  foo,\n  bar\n} from './utils';\nlet count = $signal(0);\n</script>`;
         const { code } = compile(src, 'l121.pdx');
         expect(code).toContain(`import { foo, bar } from './utils';`);
         expect(code).not.toMatch(/import \{\s*$/m); // no dangling open-brace import
@@ -129,19 +129,19 @@ describe('raw ${...} in a normal attribute is written as text, never evaluated',
 
 describe('unknown directive typo gets a diagnostic', () => {
     it('throws with a Levenshtein suggestion for @fro', () => {
-        const src = `<template>@fro (x) { <div></div> }</template>\n<script setup>\nlet count = $signal(0);\n</script>`;
+        const src = `<template>@fro (x) { <div></div> }</template>\n<script>\nlet count = $signal(0);\n</script>`;
         expect(() => compile(src, 'l108.pdx')).toThrow(/Unknown directive @fro.*Did you mean @for/s);
     });
 
     it('does not flag a CSS at-rule appearing as literal text', () => {
-        const src = `<template><pre>@media (min-width: 100px) { a { color: red } }</pre></template>\n<script setup>\nlet count = $signal(0);\n</script>`;
+        const src = `<template><pre>@media (min-width: 100px) { a { color: red } }</pre></template>\n<script>\nlet count = $signal(0);\n</script>`;
         expect(() => compile(src, 'l108b.pdx')).not.toThrow();
     });
 });
 
 describe('unclosed SFC block is reported', () => {
     it('throws "never closed" instead of degrading silently', () => {
-        const src = `<template><div></div></template>\n<script setup>\nlet count = $signal(0);`;
+        const src = `<template><div></div></template>\n<script>\nlet count = $signal(0);`;
         expect(() => compile(src, 'l109.pdx')).toThrow(/never closed/);
     });
 });

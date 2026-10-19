@@ -19,10 +19,10 @@ proposals the implementing issue may change.
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
 | `<script setup>` | `<script>` | mechanical (landed: `script-setup`; a script without legacy markers already reads the same under both, and the repository's `.pdx` files are converted) | #158 |
-| `defineProps({ x: { type: String, default: 'a' } })` | `@prop x: string = 'a';` | mechanical | #158 |
-| `defineEmits(['e'])` | `@event e: unknown;` | mechanical | #158 |
-| a top-level `return { … }` | removed: every top-level name reaches the template | mechanical | #158 |
-| a legacy form `pdx migrate` cannot convert | — | flagged | #158 |
+| `defineProps({ x: { type: String, default: 'a' } })` | `@prop x: string = 'a';` | mechanical (landed: `legacy-script`; a prop with no default becomes `T \| undefined = undefined`, as optional as it was) | #158 |
+| `defineEmits(['e'])` | `@event e: unknown;` | mechanical (landed: the alpha accepted `defineEmits()` and `defineEmits<{ e: T }>()`, which become `@event e: unknown;` / `@event e: T;`, and `emit('e', x)` becomes `e(x)`) | #158 |
+| a top-level `return { … }` | removed: every top-level name reaches the template | mechanical (landed, when every entry is a plain name) | #158 |
+| a legacy form `pdx migrate` cannot convert | — | flagged (landed) | #158 |
 | application tag `pdx-<file>` | `app-<file>` (or `pdx({ prefix })`) | mechanical in templates, app CSS and `@tag`; flagged inside strings — landed: `app-prefix`, `app-prefix-string` | #136 |
 | `pdx({ inlineBindings })` | removed | `PDX_INLINE_BINDINGS_IGNORED`; flagged | #107 (flagging †) |
 | `:scope` in a scoped block under `target: 'baseline-2024'` | the host, as under `'baseline-2026'` | **target change**: nothing to rewrite | † (decision 20) |
@@ -42,7 +42,7 @@ proposals the implementing issue may change.
 | `count.peek()` read the value's `peek` | the signal's own `peek` | fix (the alpha form was broken) | #187 |
 | `handler ??= fn` (and `\|\|=`, `&&=`) on a `$signal`, which called `fn` as an updater | stores `fn`, short circuit kept | **fix**, behaviour: flagged where the right side is a function | #187 (logical assignment †) |
 | `onSave()` with `onSave` a `$signal` (named nothing in alpha) | read, then called: `__onSave()()` | **fix**, nothing to rewrite | † (decision 17) |
-| `@mixin './x.ts' as name` | `const name = useX();` — an imported function | flagged (the module's `setup(ctx)` signature changes) | † (decision 6) |
+| `@mixin './x.ts' as name` | `const name = useX();` — an imported function | flagged (landed: `mixin-removed`; the module's `setup(ctx)` signature changes) | #158 (decision 6) |
 | a script `@snippet` body with `${arg}` | the body is a template: `{{ arg }}` | mechanical | † (decision 9) |
 | a rune outside its position (`$signal` in a function body) | `PDX_RUNE_POSITION`; the core function (`signal()`) | flagged | † (decision 12) |
 

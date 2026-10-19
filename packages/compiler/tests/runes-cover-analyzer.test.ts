@@ -23,7 +23,7 @@ function recognised(): string[] {
 
 describe('RUNES covers what the analyzer recognises', () => {
     it('found the analyzer\'s declarations, so the check below is not vacuous', () => {
-        expect(recognised()).toEqual(expect.arrayContaining(['prop', 'page', 'fetch', 'snippet', 'mixin']));
+        expect(recognised()).toEqual(expect.arrayContaining(['slot', 'page', 'fetch', 'snippet', 'use']));
     });
 
     it('every declaration the analyzer recognises has a RUNES entry', () => {

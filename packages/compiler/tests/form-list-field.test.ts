@@ -12,7 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function setup(script: string) {
-    return compile(`<template><div></div></template>\n<script setup>\n${script}\n</script>`, 'list.pdx');
+    return compile(`<template><div></div></template>\n<script>\n${script}\n</script>`, 'list.pdx');
 }
 
 /** The generated `createForm({ … })` call, as one line. */

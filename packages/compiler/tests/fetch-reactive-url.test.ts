@@ -14,7 +14,7 @@ type Options = { setup: (ctx: Record<string, unknown>) => Record<string, unknown
 
 /** Compiles `script` into a component and runs its setup; returns the requests and the props. */
 function run(script: string, props: Record<string, unknown> = {}) {
-    const src = `<template><p></p></template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template><p></p></template>\n<script>\n${script}\n</script>\n`;
     const { code } = compile(src, 'fetch-probe.pdx', [], undefined, {});
     const requests: string[] = [];
     let options: Options | undefined;

@@ -6,7 +6,7 @@ description: "Build web app UIs with PDX (@pdxui): the catalogue of its componen
 # PDX UI (build .pdx web apps)
 
 Knowledge + playbook for building UIs on **PDX UI**: the `.pdx` language (SFC:
-`<template>`/`<script setup>`/`<style scoped>`, signal reactivity, compiled to Web Components) and its
+`<template>`/`<script>`/`<style scoped>`, signal reactivity, compiled to Web Components) and its
 115 `pdx-*` components.
 
 > **Golden rule: search the catalog BEFORE building anything.** The library is large; a component

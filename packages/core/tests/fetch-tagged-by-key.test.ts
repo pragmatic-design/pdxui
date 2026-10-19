@@ -36,7 +36,7 @@ describe('an @fetch is tagged with its own key', () => {
     it('the entry carries the key as a tag, and invalidate([key]) reaches it', async () => {
         const fetch = stubFetch();
         defineCompiled('tagkeyplain', "<template><p>{{ users.data()?.length ?? 0 }}</p></template>\n"
-            + "<script setup>\n@fetch users: 'GET /api/tag-plain' as string[];\n</script>\n");
+            + "<script>\n@fetch users: 'GET /api/tag-plain' as string[];\n</script>\n");
         document.body.appendChild(document.createElement('app-tagkeyplain'));
         await settle();
         expect(tagsOf('GET:/api/tag-plain'), 'the @fetch entry is not tagged with its key').toContain('GET:/api/tag-plain');
@@ -50,7 +50,7 @@ describe('an @fetch is tagged with its own key', () => {
     it('an author\'s own tags sit beside the key', async () => {
         stubFetch();
         defineCompiled('tagkeyauthor', "<template><p>{{ users.data()?.length ?? 0 }}</p></template>\n"
-            + "<script setup>\n@fetch users: 'GET /api/tag-author' as string[] { tags: ['users'] };\n</script>\n");
+            + "<script>\n@fetch users: 'GET /api/tag-author' as string[] { tags: ['users'] };\n</script>\n");
         document.body.appendChild(document.createElement('app-tagkeyauthor'));
         await settle();
         expect(tagsOf('GET:/api/tag-author')).toEqual(expect.arrayContaining(['GET:/api/tag-author', 'users']));
@@ -59,7 +59,7 @@ describe('an @fetch is tagged with its own key', () => {
     it('a reactive URL is tagged with the key it resolves to, and a new key with the new one', async () => {
         stubFetch();
         defineCompiled('tagkeyreactive', "<template><p>{{ user.data()?.length ?? 0 }}</p><button @click=\"id = 2\">2</button></template>\n"
-            + "<script setup>\nlet id = $signal(1);\n@fetch user: 'GET /api/tag-r/${id}' as string[];\n</script>\n");
+            + "<script>\nlet id = $signal(1);\n@fetch user: 'GET /api/tag-r/${id}' as string[];\n</script>\n");
         const el = document.createElement('app-tagkeyreactive');
         document.body.appendChild(el);
         await settle();

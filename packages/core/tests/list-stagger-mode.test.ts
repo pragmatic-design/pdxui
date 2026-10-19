@@ -75,7 +75,7 @@ describe('@for … @transition @stagger, compiled', () => {
         it(`reaches the reconciler (${build ? 'build' : 'dev'})`, async () => {
             const name = `forstagger${build ? 'b' : 'd'}`;
             const src = "<template><ul>@for (items as it; track it) @transition('fade') @stagger(40) { <li>{{ it }}</li> }</ul>"
-                + "<button @click=\"items = ['a', 'b', 'c']\">go</button></template>\n<script setup>\nlet items = $signal([]);\n</script>\n";
+                + "<button @click=\"items = ['a', 'b', 'c']\">go</button></template>\n<script>\nlet items = $signal([]);\n</script>\n";
             const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
             const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
             new Function('__core', body)(core);

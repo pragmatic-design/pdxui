@@ -25,12 +25,12 @@ const SLOTTED = `<template>
   </pdx-select>
 </template>
 
-<script setup>
+<script>
 const people = [{ id: 1, name: 'Ada' }];
 </script>`;
 
 const PLAIN = `<template><p :title="t">{{ t }}</p></template>
-<script setup>
+<script>
 @prop t: string = '';
 </script>`;
 

@@ -22,7 +22,7 @@ const PATHS = {
 } as const;
 
 function sfc(script: string, template = '<button @click="picked(\'a\')">x</button>'): string {
-    return `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    return `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
 }
 
 function parses(code: string): void {

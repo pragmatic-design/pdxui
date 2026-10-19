@@ -19,7 +19,7 @@ const LOOP = `<template>
     <button @click="save">{{ e.count ?? count }}</button>
   }
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 let items = $signal([]);
 function save() {}
@@ -81,7 +81,7 @@ describe('a signal read that does not depend on the row', () => {
   @for (sizes as s; track s) { <i>{{ s }}{{ unit }}</i> }
   @for (colors as c; track c) { <b>{{ c }}{{ unit }}</b> }
 </template>
-<script setup>
+<script>
 let unit = $signal('px');
 let sizes = $signal([]);
 let colors = $signal([]);
@@ -102,7 +102,7 @@ let colors = $signal([]);
     @for (g.items as it; track it.id) { <i>{{ it.name }}{{ unit }}</i> }
   }
 </template>
-<script setup>
+<script>
 let unit = $signal('px');
 let groups = $signal([]);
 </script>`;

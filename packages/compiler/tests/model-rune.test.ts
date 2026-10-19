@@ -17,7 +17,7 @@ import { validate } from '../src/compiler/validate';
 import { parseTemplate } from '../src/parser/template';
 
 function sfc(script: string, template = '<input ::value="value" />'): string {
-    return `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    return `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
 }
 
 const FIELD = "@model value: string = '';\n@prop label: string = '';\nfunction clear() { value = ''; }";
@@ -119,11 +119,11 @@ describe('the resolver knows the models', () => {
         try {
             const file = join(root, 'src', 'name-field.pdx');
             mkdirSync(join(root, 'src'), { recursive: true });
-            writeFileSync(file, "<template><input ::value=\"value\" /></template>\n<script setup>\n@model value: string = '';\n@prop label: string = '';\n</script>\n");
+            writeFileSync(file, "<template><input ::value=\"value\" /></template>\n<script>\n@model value: string = '';\n@prop label: string = '';\n</script>\n");
             const r = new ComponentResolver();
             r.registerProjectComponents(root);
             expect([...r.modelsOf('app-name-field')!]).toEqual(['value']);
-            writeFileSync(file, "<template><p/></template>\n<script setup>\n@prop label: string = '';\n</script>\n");
+            writeFileSync(file, "<template><p/></template>\n<script>\n@prop label: string = '';\n</script>\n");
             // A later modification time, as an edit gives it: the cache is read again.
             utimesSync(file, new Date(), new Date(Date.now() + 5000));
             expect([...r.modelsOf('app-name-field')!], 'a component that declares none answers an empty set').toEqual([]);

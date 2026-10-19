@@ -8,7 +8,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function tpl(template: string, script = 'let rows = $signal([]);'): string {
-    return compile(`<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`, 'rows.pdx').code;
+    return compile(`<template>\n${template}\n</template>\n<script>\n${script}\n</script>`, 'rows.pdx').code;
 }
 
 function parses(code: string): void {

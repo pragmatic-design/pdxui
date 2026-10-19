@@ -26,7 +26,9 @@ function statement(name: string, shape: string): string {
 
 describe('the rune list, as the editor reads it', () => {
     it('is the compiler\'s, and holds the declarations the analyzer knows', () => {
-        expect(decorators.map(r => r.name)).toEqual(expect.arrayContaining(['inject', 'provide', 'tag', 'loader', 'search', 'prefetch', 'mixin']));
+        expect(decorators.map(r => r.name)).toEqual(expect.arrayContaining(['inject', 'provide', 'tag', 'loader', 'search', 'prefetch', 'use']));
+        // @mixin is removed (#158): the editor offers it no more.
+        expect(decorators.map(r => r.name)).not.toContain('mixin');
     });
 
     it('completion offers every rune', () => {
@@ -52,16 +54,6 @@ describe('the rune list, as the editor reads it', () => {
         const vf = buildVirtualFile(script, 0, [], '', -1);
         const found = getTsDiagnostics(new PdxTsService(root), pathToFileURL(join(root, 'all-runes.pdx')).href, vf, script)
             .map(d => `${d.code} ${d.message.split('\n')[0]}`);
-        expect(found).toEqual([]);
-    });
-
-    it('@mixin declares its name in the form the compiler reads — a quoted path', () => {
-        // The shape used to read `@mixin useThing as thing`, which the compiler rejects; the form it
-        // reads quotes the file, and the projection only knew the unquoted one (#58).
-        const script = "@mixin './use-thing.ts' as thing;\nthing;\n";
-        const root = join(__dirname, '..', '..', '..');
-        const found = getTsDiagnostics(new PdxTsService(root), pathToFileURL(join(root, 'mixin.pdx')).href, buildVirtualFile(script, 0, [], '', -1), script)
-            .map(d => d.message.split('\n')[0]);
         expect(found).toEqual([]);
     });
 });

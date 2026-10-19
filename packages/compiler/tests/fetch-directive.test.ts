@@ -60,14 +60,6 @@ describe('@fetch parsing', () => {
         expect(a.fetches[1].name).toBe('roles');
     });
 
-    it('@fetch activates new mode', () => {
-        const a = analyzeScript(`
-            @fetch users: 'GET /api/users' as User[];
-        `, 'users.pdx');
-
-        expect(a.mode).toBe('new');
-    });
-
     it('@fetch names are auto-exported', () => {
         const a = analyzeScript(`
             @fetch users: 'GET /api/users' as User[];

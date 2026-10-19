@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const src = (decl: string) =>
-    `<template>\n  <i :a="NAME"></i>\n</template>\n<script setup lang="ts">\n${decl}\n</script>`;
+    `<template>\n  <i :a="NAME"></i>\n</template>\n<script lang="ts">\n${decl}\n</script>`;
 
 const build = (decl: string) =>
     compile(src(decl), 'C:/x/typed.pdx', [], undefined, { production: true }).code;

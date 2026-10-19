@@ -19,7 +19,7 @@ const PROFILE_MENU = `<template>
         <slot></slot>
     </div>
 </template>
-<script setup>
+<script>
 @prop label: string = 'Me';
 @prop compact: boolean = false;
 @event closed: void;

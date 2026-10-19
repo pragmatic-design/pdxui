@@ -334,7 +334,7 @@ a signal like any other:
 ```pdx
 <template><div class="bar" :ref="bar"></div></template>
 
-<script setup>
+<script>
 import { tween } from '@pdxui/core';
 
 let bar = $signal(null);
@@ -428,7 +428,7 @@ runtime — markdown you just rendered, say — use a ref and set `innerHTML` yo
 
 ```pdx
 <template><div class="prose" :ref="host"></div></template>
-<script setup>
+<script>
 @prop markup: string = '';
 let host = $signal(null);
 $watch(markup, (value) => { if (host) host.innerHTML = value; });

@@ -7,7 +7,7 @@ import { SymbolKind } from 'vscode-languageserver';
 
 const source = [
     '<template><div>{{ count }}</div></template>',
-    '<script setup>',                       // line 1
+    '<script>',                       // line 1
     "@prop title: string = 'x';",           // line 2
     '@event changed: number;',              // line 3
     'let count = $signal(0);',              // line 4

@@ -21,7 +21,7 @@ beforeAll(async () => {
     mkdirSync(join(root, 'src'), { recursive: true });
     writeFileSync(join(root, 'src', 'typed.pdx'), [
         '<template><p>{{ n }}</p></template>',
-        '<script setup>',
+        '<script>',
         "import type { Thing } from './thing';",
         'interface User { id: number }',
         'let n = $signal<number>(1);',

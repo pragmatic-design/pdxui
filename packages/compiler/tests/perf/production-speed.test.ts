@@ -17,7 +17,7 @@ describe('production compile speed benchmarks', () => {
   <button @click="inc">+</button>
   @if (count > 10) { <div>High!</div> }</div>
 </template>
-<script setup>
+<script>
   @prop label: string = 'Counter';
   let count = $signal(0);
   function inc() { count++; }

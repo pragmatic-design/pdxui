@@ -10,7 +10,7 @@ import { compile } from '../src/plugin';
 // One render path since #107: what differs is dev and a production build.
 const PATHS = { dev: {}, production: { production: true } } as const;
 
-const sfc = (tag: string) => `<template>\n  ${tag}\n</template>\n<script setup>\nlet view = $signal('pdx-a');\n</script>\n`;
+const sfc = (tag: string) => `<template>\n  ${tag}\n</template>\n<script>\nlet view = $signal('pdx-a');\n</script>\n`;
 
 for (const [path, opts] of Object.entries(PATHS)) {
     describe(`@keepAlive(n) — ${path}`, () => {

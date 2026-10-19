@@ -23,7 +23,7 @@ compiles. This page is the working summary; the reference is the definition.
   <button class="pdx-btn pdx-primary" @click="count++">clicked {{ count }} times</button>
 </template>
 
-<script setup>
+<script>
 let count = $signal(0);
 </script>
 
@@ -32,10 +32,12 @@ button { margin-top: var(--pdx-space-md); }
 </style>
 ```
 
-Three optional blocks. `<script setup>` is where state and logic live. A plain `<script>` is the new
-mode too when it uses a rune or a declaration — the legacy mode is only a `<script>` without them, or
-one with `defineProps`/`defineEmits`/a top-level `return {}` — but write `<script setup>` for new
-files. `<style scoped>` is scoped by the compiler through a `data-pdx-*` attribute, and stops at the
+Three optional blocks. `<script>` is where state and logic live, and it has one grammar: every
+top-level name reaches the template, props are `@prop`, events are `@event`. Write `<script>`, not
+`<script setup>` (`setup` means nothing, `PDX_SETUP_REDUNDANT`); `defineProps`, `defineEmits`, a
+top-level `return {}` and mixins are removed (`PDX_REMOVED_FORM`: `pdx migrate` converts the first
+three and lists each mixin, which becomes an imported function you call).
+`<style scoped>` is scoped by the compiler through a `data-pdx-*` attribute, and stops at the
 child components the template renders: style a child through its parts, states and tokens; `:scope` is
 the component's own element. Components render in the light DOM, unless the template is
 `<template shadow>`, which renders into a shadow root.
@@ -43,7 +45,7 @@ the component's own element. Components render in the light DOM, unless the temp
 **The tag comes from the filename**, behind the app prefix (`app`, or `pdx({ prefix })`):
 `src/job-list.pdx` → `<app-job-list>`. Override with `@tag 'app-…'`. Never `@tag 'pdx-…'`: that
 prefix is the library's, and the compiler rejects it (`PDX_TAG_RESERVED`).
-A `<script setup>` compiles the same way whatever it holds: one with no rune — only imports, consts,
+A `<script>` compiles the same way whatever it holds: one with no rune — only imports, consts,
 functions and an `onMount` — still returns what it declares to the template, and an empty one still
 registers the component.
 
@@ -53,7 +55,7 @@ Every block takes a `src=`, so a screen does not have to live in one file:
 
 ```html
 <template src="./work-list.html" />
-<script setup lang="ts" src="./work-list.ts" />
+<script lang="ts" src="./work-list.ts" />
 <style scoped src="./work-list.css" />
 ```
 
@@ -106,7 +108,7 @@ in a handler is one task, and the page answers no click until it ends. Two ways 
 
 ## Declarations
 
-Written at the top of `<script setup>`, one per line, ending in `;`.
+Written at the top of `<script>`, one per line, ending in `;`.
 
 ```js
 @prop label: string = 'Hello';     // a prop: signal + attribute sync + generated type
@@ -174,7 +176,7 @@ The full vocabulary the analyzer accepts:
 
 `@prop` `@model` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@slot` `@title` `@meta`
 `@head` `@params` `@search` `@route` `@redirect` `@provide` `@inject` `@prefetch` `@expose` `@part` `@host` `@state` `@variants` `@scroll`
-`@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use` `@mixin`
+`@i18n` `@raw` `@layout` `@alias` `@outlet` `@transition` `@snippet` `@use`
 
 **`@form f: Schema { … }`** builds a form (`createForm` underneath). Its options: `save` (when a field
 saves), `source`, `parent`, `fields` (per-field save), and **`warnUnsaved`** — written bare,
@@ -299,7 +301,7 @@ promise, and decides by the state, never by truthiness:
     <pdx-button @click="retry()">Retry</pdx-button>
   }
 </template>
-<script setup>
+<script>
 interface User { id: number; name: string }
 @fetch users: 'GET /api/users' as User[];
 </script>
@@ -386,7 +388,7 @@ component):
   <h1>Patient {{ id }}</h1>
   <a href="/patients">All patients</a>
 </template>
-<script setup>
+<script>
 @page '/patients/:id';
 import { currentParams } from '@pdxui/router';
 const id = $derived(currentParams().id);

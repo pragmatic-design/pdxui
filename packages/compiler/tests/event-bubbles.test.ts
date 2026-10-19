@@ -16,7 +16,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 function sfc(script: string, template = '<button @click="saved(1)">x</button>'): string {
-    return `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    return `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
 }
 
 const codes = (r: { warnings: { code: string }[] }) => r.warnings.map((w) => w.code);

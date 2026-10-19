@@ -95,7 +95,7 @@ describe('@await codegen', () => {
     }
 </template>
 
-<script setup>
+<script>
 let ready = $signal(false);
 </script>`;
 
@@ -116,7 +116,7 @@ let ready = $signal(false);
     }
 </template>
 
-<script setup>
+<script>
 let appReady = $signal(false);
 </script>`;
 
@@ -132,7 +132,7 @@ let appReady = $signal(false);
     }
 </template>
 
-<script setup>
+<script>
 let ready = $signal(false);
 </script>`;
 
@@ -153,7 +153,7 @@ let ready = $signal(false);
     }
 </template>
 
-<script setup>
+<script>
 let data = $signal(false);
 </script>`;
 
@@ -172,7 +172,7 @@ let data = $signal(false);
     }
 </template>
 
-<script setup>
+<script>
 let status = $signal('loading');
 </script>`;
 

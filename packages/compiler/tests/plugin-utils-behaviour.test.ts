@@ -48,7 +48,7 @@ afterEach(() => { vi.restoreAllMocks(); rmSync(root, { recursive: true, force: t
 
 describe('finding the stores in a project', () => {
     it('registers a @store by its declared name, from .pdx and .pdx.ts alike', () => {
-        write('src/cart.pdx', '<script setup>\n  @store cart;\n</script>');
+        write('src/cart.pdx', '<script>\n  @store cart;\n</script>');
         write('src/user.pdx.ts', '// @store user\n');
 
         const registry = new Map<string, string>();
@@ -85,7 +85,7 @@ describe('finding the stores in a project', () => {
 
 describe('finding the routes in a project', () => {
     it('records the path, the file and a tag derived from the filename', () => {
-        write('src/dashboard.pdx', "<script setup>\n  @page '/dashboard';\n</script>");
+        write('src/dashboard.pdx', "<script>\n  @page '/dashboard';\n</script>");
 
         const routes: ScannedRoute[] = [];
         scanForRoutes(root, routes);
@@ -218,7 +218,7 @@ describe('injecting the component imports for tags used in the template', () => 
 
     it('does nothing when the source has no template', () => {
         const code = 'export default {};';
-        expect(injectComponentImports(code, 'a.pdx', '<script setup></script>', uiResolver())).toBe(code);
+        expect(injectComponentImports(code, 'a.pdx', '<script></script>', uiResolver())).toBe(code);
     });
 
     it('does nothing when the template uses no pdx-* tag', () => {

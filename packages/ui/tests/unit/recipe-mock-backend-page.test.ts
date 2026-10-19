@@ -1,6 +1,6 @@
 // The mock-backend recipe's page example runs as written.
 //
-// Its `<script setup>` uses no rune — an import, two consts and an onMount. Compiled in the legacy
+// Its `<script>` uses no rune — an import, two consts and an onMount. Compiled in the legacy
 // mode it would have no auto-return (`:source="rows"` bound undefined) and onMount not imported
 // (ReferenceError at setup) — and still compile, so compiling is not enough. This takes both of the
 // recipe's own blocks — the `makeSource` module and the page — compiles the page with the real
@@ -48,7 +48,7 @@ describe('recipe: a mock backend — the page example', () => {
     it('finds both of the recipe\'s blocks', () => {
         expect(moduleBlock, 'no ```js recipe:mock-backend block').not.toBeNull();
         expect(pageBlock, 'no page block after "Then, in a page:"').not.toBeNull();
-        expect(pageBlock).toContain('<script setup>');
+        expect(pageBlock).toContain('<script>');
         expect(pageBlock, 'the page is the rune-less setup this test is about').not.toMatch(/\$signal|\$derived|@prop/);
     });
 

@@ -24,7 +24,7 @@ resolver.registerUiManifest();
 const propsOf = (tag: string) => resolver.propsOf(tag);
 
 function compileTemplate(template: string, withProps = true) {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  let on = $signal(false);\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n  let on = $signal(false);\n</script>`;
     return compile(source, 'bound-names.pdx', [], undefined, withProps ? { propsOf } : undefined);
 }
 
@@ -84,7 +84,7 @@ describe('a bound name on a known component', () => {
 
 describe('the inline build binds a component prop the same way', () => {
     it('resolves the lowercase name, and assigns through core\'s assignBoundProperty', () => {
-        const source = '<template>\n<pdx-app-layout :withborder="on"></pdx-app-layout>\n</template>\n<script setup>\n  let on = $signal(false);\n</script>';
+        const source = '<template>\n<pdx-app-layout :withborder="on"></pdx-app-layout>\n</template>\n<script>\n  let on = $signal(false);\n</script>';
         const r = compile(source, 'bound-names.pdx', [], undefined, { production: true, propsOf });
         expect(r.code).toMatch(/assignBoundProperty\(__el\d+, "withBorder", /);
         expect(r.code).toMatch(/import \{[^}]*\bassignBoundProperty\b[^}]*\} from '@pdxui\/core'/);
@@ -126,7 +126,7 @@ describe('a bound-name warning says where the attribute is', () => {
         '    <pdx-app-layout :withborder="on"></pdx-app-layout>',// line 4
         '  </div>',
         '</template>',
-        '<script setup>',
+        '<script>',
         '  let on = $signal(false);',
         '</script>',
     ].join('\n');

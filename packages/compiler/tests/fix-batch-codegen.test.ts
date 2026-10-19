@@ -13,7 +13,7 @@ describe('#1 loop-invariant hoisting (production)', () => {
   <button @click="save">{{ e.count ?? count }}</button>
 }
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 let count = $signal(0);
 function save() {}
@@ -42,7 +42,7 @@ function save() {}
   }
 }
 </template>
-<script setup>
+<script>
 let groups = $signal([]);
 let sel = $signal(null);
 </script>`;
@@ -64,7 +64,7 @@ describe('#2 binding dedup (production)', () => {
   <span :title="entry.name + '!'" :aria-label="entry.name + '!'">{{ entry.name }}</span>
 }
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 </script>`;
         const { code } = compile(source, 'dedup-loop.pdx', [], undefined, { production: true });
@@ -78,7 +78,7 @@ let items = $signal([]);
         const source = `<template>
 <button :disabled="count > 0" :hidden="count > 0">Save</button>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'dedup-ok.pdx', [], undefined, { production: true });
@@ -88,7 +88,7 @@ let count = $signal(0);
 
 describe('#3 template-literal escaping', () => {
     it('author backticks and ${ in literal text stay text (no execution)', () => {
-        const source = '<template><p>premi ` e ${x}</p></template>\n<script setup>\nlet x = $signal(1);\n</script>';
+        const source = '<template><p>premi ` e ${x}</p></template>\n<script>\nlet x = $signal(1);\n</script>';
         const { code } = compile(source, 'esc.pdx', [], undefined, { production: false });
         // The inline render (#107) writes the text into a string literal — the block's HTML (#369):
         // nothing in it is code.
@@ -98,13 +98,13 @@ describe('#3 template-literal escaping', () => {
     });
 
     it('in production too', () => {
-        const source = '<template><p>a ` b ${y}</p></template>\n<script setup>\nlet y = $signal(2);\n</script>';
+        const source = '<template><p>a ` b ${y}</p></template>\n<script>\nlet y = $signal(2);\n</script>';
         const { code } = compile(source, 'esc-prod.pdx', [], undefined, { production: true });
         expect(markup(code).join('')).toContain('<p>a ` b ${y}</p>');
     });
 
     it('a scoped slot body, built inline since #364, writes them as text too', () => {
-        const source = '<template><pdx-list><slot name="item" let:row><p>a ` b ${y}</p></slot></pdx-list></template>\n<script setup>\nlet y = $signal(2);\n</script>';
+        const source = '<template><pdx-list><slot name="item" let:row><p>a ` b ${y}</p></slot></pdx-list></template>\n<script>\nlet y = $signal(2);\n</script>';
         const { code } = compile(source, 'esc-slot.pdx', [], undefined, { production: true });
         expect(markup(code).join('')).toContain('<p>a ` b ${y}</p>');
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
@@ -120,7 +120,7 @@ describe('#3 template-literal escaping', () => {
 describe('#5 @expose maps signals to internal var', () => {
     it('exposes a signal as __name and a function bare', () => {
         const source = `<template><div>{{ count }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 function reset() { count = 0; }
 @expose count, reset;
@@ -133,7 +133,7 @@ function reset() { count = 0; }
 describe('#6 prop .peek() rewrite is string/key-aware', () => {
     it('rewrites only the value, not the object key or string contents', () => {
         const source = `<template><div>{{ s.label }}</div></template>
-<script setup>
+<script>
 @prop label: string = '';
 let s = $signal({ label: label, text: 'label: x' });
 </script>`;
@@ -149,7 +149,7 @@ let s = $signal({ label: label, text: 'label: x' });
 describe('#7 ternary then-branch is prefixed (not treated as object key)', () => {
     it('prefixes both branches of a ternary in a binding', () => {
         const source = `<template><div :data-x="flag ? yes : no">Hi</div></template>
-<script setup>
+<script>
 let flag = $signal(true);
 let yes = $signal('Y');
 let no = $signal('N');
@@ -165,7 +165,7 @@ let no = $signal('N');
 describe('#4 TDZ-safe declaration ordering', () => {
     it('emits a signal that depends on a body const AFTER that const', () => {
         const source = `<template><div>{{ c }}</div></template>
-<script setup>
+<script>
 const base = 10;
 let c = $signal(base);
 </script>`;
@@ -178,7 +178,7 @@ let c = $signal(base);
 
     it('emits a derived used by the body BEFORE the body statement', () => {
         const source = `<template><div>{{ d }}</div></template>
-<script setup>
+<script>
 let n = $signal(2);
 const d = $derived(n * 2);
 const usesD = d + 1;
@@ -196,7 +196,7 @@ const usesD = d + 1;
     // dependency.
     it('does NOT hoist a derived that reads a body-local const, despite an effect referencing a later derived', () => {
         const source = `<template><div :ref="r">{{ list }}</div></template>
-<script setup>
+<script>
 import { effect } from '@pdxui/core';
 let r = $signal(null);
 const items = [1, 2, 3];
@@ -222,7 +222,7 @@ effect(() => { const el = r; if (!el) return; const s = sel; el.textContent = St
     // "Cannot access '__name' before initialization", naming a variable the author never wrote.
     it('does NOT hoist a derived above a signal that itself waits for a body-local', () => {
         const source = `<template><div>{{ label }}</div></template>
-<script setup>
+<script>
 const params = new URLSearchParams(location.search);
 let name = $signal(params.get('name') ?? '');
 const label = $derived(name.toUpperCase());
@@ -247,7 +247,7 @@ function refresh() { return label; }
         // an eagerly-executing body statement still has to be declared before it, which is the
         // rule the partition exists for in the first place.
         const source = `<template><div>{{ label }}</div></template>
-<script setup>
+<script>
 let name = $signal('x');
 const label = $derived(name.toUpperCase());
 const shout = label + '!';
@@ -274,7 +274,7 @@ describe('form auto-binding — all injected ${} bindings stay live', () => {
   </pdx-form-field>
 </pdx-form>
 </template>
-<script setup>
+<script>
 @form userForm: { name: string };
 </script>`;
         const { code, warnings } = compile(source, 'formbind.pdx', [], undefined, { production: false });
@@ -290,7 +290,7 @@ describe('form auto-binding — all injected ${} bindings stay live', () => {
 describe('#16 @fetch URL is escaped', () => {
     it('JSON-stringifies a static URL (double-quoted, not raw single-quoted)', () => {
         const source = `<template><div>{{ data }}</div></template>
-<script setup>
+<script>
 @fetch data: 'GET /api/users' as User[];
 </script>`;
         const { code } = compile(source, 'fetch.pdx', [], undefined, { production: false });
@@ -308,7 +308,7 @@ describe('#11 form-binding accepts single-quoted :form', () => {
   <pdx-input name="email" />
 </pdx-form>
 </template>
-<script setup>
+<script>
 @form userForm { email: string }
 </script>`;
         const { code } = compile(source, 'sqform.pdx', [], undefined, { production: false });

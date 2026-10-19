@@ -11,7 +11,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function setup(script: string) {
-    return compile(`<template><div></div></template>\n<script setup>\n${script}\n</script>`, 'form-opts.pdx');
+    return compile(`<template><div></div></template>\n<script>\n${script}\n</script>`, 'form-opts.pdx');
 }
 
 const INLINE_WITH_RULE = `

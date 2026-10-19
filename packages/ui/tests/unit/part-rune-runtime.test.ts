@@ -19,7 +19,7 @@ const MENU = `<template>
 <button data-part="trigger" @click="open = !open">Menu</button>
 @if (open) { <div data-part="popup">items</div> }
 </template>
-<script setup>
+<script>
 @part trigger, popup;
 let open = $signal(false);
 @expose parts;

@@ -14,7 +14,7 @@ const prod = (src: string) => compile(src, 'dedup-guard.pdx', [], undefined, { p
 describe('binding dedup respects control flow', () => {
     it('does not hoist a binding that only occurs inside an @if', () => {
         const code = prod(`<template>@if (shown()) { <p :title="shown().nome">{{ shown().nome }}</p> }</template>
-<script setup>
+<script>
 let viewing = $signal(-1);
 let photos = $signal([]);
 const shown = $derived(viewing >= 0 ? photos[viewing] : null);
@@ -25,7 +25,7 @@ const shown = $derived(viewing >= 0 ? photos[viewing] : null);
 
     it('does not hoist a binding that only occurs inside an @for row', () => {
         const code = prod(`<template>@for (items as it; track it) { <span :title="sel().x">{{ sel().x }}</span> }</template>
-<script setup>
+<script>
 let items = $signal([1]);
 let sel = $signal({ x: 1 });
 </script>`);
@@ -34,7 +34,7 @@ let sel = $signal({ x: 1 });
 
     it('the control: two identical bindings outside any control flow are still deduplicated', () => {
         const code = prod(`<template><button :disabled="count > 0" :hidden="count > 0">Save</button></template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`);
         expect(code).toContain('__bd_0');
@@ -42,7 +42,7 @@ let count = $signal(0);
 
     it('the control: a guarded copy does not stop two top-level copies from being deduplicated', () => {
         const code = prod(`<template><p :title="count > 0" :hidden="count > 0"></p>@if (on) { <i :title="count > 0"></i> }</template>
-<script setup>
+<script>
 let count = $signal(0);
 let on = $signal(true);
 </script>`);

@@ -18,7 +18,7 @@ const OPTS = { production: true };
 
 /** Compile in the production inline mode and return the module body without its imports. */
 function inline(template: string, setup = 'let count = $signal(0);'): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  ${setup}\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n  ${setup}\n</script>`;
     const { code } = compile(source, 'inline-construct.pdx', [], undefined, OPTS);
     return code;
 }

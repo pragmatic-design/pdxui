@@ -98,7 +98,7 @@ boundary. A rule's body, nested rules (`&`) included, is copied as written.
   </article>
 </template>
 
-<script setup>
+<script>
 @prop title: string = 'Report';
 </script>
 
@@ -332,7 +332,7 @@ to any of them re-writes all the bound properties of that instance.
   <div class="bar"></div>
 </template>
 
-<script setup>
+<script>
 @prop width: string = '40%';
 </script>
 
@@ -393,7 +393,7 @@ sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Un
   <button data-part="root"><slot></slot></button>
 </template>
 
-<script setup>
+<script>
 @variants {
   variant: { primary, ghost } = primary;
   size: { sm, md } = md;

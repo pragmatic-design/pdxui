@@ -15,7 +15,7 @@ const URI = 'file:///comp.pdx';
 
 const SOURCE = [
     '<template><p>{{ msg }}</p></template>',
-    '<script setup>',
+    '<script>',
     'let count = $signal(0);',
     "let msg = 'hello';",
     '</script>',

@@ -16,20 +16,20 @@ import { analyzeScript } from '../src/compiler/script-analyzer';
 import { generateRouteTable, devSpecifier } from '../src/route-table';
 
 const src = (script: string) =>
-    `<template>\n<div>x</div>\n</template>\n<script setup>\n${script}\n</script>`;
+    `<template>\n<div>x</div>\n</template>\n<script>\n${script}\n</script>`;
 
 const KEY_LABEL = "@page '/customers' { label: $t('customers.title') };\nlet rows = $signal([]);";
 
 describe('a label that names a dictionary key', () => {
     it('is read as a key, not as a string that happens to start with $t', () => {
-        const route = analyzeScript(KEY_LABEL, 'customers.pdx', { setup: true }).route;
+        const route = analyzeScript(KEY_LABEL, 'customers.pdx').route;
         expect(route.labelKey).toBe('customers.title');
         expect(route.label, 'the call was kept as a literal label').toBeUndefined();
         expect(route.labelFn).toBeUndefined();
     });
 
     it('double quotes are the same key', () => {
-        const route = analyzeScript("@page '/x' { label: $t(\"x.title\") };", 'x.pdx', { setup: true }).route;
+        const route = analyzeScript("@page '/x' { label: $t(\"x.title\") };", 'x.pdx').route;
         expect(route.labelKey).toBe('x.title');
     });
 
@@ -56,7 +56,7 @@ describe('a label that names a dictionary key', () => {
     });
 
     it('control — a string label and a function label are what they were', () => {
-        expect(analyzeScript("@page '/t' { label: 'Tickets' };", 't.pdx', { setup: true }).route.label).toBe('Tickets');
-        expect(analyzeScript("@page '/t/:id' { label: ticketLabel };", 't.pdx', { setup: true }).route.labelFn).toBe('ticketLabel');
+        expect(analyzeScript("@page '/t' { label: 'Tickets' };", 't.pdx').route.label).toBe('Tickets');
+        expect(analyzeScript("@page '/t/:id' { label: ticketLabel };", 't.pdx').route.labelFn).toBe('ticketLabel');
     });
 });

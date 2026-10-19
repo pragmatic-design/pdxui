@@ -234,11 +234,9 @@ export function scanForRoutes(rootDir: string, routes: ScannedRoute[],
                     // outlet reads, so it does not guess and calls what the compiler calls.
                     const descriptor = parseSFC(content);
                     // A file with no `<script>` block is read WHOLE: a `.pdx` that is nothing but
-                    // directives is what several of this scanner's own tests write. Treated as setup, which
-                    // is what `<script setup>` is and what a bare declaration means.
+                    // directives is what several of this scanner's own tests write.
                     const script = descriptor.script;
-                    const analysis = analyzeScript(script?.content ?? content, normalizePath(fullPath),
-                        { setup: script ? script.setup : true });
+                    const analysis = analyzeScript(script?.content ?? content, normalizePath(fullPath));
                     const route = analysis.route;
                     if (!route.page) continue;
 

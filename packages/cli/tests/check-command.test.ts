@@ -95,7 +95,7 @@ describe('pdx check — diagnostics found while generating code', () => {
     it('reports PDX_UNKNOWN_PROP for a bound name the component does not declare, with its line', async () => {
         writeFileSync(join(root, 'shell.pdx'),
             '<template>\n  <pdx-app-layout :withBordr="on"></pdx-app-layout>\n</template>\n' +
-            '<script setup>\nlet on = $signal(false);\n</script>\n');
+            '<script>\nlet on = $signal(false);\n</script>\n');
         const report = await checkJson();
         const warnings = report.files.flatMap((f) => f.warnings);
         const unknown = warnings.find((w) => w.code === 'PDX_UNKNOWN_PROP');
@@ -109,7 +109,7 @@ describe('pdx check — diagnostics found while generating code', () => {
     it('reports each finding once: a warning validate() already gave is not repeated', async () => {
         writeFileSync(join(root, 'counter.pdx'),
             '<template><span>{{ count }}</span></template>\n' +
-            '<script setup>\nlet count = 5;\n</script>\n');
+            '<script>\nlet count = 5;\n</script>\n');
         const warnings = (await checkJson()).files.flatMap((f) => f.warnings);
         const keys = warnings.map((w) => `${w.code}: ${w.message}`);
         expect(keys.length, 'the fixture draws a validate() warning').toBeGreaterThan(0);
@@ -120,7 +120,7 @@ describe('pdx check — diagnostics found while generating code', () => {
     it('reports where PDX_RAW_INTERPOLATION and PDX_SCRIPT_SYNTAX_ERROR are, as file line and column', async () => {
         writeFileSync(join(root, 'broken.pdx'),
             '<template>\n  <p title="${n}">x</p>\n</template>\n' +
-            '<script setup>\nlet n = $signal(1);\nlet b = ;\n</script>\n');
+            '<script>\nlet n = $signal(1);\nlet b = ;\n</script>\n');
         const warnings = (await checkJson()).files.flatMap((f) => f.warnings);
         const at = (code: string) => {
             const w = warnings.find((x) => x.code === code);
@@ -157,7 +157,7 @@ describe('pdx check — logic repeated across pages (CD-L1)', () => {
         rmSync(root, { recursive: true, force: true });
     });
 
-    const page = (functions: string) => '<template><p>{{ refusalId }}</p></template>\n<script setup>\n'
+    const page = (functions: string) => '<template><p>{{ refusalId }}</p></template>\n<script>\n'
         + "const toast = { add: () => 'id', dismiss: () => {} };\n"
         + "let refusalId = $signal('');\nlet confirmClose = $signal(false);\nlet count = $signal(0);\n"
         + functions + '\n</script>\n';
@@ -266,7 +266,7 @@ describe('pdx check — the heuristic component-design rules', () => {
         return report.files.flatMap(f => f.warnings.filter(w => w.code === code).map(w => ({ file: f.file, ...w })));
     }
 
-    const route = (page: string, load: string) => `<template><p>{{ documents.length }}</p></template>\n<script setup>\n@page '${page}';\n`
+    const route = (page: string, load: string) => `<template><p>{{ documents.length }}</p></template>\n<script>\n@page '${page}';\n`
         + `let documents = $signal([]);\nlet id = $signal('1');\n${load}\n</script>\n`;
     const FETCH = 'async function reload() {\n  const res = await fetch(`/api/attachments?employee=${encodeURIComponent(id)}`);\n  documents = await res.json();\n}';
 
@@ -288,7 +288,7 @@ describe('pdx check — the heuristic component-design rules', () => {
     });
 
     it('the per-file heuristics reach the report: a colour literal (CD-C3)', async () => {
-        writeFileSync(join(root, 'badge.pdx'), '<template><p class="b">x</p></template>\n<script setup>\nlet n = $signal(0);\n</script>\n'
+        writeFileSync(join(root, 'badge.pdx'), '<template><p class="b">x</p></template>\n<script>\nlet n = $signal(0);\n</script>\n'
             + '<style scoped>\n.b { color: #ff0000; }\n</style>\n');
         const ws = await warnings('PDX_COLOUR_LITERAL');
         expect(ws).toHaveLength(1);
@@ -322,7 +322,7 @@ describe('pdx check — i18n translations path', () => {
     // diagnostics catalog is produced by a test that names it.
     it('pdx check --i18n --json reports PDX_I18N_MISSING_KEY for it', async () => {
         mkdirSync(join(root, 'src', 'translations'), { recursive: true });
-        writeFileSync(join(root, 'src', 'a.pdx'), '<template><p>x</p></template>\n<script setup>\nlet n = $signal(0);\n</script>\n');
+        writeFileSync(join(root, 'src', 'a.pdx'), '<template><p>x</p></template>\n<script>\nlet n = $signal(0);\n</script>\n');
         writeFileSync(join(root, 'src', 'translations', 'en.json'), JSON.stringify({ hello: 'Hi', bye: 'Bye' }));
         writeFileSync(join(root, 'src', 'translations', 'it.json'), JSON.stringify({ hello: 'Ciao' }));
         const prevCwd = process.cwd();

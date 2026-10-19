@@ -16,7 +16,7 @@ export function describeProjectComponent(tag: string, filePath: string): Manifes
     try { source = readFileSync(filePath, 'utf-8'); } catch { return null; } // gone since the scan
     try {
         const descriptor = parseSFC(source);
-        const analysis = analyzeScript(descriptor.script?.content ?? '', filePath, { setup: descriptor.script?.setup });
+        const analysis = analyzeScript(descriptor.script?.content ?? '', filePath);
         const slots = new Map<string, ManifestSlot>();
         for (const s of analysis.slots) {
             slots.set(s.name, { name: s.name, description: s.scopeType ? `Scope: ${s.scopeType}` : '', ...(s.scopeType ? { scopeType: s.scopeType } : {}) });

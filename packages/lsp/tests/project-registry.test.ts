@@ -122,7 +122,7 @@ describe('packages/showcase opened on its own', () => {
             const source = readFileSync(file, 'utf-8');
             const descriptor = parseSFC(source);
             if (!descriptor.template) continue;
-            const analysis = analyzeScript(descriptor.script?.content ?? '', file, { setup: descriptor.script?.setup });
+            const analysis = analyzeScript(descriptor.script?.content ?? '', file);
             const r = registries.forFile(file, SHOWCASE);
             const found = validate(analysis, parseTemplate(descriptor.template.content), file, {
                 isKnownTag: t => r.resolver.knownWithoutImport(t) || r.manifest.has(t),

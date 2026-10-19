@@ -33,7 +33,7 @@ const SETUP = [
 ].join('\n  ');
 
 function compileWith(template: string, opts: object): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  ${SETUP}\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n  ${SETUP}\n</script>`;
     return compile(source, 'parity.pdx', [], undefined, opts).code;
 }
 

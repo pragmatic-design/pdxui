@@ -14,7 +14,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const out = (script: string, template = '<div>{{ n }}</div>') => {
-    const r = compile(`<template>${template}</template>\n<script setup>\n${script}\n</script>`, 'page.pdx');
+    const r = compile(`<template>${template}</template>\n<script>\n${script}\n</script>`, 'page.pdx');
     return typeof r === 'string' ? r : r.code;
 };
 

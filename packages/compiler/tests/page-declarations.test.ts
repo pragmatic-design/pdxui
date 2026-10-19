@@ -11,7 +11,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { RUNES } from '../src/compiler/runes';
 
-const pdx = (script: string, template = '<p>x</p>') => `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+const pdx = (script: string, template = '<p>x</p>') => `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
 const codes = (r: { warnings: { code: string }[] }) => r.warnings.map((w) => w.code);
 /** Every `__pdx_pushRoute({…})` the module makes, by path. */
 const routes = (code: string): Map<string, string> =>

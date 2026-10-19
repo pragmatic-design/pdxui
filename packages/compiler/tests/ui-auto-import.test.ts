@@ -52,7 +52,7 @@ describe('the resolver can auto-import every component @pdxui/ui ships', () => {
         // the only sign was a console.warn.
         const source = [
             '<template><pdx-page-header title="Users" /></template>',
-            '<script setup>',
+            '<script>',
             "  let ready = $signal(true);",
             '</script>',
         ].join('\n');
@@ -70,7 +70,7 @@ describe('the resolver can auto-import every component @pdxui/ui ships', () => {
 // <pdx-overlay-outlet>. No template names the tag, so the compiler adds the import the option needs.
 describe('warnUnsaved brings the dialog outlet with it', () => {
     const importsFor = (script: string): string => {
-        const source = ['<template><div>form</div></template>', '<script setup>', script, '</script>'].join('\n');
+        const source = ['<template><div>form</div></template>', '<script>', script, '</script>'].join('\n');
         const { code } = compile(source, 'edit-owner.pdx');
         const resolver = new ComponentResolver();
         resolver.registerUiManifest();
@@ -104,7 +104,7 @@ describe('warnUnsaved brings the dialog outlet with it', () => {
 // renders it, no warning fires, and the only symptom is a number in a bundle budget.
 describe('a tag written in a comment is not a tag used', () => {
     const importsFor = (template: string): string => {
-        const source = [`<template>${template}</template>`, '<script setup>', 'let ready = $signal(true);', '</script>'].join('\n');
+        const source = [`<template>${template}</template>`, '<script>', 'let ready = $signal(true);', '</script>'].join('\n');
         const { code } = compile(source, 'shell.pdx');
         const resolver = new ComponentResolver();
         resolver.registerUiManifest();

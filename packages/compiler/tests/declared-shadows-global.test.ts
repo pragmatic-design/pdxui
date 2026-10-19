@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const src = (template: string, script: string) =>
-    `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
 
 const codesOf = (source: string): string[] =>
     (compile(source, 'probe.pdx').warnings ?? []).map(w => `${w.code}: ${w.message}`);

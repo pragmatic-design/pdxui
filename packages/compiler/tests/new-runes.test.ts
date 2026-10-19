@@ -30,7 +30,7 @@ describe('@expose', () => {
     it('generates ctx.expose() in compiled output', () => {
         const source = `
 <template><div>dialog</div></template>
-<script setup>
+<script>
 let open = $signal(false);
 function show() { open = true; }
 function close() { open = false; }
@@ -63,7 +63,7 @@ describe('$store', () => {
     it('generates store() call in compiled output', () => {
         const source = `
 <template><div>{{ state.count }}</div></template>
-<script setup>
+<script>
 let state = $store({ count: 0, items: [] });
 </script>`;
         const result = compile(source, 'store-test.pdx');
@@ -106,7 +106,7 @@ describe('$watch', () => {
     it('generates watch() call in compiled output', () => {
         const source = `
 <template><div>hello</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 $watch(count, (n, o) => console.log('changed', n, o));
 </script>`;

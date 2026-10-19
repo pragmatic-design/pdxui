@@ -14,7 +14,7 @@ import { startServer, type StdioServer } from './stdio-harness';
 const EXT = join(__dirname, '..', '..', 'vscode-pdx');
 const SHIPPED = join(EXT, 'server', 'server.cjs');
 
-const PAGE = '<template>\n<pdx-button ></pdx-button>\n<p>{{ missing }}</p>\n</template>\n<script setup>\nlet count = $signal(0);\n</script>\n';
+const PAGE = '<template>\n<pdx-button ></pdx-button>\n<p>{{ missing }}</p>\n</template>\n<script>\nlet count = $signal(0);\n</script>\n';
 
 let root: string;
 let server: StdioServer;

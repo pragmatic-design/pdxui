@@ -29,7 +29,7 @@ resolver.registerUiManifest();
 const propsOf = (tag: string) => resolver.propsOf(tag);
 
 function compileTemplate(template: string) {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  let on = $signal(false);\n  let box = $signal(null);\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n  let on = $signal(false);\n  let box = $signal(null);\n</script>`;
     return compile(source, 'directives.pdx', [], undefined, { propsOf });
 }
 

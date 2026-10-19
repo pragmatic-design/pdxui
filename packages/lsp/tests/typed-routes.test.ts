@@ -26,7 +26,7 @@ afterAll(() => { rmSync(APP, { recursive: true, force: true }); });
 function errorsOf(probes: { script: string; template?: string }[], options?: { routeTypes?: boolean }): string[][] {
     const files = probes.map(({ script, template = '<p></p>' }, i) => ({
         path: join(APP, `probe-${i}.pdx`),
-        content: `<template>${template}</template>\n<script setup lang="ts">\nimport { navigate } from '@pdxui/router';\n${script}\n</script>\n`,
+        content: `<template>${template}</template>\n<script lang="ts">\nimport { navigate } from '@pdxui/router';\n${script}\n</script>\n`,
     }));
     const byFile = typecheckPdx(APP, files, options);
     return files.map((f) => (byFile.get(f.path) ?? []).map((e) => `TS${e.tsCode} ${e.message.split('\n')[0]}`));

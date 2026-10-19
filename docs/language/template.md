@@ -11,8 +11,9 @@ A template compiles along one **render path**, in the dev server and in a produc
 `pdx({ inlineBindings })` no longer selects anything (`PDX_INLINE_BINDINGS_IGNORED`), and nothing else
 does (#238). The **template path** — an `html\`…\`` tagged template that core parses and binds at
 runtime (`codegen-template.ts`) — generates nothing in a `.pdx` in the new mode: the body of a scoped
-slot fill was the last part it built, until #364. Only the legacy mode still renders through it; where
-a construct behaves differently there, its Rules say so.
+slot fill was the last part it built, until #364, and the legacy mode that rendered through it is
+removed (#158): it is reached by nothing, its Rules below describe code that no file runs, and #526
+removes it.
 
 ```ebnf
 Template       ::= ( Text | Comment | AtEscape | Element | Interpolation | Directive )*
@@ -96,7 +97,7 @@ text, anything else as `String(value)` — `interpolationText` in core, used by 
   <!-- {{ count }} here is a comment, not an interpolation -->
 </template>
 
-<script setup>
+<script>
 let name = $signal('Ada');
 let count = $signal(3);
 let user = $signal<{ email: string } | null>(null);
@@ -141,7 +142,7 @@ function the script imports is called by its own name, `fmt`, not `ctx.fmt`.
   <p>{{ price | currency('EUR') }}</p>
 </template>
 
-<script setup>
+<script>
 let price = $signal(12.5);
 function money(value: number) { return value.toFixed(2); }
 function upper(value: string) { return value.toUpperCase(); }
@@ -210,7 +211,7 @@ the same way, and has no `effect`: a later change of what it read does not reach
   <input :disabled="busy" :maxlength="limit" :data-row="7" />
 </template>
 
-<script setup>
+<script>
 let url = $signal('/users/7');
 let label = $signal('Ada');
 let active = $signal(true);
@@ -259,7 +260,7 @@ last and adds its own, and never removes a static class.
   <li class="row" :class="tone">{{ label }}</li>
 </template>
 
-<script setup>
+<script>
 let tone = $signal('row-info');
 let picked = $signal(false);
 let progress = $signal(40);
@@ -302,7 +303,7 @@ with `style.setProperty(name, String(value ?? ''))`, a camelCase key turned to k
   <div class="bar" :style="{ width: percent + '%', 'background-color': colour }"></div>
 </template>
 
-<script setup>
+<script>
 let percent = $signal(40);
 let colour = $signal('var(--pdx-color-primary)');
 </script>
@@ -383,7 +384,7 @@ modifiers wrap the setter, so there is one mechanism:
   <p>{{ name }}, {{ age }}, {{ subscribed }}, {{ country }}</p>
 </template>
 
-<script setup>
+<script>
 let name = $signal('');
 let age = $signal(30);
 let subscribed = $signal(false);
@@ -432,7 +433,7 @@ component, a single value for a radio-group-like one.
   <label><input type="radio" value="large" ::group="size" /> Large</label>
 </template>
 
-<script setup>
+<script>
 let options = $signal(['cheese', 'ham', 'olives']);
 let toppings = $signal<string[]>([]);
 let size = $signal('small');
@@ -516,7 +517,7 @@ of a library component, whose manifest does not type its detail, and of an unkno
   <p>{{ count }} {{ open }} {{ last }}</p>
 </template>
 
-<script setup>
+<script>
 let count = $signal(0);
 let open = $signal(false);
 let last = $signal(0);
@@ -568,7 +569,7 @@ its scope is disposed, so they still read the element.
   <button @click="focus()">Focus</button>
 </template>
 
-<script setup>
+<script>
 let field = $signal<HTMLInputElement | null>(null);
 function focus() { field?.focus(); }
 </script>
@@ -617,7 +618,7 @@ compiler when the script declares no name of its own for them. In the editor `na
   <div class="menu" attach:clickOutside="close">…</div>
 </template>
 
-<script setup>
+<script>
 import { tooltip } from './tooltip';
 function close() { open = false; }
 let open = $signal(true);
@@ -697,7 +698,7 @@ moves less than 10px; a pinch hands `{ scale, center }` while two pointers are d
   <div class="card" @swipe.left="next()" @longpress="pin">{{ index }}</div>
 </template>
 
-<script setup>
+<script>
 let index = $signal(0);
 function next() { index++; }
 function pin() { console.log('pinned'); }
@@ -753,7 +754,7 @@ back; the cache keeps at most 10, least recently used first out — `@keepAlive(
   <component :is="view" :item-label="label" @keepAlive />
 </template>
 
-<script setup>
+<script>
 let view = $signal('pdx-tab-list');
 let label = $signal('Orders');
 </script>
@@ -804,7 +805,7 @@ gives none. `name` defaults to `default`. Declare what a slot passes with `@slot
   </ul>
 </template>
 
-<script setup>
+<script>
 @slot row: { item: string, index: number };
 let first = $signal('Ada');
 </script>
@@ -858,7 +859,7 @@ The child calls it with its scope. `@slot(row)` takes no scope; `<slot>` without
   </app-user-table>
 </template>
 
-<script setup>
+<script>
 </script>
 ```
 
@@ -908,7 +909,7 @@ folded away (#236).
   }
 </template>
 
-<script setup>
+<script>
 let user = $signal<{ name: string } | null>(null);
 let loading = $signal(false);
 </script>
@@ -986,9 +987,6 @@ the implicit role of a `ul`/`ol` (`list`) or a table (`table`, read from a `tbod
   in the body's scope.
 - An empty body is `PDX_EMPTY_FOR` (warning).
 - The key must be unique and stable: a changing field in it recreates the row. Not checked today.
-- On the template path — the legacy mode's — in a production build, a
-  loop whose body reads a signal that does not depend on the row has that read hoisted into one
-  `computed`, and then its `@empty` is dropped. Not checked today. The inline path keeps it.
 - **`@virtual` has a shape.** The `@for` is the only content of the element around it (whitespace and
   comments aside), that element is native (a component's children are projected elsewhere), and the
   body has exactly one root element. Anything else is `PDX_VIRTUAL_SHAPE` (error), naming the rule it
@@ -1013,7 +1011,7 @@ the implicit role of a `ul`/`ol` (`list`) or a table (`table`, read from a `tbod
   </ul>
 </template>
 
-<script setup>
+<script>
 let todos = $signal([{ id: 1, text: 'Write', done: false }]);
 </script>
 ```
@@ -1039,7 +1037,7 @@ A virtual list, in a `ul`, a `tbody` and a `div`:
   </div>
 </template>
 
-<script setup>
+<script>
 let posts = $signal([]);
 let rows = $signal([]);
 let cards = $signal([]);
@@ -1110,7 +1108,7 @@ one enters. `@move(ms)` animates a `@for` row that changes index, with FLIP; `@m
   </ul>
 </template>
 
-<script setup>
+<script>
 let open = $signal(true);
 let rows = $signal([{ id: 1, label: 'First' }, { id: 2, label: 'Second' }]);
 </script>
@@ -1155,7 +1153,7 @@ rendered case is kept while the value stays on it.
   }
 </template>
 
-<script setup>
+<script>
 let status = $signal('open');
 </script>
 ```
@@ -1196,7 +1194,7 @@ block follows when the permissions change.
   }
 </template>
 
-<script setup>
+<script>
 </script>
 ```
 
@@ -1243,7 +1241,7 @@ swapped for a placeholder comment while hidden and put back in its place when sh
   }
 </template>
 
-<script setup>
+<script>
 let advanced = $signal(false);
 </script>
 ```
@@ -1284,7 +1282,7 @@ up to 60.
   }
 </template>
 
-<script setup>
+<script>
 let open = $signal(false);
 </script>
 ```
@@ -1340,7 +1338,7 @@ and renders the body; if the load fails it shows `@error`.
   }
 </template>
 
-<script setup>
+<script>
 </script>
 ```
 
@@ -1419,7 +1417,7 @@ block is removed. With `@error`, an exception the body throws while it renders l
   }
 </template>
 
-<script setup>
+<script>
 interface User { id: number; name: string }
 @fetch users: 'GET /api/users' as User[];
 </script>
@@ -1464,7 +1462,7 @@ second, `retry` when omitted, renders the body again.
   }
 </template>
 
-<script setup>
+<script>
 let order = $signal({ lines: [2, 3] });
 function total(o: { lines: number[] }) { return o.lines.reduce((a, b) => a + b, 0); }
 </script>
@@ -1505,7 +1503,7 @@ and assigns it to `ctx.total`; nodes after it read it as `total`. On the templat
   <p>{{ qty }} × {{ price }} = {{ total }}</p>
 </template>
 
-<script setup>
+<script>
 let price = $signal(4);
 let qty = $signal(3);
 </script>
@@ -1551,7 +1549,7 @@ inline path builds its elements and sets their attributes as plain values.
   </svg>
 </template>
 
-<script setup>
+<script>
 </script>
 ```
 

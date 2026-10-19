@@ -19,7 +19,7 @@ describe('a $signal that reads a script local', () => {
     it('is declared after the local and before the top-level statement that reads it', () => {
         const { code } = compile(`
 <template><p>{{ theme }}</p></template>
-<script setup>
+<script>
 const _params = new URLSearchParams('theme=dark');
 let theme = $signal(_params.get('theme') || 'neutral');
 apply(theme);
@@ -36,7 +36,7 @@ function apply(value) { document.documentElement.setAttribute('data-theme', valu
     it('a signal that reads another such signal comes after it, and both before their readers', () => {
         const { code } = compile(`
 <template><p>{{ label }}</p></template>
-<script setup>
+<script>
 const base = 10;
 let count = $signal(base);
 let label = $signal('n=' + count);
@@ -55,7 +55,7 @@ console.log(count, label);
     it('control — a signal from a literal is still declared before the body', () => {
         const { code } = compile(`
 <template><p>{{ n }}</p></template>
-<script setup>
+<script>
 const step = 2;
 let n = $signal(0);
 function bump() { n += step; }

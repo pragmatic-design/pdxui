@@ -18,7 +18,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const src = (script: string) =>
-    `<template>\n<div>x</div>\n</template>\n<script setup>\n${script}\n</script>`;
+    `<template>\n<div>x</div>\n</template>\n<script>\n${script}\n</script>`;
 
 const out = (s: string, file = 'ticket.pdx') => compile(s, file).code;
 

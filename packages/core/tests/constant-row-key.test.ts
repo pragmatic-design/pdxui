@@ -7,7 +7,7 @@ import * as core from '../src/index';
 import { compile } from '../../compiler/src/plugin';
 
 const SRC = `<template><ul>@for (rows as row; track row.id) {<li :data-id="'r' + row.id">{{ row.id }}:{{ row.label }}</li>}</ul></template>
-<script setup>
+<script>
 @prop rows: any[] = [];
 </script>
 `;

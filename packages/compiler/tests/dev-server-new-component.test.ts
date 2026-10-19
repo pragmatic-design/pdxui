@@ -29,7 +29,7 @@ const COMPONENT = `<template>
   <em data-test="late">late</em>
 </template>
 
-<script setup>
+<script>
 let ready = $signal(true);
 </script>
 `;
@@ -66,7 +66,7 @@ describe('rescanning the project is safe to repeat', () => {
         // The guard must not be "never report": two files claiming one tag is a genuine problem, and
         // the second one silently losing its auto-import is exactly what the diagnostic exists for.
         mkdirSync(join(root, 'src', 'nested'), { recursive: true });
-        writeFileSync(join(root, 'src', 'nested', 'other.pdx'), `<template>\n  <b>x</b>\n</template>\n\n<script setup>\n// @tag 'app-first'\nlet n = $signal(1);\n</script>\n`);
+        writeFileSync(join(root, 'src', 'nested', 'other.pdx'), `<template>\n  <b>x</b>\n</template>\n\n<script>\n// @tag 'app-first'\nlet n = $signal(1);\n</script>\n`);
         const r = new ComponentResolver();
         r.registerProjectComponents(root);
         r.registerProjectComponents(root);

@@ -59,7 +59,7 @@ thirteen themes instead — for a page that does not know what it will render
 
 ## Your first component, layer by layer
 
-A `.pdx` file has three blocks: `<template>` (what you see), `<script setup>` (state and logic),
+A `.pdx` file has three blocks: `<template>` (what you see), `<script>` (state and logic),
 `<style scoped>` (styles that apply inside this component). The file name becomes the tag:
 `counter.pdx` → `<app-counter>`. All three are optional, and the two extra words are worth knowing
 exactly: `setup` is intent — the *runes* are what the compiler reads — and `scoped` decides whether the
@@ -74,7 +74,7 @@ CSS is confined to the component or lands in the page globally.
   <button @click="inc">+1</button>
 </template>
 
-<script setup>
+<script>
 let count = $signal(0);
 function inc() { count++; }
 </script>
@@ -86,7 +86,7 @@ function inc() { count++; }
 **Layer 2 — a prop coming in.** Make it configurable from the outside:
 
 ```pdx
-<script setup>
+<script>
 @prop start: number = 0;
 let count = $signal(start);
 function inc() { count++; }
@@ -99,7 +99,7 @@ automatically.
 **Layer 3 — an event going out.** Let the parent know when it changes:
 
 ```pdx
-<script setup>
+<script>
 @prop start: number = 0;
 @event changed: number;
 

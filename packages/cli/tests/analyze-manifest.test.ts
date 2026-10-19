@@ -50,8 +50,8 @@ describe('pdx analyze', () => {
     });
 
     it('fills routes[] from the @page components, sorted by path', async () => {
-        write('src/pages/users.pdx', '<template><p>u</p></template>\n<script setup>\n@page \'/users\';\n@guard \'users.read\';\n</script>\n');
-        write('src/pages/home.pdx', '<template><p>h</p></template>\n<script setup>\n@page \'/\';\n</script>\n');
+        write('src/pages/users.pdx', '<template><p>u</p></template>\n<script>\n@page \'/users\';\n@guard \'users.read\';\n</script>\n');
+        write('src/pages/home.pdx', '<template><p>h</p></template>\n<script>\n@page \'/\';\n</script>\n');
         write('src/card.pdx', '<template><p>not a page</p></template>\n');
         const { routes } = await json();
         expect(routes?.map((r) => [r.path, r.tag, r.file.replace(/\\/g, '/')])).toEqual([
@@ -62,7 +62,7 @@ describe('pdx analyze', () => {
     });
 
     it('lists each component\'s models, which are props, and their <name>-change events (#124)', async () => {
-        write('src/name-field.pdx', "<template><input ::value=\"value\" /></template>\n<script setup>\n@model selectedId: string = '';\n@prop label: string = '';\n</script>\n");
+        write('src/name-field.pdx', "<template><input ::value=\"value\" /></template>\n<script>\n@model selectedId: string = '';\n@prop label: string = '';\n</script>\n");
         const [field] = (await json()).components;
         expect(field.models).toEqual(['selectedId']);
         expect(field.props?.map((p) => p.name)).toEqual(['selectedId', 'label']);

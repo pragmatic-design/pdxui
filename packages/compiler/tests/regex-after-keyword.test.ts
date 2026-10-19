@@ -12,7 +12,7 @@ import { regexStartsAt } from '../src/compiler/tokenizer';
 /** The names a setup hands its template: the object it returns. */
 function returned(decl: string): string {
     const { code } = compile(`<template><p>{{ later() }}</p></template>
-<script setup>
+<script>
 ${decl}
 function later() { return 'x'; }
 </script>`, 'regex-after-keyword.pdx');

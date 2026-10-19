@@ -9,7 +9,7 @@ import { compile } from '../src/plugin';
 import { bindingNames } from '../src/compiler/codegen-prefix';
 
 function tpl(template: string, script = 'let rows = $signal([]);'): string {
-    return compile(`<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`, 'rows.pdx').code;
+    return compile(`<template>\n${template}\n</template>\n<script>\n${script}\n</script>`, 'rows.pdx').code;
 }
 
 describe('bindingNames', () => {

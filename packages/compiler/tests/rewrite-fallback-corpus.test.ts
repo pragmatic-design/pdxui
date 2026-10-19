@@ -71,7 +71,7 @@ describe('every .pdx in the repository', () => {
         // No file in the corpus defeats the rewriter, so the per-file assertion never sees a fallback
         // there. This shows it would: a reactive read the rewriter cannot parse. If this ever stops
         // producing one, find another construct that does, rather than drop the control.
-        const broken = '<template><p>{{ n }}</p></template>\n<script setup>\nlet n = $signal(0);\nconst f = () => { n = ( ; };\n</script>';
+        const broken = '<template><p>{{ n }}</p></template>\n<script>\nlet n = $signal(0);\nconst f = () => { n = ( ; };\n</script>';
         expect(fallbacksOf(broken, 'control.pdx').length).toBeGreaterThan(0);
     });
 });

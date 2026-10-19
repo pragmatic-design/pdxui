@@ -11,7 +11,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const pdx = (script: string, template = '<p>x</p>') => `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+const pdx = (script: string, template = '<p>x</p>') => `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
 const coreImports = (code: string): string[] =>
     (code.match(/^import \{([^}]*)\} from '@pdxui\/core';$/m)?.[1] ?? '').split(',').map((s) => s.trim()).filter(Boolean);
 const codes = (r: { warnings: { code: string }[] }) => r.warnings.map((w) => w.code);

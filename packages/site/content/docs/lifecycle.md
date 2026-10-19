@@ -11,7 +11,7 @@ precise moments in a component's life — it just entered the DOM, it's about to
 it entered the viewport. You use them to hook into those moments with imperative code (timers, global
 listeners, integrations with external libraries).
 
-They're imported from `@pdxui/core` and registered in `<script setup>`.
+They're imported from `@pdxui/core` and registered in `<script>`.
 
 ## onMount + onDestroy: the fundamental pair
 

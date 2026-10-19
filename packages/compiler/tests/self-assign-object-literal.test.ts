@@ -39,7 +39,7 @@ describe('self-assignment with an object literal', () => {
 
     it('the compiled module parses', () => {
         const { code } = compile(`<template><button @click="toggle('a')">{{ JSON.stringify(closed) }}</button></template>
-<script setup>
+<script>
 let closed = $signal({});
 function toggle(year) { closed = { ...closed, [year]: true }; }
 </script>`, 'self-assign.pdx');

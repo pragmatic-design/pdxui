@@ -20,7 +20,7 @@ let root: string;
 beforeAll(() => { root = mkdtempSync(join(tmpdir(), 'pdx-inline-')); });
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
-const SFC = '<template>\n  <p :title="label">{{ label }}</p>\n</template>\n<script setup>\nlet label = $signal(\'x\');\n</script>\n';
+const SFC = '<template>\n  <p :title="label">{{ label }}</p>\n</template>\n<script>\nlet label = $signal(\'x\');\n</script>\n';
 
 function start(options: Parameters<typeof pdx>[0], command: 'build' | 'serve') {
     const plugin = pdx({ devtools: false, autoAlias: false, ...options })[0] as unknown as Hooks;

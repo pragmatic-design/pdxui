@@ -204,11 +204,6 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
                 ? find(source, script, new RegExp(`(?<=@form\\s+${escape(form)}\\b[\\s\\S]*?)(?<![\\w$])${escape(rule)}(?![\\w$])`))
                 : undefined;
         }
-        case 'PDX_LEGACY_IN_SETUP': {
-            // Match: `carries defineProps,` — the marker the message names.
-            const marker = /carries (\w+)/.exec(w.message)?.[1];
-            return marker ? find(source, script, new RegExp(`\\b${escape(marker)}\\b`)) : undefined;
-        }
         case 'PDX_ROUTE_FIELD_INVALID': {
             // Match: the field's name inside its own `@search {` / `@params {` block — or `search: {` /
             // `params: {` in an `@route` block — at the name.
@@ -232,7 +227,6 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             // Match: the `@keepAlive(…)` the message quotes, in the template.
             return text ? find(source, template, new RegExp(escape(text))) : undefined;
         case 'PDX_UNDECLARED_REF':
-        case 'PDX_TEMPLATE_NAME_NOT_PROVIDED':
             return name ? findTemplateRead(source, template, name) : undefined;
         case 'PDX_INVALID_ENUM_VALUE': {
             // Match: `<pdx-button> size="huge"` — the tag, the attribute and the value.

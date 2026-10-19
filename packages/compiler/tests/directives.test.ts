@@ -96,7 +96,7 @@ describe('compile: @show', () => {
 <template>
   @show (visible) { <div>Content</div> }
 </template>
-<script setup>
+<script>
   @prop visible: boolean = true;
 </script>`, 'test.pdx');
 
@@ -110,7 +110,7 @@ describe('compile: @portal', () => {
 <template>
   @portal ('body') { <div class="modal">Modal</div> }
 </template>
-<script setup>
+<script>
   @prop x: number = 0;
 </script>`, 'test.pdx');
 
@@ -125,7 +125,7 @@ describe('compile: @defer', () => {
 <template>
   @defer (viewport) { <div>Heavy content</div> }
 </template>
-<script setup>
+<script>
   @prop x: number = 0;
 </script>`, 'test.pdx');
 
@@ -144,7 +144,7 @@ describe('compile: @defer', () => {
     <div>Loading...</div>
   }
 </template>
-<script setup>
+<script>
   @prop x: number = 0;
 </script>`, 'test.pdx');
 
@@ -160,7 +160,7 @@ describe('compile: <component :is>', () => {
 <template>
   <component :is="currentView"/>
 </template>
-<script setup>
+<script>
   @prop currentView: string = 'pdx-home';
 </script>`, 'test.pdx');
 
@@ -173,7 +173,7 @@ describe('compile: <component :is>', () => {
 <template>
   <component :is="view" :userId="id"/>
 </template>
-<script setup>
+<script>
   @prop view: string = 'pdx-home';
   @prop id: string = '';
 </script>`, 'test.pdx');

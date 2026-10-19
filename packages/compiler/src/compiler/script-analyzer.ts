@@ -1,4 +1,4 @@
-// Script Analyzer — parses <script setup> with decorator+rune syntax.
+// Script Analyzer — parses <script> with decorator+rune syntax.
 // Extracts: @prop, @event, @slot, $signal, $derived, $effect, lifecycle hooks.
 // Scans top-level declarations for auto-expose.
 // Also detects malformed declarations and emits warnings.
@@ -61,7 +61,7 @@ function isMalformedTsType(type: string): boolean {
  *
  * A line opening with one of these and matching no rule below is reported, not pushed into the setup
  * body as if it were code: `@` starts nothing valid in JavaScript, so the module would fail to parse
- * with `Syntax error in <script setup>: Declaration expected.` — a TypeScript parser's opinion of a
+ * with `Syntax error in <script>: Declaration expected.` — a TypeScript parser's opinion of a
  * line the author wrote as a framework declaration, naming neither the keyword nor what it expected.
  *
  * The shape is the hint. It lives in the one rune list (`runes.ts`), which the editor
@@ -103,21 +103,16 @@ function declareRouteNames(route: RouteInfo, exports: ExportDecl[]): void {
 // ─── Analyzer ──────────────────────────────────────────────────────
 
 /**
- * Analyze a `<script setup>` block to extract structure (props, events, slots)
+ * Analyze a `<script>` block to extract structure (props, events, slots)
  * and reactive declarations (signals, derived, effects).
  *
- * Detects compilation mode:
- * - **new mode**: uses @prop / $signal decorators+runes
- * - **legacy mode**: uses defineProps / explicit return
+ * The script has one grammar (#158): every script is read for declarations and runes.
  *
  * @param script - Raw content of the script block
  * @param filename - Source filename (for debug naming)
- * @param options.setup - The block is `<script setup>`: the new mode unless it carries the legacy
- *   mode's own markers (defineProps/defineEmits, a top-level `return {`) — it needs no rune to get
- *   there. A plain `<script>` needs a new-mode marker.
  * @returns Complete analysis used by codegen to produce the final JS module
  */
-export function analyzeScript(script: string, _filename: string, options: { setup?: boolean; originBase?: number; lineBase?: number } = {}): ScriptAnalysis {
+export function analyzeScript(script: string, _filename: string, options: { originBase?: number; lineBase?: number } = {}): ScriptAnalysis {
     // Normalize compact single-line scripts: split statements to separate lines
     // so that line-based regex matching works for agent-generated compact code.
     const { text: normalized, lineOrigins } = normalizeStatementsWithOrigins(script);
@@ -154,8 +149,7 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             }
         }
     }
-    // Code-only view (strings/comments blanked) for mode detection — prevents a
-    // @prop/$signal( inside a comment or string from flipping legacy → new mode.
+    // Code-only view (strings/comments blanked): a `@` inside a comment or string is not a declaration.
     const codeLines = maskNonCode(normalized).split('\n');
     const props: PropInfo[] = [];
     const events: EventInfo[] = [];
@@ -210,55 +204,6 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     const RAW_MARKER = '/*@raw*/'; // marker prepended to raw lines to skip rewriting
     const warnings: ValidationWarning[] = [];
 
-    // Detect mode. One script grammar (#158): a script is the declarative mode whatever it contains,
-    // under `<script>` and `<script setup>` alike — the legacy mode is recognised by its OWN markers
-    // alone, defineProps/defineEmits or a `return {` at the top level, which only a legacy setup
-    // body may contain. Without them a script with only imports, consts and an onMount would fall
-    // into the legacy mode, silently — no auto-return, onMount not imported. With them, a rune still
-    // selects the new mode (code-only view).
-    const legacyMarkerAt = codeLines.findIndex((l, idx) =>
-        /\bdefine(?:Props|Emits)\s*[<(]/.test(l) || (setupDepthAt[idx] === 0 && /^\s*return\s*\{/.test(l)));
-    const hasLegacyMarkers = legacyMarkerAt !== -1;
-    const isNewMode = !hasLegacyMarkers || codeLines.some(l => {
-        const t = l.trim();
-        return t.startsWith('@prop ') || t.startsWith('@model ') || t.startsWith('@event ') || t.startsWith('@event(') || t.startsWith('@slot ') || t.startsWith('@expose ') || t.startsWith('@state ') || t.startsWith('@part ') || /^@host\s*\{/.test(t) || /^@variants\s*\{/.test(t) ||
-               t.startsWith('@page ') || t.startsWith('@guard ') || t.startsWith('@loader ') ||
-               t.startsWith('@search ') || t.startsWith('@prefetch ') || t.startsWith('@layout ') ||
-               t.startsWith('@fetch ') || t.startsWith('@form ') ||
-               t.startsWith('@redirect ') || t.startsWith('@alias ') || t.startsWith('@outlet ') ||
-               t.startsWith('@tag ') || t.startsWith('@route ') || t.startsWith('@route{') ||
-               t.startsWith('@head ') || t.startsWith('@head{') || t.startsWith('@params ') || t.startsWith('@params{') ||
-               t.startsWith('@provide ') || t.startsWith('@inject ') ||
-               t.startsWith('@store ') || t.startsWith('@title ') || t.startsWith('@meta ') || t.startsWith('@scroll ') || t.startsWith('@snippet ') ||
-               t.startsWith('@i18n ') || t.startsWith('@i18n{') ||
-               // A rune with a type argument too, `$signal<number>(0)` (#275).
-               RUNE_CALL.test(t) || t.includes('$effect(') ||
-               t.includes('$watch(') || t.includes('linkedSignal(');
-    });
-
-    // `<script setup>` states an intent, checked here against the mode the file actually compiles
-    // to. The two disagreements would otherwise be silent, and they fail in opposite directions:
-    // with no rune the legacy mode wins and there is no new-mode setup at all, so anything
-    // rune-shaped added later is inert; with a rune the new mode wins and the `defineProps` the
-    // author wrote does nothing. Neither is an error — a legacy component is still valid, and making
-    // `setup` FORCE the new mode would break every file that carries both. It is only not silent.
-    if (options.setup === true && hasLegacyMarkers) {
-        const markerLine = codeLines[legacyMarkerAt];
-        const named = /\bdefineProps\s*[<(]/.test(markerLine) ? 'defineProps'
-            : /\bdefineEmits\s*[<(]/.test(markerLine) ? 'defineEmits'
-                : 'a top-level `return { … }`';
-        warnings.push({
-            code: 'PDX_LEGACY_IN_SETUP',
-            severity: 'warn',
-            message: isNewMode
-                ? `<script setup> carries ${named}, a legacy marker, next to runes: the runes win and the file compiles in the NEW mode, so ${named} does nothing.`
-                : `<script setup> carries ${named}, a legacy marker, and no rune: the file compiles in the LEGACY mode, so it has no new-mode setup and any rune added to it would be inert.`,
-            hint: named === 'a top-level `return { … }`'
-                ? 'Remove the top-level return: <script setup> returns what it declares. Keep it only if the file is deliberately legacy, and then write plain <script>.'
-                : `Replace ${named} with @prop / @event declarations, or write plain <script> if the file is deliberately legacy.`,
-        });
-    }
-
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const trimmed = line.trim();
@@ -286,11 +231,6 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             } else {
                 userImports.push(flat);
             }
-            continue;
-        }
-
-        if (!isNewMode) {
-            pushBody(line, i);
             continue;
         }
 
@@ -363,16 +303,6 @@ export function analyzeScript(script: string, _filename: string, options: { setu
             userImports.push(`import '${pkg}';`);
             // Extract optional type hints: @use 'tag' from 'pkg' { props: {...}, events: {...} };
             // For now, just register the import — type hints are future work
-            continue;
-        }
-
-        // ─── @mixin './path.pdx' as name — component composition ───
-        const mixinMatch = trimmed.match(/^@mixin\s+'([^']+)'\s+as\s+(\w+)/);
-        if (mixinMatch) {
-            const [, path, alias] = mixinMatch;
-            userImports.push(`import { setup as __mixin_${alias} } from '${path}';`);
-            pushBody(`    const ${alias} = __mixin_${alias}(ctx);`, i);
-            exports.push({ name: alias, kind: 'const' as const });
             continue;
         }
 
@@ -1171,7 +1101,6 @@ export function analyzeScript(script: string, _filename: string, options: { setu
     if (route.page) Object.assign(route, routeTitleOf(head.title));
 
     const analysis: ScriptAnalysis = {
-        mode: isNewMode ? 'new' : 'legacy',
         props,
         events,
         slots,

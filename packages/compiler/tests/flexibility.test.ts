@@ -8,7 +8,7 @@ describe('@raw block — escape hatch', () => {
     it('skips signal rewriting inside @raw block', () => {
         const source = `
 <template><div>{{ count }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   count++;
   @raw {
@@ -27,7 +27,7 @@ describe('@raw block — escape hatch', () => {
     it('handles single-line @raw', () => {
         const source = `
 <template><div>{{ x }}</div></template>
-<script setup>
+<script>
   let x = $signal(0);
   @raw { console.log(x); }
 </script>`;
@@ -40,7 +40,7 @@ describe('complex prop types', () => {
     it('compiles @prop with Object type', () => {
         const source = `
 <template><div>{{ config }}</div></template>
-<script setup>
+<script>
   @prop config: { theme: string } = {};
 </script>`;
         const { code } = compile(source, 'obj-prop.pdx');
@@ -50,7 +50,7 @@ describe('complex prop types', () => {
     it('compiles @prop with Array type', () => {
         const source = `
 <template><div>{{ items }}</div></template>
-<script setup>
+<script>
   @prop items: Item[] = [];
 </script>`;
         const { code } = compile(source, 'arr-prop.pdx');
@@ -60,7 +60,7 @@ describe('complex prop types', () => {
     it('compiles @prop with Function type', () => {
         const source = `
 <template><div>click</div></template>
-<script setup>
+<script>
   @prop onSelect: (item: Item) => void;
 </script>`;
         const { code } = compile(source, 'fn-prop.pdx');
@@ -74,7 +74,7 @@ describe('Shadow DOM opt-in', () => {
 <template shadow>
   <div>Shadow content</div>
 </template>
-<script setup>
+<script>
   @prop label: string = 'test';
 </script>`;
         const { code } = compile(source, 'shadow.pdx');
@@ -86,7 +86,7 @@ describe('Shadow DOM opt-in', () => {
 <template>
   <div>Light DOM</div>
 </template>
-<script setup>
+<script>
   @prop label: string = 'test';
 </script>`;
         const { code } = compile(source, 'light.pdx');
@@ -98,26 +98,12 @@ describe('@use external WC', () => {
     it('generates import for external package', () => {
         const source = `
 <template><div><sl-button>Click</sl-button></div></template>
-<script setup>
+<script>
   @use 'sl-button' from '@shoelace-style/shoelace';
   @prop label: string = 'test';
 </script>`;
         const { code } = compile(source, 'use-external.pdx');
         expect(code).toContain("import '@shoelace-style/shoelace'");
-    });
-});
-
-describe('@mixin component composition', () => {
-    it('generates import and setup call', () => {
-        const source = `
-<template><div>{{ pagination }}</div></template>
-<script setup>
-  @mixin './with-pagination.ts' as pagination;
-  @prop items: string[] = [];
-</script>`;
-        const { code } = compile(source, 'mixin.pdx');
-        expect(code).toContain("import { setup as __mixin_pagination }");
-        expect(code).toContain('const pagination = __mixin_pagination(ctx)');
     });
 });
 

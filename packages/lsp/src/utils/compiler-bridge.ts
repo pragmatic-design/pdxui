@@ -50,7 +50,7 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
 
     if (result.descriptor.script) {
         try {
-            result.analysis = analyzeScript(result.descriptor.script.content, filename, { setup: result.descriptor.script.setup });
+            result.analysis = analyzeScript(result.descriptor.script.content, filename);
             result.warnings.push(...result.analysis.warnings);
         } catch { /* malformed script */ }
     }

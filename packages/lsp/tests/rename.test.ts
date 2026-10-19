@@ -11,7 +11,7 @@ const APP_URI = 'file:///app.pdx';
 
 const counter = [
     '<template><button @click="emitChanged">{{ label }}</button></template>',
-    '<script setup>',
+    '<script>',
     "@prop label: string = 'Hi';",
     '@event changed: number;',
     'let count = $signal(0);',
@@ -24,7 +24,7 @@ const app = [
     '  <app-counter :label="title" @changed="onChange" />',
     '  <app-counter label="static" />',
     '</template>',
-    '<script setup>',
+    '<script>',
     "let title = $signal('x');",
     'function onChange(n) { return n; }',
     '</script>',

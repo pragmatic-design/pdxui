@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function render(template: string): string {
-    const src = `<template>${template}</template>\n<script setup>\nlet rows = $signal([]);\nlet selected = $signal(null);\nlet other = $signal(0);\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\nlet rows = $signal([]);\nlet selected = $signal(null);\nlet other = $signal(0);\n</script>\n`;
     const { code } = compile(src, 'selector.pdx', [], undefined, { production: true });
     return code.slice(code.indexOf('render:'));
 }

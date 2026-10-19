@@ -65,7 +65,7 @@ export function generateLoaderModule(source: string, filename: string, name: str
         if (mentions(declaration, other)) return none;
     }
 
-    const analysis = analyzeScript(script.content, filename, { setup: script.setup });
+    const analysis = analyzeScript(script.content, filename);
     const reads = (local: string) => mentions(declaration, local);
     const imports = analysis.userImports.filter(stmt => importedLocalNames(stmt).some(reads));
     const core = analysis.coreImportNames.filter(reads);

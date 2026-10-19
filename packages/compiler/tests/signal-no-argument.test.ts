@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const SOURCE = '<template><p>{{ picked ?? "none" }} {{ typed ?? "" }}</p></template>\n<script setup>\nlet picked = $signal();\nlet typed = $signal<string | undefined>( );\n</script>\n';
+const SOURCE = '<template><p>{{ picked ?? "none" }} {{ typed ?? "" }}</p></template>\n<script>\nlet picked = $signal();\nlet typed = $signal<string | undefined>( );\n</script>\n';
 
 /** The module without its import/export lines, as `new Function` takes it. */
 const parses = (code: string): string | null => {
